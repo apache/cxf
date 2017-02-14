@@ -66,20 +66,20 @@ import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
 
 /**
- * 
+ *
  */
 public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(RMCaptureOutInterceptor.class);
- 
+
     public RMCaptureOutInterceptor() {
         super(Phase.PRE_STREAM);
         addBefore(AttachmentOutInterceptor.class.getName());
         addBefore("org.apache.cxf.interceptor.LoggingOutInterceptor");
         addBefore("org.apache.cxf.ext.logging.LoggingOutInterceptor");
     }
-    
-    protected void handle(Message msg) throws SequenceFault, RMException {  
+
+    protected void handle(Message msg) throws SequenceFault, RMException {
         AddressingProperties maps = ContextUtils.retrieveMAPs(msg, false, true,  false);
         if (null == maps) {
             LogUtils.log(LOG, Level.WARNING, "MAPS_RETRIEVAL_FAILURE_MSG");
@@ -100,7 +100,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
 
         Source source = getManager().getSource(msg);
-        
+
         RMConfiguration config = getManager().getEffectiveConfiguration(msg);
         String wsaNamespace = config.getAddressingNamespace();
         String rmNamespace = config.getRMNamespace();
@@ -112,7 +112,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         if (null != maps.getAction()) {
             action = maps.getAction().getValue();
         }
-        
+
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Action: " + action);
         }
@@ -121,23 +121,23 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         boolean isPartialResponse = MessageUtils.isPartialResponse(msg);
         RMConstants constants = protocol.getConstants();
         boolean isLastMessage = RM10Constants.CLOSE_SEQUENCE_ACTION.equals(action);
-        
+
         RMProperties rmpsOut = RMContextUtils.retrieveRMProperties(msg, true);
         if (null == rmpsOut) {
             rmpsOut = new RMProperties();
             rmpsOut.exposeAs(protocol.getWSRMNamespace());
             RMContextUtils.storeRMProperties(msg, rmpsOut, true);
         }
-        
+
         // Activate process response for oneWay
         if (msg.getExchange().isOneWay()) {
             msg.getExchange().put(Message.PROCESS_ONEWAY_RESPONSE, true);
         }
-        
+
         RMProperties rmpsIn = null;
         Identifier inSeqId = null;
         long inMessageNumber = 0;
-        
+
         if (isApplicationMessage) {
             rmpsIn = RMContextUtils.retrieveRMProperties(msg, false);
             if (null != rmpsIn && null != rmpsIn.getSequence()) {
@@ -146,13 +146,13 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
             }
             ContextUtils.storeDeferUncorrelatedMessageAbort(msg);
         }
-        
+
         Map<?, ?> invocationContext = (Map<?, ?>)msg.get(Message.INVOCATION_CONTEXT);
         if ((isApplicationMessage || (isLastMessage && invocationContext != null)) && !isPartialResponse) {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("inbound sequence: " + (null == inSeqId ? "null" : inSeqId.getValue()));
             }
-            
+
             // get the current sequence, requesting the creation of a new one if necessary
             synchronized (source) {
                 SourceSequence seq = null;
@@ -166,12 +166,12 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
                 // increase message number and store a sequence type object in
                 // context
                 seq.nextMessageNumber(inSeqId, inMessageNumber, isLastMessage);
-                
+
                 if (Boolean.TRUE.equals(msg.getContextualProperty(RMManager.WSRM_LAST_MESSAGE_PROPERTY))) {
                     // mark the message as the last one
                     seq.setLastMessage(true);
                 }
-                
+
                 rmpsOut.setSequence(seq);
 
                 // if this was the last message in the sequence, reset the
@@ -199,11 +199,11 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
                 }
             }
         }
-        
+
         // capture message if retransmission possible
         if (isApplicationMessage && !isPartialResponse) {
             OutputStream os = msg.getContent(OutputStream.class);
-            // We need to ensure that we have an output stream which won't start writing the 
+            // We need to ensure that we have an output stream which won't start writing the
             // message until connection is setup
             if (!(os instanceof WriteOnCloseOutputStream)) {
                 WriteOnCloseOutputStream cached = new WriteOnCloseOutputStream(os);
@@ -226,8 +226,8 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
 
         message.getInterceptorChain().add(new CaptureStart());
         message.getInterceptorChain().add(new CaptureEnd());
-    }    
-    
+    }
+
     private static class CaptureStart extends AbstractPhaseInterceptor<Message> {
         CaptureStart() {
             super(Phase.PRE_PROTOCOL);
@@ -252,12 +252,12 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         @Override
         public void handleMessage(Message message) throws Fault {
             XMLStreamWriter w = (XMLStreamWriter)message.get("RM_ORIGINAL_WRITER");
-            message.setContent(XMLStreamWriter.class, w); 
-            
+            message.setContent(XMLStreamWriter.class, w);
+
             CapturingXMLWriter cw = (CapturingXMLWriter)message.get("RM_CAPTURING_WRITER");
 
             try {
-                
+
                 RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);
                 SequenceType sequence = rmps.getSequence();
                 Long number = sequence.getMessageNumber();
@@ -265,7 +265,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
                 if (LOG.isLoggable(Level.INFO)) {
                     LOG.log(Level.INFO, "Captured message " + number + " in sequence " + sid.getValue());
                 }
-                
+
                 // save message for potential retransmission
                 CachedOutputStream cos = new CachedOutputStream();
                 IOUtils.copyAndCloseInput(cw.getOutputStream().createInputStream(), cos);
@@ -277,7 +277,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
                 manager.getRetransmissionQueue().addUnacknowledged(message);
                 RMStore store = manager.getStore();
                 if (null != store) {
-                    
+
                     // persist message to store
                     Source s = manager.getSource(message);
                     SourceSequence ss = s.getSequence(sid);
@@ -295,14 +295,14 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
                     PersistenceUtils.encodeRMContent(msg, message, is);
                     store.persistOutgoing(ss, msg);
                 }
-                    
+
             } catch (RMException e) {
                 // ignore
             } catch (XMLStreamException e) {
                 LOG.log(Level.SEVERE, "Error persisting message", e);
             } catch (IOException e) {
                 LOG.log(Level.SEVERE, "Error persisting message", e);
-            } 
+            }
             if (cw.getThrowable() != null) {
                 Throwable t = cw.getThrowable();
                 RuntimeException exception = null;
@@ -323,7 +323,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
         return wsaNamespace;
     }
-    
+
     boolean isRuntimeFault(Message message) {
         FaultMode mode = MessageUtils.getFaultMode(message);
         if (null == mode) {
@@ -340,36 +340,36 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
         }
         return action.equals(inAction);
     }
-    
-    private void setTerminateSequence(Message msg, Identifier identifier, ProtocolVariation protocol) 
+
+    private void setTerminateSequence(Message msg, Identifier identifier, ProtocolVariation protocol)
         throws RMException {
         TerminateSequenceType ts = new TerminateSequenceType();
         ts.setIdentifier(identifier);
-        MessageContentsList contents = 
+        MessageContentsList contents =
             new MessageContentsList(new Object[]{protocol.getCodec().convertToSend(ts)});
         msg.setContent(List.class, contents);
 
         // create a new exchange for this output-only exchange
         Exchange newex = new ExchangeImpl();
         Exchange oldex = msg.getExchange();
-        
+
         newex.put(Bus.class, oldex.getBus());
         newex.put(Endpoint.class, oldex.getEndpoint());
         newex.put(Service.class, oldex.getEndpoint().getService());
         newex.put(Binding.class, oldex.getEndpoint().getBinding());
         newex.setConduit(oldex.getConduit(msg));
         newex.setDestination(oldex.getDestination());
-        
+
         //Setup the BindingOperationInfo
         RMEndpoint rmep = getManager().getReliableEndpoint(msg);
         OperationInfo oi = rmep.getEndpoint(protocol).getEndpointInfo().getService().getInterface()
             .getOperation(protocol.getConstants().getTerminateSequenceAnonymousOperationName());
         BindingInfo bi = rmep.getBindingInfo(protocol);
         BindingOperationInfo boi = bi.getOperation(oi);
-        
+
         newex.put(BindingInfo.class, bi);
         newex.put(BindingOperationInfo.class, boi);
-        
+
         msg.setExchange(newex);
         newex.setOutMessage(msg);
     }

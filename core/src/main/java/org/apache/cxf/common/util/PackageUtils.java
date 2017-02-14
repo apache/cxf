@@ -27,11 +27,11 @@ import org.apache.cxf.helpers.JavaUtils;
 
 
 public final class PackageUtils {
-      
+
     private PackageUtils() {
-        
+
     }
-    
+
     static String getPackageName(String className) {
         int pos = className.lastIndexOf('.');
         if (pos != -1) {
@@ -40,7 +40,7 @@ public final class PackageUtils {
             return "";
         }
     }
-    
+
     public static String getPackageName(Class<?> clazz) {
         String className = clazz.getName();
         if (className.startsWith("[L")) {
@@ -48,7 +48,7 @@ public final class PackageUtils {
         }
         return getPackageName(className);
     }
-    
+
     public static String getSharedPackageName(List<Class<?>> classes) {
         if (classes.isEmpty()) {
             return "";
@@ -63,7 +63,7 @@ public final class PackageUtils {
             for (; j < lParts.size(); j++) {
                 if (i > (lParts.get(j).size() - 1) || !lParts.get(j).get(i).equals(lParts.get(0).get(i))) {
                     break;
-                }  
+                }
             }
             if (j == lParts.size()) {
                 currentParts.add(lParts.get(j - 1).get(i));
@@ -80,7 +80,7 @@ public final class PackageUtils {
         }
         return sb.toString();
     }
-    
+
     public static String parsePackageName(String namespace, String defaultPackageName) {
         String packageName = (defaultPackageName != null && defaultPackageName.trim().length() > 0)
             ? defaultPackageName : null;
@@ -90,7 +90,7 @@ public final class PackageUtils {
         }
         return packageName;
     }
-    
+
     public static String getPackageNameByNameSpaceURI(String nameSpaceURI) {
         int idx = nameSpaceURI.indexOf(':');
         String scheme = "";
@@ -227,5 +227,5 @@ public final class PackageUtils {
         namespace.append('/');
         return namespace.toString();
     }
-    
+
 }

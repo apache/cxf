@@ -83,12 +83,12 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        
-        //System.setProperty(SAAJFactoryResolver.MESSAGE_FACTORY_KEY, 
+
+        //System.setProperty(SAAJFactoryResolver.MESSAGE_FACTORY_KEY,
         //                     "com.ibm.ws.webservices.engine.soap.MessageFactoryImpl");
-        //System.setProperty(SAAJFactoryResolver.SOAP_FACTORY_KEY, 
+        //System.setProperty(SAAJFactoryResolver.SOAP_FACTORY_KEY,
         //    "com.ibm.ws.webservices.engine.xmlsoap.SOAPFactory");
-        createStaticBus();    
+        createStaticBus();
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
@@ -120,13 +120,13 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals("http://schemas.xmlsoap.org/wsdl/soap/http", bindingID);
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(1, handler2.getHandleMessageInvoked());
-        
+
         //CXF-3956 - check to make sure a Dispatch can also get the handlers
         JAXBContext context = JAXBContext.newInstance(org.apache.handler_test.types.ObjectFactory.class);
         Dispatch<Object> disp = service.createDispatch(portName, context, Service.Mode.PAYLOAD);
         setAddress(disp, "http://localhost:" + port + "/HandlerTest/SoapPort");
         disp.invokeOneWay(new org.apache.handler_test.types.PingOneWay());
-        
+
         assertEquals(2, handler1.getHandleMessageInvoked());
         assertEquals(2, handler2.getHandleMessageInvoked());
 
@@ -136,14 +136,14 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
     public void testAddingUnusedHandlersThroughConfigFile() {
         HandlerTestServiceWithAnnotation service1 = new HandlerTestServiceWithAnnotation(wsdl, serviceName);
         HandlerTest handlerTest1 = service1.getPort(portName, HandlerTest.class);
-        
+
         BindingProvider bp1 = (BindingProvider)handlerTest1;
         Binding binding1 = bp1.getBinding();
         @SuppressWarnings("rawtypes")
         List<Handler> port1HandlerChain = binding1.getHandlerChain();
         assertEquals(1, port1HandlerChain.size());
     }
-    
+
     @Test
     public void testLogicalHandlerOneWay() {
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
@@ -155,7 +155,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(1, handler2.getHandleMessageInvoked());
     }
-    
+
     @Test
     public void testLogicalHandlerTwoWay() throws Exception {
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
@@ -167,7 +167,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(2, handler1.getHandleMessageInvoked());
         assertEquals(2, handler2.getHandleMessageInvoked());
     }
-    
+
     @Test
     public void testSOAPHandlerHandleMessageReturnTrueClient() throws Exception {
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
@@ -188,7 +188,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 return true;
             }
         };
-       
+
         TestSOAPHandler soapHandler1 = new TestSOAPHandler(false);
         TestSOAPHandler soapHandler2 = new TestSOAPHandler(false);
 
@@ -201,19 +201,19 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals("handle message was not invoked", 2, handler2.getHandleMessageInvoked());
         assertEquals("handle message was not invoked", 2, soapHandler1.getHandleMessageInvoked());
         assertEquals("handle message was not invoked", 2, soapHandler2.getHandleMessageInvoked());
-        
+
         assertEquals("close must be called", 1, handler1.getCloseInvoked());
         assertEquals("close must be called", 1, handler2.getCloseInvoked());
         assertEquals("close must be called", 1, soapHandler1.getCloseInvoked());
         assertEquals("close must be called", 1, soapHandler2.getCloseInvoked());
-        
+
         assertTrue(soapHandler2.getInvokeOrderOfClose()
-                   < soapHandler1.getInvokeOrderOfClose());   
+                   < soapHandler1.getInvokeOrderOfClose());
         assertTrue(soapHandler1.getInvokeOrderOfClose()
-                   < handler2.getInvokeOrderOfClose());          
+                   < handler2.getInvokeOrderOfClose());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());  
-        
+                   < handler1.getInvokeOrderOfClose());
+
         // the server has encoded into the response the order in
         // which the handlers have been invoked, parse it and make
         // sure everything is ok expected order for inbound interceptors
@@ -227,7 +227,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             assertEquals(expected, iter.next());
         }
     }
-    
+
     @Test
     public void testLogicalHandlerHandleMessageReturnFalseClientOutBound() throws Exception {
         final String clientHandlerMessage = "handler2 client side";
@@ -271,16 +271,16 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals("the last handler must not be invoked", 0, soapHandler1.getHandleMessageInvoked());
 
         //outbound MEP processing ceased, the message direction was changed to inbound, essentially this is
-        //only one MEP. So close is called only once at the end of inbound MEP, and the close order is 
+        //only one MEP. So close is called only once at the end of inbound MEP, and the close order is
         //reversed to the outbound handler invoking order.
         assertEquals("close must be called", 1, handler1.getCloseInvoked());
         assertEquals("close must be called", 1, handler2.getCloseInvoked());
         assertEquals("close must be called", 0, handler3.getCloseInvoked());
         assertEquals("close must be called", 0, soapHandler1.getCloseInvoked());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());         
+                   < handler1.getInvokeOrderOfClose());
     }
-    
+
     @Test
     public void testLogicalHandlerHandleMessageReturnFalseClientInBound() throws Exception {
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
@@ -300,7 +300,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
 
         addHandlersToChain((BindingProvider)handlerTest, handler1, handler2, handler3, soapHandler1);
 
-        handlerTest.ping();        
+        handlerTest.ping();
 
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(2, handler2.getHandleMessageInvoked());
@@ -312,13 +312,13 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals("close must be called", 1, handler3.getCloseInvoked());
         assertEquals("close must be called", 1, soapHandler1.getCloseInvoked());
         assertTrue(soapHandler1.getInvokeOrderOfClose()
-                   < handler3.getInvokeOrderOfClose());   
+                   < handler3.getInvokeOrderOfClose());
         assertTrue(handler3.getInvokeOrderOfClose()
-                   < handler2.getInvokeOrderOfClose());          
+                   < handler2.getInvokeOrderOfClose());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());   
+                   < handler1.getInvokeOrderOfClose());
     }
-    
+
     @Test
     public void testSOAPHandlerHandleMessageReturnFalseClientOutbound() throws Exception {
         final String clientHandlerMessage = "client side";
@@ -366,19 +366,19 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(2, handler2.getHandleMessageInvoked());
         assertEquals(2, soapHandler1.getHandleMessageInvoked());
         assertEquals(1, soapHandler2.getHandleMessageInvoked());
-        
+
         assertEquals("close must be called", 1, handler1.getCloseInvoked());
         assertEquals("close must be called", 1, handler2.getCloseInvoked());
         assertEquals("close must be called", 1, soapHandler1.getCloseInvoked());
         assertEquals("close must be called", 1, soapHandler2.getCloseInvoked());
         assertTrue(soapHandler2.getInvokeOrderOfClose()
-                   < soapHandler1.getInvokeOrderOfClose());   
+                   < soapHandler1.getInvokeOrderOfClose());
         assertTrue(soapHandler1.getInvokeOrderOfClose()
-                   < handler2.getInvokeOrderOfClose());          
+                   < handler2.getInvokeOrderOfClose());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());     
+                   < handler1.getInvokeOrderOfClose());
     }
-    
+
     @Test
     public void testSOAPHandlerHandleMessageReturnFalseClientInbound() throws Exception {
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
@@ -402,25 +402,25 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(1, handler2.getHandleMessageInvoked());
         assertEquals(1, soapHandler1.getHandleMessageInvoked());
         assertEquals(2, soapHandler2.getHandleMessageInvoked());
-        
+
         assertEquals("close must be called", 1, handler1.getCloseInvoked());
         assertEquals("close must be called", 1, handler2.getCloseInvoked());
         assertEquals("close must be called", 1, soapHandler1.getCloseInvoked());
         assertEquals("close must be called", 1, soapHandler2.getCloseInvoked());
         assertTrue(soapHandler2.getInvokeOrderOfClose()
-                   < soapHandler1.getInvokeOrderOfClose());   
+                   < soapHandler1.getInvokeOrderOfClose());
         assertTrue(soapHandler1.getInvokeOrderOfClose()
-                   < handler2.getInvokeOrderOfClose());          
+                   < handler2.getInvokeOrderOfClose());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());         
+                   < handler1.getInvokeOrderOfClose());
     }
-    
+
     @Test
     public void testLogicalHandlerHandleMessageReturnsFalseServerInbound() throws PingException {
-        String[] expectedHandlers = {"soapHandler4", "soapHandler3", "handler2", 
+        String[] expectedHandlers = {"soapHandler4", "soapHandler3", "handler2",
                                      "soapHandler3", "soapHandler4"};
 
-        List<String> resp = handlerTest.pingWithArgs("handler2 inbound stop");     
+        List<String> resp = handlerTest.pingWithArgs("handler2 inbound stop");
 
         assertEquals(expectedHandlers.length, resp.size());
 
@@ -429,14 +429,14 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             assertEquals(expected, resp.get(i++));
         }
     }
-    
+
     @Test
     public void testLogicHandlerHandleMessageReturnFalseServerOutbound() throws PingException {
-        String[] expectedHandlers = {"server handler1 outbound stop", "soapHandler4", 
+        String[] expectedHandlers = {"server handler1 outbound stop", "soapHandler4",
                                      "soapHandler3", "handler2", "handler1", "handler1"};
 
-        List<String> resp = handlerTest.pingWithArgs("server handler1 outbound stop");     
-        
+        List<String> resp = handlerTest.pingWithArgs("server handler1 outbound stop");
+
         assertEquals(expectedHandlers.length, resp.size());
 
         int i = 0;
@@ -444,7 +444,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             assertEquals(expected, resp.get(i++));
         }
     }
-    
+
     @Test
     public void testSOAPHandlerHandleMessageReturnsFalseServerInbound() throws PingException {
         String[] expectedHandlers = {"soapHandler4", "soapHandler3", "soapHandler4"};
@@ -455,7 +455,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             assertEquals(expected, resp.get(i++));
         }
     }
-    
+
     @Test
     public void testSOAPHandlerHandleMessageReturnsFalseServerOutbound() throws PingException {
         String[] expectedHandlers = {"soapHandler3 outbound stop", "soapHandler4", "soapHandler3", "handler2",
@@ -480,7 +480,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
                 if (outbound) {
                     throw new ProtocolException(clientHandlerMessage);
-                }   
+                }
                 return true;
             }
         };
@@ -494,7 +494,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         } catch (ProtocolException e) {
             assertEquals(clientHandlerMessage, e.getMessage());
         }
-        
+
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(1, handler2.getHandleMessageInvoked());
         assertEquals(0, soapHandler1.getHandleMessageInvoked());
@@ -507,7 +507,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(1, handler2.getCloseInvoked());
         assertEquals(0, soapHandler1.getCloseInvoked());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());   
+                   < handler1.getInvokeOrderOfClose());
     }
 
     @Test
@@ -521,7 +521,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
                 if (!outbound) {
                     throw new ProtocolException(clientHandlerMessage);
-                }   
+                }
                 return true;
             }
         };
@@ -535,7 +535,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         } catch (ProtocolException e) {
             assertEquals(clientHandlerMessage, e.getMessage());
         }
-        
+
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(2, handler2.getHandleMessageInvoked());
         assertEquals(2, soapHandler1.getHandleMessageInvoked());
@@ -548,9 +548,9 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(1, handler2.getCloseInvoked());
         assertEquals(1, soapHandler1.getCloseInvoked());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());   
+                   < handler1.getInvokeOrderOfClose());
     }
-    
+
     @Test
     public void testLogicalHandlerHandleMessageThrowsRuntimeExceptionClientOutbound() throws Exception {
         final String clientHandlerMessage = "handler1 client side";
@@ -562,7 +562,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
                 if (outbound) {
                     throw new RuntimeException(clientHandlerMessage);
-                }   
+                }
                 return true;
             }
         };
@@ -576,11 +576,11 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         } catch (RuntimeException e) {
             assertTrue(e.getMessage().contains(clientHandlerMessage));
         }
-        
+
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(1, handler2.getHandleMessageInvoked());
         assertEquals(0, soapHandler1.getHandleMessageInvoked());
-        
+
         assertEquals(0, handler2.getHandleFaultInvoked());
         assertEquals(0, handler1.getHandleFaultInvoked());
         assertEquals(0, soapHandler1.getHandleFaultInvoked());
@@ -589,9 +589,9 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(1, handler2.getCloseInvoked());
         assertEquals(0, soapHandler1.getCloseInvoked());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());   
+                   < handler1.getInvokeOrderOfClose());
     }
-    
+
     @Test
     public void testLogicalHandlerHandleMessageThrowsRuntimeExceptionClientInbound() throws Exception {
         final String clientHandlerMessage = "handler1 client side";
@@ -603,7 +603,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
                 if (!outbound) {
                     throw new RuntimeException(clientHandlerMessage);
-                }   
+                }
                 return true;
             }
         };
@@ -617,11 +617,11 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         } catch (RuntimeException e) {
             assertTrue(e.getMessage().contains(clientHandlerMessage));
         }
-        
+
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(2, handler2.getHandleMessageInvoked());
         assertEquals(2, soapHandler1.getHandleMessageInvoked());
-        
+
         assertEquals(0, handler2.getHandleFaultInvoked());
         assertEquals(0, handler1.getHandleFaultInvoked());
         assertEquals(0, soapHandler1.getHandleFaultInvoked());
@@ -630,9 +630,9 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(1, handler2.getCloseInvoked());
         assertEquals(1, soapHandler1.getCloseInvoked());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());   
+                   < handler1.getInvokeOrderOfClose());
     }
-    
+
     @Test
     public void testSOAPHandlerHandleMessageThrowsProtocolExceptionClientOutbound() throws Exception {
         final String clientHandlerMessage = "handler1 client side";
@@ -645,12 +645,12 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
                 if (outbound) {
                     throw new ProtocolException(clientHandlerMessage);
-                }   
+                }
                 return true;
             }
         };
         TestSOAPHandler soapHandler2 = new TestSOAPHandler(false);
-        
+
         addHandlersToChain((BindingProvider)handlerTest, handler1, handler2, soapHandler1, soapHandler2);
 
         try {
@@ -659,7 +659,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         } catch (ProtocolException e) {
             assertEquals(clientHandlerMessage, e.getMessage());
         }
-        
+
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(1, handler2.getHandleMessageInvoked());
         assertEquals(1, soapHandler1.getHandleMessageInvoked());
@@ -675,7 +675,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(1, soapHandler1.getCloseInvoked());
         assertEquals(0, soapHandler2.getCloseInvoked());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());   
+                   < handler1.getInvokeOrderOfClose());
     }
 
     @Test
@@ -690,12 +690,12 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
                 if (!outbound) {
                     throw new ProtocolException(clientHandlerMessage);
-                }   
+                }
                 return true;
             }
         };
         TestSOAPHandler soapHandler2 = new TestSOAPHandler(false);
-        
+
         addHandlersToChain((BindingProvider)handlerTest, handler1, handler2, soapHandler1, soapHandler2);
 
         try {
@@ -704,7 +704,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         } catch (ProtocolException e) {
             assertEquals(clientHandlerMessage, e.getMessage());
         }
-        
+
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(1, handler2.getHandleMessageInvoked());
         assertEquals(2, soapHandler1.getHandleMessageInvoked());
@@ -720,9 +720,9 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(1, soapHandler1.getCloseInvoked());
         assertEquals(1, soapHandler2.getCloseInvoked());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());   
+                   < handler1.getInvokeOrderOfClose());
     }
-    
+
     @Test
     public void testSOAPHandlerHandleMessageThrowsRuntimeExceptionClientOutbound() throws Exception {
         final String clientHandlerMessage = "handler1 client side";
@@ -735,7 +735,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 Boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
                 if (outbound) {
                     throw new RuntimeException(clientHandlerMessage);
-                }                                    
+                }
                 return true;
             }
         };
@@ -748,12 +748,12 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         } catch (RuntimeException e) {
             assertTrue(e.getMessage().contains(clientHandlerMessage));
         }
-        
+
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(1, handler2.getHandleMessageInvoked());
         assertEquals(1, soapHandler1.getHandleMessageInvoked());
         assertEquals(0, soapHandler2.getHandleMessageInvoked());
-        
+
         assertEquals(0, handler2.getHandleFaultInvoked());
         assertEquals(0, handler1.getHandleFaultInvoked());
         assertEquals(0, soapHandler1.getHandleFaultInvoked());
@@ -764,9 +764,9 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(1, soapHandler1.getCloseInvoked());
         assertEquals(0, soapHandler2.getCloseInvoked());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());   
+                   < handler1.getInvokeOrderOfClose());
     }
-    
+
     @Test
     public void testSOAPHandlerHandleMessageThrowsRuntimeExceptionServerInbound() throws PingException {
         try {
@@ -774,9 +774,9 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             fail("did not get expected exception");
         } catch (SOAPFaultException e) {
             assertEquals("HandleMessage throws exception", e.getMessage());
-        }        
+        }
     }
-    
+
     @Test
     public void testSOAPHandlerHandleMessageThrowsRuntimeExceptionServerOutbound() throws PingException {
         try {
@@ -784,9 +784,9 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             fail("did not get expected exception");
         } catch (SOAPFaultException e) {
             assertEquals("HandleMessage throws exception", e.getMessage());
-        }        
+        }
     }
-    
+
     @Test
     public void testSOAPHandlerHandleMessageThrowsProtocolExceptionServerInbound() throws PingException {
         try {
@@ -794,7 +794,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             fail("did not get expected WebServiceException");
         } catch (WebServiceException e) {
             assertEquals("HandleMessage throws exception", e.getMessage());
-        }        
+        }
     }
     @Test
     public void testSOAPHandlerHandleMessageThrowsSOAPFaultExceptionServerInbound() throws PingException {
@@ -808,10 +808,10 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             assertEquals(new QName(SOAPConstants.URI_NS_SOAP_ENVELOPE, "Server"),
                          fault.getFaultCodeAsQName());
             assertEquals("http://gizmos.com/orders", fault.getFaultActor());
-            
+
             Detail detail = fault.getDetail();
             assertNotNull(detail);
-            
+
             QName nn = new QName("http://gizmos.com/orders/", "order");
             Element el = DOMUtils.getFirstChildWithName(detail, nn);
             assertNotNull(el);
@@ -820,9 +820,9 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             el = DOMUtils.getNextElement(el);
             el.normalize();
             assertEquals("Incomplete address: no zip code", el.getFirstChild().getNodeValue());
-        }        
+        }
     }
-    
+
     /*-------------------------------------------------------
     * This is the expected order
     *-------------------------------------------------------
@@ -843,9 +843,9 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         } catch (WebServiceException e) {
             assertEquals("soapHandler4 HandleFault throws RuntimeException",
                          e.getMessage());
-        }        
+        }
     }
-    
+
     @Test
     public void testSOAPHandlerHandleFaultThrowsSOAPFaultExceptionServerOutbound() throws PingException {
 
@@ -856,9 +856,9 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         } catch (SOAPFaultException e) {
             assertEquals("soapHandler4 HandleFault throws SOAPFaultException",
                          e.getMessage());
-        }        
+        }
     }
-    
+
     @Test
     public void testSOAPHandlerHandleMessageThrowsProtocolExceptionServerOutbound() throws PingException {
         try {
@@ -866,10 +866,10 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             fail("did not get expected WebServiceException");
         } catch (WebServiceException e) {
             assertEquals("HandleMessage throws exception", e.getMessage());
-        }        
+        }
     }
-    
-    @Test   
+
+    @Test
     public void testServerSOAPInboundHandlerThrowsSOAPFaultToClientHandlers() throws Exception {
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
         TestHandler<LogicalMessageContext> handler2 = new TestHandler<LogicalMessageContext>(false) {
@@ -889,8 +889,8 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 return true;
             }
         };
-    
-    
+
+
         TestSOAPHandler soapHandler1 = new TestSOAPHandler(false);
         TestSOAPHandler soapHandler2 = new TestSOAPHandler(false) {
             public boolean handleFault(SOAPMessageContext ctx) {
@@ -908,14 +908,14 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 return true;
             }
         };
-        
+
         addHandlersToChain((BindingProvider)handlerTest, handler1, handler2, soapHandler1, soapHandler2);
 
         try {
             handlerTest.pingWithArgs("soapHandler3 inbound throw SOAPFaultException");
             fail("did not get expected SOAPFaultException");
         } catch (SOAPFaultException e) {
-            //e.printStackTrace();            
+            //e.printStackTrace();
 /*            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintStream ps = new PrintStream(baos, true);
             e.printStackTrace(ps);
@@ -923,32 +923,32 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 .indexOf("HandleMessage throws exception") > -1);
             assertTrue("Did not get expected javax.xml.ws.soap.SOAPFaultException", baos.toString()
                 .indexOf("javax.xml.ws.soap.SOAPFaultException") > -1);*/
-                
-        }       
+
+        }
 
 /*        assertEquals("handle message was not invoked", 1, handler1.getHandleMessageInvoked());
         assertEquals("handle message was not invoked", 1, handler2.getHandleMessageInvoked());
         assertEquals("handle message was not invoked", 1, soapHandler1.getHandleMessageInvoked());
         assertEquals("handle message was not invoked", 1, soapHandler2.getHandleMessageInvoked());
-        
+
         assertEquals("handle message was not invoked", 1, handler1.getHandleFaultInvoked());
         assertEquals("handle message was not invoked", 1, handler2.getHandleFaultInvoked());
         assertEquals("handle message was not invoked", 1, soapHandler1.getHandleFaultInvoked());
-        assertEquals("handle message was not invoked", 1, soapHandler2.getHandleFaultInvoked());       
-        
+        assertEquals("handle message was not invoked", 1, soapHandler2.getHandleFaultInvoked());
+
         assertEquals("close must be called", 1, handler1.getCloseInvoked());
         assertEquals("close must be called", 1, handler2.getCloseInvoked());
         assertEquals("close must be called", 1, soapHandler1.getCloseInvoked());
         assertEquals("close must be called", 1, soapHandler2.getCloseInvoked());
-        
+
         assertTrue(soapHandler2.getInvokeOrderOfClose()
-                   < soapHandler1.getInvokeOrderOfClose());   
+                   < soapHandler1.getInvokeOrderOfClose());
         assertTrue(soapHandler1.getInvokeOrderOfClose()
-                   < handler2.getInvokeOrderOfClose());          
+                   < handler2.getInvokeOrderOfClose());
         assertTrue(handler2.getInvokeOrderOfClose()
                    < handler1.getInvokeOrderOfClose());  */
-    }  
-    
+    }
+
     /*-------------------------------------------------------
     * This is the expected order
     *-------------------------------------------------------
@@ -965,7 +965,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
     * handler2.close()
     * soapHandler3.close()
     * soapHandler4.close()
-    * */    
+    * */
     @Test
     public void testServerEndpointRemoteRuntimeException() throws PingException {
         try {
@@ -978,7 +978,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             e.printStackTrace(ps);
             assertTrue("Did not get expected exception message",  baos.toString()
                 .indexOf("RemoteException with nested RuntimeException") > -1);*/
-        }        
+        }
     }
 
 
@@ -1007,7 +1007,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 return true;
             }
 
-            private String convertDOMToString(Source s) 
+            private String convertDOMToString(Source s)
                 throws TransformerException {
                 StringWriter stringWriter = new StringWriter();
                 StreamResult streamResult = new StreamResult(stringWriter);
@@ -1016,14 +1016,14 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 Transformer transformer = transformerFactory.newTransformer();
                 transformer.setOutputProperty(OutputKeys.INDENT, "no");
                 transformer.setOutputProperty(
-                    "{http://xml.apache.org/xslt}indent-amount", 
+                    "{http://xml.apache.org/xslt}indent-amount",
                     "2");
                 transformer.setOutputProperty(OutputKeys.METHOD, "xml");
                 transformer.transform(s, streamResult);
                 return stringWriter.toString();
             }
         };
-       
+
         TestSOAPHandler soapHandler1 = new TestSOAPHandler(false);
         TestSOAPHandler soapHandler2 = new TestSOAPHandler(false) {
             public boolean handleFault(SOAPMessageContext ctx) {
@@ -1052,13 +1052,13 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             fail("did not get expected Exception");
         } catch (SOAPFaultException sfe) {
             // expected
-        }        
+        }
 
         assertEquals(1, handler1.getHandleMessageInvoked());
         assertEquals(1, handler2.getHandleMessageInvoked());
         assertEquals(1, soapHandler1.getHandleMessageInvoked());
         assertEquals(1, soapHandler2.getHandleMessageInvoked());
-        
+
         assertEquals(1, handler2.getHandleFaultInvoked());
         assertEquals(1, handler1.getHandleFaultInvoked());
         assertEquals(1, soapHandler1.getHandleFaultInvoked());
@@ -1069,9 +1069,9 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals(1, soapHandler1.getCloseInvoked());
         assertEquals(1, soapHandler2.getCloseInvoked());
         assertTrue(handler2.getInvokeOrderOfClose()
-                   < handler1.getInvokeOrderOfClose());   
+                   < handler1.getInvokeOrderOfClose());
     }
- 
+
     /*-------------------------------------------------------
      * This is the expected order
      *-------------------------------------------------------
@@ -1105,7 +1105,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
 
         }
     }
-     
+
     @Test
     public void testLogicalHandlerHandleFaultThrowsSOAPFaultExceptionServerOutbound() throws PingException {
         try {
@@ -1123,7 +1123,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
                 .indexOf("javax.xml.ws.soap.SOAPFaultException") > -1);*/
         }
     }
-     
+
     @Test
     public void testLogicalHandlerHandleMessageThrowsProtocolExceptionServerInbound()
         throws PingException {
@@ -1134,7 +1134,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             assertTrue(e.getMessage().indexOf("HandleMessage throws exception") >= 0);
         }
     }
-    
+
     @Test
     public void testDescription() throws PingException {
         TestHandler<LogicalMessageContext> handler = new TestHandler<LogicalMessageContext>(false) {
@@ -1188,7 +1188,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         assertEquals("handle message was not invoked", 2, handler2.getHandleMessageInvoked());
         assertEquals("handle message was not invoked", 2, soapHandler1.getHandleMessageInvoked());
         assertEquals("handle message was not invoked", 2, soapHandler2.getHandleMessageInvoked());
-         
+
         assertEquals("close must be called", 1, handler1.getCloseInvoked());
         assertEquals("close must be called", 1, handler2.getCloseInvoked());
         assertEquals("close must be called", 1, soapHandler1.getCloseInvoked());
@@ -1210,21 +1210,21 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             assertEquals(expected, iter.next());
         }
     }
-    
+
     @Test
     public void testMustUnderstandSoapFaultOneWay() {
-        TestMustUnderstandHandler<SOAPMessageContext> handler = 
+        TestMustUnderstandHandler<SOAPMessageContext> handler =
             new TestMustUnderstandHandler<SOAPMessageContext>();
         addHandlersToChain((BindingProvider)handlerTest, handler);
         try {
             handlerTest.pingOneWay();
         } catch (Exception e) {
-            fail("Catch unexpected exception: soap faule message " 
+            fail("Catch unexpected exception: soap faule message "
                  + "should not be returned for one way operation");
         }
 
     }
-    
+
     @Test
     public void testHandlerMessgeContext() throws PingException {
         MessageContextFirstHandler handler1 = new MessageContextFirstHandler();
@@ -1247,7 +1247,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
     }
 
     List<String> getHandlerNames(SOAPBody soapBody) throws Exception {
-        
+
         Element elNode = DOMUtils.getFirstElement(soapBody);
         List<String> stringList = null;
         JAXBContext jaxbCtx = JAXBContext.newInstance(PingResponse.class);

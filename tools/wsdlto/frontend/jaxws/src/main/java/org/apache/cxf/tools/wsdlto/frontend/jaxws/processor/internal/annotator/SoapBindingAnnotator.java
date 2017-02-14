@@ -39,24 +39,24 @@ public class SoapBindingAnnotator implements Annotator {
         if (method.getSoapStyle() == SOAPBinding.Style.DOCUMENT) {
             if (!method.isWrapperStyle()
                 && !SOAPBinding.ParameterStyle.BARE.equals(method.getInterface().getSOAPParameterStyle())) {
-            
+
                 JAnnotation bindingAnnotation = new JAnnotation(SOAPBinding.class);
-                bindingAnnotation.addElement(new JAnnotationElement("parameterStyle", 
+                bindingAnnotation.addElement(new JAnnotationElement("parameterStyle",
                                                                            SOAPBinding.ParameterStyle.BARE));
                 method.addAnnotation("SOAPBinding", bindingAnnotation);
             } else if (method.isWrapperStyle()
                 && SOAPBinding.ParameterStyle.BARE.equals(method.getInterface().getSOAPParameterStyle())) {
                 JAnnotation bindingAnnotation = new JAnnotation(SOAPBinding.class);
-                bindingAnnotation.addElement(new JAnnotationElement("parameterStyle", 
+                bindingAnnotation.addElement(new JAnnotationElement("parameterStyle",
                                                                         SOAPBinding.ParameterStyle.WRAPPED));
-                method.addAnnotation("SOAPBinding", bindingAnnotation);                
+                method.addAnnotation("SOAPBinding", bindingAnnotation);
             }
         } else if (!SOAPBinding.Style.RPC.equals(method.getInterface().getSOAPStyle())) {
             JAnnotation bindingAnnotation = new JAnnotation(SOAPBinding.class);
-            bindingAnnotation.addElement(new JAnnotationElement("style", 
+            bindingAnnotation.addElement(new JAnnotationElement("style",
                                                                        SOAPBinding.Style.RPC));
-            method.addAnnotation("SOAPBinding", bindingAnnotation);            
+            method.addAnnotation("SOAPBinding", bindingAnnotation);
         }
     }
-    
+
 }

@@ -104,7 +104,7 @@ public class WSDLToService extends AbstractCXFToolContainer {
     }
 
     public static void main(String[] pargs) {
-        
+
         CommandInterfaceUtils.commandCommonMain();
         try {
             ToolRunner.runTool(WSDLToService.class, WSDLToService.class

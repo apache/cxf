@@ -68,7 +68,7 @@ public class TestLogicalHandler implements LogicalHandler<LogicalMessageContext>
     }
     public void close(MessageContext arg0) {
     }
-    
+
     public static String getSourceAsString(Source s) throws Exception {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);

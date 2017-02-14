@@ -36,9 +36,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class PolicyBuilderTest extends Assert {
-    
+
     private PolicyBuilderImpl builder;
-    
+
     @Before
     public void setUp() {
         builder = new PolicyBuilderImpl();
@@ -49,12 +49,12 @@ public class PolicyBuilderTest extends Assert {
         abr.registerBuilder(new QName("http://sample.org/Assertions", "B"), ab);
         abr.registerBuilder(new QName("http://sample.org/Assertions", "C"), ab);
     }
-    
+
     @Test
     public void testGetPolicy() throws Exception {
         String name = "/samples/test25.xml";
-        InputStream is = PolicyBuilderTest.class.getResourceAsStream(name);        
-        
+        InputStream is = PolicyBuilderTest.class.getResourceAsStream(name);
+
         Policy p = builder.getPolicy(is);
         assertNotNull(p);
         List<PolicyComponent> a = CastUtils.cast(p.getAssertions(), PolicyComponent.class);
@@ -63,27 +63,27 @@ public class PolicyBuilderTest extends Assert {
             assertEquals(Constants.TYPE_ASSERTION, a.get(i).getType());
         }
     }
-    
+
     @Test
     public void testGetPolicyReference() throws Exception {
         String name = "/samples/test26.xml";
-        InputStream is = PolicyBuilderTest.class.getResourceAsStream(name);        
-        
+        InputStream is = PolicyBuilderTest.class.getResourceAsStream(name);
+
         PolicyReference pr = builder.getPolicyReference(is);
         assertEquals("#PolicyA", pr.getURI());
-        
+
         name = "/samples/test27.xml";
-        is = PolicyBuilderTest.class.getResourceAsStream(name);        
-        
+        is = PolicyBuilderTest.class.getResourceAsStream(name);
+
         pr = builder.getPolicyReference(is);
-        assertEquals("http://sample.org/test.wsdl#PolicyA", pr.getURI());   
+        assertEquals("http://sample.org/test.wsdl#PolicyA", pr.getURI());
     }
-    
+
     @Test
     public void testGetPolicyWithAttributes() throws Exception {
         String name = "/samples/test28.xml";
-        InputStream is = PolicyBuilderTest.class.getResourceAsStream(name);        
-        
+        InputStream is = PolicyBuilderTest.class.getResourceAsStream(name);
+
         Policy p = builder.getPolicy(is);
         assertNotNull(p);
         assertTrue(p.getAttributes().size() >= 2);

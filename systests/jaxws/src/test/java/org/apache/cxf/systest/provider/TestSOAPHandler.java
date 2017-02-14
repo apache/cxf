@@ -46,7 +46,7 @@ public class TestSOAPHandler implements SOAPHandler<SOAPMessageContext> {
             SOAPBody body = env.getBody();
             Iterator<?> it = body.getChildElements();
             while (it.hasNext()) {
-                
+
                 Object elem = it.next();
                 if (elem instanceof SOAPElement) {
 
@@ -55,7 +55,7 @@ public class TestSOAPHandler implements SOAPHandler<SOAPMessageContext> {
                         Object elem2 = it2.next();
                         if (elem2 instanceof SOAPElement) {
                             String value = ((SOAPElement)elem2).getValue();
-                            if (value != null 
+                            if (value != null
                                 && (value.indexOf("Milestone-0") >= 0
                                 || value.indexOf("TestGreetMeResponseServerLogicalHandler") >= 0)) {
                                 value = value + "ServerSOAPHandler";

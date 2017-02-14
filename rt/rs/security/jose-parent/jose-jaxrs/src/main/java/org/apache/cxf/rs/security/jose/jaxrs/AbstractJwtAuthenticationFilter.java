@@ -42,48 +42,48 @@ import org.apache.cxf.security.SecurityContext;
 @Priority(Priorities.AUTHENTICATION)
 public abstract class AbstractJwtAuthenticationFilter extends JoseJwtConsumer implements ContainerRequestFilter {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJwtAuthenticationFilter.class);
-    
+
     private String roleClaim;
     private boolean validateAudience = true;
-    
+
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         String encodedJwtToken = getEncodedJwtToken(requestContext);
         JwtToken token = super.getJwtToken(encodedJwtToken);
-        
+
         SecurityContext securityContext = configureSecurityContext(token);
         if (securityContext != null) {
             JAXRSUtils.getCurrentMessage().put(SecurityContext.class, securityContext);
         }
     }
-    
+
     protected abstract String getEncodedJwtToken(ContainerRequestContext requestContext);
 
     protected SecurityContext configureSecurityContext(JwtToken jwt) {
         Message m = JAXRSUtils.getCurrentMessage();
-        boolean enableUnsignedJwt = 
+        boolean enableUnsignedJwt =
             MessageUtils.getContextualBoolean(m, JoseConstants.ENABLE_UNSIGNED_JWT_PRINCIPAL, false);
-        
-        // The token must be signed/verified with a public key to set up the security context, 
+
+        // The token must be signed/verified with a public key to set up the security context,
         // unless we directly configure otherwise
-        if (jwt.getClaims().getSubject() != null 
+        if (jwt.getClaims().getSubject() != null
             && (isVerifiedWithAPublicKey(jwt) || enableUnsignedJwt)) {
             return new JwtTokenSecurityContext(jwt, roleClaim);
         }
         return null;
     }
-    
+
     private boolean isVerifiedWithAPublicKey(JwtToken jwt) {
         if (isJwsRequired()) {
             String alg = (String)jwt.getJwsHeader(JoseConstants.HEADER_ALGORITHM);
             SignatureAlgorithm sigAlg = SignatureAlgorithm.getAlgorithm(alg);
             return SignatureAlgorithm.isPublicKeyAlgorithm(sigAlg);
         }
-        
+
         return false;
     }
 
-    
+
     @Override
     protected void validateToken(JwtToken jwt) {
         JwtUtils.validateTokenClaims(jwt.getClaims(), getTtl(), getClockOffset(), isValidateAudience());
@@ -104,5 +104,5 @@ public abstract class AbstractJwtAuthenticationFilter extends JoseJwtConsumer im
     public void setValidateAudience(boolean validateAudience) {
         this.validateAudience = validateAudience;
     }
-    
+
 }

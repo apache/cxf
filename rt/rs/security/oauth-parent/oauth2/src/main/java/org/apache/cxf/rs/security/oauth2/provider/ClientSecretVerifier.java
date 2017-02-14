@@ -22,13 +22,13 @@ package org.apache.cxf.rs.security.oauth2.provider;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 
 /**
- * ClientSecretVerifier is responsible for validating a client secret  
+ * ClientSecretVerifier is responsible for validating a client secret
  */
 public interface ClientSecretVerifier {
 
     /**
      * Validate a client secret
-     * 
+     *
      * @param client the {@link Client} the Client
      * @param clientSecret the secret
      * @return true if the secret is valid, false otherwise

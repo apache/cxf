@@ -43,7 +43,7 @@ public class STSServer2 extends AbstractBusTestServerBase {
             e.printStackTrace();
         }
     }
-    
+
     public static void main(String args[]) {
         new STSServer2().run();
     }

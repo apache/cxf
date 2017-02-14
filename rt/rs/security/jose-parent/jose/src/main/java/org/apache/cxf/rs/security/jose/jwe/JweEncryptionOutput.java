@@ -31,17 +31,17 @@ public class JweEncryptionOutput {
     private byte[] encryptedContent;
     private byte[] authTag;
     private KeyProperties keyProps;
-    
+
     //CHECKSTYLE:OFF
-    public JweEncryptionOutput(Cipher cipher, 
-                              JweHeaders headers, 
-                              byte[] contentEncryptionKey, 
-                              byte[] iv, 
+    public JweEncryptionOutput(Cipher cipher,
+                              JweHeaders headers,
+                              byte[] contentEncryptionKey,
+                              byte[] iv,
                               AuthenticationTagProducer authTagProducer,
                               KeyProperties keyProps,
                               byte[] encryptedContent,
                               byte[] authTag) {
-    //CHECKSTYLE:ON    
+    //CHECKSTYLE:ON
         this.cipher = cipher;
         this.headers = headers;
         this.contentEncryptionKey = contentEncryptionKey;

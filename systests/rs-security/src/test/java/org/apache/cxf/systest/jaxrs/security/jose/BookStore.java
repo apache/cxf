@@ -29,10 +29,10 @@ import org.apache.cxf.systest.jaxrs.security.Book;
 
 @Path("/bookstore")
 public class BookStore {
-    
+
     public BookStore() {
     }
-    
+
     @POST
     @Path("/books")
     @Produces("text/plain")
@@ -40,7 +40,7 @@ public class BookStore {
     public String echoText(String text) {
         return text;
     }
-    
+
     @POST
     @Path("/books")
     @Produces("application/json")
@@ -48,7 +48,7 @@ public class BookStore {
     public Book echoBook(Book book) {
         return book;
     }
-    
+
     @POST
     @Path("/books")
     @Produces("application/xml")
@@ -56,7 +56,7 @@ public class BookStore {
     public Book echoBook2(Book book) {
         return book;
     }
-    
+
 }
 
 

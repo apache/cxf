@@ -26,7 +26,7 @@ import org.apache.ws.commons.schema.XmlSchema;
 public class SimpleTypeSpecVisitor extends VisitorBase {
 
     private AST identifierNode;
-    
+
     public SimpleTypeSpecVisitor(Scope scope,
                                  Definition defn,
                                  XmlSchema schemaRef,
@@ -37,25 +37,25 @@ public class SimpleTypeSpecVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        boolean result = 
+        boolean result =
             PrimitiveTypesVisitor.accept(node)
             || TemplateTypeSpecVisitor.accept(node);
         return result;
     }
-    
+
     public void visit(AST node) {
         // <simple_type_spec> ::= <base_type_spec>
         //                      | <template_type_spec>
         //                      | <scoped_name>
 
-        
+
         Visitor visitor = null;
-        
-        
+
+
         if (PrimitiveTypesVisitor.accept(node)) {
             // simple_type_spec - base_type_spec
             visitor = new PrimitiveTypesVisitor(getScope(), definition, schema, schemas);
-            
+
         } else if (TemplateTypeSpecVisitor.accept(node)) {
             // simple_type_spec - template_type_spec
             visitor = new TemplateTypeSpecVisitor(getScope(),
@@ -68,9 +68,9 @@ public class SimpleTypeSpecVisitor extends VisitorBase {
 
             // simple_type_spec - scoped_name
             visitor = new ScopedNameVisitor(getScope(), definition, schema, wsdlVisitor);
-        
+
         }
-        
+
         if (visitor != null) {
             visitor.visit(node);
 

@@ -31,10 +31,10 @@ import org.junit.Test;
 
 public class CXF5061Test extends AbstractBusClientServerTestBase {
 
-    public static final String ADDRESS 
+    public static final String ADDRESS
         = "http://localhost:" + TestUtil.getPortNumber("org.apache.cxf.systest.jaxws.CXF5061Test")
             + "/cxf5061";
-    
+
     public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
@@ -58,7 +58,7 @@ public class CXF5061Test extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testCxf5061() throws Exception {
         if (System.getProperty("java.version").startsWith("9")) {

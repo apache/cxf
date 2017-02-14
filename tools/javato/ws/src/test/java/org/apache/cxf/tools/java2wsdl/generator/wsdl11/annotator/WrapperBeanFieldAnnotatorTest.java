@@ -42,7 +42,7 @@ public class WrapperBeanFieldAnnotatorTest extends Assert {
         reqField.setOwner(clz);
         List<JAnnotation> annotation = reqField.getAnnotations();
         assertEquals(0, annotation.size());
-        
+
         reqField.annotate(new WrapperBeanFieldAnnotator());
         annotation = reqField.getAnnotations();
 

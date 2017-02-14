@@ -51,17 +51,17 @@ public class CorbaDSIServant extends DynamicImplementation {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaDSIServant.class);
     private ORB orb;
-    private POA servantPOA;    
+    private POA servantPOA;
     private List<String> interfaces;
     private MessageObserver incomingObserver;
     private CorbaDestination destination;
     private Map<String, QName> operationMap;
     private CorbaTypeMap typeMap;
-    
+
     public CorbaDSIServant() {
         //Complete
     }
-    
+
     public void init(ORB theOrb,
                      POA poa,
                      CorbaDestination dest,
@@ -79,10 +79,10 @@ public class CorbaDSIServant extends DynamicImplementation {
         destination = dest;
         incomingObserver = observer;
         typeMap = map;
-       
+
         // Get the list of interfaces that this servant will support
-        try {                
-            BindingType bindType = destination.getBindingInfo().getExtensor(BindingType.class);            
+        try {
+            BindingType bindType = destination.getBindingInfo().getExtensor(BindingType.class);
             if (bindType == null) {
                 throw new CorbaBindingException("Unable to determine corba binding information");
             }
@@ -102,7 +102,7 @@ public class CorbaDSIServant extends DynamicImplementation {
         // the WSDL operation name may not always match the CORBA operation name.
         BindingInfo bInfo = destination.getBindingInfo();
         Iterator<BindingOperationInfo> i = bInfo.getOperations().iterator();
-        
+
         operationMap = new HashMap<String, QName>(bInfo.getOperations().size());
 
         while (i.hasNext()) {
@@ -117,11 +117,11 @@ public class CorbaDSIServant extends DynamicImplementation {
     public MessageObserver getObserver() {
         return incomingObserver;
     }
-    
+
     public void setObserver(MessageObserver observer) {
         incomingObserver = observer;
     }
-    
+
     public ORB getOrb() {
         return orb;
     }
@@ -141,11 +141,11 @@ public class CorbaDSIServant extends DynamicImplementation {
     public void setCorbaTypeMap(CorbaTypeMap map) {
         typeMap = map;
     }
-    
+
     public void invoke(ServerRequest request) throws CorbaBindingException {
         String opName = request.operation();
         QName requestOperation = operationMap.get(opName);
-        
+
         MessageImpl msgImpl = new MessageImpl();
         msgImpl.setDestination(getDestination());
         Exchange exg = new ExchangeImpl();
@@ -155,7 +155,7 @@ public class CorbaDSIServant extends DynamicImplementation {
         msgImpl.setExchange(exg);
         CorbaMessage msg = new CorbaMessage(msgImpl);
         msg.setCorbaTypeMap(typeMap);
-        
+
         // If there's no output message part in our operation then it's a oneway op
         BindingMessageInfo bindingMsgOutputInfo = null;
         BindingOperationInfo bindingOpInfo = null;
@@ -168,13 +168,13 @@ public class CorbaDSIServant extends DynamicImplementation {
             bindingMsgOutputInfo = bindingOpInfo.getOutput();
             if (bindingMsgOutputInfo == null) {
                 exg.setOneWay(true);
-            } 
+            }
         }
-        
+
         // invokes the interceptors
         getObserver().onMessage(msg);
     }
-       
+
     public String[] _all_interfaces(POA poa, byte[] objectId) {
         return interfaces.toArray(new String[interfaces.size()]);
     }

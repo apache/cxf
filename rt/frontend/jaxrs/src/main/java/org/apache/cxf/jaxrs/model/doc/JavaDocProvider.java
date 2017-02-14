@@ -46,24 +46,24 @@ public class JavaDocProvider implements DocumentationProvider {
     private ClassLoader javaDocLoader;
     private final ConcurrentHashMap<String, ClassDocs> docs = new ConcurrentHashMap<>();
     private double javaDocsBuiltByVersion = JAVA_VERSION;
-    
+
     public JavaDocProvider() {
     }
-    
+
     public JavaDocProvider(URL... javaDocUrls) {
         if (javaDocUrls != null) {
             javaDocLoader = new URLClassLoader(javaDocUrls);
         }
     }
-    
+
     public JavaDocProvider(String path) throws Exception {
         this(BusFactory.getDefaultBus(), path);
     }
-    
+
     public JavaDocProvider(String... paths) throws Exception {
         this(BusFactory.getDefaultBus(), paths == null ? null : paths);
     }
-    
+
     public JavaDocProvider(Bus bus, String... paths) throws Exception {
         if (paths != null) {
             URL[] javaDocUrls = new URL[paths.length];
@@ -73,16 +73,16 @@ public class JavaDocProvider implements DocumentationProvider {
             javaDocLoader = new URLClassLoader(javaDocUrls);
         }
     }
-    
+
     private static double getVersion() {
         String version = System.getProperty("java.version");
         try {
-            return Double.parseDouble(version.substring(0, 3));    
+            return Double.parseDouble(version.substring(0, 3));
         } catch (Exception ex) {
             return JAVA_VERSION_16;
         }
     }
-    
+
     @Override
     public String getClassDoc(ClassResourceInfo cri) {
         try {
@@ -92,11 +92,11 @@ public class JavaDocProvider implements DocumentationProvider {
             }
             return doc.getClassInfo();
         } catch (Exception ex) {
-            // ignore    
+            // ignore
         }
         return null;
     }
-    
+
     @Override
     public String getMethodDoc(OperationResourceInfo ori) {
         try {
@@ -110,7 +110,7 @@ public class JavaDocProvider implements DocumentationProvider {
         }
         return null;
     }
-    
+
     @Override
     public String getMethodResponseDoc(OperationResourceInfo ori) {
         try {
@@ -120,11 +120,11 @@ public class JavaDocProvider implements DocumentationProvider {
             }
             return doc.getResponseInfo();
         } catch (Exception ex) {
-            // ignore    
+            // ignore
         }
         return null;
     }
-    
+
     @Override
     public String getMethodParameterDoc(OperationResourceInfo ori, int paramIndex) {
         try {
@@ -139,13 +139,13 @@ public class JavaDocProvider implements DocumentationProvider {
                 return null;
             }
         } catch (Exception ex) {
-            // ignore  
+            // ignore
         }
         return null;
     }
-    
+
     private Class<?> getPathAnnotatedClass(Class<?> cls) {
-        if (cls.getAnnotation(Path.class) != null) { 
+        if (cls.getAnnotation(Path.class) != null) {
             return cls;
         }
         if (cls.getSuperclass() != null && cls.getSuperclass().getAnnotation(Path.class) != null) {
@@ -153,28 +153,28 @@ public class JavaDocProvider implements DocumentationProvider {
         }
         for (Class<?> i : cls.getInterfaces()) {
             if (i.getAnnotation(Path.class) != null) {
-                return i;    
+                return i;
             }
         }
         return cls;
     }
-    
+
     private ClassDocs getClassDocInternal(Class<?> cls) throws Exception {
         Class<?> annotatedClass = getPathAnnotatedClass(cls);
         String resource = annotatedClass.getName().replace(".", "/") + ".html";
         ClassDocs classDocs = docs.get(resource);
         if (classDocs == null) {
-            ClassLoader loader = javaDocLoader != null ? javaDocLoader : annotatedClass.getClassLoader();  
+            ClassLoader loader = javaDocLoader != null ? javaDocLoader : annotatedClass.getClassLoader();
             InputStream resourceStream = loader.getResourceAsStream(resource);
             if (resourceStream != null) {
                 String doc = IOUtils.readStringFromStream(resourceStream);
-                
-                String qualifier = annotatedClass.isInterface() ? "Interface" : "Class"; 
+
+                String qualifier = annotatedClass.isInterface() ? "Interface" : "Class";
                 String classMarker = qualifier + " " + annotatedClass.getSimpleName();
                 int index = doc.indexOf(classMarker);
                 if (index != -1) {
                     String classInfoTag = getClassInfoTag();
-                    String classInfo = getJavaDocText(doc, classInfoTag, 
+                    String classInfo = getJavaDocText(doc, classInfoTag,
                                                       "Method Summary", index + classMarker.length());
                     classDocs = new ClassDocs(doc, classInfo);
                     docs.putIfAbsent(resource, classDocs);
@@ -183,8 +183,8 @@ public class JavaDocProvider implements DocumentationProvider {
         }
         return classDocs;
     }
-    
-    
+
+
     private MethodDocs getOperationDocInternal(OperationResourceInfo ori) throws Exception {
         Method method = ori.getAnnotatedMethod() == null
                 ? ori.getMethodToInvoke()
@@ -197,11 +197,11 @@ public class JavaDocProvider implements DocumentationProvider {
         if (mDocs == null) {
             String operLink = getOperLink();
             String operMarker = operLink + method.getName() + getOperationMarkerOpen();
-            
+
             int operMarkerIndex = classDoc.getClassDoc().indexOf(operMarker);
-            while (operMarkerIndex != -1) { 
+            while (operMarkerIndex != -1) {
                 int startOfOpSigIndex = operMarkerIndex + operMarker.length();
-                int endOfOpSigIndex = classDoc.getClassDoc().indexOf(getOperationMarkerClose(), 
+                int endOfOpSigIndex = classDoc.getClassDoc().indexOf(getOperationMarkerClose(),
                                                                      startOfOpSigIndex);
                 int paramLen = method.getParameterTypes().length;
                 if (endOfOpSigIndex == startOfOpSigIndex && paramLen == 0) {
@@ -216,14 +216,14 @@ public class JavaDocProvider implements DocumentationProvider {
                         }
                     }
                 }
-                operMarkerIndex = classDoc.getClassDoc().indexOf(operMarker, 
+                operMarkerIndex = classDoc.getClassDoc().indexOf(operMarker,
                                                                  operMarkerIndex + operMarker.length());
             }
-            
-            if (operMarkerIndex == -1) { 
+
+            if (operMarkerIndex == -1) {
                 return null;
             }
-            
+
             String operDoc = classDoc.getClassDoc().substring(operMarkerIndex + operMarker.length());
             String operInfoTag = getOperInfoTag();
             String operInfo = getJavaDocText(operDoc, operInfoTag, operLink, 0);
@@ -235,14 +235,14 @@ public class JavaDocProvider implements DocumentationProvider {
                 if (returnsIndex != -1 && (nextOpIndex > returnsIndex || nextOpIndex == -1)) {
                     responseInfo = getJavaDocText(operDoc, getResponseMarker(), operLink, returnsIndex + 8);
                 }
-            
+
                 int paramIndex = operDoc.indexOf("Parameters:");
                 if (paramIndex != -1 && (nextOpIndex == -1 || paramIndex < nextOpIndex)) {
                     String paramString = returnsIndex == -1 ? operDoc.substring(paramIndex)
-                        : operDoc.substring(paramIndex, returnsIndex); 
-                    
-                    String codeTag = getCodeTag(); 
-                    
+                        : operDoc.substring(paramIndex, returnsIndex);
+
+                    String codeTag = getCodeTag();
+
                     int codeIndex = paramString.indexOf(codeTag);
                     while (codeIndex != -1) {
                         int next = paramString.indexOf('<', codeIndex + 7);
@@ -257,22 +257,22 @@ public class JavaDocProvider implements DocumentationProvider {
                         if (next == paramString.length()) {
                             break;
                         } else {
-                            codeIndex = next + 1;    
+                            codeIndex = next + 1;
                         }
                         codeIndex = paramString.indexOf(codeTag, codeIndex);
                     }
-                    
+
                 }
             }
             mDocs = new MethodDocs(operInfo, paramDocs, responseInfo);
             classDoc.addMethodDocs(method, mDocs);
         }
-        
+
         return mDocs;
     }
- 
-    
-    
+
+
+
     private String getJavaDocText(String doc, String tag, String notAfterTag, int index) {
         int tagIndex = doc.indexOf(tag, index);
         if (tagIndex != -1) {
@@ -286,7 +286,7 @@ public class JavaDocProvider implements DocumentationProvider {
         }
         return null;
     }
-    
+
     protected String getClassInfoTag() {
         if (javaDocsBuiltByVersion == JAVA_VERSION_16) {
             return "<P>";
@@ -305,17 +305,17 @@ public class JavaDocProvider implements DocumentationProvider {
         String operLink = "<A NAME=\"";
         return javaDocsBuiltByVersion == JAVA_VERSION_16 ? operLink : operLink.toLowerCase();
     }
-    
+
     protected String getResponseMarker() {
         String tag = "<DD>";
         return javaDocsBuiltByVersion == JAVA_VERSION_16 ? tag : tag.toLowerCase();
     }
-    
+
     protected String getCodeTag() {
         String tag = "</CODE>";
         return javaDocsBuiltByVersion == JAVA_VERSION_16 ? tag : tag.toLowerCase();
     }
-    
+
     protected String getOperationMarkerOpen() {
         return javaDocsBuiltByVersion == JAVA_VERSION_18 ? "-" : "(";
     }
@@ -328,33 +328,33 @@ public class JavaDocProvider implements DocumentationProvider {
     public void setJavaDocsBuiltByVersion(String version) {
         javaDocsBuiltByVersion = Double.valueOf(version);
     }
-    
+
     private static class ClassDocs {
         private final String classDoc;
         private final String classInfo;
-        private final ConcurrentHashMap<Method, MethodDocs> mdocs = new ConcurrentHashMap<>(); 
+        private final ConcurrentHashMap<Method, MethodDocs> mdocs = new ConcurrentHashMap<>();
         ClassDocs(String classDoc, String classInfo) {
             this.classDoc = classDoc;
             this.classInfo = classInfo;
         }
-        
+
         public String getClassDoc() {
             return classDoc;
         }
-        
+
         public String getClassInfo() {
             return classInfo;
         }
-        
+
         public MethodDocs getMethodDocs(Method method) {
             return mdocs.get(method);
         }
-        
+
         public void addMethodDocs(Method method, MethodDocs doc) {
             mdocs.putIfAbsent(method, doc);
         }
     }
-    
+
     private static class MethodDocs {
         private final String methodInfo;
         private final List<String> paramInfo;
@@ -364,15 +364,15 @@ public class JavaDocProvider implements DocumentationProvider {
             this.paramInfo = paramInfo;
             this.responseInfo = responseInfo;
         }
-        
+
         public String getMethodInfo() {
             return methodInfo;
         }
-        
+
         public List<String> getParamInfo() {
             return paramInfo;
         }
-        
+
         public String getResponseInfo() {
             return responseInfo;
         }

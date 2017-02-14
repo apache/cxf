@@ -33,18 +33,18 @@ import org.apache.cxf.configuration.security.TLSServerParametersType;
  * configuration of the http-destination.
  */
 @NoJSR250Annotations
-public class TLSServerParametersConfig 
+public class TLSServerParametersConfig
     extends TLSServerParameters {
 
-    public TLSServerParametersConfig(TLSServerParametersType params) 
+    public TLSServerParametersConfig(TLSServerParametersType params)
         throws GeneralSecurityException,
                IOException {
-        
+
         TLSServerParametersTypeInternal iparams = null;
         if (params instanceof TLSServerParametersTypeInternal) {
             iparams = (TLSServerParametersTypeInternal)params;
         }
-        
+
         if (params.isSetSecureSocketProtocol()) {
             this.setSecureSocketProtocol(params.getSecureSocketProtocol());
         }
@@ -105,7 +105,7 @@ public class TLSServerParametersConfig
         public void setKeyManagersRef(KeyManager[] keyManagersRef) {
             this.keyManagersRef = keyManagersRef;
         }
-        
+
         public boolean isSetKeyManagersRef() {
             return this.keyManagersRef != null;
         }
@@ -117,11 +117,11 @@ public class TLSServerParametersConfig
         public void setTrustManagersRef(TrustManager[] trustManagersRef) {
             this.trustManagersRef = trustManagersRef;
         }
-        
+
         public boolean isSetTrustManagersRef() {
             return this.trustManagersRef != null;
         }
 
     }
-    
+
 }

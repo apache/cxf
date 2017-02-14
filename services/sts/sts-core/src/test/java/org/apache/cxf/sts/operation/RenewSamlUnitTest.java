@@ -73,17 +73,17 @@ import org.junit.BeforeClass;
  * Some unit tests for the renew operation to renew SAML tokens.
  */
 public class RenewSamlUnitTest extends org.junit.Assert {
-    
-    public static final QName REQUESTED_SECURITY_TOKEN = 
+
+    public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
-    
+
     private static TokenStore tokenStore;
-    
+
     @BeforeClass
     public static void init() {
         tokenStore = new DefaultInMemoryTokenStore();
     }
-    
+
     /**
      * Test to successfully renew a valid Saml 1.1 token
      */
@@ -91,19 +91,19 @@ public class RenewSamlUnitTest extends org.junit.Assert {
     public void testRenewValidSaml1Token() throws Exception {
         TokenRenewOperation renewOperation = new TokenRenewOperation();
         renewOperation.setTokenStore(tokenStore);
-        
+
         // Add Token Renewer
         List<TokenRenewer> renewerList = new ArrayList<>();
         TokenRenewer tokenRenewer = new SAMLTokenRenewer();
         tokenRenewer.setVerifyProofOfPossession(false);
         renewerList.add(tokenRenewer);
         renewOperation.setTokenRenewers(renewerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         renewOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -114,67 +114,67 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         renewOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.BEARER_KEY_KEYTYPE
             );
         request.getAny().add(tokenType);
-        
+
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
             );
-        
+
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         RenewTargetType renewTarget = new RenewTargetType();
         renewTarget.setAny(samlToken);
-        
-        JAXBElement<RenewTargetType> renewTargetType = 
+
+        JAXBElement<RenewTargetType> renewTargetType =
             new JAXBElement<RenewTargetType>(
                 QNameConstants.RENEW_TARGET, RenewTargetType.class, renewTarget
             );
         request.getAny().add(renewTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Renew a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             renewOperation.renew(request, principal, msgCtx);
         assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
-        
+
         // Test the generated token.
         Element assertion = null;
         for (Object tokenObject : response.getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 assertion = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains(SAML1Constants.CONF_BEARER));
     }
-    
-    
+
+
     /**
      * Test to successfully renew an expired Saml 1.1 token.
      */
@@ -182,7 +182,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
     public void testRenewExpiredSaml1Token() throws Exception {
         TokenRenewOperation renewOperation = new TokenRenewOperation();
         renewOperation.setTokenStore(tokenStore);
-        
+
         // Add Token Renewer
         List<TokenRenewer> renewerList = new ArrayList<>();
         TokenRenewer tokenRenewer = new SAMLTokenRenewer();
@@ -190,12 +190,12 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         tokenRenewer.setAllowRenewalAfterExpiry(true);
         renewerList.add(tokenRenewer);
         renewOperation.setTokenRenewers(renewerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         renewOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -206,69 +206,69 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         renewOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.BEARER_KEY_KEYTYPE
             );
         request.getAny().add(tokenType);
-        
+
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);
-        
+
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         RenewTargetType renewTarget = new RenewTargetType();
         renewTarget.setAny(samlToken);
-        
-        JAXBElement<RenewTargetType> renewTargetType = 
+
+        JAXBElement<RenewTargetType> renewTargetType =
             new JAXBElement<RenewTargetType>(
                 QNameConstants.RENEW_TARGET, RenewTargetType.class, renewTarget
             );
         request.getAny().add(renewTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Renew a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             renewOperation.renew(request, principal, msgCtx);
-        
+
         assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
-        
+
         // Test the generated token.
         Element assertion = null;
         for (Object tokenObject : response.getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 assertion = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("alice"));
         assertTrue(tokenString.contains(SAML1Constants.CONF_BEARER));
     }
-    
+
     /**
      * Test to successfully renew an expired Saml 2 token.
      */
@@ -276,7 +276,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
     public void testRenewExpiredSaml2Token() throws Exception {
         TokenRenewOperation renewOperation = new TokenRenewOperation();
         renewOperation.setTokenStore(tokenStore);
-        
+
         // Add Token Renewer
         List<TokenRenewer> renewerList = new ArrayList<>();
         TokenRenewer tokenRenewer = new SAMLTokenRenewer();
@@ -284,12 +284,12 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         tokenRenewer.setAllowRenewalAfterExpiry(true);
         renewerList.add(tokenRenewer);
         renewOperation.setTokenRenewers(renewerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         renewOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -300,151 +300,62 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         renewOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.BEARER_KEY_KEYTYPE
             );
         request.getAny().add(tokenType);
-        
+
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);
-        
+
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         RenewTargetType renewTarget = new RenewTargetType();
         renewTarget.setAny(samlToken);
-        
-        JAXBElement<RenewTargetType> renewTargetType = 
+
+        JAXBElement<RenewTargetType> renewTargetType =
             new JAXBElement<RenewTargetType>(
                 QNameConstants.RENEW_TARGET, RenewTargetType.class, renewTarget
             );
         request.getAny().add(renewTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Renew a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             renewOperation.renew(request, principal, msgCtx);
-        
+
         assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
-        
+
         // Test the generated token.
         Element assertion = null;
         for (Object tokenObject : response.getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 assertion = (Element)rstType.getAny();
                 break;
             }
         }
-        
-        assertNotNull(assertion);
-        String tokenString = DOM2Writer.nodeToString(assertion);
-        assertTrue(tokenString.contains("AttributeStatement"));
-        assertTrue(tokenString.contains("alice"));
-        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
-    }
-    
-    /**
-     * Test to successfully renew an expired Saml 2 token and sending no TokenType.
-     */
-    @org.junit.Test
-    public void testRenewExpiredSaml2TokenNoCacheNoTokenType() throws Exception {
-        TokenRenewOperation renewOperation = new TokenRenewOperation();
-        renewOperation.setTokenStore(tokenStore);
-        
-        // Add Token Renewer
-        List<TokenRenewer> renewerList = new ArrayList<>();
-        TokenRenewer tokenRenewer = new SAMLTokenRenewer();
-        tokenRenewer.setVerifyProofOfPossession(false);
-        tokenRenewer.setAllowRenewalAfterExpiry(true);
-        renewerList.add(tokenRenewer);
-        renewOperation.setTokenRenewers(renewerList);
-        
-        // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<>();
-        validatorList.add(new SAMLTokenValidator());
-        renewOperation.setTokenValidators(validatorList);
-        
-        // Add STSProperties object
-        STSPropertiesMBean stsProperties = new StaticSTSProperties();
-        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        stsProperties.setEncryptionCrypto(crypto);
-        stsProperties.setSignatureCrypto(crypto);
-        stsProperties.setEncryptionUsername("myservicekey");
-        stsProperties.setSignatureUsername("mystskey");
-        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
-        stsProperties.setIssuer("STS");
-        renewOperation.setStsProperties(stsProperties);
-        
-        // Mock up a request
-        RequestSecurityTokenType request = new RequestSecurityTokenType();
-        
-        // Get a SAML Token via the SAMLTokenProvider
-        CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(
-                WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
-            );
-        // Sleep to expire the token
-        Thread.sleep(100);
-        
-        Document doc = samlToken.getOwnerDocument();
-        samlToken = (Element)doc.appendChild(samlToken);
-        RenewTargetType renewTarget = new RenewTargetType();
-        renewTarget.setAny(samlToken);
-        
-        JAXBElement<RenewTargetType> renewTargetType = 
-            new JAXBElement<RenewTargetType>(
-                QNameConstants.RENEW_TARGET, RenewTargetType.class, renewTarget
-            );
-        request.getAny().add(renewTargetType);
-        
-        // Mock up message context
-        MessageImpl msg = new MessageImpl();
-        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        Principal principal = new CustomTokenPrincipal("alice");
-        msgCtx.put(
-            SecurityContext.class.getName(), 
-            createSecurityContext(principal)
-        );
-        
-        // Renew a token
-        RequestSecurityTokenResponseType response = 
-            renewOperation.renew(request, principal, msgCtx);
-        
-        assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
-        
-        // Test the generated token.
-        Element assertion = null;
-        for (Object tokenObject : response.getAny()) {
-            if (tokenObject instanceof JAXBElement<?>
-                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
-                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
-                assertion = (Element)rstType.getAny();
-                break;
-            }
-        }
-        
+
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
@@ -452,7 +363,96 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
     }
 
-    
+    /**
+     * Test to successfully renew an expired Saml 2 token and sending no TokenType.
+     */
+    @org.junit.Test
+    public void testRenewExpiredSaml2TokenNoCacheNoTokenType() throws Exception {
+        TokenRenewOperation renewOperation = new TokenRenewOperation();
+        renewOperation.setTokenStore(tokenStore);
+
+        // Add Token Renewer
+        List<TokenRenewer> renewerList = new ArrayList<>();
+        TokenRenewer tokenRenewer = new SAMLTokenRenewer();
+        tokenRenewer.setVerifyProofOfPossession(false);
+        tokenRenewer.setAllowRenewalAfterExpiry(true);
+        renewerList.add(tokenRenewer);
+        renewOperation.setTokenRenewers(renewerList);
+
+        // Add Token Validator
+        List<TokenValidator> validatorList = new ArrayList<>();
+        validatorList.add(new SAMLTokenValidator());
+        renewOperation.setTokenValidators(validatorList);
+
+        // Add STSProperties object
+        STSPropertiesMBean stsProperties = new StaticSTSProperties();
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        stsProperties.setEncryptionCrypto(crypto);
+        stsProperties.setSignatureCrypto(crypto);
+        stsProperties.setEncryptionUsername("myservicekey");
+        stsProperties.setSignatureUsername("mystskey");
+        stsProperties.setCallbackHandler(new PasswordCallbackHandler());
+        stsProperties.setIssuer("STS");
+        renewOperation.setStsProperties(stsProperties);
+
+        // Mock up a request
+        RequestSecurityTokenType request = new RequestSecurityTokenType();
+
+        // Get a SAML Token via the SAMLTokenProvider
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken =
+            createSAMLAssertion(
+                WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
+            );
+        // Sleep to expire the token
+        Thread.sleep(100);
+
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        RenewTargetType renewTarget = new RenewTargetType();
+        renewTarget.setAny(samlToken);
+
+        JAXBElement<RenewTargetType> renewTargetType =
+            new JAXBElement<RenewTargetType>(
+                QNameConstants.RENEW_TARGET, RenewTargetType.class, renewTarget
+            );
+        request.getAny().add(renewTargetType);
+
+        // Mock up message context
+        MessageImpl msg = new MessageImpl();
+        WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
+        Principal principal = new CustomTokenPrincipal("alice");
+        msgCtx.put(
+            SecurityContext.class.getName(),
+            createSecurityContext(principal)
+        );
+
+        // Renew a token
+        RequestSecurityTokenResponseType response =
+            renewOperation.renew(request, principal, msgCtx);
+
+        assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
+
+        // Test the generated token.
+        Element assertion = null;
+        for (Object tokenObject : response.getAny()) {
+            if (tokenObject instanceof JAXBElement<?>
+                && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
+                RequestedSecurityTokenType rstType =
+                    (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
+                assertion = (Element)rstType.getAny();
+                break;
+            }
+        }
+
+        assertNotNull(assertion);
+        String tokenString = DOM2Writer.nodeToString(assertion);
+        assertTrue(tokenString.contains("AttributeStatement"));
+        assertTrue(tokenString.contains("alice"));
+        assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
+    }
+
+
     /*
      * Create a security context object
      */
@@ -466,7 +466,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
             }
         };
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -474,12 +474,12 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
+
     private Element createSAMLAssertion(
-        String tokenType, Crypto crypto, String signatureUsername, 
+        String tokenType, Crypto crypto, String signatureUsername,
         CallbackHandler callbackHandler, long ttlMs, boolean allowRenewing,
         boolean allowRenewingAfterExpiry
     ) throws WSSecurityException {
@@ -487,17 +487,17 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setAcceptClientLifetime(true);
         samlTokenProvider.setConditionsProvider(conditionsProvider);
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                 tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
             );
-        
+
         Renewing renewing = new Renewing();
         renewing.setAllowRenewing(allowRenewing);
         renewing.setAllowRenewingAfterExpiry(allowRenewingAfterExpiry);
         providerParameters.getTokenRequirements().setRenewing(renewing);
-        
+
         if (ttlMs != 0) {
             Lifetime lifetime = new Lifetime();
             Date creationTime = new Date();
@@ -510,7 +510,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
 
             providerParameters.getTokenRequirements().setLifetime(lifetime);
         }
-        
+
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
@@ -519,7 +519,7 @@ public class RenewSamlUnitTest extends org.junit.Assert {
     }
 
     private TokenProviderParameters createProviderParameters(
-        String tokenType, String keyType, Crypto crypto, 
+        String tokenType, String keyType, Crypto crypto,
         String signatureUsername, CallbackHandler callbackHandler
     ) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
@@ -554,5 +554,5 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         return parameters;
     }
 
-    
+
 }

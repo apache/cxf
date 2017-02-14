@@ -92,10 +92,10 @@ public class JAXRSKerberosBookTest extends AbstractLdapTestUnit {
 
     private static final String KERBEROS_CONFIG_FILE =
         "org/apache/cxf/systest/kerberos/jaxrs/kerberos/kerberosClient.xml";
-    
+
     private static boolean runTests;
     private static boolean portUpdated;
-    
+
     @Before
     public void updatePort() throws Exception {
         if (!portUpdated) {
@@ -108,16 +108,16 @@ public class JAXRSKerberosBookTest extends AbstractLdapTestUnit {
             Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/krb5.conf");
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
-            
+
             Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/jaxrs.krb5.conf");
             Files.write(path2, content.getBytes());
-            
+
             System.setProperty("java.security.krb5.conf", path2.toString());
-            
+
             portUpdated = true;
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
 
@@ -132,11 +132,11 @@ public class JAXRSKerberosBookTest extends AbstractLdapTestUnit {
             }
 
             // System.setProperty("sun.security.krb5.debug", "true");
-            System.setProperty("java.security.auth.login.config", 
+            System.setProperty("java.security.auth.login.config",
                                basedir + "/src/test/resources/kerberos.jaas");
-            
+
         }
-        
+
         // Launch servers
         org.junit.Assert.assertTrue(
             "Server failed to launch",
@@ -151,26 +151,26 @@ public class JAXRSKerberosBookTest extends AbstractLdapTestUnit {
         SecurityTestUtil.cleanup();
         AbstractBusClientServerTestBase.stopAllServers();
     }
-    
+
     @Test
     public void testGetBookWithConfigInHttpConduit() throws Exception {
         if (!runTests) {
             return;
         }
-        
+
         doTestGetBook123Proxy(KERBEROS_CONFIG_FILE);
     }
-    
+
     private void doTestGetBook123Proxy(String configFile) throws Exception {
-        BookStore bs = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class, 
+        BookStore bs = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class,
                 configFile);
         WebClient.getConfig(bs).getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         SpnegoAuthSupplier authSupplier = new SpnegoAuthSupplier();
         authSupplier.setServicePrincipalName("bob@service.ws.apache.org");
         authSupplier.setServiceNameType(GSSName.NT_HOSTBASED_SERVICE);
         WebClient.getConfig(bs).getHttpConduit().setAuthSupplier(authSupplier);
-        
+
         // just to verify the interface call goes through CGLIB proxy too
         Assert.assertEquals("http://localhost:" + PORT, WebClient.client(bs).getBaseURI().toString());
         Book b = bs.getBook("123");
@@ -178,17 +178,17 @@ public class JAXRSKerberosBookTest extends AbstractLdapTestUnit {
         b = bs.getBook("123");
         Assert.assertEquals(b.getId(), 123);
     }
-    
+
     @Test
     public void testGetBookWithInterceptor() throws Exception {
         if (!runTests) {
             return;
         }
-        
+
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/123");
-        
+
         KerberosAuthOutInterceptor kbInterceptor = new KerberosAuthOutInterceptor();
-        
+
         AuthorizationPolicy policy = new AuthorizationPolicy();
         policy.setAuthorizationType(HttpAuthHeader.AUTH_TYPE_NEGOTIATE);
         policy.setAuthorization("alice");
@@ -197,16 +197,16 @@ public class JAXRSKerberosBookTest extends AbstractLdapTestUnit {
 
         kbInterceptor.setPolicy(policy);
         kbInterceptor.setCredDelegation(true);
-        
+
         WebClient.getConfig(wc).getOutInterceptors().add(new LoggingOutInterceptor());
         WebClient.getConfig(wc).getOutInterceptors().add(kbInterceptor);
-        
+
         // Required so as to get it working with our KDC
         kbInterceptor.setServicePrincipalName("bob@service.ws.apache.org");
         kbInterceptor.setServiceNameType(GSSName.NT_HOSTBASED_SERVICE);
-        
+
         Book b = wc.get(Book.class);
         Assert.assertEquals(b.getId(), 123);
     }
-    
+
 }

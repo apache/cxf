@@ -34,4 +34,4 @@ public interface HelloWithNoWebParam {
     void sayHi(
         long l1
     );
-} 
+}

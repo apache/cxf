@@ -27,7 +27,7 @@ public abstract class AbstractCorbaTypeListener implements CorbaTypeListener {
     protected QName currentElement;
     protected CorbaObjectHandler handler;
     protected NamespaceContext ctx;
-    
+
 
     public AbstractCorbaTypeListener(CorbaObjectHandler h) {
         handler = h;

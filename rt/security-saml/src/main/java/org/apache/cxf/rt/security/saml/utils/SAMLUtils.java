@@ -36,44 +36,44 @@ import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AttributeStatement;
 
 public final class SAMLUtils {
-    
+
     private SAMLUtils() {
-        
+
     }
-    
+
     /**
      * Extract Claims from a SAML Assertion
      */
     public static ClaimCollection getClaims(SamlAssertionWrapper assertion) {
         ClaimCollection claims = new ClaimCollection();
-        
+
         if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
             List<AttributeStatement> statements = assertion.getSaml2().getAttributeStatements();
             for (AttributeStatement as : statements) {
                 for (Attribute atr : as.getAttributes()) {
                     SAMLClaim claim = new SAMLClaim();
                     claim.setClaimType(URI.create(atr.getName()));
-                    
+
                     claim.setName(atr.getName());
                     claim.setNameFormat(atr.getNameFormat());
                     claim.setFriendlyName(atr.getFriendlyName());
-                    
+
                     for (XMLObject o : atr.getAttributeValues()) {
                         String attrValue = o.getDOM().getTextContent();
                         claim.getValues().add(attrValue);
                     }
-                    
+
                     claims.add(claim);
                 }
             }
         } else {
-            List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements = 
+            List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements =
                 assertion.getSaml1().getAttributeStatements();
-            
+
             for (org.opensaml.saml.saml1.core.AttributeStatement statement : attributeStatements) {
                 for (org.opensaml.saml.saml1.core.Attribute atr : statement.getAttributes()) {
                     SAMLClaim claim = new SAMLClaim();
-                    
+
                     String claimType = atr.getAttributeName();
                     if (atr.getAttributeNamespace() != null) {
                         claimType = atr.getAttributeNamespace() + "/" + claimType;
@@ -90,12 +90,12 @@ public final class SAMLUtils {
 
                     claims.add(claim);
                 }
-            } 
+            }
         }
-        
+
         return claims;
     }
-    
+
     /**
      * Extract roles from the given Claims
      */
@@ -108,12 +108,12 @@ public final class SAMLUtils {
         if (roleAttributeName == null) {
             roleAttributeName = SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
         }
-        
+
         Set<Principal> roles = new HashSet<>();
-        
+
         for (Claim claim : claims) {
             if (claim instanceof SAMLClaim && ((SAMLClaim)claim).getName().equals(name)
-                && (nameFormat == null 
+                && (nameFormat == null
                     || nameFormat.equals(((SAMLClaim)claim).getNameFormat()))) {
                 for (Object claimValue : claim.getValues()) {
                     if (claimValue instanceof String) {
@@ -126,10 +126,10 @@ public final class SAMLUtils {
                 }
             }
         }
-        
+
         return roles;
     }
-    
+
     public static String getIssuer(Object assertion) {
         return ((SamlAssertionWrapper)assertion).getIssuerString();
     }
@@ -137,5 +137,5 @@ public final class SAMLUtils {
     public static Element getAssertionElement(Object assertion) {
         return ((SamlAssertionWrapper)assertion).getElement();
     }
-    
+
 }

@@ -34,7 +34,7 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
         this.ex = ex;
         this.wc = wc;
     }
-    
+
     @Override
     public CompletionStage<Response> get() {
         return get(Response.class);
@@ -159,5 +159,5 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
     public <T> CompletionStage<T> method(String name, GenericType<T> responseType) {
         return wc.doInvokeAsyncStage(name, null, responseType.getRawType(), responseType.getType(), ex);
     }
-    
+
 }

@@ -54,9 +54,9 @@ public final class FaultBean {
                 return false;
             }
         }
-        return false; 
+        return false;
     }
-    
+
     private String getWebFaultBean(final Class<?> exceptionClass) {
         WebFault fault = exceptionClass.getAnnotation(WebFault.class);
         if (fault == null) {
@@ -68,7 +68,7 @@ public final class FaultBean {
     private boolean isWebFaultAbsent(final Class<?> exceptionClass) {
         return StringUtils.isEmpty(getWebFaultBean(exceptionClass));
     }
-    
+
     public WrapperBeanClass transform(final Class<?> exceptionClass, final String defaultPackage) {
         WrapperBeanClass jClass = new WrapperBeanClass();
         if (isWebFaultAbsent(exceptionClass)) {
@@ -79,7 +79,7 @@ public final class FaultBean {
         }
 
         buildBeanFields(exceptionClass, jClass);
-        
+
         String pkg = PackageUtils.getPackageName(exceptionClass);
         if (pkg.length() > 0) {
             jClass.setElementName(new QName(URIParserUtil.getNamespace(pkg),
@@ -89,7 +89,7 @@ public final class FaultBean {
                                         exceptionClass.getSimpleName()));
         }
         jClass.annotate(new WrapperBeanAnnotator(exceptionClass));
-        
+
         return jClass;
     }
 
@@ -104,10 +104,10 @@ public final class FaultBean {
         return method.getName().startsWith("get")
             && !Arrays.asList(EXCLUDED_GETTER).contains(method.getName());
     }
-    
+
     private void buildBeanFields(final Class<?> exceptionClass, final JavaClass jClass) {
-        Map<String, JavaField> fields = new TreeMap<String, JavaField>(); 
-        
+        Map<String, JavaField> fields = new TreeMap<String, JavaField>();
+
         for (Method method : exceptionClass.getMethods()) {
             if (isIncludedGetter(method)) {
                 JavaField field = new JavaField(getFieldName(method),
@@ -123,5 +123,5 @@ public final class FaultBean {
             jClass.appendSetter(ent.getValue());
         }
     }
-    
+
 }

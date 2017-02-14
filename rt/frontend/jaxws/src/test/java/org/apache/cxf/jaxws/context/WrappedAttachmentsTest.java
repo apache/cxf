@@ -32,7 +32,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class WrappedAttachmentsTest extends Assert {
     @Test
@@ -41,32 +41,32 @@ public class WrappedAttachmentsTest extends Assert {
         content.put("att-1", new DataHandler(new ByteArrayDataSource("Hello world!".getBytes(), "text/plain")));
         content.put("att-2", new DataHandler(new ByteArrayDataSource("Hola mundo!".getBytes(), "text/plain")));
         WrappedAttachments attachments = new WrappedAttachments(content);
-        Attachment att3 = new AttachmentImpl("att-3", 
+        Attachment att3 = new AttachmentImpl("att-3",
             new DataHandler(new ByteArrayDataSource("Bonjour tout le monde!".getBytes(), "text/plain")));
 
         assertEquals(2, attachments.size());
         assertFalse(attachments.isEmpty());
-        
+
         attachments.add(att3);
         assertEquals(3, attachments.size());
 
         attachments.add(att3);
         assertEquals(3, attachments.size());
-        
+
         attachments.remove(att3);
-        
+
         assertEquals(2, attachments.size());
-        
+
         Attachment attx = attachments.iterator().next();
-        
+
         attachments.remove(attx);
-        
+
         assertEquals(1, attachments.size());
-        
+
         Attachment[] atts = attachments.toArray(new Attachment[attachments.size()]);
         assertEquals(1, atts.length);
         assertEquals("att-1".equals(attx.getId()) ? "att-2" : "att-1", atts[0].getId());
-        
+
         attachments.clear();
         assertTrue(attachments.isEmpty());
         assertTrue(content.isEmpty());

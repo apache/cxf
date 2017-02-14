@@ -74,7 +74,7 @@ public class ApplicationController implements ServletContextAware {
 
         String secretKey = tokenGen.generate(new SecureRandom().generateSeed(20));
 
-        Client clientInfo = 
+        Client clientInfo =
             new Client(consumerKey, secretKey, clientApp.getClientName(), null);
         clientInfo.setCallbackURI(clientApp.getCallbackURL());
         clientInfo.setLoginName(principal.getName());
@@ -124,7 +124,7 @@ public class ApplicationController implements ServletContextAware {
     @RequestMapping("/revokeAccess")
     public ModelAndView revokeAccess(HttpServletRequest request) {
         String consumerKey = request.getParameter("consumerKey");
-        
+
         clientManager.removeAllTokens(consumerKey);
 
         ModelAndView modelAndView = new ModelAndView(new RedirectView("/app/listAuthorizedClients"));

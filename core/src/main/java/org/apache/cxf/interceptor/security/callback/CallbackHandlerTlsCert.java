@@ -31,7 +31,7 @@ public class CallbackHandlerTlsCert implements CallbackHandlerProvider {
     private CertificateToNameMapper certMapper;
     private NameToPasswordMapper nameToPasswordMapper;
     private String fixedPassword;
-    
+
     public CallbackHandlerTlsCert() {
         // By default use subjectDN as userName
         this.certMapper = new CertificateToNameMapper() {
@@ -39,7 +39,7 @@ public class CallbackHandlerTlsCert implements CallbackHandlerProvider {
                 return ((X509Certificate)cert).getSubjectDN().getName();
             }
         };
-        // By default use fixed password 
+        // By default use fixed password
         this.nameToPasswordMapper = new NameToPasswordMapper() {
             public String getPassword(String userName) {
                 return fixedPassword;
@@ -58,7 +58,7 @@ public class CallbackHandlerTlsCert implements CallbackHandlerProvider {
         String password = nameToPasswordMapper.getPassword(name);
         return new NamePasswordCallbackHandler(name, password);
     }
-    
+
     /**
      * Extracts certificate from message, expecting to find TLSSessionInfo inside.
      *
@@ -78,7 +78,7 @@ public class CallbackHandlerTlsCert implements CallbackHandlerProvider {
         // Due to RFC5246, senders certificates always comes 1st
         return certificates[0];
     }
-    
+
     public void setCertMapper(CertificateToNameMapper certMapper) {
         this.certMapper = certMapper;
     }
@@ -90,5 +90,5 @@ public class CallbackHandlerTlsCert implements CallbackHandlerProvider {
     public void setNameToPasswordMapper(NameToPasswordMapper nameToPasswordMapper) {
         this.nameToPasswordMapper = nameToPasswordMapper;
     }
-    
+
 }

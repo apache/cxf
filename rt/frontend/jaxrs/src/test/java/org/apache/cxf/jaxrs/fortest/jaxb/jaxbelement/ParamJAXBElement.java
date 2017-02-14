@@ -29,7 +29,7 @@ public class ParamJAXBElement extends JAXBElement<ParamType> {
 
     private static final long serialVersionUID = 4994571526736505284L;
     protected final static QName NAME = new QName("http://jaxbelement/10", "param");
-    
+
     public ParamJAXBElement(ParamType value) {
         super(NAME, ((Class) ParamType.class), null, value);
     }

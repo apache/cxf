@@ -38,5 +38,5 @@ public class CountingOutInterceptor extends AbstractPhaseInterceptor<Message> {
             message.setContent(OutputStream.class, newOut);
             message.getExchange().put(CountingOutputStream.class, newOut);
         }
-    }    
+    }
 }

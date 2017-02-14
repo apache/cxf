@@ -27,24 +27,24 @@ import javax.ws.rs.Produces;
 
 @Path("/bookstore")
 public class BookStore {
-    
+
     public BookStore() {
     }
-    
+
     @POST
     @Path("/books")
     @Produces("application/json")
     @Consumes("application/json")
     public String echoJcsText(String text) {
-        validateBookFromJcs(text); 
+        validateBookFromJcs(text);
         return text;
     }
-    
+
     protected void validateBookFromJcs(String text) {
-        
+
     }
-    
-    
+
+
 }
 
 

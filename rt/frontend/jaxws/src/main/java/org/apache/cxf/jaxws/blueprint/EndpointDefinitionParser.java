@@ -66,10 +66,10 @@ class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
         boolean isAbstract = false;
         boolean publish = true;
         NamedNodeMap atts = element.getAttributes();
-        
+
         String bus = null;
         Metadata impl = null;
-        
+
         for (int i = 0; i < atts.getLength(); i++) {
             Attr node = (Attr) atts.item(i);
             String val = node.getValue();
@@ -77,7 +77,7 @@ class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
             String name = node.getLocalName();
             if ("createdFromAPI".equals(name) || "abstract".equals(name)) {
                 cxfBean.setScope(MutableBeanMetadata.SCOPE_PROTOTYPE);
-                isAbstract = true; 
+                isAbstract = true;
             } else if ("publish".equals(name)) {
                 publish = Boolean.parseBoolean(val);
             } else if ("bus".equals(name)) {
@@ -108,12 +108,12 @@ class EndpointDefinitionParser extends AbstractBPBeanDefinitionParser {
                 cxfBean.addProperty(name, map);
             } else if ("binding".equals(name)) {
                 setFirstChildAsProperty(elem, context, cxfBean, "bindingConfig");
-            } else if ("inInterceptors".equals(name) 
-                    || "inFaultInterceptors".equals(name) 
+            } else if ("inInterceptors".equals(name)
+                    || "inFaultInterceptors".equals(name)
                     || "outInterceptors".equals(name)
-                    || "outFaultInterceptors".equals(name) 
-                    || "features".equals(name) 
-                    || "schemaLocations".equals(name) 
+                    || "outFaultInterceptors".equals(name)
+                    || "features".equals(name)
+                    || "schemaLocations".equals(name)
                     || "handlers".equals(name)) {
                 Metadata list = parseListData(context, cxfBean, elem);
                 cxfBean.addProperty(name, list);

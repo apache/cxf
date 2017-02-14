@@ -95,9 +95,9 @@ public class ToolSpec {
         if (streams == null) {
             return false;
         }
-        
-        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(streams, 
-                                                                     Tool.TOOL_SPEC_PUBLIC_ID, 
+
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(streams,
+                                                                     Tool.TOOL_SPEC_PUBLIC_ID,
                                                                      "instream");
         for (Element elem : elemList) {
             if (elem.getAttribute("id").equals(id)) {
@@ -163,9 +163,9 @@ public class ToolSpec {
         return handler;
     }
 
-    public Element getStreams() {        
-        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(), 
-                                                                     Tool.TOOL_SPEC_PUBLIC_ID, 
+    public Element getStreams() {
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                                     Tool.TOOL_SPEC_PUBLIC_ID,
                                                                      "streams");
         if (elemList.size() > 0) {
             return elemList.get(0);
@@ -179,8 +179,8 @@ public class ToolSpec {
         Element streams = getStreams();
 
         if (streams != null) {
-            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(streams, 
-                                                                         Tool.TOOL_SPEC_PUBLIC_ID, 
+            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(streams,
+                                                                         Tool.TOOL_SPEC_PUBLIC_ID,
                                                                          "instream");
             for (Element elem : elemList) {
                 res.add(elem.getAttribute("id"));
@@ -194,8 +194,8 @@ public class ToolSpec {
         Element streams = getStreams();
 
         if (streams != null) {
-            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(streams, 
-                                                                         Tool.TOOL_SPEC_PUBLIC_ID, 
+            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(streams,
+                                                                         Tool.TOOL_SPEC_PUBLIC_ID,
                                                                          "outstream");
 
             for (Element elem : elemList) {
@@ -206,8 +206,8 @@ public class ToolSpec {
     }
 
     public Element getUsage() {
-        return DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(), 
-                                            Tool.TOOL_SPEC_PUBLIC_ID, 
+        return DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                            Tool.TOOL_SPEC_PUBLIC_ID,
                                             "usage").get(0);
     }
 
@@ -219,9 +219,9 @@ public class ToolSpec {
     }
 
     public Element getPipeline() {
-        
-        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(), 
-                                            Tool.TOOL_SPEC_PUBLIC_ID, 
+
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                            Tool.TOOL_SPEC_PUBLIC_ID,
                                             "pipeline");
         if (elemList.size() > 0) {
             return elemList.get(0);
@@ -230,8 +230,8 @@ public class ToolSpec {
         }
     }
 
-    public List<Element> getUsageForms() {  
-        return DOMUtils.findAllElementsByTagNameNS(getUsage(), Tool.TOOL_SPEC_PUBLIC_ID, "form");   
+    public List<Element> getUsageForms() {
+        return DOMUtils.findAllElementsByTagNameNS(getUsage(), Tool.TOOL_SPEC_PUBLIC_ID, "form");
     }
 
     /**
@@ -243,18 +243,18 @@ public class ToolSpec {
      * sort out, but that is the reason why this getter method exists.
      */
     public String getStreamRefName(String streamId) {
-        if (getUsage() != null) {            
-            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(getUsage(), 
-                                                                        Tool.TOOL_SPEC_PUBLIC_ID, 
+        if (getUsage() != null) {
+            List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(getUsage(),
+                                                                        Tool.TOOL_SPEC_PUBLIC_ID,
                                                                         "associatedArgument");
             for (Element elem : elemList) {
                 if (elem.getAttribute("streamref").equals(streamId)) {
                     return ((Element)elem.getParentNode()).getAttribute("id");
                 }
             }
-            
-            elemList = DOMUtils.findAllElementsByTagNameNS(getUsage(), 
-                                                           Tool.TOOL_SPEC_PUBLIC_ID, 
+
+            elemList = DOMUtils.findAllElementsByTagNameNS(getUsage(),
+                                                           Tool.TOOL_SPEC_PUBLIC_ID,
                                                            "argument");
             for (Element elem : elemList) {
                 if (elem.getAttribute("streamref").equals(streamId)) {
@@ -278,10 +278,10 @@ public class ToolSpec {
                 if (el.hasAttribute("default")) {
                     return el.getAttribute("default");
                 }
-            } else if ("option".equals(el.getLocalName())) {              
-                List<Element> elemList = 
-                    DOMUtils.findAllElementsByTagNameNS(el, 
-                                                        "http://cxf.apache.org/Xpipe/ToolSpecification", 
+            } else if ("option".equals(el.getLocalName())) {
+                List<Element> elemList =
+                    DOMUtils.findAllElementsByTagNameNS(el,
+                                                        "http://cxf.apache.org/Xpipe/ToolSpecification",
                                                         "associatedArgument");
                 if (elemList.size() > 0) {
                     Element assArg = elemList.get(0);
@@ -297,7 +297,7 @@ public class ToolSpec {
     public String getAnnotation() {
         String result = null;
         Element element = doc.getDocumentElement();
-        
+
         Node node = element.getFirstChild();
         while (node != null) {
             if ((node.getNodeType() == Node.ELEMENT_NODE)

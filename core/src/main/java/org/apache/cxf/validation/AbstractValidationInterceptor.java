@@ -38,41 +38,41 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 public abstract class AbstractValidationInterceptor extends AbstractPhaseInterceptor< Message > {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractValidationInterceptor.class);
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractValidationInterceptor.class);
-    
+
     private Object serviceObject;
     private volatile BeanValidationProvider provider;
-    
+
     public AbstractValidationInterceptor(String phase) {
         super(phase);
     }
-        
+
     public void setServiceObject(Object object) {
         this.serviceObject = object;
     }
-    
+
     public void setProvider(BeanValidationProvider provider) {
         this.provider = provider;
     }
-    
+
     @Override
-    public void handleMessage(Message message) throws Fault {        
+    public void handleMessage(Message message) throws Fault {
         final Object theServiceObject = getServiceObject(message);
         if (theServiceObject == null) {
             return;
         }
-        
+
         final Method method = getServiceMethod(message);
         if (method == null) {
             return;
         }
-        
-        
+
+
         final List< Object > arguments = MessageContentsList.getContentsList(message);
-        
+
         handleValidation(message, theServiceObject, method, arguments);
-                    
+
     }
-    
+
     protected Object getServiceObject(Message message) {
         if (serviceObject != null) {
             return serviceObject;
@@ -87,13 +87,13 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
             if (invoker instanceof FactoryInvoker) {
                 FactoryInvoker factoryInvoker = (FactoryInvoker)invoker;
                 if (factoryInvoker.isSingletonFactory()) {
-                    return factoryInvoker.getServiceObject(message.getExchange()); 
+                    return factoryInvoker.getServiceObject(message.getExchange());
                 }
             }
         }
         return null;
     }
-    
+
     protected Method getServiceMethod(Message message) {
         Message inMessage = message.getExchange().getInMessage();
         Method method = null;
@@ -102,7 +102,7 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
             if (method == null) {
                 BindingOperationInfo bop = inMessage.getExchange().getBindingOperationInfo();
                 if (bop != null) {
-                    MethodDispatcher md = (MethodDispatcher) 
+                    MethodDispatcher md = (MethodDispatcher)
                         inMessage.getExchange().getService().get(MethodDispatcher.class.getName());
                     method = md.getMethod(bop);
                 }
@@ -113,7 +113,7 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
         }
         return method;
     }
-    
+
     protected abstract void handleValidation(Message message, Object resourceInstance,
                                              Method method, List<Object> arguments);
 
@@ -122,7 +122,7 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
         if (provider == null) {
             Object prop = message.getContextualProperty(BeanValidationProvider.class.getName());
             if (prop != null) {
-                provider = (BeanValidationProvider)prop;    
+                provider = (BeanValidationProvider)prop;
             } else {
                 provider = new BeanValidationProvider();
             }
@@ -130,6 +130,6 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
         return provider;
     }
 
-    
+
 }
 

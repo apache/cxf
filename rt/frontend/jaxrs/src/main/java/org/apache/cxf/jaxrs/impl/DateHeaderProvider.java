@@ -26,9 +26,9 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class DateHeaderProvider implements HeaderDelegate<Date> {
-    
+
     public Date fromString(String value) {
-        
+
         if (value == null) {
             throw new IllegalArgumentException("Date value can not be null");
         }

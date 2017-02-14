@@ -50,11 +50,11 @@ import org.slf4j.LoggerFactory;
 public class ValidatorTest extends BasicIntegrationTest {
     private static final String PATH_TO_RESOURCES = "/data/xkms/certificates/";
 
-    private static final org.apache.cxf.xkms.model.xmldsig.ObjectFactory DSIG_OF = 
+    private static final org.apache.cxf.xkms.model.xmldsig.ObjectFactory DSIG_OF =
         new org.apache.cxf.xkms.model.xmldsig.ObjectFactory();
-    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF = 
+    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF =
         new org.apache.cxf.xkms.model.xkms.ObjectFactory();
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(ValidatorTest.class);
 
     @Test
@@ -191,12 +191,12 @@ public class ValidatorTest extends BasicIntegrationTest {
         CertificateFactory cf = CertificateFactory.getInstance("X.509");
         return (X509Certificate)cf.generateCertificate(inputStream);
     }
-    
+
     private StatusType doValidate(ValidateRequestType request) {
         try {
             return xkmsService.validate(request).getKeyBinding().get(0).getStatus();
         } catch (Exception e) {
-            // Avoid serialization problems for some exceptions when transported by pax exam 
+            // Avoid serialization problems for some exceptions when transported by pax exam
             LOG.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage());
         }

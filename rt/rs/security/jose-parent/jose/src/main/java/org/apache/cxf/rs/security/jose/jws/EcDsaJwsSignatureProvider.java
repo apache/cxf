@@ -33,7 +33,7 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
     public EcDsaJwsSignatureProvider(ECPrivateKey key, AlgorithmParameterSpec spec, SignatureAlgorithm algo) {
         this(key, null, spec, algo);
     }
-    public EcDsaJwsSignatureProvider(ECPrivateKey key, SecureRandom random, AlgorithmParameterSpec spec, 
+    public EcDsaJwsSignatureProvider(ECPrivateKey key, SecureRandom random, AlgorithmParameterSpec spec,
                                      SignatureAlgorithm algo) {
         super(key, random, spec, algo);
     }
@@ -43,10 +43,10 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
     }
     @Override
     protected JwsSignature doCreateJwsSignature(Signature s) {
-        return new EcDsaPrivateKeyJwsSignature(s, 
+        return new EcDsaPrivateKeyJwsSignature(s,
             EcDsaJwsSignatureVerifier.SIGNATURE_LENGTH_MAP.get(super.getAlgorithm().getJwaName()));
     }
-    
+
     protected static class EcDsaPrivateKeyJwsSignature extends PrivateKeyJwsSignature {
         private int outLen;
         public EcDsaPrivateKeyJwsSignature(Signature s, int outLen) {
@@ -59,38 +59,38 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
             return jcaOutputToJoseOutput(outLen, jcaDer);
         }
     }
-    
+
     private static byte[] jcaOutputToJoseOutput(int jwsSignatureLen, byte jcaDer[]) {
         // DER uses a pattern of type-length-value triplets
         // http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One#Example_encoded_in_DER
-        
+
         // The algorithm implementation guarantees the correct DER format so no extra validation
-        
-        // ECDSA signature production: 
-        // 48 (SEQUENCE) + Total Length (1 or 2 bytes, the 1st byte is -127 if 2 bytes) 
-        // + R & S triples, where both triples are represented as 
+
+        // ECDSA signature production:
+        // 48 (SEQUENCE) + Total Length (1 or 2 bytes, the 1st byte is -127 if 2 bytes)
+        // + R & S triples, where both triples are represented as
         // 2(INTEGER TYPE) + length + the actual sequence of a given length;
         // The sequence might have the extra leading zeroes which need to be skipped
         int requiredPartLen = jwsSignatureLen / 2;
-        
+
         int rsDataBlockStart = jcaDer[1] == -127 ? 4 : 3;
         int rPartLen = jcaDer[rsDataBlockStart];
         int rDataBlockStart = rsDataBlockStart + 1;
-        int rPartLenDiff = rPartLen - requiredPartLen; 
+        int rPartLenDiff = rPartLen - requiredPartLen;
         int rValueStart = rDataBlockStart + getDataBlockOffset(jcaDer, rDataBlockStart, rPartLenDiff);
-        
+
         int sPartStart = rDataBlockStart + rPartLen;
         int sPartLen = jcaDer[sPartStart + 1];
-        int sPartLenDiff = sPartLen - requiredPartLen; 
+        int sPartLenDiff = sPartLen - requiredPartLen;
         int sDataBlockStart = sPartStart + 2;
         int sValueStart = sDataBlockStart + getDataBlockOffset(jcaDer, sDataBlockStart, sPartLenDiff);
-                
-        byte[] result = new byte[jwsSignatureLen]; 
-        System.arraycopy(jcaDer, rValueStart, result, 
-            rPartLenDiff < 0 ? rPartLenDiff * -1 : 0, 
+
+        byte[] result = new byte[jwsSignatureLen];
+        System.arraycopy(jcaDer, rValueStart, result,
+            rPartLenDiff < 0 ? rPartLenDiff * -1 : 0,
             rPartLenDiff < 0 ? requiredPartLen + rPartLenDiff : requiredPartLen);
-        System.arraycopy(jcaDer, sValueStart, result, 
-            sPartLenDiff < 0 ? requiredPartLen + sPartLenDiff * -1 : requiredPartLen, 
+        System.arraycopy(jcaDer, sValueStart, result,
+            sPartLenDiff < 0 ? requiredPartLen + sPartLenDiff * -1 : requiredPartLen,
             sPartLenDiff < 0 ? requiredPartLen + sPartLenDiff : requiredPartLen);
         return result;
     }
@@ -105,6 +105,6 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
         }
         return i;
     }
-    
-    
+
+
 }

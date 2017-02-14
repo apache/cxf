@@ -30,26 +30,26 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class OAuthServerJoseJwtConsumer extends OAuthJoseJwtConsumer {
     private boolean verifyWithClientCertificates;
-   
+
     public JwtToken getJwtToken(String wrappedJwtToken, Client client) {
-        return getJwtToken(wrappedJwtToken, 
+        return getJwtToken(wrappedJwtToken,
                            getInitializedDecryptionProvider(client),
                            getInitializedSignatureVerifier(client));
     }
-    
+
     protected JweDecryptionProvider getInitializedDecryptionProvider(Client c) {
         if (c == null) {
             return null;
         }
         return super.getInitializedDecryptionProvider(c.getClientSecret());
     }
-    
+
     protected JwsSignatureVerifier getInitializedSignatureVerifier(Client c) {
         JwsSignatureVerifier theSignatureVerifier = null;
         if (verifyWithClientCertificates && c != null && !c.getApplicationCertificates().isEmpty()) {
-            X509Certificate cert = 
+            X509Certificate cert =
                 (X509Certificate)CryptoUtils.decodeCertificate(c.getApplicationCertificates().get(0));
-            theSignatureVerifier = JwsUtils.getPublicKeySignatureVerifier(cert.getPublicKey(), 
+            theSignatureVerifier = JwsUtils.getPublicKeySignatureVerifier(cert.getPublicKey(),
                                                                           SignatureAlgorithm.RS256);
         }
         if (theSignatureVerifier == null && c != null && c.getClientSecret() != null) {
@@ -64,5 +64,5 @@ public class OAuthServerJoseJwtConsumer extends OAuthJoseJwtConsumer {
         }
         this.verifyWithClientCertificates = verifyWithClientCertificates;
     }
-    
+
 }

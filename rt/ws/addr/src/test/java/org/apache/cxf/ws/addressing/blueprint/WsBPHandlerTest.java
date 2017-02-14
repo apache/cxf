@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class WsBPHandlerTest extends Assert {
     @Test
     public void testGetSchemaLocation() {
         WsBPHandler handler = new WsBPHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/ws/addressing"));
     }
 

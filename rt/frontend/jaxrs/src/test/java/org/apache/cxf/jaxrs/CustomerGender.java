@@ -22,7 +22,7 @@ package org.apache.cxf.jaxrs;
 public enum CustomerGender {
     MALE,
     FEMALE;
-    
+
     public static CustomerGender fromString(String s) {
         if ("1".equals(s)) {
             return FEMALE;

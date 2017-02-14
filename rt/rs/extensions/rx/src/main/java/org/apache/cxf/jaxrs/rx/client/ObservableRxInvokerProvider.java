@@ -33,7 +33,7 @@ public class ObservableRxInvokerProvider implements RxInvokerProvider<Observable
     public ObservableRxInvoker getRxInvoker(SyncInvoker syncInvoker, ExecutorService executorService) {
         // TODO: At the moment we still delegate if possible to the async HTTP conduit.
         // Investigate if letting the RxJava thread pool deal with the sync invocation
-        // is indeed more effective 
+        // is indeed more effective
         return new ObservableRxInvokerImpl(((SyncInvokerImpl)syncInvoker).getWebClient(), executorService);
     }
 

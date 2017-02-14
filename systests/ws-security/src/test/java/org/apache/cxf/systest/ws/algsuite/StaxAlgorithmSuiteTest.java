@@ -35,12 +35,12 @@ import org.junit.BeforeClass;
 
 /**
  * This is a test for AlgorithmSuites. Essentially it checks that a service endpoint will
- * reject a client request that uses a different AlgorithmSuite. It tests both DOM + StAX 
+ * reject a client request that uses a different AlgorithmSuite. It tests both DOM + StAX
  * clients against the StAX server.
  */
 public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(StaxServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
@@ -53,13 +53,13 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
             launchServer(StaxServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-    
+
     @org.junit.Test
     public void testSecurityPolicy() throws Exception {
 
@@ -73,23 +73,23 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         URL wsdl = StaxAlgorithmSuiteTest.class.getResource("DoubleItAlgSuite.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetric128Port");
-        
-        DoubleItPortType port = 
+
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         // This should succeed as the client + server policies match
         // DOM
         port.doubleIt(25);
-        
+
         // Streaming
         SecurityTestUtil.enableStreaming(port);
         port.doubleIt(25);
-        
+
         portQName = new QName(NAMESPACE, "DoubleItSymmetric128Port2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         // This should fail as the client uses Basic128Rsa15 + the server uses Basic128
         try {
             // DOM
@@ -98,7 +98,7 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         try {
             // Streaming
             SecurityTestUtil.enableStreaming(port);
@@ -107,14 +107,14 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
-        
+
+
         // This should fail as the client uses Basic256 + the server uses Basic128
         if (SecurityTestUtil.checkUnrestrictedPoliciesInstalled()) {
             portQName = new QName(NAMESPACE, "DoubleItSymmetric128Port3");
             port = service.getPort(portQName, DoubleItPortType.class);
             updateAddressPort(port, PORT);
-            
+
             // This should fail as the client uses Basic128Rsa15 + the server uses Basic128
             try {
                 // DOM
@@ -123,7 +123,7 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
             } catch (Exception ex) {
                 // expected
             }
-            
+
             try {
                 // Streaming
                 SecurityTestUtil.enableStreaming(port);
@@ -136,5 +136,5 @@ public class StaxAlgorithmSuiteTest extends AbstractBusClientServerTestBase {
 
         bus.shutdown(true);
     }
-    
+
 }

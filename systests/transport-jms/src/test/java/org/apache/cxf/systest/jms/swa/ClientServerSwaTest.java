@@ -39,14 +39,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
-    public static final String ADDRESS 
+    public static final String ADDRESS
         = "jms:jndi:dynamicQueues/test.cxf.jmstransport.swa.queue"
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
             + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=";
-    
+
     static EmbeddedJMSBrokerLauncher broker;
-    
+
     public static class Server extends AbstractBusTestServerBase {
         protected void run() {
             try {
@@ -77,7 +77,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
     @AfterClass
     public static void clearProperty() {
         System.clearProperty("EmbeddedBrokerURL");
-    }    
+    }
     @Test
     public void testSwa() throws Exception {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
@@ -88,16 +88,16 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         factory.setAddress(ADDRESS + broker.getEncodedBrokerURL());
         factory.getOutInterceptors().add(new LoggingOutInterceptor());
         SwAService port = factory.create(SwAService.class);
-        
-        
+
+
         Holder<String> textHolder = new Holder<String>();
         Holder<DataHandler> data = new Holder<DataHandler>();
-        
+
         ByteArrayDataSource source = new ByteArrayDataSource("foobar".getBytes(), "application/octet-stream");
         DataHandler handler = new DataHandler(source);
-        
+
         data.value = handler;
-        
+
         textHolder.value = "Hi";
 
         port.echoData(textHolder, data);
@@ -108,7 +108,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         String string = IOUtils.newStringFromBytes(b);
         assertEquals("testfoobar", string);
         assertEquals("Hi", textHolder.value);
-        
+
         if (port instanceof Closeable) {
             ((Closeable)port).close();
         }

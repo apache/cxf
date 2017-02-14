@@ -381,14 +381,14 @@ public final class ProcessorUtil {
         XmlSchemaElement elementByName = schema.getElementByQName(partElement);
 
         XmlSchemaComplexType type = (XmlSchemaComplexType)elementByName.getSchemaType();
-        
+
         XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();
 
-        qnames.addAll(createWrappedElements(seq));    
+        qnames.addAll(createWrappedElements(seq));
 
         //If it's extension
         if (seq == null && type.getContentModel() != null) {
-            
+
             XmlSchemaContent xmlSchemaConent = type.getContentModel().getContent();
             if (xmlSchemaConent instanceof XmlSchemaComplexContentExtension) {
                 XmlSchemaComplexContentExtension extension = (XmlSchemaComplexContentExtension)type
@@ -414,7 +414,7 @@ public final class ProcessorUtil {
     }
 
     private static List<WrapperElement> createWrappedElements(XmlSchemaSequence seq) {
-       
+
         List<WrapperElement> qnames = new ArrayList<>();
         if (seq != null) {
 
@@ -433,7 +433,7 @@ public final class ProcessorUtil {
         }
         return qnames;
     }
-    
+
     public static boolean isSchemaFormQualified(ToolContext context, QName partElement) {
         ServiceInfo serviceInfo = context.get(ServiceInfo.class);
         SchemaCollection schemaCol = serviceInfo.getXmlSchemaCollection();

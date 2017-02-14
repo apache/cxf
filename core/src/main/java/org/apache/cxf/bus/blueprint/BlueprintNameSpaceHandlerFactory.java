@@ -23,7 +23,7 @@ public interface BlueprintNameSpaceHandlerFactory {
      * Creates aries blueprint NamespaceHandler.
      * The return type is untyped as aries blueprint is an
      * optional import
-     *  
+     *
      * @return handler
      */
     Object createNamespaceHandler();

@@ -31,10 +31,10 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class HawkAccessTokenValidator extends AbstractHawkAccessTokenValidator {
     private OAuthDataProvider dataProvider;
-        
+
     protected AccessTokenValidation getAccessTokenValidation(MessageContext mc,
-                                                             String authScheme, 
-                                                             String authSchemeData, 
+                                                             String authScheme,
+                                                             String authSchemeData,
                                                              MultivaluedMap<String, String> extraProps,
                                                              Map<String, String> schemeParams) {
         String macKey = schemeParams.get(OAuthConstants.HAWK_TOKEN_ID);
@@ -44,18 +44,18 @@ public class HawkAccessTokenValidator extends AbstractHawkAccessTokenValidator {
         }
         HawkAccessToken macAccessToken = (HawkAccessToken)accessToken;
         AccessTokenValidation atv = new AccessTokenValidation(macAccessToken);
-        
+
         // OAuth2 Pop token introspection will likely support returning a JWE-encrypted key
         if (!isRemoteSignatureValidation() || mc.getSecurityContext().isSecure()) {
             atv.getExtraProps().put(OAuthConstants.HAWK_TOKEN_KEY, macAccessToken.getMacKey());
             atv.getExtraProps().put(OAuthConstants.HAWK_TOKEN_ALGORITHM, macAccessToken.getMacAlgorithm());
         }
-        
+
         return atv;
     }
-    
+
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
     }
-    
+
 }

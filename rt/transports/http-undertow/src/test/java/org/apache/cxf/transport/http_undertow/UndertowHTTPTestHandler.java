@@ -28,7 +28,7 @@ import io.undertow.servlet.spec.ServletContextImpl;
 import io.undertow.util.Headers;
 
 public class UndertowHTTPTestHandler extends UndertowHTTPHandler {
-       
+
     private String responseStr;
 
     public UndertowHTTPTestHandler(String s, boolean cmExact) {
@@ -36,11 +36,11 @@ public class UndertowHTTPTestHandler extends UndertowHTTPHandler {
         responseStr = s;
     }
 
-    
+
     @Override
     public void handleRequest(HttpServerExchange undertowExchange) throws Exception {
         try {
-            
+
             HttpServletResponseImpl response = new HttpServletResponseImpl(undertowExchange,
                                                                            (ServletContextImpl)servletContext);
             HttpServletRequestImpl request = new HttpServletRequestImpl(undertowExchange,
@@ -48,12 +48,12 @@ public class UndertowHTTPTestHandler extends UndertowHTTPHandler {
 
             ServletRequestContext servletRequestContext = new ServletRequestContext(((ServletContextImpl)servletContext)
                 .getDeployment(), request, response, null);
-            
-             
+
+
             undertowExchange.putAttachment(ServletRequestContext.ATTACHMENT_KEY, servletRequestContext);
             request.setAttribute("HTTP_HANDLER", this);
             request.setAttribute("UNDERTOW_DESTINATION", undertowHTTPDestination);
-                        
+
             // just return the response for testing
             response.getOutputStream().write(responseStr.getBytes());
             response.flushBuffer();

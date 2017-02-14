@@ -49,7 +49,7 @@ public class PolicyEngineImplInitTest {
     public void setUp() throws Exception {
         assertNotNull(bus);
     }
-    
+
     @After
     public void tearDown() throws Exception {
         bus.shutdown(true);

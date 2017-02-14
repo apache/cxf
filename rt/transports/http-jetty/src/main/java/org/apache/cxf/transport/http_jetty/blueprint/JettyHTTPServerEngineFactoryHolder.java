@@ -58,11 +58,11 @@ public class JettyHTTPServerEngineFactoryHolder {
 
     private String parsedElement;
     private JettyHTTPServerEngineFactory factory;
-    
+
     private Map<String, Connector> connectorMap;
-    
+
     private Map<String, List<Handler>> handlersMap;
-    
+
     private JAXBContext jaxbContext;
     private Set<Class<?>> jaxbClasses;
 
@@ -72,14 +72,14 @@ public class JettyHTTPServerEngineFactoryHolder {
     public void init() {
         try {
             Element element = StaxUtils.read(new StringReader(parsedElement)).getDocumentElement();
-            
-            JettyHTTPServerEngineFactoryConfigType config 
+
+            JettyHTTPServerEngineFactoryConfigType config
                 = (JettyHTTPServerEngineFactoryConfigType) getJaxbObject(element,
                     JettyHTTPServerEngineFactoryConfigType.class);
 
             factory = new JettyHTTPServerEngineFactory();
 
-            Map<String, ThreadingParameters> threadingParametersMap 
+            Map<String, ThreadingParameters> threadingParametersMap
                 = new TreeMap<String, ThreadingParameters>();
 
             if (config.getIdentifiedThreadingParameters() != null) {
@@ -101,7 +101,7 @@ public class JettyHTTPServerEngineFactoryHolder {
 
                 for (TLSServerParametersIdentifiedType t : config.getIdentifiedTLSServerParameters()) {
                     try {
-                        TLSServerParameters parameter 
+                        TLSServerParameters parameter
                             = new TLSServerParametersConfig(t.getTlsServerParameters());
                         sslMap.put(t.getId(), parameter);
                     } catch (Exception e) {
@@ -134,11 +134,11 @@ public class JettyHTTPServerEngineFactoryHolder {
                             + engine.getPort().toString());
                     }
                 }
-                
+
                 if (engine.isContinuationsEnabled() != null) {
                     eng.setContinuationsEnabled(engine.isContinuationsEnabled());
                 }
- 
+
                 if (engine.getHost() != null && !StringUtils.isEmpty(engine.getHost())) {
                     eng.setHost(engine.getHost());
                 }
@@ -170,7 +170,7 @@ public class JettyHTTPServerEngineFactoryHolder {
                         parameter = new TLSServerParametersConfig(engine.getTlsServerParameters());
                         eng.setTlsServerParameters(parameter);
                     } catch (Exception e) {
-                        throw new RuntimeException("Could not configure TLS for engine on  " 
+                        throw new RuntimeException("Could not configure TLS for engine on  "
                             + eng.getHost() + ":" + eng.getPort(), e);
                     }
                 }
@@ -201,11 +201,11 @@ public class JettyHTTPServerEngineFactoryHolder {
     public void setParsedElement(String parsedElement) {
         this.parsedElement = parsedElement;
     }
-    
+
     public void setConnectorMap(Map<String, Connector> connectorMap) {
         this.connectorMap = connectorMap;
     }
-    
+
     public void setHandlersMap(Map<String, List<Handler>> handlersMap) {
         this.handlersMap = handlersMap;
     }
@@ -228,7 +228,7 @@ public class JettyHTTPServerEngineFactoryHolder {
                 if (jaxbClasses != null) {
                     tmp.addAll(jaxbClasses);
                 }
-                JAXBContextCache.addPackage(tmp, PackageUtils.getPackageName(cls), 
+                JAXBContextCache.addPackage(tmp, PackageUtils.getPackageName(cls),
                                             cls == null ? getClass().getClassLoader() : cls.getClassLoader());
                 if (cls != null) {
                     boolean hasOf = false;
@@ -242,7 +242,7 @@ public class JettyHTTPServerEngineFactoryHolder {
                     }
                 }
                 JAXBContextCache.scanPackages(tmp);
-                JAXBContextCache.CachedContextAndSchemas ccs 
+                JAXBContextCache.CachedContextAndSchemas ccs
                     = JAXBContextCache.getCachedContextAndSchemas(tmp, null, null, null, false);
                 jaxbClasses = ccs.getClasses();
                 jaxbContext = ccs.getContext();

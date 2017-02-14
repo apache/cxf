@@ -42,7 +42,7 @@ public class MultipartBodyTest extends Assert {
         assertEquals(atts.get(0), b.getRootAttachment());
         assertEquals(atts.get(1), b.getChildAttachments().get(0));
     }
-    
+
     @Test
     public void testGetAttachmentsById() {
         List<Attachment> atts = new ArrayList<>();
@@ -53,9 +53,9 @@ public class MultipartBodyTest extends Assert {
         assertEquals(atts.get(1), b.getAttachment("p2"));
         assertNull(b.getAttachment("p3"));
     }
-    
+
     private Attachment createAttachment(String id) {
-        return new Attachment(id, 
+        return new Attachment(id,
                        new DataHandler(new ByteArrayDataSource(new byte[]{1}, "application/octet-stream")),
                        new MetadataMap<String, String>());
     }

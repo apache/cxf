@@ -47,14 +47,14 @@ public class URITemplateTest extends Assert {
         assertTrue(URITemplate.compareTemplates(t2, t1) > 0);
         assertEquals(0, URITemplate.compareTemplates(t2, t2));
     }
-    
+
     @Test
     public void testPathCharacters() {
         String pathChars = ":@!$&'*+,;=-._~()";
-        assertTrue(new URITemplate(pathChars).match(pathChars, 
+        assertTrue(new URITemplate(pathChars).match(pathChars,
                                                     new MetadataMap<String, String>()));
     }
-    
+
     @Test
     public void testMatchBasic() throws Exception {
         URITemplate uriTemplate = new URITemplate("/customers/{id}");
@@ -65,7 +65,7 @@ public class URITemplateTest extends Assert {
         String value = values.getFirst("id");
         assertEquals("123", value);
     }
-    
+
     @Test
     public void testMatchWithMatrixAndTemplate() throws Exception {
         URITemplate uriTemplate = new URITemplate("/customers/{id}");
@@ -87,7 +87,7 @@ public class URITemplateTest extends Assert {
         String finalGroup = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/", finalGroup);
     }
-    
+
     @Test
     public void testMatchWithMatrixWithEmptyPath2() throws Exception {
         URITemplate uriTemplate = new URITemplate("/");
@@ -98,7 +98,7 @@ public class URITemplateTest extends Assert {
         String finalGroup = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/b/c", finalGroup);
     }
-    
+
     @Test
     public void testMatchWithMatrixOnClearPath1() throws Exception {
         URITemplate uriTemplate = new URITemplate("/customers/{id}");
@@ -119,26 +119,26 @@ public class URITemplateTest extends Assert {
         assertEquals("123", values.getFirst("id"));
         assertEquals("3", values.getFirst("order"));
     }
-    
+
     @Test
     public void testMatchWithMultipleMatrixParams() throws Exception {
-        URITemplate uriTemplate = 
+        URITemplate uriTemplate =
             new URITemplate("renderwidget/id/{id}/type/{type}/size/{size}/locale/{locale}/{properties}");
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
 
-        assertTrue(uriTemplate.match("renderwidget/id/1007/type/1/size/1/locale/en_US/properties;a=b", 
+        assertTrue(uriTemplate.match("renderwidget/id/1007/type/1/size/1/locale/en_US/properties;a=b",
                                      values));
         assertEquals("1007", values.getFirst("id"));
     }
-    
+
     @Test
     public void testMatchWithMultipleMatrixParams2() throws Exception {
-        URITemplate uriTemplate = 
+        URITemplate uriTemplate =
             new URITemplate("renderwidget/id/{id}/type/{type}/size/{size}/locale/{locale}/{properties}");
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
 
         assertTrue(uriTemplate.match(
-                   "renderwidget/id/1007/type/1/size/1/locale/en_US/properties;numResults=1;foo=bar", 
+                   "renderwidget/id/1007/type/1/size/1/locale/en_US/properties;numResults=1;foo=bar",
                     values));
         assertEquals("1007", values.getFirst("id"));
     }
@@ -161,7 +161,7 @@ public class URITemplateTest extends Assert {
 
         assertTrue(uriTemplate.match("/customers;123456/123/orders;456/3", values));
     }
-    
+
     @Test
     public void testMatchWithMatrixOnClearPath5() throws Exception {
         URITemplate uriTemplate = new URITemplate("/customers");
@@ -236,7 +236,7 @@ public class URITemplateTest extends Assert {
         String subResourcePath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/chapter/1", subResourcePath);
     }
-    
+
     @Test
     public void testURITemplateWithSubResourceVariation4() throws Exception {
         URITemplate uriTemplate = new URITemplate("/");
@@ -252,17 +252,17 @@ public class URITemplateTest extends Assert {
     public void testBasicCustomExpression() throws Exception {
         doTestBasicCustomExpression("/books/{bookId:[^/]+?}");
     }
-    
+
     @Test
     public void testBasicCustomExpressionWithSpaces() throws Exception {
         doTestBasicCustomExpression("/books/{ bookId : [^/]+? }");
     }
-    
+
     @Test
     public void testBasicCustomExpressionWithSpaces2() throws Exception {
         doTestBasicCustomExpression("/books/{ bookId }/");
     }
-    
+
     private void doTestBasicCustomExpression(String expression) {
         URITemplate uriTemplate = new URITemplate(expression);
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
@@ -271,9 +271,9 @@ public class URITemplateTest extends Assert {
         assertTrue(match);
         assertEquals("123", values.getFirst("bookId"));
         String subResourcePath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
-        assertEquals("/chapter/1", subResourcePath);    
+        assertEquals("/chapter/1", subResourcePath);
     }
-    
+
 
     @Test
     public void testBasicCustomExpression2() throws Exception {
@@ -309,7 +309,7 @@ public class URITemplateTest extends Assert {
         assertFalse(uriTemplate.match("/books/acdb", values));
 
     }
-    
+
     @Test
     public void testEscapingWildCard() throws Exception {
         URITemplate uriTemplate = new URITemplate("/books/a*");
@@ -319,7 +319,7 @@ public class URITemplateTest extends Assert {
         assertFalse(uriTemplate.match("/books/a", values));
         assertFalse(uriTemplate.match("/books/ac", values));
     }
-    
+
     @Test
     public void testValueWithLiteralPlus() throws Exception {
         URITemplate uriTemplate = new URITemplate("/books/ab+");
@@ -330,7 +330,7 @@ public class URITemplateTest extends Assert {
         assertFalse(uriTemplate.match("/books/ab", values));
         assertFalse(uriTemplate.match("/books/a", values));
     }
-    
+
     @Test
     public void testValueWithManyLiteralPluses() throws Exception {
         URITemplate uriTemplate = new URITemplate("/books/ab+++++");
@@ -357,7 +357,7 @@ public class URITemplateTest extends Assert {
         assertFalse(uriTemplate.match("/books/abc", values));
         assertFalse(uriTemplate.match("/books/a", values));
     }
-    
+
     @Test
     public void testEncodedSpace() throws Exception {
         URITemplate uriTemplate = new URITemplate("/1 2/%203");
@@ -366,7 +366,7 @@ public class URITemplateTest extends Assert {
         assertTrue(uriTemplate.match("/1%202/%203", values));
         assertFalse(uriTemplate.match("/1 2/%203", values));
     }
-    
+
     @Test
     public void testBasicCustomExpression4() throws Exception {
         URITemplate uriTemplate = new URITemplate("/books/{bookId:...\\.}");
@@ -380,7 +380,7 @@ public class URITemplateTest extends Assert {
         assertFalse(uriTemplate.match("/books/abcd", values));
         assertFalse(uriTemplate.match("/books/abc", values));
     }
-    
+
     @Test
     public void testExpressionWithNestedGroup() throws Exception {
         URITemplate uriTemplate = new URITemplate("/{resource:.+\\.(js|css|gif|png)}");
@@ -391,13 +391,13 @@ public class URITemplateTest extends Assert {
         String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/", finalPath);
         values.clear();
-        
+
         assertTrue(uriTemplate.match("/script.js/bar", values));
         assertEquals("script.js", values.getFirst("resource"));
         finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/bar", finalPath);
         values.clear();
-        
+
         assertFalse(uriTemplate.match("/script.pdf", values));
     }
 
@@ -412,7 +412,7 @@ public class URITemplateTest extends Assert {
         String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/", finalPath);
     }
-    
+
     @Test
     public void testExpressionWithNestedGroupAndTwoVars2() throws Exception {
         URITemplate uriTemplate = new URITemplate("/foo/{bar}{resource:(/format/[^/]+?)?}");
@@ -424,21 +424,21 @@ public class URITemplateTest extends Assert {
         String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/", finalPath);
         values.clear();
-        
+
         assertTrue(uriTemplate.match("/foo/1/format/2", values));
         assertEquals("1", values.getFirst("bar"));
         assertEquals("/format/2", values.getFirst("resource"));
         finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/", finalPath);
         values.clear();
-        
+
         assertTrue(uriTemplate.match("/foo/1", values));
         assertEquals("1", values.getFirst("bar"));
         assertNull(values.getFirst("resource"));
         finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/", finalPath);
     }
-    
+
     @Test
     public void testExpressionWithTwoVars() throws Exception {
         URITemplate uriTemplate = new URITemplate("/{tenant : [^/]*}/resource/{id}");
@@ -451,7 +451,7 @@ public class URITemplateTest extends Assert {
         assertEquals("1", id);
         String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/", finalPath);
-        
+
         values.clear();
         match = uriTemplate.match("//resource/1", values);
         assertTrue(match);
@@ -461,7 +461,7 @@ public class URITemplateTest extends Assert {
         assertEquals("1", id);
         finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/", finalPath);
-        
+
         values.clear();
         match = uriTemplate.match("/t1/resource/1/sub", values);
         assertTrue(match);
@@ -472,7 +472,7 @@ public class URITemplateTest extends Assert {
         finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/sub", finalPath);
     }
-    
+
     @Test
     public void testExpressionWithNestedGroupAndManySegments() throws Exception {
         URITemplate uriTemplate = new URITemplate("/foo/{bar}{resource:(/format/[^/]+?)?}/baz");
@@ -485,10 +485,10 @@ public class URITemplateTest extends Assert {
         assertEquals("/3", finalPath);
         values.clear();
     }
-    
+
     @Test
     public void testExpressionWithNestedGroup2() throws Exception {
-        URITemplate uriTemplate = 
+        URITemplate uriTemplate =
             new URITemplate("/{resource:.+\\.(js|css|gif|png)}/bar");
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
 
@@ -497,10 +497,10 @@ public class URITemplateTest extends Assert {
         String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/baz", finalPath);
     }
-    
+
     @Test
     public void testLiteralExpression() throws Exception {
-        URITemplate uriTemplate = 
+        URITemplate uriTemplate =
             new URITemplate("/bar");
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
 
@@ -508,7 +508,7 @@ public class URITemplateTest extends Assert {
         String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         assertEquals("/baz", finalPath);
     }
-    
+
     @Test
     public void testMultipleExpression2() throws Exception {
         URITemplate uriTemplate = new URITemplate("/books/{bookId:123}/chapter/{id}");
@@ -727,7 +727,7 @@ public class URITemplateTest extends Assert {
         map.put("hex", "FF");
         assertEquals("Wrong substitution", "/foo/FF", ut.substitute(map));
     }
-    
+
     @Test
     public void testEncodeLiteralCharacters() {
         URITemplate ut = new URITemplate("a {id} b");

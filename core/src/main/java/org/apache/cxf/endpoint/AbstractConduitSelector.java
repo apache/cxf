@@ -45,24 +45,24 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * that retrieves a Conduit from the ConduitInitiator.
  */
 public abstract class AbstractConduitSelector implements ConduitSelector, Closeable {
-    public static final String CONDUIT_COMPARE_FULL_URL 
+    public static final String CONDUIT_COMPARE_FULL_URL
         = "org.apache.cxf.ConduitSelector.compareFullUrl";
     protected static final String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
-    
-    
+
+
     //collection of conduits that were created so we can close them all at the end
     protected List<Conduit> conduits = new CopyOnWriteArrayList<Conduit>();
-    
+
     //protected Conduit selectedConduit;
     protected Endpoint endpoint;
 
-    
+
     public AbstractConduitSelector() {
     }
-    
+
     /**
      * Constructor, allowing a specific conduit to override normal selection.
-     * 
+     *
      * @param c specific conduit
      */
     public AbstractConduitSelector(Conduit c) {
@@ -70,25 +70,25 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             conduits.add(c);
         }
     }
-        
+
     public void close() {
         for (Conduit c : conduits) {
             c.close();
         }
         conduits.clear();
     }
-    
+
     protected void removeConduit(Conduit conduit) {
         if (conduit != null) {
             conduit.close();
             conduits.remove(conduit);
         }
     }
-    
+
     /**
      * Mechanics to actually get the Conduit from the ConduitInitiator
      * if necessary.
-     * 
+     *
      * @param message the current Message
      */
     protected Conduit getSelectedConduit(Message message) {
@@ -117,17 +117,17 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             } catch (IOException ex) {
                 throw new Fault(ex);
             }
-        } 
+        }
         if (c != null && c.getTarget() != null && c.getTarget().getAddress() != null) {
             replaceEndpointAddressPropertyIfNeeded(message, c.getTarget().getAddress().getValue(), c);
         }
-        //the search for the conduit could cause extra properties to be reset/loaded. 
+        //the search for the conduit could cause extra properties to be reset/loaded.
         message.resetContextCache();
         message.put(Conduit.class, c);
         return c;
     }
-    
-    protected Conduit createConduit(Message message, Exchange exchange, ConduitInitiator conduitInitiator) 
+
+    protected Conduit createConduit(Message message, Exchange exchange, ConduitInitiator conduitInitiator)
         throws IOException {
         Conduit c = null;
         synchronized (endpoint) {
@@ -151,7 +151,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
                 epr.setAddress(ad);
                 c = conduitInitiator.getConduit(ei, epr, exchange.getBus());
             }
-            MessageObserver observer = 
+            MessageObserver observer =
                 exchange.get(MessageObserver.class);
             if (observer != null) {
                 c.setMessageObserver(observer);
@@ -165,14 +165,14 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
 
     // Some conduits may replace the endpoint address after it has already been prepared
     // but before the invocation has been done (ex, org.apache.cxf.clustering.LoadDistributorTargetSelector)
-    // which may affect JAX-RS clients where actual endpoint address property may include additional path 
-    // segments.  
-    protected boolean replaceEndpointAddressPropertyIfNeeded(Message message, 
+    // which may affect JAX-RS clients where actual endpoint address property may include additional path
+    // segments.
+    protected boolean replaceEndpointAddressPropertyIfNeeded(Message message,
                                                              String endpointAddress,
                                                              Conduit cond) {
         return false;
     }
-    
+
     /**
      * @return the encapsulated Endpoint
      */
@@ -186,17 +186,17 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
     public void setEndpoint(Endpoint ep) {
         endpoint = ep;
     }
-    
+
     /**
      * Called on completion of the MEP for which the Conduit was required.
-     * 
+     *
      * @param exchange represents the completed MEP
      */
     public void complete(Exchange exchange) {
         // Clients expecting explicit InputStream responses
         // will need to keep low level conduits operating on InputStreams open
         // and will be responsible for closing the streams
-        
+
         if (MessageUtils.isTrue(exchange.get(KEEP_CONDUIT_ALIVE))) {
             return;
         }
@@ -212,7 +212,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
         } catch (IOException e) {
             //IGNORE
         }
-    }    
+    }
     /**
      * @return the logger to use
      */
@@ -220,12 +220,12 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
 
     /**
      * If address protocol was changed, conduit should be re-initialised
-     * 
+     *
      * @param message the current Message
      */
     protected Conduit findCompatibleConduit(Message message) {
         Conduit c = message.get(Conduit.class);
-        if (c == null 
+        if (c == null
             && message.getExchange() != null
             && message.getExchange().getOutMessage() != null
             && message.getExchange().getOutMessage() != message) {
@@ -236,7 +236,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
         }
         ContextualBooleanGetter cbg = new ContextualBooleanGetter(message);
         for (Conduit c2 : conduits) {
-            if (c2.getTarget() == null 
+            if (c2.getTarget() == null
                 || c2.getTarget().getAddress() == null
                 || c2.getTarget().getAddress().getValue() == null) {
                 continue;
@@ -256,7 +256,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             }
         }
         for (Conduit c2 : conduits) {
-            if (c2.getTarget() == null 
+            if (c2.getTarget() == null
                 || c2.getTarget().getAddress() == null
                 || c2.getTarget().getAddress().getValue() == null) {
                 return c2;
@@ -264,7 +264,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
         }
         return null;
     }
-    
+
     private boolean matchAddresses(String conduitAddress, String actualAddress, ContextualBooleanGetter cbg) {
         if (conduitAddress.length() == actualAddress.length()) {
             //let's be optimistic and try full comparison first, regardless of CONDUIT_COMPARE_FULL_URL value,
@@ -280,7 +280,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
         }
     }
 
-    //smart address substring comparison that tries to avoid building and comparing substrings unless strictly required 
+    //smart address substring comparison that tries to avoid building and comparing substrings unless strictly required
     private boolean matchAddressSubstrings(String conduitAddress, String actualAddress) {
         int idx = conduitAddress.indexOf(':');
         if (idx == actualAddress.indexOf(':')) {
@@ -291,19 +291,19 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             actualAddress = actualAddress.substring(0, idx);
             return conduitAddress.equalsIgnoreCase(actualAddress);
         } else {
-            //no possible match as for sure the substrings before idx will be different 
+            //no possible match as for sure the substrings before idx will be different
             return false;
         }
     }
-    
+
     private static final class ContextualBooleanGetter {
         private Boolean value;
         private final Message message;
-        
+
         ContextualBooleanGetter(Message message) {
             this.message = message;
         }
-        
+
         public boolean isFullComparison() {
             if (value == null) {
                 value = MessageUtils.getContextualBoolean(message, CONDUIT_COMPARE_FULL_URL, false);

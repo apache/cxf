@@ -40,29 +40,29 @@ public class LogoutService {
     protected static final Logger LOG = LogUtils.getL7dLogger(LogoutService.class);
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(LogoutService.class);
     private SPStateManager stateProvider;
-    
+
     private String mainApplicationAddress;
-    
+
     @GET
     @Produces("text/html")
     public LogoutResponse logout(@CookieParam(SSOConstants.SECURITY_CONTEXT_TOKEN) Cookie context,
                        @Context SecurityContext sc) {
         doLogout(context, sc);
         // Use View Handler to tell the user that the logout has been successful,
-        // optionally listing the user login name and/or linking to the main application address, 
+        // optionally listing the user login name and/or linking to the main application address,
         // the user may click on it, will be redirected to IDP and the process will start again
         return new LogoutResponse(sc.getUserPrincipal().getName(), mainApplicationAddress);
     }
-    
+
     @POST
     @Produces("text/html")
     public LogoutResponse postLogout(@CookieParam(SSOConstants.SECURITY_CONTEXT_TOKEN) Cookie context,
                                      @Context SecurityContext sc) {
         return logout(context, sc);
     }
-    
-    
-    
+
+
+
     private void doLogout(Cookie context, SecurityContext sc) {
         if (context == null || sc.getUserPrincipal() == null || sc.getUserPrincipal().getName() == null) {
             reportError("MISSING_RESPONSE_STATE");
@@ -70,9 +70,9 @@ public class LogoutService {
         }
         stateProvider.removeResponseState(context.getValue());
     }
-    
+
     protected void reportError(String code) {
-        org.apache.cxf.common.i18n.Message errorMsg = 
+        org.apache.cxf.common.i18n.Message errorMsg =
             new org.apache.cxf.common.i18n.Message(code, BUNDLE);
         LOG.warning(errorMsg.toString());
     }

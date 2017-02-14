@@ -38,25 +38,25 @@ import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.CollectionUtils;
 
 /**
- * 
+ *
  */
 public class BusEntityResolver extends DelegatingEntityResolver  {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(BusEntityResolver.class);
-    
+
     private EntityResolver dtdResolver;
     private EntityResolver schemaResolver;
     private Map<String, String> schemaMappings;
     private ClassLoader classLoader;
-    
+
     public BusEntityResolver(ClassLoader loader, EntityResolver dr, EntityResolver sr) {
         super(dr, sr);
         classLoader = loader;
         dtdResolver = dr;
         schemaResolver = sr;
-        
+
         try {
-            Properties mappings = PropertiesLoaderUtils.loadAllProperties("META-INF/spring.schemas", 
+            Properties mappings = PropertiesLoaderUtils.loadAllProperties("META-INF/spring.schemas",
                                                                           classLoader);
             schemaMappings = new ConcurrentHashMap<String, String>(mappings.size());
             CollectionUtils.mergePropertiesIntoMap(mappings, schemaMappings);
@@ -71,19 +71,19 @@ public class BusEntityResolver extends DelegatingEntityResolver  {
         if (null == source && null != systemId) {
             // try the schema and dtd resolver in turn, ignoring the suffix in publicId
             LOG.log(Level.FINE, "Attempting to resolve systemId {0}", systemId);
-            source = schemaResolver.resolveEntity(publicId, systemId);                
+            source = schemaResolver.resolveEntity(publicId, systemId);
             if (null == source) {
-                source = dtdResolver.resolveEntity(publicId, systemId); 
+                source = dtdResolver.resolveEntity(publicId, systemId);
             }
         }
         String resourceLocation = schemaMappings.get(systemId);
         if (resourceLocation != null && publicId == null) {
             Resource resource = new ClassPathResource(resourceLocation, classLoader);
             if (resource != null && resource.exists()) {
-                source.setPublicId(systemId);    
+                source.setPublicId(systemId);
                 source.setSystemId(resource.getURL().toString());
             }
         }
         return source;
-    }    
+    }
 }

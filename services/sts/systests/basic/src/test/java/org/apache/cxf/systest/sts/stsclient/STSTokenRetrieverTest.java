@@ -71,13 +71,13 @@ import org.junit.Test;
 /**
  * Some tests for STSClient configuration.
  */
-public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {    
+public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
-   
-    private static final String STS_SERVICE_NAME = 
+
+    private static final String STS_SERVICE_NAME =
         "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService";
-    private static final String TOKEN_TYPE_SAML_2_0 = 
+    private static final String TOKEN_TYPE_SAML_2_0 =
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
 
     private static final String SERVICE_ENDPOINT_ASSYMETRIC =
@@ -89,7 +89,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
     private static final String SERVICE_ENDPOINT_TRANSPORT =
         "https://localhost:8081/doubleit/services/doubleittransportsaml1";
     private static final String STS_TRANSPORT_WSDL_LOCATION_RELATIVE = "/SecurityTokenService/Transport?wsdl";
-    private static final String STS_TRANSPORT_ENDPOINT_NAME = 
+    private static final String STS_TRANSPORT_ENDPOINT_NAME =
         "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port";
 
     private static final String CLIENTSTORE = "/keys/clientstore.jks";
@@ -101,12 +101,12 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         STSServer stsServer = new STSServer();
         stsServer.setContext("cxf-transport.xml");
         assertTrue(launchServer(stsServer));
-        
+
         stsServer = new STSServer();
         stsServer.setContext("cxf-x509.xml");
         assertTrue(launchServer(stsServer));
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -115,12 +115,12 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testSTSAsymmetricBinding() throws Exception {
-        Bus bus = BusFactory.getThreadDefaultBus();        
+        Bus bus = BusFactory.getThreadDefaultBus();
         STSClient stsClient = initStsClientAsymmeticBinding(bus);
-        
+
         MessageImpl message = prepareMessage(bus, stsClient, SERVICE_ENDPOINT_ASSYMETRIC);
         STSTokenRetriever.TokenRequestParams params = new STSTokenRetriever.TokenRequestParams();
-        
+
         SecurityToken token = STSTokenRetriever.getToken(message, params);
         validateSecurityToken(token);
     }
@@ -129,16 +129,16 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
     public void testSTSTransportBinding() throws Exception {
         // Setup HttpsURLConnection to get STS WSDL
         configureDefaultHttpsConnection();
-        
-        Bus bus = BusFactory.getThreadDefaultBus();  
+
+        Bus bus = BusFactory.getThreadDefaultBus();
         STSClient stsClient = initStsClientTransportBinding(bus);
-        
+
         TLSClientParameters tlsParams = prepareTLSParams();
         ((HTTPConduit)stsClient.getClient().getConduit()).setTlsClientParameters(tlsParams);
-        
-        MessageImpl message = prepareMessage(bus, stsClient, SERVICE_ENDPOINT_TRANSPORT);       
+
+        MessageImpl message = prepareMessage(bus, stsClient, SERVICE_ENDPOINT_TRANSPORT);
         STSTokenRetriever.TokenRequestParams params = new STSTokenRetriever.TokenRequestParams();
-        
+
         SecurityToken token = STSTokenRetriever.getToken(message, params);
         validateSecurityToken(token);
     }
@@ -193,7 +193,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         MessageImpl message = new MessageImpl();
         message.put(SecurityConstants.STS_CLIENT, stsClient);
         message.put(Message.ENDPOINT_ADDRESS, serviceAddress);
-        
+
         Exchange exchange = new ExchangeImpl();
         ServiceInfo si = new ServiceInfo();
         Service s = new ServiceImpl(si);
@@ -223,8 +223,8 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         SSLContext sc = SSLContext.getInstance("SSL");
         sc.init(null, trustManagers, new java.security.SecureRandom());
         HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        
-        // Needed to prevent test failure using IBM JDK 
+
+        // Needed to prevent test failure using IBM JDK
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
             System.setProperty("https.protocols", "TLSv1");
         }

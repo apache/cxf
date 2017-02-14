@@ -26,10 +26,10 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
-    
+
     EndpointImpl ep1;
     EndpointImpl ep2;
-    
+
     protected void run() {
         setBus(BusFactory.getDefaultBus());
         Object implementor = new AddNumberImpl();
@@ -37,7 +37,7 @@ public class Server extends AbstractBusTestServerBase {
         ep1 = new EndpointImpl(implementor);
         ep1.getFeatures().add(new WSAddressingFeature());
         ep1.publish(address);
-        
+
         ep2 = new EndpointImpl(new AddNumberImplNoAddr());
         ep2.publish(address + "-noaddr");
     }

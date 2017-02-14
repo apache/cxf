@@ -29,12 +29,12 @@ import java.lang.annotation.Target;
  * Instructs the runtime to dispatch using the async method
  * on service if continuations are available.  This only applies
  * to the JAX-WS frontend at this time.
- * 
+ *
  * Instead of calling the "X methodName(Y, Z...) method, it will
  * call the "Future<?> methodName(Y, Z, ... AsyncHandler<MethodResponse>)"
  * method passing in an AsyncHandler that you will need to call when
  * the response is ready.   An example would be:
- * 
+ *
  * <pre>
  * public Future<?> greetMeAsync(final String requestType,
  *                               final AsyncHandler<GreetMeResponse> asyncHandler) {
@@ -45,13 +45,13 @@ import java.lang.annotation.Target;
  *            GreetMeResponse resp = new GreetMeResponse();
  *            resp.setResponseType("Hello " + requestType);
  *            r.set(resp);
- *            asyncHandler.handleResponse(r);                    
+ *            asyncHandler.handleResponse(r);
  *         }
  *    } .start();
  *    return r;
  * }
  * </pre>
- * 
+ *
  * The use of the org.apache.cxf.jaxws.ServerAsyncResponse class for the response
  * as shown above can simplify things and is recommended.
  */
@@ -60,10 +60,10 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD })
 @Inherited
 public @interface UseAsyncMethod {
-    
+
     /**
-     * By default, if continuations are not available, 
-     * it will use the non-async method.  If you ALWAYS 
+     * By default, if continuations are not available,
+     * it will use the non-async method.  If you ALWAYS
      * want the async method called, set this to true.  However,
      * that can cause threads to block.
      */

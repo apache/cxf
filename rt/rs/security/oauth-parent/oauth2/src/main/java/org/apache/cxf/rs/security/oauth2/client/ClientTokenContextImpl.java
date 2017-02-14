@@ -26,7 +26,7 @@ public class ClientTokenContextImpl implements ClientTokenContext {
     private static final long serialVersionUID = -3501237730333195311L;
     private ClientAccessToken token;
     private MultivaluedMap<String, String> state;
-    
+
     public ClientAccessToken getToken() {
         return token;
     }
@@ -42,7 +42,7 @@ public class ClientTokenContextImpl implements ClientTokenContext {
     public void setState(MultivaluedMap<String, String> state) {
         this.state = state;
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> T getState(Class<T> cls) {
         if (MultivaluedMap.class == cls) {

@@ -39,7 +39,7 @@ public class WSDLRefValidatorTest extends Assert {
         Bus b = BusFactory.getDefaultBus();
         return b.getExtension(WSDLManager.class).getDefinition(wsdl);
     }
-    
+
     @Test
     public void testNoService() throws Exception {
         String wsdl = getClass().getResource("resources/b.wsdl").toURI().toString();
@@ -82,7 +82,7 @@ public class WSDLRefValidatorTest extends Assert {
                                   text).toString());
         assertTrue(possibles.contains(t));
     }
-    
+
 
     @Test
     public void testWSDLImport2() throws Exception {
@@ -141,7 +141,7 @@ public class WSDLRefValidatorTest extends Assert {
         WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
         validator.isValid();
         ValidationResult results = validator.getValidationResults();
-        
+
         assertEquals(1, results.getErrors().size());
         String text = "{http://schemas.apache.org/yoko/idl/OptionsPT}[message:getEmployee]";
         Set<String> possibles = new HashSet<>();
@@ -171,7 +171,7 @@ public class WSDLRefValidatorTest extends Assert {
 
     @Test
     public void testNotAWsdl() throws Exception {
-        try {        
+        try {
             String wsdl = getClass().getResource("resources/c.xsd").toURI().toString();
             WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
             validator.isValid();

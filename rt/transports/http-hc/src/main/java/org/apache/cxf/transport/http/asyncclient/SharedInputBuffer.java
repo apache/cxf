@@ -32,7 +32,7 @@ import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.nio.util.ExpandableBuffer;
 
 /**
- * Content buffer that can be shared by multiple threads, usually the I/O dispatch of 
+ * Content buffer that can be shared by multiple threads, usually the I/O dispatch of
  * an I/O reactor and a worker thread.
  * <p/>
  * The I/O dispatch thread is expect to transfer data from {@link ContentDecoder} to the buffer
@@ -54,19 +54,19 @@ public class SharedInputBuffer extends ExpandableBuffer {
     private volatile IOControl ioctrl;
     private volatile boolean shutdown;
     private volatile boolean endOfStream;
-    
+
     private volatile ByteBuffer waitingBuffer;
-    
+
     //private volatile int waitCnt;
     //private volatile int nowaitCnt;
-    
-    public SharedInputBuffer(int buffersize, 
+
+    public SharedInputBuffer(int buffersize,
                              final ByteBufferAllocator allocator) {
         super(buffersize, allocator);
         this.lock = new ReentrantLock();
         this.condition = this.lock.newCondition();
         //if the buffer become 3/4 empty, we'll turn on the input
-        //events again to hopefully get more data before the next 
+        //events again to hopefully get more data before the next
         //the buffer fully empties and we have to wait to read
         this.requestInputSize = buffersize * 3 / 4;
     }
@@ -282,7 +282,7 @@ public class SharedInputBuffer extends ExpandableBuffer {
             }
             this.buffer.get(b, off, chunk);
             if (this.buffer.position() >= this.requestInputSize && !this.endOfStream && this.ioctrl != null) {
-                //we have a significant amount of space empty in the buffer, we'll turn on 
+                //we have a significant amount of space empty in the buffer, we'll turn on
                 //the input so maybe we'll get another chunk by the time the next read happens
                 //and we can then avoid waiting for input
                 this.ioctrl.requestInput();

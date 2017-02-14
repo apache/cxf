@@ -33,33 +33,33 @@ public class LdapQueryVisitor<T> extends AbstractUntypedSearchConditionVisitor<T
     public LdapQueryVisitor() {
         this(Collections.<String, String>emptyMap());
     }
-    
+
     public LdapQueryVisitor(Map<String, String> fieldMap) {
         super(fieldMap);
     }
-    
+
     public void visit(SearchCondition<T> sc) {
-    
+
         StringBuilder sb = getStringBuilder();
         if (sb == null) {
             sb = new StringBuilder();
         }
-        
+
         PrimitiveStatement statement = sc.getStatement();
         if (statement != null) {
             if (statement.getProperty() != null) {
                 String name = getRealPropertyName(statement.getProperty());
                 String rvalStr = getPropertyValue(name, statement.getValue());
                 validatePropertyValue(name, rvalStr);
-                
+
                 sb.append("(");
                 if (sc.getConditionType() == ConditionType.NOT_EQUALS) {
                     sb.append("!");
                 }
-                
+
                 String ldapOperator = conditionTypeToLdapOperator(sc.getConditionType());
                 sb.append(name).append(ldapOperator).append(rvalStr);
-                
+
                 sb.append(")");
             }
         } else {
@@ -69,7 +69,7 @@ public class LdapQueryVisitor<T> extends AbstractUntypedSearchConditionVisitor<T
             } else {
                 sb.append("|");
             }
-            
+
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
                 saveStringBuilder(sb);
                 condition.accept(this);
@@ -79,8 +79,8 @@ public class LdapQueryVisitor<T> extends AbstractUntypedSearchConditionVisitor<T
         }
         saveStringBuilder(sb);
     }
-    
-    
+
+
     public static String conditionTypeToLdapOperator(ConditionType ct) {
         String op;
         switch (ct) {

@@ -44,20 +44,20 @@ public class PolicyFeatureTest extends Assert {
     private Bus bus;
     @After
     public void tearDown() {
-        bus.shutdown(true);        
+        bus.shutdown(true);
         BusFactory.setDefaultBus(null);
     }
-    
+
     @Test
     public void testServerFactory() {
         bus = new CXFBusFactory().createBus();
         PolicyEngineImpl pei = new PolicyEngineImpl();
         bus.setExtension(pei, PolicyEngine.class);
         pei.setBus(bus);
-        
+
         Policy p = new Policy();
         p.setId("test");
-        
+
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.getFeatures().add(new WSPolicyFeature(p));
         sf.setServiceBean(new GreeterImpl());
@@ -65,97 +65,97 @@ public class PolicyFeatureTest extends Assert {
         sf.setStart(false);
         sf.setBus(bus);
         Server server = sf.create();
-        
+
         List<ServiceInfo> sis = server.getEndpoint().getService().getServiceInfos();
         ServiceInfo info = sis.get(0);
-        
+
         Policy p2 = info.getExtensor(Policy.class);
         assertEquals(p, p2);
     }
-    
+
 
     @Test
     public void testServerFactoryWith2007Xml() {
         bus = new SpringBusFactory().createBus("/org/apache/cxf/jaxws/ws/server.xml");
-        
+
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new GreeterImpl());
         sf.setAddress("http://localhost/test");
-        
+
         sf.setBus(bus);
-        
+
         Configurer c = bus.getExtension(Configurer.class);
         c.configureBean("test", sf);
         sf.setStart(false);
-        
+
         List<Feature> features = sf.getFeatures();
         assertEquals(1, features.size());
-        
+
         Server server = sf.create();
-        
+
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         assertNotNull(pe);
-        
+
         List<ServiceInfo> sis = server.getEndpoint().getService().getServiceInfos();
         ServiceInfo info = sis.get(0);
-        
+
         Policy p2 = info.getExtensor(Policy.class);
         assertNotNull(p2);
     }
 
     @Test
     public void testServerFactoryWith2004Xml() {
-        bus = 
+        bus =
             new SpringBusFactory().createBus("/org/apache/cxf/jaxws/ws/server.xml");
-        
+
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new GreeterImpl());
-        sf.setAddress("http://localhost/test");        
+        sf.setAddress("http://localhost/test");
         sf.setBus(bus);
-        
+
         Configurer c = bus.getExtension(Configurer.class);
         c.configureBean("test2004", sf);
-        
+
         List<? extends Feature> features = sf.getFeatures();
         assertEquals(1, features.size());
         sf.setStart(false);
-        
+
         Server server = sf.create();
-        
+
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         assertNotNull(pe);
-        
+
         List<ServiceInfo> sis = server.getEndpoint().getService().getServiceInfos();
         ServiceInfo info = sis.get(0);
-        
+
         Policy p2 = info.getExtensor(Policy.class);
         assertNotNull(p2);
     }
-    
+
     @Test
     public void testPolicyReference() {
-        bus = 
+        bus =
             new SpringBusFactory().createBus("/org/apache/cxf/jaxws/ws/server.xml");
-        
+
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new GreeterImpl());
-        sf.setAddress("http://localhost/test");        
+        sf.setAddress("http://localhost/test");
         sf.setBus(bus);
-        
+
         Configurer c = bus.getExtension(Configurer.class);
         c.configureBean("testExternal", sf);
-        
+
         List<Feature> features = sf.getFeatures();
         assertEquals(1, features.size());
         sf.setStart(false);
         Server server = sf.create();
-        
+
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         assertNotNull(pe);
-        
+
         List<ServiceInfo> sis = server.getEndpoint().getService().getServiceInfos();
         ServiceInfo info = sis.get(0);
-        
+
         Policy p = info.getExtensor(Policy.class);
         assertNotNull(p);
         assertEquals("External", p.getId());

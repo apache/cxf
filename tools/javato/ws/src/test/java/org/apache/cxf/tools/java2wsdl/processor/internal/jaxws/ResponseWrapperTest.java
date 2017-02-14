@@ -43,16 +43,16 @@ public class ResponseWrapperTest extends Assert {
                 return op;
             }
         }
-        return null;        
+        return null;
     }
-    
+
     @Test
     public void testBuildFields() {
         // Test String[]
         Class<?> testingClass = GreeterArray.class;
         OperationInfo opInfo = getOperation(testingClass, "sayStringArray");
         assertNotNull(opInfo);
-        
+
         ResponseWrapper responseWrapper = new ResponseWrapper();
 
         MessageInfo message = opInfo.getUnwrappedOperation().getOutput();
@@ -75,7 +75,7 @@ public class ResponseWrapperTest extends Assert {
         assertEquals("int[]", field.getType());
 
         // Test TestDataBean[]
-        
+
         opInfo = getOperation(testingClass, "sayTestDataBeanArray");
         assertNotNull(opInfo);
 
@@ -93,11 +93,11 @@ public class ResponseWrapperTest extends Assert {
         Class<?> testingClass = Class.forName(pkgName + ".Greeter");
 
         OperationInfo opInfo = getOperation(testingClass, "sayHi");
-        
+
         Wrapper wrapper = new ResponseWrapper();
         wrapper.setOperationInfo(opInfo);
         assertEquals(pkgName, wrapper.getJavaClass().getPackageName());
         assertEquals("SayHiResponse", wrapper.getJavaClass().getName());
-        
+
     }
 }

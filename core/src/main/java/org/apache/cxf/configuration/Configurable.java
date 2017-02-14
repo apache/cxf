@@ -20,15 +20,15 @@
 package org.apache.cxf.configuration;
 /**
  * A configurable interface for obtaining a bean's name
- * 
- * A class which implements this interface should return the 
- * unique bean name for configuration to use 
+ *
+ * A class which implements this interface should return the
+ * unique bean name for configuration to use
  */
 public interface Configurable {
-    
+
     /**
      * Get the configurable object's Bean name
-     * @return the bean name 
+     * @return the bean name
      */
-    String getBeanName();    
+    String getBeanName();
 }

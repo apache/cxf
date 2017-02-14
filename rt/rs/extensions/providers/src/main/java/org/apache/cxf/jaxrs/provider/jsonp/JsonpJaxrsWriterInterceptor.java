@@ -38,21 +38,21 @@ public class JsonpJaxrsWriterInterceptor implements WriterInterceptor {
 
     private String mediaType = JsonpInInterceptor.JSONP_TYPE;
     private String paddingEnd = "(";
-    
+
     public JsonpJaxrsWriterInterceptor() {
     }
-  
+
     @Override
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
         String callback = getCallbackValue(JAXRSUtils.getCurrentMessage());
         if (!StringUtils.isEmpty(callback)) {
-            context.getHeaders().putSingle(Message.CONTENT_TYPE, 
+            context.getHeaders().putSingle(Message.CONTENT_TYPE,
                                            JAXRSUtils.toMediaType(getMediaType()));
             context.getOutputStream().write((callback + getPaddingEnd()).getBytes(StandardCharsets.UTF_8));
         }
         context.proceed();
     }
-    
+
     public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }
@@ -68,12 +68,12 @@ public class JsonpJaxrsWriterInterceptor implements WriterInterceptor {
     public String getPaddingEnd() {
         return paddingEnd;
     }
-    
+
     protected String getCallbackValue(Message message) {
         Exchange exchange = message.getExchange();
         return (String) exchange.get(JsonpInInterceptor.CALLBACK_KEY);
     }
 
-    
-    
+
+
 }

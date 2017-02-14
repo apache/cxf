@@ -30,42 +30,42 @@ import org.apache.cxf.rt.security.crypto.HmacUtils;
 //https://github.com/hueniverse/hawk/blob/master/README.md
 
 public class HawkAccessToken extends ServerAccessToken {
-    
+
     private static final long serialVersionUID = -4331703769692080818L;
 
-    public HawkAccessToken(Client client, 
+    public HawkAccessToken(Client client,
                           long lifetime) {
         this(client, HmacAlgorithm.HmacSHA256, lifetime);
     }
-    
-    public HawkAccessToken(Client client, 
+
+    public HawkAccessToken(Client client,
                           String macAuthAlgo,
                           long lifetime) {
         this(client, HmacAlgorithm.toHmacAlgorithm(macAuthAlgo), lifetime);
     }
-    
-    public HawkAccessToken(Client client, 
+
+    public HawkAccessToken(Client client,
                           HmacAlgorithm macAlgo,
                           long lifetime) {
-        this(client, 
+        this(client,
              macAlgo,
-             OAuthUtils.generateRandomTokenKey(), 
-             lifetime, 
+             OAuthUtils.generateRandomTokenKey(),
+             lifetime,
              OAuthUtils.getIssuedAt());
     }
     public HawkAccessToken(Client client,
                           HmacAlgorithm algo,
                           String tokenKey,
-                          long lifetime, 
+                          long lifetime,
                           long issuedAt) {
         this(client, algo, tokenKey, null, lifetime, issuedAt);
     }
-    
+
     public HawkAccessToken(Client client,
                           HmacAlgorithm algo,
                           String tokenKey,
                           String macKey,
-                          long lifetime, 
+                          long lifetime,
                           long issuedAt) {
         super(checkClient(client), OAuthConstants.HAWK_TOKEN_TYPE, tokenKey, lifetime, issuedAt);
         this.setExtraParameters(algo, macKey);
@@ -76,23 +76,23 @@ public class HawkAccessToken extends ServerAccessToken {
     public HawkAccessToken(ServerAccessToken token, String newKey) {
         super(validateTokenType(token, OAuthConstants.HAWK_TOKEN_TYPE), newKey);
     }
-    
+
     private void setExtraParameters(HmacAlgorithm algo, String macKey) {
-        String theKey = macKey == null ? HmacUtils.generateKey(algo.getJavaName()) : macKey; 
+        String theKey = macKey == null ? HmacUtils.generateKey(algo.getJavaName()) : macKey;
         super.getParameters().put(OAuthConstants.HAWK_TOKEN_KEY,
                                   theKey);
         super.getParameters().put(OAuthConstants.HAWK_TOKEN_ALGORITHM,
                                   algo.getOAuthName());
     }
-    
+
     public String getMacId() {
         return super.getTokenKey();
     }
-    
+
     public String getMacKey() {
         return super.getParameters().get(OAuthConstants.HAWK_TOKEN_KEY);
     }
-    
+
     public String getMacAlgorithm() {
         return super.getParameters().get(OAuthConstants.HAWK_TOKEN_ALGORITHM);
     }

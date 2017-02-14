@@ -39,7 +39,7 @@ public class MessageContentsList extends ArrayList<Object> {
     public MessageContentsList(List<?> values) {
         super(values);
     }
-    
+
     public static MessageContentsList getContentsList(Message msg) {
         List<Object> o = CastUtils.cast(msg.getContent(List.class));
         if (o == null) {
@@ -52,30 +52,30 @@ public class MessageContentsList extends ArrayList<Object> {
         }
         return (MessageContentsList)o;
     }
-    
+
     public Object set(int idx, Object value) {
         ensureSize(idx);
         return super.set(idx, value);
     }
-    
+
     private void ensureSize(int idx) {
         while (idx >= size()) {
             add(REMOVED_MARKER);
         }
     }
-    
+
     public Object put(MessagePartInfo key, Object value) {
         ensureSize(key.getIndex());
         return super.set(key.getIndex(), value);
     }
-    
+
     public boolean hasValue(MessagePartInfo key) {
         if (key.getIndex() >= size()) {
             return false;
         }
         return super.get(key.getIndex()) != REMOVED_MARKER;
     }
-    
+
     public Object get(MessagePartInfo key) {
         Object o = super.get(key.getIndex());
         return o == REMOVED_MARKER ? null : o;

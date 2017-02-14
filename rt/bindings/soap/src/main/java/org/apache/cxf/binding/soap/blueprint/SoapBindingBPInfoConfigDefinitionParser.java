@@ -49,9 +49,9 @@ public class SoapBindingBPInfoConfigDefinitionParser extends AbstractBPBeanDefin
     @Override
     protected void mapElement(ParserContext ctx, MutableBeanMetadata bean, Element el, String name) {
 
-        if ("version".equals(name) 
-            || "mtomEnabled".equals(name) 
-            || "style".equals(name) 
+        if ("version".equals(name)
+            || "mtomEnabled".equals(name)
+            || "style".equals(name)
             || "use".equals(name)) {
             bean.addProperty(name, parseMapData(ctx, bean, el));
         }

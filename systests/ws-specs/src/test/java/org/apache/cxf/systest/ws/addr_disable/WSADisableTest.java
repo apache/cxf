@@ -62,15 +62,15 @@ public class WSADisableTest extends AbstractWSATestBase {
 
         AddNumbersPortType port = getService().getAddNumbersPort();
 
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                                                        "http://localhost:" 
+        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                                        "http://localhost:"
                                                         + PORT + "/jaxws/add");
 
         assertEquals(3, port.addNumbers(1, 2));
 
         String expectedOut = "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/addNumbersRequest";
         String expectedIn = "http://www.w3.org/2005/08/addressing";
-        
+
         assertLogContains(output.toString(), "//wsa:Action", expectedOut);
         assertTrue(input.toString().indexOf(expectedIn) == -1);
     }
@@ -82,20 +82,20 @@ public class WSADisableTest extends AbstractWSATestBase {
 
         AddNumbersPortType port = getService().getAddNumbersPort(new AddressingFeature(false));
 
-        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                                                        "http://localhost:" 
+        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                                        "http://localhost:"
                                                         + PORT + "/jaxws/add");
 
         assertEquals(3, port.addNumbers(1, 2));
 
         String expectedOut = "http://www.w3.org/2005/08/addressing";
         String expectedIn = "http://www.w3.org/2005/08/addressing";
-        
+
         assertTrue(output.toString().indexOf(expectedOut) == -1);
         assertTrue(input.toString().indexOf(expectedIn) == -1);
     }
-    
-    
+
+
     @Test
     public void testDiaptchWithWsaDisable() throws Exception {
 
@@ -104,7 +104,7 @@ public class WSADisableTest extends AbstractWSATestBase {
                                                                     javax.xml.ws.Service.Mode.MESSAGE,
                                                                     new AddressingFeature(false));
         ((BindingProvider)disptch).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                                           "http://localhost:" 
+                                                           "http://localhost:"
                                                            + PORT + "/jaxws/add");
 
         InputStream is = getClass().getResourceAsStream("resources/AddNumbersDispatchReq.xml");
@@ -117,7 +117,7 @@ public class WSADisableTest extends AbstractWSATestBase {
             //expected
         }
     }
-    
+
     //CXF-3060
     @Test
     public void testDisableServerEnableClientRequired() throws Exception {
@@ -136,7 +136,7 @@ public class WSADisableTest extends AbstractWSATestBase {
                        e.getMessage().indexOf(expected) > -1);
         }
     }
-    
+
 
     private AddNumbersService getService() {
         URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");

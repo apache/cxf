@@ -29,8 +29,8 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * Factory to actually create the HTTPConduit that will be used for the exchange
  */
 public interface HTTPConduitFactory {
-    
-    
+
+
     HTTPConduit createConduit(HTTPTransportFactory f,
                               Bus b,
                               EndpointInfo localInfo,

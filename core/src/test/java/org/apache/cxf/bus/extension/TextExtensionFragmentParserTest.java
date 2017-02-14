@@ -33,15 +33,15 @@ public class TextExtensionFragmentParserTest extends Assert {
         InputStream is = TextExtensionFragmentParserTest.class.getResourceAsStream("extension2.txt");
         List<Extension> extensions = new TextExtensionFragmentParser(null).getExtensions(is);
         assertEquals("Unexpected number of Extension elements.", 3, extensions.size());
-        
+
         Extension e = extensions.get(0);
         assertTrue("Extension is deferred.", !e.isDeferred());
-        assertEquals("Unexpected class name.", 
+        assertEquals("Unexpected class name.",
                      "org.apache.cxf.foo.FooImpl", e.getClassname());
         assertEquals("Unexpected number of namespace elements.", 0, e.getNamespaces().size());
         e = extensions.get(1);
         assertTrue("Extension is not deferred.", e.isDeferred());
-        assertEquals("Unexpected implementation class name.", 
+        assertEquals("Unexpected implementation class name.",
                      "java.lang.Boolean", e.getClassname());
         assertNull("Interface should be null", e.getInterfaceName());
         assertEquals("Unexpected number of namespace elements.", 0, e.getNamespaces().size());

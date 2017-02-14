@@ -37,7 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class SchemaValidationTest extends AbstractAegisTest {
     private Server server;
@@ -48,10 +48,10 @@ public class SchemaValidationTest extends AbstractAegisTest {
         super.setUp();
         setEnableJDOM(true);
         arrayService = new ArrayService();
-        server = createService(ArrayService.class, 
+        server = createService(ArrayService.class,
                                       arrayService, "Array", new QName("urn:Array", "Array"));
     }
-    
+
     @Test
     public void testInvalidArray() throws Exception {
         assertTrue(testInvalidArray(Boolean.TRUE));
@@ -60,9 +60,9 @@ public class SchemaValidationTest extends AbstractAegisTest {
         assertFalse(testInvalidArray(SchemaValidationType.OUT));
         assertFalse(testInvalidArray(Boolean.FALSE));
     }
-    
+
     private boolean testInvalidArray(Object validationType) throws Exception {
-        server.getEndpoint().getService().put(Message.SCHEMA_VALIDATION_ENABLED, validationType); 
+        server.getEndpoint().getService().put(Message.SCHEMA_VALIDATION_ENABLED, validationType);
         Node r = invoke("Array", "/org/apache/cxf/aegis/integration/invalidArrayMessage.xml");
         assertNotNull(r);
         StringWriter out = new StringWriter();

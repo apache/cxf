@@ -67,7 +67,7 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
         // serialization root type
         trailingBlocks = new TrailingBlocks();
     }
-    
+
     protected Context getContext() {
         AegisContext globalContext = new AegisContext();
         globalContext.initialize();
@@ -77,7 +77,7 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
 
     public <T> T readWriteReadRef(String file, Class<T> typeClass) throws XMLStreamException {
         Context context = getContext();
-        
+
         AegisType type = mapping.getType(typeClass);
         assertNotNull("no type found for " + typeClass.getName());
 
@@ -88,7 +88,7 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
 
         // write value to element
         Element element = writeRef(value);
-        
+
         // reread value from element
         value = typeClass.cast(readRef(element));
 
@@ -142,7 +142,7 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
         // create the document
         Element element = createElement("urn:Bean", "root", "b");
         MapNamespaceContext namespaces = new MapNamespaceContext();
-        // we should not add the out namespace here, as it is not a part of root element 
+        // we should not add the out namespace here, as it is not a part of root element
         /*for (Map.Entry<String, String> entry : getNamespaces().entrySet()) {
             namespaces.addNamespace(entry.getKey(), entry.getValue());
         }*/

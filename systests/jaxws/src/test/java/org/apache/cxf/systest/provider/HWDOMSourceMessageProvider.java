@@ -46,10 +46,10 @@ public class HWDOMSourceMessageProvider implements Provider<DOMSource> {
 
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
-    
-    @Resource 
+
+    @Resource
     WebServiceContext ctx;
-    
+
     private SOAPMessage sayHiResponse;
     private SOAPMessage greetMeResponse;
     private MessageFactory factory;
@@ -74,7 +74,7 @@ public class HWDOMSourceMessageProvider implements Provider<DOMSource> {
         if (qn == null) {
             throw new RuntimeException("No Operation Name");
         }
-        
+
         //XMLUtils.writeTo(request, System.out);
         DOMSource response = new DOMSource();
         try {

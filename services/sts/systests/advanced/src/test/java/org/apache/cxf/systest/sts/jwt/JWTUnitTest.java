@@ -36,10 +36,10 @@ import org.junit.BeforeClass;
  * Some unit tests to get a JWT token from the STS
  */
 public class JWTUnitTest extends AbstractBusClientServerTestBase {
-    
+
     public static final String JWT_TOKEN_TYPE = "urn:ietf:params:oauth:token-type:jwt";
     static final String STSPORT = allocatePort(STSServer.class);
-    private static final String DEFAULT_ADDRESS = 
+    private static final String DEFAULT_ADDRESS =
         "https://localhost:8081/doubleit/services/doubleittransportsaml1";
 
     @BeforeClass
@@ -51,7 +51,7 @@ public class JWTUnitTest extends AbstractBusClientServerTestBase {
                    launchServer(STSServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -66,21 +66,21 @@ public class JWTUnitTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         // Issue the token
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(JWT_TOKEN_TYPE, bus, DEFAULT_ADDRESS, null, null);
         assertNotNull(token);
         assertNotNull(token.getToken());
-        
+
         // Validate the token
         token = validateSecurityToken(token, bus, null, null);
         assertNotNull(token);
         assertNotNull(token.getToken());
     }
-    
+
     private SecurityToken requestSecurityToken(
-        String tokenType, 
+        String tokenType,
         Bus bus,
         String endpointAddress,
         Map<String, Object> msgProperties,
@@ -102,7 +102,7 @@ public class JWTUnitTest extends AbstractBusClientServerTestBase {
             properties = new HashMap<String, Object>();
             properties.put(SecurityConstants.USERNAME, "alice");
             properties.put(
-                           SecurityConstants.CALLBACK_HANDLER, 
+                           SecurityConstants.CALLBACK_HANDLER,
                            "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
             );
         }
@@ -113,7 +113,7 @@ public class JWTUnitTest extends AbstractBusClientServerTestBase {
 
         return stsClient.requestSecurityToken(endpointAddress);
     }
-    
+
     private SecurityToken validateSecurityToken(
         SecurityToken token,
         Bus bus,
@@ -136,7 +136,7 @@ public class JWTUnitTest extends AbstractBusClientServerTestBase {
             properties = new HashMap<String, Object>();
             properties.put(SecurityConstants.USERNAME, "alice");
             properties.put(
-                SecurityConstants.CALLBACK_HANDLER, 
+                SecurityConstants.CALLBACK_HANDLER,
                 "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
             );
         }

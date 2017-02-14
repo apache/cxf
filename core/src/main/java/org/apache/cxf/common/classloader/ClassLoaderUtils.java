@@ -36,16 +36,16 @@ import java.util.List;
  * verify any change on 6 different application servers.
  */
 public final class ClassLoaderUtils {
-    
+
     private ClassLoaderUtils() {
     }
-    
+
     public static class ClassLoaderHolder {
         ClassLoader loader;
         ClassLoaderHolder(ClassLoader c) {
             loader = c;
         }
-        
+
         public void reset() {
             ClassLoaderUtils.setThreadContextClassloader(loader);
         }
@@ -59,7 +59,7 @@ public final class ClassLoaderUtils {
             }
         });
     }
-    
+
     public static ClassLoader getURLClassLoader(
         final URL[] urls, final ClassLoader parent
     ) {
@@ -75,7 +75,7 @@ public final class ClassLoaderUtils {
     ) {
         return getURLClassLoader(urlList.toArray(new URL[urlList.size()]), parent);
     }
-    
+
     /**
      * Load a given resource. <p/> This method will try to load the resource
      * using the following methods (in order):
@@ -84,7 +84,7 @@ public final class ClassLoaderUtils {
      * <li>From ClassLoaderUtil.class.getClassLoader()
      * <li>callingClass.getClassLoader()
      * </ul>
-     * 
+     *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      */
@@ -119,14 +119,14 @@ public final class ClassLoaderUtils {
         if (url == null) {
             url = callingClass.getResource(resourceName);
         }
-        
+
         if ((url == null) && (resourceName != null) && (resourceName.charAt(0) != '/')) {
             return getResource('/' + resourceName, callingClass);
         }
 
         return url;
     }
-    
+
     /**
      * Load a given resources. <p/> This method will try to load the resources
      * using the following methods (in order):
@@ -135,7 +135,7 @@ public final class ClassLoaderUtils {
      * <li>From ClassLoaderUtil.class.getClassLoader()
      * <li>callingClass.getClassLoader()
      * </ul>
-     * 
+     *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      */
@@ -148,7 +148,7 @@ public final class ClassLoaderUtils {
             public URL nextElement() {
                 return null;
             }
-            
+
         };
         try {
             urls = Thread.currentThread().getContextClassLoader()
@@ -208,7 +208,7 @@ public final class ClassLoaderUtils {
             ret.add(urls.nextElement());
         }
 
-        
+
         if (ret.isEmpty() && (resourceName != null) && (resourceName.charAt(0) != '/')) {
             return getResources('/' + resourceName, callingClass);
         }
@@ -219,7 +219,7 @@ public final class ClassLoaderUtils {
     /**
      * This is a convenience method to load a resource as a stream. <p/> The
      * algorithm used to find the resource is given in getResource()
-     * 
+     *
      * @param resourceName The name of the resource to load
      * @param callingClass The Class object of the calling object
      */
@@ -242,7 +242,7 @@ public final class ClassLoaderUtils {
      * <li>From ClassLoaderUtil.class.getClassLoader()
      * <li>From the callingClass.getClassLoader()
      * </ul>
-     * 
+     *
      * @param className The name of the class to load
      * @param callingClass The Class object of the calling object
      * @throws ClassNotFoundException If the class cannot be found anywhere.
@@ -254,7 +254,7 @@ public final class ClassLoaderUtils {
 
             if (cl != null) {
                 return cl.loadClass(className);
-            }            
+            }
         } catch (ClassNotFoundException e) {
             //ignore
         }
@@ -267,7 +267,7 @@ public final class ClassLoaderUtils {
 
             if (cl != null) {
                 return cl.loadClass(className).asSubclass(type);
-            }            
+            }
         } catch (ClassNotFoundException e) {
             //ignore
         }

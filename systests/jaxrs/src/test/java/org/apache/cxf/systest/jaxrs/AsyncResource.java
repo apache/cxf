@@ -44,8 +44,8 @@ public class AsyncResource {
 
     @GET
     @Path("suspend")
-    public void suspend(@Suspended AsyncResponse asyncResponse) { 
-        ASYNC_RESPONSES[0].add(asyncResponse); 
+    public void suspend(@Suspended AsyncResponse asyncResponse) {
+        ASYNC_RESPONSES[0].add(asyncResponse);
     }
 
     @GET
@@ -53,61 +53,61 @@ public class AsyncResource {
     public void suspendthrow(@Suspended AsyncResponse asyncResponse) {
         throw new WebApplicationException("Oh Dear", 502);
     }
-    
+
     @GET
     @Path("cancelvoid")
-    public String cancel(@QueryParam("stage") String stage) { 
-        AsyncResponse response = takeAsyncResponse(stage); 
-        boolean ret = response.cancel(); 
-        ret &= response.cancel(); 
-        addResponse(response, stage); 
-        return ret ? TRUE : FALSE; 
+    public String cancel(@QueryParam("stage") String stage) {
+        AsyncResponse response = takeAsyncResponse(stage);
+        boolean ret = response.cancel();
+        ret &= response.cancel();
+        addResponse(response, stage);
+        return ret ? TRUE : FALSE;
     }
-    
+
     @POST
     @Path("resume")
-    public String resume(@QueryParam("stage") String stage, String response) { 
-        AsyncResponse async = takeAsyncResponse(stage); 
-        boolean b = resume(async, response); 
-        addResponse(async, stage); 
-        return b ? TRUE : FALSE; 
+    public String resume(@QueryParam("stage") String stage, String response) {
+        AsyncResponse async = takeAsyncResponse(stage);
+        boolean b = resume(async, response);
+        addResponse(async, stage);
+        return b ? TRUE : FALSE;
     }
-    
-    protected static AsyncResponse takeAsyncResponse(String stageId) { 
-        return takeAsyncResponse(Integer.parseInt(stageId)); 
+
+    protected static AsyncResponse takeAsyncResponse(String stageId) {
+        return takeAsyncResponse(Integer.parseInt(stageId));
     }
-    
+
     protected static AsyncResponse takeAsyncResponse(int stageId) {
         AsyncResponse asyncResponse = null;
         asyncResponse = ASYNC_RESPONSES[stageId].take();
         return asyncResponse;
     }
-    
-    protected static final void addResponse(AsyncResponse response, String stageId) { 
-        int id = Integer.parseInt(stageId) + 1; 
-        ASYNC_RESPONSES[id].add(response); 
+
+    protected static final void addResponse(AsyncResponse response, String stageId) {
+        int id = Integer.parseInt(stageId) + 1;
+        ASYNC_RESPONSES[id].add(response);
     }
-    
-    protected static boolean resume(AsyncResponse takenResponse, Object response) { 
-        return takenResponse.resume(response); 
+
+    protected static boolean resume(AsyncResponse takenResponse, Object response) {
+        return takenResponse.resume(response);
     }
-    
-    protected static ResponseBuilder createErrorResponseBuilder() { 
-        return Response.status(Status.EXPECTATION_FAILED); 
+
+    protected static ResponseBuilder createErrorResponseBuilder() {
+        return Response.status(Status.EXPECTATION_FAILED);
     }
-    
+
     private static class AsyncResponseQueue {
         Queue<AsyncResponse> queue = new ArrayBlockingQueue<AsyncResponse>(1);
-    
+
         public void add(AsyncResponse asyncResponse) {
             queue.add(asyncResponse);
-            
+
         }
-    
+
         public AsyncResponse take() {
             return queue.remove();
         }
-        
+
     }
 
 }

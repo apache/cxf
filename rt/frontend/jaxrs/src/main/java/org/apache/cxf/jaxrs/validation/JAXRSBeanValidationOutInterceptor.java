@@ -40,22 +40,22 @@ public class JAXRSBeanValidationOutInterceptor extends BeanValidationOutIntercep
     public JAXRSBeanValidationOutInterceptor(String phase) {
         super(phase);
     }
-    
+
     @Override
     protected Object getServiceObject(Message message) {
         return ValidationUtils.getResourceInstance(message);
     }
-    
+
     @Override
     protected Object unwrapEntity(Object entity) {
         return entity instanceof Response ? ((Response)entity).getEntity() : entity;
     }
-    
+
     @Override
     public void filter(ContainerRequestContext in, ContainerResponseContext out) throws IOException {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         if (Boolean.TRUE != message.get(OUT_VALIDATION_DONE)
-            || supportMultipleValidations) { 
+            || supportMultipleValidations) {
             try {
                 super.handleMessage(message);
             } finally {

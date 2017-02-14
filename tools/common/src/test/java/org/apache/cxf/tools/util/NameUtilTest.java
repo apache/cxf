@@ -24,7 +24,7 @@ import org.junit.Test;
 
 
 public class NameUtilTest extends Assert {
-    
+
     @Test
     public void testMangleToClassName() {
         assertEquals("Abc100Xyz",

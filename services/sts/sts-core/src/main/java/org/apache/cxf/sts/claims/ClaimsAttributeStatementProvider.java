@@ -31,7 +31,7 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
 
 public class ClaimsAttributeStatementProvider implements AttributeStatementProvider {
-    
+
     private String nameFormat = SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED;
 
     public AttributeStatementBean getStatement(TokenProviderParameters providerParameters) {
@@ -40,20 +40,20 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
         if (retrievedClaims == null) {
             return null;
         }
-        
+
         Iterator<ProcessedClaim> claimIterator = retrievedClaims.iterator();
         if (!claimIterator.hasNext()) {
             return null;
         }
-                
+
         List<AttributeBean> attributeList = new ArrayList<>();
         String tokenType = providerParameters.getTokenRequirements().getTokenType();
-        
+
         AttributeStatementBean attrBean = new AttributeStatementBean();
         while (claimIterator.hasNext()) {
             ProcessedClaim claim = claimIterator.next();
             AttributeBean attributeBean = new AttributeBean();
-            
+
             URI claimType = claim.getClaimType();
             if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
                 || WSConstants.SAML2_NS.equals(tokenType)) {
@@ -69,12 +69,12 @@ public class ClaimsAttributeStatementProvider implements AttributeStatementProvi
 
                 String namespace = uri.substring(0, lastSlash);
                 String name = uri.substring(lastSlash + 1, uri.length());
-                
+
                 attributeBean.setSimpleName(name);
                 attributeBean.setQualifiedName(namespace);
             }
             attributeBean.setAttributeValues(claim.getValues());
-            
+
             attributeList.add(attributeBean);
         }
         attrBean.setSamlAttributes(attributeList);

@@ -26,7 +26,7 @@ import org.junit.Test;
  * Simple tests of the name manager.
  */
 public class BasicNameManagerTest extends Assert {
-     
+
     @Test
     public void testPrefixGeneration() {
         BasicNameManager manager = new BasicNameManager();

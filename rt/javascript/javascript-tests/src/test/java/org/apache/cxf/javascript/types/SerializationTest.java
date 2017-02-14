@@ -197,7 +197,7 @@ public class SerializationTest extends AbstractCXFSpringTest {
         ServiceInfo serviceInfo = serviceInfos.get(0);
         schemata = serviceInfo.getSchemas();
         nameManager = BasicNameManager.newNameManager(serviceInfo);
-        NamespacePrefixAccumulator prefixAccumulator = 
+        NamespacePrefixAccumulator prefixAccumulator =
             new NamespacePrefixAccumulator(serviceInfo.getXmlSchemaCollection());
         for (SchemaInfo schema : schemata) {
             SchemaJavascriptBuilder builder = new SchemaJavascriptBuilder(serviceInfo

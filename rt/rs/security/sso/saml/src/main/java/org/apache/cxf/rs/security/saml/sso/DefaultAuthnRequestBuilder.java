@@ -35,26 +35,26 @@ import org.opensaml.saml.saml2.core.RequestedAuthnContext;
  * Protocol AuthnRequest.
  */
 public class DefaultAuthnRequestBuilder implements AuthnRequestBuilder {
-    
+
     private boolean forceAuthn;
     private boolean isPassive;
     private String protocolBinding = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST";
     private String nameIDFormat = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent";
-    
+
     /**
      * Create a SAML 2.0 Protocol AuthnRequest
      */
     public AuthnRequest createAuthnRequest(
-        Message message, 
+        Message message,
         String issuerId,
         String assertionConsumerServiceAddress
     ) throws Exception {
         Issuer issuer =
             SamlpRequestComponentBuilder.createIssuer(issuerId);
-        
+
         NameIDPolicy nameIDPolicy =
             SamlpRequestComponentBuilder.createNameIDPolicy(true, nameIDFormat, issuerId);
-        
+
         AuthnContextClassRef authnCtxClassRef =
             SamlpRequestComponentBuilder.createAuthnCtxClassRef(
                 "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
@@ -64,19 +64,19 @@ public class DefaultAuthnRequestBuilder implements AuthnRequestBuilder {
                 AuthnContextComparisonTypeEnumeration.EXACT,
                 Collections.singletonList(authnCtxClassRef), null
             );
-        
+
         //CHECKSTYLE:OFF
         return SamlpRequestComponentBuilder.createAuthnRequest(
-                assertionConsumerServiceAddress, 
-                forceAuthn, 
+                assertionConsumerServiceAddress,
+                forceAuthn,
                 isPassive,
-                protocolBinding, 
+                protocolBinding,
                 SAMLVersion.VERSION_20,
-                issuer, 
-                nameIDPolicy, 
+                issuer,
+                nameIDPolicy,
                 authnCtx
         );
-        
+
     }
 
     public boolean isForceAuthn() {
@@ -110,5 +110,5 @@ public class DefaultAuthnRequestBuilder implements AuthnRequestBuilder {
     public void setNameIDFormat(String nameIDFormat) {
         this.nameIDFormat = nameIDFormat;
     }
-    
+
 }

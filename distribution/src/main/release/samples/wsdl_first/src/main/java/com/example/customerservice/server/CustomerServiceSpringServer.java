@@ -21,7 +21,7 @@ package com.example.customerservice.server;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class CustomerServiceSpringServer {
-    
+
     protected CustomerServiceSpringServer() {
     }
 

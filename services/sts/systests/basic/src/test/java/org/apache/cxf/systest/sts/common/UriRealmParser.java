@@ -28,14 +28,14 @@ public class UriRealmParser implements RealmParser {
 
     @Override
     public String parseRealm(Map<String, Object> messageContext) throws STSException {
-        
+
 
         String realm = null;
         try {
             String url = (String)messageContext.get("org.apache.cxf.request.url");
-            
+
             StringTokenizer st = new StringTokenizer(url, "/");
-            
+
             int count = st.countTokens();
             if (count <= 4) {
                 return null;
@@ -45,7 +45,7 @@ public class UriRealmParser implements RealmParser {
                 realm = st.nextToken();
             }
         } catch (Exception ex) {
-          // No realm found  
+          // No realm found
         }
         return realm;
 

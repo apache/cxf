@@ -41,23 +41,23 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test sending claims that are defined in the policy of the WSDL to the STS for evaluation.
- * The SAML token is tested on the service side for the correct claims (role) information via a 
+ * The SAML token is tested on the service side for the correct claims (role) information via a
  * custom validator.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class ClaimsTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static final String PORT = allocatePort(Server.class);
     private static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     final TestParam test;
-    
+
     public ClaimsTest(TestParam type) {
         this.test = type;
     }
@@ -90,22 +90,22 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxSTSServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
                                                 {new TestParam(PORT, true, STSPORT)},
                                                 {new TestParam(STAX_PORT, false, STSPORT)},
                                                 {new TestParam(STAX_PORT, true, STSPORT)},
-                                                
+
                                                 {new TestParam(PORT, false, STAX_STSPORT)},
                                                 {new TestParam(PORT, true, STAX_STSPORT)},
                                                 {new TestParam(STAX_PORT, false, STAX_STSPORT)},
                                                 {new TestParam(STAX_PORT, true, STAX_STSPORT)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -125,22 +125,22 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1ClaimsPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportClaimsPort, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportClaimsPort);
         }
-        
+
         doubleIt(transportClaimsPort, 25);
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSaml1CustomClaims() throws Exception {
 
@@ -154,23 +154,23 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1CustomClaimsPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
-        
+
         updateAddressPort(transportClaimsPort, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportClaimsPort);
         }
-        
+
         doubleIt(transportClaimsPort, 25);
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSaml1WrongClaims() throws Exception {
 
@@ -184,28 +184,28 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL wsdl = ClaimsTest.class.getResource("DoubleItWrongClaims.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1ClaimsPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
-        
+
         updateAddressPort(transportClaimsPort, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportClaimsPort);
         }
-        
+
         try {
             doubleIt(transportClaimsPort, 25);
             fail("Expected Exception");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSaml1ClaimsWrongRole() throws Exception {
 
@@ -219,28 +219,28 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1FailingClaimsPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
-        
+
         updateAddressPort(transportClaimsPort, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportClaimsPort);
         }
-        
+
         try {
             doubleIt(transportClaimsPort, 25);
             fail("Expected Exception");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSaml2Claims() throws Exception {
 
@@ -254,23 +254,23 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2ClaimsPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
-        
+
         updateAddressPort(transportClaimsPort, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportClaimsPort);
         }
-        
+
         doubleIt(transportClaimsPort, 25);
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSaml2WrongClaims() throws Exception {
 
@@ -284,28 +284,28 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL wsdl = ClaimsTest.class.getResource("DoubleItWrongClaims.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2ClaimsPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
-        
+
         updateAddressPort(transportClaimsPort, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportClaimsPort);
         }
-        
+
         try {
             doubleIt(transportClaimsPort, 25);
             fail("Expected Exception");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     // In this test, the WSDL the client is using has no Claims Element (however the service
     // is using a WSDL that requires Claims). A CallbackHandler is used to send the Claims
     // Element to the STS.
@@ -322,23 +322,23 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL wsdl = ClaimsTest.class.getResource("DoubleItNoClaims.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2ClaimsPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
-        
+
         updateAddressPort(transportClaimsPort, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportClaimsPort);
         }
-        
+
         doubleIt(transportClaimsPort, 25);
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSaml2ChildClaims() throws Exception {
 
@@ -352,16 +352,16 @@ public class ClaimsTest extends AbstractBusClientServerTestBase {
         URL wsdl = ClaimsTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2ChildClaimsPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportClaimsPort, PORT);
-        
+
         doubleIt(transportClaimsPort, 25);
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

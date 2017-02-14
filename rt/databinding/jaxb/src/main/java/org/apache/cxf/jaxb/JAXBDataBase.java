@@ -41,19 +41,19 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 /**
- * 
+ *
  */
 public abstract class JAXBDataBase {
-    
-    protected JAXBContext context; 
+
+    protected JAXBContext context;
     protected Schema schema;
     protected Collection<Attachment> attachments;
     protected Integer mtomThreshold; // null if we should default.
-    
+
     protected JAXBDataBase(JAXBContext ctx) {
         context = ctx;
     }
-    
+
     public void setSchema(Schema s) {
         this.schema = s;
     }
@@ -61,7 +61,7 @@ public abstract class JAXBDataBase {
     public void setJAXBContext(JAXBContext jc) {
         this.context = jc;
     }
-    
+
     public Schema getSchema() {
         return schema;
     }
@@ -84,10 +84,10 @@ public abstract class JAXBDataBase {
     protected AttachmentMarshaller getAttachmentMarshaller() {
         return new JAXBAttachmentMarshaller(attachments, mtomThreshold);
     }
-    
+
     public void setProperty(String prop, Object value) {
     }
-    
+
     protected Annotation[] getJAXBAnnotation(MessagePartInfo mpi) {
         List<Annotation> annoList = null;
         if (mpi != null) {
@@ -96,9 +96,9 @@ public abstract class JAXBDataBase {
                 annoList = extractJAXBAnnotations(getReturnMethodAnnotations(mpi));
             }
         }
-        return annoList == null ? new Annotation[0] : annoList.toArray(new Annotation[annoList.size()]);       
+        return annoList == null ? new Annotation[0] : annoList.toArray(new Annotation[annoList.size()]);
     }
-    
+
     private List<Annotation> extractJAXBAnnotations(Annotation[] anns) {
         List<Annotation> annoList = null;
         if (anns != null) {
@@ -114,7 +114,7 @@ public abstract class JAXBDataBase {
         }
         return annoList;
     }
-    
+
     private Annotation[] getReturnMethodAnnotations(MessagePartInfo mpi) {
         AbstractMessageContainer mi = mpi.getMessageInfo();
         if (mi == null || !isOutputMessage(mi)) {
@@ -123,7 +123,7 @@ public abstract class JAXBDataBase {
         OperationInfo oi = mi != null ? mi.getOperation() : null;
         return oi != null ? (Annotation[])oi.getProperty("method.return.annotations") : null;
     }
-    
+
     protected boolean isOutputMessage(AbstractMessageContainer messageContainer) {
         if (messageContainer instanceof MessageInfo) {
             return MessageInfo.Type.OUTPUT.equals(((MessageInfo)messageContainer).getType());
@@ -138,7 +138,7 @@ public abstract class JAXBDataBase {
     public void setMtomThreshold(Integer threshold) {
         this.mtomThreshold = threshold;
     }
-    
+
     protected final boolean honorJAXBAnnotations(MessagePartInfo part) {
         if (part == null) {
             return false;
@@ -152,6 +152,6 @@ public abstract class JAXBDataBase {
         Boolean b = (Boolean)part.getProperty("honor.jaxb.annotations");
         return b == null ? false : b;
     }
-    
-    
+
+
 }

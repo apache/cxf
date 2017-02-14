@@ -36,23 +36,23 @@ import org.springframework.context.annotation.Bean;
 public class JaxRsProxyClientConfiguration extends AbstractJaxRsClientConfiguration {
     @Value("${cxf.jaxrs.client.classes-scan-packages:}")
     private String scanPackages;
-    
+
     @Bean
     protected Client jaxRsProxyClient() {
         return super.createClient();
     }
-    
+
     protected Class<?> getServiceClass() {
         return null;
     }
-    
+
     protected void setJaxrsResources(JAXRSClientFactoryBean factory) {
         Class<?> serviceClass = getServiceClass();
         if (serviceClass != null) {
             factory.setServiceClass(serviceClass);
         } else if (!StringUtils.isEmpty(scanPackages)) {
             try {
-                final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
+                final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
                     serviceClass == null ? ClasspathScanner.findClasses(scanPackages, Path.class, Provider.class)
                     : ClasspathScanner.findClasses(scanPackages, Provider.class);
                 if (serviceClass == null) {
@@ -62,10 +62,10 @@ public class JaxRsProxyClientConfiguration extends AbstractJaxRsClientConfigurat
                 factory.setProviders(
                     JAXRSClientFactoryBeanDefinitionParser.getProviders(context, classes.get(Provider.class)));
             } catch (Exception ex) {
-                throw new ServiceConstructionException(ex);    
+                throw new ServiceConstructionException(ex);
             }
         }
     }
 
-    
+
 }

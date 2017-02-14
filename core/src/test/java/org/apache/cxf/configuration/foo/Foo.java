@@ -26,9 +26,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for foo complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="foo">
  *   &lt;complexContent>
@@ -44,8 +44,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "foo",
@@ -67,11 +67,11 @@ public class Foo {
 
     /**
      * Gets the value of the position property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Point }
-     *     
+     *
      */
     public Point getPosition() {
         return position;
@@ -79,11 +79,11 @@ public class Foo {
 
     /**
      * Sets the value of the position property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Point }
-     *     
+     *
      */
     public void setPosition(Point value) {
         this.position = value;
@@ -91,11 +91,11 @@ public class Foo {
 
     /**
      * Gets the value of the address property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Address }
-     *     
+     *
      */
     public Address getAddress() {
         return address;
@@ -103,11 +103,11 @@ public class Foo {
 
     /**
      * Sets the value of the address property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Address }
-     *     
+     *
      */
     public void setAddress(Address value) {
         this.address = value;
@@ -115,11 +115,11 @@ public class Foo {
 
     /**
      * Gets the value of the name property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getName() {
         return name;
@@ -127,11 +127,11 @@ public class Foo {
 
     /**
      * Sets the value of the name property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setName(String value) {
         this.name = value;
@@ -139,11 +139,11 @@ public class Foo {
 
     /**
      * Gets the value of the intDefault property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getIntDefault() {
         return intDefault;
@@ -151,11 +151,11 @@ public class Foo {
 
     /**
      * Sets the value of the intDefault property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setIntDefault(Integer value) {
         this.intDefault = value;
@@ -163,11 +163,11 @@ public class Foo {
 
     /**
      * Gets the value of the intNoDefault property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getIntNoDefault() {
         return intNoDefault;
@@ -175,11 +175,11 @@ public class Foo {
 
     /**
      * Sets the value of the intNoDefault property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setIntNoDefault(Integer value) {
         this.intNoDefault = value;

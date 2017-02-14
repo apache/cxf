@@ -29,7 +29,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 public class BeanValidationFeature extends AbstractFeature {
 
     private BeanValidationProvider validationProvider;
-    
+
     @Override
     protected void initializeProvider(InterceptorProvider interceptorProvider, Bus bus) {
         BeanValidationInInterceptor in = new BeanValidationInInterceptor();

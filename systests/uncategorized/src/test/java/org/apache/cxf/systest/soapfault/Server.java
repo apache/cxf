@@ -25,7 +25,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
-    
+
     protected void run() {
         String address = "http://localhost:" + PORT + "/SoapFault";
 

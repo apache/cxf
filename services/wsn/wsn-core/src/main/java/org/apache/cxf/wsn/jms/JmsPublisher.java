@@ -118,8 +118,8 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
     }
 
     @Override
-    protected void validatePublisher(RegisterPublisher registerPublisherRequest) 
-        throws InvalidTopicExpressionFault, PublisherRegistrationFailedFault, 
+    protected void validatePublisher(RegisterPublisher registerPublisherRequest)
+        throws InvalidTopicExpressionFault, PublisherRegistrationFailedFault,
             PublisherRegistrationRejectedFault, ResourceUnknownFault,
             TopicNotSupportedFault {
         super.validatePublisher(registerPublisherRequest);
@@ -138,7 +138,7 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
                 producers = new HashMap<Destination, Object>();
                 advisories = new ArrayList<>();
                 for (TopicExpressionType topic : this.topic) {
-                    ConsumerEventSource advisory 
+                    ConsumerEventSource advisory
                         = new ConsumerEventSource(connection, topicConverter.toActiveMQTopic(topic));
                     advisory.setConsumerListener(this);
                     advisory.start();

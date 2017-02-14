@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  * Java class for fully-qualified-classType complex type.
  * <p>
  * The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="fully-qualified-classType">
  *   &lt;simpleContent>

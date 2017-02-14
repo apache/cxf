@@ -41,36 +41,36 @@ public class DepthRestrictingStreamInterceptor extends AbstractPhaseInterceptor<
     private int elementCountThreshold = 2000;
     private int innerElementLevelThreshold = 20;
     private int innerElementCountThreshold = 50;
-    
+
     public DepthRestrictingStreamInterceptor() {
         this(Phase.POST_STREAM);
         addAfter(StaxInInterceptor.class.getName());
     }
-    
+
     public DepthRestrictingStreamInterceptor(String phase) {
         super(phase);
     }
-    
+
     public DepthRestrictingStreamInterceptor(String phase, List<String> after) {
         super(phase);
         if (after != null) {
             addAfter(after);
         }
     }
-    
+
     public DepthRestrictingStreamInterceptor(String phase, List<String> before, List<String> after) {
         this(phase, after);
         if (before != null) {
             addBefore(before);
         }
     }
-    
+
     public void handleMessage(Message message) {
-        
+
         if (canBeIgnored(message)) {
             return;
         }
-        
+
         XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         if (reader == null) {
             InputStream is = message.getContent(InputStream.class);
@@ -82,9 +82,9 @@ public class DepthRestrictingStreamInterceptor extends AbstractPhaseInterceptor<
                 return;
             }
         }
-        DepthRestrictingStreamReader dr = 
+        DepthRestrictingStreamReader dr =
             new DepthRestrictingStreamReader(reader,
-                                             elementCountThreshold, 
+                                             elementCountThreshold,
                                              innerElementLevelThreshold,
                                              innerElementCountThreshold);
         message.setContent(XMLStreamReader.class, dr);
@@ -95,9 +95,9 @@ public class DepthRestrictingStreamInterceptor extends AbstractPhaseInterceptor<
         String ct = (String)message.get(Message.CONTENT_TYPE);
         return ct != null && !ct.contains(XML_SUB_TYPE);
     }
-    
+
     /**
-     * Sets the acceptable total number of elements in the XML payload 
+     * Sets the acceptable total number of elements in the XML payload
      * @param elementCountThreshold
      */
     public void setElementCountThreshold(int elementCountThreshold) {
@@ -109,7 +109,7 @@ public class DepthRestrictingStreamInterceptor extends AbstractPhaseInterceptor<
     }
 
     /**
-     * Sets the acceptable total stack depth in the XML payload 
+     * Sets the acceptable total stack depth in the XML payload
      * @param elementLevelThreshold
      */
     public void setInnerElementLevelThreshold(int elementLevelThreshold) {
@@ -121,7 +121,7 @@ public class DepthRestrictingStreamInterceptor extends AbstractPhaseInterceptor<
     }
 
     /**
-     * Sets the acceptable total number of child elements for the current XML element 
+     * Sets the acceptable total number of child elements for the current XML element
      * @param innerElementCountThreshold
      */
     public void setInnerElementCountThreshold(int innerElementCountThreshold) {
@@ -131,5 +131,5 @@ public class DepthRestrictingStreamInterceptor extends AbstractPhaseInterceptor<
     public int getInnerElementCountThreshold() {
         return innerElementCountThreshold;
     }
-    
+
 }

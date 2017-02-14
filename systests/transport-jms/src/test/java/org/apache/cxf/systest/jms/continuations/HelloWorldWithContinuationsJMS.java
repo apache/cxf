@@ -34,31 +34,31 @@ import org.apache.cxf.continuations.ContinuationProvider;
 
 
 
-@WebService(name = "HelloContinuation", 
-            serviceName = "HelloContinuationService", 
-            portName = "HelloContinuationPort", 
+@WebService(name = "HelloContinuation",
+            serviceName = "HelloContinuationService",
+            portName = "HelloContinuationPort",
             targetNamespace = "http://cxf.apache.org/systest/jaxws",
             endpointInterface = "org.apache.cxf.systest.jms.continuations.HelloContinuation",
             wsdlLocation = "org/apache/cxf/systest/jms/continuations/test.wsdl")
-public class HelloWorldWithContinuationsJMS implements HelloContinuation {    
-    
-    private Map<String, Continuation> suspended = 
+public class HelloWorldWithContinuationsJMS implements HelloContinuation {
+
+    private Map<String, Continuation> suspended =
         new HashMap<String, Continuation>();
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                         new ArrayBlockingQueue<Runnable>(10));
-    
+
     @Resource
     private WebServiceContext context;
-    
+
     public String sayHi(String firstName, String secondName) {
-        
+
         Continuation continuation = getContinuation(firstName);
         if (continuation == null) {
             throw new RuntimeException("Failed to get continuation");
         }
         synchronized (continuation) {
             if (continuation.isNew()) {
-                Object userObject = secondName != null && secondName.length() > 0 
+                Object userObject = secondName != null && secondName.length() > 0
                                     ? secondName : null;
                 continuation.setObject(userObject);
                 suspendInvocation(firstName, continuation);
@@ -68,8 +68,8 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
                 }
                 StringBuilder sb = new StringBuilder();
                 sb.append(firstName);
-                
-                // if the actual parameter is not null 
+
+                // if the actual parameter is not null
                 if (secondName != null && secondName.length() > 0) {
                     String surname = continuation.getObject().toString();
                     sb.append(' ').append(surname);
@@ -93,30 +93,30 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
             }
         }
         //System.out.println("Invocation for " + name + " has been suspended");
-        
+
         return true;
     }
 
     public void resumeRequest(final String name) {
-        
+
         Continuation suspendedCont = null;
         synchronized (suspended) {
             suspendedCont = suspended.get(name);
         }
-        
+
         if (suspendedCont != null) {
             synchronized (suspendedCont) {
                 suspendedCont.resume();
             }
         }
     }
-    
+
     private void suspendInvocation(final String name, Continuation cont) {
-        
+
         //System.out.println("Suspending invocation for " + name);
-        
+
         try {
-            cont.suspend(500000);    
+            cont.suspend(500000);
         } finally {
             synchronized (suspended) {
                 suspended.put(name, cont);
@@ -127,27 +127,27 @@ public class HelloWorldWithContinuationsJMS implements HelloContinuation {
                         Thread.sleep(2000);
                     } catch (InterruptedException ex) {
                         // ignore
-                    }       
+                    }
                     resumeRequest(name);
                 }
             });
         }
     }
-    
+
     private Continuation getContinuation(String name) {
-        
+
         //System.out.println("Getting continuation for " + name);
-        
+
         synchronized (suspended) {
             Continuation suspendedCont = suspended.remove(name);
             if (suspendedCont != null) {
                 return suspendedCont;
             }
         }
-        
-        ContinuationProvider provider = 
+
+        ContinuationProvider provider =
             (ContinuationProvider)context.getMessageContext().get(ContinuationProvider.class.getName());
         return provider.getContinuation();
     }
-    
+
 }

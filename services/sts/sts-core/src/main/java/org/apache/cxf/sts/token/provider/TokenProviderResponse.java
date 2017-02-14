@@ -35,7 +35,7 @@ public class TokenProviderResponse {
     private TokenReference unAttachedReference;
     private Date created;
     private Date expires;
-    
+
     /**
      * Return true if the entropy represents a Computed Key.
      */
@@ -71,7 +71,7 @@ public class TokenProviderResponse {
     public void setToken(Object token) {
         this.token = token;
     }
-    
+
     /**
      * Get the token
      * @return the token to set
@@ -87,7 +87,7 @@ public class TokenProviderResponse {
     public void setTokenId(String tokenId) {
         this.tokenId = tokenId;
     }
-    
+
     /**
      * Get the token Id
      * @return the token Id
@@ -95,7 +95,7 @@ public class TokenProviderResponse {
     public String getTokenId() {
         return tokenId;
     }
-    
+
     /**
      * Set the entropy associated with the token.
      * @param entropy the entropy associated with the token.
@@ -103,7 +103,7 @@ public class TokenProviderResponse {
     public void setEntropy(byte[] entropy) {
         this.entropy = entropy;
     }
-    
+
     /**
      * Get the entropy associated with the token.
      * @return the entropy associated with the token.
@@ -111,7 +111,7 @@ public class TokenProviderResponse {
     public byte[] getEntropy() {
         return entropy;
     }
-    
+
     /**
      * Set the attached TokenReference
      * @param attachtedReference the attached TokenReference
@@ -119,7 +119,7 @@ public class TokenProviderResponse {
     public void setAttachedReference(TokenReference attachedReference) {
         this.attachedReference = attachedReference;
     }
-    
+
     /**
      * Get the attached TokenReference
      * @return the attached TokenReference
@@ -127,7 +127,7 @@ public class TokenProviderResponse {
     public TokenReference getAttachedReference() {
         return attachedReference;
     }
-    
+
     /**
      * Set the unattached TokenReference
      * @param unAttachedReference  Set the unattached TokenReference
@@ -135,7 +135,7 @@ public class TokenProviderResponse {
     public void setUnattachedReference(TokenReference unattachedReference) {
         this.unAttachedReference = unattachedReference;
     }
-    
+
     /**
      * Get the unattached TokenReference
      * @return the unattached TokenReference
@@ -145,8 +145,8 @@ public class TokenProviderResponse {
     }
 
     /**
-     * Get the Date that this Token was Created 
-     * @return the Date that this Token was Created 
+     * Get the Date that this Token was Created
+     * @return the Date that this Token was Created
      */
     public Date getCreated() {
         if (created != null) {
@@ -156,7 +156,7 @@ public class TokenProviderResponse {
     }
 
     /**
-     * Set the Date that this Token was Created 
+     * Set the Date that this Token was Created
      * @param created the Date that this Token was Created
      */
     public void setCreated(Date created) {

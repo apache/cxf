@@ -35,7 +35,7 @@ import javax.xml.transform.stream.StreamSource;
 public final class Get {
 
     private Get() {
-    } 
+    }
 
     public static void main(String args[]) throws Exception {
         // Sent HTTP GET request to invoke sayHi
@@ -115,5 +115,5 @@ public final class Get {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }    
+    }
 }

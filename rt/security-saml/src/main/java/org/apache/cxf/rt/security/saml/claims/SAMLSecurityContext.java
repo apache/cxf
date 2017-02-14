@@ -28,26 +28,26 @@ import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.claims.ClaimsSecurityContext;
 
 public class SAMLSecurityContext implements ClaimsSecurityContext {
-    
+
     private final Principal principal;
     private Set<Principal> roles;
     private Element assertionElement;
     private String issuer;
     private ClaimCollection claims;
-    
+
     public SAMLSecurityContext(Principal principal) {
         this(principal, null);
     }
-    
+
     public SAMLSecurityContext(
-        Principal principal, 
+        Principal principal,
         Set<Principal> roles
     ) {
         this(principal, roles, null);
     }
-    
+
     public SAMLSecurityContext(
-        Principal principal, 
+        Principal principal,
         Set<Principal> roles,
         ClaimCollection claims
     ) {
@@ -55,11 +55,11 @@ public class SAMLSecurityContext implements ClaimsSecurityContext {
         this.roles = roles;
         this.claims = claims;
     }
-    
+
     public ClaimCollection getClaims() {
         return claims;
     }
-    
+
     public Principal getUserPrincipal() {
         return principal;
     }
@@ -75,7 +75,7 @@ public class SAMLSecurityContext implements ClaimsSecurityContext {
         }
         return false;
     }
-    
+
     public javax.security.auth.Subject getSubject() {
         return null;
     }
@@ -83,7 +83,7 @@ public class SAMLSecurityContext implements ClaimsSecurityContext {
     public void setUserRoles(Set<Principal> userRoles) {
         this.roles = userRoles;
     }
-    
+
     public Set<Principal> getUserRoles() {
         if (roles == null) {
             return Collections.emptySet();
@@ -94,19 +94,19 @@ public class SAMLSecurityContext implements ClaimsSecurityContext {
         }
         return retRoles;
     }
-    
+
     public void setAssertionElement(Element assertionElement) {
         this.assertionElement = assertionElement;
     }
-    
+
     public Element getAssertionElement() {
         return assertionElement;
     }
-    
+
     public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
-    
+
     public String getIssuer() {
         return issuer;
     }

@@ -44,18 +44,18 @@ public class StaticEndpointClaimsHandler implements ClaimsHandler {
     public Map<String, Map<String, String>> getEndpointClaims() {
         return endpointClaimsMap;
     }
-    
+
     public void setSupportedClaims(List<URI> supportedClaims) {
         this.supportedClaims = supportedClaims;
     }
-    
+
     public List<URI> getSupportedClaimTypes() {
         return Collections.unmodifiableList(this.supportedClaims);
-    }    
-    
+    }
+
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
-        
+
         ProcessedClaimCollection claimsColl = new ProcessedClaimCollection();
         String appliesTo = parameters.getAppliesToAddress();
         if (appliesTo == null) {
@@ -86,7 +86,7 @@ public class StaticEndpointClaimsHandler implements ClaimsHandler {
             }
         }
         return claimsColl;
-        
+
     }
 
 }

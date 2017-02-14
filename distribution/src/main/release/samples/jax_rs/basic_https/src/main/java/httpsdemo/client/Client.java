@@ -38,23 +38,23 @@ import httpsdemo.common.CustomerService;
 public final class Client {
 
     private static final String CLIENT_CONFIG_FILE = "ClientConfig.xml";
-    private static final String BASE_SERVICE_URL = 
+    private static final String BASE_SERVICE_URL =
         "https://localhost:9000/customerservice/customers";
-    
+
     private Client() {
     }
 
-    public static void main(String args[]) throws Exception {       
+    public static void main(String args[]) throws Exception {
         String keyStoreLoc = "src/main/config/clientKeystore.jks";
 
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
 
-        /* 
+        /*
          * Send HTTP GET request to query customer info using portable HttpClient
          * object from Apache HttpComponents
          */
-        SSLSocketFactory sf = new SSLSocketFactory(keyStore, "ckpass", keyStore); 
+        SSLSocketFactory sf = new SSLSocketFactory(keyStore, "ckpass", keyStore);
         Scheme httpsScheme = new Scheme("https", 9000, sf);
 
         System.out.println("Sending HTTPS GET request to query customer info");
@@ -67,7 +67,7 @@ public final class Client {
         HttpEntity entity = response.getEntity();
         entity.writeTo(System.out);
         httpclient.getConnectionManager().shutdown();
-        
+
         /*
          *  Send HTTP PUT request to update customer info, using CXF WebClient method
          *  Note: if need to use basic authentication, use the WebClient.create(baseAddress,
@@ -93,7 +93,7 @@ public final class Client {
         customer = new Customer();
         customer.setName("Jack");
         resp = wc.post(customer);
-        
+
         System.out.println("\n");
         System.exit(0);
     }

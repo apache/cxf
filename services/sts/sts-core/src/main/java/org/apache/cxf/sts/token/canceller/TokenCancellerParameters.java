@@ -42,7 +42,7 @@ public class TokenCancellerParameters {
     private TokenRequirements tokenRequirements;
     private TokenStore tokenStore;
     private ReceivedToken token;
-    
+
     public ReceivedToken getToken() {
         return token;
     }
@@ -50,7 +50,7 @@ public class TokenCancellerParameters {
     public void setToken(ReceivedToken token) {
         this.token = token;
     }
-    
+
     public TokenStore getTokenStore() {
         return tokenStore;
     }
@@ -58,7 +58,7 @@ public class TokenCancellerParameters {
     public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
-    
+
     public TokenRequirements getTokenRequirements() {
         return tokenRequirements;
     }
@@ -74,7 +74,7 @@ public class TokenCancellerParameters {
     public void setKeyRequirements(KeyRequirements keyRequirements) {
         this.keyRequirements = keyRequirements;
     }
-    
+
     public STSPropertiesMBean getStsProperties() {
         return stsProperties;
     }
@@ -82,11 +82,11 @@ public class TokenCancellerParameters {
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
+
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getPrincipal() {
         return principal;
     }
@@ -98,5 +98,5 @@ public class TokenCancellerParameters {
     public void setMessageContext(Map<String, Object> messageContext) {
         this.messageContext = messageContext;
     }
-    
+
 }

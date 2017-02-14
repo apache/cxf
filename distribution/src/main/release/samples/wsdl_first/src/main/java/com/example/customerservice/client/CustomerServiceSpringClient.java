@@ -29,10 +29,10 @@ public final class CustomerServiceSpringClient {
 
     public static void main(String args[]) throws Exception {
         // Initialize the spring context and fetch our test client
-        ClassPathXmlApplicationContext context 
+        ClassPathXmlApplicationContext context
             = new ClassPathXmlApplicationContext(new String[] {"classpath:client-applicationContext.xml"});
         CustomerServiceTester client = (CustomerServiceTester)context.getBean("tester");
-        
+
         client.testCustomerService();
         System.exit(0);
     }

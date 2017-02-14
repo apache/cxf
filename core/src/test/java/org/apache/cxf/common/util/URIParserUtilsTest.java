@@ -26,7 +26,7 @@ import org.junit.Test;
 
 
 public class URIParserUtilsTest extends Assert {
-    
+
     @Test
     public void testRelativize() throws URISyntaxException {
         assertNull(URIParserUtil.relativize(null, "foo"));

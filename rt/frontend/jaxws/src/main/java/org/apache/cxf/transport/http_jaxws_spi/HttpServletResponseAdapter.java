@@ -40,10 +40,10 @@ import javax.xml.ws.spi.http.HttpExchange;
  * coming from the HttpExchange instance provided
  * by the underlying container.
  * Note: many methods' implementation still TODO.
- * 
+ *
  */
 class HttpServletResponseAdapter implements HttpServletResponse {
-    
+
     private HttpExchange exchange;
     private String characterEncoding;
     private Locale locale;
@@ -51,7 +51,7 @@ class HttpServletResponseAdapter implements HttpServletResponse {
     private ServletOutputStreamAdapter servletOutputStream;
     private PrintWriter writer;
     private int status;
-    
+
     HttpServletResponseAdapter(HttpExchange exchange) {
         this.exchange = exchange;
     }
@@ -118,7 +118,7 @@ class HttpServletResponseAdapter implements HttpServletResponse {
 
     public void setContentLength(int len) {
         if (!committed) {
-            exchange.getResponseHeaders().put("Content-Length", 
+            exchange.getResponseHeaders().put("Content-Length",
                 Collections.singletonList(String.valueOf(len)));
         }
     }
@@ -237,7 +237,7 @@ class HttpServletResponseAdapter implements HttpServletResponse {
         public void write(int b) throws IOException {
             delegate.write(b);
         }
-        
+
         @Override
         public void flush() throws IOException {
             delegate.flush();

@@ -32,7 +32,7 @@ public class BookServerResourceCreatedSpringProviders extends AbstractBusTestSer
     public static final String PORT = allocatePort(BookServerResourceCreatedSpringProviders.class);
 
     private org.eclipse.jetty.server.Server server;
-    
+
     protected void run() {
         server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
 
@@ -53,10 +53,10 @@ public class BookServerResourceCreatedSpringProviders extends AbstractBusTestSer
         server.setHandler(handlers);
         try {
             server.start();
-                       
+
         } catch (Exception e) {
             e.printStackTrace();
-        }     
+        }
     }
 
     public void tearDown() throws Exception {
@@ -66,8 +66,8 @@ public class BookServerResourceCreatedSpringProviders extends AbstractBusTestSer
             server.destroy();
             server = null;
         }
-    }    
-    
+    }
+
     public static void main(String args[]) {
         try {
             BookServerResourceCreatedSpringProviders s = new BookServerResourceCreatedSpringProviders();

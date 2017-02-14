@@ -34,7 +34,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 public class CustomerMetricsInterceptor extends AbstractPhaseInterceptor<Message> {
     MetricRegistry registry;

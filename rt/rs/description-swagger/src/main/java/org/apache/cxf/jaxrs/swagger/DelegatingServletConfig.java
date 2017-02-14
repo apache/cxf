@@ -28,26 +28,26 @@ import io.swagger.jaxrs.config.SwaggerContextService;
 
 class DelegatingServletConfig implements ServletConfig {
     private final ServletConfig delegate;
-    
+
     DelegatingServletConfig(final ServletConfig sc) {
         this.delegate = sc;
     }
-    
+
     @Override
     public String getServletName() {
         return delegate.getServletName();
     }
-    
+
     @Override
     public ServletContext getServletContext() {
         return delegate.getServletContext();
     }
-    
+
     @Override
     public Enumeration<String> getInitParameterNames() {
         return delegate.getInitParameterNames();
     }
-    
+
     @Override
     public String getInitParameter(String name) {
         if (Objects.equals(SwaggerContextService.USE_PATH_BASED_CONFIG, name)) {

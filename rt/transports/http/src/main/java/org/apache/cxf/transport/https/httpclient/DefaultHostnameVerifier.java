@@ -57,16 +57,16 @@ import org.apache.cxf.common.logging.LogUtils;
  * Copied from httpclient.
  */
 public final class DefaultHostnameVerifier implements HostnameVerifier {
-    
+
     enum TYPE { IPv4, IPv6, DNS };
-    
+
     static final int DNS_NAME_TYPE = 2;
     static final int IP_ADDRESS_TYPE = 7;
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultHostnameVerifier.class);
 
     private final PublicSuffixMatcher publicSuffixMatcher;
-    
+
     public DefaultHostnameVerifier(final PublicSuffixMatcher publicSuffixMatcher) {
         this.publicSuffixMatcher = publicSuffixMatcher;
     }
@@ -137,7 +137,7 @@ public final class DefaultHostnameVerifier implements HostnameVerifier {
                 return;
             }
         }
-        throw new SSLException("Certificate for <" + host + "> doesn't match any " 
+        throw new SSLException("Certificate for <" + host + "> doesn't match any "
             + "of the subject alternative names: " + subjectAlts);
     }
 
@@ -150,7 +150,7 @@ public final class DefaultHostnameVerifier implements HostnameVerifier {
                 return;
             }
         }
-        throw new SSLException("Certificate for <" + host + "> doesn't match any " 
+        throw new SSLException("Certificate for <" + host + "> doesn't match any "
             + "of the subject alternative names: " + subjectAlts);
     }
 
@@ -164,18 +164,18 @@ public final class DefaultHostnameVerifier implements HostnameVerifier {
                 return;
             }
         }
-        throw new SSLException("Certificate for <" + host + "> doesn't match any " 
+        throw new SSLException("Certificate for <" + host + "> doesn't match any "
             + "of the subject alternative names: " + subjectAlts);
     }
 
     static void matchCN(final String host, final String cn,
                  final PublicSuffixMatcher publicSuffixMatcher) throws SSLException {
         if (!matchIdentityStrict(host, cn, publicSuffixMatcher)) {
-            throw new SSLException("Certificate for <" + host + "> doesn't match " 
+            throw new SSLException("Certificate for <" + host + "> doesn't match "
                 + "common name of the certificate subject: " + cn);
         }
     }
-    
+
     static boolean matchDomainRoot(final String host, final String domainRoot) {
         if (domainRoot == null) {
             return false;

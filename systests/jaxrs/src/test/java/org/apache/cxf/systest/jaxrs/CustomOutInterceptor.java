@@ -42,12 +42,12 @@ public class CustomOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     @SuppressWarnings("unchecked")
     public void handleMessage(Message message) throws Fault {
-        
+
         String requestUri = (String)message.getExchange().getInMessage().get(Message.REQUEST_URI);
         if (requestUri.endsWith("/outfault")) {
             throw new WebApplicationException(403);
         }
-        
+
         HttpHeaders requestHeaders = new HttpHeadersImpl(message.getExchange().getInMessage());
         if (requestHeaders.getHeaderString("PLAIN-MAP") != null) {
             Map<String, List<String>> headers = (Map<String, List<String>>)
@@ -66,7 +66,7 @@ public class CustomOutInterceptor extends AbstractPhaseInterceptor<Message> {
             headers.putSingle("MAP-NAME", MultivaluedMap.class.getName());
             message.put(Message.PROTOCOL_HEADERS, headers);
         }
-        
+
     }
 
 }

@@ -28,10 +28,10 @@ public class Server {
     protected Server(String args[]) throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(StreamingService.class);
-        
+
         String receiverType = args.length == 1 && args[0].equals("-receiverType=queue")
             ? "queue" : "string";
-        sf.setResourceProvider(StreamingService.class, 
+        sf.setResourceProvider(StreamingService.class,
             new SingletonResourceProvider(new StreamingService(receiverType)));
         sf.setAddress("http://localhost:9000/spark");
 
@@ -45,6 +45,6 @@ public class Server {
         System.out.println("Server exiting");
         System.exit(0);
     }
-    
-    
+
+
 }

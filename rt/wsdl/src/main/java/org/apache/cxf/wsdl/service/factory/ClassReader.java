@@ -74,12 +74,12 @@ class ClassReader extends ByteArrayInputStream {
 
         this.attrMethods = attrMethods;
     }
-    
+
     /**
      * load the bytecode for a given class, by using the class's defining
      * classloader and assuming that for a class named P.C, the bytecodes are in
      * a resource named /P/C.class.
-     * 
+     *
      * @param c the class of interest
      * @return a byte array containing the bytecode
      * @throws IOException
@@ -413,7 +413,7 @@ class ClassReader extends ByteArrayInputStream {
 
     /**
      * read a code attribute
-     * 
+     *
      * @throws IOException
      */
     public void readCode() throws IOException {

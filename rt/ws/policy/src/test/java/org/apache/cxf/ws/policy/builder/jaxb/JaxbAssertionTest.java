@@ -38,7 +38,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class JaxbAssertionTest extends Assert {
 
@@ -61,7 +61,7 @@ public class JaxbAssertionTest extends Assert {
         assertTrue(assertion.isOptional());
         assertEquals(Constants.TYPE_ASSERTION, assertion.getType());
     }
-    
+
     @Test
     public void testEqual() {
         JaxbAssertion<FooType> assertion = new JaxbAssertion<FooType>();
@@ -71,36 +71,36 @@ public class JaxbAssertionTest extends Assert {
         QName qn = new QName("http://cxf.apache.org/test/assertions/foo", "FooType");
         assertion.setName(qn);
         assertion.setData(data);
-        
+
         PolicyComponent pc = new Policy();
         assertTrue(!assertion.equal(pc));
         pc = new All();
         assertTrue(!assertion.equal(pc));
         pc = new ExactlyOne();
         assertTrue(!assertion.equal(pc));
-        
+
         IMocksControl ctrl = EasyMock.createNiceControl();
         PrimitiveAssertion xpa = ctrl.createMock(PrimitiveAssertion.class);
         QName oqn = new QName("http://cxf.apache.org/test/assertions/blah", "OtherType");
         EasyMock.expect(xpa.getName()).andReturn(oqn);
         EasyMock.expect(xpa.getType()).andReturn(Constants.TYPE_ASSERTION);
-        
+
         ctrl.replay();
         assertTrue(!assertion.equal(xpa));
         ctrl.verify();
-            
+
         FooType odata = new FooType();
         odata.setName(data.getName());
         odata.setNumber(data.getNumber());
         JaxbAssertion<FooType> oassertion = new JaxbAssertion<FooType>();
         oassertion.setData(odata);
         oassertion.setName(qn);
-        assertTrue(!assertion.equal(oassertion));  
+        assertTrue(!assertion.equal(oassertion));
         oassertion.setData(data);
         assertTrue(assertion.equal(oassertion));
-        assertTrue(assertion.equal(assertion));          
+        assertTrue(assertion.equal(assertion));
     }
-    
+
     @Test
     public void testNormalise() {
         JaxbAssertion<FooType> assertion = new JaxbAssertion<FooType>();
@@ -112,13 +112,13 @@ public class JaxbAssertionTest extends Assert {
         assertion.setData(data);
 
         JaxbAssertion<?> normalised = (JaxbAssertion<?>)assertion.normalize();
-        assertTrue(normalised.equal(assertion));       
-        assertSame(assertion.getData(), normalised.getData()); 
-        
-        assertion.setOptional(true);        
+        assertTrue(normalised.equal(assertion));
+        assertSame(assertion.getData(), normalised.getData());
+
+        assertion.setOptional(true);
         PolicyComponent pc = assertion.normalize();
         assertEquals(Constants.TYPE_POLICY, pc.getType());
-        Policy p = (Policy)pc; 
+        Policy p = (Policy)pc;
         Iterator<List<Assertion>> alternatives = p.getAlternatives();
 
         int total = 0;
@@ -130,6 +130,6 @@ public class JaxbAssertionTest extends Assert {
             }
         }
         assertTrue(!alternatives.hasNext());
-        assertEquals(1, total);    
+        assertEquals(1, total);
     }
 }

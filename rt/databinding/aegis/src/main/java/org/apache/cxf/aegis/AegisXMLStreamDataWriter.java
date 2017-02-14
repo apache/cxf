@@ -34,11 +34,11 @@ import org.apache.cxf.common.logging.LogUtils;
 public class AegisXMLStreamDataWriter extends AbstractAegisIoImpl implements AegisWriter<XMLStreamWriter> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AegisXMLStreamDataWriter.class);
-    
+
     AegisXMLStreamDataWriter(AegisContext globalContext) {
         super(globalContext);
     }
-    
+
     /**
      * Write an object to the output. This method always writes xsi:type attributes.
      * @param obj The object to write.
@@ -47,16 +47,16 @@ public class AegisXMLStreamDataWriter extends AbstractAegisIoImpl implements Aeg
      * @param output the output stream
      * @param aegisType the aegis type. This may be null if the object is non-null
      * and the type of the object is covered in the mapping. Warning, for collections
-     * this will not do what you want, you must call the alternative version of 
-     * write that takes a {@link java.lang.reflect.Type}. 
+     * this will not do what you want, you must call the alternative version of
+     * write that takes a {@link java.lang.reflect.Type}.
      * @throws Exception
      */
-    public void write(Object obj, 
+    public void write(Object obj,
                       QName elementName,
                       boolean optional,
-                      XMLStreamWriter output, 
+                      XMLStreamWriter output,
                       AegisType aegisType) throws Exception {
-        
+
         if (obj == null && aegisType == null && !optional) {
             Message message = new Message("WRITE_NULL_NEEDS_TYPE", LOG);
             throw new DatabindingException(message);
@@ -69,17 +69,17 @@ public class AegisXMLStreamDataWriter extends AbstractAegisIoImpl implements Aeg
                 aegisType = creator.createType(obj.getClass());
             }
         }
-        
+
         if (obj != null) {
             // look for overrides declared in the context.
-            aegisType = TypeUtil.getWriteType(aegisContext, obj, aegisType); 
+            aegisType = TypeUtil.getWriteType(aegisContext, obj, aegisType);
         }
-        
+
         if (aegisType == null) {
             Message message = new Message("WRITE_NEEDS_TYPE", LOG, obj);
             throw new DatabindingException(message);
         }
-        
+
         if (obj == null) {
             if (optional) { // minOccurs = 0
                 return;
@@ -92,7 +92,7 @@ public class AegisXMLStreamDataWriter extends AbstractAegisIoImpl implements Aeg
                 return;
             }
         }
-        
+
         ElementWriter writer = new ElementWriter(output);
         MessageWriter w2 = writer.getElementWriter(elementName);
         if (getContext().isWriteXsiTypes()
@@ -117,12 +117,12 @@ public class AegisXMLStreamDataWriter extends AbstractAegisIoImpl implements Aeg
             TypeCreator creator = getContext().getTypeMapping().getTypeCreator();
             aegisType = creator.createType(objectType);
         }
-        
+
         if (aegisType == null) {
             Message message = new Message("NO_MAPPING_FOR_TYPE", LOG, objectType);
             throw new DatabindingException(message);
         }
         write(obj, elementName, optional, output, aegisType);
-        
+
     }
 }

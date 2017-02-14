@@ -51,19 +51,19 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 
 public class InvocationBuilderImpl implements Invocation.Builder {
     private static final String PROPERTY_KEY = "jaxrs.filter.properties";
-    
+
     private WebClient webClient;
     private SyncInvoker sync;
-    
+
     public InvocationBuilderImpl(WebClient webClient) {
         this.webClient = webClient;
         this.sync = webClient.sync();
     }
-    
+
     public WebClient getWebClient() {
         return this.webClient;
     }
-    
+
     @Override
     public Response delete() {
         return sync.delete();
@@ -205,7 +205,7 @@ public class InvocationBuilderImpl implements Invocation.Builder {
     public Builder acceptEncoding(String... enc) {
         webClient.acceptEncoding(enc);
         return this;
-        
+
     }
 
     @Override
@@ -246,7 +246,7 @@ public class InvocationBuilderImpl implements Invocation.Builder {
         doSetHeader(rd, name, value);
         return this;
     }
-    
+
     @Override
     public Builder headers(MultivaluedMap<String, Object> headers) {
         RuntimeDelegate rd = HttpUtils.getOtherRuntimeDelegate();
@@ -259,13 +259,13 @@ public class InvocationBuilderImpl implements Invocation.Builder {
     }
 
     private void doSetHeader(RuntimeDelegate rd, String name, Object value) {
-        HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(rd, value); 
+        HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(rd, value);
         if (hd != null) {
             value = hd.toString(value);
         }
         webClient.header(name, value);
     }
-    
+
     @Override
     public Builder property(String name, Object value) {
         Map<String, Object> contextProps = WebClient.getConfig(webClient).getRequestContext();
@@ -281,7 +281,7 @@ public class InvocationBuilderImpl implements Invocation.Builder {
         }
         return this;
     }
-    
+
     @Override
     public AsyncInvoker async() {
         return webClient.async();
@@ -316,23 +316,23 @@ public class InvocationBuilderImpl implements Invocation.Builder {
     public Invocation buildPut(Entity<?> entity) {
         return build(HttpMethod.PUT, entity);
     }
-    
+
     private class InvocationImpl implements Invocation {
 
         private Invocation.Builder invBuilder;
         private String httpMethod;
         private Entity<?> entity;
-        
+
         InvocationImpl(String httpMethod) {
             this(httpMethod, null);
         }
-        
+
         InvocationImpl(String httpMethod, Entity<?> entity) {
             this.invBuilder = InvocationBuilderImpl.this;
             this.httpMethod = httpMethod;
             this.entity = entity;
         }
-        
+
         @Override
         public Response invoke() {
             return invBuilder.method(httpMethod, entity);
@@ -385,11 +385,11 @@ public class InvocationBuilderImpl implements Invocation.Builder {
         // TODO: At the moment we still delegate if possible to the async HTTP conduit.
         // Investigate if letting the CompletableFuture thread pool deal with the sync invocation
         // is indeed more effective
-        
+
         return webClient.rx(executorService);
     }
 
-    
+
     @SuppressWarnings("rawtypes")
     @Override
     public <T extends RxInvoker> T rx(Class<T> rxCls) {
@@ -401,7 +401,7 @@ public class InvocationBuilderImpl implements Invocation.Builder {
     public <T extends RxInvoker> T rx(Class<T> rxCls, ExecutorService executorService) {
         return webClient.rx(rxCls, executorService);
     }
-    
+
     @Override
     public NioInvoker nio() {
         // TODO: Implementation required (JAX-RS 2.1)

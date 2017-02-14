@@ -57,19 +57,19 @@ import org.apache.cxf.staxutils.StaxUtils;
 @HandlerChain(file = "./handlers_invocation.xml", name = "TestHandlerChain")
 public abstract class AbstractSourcePayloadProvider implements SourceProvider {
     boolean doneStax;
-    @Resource 
+    @Resource
     WebServiceContext ctx;
-    
+
     public AbstractSourcePayloadProvider() {
     }
-    
-   
-    public Source invoke(Source request) {   
+
+
+    public Source invoke(Source request) {
         QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
         if (qn == null) {
             throw new RuntimeException("No Operation Name");
         }
-        
+
         try {
             if (request instanceof StaxSource) {
                 StaxSource ss = (StaxSource)request;
@@ -78,7 +78,7 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
                 }
             }
             String input = getSourceAsString(request);
-            
+
             if (input.indexOf("ServerLogicalHandler") >= 0) {
                 return map(request.getClass());
             }
@@ -89,10 +89,10 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
         }
         return null;
     }
-    
-    private Source map(Class<? extends Source> class1) 
+
+    private Source map(Class<? extends Source> class1)
         throws Exception {
-        
+
         InputStream greetMeInputStream = getClass()
             .getResourceAsStream("resources/GreetMeRpcLiteralRespBody.xml");
         if (DOMSource.class.equals(class1)) {

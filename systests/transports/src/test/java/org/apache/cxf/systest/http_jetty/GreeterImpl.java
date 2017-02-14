@@ -37,9 +37,9 @@ import org.apache.hello_world_soap_http.types.TestDocLitFaultResponse;
 import org.apache.hello_world_soap_http.types.TestNillableResponse;
 
 
-@WebService(serviceName = "SOAPServiceAddressing", 
-            portName = "SoapPort", 
-            endpointInterface = "org.apache.hello_world_soap_http.Greeter", 
+@WebService(serviceName = "SOAPServiceAddressing",
+            portName = "SoapPort",
+            endpointInterface = "org.apache.hello_world_soap_http.Greeter",
             targetNamespace = "http://apache.org/hello_world_soap_http",
             wsdlLocation = "testutils/hello_world.wsdl")
 public class GreeterImpl implements Greeter {
@@ -62,13 +62,13 @@ public class GreeterImpl implements Greeter {
         return "Hello, finally";
     }
 
-    public void greetMeOneWay(String requestType) {   
+    public void greetMeOneWay(String requestType) {
     }
 
     public String sayHi() {
         return null;
     }
-    
+
     public void testDocLitFault(String faultType) throws BadRecordLitFault, NoSuchCodeLitFault {
     }
 
@@ -79,46 +79,46 @@ public class GreeterImpl implements Greeter {
     public String greetMeSometime(String me) {
         return null;
     }
-    
-    public Future<?>  greetMeSometimeAsync(String requestType, 
-                                           AsyncHandler<GreetMeSometimeResponse> asyncHandler) { 
-        return null; 
+
+    public Future<?>  greetMeSometimeAsync(String requestType,
+                                           AsyncHandler<GreetMeSometimeResponse> asyncHandler) {
+        return null;
     }
-    
-    public Response<GreetMeSometimeResponse> greetMeSometimeAsync(String requestType) { 
-        return null; 
+
+    public Response<GreetMeSometimeResponse> greetMeSometimeAsync(String requestType) {
+        return null;
     }
-    
-    public Response<TestDocLitFaultResponse> testDocLitFaultAsync(String faultType) {  
-        return null; 
+
+    public Response<TestDocLitFaultResponse> testDocLitFaultAsync(String faultType) {
+        return null;
     }
-    
+
     public Response<BareDocumentResponse> testDocLitBareAsync(String bare) {
         return null;
     }
-    
-    public Future<?> greetMeAsync(String requestType, AsyncHandler<GreetMeResponse> asyncHandler) { 
-        return null; 
+
+    public Future<?> greetMeAsync(String requestType, AsyncHandler<GreetMeResponse> asyncHandler) {
+        return null;
     }
-    
-    public Response<GreetMeResponse> greetMeAsync(String requestType) { 
-        return null; 
+
+    public Response<GreetMeResponse> greetMeAsync(String requestType) {
+        return null;
     }
-    
-    public Future<?> greetMeLaterAsync(long requestType, AsyncHandler<GreetMeLaterResponse> asyncHandler) { 
-        return null; 
+
+    public Future<?> greetMeLaterAsync(long requestType, AsyncHandler<GreetMeLaterResponse> asyncHandler) {
+        return null;
     }
-    
-    public Response<GreetMeLaterResponse> greetMeLaterAsync(long requestType) { 
-        return null; 
+
+    public Response<GreetMeLaterResponse> greetMeLaterAsync(long requestType) {
+        return null;
     }
-    
-    public Future<?> sayHiAsync(AsyncHandler<SayHiResponse> asyncHandler) { 
-        return null; 
+
+    public Future<?> sayHiAsync(AsyncHandler<SayHiResponse> asyncHandler) {
+        return null;
     }
-    
-    public Response<SayHiResponse> sayHiAsync() { 
-        return null; 
+
+    public Response<SayHiResponse> sayHiAsync() {
+        return null;
     }
 
     public String testNillable(String nillElem, int intElem) {
@@ -129,8 +129,8 @@ public class GreeterImpl implements Greeter {
                                                             int intElem) {
         return null;
     }
-    
-    public Future<?> testNillableAsync(String nillElem, 
+
+    public Future<?> testNillableAsync(String nillElem,
                                        int intElem,
                                        AsyncHandler<TestNillableResponse> asyncHandler) {
         return null;
@@ -140,5 +140,5 @@ public class GreeterImpl implements Greeter {
                                           AsyncHandler<TestDocLitFaultResponse> asyncHandler) {
         return null;
     }
-    
+
 }

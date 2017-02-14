@@ -63,7 +63,7 @@ public class JAXWSFrontEndProcessor implements Processor {
     private ToolContext context;
     private List<AbstractGenerator> generators = new ArrayList<>();
     private List<String> infList = new ArrayList<>();
-    
+
     @SuppressWarnings("unchecked")
     public void process() throws ToolException {
         checkJaxwsClass();
@@ -79,7 +79,7 @@ public class JAXWSFrontEndProcessor implements Processor {
         jinf.setJavaModel(jm);
         context.put(JavaModel.class, jm);
         context.put(ToolConstants.SERVICE_NAME, serviceInfo.getName());
-        EndpointInfo endpointInfo = serviceInfo.getEndpoints().iterator().next();        
+        EndpointInfo endpointInfo = serviceInfo.getEndpoints().iterator().next();
         context.put(ToolConstants.PORT_NAME, endpointInfo.getName());
         generators.add(new JaxwsSEIGenerator());
         generators.add(new JaxwsImplGenerator());
@@ -168,8 +168,8 @@ public class JAXWSFrontEndProcessor implements Processor {
             throw new ToolException(msg);
         }
     }
-    
-    
+
+
     private boolean isImplRmiRemote(Class<?> claz) {
         for (Method method : claz.getMethods()) {
             if (Modifier.isPublic(method.getModifiers()) && !Modifier.isStatic(method.getModifiers())
@@ -184,8 +184,8 @@ public class JAXWSFrontEndProcessor implements Processor {
         }
         return infList.contains("java.rmi.Remote");
     }
-    
-    
+
+
     private void getInfClass(Class<?> claz) {
         for (Class<?> inf : claz.getInterfaces()) {
             getInfClass(inf);
@@ -197,5 +197,5 @@ public class JAXWSFrontEndProcessor implements Processor {
             infList.add(claz.getName());
         }
     }
-    
+
 }

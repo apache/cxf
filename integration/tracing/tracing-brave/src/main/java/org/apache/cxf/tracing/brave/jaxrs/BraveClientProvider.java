@@ -32,28 +32,28 @@ import com.twitter.zipkin.gen.Span;
 import org.apache.cxf.tracing.brave.AbstractBraveClientProvider;
 
 @Provider
-public class BraveClientProvider extends AbstractBraveClientProvider 
+public class BraveClientProvider extends AbstractBraveClientProvider
         implements ClientRequestFilter, ClientResponseFilter {
-    
+
     public BraveClientProvider(final Brave brave) {
         super(brave);
     }
 
     @Override
     public void filter(final ClientRequestContext requestContext) throws IOException {
-        final TraceScopeHolder<Span> holder = super.startTraceSpan(requestContext.getStringHeaders(), 
+        final TraceScopeHolder<Span> holder = super.startTraceSpan(requestContext.getStringHeaders(),
             requestContext.getUri(), requestContext.getMethod());
 
         if (holder != null) {
             requestContext.setProperty(TRACE_SPAN, holder);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public void filter(final ClientRequestContext requestContext,
             final ClientResponseContext responseContext) throws IOException {
-        final TraceScopeHolder<Span> holder = 
+        final TraceScopeHolder<Span> holder =
             (TraceScopeHolder<Span>)requestContext.getProperty(TRACE_SPAN);
         super.stopTraceSpan(holder, responseContext.getStatus());
     }

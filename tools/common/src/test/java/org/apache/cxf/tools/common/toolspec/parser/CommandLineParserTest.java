@@ -66,7 +66,7 @@ public class CommandLineParserTest extends Assert {
 
     @Test
     public void testValidArgumentEnumValue() throws Exception {
-        String[] args = new String[] {"-r", "-e", "true", "arg1"};        
+        String[] args = new String[] {"-r", "-e", "true", "arg1"};
         CommandDocument result = parser.parseArguments(args);
         assertEquals("testValidArguments Failed", "true", result.getParameter("enum"));
     }
@@ -83,10 +83,10 @@ public class CommandLineParserTest extends Assert {
             CommandLineError error = (CommandLineError)errors[0];
             assertTrue("Expected InvalidArgumentEnumValu error", error instanceof ErrorVisitor.UserError);
             ErrorVisitor.UserError userError = (ErrorVisitor.UserError)error;
-            assertEquals("Invalid enum argument value message incorrect", 
-                         "-e wrongvalue not in the enumeration value list!", 
-                         userError.toString());            
-        }        
+            assertEquals("Invalid enum argument value message incorrect",
+                         "-e wrongvalue not in the enumeration value list!",
+                         userError.toString());
+        }
     }
 
     @Test
@@ -224,7 +224,7 @@ public class CommandLineParserTest extends Assert {
                      result.getParameter("packagename"));
 
     }
-    
+
 
     @Test
     public void testUsage() throws Exception {
@@ -266,7 +266,7 @@ public class CommandLineParserTest extends Assert {
         if (!isQuolifiedVersion()) {
             specialItem = "-p <[wsdl namespace =]Package Name>*";
         }
-            
+
         String[] expected = new String[]{"[ -n <C++ Namespace> ]",
                                          "Namespace",
                                          "[ -impl ]",
@@ -286,7 +286,7 @@ public class CommandLineParserTest extends Assert {
                                          "version",
                                          "<wsdlurl>",
                                          "WSDL/SCHEMA URL"};
-        
+
         int index = 0;
         String lineSeparator = System.getProperty("line.separator");
         StringTokenizer st1 = new StringTokenizer(parser.getDetailedUsage(), lineSeparator);
@@ -309,7 +309,7 @@ public class CommandLineParserTest extends Assert {
     public void testGetDetailedUsage() {
         assertTrue("Namespace".equals(parser.getDetailedUsage("namespace")));
     }
-    
+
 
     @Test
     public void testFormattedDetailedUsage() throws Exception {
@@ -317,7 +317,7 @@ public class CommandLineParserTest extends Assert {
         assertNotNull(usage);
         StringTokenizer st1 = new StringTokenizer(usage, System.getProperty("line.separator"));
         assertEquals(14, st1.countTokens());
-        
+
         while (st1.hasMoreTokens()) {
             String s = st1.nextToken();
             if (s.indexOf("java package") != -1) {
@@ -327,7 +327,7 @@ public class CommandLineParserTest extends Assert {
                 assertTrue(s.charAt(s.length() - 1) == 'o');
             }
         }
-        
+
     }
 
 }

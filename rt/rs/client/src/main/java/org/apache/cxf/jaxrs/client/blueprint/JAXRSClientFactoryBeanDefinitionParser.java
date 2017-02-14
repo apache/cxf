@@ -38,7 +38,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 
 public class JAXRSClientFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionParser {
-    
+
     public JAXRSClientFactoryBeanDefinitionParser() {
         super(JAXRSClientFactoryBean.class);
     }
@@ -55,15 +55,15 @@ public class JAXRSClientFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
         return true;
     }
 
-    
+
     @Override
-    protected void mapAttribute(MutableBeanMetadata bean, 
-                                Element e, String name, 
+    protected void mapAttribute(MutableBeanMetadata bean,
+                                Element e, String name,
                                 String val, ParserContext context) {
         if ("serviceName".equals(name)) {
             QName q = parseQName(e, val);
             bean.addProperty(name, this.createValue(context, q));
-        } else { 
+        } else {
             mapToProperty(bean, name, val, context);
         }
     }
@@ -73,7 +73,7 @@ public class JAXRSClientFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
         if ("properties".equals(name) || "headers".equals(name)) {
             bean.addProperty(name, this.parseMapData(ctx, bean, el));
         } else if ("executor".equals(name)) {
-            setFirstChildAsProperty(el, ctx, bean, "serviceFactory.executor");         
+            setFirstChildAsProperty(el, ctx, bean, "serviceFactory.executor");
         } else if ("binding".equals(name)) {
             setFirstChildAsProperty(el, ctx, bean, "bindingConfig");
         } else if ("inInterceptors".equals(name) || "inFaultInterceptors".equals(name)
@@ -97,8 +97,8 @@ public class JAXRSClientFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
             }
             bean.addProperty("modelBeans", list);
         } else {
-            setFirstChildAsProperty(el, ctx, bean, name);            
-        }        
+            setFirstChildAsProperty(el, ctx, bean, name);
+        }
     }
 
 }

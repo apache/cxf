@@ -31,20 +31,20 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ConfigurationImplTest extends Assert {
-    
+
     @Test
     public void testIsRegistered() {
         ConfigurationImpl c = new ConfigurationImpl(RuntimeType.SERVER);
         ContainerResponseFilter filter = new ContainerResponseFilterImpl();
-        assertTrue(c.register(filter, 
+        assertTrue(c.register(filter,
                    Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
         assertTrue(c.isRegistered(filter));
         assertFalse(c.isRegistered(new ContainerResponseFilterImpl()));
         assertTrue(c.isRegistered(ContainerResponseFilterImpl.class));
         assertFalse(c.isRegistered(ContainerResponseFilter.class));
-        assertFalse(c.register(filter, 
+        assertFalse(c.register(filter,
                               Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
-        assertFalse(c.register(ContainerResponseFilterImpl.class, 
+        assertFalse(c.register(ContainerResponseFilterImpl.class,
                                Collections.<Class<?>, Integer>singletonMap(ContainerResponseFilter.class, 1000)));
     }
     public static class ContainerResponseFilterImpl implements ContainerResponseFilter {
@@ -53,9 +53,9 @@ public class ConfigurationImplTest extends Assert {
         public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
             throws IOException {
             // TODO Auto-generated method stub
-            
+
         }
-        
+
     }
-    
+
 }

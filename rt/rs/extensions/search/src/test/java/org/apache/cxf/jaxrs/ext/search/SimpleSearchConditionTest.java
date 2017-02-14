@@ -332,7 +332,7 @@ public class SimpleSearchConditionTest {
         assertTrue(ssc.isMet("fooba*rbaz"));
         assertFalse(ssc.isMet("foobarbaz"));
     }
-    
+
     static class SingleAttr {
         private String foo;
 
@@ -367,5 +367,5 @@ public class SimpleSearchConditionTest {
         public String getBar() {
             return bar;
         }
-    }    
+    }
 }

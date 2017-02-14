@@ -24,12 +24,12 @@ import org.apache.log4j.PatternLayout;
 
 public class LoggerPatternLayoutLog4J extends PatternLayout {
 
-    private String header;  
-    
-    public void setHeader(String header) {  
-        this.header = header;  
-    }  
-  
+    private String header;
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
     @Override
     public String getHeader() {
         if (this.header != null) {
@@ -41,6 +41,6 @@ public class LoggerPatternLayoutLog4J extends PatternLayout {
             line.append(item).append(";");
         }
         return line.toString() + System.getProperty("line.separator");
-    }  
-    
+    }
+
 }

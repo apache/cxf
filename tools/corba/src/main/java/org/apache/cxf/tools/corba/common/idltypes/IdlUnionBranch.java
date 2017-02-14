@@ -33,7 +33,7 @@ public final class IdlUnionBranch extends IdlField {
         this.isDefault = hasDefault;
         cases = new Vector<String>();
     }
-    
+
     public static IdlUnionBranch create(IdlUnion union, String name, IdlType type, boolean isDefault) {
         return new IdlUnionBranch(union, name, type, isDefault);
     }

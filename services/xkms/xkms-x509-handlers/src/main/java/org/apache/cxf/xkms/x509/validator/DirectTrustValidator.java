@@ -35,7 +35,7 @@ import org.apache.cxf.xkms.x509.repo.CertificateRepo;
 public class DirectTrustValidator implements Validator {
 
     private static final Logger LOG = LogUtils.getL7dLogger(DirectTrustValidator.class);
-    
+
     private CertificateRepo certRepo;
 
     public DirectTrustValidator(CertificateRepo certRepo) {

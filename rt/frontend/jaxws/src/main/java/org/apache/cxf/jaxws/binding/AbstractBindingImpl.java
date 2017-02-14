@@ -31,12 +31,12 @@ public abstract class AbstractBindingImpl implements Binding {
     @SuppressWarnings("rawtypes")
     private List<Handler> handlerChain = new ArrayList<>();
     private final JaxWsEndpointImpl endpoint;
-    
+
     public AbstractBindingImpl(JaxWsEndpointImpl imp) {
         endpoint = imp;
     }
-    
-    
+
+
     @SuppressWarnings("rawtypes")
     public List<Handler> getHandlerChain() {
         //per spec, this should be a copy

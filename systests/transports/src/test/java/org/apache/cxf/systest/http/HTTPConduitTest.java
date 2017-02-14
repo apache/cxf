@@ -45,44 +45,44 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * This class tests several issues and Conduit policies based 
+ * This class tests several issues and Conduit policies based
  * on a set up of redirecting servers.
  * <pre>
- * 
+ *
  * Http Redirection:
- * 
+ *
  * Rethwel(http:9004) ----> Mortimer (http:9000)
- * 
+ *
  * Redirect Loop:
- * 
+ *
  * Hurlon (http:9006) ----> Abost(http:9007) ----\
  *   ^                                            |
  *   |-------------------------------------------/
  */
 public class HTTPConduitTest extends AbstractBusClientServerTestBase {
     private static final boolean IN_PROCESS = true;
-    
+
     private static List<String> servers = new ArrayList<>();
 
     private static Map<String, String> addrMap = new TreeMap<String, String>();
-    
-    private final QName serviceName = 
+
+    private final QName serviceName =
         new QName("http://apache.org/hello_world", "SOAPService");
-    private final QName rethwelQ = 
+    private final QName rethwelQ =
         new QName("http://apache.org/hello_world", "Rethwel");
-    private final QName mortimerQ = 
+    private final QName mortimerQ =
         new QName("http://apache.org/hello_world", "Mortimer");
-    private final QName hurlonQ = 
+    private final QName hurlonQ =
         new QName("http://apache.org/hello_world", "Hurlon");
 
     public HTTPConduitTest() {
     }
-    
-    
+
+
     public static String getPort(String s) {
         return BusServer.PORTMAP.get(s);
     }
-    
+
     @BeforeClass
     public static void allocatePorts() {
         BusServer.resetPortMap();
@@ -115,9 +115,9 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(null);
         boolean server = launchServer(Server.class, null,
                 new String[] {
-                    name, 
+                    name,
                     addrMap.get(name),
-                    serverC.toString() }, 
+                    serverC.toString() },
                 IN_PROCESS);
         if (server) {
             servers.add(name);
@@ -126,7 +126,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(bus);
         return server;
     }
-    
+
     @AfterClass
     public static void cleanUp() {
         Bus b = BusFactory.getDefaultBus(false);
@@ -148,7 +148,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
     public void assertProxyRequestCount(int i) {
     }
 
-    
+
     private Greeter getMortimerGreeter() throws MalformedURLException {
         URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
@@ -159,7 +159,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         Greeter mortimer = service.getPort(mortimerQ, Greeter.class);
         assertNotNull("Port is null", mortimer);
         updateAddressPort(mortimer, getPort("PORT0"));
-        
+
         configureProxy(ClientProxy.getClient(mortimer));
         return mortimer;
     }
@@ -172,7 +172,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         String answer = mortimer.sayHi();
         answer = mortimer.sayHi();
         answer = mortimer.sayHi();
-        assertTrue("Unexpected answer: " + answer, 
+        assertTrue("Unexpected answer: " + answer,
                 "Bonjour from Mortimer".equals(answer));
         assertProxyRequestCount(3);
     }
@@ -195,11 +195,11 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
     /**
      * This methods tests that a conduit that is not configured
-     * to follow redirects will not. The default is not to 
-     * follow redirects. 
+     * to follow redirects will not. The default is not to
+     * follow redirects.
      * Rethwel redirects to Mortimer.
-     * 
-     * Note: Unfortunately, the invocation will 
+     *
+     * Note: Unfortunately, the invocation will
      * "fail" for any number of other reasons.
      */
     @Test
@@ -226,13 +226,13 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
             //e.printStackTrace();
         }
         assertProxyRequestCount(1);
-        
+
     }
-    
+
     /**
      * We use this class to reset the default bus.
      * Note: This may not always work in the future.
-     * I was lucky in that "defaultBus" is actually a 
+     * I was lucky in that "defaultBus" is actually a
      * protected static.
      */
     class DefaultBusFactory extends SpringBusFactory {
@@ -243,7 +243,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
             return bus;
         }
     }
-    
+
     /**
      * This method tests if http to http redirects work.
      * Rethwel redirects to Mortimer.
@@ -254,10 +254,10 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         startServer("Rethwel");
 
         URL config = getClass().getResource("Http2HttpRedirect.cxf");
-    
+
         // We go through the back door, setting the default bus.
         new DefaultBusFactory().createBus(config);
-        
+
         URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
@@ -268,17 +268,17 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         updateAddressPort(rethwel, getPort("PORT1"));
         assertNotNull("Port is null", rethwel);
         configureProxy(ClientProxy.getClient(rethwel));
-        
+
         String answer = rethwel.sayHi();
-        assertTrue("Unexpected answer: " + answer, 
+        assertTrue("Unexpected answer: " + answer,
                 "Bonjour from Mortimer".equals(answer));
-        assertProxyRequestCount(2);        
+        assertProxyRequestCount(2);
     }
-    
+
     /**
      * This methods tests that a redirection loop will fail.
      * Hurlon redirects to Abost, which redirects to Hurlon.
-     * 
+     *
      * Note: Unfortunately, the invocation may "fail" for any
      * number of reasons.
      */
@@ -288,10 +288,10 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         startServer("Hurlon");
 
         URL config = getClass().getResource("Http2HttpLoopRedirectFail.cxf");
-        
+
         // We go through the back door, setting the default bus.
         new DefaultBusFactory().createBus(config);
-        
+
         URL wsdl = getClass().getResource("greeting.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
@@ -302,7 +302,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         assertNotNull("Port is null", hurlon);
         updateAddressPort(hurlon, getPort("PORT3"));
         configureProxy(ClientProxy.getClient(hurlon));
-        
+
         String answer = null;
         try {
             answer = hurlon.sayHi();
@@ -312,8 +312,8 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
             // read from the StreamReader
             //e.printStackTrace();
         }
-        assertProxyRequestCount(2);        
+        assertProxyRequestCount(2);
     }
-    
+
 }
 

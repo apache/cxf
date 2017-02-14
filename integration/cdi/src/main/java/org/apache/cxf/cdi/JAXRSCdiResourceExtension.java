@@ -52,7 +52,7 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
- * Apache CXF portable CDI extension to support initialization of JAX-RS resources.  
+ * Apache CXF portable CDI extension to support initialization of JAX-RS resources.
  */
 public class JAXRSCdiResourceExtension implements Extension {
     private boolean hasBus;
@@ -62,7 +62,7 @@ public class JAXRSCdiResourceExtension implements Extension {
     private final List< Bean< ? > > serviceBeans = new ArrayList< Bean< ? > >();
     private final List< Bean< ? > > providerBeans = new ArrayList< Bean< ? > >();
     private final List< Bean< ? extends Feature > > featureBeans = new ArrayList< Bean< ? extends Feature > >();
-    private final List< CreationalContext< ? > > disposableCreationalContexts = 
+    private final List< CreationalContext< ? > > disposableCreationalContexts =
         new ArrayList< CreationalContext< ? > >();
 
     /**
@@ -73,32 +73,32 @@ public class JAXRSCdiResourceExtension implements Extension {
         private List< Object > providers = new ArrayList<>();
         private List< Feature > features = new ArrayList<>();
         private List< CdiResourceProvider > resourceProviders = new ArrayList<>();
-        
+
         public void addProviders(final Collection< Object > others) {
             this.providers.addAll(others);
         }
-        
+
         public void addFeatures(final Collection< Feature > others) {
             this.features.addAll(others);
         }
-        
+
         public void addResourceProvider(final CdiResourceProvider other) {
             this.resourceProviders.add(other);
         }
-        
+
         public List< Object > getProviders() {
             return providers;
         }
-        
+
         public List< Feature > getFeatures() {
             return features;
         }
-        
+
         public List<CdiResourceProvider> getResourceProviders() {
             return resourceProviders;
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> void collect(@Observes final ProcessBean< T > event) {
         if (event.getAnnotated().isAnnotationPresent(ApplicationPath.class)) {
@@ -120,9 +120,9 @@ public class JAXRSCdiResourceExtension implements Extension {
     public void load(@Observes final AfterDeploymentValidation event, final BeanManager beanManager) {
         // no need of creational context, it only works for app scoped instances anyway
         final Bean<?> busBean = beanManager.resolve(beanManager.getBeans(CdiBusBean.CXF));
-        
+
         bus = (Bus)beanManager.getReference(
-                busBean, 
+                busBean,
                 Bus.class,
                 beanManager.createCreationalContext(busBean));
 
@@ -167,16 +167,16 @@ public class JAXRSCdiResourceExtension implements Extension {
             event.addBean(applicationBean);
         }
     }
-    
+
     /**
-     * Releases created CreationalContext instances 
+     * Releases created CreationalContext instances
      */
     public void release(@Observes final BeforeShutdown event) {
         for (final CreationalContext<?> disposableCreationalContext: disposableCreationalContexts) {
             disposableCreationalContext.release();
         }
     }
-    
+
     /**
      * Create the JAXRSServerFactoryBean from the application and all discovered service and provider instances.
      * @param application application instance
@@ -205,10 +205,10 @@ public class JAXRSCdiResourceExtension implements Extension {
 
         final JAXRSServerFactoryBean instance = ResourceUtils.createApplication(application, false, false, bus);
         final ClassifiedClasses classified = classes2singletons(application, beanManager);
-        
+
         instance.setProviders(classified.getProviders());
         instance.getFeatures().addAll(classified.getFeatures());
-        
+
         for (final CdiResourceProvider resourceProvider: classified.getResourceProviders()) {
             instance.setResourceProvider(resourceProvider.getResourceClass(), resourceProvider);
         }
@@ -224,21 +224,21 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @return classified instances of classes by instance types
      */
     private ClassifiedClasses classes2singletons(final Application application, final BeanManager beanManager) {
-        final ClassifiedClasses classified = new ClassifiedClasses(); 
+        final ClassifiedClasses classified = new ClassifiedClasses();
 
         // now loop through the classes
         Set<Class<?>> classes = application.getClasses();
         if (!classes.isEmpty()) {
             classified.addProviders(loadProviders(beanManager, classes));
             classified.addFeatures(loadFeatures(beanManager, classes));
-            
+
             for (final Bean< ? > bean: serviceBeans) {
                 if (classes.contains(bean.getBeanClass())) {
                     classified.addResourceProvider(new CdiResourceProvider(beanManager, bean));
                 }
             }
         }
-        
+
         return classified;
     }
 
@@ -316,7 +316,7 @@ public class JAXRSCdiResourceExtension implements Extension {
      */
     private List< Feature > loadFeatures(final BeanManager beanManager, Collection<Class<?>> limitedClasses) {
         final List< Feature > features = new ArrayList<>();
-        
+
         for (final Bean< ? extends Feature > bean: featureBeans) {
             if (limitedClasses.isEmpty() || limitedClasses.contains(bean.getBeanClass())) {
                 features.add(
@@ -328,10 +328,10 @@ public class JAXRSCdiResourceExtension implements Extension {
                 );
             }
         }
-        
+
         return features;
     }
-    
+
     /**
      * Look and apply the available JAXRSServerFactoryBean extensions to customize its
      * creation (f.e. add features, providers, assign transport, ...)
@@ -340,20 +340,20 @@ public class JAXRSCdiResourceExtension implements Extension {
      */
     private void customize(final BeanManager beanManager, final JAXRSServerFactoryBean bean) {
         final Collection<Bean<?>> extensionBeans = beanManager.getBeans(JAXRSServerFactoryCustomizationExtension.class);
-        
+
         for (final Bean<?> extensionBean: extensionBeans) {
             final JAXRSServerFactoryCustomizationExtension extension =
                 (JAXRSServerFactoryCustomizationExtension)beanManager.getReference(
-                    extensionBean, 
-                    extensionBean.getBeanClass(), 
-                    beanManager.createCreationalContext(extensionBean) 
+                    extensionBean,
+                    extensionBean.getBeanClass(),
+                    beanManager.createCreationalContext(extensionBean)
                 );
             extension.customize(bean);
         }
     }
-    
+
     /**
-     * Creates and collects the CreationalContext instances for future releasing. 
+     * Creates and collects the CreationalContext instances for future releasing.
      * @param beanManager bean manager instance
      * @param bean bean instance to create CreationalContext for
      * @return CreationalContext instance

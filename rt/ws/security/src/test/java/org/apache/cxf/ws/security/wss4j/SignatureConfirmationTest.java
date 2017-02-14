@@ -49,10 +49,10 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
  * checks to make sure that the signature value contained therein matches the saved value.
  */
 public class SignatureConfirmationTest extends AbstractSecurityTest {
-    
+
     public SignatureConfirmationTest() {
     }
-    
+
     @org.junit.Test
     public void testSignatureConfirmationRequest() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
@@ -74,10 +74,10 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         msg.put(org.apache.cxf.message.Message.REQUESTOR_ROLE, true);
 
         handler.handleMessage(msg);
-        
+
         SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
         doc = saajMsg.getSOAPPart();
-        
+
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/ds:Signature", doc);
 
@@ -88,7 +88,7 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         Set<Integer> sigv = CastUtils.cast((Set<?>)msg.get(WSHandlerConstants.SEND_SIGV));
         assertNotNull(sigv);
         assertTrue(sigv.size() != 0);
-        
+
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -114,19 +114,19 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
         inHandler.setProperty(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
 
         inHandler.handleMessage(inmsg);
-        
+
         //
         // Check that the inbound signature result was saved
         //
-        List<WSHandlerResult> sigReceived = 
+        List<WSHandlerResult> sigReceived =
             CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
         assertNotNull(sigReceived);
         assertTrue(sigReceived.size() != 0);
-        
+
         testSignatureConfirmationResponse(sigv, sigReceived);
     }
-    
-   
+
+
     private void testSignatureConfirmationResponse(
         Set<Integer> sigSaved,
         List<WSHandlerResult> sigReceived
@@ -140,18 +140,18 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
         msg.put(WSHandlerConstants.RECV_RESULTS, sigReceived);
-        
+
         handler.handleMessage(msg);
 
         SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
         doc = saajMsg.getSOAPPart();
-        
+
         assertValid("//wsse:Security", doc);
         // assertValid("//wsse:Security/wsse11:SignatureConfirmation", doc);
 
         byte[] docbytes = getMessageBytes(doc);
         // System.out.println(new String(docbytes));
-        
+
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -177,5 +177,5 @@ public class SignatureConfirmationTest extends AbstractSecurityTest {
 
         inHandler.handleMessage(inmsg);
     }
-    
+
 }

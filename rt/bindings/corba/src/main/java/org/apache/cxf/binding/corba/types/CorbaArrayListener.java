@@ -35,7 +35,7 @@ public class CorbaArrayListener extends AbstractCorbaTypeListener {
     private QName currentElName;
     private CorbaTypeListener currentTypeListener;
     private ServiceInfo serviceInfo;
-    
+
     public CorbaArrayListener(CorbaObjectHandler handler,
                               CorbaTypeMap map,
                               ORB orbRef, ServiceInfo sInfo) {

@@ -43,12 +43,12 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
-    
+
     final TestParam test;
-    
+
     public SAMLRenewUnitTest(TestParam type) {
         this.test = type;
     }
@@ -68,15 +68,15 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxSTSServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam("", false, STSPORT)},
                                                 {new TestParam("", false, STAX_STSPORT)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -91,21 +91,21 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+
+        String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
-        
+
         // Request the token
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML_TOKEN_TYPE, 2, true);
         assertNotNull(token);
         // Sleep to expire the token
         Thread.sleep(2100);
-        
+
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
         assertFalse(token.equals(renewedToken));
-        
+
         // Try to validate old token -> fail.
         try {
             validateSecurityToken(bus, wsdlLocation, token);
@@ -113,13 +113,13 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testRenewSAML2Token() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -128,21 +128,21 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+
+        String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
-        
+
         // Request the token
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 2, true);
         assertNotNull(token);
         // Sleep to expire the token
         Thread.sleep(2100);
-        
+
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
         assertFalse(token.equals(renewedToken));
-        
+
         // Try to validate old token -> fail.
         try {
             validateSecurityToken(bus, wsdlLocation, token);
@@ -150,13 +150,13 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testRenewSAML2TokenFail() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -165,17 +165,17 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+
+        String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
-        
+
         // Request the token
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 2, false);
         assertNotNull(token);
         // Sleep to expire the token
         Thread.sleep(2100);
-        
+
         // Renew the token - this will fail as we didn't send a Renewing @OK attribute
         try {
             renewSecurityToken(bus, wsdlLocation, token, false);
@@ -183,10 +183,10 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testRenewValidSAML1Token() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -195,15 +195,15 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+
+        String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
-        
+
         // Request the token
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML_TOKEN_TYPE, 300, false);
         assertNotNull(token);
-        
+
         // Validate the token
         List<SecurityToken> validatedTokens = validateSecurityToken(bus, wsdlLocation, token);
         assertFalse(validatedTokens.isEmpty());
@@ -212,13 +212,13 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
         assertFalse(token.equals(renewedToken));
-        
+
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testRenewSAML2TokenDifferentAppliesTo() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -227,17 +227,17 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+
+        String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
-        
+
         // Request the token
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML2_TOKEN_TYPE, 2, true);
         assertNotNull(token);
         // Sleep to expire the token
         Thread.sleep(2100);
-        
+
         // Renew the token
         token.setIssuerAddress("http://www.apache.org");
         try {
@@ -246,10 +246,10 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testRenewDisabled() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -258,15 +258,15 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+
+        String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
-        
+
         // Request the token
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, WSConstants.WSS_SAML_TOKEN_TYPE, 300, false, false);
         assertNotNull(token);
-        
+
         // Validate the token
         List<SecurityToken> validatedTokens = validateSecurityToken(bus, wsdlLocation, token);
         assertFalse(validatedTokens.isEmpty());
@@ -275,19 +275,19 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         // Renew the token
         SecurityToken renewedToken = renewSecurityToken(bus, wsdlLocation, token, false);
         assertFalse(token.equals(renewedToken));
-        
+
         // Validate the renewed token
         validateSecurityToken(bus, wsdlLocation, renewedToken);
 
         bus.shutdown(true);
     }
-    
+
     private SecurityToken requestSecurityToken(
         Bus bus, String wsdlLocation, String tokenType, int ttl, boolean allowExpired
     ) throws Exception {
         return requestSecurityToken(bus, wsdlLocation, tokenType, ttl, allowExpired, true);
     }
-    
+
     private SecurityToken requestSecurityToken(
         Bus bus, String wsdlLocation, String tokenType, int ttl, boolean allowExpired, boolean sendRenewing
     ) throws Exception {
@@ -301,11 +301,11 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            SecurityConstants.CALLBACK_HANDLER, 
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
         properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "serviceKeystore.properties");
-        
+
         stsClient.setTtl(ttl);
         stsClient.setAllowRenewingAfterExpiry(allowExpired);
         stsClient.setEnableLifetime(true);
@@ -318,7 +318,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         return stsClient.requestSecurityToken("https://localhost:8081/doubleit/services/doubleittransport");
     }
-    
+
     private List<SecurityToken> validateSecurityToken(
         Bus bus, String wsdlLocation, SecurityToken securityToken
     ) throws Exception {
@@ -330,7 +330,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            SecurityConstants.CALLBACK_HANDLER, 
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
         properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "serviceKeystore.properties");
@@ -340,7 +340,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
 
         return stsClient.validateSecurityToken(securityToken);
     }
-    
+
     private SecurityToken renewSecurityToken(
         Bus bus, String wsdlLocation, SecurityToken securityToken, boolean enableAppliesTo
     ) throws Exception {
@@ -352,7 +352,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            SecurityConstants.CALLBACK_HANDLER, 
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
         properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "serviceKeystore.properties");
@@ -363,8 +363,8 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setEnableLifetime(true);
         stsClient.setProperties(properties);
         stsClient.setAddressingNamespace("http://www.w3.org/2005/08/addressing");
-        
+
         return stsClient.renewSecurityToken(securityToken);
     }
-    
+
 }

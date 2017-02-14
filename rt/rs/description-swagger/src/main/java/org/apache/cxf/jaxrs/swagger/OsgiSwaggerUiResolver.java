@@ -30,11 +30,11 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
         "mvn:org.webjars/swagger-ui/",
         "wrap:mvn:org.webjars/swagger-ui/"
     };
-    
+
     OsgiSwaggerUiResolver() throws Exception {
         Class.forName("org.osgi.framework.FrameworkUtil");
     }
-    
+
     protected String findSwaggerUiRootInternal(String swaggerUiVersion) {
         try {
             Bundle bundle = FrameworkUtil.getBundle(Api.class);
@@ -43,7 +43,7 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
             }
             for (Bundle b : bundle.getBundleContext().getBundles()) {
                 String location = b.getLocation();
-                
+
                 for (String pattern: LOCATIONS) {
                     if (swaggerUiVersion != null) {
                         if (location.equals(pattern + swaggerUiVersion)) {
@@ -59,7 +59,7 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
             }
         } catch (Throwable ex) {
             // ignore
-        }   
+        }
         return null;
     }
 

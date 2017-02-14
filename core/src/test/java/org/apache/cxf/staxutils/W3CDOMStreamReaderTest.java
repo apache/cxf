@@ -39,8 +39,8 @@ import org.junit.Test;
 
 
 public class W3CDOMStreamReaderTest extends Assert {
-    
-    private static final String RESULT = 
+
+    private static final String RESULT =
         "<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"
         + "<SOAP-ENV:Header/><SOAP-ENV:Body/>"
         + "<Test xmlns=\"http://example.org/types\">"
@@ -69,7 +69,7 @@ public class W3CDOMStreamReaderTest extends Assert {
         assertTrue(StaxUtils.toString(writer.getDocument()).endsWith(RESULT));
 
     }
-    
+
     @Test
     public void testTopLevelText() throws Exception {
         ByteArrayInputStream is = new ByteArrayInputStream(

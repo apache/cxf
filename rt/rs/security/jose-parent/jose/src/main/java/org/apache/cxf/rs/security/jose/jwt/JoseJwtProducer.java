@@ -28,7 +28,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 public class JoseJwtProducer extends AbstractJoseProducer {
     private boolean jwsRequired = true;
     private boolean jweRequired;
-    
+
     public String processJwt(JwtToken jwt) {
         return processJwt(jwt, null, null);
     }
@@ -39,14 +39,14 @@ public class JoseJwtProducer extends AbstractJoseProducer {
             throw new JwtException("Unable to secure JWT");
         }
         String data = null;
-        
+
         if (isJweRequired() && theEncProvider == null) {
             theEncProvider = getInitializedEncryptionProvider(jwt.getJweHeaders());
             if (theEncProvider == null) {
                 throw new JwtException("Unable to encrypt JWT");
             }
         }
-        
+
         if (isJwsRequired()) {
             JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwt);
             if (jws.isPlainText()) {
@@ -55,11 +55,11 @@ public class JoseJwtProducer extends AbstractJoseProducer {
                 if (theSigProvider == null) {
                     theSigProvider = getInitializedSignatureProvider(jwt.getJwsHeaders());
                 }
-                
+
                 if (theSigProvider == null) {
                     throw new JwtException("Unable to sign JWT");
                 }
-                
+
                 data = jws.signWith(theSigProvider);
             }
             if (theEncProvider != null) {
@@ -87,5 +87,5 @@ public class JoseJwtProducer extends AbstractJoseProducer {
     public void setJweRequired(boolean jweRequired) {
         this.jweRequired = jweRequired;
     }
-    
+
 }

@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class HTTPUndertowTransportNamespaceHandlerTest extends Assert {
     @Test
     public void testGetSchemaLocation() {
         HTTPUndertowTransportNamespaceHandler handler = new HTTPUndertowTransportNamespaceHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/transports/http-undertow/configuration"));
     }
 

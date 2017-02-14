@@ -49,55 +49,55 @@ import org.junit.Test;
  * In these test-cases, the client is using DOM and the service is using StaX.
  */
 public class DOMToStaxSamlTest extends AbstractSecurityTest {
-    
+
     @Test
     public void testSaml1() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setValidateSamlSubjectConfirmation(false);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
         properties.put(
             WSHandlerConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler()
         );
-        
+
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testSaml1SignedSenderVouches() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
-        Properties cryptoProperties = 
+        Properties cryptoProperties =
             CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
         inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
         properties.put(WSHandlerConstants.SAML_CALLBACK_REF, new SAML1CallbackHandler());
@@ -106,61 +106,61 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         properties.put(WSHandlerConstants.USER, "alice");
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
-        
+
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testSaml2() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setValidateSamlSubjectConfirmation(false);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
         properties.put(
             WSHandlerConstants.SAML_CALLBACK_REF, new SAML2CallbackHandler()
         );
-        
+
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testSaml2SignedSenderVouches() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
-        Properties cryptoProperties = 
+        Properties cryptoProperties =
             CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
         inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
         properties.put(WSHandlerConstants.SAML_CALLBACK_REF, new SAML2CallbackHandler());
@@ -169,49 +169,49 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         properties.put(WSHandlerConstants.USER, "alice");
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
-        
+
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testSaml1TokenHOK() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
-        Properties cryptoProperties = 
+        Properties cryptoProperties =
             CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
         inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
-        
+
         CustomStaxSamlValidator validator = new CustomStaxSamlValidator();
         inProperties.addValidator(WSConstants.SAML_TOKEN, validator);
         inProperties.addValidator(WSConstants.SAML2_TOKEN, validator);
-        
+
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
         SAML1CallbackHandler callbackHandler = new SAML1CallbackHandler();
         callbackHandler.setConfirmationMethod(SAML1Constants.CONF_HOLDER_KEY);
         callbackHandler.setSignAssertion(true);
         properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
-        
+
         properties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         properties.put(WSHandlerConstants.USER, "alice");
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
-        
+
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
@@ -225,43 +225,43 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         validator.setRequireSenderVouches(false);
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testSaml2TokenHOK() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
-        Properties cryptoProperties = 
+        Properties cryptoProperties =
             CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
         inProperties.setSignatureVerificationCryptoProperties(cryptoProperties);
-        
+
         CustomStaxSamlValidator validator = new CustomStaxSamlValidator();
         inProperties.addValidator(WSConstants.SAML_TOKEN, validator);
         inProperties.addValidator(WSConstants.SAML2_TOKEN, validator);
-        
+
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         callbackHandler.setSignAssertion(true);
         properties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
-        
+
         properties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         properties.put(WSHandlerConstants.USER, "alice");
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new PasswordCallbackHandler());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
-        
+
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
@@ -272,7 +272,7 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
             // expected
         }
         validator.setRequireSenderVouches(false);
-        
+
         try {
             echo.echo("test");
             fail("Failure expected on receiving a SAML 1.1 Token instead of SAML 2.0");
@@ -283,8 +283,8 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
 
         assertEquals("test", echo.echo("test"));
     }
-    
-    
+
+
     private Service createService() {
         // Create the Service
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
@@ -292,20 +292,20 @@ public class DOMToStaxSamlTest extends AbstractSecurityTest {
         factory.setAddress("local://Echo");
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         Server server = factory.create();
-        
+
         Service service = server.getEndpoint().getService();
         service.getInInterceptors().add(new LoggingInInterceptor());
         service.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         return service;
     }
-    
+
     private Echo createClientProxy() {
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
         proxyFac.setServiceClass(Echo.class);
         proxyFac.setAddress("local://Echo");
         proxyFac.getClientFactoryBean().setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        
+
         return (Echo)proxyFac.create();
     }
 }

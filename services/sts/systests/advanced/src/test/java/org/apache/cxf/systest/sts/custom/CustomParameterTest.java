@@ -41,14 +41,14 @@ import org.junit.BeforeClass;
  * STS's CustomUTValidator.
  */
 public class CustomParameterTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static final String PORT = allocatePort(Server.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
 
@@ -65,7 +65,7 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
                 launchServer(STSServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -86,17 +86,17 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         URL wsdl = CustomParameterTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportCustomParameterPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportClaimsPort, PORT);
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
-        
+
         STSClient stsClient = new STSClient(bus);
         stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/UT?wsdl");
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}UT_Port");
-        
+
         Map<String, Object> properties = new HashMap<>();
         properties.put("security.username", "alice");
         properties.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
@@ -104,19 +104,19 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         properties.put("security.sts.token.properties", "clientKeystore.properties");
         properties.put("security.sts.token.usecert", "true");
         stsClient.setProperties(properties);
-        
+
         ((BindingProvider)transportClaimsPort).getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
-        
+
         // Successful test
-        
+
         // Add custom content to the RST
         stsClient.setCustomContent("<realm xmlns=\"http://cxf.apache.org/custom\">custom-realm</realm>");
         doubleIt(transportClaimsPort, 25);
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     // Here the custom parameter in the RST is parsed by the CustomUTValidator
     @org.junit.Test
     public void testCustomParameterInRST2Validator() throws Exception {
@@ -131,17 +131,17 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         URL wsdl = CustomParameterTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportCustomParameterPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportClaimsPort, PORT);
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
-        
+
         STSClient stsClient = new STSClient(bus);
         stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/UT?wsdl");
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}UT_Port");
-        
+
         Map<String, Object> properties = new HashMap<>();
         properties.put("security.username", "alice");
         properties.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
@@ -149,11 +149,11 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         properties.put("security.sts.token.properties", "clientKeystore.properties");
         properties.put("security.sts.token.usecert", "true");
         stsClient.setProperties(properties);
-        
+
         ((BindingProvider)transportClaimsPort).getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
-        
+
         // Failing test
-        
+
         // Add custom content to the RST
         stsClient.setCustomContent("<realm xmlns=\"http://cxf.apache.org/custom\">custom-unknown-realm</realm>");
         try {
@@ -162,11 +162,11 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     // Here the custom parameter in the RST is parsed by the CustomClaimsHandler
     @org.junit.Test
     public void testCustomParameterInRSTClaimsHandler() throws Exception {
@@ -181,17 +181,17 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         URL wsdl = CustomParameterTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportCustomParameterClaimsPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportClaimsPort, PORT);
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
-        
+
         STSClient stsClient = new STSClient(bus);
         stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl");
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
-        
+
         Map<String, Object> properties = new HashMap<>();
         properties.put("security.username", "alice");
         properties.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
@@ -199,19 +199,19 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         properties.put("security.sts.token.properties", "clientKeystore.properties");
         properties.put("security.sts.token.usecert", "true");
         stsClient.setProperties(properties);
-        
+
         ((BindingProvider)transportClaimsPort).getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
-        
+
         // Successful test
-        
+
         // Add custom content to the RST
         stsClient.setCustomContent("<realm xmlns=\"http://cxf.apache.org/custom\">custom-realm</realm>");
         doubleIt(transportClaimsPort, 25);
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     // Here the custom parameter in the RST is parsed by the CustomClaimsHandler
     @org.junit.Test
     public void testCustomParameterInRSTClaimsHandler2() throws Exception {
@@ -226,17 +226,17 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         URL wsdl = CustomParameterTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportCustomParameterClaimsPort");
-        DoubleItPortType transportClaimsPort = 
+        DoubleItPortType transportClaimsPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportClaimsPort, PORT);
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportClaimsPort, STSPORT);
-        
+
         STSClient stsClient = new STSClient(bus);
         stsClient.setWsdlLocation("https://localhost:" + STSPORT + "/SecurityTokenService/Transport?wsdl");
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
-        
+
         Map<String, Object> properties = new HashMap<>();
         properties.put("security.username", "alice");
         properties.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
@@ -244,11 +244,11 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         properties.put("security.sts.token.properties", "clientKeystore.properties");
         properties.put("security.sts.token.usecert", "true");
         stsClient.setProperties(properties);
-        
+
         ((BindingProvider)transportClaimsPort).getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
-        
+
         // Failing test
-        
+
         // Add custom content to the RST
         stsClient.setCustomContent("<realm xmlns=\"http://cxf.apache.org/custom\">custom-unknown-realm</realm>");
         try {
@@ -257,11 +257,11 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportClaimsPort).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

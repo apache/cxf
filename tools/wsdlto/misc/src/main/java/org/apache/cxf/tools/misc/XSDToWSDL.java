@@ -95,7 +95,7 @@ public class XSDToWSDL extends AbstractCXFToolContainer {
                 Message msg = new Message("NOT_A_DIRECTORY", LOG, outdir);
                 throw new ToolException(msg);
             }
-        }        
+        }
     }
 
     public static void main(String[] pargs) {

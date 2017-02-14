@@ -36,14 +36,14 @@ public abstract class JavascriptRhinoTest extends AbstractCXFSpringTest {
     protected ServerFactoryBean serverFactoryBean;
     protected Object rawImplementor;
     private Endpoint endpoint;
-    
+
     public JavascriptRhinoTest() throws Exception {
         super();
         testUtilities = new JavascriptTestUtilities(getClass());
         testUtilities.addDefaultNamespaces();
     }
 
-    public void setupRhino(String serviceEndpointBean, 
+    public void setupRhino(String serviceEndpointBean,
                            String testsJavascript,
                            Object validationType) throws Exception {
         testUtilities.setBus(getBean(Bus.class, "cxf"));
@@ -60,10 +60,10 @@ public abstract class JavascriptRhinoTest extends AbstractCXFSpringTest {
         serviceInfo = serviceInfos.get(0);
         testUtilities.loadJavascriptForService(serviceInfo);
         testUtilities.readResourceIntoRhino(testsJavascript);
-        
+
         endpoint.getService().put(Message.SCHEMA_VALIDATION_ENABLED, validationType);
     }
-    
+
     protected String getAddress() {
         return endpoint.getEndpointInfo().getAddress();
     }

@@ -28,12 +28,12 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
 
 /**
- * The 'read' side of the data binding abstraction of CXF. A DataReader&lt;T&gt; reads objects 
+ * The 'read' side of the data binding abstraction of CXF. A DataReader&lt;T&gt; reads objects
  * from a source of type T.
  * @param <T> The type of the source. Each data binding defines the set of source types that it supports.
  */
 public interface DataReader<T> {
-    
+
     String FAULT = DataReader.class.getName() + "Fault";
     String ENDPOINT = DataReader.class.getName() + "Endpoint";
     /**
@@ -43,14 +43,14 @@ public interface DataReader<T> {
      * @param s
      */
     void setSchema(Schema s);
-    
+
     /**
      * Attach a collection of attachments to a binding. This permits a binding to process the contents
      * of one or more attachments as part of reading from this reader.
      * @param attachments attachments.
-     */    
+     */
     void setAttachments(Collection<Attachment> attachments);
-    
+
     /**
      * Set an arbitrary property on the reader.
      * {@link #FAULT} and {@link #ENDPOINT} specify two common properties: the Fault object being read
@@ -58,8 +58,8 @@ public interface DataReader<T> {
      * @param prop Name of the property.
      * @param value Value of the property.
      */
-    void setProperty(String prop, Object value);    
-    
+    void setProperty(String prop, Object value);
+
     /**
      * Read an object from the input.
      * @param input input source object.
@@ -80,7 +80,7 @@ public interface DataReader<T> {
      * this API, and those that do ignore the element QName parameter.
      * @param elementQName expected element. Generally ignored.
      * @param input input source object.
-     * @param type the type of object required/requested. This is generally used 
+     * @param type the type of object required/requested. This is generally used
      * when the caller wants to receive a raw source object and avoid any binding processing.
      * For example, passing javax.xml.transform.Source. The bindings do not necessarily throw
      * if they cannot provide an object of the requested type, and will apply their normal

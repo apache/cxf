@@ -24,19 +24,19 @@ import org.junit.Test;
 
 
 public class UrlUtilsTest extends Assert {
-    
+
     @Test
     public void testUrlDecode() {
         assertEquals("+ ", UrlUtils.urlDecode("%2B+"));
     }
-    
+
     @Test
     public void testUrlDecodeSingleCharMultipleEscapes() {
         String s = "ß";
         String encoded = UrlUtils.urlEncode(s);
         assertEquals(s, UrlUtils.urlDecode(encoded));
     }
-    
+
     @Test
     public void testUrlDecodeReserved() {
         assertEquals("!$&'()*,;=", UrlUtils.urlDecode("!$&'()*,;="));
@@ -88,7 +88,7 @@ public class UrlUtilsTest extends Assert {
             assertTrue(e.getMessage().startsWith("Invalid URL encoding"));
         }
     }
-    
+
     @Test
     public void testPathDecode() {
         assertEquals("+++", UrlUtils.pathDecode("+%2B+"));

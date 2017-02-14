@@ -158,18 +158,18 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         }
         fail();
     }
-    
+
     /**
      * Performs the WSDLList option test for the specified list of parameters.
-     * 
+     *
      * @param wsdlURL The url of the wsdlList. Can be null.
      * @param wsdls
      * @throws IOException
      * @throws ToolException
      */
-    private void doWSDLListOptionTest(String wsdlURL, List<String> wsdls) 
+    private void doWSDLListOptionTest(String wsdlURL, List<String> wsdls)
         throws IOException, ToolException {
-        
+
         File file = null;
         if (wsdlURL == null) {
             // Creating a file containing a list of wsdls URLs in a temp folder
@@ -179,13 +179,13 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
                 writer.println(wsdl);
             }
             writer.close();
-            
+
             wsdlURL = file.getPath();
         }
-    
+
         env.put(ToolConstants.CFG_WSDLURL, wsdlURL);
         processor.setContext(env);
-        
+
         try {
             processor.execute();
         } finally {
@@ -293,8 +293,8 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         }
         return count;
     }
-    
-    
+
+
     @Test
     public void testResourceURLForWsdlLocation() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
@@ -347,7 +347,7 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         String str = IOUtils.readStringFromStream(new FileInputStream(new File(dir,
                                                                                "SOAPService.java")));
         assertTrue(str, str.contains("getResource"));
-        
+
         Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter");
         for (Method m : clz.getMethods()) {
             String s = m.getName();

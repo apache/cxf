@@ -59,9 +59,9 @@ import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
  * An abstract Invoker used by the Spnego and SecureConversationInInterceptors.
  */
 abstract class STSInvoker implements Invoker {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(STSInvoker.class);
-    
+
     public Object invoke(Exchange exchange, Object o) {
         AddressingProperties inProps = (AddressingProperties)exchange.getInMessage()
                 .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
@@ -102,7 +102,7 @@ abstract class STSInvoker implements Invoker {
                             binaryExchange = el;
                         } else if ("TokenType".equals(localName)) {
                             tokenType = DOMUtils.getContent(el);
-                        } 
+                        }
                     }
 
                     el = DOMUtils.getNextElement(el);
@@ -110,15 +110,15 @@ abstract class STSInvoker implements Invoker {
                 if (requestType == null) {
                     requestType = "/Issue";
                 }
-                if (requestType.endsWith("/Issue") 
+                if (requestType.endsWith("/Issue")
                     && !STSUtils.getTokenTypeSCT(namespace).equals(tokenType)) {
                     throw new Exception("Unknown token type: " + tokenType);
                 }
-                
+
                 W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
                 writer.setNsRepairing(true);
 
-                if (requestType.endsWith("/Issue")) { 
+                if (requestType.endsWith("/Issue")) {
                     doIssue(requestEl, exchange, binaryExchange, writer, prefix, namespace);
                 } else if (requestType.endsWith("/Cancel")) {
                     doCancel(exchange, cancelOrRenewToken, writer, prefix, namespace);
@@ -136,13 +136,13 @@ abstract class STSInvoker implements Invoker {
             throw new Fault("Unknown SecureConversation element: " + requestEl.getLocalName(), LOG);
         }
     }
-    
+
     abstract void doIssue(
         Element requestEl,
         Exchange exchange,
         Element binaryExchange,
         W3CDOMStreamWriter writer,
-        String prefix, 
+        String prefix,
         String namespace
     ) throws Exception;
 
@@ -157,24 +157,24 @@ abstract class STSInvoker implements Invoker {
     ) throws Exception;
 
     private void doCancel(
-        Exchange exchange, 
+        Exchange exchange,
         SecurityToken cancelToken,
         W3CDOMStreamWriter writer,
-        String prefix, 
+        String prefix,
         String namespace
     ) throws Exception {
         if (STSUtils.WST_NS_05_12.equals(namespace)) {
             writer.writeStartElement(prefix, "RequestSecurityTokenResponseCollection", namespace);
         }
         writer.writeStartElement(prefix, "RequestSecurityTokenResponse", namespace);
-        
+
         TokenStore store = (TokenStore)exchange.getEndpoint().getEndpointInfo()
                 .getProperty(TokenStore.class.getName());
         store.remove(cancelToken.getId());
         // Put the token on the out message so that we can sign the response
         exchange.put(SecurityConstants.TOKEN, cancelToken);
         writer.writeEmptyElement(prefix, "RequestedTokenCancelled", namespace);
-        
+
         writer.writeEndElement();
         if (STSUtils.WST_NS_05_12.equals(namespace)) {
             writer.writeEndElement();
@@ -188,7 +188,7 @@ abstract class STSInvoker implements Invoker {
             SecurityContextToken sct = new SecurityContextToken(childElement);
             uri = sct.getIdentifier();
         } else {
-            SecurityTokenReference ref = 
+            SecurityTokenReference ref =
                 new SecurityTokenReference(childElement, new BSPEnforcer());
             uri = ref.getReference().getURI();
         }
@@ -196,14 +196,14 @@ abstract class STSInvoker implements Invoker {
                 .getProperty(TokenStore.class.getName());
         return store.getToken(uri);
     }
-    
-    byte[] writeProofToken(String prefix, 
+
+    byte[] writeProofToken(String prefix,
         String namespace,
         W3CDOMStreamWriter writer,
         byte[] clientEntropy,
         int keySize
     ) throws NoSuchAlgorithmException, WSSecurityException, XMLStreamException {
-        byte secret[] = null; 
+        byte secret[] = null;
         writer.writeStartElement(prefix, "RequestedProofToken", namespace);
         if (clientEntropy == null) {
             secret = WSSecurityUtil.generateNonce(keySize / 8);
@@ -218,7 +218,7 @@ abstract class STSInvoker implements Invoker {
             secret = psha1.createKey(clientEntropy, entropy, 0, keySize / 8);
 
             writer.writeStartElement(prefix, "ComputedKey", namespace);
-            writer.writeCharacters(namespace + "/CK/PSHA1");            
+            writer.writeCharacters(namespace + "/CK/PSHA1");
             writer.writeEndElement();
             writer.writeEndElement();
 
@@ -232,7 +232,7 @@ abstract class STSInvoker implements Invoker {
         writer.writeEndElement();
         return secret;
     }
-    
+
     Element writeSecurityTokenReference(
         W3CDOMStreamWriter writer,
         String id,
@@ -250,7 +250,7 @@ abstract class STSInvoker implements Invoker {
         writer.getCurrentNode().appendChild(str.getElement());
         return str.getElement();
     }
-    
+
     Element writeSecurityTokenReference(
         W3CDOMStreamWriter writer,
         String id,
@@ -265,7 +265,7 @@ abstract class STSInvoker implements Invoker {
         SecurityTokenReference str = new SecurityTokenReference(writer.getDocument());
         str.addWSSENamespace();
         str.setReference(ref);
-        
+
         if (instance != null) {
             try {
                 Element firstChildElement = str.getFirstElement();
@@ -283,7 +283,7 @@ abstract class STSInvoker implements Invoker {
         writer.getCurrentNode().appendChild(str.getElement());
         return str.getElement();
     }
-    
+
     void writeLifetime(
         W3CDOMStreamWriter writer,
         Date created,
@@ -297,7 +297,7 @@ abstract class STSInvoker implements Invoker {
         writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
         writer.writeCharacters(fmt.format(created.getTime()));
         writer.writeEndElement();
-        
+
         writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
         writer.writeCharacters(fmt.format(expires.getTime()));
         writer.writeEndElement();

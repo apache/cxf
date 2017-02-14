@@ -21,28 +21,28 @@ package org.apache.cxf.jaxrs.provider.atom;
 /**
  * A callback-style provider which can be used to map an object to Atom Feed
  * without having to deal directly with types representing Atom feeds
- * 
+ *
  * @param <T> Type of objects which will be mapped to feeds or entries
  */
 public abstract class AbstractFeedBuilder<T> extends AbstractAtomElementBuilder<T> {
-    
+
     /**
-     * 
+     *
      * @param pojo Object which is being mapped
      * @return feed icon uri
      */
     public String getIcon(T pojo) {
         return null;
     }
-    
+
     /**
-     * 
+     *
      * @param pojo Object which is being mapped
      * @return feed logo uri
      */
     public String getLogo(T pojo) {
         return null;
     }
-    
-    
+
+
 }

@@ -27,27 +27,27 @@ public class ResourceOwnerGrant extends AbstractGrant {
     private static final long serialVersionUID = -1673025972824906386L;
     private String ownerName;
     private String ownerPassword;
-    
+
     public ResourceOwnerGrant(String name, String password) {
         this(name, password, null);
     }
-    
+
     public ResourceOwnerGrant(String name, String password, String scope) {
         this(name, password, scope, null);
     }
-    
-    public ResourceOwnerGrant(String name, String password, 
+
+    public ResourceOwnerGrant(String name, String password,
                               String scope, String audience) {
         super(OAuthConstants.RESOURCE_OWNER_GRANT, scope, audience);
         this.ownerName = name;
         this.ownerPassword = password;
     }
-    
+
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = super.toMap();
         map.putSingle(OAuthConstants.RESOURCE_OWNER_NAME, ownerName);
         map.putSingle(OAuthConstants.RESOURCE_OWNER_PASSWORD, ownerPassword);
-        
+
         return map;
     }
 

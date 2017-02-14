@@ -20,9 +20,9 @@ package org.apache.cxf.tools.fortest.exception;
 
 import javax.jws.WebService;
 
-@WebService(serviceName = "HelloService", 
-            portName = "HelloPort", 
-            endpointInterface = "org.apache.cxf.tools.fortest.exception.Echo", 
+@WebService(serviceName = "HelloService",
+            portName = "HelloPort",
+            endpointInterface = "org.apache.cxf.tools.fortest.exception.Echo",
             targetNamespace = "http://cxf.apache.org/test/HelloService")
 public class EchoImpl {
     public String echo(String request) throws MyException {

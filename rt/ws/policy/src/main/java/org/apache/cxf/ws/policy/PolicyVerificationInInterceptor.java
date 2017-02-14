@@ -38,26 +38,26 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.neethi.Assertion;
 
 /**
- * 
+ *
  */
 public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
     public static final PolicyVerificationInInterceptor INSTANCE = new PolicyVerificationInInterceptor();
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyVerificationInInterceptor.class);
 
     public PolicyVerificationInInterceptor() {
         super(Phase.PRE_INVOKE);
     }
 
-    /** 
-     * Determines the effective policy, and checks if one of its alternatives  
+    /**
+     * Determines the effective policy, and checks if one of its alternatives
      * is supported.
-     *  
+     *
      * @param message
      * @throws PolicyException if none of the alternatives is supported
      */
     protected void handle(Message message) {
-        
+
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         if (null == aim) {
             return;
@@ -69,26 +69,26 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
             LOG.fine("No binding operation info.");
             return;
         }
-        
+
         Endpoint e = exchange.getEndpoint();
         if (null == e) {
             LOG.fine("No endpoint.");
             return;
-        } 
+        }
 
         Bus bus = exchange.getBus();
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
             return;
         }
-        
+
         if (MessageUtils.isPartialResponse(message)) {
             LOG.fine("Not verifying policies on inbound partial response.");
             return;
         }
-        
-        getTransportAssertions(message);  
-        
+
+        getTransportAssertions(message);
+
         EffectivePolicy effectivePolicy = message.get(EffectivePolicy.class);
         if (effectivePolicy == null) {
             EndpointInfo ei = e.getEndpointInfo();
@@ -105,12 +105,12 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
             }
         } catch (PolicyException ex) {
             LOG.log(Level.SEVERE, "Inbound policy verification failed: " + ex.getMessage());
-            //To check if there is ws addressing policy violation and throw WSA specific 
+            //To check if there is ws addressing policy violation and throw WSA specific
             //exception to pass jaxws2.2 tests
             if (ex.getMessage().indexOf("Addressing") > -1) {
-                throw new Fault("A required header representing a Message Addressing Property " 
+                throw new Fault("A required header representing a Message Addressing Property "
                                     + "is not present", LOG)
-                    .setFaultCode(new QName("http://www.w3.org/2005/08/addressing", 
+                    .setFaultCode(new QName("http://www.w3.org/2005/08/addressing",
                                               "MessageAddressingHeaderRequired"));
             }
             throw ex;

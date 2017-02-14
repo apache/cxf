@@ -29,7 +29,7 @@ import net.sf.cglib.proxy.MethodProxy;
 
 
 /**
- * 
+ *
  */
 class CglibProxyHelper extends ProxyHelper {
     CglibProxyHelper() throws Exception {
@@ -37,20 +37,20 @@ class CglibProxyHelper extends ProxyHelper {
         Class.forName("net.sf.cglib.proxy.MethodInterceptor");
         Class.forName("net.sf.cglib.proxy.MethodProxy");
     }
-    
+
     @Override
-    protected Object getProxyInternal(ClassLoader loader, Class<?>[] interfaces, 
+    protected Object getProxyInternal(ClassLoader loader, Class<?>[] interfaces,
                                       final java.lang.reflect.InvocationHandler h) {
-        
+
         Class<?> superClass = null;
         List<Class<?>> theInterfaces = new ArrayList<Class<?>>();
-        
+
         for (Class<?> c : interfaces) {
             if (!c.isInterface()) {
                 if (superClass != null) {
                     throw new IllegalArgumentException("Only a single superclass is supported");
                 }
-                superClass = c; 
+                superClass = c;
             } else {
                 theInterfaces.add(c);
             }
@@ -62,17 +62,17 @@ class CglibProxyHelper extends ProxyHelper {
             enhancer.setInterfaces(theInterfaces.toArray(new Class[theInterfaces.size()]));
             enhancer.setCallback(new MethodInterceptor() {
 
-                public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) 
+                public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy)
                     throws Throwable {
                     return h.invoke(obj, method, args);
                 }
-                
+
             });
             return enhancer.create();
         } else {
             return super.getProxyInternal(loader, interfaces, h);
         }
     }
-    
-    
+
+
 }

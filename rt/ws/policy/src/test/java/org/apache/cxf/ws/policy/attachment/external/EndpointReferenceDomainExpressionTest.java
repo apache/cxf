@@ -33,43 +33,43 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class EndpointReferenceDomainExpressionTest extends Assert {
 
     private IMocksControl control;
-   
+
     // Avoid spurious failures on EasyMock detecting finalize calls
     // by using data members rather than local variables for these.
     private ServiceInfo si;
     private BindingOperationInfo boi;
     private BindingMessageInfo bmi;
     private BindingFaultInfo bfi;
-    
+
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();        
-    } 
-    
+        control = EasyMock.createNiceControl();
+    }
+
     @Test
     public void testEndpointReferenceDomainExpression() {
         EndpointReferenceType epr = control.createMock(EndpointReferenceType.class);
-        
+
         EndpointReferenceDomainExpression eprde = new EndpointReferenceDomainExpression();
         assertNull(eprde.getEndpointReference());
         eprde.setEndpointReference(epr);
         assertSame(epr, eprde.getEndpointReference());
-        
+
         si = control.createMock(ServiceInfo.class);
         boi = control.createMock(BindingOperationInfo.class);
         bmi = control.createMock(BindingMessageInfo.class);
         bfi = control.createMock(BindingFaultInfo.class);
-        
+
         assertTrue(!eprde.appliesTo(si));
         assertTrue(!eprde.appliesTo(boi));
         assertTrue(!eprde.appliesTo(bmi));
         assertTrue(!eprde.appliesTo(bfi));
-        
+
         EndpointInfo ei = control.createMock(EndpointInfo.class);
         EasyMock.expect(ei.getAddress()).andReturn("http://localhost:8080/GreeterPort");
         AttributedURIType auri = control.createMock(AttributedURIType.class);
@@ -78,7 +78,7 @@ public class EndpointReferenceDomainExpressionTest extends Assert {
         control.replay();
         assertTrue(!eprde.appliesTo(ei));
         control.verify();
-        
+
         control.reset();
         EasyMock.expect(ei.getAddress()).andReturn("http://localhost:8080/GreeterPort");
         EasyMock.expect(epr.getAddress()).andReturn(auri);
@@ -86,11 +86,11 @@ public class EndpointReferenceDomainExpressionTest extends Assert {
         control.replay();
         assertTrue(eprde.appliesTo(ei));
         control.verify();
-        
+
         bfi = null;
         bmi = null;
         boi = null;
         si = null;
     }
-    
+
 }

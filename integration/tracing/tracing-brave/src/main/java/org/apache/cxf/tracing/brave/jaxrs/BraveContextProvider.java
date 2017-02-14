@@ -28,7 +28,7 @@ import org.apache.cxf.tracing.brave.BraveTracerContext;
 
 public class BraveContextProvider implements ContextProvider< TracerContext > {
     private final Brave brave;
-    
+
     public BraveContextProvider(final Brave brave) {
         this.brave = brave;
     }
@@ -37,13 +37,13 @@ public class BraveContextProvider implements ContextProvider< TracerContext > {
     public TracerContext createContext(final Message message) {
         // Check if there is a server span passed along with the message
         final ServerSpan continuationSpan = message.get(ServerSpan.class);
-        
-        // If server span is already present, let us check if it is detached 
+
+        // If server span is already present, let us check if it is detached
         // (asynchronous invocation)
         if (continuationSpan != null) {
             return new BraveTracerContext(brave, continuationSpan);
         }
-        
+
         return new BraveTracerContext(brave);
     }
 

@@ -71,7 +71,7 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
         ef.setRuntimeClass(JettyHTTPServerEngineFactoryHolder.class);
 
         // setup the ConnectorMap and HandlersMap property for the JettyHTTPServerEngineFactoryHolder
-        
+
         try {
             // Print the DOM node
             String xmlString = StaxUtils.toString(element);
@@ -79,7 +79,7 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
             ef.setInitMethod("init");
             ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);
             ef.setDestroyMethod("destroy");
-            
+
             // setup the EngineConnector
             List<Element> engines = DOMUtils
                 .getChildrenWithName(element, HTTPJettyTransportNamespaceHandler.JETTY_TRANSPORT, "engine");
@@ -90,7 +90,7 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
             throw new RuntimeException("Could not process configuration.", e);
         }
     }
-    
+
     protected Metadata parseEngineConnector(List<Element> engines, ComponentMetadata enclosingComponent,
                                             ParserContext context) {
         List<MapEntry> entries = new ArrayList<>();
@@ -109,8 +109,8 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
 
         return new MapMetadataImpl("java.lang.String", "org.eclipse.jetty.server.Connector", entries);
     }
-    
-    protected Metadata parseEngineHandlers(List<Element> engines, ComponentMetadata enclosingComponent, 
+
+    protected Metadata parseEngineHandlers(List<Element> engines, ComponentMetadata enclosingComponent,
                                            ParserContext context) {
         List<MapEntry> entries = new ArrayList<>();
         for (Element engine : engines) {
@@ -126,6 +126,6 @@ public class JettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
         }
         return new MapMetadataImpl("java.lang.String", "java.util.List", entries);
     }
-    
-    
+
+
 }

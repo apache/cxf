@@ -32,7 +32,7 @@ import org.apache.neethi.builders.AssertionBuilder;
 public class PrimitiveAssertionBuilder implements AssertionBuilder<Element> {
 
     private QName knownElements[] = {};
-    
+
     public PrimitiveAssertionBuilder() {
     }
     public PrimitiveAssertionBuilder(Collection<QName> els) {
@@ -41,16 +41,16 @@ public class PrimitiveAssertionBuilder implements AssertionBuilder<Element> {
     public PrimitiveAssertionBuilder(QName els[]) {
         knownElements = els;
     }
-    
-    
-    public Assertion build(Element element, AssertionBuilderFactory fact) { 
+
+
+    public Assertion build(Element element, AssertionBuilderFactory fact) {
         return new PrimitiveAssertion(element);
     }
-    
+
     public QName[] getKnownElements() {
         return knownElements;
     }
-    
+
     public void setKnownElements(Collection<QName> k) {
         knownElements = k.toArray(new QName[k.size()]);
     }

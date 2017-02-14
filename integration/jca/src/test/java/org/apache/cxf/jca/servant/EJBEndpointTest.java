@@ -28,33 +28,33 @@ import org.junit.Test;
 
 
 /**
- * 
+ *
  */
 public class EJBEndpointTest extends Assert {
-    
+
     private EJBEndpoint endpoint;
-    
+
     @Before
     public void setUp() throws Exception {
         endpoint = new EJBEndpoint(null);
     }
-    
+
     @Test
     public void testGetAddressPort() throws Exception {
         int port = endpoint.getAddressPort("http://localhost:8080/services");
         assertEquals(8080, port);
     }
-    
-    @Test  
+
+    @Test
     public void testGetAddress80Port() throws Exception {
         int port = endpoint.getAddressPort("http://localhost/services");
         assertEquals(80, port);
     }
-    
+
     @Test
     public void testGetAddressEndPort() throws Exception {
         int port = endpoint.getAddressPort("http://localhost:9999");
         assertEquals(9999, port);
     }
-    
+
 }

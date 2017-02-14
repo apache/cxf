@@ -50,20 +50,20 @@ import org.apache.cxf.tracing.TracerContext;
 public class Catalog {
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
     private final CatalogStore store;
-    
+
     public Catalog() {
         store = new CatalogStore();
     }
-    
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    public Response addBook(@Context final UriInfo uriInfo, @Context final TracerContext tracing, 
+    public Response addBook(@Context final UriInfo uriInfo, @Context final TracerContext tracing,
             @FormParam("title") final String title)  {
         try {
             final String id = UUID.randomUUID().toString();
-        
+
             executor.submit(
-                tracing.wrap("Inserting New Book", 
+                tracing.wrap("Inserting New Book",
                     new Traceable<Void>() {
                         public Void call(final TracerContext context) throws Exception {
                             store.put(id, title);
@@ -72,7 +72,7 @@ public class Catalog {
                     }
                 )
             ).get(10, TimeUnit.SECONDS);
-            
+
             return Response
                 .created(uriInfo.getRequestUriBuilder().path(id).build())
                 .build();
@@ -86,10 +86,10 @@ public class Catalog {
                 .build();
         }
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public void getBooks(@Suspended final AsyncResponse response, 
+    public void getBooks(@Suspended final AsyncResponse response,
             @Context final TracerContext tracing) throws Exception {
         tracing.continueSpan(new Traceable<Void>() {
             @Override
@@ -101,25 +101,25 @@ public class Catalog {
                         return null;
                     }
                 }));
-                
+
                 return null;
             }
         });
     }
-    
+
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public JsonObject getBook(@PathParam("id") final String id) throws IOException {
         final JsonObject book = store.get(id);
-        
+
         if (book == null) {
             throw new NotFoundException("Book with does not exists: " + id);
         }
-        
+
         return book;
     }
-    
+
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -127,7 +127,7 @@ public class Catalog {
         if (!store.remove(id)) {
             throw new NotFoundException("Book with does not exists: " + id);
         }
-        
+
         return Response.ok().build();
     }
 }

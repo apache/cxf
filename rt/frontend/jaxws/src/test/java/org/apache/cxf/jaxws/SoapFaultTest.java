@@ -62,17 +62,17 @@ public class SoapFaultTest extends AbstractJaxWsTest {
         ServerFactoryBean svrFactory = new ServerFactoryBean();
         svrFactory.setBus(bus);
         svrFactory.setServiceFactory(bean);
-        
+
         svrFactory.create();
     }
 
-    
+
     @Test
     public void testInterceptorThrowingSoapFault() throws Exception {
         service.getInInterceptors().add(new FaultThrowingInterceptor());
 
         Node response = invoke("http://localhost:9000/SoapContext/SoapPort",
-                               LocalTransportFactory.TRANSPORT_ID, 
+                               LocalTransportFactory.TRANSPORT_ID,
                                "GreeterMessage.xml");
 
         assertNotNull(response);

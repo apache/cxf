@@ -47,7 +47,7 @@ public final class JAnnotation {
     }
 
     private void prompt() {
-        toString();        
+        toString();
     }
 
     public List<JAnnotationElement> getElements() {

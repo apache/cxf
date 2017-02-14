@@ -64,7 +64,7 @@ public class CorbaTypeMap {
         return typeCodeMap.get(name);
     }
 
-    // This is used by the Any type when trying to re-construct the type stored inside a 
+    // This is used by the Any type when trying to re-construct the type stored inside a
     // CORBA Any.
     public QName getIdlType(TypeCode tc) {
         String repId = null;

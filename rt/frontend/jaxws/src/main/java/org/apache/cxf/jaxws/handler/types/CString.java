@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * Java class for string complex type.
  * <p>
  * The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="string">
  *   &lt;simpleContent>
@@ -60,7 +60,7 @@ public class CString {
 
     /**
      * Gets the value of the value property.
-     * 
+     *
      * @return possible object is {@link java.lang.String }
      */
     public java.lang.String getValue() {
@@ -69,7 +69,7 @@ public class CString {
 
     /**
      * Sets the value of the value property.
-     * 
+     *
      * @param value allowed object is {@link java.lang.String }
      */
     public void setValue(java.lang.String value) {
@@ -78,7 +78,7 @@ public class CString {
 
     /**
      * Gets the value of the id property.
-     * 
+     *
      * @return possible object is {@link java.lang.String }
      */
     public java.lang.String getId() {
@@ -87,7 +87,7 @@ public class CString {
 
     /**
      * Sets the value of the id property.
-     * 
+     *
      * @param value allowed object is {@link java.lang.String }
      */
     public void setId(java.lang.String v) {

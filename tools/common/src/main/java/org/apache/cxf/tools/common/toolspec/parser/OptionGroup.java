@@ -39,11 +39,11 @@ public class OptionGroup implements TokenConsumer {
 
     public OptionGroup(Element el) {
         this.element = el;
-        
-        List<Element> optionEls = 
-            DOMUtils.findAllElementsByTagNameNS(element, 
-                                                Tool.TOOL_SPEC_PUBLIC_ID, 
-                                                "option");        
+
+        List<Element> optionEls =
+            DOMUtils.findAllElementsByTagNameNS(element,
+                                                Tool.TOOL_SPEC_PUBLIC_ID,
+                                                "option");
         for (Element elem : optionEls) {
             options.add(new Option(elem));
         }

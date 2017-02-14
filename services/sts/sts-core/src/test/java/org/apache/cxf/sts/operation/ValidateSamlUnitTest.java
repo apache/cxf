@@ -61,24 +61,24 @@ import org.apache.wss4j.dom.WSConstants;
  * Some unit tests for the validate operation to validate SAML tokens.
  */
 public class ValidateSamlUnitTest extends org.junit.Assert {
-    
-    public static final QName REQUESTED_SECURITY_TOKEN = 
+
+    public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
-    private static final QName QNAME_WST_STATUS = 
+    private static final QName QNAME_WST_STATUS =
         QNameConstants.WS_TRUST_FACTORY.createStatus(null).getName();
-    
+
     /**
      * Test to successfully validate a Saml 1.1 token.
      */
     @org.junit.Test
     public void testValidateSaml1Token() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         validateOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -89,57 +89,57 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
             );
         request.getAny().add(tokenType);
-        
+
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(samlToken);
-        
-        JAXBElement<ValidateTargetType> validateTargetType = 
+
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Validate a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
     }
-    
+
     /**
      * Test to successfully validate a Saml 2 token.
      */
     @org.junit.Test
     public void testValidateSaml2Token() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         validateOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -150,45 +150,45 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
             );
         request.getAny().add(tokenType);
-        
+
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(samlToken);
-        
-        JAXBElement<ValidateTargetType> validateTargetType = 
+
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Validate a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
     }
-    
+
     /*
      * Create a security context object
      */
@@ -202,13 +202,13 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
             }
         };
     }
-    
+
     /**
      * Return true if the response has a valid status, false otherwise
      */
     private boolean validateResponse(RequestSecurityTokenResponseType response) {
         assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
-        
+
         for (Object requestObject : response.getAny()) {
             if (requestObject instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
@@ -222,7 +222,7 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
         }
         return false;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -230,15 +230,15 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
+
     private Element createSAMLAssertion(
         String tokenType, Crypto crypto, String signatureUsername, CallbackHandler callbackHandler
     ) throws WSSecurityException {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                 tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
             );
@@ -250,7 +250,7 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
     }
 
     private TokenProviderParameters createProviderParameters(
-        String tokenType, String keyType, Crypto crypto, 
+        String tokenType, String keyType, Crypto crypto,
         String signatureUsername, CallbackHandler callbackHandler
     ) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
@@ -284,5 +284,5 @@ public class ValidateSamlUnitTest extends org.junit.Assert {
         return parameters;
     }
 
-    
+
 }

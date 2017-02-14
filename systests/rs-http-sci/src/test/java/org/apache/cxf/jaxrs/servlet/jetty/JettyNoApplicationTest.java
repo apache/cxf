@@ -28,7 +28,7 @@ import org.eclipse.jetty.webapp.WebAppContext;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 
-public class JettyNoApplicationTest extends AbstractSciTest {  
+public class JettyNoApplicationTest extends AbstractSciTest {
     @Ignore
     public static class EmbeddedJettyServer extends AbstractJettyServer {
         public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
@@ -42,20 +42,20 @@ public class JettyNoApplicationTest extends AbstractSciTest {
                     Resource.newResource(JacksonJsonProvider.class.getProtectionDomain().getCodeSource().getLocation())
                 }, PORT);
         }
-        
+
         @Override
-        protected void configureContext(final WebAppContext context) throws Exception {     
+        protected void configureContext(final WebAppContext context) throws Exception {
             context.setDescriptor(Resource.newClassPathResource("/WEB-INF/web.xml").getFile().toURI().getPath());
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
         createStaticBus();
     }
-    
+
     @Override
     protected int getPort() {
         return EmbeddedJettyServer.PORT;

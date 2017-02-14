@@ -35,10 +35,10 @@ public class CipherPair {
     private Cipher enccipher;
     private Key key;
     private byte[] ivp;
-    
+
     public CipherPair(String transformation) throws GeneralSecurityException {
         this.transformation = transformation;
-        
+
         int d = transformation.indexOf('/');
         String a;
         if (d > 0) {
@@ -58,15 +58,15 @@ public class CipherPair {
             throw e;
         }
     }
-    
+
     public String getTransformation() {
         return transformation;
     }
-    
+
     public Cipher getEncryptor() {
         return enccipher;
     }
-    
+
     public Cipher getDecryptor() {
         Cipher deccipher = null;
         try {

@@ -41,7 +41,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class AbstractRMInterceptorTest extends Assert {
 
@@ -65,7 +65,7 @@ public class AbstractRMInterceptorTest extends Assert {
         RMManager busMgr = control.createMock(RMManager.class);
         EasyMock.expect(bus.getExtension(RMManager.class)).andReturn(busMgr);
         RMManager mgr = control.createMock(RMManager.class);
-        
+
         control.replay();
         assertNull(interceptor.getBus());
         interceptor.setBus(bus);
@@ -74,7 +74,7 @@ public class AbstractRMInterceptorTest extends Assert {
         interceptor.setManager(mgr);
         assertSame(mgr, interceptor.getManager());
     }
-    
+
     @Test
     public void testHandleMessageSequenceFaultNoBinding() {
         RMInterceptor interceptor = new RMInterceptor();
@@ -91,10 +91,10 @@ public class AbstractRMInterceptorTest extends Assert {
             interceptor.handleMessage(message);
             fail("Expected Fault not thrown.");
         } catch (Fault f) {
-            assertSame(sf, f.getCause());            
+            assertSame(sf, f.getCause());
         }
     }
-    
+
     @Test
     public void testHandleMessageSequenceFault() {
         RMInterceptor interceptor = new RMInterceptor();
@@ -106,7 +106,7 @@ public class AbstractRMInterceptorTest extends Assert {
         Endpoint e = control.createMock(Endpoint.class);
         EasyMock.expect(ex.getEndpoint()).andReturn(e);
         Binding b = control.createMock(Binding.class);
-        EasyMock.expect(e.getBinding()).andReturn(b);        
+        EasyMock.expect(e.getBinding()).andReturn(b);
         RMManager mgr = control.createMock(RMManager.class);
         interceptor.setManager(mgr);
         BindingFaultFactory bff = control.createMock(BindingFaultFactory.class);
@@ -119,25 +119,25 @@ public class AbstractRMInterceptorTest extends Assert {
             interceptor.handleMessage(message);
             fail("Expected Fault not thrown.");
         } catch (Fault f) {
-            assertSame(f, fault);            
+            assertSame(f, fault);
         }
     }
-    
+
     @Test
     public void testHandleMessageRMException() {
         RMInterceptor interceptor = new RMInterceptor();
         Message message = control.createMock(Message.class);
-        RMException rme = control.createMock(RMException.class);      
+        RMException rme = control.createMock(RMException.class);
         interceptor.setRMException(rme);
         control.replay();
         try {
             interceptor.handleMessage(message);
             fail("Expected Fault not thrown.");
         } catch (Fault f) {
-            assertSame(rme, f.getCause());            
+            assertSame(rme, f.getCause());
         }
     }
-    
+
     @Test
     public void testAssertReliability() {
         RMInterceptor interceptor = new RMInterceptor();
@@ -146,7 +146,7 @@ public class AbstractRMInterceptorTest extends Assert {
         AssertionInfoMap aim = control.createMock(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = new ArrayList<>();
         EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim).times(2);
-        PolicyAssertion a = control.createMock(PolicyAssertion.class);        
+        PolicyAssertion a = control.createMock(PolicyAssertion.class);
         AssertionInfo ai = new AssertionInfo(a);
         EasyMock.expectLastCall();
         control.replay();
@@ -156,30 +156,30 @@ public class AbstractRMInterceptorTest extends Assert {
         interceptor.assertReliability(message);
         assertTrue(!ai.isAsserted());
         ais.add(ai);
-        interceptor.assertReliability(message);   
-        
+        interceptor.assertReliability(message);
+
     }
 
     class RMInterceptor extends AbstractRMInterceptor<Message> {
 
         private SequenceFault sequenceFault;
         private RMException rmException;
-        
+
         void setSequenceFault(SequenceFault sf) {
             sequenceFault = sf;
         }
-        
+
         void setRMException(RMException rme) {
             rmException = rme;
         }
-        
+
         @Override
         protected void handle(Message msg) throws SequenceFault, RMException {
-            if (null != sequenceFault) { 
+            if (null != sequenceFault) {
                 throw sequenceFault;
             } else if (null != rmException) {
                 throw rmException;
             }
-        }     
+        }
     }
 }

@@ -52,7 +52,7 @@ public class RESTLoggingTest {
         server.destroy();
         Assert.assertEquals("test1", result);
     }
-    
+
     @Test
     public void testBinary() throws IOException {
         LoggingFeature loggingFeature = new LoggingFeature();
@@ -65,12 +65,12 @@ public class RESTLoggingTest {
         loggingFeature.setLogBinary(true);
         client.get(InputStream.class).close();
         server.destroy();
-        
+
         assertLogged(sender.getEvents().get(0));
         assertLogged(sender.getEvents().get(1));
         assertNotLogged(sender.getEvents().get(2));
         assertNotLogged(sender.getEvents().get(3));
-        
+
         assertLogged(sender.getEvents().get(4));
         assertLogged(sender.getEvents().get(5));
         assertLogged(sender.getEvents().get(6));
@@ -80,7 +80,7 @@ public class RESTLoggingTest {
     private void assertLogged(LogEvent event) {
         Assert.assertNotEquals(AbstractLoggingInterceptor.CONTENT_SUPPRESSED, event.getPayload());
     }
-    
+
     private void assertNotLogged(LogEvent event) {
         Assert.assertEquals(AbstractLoggingInterceptor.CONTENT_SUPPRESSED, event.getPayload());
     }
@@ -101,7 +101,7 @@ public class RESTLoggingTest {
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         return factory.create();
     }
-    
+
     private WebClient createClientBinary(LoggingFeature loggingFeature) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(SERVICE_URI_BINARY);
@@ -109,7 +109,7 @@ public class RESTLoggingTest {
         bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         return bean.createWebClient().path("test1");
     }
-    
+
     private Server createServiceBinary(LoggingFeature loggingFeature) {
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
         factory.setAddress(SERVICE_URI_BINARY);
@@ -118,7 +118,7 @@ public class RESTLoggingTest {
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         return factory.create();
     }
-    
+
     @Test
     public void testEvents() throws MalformedURLException {
         LoggingFeature loggingFeature = new LoggingFeature();
@@ -138,7 +138,7 @@ public class RESTLoggingTest {
         checkResponseOut(events.get(2));
         checkResponseIn(events.get(3));
     }
-    
+
     private void checkRequestOut(LogEvent requestOut) {
         Assert.assertEquals(SERVICE_URI + "/test1", requestOut.getAddress());
         Assert.assertNull(requestOut.getContentType());
@@ -159,7 +159,7 @@ public class RESTLoggingTest {
         Assert.assertEquals("GET", requestIn.getHttpMethod());
         Assert.assertNotNull(requestIn.getMessageId());
     }
-    
+
     private void checkResponseOut(LogEvent responseOut) {
         // Not yet available
         Assert.assertNull(responseOut.getAddress());
@@ -167,25 +167,25 @@ public class RESTLoggingTest {
         Assert.assertEquals(EventType.RESP_OUT, responseOut.getType());
         Assert.assertNull(responseOut.getEncoding());
         Assert.assertNotNull(responseOut.getExchangeId());
-        
+
         // Not yet available
         Assert.assertNull(responseOut.getHttpMethod());
         Assert.assertNotNull(responseOut.getMessageId());
         Assert.assertEquals("test1", responseOut.getPayload());
     }
-    
+
     private void checkResponseIn(LogEvent responseIn) {
         // Not yet available
         Assert.assertNull(responseIn.getAddress());
         Assert.assertEquals("application/octet-stream", responseIn.getContentType());
         Assert.assertEquals(EventType.RESP_IN, responseIn.getType());
         Assert.assertNotNull(responseIn.getExchangeId());
-        
+
         // Not yet available
         Assert.assertNull(responseIn.getHttpMethod());
         Assert.assertNotNull(responseIn.getMessageId());
         Assert.assertEquals("test1", responseIn.getPayload());
     }
-    
+
 
 }

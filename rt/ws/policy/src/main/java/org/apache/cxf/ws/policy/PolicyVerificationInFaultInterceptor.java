@@ -33,70 +33,70 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 
 /**
- * 
+ *
  */
 public class PolicyVerificationInFaultInterceptor extends AbstractPolicyInterceptor {
-    public static final PolicyVerificationInFaultInterceptor INSTANCE 
+    public static final PolicyVerificationInFaultInterceptor INSTANCE
         = new PolicyVerificationInFaultInterceptor();
-    private static final Logger LOG 
+    private static final Logger LOG
         = LogUtils.getL7dLogger(PolicyVerificationInFaultInterceptor.class);
 
     public PolicyVerificationInFaultInterceptor() {
         super(Phase.PRE_INVOKE);
     }
 
-    /** 
-     * Determines the effective policy, and checks if one of its alternatives  
+    /**
+     * Determines the effective policy, and checks if one of its alternatives
      * is supported.
-     *  
+     *
      * @param message
      * @throws PolicyException if none of the alternatives is supported
      */
     protected void handle(Message message) {
-        
+
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         if (null == aim) {
             return;
-        }        
-        
+        }
+
         if (!MessageUtils.isRequestor(message)) {
             LOG.fine("Not a requestor.");
-            return; 
+            return;
         }
-        
+
         Exchange exchange = message.getExchange();
         assert null != exchange;
-        
+
         BindingOperationInfo boi = exchange.getBindingOperationInfo();
         if (null == boi) {
             LOG.fine("No binding operation info.");
             return;
-        }        
-        
+        }
+
         Endpoint e = exchange.getEndpoint();
         if (null == e) {
             LOG.fine("No endpoint.");
             return;
         }
         EndpointInfo ei = e.getEndpointInfo();
-        
+
         Bus bus = exchange.getBus();
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
             return;
         }
-        
+
         Exception ex = message.getContent(Exception.class);
         if (null == ex) {
             ex = exchange.get(Exception.class);
         }
-        
+
         BindingFaultInfo bfi = getBindingFaultInfo(message, ex, boi);
         if (bfi == null) {
             return;
         }
         getTransportAssertions(message);
-        
+
         EffectivePolicy effectivePolicy = pe.getEffectiveClientFaultPolicy(ei, boi, bfi, message);
         if (effectivePolicy != null) {
             aim.checkEffectivePolicy(effectivePolicy.getPolicy());

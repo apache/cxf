@@ -37,36 +37,36 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     private boolean caseInsensitive;
     private boolean readOnly;
     private Map<K, List<V>> m;
-    
+
     public MetadataMap() {
         this.m = new LinkedHashMap<K, List<V>>();
     }
-    
+
     public MetadataMap(int size) {
         this.m = new LinkedHashMap<K, List<V>>(size);
     }
-    
+
     public MetadataMap(Map<K, List<V>> store) {
         this(store, true);
     }
-    
+
     public MetadataMap(Map<K, List<V>> store, boolean copy) {
         this(store, copy, false, false);
     }
-    
+
     public MetadataMap(boolean readOnly, boolean caseInsensitive) {
         this(null, readOnly, caseInsensitive);
     }
-    
+
     public MetadataMap(Map<K, List<V>> store, boolean readOnly, boolean caseInsensitive) {
-        
+
         this (store, true, readOnly, caseInsensitive);
-        
+
     }
-    
-    public MetadataMap(Map<K, List<V>> store, boolean copyStore, 
+
+    public MetadataMap(Map<K, List<V>> store, boolean copyStore,
                        boolean readOnly, boolean caseInsensitive) {
-        
+
         if (copyStore) {
             this.m = new LinkedHashMap<K, List<V>>();
             if (store != null) {
@@ -83,13 +83,13 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         }
         this.caseInsensitive = caseInsensitive;
         this.readOnly = readOnly;
-        
+
     }
-    
+
     public void add(K key, V value) {
         addValue(key, value, true);
     }
-    
+
     private void addValue(K key, V value, boolean last) {
         List<V> data = getList(key);
         try {
@@ -113,12 +113,12 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     private List<V> getList(K key) {
         List<V> data = this.get(key);
         if (data == null) {
-            data = new ArrayList<>();    
+            data = new ArrayList<>();
             m.put(key, data);
         }
         return readOnly ? Collections.unmodifiableList(data) : data;
     }
-    
+
     public V getFirst(K key) {
         List<V> data = this.get(key);
         return data == null || data.isEmpty() ? null : data.get(0);
@@ -156,7 +156,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         K realKey = getMatchingKey(key);
         return realKey == null ? null : m.get(realKey);
     }
-    
+
     private K getMatchingKey(Object key) {
         for (K entry : m.keySet()) {
             if (entry != null && entry.toString().equalsIgnoreCase(key.toString())
@@ -217,16 +217,16 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     public int hashCode() {
         return m.hashCode();
     }
-    
+
     @Override
     public boolean equals(Object o) {
         return m.equals(o);
     }
-    
+
     public String toString() {
         return m.toString();
     }
-    
+
     private static class KeyComparator<K> implements Comparator<K> {
 
         public int compare(K k1, K k2) {
@@ -234,7 +234,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
             String s2 = k2.toString();
             return s1.compareToIgnoreCase(s2);
         }
-        
+
     }
 
     @SafeVarargs
@@ -255,7 +255,7 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         }
         getList(key).addAll(newValues);
     }
-    
+
     public void addFirst(K key, V value) {
         addValue(key, value, false);
     }
@@ -265,11 +265,11 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         if (mapKeys.size() != m.keySet().size()) {
             return false;
         }
-        
+
         for (K key : mapKeys) {
             List<V> localValues = this.get(key);
             List<V> mapValues = map.get(key);
-            if (localValues == null 
+            if (localValues == null
                 || localValues.size() != mapValues.size()
                 || !localValues.containsAll(mapValues)) {
                 return false;

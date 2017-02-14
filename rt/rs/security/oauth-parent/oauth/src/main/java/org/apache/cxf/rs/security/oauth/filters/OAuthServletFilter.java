@@ -44,7 +44,7 @@ import org.apache.cxf.security.SecurityContext;
  */
 public class OAuthServletFilter extends AbstractAuthFilter implements javax.servlet.Filter {
     protected static final String USE_USER_SUBJECT = "org.apache.cxf.rs.security.oauth.use_user_subject";
-    
+
     public void init(FilterConfig filterConfig) throws ServletException {
         ServletContext servletContext = filterConfig.getServletContext();
         super.setDataProvider(OAuthUtils.getOAuthDataProvider(servletContext));
@@ -68,21 +68,21 @@ public class OAuthServletFilter extends AbstractAuthFilter implements javax.serv
         }
     }
 
-    protected HttpServletRequest setSecurityContext(HttpServletRequest request, 
+    protected HttpServletRequest setSecurityContext(HttpServletRequest request,
                                                     OAuthInfo info) {
         final SecurityContext sc = createSecurityContext(request, info);
         HttpServletRequest newRequest = new HttpServletRequestWrapper(request) {
-        
+
             @Override
             public Principal getUserPrincipal() {
                 return sc.getUserPrincipal();
             }
-            
+
             @Override
             public boolean isUserInRole(String role) {
                 return sc.isUserInRole(role);
             }
-            
+
             @Override
             public String getAuthType() {
                 return "OAuth";
@@ -91,7 +91,7 @@ public class OAuthServletFilter extends AbstractAuthFilter implements javax.serv
         newRequest.setAttribute(OAuthContext.class.getName(), createOAuthContext(info));
         return newRequest;
     }
-    
+
     public void destroy() {
     }
 }

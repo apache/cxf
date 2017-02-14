@@ -24,12 +24,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 
 @XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)
 public class OrderException extends Exception {
-      
+
     private static final long serialVersionUID = 1L;
-    
+
     @XmlAttribute(name = "mappedField")
     private static final String MAPPED_FIELD = "MappedField";
-    
+
     private transient int transientValue;
 
     private String info1;
@@ -41,9 +41,9 @@ public class OrderException extends Exception {
     private int intVal;
 
     private String detail;
-    
-    
-    
+
+
+
     public OrderException(String message) {
         super(message);
     }
@@ -99,7 +99,7 @@ public class OrderException extends Exception {
     void setTransientValue(int transientValue) {
         this.transientValue = transientValue;
     }
-    
+
     public String mappedField() {
         return MAPPED_FIELD;
     }

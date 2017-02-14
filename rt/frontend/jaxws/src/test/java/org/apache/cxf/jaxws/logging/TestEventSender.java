@@ -31,7 +31,7 @@ final class TestEventSender implements LogEventSender {
     public void send(LogEvent event) {
         events.add(event);
     }
-    
+
     public List<LogEvent> getEvents() {
         return events;
     }

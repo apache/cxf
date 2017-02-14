@@ -34,24 +34,24 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class CreateStudentTest {
-    
+
     static final String PORT = TestUtil.getPortNumber(CreateStudentTest.class);
     static final String PORT2 = TestUtil.getPortNumber(CreateStudentTest.class, 2);
-    
+
     static final String RESOURCE_STUDENTS_URL = "http://localhost:" + PORT + "/ResourceStudents";
-    
+
     @BeforeClass
     public static void beforeClass() {
         TestUtils.createStudentsServers(PORT, PORT2);
         TestUtils.createTeachersServers(PORT2);
     }
-    
+
     @AfterClass
     public static void afterClass() {
         TestUtils.destroyStudentsServers();
         TestUtils.destroyTeachersServers();
     }
-    
+
     @Test
     public void createStudentTest() throws XMLStreamException {
         Document createStudentXML = StaxUtils.read(
@@ -59,10 +59,10 @@ public class CreateStudentTest {
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createStudentXML.getDocumentElement());
-        
+
         ResourceFactory rf = TestUtils.createResourceFactoryClient(PORT);
         CreateResponse response = rf.create(request);
-        
+
         Assert.assertEquals(RESOURCE_STUDENTS_URL,
             response.getResourceCreated().getAddress().getValue());
     }
@@ -74,14 +74,14 @@ public class CreateStudentTest {
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createStudentPartialXML.getDocumentElement());
-        
+
         ResourceFactory rf = TestUtils.createResourceFactoryClient(PORT);
         CreateResponse response = rf.create(request);
-        
+
         Assert.assertEquals(RESOURCE_STUDENTS_URL,
             response.getResourceCreated().getAddress().getValue());
     }
-    
+
     @Test(expected = SOAPFaultException.class)
     public void createStudentWrongTest() throws XMLStreamException {
         Document createStudentWrongXML = StaxUtils.read(
@@ -89,11 +89,11 @@ public class CreateStudentTest {
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createStudentWrongXML.getDocumentElement());
-        
+
         ResourceFactory rf = TestUtils.createResourceFactoryClient(PORT);
         rf.create(request);
     }
-    
+
     @Test(expected = SOAPFaultException.class)
     public void createRandomTest() throws XMLStreamException {
         Document randomXML = StaxUtils.read(
@@ -101,7 +101,7 @@ public class CreateStudentTest {
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(randomXML.getDocumentElement());
-        
+
         ResourceFactory rf = TestUtils.createResourceFactoryClient(PORT);
         rf.create(request);
     }

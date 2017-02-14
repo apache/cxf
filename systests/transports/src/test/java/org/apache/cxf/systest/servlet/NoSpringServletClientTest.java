@@ -57,7 +57,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
         serverBus = server.getBus();
         createStaticBus();
     }
-    
+
     @AfterClass
     public static void shutdownServer() throws Exception {
         if (server != null) {
@@ -91,7 +91,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
         String reply = hello.sayHi(" Willem");
         assertEquals("Get the wrongreply ", reply, "get Willem");
     }
-    
+
     @Test
     public void testStartAndStopServer() throws Exception {
         stopServer();
@@ -107,7 +107,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
         startServer();
         testHelloService();
     }
-    
+
     private void stopServer() {
         ServerRegistry reg = serverBus.getExtension(ServerRegistry.class);
         List<Server> servers = reg.getServers();
@@ -115,7 +115,7 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
             serv.stop();
         }
     }
-    
+
     private void startServer() {
         ServerRegistry reg = serverBus.getExtension(ServerRegistry.class);
         List<Server> servers = reg.getServers();

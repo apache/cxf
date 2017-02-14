@@ -28,7 +28,7 @@ import org.junit.Test;
 
 public class CXFConnectionRequestInfoTest extends Assert {
 
-    
+
     @Test
     public void testCXFConnectionRequestInfoEquals() throws Exception {
 
@@ -89,5 +89,5 @@ public class CXFConnectionRequestInfoTest extends Assert {
 
     }
 
-    
+
 }

@@ -26,7 +26,7 @@ public class NioReadEntity {
     private final NioReaderHandler reader;
     private final NioCompletionHandler completion;
     private final NioErrorHandler error;
-    
+
     public NioReadEntity(NioReaderHandler reader, NioCompletionHandler completion, NioErrorHandler error) {
         this.reader = reader;
         this.completion = completion;

@@ -81,7 +81,7 @@ public class SCTSAMLTokenProvider implements TokenProvider {
     public boolean canHandleToken(String tokenType, String realm) {
         return canHandleToken(tokenType);
     }
-    
+
     /**
      * Create a token given a TokenProviderParameters
      */
@@ -106,13 +106,13 @@ public class SCTSAMLTokenProvider implements TokenProvider {
             TokenProviderResponse response = new TokenProviderResponse();
             response.setToken(token);
             String tokenType = tokenRequirements.getTokenType();
-            if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) 
+            if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
                     || WSConstants.SAML2_NS.equals(tokenType)) {
                 response.setTokenId(token.getAttributeNS(null, "ID"));
             } else {
                 response.setTokenId(token.getAttributeNS(null, "AssertionID"));
             }
-            
+
             DateTime validFrom = null;
             DateTime validTill = null;
             if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
@@ -124,7 +124,7 @@ public class SCTSAMLTokenProvider implements TokenProvider {
             }
             response.setCreated(validFrom.toDate());
             response.setExpires(validTill.toDate());
-            
+
             response.setEntropy(entropyBytes);
             if (keySize > 0) {
                 response.setKeySize(keySize);
@@ -232,7 +232,7 @@ public class SCTSAMLTokenProvider implements TokenProvider {
                 AttributeStatementBean statementBean = statementProvider.getStatement(tokenParameters);
                 if (statementBean != null) {
                     LOG.fine(
-                        "AttributeStatements" + statementBean.toString() 
+                        "AttributeStatements" + statementBean.toString()
                         + "returned by AttributeStatementProvider " + statementProvider.getClass().getName()
                     );
                     attrBeanList.add(statementBean);
@@ -255,7 +255,7 @@ public class SCTSAMLTokenProvider implements TokenProvider {
         subjectProviderParameters.setSecret(secret);
         subjectProviderParameters.setAttrBeanList(attrBeanList);
         SubjectBean subjectBean = subjectProvider.getSubject(subjectProviderParameters);
-        
+
         ConditionsBean conditionsBean = conditionsProvider.getConditions(tokenParameters);
 
         // Set all of the beans on the SamlCallbackHandler

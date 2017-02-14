@@ -33,24 +33,24 @@ import org.w3._2002._03.xkms_wsdl.XKMSPortType;
 
 /**
  * For usage in OSGi this factory will be published as a service.
- * Outside OSGi it can be used directly 
+ * Outside OSGi it can be used directly
  */
 public class XkmsCryptoProviderFactory implements CryptoProviderFactory {
-    
+
     private final XKMSPortType xkmsConsumer;
-        
+
     public XkmsCryptoProviderFactory(XKMSPortType xkmsConsumer) {
         this.xkmsConsumer = xkmsConsumer;
     }
 
     @Override
     public Crypto create(Message message) {
-        Object crypto = 
+        Object crypto =
             SecurityUtils.getSecurityPropertyValue(SecurityConstants.SIGNATURE_CRYPTO, message);
         if (crypto instanceof Crypto) {
             new XkmsCryptoProvider(xkmsConsumer, (Crypto)crypto);
         }
-        
+
         Properties keystoreProps = CryptoProviderUtils
             .loadKeystoreProperties(message,
                                     SecurityConstants.SIGNATURE_PROPERTIES);

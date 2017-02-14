@@ -20,9 +20,9 @@
 package org.apache.cxf.sts.event;
 
 public abstract class AbstractSTSSuccessEvent extends AbstractSTSEvent {
-    
+
     public AbstractSTSSuccessEvent(Object source, long duration) {
         super(source, duration);
     }
-    
+
 }

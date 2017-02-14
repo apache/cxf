@@ -30,7 +30,7 @@ import org.apache.cxf.phase.Phase;
 public class JsonpPostStreamInterceptor extends AbstractJsonpOutInterceptor {
 
     private String paddingEnd = ");";
-    
+
     public JsonpPostStreamInterceptor() {
         super(Phase.POST_STREAM);
     }
@@ -49,5 +49,5 @@ public class JsonpPostStreamInterceptor extends AbstractJsonpOutInterceptor {
         return paddingEnd;
     }
 
-    
+
 }

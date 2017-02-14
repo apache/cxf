@@ -64,10 +64,10 @@ import org.apache.cxf.security.SecurityContext;
 @PreMatching
 // Priorities.AUTHORIZATION also works
 @Priority(Priorities.AUTHENTICATION)
-public class OAuthRequestFilter extends AbstractAccessTokenValidator 
+public class OAuthRequestFilter extends AbstractAccessTokenValidator
     implements ContainerRequestFilter {
     private static final Logger LOG = LogUtils.getL7dLogger(OAuthRequestFilter.class);
-    
+
     private boolean useUserSubject;
     private String audience;
     private String issuer;
@@ -82,15 +82,15 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     @Override
     public void filter(ContainerRequestContext context) {
         validateRequest(JAXRSUtils.getCurrentMessage());
-    }    
-    
+    }
+
     protected void validateRequest(Message m) {
         if (isCorsRequest(m)) {
             return;
         }
-        
+
         // Get the scheme and its data, Bearer only is supported by default
-        // WWW-Authenticate with the list of supported schemes will be sent back 
+        // WWW-Authenticate with the list of supported schemes will be sent back
         // if the scheme is not accepted
         String[] authParts = getAuthorizationParts(m);
         if (authParts.length < 2) {
@@ -98,42 +98,42 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         }
         String authScheme = authParts[0];
         String authSchemeData = authParts[1];
-        
+
         // Get the access token
-        AccessTokenValidation accessTokenV = getAccessTokenValidation(authScheme, authSchemeData, null); 
+        AccessTokenValidation accessTokenV = getAccessTokenValidation(authScheme, authSchemeData, null);
         if (!accessTokenV.isInitialValidationSuccessful()) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
         // Check audiences
         String validAudience = validateAudiences(accessTokenV.getAudiences());
-        
+
         // Check if token was issued by the supported issuer
         if (issuer != null && !issuer.equals(accessTokenV.getTokenIssuer())) {
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
         // Find the scopes which match the current request
-        
+
         List<OAuthPermission> permissions = accessTokenV.getTokenScopes();
         List<OAuthPermission> matchingPermissions = new ArrayList<>();
-        
+
         HttpServletRequest req = getMessageContext().getHttpServletRequest();
         for (OAuthPermission perm : permissions) {
             boolean uriOK = checkRequestURI(req, perm.getUris());
             boolean verbOK = checkHttpVerb(req, perm.getHttpVerbs());
-            boolean scopeOk = checkScopeProperty(perm.getPermission()); 
+            boolean scopeOk = checkScopeProperty(perm.getPermission());
             if (uriOK && verbOK && scopeOk) {
                 matchingPermissions.add(perm);
             }
         }
-        
-        if (!permissions.isEmpty() && matchingPermissions.isEmpty() 
+
+        if (!permissions.isEmpty() && matchingPermissions.isEmpty()
             || allPermissionsMatch && (matchingPermissions.size() != permissions.size())
             || !requiredScopes.isEmpty() && requiredScopes.size() != matchingPermissions.size()) {
             String message = "Client has no valid permissions";
             LOG.warning(message);
             throw ExceptionUtils.toForbiddenException(null, null);
         }
-      
+
         if (accessTokenV.getClientIpAddress() != null) {
             String remoteAddress = getMessageContext().getHttpServletRequest().getRemoteAddr();
             if (remoteAddress == null || accessTokenV.getClientIpAddress().equals(remoteAddress)) {
@@ -152,19 +152,19 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
                 + "using an unsupported authentication method";
             LOG.warning(message);
             throw ExceptionUtils.toForbiddenException(null, null);
-            
+
         }
-        
+
         // Create the security context and make it available on the message
         SecurityContext sc = createSecurityContext(req, accessTokenV);
         m.put(SecurityContext.class, sc);
-        
+
         // Also set the OAuthContext
         OAuthContext oauthContext = new OAuthContext(accessTokenV.getTokenSubject(),
                                                      accessTokenV.getClientSubject(),
                                                      matchingPermissions,
                                                      accessTokenV.getTokenGrantType());
-        
+
         oauthContext.setClientId(accessTokenV.getClientId());
         oauthContext.setClientConfidential(accessTokenV.isClientConfidential());
         oauthContext.setTokenKey(accessTokenV.getTokenKey());
@@ -176,7 +176,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     }
 
     protected boolean checkHttpVerb(HttpServletRequest req, List<String> verbs) {
-        if (!verbs.isEmpty() 
+        if (!verbs.isEmpty()
             && !verbs.contains(req.getMethod())) {
             String message = "Invalid http verb";
             LOG.fine(message);
@@ -184,9 +184,9 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         }
         return true;
     }
-    
+
     protected boolean checkRequestURI(HttpServletRequest request, List<String> uris) {
-        
+
         if (uris.isEmpty()) {
             return true;
         }
@@ -214,16 +214,16 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     public void setUseUserSubject(boolean useUserSubject) {
         this.useUserSubject = useUserSubject;
     }
-    
-    
-    protected SecurityContext createSecurityContext(HttpServletRequest request, 
+
+
+    protected SecurityContext createSecurityContext(HttpServletRequest request,
                                                     AccessTokenValidation accessTokenV) {
         UserSubject resourceOwnerSubject = accessTokenV.getTokenSubject();
         UserSubject clientSubject = accessTokenV.getClientSubject();
 
-        final UserSubject theSubject = 
+        final UserSubject theSubject =
             OAuthRequestFilter.this.useUserSubject ? resourceOwnerSubject : clientSubject;
-                    
+
         return new SecurityContext() {
 
             public Principal getUserPrincipal() {
@@ -238,10 +238,10 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             }
         };
     }
-    
+
     protected boolean isCorsRequest(Message m) {
-        //Redirection-based flows (Implicit Grant Flow specifically) may have 
-        //the browser issuing CORS preflight OPTIONS request. 
+        //Redirection-based flows (Implicit Grant Flow specifically) may have
+        //the browser issuing CORS preflight OPTIONS request.
         //org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter can be
         //used to handle preflights but local preflights (to be handled by the service code)
         // will be blocked by this filter unless CORS filter has done the initial validation
@@ -258,7 +258,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
                 return audience;
             }
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
-        } 
+        }
         if (!audienceIsEndpointAddress) {
             return null;
         }
@@ -272,11 +272,11 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         return null;
     }
-    
+
     public void setCheckFormData(boolean checkFormData) {
         this.checkFormData = checkFormData;
     }
-    
+
     protected String[] getAuthorizationParts(Message m) {
         if (!checkFormData) {
             return AuthorizationUtils.getAuthorizationParts(getMessageContext(), supportedSchemes);
@@ -284,11 +284,11 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             return new String[]{OAuthConstants.BEARER_AUTHORIZATION_SCHEME, getTokenFromFormData(m)};
         }
     }
-    
+
     protected String getTokenFromFormData(Message message) {
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         String type = (String)message.get(Message.CONTENT_TYPE);
-        if (type != null && MediaType.APPLICATION_FORM_URLENCODED.startsWith(type) 
+        if (type != null && MediaType.APPLICATION_FORM_URLENCODED.startsWith(type)
             && method != null && (method.equals(HttpMethod.POST) || method.equals(HttpMethod.PUT))) {
             try {
                 FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
@@ -300,8 +300,8 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
                     return token;
                 }
             } catch (Exception ex) {
-                // the exception will be thrown below    
-            }       
+                // the exception will be thrown below
+            }
         }
         AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         return null;
@@ -345,5 +345,5 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
     public void setIssuer(String issuer) {
         this.issuer = issuer;
     }
-    
+
 }

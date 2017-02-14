@@ -67,18 +67,18 @@ public class StreamingService {
     }
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                        new ArrayBlockingQueue<Runnable>(10));
-    
+
     private String receiverType;
-    
+
     public StreamingService(String receiverType) {
         this.receiverType = receiverType;
     }
-    
+
     @POST
     @Path("/multipart")
     @Consumes("multipart/form-data")
     @Produces("text/plain")
-    public void processMultipartStream(@Suspended AsyncResponse async, 
+    public void processMultipartStream(@Suspended AsyncResponse async,
                                        @Multipart("file") Attachment att) {
         MediaType mediaType = att.getContentType();
         if (mediaType == null) {
@@ -90,13 +90,13 @@ public class StreamingService {
                 }
             }
         }
-        
+
         TikaContentExtractor tika = new TikaContentExtractor();
         TikaContent tikaContent = tika.extract(att.getObject(InputStream.class),
                                                mediaType);
         processStream(async, SparkUtils.getStringsFromString(tikaContent.getContent()));
     }
-    
+
     @POST
     @Path("/stream")
     @Consumes("text/plain")
@@ -116,12 +116,12 @@ public class StreamingService {
         try {
             SparkConf sparkConf = new SparkConf().setMaster("local[*]")
                 .setAppName("JAX-RS Spark Connect " + SparkUtils.getRandomId());
-            JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1)); 
-            
+            JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
+
             SparkStreamingOutput streamOut = new SparkStreamingOutput(jssc);
             SparkStreamingListener sparkListener =  new SparkStreamingListener(streamOut);
             jssc.addStreamingListener(sparkListener);
-            
+
             JavaDStream<String> receiverStream = null;
             if ("queue".equals(receiverType)) {
                 Queue<JavaRDD<String>> rddQueue = new LinkedList<>();
@@ -132,11 +132,11 @@ public class StreamingService {
             } else {
                 receiverStream = jssc.receiverStream(new StringListReceiver(inputStrings));
             }
-            
+
             JavaPairDStream<String, Integer> wordCounts = SparkUtils.createOutputDStream(receiverStream, false);
             wordCounts.foreachRDD(new OutputFunction(streamOut));
             jssc.start();
-                                                    
+
             executor.execute(new SparkJob(async, sparkListener));
         } catch (Exception ex) {
             // the compiler does not allow to catch SparkException directly
@@ -147,13 +147,13 @@ public class StreamingService {
             }
         }
     }
-    
+
     private void processStreamOneWay(List<String> inputStrings) {
         try {
             SparkConf sparkConf = new SparkConf().setMaster("local[*]")
                 .setAppName("JAX-RS Spark Connect OneWay " + SparkUtils.getRandomId());
-            JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1)); 
-            
+            JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
+
             JavaDStream<String> receiverStream = null;
             if ("queue".equals(receiverType)) {
                 Queue<JavaRDD<String>> rddQueue = new LinkedList<>();
@@ -164,7 +164,7 @@ public class StreamingService {
             } else {
                 receiverStream = jssc.receiverStream(new StringListReceiver(inputStrings));
             }
-            
+
             JavaPairDStream<String, Integer> wordCounts = SparkUtils.createOutputDStream(receiverStream, false);
             wordCounts.foreachRDD(new PrintOutputFunction(jssc));
             jssc.start();
@@ -172,8 +172,8 @@ public class StreamingService {
             // ignore
         }
     }
-    
-    
+
+
     private static class OutputFunction implements VoidFunction<JavaPairRDD<String, Integer>> {
         private static final long serialVersionUID = 1L;
         private SparkStreamingOutput streamOut;
@@ -187,7 +187,7 @@ public class StreamingService {
                 streamOut.addResponseEntry(value);
             }
         }
-        
+
     }
     private static class PrintOutputFunction implements VoidFunction<JavaPairRDD<String, Integer>> {
         private static final long serialVersionUID = 1L;
@@ -206,7 +206,7 @@ public class StreamingService {
                 jssc.close();
             }
         }
-        
+
     }
-    
+
 }

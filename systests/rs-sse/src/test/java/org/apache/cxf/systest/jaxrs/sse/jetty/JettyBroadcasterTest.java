@@ -33,7 +33,7 @@ public class JettyBroadcasterTest extends AbstractBroadcasterSseTest {
             super("/", PORT);
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -41,7 +41,7 @@ public class JettyBroadcasterTest extends AbstractBroadcasterSseTest {
         assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
         createStaticBus();
     }
-    
+
     @Override
     protected int getPort() {
         return EmbeddedJettyServer.PORT;

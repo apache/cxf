@@ -24,28 +24,28 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
- * This class defines a feature is used to transform message using XSLT script. 
+ * This class defines a feature is used to transform message using XSLT script.
  * If this feature is present and inXSLTPath/outXLSTPath are initialised,
- * client and endpoint will transform incoming and outgoing messages correspondingly. 
- * Attention: actually the feature breaks streaming 
- * (can be fixed in further versions when XSLT engine supports XML stream). 
+ * client and endpoint will transform incoming and outgoing messages correspondingly.
+ * Attention: actually the feature breaks streaming
+ * (can be fixed in further versions when XSLT engine supports XML stream).
  */
 @NoJSR250Annotations
 public class XSLTFeature extends AbstractFeature {
     private String inXSLTPath;
     private String outXSLTPath;
-    
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         if (inXSLTPath != null) {
             XSLTInInterceptor in = new XSLTInInterceptor(inXSLTPath);
-            provider.getInInterceptors().add(in);            
+            provider.getInInterceptors().add(in);
         }
-        
+
         if (outXSLTPath != null) {
             XSLTOutInterceptor out = new XSLTOutInterceptor(outXSLTPath);
-            provider.getOutInterceptors().add(out);            
-            provider.getOutFaultInterceptors().add(out);            
+            provider.getOutInterceptors().add(out);
+            provider.getOutFaultInterceptors().add(out);
         }
     }
 

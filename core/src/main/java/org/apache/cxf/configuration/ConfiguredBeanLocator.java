@@ -23,10 +23,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * 
+ *
  */
 public interface ConfiguredBeanLocator {
-    
+
     /**
      * Gets the names of all the configured beans of the specific type.  Does
      * not cause them to be loaded.
@@ -34,8 +34,8 @@ public interface ConfiguredBeanLocator {
      * @return List of all the bean names for the given type
      */
     List<String> getBeanNamesOfType(Class<?> type);
-    
-    
+
+
     /**
      * Gets the bean of the given name and type
      * @param name
@@ -43,19 +43,19 @@ public interface ConfiguredBeanLocator {
      * @return the bean
      */
     <T> T getBeanOfType(String name, Class<T> type);
-    
+
     /**
      * Gets all the configured beans of the specific types.  Causes them
-     * all to be loaded. 
+     * all to be loaded.
      * @param type
      * @return The collection of all the configured beans of the given type
      */
     <T> Collection<? extends T> getBeansOfType(Class<T> type);
 
-    
+
     /**
      * Iterates through the beans of the given type, calling the listener
-     * to determine if it should be loaded or not. 
+     * to determine if it should be loaded or not.
      * @param type
      * @param listener
      * @return true if beans of the type were loaded
@@ -64,22 +64,22 @@ public interface ConfiguredBeanLocator {
 
     /**
      * For supporting "legacy" config, checks the configured bean to see if
-     * it has a property configured with the given name/value.  Mostly used 
-     * for supporting things configured with "activationNamespaces" set. 
+     * it has a property configured with the given name/value.  Mostly used
+     * for supporting things configured with "activationNamespaces" set.
      * @param beanName
      * @param propertyName
      * @param value
      * @return true if the bean has the given property/value
      */
     boolean hasConfiguredPropertyValue(String beanName, String propertyName, String value);
-    
+
     interface BeanLoaderListener<T> {
         /**
-         * Return true to have the loader go ahead and load the bean.  If false, 
+         * Return true to have the loader go ahead and load the bean.  If false,
          * the loader will just skip to the next bean
          * @param name
          * @param type
-         * @return true if the bean should be loaded 
+         * @return true if the bean should be loaded
          */
         boolean loadBean(String name, Class<? extends T> type);
 

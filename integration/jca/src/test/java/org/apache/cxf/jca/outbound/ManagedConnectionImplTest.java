@@ -41,7 +41,7 @@ public class ManagedConnectionImplTest {
     @Test
     public void testHandleEqualsMethod() throws Exception {
         BusFactory.setDefaultBus(null);
-        
+
         IMocksControl control = EasyMock.createNiceControl();
 
         ManagedConnectionFactoryImpl mcf = control.createMock(ManagedConnectionFactoryImpl.class);

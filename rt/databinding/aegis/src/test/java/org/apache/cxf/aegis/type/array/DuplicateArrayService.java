@@ -26,20 +26,20 @@ import javax.jws.WebService;
 
 @WebService(name = "DuplicateArray", targetNamespace = "urn:org.apache.cxf.aegis.type.java5")
 public interface DuplicateArrayService {
-    
+
     @WebMethod()
     DuplicateArrayReturnItem[] lookup(String indexid);
-  
+
     @WebMethod
     List<List<DuplicateArrayReturnItem>> lookupBatch(String indexid);
-    
-    @WebMethod 
+
+    @WebMethod
     Foo<String> doFoo(Foo<Integer> foo);
-    
-    
+
+
     class Foo<T> {
         List<T> list;
-        
+
         public void setList(List<T> l) {
             list = l;
         }

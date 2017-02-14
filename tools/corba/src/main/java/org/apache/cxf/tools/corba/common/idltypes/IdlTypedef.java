@@ -28,7 +28,7 @@ public final class IdlTypedef extends IdlDefnImplBase implements IdlType {
         super(parent, name);
         this.base = basetype;
     }
-    
+
     public static IdlTypedef create(IdlScopeBase parent, String name, IdlType base) {
         return new IdlTypedef(parent, name, base);
     }
@@ -42,5 +42,5 @@ public final class IdlTypedef extends IdlDefnImplBase implements IdlType {
     public void write(PrintWriter pw) {
         pw.println(indent() + "typedef " + base.fullName(scopeName()) + " " + localName() + ";");
     }
-    
+
 }

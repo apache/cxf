@@ -37,19 +37,19 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     private static final String SECURE = "Secure";
     private static final String EXPIRES = "Expires";
     private static final String HTTP_ONLY = "HttpOnly";
-    
+
     /** from RFC 2068, token special case characters */
-    
+
     private static final String TSPECIALS_PATH = "\"()<>@,;:\\[]?={} \t";
     private static final String TSPECIALS_ALL = TSPECIALS_PATH + "/";
-    private static final String DOUBLE_QUOTE = "\""; 
-        
+    private static final String DOUBLE_QUOTE = "\"";
+
     public NewCookie fromString(String c) {
-        
+
         if (c == null) {
             throw new IllegalArgumentException("SetCookie value can not be null");
         }
-        
+
         String name = null;
         String value = null;
         String path = null;
@@ -60,19 +60,19 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         Date expires = null;
         boolean httpOnly = false;
         int version = NewCookie.DEFAULT_VERSION;
-        
+
         String[] tokens = StringUtils.split(c, ";");
         for (String token : tokens) {
             String theToken = token.trim();
-            
+
             int sepIndex = theToken.indexOf('=');
             String paramName = sepIndex != -1 ? theToken.substring(0, sepIndex) : theToken;
-            String paramValue = sepIndex == -1 || sepIndex == theToken.length() - 1 
+            String paramValue = sepIndex == -1 || sepIndex == theToken.length() - 1
                 ? null : theToken.substring(sepIndex + 1);
             if (paramValue != null) {
                 paramValue = stripQuotes(paramValue);
             }
-            
+
             if (paramName.equalsIgnoreCase(MAX_AGE)) {
                 maxAge = Integer.parseInt(paramValue);
             } else if (paramName.equalsIgnoreCase(PATH)) {
@@ -94,14 +94,14 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
                 value = paramValue;
             }
         }
-        
+
         if (name == null || value == null) {
             throw new IllegalArgumentException("Set-Cookie is malformed : " + c);
         }
-        
+
         return new NewCookie(name, value, path, domain, version, comment, maxAge, expires, isSecure, httpOnly);
     }
-    
+
     @Override
     public String toString(NewCookie value) {
 
@@ -140,7 +140,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     /**
      * Append the input value string to the given buffer, wrapping it with
      * quotes if need be.
-     * 
+     *
      * @param value
      * @return String
      */
@@ -167,7 +167,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
     /**
      * Return true iff the string contains special characters that need to be
      * quoted.
-     * 
+     *
      * @param value
      * @return boolean
      */
@@ -181,8 +181,8 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         }
         if ('"' == value.charAt(0) && '"' == value.charAt(len - 1)) {
             // already wrapped with quotes
-            return false;         
-        } 
+            return false;
+        }
 
         for (int i = 0; i < len; i++) {
             char c = value.charAt(i);
@@ -192,7 +192,7 @@ public class NewCookieHeaderProvider implements HeaderDelegate<NewCookie> {
         }
         return false;
     }
-    
+
     static String stripQuotes(String paramValue) {
         if (paramValue.startsWith(DOUBLE_QUOTE)
             && paramValue.endsWith(DOUBLE_QUOTE) && paramValue.length() > 1) {

@@ -25,25 +25,25 @@ import java.time.Instant;
 import javax.xml.namespace.QName;
 
 /**
- * 
+ *
  */
 public class PrintWriterEventSender implements LogEventSender {
     PrintWriter writer;
-    
+
     public PrintWriterEventSender(PrintWriter writer) {
         this.writer = writer;
     }
-    
+
     void setPrintWriter(PrintWriter w) {
         writer = w;
     }
-    
-    
+
+
     /** {@inheritDoc}*/
     @Override
     public void send(LogEvent event) {
         StringBuilder b = new StringBuilder();
-        
+
         b.append(Instant.now().toString()).append(" - PrintWriterEventSender\n");
         put(b, "type", event.getType().toString());
         put(b, "address", event.getAddress());
@@ -68,7 +68,7 @@ public class PrintWriterEventSender implements LogEventSender {
     protected String localPart(QName name) {
         return name == null ? null : name.getLocalPart();
     }
-   
+
     protected void put(StringBuilder b, String key, String value) {
         if (value != null) {
             b.append("    ").append(key).append(": ").append(value).append("\n");

@@ -184,8 +184,8 @@ public final class JAXBEncoderDecoder {
     private JAXBEncoderDecoder() {
     }
 
-    public static void marshall(Marshaller marshaller, 
-                                Object elValue, 
+    public static void marshall(Marshaller marshaller,
+                                Object elValue,
                                 MessagePartInfo part,
                                 Object source) {
         try {
@@ -196,7 +196,7 @@ public final class JAXBEncoderDecoder {
         } catch (javax.xml.bind.PropertyException e) {
             // intentionally empty.
         }
-        
+
         Class<?> cls = null;
         if (part != null) {
             cls = part.getTypeClass();
@@ -233,7 +233,7 @@ public final class JAXBEncoderDecoder {
                     } else if (part.getMessageInfo().getOperation().isUnwrapped()
                                && (mObj.getClass().isArray() || mObj instanceof List)
                                && el.getMaxOccurs() != 1) {
-                        writeArrayObject(marshaller, 
+                        writeArrayObject(marshaller,
                                          source,
                                          elName,
                                          mObj);
@@ -247,8 +247,8 @@ public final class JAXBEncoderDecoder {
                 } else if (mObj instanceof JAXBElement) {
                     writeObject(marshaller, source, mObj);
                 } else if (marshaller.getSchema() != null) {
-                    //force xsi:type so types can be validated instead of trying to 
-                    //use the RPC/lit element names that aren't in the schema 
+                    //force xsi:type so types can be validated instead of trying to
+                    //use the RPC/lit element names that aren't in the schema
                     writeObject(marshaller, source, newJAXBElement(elName, Object.class, mObj));
                 } else {
                     writeObject(marshaller, source, newJAXBElement(elName, cls, mObj));
@@ -293,8 +293,8 @@ public final class JAXBEncoderDecoder {
             if (source instanceof XMLStreamWriter) {
                 bridge.marshal(elValue, (XMLStreamWriter)source, am);
             } else if (source instanceof OutputStream) {
-                //the namespace is missing when marshal the xsd:QName type 
-                //to the OutputStream directly 
+                //the namespace is missing when marshal the xsd:QName type
+                //to the OutputStream directly
                 java.io.StringWriter sw = new java.io.StringWriter();
                 StreamResult s1 = new StreamResult(sw);
                 bridge.marshal(elValue, s1);
@@ -316,7 +316,7 @@ public final class JAXBEncoderDecoder {
         }
 
     }
-    
+
 //  TODO: cache the JAXBRIContext
     public static Object unmarshalWithBridge(QName qname,
                                              Class<?> cls,
@@ -324,13 +324,13 @@ public final class JAXBEncoderDecoder {
                                              Set<Class<?>> ctxClasses,
                                              Object source,
                                              AttachmentUnmarshaller am) {
-        
+
         try {
             JAXBUtils.BridgeWrapper bridge = JAXBUtils.createBridge(ctxClasses, qname, cls, anns);
-           
+
             if (source instanceof XMLStreamReader) {
                 //DOMUtils.writeXml(StaxUtils.read((XMLStreamReader)source), System.out);
-                return bridge.unmarshal((XMLStreamReader)source, am);               
+                return bridge.unmarshal((XMLStreamReader)source, am);
             } else if (source instanceof InputStream) {
                 return bridge.unmarshal((InputStream)source);
             } else if (source instanceof Node) {
@@ -349,7 +349,7 @@ public final class JAXBEncoderDecoder {
             }
         }
 
-    }    
+    }
 
     public static void marshallException(Marshaller marshaller, Exception elValue,
                                          MessagePartInfo part, Object source) {
@@ -361,7 +361,7 @@ public final class JAXBEncoderDecoder {
             XmlAccessType accessType = Utils.getXmlAccessType(cls);
             String namespace = part.getElementQName().getNamespaceURI();
             String attNs = namespace;
-            
+
             SchemaInfo sch = part.getMessageInfo().getOperation().getInterface()
                 .getService().getSchema(namespace);
             if (sch == null) {
@@ -388,7 +388,7 @@ public final class JAXBEncoderDecoder {
                     Object o = Utils.getFieldValue(f, elValue);
                     Document doc = DOMUtils.newDocument();
                     writeObject(marshaller, doc, newJAXBElement(fname, String.class, o));
-                    
+
                     if (attNs != null) {
                         writer.writeAttribute(attNs, fname.getLocalPart(),
                                               DOMUtils.getAllContent(doc.getDocumentElement()));
@@ -407,7 +407,7 @@ public final class JAXBEncoderDecoder {
                     XmlAttribute at = m.getAnnotation(XmlAttribute.class);
                     QName mname = new QName(namespace, StringUtils.isEmpty(at.name()) ? name : at.name());
                     Document doc = DOMUtils.newDocument();
-                    Object o = Utils.getMethodValue(m, elValue); 
+                    Object o = Utils.getMethodValue(m, elValue);
                     writeObject(marshaller, doc, newJAXBElement(mname, String.class, o));
                     if (attNs != null) {
                         writer.writeAttribute(attNs, mname.getLocalPart(),
@@ -435,7 +435,7 @@ public final class JAXBEncoderDecoder {
                     if (JAXBSchemaInitializer.isArray(f.getGenericType())) {
                         writeArrayObject(marshaller, writer, fname, f.get(elValue));
                     } else {
-                        Object o = Utils.getFieldValue(f, elValue); 
+                        Object o = Utils.getFieldValue(f, elValue);
                         writeObject(marshaller, writer, newJAXBElement(fname, String.class, o));
                     }
                 } else { // it's a Method
@@ -447,7 +447,7 @@ public final class JAXBEncoderDecoder {
                     if (JAXBSchemaInitializer.isArray(m.getGenericReturnType())) {
                         writeArrayObject(marshaller, writer, mname, m.invoke(elValue));
                     } else {
-                        Object o = Utils.getMethodValue(m, elValue); 
+                        Object o = Utils.getMethodValue(m, elValue);
                         writeObject(marshaller, writer, newJAXBElement(mname, String.class, o));
                     }
                 }
@@ -461,8 +461,8 @@ public final class JAXBEncoderDecoder {
             StaxUtils.close(writer);
         }
     }
-    
-    private static void writeArrayObject(Marshaller marshaller, 
+
+    private static void writeArrayObject(Marshaller marshaller,
                                          Object source,
                                          QName mname,
                                          Object mObj) throws Fault, JAXBException {
@@ -484,12 +484,12 @@ public final class JAXBEncoderDecoder {
         int len = Array.getLength(objArray);
         for (int x = 0; x < len; x++) {
             Object o = Array.get(objArray, x);
-            writeObject(marshaller, source, 
+            writeObject(marshaller, source,
                         newJAXBElement(mname, cls == null ? o.getClass() : cls, o));
-        }        
+        }
     }
 
-    public static Exception unmarshallException(Unmarshaller u, 
+    public static Exception unmarshallException(Unmarshaller u,
                                                 Object source,
                                                 MessagePartInfo part) {
         XMLStreamReader reader;
@@ -594,7 +594,7 @@ public final class JAXBEncoderDecoder {
                             ReflectionUtil.setAccessible(fn);
                             fn.set(obj, o);
                         }
-                    }                
+                    }
                 }
                 if (reader.getEventType() == XMLStreamReader.END_ELEMENT && q.equals(reader.getName())) {
                     reader.next();
@@ -622,7 +622,7 @@ public final class JAXBEncoderDecoder {
             if (source instanceof MarshallerAwareXMLWriter) {
                 ((MarshallerAwareXMLWriter) source).setMarshaller(u);
             }
-            
+
             u.marshal(mObj, (XMLEventWriter)source);
         } else {
             throw new Fault(new Message("UNKNOWN_SOURCE", LOG, source.getClass().getName()));
@@ -653,8 +653,8 @@ public final class JAXBEncoderDecoder {
     }
 
 
-    public static Object unmarshall(Unmarshaller u, 
-                                    Object source, 
+    public static Object unmarshall(Unmarshaller u,
+                                    Object source,
                                     MessagePartInfo part,
                                     boolean unwrap) {
         Class<?> clazz = part != null ? (Class<?>)part.getTypeClass() : null;
@@ -669,7 +669,7 @@ public final class JAXBEncoderDecoder {
             XmlSchemaElement el = (XmlSchemaElement)part.getXmlSchema();
 
             if (el.getSchemaType() instanceof XmlSchemaSimpleType
-                && ((XmlSchemaSimpleType)el.getSchemaType()).getContent() 
+                && ((XmlSchemaSimpleType)el.getSchemaType()).getContent()
                 instanceof XmlSchemaSimpleTypeList) {
 
                 Object obj = unmarshall(u, source, elName, null, unwrap);
@@ -719,7 +719,7 @@ public final class JAXBEncoderDecoder {
     }
 
     private static Object updateSourceWithXSIType(Object source, final QName typeQName) {
-        if (source instanceof XMLStreamReader 
+        if (source instanceof XMLStreamReader
             && typeQName != null) {
             XMLStreamReader reader = (XMLStreamReader)source;
             String type = reader.getAttributeValue(Constants.URI_2001_SCHEMA_XSI, "type");
@@ -742,7 +742,7 @@ public final class JAXBEncoderDecoder {
         } catch (Exception e) {
             c = new HashSet<>();
         }
-        
+
         c.addAll(ret);
         return c;
     }
@@ -766,7 +766,7 @@ public final class JAXBEncoderDecoder {
 
     private static List<Object> createList(MessagePartInfo part) {
         Type genericType = (Type)part.getProperty("generic.type");
-        return createList(genericType); 
+        return createList(genericType);
     }
     private static List<Object> createList(Type genericType) {
         if (genericType instanceof ParameterizedType) {
@@ -810,28 +810,28 @@ public final class JAXBEncoderDecoder {
                                       final QName elName,
                                       final Class<?> clazz,
                                       final boolean unwrap) throws Exception {
-        
+
         Object obj = null;
         boolean unmarshalWithClass = true;
 
         if (clazz == null
-            || (!clazz.isPrimitive() 
-                && !clazz.isArray() 
-                && !clazz.isEnum() 
+            || (!clazz.isPrimitive()
+                && !clazz.isArray()
+                && !clazz.isEnum()
                 && !clazz.equals(Calendar.class)
-                && (Modifier.isAbstract(clazz.getModifiers()) 
+                && (Modifier.isAbstract(clazz.getModifiers())
                     || Modifier.isInterface(clazz.getModifiers())))) {
             unmarshalWithClass = false;
         }
 
         if (clazz != null
-            && (clazz.getName().equals("javax.xml.datatype.XMLGregorianCalendar") 
+            && (clazz.getName().equals("javax.xml.datatype.XMLGregorianCalendar")
                 || clazz.getName().equals("javax.xml.datatype.Duration"))) {
             // special treat two jaxb defined built-in abstract types
             unmarshalWithClass = true;
         }
         if (source instanceof Node) {
-            obj = unmarshalWithClass ? u.unmarshal((Node)source, clazz) 
+            obj = unmarshalWithClass ? u.unmarshal((Node)source, clazz)
                 : u.unmarshal((Node)source);
         } else if (source instanceof DepthXMLStreamReader) {
             // JAXB optimizes a ton of stuff depending on the StreamReader impl. Thus,
@@ -839,15 +839,15 @@ public final class JAXBEncoderDecoder {
             // as it doesn't read beyond the end so the DepthXMLStreamReader state
             // would be OK when it returns.   The main winner is FastInfoset where parsing
             // a testcase I have goes from about 300/sec to well over 1000.
-            
+
             DepthXMLStreamReader dr = (DepthXMLStreamReader)source;
             XMLStreamReader reader = dr.getReader();
-            
+
             // allows the XML Stream Reader to adjust it's behaviour based on the state of the unmarshaller
             if (reader instanceof UnmarshallerAwareXMLReader) {
                 ((UnmarshallerAwareXMLReader) reader).setUnmarshaller(u);
             }
-            
+
             if (u.getSchema() != null) {
                 //validating, but we may need more namespaces
                 reader = findExtraNamespaces(reader);
@@ -856,12 +856,12 @@ public final class JAXBEncoderDecoder {
                 .unmarshal(dr.getReader());
         } else if (source instanceof XMLStreamReader) {
             XMLStreamReader reader = (XMLStreamReader)source;
-            
+
             // allows the XML Stream Reader to adjust it's behaviour based on the state of the unmarshaller
             if (reader instanceof UnmarshallerAwareXMLReader) {
                 ((UnmarshallerAwareXMLReader) reader).setUnmarshaller(u);
             }
-            
+
             if (u.getSchema() != null) {
                 //validating, but we may need more namespaces
                 reader = findExtraNamespaces(reader);
@@ -873,7 +873,7 @@ public final class JAXBEncoderDecoder {
             if (source instanceof UnmarshallerAwareXMLReader) {
                 ((UnmarshallerAwareXMLReader) source).setUnmarshaller(u);
             }
-            
+
             obj = unmarshalWithClass ? u.unmarshal((XMLEventReader)source, clazz) : u
                 .unmarshal((XMLEventReader)source);
         } else if (source == null) {
@@ -902,34 +902,34 @@ public final class JAXBEncoderDecoder {
             if (ex instanceof javax.xml.bind.UnmarshalException) {
                 javax.xml.bind.UnmarshalException unmarshalEx = (javax.xml.bind.UnmarshalException)ex;
                 if (unmarshalEx.getLinkedException() != null) {
-                    throw new Fault(new Message("UNMARSHAL_ERROR", LOG, 
+                    throw new Fault(new Message("UNMARSHAL_ERROR", LOG,
                                             unmarshalEx.getLinkedException().getMessage()), ex);
                 } else {
-                    throw new Fault(new Message("UNMARSHAL_ERROR", LOG, 
-                                                unmarshalEx.getMessage()), ex);                    
+                    throw new Fault(new Message("UNMARSHAL_ERROR", LOG,
+                                                unmarshalEx.getMessage()), ex);
                 }
             }
             throw new Fault(new Message("UNMARSHAL_ERROR", LOG, ex.getMessage()), ex);
-        }        
+        }
     }
-    
+
     private static XMLStreamReader findExtraNamespaces(XMLStreamReader source) {
         //due to a deficiency in the Stax API, there isn't a way to get all
         //the namespace prefixes that are "valid" at this point.  Thus, JAXB
         //cannot set all the prefixes into the validator (which also doesn't allow
-        //setting a NSContext, just allows declaring of prefixes) so resolving 
-        //prefixes and such will fail if they were declared on any of the parent 
+        //setting a NSContext, just allows declaring of prefixes) so resolving
+        //prefixes and such will fail if they were declared on any of the parent
         //elements.
         //
         //We'll use some reflection to grab the known namespaces from woodstox
         //or the xerces parser and fake extra namespace decls on the root elements.
         //slight performance penalty, but there already is a penalty if you are validating
         //anyway.
-        
+
         NamespaceContext c = source.getNamespaceContext();
         final Map<String, String> nsMap = new TreeMap<String, String>();
         try {
-            if (c instanceof W3CNamespaceContext) {                                
+            if (c instanceof W3CNamespaceContext) {
                 Element element = ((W3CNamespaceContext)c).getElement();
                 while (element != null) {
                     NamedNodeMap namedNodeMap = element.getAttributes();
@@ -944,7 +944,7 @@ public final class JAXBEncoderDecoder {
             } else {
                 try {
                     //Woodstox version
-                    c = (NamespaceContext)c.getClass().getMethod("createNonTransientNsContext", 
+                    c = (NamespaceContext)c.getClass().getMethod("createNonTransientNsContext",
                                                                  Location.class)
                         .invoke(c, new Object[1]);
                 } catch (Throwable t) {
@@ -983,7 +983,7 @@ public final class JAXBEncoderDecoder {
         if (!nsMap.isEmpty()) {
             for (int x = 0; x < source.getNamespaceCount(); x++) {
                 String pfx = source.getNamespacePrefix(x);
-                if (pfx == null) { 
+                if (pfx == null) {
                     nsMap.remove("");
                 } else {
                     nsMap.remove(pfx);
@@ -991,14 +991,14 @@ public final class JAXBEncoderDecoder {
             }
             if (!nsMap.isEmpty()) {
                 @SuppressWarnings("unchecked")
-                final Map.Entry<String, String> namespaces[] 
+                final Map.Entry<String, String> namespaces[]
                     = nsMap.entrySet().toArray(new Map.Entry[nsMap.size()]);
                 //OK. we have extra namespaces.  We'll need to wrapper the reader
                 //with a new one that will fake extra namespace events
                 source = new DepthXMLStreamReader(source) {
                     public int getNamespaceCount() {
                         if (getDepth() == 0 && isStartElement()) {
-                            return super.getNamespaceCount() + nsMap.size(); 
+                            return super.getNamespaceCount() + nsMap.size();
                         }
                         return super.getNamespaceCount();
                     }
@@ -1024,11 +1024,11 @@ public final class JAXBEncoderDecoder {
                         }
                         return super.getNamespaceURI(arg0);
                     }
-                    
+
                 };
             }
         }
-        
+
         return source;
     }
 
@@ -1077,7 +1077,7 @@ public final class JAXBEncoderDecoder {
                 if (type != null) {
                     ret.add(type.getValue());
                 }
-                while (reader.getEventType() != XMLStreamConstants.START_ELEMENT 
+                while (reader.getEventType() != XMLStreamConstants.START_ELEMENT
                     && reader.getEventType() != XMLStreamConstants.END_ELEMENT) {
                     reader.nextTag();
                 }

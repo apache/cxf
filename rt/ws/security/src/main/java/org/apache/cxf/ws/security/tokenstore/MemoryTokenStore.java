@@ -32,10 +32,10 @@ import org.apache.cxf.common.util.StringUtils;
 public class MemoryTokenStore implements TokenStore {
     public static final long DEFAULT_TTL = 60L * 5L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
-    
+
     private Map<String, CacheEntry> tokens = new ConcurrentHashMap<>();
     private long ttl = DEFAULT_TTL;
-    
+
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
             CacheEntry cacheEntry = createCacheEntry(token);
@@ -44,7 +44,7 @@ public class MemoryTokenStore implements TokenStore {
             }
         }
     }
-    
+
     public void add(String identifier, SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(identifier)) {
             CacheEntry cacheEntry = createCacheEntry(token);
@@ -53,7 +53,7 @@ public class MemoryTokenStore implements TokenStore {
             }
         }
     }
-    
+
     /**
      * Set a new (default) TTL value in seconds
      * @param newTtl a new (default) TTL value in seconds
@@ -61,7 +61,7 @@ public class MemoryTokenStore implements TokenStore {
     public void setTTL(long newTtl) {
         ttl = newTtl;
     }
-    
+
     public void remove(String identifier) {
         if (!StringUtils.isEmpty(identifier) && tokens.containsKey(identifier)) {
             tokens.remove(identifier);
@@ -72,17 +72,17 @@ public class MemoryTokenStore implements TokenStore {
         processTokenExpiry();
         return tokens.keySet();
     }
-    
+
     public SecurityToken getToken(String id) {
         processTokenExpiry();
-        
+
         CacheEntry cacheEntry = tokens.get(id);
         if (cacheEntry != null) {
             return cacheEntry.getSecurityToken();
         }
         return null;
     }
-    
+
     protected void processTokenExpiry() {
         Date current = new Date();
         synchronized (tokens) {
@@ -93,24 +93,24 @@ public class MemoryTokenStore implements TokenStore {
             }
         }
     }
-    
+
     private CacheEntry createCacheEntry(SecurityToken token) {
         Date expires = new Date();
         long currentTime = expires.getTime();
         expires.setTime(currentTime + (ttl * 1000L));
         return new CacheEntry(token, expires);
     }
-    
+
     private static class CacheEntry {
-        
+
         private final SecurityToken securityToken;
         private final Date expires;
-        
+
         CacheEntry(SecurityToken securityToken, Date expires) {
             this.securityToken = securityToken;
             this.expires = expires;
         }
-        
+
         /**
          * Get the SecurityToken
          * @return the SecurityToken
@@ -118,7 +118,7 @@ public class MemoryTokenStore implements TokenStore {
         public SecurityToken getSecurityToken() {
             return securityToken;
         }
-        
+
         /**
          * Get when this CacheEntry is to be removed from the cache
          * @return when this CacheEntry is to be removed from the cache
@@ -126,7 +126,7 @@ public class MemoryTokenStore implements TokenStore {
         public Date getExpiry() {
             return expires;
         }
-        
+
     }
- 
+
 }

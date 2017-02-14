@@ -29,5 +29,5 @@ public interface BookAsyncInterface {
     @Path("/books/async/nocontentInterface")
     @Produces("text/plain")
     void getBookNoContentInterface(@Suspended AsyncResponse async);
-    
+
 }

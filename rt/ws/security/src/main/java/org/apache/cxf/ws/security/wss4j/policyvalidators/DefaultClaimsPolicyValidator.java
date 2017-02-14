@@ -28,16 +28,16 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 /**
- * Validate a WS-SecurityPolicy Claims policy for the 
+ * Validate a WS-SecurityPolicy Claims policy for the
  * "http://schemas.xmlsoap.org/ws/2005/05/identity" namespace.
  */
 public class DefaultClaimsPolicyValidator implements ClaimsPolicyValidator {
-    
-    private static final String DEFAULT_CLAIMS_NAMESPACE = 
+
+    private static final String DEFAULT_CLAIMS_NAMESPACE =
         "http://schemas.xmlsoap.org/ws/2005/05/identity";
-    
+
     /**
-     * Validate a particular Claims policy against a received SAML Assertion. 
+     * Validate a particular Claims policy against a received SAML Assertion.
      * Return true if the policy is valid.
      */
     public boolean validatePolicy(
@@ -47,37 +47,37 @@ public class DefaultClaimsPolicyValidator implements ClaimsPolicyValidator {
         if (claimsPolicy == null) {
             return false;
         }
-        
+
         String dialect = claimsPolicy.getAttributeNS(null, "Dialect");
         if (!DEFAULT_CLAIMS_NAMESPACE.equals(dialect)) {
             return false;
         }
-        
+
         Element claimType = DOMUtils.getFirstElement(claimsPolicy);
         while (claimType != null) {
             if ("ClaimType".equals(claimType.getLocalName())) {
                 String claimTypeUri = claimType.getAttributeNS(null, "Uri");
                 String claimTypeOptional = claimType.getAttributeNS(null, "Optional");
-                
+
                 if (("".equals(claimTypeOptional) || !Boolean.parseBoolean(claimTypeOptional))
                     && !findClaimInAssertion(assertion, URI.create(claimTypeUri))) {
                     return false;
                 }
             }
-            
+
             claimType = DOMUtils.getNextElement(claimType);
         }
-        
+
         return true;
     }
-    
+
     /**
      * Return the dialect that this ClaimsPolicyValidator can parse
      */
     public String getDialect() {
         return DEFAULT_CLAIMS_NAMESPACE;
     }
-    
+
     private boolean findClaimInAssertion(SamlAssertionWrapper assertion, URI claimURI) {
         if (assertion.getSaml1() != null) {
             return findClaimInAssertion(assertion.getSaml1(), claimURI);
@@ -86,19 +86,19 @@ public class DefaultClaimsPolicyValidator implements ClaimsPolicyValidator {
         }
         return false;
     }
-    
+
     private boolean findClaimInAssertion(org.opensaml.saml.saml2.core.Assertion assertion, URI claimURI) {
-        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements = 
+        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements =
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             return false;
         }
-        
+
         for (org.opensaml.saml.saml2.core.AttributeStatement statement : attributeStatements) {
-            
+
             List<org.opensaml.saml.saml2.core.Attribute> attributes = statement.getAttributes();
             for (org.opensaml.saml.saml2.core.Attribute attribute : attributes) {
-                
+
                 if (attribute.getName().equals(claimURI.toString())
                     && attribute.getAttributeValues() != null && !attribute.getAttributeValues().isEmpty()) {
                     return true;
@@ -107,19 +107,19 @@ public class DefaultClaimsPolicyValidator implements ClaimsPolicyValidator {
         }
         return false;
     }
-    
+
     private boolean findClaimInAssertion(org.opensaml.saml.saml1.core.Assertion assertion, URI claimURI) {
-        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements = 
+        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements =
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             return false;
         }
-        
+
         for (org.opensaml.saml.saml1.core.AttributeStatement statement : attributeStatements) {
-            
+
             List<org.opensaml.saml.saml1.core.Attribute> attributes = statement.getAttributes();
             for (org.opensaml.saml.saml1.core.Attribute attribute : attributes) {
-                
+
                 URI attributeNamespace = URI.create(attribute.getAttributeNamespace());
                 String desiredRole = attributeNamespace.relativize(claimURI).toString();
                 if (attribute.getAttributeName().equals(desiredRole)

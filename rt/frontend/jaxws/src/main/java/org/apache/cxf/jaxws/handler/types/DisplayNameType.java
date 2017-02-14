@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  * Java class for display-nameType complex type.
  * <p>
  * The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="display-nameType">
  *   &lt;simpleContent>
@@ -51,7 +51,7 @@ public class DisplayNameType extends CString {
 
     /**
      * Gets the value of the lang property.
-     * 
+     *
      * @return possible object is {@link java.lang.String }
      */
     public java.lang.String getLang() {
@@ -60,7 +60,7 @@ public class DisplayNameType extends CString {
 
     /**
      * Sets the value of the lang property.
-     * 
+     *
      * @param value allowed object is {@link java.lang.String }
      */
     public void setLang(java.lang.String value) {

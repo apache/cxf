@@ -30,32 +30,32 @@ public class JPATypedQueryVisitor<T> extends AbstractJPATypedQueryVisitor<T, T, 
     public JPATypedQueryVisitor(EntityManager em, Class<T> tClass) {
         this(em, tClass, null, null);
     }
-    
+
     public JPATypedQueryVisitor(EntityManager em, Class<T> tClass, Map<String, String> fieldMap) {
         super(em, tClass, fieldMap);
     }
-    
-    public JPATypedQueryVisitor(EntityManager em, 
-                                Class<T> tClass, 
+
+    public JPATypedQueryVisitor(EntityManager em,
+                                Class<T> tClass,
                                 List<String> joinProps) {
         super(em, tClass, null, joinProps);
     }
-    
-    public JPATypedQueryVisitor(EntityManager em, 
-                                Class<T> tClass, 
+
+    public JPATypedQueryVisitor(EntityManager em,
+                                Class<T> tClass,
                                 String joinProp) {
         super(em, tClass, null, Collections.singletonList(joinProp));
     }
-    
-    public JPATypedQueryVisitor(EntityManager em, 
-                                Class<T> tClass, 
+
+    public JPATypedQueryVisitor(EntityManager em,
+                                Class<T> tClass,
                                 Map<String, String> fieldMap,
                                 List<String> joinProps) {
         super(em, tClass, fieldMap, joinProps);
     }
-    
+
     public TypedQuery<T> getQuery() {
         return getTypedQuery();
     }
-        
+
 }

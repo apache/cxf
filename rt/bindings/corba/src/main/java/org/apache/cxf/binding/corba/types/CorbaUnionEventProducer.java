@@ -43,14 +43,14 @@ public class CorbaUnionEventProducer extends AbstractStartEndEventProducer {
         CorbaUnionHandler handler = (CorbaUnionHandler) h;
         serviceInfo = sInfo;
         orb = o;
-        name = handler.getName();        
+        name = handler.getName();
         isNil = checkIsNil(handler);
         if (!isNil) {
             CorbaObjectHandler contents = handler.getValue();
-            if (contents != null) {      
+            if (contents != null) {
                 Union unionType = (Union)handler.getType();
                 if (unionType.isSetNillable() && unionType.isNillable()) {
-                    CorbaTypeEventProducer contentEventProducer = 
+                    CorbaTypeEventProducer contentEventProducer =
                         CorbaHandlerUtils.getTypeEventProducer(contents, serviceInfo, orb);
                     currentEventProducer = new SkipStartEndEventProducer(contentEventProducer, name);
                 } else {
@@ -77,7 +77,7 @@ public class CorbaUnionEventProducer extends AbstractStartEndEventProducer {
         }
         return isItNil;
     }
-    
+
     public List<Attribute> getAttributes() {
         List<Attribute> attributes = IS_NIL_ATTRIBUTE_LIST;
         if (!isNil) {

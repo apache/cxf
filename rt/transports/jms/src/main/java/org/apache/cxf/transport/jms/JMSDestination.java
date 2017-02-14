@@ -59,7 +59,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
 
     private JMSConfiguration jmsConfig;
     private Bus bus;
-    
+
     @SuppressWarnings("unused")
     private EndpointInfo ei;
     private JMSListenerContainer jmsListener;
@@ -105,9 +105,9 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         try {
             this.jmsListener = createTargetDestinationListener();
         } catch (Exception e) {
-            // If first connect fails we will try to establish the connection in the background 
+            // If first connect fails we will try to establish the connection in the background
             new Thread(new Runnable() {
-                
+
                 @Override
                 public void run() {
                     restartConnection();
@@ -115,8 +115,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             }).start();
         }
     }
-    
-    
+
+
     private JMSListenerContainer createTargetDestinationListener() {
         Session session = null;
         try {
@@ -132,7 +132,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = jmsConfig.getTargetDestination(session);
 
-            PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection, 
+            PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection,
                                                                                             destination, this);
             container.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
             container.setTransactionManager(jmsConfig.getTransactionManager());
@@ -195,14 +195,14 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         getLogger().log(Level.FINE, "JMSDestination shutdown()");
         this.deactivate();
     }
-    
-    
+
+
 
     /**
      * Convert JMS message received by ListenerThread to CXF message and inform incomingObserver that a
      * message was received. The observer will call the service and then send the response CXF message by
      * using the BackChannelConduit
-     * 
+     *
      * @param message
      * @throws IOException
      */

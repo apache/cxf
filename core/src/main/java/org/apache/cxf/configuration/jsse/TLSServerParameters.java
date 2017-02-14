@@ -26,14 +26,14 @@ import org.apache.cxf.configuration.security.ClientAuthentication;
 /**
  * This class extends {@link TLSParameterBase} with service-specific
  * SSL/TLS parameters.
- * 
+ *
  */
 public class TLSServerParameters extends TLSParameterBase {
 
     ClientAuthentication clientAuthentication;
     List<String> excludeProtocols = new ArrayList<>();
     List<String> includeProtocols = new ArrayList<>();
-    
+
     /**
      * This parameter configures the server side to request and/or
      * require client authentication.
@@ -48,14 +48,14 @@ public class TLSServerParameters extends TLSParameterBase {
     public ClientAuthentication getClientAuthentication() {
         return clientAuthentication;
     }
-    
+
     /**
      * This parameter sets the protocol list to exclude.
      */
     public final void setExcludeProtocols(List<String> protocols) {
         excludeProtocols = protocols;
     }
-    
+
     /**
      * Returns the protocols to exclude that are associated with this endpoint.
      */
@@ -65,14 +65,14 @@ public class TLSServerParameters extends TLSParameterBase {
         }
         return excludeProtocols;
     }
-    
+
     /**
      * This parameter sets the protocol list to include.
      */
     public final void setIncludeProtocols(List<String> protocols) {
         includeProtocols = protocols;
     }
-    
+
     /**
      * Returns the protocols to include that are associated with this endpoint.
      */

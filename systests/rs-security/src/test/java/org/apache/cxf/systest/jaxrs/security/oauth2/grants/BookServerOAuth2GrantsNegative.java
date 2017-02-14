@@ -26,23 +26,23 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
-    
+
 public class BookServerOAuth2GrantsNegative extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-oauth2-grants-negative");
     private static final URL SERVER_CONFIG_FILE =
         BookServerOAuth2GrantsNegative.class.getResource("grants-negative-server.xml");
-    
+
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();
         Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
         BusFactory.setDefaultBus(springBus);
         setBus(springBus);
-        
+
         try {
             new BookServerOAuth2GrantsNegative();
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }        
+        }
     }
 
 }

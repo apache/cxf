@@ -46,26 +46,26 @@ import org.apache.cxf.ws.transfer.validationtransformation.XSLTResourceTransform
  * Parent test for all tests in WS-Transfer System Tests.
  */
 public final class TestUtils {
-    
+
     private static Server resourceFactoryServer;
-    
+
     private static Server studentsResourceServer;
-    
+
     private static Server teachersResourceFactoryServer;
-    
+
     private static Server teachersResourceServer;
-    
+
     private TestUtils() {
-        
+
     }
-    
+
     protected static ResourceFactory createResourceFactoryClient(String port) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory.class);
         factory.setAddress("http://localhost:" + port + "/ResourceFactory");
         return (ResourceFactory) factory.create();
     }
-    
+
     protected static Resource createResourceClient(EndpointReferenceType ref) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Resource.class);
@@ -79,14 +79,14 @@ public final class TestUtils {
 
         return proxy;
     }
-    
+
     protected static void createStudentsServers(String port, String port2) {
         UIDManager.reset();
         ResourceManager studentsResourceManager = new MemoryResourceManager();
         resourceFactoryServer = createResourceFactory(studentsResourceManager, port, port2);
         studentsResourceServer = createStudentsResource(studentsResourceManager, port);
     }
-    
+
     protected static void createTeachersServers(String port) {
         ResourceManager teachersResourceManager = new MemoryResourceManager();
         ResourceRemote resource = new ResourceRemote();
@@ -99,22 +99,22 @@ public final class TestUtils {
         teachersResourceFactoryServer = createTeachersResourceFactoryEndpoint(resource, port);
         teachersResourceServer = createTeacherResourceEndpoint(resource, port);
     }
-    
+
     protected static void destroyStudentsServers() {
         resourceFactoryServer.destroy();
         studentsResourceServer.destroy();
     }
-    
+
     protected static void destroyTeachersServers() {
         teachersResourceFactoryServer.destroy();
         teachersResourceServer.destroy();
     }
-    
+
     private static Server createResourceFactory(ResourceManager resourceManager, String port, String port2) {
         ResourceFactoryImpl resourceFactory = new ResourceFactoryImpl();
         resourceFactory.setResourceResolver(
-                new MyResourceResolver("http://localhost:" + port + "/ResourceStudents", 
-                                       resourceManager, 
+                new MyResourceResolver("http://localhost:" + port + "/ResourceStudents",
+                                       resourceManager,
                                        "http://localhost:" + port2 + "/ResourceTeachers"));
         resourceFactory.getResourceTypeIdentifiers().add(
                 new XSDResourceTypeIdentifier(
@@ -131,10 +131,10 @@ public final class TestUtils {
         factory.setServiceClass(org.apache.cxf.ws.transfer.resourcefactory.ResourceFactory.class);
         factory.setServiceBean(resourceFactory);
         factory.setAddress("http://localhost:" + port + "/ResourceFactory");
-        
+
         return factory.create();
     }
-    
+
     private static Server createStudentsResource(ResourceManager resourceManager, String port) {
         ResourceLocal resourceLocal = new ResourceLocal();
         resourceLocal.setManager(resourceManager);
@@ -150,7 +150,7 @@ public final class TestUtils {
         factory.setAddress("http://localhost:" + port + "/ResourceStudents");
         return factory.create();
     }
-    
+
     private static Server createTeachersResourceFactoryEndpoint(ResourceRemote resource, String port) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setServiceClass(ResourceFactory.class);
@@ -158,7 +158,7 @@ public final class TestUtils {
         factory.setAddress("http://localhost:" + port + "/ResourceTeachers" + TransferConstants.RESOURCE_REMOTE_SUFFIX);
         return factory.create();
     }
-    
+
     private static Server createTeacherResourceEndpoint(ResourceRemote resource, String port) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setServiceClass(Resource.class);
@@ -166,5 +166,5 @@ public final class TestUtils {
         factory.setAddress("http://localhost:" + port + "/ResourceTeachers");
         return factory.create();
     }
-    
+
 }

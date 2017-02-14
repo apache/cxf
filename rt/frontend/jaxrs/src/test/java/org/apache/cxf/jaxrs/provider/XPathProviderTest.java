@@ -43,7 +43,7 @@ public class XPathProviderTest extends Assert {
         assertTrue(provider.isReadable(Book.class, null, null, null));
         assertTrue(provider.isReadable(BookStore.class, null, null, null));
     }
-    
+
     @Test
     public void testIsReadableClassNames() {
         XPathProvider<?> provider = new XPathProvider<Object>();
@@ -55,7 +55,7 @@ public class XPathProviderTest extends Assert {
         assertFalse(provider.isReadable(BookStore.class, null, null, null));
         assertTrue(provider.isReadable(Book.class, null, null, null));
     }
-    
+
     @Test
     public void testReadFrom() throws Exception {
         String value = "<Book><name>The Book</name><id>2</id></Book>";
@@ -69,5 +69,5 @@ public class XPathProviderTest extends Assert {
         assertEquals(2L, book.getId());
         assertEquals("The Book", book.getName());
     }
-    
+
 }

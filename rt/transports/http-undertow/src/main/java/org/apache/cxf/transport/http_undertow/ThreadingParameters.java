@@ -25,13 +25,13 @@ public class ThreadingParameters {
      * One IO thread per CPU core is a reasonable default.
      */
     private int workerIOThreads;
-    
+
     /**
      * Specify the number of "core" threads for the worker task thread pool.
      * Generally this should be reasonably high, at least 10 per CPU core.
      */
     private int minThreads;
-    
+
     /**
      * Specify the maximum number of threads for the worker task thread pool.
      */
@@ -39,12 +39,12 @@ public class ThreadingParameters {
     private boolean workerIOThreadsSet;
     private boolean minThreadsSet;
     private boolean maxThreadsSet;
-    
+
     public void setWorkerIOThreads(int number) {
         workerIOThreadsSet = true;
         workerIOThreads = number;
     }
-    
+
     public void setMinThreads(int number) {
         minThreadsSet = true;
         minThreads = number;
@@ -54,11 +54,11 @@ public class ThreadingParameters {
         maxThreadsSet = true;
         maxThreads = number;
     }
-    
+
     public int getWorkerIOThreads() {
         return workerIOThreads;
     }
-    
+
     public int getMinThreads() {
         return minThreads;
     }
@@ -71,12 +71,12 @@ public class ThreadingParameters {
         return workerIOThreadsSet;
     }
 
-    
+
     public boolean isMinThreadsSet() {
         return minThreadsSet;
     }
 
-    
+
     public boolean isMaxThreadsSet() {
         return maxThreadsSet;
     }

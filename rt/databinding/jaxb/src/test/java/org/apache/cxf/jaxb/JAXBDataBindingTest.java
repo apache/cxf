@@ -104,7 +104,7 @@ public class JAXBDataBindingTest extends Assert {
         bus = control.createMock(Bus.class);
         bindingFactoryManager = control.createMock(BindingFactoryManager.class);
         destinationFactoryManager = control.createMock(DestinationFactoryManager.class);
-        
+
         EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andStubReturn(bindingFactoryManager);
         EasyMock.expect(bus.getExtension(DestinationFactoryManager.class))
             .andStubReturn(destinationFactoryManager);
@@ -118,7 +118,7 @@ public class JAXBDataBindingTest extends Assert {
                 break;
             }
         }
-        
+
         wsdlServiceBuilder.buildServices(def, service);
     }
 
@@ -131,7 +131,7 @@ public class JAXBDataBindingTest extends Assert {
     public void testCreateReader() {
         DataReader<?> reader = jaxbDataBinding.createReader(XMLStreamReader.class);
         assertTrue(reader instanceof DataReaderImpl);
-        
+
         reader = jaxbDataBinding.createReader(XMLEventReader.class);
         assertTrue(reader instanceof DataReaderImpl);
 
@@ -164,17 +164,17 @@ public class JAXBDataBindingTest extends Assert {
     public void testCreateWriter() {
         DataWriter<?> writer = jaxbDataBinding.createWriter(XMLStreamWriter.class);
         assertTrue(writer instanceof DataWriterImpl);
-        
+
         writer = jaxbDataBinding.createWriter(XMLEventWriter.class);
         assertTrue(writer instanceof DataWriterImpl);
-        
+
         writer = jaxbDataBinding.createWriter(Node.class);
         assertTrue(writer instanceof DataWriterImpl);
-        
+
         writer = jaxbDataBinding.createWriter(null);
         assertNull(writer);
     }
-    
+
     @Test
     public void testExtraClass() {
         Class<?>[] extraClass = new Class[] {GreetMe.class, GreetMeOneWay.class};
@@ -183,8 +183,8 @@ public class JAXBDataBindingTest extends Assert {
         assertEquals(jaxbDataBinding.getExtraClass()[0], GreetMe.class);
         assertEquals(jaxbDataBinding.getExtraClass()[1], GreetMeOneWay.class);
     }
-    
-    @Test 
+
+    @Test
     public void testContextProperties() throws Exception {
         JAXBDataBinding db = new JAXBDataBinding();
         Map<String, String> nsMap = new HashMap<String, String>();
@@ -207,7 +207,7 @@ public class JAXBDataBindingTest extends Assert {
         String xml = stringWriter.toString();
         assertTrue(xml, xml.contains("uri:ultima:thule"));
     }
-    
+
     JAXBDataBinding createJaxbContext(boolean internal) throws Exception {
         JAXBDataBinding db = new JAXBDataBinding();
         Map<String, String> nsMap = new HashMap<String, String>();
@@ -220,7 +220,7 @@ public class JAXBDataBindingTest extends Assert {
 
         //have to fastboot to avoid conflicts of generated accessors
         System.setProperty("com.sun.xml.bind.v2.runtime.JAXBContextImpl.fastBoot", "true");
-        System.setProperty("com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl.fastBoot", "true");        
+        System.setProperty("com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl.fastBoot", "true");
         if (internal) {
             System.setProperty(JAXBContext.JAXB_CONTEXT_FACTORY, "com.sun.xml.internal.bind.v2.ContextFactory");
             db.setContext(db.createJAXBContext(classes));
@@ -232,10 +232,10 @@ public class JAXBDataBindingTest extends Assert {
         System.clearProperty("com.sun.xml.internal.bind.v2.runtime.JAXBContextImpl.fastBoot");
         return db;
     }
-    
+
     void doNamespaceMappingTest(boolean internal, boolean asm) throws Exception {
         if (internal) {
-            try { 
+            try {
                 Class.forName("com.sun.xml.internal.bind.v2.ContextFactory");
             } catch (Throwable t) {
                 //on a JVM (likely IBM's) that doesn't rename the ContextFactory package to include "internal"
@@ -247,9 +247,9 @@ public class JAXBDataBindingTest extends Assert {
                 ReflectionUtil.setAccessible(ReflectionUtil.getDeclaredField(ASMHelper.class, "badASM"))
                     .set(null, Boolean.TRUE);
             }
-            
+
             JAXBDataBinding db = createJaxbContext(internal);
-            
+
             DataWriter<XMLStreamWriter> writer = db.createWriter(XMLStreamWriter.class);
             XMLOutputFactory writerFactory = XMLOutputFactory.newInstance();
             StringWriter stringWriter = new StringWriter();
@@ -267,17 +267,17 @@ public class JAXBDataBindingTest extends Assert {
             }
         }
     }
-    
+
     @Test
     public void testDeclaredNamespaceMappingRI() throws Exception {
         doNamespaceMappingTest(false, true);
     }
-    
+
     @Test
     public void testDeclaredNamespaceMappingInternal() throws Exception {
         doNamespaceMappingTest(true, true);
     }
-    
+
     @Test
     public void testDeclaredNamespaceMappingInternalNoAsm() throws Exception {
         try {
@@ -287,7 +287,7 @@ public class JAXBDataBindingTest extends Assert {
             er.getMessage().contains("Failed to map namespace");
         }
     }
-    
+
 
     @Test
     public void testResursiveType() throws Exception {
@@ -298,17 +298,17 @@ public class JAXBDataBindingTest extends Assert {
         init.addClass(Type2.class);
         assertEquals(2, classes.size());
     }
-    
+
     public abstract static class Type2 extends AddressEntity<Type2> {
     }
-    
+
     public abstract static class AddressEntity<T extends AddressEntity<T>> {
         public abstract Addressable<T> getEntity();
     }
-    
+
     public interface Addressable<T extends AddressEntity<T>> {
     }
-    
+
     @Test
     public void testConfiguredXmlAdapter() throws Exception {
         Language dutch = new Language("nl_NL", "Dutch");

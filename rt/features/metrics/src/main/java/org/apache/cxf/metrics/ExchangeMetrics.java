@@ -27,14 +27,14 @@ import org.apache.cxf.metrics.interceptors.CountingInputStream;
 import org.apache.cxf.metrics.interceptors.CountingOutputStream;
 
 /**
- * 
+ *
  */
 public class ExchangeMetrics {
     Deque<MetricsContext> contexts = new LinkedList<MetricsContext>();
     Exchange exchange;
     boolean started;
     long startTime = -1;
-    
+
     public ExchangeMetrics(Exchange e) {
         exchange = e;
     }
@@ -46,7 +46,7 @@ public class ExchangeMetrics {
         }
         return this;
     }
-    
+
     public void start() {
         started = true;
         startTime = System.nanoTime();
@@ -54,7 +54,7 @@ public class ExchangeMetrics {
             ctx.start(exchange);
         }
     }
-    
+
     public void stop() {
         started = false;
         if (startTime == -1) {
@@ -75,5 +75,5 @@ public class ExchangeMetrics {
             ctx.stop(l, inSize, outSize, exchange);
         }
     }
-    
+
 }

@@ -47,8 +47,8 @@ public class BusServer extends AbstractBusTestServerBase {
         }
         return PORTMAP.get("PORT" + x);
     }
-    
-    
+
+
     protected void run()  {
         //
         // Just instantiate the Bus; services will be instantiated

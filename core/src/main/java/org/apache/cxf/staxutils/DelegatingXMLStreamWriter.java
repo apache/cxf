@@ -26,11 +26,11 @@ import javax.xml.stream.XMLStreamWriter;
 
 public class DelegatingXMLStreamWriter implements XMLStreamWriter {
     protected final XMLStreamWriter delegate;
-    
+
     public DelegatingXMLStreamWriter(XMLStreamWriter del) {
         delegate = del;
     }
-    
+
     public void close() throws XMLStreamException {
         delegate.close();
     }
@@ -43,9 +43,9 @@ public class DelegatingXMLStreamWriter implements XMLStreamWriter {
         return delegate.getNamespaceContext();
     }
 
-    
-    
-    
+
+
+
     public String getPrefix(String uri) throws XMLStreamException {
         return delegate.getPrefix(uri);
     }
@@ -66,7 +66,7 @@ public class DelegatingXMLStreamWriter implements XMLStreamWriter {
         delegate.setPrefix(pfx, uri);
     }
 
-    public void writeAttribute(String prefix, String uri, 
+    public void writeAttribute(String prefix, String uri,
                                String local, String value) throws XMLStreamException {
         delegate.writeAttribute(prefix, uri, local, value);
     }

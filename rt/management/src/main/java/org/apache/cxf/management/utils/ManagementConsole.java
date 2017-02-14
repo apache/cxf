@@ -41,19 +41,19 @@ import org.apache.cxf.management.ManagementConstants;
 
 public final class ManagementConsole {
     private static MBeanServerConnection mbsc;
-    private static final String DEFAULT_JMXSERVICE_URL = 
+    private static final String DEFAULT_JMXSERVICE_URL =
         "service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi";
     private static final Logger LOG = LogUtils.getL7dLogger(ManagementConsole.class);
-    
+
     String jmxServerURL;
     String portName;
     String serviceName;
     String operationName;
-    
+
     ManagementConsole() {
-        
-    } 
-    
+
+    }
+
     public void getManagedObjectAttributes(ObjectName name) throws Exception {
 
         if (mbsc == null) {
@@ -76,39 +76,39 @@ public final class ManagementConsole {
             }
         }
     }
-  
-    
+
+
     void connectToMBserver() throws IOException {
-        jmxServerURL = jmxServerURL == null ? DEFAULT_JMXSERVICE_URL : jmxServerURL; 
+        jmxServerURL = jmxServerURL == null ? DEFAULT_JMXSERVICE_URL : jmxServerURL;
         JMXServiceURL url = new JMXServiceURL(jmxServerURL);
         JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
         mbsc = jmxc.getMBeanServerConnection();
     }
-    
-    void listAllManagedEndpoint() {        
+
+    void listAllManagedEndpoint() {
         try {
-            ObjectName queryEndpointName = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
+            ObjectName queryEndpointName = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME
                                                           + ":type=Bus.Service.Endpoint,*");
             Set<ObjectName> endpointNames = CastUtils.cast(mbsc.queryNames(queryEndpointName, null));
             System.out.println("The endpoints are : ");
             for (ObjectName oName : endpointNames) {
                 System.out.println(oName);
                 getManagedObjectAttributes(oName);
-            }        
+            }
         } catch (Exception e) {
             LOG.log(Level.SEVERE, "FAIL_TO_LIST_ENDPOINTS", new Object[]{e});
         }
     }
-    
-    ObjectName getEndpointObjectName() 
+
+    ObjectName getEndpointObjectName()
         throws MalformedObjectNameException, NullPointerException {
         StringBuilder buffer = new StringBuilder();
         buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":type=Bus.Service.Endpoint,");
         buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=\"" + serviceName + "\",");
-        buffer.append(ManagementConstants.PORT_NAME_PROP + "=\"" + portName + "\",*");        
+        buffer.append(ManagementConstants.PORT_NAME_PROP + "=\"" + portName + "\",*");
         return new ObjectName(buffer.toString());
     }
-    
+
     private void invokeEndpoint(String operation) {
         ObjectName endpointName = null;
         ObjectName queryEndpointName;
@@ -117,46 +117,46 @@ public final class ManagementConsole {
             Set<ObjectName> endpointNames = CastUtils.cast(mbsc.queryNames(queryEndpointName, null));
             // now get the ObjectName with the busId
             Iterator<ObjectName> it = endpointNames.iterator();
-        
+
             if (it.hasNext()) {
                 // only deal with the first endpoint object which retrun from the list.
                 endpointName = it.next();
                 mbsc.invoke(endpointName, operation, new Object[0], new String[0]);
-                System.out.println("invoke endpoint " + endpointName 
+                System.out.println("invoke endpoint " + endpointName
                                    + " operation " + operation + " succeed!");
             }
-            
+
         } catch (Exception e) {
             if (null == endpointName) {
                 LOG.log(Level.SEVERE, "FAIL_TO_CREATE_ENDPOINT_OBEJCTNAME", new Object[]{e});
-                
+
             } else {
                 LOG.log(Level.SEVERE, "FAIL_TO_INVOKE_MANAGED_OBJECT_OPERATION",
                     new Object[]{endpointName, operation, e.toString()});
             }
-        } 
+        }
     }
-    
+
     void startEndpoint() {
-        invokeEndpoint("start");        
+        invokeEndpoint("start");
     }
-    
+
     void stopEndpoint() {
         invokeEndpoint("stop");
     }
-    
+
     void restartEndpoint() {
         invokeEndpoint("stop");
         invokeEndpoint("start");
     }
-    
-    
+
+
     boolean parserArguments(String[] args) {
         portName = "";
-        serviceName = "";        
+        serviceName = "";
         operationName = "";
         boolean result = false;
-        
+
         int i;
         String arg;
         try {
@@ -187,13 +187,13 @@ public final class ManagementConsole {
         }
         return result;
     }
-    
+
     private static void printUsage() {
         System.out.println("Management Console for CXF Managed Endpoints");
         System.out.println("You can start and stop the endpoints which export as JMX managed objects");
         System.out.println("Usage: -o list ");
         System.out.println("       -o {start|stop|restart} -p PORTQNAME -s SERVICEQNAME ");
-        System.out.println("Valid options:");        
+        System.out.println("Valid options:");
         System.out.println(" -o [--operation] {list|start|stop|restart}  call the managed endpoint "
                         + "operation");
         System.out.println("                          list: show all the managed endpoints' objectNames and");
@@ -202,20 +202,20 @@ public final class ManagementConsole {
                         + "arguments");
         System.out.println("                          stop: stop the endpoint with the -p and -s arguments");
         System.out.println("                          restart: restart the endpoint with the -p and -s "
-                        + "arguments");       
-        
-        System.out.println(" -p [--port] arg          ARG: the port Qname of the managed endpoint");        
+                        + "arguments");
+
+        System.out.println(" -p [--port] arg          ARG: the port Qname of the managed endpoint");
         System.out.println(" -s [--service] arg       ARG: the service Qname of the managed endpoint");
-        System.out.println(" -j [--jmx] arg           ARG: the JMXServerURL for connecting to the mbean " 
+        System.out.println(" -j [--jmx] arg           ARG: the JMXServerURL for connecting to the mbean "
                            + "server");
         System.out.println("                           if not using this option, the JMXServerURL will be "
                            + "set as");
         System.out.println("                           \"service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi"
                         + "\"");
-        
-        
+
+
     }
-    
+
     public void doManagement() {
         try {
             connectToMBserver();
@@ -234,14 +234,14 @@ public final class ManagementConsole {
             if ("restart".equalsIgnoreCase(operationName)) {
                 restartEndpoint();
                 return;
-            } 
-            printUsage();           
-        } catch (IOException e) {            
-            LOG.log(Level.SEVERE, "FAIL_TO_CONNECT_TO_MBEAN_SERVER", new Object[]{jmxServerURL}); 
-        } 
-        
+            }
+            printUsage();
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE, "FAIL_TO_CONNECT_TO_MBEAN_SERVER", new Object[]{jmxServerURL});
+        }
+
     }
-  
+
     /**
      * @param args
      */
@@ -252,8 +252,8 @@ public final class ManagementConsole {
         } else {
             printUsage();
         }
-        
+
     }
-   
+
 
 }

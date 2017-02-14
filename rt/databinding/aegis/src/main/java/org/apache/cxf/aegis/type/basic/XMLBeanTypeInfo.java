@@ -80,7 +80,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
         if (style == null) {
             style = "element";
         }
-        
+
         boolean element = "element".equals(style);
         boolean qualify;
         if (element) {
@@ -92,7 +92,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
         if (qualify) {
             namespace = getDefaultNamespace();
         }
-        
+
         if (e != null) {
             mappedName = NamespaceHelper.createQName(e, DOMUtils.getAttributeValueEmptyNull(e, "mappedName"),
                                                      namespace);
@@ -103,15 +103,15 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
         }
 
         if (e != null) {
-            
 
-            QName mappedType = NamespaceHelper.createQName(e, 
+
+            QName mappedType = NamespaceHelper.createQName(e,
                                                            DOMUtils.getAttributeValueEmptyNull(e, "typeName"),
                                                            getDefaultNamespace());
             if (mappedType != null) {
                 mapTypeName(mappedName, mappedType);
-            } 
-            
+            }
+
             /*
              * Whenever we create a type object, it has to have a schema type. If we created a custom type
              * object out of thin air here, we've may have a problem. If "typeName" was specified, then then
@@ -120,11 +120,11 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
              * it, we'll get it wrong.
              */
 
-            
+
             String explicitTypeName = DOMUtils.getAttributeValueEmptyNull(e, "type");
             if (explicitTypeName != null) {
                 try {
-                    Class<?> typeClass = 
+                    Class<?> typeClass =
                         ClassLoaderUtils.loadClass(explicitTypeName, XMLBeanTypeInfo.class);
                     AegisType customTypeObject = (AegisType) typeClass.newInstance();
                     mapType(mappedName, customTypeObject);
@@ -140,9 +140,9 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
                     //
                 } catch (IllegalAccessException e3) {
                     //
-                }                
+                }
             }
-            
+
             String nillableVal = DOMUtils.getAttributeValueEmptyNull(e, "nillable");
             if (nillableVal != null && nillableVal.length() > 0) {
                 ensurePropertyInfo(mappedName).setNillable(Boolean.valueOf(nillableVal).booleanValue());
@@ -232,7 +232,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
 
     /**
      * Grab the Property Info for the given property
-     * 
+     *
      * @param name
      * @return the BeanTypePropertyInfo for the property or NULL if none found
      */
@@ -243,7 +243,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
     /**
      * Grab the Property Info for the given property but if not found create one
      * and add it to the map
-     * 
+     *
      * @param name
      * @return the BeanTypePropertyInfo for the property
      */

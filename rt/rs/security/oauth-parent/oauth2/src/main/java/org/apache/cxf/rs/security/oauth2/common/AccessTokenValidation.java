@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 // protecting the service resources.
 
 // If the protected resources are not CXF based then use TokenIntrospectionService which
-// returns RFC 7622 compliant TokenIntrospection response. 
+// returns RFC 7622 compliant TokenIntrospection response.
 
 
 // The problem with reading specific ServerAccessToken instances is that
@@ -38,9 +38,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 // classes like BearerAccessToken, etc, even though classes like BearerAccessToken
 // will not add anything useful to the filter protecting the application.
 
-//TODO: consider simply extending ServerAccessToken, 
-// though this will require relaxing a bit the ServerAccessToken model 
-// (introduce default constructors, etc) 
+//TODO: consider simply extending ServerAccessToken,
+// though this will require relaxing a bit the ServerAccessToken model
+// (introduce default constructors, etc)
 @XmlRootElement
 public class AccessTokenValidation {
     private boolean initialValidationSuccessful = true;
@@ -59,11 +59,11 @@ public class AccessTokenValidation {
     private List<String> audiences = new LinkedList<String>();
     private String clientCodeVerifier;
     private Map<String, String> extraProps = new HashMap<String, String>();
-    
+
     public AccessTokenValidation() {
-        
+
     }
-    
+
     public AccessTokenValidation(ServerAccessToken token) {
         this.clientId = token.getClient().getClientId();
         this.clientSubject = token.getClient().getSubject();
@@ -81,7 +81,7 @@ public class AccessTokenValidation {
         this.clientCodeVerifier = token.getClientCodeVerifier();
         this.extraProps.putAll(token.getExtraProperties());
     }
-    
+
     public String getClientId() {
         return clientId;
     }
@@ -193,5 +193,5 @@ public class AccessTokenValidation {
     public void setTokenIssuer(String tokenIssuer) {
         this.tokenIssuer = tokenIssuer;
     }
-    
+
 }

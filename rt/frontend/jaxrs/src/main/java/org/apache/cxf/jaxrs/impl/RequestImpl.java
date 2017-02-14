@@ -57,16 +57,16 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
  */
 
 public class RequestImpl implements Request {
-    
+
     private final Message m;
     private final HttpHeaders headers;
-    
+
     public RequestImpl(Message m) {
         this.m = m;
         this.headers = new HttpHeadersImpl(m);
     }
 
-    
+
 
     public Variant selectVariant(List<Variant> vars) throws IllegalArgumentException {
         if (vars == null || vars.isEmpty()) {
@@ -76,33 +76,33 @@ public class RequestImpl implements Request {
         List<Locale> acceptLangs = headers.getAcceptableLanguages();
         List<String> acceptEncs = parseAcceptEnc(
             headers.getRequestHeaders().getFirst(HttpHeaders.ACCEPT_ENCODING));
-        
+
         List<Object> varyValues = new LinkedList<Object>();
-        
+
         List<Variant> matchingVars = new LinkedList<Variant>();
         for (Variant var : vars) {
             MediaType mt = var.getMediaType();
             Locale lang = var.getLanguage();
             String enc = var.getEncoding();
-                        
+
             boolean mtMatched = mt == null || acceptMediaTypes.isEmpty()
                 || JAXRSUtils.intersectMimeTypes(acceptMediaTypes, mt).size() != 0;
             if (mtMatched) {
                 handleVaryValues(varyValues, HttpHeaders.ACCEPT);
             }
-            
+
             boolean langMatched = lang == null || acceptLangs.isEmpty()
                 || isLanguageMatched(acceptLangs, lang);
             if (langMatched) {
                 handleVaryValues(varyValues, HttpHeaders.ACCEPT_LANGUAGE);
             }
-            
-            boolean encMatched = acceptEncs.isEmpty() || enc == null 
+
+            boolean encMatched = acceptEncs.isEmpty() || enc == null
                 || isEncMatached(acceptEncs, enc);
             if (encMatched) {
                 handleVaryValues(varyValues, HttpHeaders.ACCEPT_ENCODING);
             }
-            
+
             if (mtMatched && encMatched && langMatched) {
                 matchingVars.add(var);
             }
@@ -111,7 +111,7 @@ public class RequestImpl implements Request {
             addVaryHeader(varyValues);
             Collections.sort(matchingVars, new VariantComparator());
             return matchingVars.get(0);
-        } 
+        }
         return null;
     }
 
@@ -122,7 +122,7 @@ public class RequestImpl implements Request {
             }
         }
     }
-    
+
     private static void addVaryHeader(List<Object> varyValues) {
         // at this point we still have no out-bound message so lets
         // use HttpServletResponse. If needed we can save the header on the exchange
@@ -143,12 +143,12 @@ public class RequestImpl implements Request {
             }
         }
     }
-    
+
     private static boolean isLanguageMatched(List<Locale> locales, Locale l) {
-        
+
         for (Locale locale : locales) {
             String language = locale.getLanguage();
-            if ("*".equals(language) 
+            if ("*".equals(language)
                 || language.equalsIgnoreCase(l.getLanguage())) {
                 return true;
             }
@@ -181,21 +181,21 @@ public class RequestImpl implements Request {
         }
         return list;
     }
-    
+
     public ResponseBuilder evaluatePreconditions(EntityTag eTag) {
         if (eTag == null) {
             throw new IllegalArgumentException("ETag is null");
         }
         return evaluateAll(eTag, null);
     }
-    
+
     private ResponseBuilder evaluateAll(EntityTag eTag, Date lastModified) {
         // http://tools.ietf.org/search/draft-ietf-httpbis-p4-conditional-25#section-5
         // Check If-Match. If it is not available proceed to checking If-Not-Modified-Since
         // if it is available and the preconditions are not met - return, otherwise:
         // Check If-Not-Match. If it is not available proceed to checking If-Modified-Since
         // otherwise return the evaluation result
-        
+
         ResponseBuilder rb = evaluateIfMatch(eTag, lastModified);
         if (rb == null) {
             rb = evaluateIfNonMatch(eTag, lastModified);
@@ -205,11 +205,11 @@ public class RequestImpl implements Request {
 
     private ResponseBuilder evaluateIfMatch(EntityTag eTag, Date date) {
         List<String> ifMatch = headers.getRequestHeader(HttpHeaders.IF_MATCH);
-        
+
         if (ifMatch == null || ifMatch.size() == 0) {
             return date == null ? null : evaluateIfNotModifiedSince(date);
         }
-        
+
         try {
             for (String value : ifMatch) {
                 if ("*".equals(value)) {
@@ -229,11 +229,11 @@ public class RequestImpl implements Request {
 
     private ResponseBuilder evaluateIfNonMatch(EntityTag eTag, Date lastModified) {
         List<String> ifNonMatch = headers.getRequestHeader(HttpHeaders.IF_NONE_MATCH);
-        
+
         if (ifNonMatch == null || ifNonMatch.size() == 0) {
             return lastModified == null ? null : evaluateIfModifiedSince(lastModified);
         }
-        
+
         String method = getMethod();
         boolean getOrHead = HttpMethod.GET.equals(method) || HttpMethod.HEAD.equals(method);
         try {
@@ -241,7 +241,7 @@ public class RequestImpl implements Request {
                 boolean result = "*".equals(value);
                 if (!result) {
                     EntityTag requestTag = EntityTag.valueOf(value);
-                    result = getOrHead ? requestTag.equals(eTag) 
+                    result = getOrHead ? requestTag.equals(eTag)
                         : !requestTag.isWeak() && !eTag.isWeak() && requestTag.equals(eTag);
                 }
                 if (result) {
@@ -255,7 +255,7 @@ public class RequestImpl implements Request {
         }
         return null;
     }
-    
+
     public ResponseBuilder evaluatePreconditions(Date lastModified) {
         if (lastModified == null) {
             throw new IllegalArgumentException("Date is null");
@@ -266,14 +266,14 @@ public class RequestImpl implements Request {
         }
         return rb;
     }
-    
+
     private ResponseBuilder evaluateIfModifiedSince(Date lastModified) {
         List<String> ifModifiedSince = headers.getRequestHeader(HttpHeaders.IF_MODIFIED_SINCE);
-        
+
         if (ifModifiedSince == null || ifModifiedSince.size() == 0) {
             return null;
         }
-        
+
         SimpleDateFormat dateFormat = HttpUtils.getHttpDateFormat();
 
         dateFormat.setLenient(false);
@@ -284,22 +284,22 @@ public class RequestImpl implements Request {
             // invalid header value, request should continue
             return Response.status(Response.Status.PRECONDITION_FAILED);
         }
-        
+
         if (dateSince.before(lastModified)) {
             // request should continue
             return null;
         }
-        
+
         return Response.status(Response.Status.NOT_MODIFIED);
     }
-    
+
     private ResponseBuilder evaluateIfNotModifiedSince(Date lastModified) {
         List<String> ifNotModifiedSince = headers.getRequestHeader(HttpHeaders.IF_UNMODIFIED_SINCE);
-        
+
         if (ifNotModifiedSince == null || ifNotModifiedSince.size() == 0) {
             return null;
         }
-        
+
         SimpleDateFormat dateFormat = HttpUtils.getHttpDateFormat();
 
         dateFormat.setLenient(false);
@@ -310,11 +310,11 @@ public class RequestImpl implements Request {
             // invalid header value, request should continue
             return Response.status(Response.Status.PRECONDITION_FAILED);
         }
-        
+
         if (dateSince.before(lastModified)) {
             return Response.status(Response.Status.PRECONDITION_FAILED);
         }
-        
+
         return null;
     }
 
@@ -326,7 +326,7 @@ public class RequestImpl implements Request {
         }
         return evaluateAll(eTag, lastModified);
     }
-    
+
     public String getMethod() {
         return m.get(Message.HTTP_REQUEST_METHOD).toString();
     }
@@ -349,29 +349,29 @@ public class RequestImpl implements Request {
 
         public int compare(Variant v1, Variant v2) {
             int result = compareMediaTypes(v1.getMediaType(), v2.getMediaType());
-            
+
             if (result != 0) {
                 return result;
             }
-            
+
             result = compareLanguages(v1.getLanguage(), v2.getLanguage());
-            
+
             if (result == 0) {
                 result = compareEncodings(v1.getEncoding(), v2.getEncoding());
             }
-            
+
             return result;
         }
-        
+
         private static int compareMediaTypes(MediaType mt1, MediaType mt2) {
             if (mt1 != null && mt2 == null) {
                 return -1;
             } else if (mt1 == null && mt2 != null) {
                 return 1;
-            } 
+            }
             return JAXRSUtils.compareMediaTypes(mt1, mt2);
         }
-        
+
         private static int compareLanguages(Locale l1, Locale l2) {
             if (l1 != null && l2 == null) {
                 return -1;
@@ -380,7 +380,7 @@ public class RequestImpl implements Request {
             }
             return 0;
         }
-        
+
         private static int compareEncodings(String enc1, String enc2) {
             if (enc1 != null && enc2 == null) {
                 return -1;

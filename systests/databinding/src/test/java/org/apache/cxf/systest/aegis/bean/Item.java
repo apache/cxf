@@ -22,7 +22,7 @@ package org.apache.cxf.systest.aegis.bean;
 import java.io.Serializable;
 
 /**
- * 
+ *
  */
 public class Item implements Serializable, AnInterface {
     private static final long serialVersionUID = -247285407387540770L;

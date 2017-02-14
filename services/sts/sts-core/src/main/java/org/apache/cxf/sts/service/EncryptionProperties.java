@@ -35,7 +35,7 @@ public class EncryptionProperties {
     private List<String> acceptedEncryptionAlgorithms = new ArrayList<>();
     private List<String> acceptedKeyWrapAlgorithms = new ArrayList<>();
     private String encryptionName;
-    
+
     public EncryptionProperties() {
         // Default symmetric encryption algorithms
         acceptedEncryptionAlgorithms.add(WSConstants.TRIPLE_DES);
@@ -45,68 +45,68 @@ public class EncryptionProperties {
         acceptedEncryptionAlgorithms.add(WSConstants.AES_128_GCM);
         acceptedEncryptionAlgorithms.add(WSConstants.AES_192_GCM);
         acceptedEncryptionAlgorithms.add(WSConstants.AES_256_GCM);
-        
+
         // Default key wrap algorithms
         acceptedKeyWrapAlgorithms.add(WSConstants.KEYTRANSPORT_RSA15);
         acceptedKeyWrapAlgorithms.add(WSConstants.KEYTRANSPORT_RSAOAEP);
     }
-    
+
     /**
      * Get the encryption algorithm to use
      */
     public String getEncryptionAlgorithm() {
         return encryptionAlgorithm;
     }
-    
+
     /**
      * Set the encryption algorithm to use
      */
     public void setEncryptionAlgorithm(String encryptionAlgorithm) {
         this.encryptionAlgorithm = encryptionAlgorithm;
     }
-    
+
     /**
      * Get the encryption key-wrap algorithm to use
      */
     public String getKeyWrapAlgorithm() {
         return keyWrapAlgorithm;
     }
-    
+
     /**
      * Set the encryption key-wrap algorithm to use
      */
     public void setKeyWrapAlgorithm(String keyWrapAlgorithm) {
         this.keyWrapAlgorithm = keyWrapAlgorithm;
     }
-    
+
     /**
      * Get the (WSS4J) key identifier type used to reference a certificate for encryption
      */
     public int getKeyIdentifierType() {
         return keyIdentifierType;
     }
-    
+
     /**
      * Set the (WSS4J) key identifier type used to reference a certificate for encryption
      */
     public void setKeyIdentifierType(int keyIdentifierType) {
         this.keyIdentifierType = keyIdentifierType;
     }
-    
+
     /**
      * Get the alias used to select a certificate for encryption
      */
     public String getEncryptionName() {
         return encryptionName;
     }
-    
+
     /**
      * Set the alias used to select a certificate for encryption
      */
     public void setEncryptionName(String encryptionName) {
         this.encryptionName = encryptionName;
     }
-    
+
     /**
      * Set the list of accepted encryption algorithms. A request can contain a wst:EncryptionAlgorithm
      * uri to use to encrypt an issued token. The algorithm specified must be contained in this list.
@@ -115,7 +115,7 @@ public class EncryptionProperties {
     public void setAcceptedEncryptionAlgorithms(List<String> acceptedEncryptionAlgorithms) {
         this.acceptedEncryptionAlgorithms = acceptedEncryptionAlgorithms;
     }
-    
+
     /**
      * Get the list of accepted encryption algorithms. A request can contain a wst:EncryptionAlgorithm
      * uri to use to encrypt an issued token. The algorithm specified must be contained in this list.
@@ -133,7 +133,7 @@ public class EncryptionProperties {
     public void setAcceptedKeyWrapAlgorithms(List<String> acceptedKeyWrapAlgorithms) {
         this.acceptedKeyWrapAlgorithms = acceptedKeyWrapAlgorithms;
     }
-    
+
     /**
      * Get the list of accepted key-wrap algorithms. A request can contain a wst:KeyWrapAlgorithm
      * uri for use in encrypting an issued token. The algorithm specified must be contained in this list.
@@ -142,5 +142,5 @@ public class EncryptionProperties {
     public List<String> getAcceptedKeyWrapAlgorithms() {
         return acceptedKeyWrapAlgorithms;
     }
-    
+
 }

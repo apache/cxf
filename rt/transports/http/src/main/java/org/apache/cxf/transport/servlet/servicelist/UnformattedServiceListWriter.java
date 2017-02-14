@@ -53,7 +53,7 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
             writer.write("No services have been found.");
         }
     }
-    
+
     private void writeUnformattedSOAPEndpoints(PrintWriter writer,
                                                String baseAddress,
                                                AbstractDestination[] destinations) throws IOException {
@@ -74,9 +74,9 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
                                                   AbstractDestination[] destinations) throws IOException {
         for (AbstractDestination sd : destinations) {
             String address = getAbsoluteAddress(baseAddress, sd);
-            boolean wadlAvailable = bus != null 
+            boolean wadlAvailable = bus != null
                 && PropertyUtils.isTrue(bus.getProperty("wadl.service.descrition.available"));
-            boolean swaggerAvailable = bus != null 
+            boolean swaggerAvailable = bus != null
                 && PropertyUtils.isTrue(bus.getProperty("swagger.service.descrition.available"));
             if (!wadlAvailable && !swaggerAvailable) {
                 writer.write(address + "\n");
@@ -88,7 +88,7 @@ public class UnformattedServiceListWriter implements ServiceListWriter {
             if (swaggerAvailable) {
                 writer.write(address + "/swagger.json\n");
             }
-            
+
         }
     }
 

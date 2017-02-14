@@ -38,7 +38,7 @@ public final class XmlSeeAlsoAnnotator implements Annotator {
     public XmlSeeAlsoAnnotator(ClassCollector c) {
         this.collector = c;
     }
-    
+
     public void annotate(JavaAnnotatable  ja) {
         if (collector == null || collector.getTypesPackages().isEmpty()) {
             return;
@@ -53,7 +53,7 @@ public final class XmlSeeAlsoAnnotator implements Annotator {
 
         JAnnotation jaxbAnnotation = new JAnnotation(XmlSeeAlso.class);
         intf.addImports(jaxbAnnotation.getImports());
-        
+
         List<JavaType> types = new ArrayList<>();
         for (String pkg : collector.getTypesPackages()) {
             if (pkg.equals(intf.getPackageName())) {

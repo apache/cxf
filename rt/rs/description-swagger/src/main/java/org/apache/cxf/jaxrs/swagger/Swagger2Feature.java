@@ -83,7 +83,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private boolean scanAllResources;
 
     private String ignoreRoutes;
-    
+
     private Swagger2Serializers swagger2Serializers;
 
     private boolean supportSwaggerUi = true;
@@ -93,25 +93,25 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private Map<String, String> swaggerUiMediaTypes;
 
     private boolean usePathBasedConfig;
-    
+
     private boolean dynamicBasePath;
-    
+
     private Map<String, SecuritySchemeDefinition> securityDefinitions;
-    
+
     @Override
     protected void calculateDefaultBasePath(Server server) {
         dynamicBasePath = true;
         super.calculateDefaultBasePath(server);
     }
-    
+
     @Override
     protected void addSwaggerResource(Server server, Bus bus) {
         JAXRSServiceFactoryBean sfb =
             (JAXRSServiceFactoryBean) server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
-        
+
         ApplicationInfo appInfo = null;
         if (!isScan()) {
-            ServerProviderFactory factory = 
+            ServerProviderFactory factory =
                 (ServerProviderFactory)server.getEndpoint().get(ServerProviderFactory.class.getName());
             appInfo = factory.getApplicationProvider();
             if (appInfo == null) {
@@ -122,17 +122,17 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 appInfo = new ApplicationInfo(new DefaultApplication(serviceClasses), bus);
                 server.getEndpoint().put(Application.class.getName(), appInfo);
             }
-        } 
-        
+        }
+
         List<Object> swaggerResources = new LinkedList<>();
         ApiListingResource apiListingResource = new ApiListingResource();
         swaggerResources.add(apiListingResource);
-        
+
         List<Object> providers = new ArrayList<>();
         if (runAsFilter) {
             providers.add(new SwaggerContainerRequestFilter(appInfo == null ? null : appInfo.getProvider()));
         }
-        
+
         if (supportSwaggerUi) {
             String swaggerUiRoot = SwaggerUiResolver.findSwaggerUiRoot(swaggerUiVersion);
             if (swaggerUiRoot != null) {
@@ -143,13 +143,13 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                     providers.add(new SwaggerUIServiceFilter(swaggerUiService));
                 }
                 providers.add(new SwaggerUIResourceFilter());
-                
+
                 bus.setProperty("swagger.service.ui.available", "true");
             }
         }
-        
+
         sfb.setResourceClassesFromBeans(swaggerResources);
-        
+
         List<ClassResourceInfo> cris = sfb.getClassResourceInfo();
         if (!runAsFilter) {
             for (ClassResourceInfo cri : cris) {
@@ -158,25 +158,25 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 }
             }
         }
-        
+
         if (swagger2Serializers == null) {
             swagger2Serializers = new DefaultSwagger2Serializers();
         }
         swagger2Serializers.setClassResourceInfos(cris);
         swagger2Serializers.setDynamicBasePath(dynamicBasePath);
-        
+
         providers.add(swagger2Serializers);
 
         providers.add(new ReaderConfigFilter());
-        
+
         if (usePathBasedConfig) {
             providers.add(new ServletConfigProvider());
         }
 
         ((ServerProviderFactory) server.getEndpoint().get(
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
-        BeanConfig beanConfig = appInfo == null 
-            ? new BeanConfig() 
+        BeanConfig beanConfig = appInfo == null
+            ? new BeanConfig()
             : new ApplicationBeanConfig(appInfo.getProvider());
         beanConfig.setResourcePackage(getResourcePackage());
         beanConfig.setUsePathBasedConfig(isUsePathBasedConfig());
@@ -194,19 +194,19 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         beanConfig.setScan(isScan());
         beanConfig.setPrettyPrint(isPrettyPrint());
         beanConfig.setFilterClass(getFilterClass());
-        
+
         Swagger swagger = beanConfig.getSwagger();
         if (swagger != null && securityDefinitions != null) {
             swagger.setSecurityDefinitions(securityDefinitions);
         }
-        
+
         swagger2Serializers.setBeanConfig(beanConfig);
     }
 
     public boolean isUsePathBasedConfig() {
         return usePathBasedConfig;
     }
-    
+
     public void setUsePathBasedConfig(boolean usePathBasedConfig) {
         this.usePathBasedConfig = usePathBasedConfig;
     }
@@ -254,7 +254,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     public void setSwagger2Serializers(final Swagger2Serializers swagger2Serializers) {
         this.swagger2Serializers = swagger2Serializers;
     }
-        
+
     @Override
     protected void setBasePathByAddress(String address) {
         if (!address.startsWith("/")) {
@@ -288,10 +288,10 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         @Override
         public ServletConfig createContext(Message message) {
             final ServletConfig sc = (ServletConfig)message.get("HTTP.CONFIG");
-            
+
             // When deploying into OSGi container, it is possible to use embedded Jetty
-            // transport. In this case, the ServletConfig is not available and Swagger 
-            // does not take into account certain configuration parameters. To overcome 
+            // transport. In this case, the ServletConfig is not available and Swagger
+            // does not take into account certain configuration parameters. To overcome
             // that, the ServletConfig is synthesized from ServletContext instance.
             if (sc == null) {
                 final ServletContext context = (ServletContext)message.get("HTTP.CONTEXT");
@@ -301,11 +301,11 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             } else if (sc != null && sc.getInitParameter(SwaggerContextService.USE_PATH_BASED_CONFIG) == null) {
                 return new DelegatingServletConfig(sc);
             }
-            
+
             return sc;
         }
     }
-    
+
     @PreMatching
     protected static class SwaggerContainerRequestFilter extends ApiListingResource implements ContainerRequestFilter {
 
@@ -372,12 +372,12 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             mc.getServletContext().setAttribute(ReaderConfig.class.getName(), rc);
         }
     }
-    
+
     @Path("api-docs")
     public static class SwaggerUIService {
         private static final String FAVICON = "favicon";
         private static final Map<String, String> DEFAULT_MEDIA_TYPES;
-        
+
         static {
             DEFAULT_MEDIA_TYPES = new HashMap<>();
             DEFAULT_MEDIA_TYPES.put("html", "text/html");
@@ -400,23 +400,23 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             this.swaggerUiRoot = swaggerUiRoot;
             this.mediaTypes = mediaTypes;
         }
-        
+
         @GET
         @Path("{resource:.*}")
         public Response getResource(@Context UriInfo uriInfo, @PathParam("resource") String resourcePath) {
-            if (StringUtils.isEmpty(resourcePath) || "/".equals(resourcePath)) {        
+            if (StringUtils.isEmpty(resourcePath) || "/".equals(resourcePath)) {
                 resourcePath = "index.html";
             }
-            if (resourcePath.contains(FAVICON)) {        
+            if (resourcePath.contains(FAVICON)) {
                 return Response.status(404).build();
             }
             if (resourcePath.startsWith("/")) {
                 resourcePath = resourcePath.substring(1);
             }
-            
+
             try {
                 URL resourceURL = URI.create(swaggerUiRoot + resourcePath).toURL();
-                
+
                 String mediaType = null;
                 int ind = resourcePath.lastIndexOf('.');
                 if (ind != -1 && ind < resourcePath.length()) {
@@ -427,7 +427,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                         mediaType = DEFAULT_MEDIA_TYPES.get(resourceExt);
                     }
                 }
-                
+
                 ResponseBuilder rb = Response.ok(resourceURL.openStream());
                 if (mediaType != null) {
                     rb.type(mediaType);
@@ -437,14 +437,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 throw new NotFoundException(ex);
             }
         }
-        
+
     }
     @PreMatching
     @Priority(Priorities.USER)
     protected static class SwaggerUIResourceFilter implements ContainerRequestFilter {
-        private static final Pattern PATTERN = 
-            Pattern.compile(".*[.]js|/css/.*|/images/.*|/lib/.*|.*ico|/fonts/.*"); 
-        
+        private static final Pattern PATTERN =
+            Pattern.compile(".*[.]js|/css/.*|/images/.*|/lib/.*|.*ico|/fonts/.*");
+
         @Override
         public void filter(ContainerRequestContext rc) throws IOException {
             if (HttpMethod.GET.equals(rc.getRequest().getMethod())) {
@@ -470,12 +470,12 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 String path = ui.getPath();
                 int uiPathIndex = path.lastIndexOf("api-docs");
                 if (uiPathIndex >= 0) {
-                    String resourcePath = uiPathIndex + 8 < path.length() 
+                    String resourcePath = uiPathIndex + 8 < path.length()
                         ? path.substring(uiPathIndex + 8) : "";
-                    rc.abortWith(uiService.getResource(ui, resourcePath));    
+                    rc.abortWith(uiService.getResource(ui, resourcePath));
                 }
             }
-            
+
         }
     }
     protected static class DefaultApplication extends Application {
@@ -488,5 +488,5 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             return serviceClasses;
         }
     }
-    
+
 }

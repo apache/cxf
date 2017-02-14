@@ -55,7 +55,7 @@ public class OidcSecurityContext extends SimpleSecurityContext implements Securi
     }
 
     protected static String getPrincipalName(AbstractUserInfo info) {
-        
+
         String name = info.getPreferredUserName();
         if (name == null) {
             name = info.getGivenName();
@@ -70,7 +70,7 @@ public class OidcSecurityContext extends SimpleSecurityContext implements Securi
             name = info.getSubject();
         }
         return name;
-        
+
     }
 
     @Override
@@ -83,20 +83,20 @@ public class OidcSecurityContext extends SimpleSecurityContext implements Securi
     public String getAuthenticationScheme() {
         return "OIDC";
     }
-    
+
     @Override
     public boolean isUserInRole(String role) {
-        
+
         return roleClaim != null && role != null
-            && (containsClaim(oidcContext.getIdToken(), roleClaim, role) 
+            && (containsClaim(oidcContext.getIdToken(), roleClaim, role)
                 || containsClaim(oidcContext.getUserInfo(), roleClaim, role));
     }
-    
+
     private boolean containsClaim(AbstractUserInfo userInfo, String claim, String claimValue) {
         return userInfo != null && userInfo.containsProperty(claim)
             && claimValue.equals(userInfo.getProperty(claim));
     }
-    
+
     /**
      * Set the claim name that corresponds to the "role" of the Subject of the IdToken.
      */

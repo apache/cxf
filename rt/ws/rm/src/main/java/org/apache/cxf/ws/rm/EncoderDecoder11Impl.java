@@ -53,16 +53,16 @@ import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
  * WS-RM data structures.
  */
 public final class EncoderDecoder11Impl extends EncoderDecoder {
-    
+
     public static final EncoderDecoder11Impl INSTANCE = new EncoderDecoder11Impl();
 
     private static AtomicReference<JAXBContext> jaxbContextReference = new AtomicReference<JAXBContext>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(EncoderDecoder11Impl.class);
-    
+
     private EncoderDecoder11Impl() {
     }
-    
+
     public String getWSRMNamespace() {
         return RM11Constants.NAMESPACE_URI;
     }
@@ -109,12 +109,12 @@ public final class EncoderDecoder11Impl extends EncoderDecoder {
 
     protected void buildHeaders(SequenceType seq, Collection<SequenceAcknowledgement> acks,
         Collection<AckRequestedType> reqs, boolean last, Element header, Marshaller marshaller) throws JAXBException {
-       
+
         if (null != seq) {
             LOG.log(Level.FINE, "encoding sequence into RM header");
             JAXBElement<SequenceType> element = RMUtils.getWSRMFactory().createSequence(seq);
             marshaller.marshal(element, header);
-        } 
+        }
         if (null != acks) {
             LOG.log(Level.FINE, "encoding sequence acknowledgement(s) into RM header");
             for (SequenceAcknowledgement ack : acks) {
@@ -179,7 +179,7 @@ public final class EncoderDecoder11Impl extends EncoderDecoder {
         JAXBElement<SequenceType> jaxbElement = unmarshaller.unmarshal(elem, SequenceType.class);
         return jaxbElement.getValue();
     }
-    
+
     public CloseSequenceType decodeSequenceTypeCloseSequence(Element elem) throws JAXBException {
         return null;
     }
@@ -202,7 +202,7 @@ public final class EncoderDecoder11Impl extends EncoderDecoder {
     public Object convertToSend(CreateSequenceResponseType create) {
         return create;
     }
-    
+
     public Object convertToSend(TerminateSequenceType term) {
         return term;
     }

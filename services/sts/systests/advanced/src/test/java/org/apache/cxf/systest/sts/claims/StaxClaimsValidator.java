@@ -40,7 +40,7 @@ import org.opensaml.core.xml.XMLObject;
  * check to make sure that the correct defined Claims have been met in the token.
  */
 public class StaxClaimsValidator extends SamlTokenValidatorImpl {
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public <T extends SamlSecurityToken & InboundSecurityToken> T validate(
@@ -50,14 +50,14 @@ public class StaxClaimsValidator extends SamlTokenValidatorImpl {
     ) throws WSSecurityException {
         // Check conditions
         checkConditions(samlAssertionWrapper);
-        
+
         // Check OneTimeUse Condition
-        checkOneTimeUse(samlAssertionWrapper, 
+        checkOneTimeUse(samlAssertionWrapper,
                         tokenContext.getWssSecurityProperties().getSamlOneTimeUseReplayCache());
-        
+
         // Validate the assertion against schemas/profiles
         validateAssertion(samlAssertionWrapper);
-        
+
         // Now check Claims
         boolean valid = false;
         if (samlAssertionWrapper.getSaml1() != null) {
@@ -65,7 +65,7 @@ public class StaxClaimsValidator extends SamlTokenValidatorImpl {
         } else if (samlAssertionWrapper.getSaml2() != null) {
             valid = handleSAML2Assertion(samlAssertionWrapper.getSaml2());
         }
-        
+
         if (!valid) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
@@ -86,11 +86,11 @@ public class StaxClaimsValidator extends SamlTokenValidatorImpl {
 
         return (T)securityToken;
     }
-    
+
     private boolean handleSAML1Assertion(
         org.opensaml.saml.saml1.core.Assertion assertion
     ) throws WSSecurityException {
-        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements = 
+        List<org.opensaml.saml.saml1.core.AttributeStatement> attributeStatements =
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
@@ -99,11 +99,11 @@ public class StaxClaimsValidator extends SamlTokenValidatorImpl {
         for (org.opensaml.saml.saml1.core.AttributeStatement statement : attributeStatements) {
             List<org.opensaml.saml.saml1.core.Attribute> attributes = statement.getAttributes();
             for (org.opensaml.saml.saml1.core.Attribute attribute : attributes) {
-                
+
                 if (!ClaimTypes.URI_BASE.toString().equals(attribute.getAttributeNamespace())) {
                     continue;
                 }
-                
+
                 for (XMLObject attributeValue : attribute.getAttributeValues()) {
                     Element attributeValueElement = attributeValue.getDOM();
                     String text = attributeValueElement.getTextContent();
@@ -115,23 +115,23 @@ public class StaxClaimsValidator extends SamlTokenValidatorImpl {
         }
         return true;
     }
-    
+
     private boolean handleSAML2Assertion(
         org.opensaml.saml.saml2.core.Assertion assertion
     ) throws WSSecurityException {
-        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements = 
+        List<org.opensaml.saml.saml2.core.AttributeStatement> attributeStatements =
             assertion.getAttributeStatements();
         if (attributeStatements == null || attributeStatements.isEmpty()) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
-        
+
         for (org.opensaml.saml.saml2.core.AttributeStatement statement : attributeStatements) {
             List<org.opensaml.saml.saml2.core.Attribute> attributes = statement.getAttributes();
             for (org.opensaml.saml.saml2.core.Attribute attribute : attributes) {
                 if (!attribute.getName().startsWith(ClaimTypes.URI_BASE.toString())) {
                     continue;
                 }
-                
+
                 for (XMLObject attributeValue : attribute.getAttributeValues()) {
                     Element attributeValueElement = attributeValue.getDOM();
                     String text = attributeValueElement.getTextContent();

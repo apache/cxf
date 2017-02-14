@@ -39,21 +39,21 @@ import org.junit.runners.Parameterized.Parameters;
 
 
 /**
- * In this test, a CXF client gets a token from the STS over the Asymmetric Binding. The STS is configured 
+ * In this test, a CXF client gets a token from the STS over the Asymmetric Binding. The STS is configured
  * to encrypt the issued token, using the certificate obtained from the received signature.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
-    
+
     final TestParam test;
-    
+
     public AsymmetricEncryptionTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -69,15 +69,15 @@ public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxSTSServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam("", false, STSPORT)},
                                                 {new TestParam("", false, STAX_STSPORT)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -92,10 +92,10 @@ public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         SecurityToken token = requestSecurityToken(bus, test.getStsPort());
         assertTrue(token != null);
-        
+
         bus.shutdown(true);
     }
 
@@ -110,7 +110,7 @@ public class AsymmetricEncryptionTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            SecurityConstants.CALLBACK_HANDLER, 
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
         properties.put(SecurityConstants.SIGNATURE_USERNAME, "myclientkey");

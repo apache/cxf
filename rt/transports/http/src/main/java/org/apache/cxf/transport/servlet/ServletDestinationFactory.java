@@ -27,8 +27,8 @@ import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HttpDestinationFactory;
 
 public class ServletDestinationFactory implements HttpDestinationFactory {
-    public AbstractHTTPDestination createDestination(EndpointInfo endpointInfo, 
-                                                     Bus bus, 
+    public AbstractHTTPDestination createDestination(EndpointInfo endpointInfo,
+                                                     Bus bus,
                                                      DestinationRegistry registry) throws IOException {
         return new ServletDestination(bus, registry, endpointInfo, endpointInfo.getAddress());
     }

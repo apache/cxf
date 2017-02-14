@@ -53,24 +53,24 @@ import org.apache.wss4j.dom.WSConstants;
  * Some unit tests for the validate operation to validate X.509 tokens.
  */
 public class ValidateX509TokenUnitTest extends org.junit.Assert {
-    
-    public static final QName REQUESTED_SECURITY_TOKEN = 
+
+    public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
-    private static final QName QNAME_WST_STATUS = 
+    private static final QName QNAME_WST_STATUS =
         QNameConstants.WS_TRUST_FACTORY.createStatus(null).getName();
-    
+
     /**
      * Test to successfully validate an X.509 token
      */
     @org.junit.Test
     public void testValidateX509Token() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new X509TokenValidator());
         validateOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -81,59 +81,59 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
             );
         request.getAny().add(tokenType);
-        
+
         // Create a BinarySecurityToken
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         assertTrue(certs != null && certs.length > 0);
-        
-        JAXBElement<BinarySecurityTokenType> binarySecurityTokenType = 
+
+        JAXBElement<BinarySecurityTokenType> binarySecurityTokenType =
             createBinarySecurityToken(certs[0]);
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(binarySecurityTokenType);
-        
-        JAXBElement<ValidateTargetType> validateTargetType = 
+
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Validate a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
     }
-    
+
     /**
      * Test to validate an invalid X.509 token
      */
     @org.junit.Test
     public void testValidateInvalidX509Token() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new X509TokenValidator());
         validateOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -144,49 +144,49 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
             );
         request.getAny().add(tokenType);
-        
+
         // Create a BinarySecurityToken
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("eve");
         Crypto eveCrypto = CryptoFactory.getInstance(getEveCryptoProperties());
         X509Certificate[] certs = eveCrypto.getX509Certificates(cryptoType);
         assertTrue(certs != null && certs.length > 0);
-        
-        JAXBElement<BinarySecurityTokenType> binarySecurityTokenType = 
+
+        JAXBElement<BinarySecurityTokenType> binarySecurityTokenType =
             createBinarySecurityToken(certs[0]);
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(binarySecurityTokenType);
-        
-        JAXBElement<ValidateTargetType> validateTargetType = 
+
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Validate a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             validateOperation.validate(request, principal, msgCtx);
         assertFalse(validateResponse(response));
     }
-    
-    
+
+
     /*
      * Create a security context object
      */
@@ -200,13 +200,13 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
             }
         };
     }
-    
+
     /**
      * Return true if the response has a valid status, false otherwise
      */
     private boolean validateResponse(RequestSecurityTokenResponseType response) {
         assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
-        
+
         for (Object requestObject : response.getAny()) {
             if (requestObject instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
@@ -220,7 +220,7 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
         }
         return false;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -228,10 +228,10 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
+
     private Properties getEveCryptoProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -239,10 +239,10 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "evespass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "eve.jks");
-        
+
         return properties;
     }
-    
+
     private JAXBElement<BinarySecurityTokenType> createBinarySecurityToken(
         X509Certificate cert
     ) throws Exception {
@@ -250,12 +250,12 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
         binarySecurityToken.setValue(Base64.getMimeEncoder().encodeToString(cert.getEncoded()));
         binarySecurityToken.setValueType(X509TokenValidator.X509_V3_TYPE);
         binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
-        JAXBElement<BinarySecurityTokenType> tokenType = 
+        JAXBElement<BinarySecurityTokenType> tokenType =
             new JAXBElement<BinarySecurityTokenType>(
                 QNameConstants.BINARY_SECURITY_TOKEN, BinarySecurityTokenType.class, binarySecurityToken
             );
-        
+
         return tokenType;
     }
-    
+
 }

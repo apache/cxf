@@ -22,14 +22,14 @@ package org.apache.cxf.sts.event;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 
 public class STSIssueFailureEvent extends AbstractSTSFailureEvent implements TokenProviderParametersSupport {
-    
+
     private static final String OPERATION = "Issue";
-    
-    
+
+
     public STSIssueFailureEvent(TokenProviderParameters parameters, long duration, Exception exception) {
         super(parameters, duration, exception);
     }
-    
+
     @Override
     public String getOperation() {
         return OPERATION;

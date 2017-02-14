@@ -19,8 +19,8 @@
 package org.apache.cxf.headers;
 
 public interface HeaderManager {
-    
+
     void registerHeaderProcessor(HeaderProcessor processor);
-    
+
     HeaderProcessor getHeaderProcessor(String namespace);
 }

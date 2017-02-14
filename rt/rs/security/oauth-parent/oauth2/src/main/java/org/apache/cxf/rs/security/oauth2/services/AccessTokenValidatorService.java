@@ -69,7 +69,7 @@ public class AccessTokenValidatorService extends AbstractAccessTokenValidator {
             LOG.warning("Authenticated Principal is not available");
             AuthorizationUtils.throwAuthorizationFailure(supportedSchemes, realm);
         }
-        
+
     }
 
     public void setBlockUnsecureRequests(boolean blockUnsecureRequests) {

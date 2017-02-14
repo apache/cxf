@@ -34,7 +34,7 @@ import org.junit.Test;
 
 public class ManagedConnectionImplTest extends Assert {
     private DummyManagedConnectionImpl mc;
-    
+
     @Before
     public void setUp() throws Exception {
         mc = new DummyManagedConnectionImpl(null, null, null);
@@ -47,7 +47,7 @@ public class ManagedConnectionImplTest extends Assert {
         assertTrue(mc.getLogWriter() == writer);
         writer.close();
         EasyMock.expectLastCall();
-        EasyMock.replay(writer);        
+        EasyMock.replay(writer);
         mc.destroy();
         EasyMock.verify(writer);
 
@@ -83,7 +83,7 @@ public class ManagedConnectionImplTest extends Assert {
     @Test
     public void testGetMetaData() throws Exception {
         try {
-            mc.getMetaData();            
+            mc.getMetaData();
         } catch (NotSupportedException expected) {
             fail("Got the Exception here");
         }

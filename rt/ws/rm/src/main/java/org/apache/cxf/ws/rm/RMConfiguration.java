@@ -27,7 +27,7 @@ import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
  * configuration with default values and WS-ReliableMessagingPolicy overrides.
  */
 public class RMConfiguration {
-    
+
     public enum DeliveryAssurance {
         AT_MOST_ONCE, AT_LEAST_ONCE, EXACTLY_ONCE
     }
@@ -41,16 +41,16 @@ public class RMConfiguration {
     private DeliveryAssurance deliveryAssurance;
     private String rmNamespace;
     private String rm10AddressingNamespace;
-    
+
     /**
      * Constructor.
      */
     public RMConfiguration() {
     }
-    
+
     /**
      * Copy constructor.
-     * 
+     *
      * @param base
      */
     public RMConfiguration(RMConfiguration base) {
@@ -79,7 +79,7 @@ public class RMConfiguration {
         this.inOrder = inOrder;
     }
 
-    /**  
+    /**
      * @return Returns the deliveryAssurance.
      */
     public DeliveryAssurance getDeliveryAssurance() {
@@ -99,10 +99,10 @@ public class RMConfiguration {
     public Long getInactivityTimeout() {
         return inactivityTimeout;
     }
-    
+
     /**
      * Get the number of milliseconds for the inactivity timeout.
-     * 
+     *
      * @return milliseconds, 0 if not set
      */
     public long getInactivityTimeoutTime() {
@@ -122,10 +122,10 @@ public class RMConfiguration {
     public Long getAcknowledgementInterval() {
         return acknowledgementInterval;
     }
-    
+
     /**
      * Get the number of milliseconds for the acknowledgment interval.
-     * 
+     *
      * @return milliseconds, 0 if not set
      */
     public long getAcknowledgementIntervalTime() {
@@ -210,9 +210,9 @@ public class RMConfiguration {
     public void setRM10AddressingNamespace(String addrns) {
         rm10AddressingNamespace = addrns;
     }
-    
+
     public String getAddressingNamespace() {
-        
+
         // determine based on RM namespace and RM 1.0 addressing namespace values
         if (RM10Constants.NAMESPACE_URI.equals(rmNamespace)) {
             return rm10AddressingNamespace == null
@@ -221,11 +221,11 @@ public class RMConfiguration {
         if (RM11Constants.NAMESPACE_URI.equals(rmNamespace)) {
             return EncoderDecoder11Impl.INSTANCE.getWSANamespace();
         }
-        
+
         // should not happen, but in case RM namespace is not set
         return Names200408.WSA_NAMESPACE_NAME;
     }
-    
+
     public ProtocolVariation getProtocolVariation() {
         return ProtocolVariation.findVariant(getRMNamespace(), getRM10AddressingNamespace());
     }

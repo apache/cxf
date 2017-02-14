@@ -148,10 +148,10 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
         javax.xml.ws.Service s = javax.xml.ws.Service
             .create(url, serviceName);
-        
+
         final Dispatch<DOMSource> disp = s.createDispatch(portName, DOMSource.class,
                                                     javax.xml.ws.Service.Mode.PAYLOAD);
-        
+
 
         Map<String, Object> requestContext = disp.getRequestContext();
         requestContext.put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT, Boolean.TRUE);

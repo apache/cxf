@@ -64,13 +64,13 @@ import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.servlet.BaseUrlHelper;
 
 public final class HttpUtils {
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(HttpUtils.class);
     private static final Logger LOG = LogUtils.getL7dLogger(HttpUtils.class);
-    
+
     private static final String REQUEST_PATH_TO_MATCH = "path_to_match";
     private static final String REQUEST_PATH_TO_MATCH_SLASH = "path_to_match_slash";
-    
+
     private static final String HTTP_SCHEME = "http";
     private static final String LOCAL_HOST_IP_ADDRESS = "127.0.0.1";
     private static final String REPLACE_LOOPBACK_PROPERTY = "replace.loopback.address.with.localhost";
@@ -78,71 +78,71 @@ public final class HttpUtils {
     private static final String ANY_IP_ADDRESS = "0.0.0.0";
     private static final String ANY_IP_ADDRESS_SCHEME = "://" + ANY_IP_ADDRESS;
     private static final int DEFAULT_HTTP_PORT = 80;
-        
+
     private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
     private static final String CHARSET_PARAMETER = "charset";
-    
+
     // there are more of such characters, ex, '*' but '*' is not affected by UrlEncode
     private static final String PATH_RESERVED_CHARACTERS = "=@/:!$&\'(),;~";
     private static final String QUERY_RESERVED_CHARACTERS = "?/,";
-    
+
     private HttpUtils() {
     }
-    
+
     public static String urlDecode(String value, String enc) {
         return UrlUtils.urlDecode(value, enc);
     }
-    
+
     public static String urlDecode(String value) {
         return UrlUtils.urlDecode(value);
     }
-    
+
     public static String pathDecode(String value) {
         return UrlUtils.pathDecode(value);
     }
 
     private static String componentEncode(String reservedChars, String value) {
-        
+
         StringBuilder buffer = new StringBuilder();
         StringBuilder bufferToEncode = new StringBuilder();
-        
+
         for (int i = 0; i < value.length(); i++) {
             char currentChar = value.charAt(i);
             if (reservedChars.indexOf(currentChar) != -1) {
                 if (bufferToEncode.length() > 0) {
                     buffer.append(urlEncode(bufferToEncode.toString()));
                     bufferToEncode.setLength(0);
-                }    
+                }
                 buffer.append(currentChar);
             } else {
                 bufferToEncode.append(currentChar);
             }
         }
-        
+
         if (bufferToEncode.length() > 0) {
             buffer.append(urlEncode(bufferToEncode.toString()));
         }
-        
+
         return buffer.toString();
     }
-    
+
     public static String queryEncode(String value) {
-        
+
         return componentEncode(QUERY_RESERVED_CHARACTERS, value);
     }
-    
+
     public static String urlEncode(String value) {
-        
+
         return urlEncode(value, StandardCharsets.UTF_8.name());
     }
-    
+
     public static String urlEncode(String value, String enc) {
-        
+
         return UrlUtils.urlEncode(value, enc);
     }
-    
+
     public static String pathEncode(String value) {
-        
+
         String result = componentEncode(PATH_RESERVED_CHARACTERS, value);
         // URLEncoder will encode '+' to %2B but will turn ' ' into '+'
         // We need to retain '+' and encode ' ' as %20
@@ -155,15 +155,15 @@ public final class HttpUtils {
 
         return result;
     }
-    
+
     public static boolean isPartiallyEncoded(String value) {
         return ENCODE_PATTERN.matcher(value).find();
     }
-       
+
     /**
-     * Encodes partially encoded string. Encode all values but those matching pattern 
+     * Encodes partially encoded string. Encode all values but those matching pattern
      * "percent char followed by two hexadecimal digits".
-     * 
+     *
      * @param encoded fully or partially encoded string.
      * @return fully encoded string
      */
@@ -178,21 +178,21 @@ public final class HttpUtils {
             String before = encoded.substring(i, m.start());
             sb.append(query ? HttpUtils.queryEncode(before) : HttpUtils.pathEncode(before));
             sb.append(m.group());
-            i = m.end();            
+            i = m.end();
         }
         String tail = encoded.substring(i, encoded.length());
         sb.append(query ? HttpUtils.queryEncode(tail) : HttpUtils.pathEncode(tail));
         return sb.toString();
     }
-    
+
     public static SimpleDateFormat getHttpDateFormat() {
         return Headers.getHttpDateFormat();
     }
-    
+
     public static String toHttpDate(Date date) {
         return Headers.toHttpDate(date);
     }
-    
+
     public static RuntimeDelegate getOtherRuntimeDelegate() {
         try {
             RuntimeDelegate rd = RuntimeDelegate.getInstance();
@@ -201,28 +201,28 @@ public final class HttpUtils {
             return null;
         }
     }
-    
+
     public static HeaderDelegate<Object> getHeaderDelegate(Object o) {
         return getHeaderDelegate(RuntimeDelegate.getInstance(), o);
     }
-    
+
     @SuppressWarnings("unchecked")
     public static HeaderDelegate<Object> getHeaderDelegate(RuntimeDelegate rd, Object o) {
         return rd == null ? null : (HeaderDelegate<Object>)rd.createHeaderDelegate(o.getClass());
     }
-    
+
     @SuppressWarnings("unchecked")
     public static <T> MultivaluedMap<String, T> getModifiableStringHeaders(Message m) {
         MultivaluedMap<String, Object> headers = getModifiableHeaders(m);
         convertHeaderValuesToString(headers, false);
         return (MultivaluedMap<String, T>)headers;
     }
-    
+
     public static MultivaluedMap<String, Object> getModifiableHeaders(Message m) {
         Map<String, List<Object>> headers = CastUtils.cast((Map<?, ?>)m.get(Message.PROTOCOL_HEADERS));
         return new MetadataMap<String, Object>(headers, false, false, true);
     }
-    
+
     public static void convertHeaderValuesToString(Map<String, List<Object>> headers, boolean delegateOnly) {
         if (headers == null) {
             return;
@@ -235,34 +235,34 @@ public final class HttpUtils {
             List<Object> values = entry.getValue();
             for (int i = 0; i < values.size(); i++) {
                 Object value = values.get(i);
-                
+
                 if (value != null && !(value instanceof String)) {
-                
+
                     HeaderDelegate<Object> hd = getHeaderDelegate(rd, value);
-                    
+
                     if (hd != null) {
-                        value = hd.toString(value); 
+                        value = hd.toString(value);
                     } else if (!delegateOnly) {
                         value = value.toString();
                     }
-                    
+
                     try {
                         values.set(i, value);
                     } catch (UnsupportedOperationException ex) {
                         // this may happen if an unmodifiable List was set via Map put
                         List<Object> newList = new ArrayList<>(values);
                         newList.set(i, value);
-                        // Won't help if the map is unmodifiable in which case it is a bug anyway 
+                        // Won't help if the map is unmodifiable in which case it is a bug anyway
                         headers.put(entry.getKey(), newList);
                     }
-                
+
                 }
-                
+
             }
         }
-        
+
     }
-    
+
     public static Date getHttpDate(String value) {
         if (value == null) {
             return null;
@@ -273,7 +273,7 @@ public final class HttpUtils {
             return null;
         }
     }
-    
+
     public static Locale getLocale(String value) {
         if (value == null) {
             return null;
@@ -284,22 +284,22 @@ public final class HttpUtils {
         if (index == 0 || index == value.length() - 1) {
             throw new IllegalArgumentException("Illegal locale value : " + value);
         }
-        
+
         if (index > 0) {
             language = value.substring(0, index);
             locale = value.substring(index + 1);
         } else {
             language = value;
         }
-        
+
         if (locale == null) {
             return new Locale(language);
         } else {
             return new Locale(language, locale);
         }
-        
+
     }
-    
+
     public static int getContentLength(String value) {
         if (value == null) {
             return -1;
@@ -311,7 +311,7 @@ public final class HttpUtils {
             return -1;
         }
     }
-    
+
     public static String getHeaderString(List<String> values) {
         if (values == null) {
             return null;
@@ -330,30 +330,30 @@ public final class HttpUtils {
             return sb.toString();
         }
     }
-    
+
     public static boolean isDateRelatedHeader(String headerName) {
         return HttpHeaders.DATE.equalsIgnoreCase(headerName)
                || HttpHeaders.IF_MODIFIED_SINCE.equalsIgnoreCase(headerName)
                || HttpHeaders.IF_UNMODIFIED_SINCE.equalsIgnoreCase(headerName)
                || HttpHeaders.EXPIRES.equalsIgnoreCase(headerName)
-               || HttpHeaders.LAST_MODIFIED.equalsIgnoreCase(headerName); 
+               || HttpHeaders.LAST_MODIFIED.equalsIgnoreCase(headerName);
     }
-    
+
     public static boolean isHttpRequest(Message message) {
         return message.get(AbstractHTTPDestination.HTTP_REQUEST) != null;
     }
-    
+
     public static URI toAbsoluteUri(String relativePath, Message message) {
         String base = BaseUrlHelper.getBaseURL(
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST));
         return URI.create(base + relativePath);
     }
-    
+
     public static URI toAbsoluteUri(URI u, Message message) {
-        HttpServletRequest request = 
+        HttpServletRequest request =
             (HttpServletRequest)message.get(AbstractHTTPDestination.HTTP_REQUEST);
         boolean absolute = u.isAbsolute();
-        StringBuilder uriBuf = new StringBuilder(); 
+        StringBuilder uriBuf = new StringBuilder();
         if (request != null && (!absolute || isLocalHostOrAnyIpAddress(u, uriBuf, message))) {
             String serverAndPort = request.getServerName();
             boolean localAddressUsed = false;
@@ -367,8 +367,8 @@ public final class HttpUtils {
                     localAddressUsed = true;
                 }
             }
-            
-                
+
+
             int port = localAddressUsed ? request.getLocalPort() : request.getServerPort();
             if (port != DEFAULT_HTTP_PORT) {
                 serverAndPort += ":" + port;
@@ -378,7 +378,7 @@ public final class HttpUtils {
                 u = URI.create(base + u.toString());
             } else {
                 int originalPort = u.getPort();
-                String hostValue = uriBuf.toString().contains(ANY_IP_ADDRESS_SCHEME) 
+                String hostValue = uriBuf.toString().contains(ANY_IP_ADDRESS_SCHEME)
                     ? ANY_IP_ADDRESS : LOCAL_HOST_IP_ADDRESS;
                 String replaceValue = originalPort == -1 ? hostValue : hostValue + ":" + originalPort;
                 u = URI.create(u.toString().replace(replaceValue, serverAndPort));
@@ -386,15 +386,15 @@ public final class HttpUtils {
         }
         return u;
     }
-    
+
     private static boolean isLocalHostOrAnyIpAddress(URI u, StringBuilder uriStringBuffer, Message m) {
         String uriString = u.toString();
-        boolean result = uriString.contains(LOCAL_HOST_IP_ADDRESS_SCHEME) && replaceLoopBackAddress(m) 
+        boolean result = uriString.contains(LOCAL_HOST_IP_ADDRESS_SCHEME) && replaceLoopBackAddress(m)
             || uriString.contains(ANY_IP_ADDRESS_SCHEME);
         uriStringBuffer.append(uriString);
         return result;
     }
-    
+
     private static boolean replaceLoopBackAddress(Message m) {
         Object prop = m.getContextualProperty(REPLACE_LOOPBACK_PROPERTY);
         return prop == null || PropertyUtils.isTrue(prop);
@@ -405,13 +405,13 @@ public final class HttpUtils {
         m.remove(REQUEST_PATH_TO_MATCH);
         m.put(Message.REQUEST_URI, requestURI);
     }
-    
-    
+
+
     public static String getPathToMatch(Message m, boolean addSlash) {
         String var = addSlash ? REQUEST_PATH_TO_MATCH_SLASH : REQUEST_PATH_TO_MATCH;
         String pathToMatch = (String)m.get(var);
         if (pathToMatch != null) {
-            return pathToMatch; 
+            return pathToMatch;
         }
         String requestAddress = getProtocolHeader(m, Message.REQUEST_URI, "/");
         if (m.get(Message.QUERY_STRING) == null) {
@@ -426,11 +426,11 @@ public final class HttpUtils {
         m.put(var, pathToMatch);
         return pathToMatch;
     }
-    
+
     public static String getProtocolHeader(Message m, String name, String defaultValue) {
         return getProtocolHeader(m, name, defaultValue, false);
     }
-    
+
     public static String getProtocolHeader(Message m, String name, String defaultValue, boolean setOnMessage) {
         String value = (String)m.get(name);
         if (value == null) {
@@ -441,7 +441,7 @@ public final class HttpUtils {
         }
         return value == null ? defaultValue : value;
     }
-    
+
     public static String getBaseAddress(Message m) {
         String endpointAddress = getEndpointAddress(m);
         try {
@@ -457,19 +457,19 @@ public final class HttpUtils {
             return endpointAddress == null ? "/" : endpointAddress;
         }
     }
-    
+
     public static String getEndpointAddress(Message m) {
         String address = null;
         Destination d = m.getExchange().getDestination();
         if (d != null) {
             if (d instanceof AbstractHTTPDestination) {
                 EndpointInfo ei = ((AbstractHTTPDestination)d).getEndpointInfo();
-                HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST); 
-                Object property = request != null 
+                HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
+                Object property = request != null
                     ? request.getAttribute("org.apache.cxf.transport.endpoint.address") : null;
                 address = property != null ? property.toString() : ei.getAddress();
             } else {
-                address = m.containsKey(Message.BASE_PATH) 
+                address = m.containsKey(Message.BASE_PATH)
                     ? (String)m.get(Message.BASE_PATH) : d.getAddress().getAddress().getValue();
             }
         } else {
@@ -480,7 +480,7 @@ public final class HttpUtils {
         }
         return address;
     }
-    
+
     public static void updatePath(Message m, String path) {
         String baseAddress = getBaseAddress(m);
         boolean pathSlash = path.startsWith("/");
@@ -495,9 +495,9 @@ public final class HttpUtils {
         m.remove(REQUEST_PATH_TO_MATCH_SLASH);
     }
 
-    
+
     public static String getPathToMatch(String path, String address, boolean addSlash) {
-        
+
         int ind = path.indexOf(address);
         if (ind == -1 && address.equals(path + "/")) {
             path += "/";
@@ -509,15 +509,15 @@ public final class HttpUtils {
         if (addSlash && !path.startsWith("/")) {
             path = "/" + path;
         }
-        
+
         return path;
     }
-    
+
     public static String getOriginalAddress(Message m) {
         Destination d = m.getDestination();
         return d == null ? "/" : d.getAddress().getAddress().getValue();
     }
-    
+
     public static String fromPathSegment(PathSegment ps) {
         if (PathSegmentImpl.class.isAssignableFrom(ps.getClass())) {
             return ((PathSegmentImpl)ps).getOriginalPath();
@@ -534,7 +534,7 @@ public final class HttpUtils {
         }
         return sb.toString();
     }
-    
+
     public static Response.Status getParameterFailureStatus(ParameterType pType) {
         if (pType == ParameterType.MATRIX || pType == ParameterType.PATH
             || pType == ParameterType.QUERY) {
@@ -542,7 +542,7 @@ public final class HttpUtils {
         }
         return Response.Status.BAD_REQUEST;
     }
- 
+
     public static String getSetEncoding(MediaType mt, MultivaluedMap<String, Object> headers,
                                         String defaultEncoding) {
         String enc = mt.getParameters().get(CHARSET_PARAMETER);
@@ -553,29 +553,29 @@ public final class HttpUtils {
             "0".getBytes(enc);
             return enc;
         } catch (UnsupportedEncodingException ex) {
-            String message = new org.apache.cxf.common.i18n.Message("UNSUPPORTED_ENCODING", 
+            String message = new org.apache.cxf.common.i18n.Message("UNSUPPORTED_ENCODING",
                                  BUNDLE, enc, defaultEncoding).toString();
             LOG.warning(message);
-            headers.putSingle(HttpHeaders.CONTENT_TYPE, 
-                JAXRSUtils.mediaTypeToString(mt, CHARSET_PARAMETER) 
-                + ';' + CHARSET_PARAMETER + "=" 
+            headers.putSingle(HttpHeaders.CONTENT_TYPE,
+                JAXRSUtils.mediaTypeToString(mt, CHARSET_PARAMETER)
+                + ';' + CHARSET_PARAMETER + "="
                 + (defaultEncoding == null ? StandardCharsets.UTF_8 : defaultEncoding));
         }
         return defaultEncoding;
     }
-    
+
     public static String getEncoding(MediaType mt, String defaultEncoding) {
         String charset = mt == null ? defaultEncoding : mt.getParameters().get("charset");
         return charset == null ? defaultEncoding : charset;
     }
-    
+
     public static URI resolve(UriBuilder baseBuilder, URI uri) {
         if (!uri.isAbsolute()) {
             return baseBuilder.build().resolve(uri);
         }
         return uri;
     }
-    
+
     public static URI relativize(URI base, URI uri) {
         // quick bail-out
         if (!(base.isAbsolute()) || !(uri.isAbsolute())) {
@@ -592,24 +592,24 @@ public final class HttpUtils {
             // Different protocol/auth/host/port, return as is
             return uri;
         }
-        
+
         // Ignore hostname bits for the following , but add "/" in the beginning
         // so that in worst case we'll still return "/fred" rather than
         // "http://example.com/fred".
         URI baseRel = URI.create("/").resolve(root.relativize(base));
         URI uriRel = URI.create("/").resolve(root.relativize(uri));
-        
+
         // Is it same path?
         if (baseRel.getPath().equals(uriRel.getPath())) {
             return baseRel.relativize(uriRel);
         }
-        
+
         // Direct siblings? (ie. in same folder)
         URI commonBase = baseRel.resolve("./");
         if (commonBase.equals(uriRel.resolve("./"))) {
             return commonBase.relativize(uriRel);
         }
-        
+
         // No, then just keep climbing up until we find a common base.
         URI relative = URI.create("");
         while (!(uriRel.getPath().startsWith(commonBase.getPath())) && !(commonBase.getPath().equals("/"))) {
@@ -621,13 +621,13 @@ public final class HttpUtils {
         URI relToCommon = commonBase.relativize(uriRel);
         // and prepend the needed ../
         return relative.resolve(relToCommon);
-        
+
     }
-    
+
     public static String toHttpLanguage(Locale locale) {
         return Headers.toHttpLanguage(locale);
     }
-    
+
     public static boolean isPayloadEmpty(MultivaluedMap<String, String> headers) {
         if (headers != null) {
             String value = headers.getFirst(HttpHeaders.CONTENT_LENGTH);
@@ -640,7 +640,7 @@ public final class HttpUtils {
                 }
             }
         }
-        
+
         return false;
     }
 }

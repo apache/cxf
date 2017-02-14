@@ -60,7 +60,7 @@ public class RMSoapOutInterceptorTest extends Assert {
 
     private static final Long ONE = new Long(1);
     private static final Long TEN = new Long(10);
-    
+
     private SequenceType s1;
     private SequenceType s2;
     private SequenceAcknowledgement ack1;
@@ -73,9 +73,9 @@ public class RMSoapOutInterceptorTest extends Assert {
         RMSoapOutInterceptor codec = new RMSoapOutInterceptor();
         Set<QName> headers = codec.getUnderstoodHeaders();
         assertTrue("expected Sequence header", headers.contains(RM10Constants.SEQUENCE_QNAME));
-        assertTrue("expected SequenceAcknowledgment header", 
+        assertTrue("expected SequenceAcknowledgment header",
                    headers.contains(RM10Constants.SEQUENCE_ACK_QNAME));
-        assertTrue("expected AckRequested header", 
+        assertTrue("expected AckRequested header",
                    headers.contains(RM10Constants.ACK_REQUESTED_QNAME));
     }
 
@@ -86,42 +86,42 @@ public class RMSoapOutInterceptorTest extends Assert {
         SoapMessage message = setupOutboundMessage();
 
         // no RM headers
-   
+
         codec.handleMessage(message);
         verifyHeaders(message, new String[] {});
 
         // one sequence header
 
-        message = setupOutboundMessage();        
-        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);     
+        message = setupOutboundMessage();
+        RMProperties rmps = RMContextUtils.retrieveRMProperties(message, true);
         rmps.setSequence(s1);
         codec.encode(message);
         verifyHeaders(message, new String[] {RMConstants.SEQUENCE_NAME});
 
         // one acknowledgment header
 
-        message = setupOutboundMessage(); 
-        rmps = RMContextUtils.retrieveRMProperties(message, true);          
+        message = setupOutboundMessage();
+        rmps = RMContextUtils.retrieveRMProperties(message, true);
         Collection<SequenceAcknowledgement> acks = new ArrayList<>();
         acks.add(ack1);
-        rmps.setAcks(acks);        
+        rmps.setAcks(acks);
         codec.encode(message);
         verifyHeaders(message, new String[] {RMConstants.SEQUENCE_ACK_NAME});
 
         // two acknowledgment headers
 
         message = setupOutboundMessage();
-        rmps = RMContextUtils.retrieveRMProperties(message, true);        
+        rmps = RMContextUtils.retrieveRMProperties(message, true);
         acks.add(ack2);
         rmps.setAcks(acks);
         codec.encode(message);
-        verifyHeaders(message, new String[] {RMConstants.SEQUENCE_ACK_NAME, 
+        verifyHeaders(message, new String[] {RMConstants.SEQUENCE_ACK_NAME,
                                              RMConstants.SEQUENCE_ACK_NAME});
 
         // one ack requested header
 
         message = setupOutboundMessage();
-        rmps = RMContextUtils.retrieveRMProperties(message, true);        
+        rmps = RMContextUtils.retrieveRMProperties(message, true);
         Collection<AckRequestedType> requested = new ArrayList<>();
         requested.add(ar1);
         rmps.setAcksRequested(requested);
@@ -131,14 +131,14 @@ public class RMSoapOutInterceptorTest extends Assert {
         // two ack requested headers
 
         message = setupOutboundMessage();
-        rmps = RMContextUtils.retrieveRMProperties(message, true);         
+        rmps = RMContextUtils.retrieveRMProperties(message, true);
         requested.add(ar2);
         rmps.setAcksRequested(requested);
         codec.encode(message);
-        verifyHeaders(message, new String[] {RMConstants.ACK_REQUESTED_NAME, 
+        verifyHeaders(message, new String[] {RMConstants.ACK_REQUESTED_NAME,
                                              RMConstants.ACK_REQUESTED_NAME});
     }
-    
+
     @Test
     public void testEncodeFault() throws Exception {
         RMSoapOutInterceptor codec = new RMSoapOutInterceptor();
@@ -146,7 +146,7 @@ public class RMSoapOutInterceptorTest extends Assert {
         SoapMessage message = setupOutboundFaultMessage();
 
         // no RM headers and no fault
-   
+
         codec.encode(message);
         verifyHeaders(message, new String[] {});
 
@@ -155,20 +155,20 @@ public class RMSoapOutInterceptorTest extends Assert {
         message = setupOutboundFaultMessage();
         assertTrue(MessageUtils.isFault(message));
         Exception ex = new RuntimeException("");
-        message.setContent(Exception.class, ex);      
+        message.setContent(Exception.class, ex);
         codec.encode(message);
         verifyHeaders(message, new String[] {});
-        
+
         // fault is a SoapFault but does not have a SequenceFault cause
 
         message = setupOutboundFaultMessage();
         SoapFault f = new SoapFault("REASON", RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME);
-        message.setContent(Exception.class, f);      
+        message.setContent(Exception.class, f);
         codec.encode(message);
         verifyHeaders(message, new String[] {});
 
         // fault is a SoapFault and has a SequenceFault cause
-        
+
         message = setupOutboundFaultMessage();
         SequenceFault sf = new SequenceFault("REASON");
         sf.setFaultCode(RM10Constants.UNKNOWN_SEQUENCE_FAULT_QNAME);
@@ -176,7 +176,7 @@ public class RMSoapOutInterceptorTest extends Assert {
         sid.setValue("SID");
         sf.setSender(true);
         f.initCause(sf);
-        message.setContent(Exception.class, f);      
+        message.setContent(Exception.class, f);
         codec.encode(message);
         verifyHeaders(message, new String[] {RMConstants.SEQUENCE_FAULT_NAME});
 
@@ -196,7 +196,7 @@ public class RMSoapOutInterceptorTest extends Assert {
         s2.setMessageNumber(TEN);
 
         ack1 = factory.createSequenceAcknowledgement();
-        SequenceAcknowledgement.AcknowledgementRange r = 
+        SequenceAcknowledgement.AcknowledgementRange r =
             factory.createSequenceAcknowledgementAcknowledgementRange();
         r.setLower(ONE);
         r.setUpper(ONE);
@@ -227,7 +227,7 @@ public class RMSoapOutInterceptorTest extends Assert {
         AddressingProperties maps = new AddressingProperties();
         RMContextUtils.storeMAPs(maps, soapMessage, true, false);
         ex.setOutMessage(soapMessage);
-        soapMessage.setExchange(ex);        
+        soapMessage.setExchange(ex);
         MessageFactory factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
         SOAPMessage soap = factory.createMessage();
         QName bodyName = new QName("http://cxf.apache.org", "dummy", "d");
@@ -235,7 +235,7 @@ public class RMSoapOutInterceptorTest extends Assert {
         soapMessage.setContent(SOAPMessage.class, soap);
         return soapMessage;
     }
-    
+
     private SoapMessage setupOutboundFaultMessage() throws Exception {
         Exchange ex = new ExchangeImpl();
         Message message = new MessageImpl();
@@ -246,9 +246,9 @@ public class RMSoapOutInterceptorTest extends Assert {
         RMContextUtils.storeMAPs(maps, message, false, false);
         ex.setInMessage(message);
         message = new MessageImpl();
-        SoapMessage soapMessage = new SoapMessage(message);         
+        SoapMessage soapMessage = new SoapMessage(message);
         ex.setOutFaultMessage(soapMessage);
-        soapMessage.setExchange(ex);        
+        soapMessage.setExchange(ex);
         MessageFactory factory = MessageFactory.newInstance(SOAPConstants.SOAP_1_1_PROTOCOL);
         SOAPMessage soap = factory.createMessage();
         soap.getSOAPBody().addFault();
@@ -293,7 +293,7 @@ public class RMSoapOutInterceptorTest extends Assert {
                 Element elem = (Element) obj;
                 String namespace = elem.getNamespaceURI();
                 String localName = elem.getLocalName();
-                assertTrue(RM10Constants.NAMESPACE_URI.equals(namespace) 
+                assertTrue(RM10Constants.NAMESPACE_URI.equals(namespace)
                     || Names.WSA_NAMESPACE_NAME.equals(namespace));
                 boolean found = false;
                 for (String name : names) {

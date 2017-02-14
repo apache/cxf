@@ -109,7 +109,7 @@ public class XMLFormatValidator extends ServiceValidator {
         return true;
     }
 
-    private boolean findXMLFormatRootNode(Iterator<XMLBindingMessageFormat> it, 
+    private boolean findXMLFormatRootNode(Iterator<XMLBindingMessageFormat> it,
                                           BindingOperationInfo bo,
                                           String errorPath) {
         while (it != null && it.hasNext()) {
@@ -119,7 +119,7 @@ public class XMLFormatValidator extends ServiceValidator {
                 addErrorMessage(errorPath
                                 + ": empty value of rootNode attribute, the value should be "
                                 + rootNodeName);
-                return false;                    
+                return false;
             }
         }
         return true;

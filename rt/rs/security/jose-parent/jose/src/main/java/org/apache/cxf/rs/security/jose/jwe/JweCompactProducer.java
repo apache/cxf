@@ -35,58 +35,58 @@ public class JweCompactProducer {
                        byte[] encryptedContentEncryptionKey,
                        byte[] cipherInitVector,
                        byte[] encryptedContentNoTag,
-                       byte[] authenticationTag) {    
-        this(getHeadersJson(headers), encryptedContentEncryptionKey, 
+                       byte[] authenticationTag) {
+        this(getHeadersJson(headers), encryptedContentEncryptionKey,
              cipherInitVector, encryptedContentNoTag, authenticationTag);
     }
-    
+
     public JweCompactProducer(String headersJson,
                               byte[] encryptedContentEncryptionKey,
                               byte[] cipherInitVector,
                               byte[] encryptedContentNoTag,
                               byte[] authenticationTag) {
-        jweContentBuilder = startJweContent(new StringBuilder(), headersJson, 
+        jweContentBuilder = startJweContent(new StringBuilder(), headersJson,
                                   encryptedContentEncryptionKey, cipherInitVector);
         this.encodedEncryptedContent = Base64UrlUtility.encode(encryptedContentNoTag);
         this.encodedAuthTag = Base64UrlUtility.encode(authenticationTag);
-       
+
     }
-    
+
     public JweCompactProducer(JweHeaders headers,
                        byte[] encryptedContentEncryptionKey,
                        byte[] cipherInitVector,
                        byte[] encryptedContentWithTag,
-                       int authTagLengthBits) {    
-        jweContentBuilder = startJweContent(new StringBuilder(), headers, 
+                       int authTagLengthBits) {
+        jweContentBuilder = startJweContent(new StringBuilder(), headers,
                                    encryptedContentEncryptionKey, cipherInitVector);
         this.encodedEncryptedContent = Base64UrlUtility.encodeChunk(
-            encryptedContentWithTag, 
-            0, 
+            encryptedContentWithTag,
+            0,
             encryptedContentWithTag.length - authTagLengthBits / 8);
         this.encodedAuthTag = Base64UrlUtility.encodeChunk(
-            encryptedContentWithTag, 
-            encryptedContentWithTag.length - authTagLengthBits / 8, 
+            encryptedContentWithTag,
+            encryptedContentWithTag.length - authTagLengthBits / 8,
             authTagLengthBits / 8);
-        
+
     }
     public static String startJweContent(JweHeaders headers,
                                                 byte[] encryptedContentEncryptionKey,
                                                 byte[] cipherInitVector) {
-        return startJweContent(new StringBuilder(), 
-                               headers, encryptedContentEncryptionKey, cipherInitVector).toString();       
+        return startJweContent(new StringBuilder(),
+                               headers, encryptedContentEncryptionKey, cipherInitVector).toString();
     }
     public static StringBuilder startJweContent(StringBuilder sb,
                                         JweHeaders headers,
                                         byte[] encryptedContentEncryptionKey,
                                         byte[] cipherInitVector) {
-        return startJweContent(sb, 
-                               getHeadersJson(headers), 
-                               encryptedContentEncryptionKey, 
+        return startJweContent(sb,
+                               getHeadersJson(headers),
+                               encryptedContentEncryptionKey,
                                cipherInitVector);
     }
     private static String getHeadersJson(JweHeaders headers) {
         return new JsonMapObjectReaderWriter().toJson(headers);
-        
+
     }
     public static StringBuilder startJweContent(StringBuilder sb,
                                                 String headersJson,
@@ -103,7 +103,7 @@ public class JweCompactProducer {
             .append('.');
         return sb;
     }
-    
+
     public static void startJweContent(OutputStream os,
                                        JweHeaders headers,
                                        byte[] encryptedContentEncryptionKey,
@@ -112,14 +112,14 @@ public class JweCompactProducer {
         Base64UrlUtility.encodeAndStream(jsonBytes, 0, jsonBytes.length, os);
         byte[] dotBytes = new byte[]{'.'};
         os.write(dotBytes);
-        Base64UrlUtility.encodeAndStream(encryptedContentEncryptionKey, 0, 
+        Base64UrlUtility.encodeAndStream(encryptedContentEncryptionKey, 0,
                                          encryptedContentEncryptionKey.length, os);
         os.write(dotBytes);
         Base64UrlUtility.encodeAndStream(cipherInitVector, 0, cipherInitVector.length, os);
-        os.write(dotBytes);        
+        os.write(dotBytes);
         os.flush();
     }
-    
+
     public String getJweContent() {
         return jweContentBuilder.append(encodedEncryptedContent)
                  .append('.')

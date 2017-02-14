@@ -33,16 +33,16 @@ import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.common.logging.LogUtils;
 
-@javax.jws.WebService(name = "Greeter", serviceName = "SOAPService", 
+@javax.jws.WebService(name = "Greeter", serviceName = "SOAPService",
                       targetNamespace = "http://apache.org/hello_world_soap_http")
 @HandlerChain(name = "TestHandlerChain", file = "handlers.xml")
 public class AnnotatedGreeterImpl {
 
-    private static final Logger LOG = 
+    private static final Logger LOG =
         LogUtils.getL7dLogger(AnnotatedGreeterImpl.class);
 
     @Resource
-    private int foo; 
+    private int foo;
 
     private WebServiceContext context;
 
@@ -106,7 +106,7 @@ public class AnnotatedGreeterImpl {
         incrementInvocationCount("greetMe");
         return "Bonjour " + me + "!";
     }
-    
+
     @WebMethod
     @RequestWrapper(className = "org.apache.hello_world_soap_http.types.GreetMeOneWay",
                     localName = "greetMeOneWay",
@@ -117,11 +117,11 @@ public class AnnotatedGreeterImpl {
         System.out.println("That was OneWay to say hello");
     }
 
-    public void testDocLitFault(String faultType)   {        
+    public void testDocLitFault(String faultType)   {
     }
 
     @Resource
-    public void setContext(WebServiceContext ctx) { 
+    public void setContext(WebServiceContext ctx) {
         context = ctx;
     }
 
@@ -130,12 +130,12 @@ public class AnnotatedGreeterImpl {
     }
 
     /**
-     * stop eclipse from whinging 
+     * stop eclipse from whinging
      */
-    public int getFoo() {         
+    public int getFoo() {
         return foo;
     }
-    
+
     private void incrementInvocationCount(String method) {
         LOG.info("Executing " + method);
         int n = invocationCount.get(method);

@@ -42,12 +42,12 @@ public final class Client {
     }
 
     public static void main(String args[]) throws Exception {
-        
+
         if (args.length < 2) {
             System.out.println("please specify wsdl and configuration file");
             System.exit(1);
         }
-        
+
         URL wsdlURL;
         File wsdlFile = new File(args[0]);
         if (wsdlFile.exists()) {
@@ -55,7 +55,7 @@ public final class Client {
         } else {
             wsdlURL = new URL(args[0]);
         }
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busURL;
         File busFile = new File(args[1]);

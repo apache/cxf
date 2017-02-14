@@ -41,7 +41,7 @@ public class BusExtensionLoadingTest extends Assert {
 
     /**
      * Tests the ExtensionManagerBus can be built using a given classloader
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -64,7 +64,7 @@ public class BusExtensionLoadingTest extends Assert {
 
     /**
      * Test for checking the ExtensionManagerBus is built using the TCCL by default
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -92,7 +92,7 @@ public class BusExtensionLoadingTest extends Assert {
                 return super.loadClass(className);
             }
         }
-        
+
         @Override
         public URL getResource(final String name) {
             if (name.contains("cxf") || name.contains("bus")) {

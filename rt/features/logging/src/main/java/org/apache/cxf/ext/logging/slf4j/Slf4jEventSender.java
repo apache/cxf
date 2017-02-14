@@ -45,7 +45,7 @@ public class Slf4jEventSender implements LogEventSender {
         String cat = logCategory != null ? logCategory
             : "org.apache.cxf.services." + event.getPortTypeName().getLocalPart() + "." + event.getType();
         Logger log = LoggerFactory.getLogger(cat);
-        Set<String> keys = new HashSet<>(); 
+        Set<String> keys = new HashSet<>();
         try {
             put(keys, "type", event.getType().toString());
             put(keys, "address", event.getAddress());
@@ -68,9 +68,9 @@ public class Slf4jEventSender implements LogEventSender {
                 MDC.remove(key);
             }
         }
-        
+
     }
-    
+
     private String localPart(QName name) {
         return name == null ? null : name.getLocalPart();
     }
@@ -78,7 +78,7 @@ public class Slf4jEventSender implements LogEventSender {
     private String getLogMessage(LogEvent event) {
         return event.getPayload();
     }
-    
+
     private void put(Set<String> keys, String key, String value) {
         if (value != null) {
             MDC.put(key, value);

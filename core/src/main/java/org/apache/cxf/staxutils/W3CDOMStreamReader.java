@@ -44,7 +44,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     private Document document;
 
     private W3CNamespaceContext context;
-    
+
     private String sysId;
 
     /**
@@ -54,7 +54,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         super(new ElementFrame<Node, Node>(element, null));
         content = element;
         newFrame(getCurrentFrame());
-                
+
         this.document = element.getOwnerDocument();
     }
     public W3CDOMStreamReader(Element element, String systemId) {
@@ -155,14 +155,14 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
 
     @Override
     protected ElementFrame<Node, Node> getChildFrame() {
-        return new ElementFrame<Node, Node>(getCurrentFrame().currentChild, 
+        return new ElementFrame<Node, Node>(getCurrentFrame().currentChild,
                                 getCurrentFrame());
     }
 
     @Override
     protected boolean hasMoreChildren() {
         if (getCurrentFrame().currentChild == null) {
-            return getCurrentNode().getFirstChild() != null;            
+            return getCurrentNode().getFirstChild() != null;
         }
         return getCurrentFrame().currentChild.getNextSibling() != null;
     }
@@ -171,11 +171,11 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     protected int nextChild() {
         ElementFrame<Node, Node> frame = getCurrentFrame();
         if (frame.currentChild == null) {
-            content = getCurrentNode().getFirstChild();            
+            content = getCurrentNode().getFirstChild();
         } else {
             content = frame.currentChild.getNextSibling();
         }
-        
+
         frame.currentChild = content;
         switch (content.getNodeType()) {
         case Node.ELEMENT_NODE:
@@ -296,7 +296,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
             //DOM level 2?
             schemaType = null;
         }
-        return (schemaType == null) ? "CDATA" 
+        return (schemaType == null) ? "CDATA"
             : schemaType.getTypeName() == null ? "CDATA" : schemaType.getTypeName();
     }
 
@@ -403,11 +403,11 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
 
     public String getPIData() {
         throw new UnsupportedOperationException();
-    }   
+    }
     public Location getLocation() {
         try {
             Object o = getCurrentNode().getUserData("location");
-            if (o instanceof Location) { 
+            if (o instanceof Location) {
                 return (Location)o;
             }
         } catch (Throwable ex) {
@@ -415,7 +415,7 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         }
         return super.getLocation();
     }
-    
+
     public String toString() {
         if (document == null) {
             return "<null>";
@@ -431,5 +431,5 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         }
     }
 
-    
+
 }

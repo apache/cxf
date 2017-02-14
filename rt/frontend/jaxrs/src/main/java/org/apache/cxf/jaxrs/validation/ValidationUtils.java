@@ -47,6 +47,6 @@ public final class ValidationUtils {
             return resourceProvider.getInstance(message);
         }
     }
-    
-    
+
+
 }

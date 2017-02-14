@@ -31,14 +31,14 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 public class FormatResponseHandler implements ContainerResponseFilter {
     @Context
     private MessageContext mc;
-    
+
     @Override
-    public void filter(ContainerRequestContext reqC, ContainerResponseContext respC) 
+    public void filter(ContainerRequestContext reqC, ContainerResponseContext respC)
         throws IOException {
         if (mc.getUriInfo().getQueryParameters().containsKey("_format")) {
             mc.put(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         }
-        
+
     }
 
 }

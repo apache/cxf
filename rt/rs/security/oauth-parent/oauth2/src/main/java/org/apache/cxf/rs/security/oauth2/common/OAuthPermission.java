@@ -100,7 +100,7 @@ public class OAuthPermission implements Serializable {
         this.uris = uri;
     }
 
-    
+
     /**
      * Gets the permission description
      * @return the description
@@ -138,10 +138,10 @@ public class OAuthPermission implements Serializable {
      * Indicates if this permission has been allocated by default or not.
      * Authorization View handlers may use this property to optimize the way the user selects the
      * scopes.
-     * For example, assume that read', 'add' and 'update' scopes are supported and the 
+     * For example, assume that read', 'add' and 'update' scopes are supported and the
      * 'read' scope is always allocated. This can be presented at the UI level as follows:
      * the read-only check-box control will represent a 'read' scope and a user will be able to
-     * optionally select 'add' and/or 'update' scopes, in addition to the default 'read' one. 
+     * optionally select 'add' and/or 'update' scopes, in addition to the default 'read' one.
      * @param isDefault true if the permission has been allocated by default
      */
     public void setDefaultPermission(boolean value) {
@@ -151,19 +151,19 @@ public class OAuthPermission implements Serializable {
     public boolean isDefaultPermission() {
         return isDefaultPermission;
     }
-    
+
     @Deprecated
     @Transient
     public boolean isDefault() {
         return isDefaultPermission;
     }
-    
+
     public boolean isInvisibleToClient() {
         return invisibleToClient;
     }
 
     /**
-     * Set the visibility status; by default all the scopes approved by a user can 
+     * Set the visibility status; by default all the scopes approved by a user can
      * be optionally reported to the client in access token responses. Some scopes may need
      * to stay 'invisible' to client.
      * @param invisibleToClient
@@ -176,7 +176,7 @@ public class OAuthPermission implements Serializable {
         if (!(object instanceof OAuthPermission)) {
             return false;
         }
-        
+
         OAuthPermission that = (OAuthPermission)object;
         if (getHttpVerbs() != null && that.getHttpVerbs() == null
             || getHttpVerbs() == null && that.getHttpVerbs() != null
@@ -200,7 +200,7 @@ public class OAuthPermission implements Serializable {
             || isDefaultPermission() != that.isDefaultPermission()) { //NOPMD
             return false;
         }
-        
+
         return true;
     }
     @Override
@@ -218,7 +218,7 @@ public class OAuthPermission implements Serializable {
         }
         hashCode = 31 * hashCode + Boolean.hashCode(isInvisibleToClient());
         hashCode = 31 * hashCode + Boolean.hashCode(isDefaultPermission());
-        
+
         return hashCode;
     }
 }

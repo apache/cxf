@@ -29,18 +29,18 @@ import org.apache.wss4j.dom.validate.Validator;
  * a custom processor that inserts itself into the results vector
  */
 public class CustomProcessor implements Processor {
-    
+
     public final java.util.List<WSSecurityEngineResult> handleToken(
-        final org.w3c.dom.Element elem, 
+        final org.w3c.dom.Element elem,
         final RequestData data
     ) throws WSSecurityException {
-        final WSSecurityEngineResult result = 
+        final WSSecurityEngineResult result =
             new WSSecurityEngineResult(WSConstants.SIGN);
         result.put("foo", this);
         data.getWsDocInfo().addResult(result);
         return java.util.Collections.singletonList(result);
     }
-    
+
     public void setValidator(Validator validator) {
         //
     }

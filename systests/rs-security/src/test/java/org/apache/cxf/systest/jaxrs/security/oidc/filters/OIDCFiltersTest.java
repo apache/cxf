@@ -34,74 +34,74 @@ import org.junit.BeforeClass;
  * Some tests for the OIDC filters
  */
 public class OIDCFiltersTest extends AbstractBusClientServerTestBase {
-    
+
     public static final String PORT = BookServerOIDCFilters.PORT;
     public static final String OIDC_PORT = BookServerOIDCService.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerOIDCFilters.class, true));
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerOIDCService.class, true));
     }
-    
+
     @org.junit.Test
     public void testClientCodeRequestFilter() throws Exception {
         URL busFile = OIDCFiltersTest.class.getResource("client.xml");
-        
+
         // Make an invocation + get back the redirection to the OIDC IdP
         String address = "https://localhost:" + PORT + "/secured/bookstore/books";
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), busFile.toString());
-        
+
         WebClient.getConfig(client).getRequestContext().put(
                 org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
-        
+
         Response response = client.get();
-        
+
         String location = response.getHeaderString("Location");
         // Now make an invocation on the OIDC IdP using another WebClient instance
-        
-        WebClient idpClient = WebClient.create(location, OAuth2TestUtils.setupProviders(), 
+
+        WebClient idpClient = WebClient.create(location, OAuth2TestUtils.setupProviders(),
                                                "bob", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(idpClient).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
-        
+
         // Get Authorization Code + State
         String authzCodeLocation = makeAuthorizationCodeInvocation(idpClient);
         String state = getSubstring(authzCodeLocation, "state");
         assertNotNull(state);
         String code = getSubstring(authzCodeLocation, "code");
         assertNotNull(code);
-        
+
         // Add Referer
         String referer = "https://localhost:" + OIDC_PORT + "/services/authorize";
         client.header("Referer", referer);
-        
+
         // Now invoke back on the service using the authorization code
         client.query("code", code);
         client.query("state", state);
-        
+
         Response serviceResponse = client.post(new Book("book", 123L));
         assertEquals(serviceResponse.getStatus(), 200);
-        
+
         Book returnedBook = serviceResponse.readEntity(Book.class);
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
     }
-    
+
     private String makeAuthorizationCodeInvocation(WebClient client) {
         // Make initial authorization request
         client.type("application/json").accept("application/json");
         Response response = client.get();
-        
+
         OAuthAuthorizationData authzData = response.readEntity(OAuthAuthorizationData.class);
-        
+
         // Now call "decision" to get the authorization code grant
         client.path("decision");
         client.type("application/x-www-form-urlencoded");
-        
+
         Form form = new Form();
         form.param("session_authenticity_token", authzData.getAuthenticityToken());
         form.param("client_id", authzData.getClientId());
@@ -111,13 +111,13 @@ public class OIDCFiltersTest extends AbstractBusClientServerTestBase {
         }
         form.param("state", authzData.getState());
         form.param("oauthDecision", "allow");
-        
+
         response = client.post(form);
         return response.getHeaderString("Location");
     }
-    
+
     private String getSubstring(String parentString, String substringName) {
-        String foundString = 
+        String foundString =
             parentString.substring(parentString.indexOf(substringName + "=") + (substringName + "=").length());
         int ampersandIndex = foundString.indexOf('&');
         if (ampersandIndex < 1) {
@@ -125,5 +125,5 @@ public class OIDCFiltersTest extends AbstractBusClientServerTestBase {
         }
         return foundString.substring(0, ampersandIndex);
     }
-    
+
 }

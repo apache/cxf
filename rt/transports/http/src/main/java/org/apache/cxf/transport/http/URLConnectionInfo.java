@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package org.apache.cxf.transport.http;
 
 import java.net.URI;
@@ -33,7 +33,7 @@ public class URLConnectionInfo {
      * The URL the connection is associated with.
      */
     protected final URI theURI;
-    
+
     public URLConnectionInfo(URL url) {
         URI u = null;
         try {
@@ -43,15 +43,15 @@ public class URLConnectionInfo {
         }
         theURI = u;
     }
-    
+
     public URLConnectionInfo(URI uri) {
         theURI = uri;
     }
-    
+
     /**
      * This field returns the URI associated with the connection
      * in question.
-     * 
+     *
      * @return
      */
     public URI getURI() {

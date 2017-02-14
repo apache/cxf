@@ -38,24 +38,24 @@ public abstract class AbstractSciTest extends AbstractBusClientServerTestBase {
     public void testResponseHasBeenReceivedWhenQueringBook() {
         Response r = createWebClient("/bookstore/books").path("1").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        
+
         Book book = r.readEntity(Book.class);
         assertEquals("1", book.getId());
     }
 
     protected WebClient createWebClient(final String url) {
         final List< ? > providers = Arrays.asList(new JacksonJsonProvider());
-        
+
         final WebClient wc = WebClient
             .create("http://localhost:" + getPort(), providers)
             .path(getContextPath())
             .path(url)
             .accept(MediaType.APPLICATION_JSON);
-        
+
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         return wc;
     }
-    
+
     protected abstract int getPort();
     protected abstract String getContextPath();
 }

@@ -28,7 +28,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 public class StaxSTSServer extends AbstractBusTestServerBase {
 
     private String context;
-    
+
     public StaxSTSServer() {
 
     }
@@ -45,7 +45,7 @@ public class StaxSTSServer extends AbstractBusTestServerBase {
             e.printStackTrace();
         }
     }
-    
+
     public void setContext(String context) {
         this.context = context;
     }

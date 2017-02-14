@@ -55,7 +55,7 @@ public class ClassLoaderSwitcher {
 
     /**
      * Create and set the classloader that is needed for creating the java sources from wsdl
-     * 
+     *
      * @param project
      * @param useCompileClasspath
      * @param classesDir
@@ -66,7 +66,7 @@ public class ClassLoaderSwitcher {
         List<URL> urlList = new ArrayList<>();
         StringBuilder buf = new StringBuilder();
         Set<URI> ret = new LinkedHashSet<URI>();
-        
+
         try {
             urlList.add(classesDir.toURI().toURL());
             if (!useCompileClasspath) {

@@ -37,9 +37,9 @@ public class SCTInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
     public SCTInInterceptor() {
         super(Phase.POST_PROTOCOL);
     }
-    
+
     public void handleMessage(SoapMessage message) throws Fault {
-        
+
         String s = (String)message.get(SoapBindingConstants.SOAP_ACTION);
         AddressingProperties inProps = (AddressingProperties)message
             .getContextualProperty(JAXWSAConstants.ADDRESSING_PROPERTIES_INBOUND);
@@ -48,12 +48,12 @@ public class SCTInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
             s = inProps.getAction().getValue();
         }
 
-        if (s != null 
+        if (s != null
             && s.contains("/RST/SCT")
             && (s.startsWith(STSUtils.WST_NS_05_02)
                 || s.startsWith(STSUtils.WST_NS_05_12))) {
             message.put(org.apache.cxf.ws.addressing.MAPAggregator.ACTION_VERIFIED, Boolean.TRUE);
         }
     }
-    
+
 }

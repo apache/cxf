@@ -23,15 +23,15 @@ import java.util.List;
 
 /**
  * Failover strategy based on a sequential walk through the
- * static cluster represented by multiple endpoints associated 
+ * static cluster represented by multiple endpoints associated
  * with the same service instance.
  */
 public class SequentialStrategy extends AbstractStaticFailoverStrategy {
 
     /**
      * Get next alternate endpoint.
-     * 
-     * @param alternates non-empty List of alternate endpoints 
+     *
+     * @param alternates non-empty List of alternate endpoints
      * @return
      */
     protected <T> T getNextAlternate(List<T> alternates) {

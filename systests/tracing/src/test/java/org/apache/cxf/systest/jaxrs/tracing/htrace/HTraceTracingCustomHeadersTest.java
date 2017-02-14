@@ -55,22 +55,22 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 
 public class HTraceTracingCustomHeadersTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(HTraceTracingCustomHeadersTest.class);
-    
+
     private static final String CUSTOM_HEADER_SPAN_ID = "My-Span-Id";
-    
+
     private Tracer tracer;
     private HTraceClientProvider htraceClientProvider;
-    
+
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
         protected void run() {
             final Map<String, String> properties = new HashMap<String, String>();
             properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, StandardOutSpanReceiver.class.getName());
             properties.put(Tracer.SAMPLER_CLASSES_KEY, AlwaysSampler.class.getName());
-            
+
             final Map<String, Object> headers = new HashMap<String, Object>();
             headers.put(TracerHeaders.HEADER_SPAN_ID, CUSTOM_HEADER_SPAN_ID);
-            
+
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore<TraceScope>()));
@@ -81,7 +81,7 @@ public class HTraceTracingCustomHeadersTest extends AbstractBusClientServerTestB
             sf.create();
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -89,37 +89,37 @@ public class HTraceTracingCustomHeadersTest extends AbstractBusClientServerTestB
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
     }
-    
+
     @Before
     public void setUp() {
         final Map<String, String> properties = new HashMap<String, String>();
         properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, StandardOutSpanReceiver.class.getName());
         properties.put(Tracer.SAMPLER_CLASSES_KEY, AlwaysSampler.class.getName());
-        
+
         tracer = new Tracer.Builder("tracer")
             .conf(HTraceConfiguration.fromMap(properties))
             .build();
 
         htraceClientProvider = new HTraceClientProvider(tracer);
     }
-    
+
     @Test
     public void testThatNewSpanIsCreated() {
         final SpanId spanId = SpanId.fromRandom();
-        
+
         final Response r = createWebClient("/bookstore/books")
             .header(CUSTOM_HEADER_SPAN_ID, spanId.toString())
             .get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        
+
         assertThat((String)r.getHeaders().getFirst(CUSTOM_HEADER_SPAN_ID), equalTo(spanId.toString()));
     }
-    
+
     @Test
     public void testThatNewChildSpanIsCreated() {
         final Response r = createWebClient("/bookstore/books", htraceClientProvider).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        
+
         assertThat((String)r.getHeaders().getFirst(CUSTOM_HEADER_SPAN_ID), notNullValue());
     }
 

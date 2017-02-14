@@ -20,5 +20,5 @@
 package org.apache.cxf.tools.common.model;
 
 public class A {
-    
+
 }

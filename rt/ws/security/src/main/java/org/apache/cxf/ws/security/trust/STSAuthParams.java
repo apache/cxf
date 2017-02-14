@@ -36,7 +36,7 @@ public class STSAuthParams {
     private final String callbackHandler;
     private final String alias;
     private final String keystoreProperties;
-    
+
     public STSAuthParams(AuthMode authMode, String userName, String callbackHandler) {
         this(authMode, userName, callbackHandler, null, null);
     }
@@ -49,7 +49,7 @@ public class STSAuthParams {
         this.alias = alias;
         this.keystoreProperties = keystoreProperties;
     }
-    
+
     public AuthMode getAuthMode() {
         return authMode;
     }
@@ -67,18 +67,18 @@ public class STSAuthParams {
     }
 
     public enum AuthMode {
-        X509_ASSYMETRIC(X509_ENDPOINT, KEY_TYPE_X509), 
+        X509_ASSYMETRIC(X509_ENDPOINT, KEY_TYPE_X509),
         UT_TRANSPORT(TRANSPORT_ENDPOINT, null),
         UT_SYMMETRIC(UT_ENDPOINT, null);
-        
+
         private final QName endpointName;
         private final String keyType;
-        
+
         AuthMode(QName endpointName, String keyType) {
             this.endpointName = endpointName;
             this.keyType = keyType;
         }
-        
+
         public QName getEndpointName() {
             return endpointName;
         }

@@ -24,16 +24,16 @@ import org.apache.wss4j.dom.message.WSSecBase;
 import org.apache.wss4j.dom.message.WSSecHeader;
 
 /**
- * 
+ *
  */
 public class WSSecurityTokenHolder extends WSSecBase {
     SecurityToken token;
-    
+
     public WSSecurityTokenHolder(SecurityToken t, WSSecHeader securityHeader) {
         super(securityHeader);
         token = t;
     }
-    
+
     public SecurityToken getToken() {
         return token;
     }

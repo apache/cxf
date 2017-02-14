@@ -117,7 +117,7 @@ public final class TLSParameterJaxBUtils {
                 password = tmp.toCharArray();
             }
         }
-        String provider = SSLUtils.getKeystoreProvider(kst.isSetProvider() 
+        String provider = SSLUtils.getKeystoreProvider(kst.isSetProvider()
                                                        ? kst.getProvider() : null,
                                                        LOG);
         KeyStore keyStore = provider == null
@@ -196,7 +196,7 @@ public final class TLSParameterJaxBUtils {
         }
         return is;
     }
-    
+
     /**
      * Create a KeyStore containing the trusted CA certificates contained
      * in the supplied input stream.
@@ -246,8 +246,8 @@ public final class TLSParameterJaxBUtils {
         }
 
         return new String(b, 0, l).toCharArray();
-    }    
-    
+    }
+
     /**
      * This method converts the JAXB KeyManagersType into a list of
      * JSSE KeyManagers.

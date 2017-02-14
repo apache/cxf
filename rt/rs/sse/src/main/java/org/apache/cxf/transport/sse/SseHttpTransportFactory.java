@@ -33,23 +33,23 @@ import org.apache.cxf.transport.http.HTTPTransportFactory;
 import org.apache.cxf.transport.sse.atmosphere.AtmosphereSseServletDestination;
 
 @NoJSR250Annotations
-public class SseHttpTransportFactory extends HTTPTransportFactory  
+public class SseHttpTransportFactory extends HTTPTransportFactory
         implements ConduitInitiator, DestinationFactory {
-    
+
     public static final String TRANSPORT_ID = "http://cxf.apache.org/transports/http/sse";
     public static final List<String> DEFAULT_NAMESPACES = Arrays.asList(
         TRANSPORT_ID,
         "http://cxf.apache.org/transports/http/sse/configuration"
     );
-    
+
     public SseHttpTransportFactory() {
         this(null);
     }
-    
+
     public SseHttpTransportFactory(DestinationRegistry registry) {
         super(DEFAULT_NAMESPACES, registry);
     }
-    
+
     @Override
     public Destination getDestination(EndpointInfo endpointInfo, Bus bus) throws IOException {
         return new AtmosphereSseServletDestination(bus, getRegistry(), endpointInfo, endpointInfo.getAddress());

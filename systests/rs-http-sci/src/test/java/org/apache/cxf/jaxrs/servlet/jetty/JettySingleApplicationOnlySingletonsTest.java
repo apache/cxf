@@ -25,7 +25,7 @@ import org.eclipse.jetty.util.resource.Resource;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 
-public class JettySingleApplicationOnlySingletonsTest extends AbstractSciTest {  
+public class JettySingleApplicationOnlySingletonsTest extends AbstractSciTest {
     @Ignore
     public static class EmbeddedJettyServer extends AbstractJettyServer {
         public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
@@ -40,14 +40,14 @@ public class JettySingleApplicationOnlySingletonsTest extends AbstractSciTest {
                 }, PORT);
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
         createStaticBus();
     }
-    
+
     @Override
     protected int getPort() {
         return EmbeddedJettyServer.PORT;

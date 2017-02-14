@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 public class StatsRestServiceImpl {
     private static final Random RANDOM = new Random();
     private final Sse sse = SseFactory.create();
-    
+
     @GET
     @Path("sse/{id}")
     @Produces(MediaType.SERVER_SENT_EVENTS)
@@ -72,7 +72,7 @@ public class StatsRestServiceImpl {
             }
         }.start();
     }
-    
+
     private static OutboundSseEvent createStatsEvent(final OutboundSseEvent.Builder builder, final int eventId) {
         return builder
             .id("" + eventId)

@@ -36,17 +36,17 @@ public class MBServerConnectorTest extends Assert {
 
     @Test
     public void testMBServerConnector() {
-        MBServerConnectorFactory mcf;    
-        MBeanServer mbs;        
-        mbs = MBeanServerFactory.createMBeanServer("test");            
+        MBServerConnectorFactory mcf;
+        MBeanServer mbs;
+        mbs = MBeanServerFactory.createMBeanServer("test");
         mcf = MBServerConnectorFactory.getInstance();
         mcf.setMBeanServer(mbs);
         mcf.setThreaded(true);
         mcf.setDaemon(true);
         mcf.setServiceUrl("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         try {
-            mcf.createConnector(); 
-            Thread.sleep(1000);           
+            mcf.createConnector();
+            Thread.sleep(1000);
             mcf.destroy();
         } catch (Exception ex) {
             ex.printStackTrace();

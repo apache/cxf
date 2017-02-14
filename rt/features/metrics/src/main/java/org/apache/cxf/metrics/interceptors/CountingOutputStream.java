@@ -28,7 +28,7 @@ public final class CountingOutputStream extends FilterOutputStream {
     public CountingOutputStream(OutputStream out) {
       super(out);
     }
-    
+
     public long getCount() {
         return count;
     }

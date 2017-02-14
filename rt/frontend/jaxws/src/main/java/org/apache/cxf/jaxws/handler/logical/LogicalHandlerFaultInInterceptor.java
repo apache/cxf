@@ -28,12 +28,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 
-public class LogicalHandlerFaultInInterceptor 
+public class LogicalHandlerFaultInInterceptor
     extends AbstractJAXWSHandlerInterceptor<Message> {
 
     public LogicalHandlerFaultInInterceptor(Binding binding) {
         super(binding, Phase.PRE_PROTOCOL_FRONTEND);
-        addAfter(SOAPHandlerFaultInInterceptor.class.getName());       
+        addAfter(SOAPHandlerFaultInInterceptor.class.getName());
     }
 
     public void handleMessage(Message message) {
@@ -44,7 +44,7 @@ public class LogicalHandlerFaultInInterceptor
         if (invoker.getLogicalHandlers().isEmpty()) {
             return;
         }
-        
+
         LogicalMessageContextImpl lctx = new LogicalMessageContextImpl(message);
         invoker.setLogicalMessageContext(lctx);
         boolean requestor = isRequestor(message);
@@ -52,17 +52,17 @@ public class LogicalHandlerFaultInInterceptor
             if (!requestor) {
                 //server side, wont get here
             } else {
-                //Client side inbound, thus no response expected, do nothing, the close will  
+                //Client side inbound, thus no response expected, do nothing, the close will
                 //be handled by MEPComplete later
             }
         }
- 
+
         //If this is the inbound and end of MEP, call MEP completion
         if (!isOutbound(message) && isMEPComlete(message)) {
             onCompletion(message);
         }
     }
-    
+
     public void handleFault(Message message) {
         // TODO
     }

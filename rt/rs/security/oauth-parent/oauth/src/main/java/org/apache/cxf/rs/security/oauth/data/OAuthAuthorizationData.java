@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * Typically, an HTML view will be returned to a resource owner who
  * will authorize or deny the third-party consumer
  */
-@XmlRootElement(name = "authorizationData", 
+@XmlRootElement(name = "authorizationData",
                 namespace = "http://org.apache.cxf.rs.security.oauth")
 public class OAuthAuthorizationData implements Serializable {
     private static final long serialVersionUID = -7755998413495017637L;
@@ -41,7 +41,7 @@ public class OAuthAuthorizationData implements Serializable {
     private String logoUri;
     private String replyTo;
     private List<? extends Permission> permissions;
-    
+
     public OAuthAuthorizationData() {
     }
 

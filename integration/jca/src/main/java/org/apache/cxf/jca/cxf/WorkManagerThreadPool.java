@@ -27,21 +27,21 @@ import javax.resource.spi.work.WorkManager;
 import org.eclipse.jetty.util.thread.ThreadPool;
 
 /**
- * The adapter for using Application Server's thread pool. 
+ * The adapter for using Application Server's thread pool.
  * Just simply override the dispatch method.
  */
 public class WorkManagerThreadPool extends CXFWorkAdapter implements ThreadPool {
-    
+
     private WorkManager workManager;
-    
+
     private boolean isLowOnThreads;
-    
+
     private Runnable theJob;
-    
+
     public WorkManagerThreadPool(WorkManager wm) {
         this.workManager = wm;
     }
-    
+
     public boolean dispatch(Runnable job) {
         try {
             theJob = job;
@@ -53,47 +53,47 @@ public class WorkManagerThreadPool extends CXFWorkAdapter implements ThreadPool 
         }
     }
 
-    
+
     public int getIdleThreads() {
         return 0;
     }
 
-    
+
     public int getThreads() {
         return 1;
     }
 
-    
+
     public boolean isLowOnThreads() {
         return isLowOnThreads;
     }
-    
-    
+
+
     void setIsLowOnThreads(boolean isLow) {
         this.isLowOnThreads = isLow;
     }
-    
+
     public void join() throws InterruptedException {
         //Do nothing
     }
-    
+
     public class WorkImpl implements Work {
-        
+
         private Runnable job;
-        
+
         public WorkImpl(Runnable job) {
             this.job = job;
         }
-        
+
         public void run() {
             job.run();
         }
-        
+
         public void release() {
             //empty
         }
     }
-    
+
     @Override
     public void workRejected(WorkEvent e) {
         super.workRejected(e);

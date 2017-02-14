@@ -54,7 +54,7 @@ public class WSDLToIDLGenerationTest extends Assert {
         System.setProperty("WSDLTOIDLGeneration", "true");
     }
 
-    
+
     private void checkIDLStrings(byte orig[], byte generated[]) throws Exception {
         BufferedReader origReader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(orig)));
         BufferedReader genReader = new BufferedReader(
@@ -109,14 +109,14 @@ public class WSDLToIDLGenerationTest extends Assert {
         in.close();
         out.close();
         return out.toByteArray();
-    } 
+    }
 
     @Test
     public void testOnewayGeneration() throws Exception {
-        
+
         String fileName = getClass().getResource("/idlgen/oneway.wsdl").toString();
         idlgen.setWsdlFile(fileName);
-                
+
         idlgen.setBindingName("BaseCORBABinding");
         idlgen.setOutputFile("oneway.idl");
         idlgen.setPrintWriter(new PrintWriter(idloutput));
@@ -127,13 +127,13 @@ public class WSDLToIDLGenerationTest extends Assert {
 
         checkIDLStrings(orig, idloutput.toByteArray());
     }
-    
+
     @Test
     public void testStringtypesIdlgen() throws Exception {
         try {
             String fileName = getClass().getResource("/idlgen/stringtypes.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("BasePortTypeCORBABinding");
             idlgen.setOutputFile("stringtypes.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
@@ -153,7 +153,7 @@ public class WSDLToIDLGenerationTest extends Assert {
         try {
             String fileName = getClass().getResource("/idlgen/integertypes.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("BasePortTypeCORBABinding");
             idlgen.setOutputFile("integertypes.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
@@ -167,13 +167,13 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("integertypes.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testUniontypesIdlgen() throws Exception {
         try {
             String fileName = getClass().getResource("/idlgen/uniontypes.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("Test.MultiPartCORBABinding");
             idlgen.setOutputFile("uniontypes.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
@@ -187,13 +187,13 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("uniontypes.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testDefaultUniontypesIdlgen() throws Exception {
         try {
             String fileName = getClass().getResource("/idlgen/defaultuniontypes.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("Test.MultiPartCORBABinding");
             idlgen.setOutputFile("defaultuniontypes.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
@@ -229,7 +229,7 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("exceptiontypes.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testStructIdlgen() throws Exception {
 
@@ -272,7 +272,7 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("sequencetypes.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testArrayIdlgen() throws Exception {
 
@@ -297,11 +297,11 @@ public class WSDLToIDLGenerationTest extends Assert {
 
     @Test
     public void testEnumIdlgen() throws Exception {
-        
-        try {           
+
+        try {
             String fileName = getClass().getResource("/idlgen/enum.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("BVOIPCORBABinding");
             idlgen.setOutputFile("enumtype.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
@@ -315,16 +315,16 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("enumtype.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testContentIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/content.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("ContentCORBABinding");
-            idlgen.setOutputFile("contenttype.idl");            
+            idlgen.setOutputFile("contenttype.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -336,16 +336,16 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("contenttype.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testAllTypeIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/alltype.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("BaseCORBABinding");
-            idlgen.setOutputFile("alltype.idl");            
+            idlgen.setOutputFile("alltype.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -357,16 +357,16 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("alltype.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testFixedTypeIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/fixed.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("YCORBABinding");
-            idlgen.setOutputFile("fixed.idl");            
+            idlgen.setOutputFile("fixed.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -378,16 +378,16 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("fixed.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testAnonFixedTypeIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/anonfixed.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("XCORBABinding");
-            idlgen.setOutputFile("anonfixed.idl");            
+            idlgen.setOutputFile("anonfixed.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -402,13 +402,13 @@ public class WSDLToIDLGenerationTest extends Assert {
 
     @Test
     public void testAnyTypeIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/any.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("anyInterfaceCORBABinding");
-            idlgen.setOutputFile("any.idl");            
+            idlgen.setOutputFile("any.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -424,13 +424,13 @@ public class WSDLToIDLGenerationTest extends Assert {
 
     @Test
     public void testTypeInheritanceIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/TypeInheritance.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("TypeInheritanceInterfaceCORBABinding");
-            idlgen.setOutputFile("typeInheritance.idl");            
+            idlgen.setOutputFile("typeInheritance.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -442,16 +442,16 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("typeInheritance.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testNillableIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/nillable.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("NillableCORBABinding");
-            idlgen.setOutputFile("nillable.idl");            
+            idlgen.setOutputFile("nillable.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -463,16 +463,16 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("nillable.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testTypedefIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/typedef.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("XCORBABinding");
-            idlgen.setOutputFile("typedef.idl");            
+            idlgen.setOutputFile("typedef.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -487,13 +487,13 @@ public class WSDLToIDLGenerationTest extends Assert {
 
     @Test
     public void testNestedIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/nested.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("TypeInheritanceCORBABinding");
-            idlgen.setOutputFile("nested.idl");            
+            idlgen.setOutputFile("nested.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -505,20 +505,20 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("nested.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testNestedDerivedTypesIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/nested-derivedtypes.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("DerivedTypesCORBABinding");
-            idlgen.setOutputFile("nested-derivedtypes.idl");            
+            idlgen.setOutputFile("nested-derivedtypes.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
-            InputStream origstream = 
+            InputStream origstream =
                 getClass().getResourceAsStream("/idlgen/expected_nested-derivedtypes.idl");
             byte orig[] = inputStreamToBytes(origstream);
 
@@ -530,17 +530,17 @@ public class WSDLToIDLGenerationTest extends Assert {
 
     @Test
     public void testNestedComplexTypesIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/nested_complex.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("XCORBABinding");
-            idlgen.setOutputFile("nested_complex.idl");            
+            idlgen.setOutputFile("nested_complex.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
-            InputStream origstream = 
+            InputStream origstream =
                 getClass().getResourceAsStream("/idlgen/expected_nested_complex.idl");
             byte orig[] = inputStreamToBytes(origstream);
 
@@ -552,17 +552,17 @@ public class WSDLToIDLGenerationTest extends Assert {
 
     @Test
     public void testNestedInterfaceTypesIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/nested_interfaces.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("C.C1CORBABinding");
-            idlgen.setOutputFile("nested_interfaces.idl");            
+            idlgen.setOutputFile("nested_interfaces.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
-            InputStream origstream = 
+            InputStream origstream =
                 getClass().getResourceAsStream("/idlgen/expected_nested_interfaces.idl");
             byte orig[] = inputStreamToBytes(origstream);
 
@@ -571,20 +571,20 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("nested_interfaces.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testDateTimeTypesIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/datetime.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("BaseCORBABinding");
-            idlgen.setOutputFile("datetime.idl");            
+            idlgen.setOutputFile("datetime.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
-            InputStream origstream = 
+            InputStream origstream =
                 getClass().getResourceAsStream("/idlgen/expected_datetime.idl");
             byte orig[] = inputStreamToBytes(origstream);
 
@@ -596,17 +596,17 @@ public class WSDLToIDLGenerationTest extends Assert {
 
     @Test
     public void testWsaddressingServerIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/wsaddressing_server.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("TestServerCORBABinding");
-            idlgen.setOutputFile("wsaddress_server.idl");            
+            idlgen.setOutputFile("wsaddress_server.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
-            InputStream origstream = 
+            InputStream origstream =
                 getClass().getResourceAsStream("/idlgen/expected_wsaddressing_server.idl");
             byte orig[] = inputStreamToBytes(origstream);
 
@@ -615,20 +615,20 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("wsaddressing_server.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testWsaddressingAccountIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/wsaddressing_account.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("AccountCORBABinding");
-            idlgen.setOutputFile("wsaddress_account.idl");            
+            idlgen.setOutputFile("wsaddress_account.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
-            InputStream origstream = 
+            InputStream origstream =
                 getClass().getResourceAsStream("/idlgen/expected_wsaddressing_account.idl");
             byte orig[] = inputStreamToBytes(origstream);
 
@@ -637,20 +637,20 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("wsaddressing_account.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testWsaddressingBankIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/wsaddressing_bank.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("BankCORBABinding");
-            idlgen.setOutputFile("wsaddress_bank.idl");            
+            idlgen.setOutputFile("wsaddress_bank.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
-            InputStream origstream = 
+            InputStream origstream =
                 getClass().getResourceAsStream("/idlgen/expected_wsaddressing_bank.idl");
             byte orig[] = inputStreamToBytes(origstream);
 
@@ -659,30 +659,30 @@ public class WSDLToIDLGenerationTest extends Assert {
             new File("wsaddressing_bank.idl").deleteOnExit();
         }
     }
-    
+
     @Test
     public void testMultipleBindingIdlgen() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/multiplebinding.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-                        
+
             idlgen.setOutputFile("multiplebinding.idl");
-            idlgen.setPrintWriter(new PrintWriter(idloutput));  
-            idlgen.setGenerateAllBindings(true);            
+            idlgen.setPrintWriter(new PrintWriter(idloutput));
+            idlgen.setGenerateAllBindings(true);
             idlgen.generateIDL(null);
 
             InputStream origstream = getClass().getResourceAsStream("/idlgen/expected_multiplebinding.idl");
             byte orig[] = inputStreamToBytes(origstream);
-            
+
             try {
-                checkIDLStrings(orig, idloutput.toByteArray());           
+                checkIDLStrings(orig, idloutput.toByteArray());
             } catch (Throwable ex) {
                 // The ibm jdk SOMTIMES outputs the idl modules in a different order
                 // (still valid idl).
                 origstream = getClass().getResourceAsStream("/idlgen/expected_multiplebinding_ibmjdk.idl");
                 orig = inputStreamToBytes(origstream);
-                checkIDLStrings(orig, idloutput.toByteArray());    
+                checkIDLStrings(orig, idloutput.toByteArray());
             }
         } finally {
             new File("multiplebinding.idl").deleteOnExit();
@@ -691,13 +691,13 @@ public class WSDLToIDLGenerationTest extends Assert {
 
     @Test
     public void testComplextypeDerivedSimpletype() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/complex_types.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("TypeTestCORBABinding");
-            idlgen.setOutputFile("complex_types.idl");            
+            idlgen.setOutputFile("complex_types.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -710,16 +710,16 @@ public class WSDLToIDLGenerationTest extends Assert {
         }
     }
 
-    
+
     @Test
     public void testCorbaExceptionComplexType() throws Exception {
-        
+
         try {
             String fileName = getClass().getResource("/idlgen/databaseService.wsdl").toString();
             idlgen.setWsdlFile(fileName);
-            
+
             idlgen.setBindingName("DatabaseCORBABinding");
-            idlgen.setOutputFile("databaseService.idl");            
+            idlgen.setOutputFile("databaseService.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -734,13 +734,13 @@ public class WSDLToIDLGenerationTest extends Assert {
 
     @Test
     public void testCorbaRecursiveStructs() throws Exception {
-        
+
         try {
             URI fileName = getClass().getResource("/idlgen/recursivestruct.wsdl").toURI();
             idlgen.setWsdlFile(new File(fileName).getAbsolutePath());
-            
+
             idlgen.setBindingName("TestInterfaceCORBABinding");
-            idlgen.setOutputFile("recursivestruct.idl");            
+            idlgen.setOutputFile("recursivestruct.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 
@@ -756,13 +756,13 @@ public class WSDLToIDLGenerationTest extends Assert {
 
     @Test
     public void testCoraRecursiveUnion() throws Exception {
-        
+
         try {
             URI fileName = getClass().getResource("/idlgen/recursiveunion.wsdl").toURI();
             idlgen.setWsdlFile(new File(fileName).getAbsolutePath());
-            
+
             idlgen.setBindingName("TestInterfaceCORBABinding");
-            idlgen.setOutputFile("recursiveunion.idl");            
+            idlgen.setOutputFile("recursiveunion.idl");
             idlgen.setPrintWriter(new PrintWriter(idloutput));
             idlgen.generateIDL(null);
 

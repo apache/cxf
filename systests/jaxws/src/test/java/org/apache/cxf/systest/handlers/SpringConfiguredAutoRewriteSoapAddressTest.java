@@ -56,7 +56,7 @@ public class SpringConfiguredAutoRewriteSoapAddressTest
             // Just skip the test as "127.0.0.1" doesn't work in JDK8
             return;
         }
-        
+
         serviceUrls = findAllServiceUrlsFromWsdl("127.0.0.1", port);
         assertEquals(1, serviceUrls.size());
         assertEquals("http://127.0.0.1:" + port + "/SpringEndpoint", serviceUrls.get(0));

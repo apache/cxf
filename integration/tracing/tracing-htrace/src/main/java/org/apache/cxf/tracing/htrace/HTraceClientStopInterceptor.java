@@ -27,7 +27,7 @@ public class HTraceClientStopInterceptor extends AbstractHTraceClientInterceptor
     public HTraceClientStopInterceptor() {
         this(Phase.RECEIVE);
     }
-    
+
     public HTraceClientStopInterceptor(final String phase) {
         super(phase, null);
     }
@@ -35,7 +35,7 @@ public class HTraceClientStopInterceptor extends AbstractHTraceClientInterceptor
     @Override
     public void handleMessage(Message message) throws Fault {
         @SuppressWarnings("unchecked")
-        final TraceScopeHolder<TraceScope> holder = 
+        final TraceScopeHolder<TraceScope> holder =
             (TraceScopeHolder<TraceScope>)message.getExchange().get(TRACE_SPAN);
         super.stopTraceSpan(holder);
     }

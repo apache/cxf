@@ -54,21 +54,21 @@ import org.apache.cxf.wsdl.http.AddressType;
  *
  */
 @NoJSR250Annotations
-public class HTTPTransportFactory 
-    extends AbstractTransportFactory 
+public class HTTPTransportFactory
+    extends AbstractTransportFactory
     implements ConduitInitiator, DestinationFactory {
-    
 
-    public static final List<String> DEFAULT_NAMESPACES 
+
+    public static final List<String> DEFAULT_NAMESPACES
         = Arrays.asList(
             "http://cxf.apache.org/transports/http",
             "http://cxf.apache.org/transports/http/configuration",
             "http://schemas.xmlsoap.org/wsdl/http",
             "http://schemas.xmlsoap.org/wsdl/http/"
         );
-        
+
     private static final Logger LOG = LogUtils.getL7dLogger(HTTPTransportFactory.class);
-    
+
     /**
      * This constant holds the prefixes served by this factory.
      */
@@ -79,19 +79,19 @@ public class HTTPTransportFactory
     }
 
     protected DestinationRegistry registry;
-    
+
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Lock r = lock.readLock();
     private final Lock w = lock.writeLock();
-    
+
     public HTTPTransportFactory() {
         this(new DestinationRegistryImpl());
     }
-    
+
     public HTTPTransportFactory(DestinationRegistry registry) {
         this(DEFAULT_NAMESPACES, registry);
     }
-    
+
     protected HTTPTransportFactory(List<String> transportIds, DestinationRegistry registry) {
         super(transportIds);
         if (registry == null) {
@@ -99,11 +99,11 @@ public class HTTPTransportFactory
         }
         this.registry = registry;
     }
-    
+
     public DestinationRegistry getRegistry() {
         return registry;
     }
-    
+
     public void setRegistry(DestinationRegistry newRegistry) {
         w.lock();
         try {
@@ -119,7 +119,7 @@ public class HTTPTransportFactory
             w.unlock();
         }
     }
-    
+
     /**
      * This call is used by CXF ExtensionManager to inject the activationNamespaces
      * @param ans The transport ids.
@@ -129,19 +129,19 @@ public class HTTPTransportFactory
     }
 
     public EndpointInfo createEndpointInfo(
-        ServiceInfo serviceInfo, 
-        BindingInfo b, 
+        ServiceInfo serviceInfo,
+        BindingInfo b,
         List<?>     ees
     ) {
         if (ees != null) {
             for (Iterator<?> itr = ees.iterator(); itr.hasNext();) {
                 Object extensor = itr.next();
-    
+
                 if (extensor instanceof AddressType) {
                     final AddressType httpAdd = (AddressType)extensor;
-    
-                    EndpointInfo info = 
-                        new HttpEndpointInfo(serviceInfo, 
+
+                    EndpointInfo info =
+                        new HttpEndpointInfo(serviceInfo,
                                 "http://schemas.xmlsoap.org/wsdl/http/");
                     info.setAddress(httpAdd.getLocation());
                     info.addExtensor(httpAdd);
@@ -149,12 +149,12 @@ public class HTTPTransportFactory
                 }
             }
         }
-        
-        HttpEndpointInfo hei = new HttpEndpointInfo(serviceInfo, 
+
+        HttpEndpointInfo hei = new HttpEndpointInfo(serviceInfo,
             "http://schemas.xmlsoap.org/wsdl/http/");
         AddressType at = new AddressType();
         hei.addExtensor(at);
-        
+
         return hei;
     }
 
@@ -169,13 +169,13 @@ public class HTTPTransportFactory
     /**
      * This call uses the Configurer from the bus to configure
      * a bean.
-     * 
+     *
      * @param bean
      */
     protected void configure(Bus b, Object bean) {
         configure(b, bean, null, null);
     }
-    
+
     protected void configure(Bus bus, Object bean, String name, String extraName) {
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
@@ -185,7 +185,7 @@ public class HTTPTransportFactory
             }
         }
     }
-    
+
     private static class HttpEndpointInfo extends EndpointInfo {
         AddressType saddress;
         HttpEndpointInfo(ServiceInfo serv, String trans) {
@@ -204,8 +204,8 @@ public class HTTPTransportFactory
                 saddress = (AddressType)el;
             }
         }
-    }    
-    
+    }
+
     /**
      * This call creates a new HTTPConduit for the endpoint. It is equivalent
      * to calling getConduit without an EndpointReferenceType.
@@ -217,7 +217,7 @@ public class HTTPTransportFactory
     /**
      * This call creates a new HTTP Conduit based on the EndpointInfo and
      * EndpointReferenceType.
-     * TODO: What are the formal constraints on EndpointInfo and 
+     * TODO: What are the formal constraints on EndpointInfo and
      * EndpointReferenceType values?
      */
     public Conduit getConduit(
@@ -225,7 +225,7 @@ public class HTTPTransportFactory
             EndpointReferenceType target,
             Bus bus
     ) throws IOException {
-        
+
         HTTPConduitFactory factory = findFactory(endpointInfo, bus);
         HTTPConduit conduit = null;
         if (factory != null) {
@@ -235,7 +235,7 @@ public class HTTPTransportFactory
             conduit = new URLConnectionHTTPConduit(bus, endpointInfo, target);
         }
 
-        // Spring configure the conduit.  
+        // Spring configure the conduit.
         String address = conduit.getAddress();
         if (address != null && address.indexOf('?') != -1) {
             address = address.substring(0, address.indexOf('?'));
@@ -248,7 +248,7 @@ public class HTTPTransportFactory
         conduit.finalizeConfig();
         return conduit;
     }
-    
+
     protected HTTPConduitFactory findFactory(EndpointInfo endpointInfo, Bus bus) {
         HTTPConduitFactory f = endpointInfo.getProperty(HTTPConduitFactory.class.getName(), HTTPConduitFactory.class);
         if (f == null) {
@@ -268,7 +268,7 @@ public class HTTPTransportFactory
                     HttpDestinationFactory jettyFactory = bus.getExtension(HttpDestinationFactory.class);
                     String addr = endpointInfo.getAddress();
                     if (jettyFactory == null && addr != null && addr.startsWith("http")) {
-                        String m = 
+                        String m =
                             new org.apache.cxf.common.i18n.Message("NO_HTTP_DESTINATION_FACTORY_FOUND",
                                                                    LOG).toString();
                         LOG.log(Level.SEVERE, m);
@@ -280,7 +280,7 @@ public class HTTPTransportFactory
                     } else {
                         factory = new ServletDestinationFactory();
                     }
-                    
+
                     d = factory.createDestination(endpointInfo, bus, registry);
                     registry.addDestination(d);
                     configure(bus, d);

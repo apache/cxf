@@ -57,7 +57,7 @@ public class ServiceModelUtilTest extends Assert {
     private IMocksControl control;
     private Bus bus;
     private BindingFactoryManager bindingFactoryManager;
-    
+
     @Before
     public void setUp() throws Exception {
         String wsdlUrl = getClass().getResource(WSDL_PATH).toString();
@@ -87,12 +87,12 @@ public class ServiceModelUtilTest extends Assert {
         control.replay();
         serviceInfo = wsdlServiceBuilder.buildServices(def, service).get(0);
     }
-    
+
     @After
     public void tearDown() throws Exception {
-        
+
     }
-    
+
     @Test
     public void testGetSchema() throws Exception {
         BindingInfo bindingInfo = null;
@@ -110,18 +110,18 @@ public class ServiceModelUtilTest extends Assert {
             input.getMessageInfo().getMessageParts().get(0).getElementQName().getLocalPart(), "inHeader");
         assertEquals(input.getMessageInfo().getMessageParts().get(0).getElementQName().getNamespaceURI(),
                      "http://org.apache.cxf/headers");
-        
+
         assertTrue(input.getMessageInfo().getMessageParts().get(0).isElement());
         assertEquals(
             input.getMessageInfo().getMessageParts().get(1).getElementQName().getLocalPart(), "passenger");
         assertEquals(input.getMessageInfo().getMessageParts().get(1).getElementQName().getNamespaceURI(),
                      "http://mycompany.example.com/employees");
         assertTrue(input.getMessageInfo().getMessageParts().get(1).isElement());
-        
+
         MessagePartInfo messagePartInfo = input.getMessageInfo().getMessageParts().get(0);
         SchemaInfo schemaInfo = ServiceModelUtil.getSchema(serviceInfo, messagePartInfo);
         assertEquals(schemaInfo.getNamespaceURI(), "http://org.apache.cxf/headers");
-        
+
         messagePartInfo = input.getMessageInfo().getMessageParts().get(1);
         schemaInfo = ServiceModelUtil.getSchema(serviceInfo, messagePartInfo);
         assertEquals(schemaInfo.getNamespaceURI(), "http://mycompany.example.com/employees");

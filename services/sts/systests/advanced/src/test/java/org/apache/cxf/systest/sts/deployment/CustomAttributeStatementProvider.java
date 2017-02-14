@@ -35,7 +35,7 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.dom.WSConstants;
 
 public class CustomAttributeStatementProvider implements AttributeStatementProvider {
-    
+
     private String nameFormat = SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED;
 
     public AttributeStatementBean getStatement(TokenProviderParameters providerParameters) {
@@ -55,7 +55,7 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
             params.setTokenRequirements(providerParameters.getTokenRequirements());
             params.setTokenStore(providerParameters.getTokenStore());
             params.setMessageContext(providerParameters.getMessageContext());
-            retrievedClaims = 
+            retrievedClaims =
                 claimsManager.retrieveClaimValues(
                     providerParameters.getRequestedPrimaryClaims(),
                     providerParameters.getRequestedSecondaryClaims(),
@@ -65,7 +65,7 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
         if (retrievedClaims == null) {
             return null;
         }
-        
+
         Iterator<ProcessedClaim> claimIterator = retrievedClaims.iterator();
         if (!claimIterator.hasNext()) {
             return null;
@@ -78,7 +78,7 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
         while (claimIterator.hasNext()) {
             ProcessedClaim claim = claimIterator.next();
             AttributeBean attributeBean = new AttributeBean();
-            
+
             URI claimType = claim.getClaimType();
             if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
                 || WSConstants.SAML2_NS.equals(tokenType)) {
@@ -94,7 +94,7 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
 
                 String namespace = uri.substring(0, lastSlash);
                 String name = uri.substring(lastSlash + 1, uri.length());
-                
+
                 attributeBean.setSimpleName(name);
                 attributeBean.setQualifiedName(namespace);
             }
@@ -105,7 +105,7 @@ public class CustomAttributeStatementProvider implements AttributeStatementProvi
 
         return attrBean;
     }
-    
+
     public String getNameFormat() {
         return nameFormat;
     }

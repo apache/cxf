@@ -44,9 +44,9 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
 
     public CatalogXmlSchemaURIResolver(Bus bus) {
         this.resolver = new TransportURIResolver(bus);
-        this.bus = bus; 
+        this.bus = bus;
     }
-    
+
     public Map<String, String> getResolvedMap() {
         return resolved;
     }
@@ -55,12 +55,12 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
         String resolvedSchemaLocation = null;
         OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
         try {
-            resolvedSchemaLocation = new OASISCatalogManagerHelper().resolve(catalogResolver, 
+            resolvedSchemaLocation = new OASISCatalogManagerHelper().resolve(catalogResolver,
                                           schemaLocation, baseUri);
         } catch (Exception e) {
             throw new RuntimeException("Catalog resolution failed", e);
         }
-        
+
         InputSource in = null;
         if (resolvedSchemaLocation == null) {
             in = this.resolver.resolve(schemaLocation, baseUri);
@@ -81,7 +81,7 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
         } else if (in.getByteStream() != null
             && !(in.getByteStream() instanceof ByteArrayInputStream)) {
             //workaround bug in XmlSchema - XmlSchema is not closing the InputStreams
-            //that are returned for imports.  Thus, with a lot of services starting up 
+            //that are returned for imports.  Thus, with a lot of services starting up
             //or a lot of schemas imported or similar, it's easy to run out of
             //file handles.  We'll just load the file into a byte[] and return that.
             try {

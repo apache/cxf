@@ -41,7 +41,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 public class ConfigurerImplTest extends Assert {
-    
+
     static {
         Class<?> cls;
         try {
@@ -57,40 +57,40 @@ public class ConfigurerImplTest extends Assert {
             //ignore;
         }
     }
-    
+
     @Test
     public void testConfigureSimpleNoMatchingBean() {
         SimpleBean sb = new SimpleBean("unknown");
-        
-        BusApplicationContext ac = 
+
+        BusApplicationContext ac =
             new BusApplicationContext("/org/apache/cxf/configuration/spring/test-beans.xml",
                                       false);
 
         ConfigurerImpl configurer = new ConfigurerImpl(ac);
         configurer.configureBean(sb);
-        assertEquals("Unexpected value for attribute stringAttr", 
+        assertEquals("Unexpected value for attribute stringAttr",
                      "hello", sb.getStringAttr());
-        assertTrue("Unexpected value for attribute booleanAttr", 
+        assertTrue("Unexpected value for attribute booleanAttr",
                    sb.getBooleanAttr());
-        assertEquals("Unexpected value for attribute integerAttr", 
+        assertEquals("Unexpected value for attribute integerAttr",
                      BigInteger.ONE, sb.getIntegerAttr());
-        assertEquals("Unexpected value for attribute intAttr", 
+        assertEquals("Unexpected value for attribute intAttr",
                      Integer.valueOf(2), sb.getIntAttr());
-        assertEquals("Unexpected value for attribute longAttr", 
+        assertEquals("Unexpected value for attribute longAttr",
                      Long.valueOf(3L), sb.getLongAttr());
-        assertEquals("Unexpected value for attribute shortAttr", 
+        assertEquals("Unexpected value for attribute shortAttr",
                      Short.valueOf((short)4), sb.getShortAttr());
-        assertEquals("Unexpected value for attribute decimalAttr", 
+        assertEquals("Unexpected value for attribute decimalAttr",
                      new BigDecimal("5"), sb.getDecimalAttr());
-        assertEquals("Unexpected value for attribute floatAttr", 
+        assertEquals("Unexpected value for attribute floatAttr",
                      new Float(6F), sb.getFloatAttr());
-        assertEquals("Unexpected value for attribute doubleAttr", 
+        assertEquals("Unexpected value for attribute doubleAttr",
                      Double.valueOf(7.0D), sb.getDoubleAttr());
-        assertEquals("Unexpected value for attribute byteAttr", 
+        assertEquals("Unexpected value for attribute byteAttr",
                      Byte.valueOf((byte)8), sb.getByteAttr());
-        
+
         QName qn = sb.getQnameAttr();
-        assertEquals("Unexpected value for attribute qnameAttrNoDefault", 
+        assertEquals("Unexpected value for attribute qnameAttrNoDefault",
                      "schema", qn.getLocalPart());
         assertEquals("Unexpected value for attribute qnameAttrNoDefault",
                      "http://www.w3.org/2001/XMLSchema", qn.getNamespaceURI());
@@ -106,100 +106,100 @@ public class ConfigurerImplTest extends Assert {
         for (int i = 0; i < expected.length; i++) {
             assertEquals("Unexpected value for attribute hexBinaryAttrNoDefault", expected[i], val[i]);
         }
-        
-        assertEquals("Unexpected value for attribute unsignedIntAttrNoDefault", 
+
+        assertEquals("Unexpected value for attribute unsignedIntAttrNoDefault",
                      Long.valueOf(9L), sb.getUnsignedIntAttr());
-        assertEquals("Unexpected value for attribute unsignedShortAttrNoDefault", 
+        assertEquals("Unexpected value for attribute unsignedShortAttrNoDefault",
                      Integer.valueOf(10), sb.getUnsignedShortAttr());
-        assertEquals("Unexpected value for attribute unsignedByteAttrNoDefault", 
+        assertEquals("Unexpected value for attribute unsignedByteAttrNoDefault",
                      Short.valueOf((short)11), sb.getUnsignedByteAttr());
     }
-    
+
     @Test
     public void testConfigureSimple() {
-        // Try to configure the bean with id 
+        // Try to configure the bean with id
         verifyConfigureSimple("simple");
         // Try to configure the bean with an alias name
         verifyConfigureSimple("simpleValueBean");
     }
-    
-    
+
+
     public void verifyConfigureSimple(String beanName) {
-        
+
         SimpleBean sb = new SimpleBean(beanName);
-        BusApplicationContext ac = 
+        BusApplicationContext ac =
             new BusApplicationContext("/org/apache/cxf/configuration/spring/test-beans.xml",
                                       false);
 
         ConfigurerImpl configurer = new ConfigurerImpl();
         configurer.setApplicationContext(ac);
-        
+
         configurer.configureBean(sb);
-        assertEquals("Unexpected value for attribute stringAttr", 
+        assertEquals("Unexpected value for attribute stringAttr",
                      "hallo", sb.getStringAttr());
-        assertTrue("Unexpected value for attribute booleanAttr", 
+        assertTrue("Unexpected value for attribute booleanAttr",
                    !sb.getBooleanAttr());
-        assertEquals("Unexpected value for attribute integerAttr", 
+        assertEquals("Unexpected value for attribute integerAttr",
                      BigInteger.TEN, sb.getIntegerAttr());
-        assertEquals("Unexpected value for attribute intAttr", 
+        assertEquals("Unexpected value for attribute intAttr",
                      Integer.valueOf(12), sb.getIntAttr());
-        assertEquals("Unexpected value for attribute longAttr", 
+        assertEquals("Unexpected value for attribute longAttr",
                      Long.valueOf(13L), sb.getLongAttr());
-        assertEquals("Unexpected value for attribute shortAttr", 
+        assertEquals("Unexpected value for attribute shortAttr",
                      Short.valueOf((short)14), sb.getShortAttr());
-        assertEquals("Unexpected value for attribute decimalAttr", 
+        assertEquals("Unexpected value for attribute decimalAttr",
                      new BigDecimal("15"), sb.getDecimalAttr());
-        assertEquals("Unexpected value for attribute floatAttr", 
+        assertEquals("Unexpected value for attribute floatAttr",
                      new Float(16F), sb.getFloatAttr());
-        assertEquals("Unexpected value for attribute doubleAttr", 
+        assertEquals("Unexpected value for attribute doubleAttr",
                      Double.valueOf(17D), sb.getDoubleAttr());
-        assertEquals("Unexpected value for attribute byteAttr", 
+        assertEquals("Unexpected value for attribute byteAttr",
                      Byte.valueOf((byte)18), sb.getByteAttr());
-        
-        assertEquals("Unexpected value for attribute unsignedIntAttrNoDefault", 
+
+        assertEquals("Unexpected value for attribute unsignedIntAttrNoDefault",
                      Long.valueOf(19L), sb.getUnsignedIntAttr());
-        assertEquals("Unexpected value for attribute unsignedShortAttrNoDefault", 
+        assertEquals("Unexpected value for attribute unsignedShortAttrNoDefault",
                      Integer.valueOf(20), sb.getUnsignedShortAttr());
-        assertEquals("Unexpected value for attribute unsignedByteAttrNoDefault", 
+        assertEquals("Unexpected value for attribute unsignedByteAttrNoDefault",
                      Short.valueOf((short)21), sb.getUnsignedByteAttr());
     }
-    
+
     @Test
     public void testConfigureSimpleMatchingStarBeanId() {
         SimpleBean sb = new SimpleBean("simple2");
-        BusApplicationContext ac = 
+        BusApplicationContext ac =
             new BusApplicationContext("/org/apache/cxf/configuration/spring/test-beans.xml",
                                       false);
 
         ConfigurerImpl configurer = new ConfigurerImpl();
         configurer.setApplicationContext(ac);
         configurer.configureBean(sb);
-        assertTrue("Unexpected value for attribute booleanAttr", 
+        assertTrue("Unexpected value for attribute booleanAttr",
                    !sb.getBooleanAttr());
-        assertEquals("Unexpected value for attribute integerAttr", 
+        assertEquals("Unexpected value for attribute integerAttr",
                      BigInteger.TEN, sb.getIntegerAttr());
-        assertEquals("Unexpected value for attribute stringAttr", 
+        assertEquals("Unexpected value for attribute stringAttr",
                      "StarHallo", sb.getStringAttr());
     }
-    
+
     @Test
     public void testConfigureSimpleMatchingStarBeanIdWithChildInstance() {
         SimpleBean sb = new ChildBean("simple2");
-        BusApplicationContext ac = 
+        BusApplicationContext ac =
             new BusApplicationContext("/org/apache/cxf/configuration/spring/test-beans.xml",
                                       false);
 
         ConfigurerImpl configurer = new ConfigurerImpl();
         configurer.setApplicationContext(ac);
         configurer.configureBean(sb);
-        assertTrue("Unexpected value for attribute booleanAttr", 
+        assertTrue("Unexpected value for attribute booleanAttr",
                    !sb.getBooleanAttr());
-        assertEquals("Unexpected value for attribute integerAttr", 
+        assertEquals("Unexpected value for attribute integerAttr",
                      BigInteger.TEN, sb.getIntegerAttr());
-        assertEquals("Unexpected value for attribute stringAttr", 
+        assertEquals("Unexpected value for attribute stringAttr",
                      "StarHallo", sb.getStringAttr());
     }
-    
+
     @Test
     public void testGetBeanName() {
         ConfigurerImpl configurer = new ConfigurerImpl();
@@ -216,12 +216,12 @@ public class ConfigurerImplTest extends Assert {
                 return "b";
             }
         }
-        beanInstance = new NamedBean(); 
+        beanInstance = new NamedBean();
         assertEquals("b", configurer.getBeanName(beanInstance));
         beanInstance = this;
         assertNull(configurer.getBeanName(beanInstance));
     }
-    
+
     @Test
     public void testAddApplicationContext() {
         ConfigurableApplicationContext context1 =
@@ -230,7 +230,7 @@ public class ConfigurerImplTest extends Assert {
         configurer.setApplicationContext(context1);
         // Just to simulate the OSGi's uninstall command
         context1.close();
-        
+
         ConfigurableApplicationContext context2 =
             new ClassPathXmlApplicationContext("/org/apache/cxf/configuration/spring/test-beans.xml");
         configurer.addApplicationContext(context2);
@@ -238,11 +238,11 @@ public class ConfigurerImplTest extends Assert {
         assertEquals("The Context's size is wrong", 1, contexts.size());
         assertTrue("The conetxts' contains a wrong application context", contexts.contains(context2));
     }
-    
+
     class SimpleBean implements Configurable {
-        
+
         private String beanName;
-        
+
         private String stringAttr = "hello";
         private Boolean booleanAttr = Boolean.TRUE;
         private BigInteger integerAttr = BigInteger.ONE;
@@ -259,12 +259,12 @@ public class ConfigurerImplTest extends Assert {
         private Long unsignedIntAttr = Long.valueOf(9);
         private Integer unsignedShortAttr = Integer.valueOf(10);
         private Short unsignedByteAttr = Short.valueOf((short)11);
- 
-        
+
+
         SimpleBean(String bn) {
             beanName = bn;
         }
-         
+
         public String getBeanName() {
             return beanName;
         }
@@ -399,14 +399,14 @@ public class ConfigurerImplTest extends Assert {
 
         public void setBeanName(String beanName) {
             this.beanName = beanName;
-        }    
+        }
     }
-    
+
     class ChildBean extends SimpleBean {
 
         ChildBean(String bn) {
             super(bn);
         }
-        
+
     }
 }

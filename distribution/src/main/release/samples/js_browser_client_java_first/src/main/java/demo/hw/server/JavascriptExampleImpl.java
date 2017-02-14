@@ -30,9 +30,9 @@ import demo.hw.server.data.Ingredient;
 
 @WebService(endpointInterface = "demo.hw.server.JavascriptExample")
 public class JavascriptExampleImpl implements JavascriptExample {
-    
+
     private List<Beverage> beverages;
-    
+
     public JavascriptExampleImpl() {
         beverages = new ArrayList<>();
         Ingredient calcium = new Ingredient();
@@ -47,7 +47,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
         Ingredient apple = new Ingredient();
         apple.setName("apple");
         apple.setCategory(Category.Fruit);
-        
+
         Beverage b = new Beverage();
         b.setName("zinc-fortified broccoli shake");
         b.setProof(20);
@@ -57,7 +57,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
         ingredients[1] = broccoli;
         b.setIngredients(ingredients);
         beverages.add(b);
-        
+
         b = new Beverage();
         b.setName("apple broccoli shake");
         b.setProof(50);
@@ -66,7 +66,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
         ingredients[1] = broccoli;
         b.setIngredients(ingredients);
         beverages.add(b);
-        
+
         b = new Beverage();
         b.setName("calcium-fortified apple juice");
         b.setProof(13);
@@ -75,7 +75,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
         ingredients[1] = calcium;
         b.setIngredients(ingredients);
         beverages.add(b);
-        
+
 
     }
 

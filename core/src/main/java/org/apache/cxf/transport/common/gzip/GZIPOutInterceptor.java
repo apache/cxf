@@ -67,13 +67,13 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public enum UseGzip {
         NO, YES, FORCE
     }
-    
+
     /**
      * regular expression that matches any encoding with a
      * q-value of 0 (or 0.0, 0.00, etc.).
      */
     public static final Pattern ZERO_Q = Pattern.compile(";\\s*q=0(?:\\.0+)?$");
-    
+
     /**
      * regular expression which can split encodings
      */
@@ -99,7 +99,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * given by the client in Accept-Encoding.
      */
     public static final String GZIP_ENCODING_KEY = GZIPOutInterceptor.class.getName() + ".gzipEncoding";
-    
+
     public static final String SOAP_JMS_CONTENTENCODING = "SOAPJMS_contentEncoding";
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(GZIPOutInterceptor.class);
@@ -144,7 +144,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
             message.put(USE_GZIP_KEY, use);
 
             // new stream to cache the message
-            GZipThresholdOutputStream cs 
+            GZipThresholdOutputStream cs
                 = new GZipThresholdOutputStream(threshold,
                                                 os,
                                                 use == UseGzip.FORCE,
@@ -161,7 +161,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * that gzip is not permitted. For the full gory details, see <a
      * href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.3">section
      * 14.3 of RFC 2616</a> (HTTP 1.1).
-     * 
+     *
      * @param message the outgoing message.
      * @return whether to attempt gzip compression for this message.
      * @throws Fault if the Accept-Encoding header does not allow any encoding
@@ -180,7 +180,7 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 permitted = force ? UseGzip.YES : UseGzip.NO;
             }
             message.put(GZIP_ENCODING_KEY, "gzip");
-            addHeader(message, "Accept-Encoding", "gzip;q=1.0, identity; q=0.5, *;q=0"); 
+            addHeader(message, "Accept-Encoding", "gzip;q=1.0, identity; q=0.5, *;q=0");
         } else {
             LOG.fine("Response role, checking accept-encoding");
             Exchange exchange = message.getExchange();
@@ -265,10 +265,10 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         return permitted;
     }
-    
+
     static class GZipThresholdOutputStream extends AbstractThresholdOutputStream {
         Message message;
-        
+
         GZipThresholdOutputStream(int t, OutputStream orig,
                                          boolean force, Message msg) {
             super(t);
@@ -278,9 +278,9 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 setupGZip();
             }
         }
-        
+
         private void setupGZip() {
-            
+
         }
 
         @Override
@@ -298,20 +298,20 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
             // if this is a response message, add the Vary header
             if (!Boolean.TRUE.equals(message.get(Message.REQUESTOR_ROLE))) {
                 addHeader(message, "Vary", "Accept-Encoding");
-            } 
+            }
 
             // gzip the result
             GZIPOutputStream zipOutput = new GZIPOutputStream(wrappedStream);
             wrappedStream = zipOutput;
         }
     }
-    
+
     /**
      * Adds a value to a header. If the given header name is not currently
      * set in the message, an entry is created with the given single value.
      * If the header is already set, the value is appended to the first
      * element of the list, following a comma.
-     * 
+     *
      * @param message the message
      * @param name the header to set
      * @param value the value to add
@@ -336,6 +336,6 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     public void setForce(boolean force) {
         this.force = force;
-    }    
+    }
 
 }

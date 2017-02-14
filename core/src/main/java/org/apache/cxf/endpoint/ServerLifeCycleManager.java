@@ -20,7 +20,7 @@
 package org.apache.cxf.endpoint;
 
 
-public interface ServerLifeCycleManager { 
+public interface ServerLifeCycleManager {
     void startServer(Server server);
     void stopServer(Server  server);
     void registerListener(ServerLifeCycleListener listener);

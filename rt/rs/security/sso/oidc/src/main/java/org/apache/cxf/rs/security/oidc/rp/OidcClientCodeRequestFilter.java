@@ -39,7 +39,7 @@ import org.apache.cxf.rs.security.oidc.common.ClaimsRequest;
 import org.apache.cxf.rs.security.oidc.common.IdToken;
 
 public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
-    
+
     private static final String ACR_PARAMETER = "acr_values";
     private static final String LOGIN_HINT_PARAMETER = "login_hint";
     private static final String MAX_AGE_PARAMETER = "max_age";
@@ -53,18 +53,18 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     private String claims;
     private String claimsLocales;
     private String roleClaim;
-    
+
     public OidcClientCodeRequestFilter() {
         super();
         setScopes("openid");
     }
-    
+
     public void setAuthenticationContextRef(String acr) {
         this.authenticationContextRef = Arrays.asList(StringUtils.split(acr, " "));
     }
 
     @Override
-    protected ClientTokenContext createTokenContext(ContainerRequestContext rc, 
+    protected ClientTokenContext createTokenContext(ContainerRequestContext rc,
                                                     ClientAccessToken at,
                                                     MultivaluedMap<String, String> requestParams,
                                                     MultivaluedMap<String, String> state) {
@@ -76,15 +76,15 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
             if (idTokenReader == null) {
                 throw new OAuthServiceException(OAuthConstants.SERVER_ERROR);
             }
-            IdToken idToken = idTokenReader.getIdToken(at, 
+            IdToken idToken = idTokenReader.getIdToken(at,
                                   requestParams.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE),
                                   getConsumer());
             // Validate the properties set up at the redirection time.
             validateIdToken(idToken, state);
-            
+
             ctx.setIdToken(idToken);
             if (userInfoClient != null) {
-                ctx.setUserInfo(userInfoClient.getUserInfo(at, 
+                ctx.setUserInfo(userInfoClient.getUserInfo(at,
                                                            ctx.getIdToken(),
                                                            getConsumer()));
             }
@@ -92,10 +92,10 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
             oidcSecCtx.setRoleClaim(roleClaim);
             rc.setSecurityContext(oidcSecCtx);
         }
-        
+
         return ctx;
     }
-    
+
     @Override
     protected MultivaluedMap<String, String> toCodeRequestState(ContainerRequestContext rc, UriInfo ui) {
         MultivaluedMap<String, String> state = super.toCodeRequestState(rc, ui);
@@ -106,7 +106,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     }
 
     private void validateIdToken(IdToken idToken, MultivaluedMap<String, String> state) {
-        
+
         String nonce = state.getFirst(IdToken.NONCE_CLAIM);
         String tokenNonce = idToken.getNonce();
         if (nonce != null && (tokenNonce == null || !nonce.equals(tokenNonce))) {
@@ -119,22 +119,22 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
                 throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
             }
         }
-        
+
         String acr = idToken.getAuthenticationContextRef();
         // Skip the check if the acr is not set given it is a voluntary claim
         if (acr != null && authenticationContextRef != null && !authenticationContextRef.contains(acr)) {
             throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
-        
+
     }
     public void setIdTokenReader(IdTokenReader idTokenReader) {
         this.idTokenReader = idTokenReader;
     }
 
     public void setUserInfoClient(UserInfoClient userInfoClient) {
-        this.userInfoClient = userInfoClient; 
+        this.userInfoClient = userInfoClient;
     }
-    
+
     @Override
     protected void checkSecurityContextStart(ContainerRequestContext rc) {
         SecurityContext sc = rc.getSecurityContext();
@@ -144,7 +144,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     }
 
     @Override
-    protected void setAdditionalCodeRequestParams(UriBuilder ub, 
+    protected void setAdditionalCodeRequestParams(UriBuilder ub,
                                                   MultivaluedMap<String, String> redirectState,
                                                   MultivaluedMap<String, String> codeRequestState) {
         if (redirectState != null) {
@@ -170,9 +170,9 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
         if (promptLogin != null) {
             ub.queryParam(PROMPT_PARAMETER, promptLogin);
         }
-        
+
     }
-    
+
     public void setPromptLogin(String promptLogin) {
         if (PROMPTS.contains(promptLogin)) {
             this.promptLogin = promptLogin;
@@ -188,7 +188,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     public void setClaimsRequest(ClaimsRequest claimsRequest) {
         setClaims(new JsonMapObjectReaderWriter().toJson(claimsRequest));
     }
-    
+
     public void setClaims(String claims) {
         this.claims = claims;
     }
@@ -196,7 +196,7 @@ public class OidcClientCodeRequestFilter extends ClientCodeRequestFilter {
     public void setClaimsLocales(String claimsLocales) {
         this.claimsLocales = claimsLocales;
     }
-    
+
     public void setRoleClaim(String roleClaim) {
         this.roleClaim = roleClaim;
     }

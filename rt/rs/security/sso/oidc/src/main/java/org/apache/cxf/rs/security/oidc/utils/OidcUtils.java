@@ -40,22 +40,22 @@ import org.apache.cxf.rs.security.oidc.common.UserInfo;
 import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 
 public final class OidcUtils {
-    
+
     public static final String ID_TOKEN_RESPONSE_TYPE = "id_token";
     public static final String ID_TOKEN_AT_RESPONSE_TYPE = "id_token token";
     public static final String CODE_AT_RESPONSE_TYPE = "code token";
     public static final String CODE_ID_TOKEN_RESPONSE_TYPE = "code id_token";
     public static final String CODE_ID_TOKEN_AT_RESPONSE_TYPE = "code id_token token";
-    
+
     public static final String ID_TOKEN = "id_token";
     public static final String OPENID_SCOPE = "openid";
     public static final String PROFILE_SCOPE = "profile";
     public static final String EMAIL_SCOPE = "email";
     public static final String ADDRESS_SCOPE = "address";
     public static final String PHONE_SCOPE = "phone";
-    public static final List<String> PROFILE_CLAIMS = Arrays.asList(UserInfo.NAME_CLAIM, 
+    public static final List<String> PROFILE_CLAIMS = Arrays.asList(UserInfo.NAME_CLAIM,
                                                                     UserInfo.PROFILE_CLAIM);
-    public static final List<String> EMAIL_CLAIMS = Arrays.asList(UserInfo.EMAIL_CLAIM, 
+    public static final List<String> EMAIL_CLAIMS = Arrays.asList(UserInfo.EMAIL_CLAIM,
                                                                   UserInfo.EMAIL_VERIFIED_CLAIM);
     public static final List<String> ADDRESS_CLAIMS = Arrays.asList(UserInfo.ADDRESS_CLAIM);
     public static final List<String> PHONE_CLAIMS = Arrays.asList(UserInfo.PHONE_CLAIM);
@@ -65,12 +65,12 @@ public final class OidcUtils {
     public static final String JWT_CLAIM_SOURCE_PROPERTY = "JWT";
     public static final String ENDPOINT_CLAIM_SOURCE_PROPERTY = "endpoint";
     public static final String TOKEN_CLAIM_SOURCE_PROPERTY = "access_token";
-    
+
     public static final String PROMPT_PARAMETER = "prompt";
     public static final String PROMPT_NONE_VALUE = "none";
     public static final String PROMPT_CONSENT_VALUE = "consent";
     public static final String CONSENT_REQUIRED_ERROR = "consent_required";
-    
+
     private static final Map<String, List<String>> SCOPES_MAP;
     static {
         SCOPES_MAP = new HashMap<String, List<String>>();
@@ -79,9 +79,9 @@ public final class OidcUtils {
         SCOPES_MAP.put(ADDRESS_SCOPE, ADDRESS_CLAIMS);
         SCOPES_MAP.put(PROFILE_SCOPE, PROFILE_CLAIMS);
     }
-    
+
     private OidcUtils() {
-        
+
     }
     public static List<String> getPromptValues(MultivaluedMap<String, String> params) {
         String prompt = params.getFirst(PROMPT_PARAMETER);
@@ -91,7 +91,7 @@ public final class OidcUtils {
             return Collections.emptyList();
         }
     }
-    
+
     public static String getOpenIdScope() {
         return OPENID_SCOPE;
     }
@@ -113,7 +113,7 @@ public final class OidcUtils {
     public static List<String> getScopeProperties(String scope) {
         return SCOPES_MAP.get(scope);
     }
-    
+
     private static String getScope(String... scopes) {
         StringBuilder sb = new StringBuilder();
         for (String scope : scopes) {

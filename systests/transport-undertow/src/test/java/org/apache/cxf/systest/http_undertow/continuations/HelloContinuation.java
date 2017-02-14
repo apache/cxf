@@ -27,10 +27,10 @@ import javax.jws.soap.SOAPBinding;
 public interface HelloContinuation {
     @WebMethod(operationName = "sayHi", exclude = false)
     String sayHi(String firstName, String secondName);
-    
+
     @WebMethod(operationName = "isRequestSuspended", exclude = false)
     boolean isRequestSuspended(String name);
-    
+
     @WebMethod(operationName = "resumeRequest", exclude = false)
     void resumeRequest(String name);
 }

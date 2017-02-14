@@ -26,9 +26,9 @@ public class HTTPException extends IOException {
     private int responseCode;
     private String responseMessage;
     private URL url;
-    
+
     public HTTPException(int responseCode, String responseMessage, URL url) {
-        super("HTTP response '" + responseCode + ": " 
+        super("HTTP response '" + responseCode + ": "
               + responseMessage + "' when communicating with " + url.toString());
         this.responseCode = responseCode;
         this.responseMessage = responseMessage;
@@ -46,5 +46,5 @@ public class HTTPException extends IOException {
     public URL getUrl() {
         return url;
     }
- 
+
 }

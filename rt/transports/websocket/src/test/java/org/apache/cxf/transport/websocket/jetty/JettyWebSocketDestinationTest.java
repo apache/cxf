@@ -39,7 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class JettyWebSocketDestinationTest extends Assert {
     private static final String ENDPOINT_ADDRESS = "ws://localhost:9001/websocket/nada";
@@ -54,7 +54,7 @@ public class JettyWebSocketDestinationTest extends Assert {
 
     @Test
     public void testRegisteration() throws Exception {
-        Bus bus = new ExtensionManagerBus();        
+        Bus bus = new ExtensionManagerBus();
         DestinationRegistry registry = new HTTPTransportFactory().getRegistry();
         EndpointInfo endpoint = new EndpointInfo();
         endpoint.setAddress(ENDPOINT_ADDRESS);
@@ -62,21 +62,21 @@ public class JettyWebSocketDestinationTest extends Assert {
         JettyHTTPServerEngine engine = EasyMock.createMock(JettyHTTPServerEngine.class);
 
         control.replay();
-        
+
         TestJettyWebSocketDestination dest = new TestJettyWebSocketDestination(bus, registry, endpoint, null, engine);
 
         dest.activate();
-        
+
         assertNotNull(registry.getDestinationForPath(ENDPOINT_ADDRESS));
-        
+
         dest.deactivate();
 
         assertNull(registry.getDestinationForPath(ENDPOINT_ADDRESS));
     }
-    
+
     private static class TestJettyWebSocketDestination extends Jetty9WebSocketDestination {
         TestJettyWebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
-                                      JettyHTTPServerEngineFactory serverEngineFactory, 
+                                      JettyHTTPServerEngineFactory serverEngineFactory,
                                       JettyHTTPServerEngine engine) throws IOException {
             super(bus, registry, ei, serverEngineFactory);
             this.engine = engine;

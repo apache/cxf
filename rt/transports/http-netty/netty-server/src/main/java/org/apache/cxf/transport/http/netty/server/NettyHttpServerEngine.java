@@ -66,35 +66,35 @@ public class NettyHttpServerEngine implements ServerEngine {
     private volatile Channel serverChannel;
 
     private NettyHttpServletPipelineFactory servletPipeline;
-    
+
     private Map<String, NettyHttpContextHandler> handlerMap = new ConcurrentHashMap<String, NettyHttpContextHandler>();
-    
+
     /**
      * This field holds the TLS ServerParameters that are programatically
      * configured. The tlsServerParamers (due to JAXB) holds the struct
      * placed by SpringConfig.
      */
     private TLSServerParameters tlsServerParameters;
-    
+
     private ThreadingParameters threadingParameters = new ThreadingParameters();
 
     private List<String> registedPaths = new CopyOnWriteArrayList<String>();
 
     // TODO need to setup configuration about them
     private int readIdleTime = 60;
-    
+
     private int writeIdleTime = 30;
-    
-    private int maxChunkContentSize = 1048576; 
-    
+
+    private int maxChunkContentSize = 1048576;
+
     private boolean sessionSupport;
-    
+
     // TODO need to setup configuration about them
     private EventLoopGroup bossGroup = new NioEventLoopGroup();
     private EventLoopGroup workerGroup = new NioEventLoopGroup();
-    
+
     public NettyHttpServerEngine() {
-        
+
     }
 
     public NettyHttpServerEngine(
@@ -111,13 +111,13 @@ public class NettyHttpServerEngine implements ServerEngine {
     public void setProtocol(String protocol) {
         this.protocol = protocol;
     }
-    
+
     @PostConstruct
     public void finalizeConfig() {
         // need to check if we need to any other thing other than Setting the TLSServerParameter
     }
-    
-    
+
+
     /**
      * This method is used to programmatically set the TLSServerParameters.
      * This method may only be called by the factory.
@@ -125,36 +125,36 @@ public class NettyHttpServerEngine implements ServerEngine {
     public void setTlsServerParameters(TLSServerParameters params) {
         tlsServerParameters = params;
     }
-    
+
     /**
      * This method returns the programmatically set TLSServerParameters, not
-     * the TLSServerParametersType, which is the JAXB generated type used 
+     * the TLSServerParametersType, which is the JAXB generated type used
      * in SpringConfiguration.
      * @return
      */
     public TLSServerParameters getTlsServerParameters() {
         return tlsServerParameters;
     }
-    
+
     public void setThreadingParameters(ThreadingParameters params) {
         threadingParameters = params;
     }
-    
+
     public ThreadingParameters getThreadingParameters() {
         return threadingParameters;
     }
-      
+
     protected Channel startServer() {
-          
+
         final ServerBootstrap bootstrap = new ServerBootstrap();
         bootstrap.group(bossGroup, workerGroup)
             .channel(NioServerSocketChannel.class)
             .option(ChannelOption.SO_REUSEADDR, true);
 
         // Set up the event pipeline factory.
-        servletPipeline = 
+        servletPipeline =
             new NettyHttpServletPipelineFactory(
-                 tlsServerParameters, sessionSupport, 
+                 tlsServerParameters, sessionSupport,
                  threadingParameters.getThreadPoolSize(),
                  maxChunkContentSize,
                  handlerMap, this);
@@ -243,14 +243,14 @@ public class NettyHttpServerEngine implements ServerEngine {
         if (servletPipeline != null) {
             servletPipeline.shutdown();
         }
-        
+
         if (serverChannel != null) {
             serverChannel.close();
         }
-        
+
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
-       
+
     }
 
     public int getReadIdleTime() {
@@ -276,7 +276,7 @@ public class NettyHttpServerEngine implements ServerEngine {
     public void setSessionSupport(boolean session) {
         this.sessionSupport = session;
     }
-    
+
     public int getMaxChunkContentSize() {
         return maxChunkContentSize;
     }
@@ -284,11 +284,11 @@ public class NettyHttpServerEngine implements ServerEngine {
     public void setMaxChunkContentSize(int maxChunkContentSize) {
         this.maxChunkContentSize = maxChunkContentSize;
     }
-    
+
     public int getPort() {
         return port;
     }
-    
+
     public void setPort(int port) {
         this.port = port;
     }
@@ -296,7 +296,7 @@ public class NettyHttpServerEngine implements ServerEngine {
     public void setHost(String host) {
         this.host = host;
     }
-    
+
     public String getHost() {
         return host;
     }

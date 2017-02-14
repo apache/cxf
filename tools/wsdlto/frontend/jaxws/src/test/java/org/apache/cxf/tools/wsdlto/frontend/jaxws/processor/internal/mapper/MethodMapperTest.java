@@ -35,7 +35,7 @@ public class MethodMapperTest extends Assert {
         operation.setName(new QName("urn:test:ns", "OperationTest"));
         return operation;
     }
-    
+
     @Test
     public void testMap() throws Exception {
         JavaMethod method = new MethodMapper().map(getOperation());
@@ -69,7 +69,7 @@ public class MethodMapperTest extends Assert {
 
         JavaMethod method = new MethodMapper().map(operation);
         assertNotNull(method);
-        
+
         assertTrue(method.isWrapperStyle());
     }
 }

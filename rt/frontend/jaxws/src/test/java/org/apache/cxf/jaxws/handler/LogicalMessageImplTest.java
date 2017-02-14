@@ -43,7 +43,7 @@ public class LogicalMessageImplTest extends Assert {
 
     @Before
     public void setUp() {
-        req = new AddNumbers();        
+        req = new AddNumbers();
         req.setArg0(10);
         req.setArg1(20);
         args = new ArrayList<>();
@@ -60,16 +60,16 @@ public class LogicalMessageImplTest extends Assert {
         LogicalMessageContextImpl lmci = new LogicalMessageContextImpl(message);
 
         JAXBElement<AddNumbers> el = new ObjectFactory().createAddNumbers(req);
-        
+
         LogicalMessageImpl lmi = new LogicalMessageImpl(lmci);
         lmi.setPayload(el, ctx);
-        
+
         Object obj = lmi.getPayload(ctx);
         assertTrue(obj instanceof JAXBElement);
         JAXBElement<?> el2 = (JAXBElement<?>)obj;
         assertTrue(el2.getValue() instanceof AddNumbers);
         AddNumbers resp = (AddNumbers)el2.getValue();
-        assertEquals(req.getArg0(), resp.getArg0());        
-        assertEquals(req.getArg1(), resp.getArg1());        
+        assertEquals(req.getArg0(), resp.getArg0());
+        assertEquals(req.getArg1(), resp.getArg1());
     }
 }

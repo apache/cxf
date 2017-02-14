@@ -41,10 +41,10 @@ import static org.apache.cxf.bus.osgi.OSGIBusListener.CONTEXT_SYMBOLIC_NAME_PROP
 import static org.apache.cxf.bus.osgi.OSGIBusListener.CONTEXT_VERSION_PROPERTY;
 
 /**
- * 
+ *
  */
 public class OSGiJaxwsEndpointManager extends JaxwsEndpointManager {
-    
+
     private BundleContext bundleContext;
     private BlueprintContainer container;
     private Object cxfBus;
@@ -85,14 +85,14 @@ public class OSGiJaxwsEndpointManager extends JaxwsEndpointManager {
         }
         return null;
     }
-    
+
     public void destroy() {
         if (cxfBus != null) {
             destroyBus();
         }
     }
-    
-    
+
+
     private void destroyBus() {
         ((Bus)cxfBus).shutdown(true);
         cxfBus = null;
@@ -124,5 +124,5 @@ public class OSGiJaxwsEndpointManager extends JaxwsEndpointManager {
         String version = (String) headers.get(Constants.BUNDLE_VERSION);
         return (version != null) ? Version.parseVersion(version) : Version.emptyVersion;
     }
-    
+
 }

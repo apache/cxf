@@ -27,51 +27,51 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class CorbaStreamReaderTest extends Assert {
-    
+
     private CorbaStreamReader reader;
     private CorbaTypeEventProducer mock;
-    
+
     @Before
     public void setUp() throws Exception {
         mock = EasyMock.createMock(CorbaTypeEventProducer.class);
         reader = new CorbaStreamReader(mock);
     }
-    
+
     @Test
     public void testGetName() throws Exception {
         EasyMock.expect(mock.getName()).andReturn(new QName("http://foo.org", "test"));
         EasyMock.replay(mock);
         assertEquals("checking getName ", new QName("http://foo.org", "test"), reader.getName());
     }
-    
+
     @Test
     public void testGetLocalName() throws Exception {
         EasyMock.expect(mock.getName()).andReturn(new QName("http://foo.org", "test"));
         EasyMock.replay(mock);
         assertEquals("checking localName ", "test", reader.getLocalName());
     }
-    
+
     @Test
     public void testGetNamespaceURI() throws Exception {
         EasyMock.expect(mock.getName()).andReturn(new QName("http://foo.org", "test"));
         EasyMock.replay(mock);
-        assertEquals("checking namespace ", "http://foo.org", reader.getNamespaceURI());   
+        assertEquals("checking namespace ", "http://foo.org", reader.getNamespaceURI());
     }
-    
+
     @Test
     public void testGetText() throws Exception {
         EasyMock.expect(mock.getText()).andReturn("abcdef");
         EasyMock.replay(mock);
         assertEquals("checking getText", "abcdef", reader.getText());
     }
-    
-    
+
+
     @Test
     public void testGetTextCharacters() throws Exception {
         EasyMock.expect(mock.getText()).andReturn("abcdef");
         EasyMock.replay(mock);
-        assertEquals("checking getTextCharacters", 
+        assertEquals("checking getTextCharacters",
                     "abcdef",
                     new String(reader.getTextCharacters()));
-    }    
+    }
 }

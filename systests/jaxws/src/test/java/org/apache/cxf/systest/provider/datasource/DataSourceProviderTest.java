@@ -63,7 +63,7 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly",
                 launchServer(Server.class, true));
     }
-    
+
     @Before
     public void createConnection() throws Exception {
         url = new URL("http://localhost:" + serverPort + "/test/foo");
@@ -72,13 +72,13 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
     }
 
 
-    @Test 
-    public void invokeOnServer() throws Exception { 
+    @Test
+    public void invokeOnServer() throws Exception {
         url = new URL("http://localhost:" + serverPort + "/test/foo");
         conn = (HttpURLConnection) url.openConnection();
-        printSource(new StreamSource(conn.getInputStream())); 
+        printSource(new StreamSource(conn.getInputStream()));
     }
-    
+
     @Test
     public void postAttachmentToServer() throws Exception {
         String contentType = "multipart/related; type=\"text/xml\"; "
@@ -115,8 +115,8 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
             e.printStackTrace();
         }
     }
-    
-    public static MimeMultipart readAttachmentParts(String contentType, InputStream bais) throws 
+
+    public static MimeMultipart readAttachmentParts(String contentType, InputStream bais) throws
         MessagingException, IOException {
         DataSource source = new ByteArrayDataSource(bais, contentType);
         MimeMultipart mpart = new MimeMultipart(source);

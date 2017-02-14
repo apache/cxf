@@ -29,9 +29,9 @@ public final class URLFactory {
     public static final String UNKNOWN_PROPTOCL_EX_MSG = "unknown protocol: ";
 
     private URLFactory() {
-        
+
     }
-    
+
     public static URL createURL(String spec) throws MalformedURLException {
         return createURL(null, spec);
     }

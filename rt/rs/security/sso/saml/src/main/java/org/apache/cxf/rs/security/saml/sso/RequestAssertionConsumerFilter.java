@@ -35,11 +35,11 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @PreMatching
 @Priority(Priorities.AUTHENTICATION)
-public class RequestAssertionConsumerFilter extends AbstractRequestAssertionConsumerHandler 
+public class RequestAssertionConsumerFilter extends AbstractRequestAssertionConsumerHandler
     implements ContainerRequestFilter {
 
     private boolean supportPostBinding;
-    
+
     @Override
     public void filter(ContainerRequestContext ct) throws IOException {
         String httpMethod = ct.getMethod();
@@ -56,15 +56,15 @@ public class RequestAssertionConsumerFilter extends AbstractRequestAssertionCons
                 ct.setEntityStream(new ByteArrayInputStream(strForm.getBytes()));
             }
         }
-        
+
     }
-    
+
     protected boolean processParams(ContainerRequestContext ct,
-                                 MultivaluedMap<String, String> params, 
+                                 MultivaluedMap<String, String> params,
                                  boolean postBinding) {
         String encodedSamlResponse = params.getFirst(SSOConstants.SAML_RESPONSE);
         String relayState = params.getFirst(SSOConstants.RELAY_STATE);
-        if (relayState == null && encodedSamlResponse == null) { 
+        if (relayState == null && encodedSamlResponse == null) {
             // initial redirect to IDP has not happened yet, let the SAML authentication filter do it
             JAXRSUtils.getCurrentMessage().put(SSOConstants.RACS_IS_COLLOCATED, Boolean.TRUE);
             return false;
@@ -75,5 +75,5 @@ public class RequestAssertionConsumerFilter extends AbstractRequestAssertionCons
     public void setSupportPostBinding(boolean supportPostBinding) {
         this.supportPostBinding = supportPostBinding;
     }
-    
+
 }

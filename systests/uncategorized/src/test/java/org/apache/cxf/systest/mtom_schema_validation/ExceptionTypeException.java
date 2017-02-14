@@ -22,17 +22,17 @@ import javax.xml.ws.WebFault;
 @WebFault(name = "ExceptionType", targetNamespace = "http://cxf.apache.org/")
 public class ExceptionTypeException extends Exception {
     public static final long serialVersionUID = 20130719154625L;
-    
+
     private ExceptionType exceptionType;
 
     public ExceptionTypeException() {
         super();
     }
-    
+
     public ExceptionTypeException(String message) {
         super(message);
     }
-    
+
     public ExceptionTypeException(String message, Throwable cause) {
         super(message, cause);
     }

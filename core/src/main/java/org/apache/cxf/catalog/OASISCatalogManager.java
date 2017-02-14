@@ -50,9 +50,9 @@ public class OASISCatalogManager {
 
     private static final Logger LOG =
         LogUtils.getL7dLogger(OASISCatalogManager.class);
-    private static final String DEBUG_LEVEL 
+    private static final String DEBUG_LEVEL
         = SystemPropertyAction.getPropertyOrNull(CATALOG_DEBUG_KEY);
-    
+
 
     private EntityResolver resolver;
     private Object catalog;
@@ -63,18 +63,18 @@ public class OASISCatalogManager {
         resolver = getResolver();
         catalog = getCatalog(resolver);
     }
-    
+
     public OASISCatalogManager(Bus b) {
         bus = b;
         resolver = getResolver();
         catalog = getCatalog(resolver);
         loadContextCatalogs(DEFAULT_CATALOG_NAME);
     }
-    
+
     public boolean hasCatalogs() {
         return !loadedCatalogs.isEmpty();
     }
-    
+
     private static Object getCatalog(EntityResolver resolver) {
         try {
             return ((CatalogResolver)resolver).getCatalog();
@@ -111,7 +111,7 @@ public class OASISCatalogManager {
             return catalogResolver;
         } catch (Throwable t) {
             //ignore
-        }        
+        }
         return null;
     }
 
@@ -180,7 +180,7 @@ public class OASISCatalogManager {
             }
         }
     }
-    
+
     private static OASISCatalogManager getContextCatalog() {
         try {
             OASISCatalogManager oasisCatalog = new OASISCatalogManager();
@@ -201,9 +201,9 @@ public class OASISCatalogManager {
             if (catalog != null) {
                 bus.setExtension(catalog, OASISCatalogManager.class);
             }
-        } 
+        }
         return catalog;
-        
+
     }
 
     public String resolveSystem(String sys) throws MalformedURLException, IOException {
@@ -225,7 +225,7 @@ public class OASISCatalogManager {
         }
         return ((Catalog)catalog).resolvePublic(uri, parent);
     }
-    
+
     public EntityResolver getEntityResolver() {
         return resolver;
     }

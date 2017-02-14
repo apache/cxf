@@ -30,7 +30,7 @@ import org.apache.cxf.rs.security.oauth.data.OAuthPermission;
 public class OAuthInfo {
     private AccessToken token;
     private List<OAuthPermission> permissions;
-    public OAuthInfo(AccessToken token, 
+    public OAuthInfo(AccessToken token,
                      List<OAuthPermission> matchedPermissions) {
         this.token = token;
         this.permissions = matchedPermissions;
@@ -38,7 +38,7 @@ public class OAuthInfo {
     public AccessToken getToken() {
         return token;
     }
-    
+
     public List<String> getRoles() {
         List<String> authorities = new ArrayList<>();
         for (OAuthPermission permission : permissions) {
@@ -46,10 +46,10 @@ public class OAuthInfo {
         }
         return authorities;
     }
-    
+
     public List<OAuthPermission> getMatchedPermissions() {
         return permissions;
     }
-    
-        
+
+
 }

@@ -30,18 +30,18 @@ import org.apache.cxf.message.Exchange;
 public class LoadDistributorStaticStrategy extends SequentialStrategy {
 
     private int index;
-    
+
     @Override
     public List<Endpoint> getAlternateEndpoints(Exchange exchange) {
 
         // Get the list of endpoints, including the current one.
-        // This part is required for most FailoverStrategys that provide alternate 
+        // This part is required for most FailoverStrategys that provide alternate
         // target endpoints for the LoadDistributorTargetSelector.
         List<Endpoint> alternateEndpoints = getEndpoints(exchange, true);
-        
+
         return alternateEndpoints;
     }
-    
+
     @Override
     protected <T> T getNextAlternate(List<T> alternates) {
         // Iterate through the list of endpoints even though that list is

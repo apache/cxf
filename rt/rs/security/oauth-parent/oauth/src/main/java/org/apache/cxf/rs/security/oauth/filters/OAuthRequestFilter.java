@@ -39,7 +39,7 @@ import org.apache.cxf.security.SecurityContext;
 @Provider
 @PreMatching
 public class OAuthRequestFilter extends AbstractAuthFilter implements ContainerRequestFilter {
-    
+
     @Override
     public void filter(ContainerRequestContext context) {
         try {
@@ -47,7 +47,7 @@ public class OAuthRequestFilter extends AbstractAuthFilter implements ContainerR
             MessageContext mc = new MessageContextImpl(m);
             OAuthInfo info = handleOAuthRequest(mc.getHttpServletRequest());
             setSecurityContext(mc, m, info);
-            
+
         } catch (OAuthProblemException e) {
             context.abortWith(Response.status(401).header("WWW-Authenticate", "OAuth").build());
         } catch (Exception e) {
@@ -56,10 +56,10 @@ public class OAuthRequestFilter extends AbstractAuthFilter implements ContainerR
     }
 
     private void setSecurityContext(MessageContext mc, Message m, OAuthInfo info) {
-        
+
         SecurityContext sc = createSecurityContext(mc.getHttpServletRequest(), info);
         m.setContent(SecurityContext.class, sc);
         m.setContent(OAuthContext.class, createOAuthContext(info));
-        
+
     }
 }

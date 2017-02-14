@@ -937,7 +937,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         code.append(portClassName + ".prototype = new " + currentInterfaceClassName + ";\n");
     }
 
-    
+
     /**
      * Follow a chain of references from element to element until we can obtain
      * a type.
@@ -986,7 +986,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         }
         return element.getSchemaType();
     }
-    
+
     public static void unsupportedConstruct(String messageKey,
                                             String what,
                                             QName subjectName,
@@ -1012,6 +1012,6 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         } else {
             return subject.getSourceURI() + ":" + subject.getLineNumber();
         }
-    }    
+    }
 
 }

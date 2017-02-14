@@ -34,7 +34,7 @@ import org.apache.cxf.common.logging.LogUtils;
  * This represents a Claim.
  */
 public class Claim implements Serializable, Cloneable {
-    
+
     private static final long serialVersionUID = 5730726672368086795L;
 
     private static final Logger LOG = LogUtils.getL7dLogger(Claim.class);
@@ -45,10 +45,10 @@ public class Claim implements Serializable, Cloneable {
 
     public Claim() {
     }
-    
+
     /**
      * Create a clone of the provided claim.
-     * 
+     *
      * @param claim Claim to be cloned. Value cannot be null.
      */
     public Claim(Claim claim) {
@@ -86,11 +86,11 @@ public class Claim implements Serializable, Cloneable {
     public void addValue(Object s) {
         this.values.add(s);
     }
-    
+
     public List<Object> getValues() {
         return values;
     }
-    
+
     public void serialize(XMLStreamWriter writer, String prefix, String namespace) throws XMLStreamException {
         String localname = "ClaimType";
         if (!values.isEmpty()) {
@@ -115,7 +115,7 @@ public class Claim implements Serializable, Cloneable {
         }
         writer.writeEndElement();
     }
-    
+
     @Override
     public Claim clone() {
         try {
@@ -170,7 +170,7 @@ public class Claim implements Serializable, Cloneable {
         }
         return true;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

@@ -23,7 +23,7 @@ public class JAXBExtensibilityElement extends TExtensibilityElementImpl {
     JAXBExtensibilityElement(Object o) {
         value = o;
     }
-    
+
     public Object getValue() {
         return value;
     }

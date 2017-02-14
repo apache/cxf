@@ -32,7 +32,7 @@ public class MessageTrustDeciderBeanDefinitionParser extends
     protected String getJaxbPackage() {
         return "org.apache.cxf.transports.http.configuration";
     }
-    
+
     @Override
     protected Class<?> getBeanClass(Element arg0) {
         return MessageTrustDecider.class;

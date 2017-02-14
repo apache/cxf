@@ -30,7 +30,7 @@ import org.apache.cxf.transport.Destination;
  * A base class to build your own message implementations on.
  */
 public abstract class AbstractWrappedMessage implements Message {
-    
+
     private Message message;
 
     protected AbstractWrappedMessage(Message msg) {
@@ -76,7 +76,7 @@ public abstract class AbstractWrappedMessage implements Message {
     public void setMessage(Message message) {
         this.message = message;
     }
-    
+
     public Destination getDestination() {
         return message.getDestination();
     }
@@ -96,7 +96,7 @@ public abstract class AbstractWrappedMessage implements Message {
     public void setId(String id) {
         message.setId(id);
     }
-    
+
     public InterceptorChain getInterceptorChain() {
         return message.getInterceptorChain();
     }
@@ -150,7 +150,7 @@ public abstract class AbstractWrappedMessage implements Message {
     public Collection<Object> values() {
         return message.values();
     }
-    
+
     public <T> T get(Class<T> key) {
         return message.get(key);
     }
@@ -163,7 +163,7 @@ public abstract class AbstractWrappedMessage implements Message {
 
     public Object getContextualProperty(String key) {
         return message.getContextualProperty(key);
-    }  
+    }
     void setContextualProperty(String key, Object v) {
         if (message instanceof MessageImpl) {
             ((MessageImpl)message).setContextualProperty(key, v);
@@ -172,9 +172,9 @@ public abstract class AbstractWrappedMessage implements Message {
         } else {
             //cannot set directly.  Just invalidate the cache.
             message.resetContextCache();
-        }        
+        }
     }
-    
+
     public Set<String> getContextualPropertyKeys() {
         return message.getContextualPropertyKeys();
     }
@@ -182,5 +182,5 @@ public abstract class AbstractWrappedMessage implements Message {
     public void resetContextCache() {
         message.resetContextCache();
     }
-    
+
 }

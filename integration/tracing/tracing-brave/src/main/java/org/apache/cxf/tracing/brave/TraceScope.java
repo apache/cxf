@@ -27,15 +27,15 @@ import com.twitter.zipkin.gen.Span;
 public class TraceScope implements Closeable {
     final Brave brave;
     final SpanId spanId;
-    
+
     TraceScope(final Brave brave, final SpanId spanId) {
         this.brave = brave;
         this.spanId = spanId;
     }
-    
+
     @Override
     public void close() {
-        final Span span = brave.localSpanThreadBinder().getCurrentLocalSpan(); 
+        final Span span = brave.localSpanThreadBinder().getCurrentLocalSpan();
         if (span != null && span.getTrace_id() == spanId.traceId && span.getId() == spanId.spanId) {
             brave.localTracer().finishSpan();
         }

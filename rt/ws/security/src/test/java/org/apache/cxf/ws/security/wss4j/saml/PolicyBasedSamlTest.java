@@ -70,7 +70,7 @@ public class PolicyBasedSamlTest extends AbstractPolicySecurityTest {
                 Arrays.asList(SP12Constants.SAML_TOKEN),
                 new ArrayList<>());
     }
-     
+
     @Test
     public void testSaml2Assertion() throws Exception {
         //
@@ -102,16 +102,16 @@ public class PolicyBasedSamlTest extends AbstractPolicySecurityTest {
                 Arrays.asList(SP12Constants.SAML_TOKEN),
                 new ArrayList<>());
     }
-    
+
     @Override
     protected void runInInterceptorAndValidateWss(Document document, AssertionInfoMap aim,
                                                   List<CoverageType> types) throws Exception {
-                                              
-        PolicyBasedWSS4JInInterceptor inHandler = 
+
+        PolicyBasedWSS4JInInterceptor inHandler =
             this.getInInterceptor(types);
 
         SoapMessage inmsg = this.getSoapMessageForDom(document, aim);
-        
+
         // Necessary because the Bearer Assertion does not have an internal signature
         SamlAssertionValidator assertionValidator = new SamlAssertionValidator();
         assertionValidator.setRequireBearerSignature(false);

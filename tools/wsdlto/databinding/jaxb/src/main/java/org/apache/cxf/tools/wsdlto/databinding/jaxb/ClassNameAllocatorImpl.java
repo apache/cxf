@@ -43,7 +43,7 @@ public class ClassNameAllocatorImpl implements ClassNameAllocator {
         }
 
         String fullPckClass = packageName + "." + fullClzName;
-        
+
         if (autoResolveConflicts) {
             int cnt = 1;
             while (collector.containsTypeIgnoreCase(packageName, className + (cnt == 1 ? "" : cnt))) {
@@ -56,8 +56,8 @@ public class ClassNameAllocatorImpl implements ClassNameAllocator {
             }
         }
         collector.addTypesClassName(packageName, className, fullPckClass);
-        
+
         return fullClzName;
     }
-   
+
 }

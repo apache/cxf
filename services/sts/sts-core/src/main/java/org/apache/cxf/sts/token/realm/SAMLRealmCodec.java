@@ -26,12 +26,12 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
  * This interface defines a pluggable way to return a realm associated with a SAML Assertion.
  */
 public interface SAMLRealmCodec {
-    
+
     /**
      * Get the realm associated with the SamlAssertionWrapper parameter
      * @param assertion a SAML Assertion wrapper object
      * @return the realm associated with the SamlAssertionWrapper parameter
      */
     String getRealmFromToken(SamlAssertionWrapper assertion);
-    
+
 }

@@ -68,7 +68,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfi
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 
 /**
- * 
+ *
  */
 public class CXFOSGiTestSupport {
     private static final String MAVEN_DEPENDENCIES_PROPERTIES = "/META-INF/maven/dependencies.properties";
@@ -128,10 +128,10 @@ public class CXFOSGiTestSupport {
         } catch (Throwable t) {
             throw new IllegalStateException(MAVEN_DEPENDENCIES_PROPERTIES + " can not be found", t);
         }
-    }    
+    }
     /**
      * Create an {@link org.ops4j.pax.exam.Option} for using a .
-     * 
+     *
      * @return
      */
     protected Option cxfBaseConfig() {
@@ -160,10 +160,10 @@ public class CXFOSGiTestSupport {
     protected Option testUtils() {
         return mavenBundle().groupId("org.apache.cxf").artifactId("cxf-testutils").versionAsInProject();
     }
-    
+
     /**
      * Executes a shell command and returns output as a String. Commands have a default timeout of 10 seconds.
-     * 
+     *
      * @param command
      * @return
      */
@@ -173,7 +173,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Executes a shell command and returns output as a String. Commands have a default timeout of 10 seconds.
-     * 
+     *
      * @param command The command to execute.
      * @param timeout The amount of time in millis to wait for the command to execute.
      * @param silent Specifies if the command should be displayed in the screen.
@@ -214,7 +214,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Executes multiple commands inside a Single Session. Commands have a default timeout of 10 seconds.
-     * 
+     *
      * @param commands
      * @return
      */
@@ -329,7 +329,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Finds a free port starting from the give port numner.
-     * 
+     *
      * @return
      */
     protected int getFreePort(int port) {
@@ -341,7 +341,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Returns true if port is available for use.
-     * 
+     *
      * @param port
      * @return
      */

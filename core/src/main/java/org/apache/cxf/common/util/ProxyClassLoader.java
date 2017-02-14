@@ -25,7 +25,7 @@ import java.util.Set;
 /**
  * Utility class loader that can be used to create proxies in cases where
  * the the client classes are not visible to the loader of the
- * service class.    
+ * service class.
  */
 public class ProxyClassLoader extends ClassLoader {
     private final Class<?> classes[];
@@ -78,7 +78,7 @@ public class ProxyClassLoader extends ClassLoader {
         }
         throw new ClassNotFoundException(name);
     }
-    
+
     public URL findResource(String name) {
         for (ClassLoader loader : loaders) {
             URL url = loader.getResource(name);

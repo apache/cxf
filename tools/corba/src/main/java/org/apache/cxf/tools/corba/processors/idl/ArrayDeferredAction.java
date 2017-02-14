@@ -31,28 +31,28 @@ public class ArrayDeferredAction implements SchemaDeferredAction {
     protected Array array;
     protected Anonarray anonarray;
     protected XmlSchemaElement element;
-    
-    
+
+
     public ArrayDeferredAction(Array arrayType,
                                Anonarray anonArrayType,
-                               XmlSchemaElement elem) {                           
+                               XmlSchemaElement elem) {
         array = arrayType;
         anonarray = anonArrayType;
-        element = elem;        
+        element = elem;
     }
-    
+
     public ArrayDeferredAction(Array arrayType) {
-        array = arrayType;         
+        array = arrayType;
     }
-    
+
     public ArrayDeferredAction(Anonarray anonarrayType) {
-        anonarray = anonarrayType;         
+        anonarray = anonarrayType;
     }
-    
+
     public ArrayDeferredAction(XmlSchemaElement elem) {
-        element = elem;               
+        element = elem;
     }
-    
+
     public void execute(XmlSchemaType stype, CorbaTypeImpl ctype) {
         if (array != null) {
             array.setElemtype(ctype.getQName());
@@ -65,9 +65,9 @@ public class ArrayDeferredAction implements SchemaDeferredAction {
             if (stype.getQName().equals(ReferenceConstants.WSADDRESSING_TYPE)) {
                 element.setNillable(true);
             }
-        }        
+        }
     }
-        
+
 }
 
 

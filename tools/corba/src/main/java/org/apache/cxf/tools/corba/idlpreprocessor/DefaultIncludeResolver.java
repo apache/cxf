@@ -33,7 +33,7 @@ import org.apache.cxf.common.logging.LogUtils;
 
 
 /**
- * 
+ *
  */
 public class DefaultIncludeResolver implements IncludeResolver {
 
@@ -60,7 +60,7 @@ public class DefaultIncludeResolver implements IncludeResolver {
      * @see IncludeResolver#findUserInclude(java.lang.String)
      */
     public URL findUserInclude(String spec) {
-        
+
         for (final File searchDir : userIdlDirs) {
 
             URI searchDirURI = searchDir.toURI();
@@ -68,21 +68,21 @@ public class DefaultIncludeResolver implements IncludeResolver {
                 // offload slash vs backslash to URL machinery
                 URL searchDirURL = searchDirURI.toURL();
                 final URL url = new URL(searchDirURL, spec);
-                
-                // Check if file in URL exists, otherwise try next searchDir 
+
+                // Check if file in URL exists, otherwise try next searchDir
                 try {
-                    // If we can open a stream, the file exists 
+                    // If we can open a stream, the file exists
                     InputStream str = url.openStream();
                     str.close();
                     return url;
                 } catch (IOException ioe) {
                     if (LOG.isLoggable(Level.WARNING)) {
-                        LOG.fine("Not able to resolve " 
-                                 + spec  
-                                 + "from  " 
+                        LOG.fine("Not able to resolve "
+                                 + spec
+                                 + "from  "
                                  + searchDirURL.toString());
                     }
-                } 
+                }
             } catch (MalformedURLException e) {
                 final PreprocessingException preprocessingException = new PreprocessingException(
                     "Unable to resolve user include '" + spec + "' in '"

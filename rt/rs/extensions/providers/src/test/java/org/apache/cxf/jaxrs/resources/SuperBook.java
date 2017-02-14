@@ -27,16 +27,16 @@ public class SuperBook extends Book {
     private long superId;
     public SuperBook() {
     }
-    
+
     public SuperBook(String name, long id, long superId) {
         super(name, id);
         this.superId = superId;
     }
-    
+
     public void setSuperId(long i) {
         superId = i;
     }
-    
+
     public long getSuperId() {
         return superId;
     }

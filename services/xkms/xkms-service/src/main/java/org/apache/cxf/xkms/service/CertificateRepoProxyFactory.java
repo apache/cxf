@@ -47,11 +47,11 @@ public class CertificateRepoProxyFactory {
             throw new IllegalArgumentException("Invalid filter " + filterSt, e);
         }
     }
-    
+
     public CertificateRepo create() {
         return proxy;
     }
-    
+
     public void close() {
         this.tracker.close();
     }

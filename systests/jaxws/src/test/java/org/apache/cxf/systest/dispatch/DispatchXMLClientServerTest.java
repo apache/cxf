@@ -48,9 +48,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase {
-    private static final QName SERVICE_NAME 
+    private static final QName SERVICE_NAME
         = new QName("http://apache.org/hello_world_xml_http/wrapped", "XMLService");
-    private static final QName PORT_NAME 
+    private static final QName PORT_NAME
         = new QName("http://apache.org/hello_world_xml_http/wrapped", "XMLDispatchPort");
 
     private static String port = TestUtil.getPortNumber(DispatchXMLClientServerTest.class);
@@ -62,14 +62,14 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
 
     @Test
     public void testJAXBMESSAGE() throws Exception {
-        Service service = Service.create(SERVICE_NAME);       
+        Service service = Service.create(SERVICE_NAME);
         assertNotNull(service);
-        service.addPort(PORT_NAME, "http://cxf.apache.org/bindings/xformat", 
+        service.addPort(PORT_NAME, "http://cxf.apache.org/bindings/xformat",
                         "http://localhost:"
                         + port
                         + "/XMLService/XMLDispatchPort");
-        
-        
+
+
         GreetMe gm = new GreetMe();
         gm.setRequestType("CXF");
         JAXBContext ctx = JAXBContext.newInstance(ObjectFactory.class);
@@ -77,7 +77,7 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
         GreetMeResponse resp = (GreetMeResponse)disp.invoke(gm);
         assertNotNull(resp);
         assertEquals("Hello CXF", resp.getResponseType());
-        
+
         try {
             disp.invoke(null);
             fail("Should have thrown a fault");
@@ -85,7 +85,7 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
             //expected
         }
     }
-    
+
     @Test
     public void testStreamSourceMESSAGE() throws Exception {
         /*URL wsdl = getClass().getResource("/wsdl/hello_world_xml_wrapped.wsdl");
@@ -93,27 +93,27 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
 
         XMLService service = new XMLService(wsdl, serviceName);
         assertNotNull(service);*/
-        Service service = Service.create(SERVICE_NAME);       
+        Service service = Service.create(SERVICE_NAME);
         assertNotNull(service);
-        service.addPort(PORT_NAME, "http://cxf.apache.org/bindings/xformat", 
+        service.addPort(PORT_NAME, "http://cxf.apache.org/bindings/xformat",
                         "http://localhost:"
                         + port
-                        + "/XMLService/XMLDispatchPort");        
+                        + "/XMLService/XMLDispatchPort");
 
-        InputStream is = getClass().getResourceAsStream("/messages/XML_GreetMeDocLiteralReq.xml");        
+        InputStream is = getClass().getResourceAsStream("/messages/XML_GreetMeDocLiteralReq.xml");
         StreamSource reqMsg = new StreamSource(is);
         assertNotNull(reqMsg);
 
         Dispatch<Source> disp = service.createDispatch(PORT_NAME, Source.class, Service.Mode.MESSAGE);
         Source source = disp.invoke(reqMsg);
         assertNotNull(source);
-                
-        String streamString = StaxUtils.toString(source); 
+
+        String streamString = StaxUtils.toString(source);
         Document doc = StaxUtils.read(new StringReader(streamString));
         assertEquals("greetMeResponse", doc.getFirstChild().getLocalName());
         assertEquals("Hello tli", doc.getFirstChild().getTextContent());
     }
-    
+
     @Test
     public void testDOMSourcePAYLOAD() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world_xml_wrapped.wsdl");
@@ -135,7 +135,7 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
                                      + "/XMLService/XMLDispatchPort");
         DOMSource result = disp.invoke(reqMsg);
         assertNotNull(result);
-              
+
         Node respDoc = result.getNode();
         assertEquals("greetMeResponse", respDoc.getFirstChild().getLocalName());
         assertEquals("Hello tli", respDoc.getFirstChild().getTextContent());

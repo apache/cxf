@@ -25,7 +25,7 @@ import javax.ws.rs.core.NioInputStream;
 
 public class DelegatingNioInputStream extends NioInputStream {
     private final ServletInputStream in;
-    
+
     public DelegatingNioInputStream(final ServletInputStream in) {
         this.in = in;
     }
@@ -39,27 +39,27 @@ public class DelegatingNioInputStream extends NioInputStream {
     public int read() throws IOException {
         return in.read();
     }
-    
+
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         return in.read(b, off, len);
     }
-    
+
     @Override
     public int read(byte[] b) throws IOException {
         return in.read(b);
     }
-    
+
     @Override
     public synchronized void reset() throws IOException {
         in.reset();
     }
-    
+
     @Override
     public void close() throws IOException {
         in.close();
     }
-    
+
     @Override
     public long skip(long n) throws IOException {
         return in.skip(n);
@@ -68,12 +68,12 @@ public class DelegatingNioInputStream extends NioInputStream {
     public int available() throws IOException {
         return in.available();
     }
-    
+
     @Override
     public synchronized void mark(int readlimit) {
         in.mark(readlimit);
     }
-    
+
     @Override
     public boolean markSupported() {
         return in.markSupported();

@@ -28,7 +28,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 public final class OAuthContextUtils {
     private OAuthContextUtils() {
     }
-    
+
     /**
      * @param mc the {@link MessageContext}
      * @return the id of the UserSubject of the logged in user or resource owner

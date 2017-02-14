@@ -36,9 +36,9 @@ import org.apache.cxf.tools.common.toolspec.ToolSpec;
 import org.apache.cxf.tools.wsdlto.WSDLToJavaContainer;
 
 public class JAXWSContainer extends WSDLToJavaContainer {
-    
+
     private static final String TOOL_NAME = "wsdl2java";
-    
+
     public JAXWSContainer(ToolSpec toolspec) throws Exception {
         super(TOOL_NAME, toolspec);
     }
@@ -63,7 +63,7 @@ public class JAXWSContainer extends WSDLToJavaContainer {
     public boolean isJaxws22() {
         return Service.class.getDeclaredConstructors().length == 2;
     }
-    
+
     public void validate(ToolContext env) throws ToolException {
         env.put("service.target", getServiceTarget());
         env.put("service.superclass", getServiceSuperclass());

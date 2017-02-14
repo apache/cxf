@@ -41,7 +41,7 @@ public class OAuthContext {
     private String tokenIssuer;
     private String[] tokenRequestParts;
     private Map<String, String> tokenExtraProperties = new LinkedHashMap<String, String>();
-    
+
     public OAuthContext(UserSubject resourceOwnerSubject,
                         UserSubject clientSubject,
                         List<OAuthPermission> perms,
@@ -51,7 +51,7 @@ public class OAuthContext {
         this.tokenPermissions = perms;
         this.tokenGrantType = tokenGrantType;
     }
-   
+
     /**
      * Gets the {@link UserSubject} representing the resource owner
      * @return the subject
@@ -59,7 +59,7 @@ public class OAuthContext {
     public UserSubject getSubject() {
         return resourceOwnerSubject;
     }
-    
+
     /**
      * Gets the {@link UserSubject} representing the client
      * @return the subject
@@ -67,7 +67,7 @@ public class OAuthContext {
     public UserSubject getClientSubject() {
         return clientSubject;
     }
-    
+
     /**
      * Gets the list of the permissions assigned to the current access token
      * @return the permissions
@@ -84,7 +84,7 @@ public class OAuthContext {
     public String getTokenGrantType() {
         return tokenGrantType;
     }
-    
+
     /**
       * Returns the client which obtained the access token
       * @return the client id
@@ -92,7 +92,7 @@ public class OAuthContext {
     public String getClientId() {
         return clientId;
     }
-    
+
     /**
      * Sets the client which obtained the access token
      * @param clientId
@@ -100,7 +100,7 @@ public class OAuthContext {
     public void setClientId(String clientId) {
         this.clientId = clientId;
     }
-    
+
     /**
      * Returns the access token the client is using now during the current request
      * @return the token
@@ -108,7 +108,7 @@ public class OAuthContext {
     public String getTokenKey() {
         return tokenKey;
     }
-    
+
     /**
      * Sets the access token the client is using now during the current request
      * @param tokenKey
@@ -124,7 +124,7 @@ public class OAuthContext {
     public void setTokenAudience(String audience) {
         this.tokenAudience = audience;
     }
-    
+
     public String[] getTokenRequestParts() {
         return tokenRequestParts;
     }

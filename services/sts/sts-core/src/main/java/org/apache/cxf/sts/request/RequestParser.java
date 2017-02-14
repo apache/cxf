@@ -92,20 +92,20 @@ import org.apache.xml.security.utils.Constants;
  * and TokenRequirements objects.
  */
 public class RequestParser {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(RequestParser.class);
-    
+
     private boolean allowCustomContent;
-    
+
     public RequestRequirements parseRequest(
-        RequestSecurityTokenType request, Map<String, Object> messageContext, STSPropertiesMBean stsProperties, 
+        RequestSecurityTokenType request, Map<String, Object> messageContext, STSPropertiesMBean stsProperties,
         List<ClaimsParser> claimsParsers
     ) throws STSException {
         LOG.fine("Parsing RequestSecurityToken");
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         TokenRequirements tokenRequirements = new TokenRequirements();
-        
+
         for (Object requestObject : request.getAny()) {
             // JAXB types
             if (requestObject instanceof JAXBElement<?>) {
@@ -114,14 +114,14 @@ public class RequestParser {
                     LOG.fine("Found " + jaxbElement.getName() + ": " + jaxbElement.getValue());
                 }
                 try {
-                    boolean found = 
+                    boolean found =
                         parseTokenRequirements(jaxbElement, tokenRequirements, messageContext, claimsParsers);
                     if (!found) {
                         found = parseKeyRequirements(jaxbElement, keyRequirements, messageContext, stsProperties);
                     }
                     if (!found) {
                         LOG.log(
-                            Level.WARNING, 
+                            Level.WARNING,
                             "Found a JAXB object of unknown type: " + jaxbElement.getName()
                         );
                         throw new STSException(
@@ -150,7 +150,7 @@ public class RequestParser {
                     tokenRequirements.addCustomContent((Element)requestObject);
                 } else {
                     LOG.log(
-                        Level.WARNING, 
+                        Level.WARNING,
                         "An unknown (DOM) element was received: " + element.getLocalName()
                         + " " + element.getNamespaceURI()
                     );
@@ -170,19 +170,19 @@ public class RequestParser {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Received Context attribute: " + context);
         }
-        
+
         RequestRequirements requestRequirements = new RequestRequirements();
         requestRequirements.setKeyRequirements(keyRequirements);
         requestRequirements.setTokenRequirements(tokenRequirements);
-        
+
         return requestRequirements;
     }
-    
+
     /**
      * Parse the Key and Encryption requirements into the KeyRequirements argument.
      */
     private static boolean parseKeyRequirements(
-        JAXBElement<?> jaxbElement, KeyRequirements keyRequirements, 
+        JAXBElement<?> jaxbElement, KeyRequirements keyRequirements,
         Map<String, Object> messageContext, STSPropertiesMBean stsProperties
     ) {
         if (QNameConstants.AUTHENTICATION_TYPE.equals(jaxbElement.getName())) {
@@ -230,12 +230,12 @@ public class RequestParser {
         }
         return true;
     }
-    
+
     /**
      * Parse the Token requirements into the TokenRequirements argument.
      */
     private static boolean parseTokenRequirements(
-        JAXBElement<?> jaxbElement, 
+        JAXBElement<?> jaxbElement,
         TokenRequirements tokenRequirements,
         Map<String, Object> messageContext,
         List<ClaimsParser> claimsParsers
@@ -267,7 +267,7 @@ public class RequestParser {
             if (isTokenReferenced(validateTarget.getToken())) {
                 Element target = fetchTokenElementFromReference(validateTarget.getToken(), messageContext);
                 validateTarget = new ReceivedToken(target);
-            }  
+            }
             tokenRequirements.setValidateTarget(validateTarget);
         } else if (QNameConstants.CANCEL_TARGET.equals(jaxbElement.getName())) {
             CancelTargetType cancelTargetType = (CancelTargetType)jaxbElement.getValue();
@@ -275,7 +275,7 @@ public class RequestParser {
             if (isTokenReferenced(cancelTarget.getToken())) {
                 Element target = fetchTokenElementFromReference(cancelTarget.getToken(), messageContext);
                 cancelTarget = new ReceivedToken(target);
-            }          
+            }
             tokenRequirements.setCancelTarget(cancelTarget);
         } else if (QNameConstants.RENEW_TARGET.equals(jaxbElement.getName())) {
             RenewTargetType renewTargetType = (RenewTargetType)jaxbElement.getValue();
@@ -283,7 +283,7 @@ public class RequestParser {
             if (isTokenReferenced(renewTarget.getToken())) {
                 Element target = fetchTokenElementFromReference(renewTarget.getToken(), messageContext);
                 renewTarget = new ReceivedToken(target);
-            }          
+            }
             tokenRequirements.setRenewTarget(renewTarget);
         } else if (QNameConstants.CLAIMS.equals(jaxbElement.getName())) {
             ClaimsType claimsType = (ClaimsType)jaxbElement.getValue();
@@ -301,7 +301,7 @@ public class RequestParser {
             tokenRequirements.setRenewing(renewing);
         } else if (QNameConstants.PARTICIPANTS.equals(jaxbElement.getName())) {
             ParticipantsType participantsType = (ParticipantsType)jaxbElement.getValue();
-            
+
             Participants participants = parseParticipants(participantsType);
             tokenRequirements.setParticipants(participants);
         } else {
@@ -309,7 +309,7 @@ public class RequestParser {
         }
         return true;
     }
-    
+
     /**
      * Parse the UseKey structure to get a ReceivedKey containing a cert/public-key/secret-key.
      * @param useKey The UseKey object
@@ -318,7 +318,7 @@ public class RequestParser {
      * @throws STSException
      */
     private static ReceivedKey parseUseKey(
-        UseKeyType useKey, 
+        UseKeyType useKey,
         Map<String, Object> messageContext
     ) throws STSException {
         byte[] x509 = null;
@@ -332,7 +332,7 @@ public class RequestParser {
                     X509DataType x509DataType = extractType(keyInfoContent, X509DataType.class);
                     if (null != x509DataType) {
                         LOG.fine("Found X509Data KeyInfo type");
-                        for (Object x509Object 
+                        for (Object x509Object
                             : x509DataType.getX509IssuerSerialOrX509SKIOrX509SubjectName()) {
                             x509 = extractType(x509Object, byte[].class);
                             if (null != x509) {
@@ -344,7 +344,7 @@ public class RequestParser {
                 }
             } else if (SecurityTokenReferenceType.class == useKeyJaxb.getDeclaredType()
                 || obj instanceof SecurityTokenReferenceType) {
-                SecurityTokenReferenceType strType = 
+                SecurityTokenReferenceType strType =
                     SecurityTokenReferenceType.class.cast(useKeyJaxb.getValue());
                 Element token = fetchTokenElementFromReference(strType, messageContext);
                 try {
@@ -370,9 +370,9 @@ public class RequestParser {
                 if ("KeyInfo".equals(element.getLocalName())) {
                     return parseKeyInfoElement((Element)useKey.getAny());
                 } else {
-                    NodeList x509CertData = 
+                    NodeList x509CertData =
                         element.getElementsByTagNameNS(
-                            Constants.SignatureSpecNS, Constants._TAG_X509CERTIFICATE   
+                            Constants.SignatureSpecNS, Constants._TAG_X509CERTIFICATE
                         );
                     if (x509CertData != null && x509CertData.getLength() > 0) {
                         try {
@@ -391,7 +391,7 @@ public class RequestParser {
                 "An unknown element was received", STSException.BAD_REQUEST
             );
         }
-        
+
         if (x509 != null) {
             try {
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
@@ -408,27 +408,27 @@ public class RequestParser {
         }
         return null;
     }
-    
+
     private static Participants parseParticipants(ParticipantsType participantsType) {
         Participants participants = new Participants();
-        
+
         if (participantsType.getPrimary() != null) {
             participants.setPrimaryParticipant(participantsType.getPrimary().getAny());
         }
-        
-        if (participantsType.getParticipant() != null 
+
+        if (participantsType.getParticipant() != null
             && !participantsType.getParticipant().isEmpty()) {
-            List<Object> secondaryParticipants = 
+            List<Object> secondaryParticipants =
                 new ArrayList<>(participantsType.getParticipant().size());
             for (ParticipantType secondaryParticipant : participantsType.getParticipant()) {
                 secondaryParticipants.add(secondaryParticipant.getAny());
             }
             participants.setParticipants(secondaryParticipants);
         }
-        
+
         return participants;
     }
-    
+
     private static <T> T extractType(Object param, Class<T> clazz) {
         if (param instanceof JAXBElement<?>) {
             JAXBElement<?> jaxbElement = (JAXBElement<?>) param;
@@ -438,7 +438,7 @@ public class RequestParser {
         }
         return null;
     }
-    
+
     /**
      * Parse the KeyInfo Element to return a ReceivedKey object containing the found certificate or
      * public key.
@@ -485,7 +485,7 @@ public class RequestParser {
         }
         return null;
     }
-    
+
     /**
      * Parse an Entropy object
      * @param entropy an Entropy object
@@ -498,7 +498,7 @@ public class RequestParser {
             if (entropyObject instanceof JAXBElement<?>) {
                 JAXBElement<?> entropyObjectJaxb = (JAXBElement<?>) entropyObject;
                 if (QNameConstants.BINARY_SECRET.equals(entropyObjectJaxb.getName())) {
-                    BinarySecretType binarySecretType = 
+                    BinarySecretType binarySecretType =
                         (BinarySecretType)entropyObjectJaxb.getValue();
                     LOG.fine("Found BinarySecret Entropy type");
                     Entropy entropy = new Entropy();
@@ -520,7 +520,7 @@ public class RequestParser {
                 requestData.setWssConfig(WSSConfig.getNewInstance());
                 requestData.setWsDocInfo(new WSDocInfo(entropyElement.getOwnerDocument()));
                 try {
-                    List<WSSecurityEngineResult> results = 
+                    List<WSSecurityEngineResult> results =
                         processor.handleToken(entropyElement, requestData);
                     Entropy entropy = new Entropy();
                     entropy.setDecryptedKey((byte[])results.get(0).get(WSSecurityEngineResult.TAG_SECRET));
@@ -538,10 +538,10 @@ public class RequestParser {
         }
         return null;
     }
-    
+
     /**
      * Parse the secondaryParameters element. Precedence goes to values that are specified as
-     * direct children of the RequestSecurityToken element. 
+     * direct children of the RequestSecurityToken element.
      * @param secondaryParameters the secondaryParameters element to parse
      */
     private void parseSecondaryParameters(Element secondaryParameters, List<ClaimsParser> claimsParsers,
@@ -554,16 +554,16 @@ public class RequestParser {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Found " + localName + ": " + child.getTextContent().trim());
             }
-            
-            if (keyRequirements.getKeySize() == 0 && "KeySize".equals(localName) 
+
+            if (keyRequirements.getKeySize() == 0 && "KeySize".equals(localName)
                 && STSConstants.WST_NS_05_12.equals(namespace)) {
                 long keySize = Integer.parseInt(child.getTextContent().trim());
                 keyRequirements.setKeySize(keySize);
-            } else if (tokenRequirements.getTokenType() == null 
+            } else if (tokenRequirements.getTokenType() == null
                 && "TokenType".equals(localName) && STSConstants.WST_NS_05_12.equals(namespace)) {
                 String tokenType = child.getTextContent().trim();
                 tokenRequirements.setTokenType(tokenType);
-            } else if (keyRequirements.getKeyType() == null 
+            } else if (keyRequirements.getKeyType() == null
                 && "KeyType".equals(localName) && STSConstants.WST_NS_05_12.equals(namespace)) {
                 String keyType = child.getTextContent().trim();
                 keyRequirements.setKeyType(keyType);
@@ -576,7 +576,7 @@ public class RequestParser {
             child = DOMUtils.getNextElement(child);
         }
     }
-    
+
     /**
      * Create a ClaimCollection from a DOM Element
      */
@@ -590,12 +590,12 @@ public class RequestParser {
             }
         } catch (URISyntaxException e1) {
             LOG.log(
-                Level.WARNING, 
-                "Cannot create URI from the given Dialect attribute value " + dialectAttr, 
+                Level.WARNING,
+                "Cannot create URI from the given Dialect attribute value " + dialectAttr,
                 e1
             );
         }
-        
+
         Element childClaimType = DOMUtils.getFirstElement(claimsElement);
         while (childClaimType != null) {
             Claim requestClaim = parseChildClaimType(childClaimType, dialectAttr, claimsParsers);
@@ -604,10 +604,10 @@ public class RequestParser {
             }
             childClaimType = DOMUtils.getNextElement(childClaimType);
         }
-        
+
         return requestedClaims;
     }
-    
+
     /**
      * Create a ClaimCollection from a JAXB ClaimsType object
      */
@@ -623,12 +623,12 @@ public class RequestParser {
             }
         } catch (URISyntaxException e1) {
             LOG.log(
-                Level.WARNING, 
-                "Cannot create URI from the given Dialect attribute value " + dialectAttr, 
+                Level.WARNING,
+                "Cannot create URI from the given Dialect attribute value " + dialectAttr,
                 e1
             );
         }
-        
+
         for (Object claim : claimsType.getAny()) {
             if (claim instanceof Element) {
                 Claim requestClaim = parseChildClaimType((Element)claim, dialectAttr, claimsParsers);
@@ -637,10 +637,10 @@ public class RequestParser {
                 }
             }
         }
-        
+
         return requestedClaims;
     }
-    
+
     /**
      * Parse a child ClaimType into a Claim object.
      */
@@ -657,14 +657,14 @@ public class RequestParser {
         if (IdentityClaimsParser.IDENTITY_CLAIMS_DIALECT.equals(dialect)) {
             return IdentityClaimsParser.parseClaimType(childClaimType);
         }
-        
+
         LOG.log(Level.WARNING, "No ClaimsParser is registered for dialect " + dialect);
         throw new STSException(
             "No ClaimsParser is registered for dialect " + dialect, STSException.BAD_REQUEST
         );
     }
-    
-    
+
+
     /**
      * Method to check if the passed token is a SecurityTokenReference
      */
@@ -681,8 +681,8 @@ public class RequestParser {
             return true;
         }
         return false;
-    } 
-    
+    }
+
     /**
      * Method to fetch token from the SecurityTokenReference
      */
@@ -693,11 +693,11 @@ public class RequestParser {
         String referenceURI = null;
         if (targetToken instanceof Element) {
             Element tokenElement = (Element) targetToken;
-            NodeList refList = 
+            NodeList refList =
                 tokenElement.getElementsByTagNameNS(STSConstants.WSSE_EXT_04_01, "Reference");
             if (refList.getLength() == 0) {
                 throw new STSException(
-                    "Cannot find Reference element in the SecurityTokenReference.", 
+                    "Cannot find Reference element in the SecurityTokenReference.",
                     STSException.REQUEST_FAILED
                 );
             }
@@ -711,7 +711,7 @@ public class RequestParser {
                 }
             }
         }
-        
+
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Reference URI found " + referenceURI);
         }
@@ -721,22 +721,22 @@ public class RequestParser {
                 "An unknown element was received", STSException.BAD_REQUEST
             );
         }
-   
+
         // Find processed token corresponding to the URI
         referenceURI = XMLUtils.getIDFromReference(referenceURI);
 
-        final List<WSHandlerResult> handlerResults = 
+        final List<WSHandlerResult> handlerResults =
             CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
-        
+
         if (handlerResults != null && handlerResults.size() > 0) {
             WSHandlerResult handlerResult = handlerResults.get(0);
             List<WSSecurityEngineResult> engineResults = handlerResult.getResults();
-            
+
             for (WSSecurityEngineResult engineResult : engineResults) {
                 Integer actInt = (Integer)engineResult.get(WSSecurityEngineResult.TAG_ACTION);
                 String id = (String)engineResult.get(WSSecurityEngineResult.TAG_ID);
                 if (referenceURI.equals(id)) {
-                    Element tokenElement = 
+                    Element tokenElement =
                         (Element)engineResult.get(WSSecurityEngineResult.TAG_TOKEN_ELEMENT);
                     if (tokenElement == null) {
                         throw new STSException(
@@ -746,7 +746,7 @@ public class RequestParser {
                     return tokenElement;
                 } else if (actInt == WSConstants.SCT) {
                     // Need to check special case of SecurityContextToken Identifier separately
-                    SecurityContextToken sct = 
+                    SecurityContextToken sct =
                         (SecurityContextToken)
                             engineResult.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
                     if (referenceURI.equals(sct.getIdentifier())) {

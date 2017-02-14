@@ -47,12 +47,12 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the Asymmetric binding. The CXF client gets a token from the STS by authenticating via a
- * Username Token over the symmetric binding, and then sends it to the CXF endpoint using 
+ * Username Token over the symmetric binding, and then sends it to the CXF endpoint using
  * the asymmetric binding.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
@@ -60,12 +60,12 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static final String PORT = allocatePort(Server.class);
     private static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     final TestParam test;
-    
+
     public AsymmetricBindingTest(TestParam type) {
         this.test = type;
     }
@@ -87,23 +87,23 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         STSServer stsServer = new STSServer();
         stsServer.setContext("cxf-ut.xml");
         assertTrue(launchServer(stsServer));
-        
+
         stsServer = new STSServer();
         stsServer.setContext("cxf-ut-encrypted.xml");
         assertTrue(launchServer(stsServer));
-        
+
         StaxSTSServer staxStsServer = new StaxSTSServer();
         staxStsServer.setContext("stax-cxf-ut.xml");
         assertTrue(launchServer(staxStsServer));
-        
+
         staxStsServer = new StaxSTSServer();
         staxStsServer.setContext("stax-cxf-ut-encrypted.xml");
         assertTrue(launchServer(staxStsServer));
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-        
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT2)},
                                                 {new TestParam(PORT, true, STSPORT2)},
                                                 {new TestParam(STAX_PORT, false, STSPORT2)},
@@ -114,7 +114,7 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
                                                 {new TestParam(STAX_PORT, true, STAX_STSPORT2)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -134,18 +134,18 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = AsymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML1Port");
-        DoubleItPortType asymmetricSaml1Port = 
+        DoubleItPortType asymmetricSaml1Port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(asymmetricSaml1Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml1Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(asymmetricSaml1Port);
         }
-        
+
         doubleIt(asymmetricSaml1Port, 25);
-        
+
         ((java.io.Closeable)asymmetricSaml1Port).close();
         bus.shutdown(true);
     }
@@ -163,23 +163,23 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = AsymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2Port");
-        DoubleItPortType asymmetricSaml2Port = 
+        DoubleItPortType asymmetricSaml2Port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(asymmetricSaml2Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml2Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(asymmetricSaml2Port);
         }
-        
+
         doubleIt(asymmetricSaml2Port, 30);
         TokenTestUtils.verifyToken(asymmetricSaml2Port);
-        
+
         ((java.io.Closeable)asymmetricSaml2Port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUsernameTokenSAML2KeyValue() throws Exception {
 
@@ -193,19 +193,19 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = AsymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2KeyValuePort");
-        DoubleItPortType asymmetricSaml2Port = 
+        DoubleItPortType asymmetricSaml2Port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(asymmetricSaml2Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml2Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(asymmetricSaml2Port);
         }
-        
+
         doubleIt(asymmetricSaml2Port, 30);
         TokenTestUtils.verifyToken(asymmetricSaml2Port);
-        
+
         ((java.io.Closeable)asymmetricSaml2Port).close();
         bus.shutdown(true);
     }
@@ -223,19 +223,19 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = AsymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML1EncryptedPort");
-        DoubleItPortType asymmetricSaml1EncryptedPort = 
+        DoubleItPortType asymmetricSaml1EncryptedPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(asymmetricSaml1EncryptedPort, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)asymmetricSaml1EncryptedPort, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(asymmetricSaml1EncryptedPort);
         }
-        
+
         // Set the X509Certificate manually on the STSClient (just to test that we can)
         BindingProvider bindingProvider = (BindingProvider)asymmetricSaml1EncryptedPort;
-        STSClient stsClient = 
+        STSClient stsClient =
             (STSClient)bindingProvider.getRequestContext().get(SecurityConstants.STS_CLIENT);
         if (stsClient == null) {
             stsClient = (STSClient)bindingProvider.getRequestContext().get("ws-" + SecurityConstants.STS_CLIENT);
@@ -245,13 +245,13 @@ public class AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         cryptoType.setAlias("myclientkey");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         stsClient.setUseKeyCertificate(certs[0]);
-        
+
         doubleIt(asymmetricSaml1EncryptedPort, 40);
-        
+
         ((java.io.Closeable)asymmetricSaml1EncryptedPort).close();
         bus.shutdown(true);
     }
-  
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

@@ -23,15 +23,15 @@ package org.apache.cxf.ws.transfer.validationtransformation;
  * This class represents the result from the ResourceTypeIdentifier.
  */
 public class ResourceTypeIdentifierResult {
-    
+
     private boolean correct;
-    
+
     private ResourceTransformer transformer;
-    
+
     public ResourceTypeIdentifierResult() {
-        
+
     }
-    
+
     public ResourceTypeIdentifierResult(boolean result, ResourceTransformer transformer) {
         this.correct = result;
         this.transformer = transformer;
@@ -52,5 +52,5 @@ public class ResourceTypeIdentifierResult {
     public void setTransformer(ResourceTransformer transformer) {
         this.transformer = transformer;
     }
-    
+
 }

@@ -44,29 +44,29 @@ public class InterpretNullAsOnewayProviderTest extends AbstractBusClientServerTe
     private static final String ADDRESS1 = "http://localhost:" + PORT + "/test/nullable1";
     private static final String ADDRESS2 = "http://localhost:" + PORT + "/test/nullable2";
     private static final String ADDRESS3 = "http://localhost:" + PORT + "/test/nullable3";
-    
+
     public static class Server extends AbstractBusTestServerBase {
-    
+
         protected void run() {
             // endpoint not interpreting null as oneway
             NullProviderService servant1 = new NullProviderService();
             Endpoint ep1 = Endpoint.publish(ADDRESS1, servant1);
             assertNotNull("endpoint published", ep1);
             ep1.getProperties().put("jaxws.provider.interpretNullAsOneway", Boolean.FALSE);
-            
+
             // endpoint interpreting null as oneway
             NullProviderService servant2 = new NullProviderService();
             Endpoint ep2 = Endpoint.publish(ADDRESS2, servant2);
             assertNotNull("endpoint published", ep2);
-            ep2.getProperties().put("jaxws.provider.interpretNullAsOneway", "false");            
+            ep2.getProperties().put("jaxws.provider.interpretNullAsOneway", "false");
 
             // endpoint interpreting null as oneway
             NullProviderService servant3 = new NullProviderService();
             Endpoint ep3 = Endpoint.publish(ADDRESS3, servant3);
-            assertNotNull("endpoint published", ep3);            
+            assertNotNull("endpoint published", ep3);
         }
-    
-        public static void main(String[] args) throws Exception { 
+
+        public static void main(String[] args) throws Exception {
             try {
                 Server s = new Server();
                 s.start();
@@ -87,18 +87,18 @@ public class InterpretNullAsOnewayProviderTest extends AbstractBusClientServerTe
             return null;
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testNotInterpretNullAsOneway() throws Exception {
         HttpURLConnection conn = postRequest(ADDRESS1);
         assertTrue("Soap fault must be returned", 400 <= conn.getResponseCode());
     }
-    
+
     @Test
     public void testNotInterpretNullAsOneway2() throws Exception {
         HttpURLConnection conn = postRequest(ADDRESS2);
@@ -110,7 +110,7 @@ public class InterpretNullAsOnewayProviderTest extends AbstractBusClientServerTe
         HttpURLConnection conn = postRequest(ADDRESS3);
         assertEquals("http 202 must be returned", 202, conn.getResponseCode());
     }
-    
+
     private static HttpURLConnection postRequest(String address) throws Exception {
         URL url = new URL(address);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

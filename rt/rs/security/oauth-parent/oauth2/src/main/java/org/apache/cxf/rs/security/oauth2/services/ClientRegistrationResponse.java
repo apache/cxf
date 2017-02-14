@@ -32,16 +32,16 @@ public class ClientRegistrationResponse extends JsonMapObject {
     public static final String REG_CLIENT_URI = "registration_client_uri";
     public static final String CLIENT_ID_ISSUED_AT = "client_id_issued_at";
     public static final String CLIENT_SECRET_EXPIRES_AT = "client_secret_expires_at";
-    
+
     private static final long serialVersionUID = 7114757825909879652L;
-    
+
     public ClientRegistrationResponse() {
     }
-    
+
     public ClientRegistrationResponse(Map<String, Object> props) {
         super(new LinkedHashMap<String, Object>(props));
     }
-    
+
     public void setClientId(String clientId) {
         super.setProperty(CLIENT_ID, clientId);
     }

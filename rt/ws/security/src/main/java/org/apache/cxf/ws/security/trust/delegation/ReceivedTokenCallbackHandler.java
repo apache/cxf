@@ -41,14 +41,14 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 
 /**
- * This CallbackHandler implementation obtains the previously received message from a 
- * DelegationCallback object, and obtains a received token 
+ * This CallbackHandler implementation obtains the previously received message from a
+ * DelegationCallback object, and obtains a received token
  * (SAML/UsernameToken/BinarySecurityToken) from it to be used as the delegation token.
  */
 public class ReceivedTokenCallbackHandler implements CallbackHandler {
-    
+
     private boolean useTransformedToken = true;
-    
+
     @SuppressWarnings("unchecked")
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
@@ -56,10 +56,10 @@ public class ReceivedTokenCallbackHandler implements CallbackHandler {
             if (callbacks[i] instanceof DelegationCallback) {
                 DelegationCallback callback = (DelegationCallback) callbacks[i];
                 Message message = callback.getCurrentMessage();
-                
-                if (message != null 
+
+                if (message != null
                     && message.get(PhaseInterceptorChain.PREVIOUS_MESSAGE) != null) {
-                    WeakReference<SoapMessage> wr = 
+                    WeakReference<SoapMessage> wr =
                         (WeakReference<SoapMessage>)
                             message.get(PhaseInterceptorChain.PREVIOUS_MESSAGE);
                     SoapMessage previousSoapMessage = wr.get();
@@ -68,16 +68,16 @@ public class ReceivedTokenCallbackHandler implements CallbackHandler {
                         callback.setToken(token);
                     }
                 }
-                
+
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }
         }
     }
-    
+
     private Element getTokenFromMessage(SoapMessage soapMessage) {
         if (soapMessage != null) {
-            List<WSHandlerResult> results = 
+            List<WSHandlerResult> results =
                 CastUtils.cast((List<?>)soapMessage.get(WSHandlerConstants.RECV_RESULTS));
             if (results != null) {
                 for (WSHandlerResult rResult : results) {
@@ -90,7 +90,7 @@ public class ReceivedTokenCallbackHandler implements CallbackHandler {
         }
         return null;
     }
-    
+
     private Element findToken(
         List<WSSecurityEngineResult> wsSecEngineResults
     ) {
@@ -100,12 +100,12 @@ public class ReceivedTokenCallbackHandler implements CallbackHandler {
             if (useTransformedToken && transformedToken instanceof SamlAssertionWrapper) {
                 return ((SamlAssertionWrapper)transformedToken).getElement();
             }
-            
+
             // Otherwise check the actions
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             if (actInt.intValue() == WSConstants.ST_SIGNED
                 || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                SamlAssertionWrapper assertion = 
+                SamlAssertionWrapper assertion =
                     (SamlAssertionWrapper)wser.get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
                 return assertion.getElement();
             } else if (actInt.intValue() == WSConstants.UT
@@ -114,7 +114,7 @@ public class ReceivedTokenCallbackHandler implements CallbackHandler {
                     (UsernameToken)wser.get(WSSecurityEngineResult.TAG_USERNAME_TOKEN);
                 return token.getElement();
             } else if (actInt.intValue() == WSConstants.BST) {
-                BinarySecurity token = 
+                BinarySecurity token =
                     (BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
                 return token.getElement();
             }
@@ -134,5 +134,5 @@ public class ReceivedTokenCallbackHandler implements CallbackHandler {
     public void setUseTransformedToken(boolean useTransformedToken) {
         this.useTransformedToken = useTransformedToken;
     }
-    
+
 }

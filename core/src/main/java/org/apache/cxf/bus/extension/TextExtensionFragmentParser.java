@@ -36,12 +36,12 @@ import org.apache.cxf.common.logging.LogUtils;
 public class TextExtensionFragmentParser {
     private static final Logger LOG = LogUtils.getL7dLogger(TextExtensionFragmentParser.class);
     private static Pattern colonPattern = Pattern.compile(":");
-    
+
     final ClassLoader loader;
     public TextExtensionFragmentParser(ClassLoader loader) {
         this.loader = loader;
     }
-    
+
     public List<Extension> getExtensions(final URL url) {
         InputStream is = null;
         try {
@@ -65,7 +65,7 @@ public class TextExtensionFragmentParser {
      * Reads extension definitions from a Text file and instantiates them
      * The text file has the following syntax
      * classname:interfacename:deferred(true|false):optional(true|false)
-     * 
+     *
      * @param is stream to read the extension from
      * @return list of Extensions
      * @throws IOException
@@ -110,5 +110,5 @@ public class TextExtensionFragmentParser {
         }
         return ext;
     }
-    
+
 }

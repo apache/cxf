@@ -67,14 +67,14 @@ public final class HttpAuthHeader {
         }
         this.params = parseHeader();
     }
-    
+
     public HttpAuthHeader(String authType, Map<String, String> params) {
         this.authType = authType;
         this.params = params;
         this.fullContent = paramsToString();
         this.fullHeader = authType + " " + fullContent;
     }
-    
+
     private String paramsToString() {
         StringBuilder builder = new StringBuilder();
         boolean first = true;
@@ -84,7 +84,7 @@ public final class HttpAuthHeader {
                 if (!first) {
                     builder.append(", ");
                 }
-                if (entry.getKey().equals("nc") 
+                if (entry.getKey().equals("nc")
                     || entry.getKey().equals("qop")
                     || entry.getKey().equals("algorithm")) {
                     builder.append(entry.getKey() + "=" + param + "");
@@ -137,9 +137,9 @@ public final class HttpAuthHeader {
     }
 
     /**
-     * Extracts the authorization realm from the 
+     * Extracts the authorization realm from the
      * "WWW-Authenticate" Http response header.
-     * 
+     *
      * @param authenticate content of the WWW-Authenticate header
      * @return The realm, or null if it is non-existent.
      */
@@ -151,15 +151,15 @@ public final class HttpAuthHeader {
     public boolean authTypeIsDigest() {
         return AUTH_TYPE_DIGEST.equals(this.authType);
     }
-    
+
     public boolean authTypeIsBasic() {
         return AUTH_TYPE_BASIC.equals(this.authType);
     }
-    
+
     public boolean authTypeIsNegotiate() {
         return AUTH_TYPE_DIGEST.equals(this.authType);
     }
-    
+
     public String getAuthType() {
         return authType;
     }

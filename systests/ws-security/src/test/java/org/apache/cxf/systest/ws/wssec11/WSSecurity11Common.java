@@ -41,14 +41,14 @@ import wssec.wssec11.PingService11;
  *
  */
 public class WSSecurity11Common extends AbstractBusClientServerTestBase {
-       
+
     private static final String INPUT = "foo";
 
     public void runClientServer(
         String portPrefix, String portNumber, boolean unrestrictedPoliciesInstalled,
         boolean streaming
     ) throws IOException {
-        
+
         Bus bus = null;
         if (unrestrictedPoliciesInstalled) {
             bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/client.xml");
@@ -60,15 +60,15 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(bus);
 
         URL wsdlLocation = null;
-        PingService11 svc = null; 
-        wsdlLocation = getWsdlLocation(portPrefix, portNumber); 
+        PingService11 svc = null;
+        wsdlLocation = getWsdlLocation(portPrefix, portNumber);
         svc = new PingService11(wsdlLocation);
-        final IPingService port = 
+        final IPingService port =
             svc.getPort(
                 new QName("http://WSSec/wssec11", portPrefix + "_IPingService"),
                 IPingService.class
             );
-        
+
         if (streaming) {
             ((BindingProvider)port).getRequestContext().put(
                 SecurityConstants.ENABLE_STREAMING_SECURITY, "true"
@@ -82,10 +82,10 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
         assertEquals(INPUT, output);
 
         ((java.io.Closeable)port).close();
-        
+
         bus.shutdown(true);
     }
-    
+
     private static URL getWsdlLocation(String portPrefix, String portNumber) {
         try {
             return new URL("http://localhost:" + portNumber + "/" + portPrefix + "PingService?wsdl");

@@ -29,27 +29,27 @@ import org.apache.cxf.ws.transfer.manager.ResourceManager;
 public class SimpleResourceResolver implements ResourceResolver {
 
     protected ResourceManager resourceManager;
-    
+
     protected String resourceURL;
-    
+
     public SimpleResourceResolver() {
-        
+
     }
-    
+
     public SimpleResourceResolver(String resourceURL) {
         this.resourceURL = resourceURL;
     }
-    
+
     public SimpleResourceResolver(String resourceURL, ResourceManager resourceManager) {
         this.resourceURL = resourceURL;
         this.resourceManager = resourceManager;
     }
-    
+
     @Override
     public ResourceReference resolve(Create body) {
         return new ResourceReference(resourceURL, resourceManager);
     }
-    
+
     public String getResourceURL() {
         return resourceURL;
     }
@@ -65,5 +65,5 @@ public class SimpleResourceResolver implements ResourceResolver {
     public void setResourceManager(ResourceManager resourceManager) {
         this.resourceManager = resourceManager;
     }
-    
+
 }

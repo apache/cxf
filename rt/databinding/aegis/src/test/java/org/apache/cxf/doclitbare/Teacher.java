@@ -20,23 +20,23 @@
 package org.apache.cxf.doclitbare;
 
 /**
- * 
+ *
  */
 public class Teacher {
     private int age;
     private String name;
     private String department;
-    
+
     public Teacher() {
         age = 0;
     }
-    
+
     public Teacher(int age, String name, String department) {
         this.age = age;
         this.name = name;
         this.department = department;
     }
-    
+
     public int getAge() {
         return age;
     }
@@ -55,5 +55,5 @@ public class Teacher {
     public void setDepartment(String department) {
         this.department = department;
     }
-    
+
 }

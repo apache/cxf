@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * Java class for port-component_handlerType complex type.
  * <p>
  * The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="port-component_handlerType">
  *   &lt;complexContent>
@@ -46,11 +46,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;group ref="{http://java.sun.com/xml/ns/javaee}descriptionGroup"/>
  *         &lt;element name="handler-name" type="{http://java.sun.com/xml/ns/javaee}string"/>
  *         &lt;element name="handler-class" type="{http://java.sun.com/xml/ns/javaee}fully-qualified-classType"/>
- *         &lt;element name="init-param" type="{http://java.sun.com/xml/ns/javaee}param-valueType" 
+ *         &lt;element name="init-param" type="{http://java.sun.com/xml/ns/javaee}param-valueType"
  *                     maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="soap-header" type="{http://java.sun.com/xml/ns/javaee}xsdQNameType" 
+ *         &lt;element name="soap-header" type="{http://java.sun.com/xml/ns/javaee}xsdQNameType"
  *                     maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="soap-role" type="{http://java.sun.com/xml/ns/javaee}string" 
+ *         &lt;element name="soap-role" type="{http://java.sun.com/xml/ns/javaee}string"
  *                     maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="id" type="{http://www.w3.org/2001/XMLSchema}ID" />
@@ -92,7 +92,7 @@ public class PortComponentHandlerType {
      * <CODE>set</CODE> method for the description property.
      * <p>
      * For example, to add a new item, do as follows:
-     * 
+     *
      * <pre>
      * getDescription().add(newItem);
      * </pre>
@@ -114,7 +114,7 @@ public class PortComponentHandlerType {
      * <CODE>set</CODE> method for the displayName property.
      * <p>
      * For example, to add a new item, do as follows:
-     * 
+     *
      * <pre>
      * getDisplayName().add(newItem);
      * </pre>
@@ -136,7 +136,7 @@ public class PortComponentHandlerType {
      * <CODE>set</CODE> method for the icon property.
      * <p>
      * For example, to add a new item, do as follows:
-     * 
+     *
      * <pre>
      * getIcon().add(newItem);
      * </pre>
@@ -152,7 +152,7 @@ public class PortComponentHandlerType {
 
     /**
      * Gets the value of the handlerName property.
-     * 
+     *
      * @return possible object is {@link CString }
      */
     public CString getHandlerName() {
@@ -165,7 +165,7 @@ public class PortComponentHandlerType {
 
     /**
      * Sets the value of the handlerName property.
-     * 
+     *
      * @param value allowed object is {@link CString }
      */
     public void setHandlerName(CString value) {
@@ -174,7 +174,7 @@ public class PortComponentHandlerType {
 
     /**
      * Gets the value of the handlerClass property.
-     * 
+     *
      * @return possible object is {@link FullyQualifiedClassType }
      */
     public FullyQualifiedClassType getHandlerClass() {
@@ -183,7 +183,7 @@ public class PortComponentHandlerType {
 
     /**
      * Sets the value of the handlerClass property.
-     * 
+     *
      * @param value allowed object is {@link FullyQualifiedClassType }
      */
     public void setHandlerClass(FullyQualifiedClassType value) {
@@ -198,7 +198,7 @@ public class PortComponentHandlerType {
      * <CODE>set</CODE> method for the initParam property.
      * <p>
      * For example, to add a new item, do as follows:
-     * 
+     *
      * <pre>
      * getInitParam().add(newItem);
      * </pre>
@@ -220,7 +220,7 @@ public class PortComponentHandlerType {
      * <CODE>set</CODE> method for the soapHeader property.
      * <p>
      * For example, to add a new item, do as follows:
-     * 
+     *
      * <pre>
      * getSoapHeader().add(newItem);
      * </pre>
@@ -242,7 +242,7 @@ public class PortComponentHandlerType {
      * <CODE>set</CODE> method for the soapRole property.
      * <p>
      * For example, to add a new item, do as follows:
-     * 
+     *
      * <pre>
      * getSoapRole().add(newItem);
      * </pre>
@@ -258,7 +258,7 @@ public class PortComponentHandlerType {
 
     /**
      * Gets the value of the id property.
-     * 
+     *
      * @return possible object is {@link java.lang.String }
      */
     public java.lang.String getId() {
@@ -267,7 +267,7 @@ public class PortComponentHandlerType {
 
     /**
      * Sets the value of the id property.
-     * 
+     *
      * @param value allowed object is {@link java.lang.String }
      */
     public void setId(java.lang.String value) {

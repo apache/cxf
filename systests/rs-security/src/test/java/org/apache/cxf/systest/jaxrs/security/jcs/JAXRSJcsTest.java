@@ -36,29 +36,29 @@ import org.junit.BeforeClass;
  */
 public class JAXRSJcsTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookJcsServer.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookJcsServer.class, true));
         registerBouncyCastleIfNeeded();
     }
-    
+
     private static void registerBouncyCastleIfNeeded() throws Exception {
         // Still need it for Oracle Java 7 and Java 8
-        Security.addProvider(new BouncyCastleProvider());    
+        Security.addProvider(new BouncyCastleProvider());
     }
-    
+
     @AfterClass
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);    
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
     }
-    
+
     @org.junit.Test
     public void testJcsString() throws Exception {
 
         WebClient client = createWebClient();
-        
+
         String jcs = "{}";
         String responseJcs = client.post(jcs, String.class);
         assertEquals(responseJcs, jcs);
@@ -68,12 +68,12 @@ public class JAXRSJcsTest extends AbstractBusClientServerTestBase {
         URL busFile = JAXRSJcsTest.class.getResource("client.xml");
 
         List<Object> providers = new ArrayList<>();
-        
+
         String address = "https://localhost:" + PORT + "/jcs/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
         return client;
     }
-        
+
 }

@@ -42,21 +42,21 @@ public class WrappedEndpoint implements Endpoint {
     private EndpointInfo endpointInfo;
     private Service service;
     private Boolean usingAddressing;
-    
+
     WrappedEndpoint(Endpoint wrapped, EndpointInfo info, Service s) {
         wrappedEndpoint = wrapped;
         endpointInfo = info;
         service = s;
     }
-    
+
     public Endpoint getWrappedEndpoint() {
         return wrappedEndpoint;
     }
-    
+
     public EndpointInfo getEndpointInfo() {
         return endpointInfo;
-    }  
-    
+    }
+
     public Service getService() {
         return service;
     }
@@ -94,7 +94,7 @@ public class WrappedEndpoint implements Endpoint {
     }
 
     public List<Interceptor<? extends Message>> getInInterceptors() {
-        return wrappedEndpoint.getInInterceptors();        
+        return wrappedEndpoint.getInInterceptors();
     }
 
     public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
@@ -147,7 +147,7 @@ public class WrappedEndpoint implements Endpoint {
     public void putAll(Map<? extends String, ? extends Object> t) {
         wrappedEndpoint.putAll(t);
     }
-    
+
     public Object remove(Object key) {
         return wrappedEndpoint.remove(key);
     }
@@ -159,7 +159,7 @@ public class WrappedEndpoint implements Endpoint {
     public Collection<Object> values() {
         return wrappedEndpoint.values();
     }
-    
+
     /**
      * @return the list of fearures <b>already</b> activated for this endpoint.
      */

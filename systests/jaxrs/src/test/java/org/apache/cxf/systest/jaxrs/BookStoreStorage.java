@@ -32,21 +32,21 @@ public abstract class BookStoreStorage implements LifecycleInterface {
     protected long bookId = 123;
     protected int postConstructCalls;
     protected int preDestroyCalls;
-    
+
     @PostConstruct
     public void postConstruct() {
         if (postConstructCalls++ == 1) {
             throw new RuntimeException();
         }
     }
-    
+
     @PreDestroy
     public void preDestroy() {
         if (preDestroyCalls++ == 1) {
             throw new RuntimeException();
         }
     }
-    
+
     protected void checkPostConstruct() {
         if (postConstructCalls != 1) {
             throw new RuntimeException();

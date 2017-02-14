@@ -25,7 +25,7 @@ public class RiTest extends WsnBrokerTest {
     protected String getProviderImpl() {
         return "com.sun.xml.ws.spi.ProviderImpl";
     }
-    
+
     @Test
     public void testPublisherCustomType() throws Exception {
         try {

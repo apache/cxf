@@ -25,15 +25,15 @@ import org.apache.cxf.service.Service;
 
 /**
  * Creates a new instance for each session.
- * 
- * This may have restrictions on what the bean can look like.   For example, 
+ *
+ * This may have restrictions on what the bean can look like.   For example,
  * some session implementations require the beans to be Serializable
  */
 public class SessionFactory implements Factory {
-    
+
     Factory factory;
     boolean createIfNotExist;
-    
+
     public SessionFactory(Class<?> svcClass) {
         this(new PerRequestFactory(svcClass), true);
     }

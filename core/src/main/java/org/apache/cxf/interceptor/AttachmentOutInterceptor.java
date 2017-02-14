@@ -37,23 +37,23 @@ import org.apache.cxf.phase.Phase;
 public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public static final String WRITE_ATTACHMENTS = "write.attachments";
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AttachmentOutInterceptor.class);
 
     private AttachmentOutEndingInterceptor ending = new AttachmentOutEndingInterceptor();
-    
+
     public AttachmentOutInterceptor() {
         super(Phase.PRE_STREAM);
     }
 
     public void handleMessage(Message message) {
-        
+
         // Make it possible to step into this process in spite of Eclipse
         // by declaring the Object.
         boolean mtomEnabled = AttachmentUtil.isMtomEnabled(message);
         boolean writeAtts = MessageUtils.isTrue(message.getContextualProperty(WRITE_ATTACHMENTS))
             || (message.getAttachments() != null && !message.getAttachments().isEmpty());
-        
+
         if (!mtomEnabled && !writeAtts) {
             return;
         }
@@ -61,8 +61,8 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
             return;
         }
 
-        AttachmentSerializer serializer = 
-            new AttachmentSerializer(message, 
+        AttachmentSerializer serializer =
+            new AttachmentSerializer(message,
                                      getMultipartType(),
                                      writeOptionalTypeParameters(),
                                      getRootHeaders());
@@ -72,30 +72,30 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
         if (contentTransferEncoding != null) {
             serializer.setContentTransferEncoding(contentTransferEncoding);
         }
-        
+
         try {
             serializer.writeProlog();
         } catch (IOException e) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("WRITE_ATTACHMENTS", BUNDLE), e);
-        }        
+        }
         message.setContent(AttachmentSerializer.class, serializer);
-        
+
         // Add a final interceptor to write attachements
-        message.getInterceptorChain().add(ending);   
+        message.getInterceptorChain().add(ending);
     }
-   
+
     protected String getMultipartType() {
         return "multipart/related";
     }
-    
+
     protected boolean writeOptionalTypeParameters() {
         return true;
     }
-    
+
     protected Map<String, List<String>> getRootHeaders() {
         return Collections.emptyMap();
     }
-    
+
     public class AttachmentOutEndingInterceptor extends AbstractPhaseInterceptor<Message> {
         public AttachmentOutEndingInterceptor() {
             super(Phase.PRE_STREAM_ENDING);
@@ -113,6 +113,6 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
         }
 
     }
-    
-    
+
+
 }

@@ -30,28 +30,28 @@ import org.apache.cxf.management.annotation.ManagedResource;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.apache.cxf.workqueue.WorkQueueManager;
 
-@ManagedResource(componentName = "WorkQueue", 
-                 description = "The CXF work queue", 
+@ManagedResource(componentName = "WorkQueue",
+                 description = "The CXF work queue",
                  currencyTimeLimit = 15, persistPolicy = "OnUpdate", persistPeriod = 200)
-                 
-public class WorkQueueImplMBeanWrapper implements ManagedComponent {    
+
+public class WorkQueueImplMBeanWrapper implements ManagedComponent {
     private static final String TYPE_VALUE = "WorkQueues";
-    
+
     private AutomaticWorkQueueImpl aWorkQueue;
     private WorkQueueManager manager;
-    
+
     public WorkQueueImplMBeanWrapper(AutomaticWorkQueueImpl wq,
                                      WorkQueueManager mgr) {
         aWorkQueue = wq;
         manager = mgr;
     }
-      
+
     @ManagedAttribute(description = "The WorkQueueMaxSize",
                       persistPolicy = "OnUpdate")
     public long getWorkQueueMaxSize() {
         return aWorkQueue.getMaxSize();
     }
-   
+
     @ManagedAttribute(description = "The WorkQueue Current size",
                       persistPolicy = "OnUpdate")
     public long getWorkQueueSize() {
@@ -59,20 +59,20 @@ public class WorkQueueImplMBeanWrapper implements ManagedComponent {
     }
 
     @ManagedAttribute(description = "The largest number of threads")
-    public int getLargestPoolSize() { 
-        return aWorkQueue.getLargestPoolSize(); 
+    public int getLargestPoolSize() {
+        return aWorkQueue.getLargestPoolSize();
     }
 
     @ManagedAttribute(description = "The current number of threads")
-    public int getPoolSize() { 
-        return aWorkQueue.getPoolSize(); 
+    public int getPoolSize() {
+        return aWorkQueue.getPoolSize();
     }
 
     @ManagedAttribute(description = "The number of threads currently busy")
-    public int getActiveCount() { 
-        return aWorkQueue.getActiveCount(); 
+    public int getActiveCount() {
+        return aWorkQueue.getActiveCount();
     }
-    
+
     @ManagedAttribute(description = "The WorkQueue has nothing to do",
                       persistPolicy = "OnUpdate")
     public boolean isEmpty() {

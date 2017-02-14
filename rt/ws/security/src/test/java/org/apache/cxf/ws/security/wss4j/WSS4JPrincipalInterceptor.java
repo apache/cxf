@@ -28,11 +28,11 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.SecurityContext;
 
 /**
- * A test interceptor to check that the Principal is not null + that the name is equal to a 
+ * A test interceptor to check that the Principal is not null + that the name is equal to a
  * given name.
  */
 public class WSS4JPrincipalInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
-    
+
     private String principalName;
 
     public WSS4JPrincipalInterceptor() {
@@ -45,12 +45,12 @@ public class WSS4JPrincipalInterceptor extends AbstractPhaseInterceptor<SoapMess
         if (context == null) {
             throw new SoapFault("No Security Context", SoapFault.FAULT_CODE_SERVER);
         }
-        
+
         Principal principal = context.getUserPrincipal();
         if (principal == null) {
             throw new SoapFault("No Security Principal", SoapFault.FAULT_CODE_SERVER);
         }
-        
+
         if (principalName != null && !principalName.equals(principal.getName())) {
             throw new SoapFault("Security Principal does not match", SoapFault.FAULT_CODE_SERVER);
         }
@@ -63,6 +63,6 @@ public class WSS4JPrincipalInterceptor extends AbstractPhaseInterceptor<SoapMess
     public void setPrincipalName(String principalName) {
         this.principalName = principalName;
     }
-    
-   
+
+
 }

@@ -47,7 +47,7 @@ import org.junit.Test;
 
 public class WSAFromJavaTest extends AbstractWSATestBase {
     static final String PORT = allocatePort(Server.class);
-    
+
     @Before
     public void setUp() throws Exception {
         createBus();
@@ -69,7 +69,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
 
         String expectedOut = "http://cxf.apache.org/input";
         assertTrue(output.toString().indexOf(expectedOut) != -1);
-        
+
         String expectedIn = "http://cxf.apache.org/output";
         assertTrue(input.toString().indexOf(expectedIn) != -1);
     }
@@ -91,7 +91,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         }
 
         assertTrue(output.toString().indexOf("http://cxf.apache.org/input") != -1);
-        String expectedFault = 
+        String expectedFault =
             "http://server.addr_fromjava.ws.systest.cxf.apache.org/AddNumberImpl/"
             + "addNumbers/Fault/AddNumbersException";
         assertTrue(input.toString(),
@@ -106,11 +106,11 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         AddNumberImpl port = getPort();
 
         assertEquals(3, port.addNumbers2(1, 2));
-        
+
         String base = "http://server.addr_fromjava.ws.systest.cxf.apache.org/AddNumberImpl";
         String expectedOut = base + "/addNumbers2";
         assertTrue(output.toString().indexOf(expectedOut) != -1);
-        
+
         String expectedIn = base + "/addNumbers2Response";
         assertTrue(input.toString().indexOf(expectedIn) != -1);
     }
@@ -166,8 +166,8 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         updateAddressPort(port, PORT);
         return port;
     }
-    
-    @Test 
+
+    @Test
     public void testUnmatchedActions() throws Exception {
         AddNumberImpl port = getPort();
 
@@ -176,13 +176,13 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         requestContext.put(BindingProvider.SOAPACTION_URI_PROPERTY,
                            "http://cxf.apache.org/input4");
         try {
-            //CXF-2035 
-            port.addNumbers3(-1, -1); 
+            //CXF-2035
+            port.addNumbers3(-1, -1);
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("Unexpected wrapper"));
         }
     }
-    
+
     @Test
     public void testFaultFromNonAddressService() throws Exception {
         new LoggingFeature().initialize(this.getBus());
@@ -190,7 +190,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         java.util.Map<String, Object> requestContext = ((BindingProvider)port).getRequestContext();
         requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                            "http://localhost:" + PORT + "/AddNumberImplPort-noaddr");
-        
+
         long start = System.currentTimeMillis();
         port.addNumbers(1, 2);
         try {
@@ -201,7 +201,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         long end = System.currentTimeMillis();
         assertTrue((end - start) < 50000);
     }
-    
+
     static class RemoveRelatesToHeaderInterceptor extends AbstractSoapInterceptor {
         RemoveRelatesToHeaderInterceptor() {
             super(Phase.READ);
@@ -218,7 +218,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
             headers.remove(h2);
         }
     }
-    
+
     @Test
     public void testNoRelatesToHeader() throws Exception {
         new LoggingFeature().initialize(this.getBus());
@@ -226,8 +226,8 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
 
         Client c = ClientProxy.getClient(port);
         c.getInInterceptors().add(new RemoveRelatesToHeaderInterceptor());
-        
-        
+
+
         long start = System.currentTimeMillis();
         port.addNumbers(1, 2);
         try {
@@ -237,6 +237,6 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         }
         long end = System.currentTimeMillis();
         assertTrue((end - start) < 50000);
-    }    
-    
+    }
+
 }

@@ -45,14 +45,14 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class PolicyExtensionsTest extends Assert {
 
     private static final QName KNOWN = new QName("http://cxf.apache.org/test/policy", "known");
     private static final QName KNOWN_DOMAIN_EXPR_TYPE
         = new QName("http://www.w3.org/2005/08/addressing", "EndpointReference");
-    
+
     private static final QName UNKNOWN = new QName("http://cxf.apache.org/test/policy", "unknown");
 
     @Test
@@ -66,12 +66,12 @@ public class PolicyExtensionsTest extends Assert {
 
             PolicyEngine e = bus.getExtension(PolicyEngine.class);
             assertNotNull(e);
-            
+
             assertNoPolicyInterceptors(bus.getInInterceptors());
             assertNoPolicyInterceptors(bus.getInFaultInterceptors());
             assertNoPolicyInterceptors(bus.getOutFaultInterceptors());
             assertNoPolicyInterceptors(bus.getOutInterceptors());
-            
+
         } finally {
             if (null != bus) {
                 bus.shutdown(true);
@@ -109,20 +109,20 @@ public class PolicyExtensionsTest extends Assert {
             pips = pipr.get(UNKNOWN);
             assertNotNull(pips);
             assertTrue(pips.isEmpty());
-            
+
             DomainExpressionBuilderRegistry debr = bus.getExtension(DomainExpressionBuilderRegistry.class);
             assertNotNull(debr);
             DomainExpressionBuilder deb = debr.get(KNOWN_DOMAIN_EXPR_TYPE);
             assertNotNull(deb);
             deb = debr.get(UNKNOWN);
             assertNull(deb);
-            
+
             PolicyEngine pe = bus.getExtension(PolicyEngine.class);
             assertNotNull(pe);
-            PolicyEngineImpl engine = (PolicyEngineImpl)pe; 
+            PolicyEngineImpl engine = (PolicyEngineImpl)pe;
             assertNotNull(engine.getPolicyProviders());
             assertNotNull(engine.getRegistry());
-            
+
             Collection<PolicyProvider> pps = engine.getPolicyProviders();
             assertEquals(3, pps.size());
             boolean wsdlProvider = false;
@@ -140,11 +140,11 @@ public class PolicyExtensionsTest extends Assert {
             assertTrue(wsdlProvider);
             assertTrue(externalProvider);
             assertTrue(serviceProvider);
-            
-            
+
+
             PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
             assertNotNull(builder);
-            
+
         } finally {
             if (null != bus) {
                 bus.shutdown(true);
@@ -152,9 +152,9 @@ public class PolicyExtensionsTest extends Assert {
             }
         }
     }
-    
+
     public static class TestAssertionBuilder implements AssertionBuilder<Element> {
-        
+
         QName knownElements[] = {KNOWN};
 
         public TestAssertionBuilder() {
@@ -167,9 +167,9 @@ public class PolicyExtensionsTest extends Assert {
             return knownElements;
         }
     }
-    
+
     public static class TestPolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {
-        
+
         private static final long serialVersionUID = -4588883556748035959L;
 
         public TestPolicyInterceptorProvider() {

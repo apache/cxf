@@ -34,107 +34,107 @@ public class JAXRSSpringSecurityInterfaceTest extends AbstractSpringSecurityTest
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerSecuritySpringInterface.class, true));
     }
-    
+
     @Test
     public void testFailedAuthentication() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123";
         getBook(endpointAddress, "foo", "ba", 401);
     }
-    
+
     @Test
     public void testGetBookUserAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123";
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
-    
+
     @Test
     public void testGetBookGenericsUserAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstoregenerics/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstoregenerics/thosebooks/123";
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
-    
+
     @Test
     public void testGetBookUser() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123/123";
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
         getBook(endpointAddress, "baddy", "baddyspassword", 403);
     }
-    
+
     @Test
     public void testGetBookAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks"; 
-        getBook(endpointAddress, "foo", "bar", 200); 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks";
+        getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }
-    
+
     @Test
     public void testGetBookSubresource() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/subresource"; 
-        getBook(endpointAddress, "foo", "bar", 200); 
+            "http://localhost:" + PORT + "/bookstorestorage/subresource";
+        getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 403);
-    }   
-    
+    }
+
     @Test
     public void testWebClientAdmin() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstorestorage/thosebooks";
         doGetBookWebClient(address, "foo", "bar",  200);
     }
-    
+
     @Test
     public void testProxyClientAdmin() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstorestorage";
         doGetBookProxyClient(address, "foo", "bar",  200);
     }
-    
+
     @Test
     public void testWebClientUserUnauthorized() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstorestorage/thosebooks";
         doGetBookWebClient(address, "bob", "bobspassword", 403);
     }
-    
+
     @Test
     public void testWebClientUserAuthorized() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123/123";
         doGetBookWebClient(address, "bob", "bobspassword", 200);
     }
-    
+
     private void doGetBookWebClient(String address, String username, String password, int expectedStatus) {
         WebClient wc = WebClient.create(address, username, password, null);
         Response r = wc.get();
         assertEquals(expectedStatus, r.getStatus());
         WebClient wc2 = WebClient.fromClient(wc);
         r = wc2.get();
-        assertEquals(expectedStatus, r.getStatus());    
+        assertEquals(expectedStatus, r.getStatus());
     }
-    
-    private void doGetBookProxyClient(String address, String username, String password, int expectedStatus) 
+
+    private void doGetBookProxyClient(String address, String username, String password, int expectedStatus)
         throws BookNotFoundFault {
-        SecureBookInterface books = JAXRSClientFactory.create(address, SecureBookInterface.class, 
+        SecureBookInterface books = JAXRSClientFactory.create(address, SecureBookInterface.class,
                                                        username, password, null);
         Book b = books.getThatBook();
         assertEquals(123, b.getId());
         Response r = WebClient.client(books).getResponse();
         assertEquals(expectedStatus, r.getStatus());
-            
+
     }
-    
+
     @Test
     public void testGetBookSubresourceAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/securebook/self"; 
-        getBook(endpointAddress, "foo", "bar", 200); 
+            "http://localhost:" + PORT + "/bookstorestorage/securebook/self";
+        getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }
 }

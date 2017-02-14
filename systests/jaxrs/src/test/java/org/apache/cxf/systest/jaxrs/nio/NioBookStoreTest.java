@@ -44,41 +44,41 @@ public class NioBookStoreTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(NioBookStoreServer.class, true));
         createStaticBus();
     }
-    
+
     @Test
     public void testGetAllBooks() throws Exception {
         final Response response = createWebClient("/bookstore", MediaType.TEXT_PLAIN).get();
-        
+
         try {
             assertEquals(200, response.getStatus());
-            
+
             assertThat(response.readEntity(String.class), equalTo(IOUtils.readStringFromStream(
                 getClass().getResourceAsStream("/files/books.txt"))));
         } finally {
             response.close();
         }
     }
-    
+
     @Test
     public void testGetAllBooksIs() throws Exception {
         final Response response = createWebClient("/bookstore/is", MediaType.TEXT_PLAIN).get();
-        
+
         try {
             assertEquals(200, response.getStatus());
-            
+
             assertThat(response.readEntity(String.class), equalTo(IOUtils.readStringFromStream(
                 getClass().getResourceAsStream("/files/books.txt"))));
         } finally {
             response.close();
         }
     }
-    
+
     @Test
     public void testPostBookStore() throws IOException {
         final Response response = createWebClient("/bookstore", MediaType.TEXT_PLAIN)
             .type(MediaType.APPLICATION_OCTET_STREAM)
             .post(IOUtils.readBytesFromStream(getClass().getResourceAsStream("/files/books.txt")));
-        
+
         try {
             assertEquals(200, response.getStatus());
             assertThat(response.readEntity(String.class), equalTo("Book Store uploaded: 10355 bytes"));
@@ -86,14 +86,14 @@ public class NioBookStoreTest extends AbstractBusClientServerTestBase {
             response.close();
         }
     }
-    
+
     protected WebClient createWebClient(final String url, final String mediaType) {
         final List< ? > providers = Arrays.asList(new JacksonJsonProvider());
-        
+
         final WebClient wc = WebClient
             .create("http://localhost:" + NioBookStoreServer.PORT + url, providers)
             .accept(mediaType);
-        
+
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         return wc;
     }

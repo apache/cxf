@@ -67,21 +67,21 @@ public class CorbaAnyEventProducer extends AbstractStartEndEventProducer {
             XMLEventFactory factory = XMLEventFactory.newInstance();
 
             attributes = new ArrayList<>();
-            attributes.add(factory.createAttribute(new QName(W3CConstants.NU_SCHEMA_XSI, "type"), 
-                                                   ANY_TYPE_PREFIX + ":" 
-                                                   + containedSchemaType.getLocalPart())); 
+            attributes.add(factory.createAttribute(new QName(W3CConstants.NU_SCHEMA_XSI, "type"),
+                                                   ANY_TYPE_PREFIX + ":"
+                                                   + containedSchemaType.getLocalPart()));
             namespaces = new ArrayList<>();
             namespaces.add(factory.createNamespace(ANY_TYPE_PREFIX,
                                                    containedSchemaType.getNamespaceURI()));
         }
 
-        CorbaTypeEventProducer containedProducer = 
+        CorbaTypeEventProducer containedProducer =
             CorbaHandlerUtils.getTypeEventProducer(containedType, serviceInfo, orb);
         if (containedProducer instanceof AbstractStartEndEventProducer) {
             iterator = ((AbstractStartEndEventProducer)containedProducer).getNestedTypes();
         } else {
             List<CorbaTypeEventProducer> prods = new ArrayList<>();
-            CorbaSimpleAnyContainedTypeEventProducer simpleProducer = 
+            CorbaSimpleAnyContainedTypeEventProducer simpleProducer =
                 new CorbaSimpleAnyContainedTypeEventProducer(containedProducer.getText());
             prods.add(simpleProducer);
             producers = prods.iterator();

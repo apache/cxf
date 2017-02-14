@@ -31,7 +31,7 @@ import org.apache.cxf.transport.Conduit;
  * The LoadDistributorTargetSelector attempts to do the same job as the
  * FailoverTargetSelector, but to choose an alternate target on every request
  * rather than just when a fault occurs.
- * The LoadDistributorTargetSelector uses the same FailoverStrategy interface as 
+ * The LoadDistributorTargetSelector uses the same FailoverStrategy interface as
  * the FailoverTargetSelector, but has a few significant limitations:
  * 1. Because the LoadDistributorTargetSelector needs to maintain a list of targets
  *    between calls it has to obtain that list without reference to a Message.
@@ -42,7 +42,7 @@ import org.apache.cxf.transport.Conduit;
  *    discarded after this message has been processed.  As a consequence, if the
  *    strategy chosen is a simple sequential one the first item in the list will
  *    be chosen every time.
- *    Conclusion: Be aware that if you are working with targets that are 
+ *    Conclusion: Be aware that if you are working with targets that are
  *    dependent on the Message the process will be less efficient and that the
  *    SequentialStrategy will not distribute the load at all.
  * 2. The AbstractStaticFailoverStrategy base class excludes the 'default' endpoint
@@ -54,7 +54,7 @@ import org.apache.cxf.transport.Conduit;
 public class LoadDistributorTargetSelector extends FailoverTargetSelector {
     private static final Logger LOG = LogUtils.getL7dLogger(
                         LoadDistributorTargetSelector.class);
-    private static final String IS_DISTRIBUTED = 
+    private static final String IS_DISTRIBUTED =
             "org.apache.cxf.clustering.LoadDistributorTargetSelector.IS_DISTRIBUTED";
 
     private List<String> addressList;
@@ -67,7 +67,7 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
     public LoadDistributorTargetSelector() {
         super();
     }
-    
+
     public LoadDistributorTargetSelector(String clientBootstrapAddress) {
         super(clientBootstrapAddress);
     }
@@ -127,7 +127,7 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
      * @param exchange the current Exchange
      * @param invocation the current InvocationContext
      * @return a failover endpoint if one is available
-     * 
+     *
      * Note: The only difference between this and the super implementation is
      * that the current (failed) address is removed from the list set of alternates,
      * it could be argued that that change should be in the super implementation
@@ -139,7 +139,7 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
         if (!invocation.hasAlternates()) {
             // no previous failover attempt on this invocation
             //
-            alternateAddresses = 
+            alternateAddresses =
                 getStrategy().getAlternateAddresses(exchange);
             if (alternateAddresses != null) {
                 alternateAddresses.remove(exchange.getEndpoint().getEndpointInfo().getAddress());
@@ -154,7 +154,7 @@ public class LoadDistributorTargetSelector extends FailoverTargetSelector {
 
         Endpoint failoverTarget = null;
         if (alternateAddresses != null) {
-            String alternateAddress = 
+            String alternateAddress =
                 getStrategy().selectAlternateAddress(alternateAddresses);
             if (alternateAddress != null) {
                 // re-use current endpoint

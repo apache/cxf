@@ -44,8 +44,8 @@ import org.osgi.service.blueprint.reflect.Metadata;
              "http://schemas.xmlsoap.org/wsdl/",
              "http://www.w3.org/2005/08/addressing",
              "http://schemas.xmlsoap.org/ws/2004/08/addressing"})
-public class CXFAPINamespaceHandler implements NamespaceHandler {    
-    
+public class CXFAPINamespaceHandler implements NamespaceHandler {
+
     public URL getSchemaLocation(String namespace) {
         String location = null;
 
@@ -55,7 +55,7 @@ public class CXFAPINamespaceHandler implements NamespaceHandler {
 
         if ("http://cxf.apache.org/configuration/beans".equals(namespace)
                 || "http://cxf.apache.org/schemas/configuration/cxf-beans.xsd".equals(namespace)) {
-            location = "schemas/configuration/cxf-beans.xsd";           
+            location = "schemas/configuration/cxf-beans.xsd";
         } else if ("http://cxf.apache.org/configuration/parameterized-types".equals(namespace)
                 || "http://cxf.apache.org/schemas/configuration/parameterized-types.xsd".equals(namespace)) {
             location = "schemas/configuration/parameterized-types.xsd";
@@ -96,7 +96,7 @@ public class CXFAPINamespaceHandler implements NamespaceHandler {
                 public String getId(Element element, ParserContext context) {
                     String id = element.hasAttribute("id") ? element.getAttribute("id") : null;
                     if (id == null) {
-                        id = "cxf.workqueue."; 
+                        id = "cxf.workqueue.";
                         id += element.hasAttribute("name") ? element.getAttribute("name") : "def";
                     }
                     return id;
@@ -119,5 +119,5 @@ public class CXFAPINamespaceHandler implements NamespaceHandler {
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;
     }
-    
+
 }

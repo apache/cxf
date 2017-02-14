@@ -38,9 +38,9 @@ public class CORBADocLitServerImpl extends AbstractBusTestServerBase {
             sf.createBus("org/apache/cxf/systest/type_test/databinding-schema-validation.xml"));
         Object implementor = new CORBATypeTestImpl();
         String address = "file:./TypeTest.ref";
-        Endpoint.publish(address, implementor);              
+        Endpoint.publish(address, implementor);
     }
-    
+
     public static void main(String args[]) {
         try {
             CORBADocLitServerImpl s = new CORBADocLitServerImpl();
@@ -48,10 +48,10 @@ public class CORBADocLitServerImpl extends AbstractBusTestServerBase {
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally { 
+        } finally {
             System.out.println("done!");
         }
-    }    
+    }
 
     @WebService(serviceName = "TypeTestCORBAService", portName = "TypeTestCORBAPort",
                 endpointInterface = "org.apache.type_test.doc.TypeTestPortType",

@@ -28,11 +28,11 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 public abstract class AbstractJoseConsumer {
     private JweDecryptionProvider jweDecryptor;
     private JwsSignatureVerifier jwsVerifier;
-    
+
     public void setJweDecryptor(JweDecryptionProvider jweDecryptor) {
         this.jweDecryptor = jweDecryptor;
     }
-    
+
     public JweDecryptionProvider getJweDecryptor() {
         return jweDecryptor;
     }
@@ -40,22 +40,22 @@ public abstract class AbstractJoseConsumer {
     public void setJwsVerifier(JwsSignatureVerifier theJwsVerifier) {
         this.jwsVerifier = theJwsVerifier;
     }
-    
+
     public JwsSignatureVerifier getJwsVerifier() {
         return jwsVerifier;
     }
 
     protected JweDecryptionProvider getInitializedDecryptionProvider(JweHeaders jweHeaders) {
         if (jweDecryptor != null) {
-            return jweDecryptor;    
-        } 
+            return jweDecryptor;
+        }
         return JweUtils.loadDecryptionProvider(jweHeaders, false);
     }
     protected JwsSignatureVerifier getInitializedSignatureVerifier(JwsHeaders jwsHeaders) {
         if (jwsVerifier != null) {
-            return jwsVerifier;    
+            return jwsVerifier;
         }
-        
+
         return JwsUtils.loadSignatureVerifier(jwsHeaders, false);
     }
 

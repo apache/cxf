@@ -40,18 +40,18 @@ public class PolicyDataEngineImpl implements PolicyDataEngine {
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyDataEngineImpl.class);
     private Bus bus;
     private PolicyEngine policyEngine;
-    
+
     public PolicyDataEngineImpl(Bus bus) {
         this.bus = bus;
     }
-    
+
     void setPolicyEngine(PolicyEngine policyEngine) {
         this.policyEngine = policyEngine;
     }
-    
+
     private PolicyEngine getPolicyEngine() {
         if (this.policyEngine == null) {
-            this.policyEngine = bus.getExtension(PolicyEngine.class); 
+            this.policyEngine = bus.getExtension(PolicyEngine.class);
         }
         return this.policyEngine;
     }
@@ -71,15 +71,15 @@ public class PolicyDataEngineImpl implements PolicyDataEngine {
     }
 
     public <T> T getPolicy(Message message, T confPolicy, PolicyCalculator<T> intersector) {
-        List<T> policies = getPoliciesFromMessage(intersector.getDataClassName(), 
+        List<T> policies = getPoliciesFromMessage(intersector.getDataClassName(),
                                                   message, intersector.getDataClass());
         if (!policies.contains(confPolicy)) {
-            policies.add(confPolicy); 
+            policies.add(confPolicy);
         }
         return getPolicy(policies, intersector);
     }
 
-    public <T> T getServerEndpointPolicy(Message m, EndpointInfo ei, Destination d, 
+    public <T> T getServerEndpointPolicy(Message m, EndpointInfo ei, Destination d,
                                          PolicyCalculator<T> policyCalculator) {
         Collection<Assertion> alternative = getPolicyEngine()
             .getServerEndpointPolicy(ei, d, m).getChosenAlternative();
@@ -145,8 +145,8 @@ public class PolicyDataEngineImpl implements PolicyDataEngine {
     }
 
     private <T> void logAndThrowPolicyException(T dataClass) {
-        org.apache.cxf.common.i18n.Message msg = 
-            new org.apache.cxf.common.i18n.Message("INCOMPATIBLE_HTTPCLIENTPOLICY_ASSERTIONS", 
+        org.apache.cxf.common.i18n.Message msg =
+            new org.apache.cxf.common.i18n.Message("INCOMPATIBLE_HTTPCLIENTPOLICY_ASSERTIONS",
                                                    LOG, dataClass.getClass());
         LOG.severe(msg.toString());
         throw new PolicyException(msg);

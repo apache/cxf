@@ -44,7 +44,7 @@ public final class URITemplate {
     private static final String CHARACTERS_TO_ESCAPE = ".*+$()";
     private static final String SLASH = "/";
     private static final String SLASH_QUOTE = "/;";
-    
+
     private final String template;
     private final List<String> variables = new ArrayList<>();
     private final List<String> customVariables = new ArrayList<>();
@@ -99,14 +99,14 @@ public final class URITemplate {
     public String getValue() {
         return template;
     }
-    
+
     public String getPatternValue() {
         return templateRegexPattern.toString();
     }
 
     /**
      * List of all variables in order of appearance in template.
-     * 
+     *
      * @return unmodifiable list of variable names w/o patterns, e.g. for "/foo/{v1:\\d}/{v2}" returned list
      *         is ["v1","v2"].
      */
@@ -116,7 +116,7 @@ public final class URITemplate {
 
     /**
      * List of variables with patterns (regexps). List is subset of elements from {@link #getVariables()}.
-     * 
+     *
      * @return unmodifiable list of variables names w/o patterns.
      */
     public List<String> getCustomVariables() {
@@ -164,7 +164,7 @@ public final class URITemplate {
                         segment = HttpUtils.fromPathSegment(uList.get(i));
                     }
                     if (segment.length() > 0) {
-                        sb.append(SLASH);    
+                        sb.append(SLASH);
                     }
                     sb.append(segment);
                 }
@@ -183,12 +183,12 @@ public final class URITemplate {
 
         // Assign the matched template values to template variables
         int groupCount = m.groupCount();
-        
+
         int i = 1;
         for (String name : variables) {
             while (i <= groupCount) {
                 String value = m.group(i++);
-                if ((value == null || value.length() == 0 && i < groupCount) 
+                if ((value == null || value.length() == 0 && i < groupCount)
                     && variables.size() + 1 < groupCount) {
                     continue;
                 }
@@ -198,12 +198,12 @@ public final class URITemplate {
         }
         // The right hand side value, might be used to further resolve
         // sub-resources.
-        
+
         String finalGroup = i > groupCount ? SLASH : m.group(groupCount);
         if (finalGroup == null || finalGroup.startsWith(SLASH_QUOTE)) {
             finalGroup = SLASH;
         }
-        
+
         templateVariableToValue.putSingle(FINAL_MATCH_GROUP, finalGroup);
 
         return true;
@@ -219,7 +219,7 @@ public final class URITemplate {
      * of value "[foo, bar, baz]" results with "/foo/bar/baz".
      * <p>
      * Example2: for template "/{a}/{b}/{a}" providing list of values "[foo]" results with "/foo/{b}/{a}".
-     * 
+     *
      * @param values values for variables
      * @return template with bound variables.
      * @throws IllegalArgumentException when values is null, any value does not match pattern etc.
@@ -254,7 +254,7 @@ public final class URITemplate {
     String substitute(Map<String, ? extends Object> valuesMap) throws IllegalArgumentException {
         return this.substitute(valuesMap, Collections.<String>emptySet(), false);
     }
-    
+
     /**
      * Substitutes template variables with mapped values. Variables are mapped to values; if not all variables
      * are bound result will still contain variables. Note that all variables with the same name are replaced
@@ -263,7 +263,7 @@ public final class URITemplate {
      * Example: for template "/{a}/{b}/{a}" {@link #getVariables()} returns "[a, b, a]"; providing here
      * mapping "[a: foo, b: bar]" results with "/foo/bar/foo" (full substitution) and for mapping "[b: baz]"
      * result is "{a}/baz/{a}" (partial substitution).
-     * 
+     *
      * @param valuesMap map variables to their values; on each value Object.toString() is called.
      * @return template with bound variables.
      */
@@ -290,10 +290,10 @@ public final class URITemplate {
                     }
                     sb.append(sval);
                 } else if (allowUnresolved) {
-                    sb.append(chunk); 
+                    sb.append(chunk);
                 } else {
-                    throw new IllegalArgumentException("Template variable " + var.getName() 
-                                                       + " has no matching value"); 
+                    throw new IllegalArgumentException("Template variable " + var.getName()
+                                                       + " has no matching value");
                 }
             } else {
                 sb.append(chunk);
@@ -303,8 +303,8 @@ public final class URITemplate {
     }
 
     /**
-     * Encoded literal characters surrounding template variables, 
-     * ex. "a {id} b" will be encoded to "a%20{id}%20b" 
+     * Encoded literal characters surrounding template variables,
+     * ex. "a {id} b" will be encoded to "a%20{id}%20b"
      * @return encoded value
      */
     public String encodeLiteralCharacters(boolean isQuery) {
@@ -314,18 +314,18 @@ public final class URITemplate {
             String val = chunk.getValue();
             if (chunk instanceof Literal) {
                 sb.append(HttpUtils.encodePartiallyEncoded(val, isQuery));
-            } else { 
+            } else {
                 sb.append(val);
             }
         }
         return sb.toString();
     }
-    
+
     public static URITemplate createTemplate(Path path) {
 
         return createTemplate(path == null ? null : path.value());
     }
-    
+
     public static URITemplate createTemplate(String pathValue) {
 
         if (pathValue == null) {
@@ -362,7 +362,7 @@ public final class URITemplate {
         if (result == 0) {
             result = t1.getPatternValue().compareTo(t2.getPatternValue());
         }
-            
+
         return result;
     }
 
@@ -375,7 +375,7 @@ public final class URITemplate {
     private abstract static class UriChunk {
         /**
          * Creates object form string.
-         * 
+         *
          * @param uriChunk stringified uri chunk
          * @return If param has variable form then {@link Variable} instance is created, otherwise chunk is
          *         treated as {@link Literal}.
@@ -471,7 +471,7 @@ public final class URITemplate {
         /**
          * Checks whether value matches variable. If variable has pattern its checked against, otherwise true
          * is returned.
-         * 
+         *
          * @param value value of variable
          * @return true if value is valid for variable, false otherwise.
          */
@@ -492,7 +492,7 @@ public final class URITemplate {
             }
         }
     }
-    
+
     /**
      * Splits string into parts inside and outside curly braces. Nested curly braces are ignored and treated
      * as part inside top-level curly braces. Example: string "foo{bar{baz}}blah" is split into three tokens,
@@ -546,7 +546,7 @@ public final class URITemplate {
 
         /**
          * Token is enclosed by curly braces.
-         * 
+         *
          * @param token
          *            text to verify
          * @return true if enclosed, false otherwise.
@@ -558,7 +558,7 @@ public final class URITemplate {
         /**
          * Strips token from enclosed curly braces. If token is not enclosed method
          * has no side effect.
-         * 
+         *
          * @param token
          *            text to verify
          * @return text stripped from curly brace begin-end pair.

@@ -34,11 +34,11 @@ import org.apache.cxf.endpoint.ServerRegistry;
 
 @NoJSR250Annotations(unlessNull = "bus")
 public class ServerRegistryImpl implements ServerRegistry, BusLifeCycleListener {
-    
+
     CopyOnWriteArrayList<Server> serversList;
     Bus bus;
     BusLifeCycleManager lifeCycleManager;
-    
+
     public ServerRegistryImpl() {
         serversList = new CopyOnWriteArrayList<Server>();
     }
@@ -50,10 +50,10 @@ public class ServerRegistryImpl implements ServerRegistry, BusLifeCycleListener 
     public Bus getBus() {
         return bus;
     }
-    
+
     @Resource
-    public final void setBus(Bus bus) {        
-        this.bus = bus;        
+    public final void setBus(Bus bus) {
+        this.bus = bus;
         if (null != bus) {
             bus.setExtension(this, ServerRegistry.class);
             lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
@@ -62,9 +62,9 @@ public class ServerRegistryImpl implements ServerRegistry, BusLifeCycleListener 
             }
         }
     }
-    
+
     public void register(Server server) {
-        serversList.addIfAbsent(server);        
+        serversList.addIfAbsent(server);
     }
 
     public void unregister(Server server) {
@@ -77,18 +77,18 @@ public class ServerRegistryImpl implements ServerRegistry, BusLifeCycleListener 
 
     public void initComplete() {
         // TODO Auto-generated method stub
-        
+
     }
 
     @PreDestroy
     public void preShutdown() {
         // Shutdown the service.
-        // To avoid the CurrentModificationException, do not use serversList directly 
+        // To avoid the CurrentModificationException, do not use serversList directly
         Object[] servers = serversList.toArray();
         for (int i = 0; i < servers.length; i++) {
             Server server = (Server) servers[i];
             server.destroy();
-        }        
+        }
     }
 
     public void postShutdown() {

@@ -22,7 +22,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class OAuthUtilsTest extends Assert {
-    
+
     @Test
     public void testCheckRequestURI() throws Exception {
         assertTrue(OAuthUtils.checkRequestURI("/a", "/a"));

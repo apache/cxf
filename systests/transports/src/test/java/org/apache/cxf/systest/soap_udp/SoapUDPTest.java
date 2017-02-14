@@ -33,11 +33,11 @@ import org.junit.Test;
 public class SoapUDPTest extends AbstractBusClientServerTestBase {
     private static final String PORT = Server.PORT;
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
-                                            "SOAPService");    
+                                            "SOAPService");
     private final QName localPortName = new QName("http://apache.org/hello_world_soap_http",
                                             "UDPPortName");
-    
-    
+
+
     @BeforeClass
     public static void startServers() throws Exception {
         staticBus = BusFactory.getDefaultBus();
@@ -45,22 +45,22 @@ public class SoapUDPTest extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(staticBus);
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testSOAPUDP() {
         BusFactory.setThreadDefaultBus(staticBus);
         Service service = Service.create(serviceName);
-        service.addPort(localPortName, "http://schemas.xmlsoap.org/soap/", 
+        service.addPort(localPortName, "http://schemas.xmlsoap.org/soap/",
                         "soap.udp://localhost:" + PORT);
         Greeter greeter = service.getPort(localPortName, Greeter.class);
-        
+
         String reply = greeter.greetMe("test");
         assertEquals("Hello test", reply);
         reply = greeter.sayHi();
         assertNotNull("no response received from service", reply);
         assertEquals("Bonjour", reply);
     }
-    
-    
+
+
 
 }

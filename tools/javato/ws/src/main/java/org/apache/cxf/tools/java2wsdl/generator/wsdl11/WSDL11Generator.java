@@ -106,7 +106,7 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
                 File impfile = new File(file.getParentFile(), imp.getKey());
                 Element el = imp.getValue().getElement();
                 updateImports(el, imports);
-                FileWriterUtil fileWriterUtil = 
+                FileWriterUtil fileWriterUtil =
                     new FileWriterUtil(impfile.getParent(), getToolContext().get(OutputStreamCreator.class));
                 os = fileWriterUtil.getWriter(impfile, StandardCharsets.UTF_8.name());
                 StaxUtils.writeTo(el, os, 2);
@@ -128,7 +128,7 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
 
     private void updateImports(Element el, Map<String, SchemaInfo> imports) {
         List<Element> imps = DOMUtils.getChildrenWithName(el,
-                                                          WSDLConstants.NS_SCHEMA_XSD, 
+                                                          WSDLConstants.NS_SCHEMA_XSD,
                                                           "import");
         for (Element e : imps) {
             String ns = e.getAttribute("namespace");

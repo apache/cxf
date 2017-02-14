@@ -63,7 +63,7 @@ public class LogUtilsTest extends Assert {
         EasyMock.verify(handler);
         log.removeHandler(handler);
     }
-    
+
     @Test
     public void testLogNoParamsOrThrowable() {
         Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testLogNoParamsOrThrowable");
@@ -78,7 +78,7 @@ public class LogUtilsTest extends Assert {
         EasyMock.verify(handler);
         log.removeHandler(handler);
     }
-    
+
     @Test
     public void testLogNoParamsWithThrowable() {
         Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testLogNoParamsWithThrowable");
@@ -138,7 +138,7 @@ public class LogUtilsTest extends Assert {
     public void testCXF1420() throws Exception {
         Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testCXF1420");
         LogUtils.log(log, Level.SEVERE, "SQLException for SQL [{call FOO.ping(?, ?)}]");
-    }    
+    }
     @Test
     public void testClassMethodNames() throws Exception {
         Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testClassMethodNames");
@@ -147,17 +147,17 @@ public class LogUtilsTest extends Assert {
 
         // logger called directly
         log.warning("hello");
-        
+
         String cname = handler.cname;
         String mname = handler.mname;
-        
+
         // logger called through LogUtils
         LogUtils.log(log, Level.WARNING,  "FOOBAR_MSG");
-        
+
         assertEquals(cname, handler.cname);
         assertEquals(mname, handler.mname);
     }
-    
+
     private static final class TestLogHandler extends Handler {
         String cname;
         String mname;
@@ -170,9 +170,9 @@ public class LogUtilsTest extends Assert {
         public void publish(LogRecord record) {
             cname = record.getSourceClassName();
             mname = record.getSourceMethodName();
-        }       
+        }
     }
-    
+
     private static final class LogRecordMatcher implements IArgumentMatcher {
         private final LogRecord record;
 
@@ -187,16 +187,16 @@ public class LogUtilsTest extends Assert {
                 if (record.getResourceBundle() != null) {
                     l7dString = record.getResourceBundle().getString(record.getMessage());
                 }
-                return (record.getMessage().equals(other.getMessage()) 
+                return (record.getMessage().equals(other.getMessage())
                             || l7dString.equals(other.getMessage()))
                        && record.getLevel().equals(other.getLevel())
                        && record.getThrown() == other.getThrown();
             }
             return false;
-        }    
+        }
 
         public void appendTo(StringBuffer buffer) {
             buffer.append("log records did not match");
         }
-    } 
+    }
 }

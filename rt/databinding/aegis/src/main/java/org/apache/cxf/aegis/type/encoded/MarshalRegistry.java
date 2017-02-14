@@ -26,7 +26,7 @@ import java.util.Map;
 import org.apache.cxf.aegis.Context;
 
 /**
- * MarshalRegistry maintains tracks which object instances have been marshaled 
+ * MarshalRegistry maintains tracks which object instances have been marshaled
  * and which objects still need to be marshaled.
  * <p/>
  * Note: only the StructType register objects with this class.

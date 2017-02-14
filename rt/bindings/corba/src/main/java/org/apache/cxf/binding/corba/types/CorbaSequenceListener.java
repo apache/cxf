@@ -39,7 +39,7 @@ public class CorbaSequenceListener extends AbstractCorbaTypeListener {
 
     public CorbaSequenceListener(CorbaObjectHandler handler,
                                  CorbaTypeMap map,
-                                 ORB orbRef, 
+                                 ORB orbRef,
                                  ServiceInfo sInfo) {
         super(handler);
         value = (CorbaSequenceHandler) handler;
@@ -61,7 +61,7 @@ public class CorbaSequenceListener extends AbstractCorbaTypeListener {
                                                                                 elementName,
                                                                                 seqElementType,
                                                                                 typeMap,
-                                                                                serviceInfo);        
+                                                                                serviceInfo);
         value.setTemplateElement(template);
     }
 
@@ -95,7 +95,7 @@ public class CorbaSequenceListener extends AbstractCorbaTypeListener {
     public void processCharacters(String text) {
         if (currentTypeListener == null) {
             // primitive sequence
-            CorbaTypeListener primitiveListener = 
+            CorbaTypeListener primitiveListener =
                 CorbaHandlerUtils.getTypeListener(value.getName(),
                                                   seqElementType,
                                                   typeMap,

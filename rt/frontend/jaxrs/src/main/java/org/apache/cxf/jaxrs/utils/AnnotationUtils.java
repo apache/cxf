@@ -58,7 +58,7 @@ public final class AnnotationUtils {
     private AnnotationUtils() {
 
     }
-    
+
 
     private static Set<Class<?>> initParamAnnotationClasses() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
@@ -98,7 +98,7 @@ public final class AnnotationUtils {
         }
         return names;
     }
-    
+
     public static boolean isParamAnnotationClass(Class<?> annotationClass) {
         return PARAM_ANNOTATION_CLASSES.contains(annotationClass);
     }
@@ -171,7 +171,7 @@ public final class AnnotationUtils {
                     return m;
                 }
             }
-    
+
             Class<?> declaringClass = m.getDeclaringClass();
             Class<?> superC = declaringClass.getSuperclass();
             if (superC != null && Object.class != superC) {
@@ -196,7 +196,7 @@ public final class AnnotationUtils {
                     // ignore
                 }
             }
-            if (declaringClass != serviceClass && !declaringClass.isInterface()) {  
+            if (declaringClass != serviceClass && !declaringClass.isInterface()) {
                 for (Class<?> i : serviceClass.getInterfaces()) {
                     try {
                         Method method = doGetAnnotatedMethod(serviceClass,
@@ -207,7 +207,7 @@ public final class AnnotationUtils {
                     } catch (NoSuchMethodException ex) {
                         // ignore
                     }
-                }    
+                }
             }
         }
         return null;

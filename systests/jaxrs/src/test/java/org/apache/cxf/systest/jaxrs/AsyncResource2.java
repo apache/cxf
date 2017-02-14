@@ -28,18 +28,18 @@ import javax.ws.rs.container.Suspended;
 @Path("resource2")
 public class AsyncResource2 {
     static AsyncResponse asyncResponse;
-    
+
     @GET
     @Path("/suspend")
     public void getSuspendResponse(@Suspended AsyncResponse async) {
         asyncResponse = async;
     }
-    
+
     @GET
     @Path("/setTimeOut")
     public String setTimeOut() {
         boolean setTimeout = asyncResponse.setTimeout(2, TimeUnit.SECONDS);
         return String.valueOf(setTimeout);
     }
-    
+
 }

@@ -93,11 +93,11 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
             throw new InvalidExpression();
         }
     }
-    
+
     /**
      * Get XPath from the Expression element.
      * @param expression
-     * @return 
+     * @return
      */
     private String getXPathFromExpression(ExpressionType expression) {
         if (expression.getContent().size() == 1) {
@@ -106,7 +106,7 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
             throw new InvalidExpression();
         }
     }
-    
+
     /**
      * Check if result from evaluation of XPath expression fullfils constraints
      * defined in the specification.
@@ -147,12 +147,12 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
         }
         return true;
     }
-    
+
     /**
      * Helper method for equation two strings, which can be nullable.
      * @param str1
      * @param str2
-     * @return 
+     * @return
      */
     private boolean stringEquals(String str1, String str2) {
         return str1 == null ? str2 == null : str1.equals(str2);

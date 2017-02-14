@@ -19,7 +19,7 @@
 package org.apache.cxf.rs.security.oauth.data;
 
 /**
- * Base permission description which is visible to 
+ * Base permission description which is visible to
  * authorization handlers
  * @see OAuthAuthorizationData
  */
@@ -27,16 +27,16 @@ public class Permission {
     private String permission;
     private String description;
     private boolean isDefault;
-    
+
     public Permission() {
-        
+
     }
-    
+
     public Permission(String permission, String description) {
         this.description = description;
         this.permission = permission;
     }
-    
+
     public String getDescription() {
         return description;
     }

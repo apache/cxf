@@ -27,20 +27,20 @@ public abstract class AbstractComplexCondition<T> implements SearchCondition<T> 
 
     protected List<SearchCondition<T>> conditions;
     private ConditionType cType;
-    
+
     protected AbstractComplexCondition(ConditionType cType) {
         this.cType = cType;
     }
-    
+
     protected AbstractComplexCondition(List<SearchCondition<T>> conditions, ConditionType cType) {
         this.conditions = conditions;
         this.cType = cType;
     }
-    
+
     public void setConditions(List<SearchCondition<T>> conditions) {
         this.conditions = conditions;
     }
-    
+
     public List<T> findAll(Collection<T> pojos) {
         List<T> result = new ArrayList<>();
         for (T pojo : pojos) {
@@ -72,7 +72,7 @@ public abstract class AbstractComplexCondition<T> implements SearchCondition<T> 
     }
 
     public void accept(SearchConditionVisitor<T, ?> visitor) {
-        visitor.visit(this);    
+        visitor.visit(this);
     }
-    
+
 }

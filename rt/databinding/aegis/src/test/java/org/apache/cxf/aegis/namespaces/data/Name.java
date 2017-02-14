@@ -23,7 +23,7 @@ public class Name {
 
     String data;
     String uid;
-    
+
     Name() {
         this.data = "";
         this.uid = "";

@@ -42,14 +42,14 @@ public final class JMSFactory {
     static final String MDB_TRANSACTED_METHOD = "MDBTransactedMethod";
 
     //private static final Logger LOG = LogUtils.getL7dLogger(JMSFactory.class);
-    
+
     private JMSFactory() {
     }
 
     /**
      * Create JmsSender from configuration information. Most settings are taken from jmsConfig. The QoS
      * settings in messageProperties override the settings from jmsConfig
-     * 
+     *
      * @param jmsConfig configuration information
      * @param messageProperties context headers override config settings
      * @return
@@ -80,7 +80,7 @@ public final class JMSFactory {
     public static Connection createConnection(JMSConfiguration jmsConfig) throws JMSException {
         String username = jmsConfig.getUserName();
         ConnectionFactory cf = jmsConfig.getConnectionFactory();
-        Connection connection = username != null 
+        Connection connection = username != null
             ? cf.createConnection(username, jmsConfig.getPassword())
             : cf.createConnection();
         if (jmsConfig.getDurableSubscriptionClientId() != null) {
@@ -88,11 +88,11 @@ public final class JMSFactory {
         }
         return connection;
     }
-    
+
     /**
      * Get workqueue from workqueue manager. Return an executor that will never reject messages and
      * instead block when all threads are used.
-     * 
+     *
      * @param bus
      * @param name
      * @return
@@ -103,7 +103,7 @@ public final class JMSFactory {
             AutomaticWorkQueue workQueue1 = manager.getNamedWorkQueue(name);
             final WorkQueue workQueue = (workQueue1 == null) ? manager.getAutomaticWorkQueue() : workQueue1;
             return new Executor() {
-                
+
                 @Override
                 public void execute(Runnable command) {
                     workQueue.execute(command, 0);

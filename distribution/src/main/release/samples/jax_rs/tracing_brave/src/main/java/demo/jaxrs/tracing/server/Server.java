@@ -29,11 +29,11 @@ public class Server {
 
         // Register and map the dispatcher servlet
         final ServletHolder servletHolder = new ServletHolder(new CXFNonSpringJaxrsServlet());
-        final ServletContextHandler context = new ServletContextHandler();      
+        final ServletContextHandler context = new ServletContextHandler();
         context.setContextPath("/");
         context.addServlet(servletHolder, "/*");
-        
-        servletHolder.setInitParameter("javax.ws.rs.Application", 
+
+        servletHolder.setInitParameter("javax.ws.rs.Application",
             CatalogApplication.class.getName());
 
         server.setHandler(context);

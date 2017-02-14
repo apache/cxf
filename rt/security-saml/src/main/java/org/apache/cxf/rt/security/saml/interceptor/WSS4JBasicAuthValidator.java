@@ -55,10 +55,10 @@ public abstract class WSS4JBasicAuthValidator {
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JBasicAuthValidator.class);
     private static final String SAML_ROLE_ATTRIBUTENAME_DEFAULT =
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
-    
+
     private Validator validator;
     private CallbackHandler callbackHandler;
-    
+
     protected void validate(Message message) throws WSSecurityException {
 
         AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
@@ -97,13 +97,13 @@ public abstract class WSS4JBasicAuthValidator {
     protected UsernameToken convertPolicyToToken(AuthorizationPolicy policy) {
 
         Document doc = DOMUtils.createDocument();
-        UsernameToken token = new UsernameToken(false, doc, 
+        UsernameToken token = new UsernameToken(false, doc,
                                                 WSConstants.PASSWORD_TEXT);
         token.setName(policy.getUserName());
         token.setPassword(policy.getPassword());
         return token;
     }
-    
+
     protected SecurityContext createSecurityContext(final Principal p) {
         return new SecurityContext() {
 
@@ -116,25 +116,25 @@ public abstract class WSS4JBasicAuthValidator {
             }
         };
     }
-    
+
     protected SecurityContext createSecurityContext(Message msg, Credential credential) {
         SamlAssertionWrapper samlAssertion = credential.getTransformedToken();
         if (samlAssertion == null) {
             samlAssertion = credential.getSamlAssertion();
         }
         if (samlAssertion != null) {
-            String roleAttributeName = 
+            String roleAttributeName =
                 (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SAML_ROLE_ATTRIBUTENAME, msg);
             if (roleAttributeName == null || roleAttributeName.length() == 0) {
                 roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
             }
 
-            ClaimCollection claims = 
+            ClaimCollection claims =
                 SAMLUtils.getClaims((SamlAssertionWrapper)samlAssertion);
-            Set<Principal> roles = 
+            Set<Principal> roles =
                 SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
 
-            SAMLSecurityContext context = 
+            SAMLSecurityContext context =
                 new SAMLSecurityContext(credential.getPrincipal(), roles, claims);
             context.setIssuer(SAMLUtils.getIssuer(samlAssertion));
             context.setAssertionElement(SAMLUtils.getAssertionElement(samlAssertion));
@@ -150,11 +150,11 @@ public abstract class WSS4JBasicAuthValidator {
         }
         return new UsernameTokenValidator();
     }
-    
+
     public void setValidator(Validator validator) {
         this.validator = validator;
     }
-    
+
     public CallbackHandler getCallbackHandler() {
         return callbackHandler;
     }

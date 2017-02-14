@@ -27,7 +27,7 @@ import javax.jws.WebService;
 
 @WebService(targetNamespace = "http://book.customer.cxf.apache.org/")
 public interface BookServiceWrapped {
-    
+
     @WebResult(name = "Book")
     Book getBook(@WebParam(name = "id")long bookid) throws BookNotFoundFault;
 

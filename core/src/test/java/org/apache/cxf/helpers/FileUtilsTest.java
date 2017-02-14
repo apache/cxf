@@ -24,11 +24,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class FileUtilsTest extends Assert {
-    
-    
+
+
     @Test
     public void testTempIODirExists() throws Exception {
-        
+
         String originaltmpdir = System.getProperty("java.io.tmpdir");
         try {
             System.setProperty("java.io.tmpdir", "dummy");

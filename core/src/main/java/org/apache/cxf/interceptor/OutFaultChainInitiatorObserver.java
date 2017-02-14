@@ -51,19 +51,19 @@ public class OutFaultChainInitiatorObserver extends AbstractFaultChainInitiatorO
         if (e.getService().getDataBinding() instanceof InterceptorProvider) {
             chain.add(((InterceptorProvider)e.getService().getDataBinding()).getOutFaultInterceptors());
         }
-        
+
         addToChain(chain, ex.getInMessage());
         addToChain(chain, ex.getOutFaultMessage());
     }
     private void addToChain(PhaseInterceptorChain chain, Message m) {
-        Collection<InterceptorProvider> providers 
+        Collection<InterceptorProvider> providers
             = CastUtils.cast((Collection<?>)m.get(Message.INTERCEPTOR_PROVIDERS));
         if (providers != null) {
             for (InterceptorProvider p : providers) {
                 chain.add(p.getOutFaultInterceptors());
             }
         }
-        Collection<Interceptor<? extends Message>> is 
+        Collection<Interceptor<? extends Message>> is
             = CastUtils.cast((Collection<?>)m.get(Message.FAULT_OUT_INTERCEPTORS));
         if (is != null) {
             chain.add(is);
@@ -72,7 +72,7 @@ public class OutFaultChainInitiatorObserver extends AbstractFaultChainInitiatorO
             chain.add(((InterceptorProvider)m.getDestination()).getOutFaultInterceptors());
         }
     }
-    
+
     protected SortedSet<Phase> getPhases() {
         return getBus().getExtension(PhaseManager.class).getOutPhases();
     }

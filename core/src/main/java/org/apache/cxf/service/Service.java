@@ -33,24 +33,24 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
 public interface Service extends Map<String, Object>, InterceptorProvider {
-    
+
     QName getName();
-    
+
     List<ServiceInfo> getServiceInfos();
 
     EndpointInfo getEndpointInfo(QName endpoint);
-    
+
     DataBinding getDataBinding();
 
     void setDataBinding(DataBinding dataBinding);
-    
+
     Executor getExecutor();
 
     void setExecutor(Executor executor);
-    
+
     Invoker getInvoker();
-    
+
     void setInvoker(Invoker invoker);
-    
+
     Map<QName, Endpoint> getEndpoints();
 }

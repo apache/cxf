@@ -47,10 +47,10 @@ import org.apache.cxf.staxutils.StaxUtils;
  * Creates an XMLStreamReader from the InputStream on the Message.
  */
 public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
-    
-    private static final Logger LOG = LogUtils.getL7dLogger(StaxInInterceptor.class);    
 
-    private static Map<Object, XMLInputFactory> factories = new HashMap<Object, XMLInputFactory>();        
+    private static final Logger LOG = LogUtils.getL7dLogger(StaxInInterceptor.class);
+
+    private static Map<Object, XMLInputFactory> factories = new HashMap<Object, XMLInputFactory>();
 
     public StaxInInterceptor() {
         super(Phase.POST_STREAM);
@@ -73,8 +73,8 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
         String contentType = (String)message.get(Message.CONTENT_TYPE);
-        
-        if (contentType != null 
+
+        if (contentType != null
             && contentType.contains("text/html")
             && MessageUtils.isRequestor(message)) {
             StringBuilder htmlMessage = new StringBuilder(1024);
@@ -108,7 +108,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                     .getHeader(m, HttpHeaderHelper.TRANSFER_ENCODING);
                 if ((StringUtils.isEmpty(contentLen) || "0".equals(contentLen.get(0)))
                     && StringUtils.isEmpty(contentTE)
-                    && (StringUtils.isEmpty(transferEncoding) 
+                    && (StringUtils.isEmpty(transferEncoding)
                     || !"chunked".equalsIgnoreCase(transferEncoding.get(0)))) {
                     return;
                 }
@@ -133,7 +133,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                     } else {
                         xreader = factory.createXMLStreamReader(is, encoding);
                     }
-                }                
+                }
             }
             xreader = StaxUtils.configureReader(xreader, message);
         } catch (XMLStreamException e) {
@@ -145,7 +145,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         message.getInterceptorChain().add(StaxInEndingInterceptor.INSTANCE);
     }
 
-    
+
     public static XMLInputFactory getXMLInputFactory(Message m) throws Fault {
         Object o = m.getContextualProperty(XMLInputFactory.class.getName());
         if (o instanceof XMLInputFactory) {
@@ -164,7 +164,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                     }
                 } else {
                     throw new Fault(
-                                    new org.apache.cxf.common.i18n.Message("INVALID_INPUT_FACTORY", 
+                                    new org.apache.cxf.common.i18n.Message("INVALID_INPUT_FACTORY",
                                                                            LOG, o));
                 }
 
@@ -178,7 +178,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                 }
             }
             return xif;
-        } 
+        }
         return null;
     }
 }

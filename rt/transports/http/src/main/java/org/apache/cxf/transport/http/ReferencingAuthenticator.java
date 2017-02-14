@@ -60,7 +60,7 @@ public class ReferencingAuthenticator extends Authenticator {
         }
         return pauth;
     }
-    
+
     public final void check() {
         Authenticator cxfauth = auth.get();
         if (cxfauth == null) {
@@ -115,7 +115,7 @@ public class ReferencingAuthenticator extends Authenticator {
             //ignore
         }
     }
-    
+
     PasswordAuthentication tryWith(Authenticator a) throws Exception {
         if (a == null) {
             return null;
@@ -126,7 +126,7 @@ public class ReferencingAuthenticator extends Authenticator {
                 Object o = f.get(this);
                 f.set(a, o);
             }
-        } 
+        }
         final Method m = Authenticator.class.getDeclaredMethod("getPasswordAuthentication");
         m.setAccessible(true);
         return (PasswordAuthentication)m.invoke(a);

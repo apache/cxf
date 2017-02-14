@@ -46,30 +46,30 @@ import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 /**
  * A default implementation to create a JWTClaims object. The Subject name is the name
- * of the current principal. 
+ * of the current principal.
  */
 public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
-    
+
     public static final long DEFAULT_MAX_LIFETIME = 60L * 60L * 12L;
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultJWTClaimsProvider.class);
     private boolean useX500CN;
-    
+
     private long lifetime = 60L * 30L;
     private long maxLifetime = DEFAULT_MAX_LIFETIME;
     private boolean failLifetimeExceedance = true;
     private boolean acceptClientLifetime;
     private long futureTimeToLive = 60L;
-                                                            
+
     /**
      * Get a JwtClaims object.
      */
     public JwtClaims getJwtClaims(JWTClaimsProviderParameters jwtClaimsProviderParameters) {
-        
+
         JwtClaims claims = new JwtClaims();
         claims.setSubject(getSubjectName(jwtClaimsProviderParameters));
         claims.setTokenId(UUID.randomUUID().toString());
-        
+
         // Set the Issuer
         String issuer = jwtClaimsProviderParameters.getIssuer();
         if (issuer == null) {
@@ -78,25 +78,25 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         } else {
             claims.setIssuer(issuer);
         }
-        
+
         handleWSTrustClaims(jwtClaimsProviderParameters, claims);
-        
+
         handleConditions(jwtClaimsProviderParameters, claims);
-        
+
         handleAudienceRestriction(jwtClaimsProviderParameters, claims);
-        
+
         handleActAs(jwtClaimsProviderParameters, claims);
-        
+
         return claims;
     }
-    
+
     protected String getSubjectName(JWTClaimsProviderParameters jwtClaimsProviderParameters) {
         Principal principal = getPrincipal(jwtClaimsProviderParameters);
         if (principal == null) {
             LOG.fine("Error in getting principal");
             throw new STSException("Error in getting principal", STSException.REQUEST_FAILED);
         }
-        
+
         String subjectName = principal.getName();
         if (principal instanceof X500Principal) {
             // Just use the "cn" instead of the entire DN
@@ -110,10 +110,10 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
                 //Ignore, not X500 compliant thus use the whole string as the value
             }
         }
-        
+
         return subjectName;
     }
-        
+
     /**
      * Get the Principal (which is used as the Subject). By default, we check the following (in order):
      *  - A valid OnBehalfOf principal
@@ -126,7 +126,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
 
         Principal principal = null;
         //TokenValidator in IssueOperation has validated the ReceivedToken
-        //if validation was successful, the principal was set in ReceivedToken 
+        //if validation was successful, the principal was set in ReceivedToken
         if (providerParameters.getTokenRequirements().getOnBehalfOf() != null) {
             ReceivedToken receivedToken = providerParameters.getTokenRequirements().getOnBehalfOf();
             if (receivedToken.getState().equals(STATE.VALID)) {
@@ -143,10 +143,10 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
 
         return principal;
     }
-    
+
     protected void handleWSTrustClaims(JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims) {
         TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
-        
+
         // Handle Claims
         ProcessedClaimCollection retrievedClaims = ClaimsUtils.processClaims(providerParameters);
         if (retrievedClaims != null) {
@@ -163,18 +163,18 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
             }
         }
     }
-    
+
     protected void handleConditions(JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims) {
         TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
-        
+
         Date currentDate = new Date();
         long currentTimeInSeconds = currentDate.getTime() / 1000L;
-        
+
         // Set the defaults first
         claims.setIssuedAt(currentTimeInSeconds);
         claims.setNotBefore(currentTimeInSeconds);
         claims.setExpiryTime(currentTimeInSeconds + lifetime);
-        
+
         Lifetime tokenLifetime = providerParameters.getTokenRequirements().getLifetime();
         if (lifetime > 0 && acceptClientLifetime && tokenLifetime != null
             && tokenLifetime.getCreated() != null && tokenLifetime.getExpires() != null) {
@@ -225,7 +225,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
             }
         }
     }
-    
+
     /**
      * Set the audience restriction claim. The Audiences are from an AppliesTo address, and the wst:Participants
      * (if either exist).
@@ -234,13 +234,13 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims
     ) {
         TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
-        
+
         List<String> audiences = new ArrayList<>();
         String appliesToAddress = providerParameters.getAppliesToAddress();
         if (appliesToAddress != null) {
             audiences.add(appliesToAddress);
         }
-        
+
         Participants participants = providerParameters.getTokenRequirements().getParticipants();
         if (participants != null) {
             String address = TokenProviderUtils.extractAddressFromParticipantsEPR(participants.getPrimaryParticipant());
@@ -262,22 +262,22 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         if (!audiences.isEmpty()) {
             claims.setAudiences(audiences);
         }
-        
+
     }
-    
+
     protected void handleActAs(
         JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims
     ) {
         TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
-        
+
         if (providerParameters.getTokenRequirements().getActAs() != null) {
             ReceivedToken receivedToken = providerParameters.getTokenRequirements().getActAs();
             if (receivedToken.getState().equals(STATE.VALID)) {
                 claims.setClaim("ActAs", receivedToken.getPrincipal().getName());
             }
-        } 
+        }
     }
-    
+
     public boolean isUseX500CN() {
         return useX500CN;
     }
@@ -285,7 +285,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public void setUseX500CN(boolean useX500CN) {
         this.useX500CN = useX500CN;
     }
-    
+
     /**
      * Get how long (in seconds) a client-supplied Created Element is allowed to be in the future.
      * The default is 60 seconds to avoid common problems relating to clock skew.
@@ -301,7 +301,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public void setFutureTimeToLive(long futureTimeToLive) {
         this.futureTimeToLive = futureTimeToLive;
     }
-    
+
     /**
      * Set the default lifetime in seconds for issued JWT tokens
      * @param default lifetime in seconds
@@ -309,7 +309,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public void setLifetime(long lifetime) {
         this.lifetime = lifetime;
     }
-    
+
     /**
      * Get the default lifetime in seconds for issued JWT token where requestor
      * doesn't specify a lifetime element
@@ -318,7 +318,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public long getLifetime() {
         return lifetime;
     }
-    
+
     /**
      * Set the maximum lifetime in seconds for issued JWT tokens
      * @param maximum lifetime in seconds
@@ -326,7 +326,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public void setMaxLifetime(long maxLifetime) {
         this.maxLifetime = maxLifetime;
     }
-    
+
     /**
      * Get the maximum lifetime in seconds for issued JWT token
      * if requestor specifies lifetime element
@@ -335,7 +335,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public long getMaxLifetime() {
         return maxLifetime;
     }
-    
+
     /**
      * Is client lifetime element accepted
      * Default: false
@@ -343,14 +343,14 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public boolean isAcceptClientLifetime() {
         return this.acceptClientLifetime;
     }
-    
+
     /**
      * Set whether client lifetime is accepted
      */
     public void setAcceptClientLifetime(boolean acceptClientLifetime) {
         this.acceptClientLifetime = acceptClientLifetime;
     }
-    
+
     /**
      * If requested lifetime exceeds shall it fail (default)
      * or overwrite with maximum lifetime
@@ -358,7 +358,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public boolean isFailLifetimeExceedance() {
         return this.failLifetimeExceedance;
     }
-    
+
     /**
      * If requested lifetime exceeds shall it fail (default)
      * or overwrite with maximum lifetime
@@ -366,5 +366,5 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public void setFailLifetimeExceedance(boolean failLifetimeExceedance) {
         this.failLifetimeExceedance = failLifetimeExceedance;
     }
-    
+
 }

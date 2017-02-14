@@ -37,7 +37,7 @@ import org.apache.http.protocol.HTTP;
 public class CXFHttpRequest extends AbstractHttpMessage implements HttpEntityEnclosingRequest, Configurable {
 
     private final String method;
-    
+
     private URI uri;
     private HttpEntity entity;
     private AsyncWrappedOutputStream out;
@@ -47,7 +47,7 @@ public class CXFHttpRequest extends AbstractHttpMessage implements HttpEntityEnc
         super();
         this.method = method;
     }
-    
+
     public void setOutputStream(AsyncWrappedOutputStream o) {
         out = o;
     }
@@ -69,8 +69,8 @@ public class CXFHttpRequest extends AbstractHttpMessage implements HttpEntityEnc
     @Override
     public RequestLine getRequestLine() {
         return new BasicRequestLine(
-                method, 
-                uri != null ? uri.toASCIIString() : "/", 
+                method,
+                uri != null ? uri.toASCIIString() : "/",
                 HttpVersion.HTTP_1_1);
     }
 

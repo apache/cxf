@@ -39,7 +39,7 @@ public final class ContextUtils {
     private ContextUtils() {
         //utility class
     }
-    
+
     public static boolean isRequestor(Message message) {
         return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
     }
@@ -55,7 +55,7 @@ public final class ContextUtils {
         return exchange != null
                && message == exchange.getOutMessage();
     }
-        
+
     public static DataWriter<XMLEventWriter> getDataWriter(CorbaMessage message) {
         Service service = ServiceModelUtil.getService(message.getExchange());
 

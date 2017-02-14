@@ -30,7 +30,7 @@ import org.junit.Test;
 
 
 /**
- * 
+ *
  */
 public class MEXTest extends AbstractWSATestBase {
     static final String PORT = Server.PORT;
@@ -51,20 +51,20 @@ public class MEXTest extends AbstractWSATestBase {
         Metadata metadata = exc.get2004();
         assertNotNull(metadata);
         assertEquals(2, metadata.getMetadataSection().size());
-        
+
 
         assertEquals("http://schemas.xmlsoap.org/wsdl/",
                      metadata.getMetadataSection().get(0).getDialect());
         assertEquals("http://apache.org/cxf/systest/ws/addr_feature/",
                      metadata.getMetadataSection().get(0).getIdentifier());
-        assertEquals("http://www.w3.org/2001/XMLSchema", 
+        assertEquals("http://www.w3.org/2001/XMLSchema",
                      metadata.getMetadataSection().get(1).getDialect());
-        
+
         GetMetadata body = new GetMetadata();
         body.setDialect("http://www.w3.org/2001/XMLSchema");
         metadata = exc.getMetadata(body);
         assertEquals(1, metadata.getMetadataSection().size());
-        assertEquals("http://www.w3.org/2001/XMLSchema", 
+        assertEquals("http://www.w3.org/2001/XMLSchema",
                      metadata.getMetadataSection().get(0).getDialect());
     }
 }

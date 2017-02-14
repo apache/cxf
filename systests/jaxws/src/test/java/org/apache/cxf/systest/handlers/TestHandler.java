@@ -51,36 +51,36 @@ import org.apache.handler_test.types.PingResponse;
 import org.apache.handler_test.types.PingWithArgs;
 
 
-public class TestHandler<T extends LogicalMessageContext> 
+public class TestHandler<T extends LogicalMessageContext>
     extends TestHandlerBase implements LogicalHandler<T> {
 
     private final JAXBContext jaxbCtx;
 
     public TestHandler() {
         this(true);
-    } 
+    }
 
     public TestHandler(boolean serverSide) {
-        super(serverSide); 
+        super(serverSide);
 
         try {
             jaxbCtx = JAXBContext.newInstance(PackageUtils.getPackageName(Ping.class));
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
- 
-    } 
 
-    public String getHandlerId() { 
+    }
+
+    public String getHandlerId() {
         return "handler" + getId();
-    } 
+    }
 
     public boolean handleMessage(T ctx) {
         methodCalled("handleMessage");
         printHandlerInfo("handleMessage", isOutbound(ctx));
 
         boolean outbound = (Boolean)ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-        boolean ret = getHandleMessageRet(); 
+        boolean ret = getHandleMessageRet();
 
         if (!isServerSideHandler()) {
             return true;
@@ -92,30 +92,30 @@ public class TestHandler<T extends LogicalMessageContext>
             e.printStackTrace();
             throw new ProtocolException(e);
         }
-        
+
         Object obj = ctx.getMessage().getPayload(jaxbCtx);
-        
-        if (obj instanceof Ping 
+
+        if (obj instanceof Ping
             || obj instanceof PingResponse) {
             ret = handlePingMessage(outbound, ctx);
         } else if (obj instanceof PingWithArgs) {
-            ret = handlePingWithArgsMessage(outbound, ctx); 
+            ret = handlePingWithArgsMessage(outbound, ctx);
         }
         return ret;
     }
 
 
-    private boolean handlePingWithArgsMessage(boolean outbound, T ctx) { 
+    private boolean handlePingWithArgsMessage(boolean outbound, T ctx) {
 
-        
+
         LogicalMessage msg = ctx.getMessage();
-        Object payload = msg.getPayload(jaxbCtx); 
+        Object payload = msg.getPayload(jaxbCtx);
         addHandlerId(ctx.getMessage(), ctx, outbound);
 
         boolean ret = true;
         if (payload instanceof PingWithArgs) {
             String arg = ((PingWithArgs)payload).getHandlersCommand();
-            
+
             StringTokenizer strtok = new StringTokenizer(arg, " ");
             String hid = "";
             String direction = "";
@@ -125,11 +125,11 @@ public class TestHandler<T extends LogicalMessageContext>
                 direction = strtok.nextToken();
                 command = strtok.nextToken();
             }
-            
+
             if (!getHandlerId().equals(hid)) {
                 return true;
             }
-            
+
             if ("stop".equals(command)) {
                 if (!outbound && "inbound".equals(direction)) {
                     PingResponse resp = new PingResponse();
@@ -161,12 +161,12 @@ public class TestHandler<T extends LogicalMessageContext>
                         throw new ProtocolException(exceptionText);
                     }
                 }
-             
+
             }
         }
 
         return ret;
-    } 
+    }
 
     private boolean checkServerOutBindStopHandler(boolean outbound, T ctx) {
         if (outbound) {
@@ -196,7 +196,7 @@ public class TestHandler<T extends LogicalMessageContext>
         }
     }
 
-    private void addHandlerId(LogicalMessage msg, T ctx, boolean outbound) { 
+    private void addHandlerId(LogicalMessage msg, T ctx, boolean outbound) {
 
         Object obj = msg.getPayload(jaxbCtx);
         if (obj instanceof PingResponse) {
@@ -211,7 +211,7 @@ public class TestHandler<T extends LogicalMessageContext>
     }
 
     public boolean handleFault(T ctx) {
-        methodCalled("handleFault"); 
+        methodCalled("handleFault");
         printHandlerInfo("handleFault", isOutbound(ctx));
 
         if (isServerSideHandler()) {
@@ -219,7 +219,7 @@ public class TestHandler<T extends LogicalMessageContext>
             if (!"handler2".equals(getHandlerId())) {
                 return true;
             }
-              
+
             DOMSource source = (DOMSource)ctx.getMessage().getPayload();
             Node node = source.getNode();
 
@@ -233,12 +233,12 @@ public class TestHandler<T extends LogicalMessageContext>
             if ("handler2HandleFaultThrowsRunException".equals(exceptionText)) {
                 throw new RuntimeException("handler2 HandleFault throws RuntimeException");
             } else if ("handler2HandleFaultThrowsSOAPFaultException".equals(exceptionText)) {
-                throw createSOAPFaultException("handler2 HandleFault " 
-                                               + "throws SOAPFaultException");               
-            }                
+                throw createSOAPFaultException("handler2 HandleFault "
+                                               + "throws SOAPFaultException");
+            }
 
         }
-        
+
         return true;
     }
 
@@ -253,7 +253,7 @@ public class TestHandler<T extends LogicalMessageContext>
         }
         return null;
     }
-    
+
     public void close(MessageContext arg0) {
         methodCalled("close");
     }
@@ -262,7 +262,7 @@ public class TestHandler<T extends LogicalMessageContext>
         methodCalled("destroy");
     }
 
-    public String toString() { 
-        return getHandlerId(); 
-    } 
-}    
+    public String toString() {
+        return getHandlerId();
+    }
+}

@@ -48,7 +48,7 @@ public class WSDLHelper {
         Iterator<Binding> ite = CastUtils.cast(def.getBindings().values().iterator());
         while (ite.hasNext()) {
             Binding binding = ite.next();
-            Iterator<BindingOperation> ite1 
+            Iterator<BindingOperation> ite1
                 = CastUtils.cast(binding.getBindingOperations().iterator());
             while (ite1.hasNext()) {
                 BindingOperation bop = ite1.next();
@@ -59,7 +59,7 @@ public class WSDLHelper {
         }
         return null;
     }
-    
+
     public static String writeQName(Definition def, QName qname) {
         return def.getPrefix(qname.getNamespaceURI()) + ":" + qname.getLocalPart();
     }

@@ -59,44 +59,44 @@ public final class AuthorizationUtils {
         }
         throw ExceptionUtils.toNotAuthorizedException(null, null);
     }
-    
+
     public static String[] getAuthorizationParts(MessageContext mc) {
         return getAuthorizationParts(mc, Collections.singleton("Basic"));
     }
-    
+
     public static String[] getAuthorizationParts(MessageContext mc,
                                                  Set<String> challenges) {
         return getAuthorizationParts(mc, challenges, null);
     }
-    
+
     public static String[] getAuthorizationParts(MessageContext mc,
                                                  Set<String> challenges,
                                                  String realm) {
         List<String> headers = mc.getHttpHeaders().getRequestHeader("Authorization");
         if (headers != null && headers.size() == 1) {
             String[] parts = headers.get(0).split(" ");
-            if (parts.length > 0 
-                && (challenges == null || challenges.isEmpty() 
+            if (parts.length > 0
+                && (challenges == null || challenges.isEmpty()
                 || challenges.contains(parts[0])
                 || challenges.size() == 1 && challenges.contains("*"))) {
-                return parts;       
+                return parts;
             }
         }
         throwAuthorizationFailure(challenges, realm);
         return null;
     }
-    
+
     public static void throwAuthorizationFailure(Set<String> challenges) {
         throwAuthorizationFailure(challenges, null);
     }
-    
+
     public static void throwAuthorizationFailure(Set<String> challenges, String realm) {
         throwAuthorizationFailure(challenges, realm, null);
     }
 
     public static void throwAuthorizationFailure(Set<String> challenges, String realm, Throwable cause) {
         ResponseBuilder rb = JAXRSUtils.toResponseBuilder(401);
-        
+
         StringBuilder sb = new StringBuilder();
         for (String challenge : challenges) {
             if ("*".equals(challenge)) {
@@ -115,7 +115,7 @@ public final class AuthorizationUtils {
         }
         Response r = null;
         if (cause != null) {
-            r = rb.entity(cause.getMessage()).build(); 
+            r = rb.entity(cause.getMessage()).build();
         } else {
             r = rb.build();
         }

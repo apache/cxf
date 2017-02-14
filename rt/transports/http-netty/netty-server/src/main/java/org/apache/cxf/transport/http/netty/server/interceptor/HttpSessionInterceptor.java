@@ -44,7 +44,7 @@ public class HttpSessionInterceptor implements NettyInterceptor {
     public void onRequestReceived(ChannelHandlerContext ctx, HttpRequest request) {
 
         HttpSessionThreadLocal.unset();
-        
+
         Collection<Cookie> cookies = Utils.getCookies(
                 NettyHttpSession.SESSION_ID_KEY, request);
         if (cookies != null) {
@@ -62,13 +62,13 @@ public class HttpSessionInterceptor implements NettyInterceptor {
     }
 
     @Override
-    public void onRequestSuccessed(ChannelHandlerContext ctx, 
+    public void onRequestSuccessed(ChannelHandlerContext ctx,
                                    HttpResponse response) {
 
         NettyHttpSession s = HttpSessionThreadLocal.get();
         if (s != null && !this.sessionRequestedByCookie) {
             // setup the Cookie for session
-            HttpHeaders.addHeader(response, Names.SET_COOKIE,  
+            HttpHeaders.addHeader(response, Names.SET_COOKIE,
                                   ClientCookieEncoder.STRICT.encode(NettyHttpSession.SESSION_ID_KEY, s.getId()));
         }
 

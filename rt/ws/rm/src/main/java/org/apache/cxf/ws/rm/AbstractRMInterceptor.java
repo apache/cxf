@@ -37,25 +37,25 @@ import org.apache.cxf.ws.rm.policy.RMPolicyUtilities;
 
 /**
  * Interceptor responsible for implementing exchange of RM protocol messages,
- * aggregating RM metadata in the application message and processing of 
+ * aggregating RM metadata in the application message and processing of
  * RM metadata contained in incoming application messages.
  * The same interceptor can be used on multiple endpoints.
  *
  */
 public abstract class AbstractRMInterceptor<T extends Message> extends AbstractPhaseInterceptor<T> {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(AbstractRMInterceptor.class); 
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractRMInterceptor.class);
     private RMManager manager;
     private Bus bus;
-    
+
     protected AbstractRMInterceptor(String phase) {
         super(phase);
     }
-    
+
     protected AbstractRMInterceptor() {
         this(Phase.PRE_LOGICAL);
     }
-     
+
     public RMManager getManager() {
         if (null == manager) {
             return bus.getExtension(RMManager.class);
@@ -66,7 +66,7 @@ public abstract class AbstractRMInterceptor<T extends Message> extends AbstractP
     public void setManager(RMManager m) {
         manager = m;
     }
-    
+
     public Bus getBus() {
         return bus;
     }
@@ -75,16 +75,16 @@ public abstract class AbstractRMInterceptor<T extends Message> extends AbstractP
         this.bus = bus;
     }
 
-    // Interceptor interface 
-    
+    // Interceptor interface
+
     public void handleMessage(Message msg) throws Fault {
-        
+
         try {
             handle(msg);
         } catch (SequenceFault sf) {
-            
+
             // log the fault as it may not be reported back to the client
-            
+
             Endpoint e = msg.getExchange().getEndpoint();
             Binding b = null;
             if (null != e) {
@@ -104,7 +104,7 @@ public abstract class AbstractRMInterceptor<T extends Message> extends AbstractP
             throw new Fault(ex);
         }
     }
-    
+
     /**
      * Asserts all RMAssertion assertions for the current message, regardless their attributes
      * (if there is more than one we have ensured that they are all supported by considering

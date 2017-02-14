@@ -58,15 +58,15 @@ import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.IssuedToken;
 
 /**
- * 
+ *
  */
 public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
-    
+
     private static final long serialVersionUID = -6936475570762840527L;
 
     public IssuedTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.ISSUED_TOKEN, SP12Constants.ISSUED_TOKEN));
-        
+
         //issued tokens can be attached as a supporting token without
         //any type of binding.  Make sure we can support that.
         PolicyBasedWSS4JInInterceptor in = new PolicyBasedWSS4JInInterceptor();
@@ -74,12 +74,12 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         this.getOutFaultInterceptors().add(PolicyBasedWSS4JOutInterceptor.INSTANCE);
         this.getInInterceptors().add(in);
         this.getInFaultInterceptors().add(in);
-        
+
         this.getOutInterceptors().add(new IssuedTokenOutInterceptor());
         this.getOutFaultInterceptors().add(new IssuedTokenOutInterceptor());
         this.getInInterceptors().add(new IssuedTokenInInterceptor());
         this.getInFaultInterceptors().add(new IssuedTokenInInterceptor());
-        
+
         PolicyBasedWSS4JStaxOutInterceptor so = new PolicyBasedWSS4JStaxOutInterceptor();
         PolicyBasedWSS4JStaxInInterceptor si = new PolicyBasedWSS4JStaxInInterceptor();
         this.getOutInterceptors().add(so);
@@ -87,39 +87,39 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         this.getInInterceptors().add(si);
         this.getInFaultInterceptors().add(si);
     }
-    
+
     protected static void assertIssuedToken(IssuedToken issuedToken, AssertionInfoMap aim) {
         if (issuedToken == null) {
             return;
         }
         // Assert some policies
         if (issuedToken.isRequireExternalReference()) {
-            PolicyUtils.assertPolicy(aim, new QName(issuedToken.getName().getNamespaceURI(), 
+            PolicyUtils.assertPolicy(aim, new QName(issuedToken.getName().getNamespaceURI(),
                                                     SPConstants.REQUIRE_EXTERNAL_REFERENCE));
         }
         if (issuedToken.isRequireInternalReference()) {
-            PolicyUtils.assertPolicy(aim, new QName(issuedToken.getName().getNamespaceURI(), 
+            PolicyUtils.assertPolicy(aim, new QName(issuedToken.getName().getNamespaceURI(),
                                                     SPConstants.REQUIRE_INTERNAL_REFERENCE));
         }
     }
-    
+
     static class IssuedTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         IssuedTokenOutInterceptor() {
             super(Phase.PREPARE_SEND);
-        }    
+        }
         public void handleMessage(Message message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
-            
+
             if (aim != null) {
-                Collection<AssertionInfo> ais = 
+                Collection<AssertionInfo> ais =
                     PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
                 if (ais.isEmpty()) {
                     return;
                 }
                 if (isRequestor(message)) {
                     IssuedToken itok = (IssuedToken)ais.iterator().next().getAssertion();
-                    
+
                     TokenRequestParams params = new TokenRequestParams();
                     params.setIssuer(itok.getIssuer());
                     params.setClaims(itok.getClaims());
@@ -131,7 +131,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     params.setTokenTemplate(itok.getRequestSecurityTokenTemplate());
 
                     SecurityToken tok = STSTokenRetriever.getToken(message, params);
-                    
+
                     if (tok != null) {
                         assertIssuedToken(itok, aim);
                         for (AssertionInfo ai : ais) {
@@ -147,9 +147,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     assertIssuedToken(itok, aim);
                 }
             }
-        }        
+        }
     }
-    
+
     static class IssuedTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
         IssuedTokenInInterceptor() {
             super(Phase.PRE_PROTOCOL);
@@ -161,18 +161,18 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
             // extract Assertion information
             if (aim != null) {
-                Collection<AssertionInfo> ais = 
+                Collection<AssertionInfo> ais =
                     PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.ISSUED_TOKEN);
                 if (ais.isEmpty()) {
                     return;
                 }
-                
+
                 IssuedToken itok = (IssuedToken)ais.iterator().next().getAssertion();
                 assertIssuedToken(itok, aim);
-                
+
                 if (!isRequestor(message)) {
                     message.getExchange().remove(SecurityConstants.TOKEN);
-                    List<WSHandlerResult> results = 
+                    List<WSHandlerResult> results =
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
                     if (results != null && results.size() > 0) {
                         parseHandlerResults(results.get(0), message, ais);
@@ -184,7 +184,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 }
             }
         }
-        
+
         private void parseHandlerResults(
             WSHandlerResult rResult,
             Message message,
@@ -194,9 +194,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             parameters.setAssertionInfoMap(message.get(AssertionInfoMap.class));
             parameters.setMessage(message);
             parameters.setResults(rResult);
-            
+
             parameters.setSignedResults(rResult.getActionResults().get(WSConstants.SIGN));
-            
+
             List<WSSecurityEngineResult> samlResults = new ArrayList<>();
             if (rResult.getActionResults().containsKey(WSConstants.ST_SIGNED)) {
                 samlResults.addAll(rResult.getActionResults().get(WSConstants.ST_SIGNED));
@@ -205,15 +205,15 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 samlResults.addAll(rResult.getActionResults().get(WSConstants.ST_UNSIGNED));
             }
             parameters.setSamlResults(samlResults);
-            
+
             QName qName = issuedAis.iterator().next().getAssertion().getName();
-            Map<QName, SecurityPolicyValidator> validators = 
+            Map<QName, SecurityPolicyValidator> validators =
                 ValidatorUtils.getSecurityPolicyValidators(message);
             if (validators.containsKey(qName)) {
                 validators.get(qName).validatePolicies(parameters, issuedAis);
             }
         }
-        
+
     }
-        
+
 }

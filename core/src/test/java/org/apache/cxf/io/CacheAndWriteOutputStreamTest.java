@@ -33,7 +33,7 @@ public class CacheAndWriteOutputStreamTest extends CachedOutputStreamTest {
             isClosed = true;
         }
     };
-    
+
     @Override
     protected Object createCache() {
         return new CacheAndWriteOutputStream(baos);

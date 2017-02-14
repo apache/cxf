@@ -56,7 +56,7 @@ public class JDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void flush() throws XMLStreamException {
-    }    
+    }
 
     public void writeStartElement(String local) throws XMLStreamException {
         newChild(new Element(local));

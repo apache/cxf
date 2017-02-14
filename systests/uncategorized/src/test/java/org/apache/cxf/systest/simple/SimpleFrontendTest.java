@@ -33,11 +33,11 @@ import org.junit.Test;
 
 public class SimpleFrontendTest extends Assert {
     static final String PORT1 = TestUtil.getPortNumber(SimpleFrontendTest.class);
-    
-    
+
+
     static Bus bus;
     static String add11 = "http://localhost:" + PORT1 + "/test11";
-    
+
 
     @BeforeClass
     public static void createServers() throws Exception {
@@ -47,15 +47,15 @@ public class SimpleFrontendTest extends Assert {
         sf.setAddress(add11);
         sf.setBus(bus);
         sf.create();
-        
-        
+
+
     }
-    
+
     @AfterClass
     public static void shutdown() throws Exception {
         bus.shutdown(true);
     }
-    
+
 
     @Test
     public void testGetWSDL() throws Exception {
@@ -66,5 +66,5 @@ public class SimpleFrontendTest extends Assert {
         assertFalse(response.indexOf("import") >= 0);
         assertFalse(response.indexOf("?wsdl?wsdl") >= 0);
     }
-    
+
 }

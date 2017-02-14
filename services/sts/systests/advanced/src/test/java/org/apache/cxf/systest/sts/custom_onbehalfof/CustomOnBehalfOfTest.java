@@ -35,18 +35,18 @@ import org.junit.BeforeClass;
 /**
  * In this test case, a CXF client requests a Security Token from an STS, passing a username that
  * it has obtained from an unknown client as an "OnBehalfOf" element. This username is obtained
- * by parsing the "security.username" property. The client then invokes on the service 
+ * by parsing the "security.username" property. The client then invokes on the service
  * provider using the returned (custom BinarySecurityToken) token from the STS. The service
  * provider dispatches the received BinarySecurityToken to the STS for validation, and receives
  * a transformed SAML Token in response.
  */
 public class CustomOnBehalfOfTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static final String PORT = allocatePort(Server.class);
 
     @BeforeClass
@@ -64,7 +64,7 @@ public class CustomOnBehalfOfTest extends AbstractBusClientServerTestBase {
                    launchServer(STSServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -83,7 +83,7 @@ public class CustomOnBehalfOfTest extends AbstractBusClientServerTestBase {
         URL wsdl = CustomOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportCustomBSTPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
 
@@ -92,7 +92,7 @@ public class CustomOnBehalfOfTest extends AbstractBusClientServerTestBase {
             "security.username", "alice"
         );
         doubleIt(transportPort, 25);
-        
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }

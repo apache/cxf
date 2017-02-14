@@ -64,8 +64,8 @@ public abstract class AbstractTypeTestClient
         return !(System.getProperty("java.vendor").contains("IBM")
             && "GMonth".equals(name));
     }
-    
-    public static void initClient(Class<?> clz, QName serviceName, 
+
+    public static void initClient(Class<?> clz, QName serviceName,
                                   QName portName, String wsdlPath)
         throws Exception {
         URL wsdlLocation = clz.getResource(wsdlPath);
@@ -816,7 +816,7 @@ public abstract class AbstractTypeTestClient
 
     @Test
     public void testGMonth() throws Exception {
-        if (!shouldRunTest("GMonth")) { 
+        if (!shouldRunTest("GMonth")) {
             return;
         }
         javax.xml.datatype.DatatypeFactory datatypeFactory = javax.xml.datatype.DatatypeFactory.newInstance();
@@ -2121,7 +2121,7 @@ public abstract class AbstractTypeTestClient
         if (!shouldRunTest("QNameList")) {
             return;
         }
-        if (testDocLiteral || testXMLBinding) {            
+        if (testDocLiteral || testXMLBinding) {
             List<QName> x = Arrays.asList(new QName("http://schemas.iona.com/type_test", "testqname1"),
                                           new QName("http://schemas.iona.com/type_test", "testqname2"),
                                           new QName("http://schemas.iona.com/type_test", "testqname3"));

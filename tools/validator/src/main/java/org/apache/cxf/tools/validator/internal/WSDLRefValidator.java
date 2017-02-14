@@ -125,12 +125,12 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
             if (info == null) {
                 getSchemas(bus);
             } else {
-                schemaCollection = info.getSchemaCollection();                
+                schemaCollection = info.getSchemaCollection();
             }
             checkTargetNamespace(this.definition.getTargetNamespace());
         } catch (Exception ex) {
             throw new ToolException(ex);
-        }        
+        }
     }
     private Collection<Import> getImports(final Definition wsdlDef) {
         Collection<Import> importList = new ArrayList<>();
@@ -139,7 +139,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
             List<Import> lst = CastUtils.cast((List<?>)entry.getValue());
             importList.addAll(lst);
         }
-        
+
         return importList;
     }
     private void parseImports(Definition def) {
@@ -151,7 +151,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         }
     }
 
-    
+
     private void checkTargetNamespace(String path) {
         // no check as any namespace URI is already a valid target namespace string.
     }
@@ -345,7 +345,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         XInput oNode = new XInput();
         oNode.setName(name);
         oNode.setParentNode(opVNode);
-        
+
         if (name != null && name.equals(opVNode.getAttributeValue() + "Request")) {
             oNode.setDefaultAttributeValue(true);
         }
@@ -388,7 +388,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
 
     private void collectValidationPoints() throws Exception {
         if (services.size() == 0) {
-            LOG.log(Level.WARNING, "WSDL document " 
+            LOG.log(Level.WARNING, "WSDL document "
                     + this.definition.getDocumentBaseURI() + " does not define any services");
             //addWarning("WSDL document does not define any services");
             Collection<QName> ports = CastUtils.cast(this.definition.getAllPortTypes().keySet());
@@ -411,9 +411,9 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
             QName bName = entry.getKey();
             Binding binding = this.definition.getBinding(bName);
             if (binding == null) {
-                LOG.log(Level.SEVERE, bName.toString() 
+                LOG.log(Level.SEVERE, bName.toString()
                         + " is not correct, please check that the correct namespace is being used");
-                throw new Exception(bName.toString() 
+                throw new Exception(bName.toString()
                         + " is not correct, please check that the correct namespace is being used");
             }
             XNode vBindingNode = getXNode(binding);

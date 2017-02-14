@@ -189,14 +189,14 @@ public class AnotherDerivedGreeterImpl implements GreeterEndpointInterface {
     public String testNillable(String nillElem, int intElem) {
         // TODO Auto-generated method stub
         return null;
-    }    
-    
+    }
+
     public Response<TestNillableResponse> testNillableAsync(String nillElem,
                                                             int intElem) {
         return null;
     }
-    
-    public Future<?> testNillableAsync(String nillElem, 
+
+    public Future<?> testNillableAsync(String nillElem,
                                        int intElem,
                                        AsyncHandler<TestNillableResponse> asyncHandler) {
         return null;

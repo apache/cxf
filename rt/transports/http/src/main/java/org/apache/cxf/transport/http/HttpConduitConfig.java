@@ -52,7 +52,7 @@ public class HttpConduitConfig {
     public void setAuthorizationPolicy(AuthorizationPolicy authorizationPolicy) {
         this.authorizationPolicy = authorizationPolicy;
     }
-    
+
     public void apply(HTTPConduit conduit) {
         if (tlsClientParameters != null) {
             conduit.setTlsClientParameters(tlsClientParameters);

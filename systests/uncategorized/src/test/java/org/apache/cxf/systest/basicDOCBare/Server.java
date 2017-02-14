@@ -32,14 +32,14 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
     Endpoint ep;
-    
+
     protected void run()  {
-        System.setProperty("org.apache.cxf.bus.factory", "org.apache.cxf.bus.CXFBusFactory");  
+        System.setProperty("org.apache.cxf.bus.factory", "org.apache.cxf.bus.CXFBusFactory");
         Object implementor = new PutLastTradedPriceImpl();
-        String address = "http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPort";      
+        String address = "http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPort";
         ep = Endpoint.create(implementor);
         Map<String, Object> props = new HashMap<String, Object>(2);
-        props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare", 
+        props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare",
                                                    "SOAPService"));
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
         ep.setProperties(props);

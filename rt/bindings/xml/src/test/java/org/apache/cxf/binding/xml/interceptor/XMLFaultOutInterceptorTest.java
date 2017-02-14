@@ -62,33 +62,33 @@ public class XMLFaultOutInterceptorTest extends TestBase {
         JAXBContext ctx = JAXBContext.newInstance(FaultDetail.class);
         Marshaller m = ctx.createMarshaller();
         m.marshal(detail, el);
-        
+
         OutputStream outputStream = new ByteArrayOutputStream();
         xmlMessage.setContent(OutputStream.class, outputStream);
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(outputStream);
         xmlMessage.setContent(XMLStreamWriter.class, writer);
         xmlMessage.setContent(Exception.class, xmlFault);
-        
+
         out.handleMessage(xmlMessage);
         outputStream.flush();
 
         XMLStreamReader reader = getXMLReader();
         DepthXMLStreamReader dxr = new DepthXMLStreamReader(reader);
-        
+
         dxr.nextTag();
         StaxUtils.toNextElement(dxr);
         assertEquals(XMLConstants.NS_XML_FORMAT, dxr.getNamespaceURI());
         assertEquals(XMLFault.XML_FAULT_ROOT, dxr.getLocalName());
-        
+
         dxr.nextTag();
         StaxUtils.toNextElement(dxr);
         assertEquals(XMLFault.XML_FAULT_STRING, dxr.getLocalName());
         assertEquals(fault.toString(), dxr.getElementText());
-        
+
         dxr.nextTag();
         StaxUtils.toNextElement(dxr);
         assertEquals(XMLFault.XML_FAULT_DETAIL, dxr.getLocalName());
-        
+
         dxr.nextTag();
         StaxUtils.toNextElement(dxr);
         assertEquals("faultDetail", dxr.getLocalName());

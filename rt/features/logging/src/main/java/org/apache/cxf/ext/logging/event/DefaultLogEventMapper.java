@@ -170,7 +170,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
         String contentType = safeGet(message, Message.CONTENT_TYPE);
         return contentType != null && BINARY_CONTENT_MEDIA_TYPES.contains(contentType);
     }
-    
+
     private boolean isMultipartContent(Message message) {
         String contentType = safeGet(message, Message.CONTENT_TYPE);
         return contentType != null && contentType.startsWith(MULTIPART_CONTENT_MEDIA_TYPE);
@@ -189,7 +189,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
 
     /**
      * Get MessageId from WS Addressing properties
-     * 
+     *
      * @param message
      * @return message id
      */
@@ -245,7 +245,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
         }
         return new StringBuffer().append(httpMethod).append('[').append(path).append(']').toString();
     }
-    
+
     private static String safeGet(Message message, String key) {
         if (message == null || !message.containsKey(key)) {
             return null;
@@ -285,7 +285,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
     /**
      * For REST we also consider a response to be a fault if the operation is not found or the response code
      * is an error
-     * 
+     *
      * @param message
      * @return
      */

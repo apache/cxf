@@ -36,12 +36,12 @@ public class ServerXMLBinding extends AbstractBusTestServerBase {
     static final String MIX_PORT = allocatePort(ServerXMLBinding.class, 2);
 
     List<Endpoint> eps = new LinkedList<Endpoint>();
-    
+
     protected void run() {
         Object implementor = new GreeterImpl();
         String address = "http://localhost:" + REG_PORT + "/XMLService/XMLPort";
         eps.add(Endpoint.publish(address, implementor));
-        
+
         Object implementor1 = new org.apache.hello_world_xml_http.wrapped.GreeterImpl();
         address = "http://localhost:" + WRAP_PORT + "/XMLService/XMLPort";
         eps.add(Endpoint.publish(address, implementor1));
@@ -53,12 +53,12 @@ public class ServerXMLBinding extends AbstractBusTestServerBase {
         Object implementor2 = new HeaderTesterImpl();
         address = "http://localhost:" + REG_PORT + "/XMLContext/XMLPort";
         eps.add(Endpoint.publish(address, implementor2));
-        
+
         Object implementor3 = new org.apache.hello_world_xml_http.mixed.GreeterImpl();
         address = "http://localhost:" + MIX_PORT + "/XMLService/XMLPort";
         eps.add(Endpoint.publish(address, implementor3));
     }
-    
+
     public void tearDown() {
         while (!eps.isEmpty()) {
             Endpoint ep = eps.remove(0);

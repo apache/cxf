@@ -22,7 +22,7 @@ package org.apache.cxf.binding;
 import org.apache.cxf.BusException;
 
 /**
- * The manager interface represents a repository for accessing 
+ * The manager interface represents a repository for accessing
  * <code>BindingFactory</code>s.
  *
  * Provides methods necessary for registering, unregistering or retrieving of
@@ -38,7 +38,7 @@ public interface BindingFactoryManager {
      * BindingFactory interface.
      */
     void registerBindingFactory(String name, BindingFactory binding);
-    
+
     /**
      * Deregisters the BindingFactory with the provided name.
      *

@@ -24,7 +24,7 @@ import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
 
 public class NotFoundHandler implements HttpHandler {
-    
+
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         exchange.setStatusCode(404);

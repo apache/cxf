@@ -37,7 +37,7 @@ import io.undertow.util.Headers;
 
 
 public class UndertowHTTPHandler implements HttpHandler {
-    
+
     private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
     private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
 
@@ -46,7 +46,7 @@ public class UndertowHTTPHandler implements HttpHandler {
     private boolean contextMatchExact;
     private String urlName;
     private Bus bus;
-        
+
     public UndertowHTTPHandler(UndertowHTTPDestination uhd, boolean cmt) {
         undertowHTTPDestination = uhd;
         this.contextMatchExact = cmt;
@@ -54,11 +54,11 @@ public class UndertowHTTPHandler implements HttpHandler {
     public UndertowHTTPHandler(Bus bus) {
         this.bus = bus;
     }
-    
+
     public boolean isContextMatchExact() {
         return this.contextMatchExact;
     }
-    
+
     public void setServletContext(ServletContext sc) {
         servletContext = sc;
         if (undertowHTTPDestination != null) {
@@ -74,7 +74,7 @@ public class UndertowHTTPHandler implements HttpHandler {
         return urlName;
     }
 
-   
+
     public Bus getBus() {
         return undertowHTTPDestination != null ? undertowHTTPDestination.getBus() : bus;
     }
@@ -94,8 +94,8 @@ public class UndertowHTTPHandler implements HttpHandler {
 
             ServletRequestContext servletRequestContext = new ServletRequestContext(((ServletContextImpl)servletContext)
                 .getDeployment(), request, response, null);
-            
-             
+
+
             undertowExchange.putAttachment(ServletRequestContext.ATTACHMENT_KEY, servletRequestContext);
             request.setAttribute("HTTP_HANDLER", this);
             request.setAttribute("UNDERTOW_DESTINATION", undertowHTTPDestination);
@@ -110,7 +110,7 @@ public class UndertowHTTPHandler implements HttpHandler {
                 }
             }
             undertowHTTPDestination.doService(servletContext, request, response);
-            
+
         } catch (Throwable t) {
             t.printStackTrace();
             if (undertowExchange.isResponseChannelAvailable()) {
@@ -126,6 +126,6 @@ public class UndertowHTTPHandler implements HttpHandler {
             }
         }
     }
-    
-    
+
+
 }

@@ -36,9 +36,9 @@ import org.apache.cxf.swa.types.OutputResponseAll;
 import org.apache.cxf.swa.types.VoidRequest;
 
 
-@WebService(endpointInterface = "org.apache.cxf.swa.SwAServiceInterface", 
-            serviceName = "SwAService", 
-            targetNamespace = "http://cxf.apache.org/swa", 
+@WebService(endpointInterface = "org.apache.cxf.swa.SwAServiceInterface",
+            serviceName = "SwAService",
+            targetNamespace = "http://cxf.apache.org/swa",
             portName = "SwAServiceHttpPort")
 public class SwAServiceImpl implements SwAServiceInterface {
 
@@ -49,8 +49,8 @@ public class SwAServiceImpl implements SwAServiceInterface {
             byte b[] = new byte[6];
             bis.read(b, 0, 6);
             String string = IOUtils.newStringFromBytes(b);
-            
-            ByteArrayDataSource source = 
+
+            ByteArrayDataSource source =
                 new ByteArrayDataSource(("test" + string).getBytes(), "application/octet-stream");
             data.value.setDataRef(new DataHandler(source));
         } catch (IOException e) {
@@ -66,16 +66,16 @@ public class SwAServiceImpl implements SwAServiceInterface {
             byte b[] = new byte[6];
             bis.read(b, 0, 6);
             String string = IOUtils.newStringFromBytes(b);
-            
-            ByteArrayDataSource source = 
+
+            ByteArrayDataSource source =
                 new ByteArrayDataSource(("test" + string).getBytes(), "application/octet-stream");
             data.value = new DataHandler(source);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
-    public void echoDataWithHeader(Holder<String> text, 
+
+    public void echoDataWithHeader(Holder<String> text,
                                    Holder<DataHandler> data,
                                    Holder<String> headerText) {
         try {
@@ -84,8 +84,8 @@ public class SwAServiceImpl implements SwAServiceInterface {
             byte b[] = new byte[6];
             bis.read(b, 0, 6);
             String string = IOUtils.newStringFromBytes(b);
-            
-            ByteArrayDataSource source = 
+
+            ByteArrayDataSource source =
                 new ByteArrayDataSource(("test" + string).getBytes(), "application/octet-stream");
             data.value = new DataHandler(source);
         } catch (IOException e) {

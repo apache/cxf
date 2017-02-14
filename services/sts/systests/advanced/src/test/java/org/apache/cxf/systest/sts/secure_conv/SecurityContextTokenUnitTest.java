@@ -41,16 +41,16 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
-    
+
     final TestParam test;
-    
+
     public SecurityContextTokenUnitTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -66,15 +66,15 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
                    launchServer(StaxSTSServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam("", false, STSPORT)},
                                                 {new TestParam("", true, STAX_STSPORT)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -89,16 +89,16 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+
+        String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCT?wsdl";
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSecurityContextTokenNoEntropy() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -107,16 +107,16 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+
+        String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCT?wsdl";
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, false);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSecurityContextTokenEncrypted() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -125,16 +125,16 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+
+        String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCTEncrypted?wsdl";
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, true);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSecurityContextTokenNoEntropyEncrypted() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -143,16 +143,16 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+
+        String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/TransportSCTEncrypted?wsdl";
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(bus, wsdlLocation, false);
         assertTrue(token.getSecret() != null && token.getSecret().length > 0);
-        
+
         bus.shutdown(true);
     }
-    
+
     private SecurityToken requestSecurityToken(
         Bus bus, String wsdlLocation, boolean enableEntropy
     ) throws Exception {
@@ -164,7 +164,7 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            SecurityConstants.CALLBACK_HANDLER, 
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
         properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "serviceKeystore.properties");
@@ -177,5 +177,5 @@ public class SecurityContextTokenUnitTest extends AbstractBusClientServerTestBas
 
         return stsClient.requestSecurityToken("http://localhost:8081/doubleit/services/doubleitsymmetric");
     }
-    
+
 }

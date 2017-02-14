@@ -30,5 +30,5 @@ public interface CancelOperation {
     RequestSecurityTokenResponseType cancel(RequestSecurityTokenType request,
                                             Principal principal,
                                             Map<String, Object> messageContext);
-    
+
 }

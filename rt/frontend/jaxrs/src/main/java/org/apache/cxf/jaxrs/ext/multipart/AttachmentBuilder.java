@@ -28,43 +28,43 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
  * Fluid builder class for {@link Attachment} objects.
  */
 public class AttachmentBuilder {
-    private MultivaluedMap<String, String> headers = 
+    private MultivaluedMap<String, String> headers =
         new MetadataMap<String, String>(false, true);
     private Object object;
     private DataHandler dataHandler;
     private ContentDisposition contentDisposition;
-    
+
     public AttachmentBuilder() {
         //
     }
-    
+
     public AttachmentBuilder id(String id) {
         headers.putSingle("Content-Id", id);
         return this;
-        
+
     }
-    
+
     public AttachmentBuilder mediaType(String mediaType) {
         headers.putSingle("Content-Type", mediaType);
         return this;
     }
-    
+
     public AttachmentBuilder object(Object theObject) {
         this.object = theObject;
         return this;
     }
-    
+
     public AttachmentBuilder dataHandler(DataHandler newDataHandler) {
         this.dataHandler = newDataHandler;
         return this;
     }
-   
-    
+
+
     public AttachmentBuilder header(String key, String value) {
         headers.putSingle(key, value);
         return this;
     }
-    
+
     /**
      * Set all of the headers. This will overwrite any content ID,
      * media type, ContentDisposition, or other header set by previous calls.
@@ -76,12 +76,12 @@ public class AttachmentBuilder {
         contentDisposition = null;
         return this;
     }
-    
+
     public AttachmentBuilder contentDisposition(ContentDisposition newContentDisposition) {
         this.contentDisposition = newContentDisposition;
         return this;
     }
-    
+
     public Attachment build() {
         if (contentDisposition != null) {
             headers.putSingle("Content-Disposition", contentDisposition.toString());

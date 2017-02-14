@@ -34,9 +34,9 @@ public final class WsdlUtilities {
 
     private WsdlUtilities() {
     }
-    
-    public static boolean fillWsdlOptionFromArtifact(GenericWsdlOption option, 
-                                                        Artifact artifact, 
+
+    public static boolean fillWsdlOptionFromArtifact(GenericWsdlOption option,
+                                                        Artifact artifact,
                                                         File outputDir) {
         if (!WSDL_TYPE.equals(artifact.getType())) {
             return false;

@@ -49,10 +49,10 @@ public class GreeterImpl implements Greeter {
 
     public String sayHi1(List<org.apache.hello_world_soap_http.any_types.SayHi1.Port> port) {
         return port.get(0).getRequestType() + port.get(1).getRequestType();
-        
+
     }
 
-    
-    
+
+
 
 }

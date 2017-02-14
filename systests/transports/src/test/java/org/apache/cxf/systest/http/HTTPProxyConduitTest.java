@@ -38,19 +38,19 @@ import org.littleshoot.proxy.HttpRequestFilter;
 
 
 /**
- * 
+ *
  */
 public class HTTPProxyConduitTest extends HTTPConduitTest {
     static final int PROXY_PORT = Integer.parseInt(allocatePort(HTTPProxyConduitTest.class));
     static DefaultHttpProxyServer proxy;
     static CountingFilter requestFilter = new CountingFilter();
-    
+
     static class CountingFilter implements HttpRequestFilter {
         AtomicInteger count = new AtomicInteger();
         public void filter(HttpRequest httpRequest) {
             count.incrementAndGet();
         }
-        
+
         public void reset() {
             count.set(0);
         }
@@ -58,17 +58,17 @@ public class HTTPProxyConduitTest extends HTTPConduitTest {
             return count.get();
         }
     }
-    
+
     public HTTPProxyConduitTest() {
     }
 
-    
+
     @AfterClass
     public static void stopProxy() {
         proxy.stop();
         proxy = null;
     }
-    
+
     @BeforeClass
     public static void startProxy() {
         proxy = new DefaultHttpProxyServer(PROXY_PORT, requestFilter, new HashMap<String, HttpFilter>());
@@ -78,7 +78,7 @@ public class HTTPProxyConduitTest extends HTTPConduitTest {
     public void resetCount() {
         requestFilter.reset();
     }
-    
+
     public void configureProxy(Client client) {
         HTTPConduit cond = (HTTPConduit)client.getConduit();
         HTTPClientPolicy pol = cond.getClient();
@@ -89,12 +89,12 @@ public class HTTPProxyConduitTest extends HTTPConduitTest {
         pol.setProxyServer("localhost");
         pol.setProxyServerPort(PROXY_PORT);
     }
-    
+
     public void resetProxyCount() {
         requestFilter.reset();
     }
     public void assertProxyRequestCount(int i) {
         assertEquals("Unexpected request count", i, requestFilter.getCount());
     }
-    
+
 }

@@ -98,7 +98,7 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
         assertEquals("CXF", new String(photo.value));
         assertNotNull(image.value);
     }
-    
+
     @Test
     @org.junit.Ignore
     public void testEcho() throws Exception {
@@ -129,8 +129,8 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             //ignore
         }
-        
+
         return hello;
-        
+
     }
 }

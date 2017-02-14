@@ -35,15 +35,15 @@ import org.junit.BeforeClass;
  * Some tests for STSClient configuration.
  */
 public class STSClientTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -56,7 +56,7 @@ public class STSClientTest extends AbstractBusClientServerTestBase {
         stsServer.setContext("cxf-transport.xml");
         assertTrue(launchServer(stsServer));
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -76,16 +76,16 @@ public class STSClientTest extends AbstractBusClientServerTestBase {
         URL wsdl = STSClientTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, PORT);
-        
+
         doubleIt(transportSaml1Port, 25);
-        
+
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testDefaultSTSClient() throws Exception {
 
@@ -99,16 +99,16 @@ public class STSClientTest extends AbstractBusClientServerTestBase {
         URL wsdl = STSClientTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, PORT);
-        
+
         doubleIt(transportSaml1Port, 25);
-        
+
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

@@ -42,15 +42,15 @@ import org.junit.Test;
  * exchange of WS-RM protocol messages.
  */
 public class RobustServiceAtMostOnceTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class); 
-    public static final String GREETMEONEWAY_ACTION 
+    public static final String PORT = allocatePort(Server.class);
+    public static final String GREETMEONEWAY_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
     private static final Logger LOG = LogUtils.getLogger(RobustServiceAtMostOnceTest.class);
-    
+
     private static GreeterCounterImpl serverGreeter;
     private Greeter greeter;
 
-    
+
     public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
         protected void run() {
@@ -68,7 +68,7 @@ public class RobustServiceAtMostOnceTest extends AbstractBusClientServerTestBase
             bus.getInInterceptors().add(sps);
             serverGreeter = new GreeterCounterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            
+
             // publish this robust oneway endpoint
             ep = Endpoint.create(serverGreeter);
             ep.getProperties().put(Message.ROBUST_ONEWAY, Boolean.TRUE);
@@ -86,25 +86,25 @@ public class RobustServiceAtMostOnceTest extends AbstractBusClientServerTestBase
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
-    @Test 
+
+    @Test
     public void testRobustAtMostOnceWithSlowProcessing() throws Exception {
         LOG.fine("Creating greeter client");
         SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus("/org/apache/cxf/systest/ws/rm/seqlength1.xml");
         // set the client retry interval much shorter than the slow processing delay
-        RMManager manager = bus.getExtension(RMManager.class); 
+        RMManager manager = bus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(new Long(3000));
 
         BusFactory.setDefaultBus(bus);
         GreeterService gs = new GreeterService();
         greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
-        
+
         LOG.fine("Invoking greeter");
         greeter.greetMeOneWay("one");
         Thread.sleep(10000);
-        
+
         assertEquals("invoked too many times", 1, serverGreeter.getCount());
         assertTrue("still in retransmission", manager.getRetransmissionQueue().isEmpty());
     }
@@ -116,7 +116,7 @@ public class RobustServiceAtMostOnceTest extends AbstractBusClientServerTestBase
             super.greetMeOneWay(arg0);
             count++;
         }
-        
+
         public int getCount() {
             return count;
         }

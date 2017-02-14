@@ -35,7 +35,7 @@ import org.junit.Test;
 
 public class FaultBeanGeneratorTest extends ProcessorTestBase {
     JavaToWSDLProcessor processor = new JavaToWSDLProcessor();
-    
+
     String classPath = "";
     @Before
     public void setUp() throws Exception {

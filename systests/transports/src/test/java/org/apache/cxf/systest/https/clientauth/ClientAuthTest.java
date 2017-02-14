@@ -45,7 +45,7 @@ import org.junit.BeforeClass;
 public class ClientAuthTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(ClientAuthServer.class);
     static final String PORT2 = allocatePort(ClientAuthServer.class, 2);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -55,7 +55,7 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
             launchServer(ClientAuthServer.class, true)
         );
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         stopAllServers();
@@ -70,21 +70,21 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT);
-        
+
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Server does not (directly) trust the client cert
     @org.junit.Test
     public void testInvalidDirectTrust() throws Exception {
@@ -94,26 +94,26 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT);
-        
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected on an untrusted cert");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Client does not specify a KeyStore, only a TrustStore
     @org.junit.Test
     public void testNoClientCert() throws Exception {
@@ -123,26 +123,26 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT);
-        
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected on no trusted cert");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Server trusts the issuer of the client cert
     @org.junit.Test
     public void testChainTrust() throws Exception {
@@ -152,21 +152,21 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT2);
-        
+
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Server does not trust the issuer of the client cert
     @org.junit.Test
     public void testInvalidChainTrust() throws Exception {
@@ -176,26 +176,26 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT2);
-        
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected on no trusted cert");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Client does not trust the issuer of the server cert
     @org.junit.Test
     public void testClientInvalidCertChain() throws Exception {
@@ -205,26 +205,26 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT);
-        
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected on no trusted cert");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Client does not directly trust the server cert
     @org.junit.Test
     public void testClientInvalidDirectTrust() throws Exception {
@@ -234,46 +234,46 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT2);
-        
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected on no trusted cert");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSSLConnectionUsingJavaAPIs() throws Exception {
         URL service = new URL("https://localhost:" + PORT);
         HttpsURLConnection connection = (HttpsURLConnection) service.openConnection();
-        
+
         connection.setHostnameVerifier(new DisableCNCheckVerifier());
-        
+
         SSLContext sslContext = SSLContext.getInstance("TLS");
-        
+
         KeyStore ts = KeyStore.getInstance("JKS");
-        try (InputStream trustStore = 
+        try (InputStream trustStore =
             ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", ClientAuthTest.class)) {
             ts.load(trustStore, "password".toCharArray());
         }
 
         TrustManagerFactory tmf = TrustManagerFactory.getInstance("PKIX");
         tmf.init(ts);
-        
+
         KeyStore ks = KeyStore.getInstance("JKS");
-        try (InputStream keyStore = 
+        try (InputStream keyStore =
             ClassLoaderUtils.getResourceAsStream("keys/Morpit.jks", ClientAuthTest.class)) {
             ks.load(keyStore, "password".toCharArray());
         }
@@ -282,20 +282,20 @@ public class ClientAuthTest extends AbstractBusClientServerTestBase {
         kmf.init(ks, "password".toCharArray());
 
         sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), new java.security.SecureRandom());
-        
+
         connection.setSSLSocketFactory(sslContext.getSocketFactory());
-        
+
         connection.connect();
-        
+
         connection.disconnect();
     }
-    
+
     private static final class DisableCNCheckVerifier implements HostnameVerifier {
 
         @Override
         public boolean verify(String arg0, SSLSession arg1) {
             return true;
         }
-        
+
     };
 }

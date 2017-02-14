@@ -47,11 +47,11 @@ public class GreeterDOMSourcePayloadProvider implements Provider<DOMSource> {
             StreamResult result = new StreamResult(System.out);
             transformer.transform(request, result);
             System.out.println("\n");
-            
+
             InputStream is = getClass().getResourceAsStream("/GreetMeDocLiteralResp3.xml");
-            
+
             SOAPMessage greetMeResponse =  MessageFactory.newInstance().createMessage(null, is);
-            is.close();            
+            is.close();
             response.setNode(greetMeResponse.getSOAPBody().extractContentAsDocument());
         } catch (Exception ex) {
             ex.printStackTrace();

@@ -34,9 +34,9 @@ import uri.cxf_apache_org.jstest.types.any.alts.Alternative1;
 import uri.cxf_apache_org.jstest.types.any.alts.Alternative2;
 
 /**
- * 
+ *
  */
-//@org.apache.cxf.feature.Features(features = "org.apache.cxf.feature.LoggingFeature")   
+//@org.apache.cxf.feature.Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class AnyImpl implements AcceptAny {
 
     private Object any1value;
@@ -46,7 +46,7 @@ public class AnyImpl implements AcceptAny {
     private String after;
     private boolean returnOptional;
     private CountDownLatch onewayNotify;
-    
+
     public void reset() {
         any1value = null;
         anyNvalue = null;
@@ -57,7 +57,7 @@ public class AnyImpl implements AcceptAny {
 
     /**
      * *
-     * 
+     *
      * @return Returns the any1value.
      */
     public Object getAny1value() {
@@ -66,7 +66,7 @@ public class AnyImpl implements AcceptAny {
 
     /**
      * *
-     * 
+     *
      * @return Returns the anyNvalue.
      */
     public Object[] getAnyNvalue() {
@@ -75,7 +75,7 @@ public class AnyImpl implements AcceptAny {
 
     /**
      * *
-     * 
+     *
      * @return Returns the anyOptionalValue.
      */
     public Object getAnyOptionalValue() {
@@ -84,7 +84,7 @@ public class AnyImpl implements AcceptAny {
 
     /**
      * *
-     * 
+     *
      * @return Returns the before.
      */
     public String getBefore() {
@@ -93,7 +93,7 @@ public class AnyImpl implements AcceptAny {
 
     /**
      * *
-     * 
+     *
      * @return Returns the after.
      */
     public String getAfter() {
@@ -181,10 +181,10 @@ public class AnyImpl implements AcceptAny {
         // not used, just here to force some types into sight.
     }
 
-    public void prepareToWaitForOneWay() { 
+    public void prepareToWaitForOneWay() {
         onewayNotify = new CountDownLatch(1);
     }
-    
+
     public void waitForOneWay() {
         if (onewayNotify == null) {
             return;
@@ -196,7 +196,7 @@ public class AnyImpl implements AcceptAny {
         } catch (InterruptedException e) {
             //
         } finally {
-            onewayNotify = null;            
+            onewayNotify = null;
         }
     }
 }

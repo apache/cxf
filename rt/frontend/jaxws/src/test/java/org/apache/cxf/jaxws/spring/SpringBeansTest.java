@@ -76,7 +76,7 @@ public class SpringBeansTest extends Assert {
         assertNotNull(bean);
         return (EndpointImpl) bean;
     }
-    
+
     @Test
     public void testEndpoints() throws Exception {
         ClassPathXmlApplicationContext ctx =
@@ -91,7 +91,7 @@ public class SpringBeansTest extends Assert {
             fail("can't get the right implementor object");
         }
         assertEquals("http://localhost:8080/simpleWithAddress",
-                     ep.getServer().getEndpoint().getEndpointInfo().getAddress());        
+                     ep.getServer().getEndpoint().getEndpointInfo().getAddress());
 
         ep = getEndpointImplBean("inlineImplementor", ctx);
         if (!(ep.getImplementor() instanceof org.apache.hello_world_soap_http.GreeterImpl)) {
@@ -146,10 +146,10 @@ public class SpringBeansTest extends Assert {
         ep = getEndpointImplBean("publishedEndpointUrl", ctx);
         String expectedEndpointUrl = "http://cxf.apache.org/Greeter";
         assertEquals(expectedEndpointUrl, ep.getPublishedEndpointUrl());
-        
+
         ep = getEndpointImplBean("epWithDataBinding", ctx);
         DataBinding dataBinding = ep.getDataBinding();
-        
+
         assertTrue(dataBinding instanceof JAXBDataBinding);
         assertEquals("The namespace map should have an entry",
                      ((JAXBDataBinding)dataBinding).getNamespaceMap().size(), 1);
@@ -220,7 +220,7 @@ public class SpringBeansTest extends Assert {
         //we shouldn't be shutting down
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/servers.xml"});
-        
+
         final Bus b = (Bus)ctx.getBean("cxf");
         BusLifeCycleManager lifeCycleManager = b.getExtension(BusLifeCycleManager.class);
         BusLifeCycleListener listener = new BusLifeCycleListener() {
@@ -239,9 +239,9 @@ public class SpringBeansTest extends Assert {
         ClassPathXmlApplicationContext ctx2 =
                 new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/child.xml"},
                                                    ctx);
-        
+
         ctx2.close();
-        
+
         assertNull(b.getProperty("post.was.called"));
         assertNull(b.getProperty("pre.was.called"));
     }
@@ -299,7 +299,7 @@ public class SpringBeansTest extends Assert {
 
         ClientHolderBean greeters = (ClientHolderBean)ctx.getBean("greeters");
         assertEquals(4, greeters.greeterCount());
-        
+
         Object bean = ctx.getBean("client1.proxyFactory");
         assertNotNull(bean);
 
@@ -355,7 +355,7 @@ public class SpringBeansTest extends Assert {
         assertTrue(sbc.getVersion() instanceof Soap12);
         assertTrue("the soap configure should set isMtomEnabled to be true",
                    sbc.isMtomEnabled());
-        
+
         Greeter g1 = greeters.getGreet1();
         Greeter g2 = greeters.getGreet2();
         assertNotSame(g1, g2);
@@ -367,9 +367,9 @@ public class SpringBeansTest extends Assert {
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/clients.xml"});
 
-        
+
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        
+
         Greeter g = factory.create(Greeter.class);
         ClientImpl c = (ClientImpl)ClientProxy.getClient(g);
         for (Interceptor<? extends Message> i : c.getInInterceptors()) {
@@ -413,14 +413,14 @@ public class SpringBeansTest extends Assert {
             cxf1 = (Bus) ctx.getBean("cxf1");
             assertNotNull(cxf1);
             assertEquals(cxf1, ep1.getBus());
-            assertEquals("barf", ep1.getBus().getProperty("foo"));            
+            assertEquals("barf", ep1.getBus().getProperty("foo"));
 
             EndpointImpl ep2 = (EndpointImpl) ctx.getBean("ep2");
             assertNotNull(ep2);
             cxf2 = (Bus) ctx.getBean("cxf2");
             assertNotNull(cxf2);
             assertEquals(cxf2, ep2.getBus());
-            assertEquals("snarf", ep2.getBus().getProperty("foo"));            
+            assertEquals("snarf", ep2.getBus().getProperty("foo"));
 
         } finally {
             if (cxf1 != null) {
@@ -444,11 +444,11 @@ public class SpringBeansTest extends Assert {
             assertTrue(ex.getMessage().contains("cxf1"));
         }
     }
-    
+
     @Test
     public void testCXF3959NormalImport() throws Exception {
         PostConstructCalledCount.reset();
-        ClassPathXmlApplicationContext ctx 
+        ClassPathXmlApplicationContext ctx
             = new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/cxf3959a.xml");
         assertNotNull(ctx);
         assertEquals(2, PostConstructCalledCount.getCount());
@@ -457,7 +457,7 @@ public class SpringBeansTest extends Assert {
     @Test
     public void testCXF3959NoImport() throws Exception {
         PostConstructCalledCount.reset();
-        ClassPathXmlApplicationContext ctx 
+        ClassPathXmlApplicationContext ctx
             = new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/cxf3959b.xml");
         assertNotNull(ctx);
         assertEquals(2, PostConstructCalledCount.getCount());
@@ -466,7 +466,7 @@ public class SpringBeansTest extends Assert {
     @Test
     public void testCXF3959SpringInject() throws Exception {
         PostConstructCalledCount.reset();
-        ClassPathXmlApplicationContext ctx 
+        ClassPathXmlApplicationContext ctx
             = new ClassPathXmlApplicationContext("/org/apache/cxf/jaxws/spring/cxf3959c.xml");
         assertNotNull(ctx);
         assertEquals(2, PostConstructCalledCount.getCount());

@@ -22,7 +22,7 @@ package org.apache.cxf.systest.ws.policy;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-@WebService(name = "SslUsernamePasswordAttachmentService", 
+@WebService(name = "SslUsernamePasswordAttachmentService",
             targetNamespace = "http://www.example.org/contract/SslUsernamePasswordAttachmentService")
 public interface SslUsernamePasswordAttachmentService {
     @WebMethod(operationName = "doSslAndUsernamePasswordPolicy")

@@ -44,22 +44,22 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class WSDLGetAuthenticatorInterceptor extends AbstractPhaseInterceptor<Message> {
-        
+
     private static final String HEADER_WWW_AUTHENTICATE = "WWW-Authenticate";
 
     private static final String AUTHENTICATION_SCHEME_BASIC = "Basic";
-       
+
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLGetAuthenticatorInterceptor.class);
-    
-    private String contextName; 
-    
+
+    private String contextName;
+
     public WSDLGetAuthenticatorInterceptor() {
         super(Phase.READ);
         getBefore().add("org.apache.cxf.frontend.WSDLGetInterceptor");
     }
 
     public void handleMessage(Message message) throws Fault {
-        
+
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         String query = (String)message.get(Message.QUERY_STRING);
         if (!"GET".equals(method) || StringUtils.isEmpty(query)) {
@@ -79,12 +79,12 @@ public class WSDLGetAuthenticatorInterceptor extends AbstractPhaseInterceptor<Me
                         return;
                     }
                 }
-                
+
             }
-        
+
         }
     }
-        
+
     private void handle401response(Message message, Endpoint e) {
         HttpServletResponse response = (HttpServletResponse)message.get("HTTP.RESPONSE");
         response.setHeader(HEADER_WWW_AUTHENTICATE, AUTHENTICATION_SCHEME_BASIC + " realm=\"" + contextName + "\"");

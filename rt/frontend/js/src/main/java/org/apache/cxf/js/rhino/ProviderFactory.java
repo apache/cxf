@@ -144,7 +144,7 @@ public class ProviderFactory {
             throw new Exception(f.getPath() + NO_PROVIDER);
         }
     }
-    
+
     public void stop() {
         while (!providers.isEmpty()) {
             AbstractDOMProvider p = providers.remove(0);

@@ -38,7 +38,7 @@ import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 
 public class UndertowDigestAuthHandler implements CXFUndertowHttpHandler {
-    
+
     private HttpHandler next;
     private HttpHandler securityHandler;
     private IdentityManager identityManager;
@@ -58,23 +58,23 @@ public class UndertowDigestAuthHandler implements CXFUndertowHttpHandler {
         HttpHandler handler = this.next;
         handler = new AuthenticationCallHandler(handler);
         handler = new AuthenticationConstraintHandler(handler);
-        final List<AuthenticationMechanism> mechanisms 
+        final List<AuthenticationMechanism> mechanisms
             = Collections.<AuthenticationMechanism>singletonList(
               new DigestAuthenticationMechanism("WSRealm", "WSDomain", "DIGEST", this.identityManager));
         handler = new AuthenticationMechanismsHandler(handler, mechanisms);
         this.securityHandler = new SecurityInitialHandler(AuthenticationMode.PRO_ACTIVE, identityManager, handler);
-        
+
     }
 
     @Override
     public void setNext(HttpHandler nextHandler) {
         this.next = nextHandler;
     }
-    
+
     private void buildIdMgr() {
         final Map<String, char[]> users = new HashMap<>(1);
         users.put("ffang", "pswd".toCharArray());
-        
+
         identityManager = new MapIdentityManager(users);
     }
 

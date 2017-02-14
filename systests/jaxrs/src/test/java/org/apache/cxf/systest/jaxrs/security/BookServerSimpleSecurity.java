@@ -33,16 +33,16 @@ public class BookServerSimpleSecurity extends AbstractSpringServer {
     public BookServerSimpleSecurity() {
         super("/jaxrs_simple_security", PORT);
     }
-    
+
     @Override
     protected void configureServer(org.eclipse.jetty.server.Server server) throws Exception {
         URL resource = getClass()
             .getResource("/org/apache/cxf/systest/jaxrs/security/jetty-realm.properties");
-        LoginService realm = 
+        LoginService realm =
             new HashLoginService("BookStoreRealm", resource.toURI().getPath());
         server.addBean(realm);
     }
-    
+
     public static void main(String args[]) {
         try {
             BookServerSimpleSecurity s = new BookServerSimpleSecurity();

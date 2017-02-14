@@ -31,14 +31,14 @@ import org.springframework.beans.factory.xml.ParserContext;
 
 
 public class PolicyBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
-  
+
     @Override
-    protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {        
+    protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         bean.addPropertyValue("element", element);
     }
-    
+
     @Override
-    protected String resolveId(Element element, AbstractBeanDefinition bean, 
+    protected String resolveId(Element element, AbstractBeanDefinition bean,
                                ParserContext ctx) throws BeanDefinitionStoreException {
         return element.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                       PolicyConstants.WSU_ID_ATTR_NAME);

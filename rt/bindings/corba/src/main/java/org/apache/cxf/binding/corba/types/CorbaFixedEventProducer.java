@@ -38,7 +38,7 @@ public class CorbaFixedEventProducer implements CorbaTypeEventProducer {
         name = handler.getName();
     }
 
-    public String getLocalName() {        
+    public String getLocalName() {
         return handler.getSimpleName();
     }
 
@@ -57,7 +57,7 @@ public class CorbaFixedEventProducer implements CorbaTypeEventProducer {
     public boolean hasNext() {
         return state < states.length;
     }
-    
+
     public List<Attribute> getAttributes() {
         return null;
     }

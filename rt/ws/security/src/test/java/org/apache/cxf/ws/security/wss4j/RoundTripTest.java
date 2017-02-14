@@ -48,7 +48,7 @@ public class RoundTripTest extends AbstractSecurityTest {
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         Server server = factory.create();
         Service service = server.getEndpoint().getService();
-        
+
         service.getInInterceptors().add(new SAAJInInterceptor());
         service.getInInterceptors().add(new LoggingInInterceptor());
         service.getOutInterceptors().add(new SAAJOutInterceptor());
@@ -74,7 +74,7 @@ public class RoundTripTest extends AbstractSecurityTest {
         proxyFac.setServiceClass(Echo.class);
         proxyFac.setAddress("local://Echo");
         proxyFac.getClientFactoryBean().setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        
+
         echo = (Echo)proxyFac.create();
 
         client = ClientProxy.getClient(echo);

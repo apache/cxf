@@ -27,12 +27,12 @@ import org.apache.cxf.hello_world_soap_http.Greeter;
             endpointInterface = "org.apache.cxf.hello_world_soap_http.Greeter",
             wsdlLocation = "file:./src/main/resources/hello_world_wssec.wsdl",
             targetNamespace = "http://cxf.apache.org/hello_world_soap_http")
-                  
+
 public class GreeterImpl implements Greeter {
 
-    private static final Logger LOG = 
+    private static final Logger LOG =
         Logger.getLogger(GreeterImpl.class.getPackage().getName());
-    
+
     /* (non-Javadoc)
      * @see org.apache.cxf.hello_world_soap_http.Greeter#greetMe(java.lang.String)
      */
@@ -42,7 +42,7 @@ public class GreeterImpl implements Greeter {
         System.out.println("Message received: " + me + "\n");
         return "Hello " + me;
     }
-    
+
     /* (non-Javadoc)
      * @see org.apache.cxf.hello_world_soap_http.Greeter#greetMeOneWay(java.lang.String)
      */

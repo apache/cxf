@@ -38,7 +38,7 @@ public class WireTapIn extends AbstractPhaseInterceptor<Message> {
 
     /**
      * Instantiates a new WireTapIn
-     * @param limit 
+     * @param limit
      *
      * @param logMessageContent the log message content
      */
@@ -94,13 +94,13 @@ public class WireTapIn extends AbstractPhaseInterceptor<Message> {
         message.setContent(CachedOutputStream.class, bos);
 
     }
-    
+
     public void setLimit(int limit) {
         this.limit = limit;
     }
-    
+
     public void setThreshold(long threshold) {
         this.threshold = threshold;
     }
-    
+
 }

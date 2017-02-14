@@ -23,9 +23,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class OAuthRedirectionState implements Serializable {
-    
+
     private static final long serialVersionUID = -661649302262699347L;
-    
+
     private String clientId;
     private String redirectUri;
     private String state;
@@ -35,7 +35,7 @@ public class OAuthRedirectionState implements Serializable {
     private String clientCodeChallenge;
     private String responseType;
     private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
-    
+
     public OAuthRedirectionState() {
     }
 
@@ -54,7 +54,7 @@ public class OAuthRedirectionState implements Serializable {
     public String getClientId() {
         return clientId;
     }
-    
+
     /**
      * Sets the redirect uri which needs to be retained in a hidden form field
      * @param redirectUri the redirect uri
@@ -86,7 +86,7 @@ public class OAuthRedirectionState implements Serializable {
     public String getState() {
         return state;
     }
-    
+
     /**
      * Sets the requested scope which needs to be retained in a hidden form field
      * @param proposedScope the scope
@@ -145,6 +145,6 @@ public class OAuthRedirectionState implements Serializable {
     public void setExtraProperties(Map<String, String> extraProperties) {
         this.extraProperties = extraProperties;
     }
-    
-    
+
+
 }

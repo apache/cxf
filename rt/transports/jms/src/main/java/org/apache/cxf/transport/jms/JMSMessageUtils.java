@@ -56,7 +56,7 @@ import org.apache.cxf.transport.jms.util.JMSMessageConverter;
 import org.apache.cxf.transport.jms.util.JMSUtil;
 
 /**
- * Static util methods for converting cxf to jms messages and vice a versa 
+ * Static util methods for converting cxf to jms messages and vice a versa
  */
 final class JMSMessageUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JMSMessageUtils.class);
@@ -64,21 +64,21 @@ final class JMSMessageUtils {
     private JMSMessageUtils() {
 
     }
-    public static org.apache.cxf.message.Message asCXFMessage(Message message, String headerType) 
+    public static org.apache.cxf.message.Message asCXFMessage(Message message, String headerType)
         throws UnsupportedEncodingException, JMSException {
         org.apache.cxf.message.Message inMessage = new MessageImpl();
         populateIncomingContext(message, inMessage, headerType);
         retrieveAndSetPayload(inMessage, message);
         return inMessage;
     }
-    
+
     /**
      * Extract the payload of an incoming JMS message
-     * 
-     * @param inMessage 
+     *
+     * @param inMessage
      * @param message the incoming message
      * @throws UnsupportedEncodingException
-     * @throws JMSException 
+     * @throws JMSException
      */
     public static void retrieveAndSetPayload(org.apache.cxf.message.Message inMessage, Message message)
         throws UnsupportedEncodingException, JMSException {
@@ -101,7 +101,7 @@ final class JMSMessageUtils {
         }
         headers.put(JMSSpecConstants.JMS_MESSAGE_TYPE, Collections.singletonList(messageType));
     }
-    
+
     private static void populateIncomingContext(javax.jms.Message message,
                                                org.apache.cxf.message.Message inMessage, String messageType)
         throws UnsupportedEncodingException, JMSException {
@@ -160,8 +160,8 @@ final class JMSMessageUtils {
      * @param jmsMessage
      * @param inMessage
      * @param messagePropertiesType
-     * @throws UnsupportedEncodingException 
-     * @throws JMSException 
+     * @throws UnsupportedEncodingException
+     * @throws JMSException
      */
     private static void populateIncomingMessageProperties(Message jmsMessage,
                                                           org.apache.cxf.message.Message inMessage,
@@ -226,16 +226,16 @@ final class JMSMessageUtils {
     }
 
     /**
-     * Extract the property JMSXUserID or JMS_TIBCO_SENDER from the jms message and 
-     * create a SecurityContext from it. 
+     * Extract the property JMSXUserID or JMS_TIBCO_SENDER from the jms message and
+     * create a SecurityContext from it.
      * For more info see Jira Issue CXF-2055
      * {@link https://issues.apache.org/jira/browse/CXF-2055}
-     * 
+     *
      * @param message jms message to retrieve user information from
      * @return SecurityContext that contains the user of the producer of the message as the Principal
      * @throws JMSException if something goes wrong
      */
-    public static SecurityContext buildSecurityContext(javax.jms.Message message, 
+    public static SecurityContext buildSecurityContext(javax.jms.Message message,
                                                         JMSConfiguration config) throws JMSException {
         String tempUserName = message.getStringProperty("JMSXUserID");
         if (tempUserName == null && config.isJmsProviderTibcoEms()) {
@@ -291,7 +291,7 @@ final class JMSMessageUtils {
 
         return normalizedEncoding;
     }
-    
+
     private static String getContentType(org.apache.cxf.message.Message message) {
         String contentType = (String)message.get(org.apache.cxf.message.Message.CONTENT_TYPE);
         String enc = (String)message.get(org.apache.cxf.message.Message.ENCODING);
@@ -316,9 +316,9 @@ final class JMSMessageUtils {
         }
         return contentType;
     }
-    
+
     private static String getContentEncoding(org.apache.cxf.message.Message message) {
-        Map<String, List<String>> headers 
+        Map<String, List<String>> headers
             = CastUtils.cast((Map<?, ?>)message.get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
         if (headers != null) {
             List<String> l = headers.get("Content-Encoding");
@@ -334,21 +334,21 @@ final class JMSMessageUtils {
                                        Object payload,
                                        String messageType,
                                        Session session,
-                                       String correlationId, 
+                                       String correlationId,
                                        String headerType)
         throws JMSException {
 
         Message jmsMessage = JMSUtil.createAndSetPayload(payload, session, messageType);
         JMSMessageHeadersType messageProperties = getOrCreateHeader(outMessage, headerType);
         JMSMessageUtils.prepareJMSMessageHeaderProperties(messageProperties, outMessage, jmsConfig);
-        JMSMessageUtils.prepareJMSMessageProperties(messageProperties, outMessage, 
+        JMSMessageUtils.prepareJMSMessageProperties(messageProperties, outMessage,
                                                     jmsConfig.getTargetService(), jmsConfig.getRequestURI());
         JMSMessageUtils.setJMSMessageProperties(jmsMessage, messageProperties);
         jmsMessage.setJMSCorrelationID(correlationId);
         return jmsMessage;
     }
-    
-    private static JMSMessageHeadersType getOrCreateHeader(org.apache.cxf.message.Message message, 
+
+    private static JMSMessageHeadersType getOrCreateHeader(org.apache.cxf.message.Message message,
                                                            String headerName) {
         JMSMessageHeadersType messageProperties = (JMSMessageHeadersType)message
             .get(headerName);
@@ -381,7 +381,7 @@ final class JMSMessageUtils {
             jmsMessage.setBooleanProperty(JMSSpecConstants.ISFAULT_FIELD, messageProperties
                 .isSOAPJMSIsFault());
         }
-        
+
         if (messageProperties.isSetProperty()) {
             for (JMSPropertyType prop : messageProperties.getProperty()) {
                 jmsMessage.setStringProperty(prop.getName(), prop.getValue());
@@ -426,14 +426,14 @@ final class JMSMessageUtils {
                                                     org.apache.cxf.message.Message outMessage,
                                                     String targetService,
                                                     String requestURI) {
-        
+
         // Retrieve or create protocol headers
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)outMessage
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
 
-        boolean isSoapMessage = 
+        boolean isSoapMessage =
             !MessageUtils.isTrue(outMessage.getExchange().get(org.apache.cxf.message.Message.REST_MESSAGE));
-        
+
         if (isSoapMessage) {
             if (!messageProperties.isSetSOAPJMSTargetService()) {
                 messageProperties.setSOAPJMSTargetService(targetService);
@@ -450,7 +450,7 @@ final class JMSMessageUtils {
                 messageProperties.setSOAPJMSSOAPAction(soapAction);
             }
             if (!messageProperties.isSetSOAPJMSIsFault()) {
-                boolean isFault = outMessage.getContent(Exception.class) != null; 
+                boolean isFault = outMessage.getContent(Exception.class) != null;
                 messageProperties.setSOAPJMSIsFault(isFault);
             }
             if (!messageProperties.isSetSOAPJMSRequestURI()) {
@@ -458,18 +458,18 @@ final class JMSMessageUtils {
             }
         } else {
             if (MessageUtils.isRequestor(outMessage)) {
-                addJMSPropertiesFromMessage(messageProperties, 
-                                            outMessage, 
+                addJMSPropertiesFromMessage(messageProperties,
+                                            outMessage,
                                             org.apache.cxf.message.Message.HTTP_REQUEST_METHOD,
                                             org.apache.cxf.message.Message.REQUEST_URI,
                                             org.apache.cxf.message.Message.ACCEPT_CONTENT_TYPE);
             } else {
-                addJMSPropertyFromMessage(messageProperties, 
-                                          outMessage, 
+                addJMSPropertyFromMessage(messageProperties,
+                                          outMessage,
                                           org.apache.cxf.message.Message.RESPONSE_CODE);
             }
-            addJMSPropertyFromMessage(messageProperties, 
-                                      outMessage, 
+            addJMSPropertyFromMessage(messageProperties,
+                                      outMessage,
                                       org.apache.cxf.message.Message.CONTENT_TYPE);
         }
         if (headers != null) {
@@ -502,18 +502,18 @@ final class JMSMessageUtils {
                                         org.apache.cxf.message.Message outMessage,
                                         Map<String, List<String>> headers) {
         String soapAction = null;
-        
+
         if (headers != null) {
             List<String> action = headers.remove("SOAPAction");
             if (action != null && action.size() > 0) {
                 soapAction = action.get(0);
             }
         }
-        
+
         if (soapAction == null) {
             soapAction = messageProperties.getSOAPJMSSOAPAction();
         }
-        
+
         if (soapAction == null) {
             soapAction = extractActionFromSoap12(outMessage);
         }
@@ -521,16 +521,16 @@ final class JMSMessageUtils {
     }
 
     private static void addJMSPropertiesFromMessage(JMSMessageHeadersType messageProperties,
-                                                    org.apache.cxf.message.Message message, 
+                                                    org.apache.cxf.message.Message message,
                                                     String... keys) {
         for (String key : keys) {
             addJMSPropertyFromMessage(messageProperties, message, key);
         }
-        
+
     }
-    
+
     private static void addJMSPropertyFromMessage(JMSMessageHeadersType messageProperties,
-                                                  org.apache.cxf.message.Message message, 
+                                                  org.apache.cxf.message.Message message,
                                                   String key) {
         Object value = message.get(key);
         if (value != null) {
@@ -555,11 +555,11 @@ final class JMSMessageUtils {
 
     private static String extractActionFromSoap12(org.apache.cxf.message.Message message) {
         String ct = (String) message.get(org.apache.cxf.message.Message.CONTENT_TYPE);
-        
+
         if (ct == null) {
             return null;
         }
-        
+
         int start = ct.indexOf("action=");
         if (start != -1) {
             int end;
@@ -577,7 +577,7 @@ final class JMSMessageUtils {
         }
         return null;
     }
-    
+
     public static boolean isMtomEnabled(final org.apache.cxf.message.Message message) {
         return MessageUtils.isTrue(message.getContextualProperty(
                                                        org.apache.cxf.message.Message.MTOM_ENABLED));

@@ -54,7 +54,7 @@ public class DynamicRegistrationService {
     private int clientIdSizeInBytes = DEFAULT_CLIENT_ID_SIZE;
     private MessageContext mc;
     private boolean supportRegistrationAccessTokens = true;
-    
+
     @POST
     @Consumes("application/json")
     @Produces("application/json")
@@ -63,10 +63,10 @@ public class DynamicRegistrationService {
         Client client = createNewClient(request);
         createRegAccessToken(client);
         clientProvider.setClient(client);
-        
+
         return Response.status(201).entity(fromClientToRegistrationResponse(client)).build();
     }
-    
+
     protected void checkInitialAccessToken() {
         if (initialAccessToken != null) {
             String accessToken = getRequestAccessToken();
@@ -74,18 +74,18 @@ public class DynamicRegistrationService {
                 throw ExceptionUtils.toNotAuthorizedException(null, null);
             }
         }
-        
+
     }
 
     protected String createRegAccessToken(Client client) {
         String regAccessToken = OAuthUtils.generateRandomTokenKey();
-        client.getProperties().put(ClientRegistrationResponse.REG_ACCESS_TOKEN, 
+        client.getProperties().put(ClientRegistrationResponse.REG_ACCESS_TOKEN,
                                    regAccessToken);
         return regAccessToken;
     }
     protected void checkRegistrationAccessToken(Client c, String accessToken) {
         String regAccessToken = c.getProperties().get(ClientRegistrationResponse.REG_ACCESS_TOKEN);
-        
+
         if (!regAccessToken.equals(accessToken)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
@@ -96,32 +96,32 @@ public class DynamicRegistrationService {
     public ClientRegistration readClientRegistrationWithQuery(@QueryParam("client_id") String clientId) {
         return doReadClientRegistration(clientId);
     }
-    
+
     @GET
     @Path("{clientId}")
     @Produces("application/json")
     public ClientRegistration readClientRegistrationWithPath(@PathParam("clientId") String clientId) {
-        
+
         return doReadClientRegistration(clientId);
     }
-    
+
     @PUT
     @Path("{clientId}")
     @Consumes("application/json")
     public Response updateClientRegistration(@PathParam("clientId") String clientId) {
         return Response.ok().build();
     }
-    
+
     @DELETE
     @Path("{clientId}")
     public Response deleteClientRegistration(@PathParam("clientId") String clientId) {
         if (readClient(clientId) != null) {
-            clientProvider.removeClient(clientId);    
+            clientProvider.removeClient(clientId);
         }
-        
+
         return Response.ok().build();
     }
-    
+
     protected ClientRegistrationResponse fromClientToRegistrationResponse(Client client) {
         ClientRegistrationResponse response = new ClientRegistrationResponse();
         response.setClientId(client.getClientId());
@@ -132,18 +132,18 @@ public class DynamicRegistrationService {
         }
         response.setClientIdIssuedAt(client.getRegisteredAt());
         UriBuilder ub = getMessageContext().getUriInfo().getAbsolutePathBuilder();
-        
+
         if (supportRegistrationAccessTokens) {
             // both registration access token and uri are either included or excluded
             response.setRegistrationClientUri(
                 ub.path(client.getClientId()).build().toString());
-        
+
             response.setRegistrationAccessToken(
                 client.getProperties().get(ClientRegistrationResponse.REG_ACCESS_TOKEN));
         }
         return response;
     }
-    
+
     protected ClientRegistration doReadClientRegistration(String clientId) {
         Client client = readClient(clientId);
         return fromClientToClientRegistration(client);
@@ -168,10 +168,10 @@ public class DynamicRegistrationService {
         //etc
         return reg;
     }
-    
+
     protected Client readClient(String clientId) {
         String accessToken = getRequestAccessToken();
-                                                 
+
         Client c = clientProvider.getClient(clientId);
         if (c == null) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
@@ -179,8 +179,8 @@ public class DynamicRegistrationService {
         checkRegistrationAccessToken(c, accessToken);
         return c;
     }
-    
-    
+
+
     public String getInitialAccessToken() {
         return initialAccessToken;
     }
@@ -188,22 +188,22 @@ public class DynamicRegistrationService {
     public void setInitialAccessToken(String initialAccessToken) {
         this.initialAccessToken = initialAccessToken;
     }
-    
+
     protected Client createNewClient(ClientRegistration request) {
         // Client ID
         String clientId = generateClientId();
-        
+
         // Client Name
         String clientName = request.getClientName();
         if (StringUtils.isEmpty(clientName)) {
             clientName = clientId;
         }
-        
+
         List<String> grantTypes = request.getGrantTypes();
         if (grantTypes == null) {
             grantTypes = Collections.singletonList("authorization_code");
         }
-        
+
         // Client Type
         // https://tools.ietf.org/html/rfc7591 has no this property but
         // but http://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata does
@@ -211,21 +211,21 @@ public class DynamicRegistrationService {
         if (appType == null) {
             appType = DEFAULT_APPLICATION_TYPE;
         }
-        boolean isConfidential = DEFAULT_APPLICATION_TYPE.equals(appType) 
+        boolean isConfidential = DEFAULT_APPLICATION_TYPE.equals(appType)
             && grantTypes.contains(OAuthConstants.AUTHORIZATION_CODE_GRANT);
-        
+
         // Client Secret
         String clientSecret = isConfidential
             ? generateClientSecret(request)
             : null;
 
         Client newClient = new Client(clientId, clientSecret, isConfidential, clientName);
-        
+
         newClient.setAllowedGrantTypes(grantTypes);
-        
+
         // Client Registration Time
         newClient.setRegisteredAt(System.currentTimeMillis() / 1000);
-        
+
         // Client Redirect URIs
         List<String> redirectUris = request.getRedirectUris();
         if (redirectUris != null) {
@@ -234,13 +234,13 @@ public class DynamicRegistrationService {
             }
             newClient.setRedirectUris(redirectUris);
         }
-        
+
         // Client Resource Audience URIs
         List<String> resourceUris = request.getResourceUris();
         if (resourceUris != null) {
             newClient.setRegisteredAudiences(resourceUris);
         }
-        
+
         // Client Scopes
         String scope = request.getScope();
         if (!StringUtils.isEmpty(scope)) {
@@ -256,27 +256,27 @@ public class DynamicRegistrationService {
         if (clientLogoUri != null) {
             newClient.setApplicationLogoUri(clientLogoUri);
         }
-        
+
         //TODO: check other properties
         // Add more typed properties like tosUri, policyUri, etc to Client
         // or set them as Client extra properties
-     
+
         newClient.setRegisteredDynamically(true);
         return newClient;
     }
 
     protected void validateRequestUri(String uri, String appType, List<String> grantTypes) {
-        // Web Clients using the OAuth Implicit Grant Type MUST only register URLs using the https scheme 
+        // Web Clients using the OAuth Implicit Grant Type MUST only register URLs using the https scheme
         // as redirect_uris; they MUST NOT use localhost as the hostname. Native Clients MUST only register
         // redirect_uris using custom URI schemes or URLs using the http: scheme with localhost as the hostname.
-        // Authorization Servers MAY place additional constraints on Native Clients. Authorization Servers MAY 
+        // Authorization Servers MAY place additional constraints on Native Clients. Authorization Servers MAY
         // reject Redirection URI values using the http scheme, other than the localhost case for Native Clients
     }
 
     public void setClientProvider(ClientRegistrationProvider clientProvider) {
         this.clientProvider = clientProvider;
     }
-    
+
     protected String generateClientId() {
         return Base64UrlUtility.encode(
                    CryptoUtils.generateSecureRandomBytes(
@@ -297,18 +297,18 @@ public class DynamicRegistrationService {
     }
 
     protected String getRequestAccessToken() {
-        return AuthorizationUtils.getAuthorizationParts(getMessageContext(), 
+        return AuthorizationUtils.getAuthorizationParts(getMessageContext(),
                     Collections.singleton(OAuthConstants.BEARER_AUTHORIZATION_SCHEME))[1];
     }
     protected int getClientSecretSizeInBytes(ClientRegistration request) {
         return 16;
     }
 
-    @Context 
+    @Context
     public void setMessageContext(MessageContext context) {
         this.mc = context;
     }
-    
+
     public MessageContext getMessageContext() {
         return mc;
     }

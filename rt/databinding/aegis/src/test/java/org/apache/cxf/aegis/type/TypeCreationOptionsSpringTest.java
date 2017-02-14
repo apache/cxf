@@ -32,32 +32,32 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class TypeCreationOptionsSpringTest extends AbstractCXFSpringTest {
     public static final String PORT = TestUtil.getPortNumber(TypeCreationOptionsSpringTest.class);
-    
-    
+
+
     @Override
     protected String[] getConfigLocations() {
         setConfigContextClass(TypeCreationOptionsSpringTest.class);
         return new String[] {"/org/apache/cxf/aegis/type/aegisOptionsTestBeans.xml"};
     }
-    
-    @Test 
+
+    @Test
     public void testMinOccurs() throws Exception {
         TestUtilities testUtilities = new TestUtilities(TypeCreationOptionsSpringTest.class);
         testUtilities.setBus(getBean(Bus.class, "cxf"));
         testUtilities.addDefaultNamespaces();
         testUtilities.addNamespace("ts", "http://cxf.org.apache/service");
         //{urn:org.apache.cxf.aegis}arrayService
-        Server s = testUtilities.getServerForService(new QName("urn:org.apache.cxf.aegis", 
+        Server s = testUtilities.getServerForService(new QName("urn:org.apache.cxf.aegis",
                                                                "arrayService"));
         Document wsdl = testUtilities.getWSDLDocument(s);
-        assertXPathEquals("//xsd:complexType[@name='ArrayOfInt']/" 
-                          + "xsd:sequence/xsd:element[@name='int']/@minOccurs", 
+        assertXPathEquals("//xsd:complexType[@name='ArrayOfInt']/"
+                          + "xsd:sequence/xsd:element[@name='int']/@minOccurs",
                           "3", wsdl);
 
     }
-    
+
 }

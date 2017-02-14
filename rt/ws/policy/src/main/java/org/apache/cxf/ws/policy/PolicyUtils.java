@@ -37,13 +37,13 @@ import org.apache.neethi.PolicyContainingAssertion;
 import org.apache.neethi.PolicyOperator;
 
 /**
- * 
+ *
  */
 public final class PolicyUtils {
 
     public static class WrappedAssertor implements Assertor {
         org.apache.cxf.transport.Assertor obj;
-        
+
         public WrappedAssertor(org.apache.cxf.transport.Assertor o) {
             obj = o;
         }
@@ -61,52 +61,52 @@ public final class PolicyUtils {
     }
 
     private static final String INDENT = "  ";
-    
+
     private PolicyUtils() {
-    }  
-    
+    }
+
     /**
-     * Checks if a given policy contains no policy components 
-     * or if it has only empty ExactlyOne or All components 
-     * containing no assertions 
-     * 
+     * Checks if a given policy contains no policy components
+     * or if it has only empty ExactlyOne or All components
+     * containing no assertions
+     *
      * @param p the policy
      * @return true if the policy is empty
      */
     public static boolean isEmptyPolicy(Policy p) {
-        
+
         return isEmptyPolicyOperator(p);
     }
-    
+
     /**
-     * Checks if a given policy operator has no policy components 
-     * or if it has only empty ExactlyOne or All components 
-     * containing no assertions 
-     * 
+     * Checks if a given policy operator has no policy components
+     * or if it has only empty ExactlyOne or All components
+     * containing no assertions
+     *
      * @param p the policy operator
      * @return true if this policy operator is empty
      */
     public static boolean isEmptyPolicyOperator(PolicyOperator p) {
-        
+
         if (p.isEmpty()) {
             return true;
         }
-        
-        
+
+
         for (PolicyComponent component : p.getPolicyComponents()) {
             if (!(component instanceof PolicyOperator)
                 || !isEmptyPolicyOperator((PolicyOperator)component)) {
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * Determine if a collection of assertions contains a given assertion, using
      * the equal method from the Assertion interface.
-     * 
+     *
      * @param assertions a collection of assertions
      * @param candidate the assertion to test
      * @return true iff candidate is equal to one of the assertions in the collection
@@ -119,16 +119,16 @@ public final class PolicyUtils {
         }
         return false;
     }
-    
+
     /**
      * Determine if one collection of assertions contains another collection of assertion, using
      * the equal method from the Assertion interface.
-     * 
+     *
      * @param assertions a collection of assertions
      * @param candidates the collections of assertion to test
      * @return true iff each candidate is equal to one of the assertions in the collection
      */
-    public static boolean contains(Collection<Assertion> assertions, 
+    public static boolean contains(Collection<Assertion> assertions,
                                    Collection<Assertion> candidates) {
         if (null == candidates || candidates.isEmpty()) {
             return true;
@@ -140,7 +140,7 @@ public final class PolicyUtils {
         }
         return true;
     }
-    
+
     public static void logPolicy(Logger log, Level level, String msg, PolicyComponent pc) {
         if (!log.isLoggable(level)) {
             return;
@@ -155,13 +155,13 @@ public final class PolicyUtils {
         printPolicyComponent(pc, buf, 0);
         log.log(level, buf.toString());
     }
-    
+
     public static void printPolicyComponent(PolicyComponent pc) {
         StringBuilder buf = new StringBuilder();
         printPolicyComponent(pc, buf, 0);
         System.out.println(buf.toString());
     }
-    
+
     public static void printPolicyComponent(PolicyComponent pc, StringBuilder buf, int level) {
         indent(buf, level);
         buf.append("type: ");
@@ -180,7 +180,7 @@ public final class PolicyUtils {
                 PolicyComponent nested = ((PolicyContainingAssertion)pc).getPolicy();
                 level++;
                 printPolicyComponent(nested, buf, level);
-                level--;                
+                level--;
             }
         } else {
             level++;
@@ -193,17 +193,17 @@ public final class PolicyUtils {
             level--;
         }
     }
-    
+
     private static void indent(StringBuilder buf, int level) {
         for (int i = 0; i < level; i++) {
             buf.append(INDENT);
         }
     }
-    
+
     private static void nl(StringBuilder buf) {
         buf.append(SystemPropertyAction.getProperty("line.separator"));
     }
-    
+
     private static String typeToString(short type) {
         switch(type) {
         case Constants.TYPE_ASSERTION:
@@ -221,7 +221,7 @@ public final class PolicyUtils {
         }
         return "";
     }
-    
+
     public static Assertor createAsserter(Object o) {
         if (o instanceof Assertor) {
             return (Assertor)o;
@@ -231,5 +231,5 @@ public final class PolicyUtils {
         }
         return null;
     }
-    
+
 }

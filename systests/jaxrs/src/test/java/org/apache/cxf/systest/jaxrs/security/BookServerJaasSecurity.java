@@ -29,11 +29,11 @@ public class BookServerJaasSecurity extends AbstractSpringServer {
     public BookServerJaasSecurity() {
         super("/jaxrs_jaas_security", PORT);
     }
-    
+
     public BookServerJaasSecurity(String[] args) {
         super("/jaxrs_jaas_security", PORT);
     }
-    
+
     public static void main(String args[]) {
         try {
             BookServerJaasSecurity s = new BookServerJaasSecurity();

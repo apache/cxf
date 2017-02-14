@@ -25,7 +25,7 @@ import javax.jws.WebService;
 import org.apache.cxf.soapfault.SoapFaultPortType;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 
-@WebService(endpointInterface = "org.apache.cxf.soapfault.SoapFaultPortType", 
+@WebService(endpointInterface = "org.apache.cxf.soapfault.SoapFaultPortType",
             serviceName = "SoapFaultService")
 @HandlerChain(file = "./handlers.xml", name = "TestHandlerChain")
 public class SOAPFaultImpl implements SoapFaultPortType {

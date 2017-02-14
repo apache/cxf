@@ -38,7 +38,7 @@ public class JwsOutputStream extends FilterOutputStream {
         byte[] bytes = ByteBuffer.allocate(Integer.SIZE / 8).putInt(value).array();
         write(bytes, 0, bytes.length);
     }
-    
+
     @Override
     public void write(byte b[], int off, int len) throws IOException {
         signature.update(b, off, len);
@@ -55,5 +55,5 @@ public class JwsOutputStream extends FilterOutputStream {
         Base64UrlUtility.encodeAndStream(finalBytes, 0, finalBytes.length, out);
         flushed = true;
     }
-    
+
 }

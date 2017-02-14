@@ -27,14 +27,14 @@ import uri.cxf_apache_org.jstest.PingMeFault;
 import uri.cxf_apache_org.jstest.types.FaultDetail;
 
 
-@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService", 
-                      targetNamespace = "http://apache.org/hello_world_soap_http", 
+@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
+                      targetNamespace = "http://apache.org/hello_world_soap_http",
                       endpointInterface = "uri.cxf_apache_org.jstest.Greeter")
-@org.apache.cxf.feature.Features(features = "org.apache.cxf.feature.LoggingFeature")      
+@org.apache.cxf.feature.Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class GreeterImpl implements Greeter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(GreeterImpl.class);
-    
+
     /* (non-Javadoc)
      * @see org.apache.hello_world_soap_http.Greeter#greetMe(java.lang.String)
      */
@@ -42,7 +42,7 @@ public class GreeterImpl implements Greeter {
         LOG.info("Executing operation greetMe");
         return "Hello " + me;
     }
-    
+
     /* (non-Javadoc)
      * @see org.apache.hello_world_soap_http.Greeter#greetMeOneWay(java.lang.String)
      */
@@ -57,7 +57,7 @@ public class GreeterImpl implements Greeter {
         LOG.info("Executing operation sayHi");
         return "Bonjour";
     }
-    
+
     public void pingMe() throws PingMeFault {
         FaultDetail faultDetail = new FaultDetail();
         faultDetail.setMajor((short)2);

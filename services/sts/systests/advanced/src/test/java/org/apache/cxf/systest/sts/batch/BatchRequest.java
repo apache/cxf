@@ -26,7 +26,7 @@ public class BatchRequest {
     private String keyType;
     private String appliesTo;
     private Element validateTarget;
-    
+
     public String getTokenType() {
         return tokenType;
     }
@@ -51,6 +51,6 @@ public class BatchRequest {
     public void setValidateTarget(Element validateTarget) {
         this.validateTarget = validateTarget;
     }
-    
-    
+
+
 }

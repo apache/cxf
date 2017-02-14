@@ -40,12 +40,12 @@ public class StringArrayTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @AfterClass
     public static void stopAllServers() throws Exception {
-        
+
     }
-    
+
     @Test
     public void testStringArrayList() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
@@ -55,12 +55,12 @@ public class StringArrayTest extends AbstractBusClientServerTestBase {
         StringWriter swin = new java.io.StringWriter();
         java.io.PrintWriter pwin = new java.io.PrintWriter(swin);
         LoggingInInterceptor logIn = new LoggingInInterceptor(new PrintWriterEventSender(pwin));
-        
+
         StringWriter swout = new java.io.StringWriter();
         java.io.PrintWriter pwout = new java.io.PrintWriter(swout);
         LoggingOutInterceptor logOut = new LoggingOutInterceptor(new PrintWriterEventSender(pwout));
-        
-        
+
+
         getBus().getInInterceptors().add(logIn);
         getBus().getOutInterceptors().add(logOut);
         SOAPServiceRPCLit service = new SOAPServiceRPCLit();
@@ -68,14 +68,14 @@ public class StringArrayTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
         String[] strs = new String[]{"org", "apache", "cxf"};
         String[] res =  port.stringListTest(strs);
-        assertArrayEquals(strs, res);      
+        assertArrayEquals(strs, res);
 
-        assertTrue("Request message is not marshalled correctly and @XmlList does not take effect:\n" 
+        assertTrue("Request message is not marshalled correctly and @XmlList does not take effect:\n"
                    + swout.toString(),
                    swout.toString().indexOf("<in>org apache cxf</in>") > -1);
-        assertTrue("Response message is not marshalled correctly and @XmlList does not take effect\n" 
+        assertTrue("Response message is not marshalled correctly and @XmlList does not take effect\n"
                    + swin.toString(),
                    swin.toString().indexOf("<out>org apache cxf</out>") > -1);
     }
-    
+
 }

@@ -29,10 +29,10 @@ import org.apache.cxf.jca.jarloader.JarLoader;
 
 
 public final class PlugInClassLoaderHelper {
-    private static final Logger LOG = 
+    private static final Logger LOG =
         LogUtils.getL7dLogger(PlugInClassLoaderHelper.class);
     private static Map<String, byte[]> nonClassesMap = new HashMap<String, byte[]>();
-   
+
 
     private PlugInClassLoaderHelper() {
         // singleton
@@ -47,11 +47,11 @@ public final class PlugInClassLoaderHelper {
             return false;
         }
     }
-   
+
     public static byte[] getResourceAsBytes(String name) throws IOException {
         // check nonClassCache for properties etc..
         if (!name.endsWith(".class") && nonClassesMap.containsKey(name)) {
-            return nonClassesMap.get(name);            
+            return nonClassesMap.get(name);
         }
 
         // first check file path directorys, then check jars
@@ -90,7 +90,7 @@ public final class PlugInClassLoaderHelper {
                     if (!name.endsWith(".class")) {
                         nonClassesMap.put(name, bytes);
                     }
-                    return bytes;                    
+                    return bytes;
                 }
             }
         }

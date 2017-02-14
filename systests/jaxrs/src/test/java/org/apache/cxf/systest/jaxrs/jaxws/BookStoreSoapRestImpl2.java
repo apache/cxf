@@ -26,5 +26,5 @@ public class BookStoreSoapRestImpl2 implements BookStoreJaxws, BookStoreJaxrs  {
         return 0;
     }
 
-        
+
 }

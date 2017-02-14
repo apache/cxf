@@ -37,16 +37,16 @@ import org.apache.wss4j.common.util.XMLUtils;
  */
 public class CustomClaimsHandler implements ClaimsHandler {
 
-    public static final URI ROLE = 
-            URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");  
-    public static final URI GIVEN_NAME = 
-        URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");  
-    public static final URI LANGUAGE = 
+    public static final URI ROLE =
+            URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+    public static final URI GIVEN_NAME =
+        URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
+    public static final URI LANGUAGE =
         URI.create("http://schemas.mycompany.com/claims/language");
-    
+
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
-      
+
         if (claims != null && claims.size() > 0) {
             ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
             List<Element> customContent = parameters.getTokenRequirements().getCustomContent();
@@ -62,7 +62,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
                     }
                 }
             }
-            
+
             for (Claim requestClaim : claims) {
                 ProcessedClaim claim = new ProcessedClaim();
                 claim.setClaimType(requestClaim.getClaimType());

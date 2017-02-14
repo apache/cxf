@@ -93,7 +93,7 @@ public class X509Locator implements Locator {
         }
         return cert;
     }
-    
+
     private String getIdForApplication(Applications application, List<UseKeyWithType> ids) {
         for (UseKeyWithType id : ids) {
             if (application.getUri().equalsIgnoreCase(id.getApplication())) {
@@ -102,7 +102,7 @@ public class X509Locator implements Locator {
         }
         return null;
     }
-    
+
     private List<UseKeyWithType> parse(LocateRequestType request) {
         List<UseKeyWithType> keyIDs = new ArrayList<>();
         if (request == null) {

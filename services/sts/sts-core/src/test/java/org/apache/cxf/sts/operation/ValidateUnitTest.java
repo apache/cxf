@@ -44,30 +44,30 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.BinarySecurityTokenT
  * Some unit tests for the validate operation.
  */
 public class ValidateUnitTest extends org.junit.Assert {
-    
-    private static final QName QNAME_WST_STATUS = 
+
+    private static final QName QNAME_WST_STATUS =
         QNameConstants.WS_TRUST_FACTORY.createStatus(null).getName();
-    
-    
+
+
     /**
      * Test to successfully validate a (dummy) token.
      */
     @org.junit.Test
     public void testValidateToken() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new DummyTokenValidator());
         validateOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
             );
@@ -75,118 +75,118 @@ public class ValidateUnitTest extends org.junit.Assert {
         ValidateTargetType validateTarget = new ValidateTargetType();
         JAXBElement<BinarySecurityTokenType> token = createToken();
         validateTarget.setAny(token);
-        JAXBElement<ValidateTargetType> validateTargetType = 
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Validate a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             validateOperation.validate(request, null, msgCtx);
         assertTrue(validateResponse(response));
     }
-    
-    
+
+
     /**
      * Test to successfully validate multiple (dummy) tokens.
      */
     @org.junit.Test
     public void testValidateMultipleTokens() throws Exception {
-        TokenRequestCollectionOperation requestCollectionOperation = 
+        TokenRequestCollectionOperation requestCollectionOperation =
             new TokenRequestCollectionOperation();
         TokenValidateOperation validateOperation = new TokenValidateOperation();
         requestCollectionOperation.setValidateOperation(validateOperation);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new DummyTokenValidator());
         validateOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
-        RequestSecurityTokenCollectionType requestCollection = 
+        RequestSecurityTokenCollectionType requestCollection =
             new RequestSecurityTokenCollectionType();
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
             );
         request.getAny().add(tokenType);
-        
-        JAXBElement<String> requestType = 
+
+        JAXBElement<String> requestType =
             new JAXBElement<String>(
-                QNameConstants.REQUEST_TYPE, String.class, 
+                QNameConstants.REQUEST_TYPE, String.class,
                 TokenRequestCollectionOperation.WSTRUST_REQUESTTYPE_BATCH_VALIDATE
             );
         request.getAny().add(requestType);
-        
+
         ValidateTargetType validateTarget = new ValidateTargetType();
         JAXBElement<BinarySecurityTokenType> token = createToken();
         validateTarget.setAny(token);
-        JAXBElement<ValidateTargetType> validateTargetType = 
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
         requestCollection.getRequestSecurityToken().add(request);
-        
+
         request = new RequestSecurityTokenType();
         request.getAny().add(tokenType);
         request.getAny().add(requestType);
         validateTarget.setAny(token);
         request.getAny().add(validateTargetType);
         requestCollection.getRequestSecurityToken().add(request);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Validate a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             requestCollectionOperation.requestCollection(requestCollection, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertEquals(securityTokenResponse.size(), 2);
         assertTrue(validateResponse(securityTokenResponse.get(0)));
         assertTrue(validateResponse(securityTokenResponse.get(1)));
     }
-    
+
     /**
      * Test that calls Validate without a ValidateTarget
      */
     @org.junit.Test
     public void testNoToken() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new DummyTokenValidator());
         validateOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
             );
         request.getAny().add(tokenType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Validate a token
         try {
             validateOperation.validate(request, null, msgCtx);
@@ -195,26 +195,26 @@ public class ValidateUnitTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     /**
      * Test to validate a token of an unknown or missing TokenType value.
      */
     @org.junit.Test
     public void testTokenType() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new DummyTokenValidator());
         validateOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, "UnknownTokenType"
             );
@@ -222,16 +222,16 @@ public class ValidateUnitTest extends org.junit.Assert {
         ValidateTargetType validateTarget = new ValidateTargetType();
         JAXBElement<BinarySecurityTokenType> token = createToken();
         validateTarget.setAny(token);
-        JAXBElement<ValidateTargetType> validateTargetType = 
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Validate a token - failure expected on an unknown token type
         try {
             validateOperation.validate(request, null, msgCtx);
@@ -239,15 +239,15 @@ public class ValidateUnitTest extends org.junit.Assert {
         } catch (STSException ex) {
             // expected
         }
-        
+
         // Validate a token - no token type is sent, so it defaults to status
         request.getAny().remove(0);
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             validateOperation.validate(request, null, msgCtx);
         assertTrue(validateResponse(response));
     }
-    
-    
+
+
     /**
      * Test that sends a Context attribute when validating a token, and checks it gets
      * a response with the Context attribute properly set.
@@ -255,19 +255,19 @@ public class ValidateUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testContext() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new DummyTokenValidator());
         validateOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
             );
@@ -275,24 +275,24 @@ public class ValidateUnitTest extends org.junit.Assert {
         ValidateTargetType validateTarget = new ValidateTargetType();
         JAXBElement<BinarySecurityTokenType> token = createToken();
         validateTarget.setAny(token);
-        JAXBElement<ValidateTargetType> validateTargetType = 
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
         request.setContext("AuthenticationContext");
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Validate a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             validateOperation.validate(request, null, msgCtx);
         assertTrue(validateResponse(response));
         assertTrue("AuthenticationContext".equals(response.getContext()));
     }
-    
+
     /**
      * Mock up a (JAXB) BinarySecurityTokenType.
      */
@@ -302,19 +302,19 @@ public class ValidateUnitTest extends org.junit.Assert {
         binarySecurityToken.setValue("12345678");
         binarySecurityToken.setValueType(DummyTokenProvider.TOKEN_TYPE);
         binarySecurityToken.setEncodingType(DummyTokenProvider.BASE64_NS);
-        JAXBElement<BinarySecurityTokenType> tokenType = 
+        JAXBElement<BinarySecurityTokenType> tokenType =
             new JAXBElement<BinarySecurityTokenType>(
                 QNameConstants.BINARY_SECURITY_TOKEN, BinarySecurityTokenType.class, binarySecurityToken
             );
         return tokenType;
     }
-    
+
     /**
      * Return true if the response has a valid status, false otherwise
      */
     private boolean validateResponse(RequestSecurityTokenResponseType response) {
         assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
-        
+
         for (Object requestObject : response.getAny()) {
             if (requestObject instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;

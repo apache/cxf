@@ -109,10 +109,10 @@ public class OutboundSseEventImpl implements OutboundSseEvent {
                 data
             );
         }
-        
+
     }
     //CHECKSTYLE:OFF
-    OutboundSseEventImpl(String id, String name, String comment, long reconnectDelay, 
+    OutboundSseEventImpl(String id, String name, String comment, long reconnectDelay,
             Class<?> type, Type genericType, MediaType mediaType, Object data) {
         this.id = id;
         this.name = name;
@@ -124,7 +124,7 @@ public class OutboundSseEventImpl implements OutboundSseEvent {
         this.data = data;
     }
     //CHECKSTYLE:ON
-    
+
     @Override
     public String getId() {
         return id;

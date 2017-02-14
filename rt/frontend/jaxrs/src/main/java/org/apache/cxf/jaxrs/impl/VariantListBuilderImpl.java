@@ -30,14 +30,14 @@ import javax.ws.rs.core.Variant;
 import javax.ws.rs.core.Variant.VariantListBuilder;
 
 public class VariantListBuilderImpl extends VariantListBuilder {
-    
+
     private List<String> encodings = new ArrayList<>();
     private List<Locale> languages = new ArrayList<>();
     private List<MediaType> mediaTypes = new ArrayList<>();
     private List<Variant> variants = new ArrayList<>();
-    
+
     public VariantListBuilderImpl() {
-        
+
     }
 
     @Override
@@ -70,13 +70,13 @@ public class VariantListBuilderImpl extends VariantListBuilder {
         variants.clear();
         resetMeta();
     }
-    
+
     private void resetMeta() {
         mediaTypes.clear();
         languages.clear();
         encodings.clear();
     }
-    
+
     private void addVariants() {
         if (mediaTypes.size() > 0) {
             handleMediaTypes();
@@ -86,9 +86,9 @@ public class VariantListBuilderImpl extends VariantListBuilder {
             for (String enc : encodings) {
                 variants.add(new Variant(null, (Locale)null, enc));
             }
-        } 
+        }
     }
-    
+
     private void handleMediaTypes() {
         for (MediaType type : mediaTypes) {
             if (languages.size() > 0) {
@@ -102,13 +102,13 @@ public class VariantListBuilderImpl extends VariantListBuilder {
             }
         }
     }
-    
+
     private void handleLanguages(MediaType type) {
         for (Locale lang : languages) {
             if (encodings.size() > 0) {
                 for (String enc : encodings) {
                     variants.add(new Variant(type, lang, enc));
-                }    
+                }
             } else {
                 variants.add(new Variant(type, lang, null));
             }

@@ -33,7 +33,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
 
@@ -67,7 +67,7 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
             if (!"gzip".equals(contentEncoding)) {
                 jmsFault = JMSFaultFactory.createContentEncodingNotSupported(contentEncoding);
             }
-        } 
+        }
         if (jmsFault != null) {
             Fault f = createFault(message, jmsFault);
             if (f != null) {

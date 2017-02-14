@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response;
 public class AsyncInvokerImpl implements AsyncInvoker {
 
     private WebClient wc;
-    
+
     public AsyncInvokerImpl(WebClient wc) {
         this.wc = wc;
     }
@@ -192,27 +192,27 @@ public class AsyncInvokerImpl implements AsyncInvoker {
 
     @Override
     public <T> Future<T> method(String name, Entity<?> entity, Class<T> responseType) {
-        return wc.doInvokeAsync(name, 
-                             entity, 
-                             null, 
+        return wc.doInvokeAsync(name,
+                             entity,
+                             null,
                              null, responseType, responseType, null);
     }
 
     @Override
     public <T> Future<T> method(String name, Entity<?> entity, GenericType<T> responseType) {
-        return wc.doInvokeAsync(name, 
-                             entity, 
-                             null, 
+        return wc.doInvokeAsync(name,
+                             entity,
+                             null,
                              null, responseType.getRawType(), responseType.getType(), null);
     }
 
     @Override
     public <T> Future<T> method(String name, Entity<?> entity, InvocationCallback<T> callback) {
-        return wc.doInvokeAsyncCallback(name, 
-                                     entity, 
+        return wc.doInvokeAsyncCallback(name,
+                                     entity,
                                      null,
-                                     null, 
+                                     null,
                                      callback);
     }
-    
+
 }

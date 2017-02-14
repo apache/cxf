@@ -29,7 +29,7 @@ public class Activator implements BundleActivator {
     public void start(BundleContext context) throws Exception {
         try {
             BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
-                
+
                 @Override
                 public Object createNamespaceHandler() {
                     return new SimpleBPNamespaceHandler();
@@ -39,7 +39,7 @@ public class Activator implements BundleActivator {
         } catch (NoClassDefFoundError error) {
             // No Blueprint is available
         }
-        
+
     }
 
     @Override

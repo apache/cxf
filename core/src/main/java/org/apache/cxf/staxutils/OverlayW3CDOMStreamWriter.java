@@ -43,7 +43,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
 
     List<Boolean> isOverlaidStack = new LinkedList<Boolean>();
     Boolean textOverlay;
-    
+
     public OverlayW3CDOMStreamWriter(Document document) {
         super(document);
     }
@@ -107,7 +107,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 } catch (Throwable t) {
                     //ignore - non DOM level 3
                 }
-                if (nd2.getNodeType() == Node.ELEMENT_NODE 
+                if (nd2.getNodeType() == Node.ELEMENT_NODE
                     && local.equals(nd2.getLocalName())
                     && StringUtils.isEmpty(nd2.getNamespaceURI())
                     && userData != null) {
@@ -148,7 +148,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 } catch (Throwable t) {
                     //ignore - non DOM level 3
                 }
-                if (nd2.getNodeType() == Node.ELEMENT_NODE 
+                if (nd2.getNodeType() == Node.ELEMENT_NODE
                     && local.equals(nd2.getLocalName())
                     && namespace.equals(nd2.getNamespaceURI())
                     && userData == null) {
@@ -182,7 +182,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 } else {
                     nd2 = nd.getFirstChild();
                 }
-                
+
                 while (nd2 != null) {
                     Object userData = null;
                     try {
@@ -191,7 +191,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                         //ignore - non DOM level 3
                     }
 
-                    if (nd2.getNodeType() == Node.ELEMENT_NODE 
+                    if (nd2.getNodeType() == Node.ELEMENT_NODE
                         && local.equals(nd2.getLocalName())
                         && namespace.equals(nd2.getNamespaceURI())
                         && userData == null) {
@@ -212,7 +212,7 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
             textOverlay = false;
         }
     }
-    
+
     public void writeCharacters(String text) throws XMLStreamException {
         if (!isOverlaid || textOverlay == null) {
             super.writeCharacters(text);
@@ -226,8 +226,8 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
             }
             super.writeCharacters(text);
         }
-        
+
     }
 
-    
+
 }

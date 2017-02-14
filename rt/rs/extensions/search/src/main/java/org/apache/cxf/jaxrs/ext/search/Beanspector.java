@@ -35,7 +35,7 @@ import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
  * Bean introspection utility.
  */
 public class Beanspector<T> {
-    private final Map< Class< ? >, Class< ? > > primitiveWrappers = getPrimitiveWrappers();        
+    private final Map< Class< ? >, Class< ? > > primitiveWrappers = getPrimitiveWrappers();
 
     private Class<T> tclass;
     private T tobj;
@@ -107,7 +107,7 @@ public class Beanspector<T> {
                                        setters.keySet(), getters.keySet());
             throw new IntrospectionException(msg);
         }
-        return new TypeInfo(m.getReturnType(), m.getGenericReturnType(), 
+        return new TypeInfo(m.getReturnType(), m.getGenericReturnType(),
             primitiveToWrapper(m.getReturnType()));
     }
 
@@ -174,7 +174,7 @@ public class Beanspector<T> {
 
     private Map< Class< ? >, Class< ? > > getPrimitiveWrappers() {
         final Map< Class< ? >, Class< ? > > wrappers = new HashMap< Class< ? >, Class< ? > >();
-        
+
         wrappers.put(boolean.class, Boolean.class);
         wrappers.put(byte.class, Byte.class);
         wrappers.put(char.class, Character.class);
@@ -183,14 +183,14 @@ public class Beanspector<T> {
         wrappers.put(long.class, Long.class);
         wrappers.put(double.class, Double.class);
         wrappers.put(float.class, Float.class);
-        
+
         return wrappers;
     }
-    
+
     private Class< ? > primitiveToWrapper(final Class< ? > cls) {
         return cls.isPrimitive() ?  primitiveWrappers.get(cls) : cls;
     }
-    
+
     private boolean isGetter(Method m) {
         return m.getParameterTypes().length == 0
                && (m.getName().startsWith("get") || m.getName().startsWith("is"));
@@ -214,32 +214,32 @@ public class Beanspector<T> {
                && (m.getName().startsWith("set") || m.getName().startsWith("is"));
     }
 
-    
+
     public static class TypeInfo {
         private Class<?> cls;
         // The wrapper class in case cls is a primitive class (byte, long, ...)
-        private Class<?> wrapper; 
+        private Class<?> wrapper;
         private Type genericType;
         private CollectionCheckInfo checkInfo;
-        
+
         public TypeInfo(Class<?> cls, Type genericType) {
             this(cls, genericType, cls);
         }
-        
+
         public TypeInfo(Class<?> cls, Type genericType, Class<?> wrapper) {
             this.cls = cls;
             this.genericType = genericType;
             this.wrapper = wrapper;
         }
-        
+
         public Class<?> getTypeClass() {
             return cls;
         }
-        
+
         public Class<?> getWrappedTypeClass() {
             return wrapper;
         }
-        
+
         public Type getGenericType() {
             return genericType;
         }

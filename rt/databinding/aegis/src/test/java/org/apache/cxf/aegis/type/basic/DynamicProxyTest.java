@@ -36,7 +36,7 @@ public class DynamicProxyTest extends AbstractAegisTest {
         context.initialize();
         mapping = context.getTypeMapping();
     }
-    
+
     @Test
     public void testDynamicProxy() throws Exception {
         BeanType type = new BeanType();

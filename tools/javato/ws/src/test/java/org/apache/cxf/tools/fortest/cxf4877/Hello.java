@@ -39,4 +39,4 @@ public interface Hello {
     @WebMethod
     @Action
     SayHiResponse sayHi(SayHi s);
-} 
+}

@@ -28,7 +28,7 @@ import org.apache.cxf.tools.common.model.JavaAnnotatable;
 import org.apache.cxf.tools.common.model.JavaInterface;
 
 public final class WebServiceAnnotator implements Annotator {
-    
+
     public void annotate(JavaAnnotatable  ja) {
         JavaInterface intf = null;
         if (ja instanceof JavaInterface) {
@@ -37,10 +37,10 @@ public final class WebServiceAnnotator implements Annotator {
             throw new RuntimeException("WebService can only annotate JavaInterface");
         }
         JAnnotation serviceAnnotation = new JAnnotation(WebService.class);
-        serviceAnnotation.addElement(new JAnnotationElement("targetNamespace", 
+        serviceAnnotation.addElement(new JAnnotationElement("targetNamespace",
                                                                    intf.getNamespace()));
         serviceAnnotation.addElement(new JAnnotationElement("name", intf.getWebServiceName()));
-        
+
         intf.addAnnotation(serviceAnnotation);
     }
 }

@@ -47,8 +47,8 @@ import org.apache.wss4j.dom.validate.Validator;
  * it to a STS via WS-Trust. The default binding is "validate", but "issue" is also possible
  * by setting the "useIssueBinding" property. In this case, the credentials are sent via
  * "OnBehalfOf" unless the "useOnBehalfOf" property is set to "false", in which case the
- * credentials are used depending on the security policy of the STS endpoint (e.g. in a 
- * UsernameToken if this is what the policy requires). Setting "useOnBehalfOf" to "false" + 
+ * credentials are used depending on the security policy of the STS endpoint (e.g. in a
+ * UsernameToken if this is what the policy requires). Setting "useOnBehalfOf" to "false" +
  * "useIssueBinding" to "true" only works for validating UsernameTokens.
  */
 public class STSTokenValidator implements Validator {
@@ -59,10 +59,10 @@ public class STSTokenValidator implements Validator {
     private STSClient stsClient;
     private TokenStore tokenStore;
     private boolean disableCaching;
-    
+
     public STSTokenValidator() {
     }
-    
+
     /**
      * Construct a new instance.
      * @param alwaysValidateToSts whether to always validate the token to the STS
@@ -70,18 +70,18 @@ public class STSTokenValidator implements Validator {
     public STSTokenValidator(boolean alwaysValidateToSts) {
         this.alwaysValidateToSts = alwaysValidateToSts;
     }
-    
+
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
-        
+
         if (isValidatedLocally(credential, data)) {
             return credential;
         }
-        
+
         return validateWithSTS(credential, (Message)data.getMsgContext());
     }
-    
+
     public Credential validateWithSTS(Credential credential, Message message) throws WSSecurityException {
-        
+
         try {
             SecurityToken token = new SecurityToken();
             Element tokenElement = null;
@@ -104,7 +104,7 @@ public class STSTokenValidator implements Validator {
                 hash = credential.getSecurityContextToken().hashCode();
             }
             token.setToken(tokenElement);
-            
+
             TokenStore ts = null;
             if (!disableCaching) {
                 ts = getTokenStore(message);
@@ -122,26 +122,26 @@ public class STSTokenValidator implements Validator {
                 }
             }
             token.setTokenHash(hash);
-            
+
             STSClient c = stsClient;
             if (c == null) {
                 c = STSUtils.getClient(message, "sts");
             }
-            
+
             synchronized (c) {
                 System.setProperty("noprint", "true");
-                
+
                 SecurityToken returnedToken = null;
-                
+
                 if (useIssueBinding && useOnBehalfOf) {
                     ElementCallbackHandler callbackHandler = new ElementCallbackHandler(tokenElement);
                     c.setOnBehalfOf(callbackHandler);
                     returnedToken = c.requestSecurityToken();
                     c.setOnBehalfOf(null);
                 } else if (useIssueBinding && !useOnBehalfOf && credential.getUsernametoken() != null) {
-                    c.getProperties().put(SecurityConstants.USERNAME, 
+                    c.getProperties().put(SecurityConstants.USERNAME,
                                           credential.getUsernametoken().getName());
-                    c.getProperties().put(SecurityConstants.PASSWORD, 
+                    c.getProperties().put(SecurityConstants.PASSWORD,
                                           credential.getUsernametoken().getPassword());
                     returnedToken = c.requestSecurityToken();
                     c.getProperties().remove(SecurityConstants.USERNAME);
@@ -150,7 +150,7 @@ public class STSTokenValidator implements Validator {
                     List<SecurityToken> tokens = c.validateSecurityToken(token);
                     returnedToken = tokens.get(0);
                 }
-                
+
                 if (returnedToken != token) {
                     SamlAssertionWrapper assertion = new SamlAssertionWrapper(returnedToken.getToken());
                     credential.setTransformedToken(assertion);
@@ -169,18 +169,18 @@ public class STSTokenValidator implements Validator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, e, "invalidSAMLsecurity");
         }
     }
-    
+
     static final TokenStore getTokenStore(Message message) {
         if (message == null) {
             return null;
         }
-        
+
         return TokenStoreUtils.getTokenStore(message);
     }
-    
-    protected boolean isValidatedLocally(Credential credential, RequestData data) 
+
+    protected boolean isValidatedLocally(Credential credential, RequestData data)
         throws WSSecurityException {
-        
+
         if (!alwaysValidateToSts && credential.getSamlAssertion() != null) {
             try {
                 samlValidator.validate(credential, data);
@@ -212,7 +212,7 @@ public class STSTokenValidator implements Validator {
     public void setUseIssueBinding(boolean useIssueBinding) {
         this.useIssueBinding = useIssueBinding;
     }
-    
+
     public boolean isUseOnBehalfOf() {
         return useOnBehalfOf;
     }
@@ -220,7 +220,7 @@ public class STSTokenValidator implements Validator {
     public void setUseOnBehalfOf(boolean useOnBehalfOf) {
         this.useOnBehalfOf = useOnBehalfOf;
     }
-    
+
     public STSClient getStsClient() {
         return stsClient;
     }
@@ -246,19 +246,19 @@ public class STSTokenValidator implements Validator {
     }
 
     private static class ElementCallbackHandler implements CallbackHandler {
-        
+
         private final Element tokenElement;
-        
+
         ElementCallbackHandler(Element tokenElement) {
             this.tokenElement = tokenElement;
         }
-        
+
         public void handle(Callback[] callbacks)
             throws IOException, UnsupportedCallbackException {
             for (int i = 0; i < callbacks.length; i++) {
                 if (callbacks[i] instanceof DelegationCallback) {
                     DelegationCallback callback = (DelegationCallback) callbacks[i];
-                    
+
                     callback.setToken(tokenElement);
                 } else {
                     throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");

@@ -28,7 +28,7 @@ public class AddNumberImpl implements AddNumbersPortType {
         return null;
     }
 
-    public UserObject testCXF1752(List<Long> receivers, UserObject item, 
+    public UserObject testCXF1752(List<Long> receivers, UserObject item,
                                   byte[] binaryContent, UserObject[] objects,
                                   List<UserObject> objects2,
                                   String fileName) {

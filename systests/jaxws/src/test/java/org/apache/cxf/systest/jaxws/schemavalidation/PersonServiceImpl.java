@@ -21,8 +21,8 @@ package org.apache.cxf.systest.jaxws.schemavalidation;
 
 import javax.jws.WebService;
 
-@WebService(endpointInterface = "org.apache.cxf.systest.jaxws.schemavalidation.PersonService", 
-    serviceName = "PersonService", 
+@WebService(endpointInterface = "org.apache.cxf.systest.jaxws.schemavalidation.PersonService",
+    serviceName = "PersonService",
     targetNamespace = "http://org.apache.cxf/service/PersonService")
 public class PersonServiceImpl implements PersonService {
     @Override

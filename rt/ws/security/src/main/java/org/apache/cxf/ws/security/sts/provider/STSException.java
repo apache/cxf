@@ -22,7 +22,7 @@ package org.apache.cxf.ws.security.sts.provider;
 import javax.xml.namespace.QName;
 
 /**
- * A RuntimeException that can be thrown by an STS implementation. If the FaultCode is set, then this 
+ * A RuntimeException that can be thrown by an STS implementation. If the FaultCode is set, then this
  * code/String will be returned to the user, otherwise the Exception message is returned.
  */
 public class STSException extends RuntimeException {
@@ -31,7 +31,7 @@ public class STSException extends RuntimeException {
      * WS-Trust 1.3 namespace
      */
     public static final String WST_NS_05_12 = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
-    
+
     /**
      * Specification Fault Codes
      */
@@ -46,11 +46,11 @@ public class STSException extends RuntimeException {
     public static final QName INVALID_SCOPE = new QName(WST_NS_05_12, "InvalidScope");
     public static final QName RENEW_NEEDED = new QName(WST_NS_05_12, "RenewNeeded");
     public static final QName UNABLE_TO_RENEW = new QName(WST_NS_05_12, "UnableToRenew");
-    
+
     /**
      * A map of Fault Code to Fault Strings
      */
-    private static final java.util.Map<QName, String> FAULT_CODE_MAP = 
+    private static final java.util.Map<QName, String> FAULT_CODE_MAP =
             new java.util.HashMap<QName, String>();
 
     static {
@@ -66,24 +66,24 @@ public class STSException extends RuntimeException {
         FAULT_CODE_MAP.put(RENEW_NEEDED, "A renewable security token has expired");
         FAULT_CODE_MAP.put(UNABLE_TO_RENEW, "The requested renewal failed");
     }
-    
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 2186924985128534490L;
-    
-    
+
+
     private QName faultCode;
-    
+
     public STSException(String message) {
         super(message);
     }
-    
+
     public STSException(String message, QName faultCode) {
         super(message);
         this.faultCode = faultCode;
     }
-    
+
     public STSException(String message, Throwable e) {
         super(message, e);
     }
@@ -92,15 +92,15 @@ public class STSException extends RuntimeException {
         super(message, e);
         this.faultCode = faultCode;
     }
-    
+
     public void setFaultCode(QName faultCode) {
         this.faultCode = faultCode;
     }
-    
+
     public QName getFaultCode() {
         return faultCode;
     }
-    
+
     @Override
     public String getMessage() {
         if (faultCode != null && FAULT_CODE_MAP.get(faultCode) != null) {

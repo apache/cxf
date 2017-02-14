@@ -83,11 +83,11 @@ public class HandlerChainBuilder {
     public boolean isHandlerInitEnabled() {
         return handlerInitEnabled;
     }
-    
+
     /**
      * sorts the handlers into correct order. All of the logical handlers first
      * followed by the protocol handlers
-     * 
+     *
      * @param handlers
      * @return sorted list of handlers
      */
@@ -139,14 +139,14 @@ public class HandlerChainBuilder {
         }
         return handlerChain;
     }
-    
+
     /**
      * Resolve handler chain configuration file associated with the given class
-     * 
+     *
      * @param clz
      * @param filename
      * @return A URL object or null if no resource with this name is found
-     */    
+     */
     protected URL resolveHandlerChainFile(Class<?> clz, String filename) {
         URL handlerFile = clz.getResource(filename);
         if (handlerFile == null) {
@@ -157,11 +157,11 @@ public class HandlerChainBuilder {
                 handlerFile.openStream();
             } catch (Exception e) {
                 //do nothing
-            } 
+            }
         }
         return handlerFile;
-    } 
-    
+    }
+
     private void configureHandler(Handler<?> handler, PortComponentHandlerType h) {
         if (!handlerInitEnabled) {
             return;

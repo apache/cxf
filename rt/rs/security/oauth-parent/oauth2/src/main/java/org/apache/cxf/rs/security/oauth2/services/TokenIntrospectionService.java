@@ -56,7 +56,7 @@ public class TokenIntrospectionService {
         checkSecurityContext();
         String tokenId = params.getFirst(OAuthConstants.TOKEN_ID);
         ServerAccessToken at = dataProvider.getAccessToken(tokenId);
-        if (at == null || OAuthUtils.isExpired(at.getIssuedAt(), at.getExpiresIn())) { 
+        if (at == null || OAuthUtils.isExpired(at.getIssuedAt(), at.getExpiresIn())) {
             return new TokenIntrospection(false);
         }
         TokenIntrospection response = new TokenIntrospection(true);
@@ -77,18 +77,18 @@ public class TokenIntrospectionService {
         if (at.getIssuer() != null) {
             response.setIss(at.getIssuer());
         }
-        
+
         response.setIat(at.getIssuedAt());
         if (at.getExpiresIn() > 0) {
             response.setExp(at.getIssuedAt() + at.getExpiresIn());
         }
-        
+
         response.setTokenType(at.getTokenType());
-        
+
         if (reportExtraTokenProperties) {
             response.getExtensions().putAll(at.getExtraProperties());
         }
-        
+
         return response;
     }
 
@@ -102,7 +102,7 @@ public class TokenIntrospectionService {
             LOG.warning("Authenticated Principal is not available");
             ExceptionUtils.toNotAuthorizedException(null, null);
         }
-        
+
     }
 
     public void setBlockUnsecureRequests(boolean blockUnsecureRequests) {
@@ -116,7 +116,7 @@ public class TokenIntrospectionService {
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
     }
-    
+
     @Context
     public void setMessageContext(MessageContext context) {
         this.mc = context;

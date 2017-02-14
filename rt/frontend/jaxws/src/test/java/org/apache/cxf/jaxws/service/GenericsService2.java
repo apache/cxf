@@ -22,28 +22,28 @@ package org.apache.cxf.jaxws.service;
 import javax.jws.WebService;
 
 /**
- * 
+ *
  */
 @WebService(targetNamespace = "http://jaxws.cxf.apache.org/")
 public interface GenericsService2<T, P> {
     P convert(T t);
-    
+
     Value<P> convert2(Value<T> in);
-    
+
     class Value<V> {
         V val;
-        
+
         public Value() {
-            
+
         }
         public Value(V v) {
             val = v;
         }
-        
+
         public V getValue() {
             return val;
         }
-        
+
         public void setValue(V v) {
             val = v;
         }

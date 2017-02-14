@@ -39,19 +39,19 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 @Path("authorize-hybrid")
 public class OidcHybridService extends OidcImplicitService {
     private OidcAuthorizationCodeService codeService;
-    
+
     public OidcHybridService() {
         this(false);
     }
     public OidcHybridService(boolean hybridOnly) {
         super(getResponseTypes(hybridOnly), OAuthConstants.IMPLICIT_GRANT);
     }
-    
+
     private static Set<String> getResponseTypes(boolean hybridOnly) {
-        List<String> types = new ArrayList<>(); 
+        List<String> types = new ArrayList<>();
         types.addAll(
-            Arrays.asList(OidcUtils.CODE_AT_RESPONSE_TYPE, 
-                          OidcUtils.CODE_ID_TOKEN_RESPONSE_TYPE, 
+            Arrays.asList(OidcUtils.CODE_AT_RESPONSE_TYPE,
+                          OidcUtils.CODE_ID_TOKEN_RESPONSE_TYPE,
                           OidcUtils.CODE_ID_TOKEN_AT_RESPONSE_TYPE));
         if (!hybridOnly) {
             types.add(OidcUtils.ID_TOKEN_RESPONSE_TYPE);
@@ -59,14 +59,14 @@ public class OidcHybridService extends OidcImplicitService {
         }
         return new HashSet<>(types);
     }
-    
+
     @Override
     protected boolean canAccessTokenBeReturned(String responseType) {
         return OidcUtils.ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType)
             || OidcUtils.CODE_ID_TOKEN_AT_RESPONSE_TYPE.equals(responseType)
             || OidcUtils.CODE_AT_RESPONSE_TYPE.equals(responseType);
     }
-    
+
     @Override
     protected StringBuilder prepareRedirectResponse(OAuthRedirectionState state,
                                    Client client,
@@ -76,10 +76,10 @@ public class OidcHybridService extends OidcImplicitService {
                                    ServerAccessToken preAuthorizedToken) {
         ServerAuthorizationCodeGrant codeGrant = prepareHybrideCode(
             state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
-        
-        StringBuilder sb = super.prepareRedirectResponse(state, client, requestedScope, 
+
+        StringBuilder sb = super.prepareRedirectResponse(state, client, requestedScope,
                                                           approvedScope, userSubject, preAuthorizedToken);
-   
+
         if (codeGrant != null) {
             sb.append("&");
             sb.append(OAuthConstants.AUTHORIZATION_CODE_VALUE).append("=").append(codeGrant.getCode());
@@ -96,10 +96,10 @@ public class OidcHybridService extends OidcImplicitService {
                                                 ServerAccessToken preAuthorizedToken) {
         ServerAuthorizationCodeGrant codeGrant = prepareHybrideCode(
             state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
-        
-        AbstractFormImplicitResponse implResp = super.prepareFormResponse(state, client, requestedScope, 
+
+        AbstractFormImplicitResponse implResp = super.prepareFormResponse(state, client, requestedScope,
                                                           approvedScope, userSubject, preAuthorizedToken);
-   
+
         FormHybridResponse response = new FormHybridResponse();
         response.setResponseType(state.getResponseType());
         response.setRedirectUri(state.getRedirectUri());
@@ -110,8 +110,8 @@ public class OidcHybridService extends OidcImplicitService {
         }
         return response;
     }
-    
-    
+
+
     protected ServerAuthorizationCodeGrant prepareHybrideCode(OAuthRedirectionState state,
                                                 Client client,
                                                 List<String> requestedScope,
@@ -122,12 +122,12 @@ public class OidcHybridService extends OidcImplicitService {
         if (state.getResponseType() != null && state.getResponseType().startsWith(OAuthConstants.CODE_RESPONSE_TYPE)) {
             codeGrant = codeService.getGrantRepresentation(
                 state, client, requestedScope, approvedScope, userSubject, preAuthorizedToken);
-            JAXRSUtils.getCurrentMessage().getExchange().put(OAuthConstants.AUTHORIZATION_CODE_VALUE, 
+            JAXRSUtils.getCurrentMessage().getExchange().put(OAuthConstants.AUTHORIZATION_CODE_VALUE,
                                                              codeGrant.getCode());
         }
         return codeGrant;
     }
-    
+
     public void setCodeService(OidcAuthorizationCodeService codeService) {
         this.codeService = codeService;
     }

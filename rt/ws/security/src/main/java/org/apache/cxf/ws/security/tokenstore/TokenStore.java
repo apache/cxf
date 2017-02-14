@@ -26,32 +26,32 @@ import java.util.Collection;
  * to handle token expiration (e.g. by querying the SecurityToken's expires date).
  */
 public interface TokenStore {
-    
+
     /**
      * Add the given token to the cache. The SecurityTokens getId() identifier will be used to
      * key it in the cache.
      * @param token The token to be added
      */
     void add(SecurityToken token);
-    
+
     /**
      * Add the given token to the cache under the given identifier
      * @param identifier The identifier to use to key the SecurityToken in the cache
      * @param token The token to be added
      */
     void add(String identifier, SecurityToken token);
-    
+
     /**
      * Remove an existing token by its identifier
      */
     void remove(String identifier);
-    
+
     /**
      * Return the list of all valid token identifiers.
      * @return As array of (valid) token identifiers
      */
     Collection<String> getTokenIdentifiers();
-    
+
     /**
      * Returns the <code>Token</code> of the given identifier
      * @param identifier

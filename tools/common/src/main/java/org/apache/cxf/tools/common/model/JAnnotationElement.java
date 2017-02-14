@@ -90,7 +90,7 @@ public final class JAnnotationElement {
                     if (i < Array.getLength(value) - 1) {
                         sb.append(", ");
                     }
-                }                
+                }
                 sb.append("}");
             } else {
                 appendValue(sb, value);

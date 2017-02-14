@@ -53,11 +53,11 @@ public class PropertyUtil {
             }
         }
     }
-    
+
     public void load(InputStream is) throws IOException {
         load(is, DEFAULT_DELIM);
     }
-    
+
     public String getProperty(String key) {
         return this.maps.get(key);
     }

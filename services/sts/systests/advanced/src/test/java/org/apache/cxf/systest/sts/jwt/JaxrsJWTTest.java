@@ -50,12 +50,12 @@ import org.junit.BeforeClass;
  * service provider, which validates it.
  */
 public class JaxrsJWTTest extends AbstractBusClientServerTestBase {
-    
+
     public static final String JWT_TOKEN_TYPE = "urn:ietf:params:oauth:token-type:jwt";
     static final String STSPORT = allocatePort(STSServer.class);
 
     private static final String PORT = allocatePort(Server.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -71,7 +71,7 @@ public class JaxrsJWTTest extends AbstractBusClientServerTestBase {
                    launchServer(STSServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -89,25 +89,25 @@ public class JaxrsJWTTest extends AbstractBusClientServerTestBase {
         SpringBusFactory.setThreadDefaultBus(bus);
 
         final String address = "https://localhost:" + PORT + "/doubleit/services/doubleit-rs";
-        final int numToDouble = 25;  
-       
+        final int numToDouble = 25;
+
         List<Object> providers = Collections.singletonList(new JwtOutFilter());
-        
+
         WebClient client = WebClient.create(address, providers);
         client.type("text/plain").accept("text/plain");
-        
+
         STSClient stsClient = getSTSClient(JWT_TOKEN_TYPE, bus);
-        STSTokenOutInterceptor stsInterceptor = 
+        STSTokenOutInterceptor stsInterceptor =
             new STSTokenOutInterceptor(Phase.PRE_LOGICAL, stsClient, new TokenRequestParams());
         stsInterceptor.getBefore().add(JwtOutFilter.class.getName());
         WebClient.getConfig(client).getOutInterceptors().add(stsInterceptor);
-        
+
         int resp = client.post(numToDouble, Integer.class);
         org.junit.Assert.assertEquals(2 * numToDouble, resp);
-        
+
         bus.shutdown(true);
     }
-    
+
     private STSClient getSTSClient(
         String tokenType, Bus bus
     ) throws Exception {
@@ -121,7 +121,7 @@ public class JaxrsJWTTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            SecurityConstants.CALLBACK_HANDLER, 
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
 
@@ -131,20 +131,20 @@ public class JaxrsJWTTest extends AbstractBusClientServerTestBase {
 
         return stsClient;
     }
-    
+
     private static class JwtOutFilter implements ClientRequestFilter {
-        
+
         @Override
         public void filter(ClientRequestContext requestContext) throws IOException {
-            SecurityToken token = 
+            SecurityToken token =
                 (SecurityToken)requestContext.getProperty(SecurityConstants.TOKEN);
             if (token == null) {
                 Message m = PhaseInterceptorChain.getCurrentMessage();
                 token = (SecurityToken)m.getContextualProperty(SecurityConstants.TOKEN);
             }
-            
+
             if (token != null && token.getToken() != null) {
-                requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, 
+                requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION,
                                                       "JWT" + " " + token.getToken().getTextContent());
             }
         }

@@ -50,7 +50,7 @@ public class WrapperBeanFieldAnnotator implements Annotator {
                 JAnnotation mimeAnno = new JAnnotation(XmlMimeType.class);
                 mimeAnno.addElement(new JAnnotationElement("value", ((XmlMimeType)ann).value()));
                 jField.addAnnotation(mimeAnno);
-            } else if (ann instanceof XmlJavaTypeAdapter) {           
+            } else if (ann instanceof XmlJavaTypeAdapter) {
                 JAnnotation jaxbAnn = new JAnnotation(XmlJavaTypeAdapter.class);
                 jaxbAnn.addElement(new JAnnotationElement("value", ((XmlJavaTypeAdapter)ann).value()));
                 jaxbAnn.addElement(new JAnnotationElement("type", ((XmlJavaTypeAdapter)ann).type()));
@@ -67,11 +67,11 @@ public class WrapperBeanFieldAnnotator implements Annotator {
                 JAnnotation xmlElementAnnotation = new JAnnotation(XmlElement.class);
                 xmlElementAnnotation.addElement(new JAnnotationElement("name", el.name()));
                 if (!StringUtils.isEmpty(el.namespace())) {
-                    xmlElementAnnotation.addElement(new JAnnotationElement("namespace", 
+                    xmlElementAnnotation.addElement(new JAnnotationElement("namespace",
                                                                            el.namespace()));
                 }
                 if (el.nillable()) {
-                    xmlElementAnnotation.addElement(new JAnnotationElement("nillable", 
+                    xmlElementAnnotation.addElement(new JAnnotationElement("nillable",
                                                                            el.nillable(), true));
                 }
                 if (el.required()) {
@@ -79,7 +79,7 @@ public class WrapperBeanFieldAnnotator implements Annotator {
                                                                            el.required(), true));
                 }
                 if (!StringUtils.isEmpty(el.defaultValue())) {
-                    xmlElementAnnotation.addElement(new JAnnotationElement("defaultValue", 
+                    xmlElementAnnotation.addElement(new JAnnotationElement("defaultValue",
                                                                            el.defaultValue()));
                 }
                 jField.addAnnotation(xmlElementAnnotation);
@@ -89,7 +89,7 @@ public class WrapperBeanFieldAnnotator implements Annotator {
             JAnnotation xmlElementAnnotation = new JAnnotation(XmlElement.class);
             xmlElementAnnotation.addElement(new JAnnotationElement("name", rawName));
             if (!StringUtils.isEmpty(jField.getTargetNamespace())) {
-                xmlElementAnnotation.addElement(new JAnnotationElement("namespace", 
+                xmlElementAnnotation.addElement(new JAnnotationElement("namespace",
                                                                               jField.getTargetNamespace()));
             }
 

@@ -105,7 +105,7 @@ public class LogicalHandlerInterceptorTest extends Assert {
         control.verify();
     }
 
-    //JAX-WS spec: If handler returns false, for a request-response MEP, if the message 
+    //JAX-WS spec: If handler returns false, for a request-response MEP, if the message
     //direction is reversed during processing of a request message then the message
     //becomes a response message.
     //NOTE: commented out as this has been covered by other tests.

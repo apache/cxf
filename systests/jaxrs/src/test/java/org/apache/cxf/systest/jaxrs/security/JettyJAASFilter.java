@@ -45,5 +45,5 @@ public class JettyJAASFilter extends JAASAuthenticationFilter {
             }
         };
     }
-    
+
 }

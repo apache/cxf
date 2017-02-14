@@ -42,7 +42,7 @@ import org.apache.cxf.message.Message;
 public class WriterInterceptorMBW implements WriterInterceptor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WriterInterceptorMBW.class);
-    
+
     private MessageBodyWriter<Object> writer;
     private Message m;
     public WriterInterceptorMBW(MessageBodyWriter<Object> writer, Message m) {
@@ -53,28 +53,28 @@ public class WriterInterceptorMBW implements WriterInterceptor {
     public MessageBodyWriter<Object> getMBW() {
         return writer;
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public void aroundWriteTo(WriterInterceptorContext c) throws IOException, WebApplicationException {
-        
+
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
         }
-        
+
         MultivaluedMap<String, Object> headers = c.getHeaders();
         Object mtObject = headers.getFirst(HttpHeaders.CONTENT_TYPE);
         MediaType entityMt = mtObject == null ? c.getMediaType() : JAXRSUtils.toMediaType(mtObject.toString());
         m.put(Message.CONTENT_TYPE, entityMt.toString());
-        
+
         Class<?> entityCls = c.getType();
         Type entityType = c.getGenericType();
         Annotation[] entityAnns = c.getAnnotations();
-        
+
         if (writer == null
             || m.get(ProviderFactory.PROVIDER_SELECTION_PROPERTY_CHANGED) == Boolean.TRUE
             && !writer.isWriteable(entityCls, entityType, entityAnns, entityMt)) {
-            
+
             writer = (MessageBodyWriter<Object>)ProviderFactory.getInstance(m)
                 .createMessageBodyWriter(entityCls, entityType, entityAnns, entityMt, m);
             if (writer == null) {
@@ -82,17 +82,17 @@ public class WriterInterceptorMBW implements WriterInterceptor {
                 throw new ProcessingException(errorMessage);
             }
         }
-        
+
         HttpUtils.convertHeaderValuesToString(headers, true);
-        
-        writer.writeTo(c.getEntity(), 
-                       c.getType(), 
-                       c.getGenericType(), 
-                       c.getAnnotations(), 
-                       entityMt, 
-                       headers, 
+
+        writer.writeTo(c.getEntity(),
+                       c.getType(),
+                       c.getGenericType(),
+                       c.getAnnotations(),
+                       entityMt,
+                       headers,
                        c.getOutputStream());
     }
-    
-    
+
+
 }

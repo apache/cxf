@@ -36,11 +36,11 @@ public class ClientBuilderImpl extends ClientBuilder {
 
     private Configurable<ClientBuilder> configImpl;
     private TLSConfiguration secConfig = new TLSConfiguration();
-    
+
     public ClientBuilderImpl() {
         configImpl = new ClientConfigurableImpl<ClientBuilder>(this);
     }
-    
+
     @Override
     public Configuration getConfiguration() {
         return configImpl.getConfiguration();
@@ -114,7 +114,7 @@ public class ClientBuilderImpl extends ClientBuilder {
     public ClientBuilder keyStore(KeyStore store, char[] password) {
         secConfig.setSslContext(null);
         try {
-            KeyManagerFactory tmf = 
+            KeyManagerFactory tmf =
                 KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             tmf.init(store, password);
             secConfig.getTlsClientParams().setKeyManagers(tmf.getKeyManagers());
@@ -123,19 +123,19 @@ public class ClientBuilderImpl extends ClientBuilder {
         }
         return this;
     }
-    
+
     @Override
     public ClientBuilder trustStore(KeyStore store) {
         secConfig.setSslContext(null);
         try {
-            TrustManagerFactory tmf = 
+            TrustManagerFactory tmf =
                 TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(store);
             secConfig.getTlsClientParams().setTrustManagers(tmf.getTrustManagers());
         } catch (Exception ex) {
             throw new ProcessingException(ex);
         }
-        
+
         return this;
     }
 

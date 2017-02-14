@@ -31,7 +31,7 @@ import org.apache.htrace.core.TraceScope;
 import org.apache.htrace.core.Tracer;
 
 @Provider
-public class HTraceClientProvider extends AbstractHTraceClientProvider 
+public class HTraceClientProvider extends AbstractHTraceClientProvider
         implements ClientRequestFilter, ClientResponseFilter {
 
     public HTraceClientProvider(final Tracer tracer) {
@@ -40,19 +40,19 @@ public class HTraceClientProvider extends AbstractHTraceClientProvider
 
     @Override
     public void filter(final ClientRequestContext requestContext) throws IOException {
-        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(requestContext.getStringHeaders(), 
+        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(requestContext.getStringHeaders(),
             requestContext.getUri().toString(), requestContext.getMethod());
 
         if (holder != null) {
             requestContext.setProperty(TRACE_SPAN, holder);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public void filter(final ClientRequestContext requestContext,
             final ClientResponseContext responseContext) throws IOException {
-        final TraceScopeHolder<TraceScope> holder = 
+        final TraceScopeHolder<TraceScope> holder =
             (TraceScopeHolder<TraceScope>)requestContext.getProperty(TRACE_SPAN);
         super.stopTraceSpan(holder);
     }

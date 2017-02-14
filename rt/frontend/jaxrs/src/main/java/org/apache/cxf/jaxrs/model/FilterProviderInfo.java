@@ -31,13 +31,13 @@ public class FilterProviderInfo<T> extends ProviderInfo<T> {
     private Set<String> nameBinding;
     private Map<Class<?>, Integer> supportedContracts;
     private boolean dynamic;
-    
+
     public FilterProviderInfo(T provider,
                               Bus bus,
                               Map<Class<?>, Integer> supportedContracts) {
-        this(provider, bus, ProviderFactory.DEFAULT_FILTER_NAME_BINDING, false, supportedContracts);        
+        this(provider, bus, ProviderFactory.DEFAULT_FILTER_NAME_BINDING, false, supportedContracts);
     }
-    
+
     public FilterProviderInfo(T provider,
                               Bus bus,
                               String nameBinding,
@@ -56,7 +56,7 @@ public class FilterProviderInfo<T> extends ProviderInfo<T> {
     public int getPriority(Class<?> contract) {
         return supportedContracts.get(contract);
     }
-    
+
     public boolean isDynamic() {
         return dynamic;
     }

@@ -30,7 +30,7 @@ import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 
 public class CodeAuthSupplier implements HttpAuthSupplier {
     private volatile String code;
-    private BearerAuthSupplier tokenSupplier = new BearerAuthSupplier(); 
+    private BearerAuthSupplier tokenSupplier = new BearerAuthSupplier();
     public CodeAuthSupplier() {
     }
 
@@ -44,7 +44,7 @@ public class CodeAuthSupplier implements HttpAuthSupplier {
                                    String fullHeader) {
         if (code != null) {
             synchronized (tokenSupplier) {
-                if (tokenSupplier.getClientAccessToken().getTokenKey() == null) {    
+                if (tokenSupplier.getClientAccessToken().getTokenKey() == null) {
                     WebClient wc = tokenSupplier.createAccessTokenServiceClient();
                     ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
                                                     tokenSupplier.getConsumer(),

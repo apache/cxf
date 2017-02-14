@@ -38,7 +38,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class SoapActionInInterceptorTest extends Assert {
     private IMocksControl control;
@@ -50,7 +50,7 @@ public class SoapActionInInterceptorTest extends Assert {
 
     @Test
     public void testGetSoapActionForSOAP11() throws Exception {
-        SoapMessage message = setUpMessage("text/xml", Soap11.getInstance(), "urn:cxf"); 
+        SoapMessage message = setUpMessage("text/xml", Soap11.getInstance(), "urn:cxf");
         control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
@@ -59,7 +59,7 @@ public class SoapActionInInterceptorTest extends Assert {
 
     @Test
     public void testGetSoapActionForSOAP11None() throws Exception {
-        SoapMessage message = setUpMessage("text/xml", Soap11.getInstance(), null);  
+        SoapMessage message = setUpMessage("text/xml", Soap11.getInstance(), null);
         control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertNull(action);
@@ -86,7 +86,7 @@ public class SoapActionInInterceptorTest extends Assert {
 
     @Test
     public void testGetSoapActionForSOAP11SwA() throws Exception {
-        SoapMessage message = setUpMessage("multipart/related", Soap11.getInstance(), "urn:cxf"); 
+        SoapMessage message = setUpMessage("multipart/related", Soap11.getInstance(), "urn:cxf");
         control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
@@ -99,7 +99,7 @@ public class SoapActionInInterceptorTest extends Assert {
     public void testGetSoapActionForSOAP12SwAWithStartInfo() throws Exception {
         SoapMessage message = setUpMessage(
             "multipart/related; start-info=\"application/soap+xml; action=\\\"urn:cxf\\\"",
-            Soap12.getInstance(), null); 
+            Soap12.getInstance(), null);
         control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
@@ -113,7 +113,7 @@ public class SoapActionInInterceptorTest extends Assert {
     public void testGetSoapActionForSOAP12SwAWithAction() throws Exception {
         SoapMessage message = setUpMessage(
             "multipart/related; start-info=\"application/soap+xml\"; action=\"urn:cxf\"",
-            Soap12.getInstance(), null); 
+            Soap12.getInstance(), null);
         control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
@@ -126,7 +126,7 @@ public class SoapActionInInterceptorTest extends Assert {
     public void testGetSoapActionForSOAP12SwAWithActionInPartHeaders() throws Exception {
         SoapMessage message = setUpMessage(
             "multipart/related",
-            Soap12.getInstance(), "urn:cxf"); 
+            Soap12.getInstance(), "urn:cxf");
         control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
@@ -138,7 +138,7 @@ public class SoapActionInInterceptorTest extends Assert {
     public void testGetSoapActionForSOAP12SwANone() throws Exception {
         SoapMessage message = setUpMessage(
             "multipart/related",
-            Soap12.getInstance(), null); 
+            Soap12.getInstance(), null);
         control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertNull(action);
@@ -149,7 +149,7 @@ public class SoapActionInInterceptorTest extends Assert {
     public void testGetSoapActionForSOAP11MTOM() throws Exception {
         SoapMessage message = setUpMessage(
             "multipart/related; type=\"application/xop+xml\"; start-info=\"text/xml\"",
-            Soap11.getInstance(), "urn:cxf"); 
+            Soap11.getInstance(), "urn:cxf");
         control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
@@ -157,14 +157,14 @@ public class SoapActionInInterceptorTest extends Assert {
     }
 
     @Test
-    // some systems use this form, although this is not spec-conformant as 
+    // some systems use this form, although this is not spec-conformant as
     // the action property is not part of the multipart/related media type.
     // here the action propety is set as in start-info="application/soap+xml"; action="urn:cxf"
     public void testGetSoapActionForSOAP12MTOMWithAction() throws Exception {
         SoapMessage message = setUpMessage(
             "multipart/related; type=\"application/xop+xml\""
                 + "; start-info=\"application/soap+xml\"; action=\"urn:cxf\"",
-            Soap11.getInstance(), "urn:cxf"); 
+            Soap11.getInstance(), "urn:cxf");
         control.replay();
         String action = SoapActionInInterceptor.getSoapAction(message);
         assertEquals("urn:cxf", action);
@@ -178,7 +178,7 @@ public class SoapActionInInterceptorTest extends Assert {
         if (version instanceof Soap11 && prop != null) {
             headers.put("SOAPAction", Collections.singletonList(prop));
         } else if (version instanceof Soap12 && prop != null) {
-            partHeaders.put(Message.CONTENT_TYPE, 
+            partHeaders.put(Message.CONTENT_TYPE,
                             Collections.singletonList("application/soap+xml; action=\"" + prop + "\""));
         }
         EasyMock.expect(message.getVersion()).andReturn(version).anyTimes();

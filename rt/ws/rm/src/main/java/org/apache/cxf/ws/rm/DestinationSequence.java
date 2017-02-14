@@ -52,7 +52,7 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement.AcknowledgementRange
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 
 public class DestinationSequence extends AbstractSequence {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(DestinationSequence.class);
 
     private Destination destination;
@@ -70,17 +70,17 @@ public class DestinationSequence extends AbstractSequence {
     private List<Continuation> continuations = new LinkedList<Continuation>();
     // this map is used for robust and redelivery tracking. for redelivery it holds the beingDeliverd messages
     private Set<Long> deliveringMessageNumbers = new HashSet<>();
-    
+
     public DestinationSequence(Identifier i, EndpointReferenceType a, Destination d, ProtocolVariation pv) {
         this(i, a, 0, false, null, pv);
         destination = d;
     }
-    
+
     public DestinationSequence(Identifier i, EndpointReferenceType a,
                               long lmn, SequenceAcknowledgement ac, ProtocolVariation pv) {
         this(i, a, lmn, false, ac, pv);
     }
-    
+
     public DestinationSequence(Identifier i, EndpointReferenceType a,
                               long lmn, boolean t, SequenceAcknowledgement ac, ProtocolVariation pv) {
         super(i, pv);
@@ -94,35 +94,35 @@ public class DestinationSequence extends AbstractSequence {
         }
         monitor = new SequenceMonitor();
     }
-    
+
     /**
      * @return the acksTo address for the sequence
      */
     public EndpointReferenceType getAcksTo() {
         return acksTo;
     }
-    
+
     /**
      * @return the message number of the last message or 0 if the last message had not been received.
      */
     public long getLastMessageNumber() {
         return lastMessageNumber;
     }
-    
+
     /**
-     * @return the sequence acknowledgement presenting the sequences thus far received by a destination 
+     * @return the sequence acknowledgement presenting the sequences thus far received by a destination
      */
     public SequenceAcknowledgement getAcknowledgment() {
         return acknowledgement;
     }
-    
+
     /**
      * @return the identifier of the rm destination
      */
     public String getEndpointIdentifier() {
         return destination.getName();
     }
-    
+
     public void acknowledge(Message message) throws SequenceFault {
         RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
         SequenceType st = rmps.getSequence();
@@ -132,17 +132,17 @@ public class DestinationSequence extends AbstractSequence {
             RMConstants consts = getProtocol().getConstants();
             SequenceFaultFactory sff = new SequenceFaultFactory(consts);
             throw sff.createSequenceTerminatedFault(st.getIdentifier(), false);
-        }        
-        
+        }
+
         monitor.acknowledgeMessage();
         boolean updated = false;
-        
+
         synchronized (this) {
             boolean done = false;
             int i = 0;
             for (; i < acknowledgement.getAcknowledgementRange().size(); i++) {
                 AcknowledgementRange r = acknowledgement.getAcknowledgementRange().get(i);
-                if (r.getLower().compareTo(messageNumber) <= 0 
+                if (r.getLower().compareTo(messageNumber) <= 0
                     && r.getUpper().compareTo(messageNumber) >= 0) {
                     done = true;
                     break;
@@ -163,7 +163,7 @@ public class DestinationSequence extends AbstractSequence {
             }
 
             if (!done) {
-                
+
                 // need new acknowledgement range
                 AcknowledgementRange range = new AcknowledgementRange();
                 range.setLower(messageNumber);
@@ -171,10 +171,10 @@ public class DestinationSequence extends AbstractSequence {
                 updated = true;
                 acknowledgement.getAcknowledgementRange().add(i, range);
                 if (acknowledgement.getAcknowledgementRange().size() > 1) {
-                    
+
                     // acknowledge out-of-order at first opportunity
                     scheduleImmediateAcknowledgement();
-                    
+
                 }
             }
             mergeRanges();
@@ -219,17 +219,17 @@ public class DestinationSequence extends AbstractSequence {
             }
         }
         deliveringMessageNumbers.add(messageNumber);
-        
+
         RMEndpoint reliableEndpoint = destination.getReliableEndpoint();
         RMConfiguration cfg = reliableEndpoint.getConfiguration();
-        
+
         if (null == rmps.getCloseSequence()) {
             scheduleAcknowledgement(cfg.getAcknowledgementIntervalTime());
         }
         long inactivityTimeout = cfg.getInactivityTimeoutTime();
         scheduleSequenceTermination(inactivityTimeout);
     }
-    
+
     void mergeRanges() {
         List<AcknowledgementRange> ranges = acknowledgement.getAcknowledgementRange();
         for (int i = ranges.size() - 1; i > 0; i--) {
@@ -241,39 +241,39 @@ public class DestinationSequence extends AbstractSequence {
             }
         }
     }
-    
+
     void setDestination(Destination d) {
         destination = d;
     }
-    
+
     Destination getDestination() {
         return destination;
     }
-    
+
     /**
      * Returns the monitor for this sequence.
-     * 
+     *
      * @return the sequence monitor.
      */
     SequenceMonitor getMonitor() {
         return monitor;
     }
-    
+
     void setLastMessageNumber(long lmn) {
         lastMessageNumber = lmn;
     }
-      
+
     boolean canPiggybackAckOnPartialResponse() {
         // TODO: should also check if we allow breaking the WI Profile rule by which no headers
         // can be included in a HTTP response
         return getAcksTo().getAddress().getValue().equals(RMUtils.getAddressingConstants().getAnonymousURI());
     }
-    
+
     /**
      * Ensures that the delivery assurance is honored.
      * If the delivery assurance includes either AtLeastOnce or ExactlyOnce, combined with InOrder, this
      * queues out-of-order messages for processing after the missing messages have been received.
-     * 
+     *
      * @param mn message number
      * @return <code>true</code> if message processing to continue, <code>false</code> if to be dropped
      */
@@ -288,7 +288,7 @@ public class DestinationSequence extends AbstractSequence {
         if (message != null) {
             robust = MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY));
             if (robust) {
-                robustDelivering = 
+                robustDelivering =
                     MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY));
             }
         }
@@ -303,7 +303,7 @@ public class DestinationSequence extends AbstractSequence {
         if (inOrder) {
             nextInOrder++;
         } else {
-            
+
             // message out of order, schedule acknowledgement to update sender
             scheduleImmediateAcknowledgement();
             if (nextInOrder < mn) {
@@ -313,13 +313,13 @@ public class DestinationSequence extends AbstractSequence {
         if (cont != null && config.isInOrder() && !cont.isNew()) {
             return waitInQueue(mn, canSkip, message, cont);
         }
-        if ((da == DeliveryAssurance.EXACTLY_ONCE || da == DeliveryAssurance.AT_MOST_ONCE) 
+        if ((da == DeliveryAssurance.EXACTLY_ONCE || da == DeliveryAssurance.AT_MOST_ONCE)
             && (isAcknowledged(mn) || (robustDelivering && deliveringMessageNumbers.contains(mn)))) {
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
                 "MESSAGE_ALREADY_DELIVERED_EXC", LOG, mn, getIdentifier().getValue());
             LOG.log(Level.INFO, msg.toString());
             return false;
-        } 
+        }
         if (robustDelivering) {
             addDeliveringMessageNumber(mn);
         }
@@ -328,7 +328,7 @@ public class DestinationSequence extends AbstractSequence {
         }
         return true;
     }
-    
+
     void removeDeliveringMessageNumber(long mn) {
         synchronized (deliveringMessageNumbers) {
             deliveringMessageNumbers.remove(mn);
@@ -339,7 +339,7 @@ public class DestinationSequence extends AbstractSequence {
             deliveringMessageNumbers.add(mn);
         }
     }
-    
+
     // this method is only used for redelivery
     boolean allAcknowledgedMessagesDelivered() {
         return deliveringMessageNumbers.isEmpty();
@@ -351,11 +351,11 @@ public class DestinationSequence extends AbstractSequence {
         }
         return message.get(Continuation.class);
     }
-    
+
     synchronized boolean waitInQueue(long mn, boolean canSkip,
                                      Message message, Continuation continuation) {
         while (true) {
-            
+
             // can process now if no other in process and this one is next
             if (inProcessNumber == 0) {
                 long diff = mn - highNumberCompleted;
@@ -364,7 +364,7 @@ public class DestinationSequence extends AbstractSequence {
                     return true;
                 }
             }
-            
+
             // can abort now if same message in process or already processed
             if (mn == inProcessNumber || isAcknowledged(mn)) {
                 return false;
@@ -390,7 +390,7 @@ public class DestinationSequence extends AbstractSequence {
             try {
                 //if we get here, there isn't a continuation available
                 //so we need to block/wait
-                wait();                        
+                wait();
             } catch (InterruptedException ie) {
                 // ignore
             }
@@ -403,13 +403,13 @@ public class DestinationSequence extends AbstractSequence {
         }
         notifyAll();
     }
-    
+
     synchronized void processingComplete(long mn) {
         inProcessNumber = 0;
         highNumberCompleted = mn;
         wakeupAll();
     }
-    
+
     void purgeAcknowledged(long messageNr) {
         RMStore store = destination.getManager().getStore();
         if (null == store) {
@@ -428,11 +428,11 @@ public class DestinationSequence extends AbstractSequence {
     public boolean sendAcknowledgement() {
         return acknowledgeOnNextOccasion;
     }
-    
+
     List<DeferredAcknowledgment> getDeferredAcknowledgements() {
         return deferredAcknowledgments;
     }
-    
+
     /**
      * The correlation of the incoming CreateSequence call used to create this
      * sequence is recorded so that in the absence of an offer, the corresponding
@@ -441,24 +441,24 @@ public class DestinationSequence extends AbstractSequence {
     void setCorrelationID(String cid) {
         correlationID = cid;
     }
-   
+
     String getCorrelationID() {
         return correlationID;
     }
 
-    void scheduleAcknowledgement(long acknowledgementInterval) {  
+    void scheduleAcknowledgement(long acknowledgementInterval) {
         AcksPolicyType ap = destination.getManager().getDestinationPolicy().getAcksPolicy();
- 
+
         if (acknowledgementInterval > 0 && getMonitor().getMPM() >= (ap == null ? 10 : ap.getIntraMessageThreshold())) {
             LOG.fine("Schedule deferred acknowledgment");
             scheduleDeferredAcknowledgement(acknowledgementInterval);
         } else {
             LOG.fine("Schedule immediate acknowledgment");
             scheduleImmediateAcknowledgement();
-            
+
             destination.getManager().getTimer().schedule(
                 new ImmediateFallbackAcknowledgment(), ap == null ? 1000L : ap.getImmediaAcksTimeout());
-           
+
         }
     }
 
@@ -466,8 +466,8 @@ public class DestinationSequence extends AbstractSequence {
     void scheduleImmediateAcknowledgement() {
         acknowledgeOnNextOccasion = true;
     }
-    
-    synchronized void scheduleSequenceTermination(long inactivityTimeout) { 
+
+    synchronized void scheduleSequenceTermination(long inactivityTimeout) {
         if (inactivityTimeout <= 0) {
             return;
         }
@@ -482,7 +482,7 @@ public class DestinationSequence extends AbstractSequence {
     }
 
     synchronized void scheduleDeferredAcknowledgement(long delay) {
-        
+
         if (null == deferredAcknowledgments) {
             deferredAcknowledgments = new ArrayList<>();
         }
@@ -498,7 +498,7 @@ public class DestinationSequence extends AbstractSequence {
         destination.getManager().getTimer().schedule(da, delay);
         LOG.fine("Scheduled acknowledgment to be sent in " + delay + " ms");
     }
-    
+
     synchronized void cancelDeferredAcknowledgments() {
         if (null == deferredAcknowledgments) {
             return;
@@ -508,7 +508,7 @@ public class DestinationSequence extends AbstractSequence {
             da.cancel();
         }
     }
-    
+
     synchronized void cancelTermination() {
         if (null != scheduledTermination) {
             scheduledTermination.cancel();
@@ -521,7 +521,7 @@ public class DestinationSequence extends AbstractSequence {
             LOG.fine("timer task: send acknowledgment.");
             DestinationSequence.this.scheduleImmediateAcknowledgement();
 
-            try {                
+            try {
                 RMEndpoint rme = destination.getReliableEndpoint();
                 Proxy proxy = rme.getProxy();
                 proxy.acknowledge(DestinationSequence.this);
@@ -531,12 +531,12 @@ public class DestinationSequence extends AbstractSequence {
                 synchronized (DestinationSequence.this) {
                     DestinationSequence.this.deferredAcknowledgments.remove(this);
                 }
-               
+
             }
 
         }
     }
-    
+
     final class ImmediateFallbackAcknowledgment extends TimerTask {
         public void run() {
             LOG.fine("timer task: send acknowledgment.");
@@ -545,11 +545,11 @@ public class DestinationSequence extends AbstractSequence {
                 return;
             }
 
-            try {                
+            try {
                 destination.getReliableEndpoint().getProxy().acknowledge(DestinationSequence.this);
             } catch (RMException ex) {
                 // already logged
-            } 
+            }
         }
     }
 
@@ -564,19 +564,19 @@ public class DestinationSequence extends AbstractSequence {
             store.persistIncoming(this, null);
         }
     }
-    
+
     public boolean isTerminated() {
         return terminated;
     }
-    
+
     final class SequenceTermination extends TimerTask {
-        
+
         private long maxInactivityTimeout;
-        
+
         void updateInactivityTimeout(long timeout) {
             maxInactivityTimeout = Math.max(maxInactivityTimeout, timeout);
         }
-        
+
         public void run() {
             synchronized (DestinationSequence.this) {
                 DestinationSequence.this.scheduledTermination = null;
@@ -584,19 +584,19 @@ public class DestinationSequence extends AbstractSequence {
                 long lat = Math.max(rme.getLastControlMessage(), rme.getLastApplicationMessage());
                 if (0 == lat) {
                     return;
-                }                
+                }
                 long now = System.currentTimeMillis();
                 if (now - lat >= maxInactivityTimeout) {
-                    
+
                     // terminate regardless outstanding acknowledgments - as we assume that the client is
                     // gone there is no point in sending a SequenceAcknowledgment
-                    
-                    LogUtils.log(LOG, Level.WARNING, "TERMINATING_INACTIVE_SEQ_MSG", 
+
+                    LogUtils.log(LOG, Level.WARNING, "TERMINATING_INACTIVE_SEQ_MSG",
                                  DestinationSequence.this.getIdentifier().getValue());
                     DestinationSequence.this.destination.terminateSequence(DestinationSequence.this);
 
                 } else {
-                   // reschedule 
+                   // reschedule
                     SequenceTermination st = new SequenceTermination();
                     st.updateInactivityTimeout(maxInactivityTimeout);
                     DestinationSequence.this.destination.getManager().getTimer()

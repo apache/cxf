@@ -45,8 +45,8 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
     private final SOAPPart part;
     private final SOAPEnvelope envelope;
     private String uri;
-    
-    
+
+
     public SAAJStreamWriter(SOAPPart part) {
         super(part);
         this.part = part;
@@ -73,7 +73,7 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         this.envelope = env;
         isOverlaid = false;
     }
-    
+
     @Override
     public String getPrefix(String nsuri) throws XMLStreamException {
         if (isOverlaid && part != null && getCurrentNode() == null) {
@@ -105,11 +105,11 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         }
         return envelope;
     }
-    
+
     protected void adjustOverlaidNode(Node nd2, String pfx) {
         String namespace = nd2.getNamespaceURI();
         try {
-            if (namespace != null 
+            if (namespace != null
                 && namespace.equals(getEnvelopeURI())) {
                 adjustPrefix((SOAPElement)nd2, pfx);
                 if ("Envelope".equals(nd2.getLocalName())) {
@@ -121,14 +121,14 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         }
         super.adjustOverlaidNode(nd2, pfx);
     }
-    
+
     protected void createAndAddElement(String prefix, String local, String namespace) {
         if (part == null) {
             super.createAndAddElement(prefix, local, namespace);
             return;
         }
         try {
-            if (namespace != null 
+            if (namespace != null
                 && namespace.equals(getEnvelopeURI())) {
                 if ("Envelope".equals(local)) {
                     setChild(adjustPrefix(getEnvelope(), prefix), false);
@@ -152,7 +152,7 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
                 } else if ("Fault".equals(local)) {
                     SOAPFault f = getEnvelope().getBody().getFault();
                     if (f == null) {
-                        Element el = getDocument().createElementNS(namespace, 
+                        Element el = getDocument().createElementNS(namespace,
                                              StringUtils.isEmpty(prefix) ? local : prefix + ":" + local);
                         getEnvelope().getBody().appendChild(el);
                         f = getEnvelope().getBody().getFault();
@@ -187,7 +187,7 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         }
         super.createAndAddElement(prefix, local, namespace);
     }
-    
+
     @Override
     protected Element createElementNS(String ns, String pfx, String local) {
         Element cur = getCurrentNode();
@@ -229,5 +229,5 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         }
         return super.createElementNS(ns, pfx, local);
     }
-    
+
 }

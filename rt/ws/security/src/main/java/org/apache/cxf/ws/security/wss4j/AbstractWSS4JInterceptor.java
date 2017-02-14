@@ -44,11 +44,11 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.handler.WSHandler;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 
-public abstract class AbstractWSS4JInterceptor extends WSHandler implements SoapInterceptor, 
+public abstract class AbstractWSS4JInterceptor extends WSHandler implements SoapInterceptor,
     PhaseInterceptor<SoapMessage> {
 
     private static final Set<QName> HEADERS = new HashSet<>();
-    
+
     static {
         HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
         HEADERS.add(new QName(WSConstants.ENC_NS, "EncryptedData"));
@@ -60,7 +60,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     private final Set<String> after = new HashSet<>();
     private String phase;
     private String id;
-    
+
     public AbstractWSS4JInterceptor() {
         super();
         id = getClass().getName();
@@ -145,43 +145,43 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
 
     protected boolean isRequestor(SoapMessage message) {
         return MessageUtils.isRequestor(message);
-    }  
-    
+    }
+
     protected void translateProperties(SoapMessage msg) {
         String bspCompliant = (String)msg.getContextualProperty(SecurityConstants.IS_BSP_COMPLIANT);
         if (bspCompliant != null) {
             msg.put(WSHandlerConstants.IS_BSP_COMPLIANT, bspCompliant);
         }
-        String futureTTL = 
+        String futureTTL =
             (String)msg.getContextualProperty(SecurityConstants.TIMESTAMP_FUTURE_TTL);
         if (futureTTL != null) {
             msg.put(WSHandlerConstants.TTL_FUTURE_TIMESTAMP, futureTTL);
         }
-        String ttl = 
+        String ttl =
                 (String)msg.getContextualProperty(SecurityConstants.TIMESTAMP_TTL);
         if (ttl != null) {
             msg.put(WSHandlerConstants.TTL_TIMESTAMP, ttl);
         }
-        
-        String utFutureTTL = 
+
+        String utFutureTTL =
             (String)msg.getContextualProperty(SecurityConstants.USERNAMETOKEN_FUTURE_TTL);
         if (utFutureTTL != null) {
             msg.put(WSHandlerConstants.TTL_FUTURE_USERNAMETOKEN, utFutureTTL);
         }
-        String utTTL = 
+        String utTTL =
             (String)msg.getContextualProperty(SecurityConstants.USERNAMETOKEN_TTL);
         if (utTTL != null) {
             msg.put(WSHandlerConstants.TTL_USERNAMETOKEN, utTTL);
         }
-        
-        String certConstraints = 
+
+        String certConstraints =
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SUBJECT_CERT_CONSTRAINTS, msg);
         if (certConstraints != null) {
             msg.put(WSHandlerConstants.SIG_SUBJECT_CERT_CONSTRAINTS, certConstraints);
         }
-        
+
         // Now set SAML SenderVouches + Holder Of Key requirements
-        String valSAMLSubjectConf = 
+        String valSAMLSubjectConf =
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION,
                                                            msg);
         boolean validateSAMLSubjectConf = true;
@@ -189,11 +189,11 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
             validateSAMLSubjectConf = Boolean.parseBoolean(valSAMLSubjectConf);
         }
         msg.put(
-            WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION, 
+            WSHandlerConstants.VALIDATE_SAML_SUBJECT_CONFIRMATION,
             Boolean.toString(validateSAMLSubjectConf)
         );
-        
-        PasswordEncryptor passwordEncryptor = 
+
+        PasswordEncryptor passwordEncryptor =
             (PasswordEncryptor)msg.getContextualProperty(SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE);
         if (passwordEncryptor != null) {
             msg.put(ConfigurationConstants.PASSWORD_ENCRYPTOR_INSTANCE, passwordEncryptor);
@@ -202,16 +202,16 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
 
     @Override
     protected Crypto loadCryptoFromPropertiesFile(
-        String propFilename, 
+        String propFilename,
         RequestData reqData
     ) throws WSSecurityException {
         Message message = (Message)reqData.getMsgContext();
         ClassLoader classLoader = this.getClassLoader(reqData.getMsgContext());
         PasswordEncryptor passwordEncryptor = getPasswordEncryptor(reqData);
-        return 
+        return
             WSS4JUtils.loadCryptoFromPropertiesFile(
                 message, propFilename, classLoader, passwordEncryptor
             );
     }
-    
+
 }

@@ -65,19 +65,19 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         String text = wc.accept("text/plain").get(String.class);
         assertEquals("Hello, world!", text);
     }
-    
+
     @Test
     public void testGetHelloWorldTextObservableSync() throws Exception {
         String address = "http://localhost:" + PORT + "/reactive/text";
         WebClient wc = WebClient.create(address, Collections.singletonList(
             new ObservableReader<Object>()));
-        GenericType<Observable<String>> genericResponseType = 
-            new GenericType<Observable<String>>() {        
+        GenericType<Observable<String>> genericResponseType =
+            new GenericType<Observable<String>>() {
             };
         Observable<String> obs = wc.accept("text/plain").get(genericResponseType);
         obs.subscribe(s -> assertResponse(s));
     }
-    
+
     private void assertResponse(String s) {
         assertEquals("Hello, world!", s);
     }
@@ -114,9 +114,9 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(address,
                                         Collections.singletonList(new JacksonJsonProvider()));
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
-        GenericType<List<HelloWorldBean>> genericResponseType = new GenericType<List<HelloWorldBean>>() {        
+        GenericType<List<HelloWorldBean>> genericResponseType = new GenericType<List<HelloWorldBean>>() {
         };
-        
+
         List<HelloWorldBean> beans = wc.accept("application/json").get(genericResponseType);
         assertEquals(2, beans.size());
         assertEquals("Hello", beans.get(0).getGreeting());
@@ -124,7 +124,7 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         assertEquals("Ciao", beans.get(1).getGreeting());
         assertEquals("World", beans.get(1).getAudience());
     }
-    
+
     @Test
     public void testGetHelloWorldAsyncObservable() throws Exception {
         String address = "http://localhost:" + PORT + "/reactive/textAsync";
@@ -133,12 +133,12 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         Observable<String> obs = wc.accept("text/plain")
             .rx(ObservableRxInvoker.class)
             .get(String.class);
-        obs.map(s -> { 
-            return s + s; 
+        obs.map(s -> {
+            return s + s;
         });
-        
+
         Thread.sleep(3000);
-        
+
         obs.subscribe(s -> assertDuplicateResponse(s));
     }
     @Test
@@ -152,7 +152,7 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
             },
             t -> validateT((ExecutionException)t));
     }
-    
+
     private void validateT(ExecutionException t) {
         assertTrue(t.getCause() instanceof NotFoundException);
     }

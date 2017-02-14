@@ -65,7 +65,7 @@ public class HugeResponseInterceptor extends AbstractPhaseInterceptor<Message> {
                 CachedOutputStream bos = new CachedOutputStream();
                 try {
                     is = getClass().getClassLoader().getResourceAsStream(
-                        "org/apache/cxf/systest/dispatch/resources/" 
+                        "org/apache/cxf/systest/dispatch/resources/"
                         + "GreetMeDocLiteralRespBreakElementCountThreshold.xml");
                     IOUtils.copy(is, bos);
                     bos.flush();

@@ -37,16 +37,16 @@ import org.apache.cxf.transport.https.httpclient.DefaultHostnameVerifier;
 import org.apache.cxf.transport.https.httpclient.PublicSuffixMatcherLoader;
 
 public final class SSLUtils {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(SSLUtils.class);
-                              
+
     private SSLUtils() {
         //Helper class
     }
-    
+
     public static HostnameVerifier getHostnameVerifier(TLSClientParameters tlsClientParameters) {
         HostnameVerifier verifier;
-        
+
         if (tlsClientParameters.getHostnameVerifier() != null) {
             verifier = tlsClientParameters.getHostnameVerifier();
         } else if (tlsClientParameters.isUseHttpsURLConnectionDefaultHostnameVerifier()) {
@@ -58,7 +58,7 @@ public final class SSLUtils {
         }
         return verifier;
     }
-    
+
     public static SSLContext getSSLContext(TLSParameterBase parameters) throws GeneralSecurityException {
         // TODO do we need to cache the context
         String provider = parameters.getJsseProvider();
@@ -68,23 +68,23 @@ public final class SSLUtils {
 
         SSLContext ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
             .getInstance(protocol, provider);
-        
+
         if (parameters instanceof TLSClientParameters) {
             ctx.getClientSessionContext().setSessionTimeout(((TLSClientParameters)parameters).getSslCacheTimeout());
         }
-        
+
         KeyManager[] keyManagers = parameters.getKeyManagers();
         if (keyManagers == null && parameters instanceof TLSClientParameters) {
             keyManagers = org.apache.cxf.configuration.jsse.SSLUtils.getDefaultKeyStoreManagers(LOG);
         }
         configureKeyManagersWithCertAlias(parameters, keyManagers);
-        
+
         ctx.init(keyManagers, parameters.getTrustManagers(),
                  parameters.getSecureRandom());
-        
+
         return ctx;
     }
-        
+
     public static void configureKeyManagersWithCertAlias(TLSParameterBase tlsParameters,
                                                       KeyManager[] keyManagers)
         throws GeneralSecurityException {
@@ -102,7 +102,7 @@ public final class SSLUtils {
             }
         }
     }
-    
+
     public static SSLEngine createServerSSLEngine(TLSServerParameters parameters) throws Exception {
         SSLContext sslContext = getSSLContext(parameters);
         SSLEngine serverEngine = sslContext.createSSLEngine();
@@ -110,13 +110,13 @@ public final class SSLUtils {
         serverEngine.setNeedClientAuth(parameters.getClientAuthentication().isRequired());
         return serverEngine;
     }
-    
+
     public static SSLEngine createClientSSLEngine(TLSClientParameters parameters) throws Exception {
         SSLContext sslContext = getSSLContext(parameters);
         SSLEngine clientEngine = sslContext.createSSLEngine();
         clientEngine.setUseClientMode(true);
         return clientEngine;
     }
-    
+
 
 }

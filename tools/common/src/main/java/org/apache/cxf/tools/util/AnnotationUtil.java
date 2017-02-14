@@ -42,7 +42,7 @@ public final class AnnotationUtil {
     private AnnotationUtil() {
 
     }
-    
+
     public static <T extends Annotation> T getPrivClassAnnotation(final Class<?> clazz,
                                                                   final Class<T> anoClass) {
         return AccessController.doPrivileged(new PrivilegedAction<T>() {

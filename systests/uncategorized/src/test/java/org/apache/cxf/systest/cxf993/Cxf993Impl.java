@@ -22,7 +22,7 @@ package org.apache.cxf.systest.cxf993;
 import testnotification.NotificationServicePort;
 
 /**
- * 
+ *
  */
 
 public class Cxf993Impl implements NotificationServicePort {

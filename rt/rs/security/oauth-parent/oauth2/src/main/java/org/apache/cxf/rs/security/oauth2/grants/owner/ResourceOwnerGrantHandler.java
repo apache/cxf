@@ -33,14 +33,14 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  */
 public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
     private ResourceOwnerLoginHandler loginHandler;
-    
+
     public ResourceOwnerGrantHandler() {
         super(OAuthConstants.RESOURCE_OWNER_GRANT);
     }
 
     public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
-        
+
         String ownerName = params.getFirst(OAuthConstants.RESOURCE_OWNER_NAME);
         String ownerPassword = params.getFirst(OAuthConstants.RESOURCE_OWNER_PASSWORD);
         if (ownerName == null || ownerPassword == null) {
@@ -53,7 +53,7 @@ public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
         }
         return doCreateAccessToken(client, subject, params);
     }
-    
+
     public ResourceOwnerLoginHandler getLoginHandler() {
         return this.loginHandler;
     }

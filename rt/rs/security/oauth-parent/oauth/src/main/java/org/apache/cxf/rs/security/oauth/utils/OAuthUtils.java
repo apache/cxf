@@ -60,12 +60,12 @@ import org.apache.cxf.rs.security.oauth.provider.DefaultOAuthValidator;
 import org.apache.cxf.rs.security.oauth.provider.OAuthDataProvider;
 
 /**
- * Various utility methods 
+ * Various utility methods
  */
 public final class OAuthUtils {
     public static final String REPORT_FAILURE_DETAILS = "report.failure.details";
     public static final String REPORT_FAILURE_DETAILS_AS_HEADER = "report.failure.details.as.header";
-    
+
     private OAuthUtils() {
     }
 
@@ -86,19 +86,19 @@ public final class OAuthUtils {
         }
         return false;
     }
-    
-    public static void validateMessage(OAuthMessage oAuthMessage, 
-                                       Client client, 
+
+    public static void validateMessage(OAuthMessage oAuthMessage,
+                                       Client client,
                                        Token token,
                                        OAuthDataProvider provider,
-                                       OAuthValidator validator) 
+                                       OAuthValidator validator)
         throws Exception {
         OAuthConsumer consumer = new OAuthConsumer(null, client.getConsumerKey(),
             client.getSecretKey(), null);
         OAuthAccessor accessor = new OAuthAccessor(consumer);
         if (token != null) {
             if (token instanceof RequestToken) {
-                accessor.requestToken = token.getTokenKey(); 
+                accessor.requestToken = token.getTokenKey();
             } else {
                 accessor.accessToken = token.getTokenKey();
             }
@@ -116,7 +116,7 @@ public final class OAuthUtils {
             ((DefaultOAuthValidator)validator).validateToken(token, provider);
         }
     }
-    
+
     public static OAuthMessage getOAuthMessage(MessageContext mc,
                                                HttpServletRequest request,
                                                String[] requiredParams) throws Exception {
@@ -125,22 +125,22 @@ public final class OAuthUtils {
         oAuthMessage.requireParameters(requiredParams);
         return oAuthMessage;
     }
-    
+
     public static void addParametersIfNeeded(MessageContext mc,
                                              HttpServletRequest request,
                                              OAuthMessage oAuthMessage) throws IOException {
         List<Entry<String, String>> params = oAuthMessage.getParameters();
         String enc = oAuthMessage.getBodyEncoding();
         enc = enc == null ? StandardCharsets.UTF_8.name() : enc;
-        
-        if (params.isEmpty() 
+
+        if (params.isEmpty()
             && MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(
                 MediaType.valueOf(oAuthMessage.getBodyType()))) {
-            InputStream stream = mc != null 
+            InputStream stream = mc != null
                 ? mc.getContent(InputStream.class) : oAuthMessage.getBodyAsStream();
             String body = FormUtils.readBody(stream, enc);
             MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-            FormUtils.populateMapFromString(map, PhaseInterceptorChain.getCurrentMessage(), body, enc, true, 
+            FormUtils.populateMapFromString(map, PhaseInterceptorChain.getCurrentMessage(), body, enc, true,
                                             request);
             for (String key : map.keySet()) {
                 oAuthMessage.addParameter(key, map.getFirst(key));
@@ -158,10 +158,10 @@ public final class OAuthUtils {
             }
         }
     }
-    
-    
-    public static Response handleException(MessageContext mc, 
-                                           Exception e, 
+
+
+    public static Response handleException(MessageContext mc,
+                                           Exception e,
                                            int status) {
         ResponseBuilder builder = Response.status(status);
         if (MessageUtils.isTrue(mc.getContextualProperty(REPORT_FAILURE_DETAILS))) {
@@ -180,15 +180,15 @@ public final class OAuthUtils {
             if (asHeader) {
                 builder.header("oauth_problem", text);
             } else {
-                builder.entity(e.getMessage());    
+                builder.entity(e.getMessage());
             }
         }
         return builder.build();
     }
 
-    public static List<String> parseParamValue(String paramValue, String defaultValue) 
+    public static List<String> parseParamValue(String paramValue, String defaultValue)
         throws IOException {
-        
+
         List<String> scopeList = new ArrayList<>();
 
         if (!StringUtils.isEmpty(paramValue)) {
@@ -205,7 +205,7 @@ public final class OAuthUtils {
         return scopeList;
     }
 
-    
+
     public static RequestToken handleTokenRejectedException() throws OAuthProblemException {
         OAuthProblemException problemEx = new OAuthProblemException(
                 OAuth.Problems.TOKEN_REJECTED);
@@ -227,7 +227,7 @@ public final class OAuthUtils {
         }
         return getOAuthDataProvider(servletContext);
     }
-    
+
     public static synchronized OAuthDataProvider getOAuthDataProvider(
             ServletContext servletContext) {
         OAuthDataProvider dataProvider = (OAuthDataProvider) servletContext
@@ -242,11 +242,11 @@ public final class OAuthUtils {
                         "There should be provided [ " + OAuthConstants.OAUTH_DATA_PROVIDER_CLASS
                                 + " ] context init param in web.xml");
             }
-            
+
             try {
                 dataProvider = (OAuthDataProvider) OAuthUtils
                         .instantiateClass(dataProviderClassName);
-               
+
                 servletContext
                         .setAttribute(OAuthConstants.OAUTH_DATA_PROVIDER_INSTANCE_KEY, dataProvider);
             } catch (Exception e) {
@@ -257,22 +257,22 @@ public final class OAuthUtils {
 
         return dataProvider;
     }
-    
+
     public static synchronized OAuthValidator getOAuthValidator(ServletContext servletContext) {
 
         OAuthValidator dataProvider = (OAuthValidator) servletContext
               .getAttribute(OAuthConstants.OAUTH_VALIDATOR_INSTANCE_KEY);
-    
+
         if (dataProvider == null) {
             String dataProviderClassName = servletContext
                 .getInitParameter(OAuthConstants.OAUTH_VALIDATOR_CLASS);
-    
+
             if (!StringUtils.isEmpty(dataProviderClassName)) {
-            
+
                 try {
                     dataProvider = (OAuthValidator) OAuthUtils
                         .instantiateClass(dataProviderClassName);
-                 
+
                     servletContext
                         .setAttribute(OAuthConstants.OAUTH_VALIDATOR_INSTANCE_KEY, dataProvider);
                 } catch (Exception e) {
@@ -281,8 +281,8 @@ public final class OAuthUtils {
                 }
             }
         }
-    
+
         return dataProvider == null ? new DefaultOAuthValidator() : dataProvider;
     }
-    
+
 }

@@ -50,15 +50,15 @@ import org.junit.Test;
 
 public class CodeFirstWSDLTest extends AbstractJaxWsTest {
     String address = "local://localhost:9000/Hello";
-    
+
     private Definition createService(Class<?> clazz) throws Exception {
-        
+
         JaxWsImplementorInfo info = new JaxWsImplementorInfo(clazz);
         ReflectionServiceFactoryBean bean = new JaxWsServiceFactoryBean(info);
 
         Bus bus = getBus();
         bean.setBus(bus);
-        
+
         Service service = bean.create();
 
         InterfaceInfo i = service.getServiceInfos().get(0).getInterface();
@@ -70,15 +70,15 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
         svrFactory.setServiceBean(clazz.newInstance());
         svrFactory.setAddress(address);
         svrFactory.create();
-        
+
         Collection<BindingInfo> bindings = service.getServiceInfos().get(0).getBindings();
         assertEquals(1, bindings.size());
-        
-        ServiceWSDLBuilder wsdlBuilder = 
+
+        ServiceWSDLBuilder wsdlBuilder =
             new ServiceWSDLBuilder(bus, service.getServiceInfos().get(0));
         return wsdlBuilder.build();
     }
-    
+
     @Test
     public void testWSDL1() throws Exception {
         Definition d = createService(Hello2.class);
@@ -134,20 +134,20 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
 
             Bus bus = getBus();
             bean.setBus(bus);
-            
+
             bean.create();
-            
+
             fail("WebMethod(exclude=true) is not allowed");
         } catch (JaxWsConfigurationException e) {
             assertTrue(e.getMessage().contains("WebMethod"));
         }
     }
-    
+
     @Test
     public void testDocumentationOnSEI() throws Exception {
         //CXF-3093
         EndpointImpl ep = (EndpointImpl)Endpoint.publish("local://foo", new CXF3093Impl());
-        ServiceWSDLBuilder wsdlBuilder = 
+        ServiceWSDLBuilder wsdlBuilder =
             new ServiceWSDLBuilder(bus, ep.getService().getServiceInfos().get(0));
         Definition def = wsdlBuilder.build();
         Document d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
@@ -158,13 +158,13 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
                           d.getDocumentElement());
         assertXPathEquals("//wsdl:definitions/wsdl:binding/wsdl:documentation", "My binding doc",
                           d.getDocumentElement());
-        
-        
+
+
         JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
         builder.setServiceClass(CXF3093Impl.class);
         ServiceInfo serviceInfo = builder.createService();
         wsdlBuilder = new ServiceWSDLBuilder(bus, serviceInfo);
-        
+
         def = wsdlBuilder.build();
         d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
         //org.apache.cxf.helpers.XMLUtils.printDOM(d);
@@ -178,15 +178,15 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
 
     @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt")
     @WSDLDocumentationCollection({
-        @WSDLDocumentation("My portType documentation"), 
-        @WSDLDocumentation(value = "My top level documentation", 
-                           placement = WSDLDocumentation.Placement.TOP), 
-        @WSDLDocumentation(value = "My binding doc", placement = WSDLDocumentation.Placement.BINDING) 
+        @WSDLDocumentation("My portType documentation"),
+        @WSDLDocumentation(value = "My top level documentation",
+                           placement = WSDLDocumentation.Placement.TOP),
+        @WSDLDocumentation(value = "My binding doc", placement = WSDLDocumentation.Placement.BINDING)
     })
-    public interface CXF3093PortType { 
-        int doubleIt(int numberToDouble); 
+    public interface CXF3093PortType {
+        int doubleIt(int numberToDouble);
     }
-    
+
     @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
                 serviceName = "DoubleItService",
                 portName = "DoubleItPort")
@@ -194,15 +194,15 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
         public int doubleIt(int numberToDouble) {
             return numberToDouble * 2;
         }
-        
+
     }
 
-    
+
     @Test
     public void testOnlyRootElementOnFaultBean() throws Exception {
         //CXF-4016
         EndpointImpl ep = (EndpointImpl)Endpoint.publish("local://foo4016", new CXF4016Impl());
-        ServiceWSDLBuilder wsdlBuilder = 
+        ServiceWSDLBuilder wsdlBuilder =
             new ServiceWSDLBuilder(bus, ep.getService().getServiceInfos().get(0));
         Definition def = wsdlBuilder.build();
         Document d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
@@ -220,12 +220,12 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
         public int doubleIt(int numberToDouble) throws CustomException {
             return numberToDouble * 2;
         }
-        
-    } 
+
+    }
     @WebFault(name = "CustomException", targetNamespace = "http://www.example.org/contract/DoubleIt")
     public static class CustomException extends Exception {
         private static final long serialVersionUID = 1L;
-        private CustomMessageBean faultInfo; 
+        private CustomMessageBean faultInfo;
 
         public CustomException(String msg) {
             super(msg);
@@ -241,13 +241,13 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
             faultInfo = b;
         }
     }
-    
+
     @XmlRootElement(name = "CustomMessageBean")
     @XmlType(name = "", propOrder = { "myId", "msg" })
     public static class CustomMessageBean {
         String msg;
         int myId;
-        
+
         public CustomMessageBean() {
         }
 
@@ -267,13 +267,13 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
             this.msg = msg;
         }
     }
-    
-    
+
+
     @Test
     public void testDocumentationOnImpl() throws Exception {
         //CXF-3092
         EndpointImpl ep = (EndpointImpl)Endpoint.publish("local://foo", new CXF3092Impl());
-        ServiceWSDLBuilder wsdlBuilder = 
+        ServiceWSDLBuilder wsdlBuilder =
             new ServiceWSDLBuilder(bus, ep.getService().getServiceInfos().get(0));
         Definition def = wsdlBuilder.build();
         Document d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
@@ -284,12 +284,12 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
                           d.getDocumentElement());
         assertXPathEquals("//wsdl:definitions/wsdl:binding/wsdl:documentation", "My binding doc",
                           d.getDocumentElement());
-        
+
         JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
         builder.setServiceClass(CXF3092Impl.class);
         ServiceInfo serviceInfo = builder.createService();
         wsdlBuilder = new ServiceWSDLBuilder(bus, serviceInfo);
-        
+
         def = wsdlBuilder.build();
         d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
         //org.apache.cxf.helpers.XMLUtils.printDOM(d);
@@ -302,24 +302,24 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
     }
 
     @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt")
-    public interface CXF3092PortType { 
-        int doubleIt(int numberToDouble); 
+    public interface CXF3092PortType {
+        int doubleIt(int numberToDouble);
     }
-    
+
     @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
                 serviceName = "DoubleItService",
                 portName = "DoubleItPort")
     @WSDLDocumentationCollection({
-        @WSDLDocumentation("My Service documentation"), 
-        @WSDLDocumentation(value = "My top level documentation", 
-                           placement = WSDLDocumentation.Placement.TOP), 
-        @WSDLDocumentation(value = "My binding doc", placement = WSDLDocumentation.Placement.BINDING) 
+        @WSDLDocumentation("My Service documentation"),
+        @WSDLDocumentation(value = "My top level documentation",
+                           placement = WSDLDocumentation.Placement.TOP),
+        @WSDLDocumentation(value = "My binding doc", placement = WSDLDocumentation.Placement.BINDING)
     })
     public static class CXF3092Impl implements CXF3092PortType {
         public int doubleIt(int numberToDouble) {
             return numberToDouble * 2;
         }
-        
+
     }
 
 }

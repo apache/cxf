@@ -32,7 +32,7 @@ public class BookReview {
     private Review review;
     private List<String> authors = new LinkedList<String>();
     private Book book;
-    
+
     public Review getReview() {
         return review;
     }
@@ -58,7 +58,7 @@ public class BookReview {
     public void setId(int id) {
         this.id = id;
     }
-    
+
     @ElementCollection
     public List<String> getAuthors() {
         return authors;

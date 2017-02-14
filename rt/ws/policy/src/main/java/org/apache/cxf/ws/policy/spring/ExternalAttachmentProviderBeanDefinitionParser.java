@@ -38,6 +38,6 @@ public class ExternalAttachmentProviderBeanDefinitionParser extends AbstractBean
     @Override
     protected boolean hasBusProperty() {
         return true;
-    } 
-      
+    }
+
 }

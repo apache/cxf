@@ -61,7 +61,7 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
         }
         return hexString.toString();
     }
-    
+
     @Before
     public void setUp() throws Exception {
         if (System.getProperty("java.version").startsWith("9")) {
@@ -76,14 +76,14 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly",
                    launchServer(ArrayServiceServer.class, true));
     }
-    
+
     @Test
     public void testInvocation() throws Exception {
-        JaxWsDynamicClientFactory dcf = 
+        JaxWsDynamicClientFactory dcf =
             JaxWsDynamicClientFactory.newInstance();
         URL wsdlURL = new URL("http://localhost:" + PORT + "/NoBodyParts/NoBodyPartsService?wsdl");
         Client client = dcf.createClient(wsdlURL);
-        byte[] bucketOfBytes = 
+        byte[] bucketOfBytes =
             IOUtils.readBytesFromStream(getClass().getResourceAsStream("/wsdl/no_body_parts.wsdl"));
         Operation1 parameters = new Operation1();
         parameters.setOptionString("opt-ion");
@@ -91,14 +91,14 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
         Object[] rparts = client.invoke("operation1", parameters, bucketOfBytes);
         Operation1Response r = (Operation1Response)rparts[0];
         assertEquals(md5(bucketOfBytes), r.getStatus());
-        
+
         ClientCallback callback = new ClientCallback();
         client.invoke(callback, "operation1", parameters, bucketOfBytes);
         rparts = callback.get();
         r = (Operation1Response)rparts[0];
         assertEquals(md5(bucketOfBytes), r.getStatus());
     }
-    
+
     @Test
     public void testArrayList() throws Exception {
         JaxWsDynamicClientFactory dcf = JaxWsDynamicClientFactory.newInstance();
@@ -107,12 +107,12 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
 
         String[] values = new String[] {"foobar", "something" };
         List<String> list = Arrays.asList(values);
-        
+
         client.getOutInterceptors().add(new LoggingOutInterceptor());
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.invoke("init", list);
     }
-    
+
     @Test
     public void testArgfiles() throws Exception {
         System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
@@ -122,10 +122,10 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
 
         String[] values = new String[] {"foobar", "something" };
         List<String> list = Arrays.asList(values);
-        
+
         client.getOutInterceptors().add(new LoggingOutInterceptor());
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.invoke("init", list);
     }
-    
+
 }

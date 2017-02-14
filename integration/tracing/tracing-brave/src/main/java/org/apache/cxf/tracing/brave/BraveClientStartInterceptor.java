@@ -38,13 +38,13 @@ public class BraveClientStartInterceptor extends AbstractBraveClientInterceptor 
     @Override
     public void handleMessage(Message message) throws Fault {
         final ParsedMessage parsed = new ParsedMessage(message);
-        
-        final TraceScopeHolder<Span> holder = super.startTraceSpan(parsed.getHeaders(), 
+
+        final TraceScopeHolder<Span> holder = super.startTraceSpan(parsed.getHeaders(),
             parsed.getUri(), parsed.getHttpMethod());
-        
+
         if (holder != null) {
             message.getExchange().put(TRACE_SPAN, holder);
         }
     }
-    
+
 }

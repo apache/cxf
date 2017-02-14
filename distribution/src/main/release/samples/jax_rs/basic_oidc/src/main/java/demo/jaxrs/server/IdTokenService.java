@@ -35,7 +35,7 @@ public class IdTokenService {
     public Response getIdTokenFromForm(@Context IdTokenContext idTokenContext) {
         return getIdToken(idTokenContext);
     }
-    
+
     @GET
     @Path("/token")
     @Produces("text/html")

@@ -51,7 +51,7 @@ public class MalformedResponseInterceptor extends AbstractPhaseInterceptor<Messa
                 message.setContent(InputStream.class, bos.getInputStream());
                 bos.close();
                 message.setContent(InputStream.class, bos.getInputStream());
-                
+
             } catch (IOException e) {
                 throw new Fault(e);
             }

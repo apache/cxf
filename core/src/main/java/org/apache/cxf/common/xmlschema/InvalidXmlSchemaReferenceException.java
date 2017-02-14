@@ -20,14 +20,14 @@
 package org.apache.cxf.common.xmlschema;
 
 /**
- * Exception thrown when we detect an attempt to set an impossible XML Schema reference. 
+ * Exception thrown when we detect an attempt to set an impossible XML Schema reference.
  */
 public class InvalidXmlSchemaReferenceException extends RuntimeException {
 
     private static final long serialVersionUID = -2053958361555768873L;
 
     /**
-     * 
+     *
      */
     public InvalidXmlSchemaReferenceException() {
     }

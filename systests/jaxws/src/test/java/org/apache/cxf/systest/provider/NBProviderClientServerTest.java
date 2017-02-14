@@ -41,7 +41,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class NBProviderClientServerTest extends AbstractBusClientServerTestBase {
-    public static final String ADDRESS 
+    public static final String ADDRESS
         = "http://localhost:" + TestUtil.getPortNumber(Server.class)
             + "/SoapContext/SoapProviderPort";
 
@@ -49,10 +49,10 @@ public class NBProviderClientServerTest extends AbstractBusClientServerTestBase 
 
     public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
-        
+
         protected void run() {
             Object implementor = new NBSoapMessageDocProvider();
-            ep = Endpoint.publish(ADDRESS, implementor);                                 
+            ep = Endpoint.publish(ADDRESS, implementor);
         }
 
         @Override
@@ -77,12 +77,12 @@ public class NBProviderClientServerTest extends AbstractBusClientServerTestBase 
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testSOAPMessageModeDocLit() throws Exception {
-        QName serviceName = 
+        QName serviceName =
             new QName("http://apache.org/hello_world_soap_http", "SOAPProviderService");
-        QName portName = 
+        QName portName =
             new QName("http://apache.org/hello_world_soap_http", "SoapProviderPort");
 
         Service service = Service.create(serviceName);
@@ -91,7 +91,7 @@ public class NBProviderClientServerTest extends AbstractBusClientServerTestBase 
 
         try {
             Dispatch<SOAPMessage> dispatch = service.createDispatch(portName, SOAPMessage.class, Service.Mode.MESSAGE);
-            
+
             MessageFactory factory = MessageFactory.newInstance();
             SOAPMessage request = encodeRequest(factory, "sayHi");
             SOAPMessage response;
@@ -99,19 +99,19 @@ public class NBProviderClientServerTest extends AbstractBusClientServerTestBase 
                 response = dispatch.invoke(request);
                 fail("Should have thrown an exception");
             } catch (Exception ex) {
-                //expected 
+                //expected
                 assertEquals("no body expected", ex.getMessage());
             }
-            
+
             request = encodeRequest(factory, null);
             response = dispatch.invoke(request);
             String resp = decodeResponse(response);
             assertEquals("Bonjour", resp);
-            
+
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
-        
+
     }
 
     private SOAPMessage encodeRequest(MessageFactory factory, String value) throws SOAPException {
@@ -121,7 +121,7 @@ public class NBProviderClientServerTest extends AbstractBusClientServerTestBase 
         if (value != null) {
             request.getSOAPBody().addBodyElement(envelope.createName(value, "ns1", sayHi.getNamespaceURI()));
         }
-        
+
         return request;
     }
 

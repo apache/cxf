@@ -34,7 +34,7 @@ public class DefaultHttpSessionStore implements HttpSessionStore {
 
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultHttpSessionStore.class);
 
-    private static final Map<String, NettyHttpSession> SESSIONS 
+    private static final Map<String, NettyHttpSession> SESSIONS
         = new ConcurrentHashMap<String, NettyHttpSession>();
 
     @Override
@@ -72,7 +72,7 @@ public class DefaultHttpSessionStore implements HttpSessionStore {
             if (session.getMaxInactiveInterval() < 0) {
                 continue;
             }
-            
+
             long currentMillis = System.currentTimeMillis();
 
             if (currentMillis - session.getLastAccessedTime() > session

@@ -29,27 +29,27 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class NewCookieHeaderProviderTest extends Assert {
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testNullValue() throws Exception {
         NewCookie.valueOf(null);
     }
-        
+
     @Test
     public void testFromSimpleString() {
         NewCookie c = NewCookie.valueOf("foo=bar");
         assertTrue("bar".equals(c.getValue())
                    && "foo".equals(c.getName()));
     }
-    
+
     @Test
     public void testFromSimpleStringWithExpires() {
         NewCookie c = NewCookie.valueOf("foo=bar;Expires=Wed, 09 Jun 2021 10:18:14 GMT");
         assertTrue("bar".equals(c.getValue())
                    && "foo".equals(c.getName()));
     }
-    
-        
+
+
     @Test
     public void testFromComplexString() {
         NewCookie c = NewCookie.valueOf(
@@ -62,7 +62,7 @@ public class NewCookieHeaderProviderTest extends Assert {
                    && "comment".equals(c.getComment())
                    && 10 == c.getMaxAge());
     }
-    
+
     @Test
     public void testFromComplexStringWithExpiresAndHttpOnly() {
         NewCookie c = NewCookie.valueOf(
@@ -81,7 +81,7 @@ public class NewCookieHeaderProviderTest extends Assert {
         assertNotNull(d);
         assertEquals("Wed, 09 Jun 2021 10:18:14 GMT", HttpUtils.toHttpDate(d));
     }
-    
+
     @Test
     public void testFromComplexStringLowerCase() {
         NewCookie c = NewCookie.valueOf(
@@ -94,8 +94,8 @@ public class NewCookieHeaderProviderTest extends Assert {
                    && "comment".equals(c.getComment())
                    && 10 == c.getMaxAge());
     }
-    
-    
+
+
     @Test
     public void testFromStringWithSpaces() {
         NewCookie c = NewCookie.valueOf(
@@ -108,7 +108,7 @@ public class NewCookieHeaderProviderTest extends Assert {
                    && "comment".equals(c.getComment())
                    && 10 == c.getMaxAge());
     }
-    
+
     @Test
     public void testFromStringWithSpecialChar() {
         NewCookie c = NewCookie.valueOf(
@@ -122,14 +122,14 @@ public class NewCookieHeaderProviderTest extends Assert {
                    && "comment@comment:,".equals(c.getComment())
                    && 10 == c.getMaxAge());
     }
-    
+
     @Test
     public void testToString() {
         NewCookie c = new NewCookie("foo", "bar", "path", "domain", "comment", 2, true);
-        assertEquals("foo=bar;Comment=comment;Domain=domain;Max-Age=2;Path=path;Secure;Version=1", 
-                     c.toString());               
+        assertEquals("foo=bar;Comment=comment;Domain=domain;Max-Age=2;Path=path;Secure;Version=1",
+                     c.toString());
     }
-    
+
     @Test
     public void testToStringWithSpecialChar() {
         NewCookie c = new NewCookie("foo", "bar (space)<>[]", "/path?path", "domain.com", "comment@comment:,", 2, true);
@@ -142,5 +142,5 @@ public class NewCookieHeaderProviderTest extends Assert {
         assertEquals("foo=\"bar (space)<>[]\";Comment=\"comment@comment:,\";Domain=domain.com;Max-Age=2;"
                      + "Path=/path;Secure;Version=1", c.toString());
     }
-    
+
 }

@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class HTTPJettyTransportNamespaceHandlerTest extends Assert {
     @Test
     public void testGetSchemaLocation() {
         HTTPJettyTransportNamespaceHandler handler = new HTTPJettyTransportNamespaceHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/transports/http-jetty/configuration"));
     }
 

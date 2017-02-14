@@ -40,7 +40,7 @@ import org.junit.Test;
 
 /**
  * Unit tests for the DefaultHostnameVerifier
- * 
+ *
  * Copied from httpclient
  */
 public class DefaultHostnameVerifierTest {
@@ -191,7 +191,7 @@ public class DefaultHostnameVerifierTest {
             // whew!  we're okay!
         }
     }
-    
+
     @Test
     public void testDomainRootMatching() {
 

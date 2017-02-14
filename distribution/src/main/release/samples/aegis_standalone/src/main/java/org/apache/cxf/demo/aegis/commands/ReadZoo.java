@@ -34,7 +34,7 @@ import org.apache.cxf.demo.aegis.types.Animal;
 import org.apache.cxf.demo.aegis.types.Zoo;
 
 /**
- * 
+ *
  */
 public final class ReadZoo {
 

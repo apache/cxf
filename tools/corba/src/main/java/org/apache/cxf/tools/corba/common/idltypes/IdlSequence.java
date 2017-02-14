@@ -32,7 +32,7 @@ public final class IdlSequence extends IdlSequenceBase {
     private IdlSequence(IdlScopeBase parent, String name, IdlType elem, int bound) {
         super(parent, name, elem, bound);
     }
-    
+
     public static IdlSequence create(IdlScopeBase parent, String name, IdlType elem) {
         return new IdlSequence(parent, name, elem, 0);
     }
@@ -55,7 +55,7 @@ public final class IdlSequence extends IdlSequenceBase {
         }
     }
 
-    
+
     public void writeFwd(PrintWriter pw) {
         if (!elemType().isEmptyDef() && isCircular()) {
             writeTypedef(pw);
@@ -74,5 +74,5 @@ public final class IdlSequence extends IdlSequenceBase {
             }
         }
     }
-    
+
 }

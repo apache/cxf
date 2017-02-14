@@ -51,15 +51,15 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static boolean unrestrictedPoliciesInstalled;
-    
+
     static {
         unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
     };
-    
+
     final TestParam test;
-    
+
     public CryptoCoverageCheckerTest(TestParam type) {
         this.test = type;
     }
@@ -79,23 +79,23 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(PORT, true)},
                                                 {new TestParam(STAX_PORT, false)},
                                                 {new TestParam(STAX_PORT, true)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-    
+
     @org.junit.Test
     public void testSignedBodyTimestamp() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -104,29 +104,29 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
                      + "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
                      + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;");
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         if (test.isStreaming()) {
             WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
             bus.getOutInterceptors().add(staxOutInterceptor);
@@ -134,13 +134,13 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
+
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedBodyOnly() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -149,27 +149,27 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         if (test.isStreaming()) {
             WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
             bus.getOutInterceptors().add(staxOutInterceptor);
@@ -177,18 +177,18 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not signing the Timestamp");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedTimestampOnly() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -197,28 +197,28 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
                      + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;");
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         if (test.isStreaming()) {
             WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
             bus.getOutInterceptors().add(staxOutInterceptor);
@@ -226,7 +226,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not signing the Timestamp");
@@ -237,7 +237,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedBodyTimestampSoap12() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -246,29 +246,29 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampSoap12Port");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://www.w3.org/2003/05/soap-envelope}Body;"
                      + "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
                      + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;");
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         if (test.isStreaming()) {
             WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
             bus.getOutInterceptors().add(staxOutInterceptor);
@@ -276,13 +276,13 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
+
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-   
+
     @org.junit.Test
     public void testSignedBodyOnlySoap12() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -291,27 +291,27 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampSoap12Port");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://www.w3.org/2003/05/soap-envelope}Body;");
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         if (test.isStreaming()) {
             WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
             bus.getOutInterceptors().add(staxOutInterceptor);
@@ -319,18 +319,18 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not signing the Timestamp");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedTimestampOnlySoap12() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -339,28 +339,28 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBodyTimestampSoap12Port");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
                      + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;");
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         if (test.isStreaming()) {
             WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
             bus.getOutInterceptors().add(staxOutInterceptor);
@@ -368,21 +368,21 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not signing the Timestamp");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedEncryptedBody() throws Exception {
-        
+
         if (!unrestrictedPoliciesInstalled) {
             return;
         }
@@ -392,21 +392,21 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedBodyPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature Encrypt");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("encryptionPropFile", "bob.properties");
         outProps.put("user", "alice");
         outProps.put("encryptionUser", "bob");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
@@ -416,7 +416,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         if (test.isStreaming()) {
             WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
             bus.getOutInterceptors().add(staxOutInterceptor);
@@ -426,11 +426,11 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         }
 
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedNotEncryptedBody() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -439,32 +439,32 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedBodyPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature Encrypt");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("encryptionPropFile", "bob.properties");
         outProps.put("user", "alice");
         outProps.put("encryptionUser", "bob");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
         outProps.put("encryptionParts",
                      "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
                      + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;");
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         if (test.isStreaming()) {
             WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
             bus.getOutInterceptors().add(staxOutInterceptor);
@@ -472,18 +472,18 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the SOAP Body");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testWSAddressing() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -492,19 +492,19 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItWSAPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("signatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
@@ -514,7 +514,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         WSS4JStaxOutInterceptor staxOutInterceptor = null;
         WSS4JOutInterceptor outInterceptor = null;
         if (test.isStreaming()) {
@@ -524,28 +524,28 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not signing the WS-Addressing headers");
         } catch (Exception ex) {
             // expected
         }
-        
+
         // Now sign the WS-Addressing headers
         outProps.put("signatureParts",
                 "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
                 + "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
                 + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;"
                 + "{}{http://www.w3.org/2005/08/addressing}ReplyTo;");
-        
+
         if (test.isStreaming()) {
             bus.getOutInterceptors().remove(staxOutInterceptor);
             SecurityTestUtil.enableStreaming(port);
         } else {
             bus.getOutInterceptors().remove(outInterceptor);
         }
-        
+
         if (test.isStreaming()) {
             staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
             bus.getOutInterceptors().add(staxOutInterceptor);
@@ -553,13 +553,13 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
+
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testWSAddressingOptionalSignatureParts() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -568,30 +568,30 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItWSAPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("optionalSignatureParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
                      + "{}{http://docs.oasis-open.org/wss/2004/01/oasis-"
                      + "200401-wss-wssecurity-utility-1.0.xsd}Timestamp;"
                      + "{}{http://www.w3.org/2005/08/addressing}ReplyTo;");
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         WSS4JStaxOutInterceptor staxOutInterceptor = null;
         WSS4JOutInterceptor outInterceptor = null;
         if (test.isStreaming()) {
@@ -601,15 +601,15 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
+
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
-    // Here the service is sending an secured message back to the client. For a server Fault 
-    // message it returns the original fault, as the CryptoCoverageChecker is configured not 
+
+    // Here the service is sending an secured message back to the client. For a server Fault
+    // message it returns the original fault, as the CryptoCoverageChecker is configured not
     // to check a fault (see CXF-4954)
     @org.junit.Test
     public void testClientChecker() throws Exception {
@@ -619,19 +619,19 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItClientCheckerPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         // This test only applies to the DOM implementation
         if (PORT.equals(test.getPort()) && !test.isStreaming()) {
             int result = port.doubleIt(25);
             assertEquals(50, result);
-            
+
             // Now try with a message that will create a Fault in the SEI
             try {
                 port.doubleIt(0);
@@ -640,12 +640,12 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 assertTrue(ex.getMessage().contains("0 can't be doubled"));
             }
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
-    // Here the service is sending an secured message back to the client. For a server Fault 
+
+    // Here the service is sending an secured message back to the client. For a server Fault
     // message it should return a secured Fault message as well
     @org.junit.Test
     public void testClientChecker2() throws Exception {
@@ -655,18 +655,18 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItClientCheckerPort2");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         // This test only applies to the DOM implementation
         if (PORT.equals(test.getPort()) && !test.isStreaming()) {
             port.doubleIt(25);
-            
+
             // Now try with a message that will create a Fault in the SEI
             try {
                 port.doubleIt(0);
@@ -675,14 +675,14 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 assertTrue(ex.getMessage().contains("0 can't be doubled"));
             }
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testEncryptedUsernameToken() throws Exception {
-        
+
         if (!unrestrictedPoliciesInstalled) {
             return;
         }
@@ -692,20 +692,20 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedUsernameTokenPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "UsernameToken Encrypt");
         outProps.put("encryptionPropFile", "bob.properties");
         outProps.put("user", "alice");
         outProps.put("encryptionUser", "bob");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("encryptionParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;"
@@ -714,7 +714,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         if (test.isStreaming()) {
             WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
             bus.getOutInterceptors().add(staxOutInterceptor);
@@ -724,14 +724,14 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         }
 
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testNotEncryptedUsernameToken() throws Exception {
-        
+
         if (!unrestrictedPoliciesInstalled) {
             return;
         }
@@ -741,20 +741,20 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = CryptoCoverageCheckerTest.class.getResource("DoubleItCoverageChecker.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedUsernameTokenPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "UsernameToken Encrypt");
         outProps.put("encryptionPropFile", "bob.properties");
         outProps.put("user", "alice");
         outProps.put("encryptionUser", "bob");
-        outProps.put("passwordCallbackClass", 
+        outProps.put("passwordCallbackClass",
                      "org.apache.cxf.systest.ws.common.KeystorePasswordCallback");
         outProps.put("encryptionParts",
                      "{}{http://schemas.xmlsoap.org/soap/envelope/}Body;");
@@ -762,7 +762,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         if (test.isStreaming()) {
             WSS4JStaxOutInterceptor staxOutInterceptor = new WSS4JStaxOutInterceptor(outProps);
             bus.getOutInterceptors().add(staxOutInterceptor);
@@ -770,7 +770,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
             WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProps);
             bus.getOutInterceptors().add(outInterceptor);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");

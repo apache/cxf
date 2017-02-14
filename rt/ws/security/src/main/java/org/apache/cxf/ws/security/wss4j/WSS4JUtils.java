@@ -66,20 +66,20 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
  * UsernameTokenInterceptor.
  */
 public final class WSS4JUtils {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JUtils.class);
-    
+
     private WSS4JUtils() {
         // complete
     }
-    
+
     /**
      * Get the security token lifetime value (in milliseconds). The default is "300000" (5 minutes).
      * @return the security token lifetime value in milliseconds
      */
     public static long getSecurityTokenLifetime(Message message) {
         if (message != null) {
-            String tokenLifetime = 
+            String tokenLifetime =
                 (String)message.getContextualProperty(SecurityConstants.SECURITY_TOKEN_LIFETIME);
             if (tokenLifetime != null) {
                 return Long.parseLong(tokenLifetime);
@@ -89,13 +89,13 @@ public final class WSS4JUtils {
     }
 
     /**
-     * Get a ReplayCache instance. It first checks to see whether caching has been explicitly 
+     * Get a ReplayCache instance. It first checks to see whether caching has been explicitly
      * enabled or disabled via the booleanKey argument. If it has been set to false then no
      * replay caching is done (for this booleanKey). If it has not been specified, then caching
      * is enabled only if we are not the initiator of the exchange. If it has been specified, then
      * caching is enabled.
-     * 
-     * It tries to get an instance of ReplayCache via the instanceKey argument from a 
+     *
+     * It tries to get an instance of ReplayCache via the instanceKey argument from a
      * contextual property, and failing that the message exchange. If it can't find any, then it
      * defaults to using an EH-Cache instance and stores that on the message exchange.
      */
@@ -118,7 +118,7 @@ public final class WSS4JUtils {
         if (ep != null && ep.getEndpointInfo() != null) {
             EndpointInfo info = ep.getEndpointInfo();
             synchronized (info) {
-                ReplayCache replayCache = 
+                ReplayCache replayCache =
                         (ReplayCache)message.getContextualProperty(instanceKey);
                 if (replayCache == null) {
                     replayCache = (ReplayCache)info.getProperty(instanceKey);
@@ -143,7 +143,7 @@ public final class WSS4JUtils {
                         ReplayCacheFactory replayCacheFactory = ReplayCacheFactory.newInstance();
                         replayCache = replayCacheFactory.newReplayCache(cacheKey, configFile);
                     }
-                    
+
                     info.setProperty(instanceKey, replayCache);
                 }
                 return replayCache;
@@ -151,7 +151,7 @@ public final class WSS4JUtils {
         }
         return null;
     }
-    
+
     public static String parseAndStoreStreamingSecurityToken(
         org.apache.xml.security.stax.securityToken.SecurityToken securityToken,
         Message message
@@ -204,10 +204,10 @@ public final class WSS4JUtils {
     /**
      * Create a SoapFault from a WSSecurityException, following the SOAP Message Security
      * 1.1 specification, chapter 12 "Error Handling".
-     * 
+     *
      * When the Soap version is 1.1 then set the Fault/Code/Value from the fault code
      * specified in the WSSecurityException (if it exists).
-     * 
+     *
      * Otherwise set the Fault/Code/Value to env:Sender and the Fault/Code/Subcode/Value
      * as the fault code from the WSSecurityException.
      */
@@ -215,11 +215,11 @@ public final class WSS4JUtils {
         SoapMessage message, SoapVersion version, WSSecurityException e
     ) {
         SoapFault fault;
-        
+
         String errorMessage = null;
         javax.xml.namespace.QName faultCode = null;
-        
-        boolean returnSecurityError = 
+
+        boolean returnSecurityError =
             MessageUtils.getContextualBoolean(message, SecurityConstants.RETURN_SECURITY_ERROR, false);
         if (returnSecurityError || MessageUtils.isRequestor(message)) {
             errorMessage = e.getMessage();
@@ -228,7 +228,7 @@ public final class WSS4JUtils {
             errorMessage = e.getSafeExceptionMessage();
             faultCode = e.getSafeFaultCode();
         }
-        
+
         if (version.getVersion() == 1.1 && faultCode != null) {
             fault = new SoapFault(errorMessage, e, faultCode);
         } else {
@@ -239,7 +239,7 @@ public final class WSS4JUtils {
         }
         return fault;
     }
-    
+
     public static Properties getProps(Object o, URL propsURL) {
         Properties properties = null;
         if (o instanceof Properties) {
@@ -254,22 +254,22 @@ public final class WSS4JUtils {
                 properties = null;
             }
         }
-        
+
         return properties;
     }
-    
+
     public static PasswordEncryptor getPasswordEncryptor(Message message) {
         if (message == null) {
             return null;
         }
-        PasswordEncryptor passwordEncryptor = 
+        PasswordEncryptor passwordEncryptor =
             (PasswordEncryptor)message.getContextualProperty(
                 SecurityConstants.PASSWORD_ENCRYPTOR_INSTANCE
             );
         if (passwordEncryptor != null) {
             return passwordEncryptor;
         }
-        
+
         Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
         try {
             CallbackHandler callbackHandler = SecurityUtils.getCallbackHandler(o);
@@ -279,13 +279,13 @@ public final class WSS4JUtils {
         } catch (Exception ex) {
             return null;
         }
-        
+
         return null;
     }
-    
+
     public static Crypto loadCryptoFromPropertiesFile(
         Message message,
-        String propFilename, 
+        String propFilename,
         ClassLoader classLoader,
         PasswordEncryptor passwordEncryptor
     ) throws WSSecurityException {
@@ -293,20 +293,20 @@ public final class WSS4JUtils {
             URL url = SecurityUtils.loadResource(message, propFilename);
             if (url != null) {
                 Properties props = new Properties();
-                try (InputStream in = url.openStream()) { 
+                try (InputStream in = url.openStream()) {
                     props.load(in);
                 }
                 return CryptoFactory.getInstance(props, classLoader, passwordEncryptor);
             }
         } catch (Exception e) {
             //ignore
-        } 
+        }
         return CryptoFactory.getInstance(propFilename, classLoader);
     }
- 
+
     public static Crypto getEncryptionCrypto(
-        Object e, 
-        SoapMessage message, 
+        Object e,
+        SoapMessage message,
         PasswordEncryptor passwordEncryptor
     ) throws WSSecurityException {
         Crypto encrCrypto = null;
@@ -320,7 +320,7 @@ public final class WSS4JUtils {
                 Exception ex = new Exception("Cannot find Crypto Encryption properties: " + e);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
             }
-            
+
             encrCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
                                                    passwordEncryptor);
 
@@ -331,10 +331,10 @@ public final class WSS4JUtils {
         }
         return encrCrypto;
     }
-    
+
     public static Crypto getSignatureCrypto(
-        Object s, 
-        SoapMessage message, 
+        Object s,
+        SoapMessage message,
         PasswordEncryptor passwordEncryptor
     ) throws WSSecurityException {
         Crypto signCrypto = null;
@@ -348,7 +348,7 @@ public final class WSS4JUtils {
                 Exception ex = new Exception("Cannot find Crypto Signature properties: " + s);
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
             }
-            
+
             signCrypto = CryptoFactory.getInstance(props, Loader.getClassLoader(CryptoFactory.class),
                                                    passwordEncryptor);
 
@@ -359,7 +359,7 @@ public final class WSS4JUtils {
         }
         return signCrypto;
     }
-    
+
     /**
      * Get the certificate that was used to sign the request
      */
@@ -367,11 +367,11 @@ public final class WSS4JUtils {
         if (results == null || results.isEmpty()) {
             return null;
         }
-        
+
         for (WSHandlerResult rResult : results) {
-            List<WSSecurityEngineResult> signedResults = 
+            List<WSSecurityEngineResult> signedResults =
                 rResult.getActionResults().get(WSConstants.SIGN);
-            
+
             if (signedResults != null && !signedResults.isEmpty()) {
                 for (WSSecurityEngineResult signedResult : signedResults) {
                     if (signedResult.containsKey(WSSecurityEngineResult.TAG_X509_CERTIFICATE)) {
@@ -381,7 +381,7 @@ public final class WSS4JUtils {
                 }
             }
         }
-        
+
         return null;
     }
 }

@@ -53,7 +53,7 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
         }
         OutputStream actualOs = ctx.getOutputStream();
         List<JweEncryptionProvider> providers = getInitializedEncryptionProviders();
-        
+
         String ctString = null;
         MediaType contentMediaType = ctx.getMediaType();
         if (contentTypeRequired && contentMediaType != null) {
@@ -70,12 +70,12 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
         List<KeyAlgorithm> keyAlgos = new ArrayList<>();
         for (JweEncryptionProvider p : providers) {
             if (!keyAlgos.contains(p.getKeyAlgorithm())) {
-                keyAlgos.add(p.getKeyAlgorithm());    
+                keyAlgos.add(p.getKeyAlgorithm());
             }
         }
         List<JweHeaders> perRecipientUnprotectedHeaders = null;
         if (keyAlgos.size() == 1) {
-            // Can be optionally set in shared unprotected headers 
+            // Can be optionally set in shared unprotected headers
             // or per-recipient headers
             protectedHeaders.setKeyEncryptionAlgorithm(keyAlgos.get(0));
         } else {
@@ -89,31 +89,31 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
         if (useJweOutputStream) {
             //TODO
         } else {
-            CachedOutputStream cos = new CachedOutputStream(); 
+            CachedOutputStream cos = new CachedOutputStream();
             ctx.setOutputStream(cos);
             ctx.proceed();
-            
-            
-            
+
+
+
             JweJsonProducer producer = new JweJsonProducer(protectedHeaders, cos.getBytes());
             String jweContent = producer.encryptWith(providers, perRecipientUnprotectedHeaders);
-            
+
             setJoseMediaType(ctx);
-            IOUtils.copy(new ByteArrayInputStream(StringUtils.toBytesUTF8(jweContent)), 
+            IOUtils.copy(new ByteArrayInputStream(StringUtils.toBytesUTF8(jweContent)),
                          actualOs);
             actualOs.flush();
         }
     }
-    
+
     private void setJoseMediaType(WriterInterceptorContext ctx) {
         MediaType joseMediaType = JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE_JSON);
         ctx.setMediaType(joseMediaType);
     }
-    
+
     public void setUseJweOutputStream(boolean useJweOutputStream) {
         this.useJweOutputStream = useJweOutputStream;
     }
 
-    
-    
+
+
 }

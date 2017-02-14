@@ -27,9 +27,9 @@ import org.omg.CORBA.TypeCode;
 import org.omg.CORBA.portable.InputStream;
 import org.omg.CORBA.portable.OutputStream;
 
-public final class SystemExceptionHelper 
+public final class SystemExceptionHelper
     implements org.omg.CORBA.portable.Streamable {
-    
+
     private static final int BAD_CONTEXT = 0;
     private static final int BAD_INV_ORDER = 1;
     private static final int BAD_OPERATION = 2;
@@ -66,7 +66,7 @@ public final class SystemExceptionHelper
     private static final int TRANSACTION_UNAVAILABLE = 33;
     private static final int TRANSIENT = 34;
     private static final int UNKNOWN = 35;
-    
+
     private static final String[] IDS = {
         "IDL:omg.org/CORBA/BAD_CONTEXT:1.0",
         "IDL:omg.org/CORBA/BAD_INV_ORDER:1.0",
@@ -98,14 +98,14 @@ public final class SystemExceptionHelper
 
     SystemException value;
     TypeCode typeCode;
-    
+
     private SystemExceptionHelper() {
     }
     private SystemExceptionHelper(SystemException ex) {
         value = ex;
     }
-    
-    
+
+
 
     private static int binarySearch(String[] arr, String value) {
         int left = 0;
@@ -133,9 +133,9 @@ public final class SystemExceptionHelper
         any.insert_Streamable(new SystemExceptionHelper(val));
     }
 
-    
-    
-    //CHECKSTYLE:OFF 
+
+
+    //CHECKSTYLE:OFF
     //NCSS is to high for this due to the massive switch statement
     public static SystemException read(org.omg.CORBA.portable.InputStream in) {
 
@@ -258,13 +258,13 @@ public final class SystemExceptionHelper
         return ex;
     }
     //CHECKSTYLE:ON
-    
-    
-    
+
+
+
     public void _read(InputStream instream) {
         value = read(instream);
     }
-    
+
     public TypeCode _type() {
         if (typeCode == null) {
             ORB orb = ORB.init();
@@ -288,7 +288,7 @@ public final class SystemExceptionHelper
                 name = className.substring(className.lastIndexOf('.') + 1);
                 id = "IDL:omg.org/CORBA/" + name + ":1.0";
             }
-            
+
             typeCode = orb.create_exception_tc(id, name, smBuf);
         }
         return typeCode;
@@ -300,7 +300,7 @@ public final class SystemExceptionHelper
             id = "IDL:omg.org/CORBA/UNKNOWN";
         } else {
             String className = value.getClass().getName();
-            id = "IDL:omg.org/CORBA/" 
+            id = "IDL:omg.org/CORBA/"
                 + className.substring(className.lastIndexOf('.') + 1) + ":1.0";
         }
 

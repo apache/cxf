@@ -41,7 +41,7 @@ public class JaxWsAPITest extends AbstractVmJMSTest {
         startBusAndJMS(JaxWsAPITest.class);
         publish(new GreeterImplDoc());
     }
-    
+
     @Test
     public void testGreeterUsingJaxWSAPI() throws Exception {
         QName serviceName = new QName("http://apache.org/hello_world_doc_lit", "SOAPService2");

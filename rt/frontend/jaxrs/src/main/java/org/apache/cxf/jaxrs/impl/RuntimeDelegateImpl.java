@@ -42,8 +42,8 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 
 public class RuntimeDelegateImpl extends RuntimeDelegate {
-    protected Map<Class<?>, HeaderDelegate<?>> headerProviders 
-        = new HashMap<Class<?>, HeaderDelegate<?>>();    
+    protected Map<Class<?>, HeaderDelegate<?>> headerProviders
+        = new HashMap<Class<?>, HeaderDelegate<?>>();
 
     public RuntimeDelegateImpl() {
         headerProviders.put(MediaType.class, new MediaTypeHeaderProvider());
@@ -54,13 +54,13 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
         headerProviders.put(Link.class, new LinkHeaderProvider());
         headerProviders.put(Date.class, new DateHeaderProvider());
     }
-    
-    
-    
+
+
+
     public <T> T createInstance(Class<T> type) {
         if (type.isAssignableFrom(ResponseBuilder.class)) {
             return type.cast(new ResponseBuilderImpl());
-        } 
+        }
         if (type.isAssignableFrom(UriBuilder.class)) {
             return type.cast(new UriBuilderImpl());
         }
@@ -69,8 +69,8 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
         }
         return null;
     }
-   
-    
+
+
     @SuppressWarnings("unchecked")
     @Override
     public <T> HeaderDelegate<T> createHeaderDelegate(Class<T> type) {
@@ -98,13 +98,13 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
 
     @Override
     public VariantListBuilder createVariantListBuilder() {
-        return new VariantListBuilderImpl(); 
+        return new VariantListBuilderImpl();
     }
 
 
 
     @Override
-    public <T> T createEndpoint(Application app, Class<T> endpointType) 
+    public <T> T createEndpoint(Application app, Class<T> endpointType)
         throws IllegalArgumentException, UnsupportedOperationException {
         if (app == null || (!Server.class.isAssignableFrom(endpointType)
             && !JAXRSServerFactoryBean.class.isAssignableFrom(endpointType))) {
@@ -125,6 +125,6 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
     public Link.Builder createLinkBuilder() {
         return new LinkBuilderImpl();
     }
-    
+
 
 }

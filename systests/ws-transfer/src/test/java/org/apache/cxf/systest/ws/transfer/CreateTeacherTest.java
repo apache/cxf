@@ -34,24 +34,24 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class CreateTeacherTest {
-    
+
     static final String PORT = TestUtil.getPortNumber(CreateStudentTest.class);
     static final String PORT2 = TestUtil.getPortNumber(CreateStudentTest.class, 2);
-    
+
     static final String RESOURCE_TEACHERS_URL = "http://localhost:" + PORT2 + "/ResourceTeachers";
-    
+
     @BeforeClass
     public static void beforeClass() {
         TestUtils.createStudentsServers(PORT, PORT2);
         TestUtils.createTeachersServers(PORT2);
     }
-    
+
     @AfterClass
     public static void afterClass() {
         TestUtils.destroyStudentsServers();
         TestUtils.destroyTeachersServers();
     }
-    
+
     @Test
     public void createTeacherTest() throws XMLStreamException {
         Document createTeacherXML = StaxUtils.read(
@@ -59,10 +59,10 @@ public class CreateTeacherTest {
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createTeacherXML.getDocumentElement());
-        
+
         ResourceFactory rf = TestUtils.createResourceFactoryClient(PORT);
         CreateResponse response = rf.create(request);
-        
+
         Assert.assertEquals(RESOURCE_TEACHERS_URL,
             response.getResourceCreated().getAddress().getValue());
     }
@@ -74,14 +74,14 @@ public class CreateTeacherTest {
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createTeacherPartialXML.getDocumentElement());
-        
+
         ResourceFactory rf = TestUtils.createResourceFactoryClient(PORT);
         CreateResponse response = rf.create(request);
-        
+
         Assert.assertEquals(RESOURCE_TEACHERS_URL,
             response.getResourceCreated().getAddress().getValue());
     }
-    
+
     @Test(expected = SOAPFaultException.class)
     public void createTeacherWrongTest() throws XMLStreamException {
         Document createTeacherWrongXML = StaxUtils.read(
@@ -89,9 +89,9 @@ public class CreateTeacherTest {
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createTeacherWrongXML.getDocumentElement());
-        
+
         ResourceFactory rf = TestUtils.createResourceFactoryClient(PORT);
         rf.create(request);
     }
-    
+
 }

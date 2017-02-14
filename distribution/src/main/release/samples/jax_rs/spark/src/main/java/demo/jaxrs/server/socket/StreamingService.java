@@ -59,20 +59,20 @@ public class StreamingService {
     }
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                        new ArrayBlockingQueue<Runnable>(10));
-    private Map<String, BlockingQueue<String>> sparkResponses = 
+    private Map<String, BlockingQueue<String>> sparkResponses =
         new ConcurrentHashMap<String, BlockingQueue<String>>();
     private PrintStream sparkOutputStream;
-    
+
     public StreamingService(BufferedReader sparkInputStream, PrintStream sparkOutputStream) {
         this.sparkOutputStream = sparkOutputStream;
         executor.execute(new SparkResultJob(sparkResponses, sparkInputStream));
     }
-    
+
     @POST
     @Path("/multipart")
     @Consumes("multipart/form-data")
     @Produces("text/plain")
-    public void processMultipartStream(@Suspended AsyncResponse async, 
+    public void processMultipartStream(@Suspended AsyncResponse async,
                                        @Multipart("file") Attachment att) {
         MediaType mediaType = att.getContentType();
         if (mediaType == null) {
@@ -84,13 +84,13 @@ public class StreamingService {
                 }
             }
         }
-        
+
         TikaContentExtractor tika = new TikaContentExtractor();
         TikaContent tikaContent = tika.extract(att.getObject(InputStream.class),
                                                mediaType);
         processStream(async, SparkUtils.getStringsFromString(tikaContent.getContent()));
     }
-    
+
     @POST
     @Path("/stream")
     @Consumes("text/plain")
@@ -103,7 +103,7 @@ public class StreamingService {
         executor.execute(
             new SparkJob(async, sparkResponses, sparkOutputStream, inputStrings));
     }
-    
+
     @POST
     @Path("/streamOneWay")
     @Consumes("text/plain")

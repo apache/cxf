@@ -67,33 +67,33 @@ import org.junit.Assert;
  * Some unit tests for the issue operation to issue JWT tokens in a specific realm.
  */
 public class IssueJWTRealmUnitTest extends org.junit.Assert {
-    
-    public static final QName REQUESTED_SECURITY_TOKEN = 
+
+    public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
-    public static final QName ATTACHED_REFERENCE = 
+    public static final QName ATTACHED_REFERENCE =
         QNameConstants.WS_TRUST_FACTORY.createRequestedAttachedReference(null).getName();
-    public static final QName UNATTACHED_REFERENCE = 
+    public static final QName UNATTACHED_REFERENCE =
         QNameConstants.WS_TRUST_FACTORY.createRequestedUnattachedReference(null).getName();
-    
+
     /**
      * Test to successfully issue a JWT token in realm "A".
      */
     @org.junit.Test
     public void testIssueJWTTokenRealmA() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
         List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -105,68 +105,68 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         stsProperties.setIssuer("STS");
         stsProperties.setRealmParser(new CustomRealmParser());
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, JWTTokenProvider.JWT_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "ldap");
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, principal, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
-        
+
         // Test the generated token.
         Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 token = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(token);
         validateToken(token.getTextContent(), "A-Issuer", stsProperties.getSignatureUsername(), crypto);
     }
-    
+
     /**
      * Test to successfully issue a JWT token in realm "B".
      */
     @org.junit.Test
     public void testIssueJWTTokenRealmB() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
         List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -178,68 +178,68 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         stsProperties.setIssuer("STS");
         stsProperties.setRealmParser(new CustomRealmParser());
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, JWTTokenProvider.JWT_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "https");
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, principal, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
-        
+
         // Test the generated token.
         Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 token = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(token);
         validateToken(token.getTextContent(), "B-Issuer", stsProperties.getSignatureUsername(), crypto);
     }
-    
+
     /**
      * Test to successfully issue a JWT token in the default realm.
      */
     @org.junit.Test
     public void testIssueJWTTokenDefaultRealm() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
         List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -251,50 +251,50 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         stsProperties.setIssuer("STS");
         stsProperties.setRealmParser(new CustomRealmParser());
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, JWTTokenProvider.JWT_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "unknown");
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, principal, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
-        
+
         // Test the generated token.
         Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 token = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(token);
         validateToken(token.getTextContent(), "STS", stsProperties.getSignatureUsername(), crypto);
     }
-    
-    
+
+
     /**
      * Test to successfully issue a JWT token in realm "B"
      * using crypto definition in RealmProperties
@@ -302,19 +302,19 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testIssueJWTTokenRealmBCustomCrypto() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
         List<TokenProvider> providerList = new ArrayList<>();
         JWTTokenProvider provider = new JWTTokenProvider();
         provider.setRealmMap(createRealms());
         providerList.add(provider);
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -326,33 +326,33 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         stsProperties.setIssuer("STS");
         stsProperties.setRealmParser(new CustomRealmParser());
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Set signature properties in Realm B
         Map<String, RealmProperties> realms = provider.getRealmMap();
         RealmProperties realm = realms.get("B");
         realm.setSignatureCrypto(crypto);
         realm.setCallbackHandler(new PasswordCallbackHandler());
-        
-        
+
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, JWTTokenProvider.JWT_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "https");
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Issue a token - this will fail as the RealmProperties configuration is inconsistent
         // no signature alias defined
         try {
@@ -361,32 +361,32 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         } catch (STSException ex) {
             // expected
         }
-        
+
         realm.setSignatureAlias("mystskey");
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, principal, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
-        
+
         // Test the generated token.
         Element token = null;
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 token = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(token);
         validateToken(token.getTextContent(), "B-Issuer", stsProperties.getSignatureUsername(), crypto);
     }
-    
+
     /**
      * Create some JWT Realms
      */
@@ -398,23 +398,23 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         realm = new RealmProperties();
         realm.setIssuer("B-Issuer");
         realms.put("B", realm);
-        
+
         return realms;
     }
-    
+
     private void validateToken(String token, String issuer, String sigUsername, Crypto sigCrypto) throws Exception {
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals(issuer, jwt.getClaim(JwtConstants.CLAIM_ISSUER));
-        
+
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(sigUsername);
         X509Certificate[] certs = sigCrypto.getX509Certificates(cryptoType);
         assertNotNull(certs);
-        
+
         assertTrue(jwtConsumer.verifySignatureWith(certs[0], SignatureAlgorithm.RS256));
     }
-    
+
     /*
      * Create a security context object
      */
@@ -428,7 +428,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
             }
         };
     }
-    
+
     /*
      * Mock up an AppliesTo element using the supplied address
      */
@@ -445,7 +445,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         appliesTo.appendChild(endpointRef);
         return appliesTo;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -453,8 +453,8 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
+
 }

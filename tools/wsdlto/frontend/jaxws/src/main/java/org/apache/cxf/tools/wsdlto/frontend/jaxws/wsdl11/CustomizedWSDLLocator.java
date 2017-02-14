@@ -39,19 +39,19 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
 
     private String baseUri;
     private String importedUri;
- 
+
     private OASISCatalogManager catalogResolver;
-   
+
     private Map<String, Element> elementMap;
     private String latestImportURI;
     private Map<String, String> resolvedMap = new HashMap<String, String>();
     private boolean resolveFromMap;
-    
+
     public CustomizedWSDLLocator(String wsdlUrl, Map<String, Element> map) {
         this.wsdlUrl = wsdlUrl;
         this.baseUri = this.wsdlUrl;
         resolver = new ExtendedURIResolver();
-        elementMap = map; 
+        elementMap = map;
     }
 
     public void setCatalogResolver(final OASISCatalogManager cr) {
@@ -60,7 +60,7 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
 
     private InputSource resolve(final String target, final String base) {
         try {
-            String resolvedLocation = 
+            String resolvedLocation =
                 new OASISCatalogManagerHelper().resolve(catalogResolver, target, base);
             if (resolvedLocation == null) {
                 return this.resolver.resolve(target, base);
@@ -80,7 +80,7 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
             InputSource ins = new InputSource(new StringReader(content));
             ins.setSystemId(baseUri);
             return ins;
-            
+
         }
         InputSource result = resolve(baseUri, null);
         baseUri = resolver.getURI();
@@ -92,7 +92,7 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
     public String getLatestImportURI() {
         if (this.resolveFromMap) {
             return this.latestImportURI;
-            
+
         }
         return resolver.getLatestImportURI();
     }
@@ -105,7 +105,7 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
                 URI parentURI = new URI(parent);
                 importURI = parentURI.resolve(importURI);
             }
-            
+
             if (elementMap.get(importURI.toString()) != null) {
                 Element ele = elementMap.get(importURI.toString());
                 String content = StaxUtils.toString(ele);
@@ -114,19 +114,19 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
                 ins.setSystemId(importURI.toString());
                 this.resolveFromMap = true;
                 this.latestImportURI = importURI.toString();
-                return ins;    
+                return ins;
             }
-            
+
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Failed to Resolve " + importLocation, e);        
-        } 
+            throw new RuntimeException("Failed to Resolve " + importLocation, e);
+        }
         resolveFromMap = false;
         return resolve(importedUri, baseUri);
     }
     public void close() {
         resolver.close();
     }
-    
+
     public Map<String, String> getResolvedMap() {
         return resolvedMap;
     }

@@ -25,7 +25,7 @@ import javax.persistence.metamodel.SingularAttribute;
 //CHECKSTYLE:OFF
 public final class Book_ {
     private Book_() {
-        
+
     }
     public static volatile SingularAttribute<Book, Integer> id;
     public static volatile SingularAttribute<Book, String> bookTitle;

@@ -26,15 +26,15 @@ import org.apache.cxf.ws.transfer.manager.ResourceManager;
  * @see ResourceResolver
  */
 public class ResourceReference {
-    
+
     private ResourceManager resourceManager;
-    
+
     private String resourceURL;
-    
+
     public ResourceReference() {
-        
+
     }
-    
+
     public ResourceReference(
             String resourceURL,
             ResourceManager resourceManager) {
@@ -57,5 +57,5 @@ public class ResourceReference {
     public void setResourceURL(String resourceURL) {
         this.resourceURL = resourceURL;
     }
-    
+
 }

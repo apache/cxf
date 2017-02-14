@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class HandlerContext {
-    
+
     private Map<Class<?>, Object> contextMap = new HashMap<>();
 
     public HandlerContext() {

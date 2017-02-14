@@ -23,7 +23,7 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
-@WebService(name = "Endpoint", serviceName = "EndpointService", 
+@WebService(name = "Endpoint", serviceName = "EndpointService",
             targetNamespace = "http://cxf.apache.org/cxf1519")
 public class EndpointImpl implements Endpoint {
     @WebMethod

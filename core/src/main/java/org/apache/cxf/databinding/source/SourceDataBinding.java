@@ -38,11 +38,11 @@ import org.apache.ws.commons.schema.constants.Constants;
  * A simple databinding implementation which reads and writes Source objects.
  */
 public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBinding {
-    
+
     public static final String PREFERRED_FORMAT = "source-preferred-format";
 
     final Class<?> preferred;
-    
+
     public SourceDataBinding() {
         super();
         preferred = null;
@@ -69,7 +69,7 @@ public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBi
             } .walk();
         }
     }
-    
+
 
     @SuppressWarnings("unchecked")
     public <T> DataReader<T> createReader(Class<T> cls) {

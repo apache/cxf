@@ -35,25 +35,25 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.transport.http.auth.AbstractSpnegoAuthSupplier;
 
-public class KerberosAuthOutInterceptor extends AbstractSpnegoAuthSupplier 
+public class KerberosAuthOutInterceptor extends AbstractSpnegoAuthSupplier
     implements PhaseInterceptor<Message> {
 
     private String phase = Phase.MARSHAL;
     private AuthorizationPolicy policy;
-    
+
     public KerberosAuthOutInterceptor() {
-        
+
     }
     public KerberosAuthOutInterceptor(String phase) {
         this.phase = phase;
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         URI currentURI = getCurrentURI(message);
-        String value = super.getAuthorization(getPolicy(), 
-                                              currentURI, 
+        String value = super.getAuthorization(getPolicy(),
+                                              currentURI,
                                               message);
-        Map<String, List<String>> headers = 
+        Map<String, List<String>> headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         if (headers == null) {
             headers = new HashMap<String, List<String>>();
@@ -61,7 +61,7 @@ public class KerberosAuthOutInterceptor extends AbstractSpnegoAuthSupplier
         }
         headers.put("Authorization", Collections.singletonList(value));
     }
-    
+
     private URI getCurrentURI(Message message) {
         try {
             return new URI((String)message.get(Message.ENDPOINT_ADDRESS));

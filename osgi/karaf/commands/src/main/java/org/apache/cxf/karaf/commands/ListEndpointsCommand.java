@@ -44,7 +44,7 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 
 /**
- * 
+ *
  */
 @Command(scope = "cxf", name = "list-endpoints",
     description = "Lists all CXF Endpoints on a Bus.")
@@ -52,13 +52,13 @@ import org.osgi.service.cm.ConfigurationAdmin;
 public class ListEndpointsCommand extends CXFController implements Action {
     protected static final String HEADER_FORMAT = "%-25s %-10s %-60s %-40s";
     protected static final String OUTPUT_FORMAT = "[%-23s] [%-8s] [%-58s] [%-38s]";
-    
+
     @Argument(index = 0, name = "bus",
-        description = "The CXF bus name where to look for the Endpoints", 
+        description = "The CXF bus name where to look for the Endpoints",
         required = false, multiValued = false)
     @Completion(BusCompleter.class)
     String name;
-    
+
     @Option(name = "-f", aliases = {"--fulladdress" },
         description = "Display full address of an endpoint ", required = false, multiValued = false)
     boolean fullAddress;
@@ -108,7 +108,7 @@ public class ListEndpointsCommand extends CXFController implements Action {
         table.print(System.out, !noFormat);
         return null;
     }
-    
+
     private String toFullAddress(String address) throws IOException, InvalidSyntaxException {
         ConfigurationAdmin configAdmin = getConfigAdmin();
         if (address.startsWith("/") && configAdmin != null) {
@@ -129,7 +129,7 @@ public class ListEndpointsCommand extends CXFController implements Action {
         return address;
     }
 
-    private String extractConfigProperty(ConfigurationAdmin configAdmin, 
+    private String extractConfigProperty(ConfigurationAdmin configAdmin,
                                          String pid, String propertyName) throws IOException,
         InvalidSyntaxException {
         String ret = null;
@@ -145,17 +145,17 @@ public class ListEndpointsCommand extends CXFController implements Action {
 
     private String getCXFOSGiServletContext() throws InvalidSyntaxException {
         String ret = null;
-        String filter = "(&(" + "objectclass=" + "javax.servlet.Servlet" 
+        String filter = "(&(" + "objectclass=" + "javax.servlet.Servlet"
             + ")(servlet-name=cxf-osgi-transport-servlet))";
 
         ServiceReference ref = getBundleContext().getServiceReferences(null, filter)[0];
-        
+
         if (ref != null) {
             ret = (String)ref.getProperty("alias");
-        } 
-        
+        }
+
         return ret;
-        
+
     }
 
     private String getHttpOSGiServicePort() throws InvalidSyntaxException {

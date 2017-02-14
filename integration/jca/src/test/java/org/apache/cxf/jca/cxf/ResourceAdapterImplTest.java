@@ -41,7 +41,7 @@ import org.junit.Test;
 public class ResourceAdapterImplTest extends Assert {
 
     public ResourceAdapterImplTest() {
-        
+
     }
 
     @Test
@@ -152,11 +152,11 @@ public class ResourceAdapterImplTest extends Assert {
         Bus bus = EasyMock.createMock(Bus.class);
         bus.shutdown(true);
         EasyMock.expectLastCall();
-        EasyMock.replay(bus);        
+        EasyMock.replay(bus);
         rai.registerBus(bus);
         rai.stop();
         EasyMock.verify(bus);
     }
 
-    
+
 }

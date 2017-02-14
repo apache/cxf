@@ -33,26 +33,26 @@ import org.apache.cxf.greeter_control.types.SayHiResponse;
 
 @WebService(serviceName = "GreeterService",
             portName = "GreeterPort",
-            endpointInterface = "org.apache.cxf.greeter_control.Greeter", 
+            endpointInterface = "org.apache.cxf.greeter_control.Greeter",
             targetNamespace = "http://cxf.apache.org/greeter_control")
 @FactoryType(FactoryType.Type.Session)
 public class SessionAnnotationGreeterImpl implements Greeter {
     String name;
-    
+
     public SessionAnnotationGreeterImpl() {
     }
-    
+
     // greetMe will use session to return last called name
     public String greetMe(String me) {
         name = me;
         return "Hello " + me;
     }
-    
+
 
     public String sayHi() {
         return "Bonjour " + name;
     }
-    
+
     public void pingMe() {
     }
 
@@ -71,7 +71,7 @@ public class SessionAnnotationGreeterImpl implements Greeter {
 
     public void greetMeOneWay(String requestType) {
         // TODO Auto-generated method stub
-        
+
     }
 
 

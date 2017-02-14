@@ -35,10 +35,10 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
     private int current = XMLStreamReader.START_DOCUMENT;
     private boolean filter = true;
     private boolean advanceAtEnd = true;
-    
+
     public FragmentStreamReader(XMLStreamReader reader) {
         super(reader);
-    }    
+    }
     public FragmentStreamReader(XMLStreamReader reader, boolean doDocEvents) {
         super(reader);
         this.doDocEvents = doDocEvents;
@@ -49,12 +49,12 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
                 startElement = true;
             }
         }
-    }    
-   
+    }
+
     public int getEventType() {
         return current;
     }
-    
+
     public boolean isCharacters() {
         return current == XMLStreamReader.CHARACTERS;
     }
@@ -69,31 +69,31 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
 
     public boolean isWhiteSpace() {
         return current == XMLStreamReader.CHARACTERS && reader.isWhiteSpace();
-    }    
+    }
 
     public boolean hasNext() throws XMLStreamException {
-        
+
         if (endDoc) {
             return false;
         }
-        
+
         return reader.hasNext();
     }
-    
+
     public final int next() throws XMLStreamException {
         if (!startElement) {
             depth = getDepth();
-            
+
             current = reader.getEventType();
-            
+
             if (filter) {
                 while (current != START_ELEMENT && depth >= getDepth() && super.hasNext()) {
                     current = super.next();
                 }
-                
+
                 filter = false;
             }
-            
+
             startElement = true;
             current = START_ELEMENT;
         } else if (middle) {
@@ -110,7 +110,7 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
             if (advanceAtEnd) {
                 super.next();
             }
-            
+
             endDoc = true;
             current = END_DOCUMENT;
         } else {
@@ -131,6 +131,6 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
      */
     public void setAdvanceAtEnd(boolean a) {
         this.advanceAtEnd = a;
-    }    
+    }
 
 }

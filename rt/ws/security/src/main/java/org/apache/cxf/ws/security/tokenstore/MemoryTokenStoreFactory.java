@@ -26,9 +26,9 @@ import org.apache.cxf.message.Message;
  * A factory to return a MemoryTokenStore instance.
  */
 public class MemoryTokenStoreFactory extends TokenStoreFactory {
-    
+
     public TokenStore newTokenStore(String key, Message message) {
         return new MemoryTokenStore();
     }
-    
+
 }

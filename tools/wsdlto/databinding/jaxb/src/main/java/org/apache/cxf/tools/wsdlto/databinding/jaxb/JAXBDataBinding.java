@@ -129,7 +129,7 @@ import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerExcep
 public class JAXBDataBinding implements DataBindingProfile {
     static final String XJCVERSION;
     static {
-        
+
         VersionDetectListener listener = new VersionDetectListener();
         try {
             Driver.run(new String[] {"-version"}, listener);
@@ -138,7 +138,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
         XJCVERSION = listener.getVersion();
     }
-    
+
     static final class VersionDetectListener extends XJCListener {
         private String s = "2.1";
         VersionDetectListener() {
@@ -239,7 +239,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
         private String mapSchemaLocation(String target) {
             //See http://java.net/jira/browse/JAXB-925
-            if (this.getLocation().getSystemId().startsWith("jar:") 
+            if (this.getLocation().getSystemId().startsWith("jar:")
                 && XJCVERSION.startsWith("2.2")) {
                 return target;
             }
@@ -299,7 +299,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     private DefaultValueProvider defaultValues;
     private boolean initialized;
     private JAXBBindErrorListener listener;
-    
+
     static {
         DEFAULT_TYPE_MAP.add("boolean");
         DEFAULT_TYPE_MAP.add("int");
@@ -337,14 +337,14 @@ public class JAXBDataBinding implements DataBindingProfile {
                 c.remove(ToolConstants.CFG_ENCODING);
                 String fenc = System.getProperty("file.encoding");
                 if (!encoding.equals(fenc)) {
-                    LOG.log(Level.WARNING, "JAXB_NO_ENCODING_SUPPORT", 
+                    LOG.log(Level.WARNING, "JAXB_NO_ENCODING_SUPPORT",
                             new String[] {Driver.getBuildID(), fenc});
                 }
             }
         }
-        
+
     }
-    
+
     public void initialize(ToolContext c) throws ToolException {
         this.context = c;
         checkEncoding(c);
@@ -427,7 +427,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 throw new ToolException(msg.toString(), e);
             }
         }
-        
+
         if (context.optionSet(ToolConstants.CFG_MARK_GENERATED)) {
             // Add the @Generated annotation in the Java files generated. This is done by passing
             // '-mark-generated' attribute to jaxb xjc.
@@ -456,7 +456,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             schemaCompiler.setDefaultPackageName(context.getPackageName());
         }
 
-        
+
         rawJaxbModelGenCode = schemaCompiler.bind();
 
         addedEnumClassToCollector(schemas, allocator);
@@ -505,7 +505,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 String s = atts.getValue("schemaLocation");
                 if (!StringUtils.isEmpty(s)) {
                     //See http://java.net/jira/browse/JAXB-925
-                    if (locator.getSystemId().startsWith("jar:") 
+                    if (locator.getSystemId().startsWith("jar:")
                         && XJCVERSION.startsWith("2.2")) {
                         return s;
                     }
@@ -527,7 +527,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                     return new ReferenceFinder(parent, catalog);
                 }
             };
-            
+
             Constructor<DOMForest> c = null;
             DOMForest forest = null;
 
@@ -734,7 +734,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
 
     }
-    
+
     private XMLStreamReader createNoCDATAReader(final XMLStreamReader reader) {
         return new StreamReaderDelegate(reader) {
             public int next() throws XMLStreamException {
@@ -964,7 +964,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
 
-    public void validateSchema(Element ele, 
+    public void validateSchema(Element ele,
                                String uri,
                                final OASISCatalogManager catalog,
                                final SchemaCollection schemaCollection) throws ToolException {
@@ -1273,7 +1273,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
     private static String mapSchemaLocation(String target, String base, OASISCatalogManager catalog) {
         try {
-            String resolvedLocation = new OASISCatalogManagerHelper().resolve(catalog, 
+            String resolvedLocation = new OASISCatalogManagerHelper().resolve(catalog,
                                                                               target, base);
             if (resolvedLocation != null) {
                 return resolvedLocation;
@@ -1282,7 +1282,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         } catch (Exception ex) {
             //ignore
         }
-        
+
 
         try {
             URIResolver resolver = new URIResolver(base, target);

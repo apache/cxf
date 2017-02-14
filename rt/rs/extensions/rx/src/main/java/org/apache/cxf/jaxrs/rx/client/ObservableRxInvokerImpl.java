@@ -37,7 +37,7 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
         this.wc = wc;
         this.ex = ex;
     }
-    
+
     @Override
     public Observable<Response> get() {
         return get(Response.class);
@@ -162,9 +162,9 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
     public <T> Observable<T> method(String name, GenericType<T> responseType) {
         return doInvokeAsync(name, null, responseType.getRawType(), responseType.getType());
     }
-    
-    protected <T> Observable<T> doInvokeAsync(String httpMethod, 
-                                              Object body, 
+
+    protected <T> Observable<T> doInvokeAsync(String httpMethod,
+                                              Object body,
                                               Class<?> respClass,
                                               Type outType) {
         JaxrsClientObservableCallback<T> cb = new JaxrsClientObservableCallback<T>(respClass, outType, ex);

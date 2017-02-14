@@ -46,7 +46,7 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public final class SwaggerUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(ResourceUtils.class);
-    private static final Map<String, String> SWAGGER_TYPE_MAP; 
+    private static final Map<String, String> SWAGGER_TYPE_MAP;
     static {
         SWAGGER_TYPE_MAP = new HashMap<String, String>();
         SWAGGER_TYPE_MAP.put("string", "String");
@@ -63,7 +63,7 @@ public final class SwaggerUtils {
         SWAGGER_TYPE_MAP.put("file", "java.io.InputStream");
     }
     private SwaggerUtils() {
-        
+
     }
     public static UserApplication getUserApplication(String loc) {
         return getUserApplication(loc, BusFactory.getThreadDefaultBus());
@@ -86,12 +86,12 @@ public final class SwaggerUtils {
     public static UserApplication getUserApplicationFromJson(String json) {
         JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
         Map<String, Object> map = reader.fromJson(json);
-    
+
         UserApplication app = new UserApplication();
         String relativePath = (String)map.get("basePath");
         app.setBasePath(StringUtils.isEmpty(relativePath) ? "/" : relativePath);
-        
-        
+
+
         Map<String, List<UserOperation>> userOpsMap = new LinkedHashMap<String, List<UserOperation>>();
         Set<String> tags = new HashSet<>();
         List<Map<String, Object>> tagsProp = CastUtils.cast((List<?>)map.get("tags"));
@@ -105,56 +105,56 @@ public final class SwaggerUtils {
         for (String tag : tags) {
             userOpsMap.put(tag, new LinkedList<UserOperation>());
         }
-        
-        
+
+
         Map<String, Map<String, Object>> paths = CastUtils.cast((Map<?, ?>)map.get("paths"));
         for (Map.Entry<String, Map<String, Object>> pathEntry : paths.entrySet()) {
             String operPath = pathEntry.getKey();
-            
+
             Map<String, Object> operations = pathEntry.getValue();
             for (Map.Entry<String, Object> operEntry : operations.entrySet()) {
-                
+
                 UserOperation userOp = new UserOperation();
                 userOp.setVerb(operEntry.getKey().toUpperCase());
-                
+
                 Map<String, Object> oper = CastUtils.cast((Map<?, ?>)operEntry.getValue());
                 List<String> opTags = CastUtils.cast((List<?>)oper.get("tags"));
                 String opTag = opTags == null ? "" : opTags.get(0);
-                
+
                 String realOpPath = operPath.equals("/" + opTag) ? "/" : operPath.substring(opTag.length() + 1);
                 userOp.setPath(realOpPath);
-                
+
                 userOp.setName((String)oper.get("operationId"));
                 List<String> opProduces = CastUtils.cast((List<?>)oper.get("produces"));
                 userOp.setProduces(listToString(opProduces));
-                
+
                 List<String> opConsumes = CastUtils.cast((List<?>)oper.get("consumes"));
                 userOp.setConsumes(listToString(opConsumes));
-                
-                List<Parameter> userOpParams = new LinkedList<Parameter>(); 
+
+                List<Parameter> userOpParams = new LinkedList<Parameter>();
                 List<Map<String, Object>> params = CastUtils.cast((List<?>)oper.get("parameters"));
                 for (Map<String, Object> param : params) {
                     String name = (String)param.get("name");
                     //"query", "header", "path", "formData" or "body"
                     String paramType = (String)param.get("in");
-                    ParameterType pType = "body".equals(paramType) ? ParameterType.REQUEST_BODY 
-                        : "formData".equals(paramType) 
-                        ? ParameterType.FORM : ParameterType.valueOf(paramType.toUpperCase()); 
+                    ParameterType pType = "body".equals(paramType) ? ParameterType.REQUEST_BODY
+                        : "formData".equals(paramType)
+                        ? ParameterType.FORM : ParameterType.valueOf(paramType.toUpperCase());
                     Parameter userParam = new Parameter(pType, name);
-                    
+
                     setJavaType(userParam, (String)param.get("type"));
                     userOpParams.add(userParam);
-                }   
+                }
                 if (!userOpParams.isEmpty()) {
                     userOp.setParameters(userOpParams);
                 }
-                userOpsMap.get(opTag).add(userOp);    
-                
+                userOpsMap.get(opTag).add(userOp);
+
             }
         }
-        
+
         List<UserResource> resources = new LinkedList<UserResource>();
-        
+
         for (Map.Entry<String, List<UserOperation>> entry : userOpsMap.entrySet()) {
             UserResource ur = new UserResource();
             ur.setPath("/" + entry.getKey());
@@ -162,11 +162,11 @@ public final class SwaggerUtils {
             ur.setName(entry.getKey());
             resources.add(ur);
         }
-        
+
         app.setResources(resources);
         return app;
     }
-    
+
     private static void setJavaType(Parameter userParam, String typeName) {
         String javaTypeName = SWAGGER_TYPE_MAP.get(typeName);
         if (javaTypeName != null) {
@@ -176,7 +176,7 @@ public final class SwaggerUtils {
                 // ignore - can be a reference to a JSON model class, etc
             }
         }
-        
+
     }
     private static String listToString(List<String> list) {
         if (list != null) {

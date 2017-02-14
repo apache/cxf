@@ -32,12 +32,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class JwsJsonConsumerTest extends Assert {
-    private static final String DUAL_SIGNED_DOCUMENT =                           
+    private static final String DUAL_SIGNED_DOCUMENT =
         "{\"payload\":\n"
         + "\t\"eyJpc3MiOiJqb2UiLA0KICJleHAiOjEzMDA4MTkzODAsDQogImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ\",\n"
         + "\t\"signatures\":[\n"
         + "\t\t\t{\"protected\":\"eyJhbGciOiJSUzI1NiJ9\",\n"
-        + "\t\t\t \"header\":\n"   
+        + "\t\t\t \"header\":\n"
         + "\t\t\t\t{\"kid\":\"2010-12-29\"},\n"
         + "\t\t\t \"signature\":\n"
         + "\t\t\t\t\"cC4hiUPoj9Eetdgtv3hF80EGrhuB__dzERat0XF9g2VtQgr9PJbu3XOiZj5RZmh7AAuHIm4Bh-0Qc_lF5YKt_O8W2Fp5"
@@ -50,13 +50,13 @@ public class JwsJsonConsumerTest extends Assert {
         + "\t\t\t \"signature\":\n"
         + "\t\t\t\t\"DtEhU3ljbEg8L38VWAfUAqOyKAM6-Xx-F4GawxaepmXFCgfTjDxw5djxLa8ISlSApmWQxfKTUJqPP3-Kg6NU1Q\"}]\n"
         + "}";
-    
+
     private static final String KID_OF_THE_FIRST_SIGNER = "2010-12-29";
     private static final String KID_OF_THE_SECOND_SIGNER = "e9bc097a-ce51-4036-9562-d2ade882db0d";
-    
+
     @Test
     public void testVerifySignedWithProtectedHeaderOnlyUnencodedPayload() {
-        JwsJsonConsumer consumer = 
+        JwsJsonConsumer consumer =
             new JwsJsonConsumer(JwsJsonProducerTest.SIGNED_JWS_JSON_FLAT_UNENCODED_DOCUMENT);
         assertEquals(JwsJsonProducerTest.UNSIGNED_PLAIN_DOCUMENT, consumer.getJwsPayload());
         assertEquals(JwsJsonProducerTest.UNSIGNED_PLAIN_DOCUMENT, consumer.getDecodedJwsPayload());
@@ -67,12 +67,12 @@ public class JwsJsonConsumerTest extends Assert {
         assertEquals(1, critical.size());
         assertEquals(JoseConstants.JWS_HEADER_B64_STATUS_HEADER, critical.get(0));
     }
-    
+
     @Test
     public void testVerifyDualSignedDocument() throws Exception {
-        JwsJsonConsumer consumer = new JwsJsonConsumer(DUAL_SIGNED_DOCUMENT); 
+        JwsJsonConsumer consumer = new JwsJsonConsumer(DUAL_SIGNED_DOCUMENT);
         JsonWebKeys jwks = readKeySet("jwkPublicJsonConsumerSet.txt");
-        
+
         List<JwsJsonSignatureEntry> sigEntries = consumer.getSignatureEntries();
         assertEquals(2, sigEntries.size());
         // 1st signature
@@ -90,9 +90,9 @@ public class JwsJsonConsumerTest extends Assert {
     }
     @Test
     public void testVerifySingleEntryInDualSignedDocument() throws Exception {
-        JwsJsonConsumer consumer = new JwsJsonConsumer(DUAL_SIGNED_DOCUMENT); 
+        JwsJsonConsumer consumer = new JwsJsonConsumer(DUAL_SIGNED_DOCUMENT);
         JsonWebKeys jwks = readKeySet("jwkPublicJsonConsumerSet.txt");
-        
+
         List<JwsJsonSignatureEntry> sigEntries = consumer.getSignatureEntries();
         assertEquals(2, sigEntries.size());
         // 1st signature
@@ -106,7 +106,7 @@ public class JwsJsonConsumerTest extends Assert {
             consumer.verifyAndGetNonValidated(Collections.singletonList(jws));
         assertEquals(1, remainingEntries.size());
         assertEquals(KID_OF_THE_SECOND_SIGNER, remainingEntries.get(0).getKeyId());
-        
+
     }
     public JsonWebKeys readKeySet(String fileName) throws Exception {
         InputStream is = JwsJsonConsumerTest.class.getResourceAsStream(fileName);

@@ -27,12 +27,12 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.security.KerberosAuthenticationFilter;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
-    
+
 public class BookKerberosServer extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-kerberos");
-    
+
     protected void run() {
-        
+
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class);
         //default lifecycle is per-request, change it to singleton
@@ -45,8 +45,8 @@ public class BookKerberosServer extends AbstractBusTestServerBase {
         //filter.setServicePrincipalName("HTTP/ktab");
         sf.setProvider(filter);
         sf.setAddress("http://localhost:" + PORT + "/");
-      
-        sf.create();        
+
+        sf.create();
     }
 
     public static void main(String[] args) {
@@ -60,7 +60,7 @@ public class BookKerberosServer extends AbstractBusTestServerBase {
             System.out.println("done!");
         }
     }
-    
+
     public static CallbackHandler getCallbackHandler(final String username, final String password) {
         return new NamePasswordCallbackHandler(username, password);
     }

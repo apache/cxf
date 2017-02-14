@@ -36,7 +36,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.wsn.wsdl.WSNWSDLLocator;
 
 /**
- * 
+ *
  */
 public class CXFWSNHelper extends WSNHelper {
 
@@ -48,18 +48,18 @@ public class CXFWSNHelper extends WSNHelper {
     public <T> T getPort(String address,
                          Class<T> serviceInterface,
                          Class<?>... extraClasses) {
-        
+
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             if (setClassLoader) {
                 Thread.currentThread().setContextClassLoader(WSNHelper.class.getClassLoader());
             }
-            
+
             JaxWsProxyFactoryBean jwfb = new JaxWsProxyFactoryBean();
             jwfb.getClientFactoryBean().setWsdlURL(WSNWSDLLocator.getWSDLUrl().toExternalForm());
-            jwfb.setServiceName(new QName("http://cxf.apache.org/wsn/jaxws", 
+            jwfb.setServiceName(new QName("http://cxf.apache.org/wsn/jaxws",
                                           serviceInterface.getSimpleName() + "Service"));
-            jwfb.setEndpointName(new QName("http://cxf.apache.org/wsn/jaxws", 
+            jwfb.setEndpointName(new QName("http://cxf.apache.org/wsn/jaxws",
                                            serviceInterface.getSimpleName() + "Port"));
             jwfb.setAddress(address);
             if (extraClasses != null && extraClasses.length > 0) {
@@ -67,7 +67,7 @@ public class CXFWSNHelper extends WSNHelper {
                 props.put("jaxb.additionalContextClasses", extraClasses);
                 jwfb.getClientFactoryBean().getServiceFactory().setProperties(props);
             }
-            return jwfb.create(serviceInterface); 
+            return jwfb.create(serviceInterface);
         } finally {
             Thread.currentThread().setContextClassLoader(cl);
         }

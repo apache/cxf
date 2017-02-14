@@ -46,22 +46,22 @@ import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
  * Some unit tests for creating JWT Tokens with lifetime
  */
 public class JWTProviderLifetimeTest extends org.junit.Assert {
-    
+
     /**
      * Issue JWT token with a valid requested lifetime
      */
     @org.junit.Test
     public void testJWTValidLifetime() throws Exception {
-        
+
         int requestedLifetime = 60;
         JWTTokenProvider tokenProvider = new JWTTokenProvider();
         DefaultJWTClaimsProvider claimsProvider = new DefaultJWTClaimsProvider();
         claimsProvider.setAcceptClientLifetime(true);
         tokenProvider.setJwtClaimsProvider(claimsProvider);
-               
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
-        
+
         // Set expected lifetime to 1 minute
         Date creationTime = new Date();
         Date expirationTime = new Date();
@@ -70,69 +70,69 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         lifetime.setCreated(fmt.format(creationTime));
         lifetime.setExpires(fmt.format(expirationTime));
-        providerParameters.getTokenRequirements().setLifetime(lifetime);    
-        
+        providerParameters.getTokenRequirements().setLifetime(lifetime);
+
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(requestedLifetime * 1000L, providerResponse.getExpires().getTime() 
+        assertEquals(requestedLifetime * 1000L, providerResponse.getExpires().getTime()
                      - providerResponse.getCreated().getTime());
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
     }
-    
+
     /**
      * Issue JWT token with a lifetime configured in JWTTokenProvider
      * No specific lifetime requested
      */
     @org.junit.Test
     public void testJWTProviderLifetime() throws Exception {
-        
+
         long providerLifetime = 10 * 600L;
         JWTTokenProvider tokenProvider = new JWTTokenProvider();
         DefaultJWTClaimsProvider claimsProvider = new DefaultJWTClaimsProvider();
         claimsProvider.setLifetime(providerLifetime);
         tokenProvider.setJwtClaimsProvider(claimsProvider);
-                       
+
         TokenProviderParameters providerParameters = createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
-        
+
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
-        assertEquals(providerLifetime * 1000L, providerResponse.getExpires().getTime() 
+
+        assertEquals(providerLifetime * 1000L, providerResponse.getExpires().getTime()
                      - providerResponse.getCreated().getTime());
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
     }
-    
-    
+
+
     /**
      * Issue JWT token with a with a lifetime
      * which exceeds configured maximum lifetime
      */
     @org.junit.Test
     public void testJWTExceededConfiguredMaxLifetime() throws Exception {
-        
+
         long maxLifetime = 30 * 60L;  // 30 minutes
         JWTTokenProvider tokenProvider = new JWTTokenProvider();
         DefaultJWTClaimsProvider claimsProvider = new DefaultJWTClaimsProvider();
         claimsProvider.setMaxLifetime(maxLifetime);
         claimsProvider.setAcceptClientLifetime(true);
         tokenProvider.setJwtClaimsProvider(claimsProvider);
-                       
+
         TokenProviderParameters providerParameters = createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
-        
+
         // Set expected lifetime to 35 minutes
         long requestedLifetime = 35 * 60L;
         Date creationTime = new Date();
@@ -142,8 +142,8 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         lifetime.setCreated(fmt.format(creationTime));
         lifetime.setExpires(fmt.format(expirationTime));
-        providerParameters.getTokenRequirements().setLifetime(lifetime);         
-        
+        providerParameters.getTokenRequirements().setLifetime(lifetime);
+
         try {
             tokenProvider.createToken(providerParameters);
             fail("Failure expected due to exceeded lifetime");
@@ -151,22 +151,22 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             //expected
         }
     }
-    
+
     /**
      * Issue JWT token with a with a lifetime
      * which exceeds default maximum lifetime
      */
     @org.junit.Test
     public void testJWTExceededDefaultMaxLifetime() throws Exception {
-        
+
         JWTTokenProvider tokenProvider = new JWTTokenProvider();
         DefaultJWTClaimsProvider claimsProvider = new DefaultJWTClaimsProvider();
         claimsProvider.setAcceptClientLifetime(true);
         tokenProvider.setJwtClaimsProvider(claimsProvider);
-                               
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
-        
+
         // Set expected lifetime to Default max lifetime plus 1
         long requestedLifetime = DefaultConditionsProvider.DEFAULT_MAX_LIFETIME + 1;
         Date creationTime = new Date();
@@ -176,8 +176,8 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         lifetime.setCreated(fmt.format(creationTime));
         lifetime.setExpires(fmt.format(expirationTime));
-        providerParameters.getTokenRequirements().setLifetime(lifetime);         
-        
+        providerParameters.getTokenRequirements().setLifetime(lifetime);
+
         try {
             tokenProvider.createToken(providerParameters);
             fail("Failure expected due to exceeded lifetime");
@@ -185,7 +185,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             //expected
         }
     }
-    
+
     /**
      * Issue JWT token with a with a lifetime
      * which exceeds configured maximum lifetime
@@ -193,7 +193,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testJWTExceededConfiguredMaxLifetimeButUpdated() throws Exception {
-        
+
         long maxLifetime = 30 * 60L;  // 30 minutes
         JWTTokenProvider tokenProvider = new JWTTokenProvider();
         DefaultJWTClaimsProvider claimsProvider = new DefaultJWTClaimsProvider();
@@ -201,10 +201,10 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         claimsProvider.setFailLifetimeExceedance(false);
         claimsProvider.setAcceptClientLifetime(true);
         tokenProvider.setJwtClaimsProvider(claimsProvider);
-                       
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
-        
+
         // Set expected lifetime to 35 minutes
         long requestedLifetime = 35 * 60L;
         Date creationTime = new Date();
@@ -214,38 +214,38 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         lifetime.setCreated(fmt.format(creationTime));
         lifetime.setExpires(fmt.format(expirationTime));
-        providerParameters.getTokenRequirements().setLifetime(lifetime);         
-        
+        providerParameters.getTokenRequirements().setLifetime(lifetime);
+
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(maxLifetime * 1000L, providerResponse.getExpires().getTime() 
+        assertEquals(maxLifetime * 1000L, providerResponse.getExpires().getTime()
                      - providerResponse.getCreated().getTime());
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
     }
-    
+
     /**
      * Issue JWT token with a near future Created Lifetime. This should pass as we allow a future
      * dated Lifetime up to 60 seconds to avoid clock skew problems.
      */
     @org.junit.Test
     public void testJWTNearFutureCreatedLifetime() throws Exception {
-        
+
         int requestedLifetime = 60;
         JWTTokenProvider tokenProvider = new JWTTokenProvider();
         DefaultJWTClaimsProvider claimsProvider = new DefaultJWTClaimsProvider();
         claimsProvider.setAcceptClientLifetime(true);
         tokenProvider.setJwtClaimsProvider(claimsProvider);
-               
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
-        
+
         // Set expected lifetime to 1 minute
         Date creationTime = new Date();
         Date expirationTime = new Date();
@@ -255,38 +255,38 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         lifetime.setCreated(fmt.format(creationTime));
         lifetime.setExpires(fmt.format(expirationTime));
-        providerParameters.getTokenRequirements().setLifetime(lifetime);    
-        
+        providerParameters.getTokenRequirements().setLifetime(lifetime);
+
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(50L * 1000L, providerResponse.getExpires().getTime() 
+        assertEquals(50L * 1000L, providerResponse.getExpires().getTime()
                      - providerResponse.getCreated().getTime());
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
     }
-    
+
     /**
      * Issue JWT token with a future Created Lifetime. This should fail as we only allow a future
      * dated Lifetime up to 60 seconds to avoid clock skew problems.
      */
     @org.junit.Test
     public void testJWTFarFutureCreatedLifetime() throws Exception {
-        
+
         int requestedLifetime = 60;
         JWTTokenProvider tokenProvider = new JWTTokenProvider();
         DefaultJWTClaimsProvider claimsProvider = new DefaultJWTClaimsProvider();
         claimsProvider.setAcceptClientLifetime(true);
         tokenProvider.setJwtClaimsProvider(claimsProvider);
-               
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
-        
+
         // Set expected lifetime to 1 minute
         Date creationTime = new Date();
         creationTime.setTime(creationTime.getTime() + (60L * 2L * 1000L));
@@ -296,67 +296,67 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         lifetime.setCreated(fmt.format(creationTime));
         lifetime.setExpires(fmt.format(expirationTime));
-        providerParameters.getTokenRequirements().setLifetime(lifetime);    
-        
+        providerParameters.getTokenRequirements().setLifetime(lifetime);
+
         try {
             tokenProvider.createToken(providerParameters);
             fail("Failure expected on a Created Element too far in the future");
         } catch (STSException ex) {
             // expected
         }
-        
+
         // Now allow this sort of Created Element
         claimsProvider.setFutureTimeToLive(60L * 60L);
-        
+
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
     }
-    
+
     /**
      * Issue JWT token with no Expires element. This will be rejected, but will default to the
      * configured TTL and so the request will pass.
      */
     @org.junit.Test
     public void testJWTNoExpires() throws Exception {
-        
+
         JWTTokenProvider tokenProvider = new JWTTokenProvider();
         DefaultJWTClaimsProvider claimsProvider = new DefaultJWTClaimsProvider();
         claimsProvider.setAcceptClientLifetime(true);
         tokenProvider.setJwtClaimsProvider(claimsProvider);
-               
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
-        
+
         // Set expected lifetime to 1 minute
         Date creationTime = new Date();
         creationTime.setTime(creationTime.getTime() + (60L * 2L * 1000L));
         Lifetime lifetime = new Lifetime();
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         lifetime.setCreated(fmt.format(creationTime));
-        providerParameters.getTokenRequirements().setLifetime(lifetime);    
-        
+        providerParameters.getTokenRequirements().setLifetime(lifetime);
+
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(claimsProvider.getLifetime() * 1000L, providerResponse.getExpires().getTime() 
+        assertEquals(claimsProvider.getLifetime() * 1000L, providerResponse.getExpires().getTime()
                      - providerResponse.getCreated().getTime());
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
     }
-    
+
     private TokenProviderParameters createProviderParameters(String tokenType) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
 
@@ -398,10 +398,10 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
-  
-    
+
+
+
 }

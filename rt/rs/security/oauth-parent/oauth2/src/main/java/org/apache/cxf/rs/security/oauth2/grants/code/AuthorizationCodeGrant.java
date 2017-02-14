@@ -32,7 +32,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 
 /**
- * Base Authorization Code Grant representation, captures the code 
+ * Base Authorization Code Grant representation, captures the code
  * and the redirect URI this code has been returned to, visible to the client
  */
 @MappedSuperclass
@@ -41,22 +41,22 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
     private String code;
     private String redirectUri;
     private String codeVerifier;
-    
+
     public AuthorizationCodeGrant() {
-        
+
     }
-    
+
     public AuthorizationCodeGrant(String code) {
         this.code = code;
     }
-    
+
     public AuthorizationCodeGrant(String code, URI uri) {
         this.code = code;
         redirectUri = uri.toString();
     }
 
     /**
-     * Sets the redirect URI, if set then the client is expected to 
+     * Sets the redirect URI, if set then the client is expected to
      * include the same URI during the access token request
      * @param redirectUri redirect URI
      */
@@ -80,7 +80,7 @@ public class AuthorizationCodeGrant implements AccessTokenGrant {
     public String getCode() {
         return code;
     }
-    
+
     public void setCode(String c) {
         this.code = c;
     }

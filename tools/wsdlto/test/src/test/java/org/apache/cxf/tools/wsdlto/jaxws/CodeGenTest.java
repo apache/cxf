@@ -61,7 +61,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/pizza.wsdl"));
         env.put(ToolConstants.CFG_EXTRA_SOAPHEADER, "TRUE");
-        env.remove(ToolConstants.CFG_VALIDATE_WSDL); 
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL);
         processor.setContext(env);
         processor.execute();
 
@@ -121,7 +121,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     @Test
     public void testHeaderFromAnotherMessage2() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/pizza.wsdl"));
-        env.remove(ToolConstants.CFG_VALIDATE_WSDL); 
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL);
         processor.setContext(env);
         processor.execute();
 
@@ -155,7 +155,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     public void testHeaderFromAnotherMessage3() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/pizza.wsdl"));
         env.put(ToolConstants.CFG_EXTRA_SOAPHEADER, "FALSE");
-        env.remove(ToolConstants.CFG_VALIDATE_WSDL); 
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL);
         processor.setContext(env);
         processor.execute();
 
@@ -275,7 +275,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         SOAPBinding soapBindingAnno = AnnotationUtil.getPrivClassAnnotation(clz, SOAPBinding.class);
         assertEquals("LITERAL", soapBindingAnno.use().toString());
         assertEquals("RPC", soapBindingAnno.style().toString());
-        
+
         assertEquals("Generate operation error", 3, clz.getMethods().length);
 
         Class<?> paraClass = classLoader
@@ -419,11 +419,11 @@ public class CodeGenTest extends AbstractCodeGenTest {
             //ignore
         }
 
-        
+
         clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterDAsync");
         method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
                                                                      javax.xml.ws.AsyncHandler.class});
-        
+
         clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterCAsync");
         try {
             method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
@@ -434,7 +434,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         }
         method1 = clz.getMethod("testIntAsync", new Class[] {Integer.TYPE,
                                                              javax.xml.ws.AsyncHandler.class});
-        
+
         clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_async_soap_http.GreeterBAsync");
         try {
             method1 = clz.getMethod("greetMeSometimeAsync", new Class[] {java.lang.String.class,
@@ -445,8 +445,8 @@ public class CodeGenTest extends AbstractCodeGenTest {
         }
         method1 = clz.getMethod("testIntAsync", new Class[] {Integer.TYPE,
                                                              javax.xml.ws.AsyncHandler.class});
-    }    
-    
+    }
+
     @Test
     public void testHelloWorldSoap12() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world_soap12.wsdl"));
@@ -623,7 +623,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertTrue(cxf.exists());
         File w2j = new File(cxf, "w2j");
         assertTrue(w2j.exists());
-        
+
         File helloworldsoaphttp = new File(w2j, "hello_world_soap_http");
         assertTrue(helloworldsoaphttp.exists());
         File types = new File(helloworldsoaphttp, "types");
@@ -653,9 +653,9 @@ public class CodeGenTest extends AbstractCodeGenTest {
             msg = expected.getMessage();
         }
         assertNotNull(msg);
-        assertTrue(":some_rubbish_argument is present in :" + msg, 
+        assertTrue(":some_rubbish_argument is present in :" + msg,
                    msg.indexOf(":some_rubbish_argument") != -1);
-        assertTrue("Dummy plugin usage string present in :" + msg, 
+        assertTrue("Dummy plugin usage string present in :" + msg,
                    msg.indexOf(DummyXjcPlugin.DUMMY_ARG) != -1);
     }
 
@@ -673,7 +673,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
             msg = expected.getMessage();
         }
         assertNotNull(msg);
-        assertTrue("Dummy plugin usage string present in :" + msg, 
+        assertTrue("Dummy plugin usage string present in :" + msg,
                    msg.indexOf(DummyXjcPlugin.DUMMY_ARG) != -1);
         assertTrue("No BadParameter in msg:" + msg,
                    msg.indexOf("Bad") == -1);
@@ -1126,7 +1126,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
             processor.setContext(env);
             processor.execute();
         } catch (Exception e) {
-            String expectedMsg = "Invalid WSDL, Operation notify in PortType " 
+            String expectedMsg = "Invalid WSDL, Operation notify in PortType "
                 + "{http://services.medial.com.br/echo}EchoNotification not request-response or one-way";
             assertTrue("Invalid wsdl should be diagnosed", e.getMessage()
                 .indexOf(expectedMsg) > -1);
@@ -1167,7 +1167,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     public void testRPCHeader() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/soapheader_rpc.wsdl"));
         env.remove(ToolConstants.CFG_VALIDATE_WSDL); // headers must be element, but validation
-                       // doesn't fully process the entire soap:binding information to 
+                       // doesn't fully process the entire soap:binding information to
                        // to figure out which parts are headers and which are body for rpc/lit
         processor.setContext(env);
         processor.execute();
@@ -1304,7 +1304,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello-mime.wsdl"));
         env.put(ToolConstants.CFG_MIMEMETHODS, new String[0]);
         env.remove(ToolConstants.CFG_VALIDATE_WSDL);
-        
+
         processor.setContext(env);
         processor.execute();
 
@@ -1352,7 +1352,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/tns_url_with_colon.wsdl"));
         processor.setContext(env);
         processor.execute();
-        
+
         Class<?> sei =  classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.tns.soap.Greeter");
         assertNotNull("Greeter class from wsdl targetNamespace could not be found", sei);
 
@@ -1365,7 +1365,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/tns_urn.wsdl"));
         processor.setContext(env);
         processor.execute();
-        
+
         Class<?> sei =  classLoader.loadClass("apache.cxf.issue._6527.Greeter");
         assertNotNull("Greeter class from wsdl targetNamespace could not be found", sei);
 
@@ -1378,12 +1378,12 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
         Class<?> sei = this.classLoader.loadClass("org.apache.w3c.epr.AddNumbersPortType");
-        Method method = sei.getMethod("addNumbers", 
+        Method method = sei.getMethod("addNumbers",
                                       new Class[]{javax.xml.ws.wsaddressing.W3CEndpointReference.class});
         assertNotNull("wsdl2java does not map w3c:EndpointReferenceType to javax.xml.ws.EndpointReference",
                       method);
     }
-    
+
     @Test
     public void testHandlerAnnotation() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf-1344/handlerbinding.wsdl"));
@@ -1391,13 +1391,13 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
     }
-    
+
     @Test
     public void testGenerateXmlListAnno() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf-1354/string_array_test.wsdl"));
         processor.setContext(env);
         processor.execute();
-        
+
         Class<?> sei =  classLoader.loadClass("org.apache.stringarray.StringListTest");
         Method method = sei.getMethods()[0];
         assertNotNull("@XmlList is not generated for method", method.getAnnotation(XmlList.class));
@@ -1408,9 +1408,9 @@ public class CodeGenTest extends AbstractCodeGenTest {
             }
         }
         assertTrue("@XmlList is not generated for paramter", xmlListGenerated);
-        
+
     }
-    
+
     @Test
     public void testWrapperWithWildcard()  throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf-1404/hello_world.wsdl"));
@@ -1436,14 +1436,14 @@ public class CodeGenTest extends AbstractCodeGenTest {
         WebParam wp = (WebParam)m[0].getParameterAnnotations()[1][0];
         assertTrue(wp.header());
     }
-    
+
     @Test
     public void testCXFNotType() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
         env.put(ToolConstants.CFG_FAULT_SERIAL_VERSION_UID, "FQCN");
         processor.setContext(env);
         processor.execute();
-        
+
         File sayHiResponseFile =
             new File(output, "org/apache/cxf/w2j/hello_world_soap_http/types/SayHiResponse");
         assertFalse(sayHiResponseFile.exists());
@@ -1471,8 +1471,8 @@ public class CodeGenTest extends AbstractCodeGenTest {
         fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.BadRecordLitFault");
         assertEquals(fault.getName().hashCode(), ObjectStreamClass.lookup(fault).getSerialVersionUID());
     }
-    
-    
+
+
     @Test
     public void testNoFaultSerialVersionUID() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
@@ -1498,9 +1498,9 @@ public class CodeGenTest extends AbstractCodeGenTest {
         } catch (NoSuchFieldException e) {
             //
         }
-                
+
     }
-    
+
     @Test
     public void testFaultSerialVersionUIDNONE() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
@@ -1527,9 +1527,9 @@ public class CodeGenTest extends AbstractCodeGenTest {
         } catch (NoSuchFieldException e) {
             //
         }
-            
+
     }
-    
+
     @Test
     public void testFaultSerialVersionUIDNONETIMESTAMP() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
@@ -1545,7 +1545,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         Class<?> fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.NoSuchCodeLitFault");
         Field serialVersionUID = fault.getDeclaredField("serialVersionUID");
         assertNotNull(serialVersionUID);
-        
+
         fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.BadRecordLitFault");
         serialVersionUID = fault.getDeclaredField("serialVersionUID");
         assertNotNull(serialVersionUID);
@@ -1567,7 +1567,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertNotNull(serialVersionUID);
         Long l = (Long)serialVersionUID.get(null);
         assertEquals(123456789L, l.longValue());
-        
+
         fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.BadRecordLitFault");
         serialVersionUID = fault.getDeclaredField("serialVersionUID");
         assertNotNull(serialVersionUID);
@@ -1578,12 +1578,12 @@ public class CodeGenTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
         processor.setContext(env);
         processor.execute();
-        
+
         File faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/NoSuchCodeLitFault.java");
         assertTrue(faultFile.exists());
         faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/BadRecordLitFault.java");
         assertTrue(faultFile.exists());
-        
+
         Class<?> fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.NoSuchCodeLitFault");
         assertEquals(Exception.class, fault.getSuperclass());
     }
@@ -1606,12 +1606,12 @@ public class CodeGenTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_EXCEPTION_SUPER, "java.lang.RuntimeException");
         processor.setContext(env);
         processor.execute();
-        
+
         File faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/NoSuchCodeLitFault.java");
         assertTrue(faultFile.exists());
         faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/BadRecordLitFault.java");
         assertTrue(faultFile.exists());
-        
+
         Class<?> fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.NoSuchCodeLitFault");
         assertEquals(RuntimeException.class, fault.getSuperclass());
     }
@@ -1670,7 +1670,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
     }
 
-    
+
     @Test
     // CXF-4135
     public void testPassShemaFileAsJAXBBinding() throws Exception {
@@ -1683,7 +1683,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         File seiFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/Greeter.java");
         assertTrue(seiFile.exists());
     }
-    
+
     @Test
     public void testClientJar() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world_wsdl_import.wsdl"));
@@ -1692,7 +1692,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.execute();
         File clientjarFile = new File(output, "test-client.jar");
         assertTrue(clientjarFile.exists());
-        
+
         List<String> jarEntries = new ArrayList<>();
         JarInputStream jarIns = new JarInputStream(new FileInputStream(clientjarFile));
         JarEntry entry = null;
@@ -1708,5 +1708,5 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertTrue("org/apache/cxf/w2j/hello_world/SOAPService.class is expected",
                      jarEntries.contains("org/apache/cxf/w2j/hello_world/SOAPService.class"));
     }
-    
+
 }

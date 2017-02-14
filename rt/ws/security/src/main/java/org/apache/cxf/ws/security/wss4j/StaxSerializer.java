@@ -58,14 +58,14 @@ import org.apache.xml.security.encryption.XMLEncryptionException;
 public class StaxSerializer extends AbstractSerializer {
     XMLInputFactory factory;
     boolean validFactory;
-    
+
     boolean addNamespaces(XMLStreamReader reader, Node ctx) {
         try {
             NamespaceContext nsctx = reader.getNamespaceContext();
             if (nsctx instanceof com.ctc.wstx.sr.InputElementStack) {
                 com.ctc.wstx.sr.InputElementStack ies = (com.ctc.wstx.sr.InputElementStack)nsctx;
                 com.ctc.wstx.util.InternCache ic = com.ctc.wstx.util.InternCache.getInstance();
-                
+
                 Map<String, String> storedNamespaces = new HashMap<String, String>();
                 Node wk = ctx;
                 while (wk != null) {
@@ -76,7 +76,7 @@ public class StaxSerializer extends AbstractSerializer {
                             String nodeName = att.getNodeName();
                             if (("xmlns".equals(nodeName) || nodeName.startsWith("xmlns:"))
                                 && !storedNamespaces.containsKey(att.getNodeName())) {
-                                
+
                                 String prefix = att.getLocalName();
                                 if ("xmlns".equals(prefix)) {
                                     prefix = "";
@@ -92,11 +92,11 @@ public class StaxSerializer extends AbstractSerializer {
             }
             return true;
         } catch (Throwable t) {
-            //ignore, not much we can do but hope the decrypted XML is stand alone ok 
+            //ignore, not much we can do but hope the decrypted XML is stand alone ok
         }
         return false;
     }
-    
+
     private XMLStreamReader createWstxReader(byte[] source, Node ctx) throws XMLEncryptionException {
         try {
             if (factory == null) {
@@ -131,11 +131,11 @@ public class StaxSerializer extends AbstractSerializer {
     public Node deserialize(byte[] source, Node ctx) throws XMLEncryptionException {
         XMLStreamReader reader = createWstxReader(source, ctx);
         if (reader != null) {
-            return deserialize(ctx, reader, false);            
+            return deserialize(ctx, reader, false);
         }
         return deserialize(ctx, new InputSource(createStreamContext(source, ctx)));
     }
-    
+
     InputStream createStreamContext(byte[] source, Node ctx) throws XMLEncryptionException {
         Vector<InputStream> v = new Vector<>(2);
 
@@ -193,7 +193,7 @@ public class StaxSerializer extends AbstractSerializer {
         String fragment = createContext(source, ctx);
         return deserialize(ctx, new InputSource(new StringReader(fragment)));
     }
-    
+
     @Override
     public byte[] serializeToByteArray(Element element) throws Exception {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -203,7 +203,7 @@ public class StaxSerializer extends AbstractSerializer {
             return baos.toByteArray();
         }
     }
-    
+
     /**
      * @param ctx
      * @param inputSource
@@ -229,12 +229,12 @@ public class StaxSerializer extends AbstractSerializer {
                 while (el != null && !(el instanceof SOAPEnvelope)) {
                     el = el.getParentElement();
                 }
-                //cannot load into fragment due to a ClassCastException iwthin SAAJ addChildElement 
+                //cannot load into fragment due to a ClassCastException iwthin SAAJ addChildElement
                 //which only checks for Document as parent, not DocumentFragment
                 Element element = ctx.getOwnerDocument().createElementNS("dummy", "dummy");
                 writer = new SAAJStreamWriter((SOAPEnvelope)el, element);
                 StaxUtils.copy(reader, writer);
-                
+
                 DocumentFragment result = contextDocument.createDocumentFragment();
                 Node child = element.getFirstChild();
                 if (wrapped) {
@@ -248,16 +248,16 @@ public class StaxSerializer extends AbstractSerializer {
                     result.appendChild(child);
                     child = nextChild;
                 }
-                
+
                 return result;
             }
             // Import to a dummy fragment
             DocumentFragment dummyFragment = contextDocument.createDocumentFragment();
             writer = StaxUtils.createXMLStreamWriter(new DOMResult(dummyFragment));
             StaxUtils.copy(reader, writer);
-            
+
             // Remove the "dummy" wrapper
-            
+
             if (wrapped) {
                 DocumentFragment result = contextDocument.createDocumentFragment();
                 Node child = dummyFragment.getFirstChild().getFirstChild();

@@ -54,17 +54,17 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
             return false;
         }
     }
-    
+
     private static Constructor<?> probeConstructor(String name) {
         try {
             Class<?> clz = Class.forName(name, true, WebSocketDestinationFactory.class.getClassLoader());
-            return clz.getConstructor(Bus.class, DestinationRegistry.class, 
+            return clz.getConstructor(Bus.class, DestinationRegistry.class,
                                       EndpointInfo.class, JettyHTTPServerEngineFactory.class);
         } catch (Throwable t) {
             return null;
         }
     }
-    
+
     public AbstractHTTPDestination createDestination(EndpointInfo endpointInfo, Bus bus,
                                                      DestinationRegistry registry) throws IOException {
         if (endpointInfo.getAddress().startsWith("ws")) {
@@ -82,7 +82,7 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
         } else {
             //REVISIT other way of getting the registry of http so that the plain cxf servlet finds the destination?
             registry = getDestinationRegistry(bus);
-            
+
             // choose atmosphere if available, otherwise assume jetty is available
             if (ATMOSPHERE_AVAILABLE && !atmosphereDisabled) {
                 // use atmosphere if available
@@ -110,8 +110,8 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
         }
         return null;
     }
-    
-    private AbstractHTTPDestination createJettyHTTPDestination(Constructor<?> ctr, Bus bus, 
+
+    private AbstractHTTPDestination createJettyHTTPDestination(Constructor<?> ctr, Bus bus,
                                                                DestinationRegistry registry, EndpointInfo ei,
                                                                JettyHTTPServerEngineFactory jhsef) throws IOException {
         if (ctr != null) {

@@ -28,15 +28,15 @@ import java.lang.annotation.Target;
 /**
  * Attach <a href="http://www.w3.org/TR/cors/">CORS</a> information
  * to a resource. This annotation is read by {@link CrossOriginResourceSharingFilter}.
- * If this annotation is present on a method, or 
+ * If this annotation is present on a method, or
  * on the method's class (or its superclasses), then it completely
- * overrides any parameters set in {@link CrossOriginResourceSharingFilter}. 
+ * overrides any parameters set in {@link CrossOriginResourceSharingFilter}.
  * If a particular parameter of this annotation is not specified, then the
- * default value is used, <em>not</em> the parameters of the filter. 
- * 
- * Note that the CORS specification censors the headers on a 
+ * default value is used, <em>not</em> the parameters of the filter.
+ *
+ * Note that the CORS specification censors the headers on a
  * preflight OPTIONS request. As a result, the filter cannot determine
- * exactly which method corresponds to the request, and so uses only 
+ * exactly which method corresponds to the request, and so uses only
  * class-level annotations to set policies.
  */
 @Target({ElementType.TYPE, ElementType.METHOD })
@@ -44,9 +44,9 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface CrossOriginResourceSharing {
     /**
-     * If true, this resource will return 
+     * If true, this resource will return
      * <pre>Access-Control-Allow-Origin: *</pre>
-     * for a valid request 
+     * for a valid request
      */
     boolean allowAllOrigins() default false;
     /**
@@ -56,20 +56,20 @@ public @interface CrossOriginResourceSharing {
     String[] allowOrigins() default { };
     /**
      * A list of headers that the client may include
-     * in an actual request. All the headers listed in 
+     * in an actual request. All the headers listed in
      * the Access-Control-Request-Headers will be allowed if
      * the list is empty
      */
     String[] allowHeaders() default { };
-    
+
     /**
-     * If true, this resource will return 
+     * If true, this resource will return
      * <pre>Access-Control-Allow-Credentials: true</pre>
      */
     boolean allowCredentials() default false;
     /**
      * A list of headers to return in <tt>
-     * Access-Control-Expose-Headers</tt>. 
+     * Access-Control-Expose-Headers</tt>.
      */
     String[] exposeHeaders() default { };
     /**

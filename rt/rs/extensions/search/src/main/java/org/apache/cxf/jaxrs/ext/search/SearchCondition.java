@@ -28,57 +28,57 @@ import java.util.List;
  * Google Collections <a href="http://google-collections.googlecode.com/svn/trunk/javadoc/com/google/common/base/Predicate.html">Predicate</a>
  * might've been used instead, but it is a too generic and its apply method is not quite needed here
  * </p>
- *  
+ *
  * @param <T> Type of the object which will be checked by SearchCondition instance
- *  
+ *
  */
 //CHECKSTYLE:ON
 public interface SearchCondition<T> {
-    
+
     /**
      * Checks if the given pojo instance meets this search condition
-     * 
+     *
      * @param pojo the object which will be checked
      * @return true if the pojo meets this search condition, false - otherwise
      */
     boolean isMet(T pojo);
-    
+
     /**
      * Returns a list of pojos matching the condition
      * @param pojos list of pojos
      * @return list of the matching pojos or null if none have been found
      */
     List<T> findAll(Collection<T> pojos);
-    
+
     /**
      * Some SearchConditions may use instance of T to capture the actual search criteria
      * thus making it simpler to implement isMet(T). In some cases, the code which is given
      * SearchCondition may find it more efficient to directly deal with the captured state
      * for a more efficient lookup of matching data/records as opposed to calling
      * SearchCondition.isMet for every instance of T it knows about.
-     * 
-     *  
-     * @return T the captured search criteria, can be null 
+     *
+     *
+     * @return T the captured search criteria, can be null
      */
     T getCondition();
 
-    
+
     /**
      * Primitive statement such a > b, i < 5, etc
-     * this condition may represent. Complex conditions will return null.  
-     *  
-     * @return primitive search statement, can be null 
+     * this condition may represent. Complex conditions will return null.
+     *
+     * @return primitive search statement, can be null
      */
     PrimitiveStatement getStatement();
-    
+
     /**
      * List of conditions this SearchCondition may represent.
      * Composite SearchConditions will return a list of conditions they are
-     * composed from, primitive ones will return null  
+     * composed from, primitive ones will return null
      * @return list of conditions, can be null
      */
     List<SearchCondition<T>> getSearchConditions();
-    
+
     /**
      * Returns the type of the condition this SearchCondition represents
      * @return condition type
@@ -87,9 +87,9 @@ public interface SearchCondition<T> {
 
     /**
      * Provides a visitor which will convert this SearchCondition into
-     * a custom expression, for example, into the SQL statement, etc 
+     * a custom expression, for example, into the SQL statement, etc
      * @param visitor
      */
     void accept(SearchConditionVisitor<T, ?> visitor);
-    
+
 }

@@ -36,9 +36,9 @@ public final class CacheUtils {
     private CacheUtils() {
         // complete
     }
-    
+
     public static SecurityToken createSecurityTokenForStorage(
-        Element token, 
+        Element token,
         String tokenIdentifier,
         Date expiry,
         Principal principal,
@@ -58,21 +58,21 @@ public final class CacheUtils {
         // Handle Renewing logic
         if (renewing != null) {
             props.put(
-                STSConstants.TOKEN_RENEWING_ALLOW, 
+                STSConstants.TOKEN_RENEWING_ALLOW,
                 String.valueOf(renewing.isAllowRenewing())
             );
             props.put(
-                STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, 
+                STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY,
                 String.valueOf(renewing.isAllowRenewingAfterExpiry())
             );
         } else {
             props.put(STSConstants.TOKEN_RENEWING_ALLOW, "true");
             props.put(STSConstants.TOKEN_RENEWING_ALLOW_AFTER_EXPIRY, "false");
         }
-        
+
         return securityToken;
     }
-    
+
     public static void storeTokenInCache(
         SecurityToken securityToken,
         TokenStore cache,

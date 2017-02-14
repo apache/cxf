@@ -103,7 +103,7 @@ public class TrailingBlocks {
             Object instance = objectType.readObject(creader, context);
             blocks.add(instance);
 
-            // register the instance 
+            // register the instance
             SoapRefRegistry.get(context).addInstance(id, instance);
 
             // close the element reader

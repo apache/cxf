@@ -30,7 +30,7 @@ import org.apache.cxf.wsn.client.Subscription;
 import org.oasis_open.docs.wsn.b_2.NotificationMessageHolderType;
 
 /**
- * 
+ *
  */
 public final class Client {
     private Client() {
@@ -45,7 +45,7 @@ public final class Client {
         if (args.length > 0) {
             wsnPort = args[0];
         }
-        
+
         // Start a consumer that will listen for notification messages
         // We'll just print the text content out for now.
         Consumer consumer = new Consumer(new Consumer.Callback() {
@@ -57,22 +57,22 @@ public final class Client {
                 }
             }
         }, "http://localhost:9001/MyConsumer");
-        
-        
+
+
         // Create a subscription for a Topic on the broker
-        NotificationBroker notificationBroker 
+        NotificationBroker notificationBroker
             = new NotificationBroker("http://localhost:" + wsnPort + "/wsn/NotificationBroker");
         Subscription subscription = notificationBroker.subscribe(consumer, "MyTopic");
 
 
         // Send a notification on the Topic
-        notificationBroker.notify("MyTopic", 
+        notificationBroker.notify("MyTopic",
                                   new JAXBElement<String>(new QName("urn:test:org", "foo"),
                                           String.class, "Hello World!"));
-        
+
         // Just sleep for a bit to make sure the notification gets delivered
         Thread.sleep(5000);
-        
+
         // Cleanup and exit
         subscription.unsubscribe();
         consumer.stop();

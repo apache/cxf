@@ -30,33 +30,33 @@ public abstract class AbstractTracingProvider {
     protected static String getSpanIdHeader() {
         return getHeaderOrDefault(TracerHeaders.HEADER_SPAN_ID, DEFAULT_HEADER_SPAN_ID);
     }
-    
+
     protected static class TraceScopeHolder<T> implements Serializable {
         private static final long serialVersionUID = -5985783659818936359L;
 
         private final T scope;
         private final boolean detached;
-        
+
         public TraceScopeHolder(final T scope, final boolean detached) {
             this.scope = scope;
             this.detached = detached;
         }
-        
+
         public T getScope() {
             return scope;
         }
-        
+
         public boolean isDetached() {
             return detached;
         }
     }
-    
+
     private static String getHeaderOrDefault(final String property, final String fallback) {
         final Message message = PhaseInterceptorChain.getCurrentMessage();
-        
+
         if (message != null) {
             final Object header = message.getContextualProperty(property);
-            
+
             if (header instanceof String) {
                 final String name = (String)header;
                 if (!StringUtils.isEmpty(name)) {
@@ -64,10 +64,10 @@ public abstract class AbstractTracingProvider {
                 }
             }
         }
-        
+
         return fallback;
     }
-    
+
     protected String buildSpanDescription(final String path, final String method) {
         if (StringUtils.isEmpty(method)) {
             return path;

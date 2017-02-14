@@ -25,50 +25,50 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 
 /**
- * The default singleton resource provider which returns 
+ * The default singleton resource provider which returns
  * the same resource instance per every request
  */
 public class SingletonResourceProvider implements ResourceProvider {
     private Object resourceInstance;
-    
+
     public SingletonResourceProvider(Object o, boolean callPostConstruct) {
         resourceInstance = o;
         if (callPostConstruct) {
-            InjectionUtils.invokeLifeCycleMethod(o, 
+            InjectionUtils.invokeLifeCycleMethod(o,
                 ResourceUtils.findPostConstructMethod(ClassHelper.getRealClass(o)));
         }
     }
-    
-    public SingletonResourceProvider(Object o) { 
+
+    public SingletonResourceProvider(Object o) {
         this(o, false);
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public boolean isSingleton() {
         return true;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public Object getInstance(Message m) {
         return resourceInstance;
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public void releaseInstance(Message m, Object o) {
         // complete
     }
-    
+
     /**
      * {@inheritDoc}
      */
     public Class<?> getResourceClass() {
         return ClassHelper.getRealClass(resourceInstance);
     }
-    
+
 }

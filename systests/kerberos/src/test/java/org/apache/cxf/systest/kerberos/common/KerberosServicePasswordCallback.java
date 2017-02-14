@@ -33,7 +33,7 @@ import org.apache.wss4j.common.kerberos.KerberosContextAndServiceNameCallback;
  *  A CallbackHandler implementation for the kerberos service.
  */
 public class KerberosServicePasswordCallback extends KeystorePasswordCallback {
-    
+
     public KerberosServicePasswordCallback() {
     }
 
@@ -42,7 +42,7 @@ public class KerberosServicePasswordCallback extends KeystorePasswordCallback {
             if (callbacks[i] instanceof WSPasswordCallback) {
                 super.handle(new Callback[]{callbacks[i]});
             } else if (callbacks[i] instanceof KerberosContextAndServiceNameCallback) {
-                KerberosContextAndServiceNameCallback pc = 
+                KerberosContextAndServiceNameCallback pc =
                     (KerberosContextAndServiceNameCallback)callbacks[i];
                 pc.setContextName("bob");
                 pc.setServiceName("bob@service.ws.apache.org");
@@ -55,6 +55,6 @@ public class KerberosServicePasswordCallback extends KeystorePasswordCallback {
             }
         }
     }
-    
+
 
 }

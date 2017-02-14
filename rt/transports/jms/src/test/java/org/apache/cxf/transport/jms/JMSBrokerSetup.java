@@ -32,12 +32,12 @@ public class JMSBrokerSetup {
     public JMSBrokerSetup(String url) {
         jmsBrokerUrl = url;
     }
-    
+
     public void start() throws Exception {
         jmsBrokerThread = new JMSEmbeddedBroker(jmsBrokerUrl);
         jmsBrokerThread.startBroker();
     }
-    
+
     public void stop() throws Exception {
         synchronized (this) {
             jmsBrokerThread.shutdownBroker = true;
@@ -45,20 +45,20 @@ public class JMSBrokerSetup {
         if (jmsBrokerThread != null) {
             jmsBrokerThread.join();
         }
-        
+
         jmsBrokerThread = null;
     }
-    
+
     class JMSEmbeddedBroker extends Thread {
         boolean shutdownBroker;
         final String brokerUrl;
         Exception exception;
-        
-        
+
+
         JMSEmbeddedBroker(String url) {
             brokerUrl = url;
         }
-        
+
         public void startBroker() throws Exception {
             synchronized (this) {
                 super.start();
@@ -72,13 +72,13 @@ public class JMSBrokerSetup {
                 }
             }
         }
-        
+
         public void run() {
-            try {  
+            try {
                 //ContainerWapper container;
                 BrokerService broker = new BrokerService();
-                synchronized (this) {                                     
-                    broker.setPersistenceAdapter(new MemoryPersistenceAdapter());                    
+                synchronized (this) {
+                    broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
                     broker.setTmpDataDirectory(new File("./target"));
                     broker.setPopulateJMSXUserID(true);
                     broker.addConnector(brokerUrl);
@@ -91,15 +91,15 @@ public class JMSBrokerSetup {
                     while (!shutdownBroker) {
                         wait(1000);
                     }
-                }                
-                broker.stop();              
-                broker = null;                
+                }
+                broker.stop();
+                broker = null;
             } catch (Exception e) {
                 exception = e;
                 e.printStackTrace();
             }
         }
-        
-       
+
+
     }
 }

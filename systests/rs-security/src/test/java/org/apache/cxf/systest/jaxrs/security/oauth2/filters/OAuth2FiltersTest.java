@@ -37,23 +37,23 @@ import org.junit.BeforeClass;
 public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerOAuth2Filters.PORT;
     public static final String OAUTH_PORT = BookServerOAuth2Service.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2Filters.class, true));
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerOAuth2Service.class, true));
     }
 
     @org.junit.Test
     public void testServiceWithToken() throws Exception {
         URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
-        
+
         // Get Authorization Code
         String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
 
-        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                                  "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
@@ -61,97 +61,15 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
 
         String code = OAuth2TestUtils.getAuthorizationCode(oauthClient);
         assertNotNull(code);
-        
+
         // Now get the access token
-        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                        "consumer-id", "this-is-a-secret", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        ClientAccessToken accessToken = 
-            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(oauthClient, code);
-        assertNotNull(accessToken.getTokenKey());
-
-        // Now invoke on the service with the access token
-        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
-                                            busFile.toString());
-        client.header("Authorization", "Bearer " + accessToken.getTokenKey());
-        
-        Response response = client.post(new Book("book", 123L));
-        assertEquals(response.getStatus(), 200);
-        
-        Book returnedBook = response.readEntity(Book.class);
-        assertEquals(returnedBook.getName(), "book");
-        assertEquals(returnedBook.getId(), 123L);
-    }
-    
-    @org.junit.Test
-    public void testServiceWithFakeToken() throws Exception {
-        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
-        
-        // Now invoke on the service with the faked access token
-        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
-                                            busFile.toString());
-        client.header("Authorization", "Bearer " + UUID.randomUUID().toString());
-        
-        Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
-    }
-    
-    @org.junit.Test
-    public void testServiceWithNoToken() throws Exception {
-        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
-        
-        // Now invoke on the service with the faked access token
-        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
-                                            busFile.toString());
-        
-        Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
-    }
-    
-    @org.junit.Test
-    public void testServiceWithEmptyToken() throws Exception {
-        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
-        
-        // Now invoke on the service with the faked access token
-        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
-                                            busFile.toString());
-        client.header("Authorization", "Bearer ");
-        
-        Response response = client.post(new Book("book", 123L));
-        assertNotEquals(response.getStatus(), 200);
-    }
-    
-    @org.junit.Test
-    public void testServiceWithTokenAndScope() throws Exception {
-        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
-        
-        // Get Authorization Code
-        String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
-
-        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
-                                                 "alice", "security", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(oauthClient).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
-
-        String code = OAuth2TestUtils.getAuthorizationCode(oauthClient, "create_book");
-        assertNotNull(code);
-        
-        // Now get the access token
-        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
-                                       "consumer-id", "this-is-a-secret", busFile.toString());
-        // Save the Cookie for the second request...
-        WebClient.getConfig(oauthClient).getRequestContext().put(
-            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
-
-        ClientAccessToken accessToken = 
+        ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(oauthClient, code);
         assertNotNull(accessToken.getTokenKey());
 
@@ -160,23 +78,105 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
-        
+
         Response response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
-        
+
         Book returnedBook = response.readEntity(Book.class);
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
     }
-    
+
     @org.junit.Test
-    public void testServiceWithTokenAndIncorrectScopeVerb() throws Exception {
+    public void testServiceWithFakeToken() throws Exception {
         URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
-        
+
+        // Now invoke on the service with the faked access token
+        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            busFile.toString());
+        client.header("Authorization", "Bearer " + UUID.randomUUID().toString());
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+
+    @org.junit.Test
+    public void testServiceWithNoToken() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+
+        // Now invoke on the service with the faked access token
+        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            busFile.toString());
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+
+    @org.junit.Test
+    public void testServiceWithEmptyToken() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+
+        // Now invoke on the service with the faked access token
+        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            busFile.toString());
+        client.header("Authorization", "Bearer ");
+
+        Response response = client.post(new Book("book", 123L));
+        assertNotEquals(response.getStatus(), 200);
+    }
+
+    @org.junit.Test
+    public void testServiceWithTokenAndScope() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+
         // Get Authorization Code
         String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
 
-        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
+                                                 "alice", "security", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(oauthClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        String code = OAuth2TestUtils.getAuthorizationCode(oauthClient, "create_book");
+        assertNotNull(code);
+
+        // Now get the access token
+        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
+                                       "consumer-id", "this-is-a-secret", busFile.toString());
+        // Save the Cookie for the second request...
+        WebClient.getConfig(oauthClient).getRequestContext().put(
+            org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
+
+        ClientAccessToken accessToken =
+            OAuth2TestUtils.getAccessTokenWithAuthorizationCode(oauthClient, code);
+        assertNotNull(accessToken.getTokenKey());
+
+        // Now invoke on the service with the access token
+        String address = "https://localhost:" + PORT + "/secured/bookstore/books";
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
+                                            busFile.toString());
+        client.header("Authorization", "Bearer " + accessToken.getTokenKey());
+
+        Response response = client.post(new Book("book", 123L));
+        assertEquals(response.getStatus(), 200);
+
+        Book returnedBook = response.readEntity(Book.class);
+        assertEquals(returnedBook.getName(), "book");
+        assertEquals(returnedBook.getId(), 123L);
+    }
+
+    @org.junit.Test
+    public void testServiceWithTokenAndIncorrectScopeVerb() throws Exception {
+        URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
+
+        // Get Authorization Code
+        String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
+
+        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                                  "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
@@ -184,21 +184,21 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
 
         String code = OAuth2TestUtils.getAuthorizationCode(oauthClient, "read_book");
         assertNotNull(code);
-        
+
         // Now get the access token
-        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                        "consumer-id", "this-is-a-secret", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        ClientAccessToken accessToken = 
+        ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(oauthClient, code);
         assertNotNull(accessToken.getTokenKey());
 
         // Now invoke on the service with the access token
         String address = "https://localhost:" + PORT + "/secured/bookstore/books";
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
 
@@ -206,15 +206,15 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testServiceWithTokenAndIncorrectScopeURI() throws Exception {
         URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
-        
+
         // Get Authorization Code
         String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
 
-        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                                  "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
@@ -222,21 +222,21 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
 
         String code = OAuth2TestUtils.getAuthorizationCode(oauthClient, "create_image");
         assertNotNull(code);
-        
+
         // Now get the access token
-        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                        "consumer-id", "this-is-a-secret", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        ClientAccessToken accessToken = 
+        ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(oauthClient, code);
         assertNotNull(accessToken.getTokenKey());
 
         // Now invoke on the service with the access token
         String address = "https://localhost:" + PORT + "/secured/bookstore/books";
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
 
@@ -244,57 +244,57 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testServiceWithTokenAndMultipleScopes() throws Exception {
         URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
-        
+
         // Get Authorization Code
         String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
 
-        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                                  "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        String code = OAuth2TestUtils.getAuthorizationCode(oauthClient, 
+        String code = OAuth2TestUtils.getAuthorizationCode(oauthClient,
                                                            "read_book create_image create_book");
         assertNotNull(code);
-        
+
         // Now get the access token
-        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                        "consumer-id", "this-is-a-secret", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
-        ClientAccessToken accessToken = 
+        ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(oauthClient, code);
         assertNotNull(accessToken.getTokenKey());
 
         // Now invoke on the service with the access token
         String address = "https://localhost:" + PORT + "/secured/bookstore/books";
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
-        
+
         Response response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
-        
+
         Book returnedBook = response.readEntity(Book.class);
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
     }
-    
+
     @org.junit.Test
     public void testServiceWithTokenUsingAudience() throws Exception {
         URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
-        
+
         // Get Authorization Code
         String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
 
-        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                                  "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
@@ -302,41 +302,41 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
 
         String code = OAuth2TestUtils.getAuthorizationCode(oauthClient, null, "consumer-id-aud");
         assertNotNull(code);
-        
+
         // Now get the access token
-        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                        "consumer-id-aud", "this-is-a-secret", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
         String address = "https://localhost:" + PORT + "/secured/bookstore/books";
-        ClientAccessToken accessToken = 
+        ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(oauthClient, code,
                                                                 "consumer-id-aud", address);
         assertNotNull(accessToken.getTokenKey());
 
         // Now invoke on the service with the access token
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
-        
+
         Response response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
-        
+
         Book returnedBook = response.readEntity(Book.class);
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
     }
-    
+
     @org.junit.Test
     public void testServiceWithTokenUsingIncorrectAudience() throws Exception {
         URL busFile = OAuth2FiltersTest.class.getResource("client.xml");
-        
+
         // Get Authorization Code
         String oauthService = "https://localhost:" + OAUTH_PORT + "/services/";
 
-        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        WebClient oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                                  "alice", "security", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
@@ -344,27 +344,27 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
 
         String code = OAuth2TestUtils.getAuthorizationCode(oauthClient, null, "consumer-id-aud2");
         assertNotNull(code);
-        
+
         // Now get the access token
-        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(), 
+        oauthClient = WebClient.create(oauthService, OAuth2TestUtils.setupProviders(),
                                        "consumer-id-aud2", "this-is-a-secret", busFile.toString());
         // Save the Cookie for the second request...
         WebClient.getConfig(oauthClient).getRequestContext().put(
             org.apache.cxf.message.Message.MAINTAIN_SESSION, Boolean.TRUE);
 
         String address = "https://localhost:" + PORT + "/securedxyz/bookstore/books";
-        ClientAccessToken accessToken = 
+        ClientAccessToken accessToken =
             OAuth2TestUtils.getAccessTokenWithAuthorizationCode(oauthClient, code,
                                                                 "consumer-id-aud2", address);
         assertNotNull(accessToken.getTokenKey());
 
         // Now invoke on the service with the access token
-        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
+        WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
-        
+
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
 }

@@ -33,7 +33,7 @@ import org.osgi.service.blueprint.reflect.Metadata;
 
 @Namespaces("http://cxf.apache.org/transports/http/configuration")
 public class HttpBPHandler extends BaseNamespaceHandler {
-    
+
     public HttpBPHandler() {
     }
 
@@ -54,7 +54,7 @@ public class HttpBPHandler extends BaseNamespaceHandler {
         } else if ("destination".equals(s)) {
             return new HttpDestinationBPBeanDefinitionParser().parse(element, context);
         }
-        
+
         return null;
     }
 
@@ -62,9 +62,9 @@ public class HttpBPHandler extends BaseNamespaceHandler {
     public Set<Class> getManagedClasses() {
         return null;
     }
-    
+
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;
     }
-    
+
 }

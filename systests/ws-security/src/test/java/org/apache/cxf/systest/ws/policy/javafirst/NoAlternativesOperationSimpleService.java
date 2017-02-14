@@ -22,9 +22,9 @@ package org.apache.cxf.systest.ws.policy.javafirst;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-@WebService(name = "NoAlternativesOperationSimpleService", 
+@WebService(name = "NoAlternativesOperationSimpleService",
             targetNamespace = "http://www.example.org/contract/NoAlternativesOperationSimpleService")
-public interface NoAlternativesOperationSimpleService {  
+public interface NoAlternativesOperationSimpleService {
     @WebMethod(operationName = "doStuff")
     void doStuff();
 

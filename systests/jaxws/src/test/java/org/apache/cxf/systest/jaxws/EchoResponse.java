@@ -34,11 +34,11 @@ public class EchoResponse {
 
     /**
      * Gets the value of the result property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getResult() {
         return result;
@@ -46,11 +46,11 @@ public class EchoResponse {
 
     /**
      * Sets the value of the result property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setResult(String value) {
         this.result = value;

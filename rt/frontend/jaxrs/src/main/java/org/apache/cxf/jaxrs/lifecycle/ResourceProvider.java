@@ -27,25 +27,25 @@ import org.apache.cxf.message.Message;
 public interface ResourceProvider {
 
     /**
-     * Returns the resource instance which will handle the current request 
+     * Returns the resource instance which will handle the current request
      * @param m the current request message
      * @return resource instance
      */
     Object getInstance(Message m);
-    
+
     /**
      * Releases the resource instance if needed
      * @param m the current request message
      * @param o resource instance
      */
     void releaseInstance(Message m, Object o);
-    
+
     /**
      * Returns the Class of the resource
      * @return
      */
     Class<?> getResourceClass();
-    
+
     /**
      * Indicates if the managed resource is a singleton
      * @return

@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 public @interface Provider {
     enum Type { InInterceptor, OutInterceptor, InFaultInterceptor, OutFaultInterceptor, Feature }
     enum Scope { Server, Client, All }
-    
+
     Type value();
-    Scope scope() default Scope.All; 
+    Scope scope() default Scope.All;
 }

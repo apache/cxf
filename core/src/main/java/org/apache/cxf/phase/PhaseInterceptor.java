@@ -26,11 +26,11 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Message;
 
 /**
- * A phase interceptor is an intercetor that participates in a 
+ * A phase interceptor is an intercetor that participates in a
  * PhaseInterceptorChain.
  * The phase property controls the phase in which the interceptor is placed.
- * The before and after properties allow for fine grained control over where 
- * the phase the interceptor is placed. They specify the IDs of the 
+ * The before and after properties allow for fine grained control over where
+ * the phase the interceptor is placed. They specify the IDs of the
  * interceptors that must be placed before and after the interceptor.
  *
  * @see org.apache.cxf.phase.PhaseInterceptorChain
@@ -38,18 +38,18 @@ import org.apache.cxf.message.Message;
 public interface PhaseInterceptor<T extends Message> extends Interceptor<T> {
 
     /**
-     * Returns a set containing the IDs of the interceptors that should be 
-     * executed before this interceptor. This interceptor will be placed 
+     * Returns a set containing the IDs of the interceptors that should be
+     * executed before this interceptor. This interceptor will be placed
      * in the chain after the interceptors in the set.
      * @return the IDs of the interceptors
      */
     Set<String> getAfter();
 
     /**
-     * Returns a set containing the IDs of the interceptors that should be 
-     * executed after this interceptor. This interceptor will be placed in 
+     * Returns a set containing the IDs of the interceptors that should be
+     * executed after this interceptor. This interceptor will be placed in
      * the inteceptor chain before the interceptors in the set.
-     * @return the ids of the interceptors 
+     * @return the ids of the interceptors
      */
     Set<String> getBefore();
 
@@ -64,9 +64,9 @@ public interface PhaseInterceptor<T extends Message> extends Interceptor<T> {
      * @return the phase
      */
     String getPhase();
-    
+
     /**
-     * Returns a collection of Interceptors that should be added to the chain 
+     * Returns a collection of Interceptors that should be added to the chain
      * whenever this interceptor is added.   May return null.
      * @return the collection of interceptors
      */

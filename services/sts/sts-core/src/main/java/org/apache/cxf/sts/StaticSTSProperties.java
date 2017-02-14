@@ -44,9 +44,9 @@ import org.apache.wss4j.dom.engine.WSSConfig;
  * A static implementation of the STSPropertiesMBean.
  */
 public class StaticSTSProperties implements STSPropertiesMBean {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(StaticSTSProperties.class);
-    
+
     private CallbackHandler callbackHandler;
     private String callbackHandlerClass;
     private Crypto signatureCrypto;
@@ -84,7 +84,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
                 throw new STSException(ex.getMessage());
             }
         }
-        
+
         if (encryptionCrypto == null && getEncryptionCryptoProperties() != null) {
             ResourceManager resourceManager = getResourceManager();
             Properties encrProperties = SecurityUtils.loadProperties(resourceManager, getEncryptionCryptoProperties());
@@ -99,7 +99,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
                 throw new STSException(ex.getMessage());
             }
         }
-        
+
         if (callbackHandler == null && getCallbackHandlerClass() != null) {
             try {
                 callbackHandler = SecurityUtils.getCallbackHandler(getCallbackHandlerClass());
@@ -114,7 +114,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
         }
         WSSConfig.init();
     }
-    
+
     private ResourceManager getResourceManager() {
         Bus b = bus;
         if (b == null) {
@@ -124,8 +124,8 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     }
 
     /**
-     * Set the CallbackHandler object. 
-     * @param callbackHandler the CallbackHandler object. 
+     * Set the CallbackHandler object.
+     * @param callbackHandler the CallbackHandler object.
      */
     public void setCallbackHandler(CallbackHandler callbackHandler) {
         this.callbackHandler = callbackHandler;
@@ -133,10 +133,10 @@ public class StaticSTSProperties implements STSPropertiesMBean {
             LOG.fine("Setting callbackHandler: " + callbackHandler);
         }
     }
-    
+
     /**
-     * Set the String corresponding to the CallbackHandler class. 
-     * @param callbackHandlerClass the String corresponding to the CallbackHandler class. 
+     * Set the String corresponding to the CallbackHandler class.
+     * @param callbackHandlerClass the String corresponding to the CallbackHandler class.
      */
     public void setCallbackHandlerClass(String callbackHandlerClass) {
         this.callbackHandlerClass = callbackHandlerClass;
@@ -144,11 +144,11 @@ public class StaticSTSProperties implements STSPropertiesMBean {
             LOG.fine("Setting callbackHandlerClass: " + callbackHandlerClass);
         }
     }
-    
+
     public String getCallbackHandlerClass() {
         return this.callbackHandlerClass;
     }
-    
+
     /**
      * Get the CallbackHandler object.
      * @return the CallbackHandler object.
@@ -156,7 +156,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public CallbackHandler getCallbackHandler() {
         return callbackHandler;
     }
-    
+
     /**
      * Set the signature Crypto object
      * @param signatureCrypto the signature Crypto object
@@ -164,7 +164,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public void setSignatureCrypto(Crypto signatureCrypto) {
         this.signatureCrypto = signatureCrypto;
     }
-    
+
     /**
      * Set the String corresponding to the signature Properties class
      * @param signaturePropertiesFile the String corresponding to the signature properties file
@@ -173,7 +173,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public void setSignaturePropertiesFile(String signaturePropertiesFile) {
         setSignatureCryptoProperties(signaturePropertiesFile);
     }
-    
+
     /**
      * Set the Object corresponding to the signature Properties class. It can be a String
      * corresponding to a filename, a Properties object, or a URL.
@@ -185,11 +185,11 @@ public class StaticSTSProperties implements STSPropertiesMBean {
             LOG.fine("Setting signature crypto properties: " + signatureCryptoProperties);
         }
     }
-    
+
     public Object getSignatureCryptoProperties() {
         return this.signatureCryptoProperties;
     }
-    
+
     /**
      * Get the signature Crypto object
      * @return the signature Crypto object
@@ -197,7 +197,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public Crypto getSignatureCrypto() {
         return signatureCrypto;
     }
-    
+
     /**
      * Set the username/alias to use to sign any issued tokens
      * @param signatureUsername the username/alias to use to sign any issued tokens
@@ -208,7 +208,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
             LOG.fine("Setting signatureUsername: " + signatureUsername);
         }
     }
-    
+
     /**
      * Get the username/alias to use to sign any issued tokens
      * @return the username/alias to use to sign any issued tokens
@@ -216,7 +216,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public String getSignatureUsername() {
         return signatureUsername;
     }
-    
+
     /**
      * Set the encryption Crypto object
      * @param encryptionCrypto the encryption Crypto object
@@ -224,7 +224,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public void setEncryptionCrypto(Crypto encryptionCrypto) {
         this.encryptionCrypto = encryptionCrypto;
     }
-    
+
     /**
      * Set the String corresponding to the encryption Properties class
      * @param signaturePropertiesFile the String corresponding to the encryption properties file
@@ -233,7 +233,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public void setEncryptionPropertiesFile(String encryptionPropertiesFile) {
         setEncryptionCryptoProperties(encryptionPropertiesFile);
     }
-    
+
     /**
      * Set the Object corresponding to the encryption Properties class. It can be a String
      * corresponding to a filename, a Properties object, or a URL.
@@ -245,11 +245,11 @@ public class StaticSTSProperties implements STSPropertiesMBean {
             LOG.fine("Setting encryptionProperties: " + encryptionCryptoProperties);
         }
     }
-    
+
     public Object getEncryptionCryptoProperties() {
         return this.encryptionCryptoProperties;
     }
-    
+
     /**
      * Get the encryption Crypto object
      * @return the encryption Crypto object
@@ -257,7 +257,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public Crypto getEncryptionCrypto() {
         return encryptionCrypto;
     }
-    
+
     /**
      * Set the username/alias to use to encrypt any issued tokens. This is a default value - it
      * can be configured per Service in the ServiceMBean.
@@ -269,7 +269,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
             LOG.fine("Setting encryptionUsername: " + encryptionUsername);
         }
     }
-    
+
     /**
      * Get the username/alias to use to encrypt any issued tokens. This is a default value - it
      * can be configured per Service in the ServiceMBean
@@ -278,7 +278,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public String getEncryptionUsername() {
         return encryptionUsername;
     }
-    
+
     /**
      * Set the EncryptionProperties to use.
      * @param encryptionProperties the EncryptionProperties to use.
@@ -286,7 +286,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public void setEncryptionProperties(EncryptionProperties encryptionProperties) {
         this.encryptionProperties = encryptionProperties;
     }
-    
+
     /**
      * Get the EncryptionProperties to use.
      * @return the EncryptionProperties to use.
@@ -294,7 +294,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public EncryptionProperties getEncryptionProperties() {
         return encryptionProperties;
     }
-    
+
     /**
      * Set the STS issuer name
      * @param issuer the STS issuer name
@@ -305,7 +305,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
             LOG.fine("Setting issuer: " + issuer);
         }
     }
-    
+
     /**
      * Get the STS issuer name
      * @return the STS issuer name
@@ -313,7 +313,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public String getIssuer() {
         return issuer;
     }
-    
+
     /**
      * Set the SignatureProperties to use.
      * @param signatureProperties the SignatureProperties to use.
@@ -321,7 +321,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public void setSignatureProperties(SignatureProperties signatureProperties) {
         this.signatureProperties = signatureProperties;
     }
-    
+
     /**
      * Get the SignatureProperties to use.
      * @return the SignatureProperties to use.
@@ -329,7 +329,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public SignatureProperties getSignatureProperties() {
         return signatureProperties;
     }
-    
+
     /**
      * Set the RealmParser object to use.
      * @param realmParser the RealmParser object to use.
@@ -337,7 +337,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public void setRealmParser(RealmParser realmParser) {
         this.realmParser = realmParser;
     }
-    
+
     /**
      * Get the RealmParser object to use.
      * @return the RealmParser object to use.
@@ -345,7 +345,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public RealmParser getRealmParser() {
         return realmParser;
     }
-    
+
     /**
      * Set the IdentityMapper object to use.
      * @param identityMapper the IdentityMapper object to use.
@@ -353,7 +353,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public void setIdentityMapper(IdentityMapper identityMapper) {
         this.identityMapper = identityMapper;
     }
-    
+
     /**
      * Get the IdentityMapper object to use.
      * @return the IdentityMapper object to use.
@@ -361,7 +361,7 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public IdentityMapper getIdentityMapper() {
         return identityMapper;
     }
-    
+
     public void setRelationships(List<Relationship> relationships) {
         this.relationships = relationships;
         this.relationshipResolver = new RelationshipResolver(this.relationships);
@@ -370,9 +370,9 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public List<Relationship> getRelationships() {
         return relationships;
     }
-    
+
     public RelationshipResolver getRelationshipResolver() {
-        return relationshipResolver;      
+        return relationshipResolver;
     }
 
     public SAMLRealmCodec getSamlRealmCodec() {
@@ -390,20 +390,20 @@ public class StaticSTSProperties implements STSPropertiesMBean {
     public void setBus(Bus bus) {
         this.bus = bus;
     }
-    
+
     /**
-     * Get whether to validate a client Public Key or Certificate presented as part of a 
+     * Get whether to validate a client Public Key or Certificate presented as part of a
      * UseKey element. This is true by default.
      */
     public boolean isValidateUseKey() {
         return validateUseKey;
     }
-    
+
     /**
-     * Set whether to validate a client Public Key or Certificate presented as part of a 
+     * Set whether to validate a client Public Key or Certificate presented as part of a
      * UseKey element. If this is set to true (the default), the public key must be trusted
      * by the Signature Crypto of the STS.
-     * 
+     *
      * @param validateUseKey whether to validate a client UseKey or not.
      */
     public void setValidateUseKey(boolean validateUseKey) {

@@ -45,19 +45,19 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
         sf.setEnableStaticResolution(true);
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.BookStoreNoSubResource.class);
         sf.create();
-        
+
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         assertEquals(1, resources.size());
-        
+
         //Verify root ClassResourceInfo: BookStoreNoSubResource
         ClassResourceInfo rootCri = resources.get(0);
         assertNotNull(rootCri.getURITemplate());
         URITemplate template = rootCri.getURITemplate();
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
-        assertTrue(template.match("/bookstore/books/123", values));     
-        assertFalse(rootCri.hasSubResources());   
+        assertTrue(template.match("/bookstore/books/123", values));
+        assertFalse(rootCri.hasSubResources());
         MethodDispatcher md = rootCri.getMethodDispatcher();
-        assertEquals(7, md.getOperationResourceInfos().size());  
+        assertEquals(7, md.getOperationResourceInfos().size());
         Set<OperationResourceInfo> ops = md.getOperationResourceInfos();
         assertTrue("No operation found", verifyOp(ops, "getBook", "GET", false));
         assertTrue("No operation found", verifyOp(ops, "getBookStoreInfo", "GET", false));
@@ -66,7 +66,7 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
         assertTrue("No operation found", verifyOp(ops, "addBook", "POST", false));
         assertTrue("No operation found", verifyOp(ops, "updateBook", "PUT", false));
         assertTrue("No operation found", verifyOp(ops, "deleteBook", "DELETE", false));
-        
+
     }
 
     @Test
@@ -74,30 +74,30 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly.class);
         sf.create();
-        
+
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         assertEquals(1, resources.size());
     }
-    
+
     @Test
     public void testSubResources() throws Exception {
         JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
         sf.setEnableStaticResolution(true);
         sf.setResourceClasses(org.apache.cxf.jaxrs.resources.BookStore.class);
         sf.create();
-        
+
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
         assertEquals(1, resources.size());
-        
+
         //Verify root ClassResourceInfo: BookStore
         ClassResourceInfo rootCri = resources.get(0);
         assertNotNull(rootCri.getURITemplate());
         URITemplate template = rootCri.getURITemplate();
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
-        assertTrue(template.match("/bookstore/books/123", values));     
-        assertTrue(rootCri.hasSubResources());   
+        assertTrue(template.match("/bookstore/books/123", values));
+        assertTrue(rootCri.hasSubResources());
         MethodDispatcher md = rootCri.getMethodDispatcher();
-        assertEquals(7, md.getOperationResourceInfos().size());  
+        assertEquals(7, md.getOperationResourceInfos().size());
         for (OperationResourceInfo ori : md.getOperationResourceInfos()) {
             if ("getDescription".equals(ori.getMethodToInvoke().getName())) {
                 assertEquals("GET", ori.getHttpMethod());
@@ -135,10 +135,10 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
                 fail("unexpected OperationResourceInfo" + ori.getMethodToInvoke().getName());
             }
         }
-        
+
         // Verify sub-resource ClassResourceInfo: Book
         assertEquals(1, rootCri.getSubResources().size());
-        ClassResourceInfo subCri = rootCri.getSubResources().iterator().next();        
+        ClassResourceInfo subCri = rootCri.getSubResources().iterator().next();
         assertNull(subCri.getURITemplate());
         assertEquals(org.apache.cxf.jaxrs.resources.Book.class, subCri.getResourceClass());
         MethodDispatcher subMd = subCri.getMethodDispatcher();
@@ -147,7 +147,7 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
         OperationResourceInfo subOri = subMd.getOperationResourceInfos().iterator().next();
         assertEquals("GET", subOri.getHttpMethod());
         assertNotNull(subOri.getURITemplate());
-        
+
         //getState method
         OperationResourceInfo subOri2 = subMd.getOperationResourceInfos().iterator().next();
         assertEquals("GET", subOri2.getHttpMethod());
@@ -155,8 +155,8 @@ public class JAXRSServiceFactoryBeanTest extends Assert {
     }
 
     private boolean verifyOp(Set<OperationResourceInfo> ops,
-                             String opName, 
-                             String httpMethod, 
+                             String opName,
+                             String httpMethod,
                              boolean isSubresource) {
         for (OperationResourceInfo ori : ops) {
             if (opName.equals(ori.getMethodToInvoke().getName())) {

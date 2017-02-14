@@ -32,18 +32,18 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class JAXRSClientConduitWebSocketTest extends AbstractBusClientServerTestBase {
     private static final String PORT = BookServerWebSocket.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(new BookServerWebSocket()));
         createStaticBus();
     }
-    
+
     @Test
     public void testBookWithWebSocket() throws Exception {
         String address = "ws://localhost:" + getPort() + "/websocket";
@@ -51,7 +51,7 @@ public class JAXRSClientConduitWebSocketTest extends AbstractBusClientServerTest
         BookStoreWebSocket resource = JAXRSClientFactory.create(address, BookStoreWebSocket.class);
         Client client = WebClient.client(resource);
         client.header(HttpHeaders.USER_AGENT, JAXRSClientConduitWebSocketTest.class.getName());
-        
+
         // call the GET service
         assertEquals("CXF in Action", new String(resource.getBookName()));
 
@@ -65,7 +65,7 @@ public class JAXRSClientConduitWebSocketTest extends AbstractBusClientServerTest
 
         // call the POST service
         assertEquals(Long.valueOf(123), resource.echoBookId(123));
-        
+
         // call the same POST service in the text mode
         //TODO add some way to control the client to switch between the bytes and text modes
         assertEquals(Long.valueOf(123), resource.echoBookId(123));
@@ -83,15 +83,15 @@ public class JAXRSClientConduitWebSocketTest extends AbstractBusClientServerTest
         BookStoreWebSocket resource = JAXRSClientFactory.create(address, BookStoreWebSocket.class, null, true);
         Client client = WebClient.client(resource);
         client.header(HttpHeaders.USER_AGENT, JAXRSClientConduitWebSocketTest.class.getName());
-        
+
         // call the POST service twice (a unique requestId is automatically included to correlate the response)
         EchoBookIdRunner[] runners = new EchoBookIdRunner[2];
         runners[0] = new EchoBookIdRunner(resource, 549);
         runners[1] = new EchoBookIdRunner(resource, 495);
-        
+
         new Thread(runners[0]).start();
         new Thread(runners[1]).start();
-        
+
         long timetowait = 5000;
         while (timetowait > 0) {
             if (runners[0].isCompleted() && runners[1].isCompleted()) {
@@ -102,7 +102,7 @@ public class JAXRSClientConduitWebSocketTest extends AbstractBusClientServerTest
         }
         assertEquals(Long.valueOf(549), runners[0].getValue());
         assertEquals(Long.valueOf(495), runners[1].getValue());
-    }    
+    }
 
     private static class EchoBookIdRunner implements Runnable {
         private BookStoreWebSocket resource;

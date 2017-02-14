@@ -39,19 +39,19 @@ public class BookStorePerRequest {
     private Map<Long, Book> books = new HashMap<Long, Book>();
     private List<String> bookIds;
     private List<String> setterBookIds;
-    
+
     public BookStorePerRequest() {
         throw new RuntimeException();
     }
-    
+
     public BookStorePerRequest(@Context HttpHeaders headers) {
         throw new RuntimeException();
     }
-    
+
     public BookStorePerRequest(@Context HttpHeaders headers, Long bar) {
         throw new RuntimeException();
     }
-    
+
     public BookStorePerRequest(@Context HttpHeaders headers,
                                @HeaderParam("BOOK") List<String> bookIds) {
         if (!bookIds.contains("3")) {
@@ -62,7 +62,7 @@ public class BookStorePerRequest {
         this.bookIds = bookIds;
         init();
     }
-    
+
     @HeaderParam("Book")
     public void setBook(List<String> ids) {
         if (!ids.equals(bookIds) || ids.size() != 3) {
@@ -71,7 +71,7 @@ public class BookStorePerRequest {
         }
         setterBookIds = ids;
     }
-    
+
     @Context
     public void setHttpHeaders(HttpHeaders headers) {
         List<String> ids = httpHeaders.getRequestHeader("BOOK");
@@ -80,31 +80,31 @@ public class BookStorePerRequest {
                                            .entity("Context setter: unexpected header value").build());
         }
     }
-    
+
     @GET
     @Path("/book%20headers/")
     public Book getBookByHeader2() throws Exception {
         return getBookByHeader();
     }
-    
+
     @GET
     @Path("/bookheaders/")
     public Book getBookByHeader() throws Exception {
-        
+
         List<String> ids = httpHeaders.getRequestHeader("BOOK");
         if (!ids.equals(bookIds)) {
             throw new RuntimeException();
         }
         return doGetBook(ids.get(0) + ids.get(1) + ids.get(2));
     }
-    
+
     @GET
     @Path("/bookheaders/injected")
     public Book getBookByHeaderInjected() throws Exception {
-        
+
         return doGetBook(setterBookIds.get(0) + setterBookIds.get(1) + setterBookIds.get(2));
     }
-    
+
     private Book doGetBook(String id) throws BookNotFoundFault {
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
@@ -114,16 +114,16 @@ public class BookStorePerRequest {
             details.setId(Long.parseLong(id));
             throw new BookNotFoundFault(details);
         }
-    }        
-    
-    
+    }
+
+
     final void init() {
         Book book = new Book();
         book.setId(123);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
-    
+
 }
 
 

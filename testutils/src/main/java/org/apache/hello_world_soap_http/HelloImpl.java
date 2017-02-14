@@ -17,14 +17,14 @@
  * under the License.
  */
 package org.apache.hello_world_soap_http;
-@javax.jws.WebService(name = "Hello", 
+@javax.jws.WebService(name = "Hello",
                       serviceName = "HelloService",
                       portName = "HelloPort",
-                      targetNamespace = "http://apache.org/hello_world_soap_http", 
+                      targetNamespace = "http://apache.org/hello_world_soap_http",
                       endpointInterface = "org.apache.hello_world_soap_http.Hello")
 
 public class HelloImpl implements Hello {
     public String sayHi() {
         return "Hello CXF";
-    }    
+    }
 }

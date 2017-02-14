@@ -48,7 +48,7 @@ public class ClaimsParameters {
     private Map<String, Object> additionalProperties;
     private TokenStore tokenStore;
     private String realm;
-    
+
     public TokenStore getTokenStore() {
         return tokenStore;
     }
@@ -56,7 +56,7 @@ public class ClaimsParameters {
     public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
-        
+
     public String getAppliesToAddress() {
         return appliesToAddress;
     }
@@ -72,7 +72,7 @@ public class ClaimsParameters {
     public void setTokenRequirements(TokenRequirements tokenRequirements) {
         this.tokenRequirements = tokenRequirements;
     }
-    
+
     public KeyRequirements getKeyRequirements() {
         return keyRequirements;
     }
@@ -88,7 +88,7 @@ public class ClaimsParameters {
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
+
     public EncryptionProperties getEncryptionProperties() {
         return encryptionProperties;
     }
@@ -96,15 +96,15 @@ public class ClaimsParameters {
     public void setEncryptionProperties(EncryptionProperties encryptionProperties) {
         this.encryptionProperties = encryptionProperties;
     }
-    
+
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getPrincipal() {
         return principal;
     }
-    
+
     public Set<Principal> getRoles() {
         return roles;
     }
@@ -112,19 +112,19 @@ public class ClaimsParameters {
     public void setRoles(Set<Principal> roles) {
         this.roles = roles;
     }
-    
+
     public void setAdditionalProperties(Map<String, Object> additionalProperties) {
         this.additionalProperties = additionalProperties;
     }
-    
+
     public Map<String, Object> getAdditionalProperties() {
         return additionalProperties;
     }
-    
+
     public void setRealm(String realm) {
         this.realm = realm;
     }
-    
+
     public String getRealm() {
         return realm;
     }
@@ -136,6 +136,6 @@ public class ClaimsParameters {
     public void setMessageContext(Map<String, Object> messageContext) {
         this.messageContext = messageContext;
     }
-    
+
 }
 

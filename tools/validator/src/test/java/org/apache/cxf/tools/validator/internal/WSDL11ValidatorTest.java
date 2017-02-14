@@ -26,7 +26,7 @@ import org.junit.Test;
 
 public class WSDL11ValidatorTest extends Assert {
     private ToolContext context = new ToolContext();
-    
+
     @Test
     public void testWSDLImport() throws Exception {
         String wsdlSource = getClass().getResource("resources/a.wsdl").toURI().toString();

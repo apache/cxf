@@ -42,7 +42,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         super(phase);
         this.sender = sender;
     }
-    
+
     public void setLimit(int lim) {
         this.limit = lim;
     }
@@ -64,21 +64,21 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             ((PrettyLoggingFilter)this.sender).setPrettyLogging(prettyLogging);
         }
     }
-    
+
     protected boolean shouldLogContent(LogEvent event) {
-        return event.isBinaryContent() && logBinary 
+        return event.isBinaryContent() && logBinary
             || event.isMultipartContent() && logMultipart
             || !event.isBinaryContent() && !event.isMultipartContent();
     }
-    
+
     public void setLogBinary(boolean logBinary) {
         this.logBinary = logBinary;
     }
-    
+
     public void setLogMultipart(boolean logMultipart) {
         this.logMultipart = logMultipart;
     }
-    
+
     public void createExchangeId(Message message) {
         Exchange exchange = message.getExchange();
         String exchangeId = (String)exchange.get(LogEvent.KEY_EXCHANGE_ID);

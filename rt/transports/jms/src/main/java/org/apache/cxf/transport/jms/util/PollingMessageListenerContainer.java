@@ -74,7 +74,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             }
 
         }
-        
+
         private void safeRollBack(Session session, Exception e) {
             try {
                 if (session.getTransacted()) {
@@ -86,7 +86,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         }
 
     }
-    
+
     private class XAPoller implements Runnable {
 
         @Override
@@ -101,7 +101,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                     }
                     transactionManager.begin();
                     /*
-                     * Create session inside transaction to give it the 
+                     * Create session inside transaction to give it the
                      * chance to enlist itself as a resource
                      */
                     Session session = closer.register(connection.createSession(transacted, acknowledgeMode));
@@ -123,7 +123,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             }
 
         }
-        
+
         private void safeRollBack(Session session) {
             try {
                 transactionManager.rollback();
@@ -133,7 +133,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         }
 
     }
-    
+
     private MessageConsumer createConsumer(Session session) throws JMSException {
         if (durableSubscriptionName != null && destination instanceof Topic) {
             return session.createDurableSubscriber((Topic)destination, durableSubscriptionName,
@@ -150,7 +150,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         }
         running = true;
         for (int c = 0; c < getConcurrentConsumers(); c++) {
-            Runnable poller = (transactionManager != null) ? new XAPoller() : new Poller(); 
+            Runnable poller = (transactionManager != null) ? new XAPoller() : new Poller();
             getExecutor().execute(poller);
         }
     }
@@ -162,7 +162,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
             return;
         }
         running = false;
-        super.stop();        
+        super.stop();
     }
 
     @Override

@@ -21,30 +21,30 @@ package org.apache.cxf.jaxrs.provider.atom;
 /**
  * A callback-style provider which can be used to map an object to Atom Entry
  * without having to deal directly with types representing Atom entries
- * 
+ *
  * @param <T> Type of objects which will be mapped to entries
  */
 public abstract class AbstractEntryBuilder<T> extends AbstractAtomElementBuilder<T> {
     /**
-     * 
+     *
      * @param pojo Object which is being mapped
      * @return element publication date
      */
     public String getPublished(T pojo) {
         return null;
     }
-    
+
     /**
-     * 
+     *
      * @param pojo Object which is being mapped
      * @return element summary
      */
     public String getSummary(T pojo) {
         return null;
     }
-    
+
     /**
-     * 
+     *
      * @param pojo Object which is being mapped
      * @return entry content
      */

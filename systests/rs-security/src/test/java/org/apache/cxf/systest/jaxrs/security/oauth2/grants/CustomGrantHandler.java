@@ -33,11 +33,11 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 public class CustomGrantHandler implements AccessTokenGrantHandler {
 
     private OAuthDataProvider dataProvider;
-    
+
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
     }
-    
+
     public List<String> getSupportedGrantTypes() {
         return Collections.singletonList("custom_grant");
     }

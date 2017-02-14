@@ -38,21 +38,21 @@ import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * Is called in OSGi on start and stop of the cxf bundle.
- * Manages 
+ * Manages
  * - CXFBundleListener
  * - Attaching ManagedWorkqueues to config admin service
  * - OsgiBusListener
  * - Blueprint namespaces
  */
 public class CXFActivator implements BundleActivator {
-    
+
     private List<Extension> extensions;
     private ManagedWorkQueueList workQueues;
     private ServiceTracker configAdminTracker;
     private CXFExtensionBundleListener cxfBundleListener;
     private ServiceRegistration workQueueServiceRegistration;
-    
-    
+
+
 
     /** {@inheritDoc}*/
     public void start(BundleContext context) throws Exception {
@@ -64,17 +64,17 @@ public class CXFActivator implements BundleActivator {
         configAdminTracker = new ServiceTracker(context, ConfigurationAdmin.class.getName(), null);
         configAdminTracker.open();
         workQueues.setConfigAdminTracker(configAdminTracker);
-        workQueueServiceRegistration = registerManagedServiceFactory(context, ManagedServiceFactory.class, 
+        workQueueServiceRegistration = registerManagedServiceFactory(context, ManagedServiceFactory.class,
                                                                      workQueues,
                                                                      ManagedWorkQueueList.FACTORY_PID);
-                
+
         extensions = new ArrayList<>();
         extensions.add(createOsgiBusListenerExtension(context));
         extensions.add(createManagedWorkQueueListExtension(workQueues));
         ExtensionRegistry.addExtensions(extensions);
 
         BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
-                
+
             @Override
             public Object createNamespaceHandler() {
                 return new CXFAPINamespaceHandler();
@@ -93,10 +93,10 @@ public class CXFActivator implements BundleActivator {
 
     private ServiceRegistration registerManagedServiceFactory(BundleContext context,
                                                               Class<?> serviceClass,
-                                                              Object service, 
+                                                              Object service,
                                                               String servicePid) {
         Properties props = new Properties();
-        props.put(Constants.SERVICE_PID, servicePid);  
+        props.put(Constants.SERVICE_PID, servicePid);
         return context.registerService(serviceClass.getName(), service, props);
     }
 

@@ -23,7 +23,7 @@ import java.net.URI;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 
-public class SpnegoAuthSupplier extends AbstractSpnegoAuthSupplier 
+public class SpnegoAuthSupplier extends AbstractSpnegoAuthSupplier
     implements HttpAuthSupplier {
 
     public boolean requiresRequestCaching() {

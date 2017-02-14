@@ -92,8 +92,8 @@ public class Java2WSMojo extends AbstractMojo {
      * @parameter
      */
     private String address;
-    
-    
+
+
     /**
      * @parameter
      */

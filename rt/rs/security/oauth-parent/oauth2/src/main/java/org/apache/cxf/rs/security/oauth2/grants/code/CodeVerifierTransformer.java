@@ -19,6 +19,6 @@
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
 public interface CodeVerifierTransformer {
-    String transformCodeVerifier(String codeVerifier); 
+    String transformCodeVerifier(String codeVerifier);
     String getChallengeMethod();
 }

@@ -28,7 +28,7 @@ public abstract class IdlStructBase extends IdlScopeBase implements IdlType {
     private String kind;
 
     protected IdlStructBase(IdlScopeBase parent, String name, String type) {
-        super(parent, name);   
+        super(parent, name);
         this.kind = type;
     }
 
@@ -44,7 +44,7 @@ public abstract class IdlStructBase extends IdlScopeBase implements IdlType {
         indentLess();
         pw.println(indent() + "};");
     }
-       
+
     public void writeFwd(PrintWriter pw) {
         if (isCircular()) {
             pw.println(indent() + kind + " " + localName() + ";");
@@ -67,7 +67,7 @@ public abstract class IdlStructBase extends IdlScopeBase implements IdlType {
         }
         return !hasNonEmptyMembers;
     }
-    
+
     public IdlScopeBase getCircularScope(IdlScopeBase startScope, List<Object> doneDefn) {
         if (startScope == null) {
             startScope = this;

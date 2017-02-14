@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 public class VelocityWriter extends BufferedWriter {
-    
+
     private final String newLine = System.getProperty("line.separator");
 
     public VelocityWriter(Writer out) {
@@ -46,12 +46,12 @@ public class VelocityWriter extends BufferedWriter {
         } else {
             super.write(str);
         }
-       
+
     }
-   
-    
-    
-    
+
+
+
+
     public void write(String str) throws IOException {
         if (str.indexOf("\r\n") >= 0  && newLine != null) {
             super.write(str.replaceAll("\r\n", newLine));

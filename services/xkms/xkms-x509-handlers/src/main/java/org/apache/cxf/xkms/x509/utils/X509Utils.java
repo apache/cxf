@@ -103,7 +103,7 @@ public final class X509Utils {
             return (X509Certificate) certificate;
         } else {
             throw new CertificateException("Unsupported certificate type encountered: "
-                    + ((certificate != null && certificate.getClass() != null) 
+                    + ((certificate != null && certificate.getClass() != null)
                         ? certificate.getClass().getName() : "Null"));
         }
     }

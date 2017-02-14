@@ -30,13 +30,13 @@ public interface DestinationRegistry {
     void removeDestination(String path);
 
     AbstractHTTPDestination getDestinationForPath(String path);
-    
+
     AbstractHTTPDestination getDestinationForPath(String path, boolean tryDecoding);
-    
+
     AbstractHTTPDestination checkRestfulRequest(String address);
-    
+
     Collection<AbstractHTTPDestination> getDestinations();
-    
+
     AbstractDestination[] getSortedDestinations();
 
     Set<String> getDestinationsPaths();

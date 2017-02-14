@@ -39,11 +39,11 @@ import org.junit.Test;
 
 public class SoapActionInterceptorTest extends Assert {
 
-    
+
     @Test
     public void testSoapAction() throws Exception {
         SoapPreProtocolOutInterceptor i = new SoapPreProtocolOutInterceptor();
-        
+
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
         message.getExchange().setOutMessage(message);
@@ -55,7 +55,7 @@ public class SoapActionInterceptorTest extends Assert {
         soapMessage.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         assertEquals(Soap11.getInstance(), soapMessage.getVersion());
         (new SoapPreProtocolOutInterceptor()).handleMessage(soapMessage);
-        Map<String, List<String>> reqHeaders   
+        Map<String, List<String>> reqHeaders
             = CastUtils.cast((Map<?, ?>)soapMessage.get(Message.PROTOCOL_HEADERS));
         assertNotNull(reqHeaders);
         assertEquals("\"\"", reqHeaders.get(SoapBindingConstants.SOAP_ACTION).get(0));
@@ -67,14 +67,14 @@ public class SoapActionInterceptorTest extends Assert {
         i.handleMessage(soapMessage);
         String ct = (String) soapMessage.get(Message.CONTENT_TYPE);
         assertEquals("application/soap+xml", ct);
-        
+
         BindingOperationInfo bop = createBindingOperation();
- 
+
         soapMessage.getExchange().put(BindingOperationInfo.class, bop);
         SoapOperationInfo soapInfo = new SoapOperationInfo();
         soapInfo.setAction("foo");
         bop.addExtensor(soapInfo);
-        
+
         i.handleMessage(soapMessage);
         ct = (String) soapMessage.get(Message.CONTENT_TYPE);
         assertEquals("application/soap+xml; action=\"foo\"", ct);
@@ -85,7 +85,7 @@ public class SoapActionInterceptorTest extends Assert {
         InterfaceInfo ii = s.createInterface(new QName("FooInterface"));
         s.setInterface(ii);
         ii.addOperation(new QName("fooOp"));
-        
+
         BindingInfo b = new BindingInfo(s, "foo");
         return b.buildOperation(new QName("fooOp"), null, null);
     }

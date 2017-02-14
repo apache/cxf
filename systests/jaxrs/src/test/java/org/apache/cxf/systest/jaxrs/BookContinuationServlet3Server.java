@@ -19,14 +19,14 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-    
+
 public class BookContinuationServlet3Server extends AbstractSpringServer {
     public static final String PORT = allocatePort(BookContinuationServlet3Server.class);
 
     public BookContinuationServlet3Server() {
         super("/jaxrs_async", Integer.valueOf(PORT));
     }
-    
+
     public static void main(String args[]) {
         try {
             BookContinuationServlet3Server s = new BookContinuationServlet3Server();

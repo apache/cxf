@@ -42,13 +42,13 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
     private WebClient jwkSetClient;
     private boolean supportSelfIssuedProvider;
     private boolean strictTimeValidation;
-    private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<String, JsonWebKey>(); 
+    private ConcurrentHashMap<String, JsonWebKey> keyMap = new ConcurrentHashMap<String, JsonWebKey>();
 
     /**
      * Validate core JWT claims
      * @param claims the claims
      * @param clientId OAuth2 client id
-     * @param validateClaimsAlways if set to true then enforce that the claims 
+     * @param validateClaimsAlways if set to true then enforce that the claims
      *                             to be validated must be set
      */
     public void validateJwtClaims(JwtClaims claims, String clientId, boolean validateClaimsAlways) {
@@ -57,7 +57,7 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
         if (issuer == null && validateClaimsAlways) {
             throw new OAuthServiceException("Invalid issuer");
         }
-        if (supportSelfIssuedProvider && issuerId == null 
+        if (supportSelfIssuedProvider && issuerId == null
             && issuer != null && SELF_ISSUED_ISSUER.equals(issuer)) {
             validateSelfIssuedProvider(claims, clientId, validateClaimsAlways);
         } else {
@@ -68,7 +68,7 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
             if (claims.getSubject() == null) {
                 throw new OAuthServiceException("Invalid subject");
             }
-            
+
             // validate authorized party
             String authorizedParty = (String)claims.getClaim(IdToken.AZP_CLAIM);
             if (authorizedParty != null && !authorizedParty.equals(clientId)) {
@@ -76,24 +76,24 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
             }
             // validate audience
             List<String> audiences = claims.getAudiences();
-            if (StringUtils.isEmpty(audiences) && validateClaimsAlways 
+            if (StringUtils.isEmpty(audiences) && validateClaimsAlways
                 || !StringUtils.isEmpty(audiences) && !audiences.contains(clientId)) {
                 throw new OAuthServiceException("Invalid audience");
             }
-    
+
             // If strict time validation: if no issuedTime claim is set then an expiresAt claim must be set
             // Otherwise: validate only if expiresAt claim is set
-            boolean expiredRequired = 
+            boolean expiredRequired =
                 validateClaimsAlways || strictTimeValidation && claims.getIssuedAt() == null;
             try {
                 JwtUtils.validateJwtExpiry(claims, getClockOffset(), expiredRequired);
             } catch (JwtException ex) {
                 throw new OAuthServiceException("ID Token has expired", ex);
             }
-            
+
             // If strict time validation: If no expiresAt claim is set then an issuedAt claim must be set
             // Otherwise: validate only if issuedAt claim is set
-            boolean issuedAtRequired = 
+            boolean issuedAtRequired =
                 validateClaimsAlways || strictTimeValidation && claims.getExpiryTime() == null;
             try {
                 JwtUtils.validateJwtIssuedAt(claims, getTtl(), getClockOffset(), issuedAtRequired);
@@ -105,11 +105,11 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
                     JwtUtils.validateJwtNotBefore(claims, getClockOffset(), strictTimeValidation);
                 } catch (JwtException ex) {
                     throw new OAuthServiceException("ID Token can not be used yet", ex);
-                }    
+                }
             }
         }
     }
-    
+
     private void validateSelfIssuedProvider(JwtClaims claims, String clientId, boolean validateClaimsAlways) {
     }
 
@@ -160,7 +160,7 @@ public class OidcClaimsValidator extends OAuthJoseJwtConsumer {
         if (theJwsVerifier == null) {
             throw new SecurityException("JWS Verifier is not available");
         }
-        
+
         return theJwsVerifier;
     }
 

@@ -115,7 +115,7 @@ public class ElementReader extends AbstractMessageReader {
                     return null;
                 }
                 value = root.getElementText();
-                
+
                 hasCheckedChildren = true;
                 hasChildren = false;
                 if (root.hasNext()) {
@@ -124,7 +124,7 @@ public class ElementReader extends AbstractMessageReader {
             } catch (XMLStreamException e) {
                 throw new DatabindingException("Could not read XML stream.", e);
             }
-            
+
             if (value == null) {
                 value = "";
             }

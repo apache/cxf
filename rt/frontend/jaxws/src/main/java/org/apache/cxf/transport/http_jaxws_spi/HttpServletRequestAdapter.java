@@ -57,7 +57,7 @@ import javax.xml.ws.spi.http.HttpExchange;
  * coming from the HttpExchange and HttpContext instances provided
  * by the underlying container.
  * Note: many methods' implementation still TODO.
- * 
+ *
  */
 class HttpServletRequestAdapter implements HttpServletRequest {
 
@@ -106,7 +106,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
         }
         return servletInputStreamAdapter;
     }
-    
+
     public String getLocalAddr() {
         InetSocketAddress isa = exchange.getLocalAddress();
         if (isa != null) {
@@ -399,11 +399,11 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     public void logout() throws ServletException {
         throw new UnsupportedOperationException();
     }
-    
+
     private static class ServletInputStreamAdapter extends ServletInputStream {
-        
+
         private InputStream delegate;
-        
+
         ServletInputStreamAdapter(InputStream delegate) {
             this.delegate = delegate;
         }
@@ -426,7 +426,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
         @Override
         public void setReadListener(ReadListener arg0) {
             throw new UnsupportedOperationException();
-            
+
         }
     }
 

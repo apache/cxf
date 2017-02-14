@@ -29,7 +29,7 @@ public class SyncInvokerImpl implements SyncInvoker {
     public SyncInvokerImpl(WebClient wc) {
         this.wc = wc;
     }
-    
+
     @Override
     public Response delete() {
         return method(HttpMethod.DELETE);
@@ -124,7 +124,7 @@ public class SyncInvokerImpl implements SyncInvoker {
     public <T> T trace(GenericType<T> genericType) {
         return method("TRACE", genericType);
     }
-    
+
     @Override
     public Response method(String method) {
         return method(method, Response.class);
@@ -154,7 +154,7 @@ public class SyncInvokerImpl implements SyncInvoker {
     public <T> T method(String method, Entity<?> entity, GenericType<T> genericType) {
         return wc.invoke(method, entity, genericType);
     }
-    
+
     public WebClient getWebClient() {
         return wc;
     }

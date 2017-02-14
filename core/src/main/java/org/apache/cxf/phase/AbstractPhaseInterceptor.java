@@ -29,10 +29,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 /**
- * Provides a starting point implementation for a interceptors that 
- * participate in phased message processing. Developers should extend from 
+ * Provides a starting point implementation for a interceptors that
+ * participate in phased message processing. Developers should extend from
  * this class when implementing custom interceptors.
- * Developers need to provide an implementation for handleMessage() and 
+ * Developers need to provide an implementation for handleMessage() and
  * can override the handleFault() implementation. They should not override
  * the other methods.
  */
@@ -43,7 +43,7 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
     private final Set<String> after = new SortedArraySet<String>();
 
     /**
-     * Instantiates the interceptor to live in a specified phase. The 
+     * Instantiates the interceptor to live in a specified phase. The
      * interceptor's id will be set to the name of the implementing class.
      *
      * @param phase the interceptor's phase
@@ -63,10 +63,10 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
     }
 
     /**
-     * Instantiates the interceptor and specifies if it gets a system 
-     * determined unique id. If <code>uniqueId</code> is set to true the 
-     * interceptor's id will be determined by the runtime. If 
-     * <code>uniqueId</code> is set to false, the implementing class' name 
+     * Instantiates the interceptor and specifies if it gets a system
+     * determined unique id. If <code>uniqueId</code> is set to true the
+     * interceptor's id will be determined by the runtime. If
+     * <code>uniqueId</code> is set to false, the implementing class' name
      * is used as the id.
      *
      * @param phase the interceptor's phase
@@ -77,8 +77,8 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
     }
 
     /**
-     * Instantiates the interceptor with a specified id or with a system 
-     * determined unique id. The specified id will be used unless 
+     * Instantiates the interceptor with a specified id or with a system
+     * determined unique id. The specified id will be used unless
      * <code>uniqueId</code> is set to true.
      *
      * @param i the interceptor's id
@@ -95,12 +95,12 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
         id = i;
         phase = p;
     }
-    
+
     /**
-     * Specifies that the current interceptor needs to be added to the 
-     * interceptor chain before the specified collection of interceptors. 
+     * Specifies that the current interceptor needs to be added to the
+     * interceptor chain before the specified collection of interceptors.
      * This method replaces any existing list with the provided list.
-     * 
+     *
      * @param i a collection of interceptor ids
      */
     public void setBefore(Collection<String> i) {
@@ -109,10 +109,10 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
     }
 
     /**
-     * Specifies that the current interceptor needs to be added to the 
+     * Specifies that the current interceptor needs to be added to the
      * interceptor chain after the specified collection of interceptors.
      * This method replaces any existing list with the provided list.
-     * 
+     *
      * @param i a collection of interceptor ids
      */
     public void setAfter(Collection<String> i) {
@@ -121,9 +121,9 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
     }
 
     /**
-     * Specifies that the current interceptor needs to be added to the 
+     * Specifies that the current interceptor needs to be added to the
      * interceptor chain before the specified collection of interceptors.
-     * 
+     *
      * @param i a collection of interceptor ids
      */
     public void addBefore(Collection<String> i) {
@@ -131,19 +131,19 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
     }
 
     /**
-     * Specifies that the current interceptor needs to be added to the 
+     * Specifies that the current interceptor needs to be added to the
      * interceptor chain after the specified collection of interceptors.
-     * 
+     *
      * @param i a collection of interceptor ids
      */
     public void addAfter(Collection<String> i) {
         after.addAll(i);
     }
-    
+
     /**
-     * Specifies that the current interceptor needs to be added to the 
+     * Specifies that the current interceptor needs to be added to the
      * interceptor chain before the specified interceptor.
-     * 
+     *
      * @param i an interceptor id
      */
     public void addBefore(String i) {
@@ -151,9 +151,9 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
     }
 
     /**
-     * Specifies that the current interceptor needs to be added to the 
+     * Specifies that the current interceptor needs to be added to the
      * interceptor chain after the specified interceptor.
-     * 
+     *
      * @param i an interceptor id
      */
     public void addAfter(String i) {
@@ -168,7 +168,7 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
     public final Set<String> getBefore() {
         return before;
     }
-    
+
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         return null;
     }
@@ -189,15 +189,15 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         return "GET".equals(method) && message.getContent(XMLStreamReader.class) == null;
     }
-    
+
     /**
      * Determine if current messaging role is that of requestor.
-     * 
+     *
      * @param message the current Message
      * @return true if the current messaging role is that of requestor
      */
     protected boolean isRequestor(T message) {
         return MessageUtils.isRequestor(message);
-    }  
+    }
 
 }

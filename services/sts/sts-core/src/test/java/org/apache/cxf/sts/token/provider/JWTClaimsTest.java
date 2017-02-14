@@ -50,49 +50,49 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
  * A unit test for creating JWT Tokens with various claims populated by a ClaimsHandler.
  */
 public class JWTClaimsTest extends org.junit.Assert {
-    
-    public static final URI CLAIM_STATIC_COMPANY = 
+
+    public static final URI CLAIM_STATIC_COMPANY =
         URI.create("http://apache.org/claims/test/company");
-    
-    public static final URI CLAIM_APPLICATION = 
+
+    public static final URI CLAIM_APPLICATION =
         URI.create("http://apache.org/claims/test/applicationId");
-    
+
     private static final String CLAIM_STATIC_COMPANY_VALUE = "myc@mpany";
-    
+
     private static final String APPLICATION_APPLIES_TO = "http://dummy-service.com/dummy";
-    
+
     /**
      * Test the creation of a JWTToken with various claims set by a ClaimsHandler.
      */
     @org.junit.Test
     public void testJWTClaims() throws Exception {
         TokenProvider tokenProvider = new JWTTokenProvider();
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE, null);
-        
+
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
         claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
-        
+
         ClaimCollection claims = createClaims();
         providerParameters.setRequestedPrimaryClaims(claims);
-        
+
         assertTrue(tokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(ClaimTypes.EMAILADDRESS.toString()), "alice@cxf.apache.org");
         assertEquals(jwt.getClaim(ClaimTypes.FIRSTNAME.toString()), "alice");
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
     }
-    
+
     /**
      * Test the creation of a JWTToken with various claims set by a ClaimsHandler.
      * We have both a primary claim (sent in wst:RequestSecurityToken) and a secondary claim
@@ -101,30 +101,30 @@ public class JWTClaimsTest extends org.junit.Assert {
     @org.junit.Test
     public void testJWTMultipleClaims() throws Exception {
         TokenProvider tokenProvider = new JWTTokenProvider();
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE, null);
-        
+
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
         claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
-        
+
         ClaimCollection primaryClaims = createClaims();
         providerParameters.setRequestedPrimaryClaims(primaryClaims);
-        
+
         ClaimCollection secondaryClaims = new ClaimCollection();
         Claim claim = new Claim();
         claim.setClaimType(ClaimTypes.STREETADDRESS);
         secondaryClaims.add(claim);
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
-        
+
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(ClaimTypes.EMAILADDRESS.toString()), "alice@cxf.apache.org");
@@ -132,42 +132,42 @@ public class JWTClaimsTest extends org.junit.Assert {
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
         assertEquals(jwt.getClaim(ClaimTypes.STREETADDRESS.toString()), "1234 1st Street");
     }
-    
+
     /**
      * Test the creation of a JWTToken with various claims set by a ClaimsHandler.
      * We have both a primary claim (sent in wst:RequestSecurityToken) and a secondary claim
-     * (send in wst:RequestSecurityToken/wst:SecondaryParameters), and both have the 
+     * (send in wst:RequestSecurityToken/wst:SecondaryParameters), and both have the
      * same dialect in this test.
      */
     @org.junit.Test
     public void testJWTMultipleClaimsSameDialect() throws Exception {
         TokenProvider tokenProvider = new JWTTokenProvider();
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE, null);
-        
+
         ClaimsManager claimsManager = new ClaimsManager();
         ClaimsHandler claimsHandler = new CustomClaimsHandler();
         claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
-        
+
         ClaimCollection primaryClaims = createClaims();
         primaryClaims.setDialect(ClaimTypes.URI_BASE);
         providerParameters.setRequestedPrimaryClaims(primaryClaims);
-        
+
         ClaimCollection secondaryClaims = new ClaimCollection();
         Claim claim = new Claim();
         claim.setClaimType(ClaimTypes.STREETADDRESS);
         secondaryClaims.add(claim);
         secondaryClaims.setDialect(ClaimTypes.URI_BASE);
         providerParameters.setRequestedSecondaryClaims(secondaryClaims);
-        
+
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(ClaimTypes.EMAILADDRESS.toString()), "alice@cxf.apache.org");
@@ -175,16 +175,16 @@ public class JWTClaimsTest extends org.junit.Assert {
         assertEquals(jwt.getClaim(ClaimTypes.LASTNAME.toString()), "doe");
         assertEquals(jwt.getClaim(ClaimTypes.STREETADDRESS.toString()), "1234 1st Street");
     }
-    
+
     /**
      * Test the creation of a JWTToken with StaticClaimsHandler
      */
     @org.junit.Test
     public void testJWTStaticClaims() throws Exception {
         TokenProvider tokenProvider = new JWTTokenProvider();
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE, null);
-        
+
         ClaimsManager claimsManager = new ClaimsManager();
         StaticClaimsHandler claimsHandler = new StaticClaimsHandler();
         Map<String, String> staticClaimsMap = new HashMap<String, String>();
@@ -192,49 +192,49 @@ public class JWTClaimsTest extends org.junit.Assert {
         claimsHandler.setGlobalClaims(staticClaimsMap);
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)claimsHandler));
         providerParameters.setClaimsManager(claimsManager);
-        
+
         ClaimCollection claims = new ClaimCollection();
         Claim claim = new Claim();
         claim.setClaimType(CLAIM_STATIC_COMPANY);
         claims.add(claim);
         providerParameters.setRequestedPrimaryClaims(claims);
-        
+
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         assertEquals(jwt.getClaim(CLAIM_STATIC_COMPANY.toString()), CLAIM_STATIC_COMPANY_VALUE);
     }
-    
+
     private TokenProviderParameters createProviderParameters(
         String tokenType, String appliesTo
     ) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(tokenType);
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         parameters.setMessageContext(msgCtx);
-        
+
         if (appliesTo != null) {
             parameters.setAppliesToAddress(appliesTo);
         } else {
             parameters.setAppliesToAddress(APPLICATION_APPLIES_TO);
         }
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -245,12 +245,12 @@ public class JWTClaimsTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         parameters.setEncryptionProperties(new EncryptionProperties());
-        
+
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -258,29 +258,29 @@ public class JWTClaimsTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
+
     /**
      * Create a set of parsed Claims
      */
     private ClaimCollection createClaims() {
         ClaimCollection claims = new ClaimCollection();
-        
+
         Claim claim = new Claim();
         claim.setClaimType(ClaimTypes.FIRSTNAME);
         claims.add(claim);
-        
+
         claim = new Claim();
         claim.setClaimType(ClaimTypes.LASTNAME);
         claims.add(claim);
-        
+
         claim = new Claim();
         claim.setClaimType(ClaimTypes.EMAILADDRESS);
         claims.add(claim);
-        
+
         return claims;
     }
-    
+
 }

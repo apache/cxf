@@ -42,10 +42,10 @@ import org.osgi.service.blueprint.reflect.Metadata;
 @Namespaces("http://cxf.apache.org/blueprint/jaxws")
 public class JAXWSBPNamespaceHandler extends BaseNamespaceHandler {
     private BlueprintContainer blueprintContainer;
-    
+
     public JAXWSBPNamespaceHandler() {
     }
-    
+
     public URL getSchemaLocation(String namespace) {
         if ("http://cxf.apache.org/blueprint/jaxws".equals(namespace)) {
             return getClass().getClassLoader().getResource("schemas/blueprint/jaxws.xsd");
@@ -75,7 +75,7 @@ public class JAXWSBPNamespaceHandler extends BaseNamespaceHandler {
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;
     }
-    
+
 
     public BlueprintContainer getBlueprintContainer() {
         return blueprintContainer;
@@ -84,9 +84,9 @@ public class JAXWSBPNamespaceHandler extends BaseNamespaceHandler {
     public void setBlueprintContainer(BlueprintContainer blueprintContainer) {
         this.blueprintContainer = blueprintContainer;
     }
-    
-    
-    
+
+
+
     @NoJSR250Annotations
     public static class BPJaxWsServerFactoryBean extends JaxWsServerFactoryBean {
 
@@ -101,7 +101,7 @@ public class JAXWSBPNamespaceHandler extends BaseNamespaceHandler {
         public Server getServer() {
             return server;
         }
-        
+
         public void init() {
             create();
         }
@@ -119,6 +119,6 @@ public class JAXWSBPNamespaceHandler extends BaseNamespaceHandler {
             }
         }
     }
-    
-    
+
+
 }

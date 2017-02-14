@@ -28,17 +28,17 @@ public class ProcessorUtilTest extends Assert {
     private boolean isWindows() {
         return System.getProperty("os.name").contains("Windows");
     }
-    
+
     @Test
     public void testGetAbsolutePath() throws Exception {
         assertEquals("http://cxf.org",
                      ProcessorUtil.getAbsolutePath("http://cxf.org"));
 
         if (isWindows()) {
-                        
+
             assertEquals("c:/org/cxf",
                          ProcessorUtil.getAbsolutePath("c:\\org\\cxf"));
-            
+
             assertEquals("c:/org/cxf",
                          ProcessorUtil.getAbsolutePath("c:/org/cxf"));
         }

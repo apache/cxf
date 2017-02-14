@@ -48,7 +48,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * Tests the correct interaction of ws-rm calls with ws-security when policy validator verifies the calls.
  */
 public class WSRMWithWSSecurityPolicyTest extends AbstractBusClientServerTestBase {
-    public static final String PORT = allocatePort(Server.class); 
+    public static final String PORT = allocatePort(Server.class);
     private static final Logger LOG = LogUtils.getLogger(WSRMWithWSSecurityPolicyTest.class);
 
     public static class Server extends AbstractBusTestServerBase {
@@ -69,24 +69,24 @@ public class WSRMWithWSSecurityPolicyTest extends AbstractBusClientServerTestBas
     public void testWithSecurityInPolicy() throws Exception {
         LOG.fine("Creating greeter client");
 
-        try (ClassPathXmlApplicationContext context = 
+        try (ClassPathXmlApplicationContext context =
             new ClassPathXmlApplicationContext("org/apache/cxf/systest/ws/rm/sec/client-policy.xml")) {
 
             Bus bus = (Bus)context.getBean("bus");
             BusFactory.setDefaultBus(bus);
             BusFactory.setThreadDefaultBus(bus);
-            
+
             Greeter greeter = (Greeter)context.getBean("GreeterCombinedClient");
-    
+
             RMManager manager = bus.getExtension(RMManager.class);
             boolean empty = manager.getRetransmissionQueue().isEmpty();
             assertTrue("RetransmissionQueue is not empty", empty);
-            
+
             LOG.fine("Invoking greeter");
             greeter.greetMeOneWay("one");
-    
+
             Thread.sleep(3000);
-    
+
             empty = manager.getRetransmissionQueue().isEmpty();
             assertTrue("RetransmissionQueue not empty", empty);
 
@@ -109,7 +109,7 @@ public class WSRMWithWSSecurityPolicyTest extends AbstractBusClientServerTestBas
             Map<String, Object> responseContext = new HashMap<String, Object>();
             invocationContext.put(Client.REQUEST_CONTEXT, requestContext);
             invocationContext.put(Client.RESPONSE_CONTEXT, responseContext);
-    
+
             requestContext.put("ws-security.username", "Alice");
             requestContext.put("ws-security.callback-handler", "org.apache.cxf.systest.ws.rm.sec.UTPasswordCallback");
             requestContext.put("ws-security.encryption.properties", "bob.properties");

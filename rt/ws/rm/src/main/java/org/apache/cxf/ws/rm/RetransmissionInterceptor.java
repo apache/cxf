@@ -40,7 +40,7 @@ public class RetransmissionInterceptor extends AbstractPhaseInterceptor<Message>
         addAfter(MessageSenderInterceptor.class.getName());
         addBefore(GZIPOutInterceptor.class.getName());
     }
-    
+
     public RMManager getManager() {
         return manager;
     }
@@ -52,7 +52,7 @@ public class RetransmissionInterceptor extends AbstractPhaseInterceptor<Message>
     public void handleMessage(Message message) throws Fault {
         handle(message, false);
     }
-    
+
     @Override
     public void handleFault(Message message) {
         handle(message, true);
@@ -62,20 +62,20 @@ public class RetransmissionInterceptor extends AbstractPhaseInterceptor<Message>
         if (null == getManager().getRetransmissionQueue()) {
             return;
         }
-          
+
         OutputStream os = message.getContent(OutputStream.class);
         if (null == os) {
             return;
         }
-        if (isFault) { 
-            // remove the exception set by the PhaseInterceptorChain so that the 
-            // error does not reach the client when retransmission is scheduled 
+        if (isFault) {
+            // remove the exception set by the PhaseInterceptorChain so that the
+            // error does not reach the client when retransmission is scheduled
             message.setContent(Exception.class, null);
-            message.getExchange().put(Exception.class, null); 
+            message.getExchange().put(Exception.class, null);
         }
     }
 }
-    
-    
 
-   
+
+
+

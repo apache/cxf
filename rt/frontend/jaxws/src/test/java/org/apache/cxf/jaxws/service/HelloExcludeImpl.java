@@ -29,7 +29,7 @@ public class HelloExcludeImpl implements HelloExcludeOnInterface {
     public String sayHi(String text) {
         return text;
     }
-    
+
     public List<String> getGreetings() {
         List<String> strings = new ArrayList<>();
         strings.add("Hello");

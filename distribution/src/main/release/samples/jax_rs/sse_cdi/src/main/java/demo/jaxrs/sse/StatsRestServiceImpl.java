@@ -70,7 +70,7 @@ public class StatsRestServiceImpl {
             }
         }.start();
     }
-    
+
     private static OutboundSseEvent createStatsEvent(final OutboundSseEvent.Builder builder, final int eventId) {
         return builder
             .id("" + eventId)

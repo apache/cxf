@@ -21,7 +21,7 @@ package org.apache.cxf.rt.security.claims;
 import org.apache.cxf.security.LoginSecurityContext;
 
 public interface ClaimsSecurityContext extends LoginSecurityContext {
-    
+
     ClaimCollection getClaims();
-    
+
 }

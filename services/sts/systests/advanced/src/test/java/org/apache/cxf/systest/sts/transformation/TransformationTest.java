@@ -37,17 +37,17 @@ import org.junit.BeforeClass;
  * The provider dispatches the Username Token to an STS for validation (via TLS), and also
  * send a TokenType corresponding to a SAML2 Assertion. The STS will create the requested
  * SAML Assertion after validation and return it to the provider.
- * 
+ *
  * In the second test, the service will also send some claims to the STS for inclusion in the
  * SAML Token, and validate the result.
  */
 public class TransformationTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static final String PORT = allocatePort(Server.class);
 
     @BeforeClass
@@ -65,7 +65,7 @@ public class TransformationTest extends AbstractBusClientServerTestBase {
             launchServer(STSServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -85,16 +85,16 @@ public class TransformationTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransformationTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportUTPort");
-        DoubleItPortType transportUTPort = 
+        DoubleItPortType transportUTPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportUTPort, PORT);
-        
+
         doubleIt(transportUTPort, 25);
-        
+
         ((java.io.Closeable)transportUTPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testTokenTransformationClaims() throws Exception {
 
@@ -108,16 +108,16 @@ public class TransformationTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransformationTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportUTClaimsPort");
-        DoubleItPortType transportUTPort = 
+        DoubleItPortType transportUTPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportUTPort, PORT);
-        
+
         doubleIt(transportUTPort, 25);
-        
+
         ((java.io.Closeable)transportUTPort).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

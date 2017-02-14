@@ -55,13 +55,13 @@ import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.SequenceFault;
 
 /**
- * Protocol Handler responsible for {en|de}coding the RM 
+ * Protocol Handler responsible for {en|de}coding the RM
  * Properties for {outgo|incom}ing messages.
  */
 public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
 
     protected static JAXBContext jaxbContext;
-    
+
     private static final Set<QName> HEADERS;
     static {
         Set<QName> set = new HashSet<>();
@@ -71,25 +71,25 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
     }
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMSoapOutInterceptor.class);
-    
+
     /**
      * Constructor.
      */
     public RMSoapOutInterceptor() {
         super(Phase.PRE_PROTOCOL);
-        
+
         addAfter(MAPCodec.class.getName());
-    } 
-    
-    // AbstractSoapInterceptor interface 
-    
+    }
+
+    // AbstractSoapInterceptor interface
+
     /**
-     * @return the set of SOAP headers understood by this handler 
+     * @return the set of SOAP headers understood by this handler
      */
     public Set<QName> getUnderstoodHeaders() {
         return HEADERS;
     }
-    
+
     // Interceptor interface
 
     /* (non-Javadoc)
@@ -98,7 +98,7 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
     public void handleMessage(SoapMessage message) throws Fault {
         encode(message);
     }
-    
+
     /**
      * Encode the current RM properties in protocol-specific headers.
      *
@@ -114,7 +114,7 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
                 encodeFault(message, (SequenceFault)ex.getCause());
             }
         }
-        
+
     }
 
     /**
@@ -129,7 +129,7 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
         }
         LOG.log(Level.FINE, "encoding RMPs in SOAP headers");
         try {
-            
+
             AddressingProperties maps = RMContextUtils.retrieveMAPs(message, false, true);
             ProtocolVariation protocol = ProtocolVariation.findVariant(rmps.getNamespaceURI(), maps.getNamespaceURI());
             Element header = protocol.getCodec().buildHeaders(rmps, message.getVersion().getHeader());
@@ -156,7 +156,7 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
             LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", je);
         }
     }
-    
+
     /**
      * Encode the SequenceFault in protocol-specific header.
      *
@@ -183,6 +183,6 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
             headers.add(new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node));
         } catch (JAXBException je) {
             LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", je);
-        }        
+        }
     }
 }

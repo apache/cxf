@@ -26,7 +26,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class JwtUtils {
     private JwtUtils() {
-        
+
     }
     public static String claimsToJson(JwtClaims claims) {
         return claimsToJson(claims, null);
@@ -40,7 +40,7 @@ public final class JwtUtils {
     public static JwtClaims jsonToClaims(String json) {
         return new JwtClaims(new JsonMapObjectReaderWriter().fromJson(json));
     }
-    
+
     public static void validateJwtExpiry(JwtClaims claims, int clockOffset, boolean claimRequired) {
         Long expiryTime = claims.getExpiryTime();
         if (expiryTime == null) {
@@ -58,7 +58,7 @@ public final class JwtUtils {
             throw new JwtException("The token has expired");
         }
     }
-    
+
     public static void validateJwtNotBefore(JwtClaims claims, int clockOffset, boolean claimRequired) {
         Long notBeforeTime = claims.getNotBefore();
         if (notBeforeTime == null) {
@@ -67,7 +67,7 @@ public final class JwtUtils {
             }
             return;
         }
-        
+
         Date validCreation = new Date();
         long currentTime = validCreation.getTime();
         if (clockOffset != 0) {
@@ -80,7 +80,7 @@ public final class JwtUtils {
             throw new JwtException("The token cannot be accepted yet");
         }
     }
-    
+
     public static void validateJwtIssuedAt(JwtClaims claims, int timeToLive, int clockOffset, boolean claimRequired) {
         Long issuedAtInSecs = claims.getIssuedAt();
         if (issuedAtInSecs == null) {
@@ -89,37 +89,37 @@ public final class JwtUtils {
             }
             return;
         }
-        
+
         Date createdDate = new Date(issuedAtInSecs * 1000L);
         Date validCreation = new Date();
         long currentTime = validCreation.getTime();
         if (clockOffset > 0) {
             validCreation.setTime(currentTime + (long)clockOffset * 1000L);
         }
-        
+
         // Check to see if the IssuedAt time is in the future
         if (createdDate.after(validCreation)) {
             throw new JwtException("Invalid issuedAt");
         }
-        
+
         if (timeToLive > 0) {
             // Calculate the time that is allowed for the message to travel
             currentTime -= (long)timeToLive * 1000L;
             validCreation.setTime(currentTime);
-    
+
             // Validate the time it took the message to travel
             if (createdDate.before(validCreation)) {
                 throw new JwtException("Invalid issuedAt");
             }
         }
     }
-    
+
     public static void validateJwtAudienceRestriction(JwtClaims claims, Message message) {
         String expectedAudience = (String)message.getContextualProperty(JwtConstants.EXPECTED_CLAIM_AUDIENCE);
         if (expectedAudience == null) {
             expectedAudience = (String)message.getContextualProperty(Message.REQUEST_URL);
         }
-        
+
         if (expectedAudience != null) {
             for (String audience : claims.getAudiences()) {
                 if (expectedAudience.equals(audience)) {
@@ -129,22 +129,22 @@ public final class JwtUtils {
         }
         throw new JwtException("Invalid audience restriction");
     }
-    
+
     public static void validateTokenClaims(JwtClaims claims, int timeToLive, int clockOffset,
                                            boolean validateAudienceRestriction) {
         // If we have no issued time then we need to have an expiry
         boolean expiredRequired = claims.getIssuedAt() == null;
         validateJwtExpiry(claims, clockOffset, expiredRequired);
-        
+
         validateJwtNotBefore(claims, clockOffset, false);
-        
+
         // If we have no expiry then we must have an issued at
         boolean issuedAtRequired = claims.getExpiryTime() == null;
         validateJwtIssuedAt(claims, timeToLive, clockOffset, issuedAtRequired);
-        
+
         if (validateAudienceRestriction) {
             validateJwtAudienceRestriction(claims, PhaseInterceptorChain.getCurrentMessage());
         }
     }
-    
+
 }

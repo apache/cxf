@@ -23,7 +23,7 @@ import javax.resource.spi.ManagedConnection;
 
 public interface CXFManagedConnection extends ManagedConnection {
 
-    void close(Object handle) throws ResourceException; 
-    CXFManagedConnectionFactory getManagedConnectionFactory(); 
-    CXFTransaction getCXFTransaction(); 
+    void close(Object handle) throws ResourceException;
+    CXFManagedConnectionFactory getManagedConnectionFactory();
+    CXFTransaction getCXFTransaction();
 }

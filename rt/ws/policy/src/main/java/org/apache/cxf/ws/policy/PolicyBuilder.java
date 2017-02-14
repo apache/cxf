@@ -38,35 +38,35 @@ import org.apache.neethi.PolicyRegistry;
 public interface PolicyBuilder {
     /**
      * Creates a PolicyReference object from a DOM element.
-     * 
+     *
      * @param element the element
      * @return the PolicyReference object constructed from the element
      */
     PolicyReference getPolicyReference(Object element);
-    
+
     /**
      * Creates a Policy object from an DOM element.
-     * 
+     *
      * @param element the element
      * @return the Policy object constructed from the element
      */
     Policy getPolicy(Object element);
-    
-    
+
+
     /**
      * Creates a Policy object from an InputStream.
-     * 
+     *
      * @param stream the inputstream
      * @return the Policy object constructed from the element
      */
     Policy getPolicy(InputStream stream)
         throws IOException, ParserConfigurationException, SAXException;
-    
-    
+
+
     /**
      * Return the PolicyRegistry associated with the builder
      * @return the PolicyRegistry
      */
     PolicyRegistry getPolicyRegistry();
-    
+
 }

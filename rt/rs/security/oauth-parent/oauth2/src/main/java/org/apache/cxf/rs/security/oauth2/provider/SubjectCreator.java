@@ -25,14 +25,14 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 /**
- * Optional provider responsible for creating 
+ * Optional provider responsible for creating
  * resource owner subject representations
  */
 public interface SubjectCreator {
 
 
     /**
-     * Create a {@link UserSubject} 
+     * Create a {@link UserSubject}
      * @param mc the {@link MessageContext} of this request
      * @param params the request parameters
      * @return {@link UserSubject}

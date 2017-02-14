@@ -78,7 +78,7 @@ public final class FilteringUtil {
             return false;
         }
     }
-    
+
     public static boolean runFilterOnMessage(SOAPMessage msg, FilterType filter) {
         try {
             Iterator<?> i  = msg.getSOAPBody().getChildElements();

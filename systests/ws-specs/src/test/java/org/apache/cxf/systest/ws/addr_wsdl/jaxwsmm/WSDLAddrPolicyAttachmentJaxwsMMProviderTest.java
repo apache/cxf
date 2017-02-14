@@ -50,7 +50,7 @@ public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClie
 
     private static final Logger LOG = LogUtils.getLogger(WSDLAddrPolicyAttachmentJaxwsMMProviderTest.class);
 
-    private static final String ADDRESS = "http://localhost:" 
+    private static final String ADDRESS = "http://localhost:"
             + PORT + "/AsyncMessagingServiceProvider";
     private static final String WSDL_ADDRESS = ADDRESS + "?wsdl";
     private static final QName ENDPOINT_NAME = new QName("http://messaging/", "AsyncMessagingService");

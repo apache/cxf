@@ -92,13 +92,13 @@ class EventSinkInterfaceNotificationTask implements Runnable {
                 }
                 param = event;
             }
-            
+
             method.invoke(proxy, param);
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
-    
+
     @SuppressWarnings({
         "unchecked", "rawtypes"
     })
@@ -113,7 +113,7 @@ class EventSinkInterfaceNotificationTask implements Runnable {
         ReferenceParametersAddingHandler handler = new
                 ReferenceParametersAddingHandler(
                 target.getNotificationReferenceParams());
-        
+
         JaxWsProxyFactoryBean service = new JaxWsProxyFactoryBean();
         service.getOutInterceptors().add(new LoggingOutInterceptor());
         service.setServiceClass(sinkInterface);
@@ -124,7 +124,7 @@ class EventSinkInterfaceNotificationTask implements Runnable {
         if (target.getFilter() != null && target.getFilter().getContent().size() > 0) {
             service.getOutInterceptors().add(new FilteringInterceptor(target.getFilter()));
         }
-        
+
         if (extraClasses != null && extraClasses.length > 0) {
             Map<String, Object> props = new HashMap<String, Object>();
             props.put("jaxb.additionalContextClasses", extraClasses);

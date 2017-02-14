@@ -71,7 +71,7 @@ public class XSLTInterceptorsTest {
         inInterceptor = new XSLTInInterceptor(TRANSFORMATION_XSL);
         outInterceptor = new XSLTOutInterceptor(TRANSFORMATION_XSL);
     }
-    
+
     @Test
     public void inStreamTest() throws Exception {
         message.setContent(InputStream.class, messageIS);
@@ -141,7 +141,7 @@ public class XSLTInterceptorsTest {
         Document doc = StaxUtils.read(cWriter.getReader());
         Assert.assertTrue("Message was not transformed", checkTransformedXML(doc));
     }
-    
+
     private boolean checkTransformedXML(Document doc) {
         NodeList list = doc.getDocumentElement()
             .getElementsByTagNameNS("http://customerservice.example.com/", "getCustomersByName1");

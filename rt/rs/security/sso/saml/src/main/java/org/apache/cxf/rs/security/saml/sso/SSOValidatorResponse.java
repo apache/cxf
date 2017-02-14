@@ -39,19 +39,19 @@ public class SSOValidatorResponse {
     public void setAssertion(String assertion) {
         this.assertion = assertion;
     }
-    
+
     public Date getSessionNotOnOrAfter() {
         return sessionNotOnOrAfter;
     }
-    
+
     public void setSessionNotOnOrAfter(Date sessionNotOnOrAfter) {
         this.sessionNotOnOrAfter = sessionNotOnOrAfter;
     }
-    
+
     public String getResponseId() {
         return responseId;
     }
-    
+
     public void setResponseId(String responseId) {
         this.responseId = responseId;
     }

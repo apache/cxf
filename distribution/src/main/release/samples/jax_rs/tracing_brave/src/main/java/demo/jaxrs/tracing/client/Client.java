@@ -32,16 +32,16 @@ import org.apache.cxf.tracing.brave.jaxrs.BraveClientProvider;
 public final class Client {
     private Client() {
     }
-    
+
     public static void main(final String[] args) throws Exception {
         final Brave brave = new Brave.Builder().build();
         final BraveClientProvider provider = new BraveClientProvider(brave);
-        
+
         final Response response = WebClient
             .create("http://localhost:9000/catalog", Arrays.asList(provider))
             .accept(MediaType.APPLICATION_JSON)
             .get();
-        
+
         System.out.println(response.readEntity(String.class));
         response.close();
     }

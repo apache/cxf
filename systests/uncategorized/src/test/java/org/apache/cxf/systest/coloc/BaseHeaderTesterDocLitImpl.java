@@ -98,7 +98,7 @@ public class BaseHeaderTesterDocLitImpl implements HeaderTester {
                                         new Object[]{"FAULT TEST"}));
         } else if ("RUNTIME".equals(msgType)) {
             throw new IllegalArgumentException(HeaderTesterUtil.EX_STRING);
-        } 
+        }
     }
 
     public void init(Log log) {

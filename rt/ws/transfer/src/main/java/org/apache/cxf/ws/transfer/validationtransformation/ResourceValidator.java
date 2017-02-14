@@ -25,7 +25,7 @@ import org.apache.cxf.ws.transfer.Representation;
  * The interface for Validator objects.
  */
 public interface ResourceValidator {
-    
+
     boolean validate(Representation newRepresentation, Representation oldRepresentation);
 
 }

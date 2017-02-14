@@ -49,7 +49,7 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
 
 public class RequestParserUnitTest extends org.junit.Assert {
 
-    private static final String SECURITY_HEADER = 
+    private static final String SECURITY_HEADER =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><wsse:Security "
         + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\""
         + " xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\""
@@ -60,8 +60,8 @@ public class RequestParserUnitTest extends org.junit.Assert {
         + "xmlns:wsc=\"http://schemas.xmlsoap.org/ws/2005/02/sc\" "
         + "xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" "
         + "wsu:Id=\"sct\"><wsc:Identifier>check</wsc:Identifier></wsc:SecurityContextToken></wsse:Security>";
-    
-    private static final String SECURITY_HEADER_X509 = 
+
+    private static final String SECURITY_HEADER_X509 =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><wsse:Security "
         + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\""
         + " xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\""
@@ -71,7 +71,7 @@ public class RequestParserUnitTest extends org.junit.Assert {
         + "</wsse:UsernameToken><wsse:BinarySecurityToken "
         + "xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" "
         + "EncodingType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0"
-        + "#Base64Binary\" " 
+        + "#Base64Binary\" "
         + "ValueType=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0"
         + "#X509v3\" " + "wsu:Id=\"x509\">"
         + "MIIEFjCCA3+gAwIBAgIJAJORWX2Xsa8DMA0GCSqGSIb3DQEBBQUAMIG5MQswCQYDVQQGEwJVUzERMA8GA1UECBMITmV3IFlvcm"
@@ -99,7 +99,7 @@ public class RequestParserUnitTest extends org.junit.Assert {
         + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">"
         + "<wsse:Reference URI=\"#sct\"></wsse:Reference></wsse:SecurityTokenReference>"
         + "</wst:CancelTarget>" + "</wst:RequestSecurityToken>";
-    
+
     private static final String VALIDATE_SCT_REFERENCE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<wst:RequestSecurityToken xmlns:wst=\"http://docs.oasis-open.org/ws-sx/ws-trust/200512\">"
         + "<wst:TokenType>http://schemas.xmlsoap.org/ws/2005/02/sc/sct</wst:TokenType>"
@@ -109,7 +109,7 @@ public class RequestParserUnitTest extends org.junit.Assert {
         + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">"
         + "<wsse:Reference URI=\"#sct\"></wsse:Reference></wsse:SecurityTokenReference>"
         + "</wst:ValidateTarget>" + "</wst:RequestSecurityToken>";
-    
+
     private static final String USE_KEY_X509_REFERENCE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         + "<wst:RequestSecurityToken xmlns:wst=\"http://docs.oasis-open.org/ws-sx/ws-trust/200512\">"
         + "<wst:TokenType>http://schemas.xmlsoap.org/ws/2005/02/sc/sct</wst:TokenType>"
@@ -119,7 +119,7 @@ public class RequestParserUnitTest extends org.junit.Assert {
         + "xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">"
         + "<wsse:Reference URI=\"#x509\"></wsse:Reference></wsse:SecurityTokenReference>"
         + "</wst:UseKey>" + "</wst:RequestSecurityToken>";
-    
+
     /**
      * Test for fetching (and cancelling) a referenced SecurityContextToken.
      */
@@ -128,24 +128,24 @@ public class RequestParserUnitTest extends org.junit.Assert {
         Element secHeaderElement = (Element) parseStringToElement(SECURITY_HEADER).getFirstChild();
         RequestSecurityTokenType request = createJaxbObject(CANCEL_SCT_REFERENCE);
         RequestParser parser = new RequestParser();
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgContext = new WrappedMessageContext(msg);
-        
+
         // Process the security header and store the results in the message context
         WSSecurityEngine securityEngine = new WSSecurityEngine();
         RequestData reqData = new RequestData();
         reqData.setCallbackHandler(new PasswordCallbackHandler());
-        
-        WSHandlerResult results = 
+
+        WSHandlerResult results =
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
         List<WSHandlerResult> resultsList = new ArrayList<>();
         resultsList.add(results);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
-        
+
         RequestRequirements requestRequirements = parser.parseRequest(request, msgContext, null, null);
-        
+
         SCTCanceller sctCanceller = new SCTCanceller();
         assertTrue(sctCanceller.canHandleToken(requestRequirements.getTokenRequirements().getCancelTarget()));
     }
@@ -158,28 +158,28 @@ public class RequestParserUnitTest extends org.junit.Assert {
         Element secHeaderElement = (Element) parseStringToElement(SECURITY_HEADER).getFirstChild();
         RequestSecurityTokenType request = createJaxbObject(VALIDATE_SCT_REFERENCE);
         RequestParser parser = new RequestParser();
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgContext = new WrappedMessageContext(msg);
-        
+
         // Process the security header and store the results in the message context
         WSSecurityEngine securityEngine = new WSSecurityEngine();
         RequestData reqData = new RequestData();
         reqData.setCallbackHandler(new PasswordCallbackHandler());
-        
-        WSHandlerResult results = 
+
+        WSHandlerResult results =
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
         List<WSHandlerResult> resultsList = new ArrayList<>();
         resultsList.add(results);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
-        
+
         RequestRequirements requestRequirements = parser.parseRequest(request, msgContext, null, null);
-        
+
         SCTValidator sctValidator = new SCTValidator();
         assertTrue(sctValidator.canHandleToken(requestRequirements.getTokenRequirements().getValidateTarget()));
     }
-    
+
     /**
      * Test for fetching (and validating) a referenced BinarySecurityToken from a UseKey Element.
      */
@@ -188,28 +188,28 @@ public class RequestParserUnitTest extends org.junit.Assert {
         Element secHeaderElement = (Element) parseStringToElement(SECURITY_HEADER_X509).getFirstChild();
         RequestSecurityTokenType request = createJaxbObject(USE_KEY_X509_REFERENCE);
         RequestParser parser = new RequestParser();
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgContext = new WrappedMessageContext(msg);
-        
+
         // Process the security header and store the results in the message context
         WSSecurityEngine securityEngine = new WSSecurityEngine();
         RequestData reqData = new RequestData();
         reqData.setSigVerCrypto(getCrypto());
         reqData.setCallbackHandler(new PasswordCallbackHandler());
-        
-        WSHandlerResult results = 
+
+        WSHandlerResult results =
             securityEngine.processSecurityHeader(secHeaderElement, reqData);
         List<WSHandlerResult> resultsList = new ArrayList<>();
         resultsList.add(results);
         msgContext.put(WSHandlerConstants.RECV_RESULTS, resultsList);
-        
+
         RequestRequirements requestRequirements = parser.parseRequest(request, msgContext, null, null);
-        
+
         assertNotNull(requestRequirements.getKeyRequirements().getReceivedKey().getX509Cert());
     }
-    
+
     private Document parseStringToElement(String str) throws Exception {
         DocumentBuilderFactory builderFac = DocumentBuilderFactory.newInstance();
         builderFac.setNamespaceAware(true);
@@ -220,14 +220,14 @@ public class RequestParserUnitTest extends org.junit.Assert {
     }
 
     private RequestSecurityTokenType createJaxbObject(String str) throws Exception {
-        JAXBContext jaxbContext = 
+        JAXBContext jaxbContext =
             JAXBContext.newInstance("org.apache.cxf.ws.security.sts.provider.model");
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        JAXBElement<?> jaxbElement = 
+        JAXBElement<?> jaxbElement =
             (JAXBElement<?>) unmarshaller.unmarshal(new InputSource(new StringReader(str)));
         return (RequestSecurityTokenType) jaxbElement.getValue();
     }
-    
+
     private Crypto getCrypto() throws WSSecurityException {
         Properties properties = new Properties();
         properties.put(
@@ -235,7 +235,7 @@ public class RequestParserUnitTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return CryptoFactory.getInstance(properties);
     }
 

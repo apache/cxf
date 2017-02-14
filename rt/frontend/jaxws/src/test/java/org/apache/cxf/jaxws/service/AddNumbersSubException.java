@@ -24,14 +24,14 @@ import javax.xml.ws.WebFault;
 
 @WebFault
 public class AddNumbersSubException extends AddNumbersException {
-       
+
     private static final long serialVersionUID = 1L;
-    
+
     private String subInfo;
     public AddNumbersSubException(String info) {
         this.subInfo = info;
     }
-    
+
     public String getSubInfo() {
         return subInfo;
     }

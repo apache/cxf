@@ -43,7 +43,7 @@ import org.apache.cxf.message.MessageUtils;
  * construct {@link SearchCondition} structure. Since this class operates on Java type T, not on XML
  * structures "selectors" part of specification is not applicable; instead selectors describes getters of type
  * T used as search condition type (see {@link SimpleSearchCondition#isMet(Object)} for details.
- * 
+ *
  * @param <T> type of search condition.
  */
 public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
@@ -57,18 +57,18 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
     public static final String LE = "=le=";
     public static final String EQ = "==";
     public static final String NEQ = "!=";
-    
+
     public static final Map<ConditionType, String> CONDITION_MAP;
-        
-    
-    public static final String SUPPORT_SINGLE_EQUALS = "fiql.support.single.equals.operator";       
+
+
+    public static final String SUPPORT_SINGLE_EQUALS = "fiql.support.single.equals.operator";
     public static final String EXTENSION_COUNT = "count";
     protected static final String EXTENSION_COUNT_OPEN = EXTENSION_COUNT + "(";
-    
+
     private static final Map<String, ConditionType> OPERATORS_MAP;
     private static final Pattern COMPARATORS_PATTERN;
     private static final Pattern COMPARATORS_PATTERN_SINGLE_EQUALS;
-    
+
     static {
         // operatorsMap
         OPERATORS_MAP = new HashMap<>();
@@ -78,7 +78,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         OPERATORS_MAP.put(LE, ConditionType.LESS_OR_EQUALS);
         OPERATORS_MAP.put(EQ, ConditionType.EQUALS);
         OPERATORS_MAP.put(NEQ, ConditionType.NOT_EQUALS);
-        
+
         CONDITION_MAP = new HashMap<>();
         CONDITION_MAP.put(ConditionType.GREATER_THAN, GT);
         CONDITION_MAP.put(ConditionType.GREATER_OR_EQUALS, GE);
@@ -86,13 +86,13 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         CONDITION_MAP.put(ConditionType.LESS_OR_EQUALS, LE);
         CONDITION_MAP.put(ConditionType.EQUALS, EQ);
         CONDITION_MAP.put(ConditionType.NOT_EQUALS, NEQ);
-        
-        
+
+
         // pattern
         String comparators = GT + "|" + GE + "|" + LT + "|" + LE + "|" + EQ + "|" + NEQ;
         String s1 = "[\\p{ASCII}]+(" + comparators + ")";
         COMPARATORS_PATTERN = Pattern.compile(s1);
-        
+
         String s2 = "[\\p{ASCII}]+(" + comparators + "|" + "=" + ")";
         COMPARATORS_PATTERN_SINGLE_EQUALS = Pattern.compile(s2);
     }
@@ -101,51 +101,51 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
     protected Pattern comparatorsPattern = COMPARATORS_PATTERN;
     /**
      * Creates FIQL parser.
-     * 
+     *
      * @param tclass - class of T used to create condition objects in built syntax tree. Class T must have
      *            accessible no-arg constructor and complementary setters to these used in FIQL expressions.
      */
     public FiqlParser(Class<T> tclass) {
         this(tclass, Collections.<String, String>emptyMap());
     }
-    
+
     /**
      * Creates FIQL parser.
-     * 
+     *
      * @param tclass - class of T used to create condition objects in built syntax tree. Class T must have
      *            accessible no-arg constructor and complementary setters to these used in FIQL expressions.
-     * @param contextProperties            
+     * @param contextProperties
      */
     public FiqlParser(Class<T> tclass, Map<String, String> contextProperties) {
         this(tclass, contextProperties, null);
     }
-    
+
     /**
      * Creates FIQL parser.
-     * 
+     *
      * @param tclass - class of T used to create condition objects in built syntax tree. Class T must have
      *            accessible no-arg constructor and complementary setters to these used in FIQL expressions.
      * @param contextProperties
-     * @param beanProperties 
+     * @param beanProperties
      */
-    public FiqlParser(Class<T> tclass, 
+    public FiqlParser(Class<T> tclass,
                       Map<String, String> contextProperties,
                       Map<String, String> beanProperties) {
         super(tclass, contextProperties, beanProperties);
-        
+
         if (MessageUtils.isTrue(this.contextProperties.get(SUPPORT_SINGLE_EQUALS))) {
             operatorsMap = new HashMap<>(operatorsMap);
             operatorsMap.put("=", ConditionType.EQUALS);
             comparatorsPattern = COMPARATORS_PATTERN_SINGLE_EQUALS;
         }
     }
-    
+
     /**
      * Parses expression and builds search filter. Names used in FIQL expression are names of getters/setters
      * in type T.
      * <p>
      * Example:
-     * 
+     *
      * <pre>
      * class Condition {
      *   public String getFoo() {...}
@@ -153,11 +153,11 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
      *   public int getBar() {...}
      *   public void setBar(int bar) {...}
      * }
-     * 
+     *
      * FiqlParser&lt;Condition> parser = new FiqlParser&lt;Condition&gt;(Condition.class);
      * parser.parse("foo==mystery*;bar=ge=10");
      * </pre>
-     * 
+     *
      * @param fiqlExpression expression of filter.
      * @return tree of {@link SearchCondition} objects representing runtime search structure.
      * @throws SearchParseException when expression does not follow FIQL grammar
@@ -256,9 +256,9 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
             if ("".equals(value)) {
                 throw new SearchParseException("Not a comparison expression: " + expr);
             }
-            
+
             String name = unwrapSetter(propertyName);
-        
+
             name = getActualSetterName(name);
             TypeInfoObject castedValue = parseType(propertyName, name, value);
             if (castedValue != null) {
@@ -271,7 +271,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         }
     }
 
-    
+
     protected TypeInfoObject parseType(String originalName, String setter, String value) throws SearchParseException {
         TypeInfo typeInfo = getTypeInfo(setter, value);
         if (isDecodeQueryValues()) {
@@ -280,21 +280,21 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         Object object = parseType(originalName, null, null, setter, typeInfo, value);
         return new TypeInfoObject(object, typeInfo);
     }
-    
+
     @Override
     protected boolean isCount(String propName) {
         return propName.startsWith(EXTENSION_COUNT_OPEN);
     }
-    
-    
+
+
     protected String unwrapSetter(String setter) {
         if (setter.startsWith(EXTENSION_COUNT_OPEN) && setter.endsWith(")")) {
-            return setter.substring(EXTENSION_COUNT_OPEN.length(), setter.length() - 1);        
+            return setter.substring(EXTENSION_COUNT_OPEN.length(), setter.length() - 1);
         } else {
             return setter;
         }
     }
-    
+
     // node of abstract syntax tree
     protected interface ASTNode<T> {
         SearchCondition<T> build() throws SearchParseException;
@@ -342,7 +342,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
             } else {
                 return new AndSearchCondition<>(scNodes);
             }
-            
+
         }
     }
 
@@ -359,7 +359,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
 
         @Override
         public String toString() {
-            return name + " " + operator + " " + tvalue.getObject() 
+            return name + " " + operator + " " + tvalue.getObject()
                 + " (" + tvalue.getObject().getClass().getSimpleName() + ")";
         }
 
@@ -368,9 +368,9 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
             String templateName = getSetter(name);
             T cond = createTemplate(templateName);
             ConditionType ct = operatorsMap.get(operator);
-            
+
             if (isPrimitive(cond)) {
-                return new SimpleSearchCondition<>(ct, cond); 
+                return new SimpleSearchCondition<>(ct, cond);
             } else {
                 String templateNameLCase = templateName.toLowerCase();
                 return new SimpleSearchCondition<>(Collections.singletonMap(templateNameLCase, ct),
@@ -383,7 +383,7 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         private boolean isPrimitive(T pojo) {
             return pojo.getClass().getName().startsWith("java.lang");
         }
-        
+
         @SuppressWarnings("unchecked")
         private T createTemplate(String setter) throws SearchParseException {
             try {
@@ -400,11 +400,11 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
             }
         }
     }
-    
+
     protected static class TypeInfoObject {
         private final Object object;
         private final TypeInfo typeInfo;
-        
+
         TypeInfoObject(Object object, TypeInfo typeInfo) {
             this.object = object;
             this.typeInfo = typeInfo;
@@ -417,6 +417,6 @@ public class FiqlParser<T> extends AbstractSearchConditionParser<T> {
         public Object getObject() {
             return object;
         }
-                
+
     }
 }

@@ -46,7 +46,7 @@ import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
 public class AccessTokenHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AccessTokenHandler.class);
-    private static final String[] REQUIRED_PARAMETERS = 
+    private static final String[] REQUIRED_PARAMETERS =
         new String[] {
             OAuth.OAUTH_CONSUMER_KEY,
             OAuth.OAUTH_TOKEN,
@@ -55,19 +55,19 @@ public class AccessTokenHandler {
             OAuth.OAUTH_TIMESTAMP,
             OAuth.OAUTH_NONCE
         };
-    
-    public Response handle(MessageContext mc, 
+
+    public Response handle(MessageContext mc,
                            OAuthDataProvider dataProvider,
                            OAuthValidator validator) {
         try {
-            OAuthMessage oAuthMessage = 
+            OAuthMessage oAuthMessage =
                 OAuthUtils.getOAuthMessage(mc, mc.getHttpServletRequest(), REQUIRED_PARAMETERS);
 
             RequestToken requestToken = dataProvider.getRequestToken(oAuthMessage.getToken());
             if (requestToken == null) {
                 throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
             }
-            
+
             String oauthVerifier = oAuthMessage.getParameter(OAuth.OAUTH_VERIFIER);
             if (StringUtils.isEmpty(oauthVerifier)) {
                 if (requestToken.getSubject() != null && requestToken.isPreAuthorized()) {
@@ -78,9 +78,9 @@ public class AccessTokenHandler {
             } else if (!oauthVerifier.equals(requestToken.getVerifier())) {
                 throw new OAuthProblemException(OAuthConstants.VERIFIER_INVALID);
             }
-            
-            OAuthUtils.validateMessage(oAuthMessage, 
-                                       requestToken.getClient(), 
+
+            OAuthUtils.validateMessage(oAuthMessage,
+                                       requestToken.getClient(),
                                        requestToken,
                                        dataProvider,
                                        validator);

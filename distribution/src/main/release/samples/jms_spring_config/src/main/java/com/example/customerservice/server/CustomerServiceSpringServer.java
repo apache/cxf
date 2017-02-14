@@ -26,7 +26,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public final class CustomerServiceSpringServer {
     private CustomerServiceSpringServer() {
     }
-    
+
     public static void main(String args[]) throws Exception {
         ClassPathXmlApplicationContext ctx
             = new ClassPathXmlApplicationContext("server-applicationContext.xml");

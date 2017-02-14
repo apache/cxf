@@ -51,7 +51,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
         return result;
     }
 
-    
+
     public IdlDefn holdForScope(IdlDefn def) {
         hold.push(def);
         return def;
@@ -98,7 +98,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
         if (undefined) {
             return result;
         }
-        
+
         for (IdlDefn nextDef : defns) {
             if (nextDef.localName().equals(nm)) {
                 result = nextDef;
@@ -121,7 +121,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
         if (parents != null) {
             IdlDefn defn = lookup(parents, undefined);
 
-            if (!(defn instanceof IdlScopeBase)) { 
+            if (!(defn instanceof IdlScopeBase)) {
                 //|| defn == null) {
                 return null;
             }
@@ -171,7 +171,7 @@ public abstract class IdlScopeBase extends IdlDefnImplBase {
 
         return result;
     }
-    
+
     public IdlScopeBase getCircularScope(IdlScopeBase startScope, List<Object> doneDefn) {
         if (doneDefn.contains(this)) {
             return (this == startScope) ? this : null;

@@ -58,13 +58,13 @@ public class NioBookStore {
                         out.write(buffer, 0, n);
                         return true;
                     }
-                        
-                    try { 
-                        in.close(); 
-                    } catch (IOException ex) { 
-                        /* do nothing */ 
+
+                    try {
+                        in.close();
+                    } catch (IOException ex) {
+                        /* do nothing */
                     }
-                    
+
                     return false;
                 } catch (IOException ex) {
                     throw new WebApplicationException(ex);
@@ -75,7 +75,7 @@ public class NioBookStore {
             }
         ).build();
     }
-    
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/is")
@@ -83,7 +83,7 @@ public class NioBookStore {
     public InputStream readBooksFromInputStream() throws IOException {
         return getClass().getResourceAsStream("/files/books.txt");
     }
-    
+
     @POST
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     @Produces(MediaType.TEXT_PLAIN)
@@ -109,7 +109,7 @@ public class NioBookStore {
                     if (!in.isFinished()) {
                         throw new IllegalStateException("Reader did not finish yet");
                     }
-                    
+
                     out.close();
                     response.resume("Book Store uploaded: " + adder.longValue() + " bytes");
                 } catch (IOException e) {

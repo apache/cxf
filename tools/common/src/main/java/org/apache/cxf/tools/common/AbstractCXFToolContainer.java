@@ -45,13 +45,13 @@ import org.apache.cxf.version.Version;
  */
 public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractCXFToolContainer.class);
-    
+
     private final String name;
     private CommandDocument commandDocument;
     private boolean verbose;
     private String usage;
     private final ErrorVisitor errors = new ErrorVisitor();
-    
+
     public AbstractCXFToolContainer(String nm, ToolSpec toolspec) throws Exception {
         super(toolspec);
         name = nm;
@@ -73,12 +73,12 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
             if (commandDocument.hasParameter(ToolConstants.CFG_VERBOSE)) {
                 verbose = true;
                 outputFullCommandLine();
-                outputVersion();               
+                outputVersion();
             }
             checkParams(errors);
-        }             
+        }
     }
-    
+
     private void outputInfo() {
         CommandLineParser parser = getCommandLineParser();
 
@@ -151,7 +151,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         }
         out.println();
     }
-    
+
     public String getFileBase(String wsdlUrl) {
         String fileBase = wsdlUrl;
         StringTokenizer tok = new StringTokenizer(wsdlUrl, "\\/");
@@ -218,7 +218,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         }
         return ins;
     }
-   
+
     public Properties loadProperties(InputStream inputs) {
         Properties p = new Properties();
         try {
@@ -229,8 +229,8 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         }
         return p;
     }
-    
-    
+
+
     public Properties loadProperties(String propertyFile) {
         Properties p = new Properties();
 

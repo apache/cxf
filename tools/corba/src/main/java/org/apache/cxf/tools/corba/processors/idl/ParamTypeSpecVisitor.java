@@ -38,13 +38,13 @@ public class ParamTypeSpecVisitor extends VisitorBase {
         //                     | <wstring_type>
         //                     | <scoped_name>
 
-        
+
         Visitor visitor = null;
-        
-        
+
+
         if (PrimitiveTypesVisitor.accept(node)) {
             // base_type_spec
-            visitor = new PrimitiveTypesVisitor(getScope(), definition, schema, schemas);            
+            visitor = new PrimitiveTypesVisitor(getScope(), definition, schema, schemas);
         } else if (StringVisitor.accept(node)) {
             // string_type_spec
             // wstring_type_spec
@@ -53,12 +53,12 @@ public class ParamTypeSpecVisitor extends VisitorBase {
         } else if (ScopedNameVisitor.accept(getScope(), definition, schema, node, wsdlVisitor)) {
             // scoped_name
             visitor = new ScopedNameVisitor(getScope(), definition, schema, wsdlVisitor);
-               
+
         } else {
             throw new RuntimeException("[ParamTypeSpecVisitor] Invalid IDL: unknown element "
                                        + node.toString());
         }
-        
+
         visitor.visit(node);
         setSchemaType(visitor.getSchemaType());
         setCorbaType(visitor.getCorbaType());

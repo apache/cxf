@@ -38,52 +38,52 @@ public class LdapQueryVisitorTest extends Assert {
         LdapQueryVisitor<Condition> visitor = new LdapQueryVisitor<Condition>();
         filter.accept(visitor.visitor());
         String ldap = visitor.getQuery();
-        
+
         assertEquals("(!name=ami)", ldap);
     }
-    
+
     @Test
     public void testAndQuery() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
         LdapQueryVisitor<Condition> visitor = new LdapQueryVisitor<Condition>();
         filter.accept(visitor.visitor());
         String ldap = visitor.getQuery();
-        
+
         assertEquals("(&(name=ami*)(level>=10))", ldap);
     }
-    
+
     @Test
     public void testOrQuery() throws SearchParseException {
         SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
         LdapQueryVisitor<Condition> visitor = new LdapQueryVisitor<Condition>();
         filter.accept(visitor.visitor());
         String ldap = visitor.getQuery();
-        
+
         assertEquals("(|(name=ami*)(level>=10))", ldap);
     }
-    
+
     @Test
     public void testAndOrQuery() throws SearchParseException {
-        SearchCondition<Condition> filter = 
+        SearchCondition<Condition> filter =
             parser.parse("name==foo;(name!=bar,level=le=10)");
         LdapQueryVisitor<Condition> visitor = new LdapQueryVisitor<Condition>();
         filter.accept(visitor.visitor());
         String ldap = visitor.getQuery();
-        
+
         assertEquals("(&(name=foo)(|(!name=bar)(level<=10)))", ldap);
     }
-    
+
     @Test
     public void testComplexQuery() throws SearchParseException {
-        SearchCondition<Condition> filter = 
+        SearchCondition<Condition> filter =
             parser.parse("(name==test,level==18);(name==test1,level!=19)");
         LdapQueryVisitor<Condition> visitor = new LdapQueryVisitor<Condition>();
         filter.accept(visitor.visitor());
         String ldap = visitor.getQuery();
         assertEquals("(&(|(name=test)(level=18))(|(name=test1)(!level=19)))", ldap);
     }
-    
-    
+
+
     @Ignore
     public static class Condition {
         private String name;

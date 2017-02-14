@@ -36,7 +36,7 @@ import org.apache.cxf.ws.transfer.dialect.fragment.faults.InvalidExpression;
 public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
 
     private static Pattern qNamePattern;
-    
+
     public FragmentDialectLanguageQName() {
         if (qNamePattern == null) {
             String qName = getQNamePatternString();
@@ -68,7 +68,7 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
         // see http://www.w3.org/TR/REC-xml-names/#NT-QName
         return String.format("((%s):)?(%s)", ncName, ncName);
     }
-    
+
     @Override
     public Object getResourceFragment(final Representation representation, ExpressionType expression) {
         String expressionStr = getXPathFromQNameExpression(expression);
@@ -111,7 +111,7 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
         }
         return xu.getValueList(expressionStr, resource);
     }
-    
+
     /**
      * Converts expression in QName language to XPath expression.
      * @param expression Expression in QName language.
@@ -130,5 +130,5 @@ public class FragmentDialectLanguageQName implements FragmentDialectLanguage {
             throw new InvalidExpression();
         }
     }
-    
+
 }

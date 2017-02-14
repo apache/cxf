@@ -39,21 +39,21 @@ import org.opensaml.xacml.ctx.ResourceType;
 import org.opensaml.xacml.ctx.SubjectType;
 
 /**
- * This class constructs an XACML 2.0 Request given a Principal, list of roles and MessageContext, 
+ * This class constructs an XACML 2.0 Request given a Principal, list of roles and MessageContext,
  * following the SAML 2.0 profile of XACML 2.0. The principal name is inserted as the Subject ID,
  * and the list of roles associated with that principal are inserted as Subject roles. The action
- * to send defaults to "execute". 
- * 
- * For a SOAP Service, the resource-id Attribute refers to the 
+ * to send defaults to "execute".
+ *
+ * For a SOAP Service, the resource-id Attribute refers to the
  * "{serviceNamespace}serviceName#{operationNamespace}operationName" String (shortened to
- * "{serviceNamespace}serviceName#operationName" if the namespaces are identical). The 
+ * "{serviceNamespace}serviceName#operationName" if the namespaces are identical). The
  * "{serviceNamespace}serviceName", "{operationNamespace}operationName" and resource URI are also
  * sent to simplify processing at the PDP side.
- * 
- * For a REST service the request URL is the resource. You can also configure the ability to 
- * send the truncated request URI instead for a SOAP or REST service. The current DateTime is 
+ *
+ * For a REST service the request URL is the resource. You can also configure the ability to
+ * send the truncated request URI instead for a SOAP or REST service. The current DateTime is
  * also sent in an Environment, however this can be disabled via configuration.
- * 
+ *
  */
 public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
 
@@ -68,7 +68,7 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         throws Exception {
         CXFMessageParser messageParser = new CXFMessageParser(message);
         String issuer = messageParser.getIssuer();
-        
+
         String actionToUse = messageParser.getAction(action);
 
         SubjectType subjectType = createSubjectType(principal, roles, issuer);
@@ -78,24 +78,24 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         ActionType actionType = RequestComponentBuilder.createActionType(Collections.singletonList(actionAttribute));
 
         return RequestComponentBuilder.createRequestType(Collections.singletonList(subjectType),
-                                                         Collections.singletonList(resourceType), 
+                                                         Collections.singletonList(resourceType),
                                                          actionType,
                                                          createEnvironmentType());
     }
 
     private ResourceType createResourceType(CXFMessageParser messageParser) {
         List<AttributeType> attributes = new ArrayList<>();
-        
+
         // Resource-id
         String resourceId = null;
         boolean isSoapService = messageParser.isSOAPService();
         if (isSoapService) {
             QName serviceName = messageParser.getWSDLService();
             QName operationName = messageParser.getWSDLOperation();
-            
+
             if (serviceName != null) {
                 resourceId = serviceName.toString() + "#";
-                if (serviceName.getNamespaceURI() != null 
+                if (serviceName.getNamespaceURI() != null
                     && serviceName.getNamespaceURI().equals(operationName.getNamespaceURI())) {
                     resourceId += operationName.getLocalPart();
                 } else {
@@ -107,10 +107,10 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
         } else {
             resourceId = messageParser.getResourceURI(sendFullRequestURL);
         }
-        
+
         attributes.add(createAttribute(XACMLConstants.RESOURCE_ID, XACMLConstants.XS_STRING, null,
                                            resourceId));
-        
+
         if (isSoapService) {
             // WSDL Service
             QName wsdlService = messageParser.getWSDLService();
@@ -118,18 +118,18 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
                 attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_SERVICE_ID, XACMLConstants.XS_STRING, null,
                                            wsdlService.toString()));
             }
-            
+
             // WSDL Operation
             QName wsdlOperation = messageParser.getWSDLOperation();
             attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_OPERATION_ID, XACMLConstants.XS_STRING, null,
                                            wsdlOperation.toString()));
-            
+
             // WSDL Endpoint
             String endpointURI = messageParser.getResourceURI(sendFullRequestURL);
             attributes.add(createAttribute(XACMLConstants.RESOURCE_WSDL_ENDPOINT, XACMLConstants.XS_STRING, null,
                                            endpointURI));
         }
-        
+
         return RequestComponentBuilder.createResourceType(attributes, null);
     }
 
@@ -142,7 +142,7 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
             attributes.add(environmentAttribute);
             return RequestComponentBuilder.createEnvironmentType(attributes);
         }
-        
+
         List<AttributeType> attributes = Collections.emptyList();
         return RequestComponentBuilder.createEnvironmentType(attributes);
     }
@@ -156,14 +156,14 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
             List<AttributeValueType> roleAttributes = new ArrayList<>();
             for (String role : roles) {
                 if (role != null) {
-                    AttributeValueType subjectRoleAttributeValue = 
+                    AttributeValueType subjectRoleAttributeValue =
                         RequestComponentBuilder.createAttributeValueType(role);
                     roleAttributes.add(subjectRoleAttributeValue);
                 }
             }
 
             if (!roleAttributes.isEmpty()) {
-                AttributeType subjectRoleAttribute = 
+                AttributeType subjectRoleAttribute =
                     createAttribute(
                         XACMLConstants.SUBJECT_ROLE,
                         XACMLConstants.XS_ANY_URI,
@@ -180,9 +180,9 @@ public class DefaultXACMLRequestBuilder implements XACMLRequestBuilder {
     private AttributeType createAttribute(String id, String type, String issuer, List<AttributeValueType> values) {
         return RequestComponentBuilder.createAttributeType(id, type, issuer, values);
     }
-    
+
     private AttributeType createAttribute(String id, String type, String issuer, String value) {
-        return createAttribute(id, type, issuer, 
+        return createAttribute(id, type, issuer,
                                Collections.singletonList(RequestComponentBuilder.createAttributeValueType(value)));
     }
 

@@ -36,19 +36,19 @@ public class XMLFault extends Fault {
 
     public static final String XML_FAULT_CODE_CLIENT = "CLIENT";
 
-    
+
     static final long serialVersionUID = 100000;
 
     public XMLFault(Message message, Throwable throwable) {
-        super(message, throwable);        
+        super(message, throwable);
     }
 
     public XMLFault(Message message) {
-        super(message);        
+        super(message);
     }
 
     public XMLFault(String message) {
-        super(new Message(message, (ResourceBundle) null));        
+        super(new Message(message, (ResourceBundle) null));
     }
 
     public static XMLFault createFault(Fault f) {

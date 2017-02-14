@@ -42,17 +42,17 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
 public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
-    private static final Logger LOG = LogUtils.getL7dLogger(FaultOutInterceptor.class); 
+    private static final Logger LOG = LogUtils.getL7dLogger(FaultOutInterceptor.class);
 
     /**
      * Marker interfaces for Exceptions that have a
-     * getFaultInfo() method that returns some sort 
+     * getFaultInfo() method that returns some sort
      * of object that the FaultOutInterceptor can
      * marshal into a fault detail element
      */
     public interface FaultInfoException {
     }
-    
+
     public FaultOutInterceptor() {
         super(Phase.PRE_PROTOCOL);
     }
@@ -67,7 +67,7 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (cause == null) {
             return;
         }
-        
+
         BindingOperationInfo bop = message.getExchange().getBindingOperationInfo();
         if (bop == null) {
             return;
@@ -111,7 +111,7 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 f.setMessage(ex.getMessage());
             } catch (Exception fex) {
                 //ignore - if any exceptions occur here, we'll ignore them
-                //and let the default fault handling of the binding convert 
+                //and let the default fault handling of the binding convert
                 //the fault like it was an unchecked exception.
                 LOG.log(Level.WARNING, "EXCEPTION_WHILE_WRITING_FAULT", fex);
             }
@@ -146,7 +146,7 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     /**
      * Find the correct Fault part for a particular exception.
-     * 
+     *
      * @param op
      * @param class1
      */

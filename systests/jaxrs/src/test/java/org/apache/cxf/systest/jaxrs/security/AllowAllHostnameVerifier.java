@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package org.apache.cxf.systest.jaxrs.security;
 
 import java.security.cert.Certificate;
@@ -26,7 +26,7 @@ import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 
 /**
- * Allow all hostnames. This is only suitable for use in testing, and NOT in production! 
+ * Allow all hostnames. This is only suitable for use in testing, and NOT in production!
  */
 class AllowAllHostnameVerifier implements javax.net.ssl.HostnameVerifier {
 

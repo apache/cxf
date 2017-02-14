@@ -45,7 +45,7 @@ import org.apache.cxf.common.logging.LogUtils;
 
 public class Java5TypeCreator extends AbstractTypeCreator {
     private static final Logger LOG = LogUtils.getL7dLogger(Java5TypeCreator.class);
-    
+
     private AnnotationReader annotationReader;
 
     public Java5TypeCreator() {
@@ -55,7 +55,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
     public Java5TypeCreator(AnnotationReader annotationReader) {
         this.annotationReader = annotationReader;
     }
-    
+
     public static Class<? extends AegisType> castToAegisTypeClass(Class<?> c) {
         if (c == null) {
             return null;
@@ -112,7 +112,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                                              genericReturnType,
                                              returnName,
                                              annotationReader.getReturnNamespace(m)));
-                
+
             }
             return info;
         }
@@ -186,23 +186,23 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         if (paramType == null) {
             return createObjectType();
         }
-        
+
         /* null arises when the index-th parameter to generic is something list List<T> */
         Class<?> clazz = TypeUtil.getTypeRelatedClass(paramType);
         if (clazz == null) {
             return createObjectType();
         }
-        
+
         // here is where we insist that we only deal with collection types.
 
-        if (!Collection.class.isAssignableFrom(clazz) 
+        if (!Collection.class.isAssignableFrom(clazz)
             && !Map.class.isAssignableFrom(clazz)) {
             return getTopCreator().createType(clazz);
         }
-        
+
         TypeClassInfo info = createBasicClassInfo(clazz);
         info.setDescription(clazz.toString());
-        info.setType(paramType, paramType instanceof ParameterizedType ? pm : null); 
+        info.setType(paramType, paramType instanceof ParameterizedType ? pm : null);
 
         AegisType type = createTypeForClass(info);
 
@@ -212,7 +212,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
     protected Type getComponentType(Type genericType, int index) {
         if (genericType instanceof ParameterizedType) {
             ParameterizedType type = (ParameterizedType)genericType;
-            Type paramType = type.getActualTypeArguments()[index]; 
+            Type paramType = type.getActualTypeArguments()[index];
             if (paramType instanceof WildcardType) {
                 WildcardType wildcardType = (WildcardType)paramType;
                 // we really aren't prepared to deal with multiple upper bounds,
@@ -232,8 +232,8 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         }
         return findMapGenericTypes(genericType, pm, key);
     }
-    
-    
+
+
     private Type findMapGenericTypes(Type cls, Map<String, Type> pm, boolean key) {
         if (cls == null) {
             return null;
@@ -260,7 +260,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         } else if (cls instanceof Class) {
             Class<?> c = (Class<?>)cls;
             if (Map.class.isAssignableFrom(c)) {
-                
+
                 for (Type tp : c.getGenericInterfaces()) {
                     Map<String, Type> cp = new HashMap<String, Type>(pm);
 
@@ -273,10 +273,10 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                 if (c.getSuperclass() != null && Map.class.isAssignableFrom(c.getSuperclass())) {
                     return findMapGenericTypes(c.getGenericSuperclass(), pm, key);
                 }
-            } 
+            }
         }
         return null;
-    }    
+    }
 
     @Override
     public AegisType createDefaultType(TypeClassInfo info) {
@@ -338,7 +338,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                 typeClass = (Class<?>)type;
             }
         }
-        
+
         if (name == null || name.length() == 0) {
             name = ServiceUtils.makeServiceNameFromClassName(typeClass);
         }

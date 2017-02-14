@@ -29,7 +29,7 @@ import javax.ws.rs.core.MediaType;
 @Path("/bookstore/versioned")
 public class BookStoreVersioned {
     @Inject private String version;
-    
+
     @GET
     @Path("/version")
     @Produces(MediaType.TEXT_PLAIN)

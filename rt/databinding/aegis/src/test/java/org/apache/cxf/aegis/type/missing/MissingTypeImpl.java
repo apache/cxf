@@ -22,8 +22,8 @@ package org.apache.cxf.aegis.type.missing;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-@WebService(serviceName = "MissingType", 
-            endpointInterface = "org.apache.cxf.aegis.type.missing.MissingType", 
+@WebService(serviceName = "MissingType",
+            endpointInterface = "org.apache.cxf.aegis.type.missing.MissingType",
             targetNamespace = "urn:org:apache:cxf:aegis:type:missing")
 public class MissingTypeImpl implements MissingType {
 

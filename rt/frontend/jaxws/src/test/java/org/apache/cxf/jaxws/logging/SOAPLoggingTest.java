@@ -58,8 +58,8 @@ public class SOAPLoggingTest extends AbstractJaxWsTest {
             return msg;
         }
     }
-    
-    
+
+
     @Test
     public void testSoap() {
         DefaultLogEventMapper mapper = new DefaultLogEventMapper();
@@ -89,7 +89,7 @@ public class SOAPLoggingTest extends AbstractJaxWsTest {
         client.echo("test");
         ep.stop();
     }
-    
+
     @Test
     public void testEvents() throws MalformedURLException {
         TestService serviceImpl = new TestServiceImplementation();
@@ -121,7 +121,7 @@ public class SOAPLoggingTest extends AbstractJaxWsTest {
         Assert.assertEquals("TestService", requestOut.getPortTypeName().getLocalPart());
         Assert.assertEquals("TestServiceService", requestOut.getServiceName().getLocalPart());
     }
-    
+
     private void checkRequestIn(LogEvent requestIn) {
         Assert.assertEquals(SERVICE_URI, requestIn.getAddress());
         Assert.assertTrue(requestIn.getContentType(), requestIn.getContentType().contains("text/xml"));
@@ -134,7 +134,7 @@ public class SOAPLoggingTest extends AbstractJaxWsTest {
         Assert.assertEquals("TestService", requestIn.getPortTypeName().getLocalPart());
         Assert.assertEquals("TestServiceImplementationService", requestIn.getServiceName().getLocalPart());
     }
-    
+
     private void checkResponseOut(LogEvent responseOut) {
         // Not yet available
         Assert.assertNull(responseOut.getAddress());
@@ -142,7 +142,7 @@ public class SOAPLoggingTest extends AbstractJaxWsTest {
         Assert.assertEquals(EventType.RESP_OUT, responseOut.getType());
         Assert.assertEquals(StandardCharsets.UTF_8.name(), responseOut.getEncoding());
         Assert.assertNotNull(responseOut.getExchangeId());
-        
+
         // Not yet available
         Assert.assertNull(responseOut.getHttpMethod());
         Assert.assertNotNull(responseOut.getMessageId());
@@ -151,14 +151,14 @@ public class SOAPLoggingTest extends AbstractJaxWsTest {
         Assert.assertEquals("TestService", responseOut.getPortTypeName().getLocalPart());
         Assert.assertEquals("TestServiceImplementationService", responseOut.getServiceName().getLocalPart());
     }
-    
+
     private void checkResponseIn(LogEvent responseIn) {
         Assert.assertNull(responseIn.getAddress());
         Assert.assertTrue(responseIn.getContentType(), responseIn.getContentType().contains("text/xml"));
         Assert.assertEquals(EventType.RESP_IN, responseIn.getType());
         Assert.assertEquals(StandardCharsets.UTF_8.name(), responseIn.getEncoding());
         Assert.assertNotNull(responseIn.getExchangeId());
-        
+
         // Not yet available
         Assert.assertNull(responseIn.getHttpMethod());
         Assert.assertNotNull(responseIn.getMessageId());

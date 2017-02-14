@@ -57,6 +57,6 @@ public class SparkStreamingOutput implements StreamingOutput {
         } catch (InterruptedException ex) {
             // ignore
         }
-        
+
     }
 }

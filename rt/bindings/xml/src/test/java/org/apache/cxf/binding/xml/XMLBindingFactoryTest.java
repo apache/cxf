@@ -28,19 +28,19 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class XMLBindingFactoryTest extends Assert {
-    
+
     @Test
     public void testContainsInAttachmentInterceptor() {
         XMLBindingFactory xbf = new XMLBindingFactory();
         Binding b = xbf.createBinding(new BindingInfo(null, null));
-        
+
         boolean found = false;
         for (Interceptor<? extends Message> interseptor : b.getInInterceptors()) {
             if (interseptor instanceof AttachmentInInterceptor) {
                 found = true;
             }
         }
-        
+
         assertTrue("No in attachment interceptor found", found);
     }
 

@@ -20,7 +20,7 @@
 package org.apache.cxf.management;
 
 public final class ManagementConstants {
-    
+
     public static final String DEFAULT_DOMAIN_NAME = "org.apache.cxf";
     public static final String BUS_ID_PROP = "bus.id";
     public static final String NAME_PROP = "name";
@@ -30,8 +30,8 @@ public final class ManagementConstants {
     public static final String OPERATION_NAME_PROP = "operation";
     public static final String PORT_NAME_PROP = "port";
     public static final String INSTANCE_ID_PROP = "instance.id";
-    
+
     private ManagementConstants() {
-        
+
     }
 }

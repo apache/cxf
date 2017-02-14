@@ -30,7 +30,7 @@ import org.junit.Test;
 
 public class JAXRSClientServerThrottledTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerThrottled.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -38,7 +38,7 @@ public class JAXRSClientServerThrottledTest extends AbstractBusClientServerTestB
                    launchServer(BookServerThrottled.class, true));
         createStaticBus();
     }
-    
+
     @Test
     public void testGetBookRetryAfter() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/query/default";

@@ -42,21 +42,21 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
 
     final TestParam test;
-    
+
     public STSSenderVouchesTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -78,15 +78,15 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxSTSServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
                                                 {new TestParam(PORT, false, STAX_STSPORT)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -102,26 +102,26 @@ public class STSSenderVouchesTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = STSSenderVouchesTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2Port");
-        DoubleItPortType port = 
+        DoubleItPortType port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         doubleIt(port, 25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

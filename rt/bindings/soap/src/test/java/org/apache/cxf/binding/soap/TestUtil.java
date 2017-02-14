@@ -44,22 +44,22 @@ public final class TestUtil {
 
     public static XopType createXopObject(Class<?> clazz)
         throws IOException, URISyntaxException {
-        
+
         XopType xopObj = new XopType();
-        xopObj.setName("hello world");        
-                
+        xopObj.setName("hello world");
+
         URL url1 = clazz.getResource("my.wav");
-        
+
         xopObj.setAttachinfo(new DataHandler(url1));
-        
-        return xopObj;        
+
+        return xopObj;
     }
-    
+
     public static SoapMessage createSoapMessage(SoapVersion soapVersion,
                                                 InterceptorChain chain, Class<?> clazz)
-        throws IOException {        
-        
-        SoapMessage soapMessage = createEmptySoapMessage(soapVersion, chain);        
+        throws IOException {
+
+        SoapMessage soapMessage = createEmptySoapMessage(soapVersion, chain);
         // setup the message result with attachment.class
         ByteArrayDataSource bads = new ByteArrayDataSource(clazz.getResourceAsStream("primarySoapPart.xml"),
                                                            "Application/xop+xml");
@@ -83,7 +83,7 @@ public final class TestUtil {
 
         return soapMessage;
     }
-    
+
     public static SoapMessage createEmptySoapMessage(SoapVersion soapVersion, InterceptorChain chain) {
         Exchange exchange = new ExchangeImpl();
         MessageImpl messageImpl = new MessageImpl();

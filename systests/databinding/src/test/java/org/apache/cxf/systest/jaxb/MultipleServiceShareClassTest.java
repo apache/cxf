@@ -39,21 +39,21 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class MultipleServiceShareClassTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(MultipleServiceShareClassTest.class);
     static final String ADDRESS1 = "http://localhost:" + PORT + "/BarService";
     static final String ADDRESS2 = "http://localhost:" + PORT + "/FooService";
-    
-    public static class Server extends AbstractBusTestServerBase {        
+
+    public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
             registerService(FooService.class, new FooServiceImpl());
             registerService(BarService.class, new BarServiceImpl());
 
         }
-        
+
         private void registerService(final Class<?> service, final Object serviceImpl) {
             final JaxWsServerFactoryBean builder = new JaxWsServerFactoryBean();
             builder.setBus(getBus());
@@ -79,10 +79,10 @@ public class MultipleServiceShareClassTest extends AbstractBusClientServerTestBa
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testCallMultipleService() throws Exception {
-        
+
         final NameElement barName = new BarName();
         barName.setName("Bob");
         callBar(barName);
@@ -91,7 +91,7 @@ public class MultipleServiceShareClassTest extends AbstractBusClientServerTestBa
         callFoo(fooName);
 
     }
-    
+
     private void callFoo(final NameElement nameElement) {
         FooService fooClient = createGetterService(FooService.class);
         assertEquals(fooClient.getName(nameElement), "Alice");

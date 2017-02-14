@@ -41,7 +41,7 @@ public class BookStore implements BookStoreService {
             );
         }
     }
-    
+
     @WebMethod
     public int removeBooks() {
         throw new RuntimeException("Unable to remove books");

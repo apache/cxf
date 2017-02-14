@@ -47,11 +47,11 @@ public class ParseJavaDocMojo extends AbstractMojo {
 
     /**
      * The source encoding.
-     * 
+     *
      * @parameter defaultValue = "${project.build.sourceEncoding}"
      */
     private String encoding;
-    
+
     /**
      * @parameter expression="${project}"
      * @required
@@ -99,7 +99,7 @@ public class ParseJavaDocMojo extends AbstractMojo {
 
     /**
      * The local maven repository.
-     * 
+     *
      * @parameter expression="${localRepository}"
      * @required
      * @readonly
@@ -108,14 +108,14 @@ public class ParseJavaDocMojo extends AbstractMojo {
 
     /**
      * The remote repositories where artifacts are located.
-     * 
+     *
      * @parameter expression="${project.remoteArtifactRepositories}"
      * @required
      * @readonly
      */
     private List<ArtifactRepository> remoteRepositories;
-    
-    
+
+
     /**
      * Directory into which assembled {@link JavadocOptions} instances will be written before they
      * are added to javadoc resources bundles.
@@ -137,11 +137,11 @@ public class ParseJavaDocMojo extends AbstractMojo {
             f = AbstractJavadocMojo.class.getDeclaredField("encoding");
             f.setAccessible(true);
             f.set(mojo, encoding);
-            
+
             f = AbstractJavadocMojo.class.getDeclaredField("stylesheet");
             f.setAccessible(true);
             f.set(mojo, "stylesheet");
-            
+
             f = AbstractJavadocMojo.class.getDeclaredField("javadocOptionsDir");
             f.setAccessible(true);
             f.set(mojo, javadocOptionsDir);
@@ -196,26 +196,26 @@ public class ParseJavaDocMojo extends AbstractMojo {
             f = AbstractJavadocMojo.class.getDeclaredField("applyJavadocSecurityFix");
             f.setAccessible(true);
             f.set(mojo, false);
-            
+
             f = AbstractJavadocMojo.class.getDeclaredField("additionalparam");
             f.setAccessible(true);
-            f.set(mojo, "-dumpJavaDocFile " + this.dumpFileOutputDirectory.getAbsolutePath() 
+            f.set(mojo, "-dumpJavaDocFile " + this.dumpFileOutputDirectory.getAbsolutePath()
                       + File.separator + "dumpFile.properties");
 
             f = AbstractJavadocMojo.class.getDeclaredField("useStandardDocletOptions");
             f.setAccessible(true);
             f.set(mojo, false);
-            
+
             f = AbstractJavadocMojo.class.getDeclaredField("project");
             f.setAccessible(true);
             f.set(mojo, mavenProject);
-            
+
             if (dumpFileOutputDirectory != null) {
                 f = AbstractJavadocMojo.class.getDeclaredField("outputDirectory");
                 f.setAccessible(true);
                 f.set(mojo, dumpFileOutputDirectory);
             }
-        
+
             Method m = AbstractJavadocMojo.class.getDeclaredMethod("executeReport", Locale.class);
             m.setAccessible(true);
             m.invoke(mojo, locale);

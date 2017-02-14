@@ -36,9 +36,9 @@ import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
-@WebService(serviceName = "NumberFactoryService", 
-            portName = "NumberFactoryPort", 
-            endpointInterface = "org.apache.cxf.factory_pattern.NumberFactory", 
+@WebService(serviceName = "NumberFactoryService",
+            portName = "NumberFactoryPort",
+            endpointInterface = "org.apache.cxf.factory_pattern.NumberFactory",
             targetNamespace = "http://cxf.apache.org/factory_pattern")
 public class NumberFactoryImpl implements NumberFactory {
     public static final String FACTORY_NS = "http://cxf.apache.org/factory_pattern";
@@ -58,7 +58,7 @@ public class NumberFactoryImpl implements NumberFactory {
         bus = b;
         port = p;
     }
-    
+
     public void stop() throws Exception {
         for (AutoCloseable ep: endpoints) {
             ep.close();
@@ -98,16 +98,16 @@ public class NumberFactoryImpl implements NumberFactory {
         String wsdlLocation = "testutils/factory_pattern.wsdl";
         String bindingId = null;
 
-        EndpointImpl ep = new EndpointImpl(bus, 
+        EndpointImpl ep = new EndpointImpl(bus,
                                            servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPort"));
         ep.publish(getServantAddressRoot());
         endpoints.add(ep);
-        
+
         templateEpr = ep.getServer().getDestination().getAddress();
 
         // jms port
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, wsdlLocation);        
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, wsdlLocation);
         ep = new EndpointImpl(bus, servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPortJMS"));
         ep.setAddress("jms:jndi:dynamicQueues/test.cxf.factory_pattern.queue");
@@ -116,5 +116,5 @@ public class NumberFactoryImpl implements NumberFactory {
         ep.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
         endpoints.add(ep);
     }
-    
+
 }

@@ -23,16 +23,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 
+ *
  */
 public class RegistryImpl<K, T> implements Registry<K, T> {
-    
+
     protected final Map<K, T> entries;
-    
+
     protected RegistryImpl() {
         this(null);
     }
-    
+
     protected RegistryImpl(Map<K, T> e) {
         if (null == e) {
             e = new ConcurrentHashMap<K, T>(16, 0.75f, 4);
@@ -58,7 +58,7 @@ public class RegistryImpl<K, T> implements Registry<K, T> {
         return entries.get(k);
     }
 
-    
-    
-    
+
+
+
 }

@@ -36,16 +36,16 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> {
-    
+
     public static final String CACHE_CONTROL_SEPARATOR_PROPERTY =
         "org.apache.cxf.http.cache-control.separator";
     private static final String DEFAULT_SEPARATOR = ",";
-    
-    private static final String COMPLEX_HEADER_EXPRESSION = 
+
+    private static final String COMPLEX_HEADER_EXPRESSION =
         "(([\\w-]+=\"[^\"]*\")|([\\w-]+=[\\w]+)|([\\w-]+))";
     private static final Pattern COMPLEX_HEADER_PATTERN =
         Pattern.compile(COMPLEX_HEADER_EXPRESSION);
-    
+
     private static final String PUBLIC = "public";
     private static final String PRIVATE = "private";
     private static final String NO_CACHE = "no-cache";
@@ -68,7 +68,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         int maxAge = -1;
         int sMaxAge = -1;
         Map<String, String> extensions = new HashMap<String, String>();
-        
+
         String[] tokens = getTokens(c);
         for (String rawToken : tokens) {
             String token = rawToken.trim();
@@ -98,7 +98,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
                 extensions.put(extPair[0], value);
             }
         }
-        
+
         CacheControl cc = new CacheControl();
         cc.setMaxAge(maxAge);
         cc.setSMaxAge(sMaxAge);
@@ -111,7 +111,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         cc.setNoStore(noStore);
         cc.setNoTransform(noTransform);
         cc.getCacheExtension().putAll(extensions);
-        
+
         return cc;
     }
 
@@ -134,10 +134,10 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             return StringUtils.split(c, separator);
         }
     }
-    
+
     public String toString(CacheControl c) {
         String separator = getSeparator();
-        
+
         StringBuilder sb = new StringBuilder();
         if (c.isPrivate()) {
             sb.append(PRIVATE);
@@ -182,9 +182,9 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             sb.append(separator);
         }
         String s = sb.toString();
-        return s.endsWith(separator) ? s.substring(0, s.length() - 1) : s; 
+        return s.endsWith(separator) ? s.substring(0, s.length() - 1) : s;
     }
-    
+
     private static void addFields(List<String> fields, String token) {
         int i = token.indexOf('=');
         if (i != -1) {
@@ -201,7 +201,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
                 }
             }
         }
-        
+
     }
 
     private static void handleFields(List<String> fields, StringBuilder sb) {
@@ -218,13 +218,13 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         }
         sb.append('\"');
     }
-    
+
     protected String getSeparator() {
-        
+
         String separator = DEFAULT_SEPARATOR;
-        
+
         Message message = getCurrentMessage();
-        
+
         if (message != null) {
             Object sepProperty = message.getContextualProperty(CACHE_CONTROL_SEPARATOR_PROPERTY);
             if (sepProperty != null) {
@@ -236,7 +236,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         }
         return separator;
     }
-    
+
     protected Message getCurrentMessage() {
         return PhaseInterceptorChain.getCurrentMessage();
     }

@@ -88,22 +88,22 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
 
         port.deregisterPeerManager(new java.lang.String());
 
-        
+
         port.registerEndpoint(null, w3cEpr);
 
-        
+
         port.deregisterEndpoint(null, w3cEpr);
 
-        
-        
+
+
         port.lookupEndpoint(new javax.xml.namespace.QName("", ""));
-            
+
         port.listEndpoints();
 
         port.queryEndpoints(new QueryEndpoints());
 
     }
-    
+
     @Test
     public void testLookupEndpointAndVerifyWsdlLocationAndNamespace() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/locator.wsdl");
@@ -112,13 +112,13 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
         LocatorService_Service ss = new LocatorService_Service(wsdl, serviceName);
         LocatorService port = ss.getLocatorServicePort();
         updateAddressPort(port, PORT);
-        
+
         W3CEndpointReference epr = port.lookupEndpoint(new QName("http://service/1", "Number"));
         String eprString = epr.toString();
         assertTrue(eprString.contains("Metadata"));
         assertTrue(eprString.contains("wsdlLocation=\"http://service/1 wsdlLoc\""));
     }
-    
+
     @Test
     public void testLookupEndpointAndVerifyWsdlLocationOnly() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/locator.wsdl");
@@ -127,7 +127,7 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
         LocatorService_Service ss = new LocatorService_Service(wsdl, serviceName);
         LocatorService port = ss.getLocatorServicePort();
         updateAddressPort(port, PORT);
-        
+
         W3CEndpointReference epr = port.lookupEndpoint(new QName("http://service/2", "Number"));
         String eprString = epr.toString();
         assertTrue(eprString.contains("Metadata"));

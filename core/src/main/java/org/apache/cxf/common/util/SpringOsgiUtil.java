@@ -28,7 +28,7 @@ final class SpringOsgiUtil {
 
     private SpringOsgiUtil() {
     }
-    
+
     public static ResourcePatternResolver getResolver(ClassLoader loader) {
         Bundle bundle = null;
         if (loader == null) {

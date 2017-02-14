@@ -37,12 +37,12 @@ public class JweOutputStream extends FilterOutputStream {
     private byte[] lastRawDataChunk;
     private byte[] lastEncryptedDataChunk;
     private boolean flushed;
-    public JweOutputStream(OutputStream out, 
-                           Cipher encryptingCipher, 
+    public JweOutputStream(OutputStream out,
+                           Cipher encryptingCipher,
                            AuthenticationTagProducer authTagProducer) {
         super(out);
         this.encryptingCipher = encryptingCipher;
-        this.blockSize = encryptingCipher.getBlockSize(); 
+        this.blockSize = encryptingCipher.getBlockSize();
         this.authTagProducer = authTagProducer;
     }
 
@@ -51,7 +51,7 @@ public class JweOutputStream extends FilterOutputStream {
         byte[] bytes = ByteBuffer.allocate(Integer.SIZE / 8).putInt(value).array();
         write(bytes, 0, bytes.length);
     }
-    
+
     @Override
     public void write(byte b[], int off, int len) throws IOException {
         if (lastRawDataChunk != null) {
@@ -66,7 +66,7 @@ public class JweOutputStream extends FilterOutputStream {
                 encryptAndWrite(lastRawDataChunk, 0, lastRawDataChunk.length);
                 lastRawDataChunk = null;
             }
-        } 
+        }
         int offset = 0;
         int chunkSize = blockSize > len ? blockSize : blockSize * (len / blockSize);
         for (; offset + chunkSize <= len; offset += chunkSize, off += chunkSize) {
@@ -75,9 +75,9 @@ public class JweOutputStream extends FilterOutputStream {
         if (offset < len) {
             lastRawDataChunk = newArray(b, off, len - offset);
         }
-        
+
     }
-    
+
     private void encryptAndWrite(byte[] chunk, int off, int len) throws IOException {
         byte[] encrypted = encryptingCipher.update(chunk, off, len);
         if (authTagProducer != null) {
@@ -95,7 +95,7 @@ public class JweOutputStream extends FilterOutputStream {
         } else {
             theChunk = encryptedChunk;
         }
-        int rem = finalWrite ? 0 : lenToEncode % 3; 
+        int rem = finalWrite ? 0 : lenToEncode % 3;
         Base64UrlUtility.encodeAndStream(theChunk, off, lenToEncode - rem, out);
         out.flush();
         if (rem > 0) {
@@ -104,13 +104,13 @@ public class JweOutputStream extends FilterOutputStream {
             lastEncryptedDataChunk = null;
         }
     }
-    
+
     public void finalFlush() throws IOException {
         if (flushed) {
             return;
         }
         try {
-            byte[] finalBytes = lastRawDataChunk == null 
+            byte[] finalBytes = lastRawDataChunk == null
                 ? encryptingCipher.doFinal()
                 : encryptingCipher.doFinal(lastRawDataChunk, 0, lastRawDataChunk.length);
             final int authTagLengthBits = 128;
@@ -121,7 +121,7 @@ public class JweOutputStream extends FilterOutputStream {
                 encodeAndWrite(finalBytes, 0, finalBytes.length - authTagLengthBits / 8, true);
             }
             out.write(new byte[]{'.'});
-            
+
             if (authTagProducer == null) {
                 encodeAndWrite(finalBytes, finalBytes.length - authTagLengthBits / 8, authTagLengthBits / 8, true);
             } else {

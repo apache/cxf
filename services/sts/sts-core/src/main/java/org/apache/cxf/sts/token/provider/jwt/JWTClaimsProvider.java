@@ -29,5 +29,5 @@ public interface JWTClaimsProvider {
      * Get a JwtClaims object.
      */
     JwtClaims getJwtClaims(JWTClaimsProviderParameters jwtClaimsProviderParameters);
-        
+
 }

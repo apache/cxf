@@ -23,7 +23,7 @@ import java.util.Currency;
 
 public class Money {
     protected  Currency currency;
-    
+
     public Currency getCurrency() {
         return currency;
     }

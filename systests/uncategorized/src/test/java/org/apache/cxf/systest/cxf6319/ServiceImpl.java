@@ -30,5 +30,5 @@ public class ServiceImpl {
     public String echo(@WebParam(name = "s", targetNamespace = "http://example.com") String s) {
         return s;
     }
-    
+
 }

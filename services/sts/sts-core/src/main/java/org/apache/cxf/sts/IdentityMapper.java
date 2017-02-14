@@ -26,7 +26,7 @@ import java.security.Principal;
  * realm.
  */
 public interface IdentityMapper {
-    
+
     /**
      * Map a principal in the source realm to the target realm
      * @param sourceRealm the source realm of the Principal

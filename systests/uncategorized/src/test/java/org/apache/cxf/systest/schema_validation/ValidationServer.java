@@ -48,7 +48,7 @@ public class ValidationServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(ValidationServer.class);
 
     List<Endpoint> eps = new LinkedList<Endpoint>();
-    
+
     public ValidationServer() {
     }
 
@@ -67,18 +67,18 @@ public class ValidationServer extends AbstractBusTestServerBase {
             eps.remove(0).stop();
         }
     }
-    
-    @WebService(serviceName = "SchemaValidationService", 
+
+    @WebService(serviceName = "SchemaValidationService",
         portName = "SoapPort",
         endpointInterface = "org.apache.schema_validation.SchemaValidation",
         targetNamespace = "http://apache.org/schema_validation",
         wsdlLocation = "classpath:/wsdl/schema_validation.wsdl")
     @SchemaValidation
     static class ValidatingSchemaValidationImpl extends SchemaValidationImpl {
-        
+
     }
 
-    @WebService(serviceName = "SchemaValidationService", 
+    @WebService(serviceName = "SchemaValidationService",
         portName = "SoapPort",
         endpointInterface = "org.apache.schema_validation.SchemaValidation",
         targetNamespace = "http://apache.org/schema_validation",
@@ -89,7 +89,7 @@ public class ValidationServer extends AbstractBusTestServerBase {
             return true;
         }
     }
-    
+
     private static String getResponse(String v) {
         if ("9999999999".equals(v)) {
             return "<soap:Fault xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
@@ -114,7 +114,7 @@ public class ValidationServer extends AbstractBusTestServerBase {
     }
 
     @WebServiceProvider(wsdlLocation = "classpath:/wsdl/schema_validation.wsdl",
-        serviceName = "SchemaValidationService", 
+        serviceName = "SchemaValidationService",
         portName = "SoapPort",
         targetNamespace = "http://apache.org/schema_validation")
     @ServiceMode(Service.Mode.PAYLOAD)
@@ -136,9 +136,9 @@ public class ValidationServer extends AbstractBusTestServerBase {
             return null;
         }
     }
-    
+
     @WebServiceProvider(wsdlLocation = "classpath:/wsdl/schema_validation.wsdl",
-        serviceName = "SchemaValidationService", 
+        serviceName = "SchemaValidationService",
         portName = "SoapPort",
         targetNamespace = "http://apache.org/schema_validation")
     @ServiceMode(Service.Mode.MESSAGE)
@@ -154,7 +154,7 @@ public class ValidationServer extends AbstractBusTestServerBase {
                 }
                 el = DOMUtils.getFirstElement(el);
                 String name = el.getLocalName();
-                
+
                 if ("SomeRequest".equals(name)) {
                     String v = DOMUtils.getFirstElement(el).getTextContent();
                     return new StreamSource(
@@ -164,7 +164,7 @@ public class ValidationServer extends AbstractBusTestServerBase {
             } catch (XMLStreamException ex) {
                 ex.printStackTrace();
             }
-            
+
             return null;
         }
     }

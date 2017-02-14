@@ -49,7 +49,7 @@ public class EndpointReferenceBuilder {
         this.endpoint = e;
     }
     public EndpointReference getEndpointReference() {
-        
+
         //if there is epr in wsdl, direct return this EPR
         List<ExtensibilityElement> portExtensors = endpoint.getEndpointInfo()
             .getExtensors(ExtensibilityElement.class);
@@ -76,18 +76,18 @@ public class EndpointReferenceBuilder {
 
             }
         }
-        
-        
-        String bindingId = endpoint.getJaxwsBinding().getBindingID();   
-        
+
+
+        String bindingId = endpoint.getJaxwsBinding().getBindingID();
+
         if (!SOAPBindingImpl.isSoapBinding(bindingId)) {
             throw new UnsupportedOperationException(new Message("GET_ENDPOINTREFERENCE_UNSUPPORTED_BINDING",
                                                                 LOG, bindingId).toString());
         }
-        
-        W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();      
+
+        W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
         builder.address(this.endpoint.getEndpointInfo().getAddress());
-        
+
         builder.serviceName(this.endpoint.getService().getName());
         builder.endpointName(this.endpoint.getEndpointInfo().getName());
 
@@ -98,7 +98,7 @@ public class EndpointReferenceBuilder {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(EndpointReferenceBuilder.class.getClassLoader());
-            
+
             return builder.build();
         } finally {
             Thread.currentThread().setContextClassLoader(cl);

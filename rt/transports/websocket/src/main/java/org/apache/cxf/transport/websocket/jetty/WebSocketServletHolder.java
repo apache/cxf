@@ -28,7 +28,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.ServletContext;
 
 /**
- * 
+ *
  */
 public interface WebSocketServletHolder {
     String getAuthType();

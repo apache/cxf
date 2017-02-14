@@ -30,7 +30,7 @@ public class TokenDelegationResponse {
     private Map<String, Object> additionalProperties;
     private ReceivedToken token;
     private boolean delegationAllowed;
-    
+
     public ReceivedToken getToken() {
         return token;
     }
@@ -38,11 +38,11 @@ public class TokenDelegationResponse {
     public void setToken(ReceivedToken token) {
         this.token = token;
     }
-    
+
     public void setAdditionalProperties(Map<String, Object> additionalProperties) {
         this.additionalProperties = additionalProperties;
     }
-    
+
     public Map<String, Object> getAdditionalProperties() {
         return additionalProperties;
     }
@@ -54,5 +54,5 @@ public class TokenDelegationResponse {
     public void setDelegationAllowed(boolean delegationAllowed) {
         this.delegationAllowed = delegationAllowed;
     }
-    
+
 }

@@ -22,7 +22,7 @@ package org.apache.cxf.sts.event;
 import org.apache.cxf.sts.token.validator.TokenValidatorParameters;
 
 public interface TokenValidatorParametersSupport {
-    
+
     TokenValidatorParameters getTokenParameters();
-    
+
 }

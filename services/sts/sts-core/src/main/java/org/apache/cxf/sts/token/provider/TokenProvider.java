@@ -23,13 +23,13 @@ package org.apache.cxf.sts.token.provider;
  * An interface that can provide a security token.
  */
 public interface TokenProvider {
-    
+
     /**
      * Return true if this TokenProvider implementation is capable of providing a token
      * that corresponds to the given TokenType
      */
     boolean canHandleToken(String tokenType);
-    
+
     /**
      * Return true if this TokenProvider implementation is capable of providing a token
      * that corresponds to the given TokenType in a given realm

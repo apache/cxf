@@ -28,26 +28,26 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 
 /**
- * 
+ *
  */
 public final class KerberosUtils {
 
     private KerberosUtils() {
         //utility class
     }
-    
+
     public static KerberosClient getClient(Message message, String type) throws WSSecurityException {
         KerberosClient client = (KerberosClient)message
             .getContextualProperty(SecurityConstants.KERBEROS_CLIENT);
         if (client == null) {
             client = new KerberosClient();
-            
-            String jaasContext = 
+
+            String jaasContext =
                 (String)message.getContextualProperty(SecurityConstants.KERBEROS_JAAS_CONTEXT_NAME);
-            String kerberosSpn = 
+            String kerberosSpn =
                 (String)message.getContextualProperty(SecurityConstants.KERBEROS_SPN);
             try {
-                CallbackHandler callbackHandler = 
+                CallbackHandler callbackHandler =
                     SecurityUtils.getCallbackHandler(
                         SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message)
                     );
@@ -55,21 +55,21 @@ public final class KerberosUtils {
             } catch (Exception ex) {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, ex);
             }
-            boolean useCredentialDelegation = 
-                MessageUtils.getContextualBoolean(message, 
-                                              SecurityConstants.KERBEROS_USE_CREDENTIAL_DELEGATION, 
+            boolean useCredentialDelegation =
+                MessageUtils.getContextualBoolean(message,
+                                              SecurityConstants.KERBEROS_USE_CREDENTIAL_DELEGATION,
                                               false);
-            
-            boolean isInServiceNameForm = 
-                MessageUtils.getContextualBoolean(message, 
-                                              SecurityConstants.KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM, 
+
+            boolean isInServiceNameForm =
+                MessageUtils.getContextualBoolean(message,
+                                              SecurityConstants.KERBEROS_IS_USERNAME_IN_SERVICENAME_FORM,
                                               false);
-            
-            boolean requestCredentialDelegation = 
-                MessageUtils.getContextualBoolean(message, 
-                                              SecurityConstants.KERBEROS_REQUEST_CREDENTIAL_DELEGATION, 
+
+            boolean requestCredentialDelegation =
+                MessageUtils.getContextualBoolean(message,
+                                              SecurityConstants.KERBEROS_REQUEST_CREDENTIAL_DELEGATION,
                                               false);
-            
+
             client.setContextName(jaasContext);
             client.setServiceName(kerberosSpn);
             client.setUseDelegatedCredential(useCredentialDelegation);
@@ -78,5 +78,5 @@ public final class KerberosUtils {
         }
         return client;
     }
-    
+
 }

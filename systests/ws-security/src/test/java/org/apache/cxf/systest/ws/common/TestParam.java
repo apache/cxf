@@ -24,12 +24,12 @@ package org.apache.cxf.systest.ws.common;
 public final class TestParam {
     final String port;
     final boolean streaming;
-    
+
     public TestParam(String p, boolean b) {
         port = p;
         streaming = b;
     }
-    
+
     public String toString() {
         return port + ":" + (streaming ? "streaming" : "dom");
     }
@@ -37,9 +37,9 @@ public final class TestParam {
     public String getPort() {
         return port;
     }
-    
+
     public boolean isStreaming() {
         return streaming;
     }
-    
+
 }

@@ -30,9 +30,9 @@ import org.apache.cxf.jaxrs.json.basic.JsonMapObject;
 public class JsonWebKeys extends JsonMapObject {
     public static final String KEYS_PROPERTY = "keys";
     private static final long serialVersionUID = -8002543601655429723L;
-    
+
     public JsonWebKeys() {
-        
+
     }
     public JsonWebKeys(JsonWebKey key) {
         setInitKey(key);
@@ -48,7 +48,7 @@ public class JsonWebKeys extends JsonMapObject {
                 return CastUtils.cast(list);
             } else {
                 List<JsonWebKey> keys = new LinkedList<JsonWebKey>();
-                List<Map<String, Object>> listOfMaps = 
+                List<Map<String, Object>> listOfMaps =
                     CastUtils.cast((List<?>)super.getProperty(KEYS_PROPERTY));
                 for (Map<String, Object> map : listOfMaps) {
                     keys.add(new JsonWebKey(map));
@@ -61,11 +61,11 @@ public class JsonWebKeys extends JsonMapObject {
     }
     public void setKey(JsonWebKey key) {
         setKeys(Collections.singletonList(key));
-    } 
+    }
     public void setKeys(List<JsonWebKey> keys) {
         super.setProperty(KEYS_PROPERTY, keys);
     }
-    
+
     public Map<String, JsonWebKey> getKeyIdMap() {
         List<JsonWebKey> keys = getKeys();
         if (keys == null) {
@@ -102,7 +102,7 @@ public class JsonWebKeys extends JsonMapObject {
         }
         return map;
     }
-    
+
     public Map<KeyOperation, List<JsonWebKey>> getKeyOperationMap() {
         List<JsonWebKey> keys = getKeys();
         if (keys == null) {

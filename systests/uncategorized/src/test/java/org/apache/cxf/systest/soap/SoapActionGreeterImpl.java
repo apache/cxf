@@ -23,7 +23,7 @@ import javax.jws.WebService;
 
 import org.apache.hello_world_soap_action.Greeter;
 
-@WebService(endpointInterface = "org.apache.hello_world_soap_action.Greeter", 
+@WebService(endpointInterface = "org.apache.hello_world_soap_action.Greeter",
             serviceName = "SOAPService")
 public class SoapActionGreeterImpl implements Greeter {
 

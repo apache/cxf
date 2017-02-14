@@ -41,10 +41,10 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.W
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.XmlSeeAlsoAnnotator;
 
 public class WSDLToJavaProcessor extends WSDLToProcessor implements ClassNameProcessor {
-    public static final String MODEL_MAP = WSDLToProcessor.class.getName() 
+    public static final String MODEL_MAP = WSDLToProcessor.class.getName()
         + ".MODEL_MAP";
-    
-    
+
+
     public void processClassNames() {
         ServiceInfo serviceInfo = context.get(ServiceInfo.class);
 
@@ -52,7 +52,7 @@ public class WSDLToJavaProcessor extends WSDLToProcessor implements ClassNamePro
         portTypeProcessor.processClassNames(serviceInfo);
     }
 
-    
+
     public void process() throws ToolException {
         super.process();
 
@@ -74,16 +74,16 @@ public class WSDLToJavaProcessor extends WSDLToProcessor implements ClassNamePro
             map.put(serviceInfo.getName(), javaModel);
         }
         context.put(JavaModel.class, javaModel);
-        
+
         List<JavaInterface> interfaces = new ArrayList<>();
         interfaces.addAll(javaModel.getInterfaces().values());
-        
+
         PortTypeProcessor portTypeProcessor = new PortTypeProcessor(context);
         portTypeProcessor.process(serviceInfo);
 
         ServiceProcessor serviceProcessor = new ServiceProcessor(context);
         serviceProcessor.process(serviceInfo);
-        
+
         for (JavaInterface intf : javaModel.getInterfaces().values()) {
             if (!interfaces.contains(intf)) {
                 intf.annotate(new WebServiceAnnotator());

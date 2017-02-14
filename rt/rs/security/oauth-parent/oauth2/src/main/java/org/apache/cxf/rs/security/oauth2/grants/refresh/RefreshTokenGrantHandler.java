@@ -36,11 +36,11 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
     private OAuthDataProvider dataProvider;
     private boolean partialMatchScopeValidation;
     private boolean useAllClientScopes;
-    
+
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
     }
-    
+
     public List<String> getSupportedGrantTypes() {
         return Collections.singletonList(OAuthConstants.REFRESH_TOKEN_GRANT);
     }
@@ -52,7 +52,7 @@ public class RefreshTokenGrantHandler implements AccessTokenGrantHandler {
                                             params.getFirst(OAuthConstants.SCOPE),
                                             useAllClientScopes,
                                             partialMatchScopeValidation);
-        
+
         return dataProvider.refreshAccessToken(client, refreshToken, requestedScopes);
     }
 

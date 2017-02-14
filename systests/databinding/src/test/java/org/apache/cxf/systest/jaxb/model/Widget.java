@@ -47,7 +47,7 @@ public abstract class Widget {
     private boolean broken;
 
     /**
-     * 
+     *
      */
     public Widget() {
         super();
@@ -125,7 +125,7 @@ public abstract class Widget {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -146,7 +146,7 @@ public abstract class Widget {
     }
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override

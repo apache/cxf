@@ -28,7 +28,7 @@ public class ClusteringBPBeanDefinitionParser extends SimpleBPBeanDefinitionPars
     public ClusteringBPBeanDefinitionParser(Class<?> cls) {
         super(cls);
     }
-    
+
     @Override
     protected void mapElement(ParserContext ctx, MutableBeanMetadata bean, Element el, String name) {
         setFirstChildAsProperty(el, ctx, bean, name);

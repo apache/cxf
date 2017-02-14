@@ -36,5 +36,5 @@ public interface SimpleRPC {
     void returnVoid(@WebParam(name = "P1") String p1, @WebParam(name = "P2") int p2);
     @WebMethod
     void beanType(@WebParam(name = "param1") TestBean1 p1);
-    
+
 }

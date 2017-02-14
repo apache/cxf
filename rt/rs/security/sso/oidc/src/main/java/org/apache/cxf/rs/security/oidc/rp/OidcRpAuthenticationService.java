@@ -39,22 +39,22 @@ public class OidcRpAuthenticationService {
     private ClientTokenContextManager stateManager;
     private String defaultLocation;
     @Context
-    private MessageContext mc; 
-    
+    private MessageContext mc;
+
     @POST
     @Path("signin")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response completeScriptAuthentication(@Context IdTokenContext idTokenContext) {
         OidcClientTokenContextImpl ctx = new OidcClientTokenContextImpl();
         ctx.setIdToken(idTokenContext.getIdToken());
-        return completeAuthentication(ctx);   
+        return completeAuthentication(ctx);
     }
-    
+
     @GET
     @Path("complete")
     public Response completeAuthentication(@Context OidcClientTokenContext oidcContext) {
         stateManager.setClientTokenContext(mc, oidcContext);
-        
+
         URI redirectUri = null;
         MultivaluedMap<String, String> state = oidcContext.getState();
         String location = state != null ? state.getFirst("state") : null;

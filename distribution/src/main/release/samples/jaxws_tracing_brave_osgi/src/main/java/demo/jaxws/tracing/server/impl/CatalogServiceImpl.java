@@ -39,16 +39,16 @@ public class CatalogServiceImpl implements CatalogService {
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
     private final Map<String, Book> books = new ConcurrentHashMap<>();
     private final Brave brave;
-    
+
     public CatalogServiceImpl(final Brave brave) {
         this.brave = brave;
     }
-    
+
     @UseAsyncMethod
     public void addBook(Book book)  {
         throw new UnsupportedOperationException("Please use async version of the method");
     }
-    
+
     public Future<?> addBookAsync(Book book, AsyncHandler<Book> handler) {
         final ServerAsyncResponse<Book> response = new ServerAsyncResponse<Book>();
 
@@ -61,21 +61,21 @@ public class CatalogServiceImpl implements CatalogService {
                 brave.localTracer().finishSpan();
             }
         });
-        
+
         return response;
     }
 
     @Override
     public Book getBook(final String id) {
         final Book book = books.get(id);
-        
+
         if (book == null) {
             throw new RuntimeException("Book with does not exists: " + id);
         }
-        
+
         return book;
     }
-    
+
     @Override
     public void delete(final String id) {
         if (books.remove(id) == null) {

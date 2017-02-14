@@ -30,7 +30,7 @@ import java.util.Set;
 
 public final class AlgorithmUtils {
     public static final String AES = "AES";
-    
+
     // Key Encryption
     // JWA
     public static final String RSA_OAEP_ALGO = "RSA-OAEP";
@@ -93,7 +93,7 @@ public final class AlgorithmUtils {
     public static final String ES_SHA_256_JAVA = "SHA256withECDSA";
     public static final String ES_SHA_384_JAVA = "SHA384withECDSA";
     public static final String ES_SHA_512_JAVA = "SHA512withECDSA";
-    
+
     public static final Set<String> HMAC_SIGN_SET = new HashSet<>(Arrays.asList(HMAC_SHA_256_ALGO,
                                                                                       HMAC_SHA_384_ALGO,
                                                                                       HMAC_SHA_512_ALGO));
@@ -127,7 +127,7 @@ public final class AlgorithmUtils {
     public static final Set<String> ECDH_ES_WRAP_SET = new HashSet<>(Arrays.asList(ECDH_ES_A128KW_ALGO,
                       ECDH_ES_A192KW_ALGO,
                       ECDH_ES_A256KW_ALGO));
-    
+
     private static final Map<String, String> JAVA_TO_JWA_NAMES;
     private static final Map<String, String> JWA_TO_JAVA_NAMES;
     static {
@@ -191,7 +191,7 @@ public final class AlgorithmUtils {
         JWA_TO_JAVA_NAMES.put(ECDH_ES_A192KW_ALGO, AES_WRAP_ALGO_JAVA);
         JWA_TO_JAVA_NAMES.put(ECDH_ES_A256KW_ALGO, AES_WRAP_ALGO_JAVA);
     }
-    
+
     private AlgorithmUtils() {
     }
     public static boolean isRsa(String algo) {
@@ -210,73 +210,73 @@ public final class AlgorithmUtils {
         return AES_GCM_KW_SET.contains(algo);
     }
     public static boolean isPbesHsWrap(String algo) {
-        return PBES_HS_SET.contains(algo); 
+        return PBES_HS_SET.contains(algo);
     }
     public static boolean isEcdhEsWrap(String algo) {
-        return ECDH_ES_WRAP_SET.contains(algo); 
+        return ECDH_ES_WRAP_SET.contains(algo);
     }
     public static boolean isEcdhEsDirect(String algo) {
-        return ECDH_ES_DIRECT_ALGO.equals(algo); 
+        return ECDH_ES_DIRECT_ALGO.equals(algo);
     }
     public static boolean isAesGcm(String algo) {
         return AES_GCM_CEK_SET.contains(algo);
     }
     public static boolean isAesCbcHmac(String algo) {
-        return ACBC_HS_SET.contains(algo); 
+        return ACBC_HS_SET.contains(algo);
     }
     public static boolean isOctet(String algo) {
         return isHmacSign(algo)
             || isAesCbcHmac(algo)
             || isAesGcm(algo)
             || isAesGcmKeyWrap(algo)
-            || isAesKeyWrap(algo); 
+            || isAesKeyWrap(algo);
     }
     public static boolean isHmacSign(String algo) {
-        return HMAC_SIGN_SET.contains(algo); 
+        return HMAC_SIGN_SET.contains(algo);
     }
     public static boolean isHmacSign(SignatureAlgorithm algo) {
-        return isHmacSign(algo.getJwaName()); 
+        return isHmacSign(algo.getJwaName());
     }
     public static boolean isRsaSign(String algo) {
-        return isRsaShaSign(algo) || isRsaShaPsSign(algo); 
+        return isRsaShaSign(algo) || isRsaShaPsSign(algo);
     }
     public static boolean isRsaSign(SignatureAlgorithm algo) {
-        return isRsaSign(algo.getJwaName()); 
+        return isRsaSign(algo.getJwaName());
     }
     public static boolean isRsaShaSign(String algo) {
-        return RSA_SHA_SIGN_SET.contains(algo); 
+        return RSA_SHA_SIGN_SET.contains(algo);
     }
     public static boolean isRsaShaSign(SignatureAlgorithm algo) {
-        return isRsaShaSign(algo.getJwaName()); 
+        return isRsaShaSign(algo.getJwaName());
     }
     public static boolean isRsaShaPsSign(String algo) {
-        return RSA_SHA_PS_SIGN_SET.contains(algo); 
+        return RSA_SHA_PS_SIGN_SET.contains(algo);
     }
     public static boolean isRsaShaPsSign(SignatureAlgorithm algo) {
-        return isRsaShaPsSign(algo.getJwaName()); 
+        return isRsaShaPsSign(algo.getJwaName());
     }
     public static boolean isEcDsaSign(String algo) {
-        return EC_SHA_SIGN_SET.contains(algo); 
+        return EC_SHA_SIGN_SET.contains(algo);
     }
     public static boolean isEcDsaSign(SignatureAlgorithm algo) {
-        return isEcDsaSign(algo.getJwaName()); 
+        return isEcDsaSign(algo.getJwaName());
     }
-    
+
     public static String toJwaName(String javaName, int keyBitSize) {
         //TODO: perhaps a key should be a name+keysize pair
         String name = JAVA_TO_JWA_NAMES.get(javaName);
         if (name == null && javaName.startsWith(AES)) {
             name = "A" + keyBitSize + "GCM";
-        } 
+        }
         return name;
     }
-    public static String toJavaName(String jwtName) {    
+    public static String toJavaName(String jwtName) {
         return JWA_TO_JAVA_NAMES.get(jwtName);
     }
-    public static String toJavaAlgoNameOnly(String jwtName) {    
+    public static String toJavaAlgoNameOnly(String jwtName) {
         return stripAlgoProperties(toJavaName(jwtName));
     }
-    public static String stripAlgoProperties(String javaName) {    
+    public static String stripAlgoProperties(String javaName) {
         if (javaName != null) {
             int index = javaName.indexOf('/');
             if (index != -1) {
@@ -285,5 +285,5 @@ public final class AlgorithmUtils {
         }
         return javaName;
     }
-    
+
 }

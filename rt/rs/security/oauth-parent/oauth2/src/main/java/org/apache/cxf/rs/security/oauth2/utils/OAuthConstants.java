@@ -20,7 +20,7 @@
 package org.apache.cxf.rs.security.oauth2.utils;
 
 /**
- * Miscellaneous constants 
+ * Miscellaneous constants
  */
 public final class OAuthConstants {
     // Common OAuth2 constants
@@ -28,9 +28,9 @@ public final class OAuthConstants {
     public static final String CLIENT_SECRET = "client_secret";
     public static final String CLIENT_AUDIENCE = "audience";
     public static final String RESOURCE_INDICATOR = "resource";
-    
+
     public static final String NONCE = "nonce";
-    
+
     public static final String REDIRECT_URI = "redirect_uri";
     public static final String SCOPE = "scope";
     public static final String STATE = "state";
@@ -45,57 +45,57 @@ public final class OAuthConstants {
     public static final String FORM_RESPONSE_MODE = "form_post";
     // CXF-Specific
     public static final String ACCESS_TOKEN_ISSUED_AT = "issued_at";
-    
-    
+
+
     // Well-known grant types
     public static final String AUTHORIZATION_CODE_GRANT = "authorization_code";
     public static final String CLIENT_CREDENTIALS_GRANT = "client_credentials";
     public static final String IMPLICIT_GRANT = "implicit";
     public static final String RESOURCE_OWNER_GRANT = "password";
     public static final String REFRESH_TOKEN_GRANT = "refresh_token";
-    
+
     // CXF-specific grant
     // The token is returned directly to a human user who copies it into a confidential client
     public static final String IMPLICIT_CONFIDENTIAL_GRANT = "urn:ietf:params:oauth:grant-type:implicit-confidential";
     public static final String DIRECT_TOKEN_GRANT = "urn:ietf:params:oauth:grant-type:direct-token-grant";
-    
+
     // Well-known token types
     public static final String BEARER_TOKEN_TYPE = "Bearer";
     public static final String HAWK_TOKEN_TYPE = "hawk";
-    
+
     // https://tools.ietf.org/html/rfc7636
     public static final String AUTHORIZATION_CODE_VERIFIER = "code_verifier";
     public static final String AUTHORIZATION_CODE_CHALLENGE = "code_challenge";
     public static final String AUTHORIZATION_CODE_CHALLENGE_METHOD = "code_challenge_method";
-    
+
     // CXF-specific
     public static final String REFRESH_TOKEN_TYPE = "refresh";
-        
+
     // Hawk token parameters
     // Set by Access Token Service
     public static final String HAWK_TOKEN_KEY = "secret";
     public static final String HAWK_TOKEN_ALGORITHM = "algorithm";
-    
+
     // Set in Authorization header
     public static final String HAWK_TOKEN_ID = "id";
     public static final String HAWK_TOKEN_TIMESTAMP = "ts";
     public static final String HAWK_TOKEN_EXTENSION = "ext";
     public static final String HAWK_TOKEN_NONCE = "nonce";
     public static final String HAWK_TOKEN_SIGNATURE = "mac";
-    
+
     // Mac/Hawk HMAC algorithm names
     public static final String HMAC_ALGO_SHA_1 = "hmac-sha-1";
     public static final String HMAC_ALGO_SHA_256 = "hmac-sha-256";
-    
+
     // Token Authorization schemes
     public static final String BEARER_AUTHORIZATION_SCHEME = "Bearer";
     public static final String HAWK_AUTHORIZATION_SCHEME = "Hawk";
     public static final String ALL_AUTH_SCHEMES = "*";
 
-    
+
     // Default Client Authentication Scheme
     public static final String BASIC_SCHEME = "Basic";
-    
+
     // Authorization Code grant constants
     public static final String AUTHORIZATION_CODE_VALUE = "code";
     public static final String CODE_RESPONSE_TYPE = "code";
@@ -104,16 +104,16 @@ public final class OAuthConstants {
     public static final String AUTHORIZATION_DECISION_KEY = "oauthDecision";
     public static final String AUTHORIZATION_DECISION_ALLOW = "allow";
     public static final String AUTHORIZATION_DECISION_DENY = "deny";
-    
+
     // Resource Owner grant constants
     public static final String RESOURCE_OWNER_NAME = "username";
     public static final String RESOURCE_OWNER_PASSWORD = "password";
-    
+
     // Error constants
     public static final String ERROR_KEY = "error";
     public static final String ERROR_DESCRIPTION_KEY = "error_description";
     public static final String ERROR_URI_KEY = "error_uri";
-    
+
     public static final String SERVER_ERROR = "server_error";
     public static final String INVALID_REQUEST = "invalid_request";
     public static final String INVALID_GRANT = "invalid_grant";
@@ -123,27 +123,27 @@ public final class OAuthConstants {
     public static final String INVALID_CLIENT = "invalid_client";
     public static final String INVALID_SCOPE = "invalid_scope";
     public static final String ACCESS_DENIED = "access_denied";
-    
+
     // Token Revocation, Introspection
     public static final String TOKEN_ID = "token";
     public static final String TOKEN_TYPE_HINT = "token_type_hint";
     public static final String UNSUPPORTED_TOKEN_TYPE = "unsupported_token_type";
-    
+
     // Authorization scheme constants, used internally by AccessTokenValidation client and service
     public static final String AUTHORIZATION_SCHEME_TYPE = "authScheme";
     public static final String AUTHORIZATION_SCHEME_DATA = "authSchemeData";
-    
+
     // Default refresh token scope value - checked by CXF utility code
     public static final String REFRESH_TOKEN_SCOPE = "refreshToken";
-    
+
     // Client Secret (JWS) Signature Algorithm
     public static final String CLIENT_SECRET_SIGNATURE_ALGORITHM = "client.secret.signature.algorithm";
     // Client Secret (JWE) Content Encryption Algorithm
-    public static final String CLIENT_SECRET_CONTENT_ENCRYPTION_ALGORITHM = 
+    public static final String CLIENT_SECRET_CONTENT_ENCRYPTION_ALGORITHM =
         "client.secret.content.encryption.algorithm";
-    
+
     // Client Secret Encrypting Algorithm
     private OAuthConstants() {
     }
-    
+
 }

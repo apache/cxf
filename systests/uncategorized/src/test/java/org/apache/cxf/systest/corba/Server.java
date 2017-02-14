@@ -27,7 +27,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
     public static final String PERSIST_PORT = allocatePort(Server.class);
-    
+
     protected void run()  {
         System.out.println("Starting Server");
         System.setProperty("com.sun.CORBA.POA.ORBServerId", "1");

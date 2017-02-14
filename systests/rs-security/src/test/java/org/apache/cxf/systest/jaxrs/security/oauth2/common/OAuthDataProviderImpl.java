@@ -44,7 +44,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         // filters/grants test client
         Client client = new Client("consumer-id", "this-is-a-secret", true);
         client.setRedirectUris(Collections.singletonList("http://www.blah.apache.org"));
-        
+
         client.getAllowedGrantTypes().add("authorization_code");
         client.getAllowedGrantTypes().add("refresh_token");
         client.getAllowedGrantTypes().add("implicit");
@@ -53,7 +53,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client.getAllowedGrantTypes().add("client_credentials");
         client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:saml2-bearer");
         client.getAllowedGrantTypes().add("urn:ietf:params:oauth:grant-type:jwt-bearer");
-        
+
         client.getRegisteredScopes().add("read_balance");
         client.getRegisteredScopes().add("create_balance");
         client.getRegisteredScopes().add("read_data");
@@ -61,48 +61,48 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client.getRegisteredScopes().add("create_book");
         client.getRegisteredScopes().add("create_image");
         client.getRegisteredScopes().add("openid");
-        
+
         this.setClient(client);
-        
+
         // OIDC filters test client
         client = new Client("consumer-id-oidc", "this-is-a-secret", true);
-        client.setRedirectUris(Collections.singletonList("https://localhost:" + servicePort 
+        client.setRedirectUris(Collections.singletonList("https://localhost:" + servicePort
                                                          + "/secured/bookstore/books"));
-        
+
         client.getAllowedGrantTypes().add("authorization_code");
         client.getAllowedGrantTypes().add("refresh_token");
-        
+
         client.getRegisteredScopes().add("openid");
-        
+
         this.setClient(client);
-        
+
         // Audience test client
         client = new Client("consumer-id-aud", "this-is-a-secret", true);
         client.setRedirectUris(Collections.singletonList("http://www.blah.apache.org"));
-        
+
         client.getAllowedGrantTypes().add("authorization_code");
         client.getAllowedGrantTypes().add("refresh_token");
-        
-        client.getRegisteredAudiences().add("https://localhost:" + servicePort 
+
+        client.getRegisteredAudiences().add("https://localhost:" + servicePort
                                             + "/secured/bookstore/books");
         client.getRegisteredAudiences().add("https://127.0.0.1/test");
         client.getRegisteredScopes().add("openid");
-        
+
         this.setClient(client);
-        
+
         // Audience test client 2
         client = new Client("consumer-id-aud2", "this-is-a-secret", true);
         client.setRedirectUris(Collections.singletonList("http://www.blah.apache.org"));
-        
+
         client.getAllowedGrantTypes().add("authorization_code");
         client.getAllowedGrantTypes().add("refresh_token");
-        
-        client.getRegisteredAudiences().add("https://localhost:" + servicePort 
+
+        client.getRegisteredAudiences().add("https://localhost:" + servicePort
                                             + "/securedxyz/bookstore/books");
         client.getRegisteredScopes().add("openid");
-        
+
         this.setClient(client);
-        
+
         // JAXRSOAuth2Test clients
         client = new Client("alice", "alice", true);
         client.getAllowedGrantTypes().add(Constants.SAML2_BEARER_GRANT);
@@ -112,8 +112,8 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
 
         Certificate cert = loadCert();
         String encodedCert = Base64Utility.encode(cert.getEncoded());
-        
-        Client client2 = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US", 
+
+        Client client2 = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US",
                                     null,
                                     true,
                                     null,
@@ -121,42 +121,42 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
         client2.getAllowedGrantTypes().add("custom_grant");
         client2.setApplicationCertificates(Collections.singletonList(encodedCert));
         this.setClient(client2);
-        
+
         // external clients (in LDAP/etc) which can be used for client cred
         externalClients.add("bob:bobPassword");
-        
+
     }
-    
+
     private Certificate loadCert() throws Exception {
         try (InputStream is = ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", this.getClass())) {
             return CryptoUtils.loadCertificate(is, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'}, "morpit", null);
         }
     }
-    
+
     @Override
     public Client getClient(String clientId) {
         Client c = super.getClient(clientId);
         if (c == null) {
-            String clientSecret = super.getCurrentClientSecret(); 
+            String clientSecret = super.getCurrentClientSecret();
             if (externalClients.contains(clientId + ":" + clientSecret)) {
                 c = new Client(clientId, clientSecret, true);
             }
         }
         return c;
-        
+
     }
-    
+
     @Override
     protected boolean isRefreshTokenSupported(List<String> theScopes) {
         return true;
     }
-    
+
     @Override
     public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScopes) {
         if (requestedScopes.isEmpty()) {
             return Collections.emptyList();
         }
-        
+
         List<OAuthPermission> permissions = new ArrayList<>();
         for (String requestedScope : requestedScopes) {
             if ("read_book".equals(requestedScope)) {
@@ -166,7 +166,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 String partnerAddress = "/secured/bookstore/books/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
-                
+
                 permissions.add(permission);
             } else if ("create_book".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission("create_book");
@@ -175,7 +175,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 String partnerAddress = "/secured/bookstore/books/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
-                
+
                 permissions.add(permission);
             } else if ("create_image".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission("create_image");
@@ -184,7 +184,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 String partnerAddress = "/secured/bookstore/image/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
-                
+
                 permissions.add(permission);
             } else if ("read_balance".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission("read_balance");
@@ -193,7 +193,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 String partnerAddress = "/partners/balance/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
-                
+
                 permissions.add(permission);
             } else if ("create_balance".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission("create_balance");
@@ -202,7 +202,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 String partnerAddress = "/partners/balance/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
-                
+
                 permissions.add(permission);
             } else if ("read_data".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission("read_data");
@@ -211,7 +211,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 String partnerAddress = "/partners/data/*";
                 uris.add(partnerAddress);
                 permission.setUris(uris);
-                
+
                 permissions.add(permission);
             } else if ("openid".equals(requestedScope)) {
                 OAuthPermission permission = new OAuthPermission("openid", "Authenticate user");
@@ -220,7 +220,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                 throw new OAuthServiceException("invalid_scope");
             }
         }
-        
+
         return permissions;
     }
 }

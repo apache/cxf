@@ -41,7 +41,7 @@ public final class NameUtil {
 
     private NameUtil() {
     }
-    
+
     static {
         for (int t0 = 0; t0 < 5; t0++) {
             for (int t1 = 0; t1 < 5; t1++) {
@@ -266,5 +266,5 @@ public final class NameUtil {
 
     public static String mangleNameToVariableName(String name) {
         return toMixedCaseName(toWordList(name), false);
-    }    
+    }
 }

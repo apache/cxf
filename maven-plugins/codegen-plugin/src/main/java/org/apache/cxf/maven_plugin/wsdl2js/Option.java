@@ -63,7 +63,7 @@ public class Option {
         public void setPrefix(String prefix) {
             this.prefix = prefix;
         }
-    
+
     }
 
     /**
@@ -71,7 +71,7 @@ public class Option {
      */
     UriPrefixPair[] packagePrefixes;
     /**
-     * OASIS catalog file for use when reading the WSDL. 
+     * OASIS catalog file for use when reading the WSDL.
      */
     File catalog;
     /**
@@ -79,7 +79,7 @@ public class Option {
      */
     File output;
     /**
-     * Whether to validate the WSDL. 
+     * Whether to validate the WSDL.
      */
     String validate;
     /**
@@ -87,14 +87,14 @@ public class Option {
      */
     String wsdlVersion;
     /**
-     * A set of dependent files used to detect that the generator must process WSDL, even 
+     * A set of dependent files used to detect that the generator must process WSDL, even
      * if generator marker files are up to date.
      */
     File dependencies[];
 
     public Option() {
     }
-    
+
     public void merge(Option other) {
         if (catalog == null) {
             catalog = other.getCatalog();
@@ -141,7 +141,7 @@ public class Option {
     }
 
     /**
-     * @return output directory. Default is set 
+     * @return output directory. Default is set
      * at the plugin level.
      */
     public File getOutput() {

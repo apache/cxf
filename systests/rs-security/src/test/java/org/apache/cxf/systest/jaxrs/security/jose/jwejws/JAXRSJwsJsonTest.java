@@ -53,26 +53,26 @@ import org.junit.Test;
 
 public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJwsJson.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerJwsJson.class, true));
         registerBouncyCastle();
     }
-    
+
     private static void registerBouncyCastle() throws Exception {
-        Security.addProvider(new BouncyCastleProvider());    
+        Security.addProvider(new BouncyCastleProvider());
     }
     @AfterClass
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);    
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
     }
-    
+
     @Test
     public void testJwsJsonPlainTextHmac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac";
-        BookStore bs = createBookStore(address, 
+        BookStore bs = createBookStore(address,
                                        "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties",
                                        null);
         String text = bs.echoText("book");
@@ -81,8 +81,8 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJwsJsonPlainTextHmacUnencoded() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac";
-        BookStore bs = createBookStore(address, 
-                                       Collections.singletonMap(JoseConstants.RSSEC_SIGNATURE_PROPS, 
+        BookStore bs = createBookStore(address,
+                                       Collections.singletonMap(JoseConstants.RSSEC_SIGNATURE_PROPS,
                                            "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"),
                                        null,
                                        false);
@@ -92,7 +92,7 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     @Test
     public void testJwsJsonBookBeanHmac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac";
-        BookStore bs = createBookStore(address, 
+        BookStore bs = createBookStore(address,
                                        "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties",
                                        Collections.singletonList(new JacksonJsonProvider()));
         Book book = bs.echoBook(new Book("book", 123L));
@@ -112,14 +112,14 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(JoseConstants.RSSEC_SIGNATURE_PROPS, jwkStoreProperty);
         props.put(JoseConstants.RSSEC_ENCRYPTION_PROPS, jwkStoreProperty);
-        BookStore bs = createBookStore(address, 
+        BookStore bs = createBookStore(address,
                                        props,
                                        extraProviders);
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }
-    
+
     @Test
     public void testJwsJsonBookDoubleHmac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac2";
@@ -128,14 +128,14 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties");
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, properties);
-        map.put(JoseConstants.RSSEC_SIGNATURE_IN_PROPS, 
+        map.put(JoseConstants.RSSEC_SIGNATURE_IN_PROPS,
                 "org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties");
         BookStore bs = createBookStore(address, map, null);
         Book book = bs.echoBook(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }
-    
+
     @Test
     public void testJwsJsonBookDoubleHmacSinglePropsFile() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac2";
@@ -143,30 +143,30 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac2.properties");
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, properties);
-        map.put(JoseConstants.RSSEC_SIGNATURE_IN_PROPS, 
+        map.put(JoseConstants.RSSEC_SIGNATURE_IN_PROPS,
                 "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
         BookStore bs = createBookStore(address, map, null);
         Book book = bs.echoBook2(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }
-    
+
     // Test signing an XML payload
     @Test
     public void testJwsJsonPlainTextHmacXML() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac";
-        BookStore bs = createBookStore(address, 
+        BookStore bs = createBookStore(address,
                                        "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties",
                                        null);
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
-    
+
     // Test signing with a bad signature key
     @Test
     public void testJwsJsonPlaintextHMACBadKey() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac";
-        BookStore bs = createBookStore(address, 
+        BookStore bs = createBookStore(address,
                                        "org/apache/cxf/systest/jaxrs/security/secret.jwk.bad.properties",
                                        null);
         try {
@@ -176,23 +176,23 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
             // expected
         }
     }
-    
+
     private BookStore createBookStore(String address, Object properties,
                                       List<?> extraProviders) throws Exception {
-        return createBookStore(address, 
+        return createBookStore(address,
                                Collections.singletonMap(JoseConstants.RSSEC_SIGNATURE_PROPS, properties),
                                extraProviders,
                                true);
     }
-    private BookStore createBookStore(String address, 
+    private BookStore createBookStore(String address,
                                       Map<String, Object> mapProperties,
                                       List<?> extraProviders) throws Exception {
-        return createBookStore(address, 
+        return createBookStore(address,
                                mapProperties,
                                extraProviders,
                                true);
     }
-    private BookStore createBookStore(String address, 
+    private BookStore createBookStore(String address,
                                       Map<String, Object> mapProperties,
                                       List<?> extraProviders,
                                       boolean encodePayload) throws Exception {
@@ -216,5 +216,5 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         bean.getProperties(true).putAll(mapProperties);
         return bean.create(BookStore.class);
     }
-    
+
 }

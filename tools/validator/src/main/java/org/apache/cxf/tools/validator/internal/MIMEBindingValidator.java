@@ -75,7 +75,7 @@ public class MIMEBindingValidator
                     if (gotRootPart) {
                         addErrorMessage("Operation("
                                         + operationName
-                                        + "): There's more than one soap body mime part" 
+                                        + "): There's more than one soap body mime part"
                                         + " in its binding input");
                         return false;
                     }
@@ -91,9 +91,9 @@ public class MIMEBindingValidator
         if (!gotRootPart) {
             addErrorMessage("Operation("
                             + operationName
-                            + "): There's no soap body in mime part" 
+                            + "): There's no soap body in mime part"
                             + " in its binding input");
-            return false;            
+            return false;
         }
         return true;
     }
@@ -116,7 +116,7 @@ public class MIMEBindingValidator
                     if (!partName.equals(mimeContnetPart)) {
                         addErrorMessage("Operation("
                                         + operationName
-                                        + "): Part attribute value for meme:content " 
+                                        + "): Part attribute value for meme:content "
                                         + "elements are different");
                         return false;
                     }

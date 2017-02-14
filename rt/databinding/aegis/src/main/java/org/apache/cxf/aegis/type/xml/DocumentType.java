@@ -57,7 +57,7 @@ public class DocumentType extends AegisType {
     }
 
     @Override
-    public void writeObject(Object object, MessageWriter writer, 
+    public void writeObject(Object object, MessageWriter writer,
                             Context context) throws DatabindingException {
         Document doc = (Document)object;
 

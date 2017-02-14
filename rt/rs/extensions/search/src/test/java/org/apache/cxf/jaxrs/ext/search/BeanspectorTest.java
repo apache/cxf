@@ -26,7 +26,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class BeanspectorTest extends Assert {
-    
+
     @Test
     public void testSimpleBean() throws SearchParseException {
         Beanspector<SimpleBean> bean = new Beanspector<SimpleBean>(new SimpleBean());
@@ -35,7 +35,7 @@ public class BeanspectorTest extends Assert {
         assertTrue(getters.contains("class"));
         assertTrue(getters.contains("a"));
         assertTrue(getters.contains("promised"));
-        
+
         Set<String> setters = bean.getSettersNames();
         assertEquals(1, setters.size());
         assertTrue(getters.contains("a"));
@@ -45,7 +45,7 @@ public class BeanspectorTest extends Assert {
     public void testMismatchedAccessorTypes() throws SearchParseException {
         new Beanspector<MismatchedTypes>(MismatchedTypes.class);
     }
-    
+
     @Ignore
     static class MismatchedTypes {
         public Date getFoo() {
@@ -57,12 +57,12 @@ public class BeanspectorTest extends Assert {
     }
     @Ignore
     static class SimpleBean {
-        
+
         public boolean isPromised() {
             return true;
         }
-        
-        
+
+
         public String getA() {
             return "a";
         }

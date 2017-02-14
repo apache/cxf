@@ -24,16 +24,16 @@ import javax.security.auth.Subject;
 import org.apache.cxf.Bus;
 
 public interface CXFInvocationHandlerData  {
-  
-    void setTarget(Object t); 
-    Object getTarget(); 
-    
-    void setBus(Bus bus); 
-    Bus getBus(); 
-    
-    void setManagedConnection(CXFManagedConnection managedConnection); 
-    CXFManagedConnection getManagedConnection(); 
+
+    void setTarget(Object t);
+    Object getTarget();
+
+    void setBus(Bus bus);
+    Bus getBus();
+
+    void setManagedConnection(CXFManagedConnection managedConnection);
+    CXFManagedConnection getManagedConnection();
 
     void setSubject(Subject subject);
-    Subject getSubject(); 
+    Subject getSubject();
 }

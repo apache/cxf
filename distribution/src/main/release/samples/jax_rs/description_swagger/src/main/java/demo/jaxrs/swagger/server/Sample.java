@@ -46,7 +46,7 @@ import com.wordnik.swagger.annotations.ApiImplicitParams;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 
-@Path("/sample") 
+@Path("/sample")
 @Api(value = "/sample", description = "Sample JAX-RS service with Swagger documentation")
 public class Sample {
     private Map<String, Item> items;
@@ -61,21 +61,21 @@ public class Sample {
     @Produces({ MediaType.APPLICATION_JSON })
     @GET
     @ApiOperation(
-        value = "Get operation with Response and @Default value", 
-        notes = "Get operation with Response and @Default value", 
-        response = Item.class, 
+        value = "Get operation with Response and @Default value",
+        notes = "Get operation with Response and @Default value",
+        response = Item.class,
         responseContainer = "List"
     )
     public Response getItems(
         @ApiParam(value = "Page to fetch", required = true) @QueryParam("page") @DefaultValue("1") int page) {
         return Response.ok(items.values()).build();
     }
-    
+
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("/{name}")
     @GET
     @ApiOperation(
-        value = "Get operation with type and headers", 
+        value = "Get operation with type and headers",
         notes = "Get operation with type and headers",
         response = Item.class
     )
@@ -84,51 +84,51 @@ public class Sample {
         @ApiParam(value = "name", required = true) @PathParam("name") String name) {
         return items.get(name);
     }
-    
+
     @Consumes({ MediaType.APPLICATION_JSON })
     @POST
     @ApiOperation(
-        value = "Post operation with entity in a body", 
+        value = "Post operation with entity in a body",
         notes = "Post operation with entity in a body",
         response = Item.class
     )
     public Response createItem(
         @Context final UriInfo uriInfo,
         @ApiParam(value = "item", required = true) final Item item) {
-        items.put(item.getName(), item);        
+        items.put(item.getName(), item);
         return Response
             .created(uriInfo.getBaseUriBuilder().path(item.getName()).build())
             .entity(item).build();
     }
-    
+
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("/{name}")
     @PUT
     @ApiOperation(
-        value = "Put operation with form parameter", 
+        value = "Put operation with form parameter",
         notes = "Put operation with form parameter",
         response = Item.class
     )
     public Item updateItem(
         @ApiParam(value = "name", required = true) @PathParam("name") String name,
-        @ApiParam(value = "value", required = true) @FormParam("value") String value) {        
+        @ApiParam(value = "value", required = true) @FormParam("value") String value) {
         Item item = new Item(name, value);
         items.put(name,  item);
         return item;
     }
-    
+
     @Path("/{name}")
     @DELETE
     @ApiOperation(
-        value = "Delete operation with implicit header", 
+        value = "Delete operation with implicit header",
         notes = "Delete operation with implicit header"
     )
     @ApiImplicitParams(
        @ApiImplicitParam(
-           name = "Accept-Language", 
-           value = "language", 
-           required = true, 
-           dataType = "String", 
+           name = "Accept-Language",
+           value = "language",
+           required = true,
+           dataType = "String",
            paramType = "header"
        )
     )

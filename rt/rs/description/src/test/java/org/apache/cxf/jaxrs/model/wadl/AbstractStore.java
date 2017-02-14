@@ -22,12 +22,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 public class AbstractStore<T> {
-    
+
     @Path("/thestore")
     @GET
     public T getStoreArtifact() {
         return null;
     }
-    
+
 
 }

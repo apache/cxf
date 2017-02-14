@@ -51,16 +51,16 @@ import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
  * 1.0 representation using the WS-Addressing recommendation 200508 namespace.
  */
 public final class EncoderDecoder10AImpl extends EncoderDecoder {
-    
+
     public static final EncoderDecoder10AImpl INSTANCE = new EncoderDecoder10AImpl();
 
     private static AtomicReference<JAXBContext> jaxbContextReference = new AtomicReference<JAXBContext>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(EncoderDecoder10AImpl.class);
-    
+
     private EncoderDecoder10AImpl() {
     }
-    
+
     public String getWSRMNamespace() {
         return RM10Constants.NAMESPACE_URI;
     }
@@ -113,10 +113,10 @@ public final class EncoderDecoder10AImpl extends EncoderDecoder {
             if (last) {
                 toseq.setLastMessage(new org.apache.cxf.ws.rm.v200502wsa15.SequenceType.LastMessage());
             }
-            JAXBElement<org.apache.cxf.ws.rm.v200502wsa15.SequenceType> element 
+            JAXBElement<org.apache.cxf.ws.rm.v200502wsa15.SequenceType> element
                 = RMUtils.getWSRM200502WSA200508Factory().createSequence(toseq);
             marshaller.marshal(element, header);
-        } 
+        }
         if (null != acks) {
             LOG.log(Level.FINE, "encoding sequence acknowledgement(s) into RM header");
             for (SequenceAcknowledgement ack : acks) {
@@ -178,7 +178,7 @@ public final class EncoderDecoder10AImpl extends EncoderDecoder {
             = unmarshaller.unmarshal(elem, org.apache.cxf.ws.rm.v200502wsa15.SequenceType.class);
         return VersionTransformer.convert(jaxbElement.getValue());
     }
-    
+
     public CloseSequenceType decodeSequenceTypeCloseSequence(Element elem) throws JAXBException {
         Unmarshaller unmarshaller = getContext().createUnmarshaller();
         JAXBElement<org.apache.cxf.ws.rm.v200502wsa15.SequenceType> jaxbElement
@@ -211,7 +211,7 @@ public final class EncoderDecoder10AImpl extends EncoderDecoder {
     public Object convertToSend(CreateSequenceType create) {
         return VersionTransformer.convert200502wsa15(create);
     }
-    
+
     public Object convertToSend(TerminateSequenceType term) {
         return VersionTransformer.convert200502wsa15(term);
     }

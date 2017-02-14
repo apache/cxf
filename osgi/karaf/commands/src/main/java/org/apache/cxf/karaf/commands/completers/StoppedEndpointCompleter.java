@@ -25,7 +25,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Service;
 @Service
 public class StoppedEndpointCompleter extends EndpointCompleterSupport {
 
-    
+
     @Override
     protected boolean acceptsFeature(Server server) {
         return !server.isStarted();

@@ -24,11 +24,11 @@ package org.apache.cxf.ws.rm;
  * waiting for completion.
  */
 public class MessageCountingCallback implements MessageCallback {
-    
+
     /** Internal lock (rather than using this, so we can prevent any other access). */
     private Object lock = new Object();
     private volatile int countOutstanding;
-    
+
     @Override
     public void messageAccepted(String seqId, long msgNum) {
         synchronized (lock) {
@@ -45,19 +45,19 @@ public class MessageCountingCallback implements MessageCallback {
             }
         }
     }
-    
+
     /**
      * Get the number of messages accepted for sending which have not yet been acknowledged.
-     * 
+     *
      * @return count
      */
     public int getCountOutstanding() {
         return countOutstanding;
     }
-    
+
     /**
      * Wait for all accepted messages to be acknowledged.
-     * 
+     *
      * @param timeout maximum time to wait, in milliseconds (no timeout if 0)
      * @return <code>true</code> if all accepted messages acknowledged, <code>false</code> if timed out
      */
@@ -69,7 +69,7 @@ public class MessageCountingCallback implements MessageCallback {
                 if (timeout != 0) {
                     remain = start + timeout - System.currentTimeMillis();
                     if (remain <= 0) {
-                        return false; 
+                        return false;
                     }
                 }
                 try {

@@ -51,11 +51,11 @@ public class BookStore {
     private final Sse sse = SseFactory.create();
     private final CountDownLatch latch = new CountDownLatch(2);
     private final SseBroadcaster broadcaster;
-    
+
     public BookStore() {
         broadcaster = sse.newBroadcaster();
     }
-    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<Book> books() {
@@ -64,13 +64,13 @@ public class BookStore {
                 new Book("New Book #2", 2)
             );
     }
-    
+
     @GET
     @Path("sse/{id}")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void forBook(@Context SseEventSink sink, @PathParam("id") final String id, 
+    public void forBook(@Context SseEventSink sink, @PathParam("id") final String id,
             @HeaderParam(HttpHeaders.LAST_EVENT_ID_HEADER) @DefaultValue("0") final String lastEventId) {
-        
+
         new Thread() {
             public void run() {
                 try {
@@ -103,12 +103,12 @@ public class BookStore {
             latch.countDown();
         }
     }
-    
+
     @POST
     @Path("broadcast/close")
     public void stop() {
         try {
-            // Await a least 2 clients to be broadcasted over 
+            // Await a least 2 clients to be broadcasted over
             if (!latch.await(10, TimeUnit.SECONDS)) {
                 LOG.warn("Not enough clients have been connected, closing broadcaster anyway");
             }
@@ -116,16 +116,16 @@ public class BookStore {
             final Builder builder = sse.newEventBuilder();
             broadcaster.broadcast(createStatsEvent(builder.name("book"), 1000));
             broadcaster.broadcast(createStatsEvent(builder.name("book"), 2000));
-            
+
         } catch (final InterruptedException ex) {
             LOG.error("Wait has been interrupted", ex);
         }
-        
+
         if (broadcaster != null) {
             broadcaster.close();
         }
     }
-    
+
     private static OutboundSseEvent createStatsEvent(final OutboundSseEvent.Builder builder, final int eventId) {
         return builder
             .id(Integer.toString(eventId))

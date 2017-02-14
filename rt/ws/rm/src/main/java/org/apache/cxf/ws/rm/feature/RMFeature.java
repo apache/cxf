@@ -39,7 +39,7 @@ import org.apache.cxf.ws.rm.soap.RMSoapOutInterceptor;
 import org.apache.cxf.ws.rmp.v200502.RMAssertion;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
 public class RMFeature extends AbstractFeature {

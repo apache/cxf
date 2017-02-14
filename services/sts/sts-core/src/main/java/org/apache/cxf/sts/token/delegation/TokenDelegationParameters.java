@@ -30,8 +30,8 @@ import org.apache.cxf.sts.request.TokenRequirements;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 
 /**
- * This class encapsulates the parameters that will be passed to a TokenDelegationHandler instance to. 
- * It consists of both parameters that have been extracted from the request, as well as 
+ * This class encapsulates the parameters that will be passed to a TokenDelegationHandler instance to.
+ * It consists of both parameters that have been extracted from the request, as well as
  * configuration specific to the Operation itself (STSPropertiesMBean etc.)
  */
 public class TokenDelegationParameters {
@@ -46,7 +46,7 @@ public class TokenDelegationParameters {
     private String appliesToAddress;
     private Principal tokenPrincipal;
     private Set<Principal> tokenRoles;
-    
+
     public ReceivedToken getToken() {
         return token;
     }
@@ -62,7 +62,7 @@ public class TokenDelegationParameters {
     public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
-    
+
     public TokenRequirements getTokenRequirements() {
         return tokenRequirements;
     }
@@ -78,7 +78,7 @@ public class TokenDelegationParameters {
     public void setKeyRequirements(KeyRequirements keyRequirements) {
         this.keyRequirements = keyRequirements;
     }
-    
+
     public STSPropertiesMBean getStsProperties() {
         return stsProperties;
     }
@@ -86,11 +86,11 @@ public class TokenDelegationParameters {
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
+
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getPrincipal() {
         return principal;
     }
@@ -126,5 +126,5 @@ public class TokenDelegationParameters {
     public void setMessageContext(Map<String, Object> messageContext) {
         this.messageContext = messageContext;
     }
-    
+
 }

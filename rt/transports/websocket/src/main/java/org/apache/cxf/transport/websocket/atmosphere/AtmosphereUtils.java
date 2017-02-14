@@ -35,7 +35,7 @@ import org.atmosphere.interceptor.SSEAtmosphereInterceptor;
 import org.atmosphere.util.Utils;
 
 /**
- * 
+ *
  */
 public final class AtmosphereUtils {
 
@@ -49,7 +49,7 @@ public final class AtmosphereUtils {
         .interceptor(new SSEAtmosphereInterceptor()).interceptor(new JavaScriptProtocol());
 
         if (ais == null || ais instanceof AtmosphereInterceptor) {
-            framework.interceptor(ais == null 
+            framework.interceptor(ais == null
                 ? new DefaultProtocolInterceptor() : (AtmosphereInterceptor)ais);
             return;
         }
@@ -61,9 +61,9 @@ public final class AtmosphereUtils {
             }
         }
     }
-    
+
     public static boolean useAtmosphere(HttpServletRequest req) {
-        return Utils.webSocketEnabled(req) 
-            || req.getParameter(HeaderConfig.X_ATMOSPHERE_TRANSPORT) != null; 
+        return Utils.webSocketEnabled(req)
+            || req.getParameter(HeaderConfig.X_ATMOSPHERE_TRANSPORT) != null;
     }
 }

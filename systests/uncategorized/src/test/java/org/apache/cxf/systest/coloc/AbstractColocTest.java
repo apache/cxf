@@ -39,7 +39,7 @@ import org.junit.Before;
 
 public abstract class AbstractColocTest extends Assert {
     public static final String PORT = TestUtil.getPortNumber(AbstractColocTest.class);
-    
+
     /**
      * Cxf Bus
      */

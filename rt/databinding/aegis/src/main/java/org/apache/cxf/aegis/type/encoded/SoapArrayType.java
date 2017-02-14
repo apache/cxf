@@ -143,7 +143,7 @@ public class SoapArrayType extends AegisType {
                 compType = arrayTypeInfo.getType();
             }
             // check for an xsi:type override
-            compType = TypeUtil.getReadType(creader.getXMLStreamReader(), 
+            compType = TypeUtil.getReadType(creader.getXMLStreamReader(),
                                             context.getGlobalContext(), compType);
 
             // wrap type with soap ref to handle hrefs
@@ -277,7 +277,7 @@ public class SoapArrayType extends AegisType {
     public void writeObject(Object values,
             MessageWriter writer,
             Context context) throws DatabindingException {
-        
+
         if (values == null) {
             return;
         }
@@ -302,7 +302,7 @@ public class SoapArrayType extends AegisType {
                 getDimensions() - 1,
                 Array.getLength(values));
         // ensure that the writer writes out this prefix...
-        writer.getPrefixForNamespace(arrayTypeInfo.getTypeName().getNamespaceURI(), 
+        writer.getPrefixForNamespace(arrayTypeInfo.getTypeName().getNamespaceURI(),
                                      arrayTypeInfo.getTypeName().getPrefix());
         arrayTypeInfo.writeAttribute(writer);
 

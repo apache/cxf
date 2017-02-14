@@ -18,13 +18,13 @@
  */
 package org.apache.cxf.management.counters;
 
-public interface ResponseTimeCounterMBean {   
+public interface ResponseTimeCounterMBean {
     Number getNumInvocations();
     Number getNumCheckedApplicationFaults();
     Number getNumLogicalRuntimeFaults();
     Number getNumRuntimeFaults();
     Number getNumUnCheckedApplicationFaults();
-    
+
     /**
      * Get the Average Response Time
      * NOTE: if the invocation number is 0, this method
@@ -32,8 +32,8 @@ public interface ResponseTimeCounterMBean {
      */
     Number getAvgResponseTime();
     Number getMaxResponseTime();
-    Number getMinResponseTime();   
-    Number getTotalHandlingTime();   
+    Number getMinResponseTime();
+    Number getTotalHandlingTime();
     void reset();
     void enable(boolean value);
     boolean isEnabled();

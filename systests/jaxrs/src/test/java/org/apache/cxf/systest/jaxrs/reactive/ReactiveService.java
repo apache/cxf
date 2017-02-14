@@ -39,30 +39,30 @@ import rx.schedulers.Schedulers;
 
 @Path("/reactive")
 public class ReactiveService {
-    
+
     @GET
     @Produces("text/plain")
     @Path("text")
     public Observable<String> getText() {
         return Observable.just("Hello, world!");
     }
-    
+
     @GET
     @Produces("text/plain")
     @Path("textAsync")
     public void getTextAsync(@Suspended final AsyncResponse ar) {
         Observable.just("Hello, ").map(s -> s + "world!")
             .subscribe(new StringAsyncSubscriber(ar));
-        
+
     }
-    
+
     @GET
     @Produces("application/json")
     @Path("textJson")
     public Observable<HelloWorldBean> getJson() {
         return Observable.just(new HelloWorldBean());
     }
-    
+
     @GET
     @Produces("application/json")
     @Path("textJsonImplicitList")
@@ -83,11 +83,11 @@ public class ReactiveService {
                     Thread.sleep(2000);
                 } catch (InterruptedException ex) {
                     // ignore
-                }  
+                }
                 Observable.just(bean1, bean2).subscribe(new ListAsyncSubscriber<HelloWorldBean>(ar));
             }
         }).start();
-        
+
     }
     @GET
     @Produces("application/json")
@@ -107,9 +107,9 @@ public class ReactiveService {
         bean2.setGreeting("Ciao");
         return Observable.just(Arrays.asList(bean1, bean2));
     }
-    
+
     private class StringAsyncSubscriber extends AbstractAsyncSubscriber<String> {
-        
+
         private StringBuilder sb = new StringBuilder();
         StringAsyncSubscriber(AsyncResponse ar) {
             super(ar);
@@ -123,7 +123,7 @@ public class ReactiveService {
         public void onNext(String s) {
             sb.append(s);
         }
-        
+
     }
 }
 

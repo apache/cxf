@@ -34,11 +34,11 @@ public class LogicalMessageContextImpl extends WrappedMessageContext implements 
     public LogicalMessageContextImpl(Message wrapped) {
         super(wrapped, Scope.HANDLER);
     }
-      
+
     public LogicalMessage getMessage() {
         return new LogicalMessageImpl(this);
     }
-    
+
     public Object get(Object key) {
         Object o = super.get(key);
         if ((MessageContext.HTTP_RESPONSE_HEADERS.equals(key)

@@ -42,28 +42,28 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * In this test case, a CXF client requests a Security Token from an STS, passing a username that
  * it has obtained from an unknown client as an "OnBehalfOf" element. This username is obtained
- * by parsing the "security.username" property. The client then invokes on the service 
- * provider using the returned token from the STS. 
+ * by parsing the "security.username" property. The client then invokes on the service
+ * provider using the returned token from the STS.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
     static final String STAX_STSPORT2 = allocatePort(StaxSTSServer.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server2.class);
-    
+
     final TestParam test;
-    
+
     public UsernameOnBehalfOfTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -75,23 +75,23 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         STSServer stsServer = new STSServer();
         stsServer.setContext("cxf-x509.xml");
         assertTrue(launchServer(stsServer));
-        
+
         StaxSTSServer staxStsServer = new StaxSTSServer();
         staxStsServer.setContext("stax-cxf-x509.xml");
         assertTrue(launchServer(staxStsServer));
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT2)},
                                                 {new TestParam(PORT, true, STSPORT2)},
-                                                
+
                                                 {new TestParam(PORT, false, STAX_STSPORT2)},
                                                 {new TestParam(PORT, true, STAX_STSPORT2)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -111,13 +111,13 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameOnBehalfOfTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItOBOAsymmetricSAML2BearerPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
             service.getPort(portQName, DoubleItPortType.class);
         ((BindingProvider)port).getRequestContext().put("thread.local.request.context", "true");
         updateAddressPort(port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
@@ -127,20 +127,20 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
             "security.username", "alice"
         );
         doubleIt(port, 25);
-        
+
         ((java.io.Closeable)port).close();
-        
-        DoubleItPortType port2 = 
+
+        DoubleItPortType port2 =
             service.getPort(portQName, DoubleItPortType.class);
         ((BindingProvider)port2).getRequestContext().put("thread.local.request.context", "true");
         updateAddressPort(port2, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)port2, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port2);
         }
-        
+
         ((BindingProvider)port2).getRequestContext().put(
             "security.username", "eve"
         );
@@ -151,11 +151,11 @@ public class UsernameOnBehalfOfTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port2).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(2 * numToDouble, resp);

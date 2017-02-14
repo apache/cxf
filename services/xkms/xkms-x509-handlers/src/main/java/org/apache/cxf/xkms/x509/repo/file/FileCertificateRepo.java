@@ -75,7 +75,7 @@ public class FileCertificateRepo implements CertificateRepo {
     public void saveCACertificate(X509Certificate cert, UseKeyWithType id) {
         saveCategorizedCertificate(cert, id, false, true);
     }
-    
+
     public void saveCRL(X509CRL crl, UseKeyWithType id) {
         String name = crl.getIssuerX500Principal().getName();
         try {
@@ -84,7 +84,7 @@ public class FileCertificateRepo implements CertificateRepo {
             if (!p.matcher(path).find()) {
                 throw new URISyntaxException(path, "Input did not match [a-zA-Z_0-9-_].");
             }
-            
+
             File certFile = new File(storageDir + "/" + CRLS_PATH, path);
             certFile.getParentFile().mkdirs();
             try (FileOutputStream fos = new FileOutputStream(certFile);
@@ -182,7 +182,7 @@ public class FileCertificateRepo implements CertificateRepo {
             return (X509Certificate)certFactory.generateCertificate(fis);
         }
     }
-    
+
     public X509CRL readCRL(File crlFile) throws FileNotFoundException, CRLException, IOException {
         try (FileInputStream fis = new FileInputStream(crlFile)) {
             return (X509CRL)certFactory.generateCRL(fis);
@@ -232,7 +232,7 @@ public class FileCertificateRepo implements CertificateRepo {
         }
         return results;
     }
-    
+
     @Override
     public List<X509CRL> getCRLs() {
         List<X509CRL> results = new ArrayList<>();
@@ -252,7 +252,7 @@ public class FileCertificateRepo implements CertificateRepo {
             }
 
         }
-        
+
         return results;
     }
 
@@ -292,7 +292,7 @@ public class FileCertificateRepo implements CertificateRepo {
                     continue;
                 }
                 X509Certificate cert = readCertificate(certFile);
-                LOG.debug("Searching for " + subjectDn + ". Checking cert " 
+                LOG.debug("Searching for " + subjectDn + ". Checking cert "
                     + cert.getSubjectDN().getName() + ", " + cert.getSubjectX500Principal().getName());
                 String[] csDnArray = cert.getSubjectDN().getName().split(SPLIT_REGEX);
                 Arrays.sort(csDnArray);
@@ -313,8 +313,8 @@ public class FileCertificateRepo implements CertificateRepo {
         }
         return null;
     }
-    
-      
+
+
     private boolean arraysEqualsIgnoreCaseIgnoreWhiteSpace(String[] s1, String[] s2) {
         if (s1 == null || s2 == null || s1.length != s2.length) {
             return false;

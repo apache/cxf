@@ -42,12 +42,12 @@ public class DigestServer extends AbstractBusTestServerBase {
         URL resource = getClass()
             .getResource("jetty-realm.properties");
         File file = new File(resource.toURI());
-        
-        LoginService realm = 
+
+        LoginService realm =
             new HashLoginService("BookStoreRealm", file.getAbsolutePath());
         server.addBean(realm);
     }
-    
+
     protected void run() {
         //System.out.println("Starting Server");
 
@@ -63,20 +63,20 @@ public class DigestServer extends AbstractBusTestServerBase {
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
         }
-        
+
         webappcontext.setWar(warPath);
 
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
 
         server.setHandler(handlers);
-        
+
         try {
             configureServer();
             server.start();
         } catch (Exception e) {
             e.printStackTrace();
-        }     
+        }
     }
     public void tearDown() throws Exception {
         if (server != null) {

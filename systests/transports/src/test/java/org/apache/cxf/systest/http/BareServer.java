@@ -27,9 +27,9 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class BareServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BareServer.class);
-    
+
     Endpoint ep;
-    
+
     @Override
     protected void run() {
         Bus bus = new SpringBusFactory().createBus();
@@ -43,7 +43,7 @@ public class BareServer extends AbstractBusTestServerBase {
         ep.stop();
         ep = null;
     }
-    
+
     public static void main(String[] args) {
         try {
             // System.out.println("!!!!start");

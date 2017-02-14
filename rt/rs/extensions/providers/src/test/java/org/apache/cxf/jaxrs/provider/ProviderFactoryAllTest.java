@@ -39,67 +39,67 @@ public class ProviderFactoryAllTest extends Assert {
     public void setUp() {
         ServerProviderFactory.getInstance().clearProviders();
     }
-    
+
     @Test
     public void testAtomPojoProvider() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         AtomPojoProvider provider = new AtomPojoProvider();
         pf.registerUserProvider(provider);
         MessageBodyReader<?> feedReader = pf.createMessageBodyReader(Book.class,
-                                               Book.class, null, 
-                                               MediaType.valueOf("application/atom+xml"), 
+                                               Book.class, null,
+                                               MediaType.valueOf("application/atom+xml"),
                                                new MessageImpl());
         assertSame(feedReader, provider);
-        
-        MessageBodyReader<?> entryReader = pf.createMessageBodyReader(TagVO.class, 
-                                               TagVO.class, null, 
-                                               MediaType.valueOf("application/atom+xml;type=entry"), 
+
+        MessageBodyReader<?> entryReader = pf.createMessageBodyReader(TagVO.class,
+                                               TagVO.class, null,
+                                               MediaType.valueOf("application/atom+xml;type=entry"),
                                                new MessageImpl());
         assertSame(entryReader, provider);
     }
-    
-    
+
+
     @Test
     public void testCustomJsonProvider() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         JSONProvider<Book> provider = new JSONProvider<Book>();
         pf.registerUserProvider(provider);
-        MessageBodyReader<?> customJsonReader = pf.createMessageBodyReader(Book.class, null, null, 
+        MessageBodyReader<?> customJsonReader = pf.createMessageBodyReader(Book.class, null, null,
                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
         assertSame(customJsonReader, provider);
-        
-        MessageBodyWriter<?> customJsonWriter = pf.createMessageBodyWriter(Book.class, null, null, 
+
+        MessageBodyWriter<?> customJsonWriter = pf.createMessageBodyWriter(Book.class, null, null,
                                                MediaType.APPLICATION_JSON_TYPE, new MessageImpl());
         assertSame(customJsonWriter, provider);
     }
-    
-    private void verifyProvider(ProviderFactory pf, Class<?> type, Class<?> provider, String mediaType) 
+
+    private void verifyProvider(ProviderFactory pf, Class<?> type, Class<?> provider, String mediaType)
         throws Exception {
-        
+
         if (pf == null) {
             pf = ServerProviderFactory.getInstance();
         }
-        
+
         MediaType mType = MediaType.valueOf(mediaType);
-        
+
         MessageBodyReader<?> reader = pf.createMessageBodyReader(type, type, null, mType, new MessageImpl());
         assertSame("Unexpected provider found", provider, reader.getClass());
-    
+
         MessageBodyWriter<?> writer = pf.createMessageBodyWriter(type, type, null, mType, new MessageImpl());
         assertTrue("Unexpected provider found", provider == writer.getClass());
     }
-    
-    
-    private void verifyProvider(Class<?> type, Class<?> provider, String mediaType) 
+
+
+    private void verifyProvider(Class<?> type, Class<?> provider, String mediaType)
         throws Exception {
         verifyProvider(null, type, provider, mediaType);
-        
+
     }
-       
+
     @Test
     public void testGetJSONProviderConsumeMime() throws Exception {
-        verifyProvider(org.apache.cxf.jaxrs.resources.Book.class, JSONProvider.class, 
+        verifyProvider(org.apache.cxf.jaxrs.resources.Book.class, JSONProvider.class,
                        "application/json");
     }
-    
+
 }

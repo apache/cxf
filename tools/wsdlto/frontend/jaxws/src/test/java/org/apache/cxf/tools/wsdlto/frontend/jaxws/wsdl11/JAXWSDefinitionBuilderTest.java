@@ -171,7 +171,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         builder.build();
 
         Definition def = builder.getWSDLModel();
-        assertTrue(def.getServices().keySet().contains(new QName("http://apache.org/hello_world_soap_http", 
+        assertTrue(def.getServices().keySet().contains(new QName("http://apache.org/hello_world_soap_http",
                                                                  "SOAPService")));
     }
 }

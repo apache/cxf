@@ -30,13 +30,13 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
  * algorithm
  */
 public class CipherSuiteChecker extends AbstractPhaseInterceptor<Message> {
-    
+
     private String requiredAlgorithm;
-    
+
     public CipherSuiteChecker() {
         super(Phase.PRE_INVOKE);
     }
-    
+
     public CipherSuiteChecker(String phase) {
         super(phase);
     }
@@ -56,5 +56,5 @@ public class CipherSuiteChecker extends AbstractPhaseInterceptor<Message> {
         this.requiredAlgorithm = requiredAlgorithm;
     }
 
-    
+
 }

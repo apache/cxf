@@ -24,7 +24,7 @@ package org.apache.cxf.sts.request;
 public class Renewing {
     private boolean allowRenewing = true;
     private boolean allowRenewingAfterExpiry;
-    
+
     public boolean isAllowRenewing() {
         return allowRenewing;
     }

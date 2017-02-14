@@ -35,14 +35,14 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class UDPTransportTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(UDPTransportTest.class);
-    private static Server server; 
+    private static Server server;
 
-    @WebService(serviceName = "SOAPService", 
-        endpointInterface = "org.apache.hello_world.Greeter", 
+    @WebService(serviceName = "SOAPService",
+        endpointInterface = "org.apache.hello_world.Greeter",
         targetNamespace = "http://apache.org/hello_world")
     static class GreeterImpl implements Greeter {
         private String myName = "defaultGreeter";
@@ -57,8 +57,8 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
         public void pingMe() {
         }
     }
-    
-    
+
+
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         createStaticBus();
@@ -68,8 +68,8 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
         factory.setServiceBean(new GreeterImpl());
         server = factory.create();
     }
-    
-    @AfterClass 
+
+    @AfterClass
     public static void shutdown() throws Exception {
         if (server != null) {
             server.stop();
@@ -78,30 +78,30 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testSimpleUDP() throws Exception {
-        JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean(); 
+        JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean();
         fact.setAddress("udp://localhost:" + PORT);
         Greeter g = fact.create(Greeter.class);
         for (int x = 0; x < 5; x++) {
             assertEquals("Hello World", g.greetMe("World"));
         }
-               
+
         ((java.io.Closeable)g).close();
     }
     @Test
     public void testBroadcastUDP() throws Exception {
         // Disable the test on Redhat Enterprise Linux which doesn't enable the UDP broadcast by default
-        if (System.getProperties().getProperty("os.name").equals("Linux") 
+        if (System.getProperties().getProperty("os.name").equals("Linux")
             && System.getProperties().getProperty("os.version").indexOf("el") > 0) {
             System.out.println("Skipping broadcast test for REL");
             return;
         }
-        
+
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         int count = 0;
         while (interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
             if (!networkInterface.isUp() || networkInterface.isLoopback()) {
-                continue;  
+                continue;
             }
             count++;
         }
@@ -110,17 +110,17 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
             System.out.println("Skipping broadcast test");
             return;
         }
-            
-        JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean(); 
+
+        JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean();
         fact.setAddress("udp://:" + PORT + "/foo");
         Greeter g = fact.create(Greeter.class);
         assertEquals("Hello World", g.greetMe("World"));
         ((java.io.Closeable)g).close();
     }
-    
+
     @Test
     public void testLargeRequest() throws Exception {
-        JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean(); 
+        JaxWsProxyFactoryBean fact = new JaxWsProxyFactoryBean();
         fact.setAddress("udp://localhost:" + PORT);
         Greeter g = fact.create(Greeter.class);
         StringBuilder b = new StringBuilder(100000);
@@ -128,7 +128,7 @@ public class UDPTransportTest extends AbstractBusClientServerTestBase {
             b.append("Hello ");
         }
         assertEquals("Hello " + b.toString(), g.greetMe(b.toString()));
-               
+
         ((java.io.Closeable)g).close();
-    }    
+    }
 }

@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class ObjectWithAMapNs2 {
     private Map<String, Boolean> theMap;
-    
+
     public ObjectWithAMapNs2() {
         theMap = new HashMap<String, Boolean>();
         theMap.put("rainy", Boolean.TRUE);

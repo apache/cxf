@@ -40,7 +40,7 @@ public class IsAnnotationContaining extends IsCollectionContaining<Annotation> {
             }
         });
     }
-    
+
     public static IsAnnotationContaining hasItem(final String value) {
         return new IsAnnotationContaining(value);
     }

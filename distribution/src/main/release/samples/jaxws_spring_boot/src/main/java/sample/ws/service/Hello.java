@@ -34,12 +34,12 @@ import javax.xml.ws.ResponseWrapper;
 public interface Hello {
 
     @WebResult(name = "return", targetNamespace = "")
-    @RequestWrapper(localName = "sayHello", 
-                    targetNamespace = "http://service.ws.sample/", 
+    @RequestWrapper(localName = "sayHello",
+                    targetNamespace = "http://service.ws.sample/",
                     className = "sample.ws.service.SayHello")
     @WebMethod(action = "urn:SayHello")
-    @ResponseWrapper(localName = "sayHelloResponse", 
-                     targetNamespace = "http://service.ws.sample/", 
+    @ResponseWrapper(localName = "sayHelloResponse",
+                     targetNamespace = "http://service.ws.sample/",
                      className = "sample.ws.service.SayHelloResponse")
     String sayHello(@WebParam(name = "myname", targetNamespace = "") String myname);
 }

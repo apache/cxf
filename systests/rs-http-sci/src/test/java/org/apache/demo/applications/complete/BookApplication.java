@@ -26,7 +26,7 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-    
+
 
 import org.apache.demo.resources.BookStore;
 
@@ -36,7 +36,7 @@ public class BookApplication extends Application {
     public Set< Class< ? > > getClasses() {
         return new HashSet< Class< ? > >(Arrays.asList(JacksonJsonProvider.class));
     }
-    
+
     @Override
     public Set< Object > getSingletons() {
         return new HashSet< Object >(Arrays.asList(new BookStore()));

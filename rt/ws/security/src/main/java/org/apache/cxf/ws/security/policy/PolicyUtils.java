@@ -35,11 +35,11 @@ import org.apache.wss4j.policy.model.AbstractBinding;
  * Some common functionality that can be shared for working with policies
  */
 public final class PolicyUtils {
-    
+
     private PolicyUtils() {
         // complete
     }
-    
+
     public static Collection<AssertionInfo> getAllAssertionsByLocalname(
         AssertionInfoMap aim, String localname
     ) {
@@ -65,23 +65,23 @@ public final class PolicyUtils {
         if (ais != null && !ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
-            }    
+            }
             return true;
         }
         return false;
     }
-    
+
     public static boolean assertPolicy(AssertionInfoMap aim, String localname) {
         Collection<AssertionInfo> ais = getAllAssertionsByLocalname(aim, localname);
         if (!ais.isEmpty()) {
             for (AssertionInfo ai : ais) {
                 ai.setAsserted(true);
-            }    
+            }
             return true;
         }
         return false;
     }
-    
+
     public static AssertionInfo getFirstAssertionByLocalname(
         AssertionInfoMap aim, String localname
     ) {
@@ -106,9 +106,9 @@ public final class PolicyUtils {
 
         return (sp11Ais != null && !sp11Ais.isEmpty()) || (sp12Ais != null && !sp12Ais.isEmpty());
     }
-    
+
     public static AbstractBinding getSecurityBinding(AssertionInfoMap aim) {
-        
+
         AssertionInfo asymAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ASYMMETRIC_BINDING);
         if (asymAis != null) {
             asymAis.setAsserted(true);
@@ -120,13 +120,13 @@ public final class PolicyUtils {
             symAis.setAsserted(true);
             return (AbstractBinding)symAis.getAssertion();
         }
-        
+
         AssertionInfo transAis = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRANSPORT_BINDING);
         if (transAis != null) {
             transAis.setAsserted(true);
             return (AbstractBinding)transAis.getAssertion();
         }
-        
+
         return null;
     }
 

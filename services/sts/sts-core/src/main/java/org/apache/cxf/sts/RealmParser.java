@@ -23,13 +23,13 @@ import java.util.Map;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 
 /**
- * This interface defines a pluggable way of defining a realm for the current request.  
+ * This interface defines a pluggable way of defining a realm for the current request.
  */
 public interface RealmParser {
-    
+
     /**
      * Return the realm of the current request given a message context map
      */
     String parseRealm(Map<String, Object> messageContext) throws STSException;
-    
+
 }

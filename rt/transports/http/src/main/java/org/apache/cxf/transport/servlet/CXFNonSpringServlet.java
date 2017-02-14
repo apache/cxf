@@ -50,17 +50,17 @@ import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 
 public class CXFNonSpringServlet extends AbstractHTTPServlet {
     public static final String TRANSPORT_ID = "transportId";
-    
+
     private static final long serialVersionUID = -2437897227486327166L;
     private static final String IGNORE_SERVLET_CONTEXT_RESOLVER = "ignore.servlet.context.resolver";
-    
+
     protected Bus bus;
     private DestinationRegistry destinationRegistry;
     private boolean globalRegistry;
     private ServletController controller;
     private ClassLoader loader;
     private boolean loadBus = true;
-    
+
     public CXFNonSpringServlet() {
     }
 
@@ -95,7 +95,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         if (Boolean.valueOf(sc.getInitParameter(IGNORE_SERVLET_CONTEXT_RESOLVER))) {
             return;
         }
-        
+
         ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
         resourceManager.addResourceResolver(new ServletContextResourceResolver(sc.getServletContext()));
     }
@@ -103,7 +103,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     protected ClassLoader initClassLoader() {
         return bus.getExtension(ClassLoader.class);
     }
-    
+
     protected DestinationRegistry getDestinationRegistryFromBusOrDefault(final String transportId) {
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         try {
@@ -123,14 +123,14 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     protected void loadBus(ServletConfig sc) {
         this.bus = BusFactory.newInstance().createBus();
     }
-    
+
     protected ServletController createServletController(ServletConfig servletConfig) {
-        HttpServlet serviceListGeneratorServlet = 
+        HttpServlet serviceListGeneratorServlet =
             new ServiceListGeneratorServlet(destinationRegistry, bus);
         ServletController newController =
             new ServletController(destinationRegistry,
                                   servletConfig,
-                                  serviceListGeneratorServlet);        
+                                  serviceListGeneratorServlet);
         return newController;
     }
 
@@ -195,7 +195,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     public void destroy() {
         if (!globalRegistry) {
             for (String path : destinationRegistry.getDestinationsPaths()) {
-                // clean up the destination in case the destination itself can 
+                // clean up the destination in case the destination itself can
                 // no longer access the registry later
                 AbstractHTTPDestination dest = destinationRegistry.getDestinationForPath(path);
                 synchronized (dest) {
@@ -208,14 +208,14 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         destroyBus();
         super.destroy();
     }
-    
+
     public void destroyBus() {
         if (bus != null) {
             bus.shutdown(true);
             bus = null;
         }
     }
-    
+
     private static class HttpServletRequestFilter extends HttpServletRequestWrapper {
         private String filterName;
         private String servletPath;
@@ -224,7 +224,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
             super(request);
             this.filterName = filterName;
         }
-        
+
         @Override
         public String getServletPath() {
             if (servletPath == null) {
@@ -233,7 +233,7 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
                     Object registration = m.invoke(super.getServletContext(), new Object[]{filterName});
                     if (registration != null) {
                         m = registration.getClass().getMethod("getUrlPatternMappings", new Class[] {});
-                        Collection<String> mappings = 
+                        Collection<String> mappings =
                             CastUtils.cast((Collection<?>)m.invoke(registration, new Object[]{}));
                         if (!mappings.isEmpty()) {
                             String mapping = mappings.iterator().next();
@@ -249,10 +249,10 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
                     servletPath = "";
                 }
             }
-            
+
             return servletPath;
         }
-        
+
         @Override
         public String getPathInfo() {
             if (pathInfo == null) {

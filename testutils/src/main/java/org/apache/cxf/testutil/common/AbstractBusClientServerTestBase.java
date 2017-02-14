@@ -37,8 +37,8 @@ import org.junit.AfterClass;
 
 public abstract class AbstractBusClientServerTestBase extends AbstractClientServerTestBase {
 
-    protected static Bus staticBus; 
-    protected Bus bus; 
+    protected static Bus staticBus;
+    protected Bus bus;
 
     public void createBus(String config) throws Exception {
         if (config != null) {
@@ -48,11 +48,11 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
         }
         BusFactory.setDefaultBus(bus);
     }
-    
+
     public void createBus() throws Exception {
         createBus(null);
     }
-    
+
     public static Bus getStaticBus() {
         return staticBus;
     }
@@ -69,21 +69,21 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
     public static Bus createStaticBus() throws Exception {
         return createStaticBus(null);
     }
-    
+
     @After
     public void deleteBus() throws Exception {
         if (null != bus) {
             bus.shutdown(true);
             bus = null;
         }
-    } 
+    }
     @AfterClass
     public static void deleteStaticBus() throws Exception {
         if (null != staticBus) {
             staticBus.shutdown(true);
             staticBus = null;
         }
-    } 
+    }
 
 
     protected Bus getBus() {
@@ -96,14 +96,14 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
     protected void setBus(Bus b) {
         bus = b;
     }
-    
+
     protected HttpURLConnection getHttpConnection(String target) throws Exception {
-        URL url = new URL(target);        
-        
-        URLConnection connection = url.openConnection();            
-        
+        URL url = new URL(target);
+
+        URLConnection connection = url.openConnection();
+
         assertTrue(connection instanceof HttpURLConnection);
-        return (HttpURLConnection)connection;        
+        return (HttpURLConnection)connection;
     }
 
     protected boolean runClient(Runnable clientImpl, long timeOut, TimeUnit timeUnit)

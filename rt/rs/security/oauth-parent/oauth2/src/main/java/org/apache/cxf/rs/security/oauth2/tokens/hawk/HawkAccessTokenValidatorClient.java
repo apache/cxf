@@ -32,11 +32,11 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class HawkAccessTokenValidatorClient extends AbstractHawkAccessTokenValidator {
     private AccessTokenValidator validator;
-        
+
     public AccessTokenValidation validateAccessToken(MessageContext mc,
-                                                     String authScheme, 
-                                                     String authSchemeData, 
-                                                     MultivaluedMap<String, String> extraProps) 
+                                                     String authScheme,
+                                                     String authSchemeData,
+                                                     MultivaluedMap<String, String> extraProps)
         throws OAuthServiceException {
         if (isRemoteSignatureValidation()) {
             MultivaluedMap<String, String> map = new MetadataMap<String, String>();
@@ -49,11 +49,11 @@ public class HawkAccessTokenValidatorClient extends AbstractHawkAccessTokenValid
         } else {
             return super.validateAccessToken(mc, authScheme, authSchemeData, extraProps);
         }
-        
+
     }
     protected AccessTokenValidation getAccessTokenValidation(MessageContext mc,
-                                                             String authScheme, 
-                                                             String authSchemeData, 
+                                                             String authScheme,
+                                                             String authSchemeData,
                                                              MultivaluedMap<String, String> extraProps,
                                                              Map<String, String> schemeParams) {
         return validator.validateAccessToken(mc, authScheme, authSchemeData, extraProps);
@@ -61,10 +61,10 @@ public class HawkAccessTokenValidatorClient extends AbstractHawkAccessTokenValid
 
     public void setValidator(AccessTokenValidator validator) {
         List<String> schemes = validator.getSupportedAuthorizationSchemes();
-        if (!schemes.contains("*") && !schemes.contains(OAuthConstants.HAWK_AUTHORIZATION_SCHEME)) { 
+        if (!schemes.contains("*") && !schemes.contains(OAuthConstants.HAWK_AUTHORIZATION_SCHEME)) {
             throw new IllegalArgumentException();
         }
         this.validator = validator;
     }
-    
+
 }

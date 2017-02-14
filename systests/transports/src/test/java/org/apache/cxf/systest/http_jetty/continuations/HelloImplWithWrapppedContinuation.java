@@ -28,30 +28,30 @@ import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
 
 
-@WebService(name = "HelloContinuation", 
-            serviceName = "HelloContinuationService", 
-            portName = "HelloContinuationPort", 
+@WebService(name = "HelloContinuation",
+            serviceName = "HelloContinuationService",
+            portName = "HelloContinuationPort",
             targetNamespace = "http://cxf.apache.org/systest/jaxws",
             endpointInterface = "org.apache.cxf.systest.http_jetty.continuations.HelloContinuation")
 public class HelloImplWithWrapppedContinuation implements HelloContinuation {
-    
-    
-    private Map<String, Continuation> suspended = 
+
+
+    private Map<String, Continuation> suspended =
         new HashMap<String, Continuation>();
-    
-    
+
+
     @Resource
     private WebServiceContext context;
-    
+
     public String sayHi(String firstName, String secondName) {
-        
+
         Continuation continuation = getContinuation(firstName);
         if (continuation == null) {
             throw new RuntimeException("Failed to get continuation");
         }
         synchronized (continuation) {
             if (continuation.isNew()) {
-                Object userObject = secondName != null && secondName.length() > 0 
+                Object userObject = secondName != null && secondName.length() > 0
                                     ? secondName : null;
                 continuation.setObject(userObject);
                 long timeout = 20000;
@@ -62,8 +62,8 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
             } else {
                 StringBuilder sb = new StringBuilder();
                 sb.append(firstName);
-                
-                // if the actual parameter is not null 
+
+                // if the actual parameter is not null
                 if (secondName != null && secondName.length() > 0) {
                     String surname = continuation.getObject().toString();
                     sb.append(' ').append(surname);
@@ -90,22 +90,22 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
     }
 
     public void resumeRequest(final String name) {
-        
+
         Continuation suspendedCont = null;
         synchronized (suspended) {
             suspendedCont = suspended.get(name);
         }
-        
+
         if (suspendedCont != null) {
             synchronized (suspendedCont) {
                 suspendedCont.resume();
             }
         }
     }
-    
+
     private void suspendInvocation(String name, Continuation cont, long timeout) {
         try {
-            cont.suspend(timeout);    
+            cont.suspend(timeout);
         } finally {
             synchronized (suspended) {
                 suspended.put(name, cont);
@@ -113,7 +113,7 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
             }
         }
     }
-    
+
     private Continuation getContinuation(String name) {
         synchronized (suspended) {
             Continuation suspendedCont = suspended.remove(name);
@@ -121,8 +121,8 @@ public class HelloImplWithWrapppedContinuation implements HelloContinuation {
                 return suspendedCont;
             }
         }
-        
-        ContinuationProvider provider = 
+
+        ContinuationProvider provider =
             (ContinuationProvider)context.getMessageContext().get(ContinuationProvider.class.getName());
         return provider.getContinuation();
     }

@@ -279,7 +279,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
     }
 
     static JAXBBeanInfo findFromTypeAdapter(JAXBContextProxy context,
-                                            @SuppressWarnings("rawtypes") 
+                                            @SuppressWarnings("rawtypes")
                                              Class<? extends XmlAdapter> aclass) {
         Class<?> c2 = aclass;
         Type sp = c2.getGenericSuperclass();
@@ -469,8 +469,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             }
         }
     }
-    
-    
+
+
     private void buildExceptionType(MessagePartInfo part, Class<?> cls) {
         SchemaInfo schemaInfo = null;
         for (SchemaInfo s : serviceInfo.getSchemas()) {
@@ -484,22 +484,22 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         String[] propertyOrder = null;
         boolean respectXmlTypeNS = false;
         XmlSchema faultBeanSchema = null;
-        if (xmlTypeAnno != null && !StringUtils.isEmpty(xmlTypeAnno.namespace()) 
+        if (xmlTypeAnno != null && !StringUtils.isEmpty(xmlTypeAnno.namespace())
             && !xmlTypeAnno.namespace().equals(part.getElementQName().getNamespaceURI())) {
             respectXmlTypeNS = true;
             NamespaceMap nsMap = new NamespaceMap();
             nsMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, xmlTypeAnno.namespace());
             nsMap.add(WSDLConstants.NP_SCHEMA_XSD, WSDLConstants.NS_SCHEMA_XSD);
-            
+
             SchemaInfo faultBeanSchemaInfo = createSchemaIfNeeded(xmlTypeAnno.namespace(), nsMap);
-            faultBeanSchema = faultBeanSchemaInfo.getSchema(); 
+            faultBeanSchema = faultBeanSchemaInfo.getSchema();
         }
-        
+
         if (xmlTypeAnno != null &&  xmlTypeAnno.propOrder().length > 0) {
             propertyOrder = xmlTypeAnno.propOrder();
             //TODO: handle @XmlAccessOrder
         }
-                        
+
         XmlSchema schema = null;
         if (schemaInfo == null) {
             NamespaceMap nsMap = new NamespaceMap();
@@ -507,14 +507,14 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             nsMap.add(WSDLConstants.NP_SCHEMA_XSD, WSDLConstants.NS_SCHEMA_XSD);
             schemaInfo = createSchemaIfNeeded(part.getElementQName().getNamespaceURI(), nsMap);
 
-        } 
+        }
         schema = schemaInfo.getSchema();
-       
+
 
         // Before updating everything, make sure we haven't added this
         // type yet.  Multiple methods that throw the same exception
         // types will cause duplicates.
-        String faultTypeName = xmlTypeAnno != null && !StringUtils.isEmpty(xmlTypeAnno.name()) 
+        String faultTypeName = xmlTypeAnno != null && !StringUtils.isEmpty(xmlTypeAnno.name())
                ? xmlTypeAnno.name()  :  part.getElementQName().getLocalPart();
         XmlSchemaType existingType = schema.getTypeByName(faultTypeName);
         if (existingType != null) {
@@ -525,11 +525,11 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         el.setName(part.getElementQName().getLocalPart());
         part.setXmlSchema(el);
         schemaInfo.setElement(null);
-        
+
         if (respectXmlTypeNS) {
             schema = faultBeanSchema; //create complexType in the new created schema for xmlType
         }
-        
+
         XmlSchemaComplexType ct = new XmlSchemaComplexType(schema, true);
         ct.setName(faultTypeName);
 
@@ -568,7 +568,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             if ((type == null) && (m.getGenericReturnType() instanceof ParameterizedType)) {
                 type = m.getGenericReturnType();
             }
-            
+
             if (generateGenericType(type)) {
                 buildGenericElements(schema, seq, m, type);
             } else {
@@ -586,22 +586,22 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (Exception.class.isAssignableFrom(cls)) {
             addExceptionMessage(cls, schema, seq);
         }
-        
+
         if (propertyOrder != null) {
             if (propertyOrder.length == seq.getItems().size()) {
                 sortItems(seq, propertyOrder);
-            } else if (propertyOrder.length > 1 
+            } else if (propertyOrder.length > 1
                 || (propertyOrder.length == 1 && !propertyOrder[0].isEmpty())) {
-                LOG.log(Level.WARNING, "propOrder in @XmlType doesn't define all schema elements :" 
+                LOG.log(Level.WARNING, "propOrder in @XmlType doesn't define all schema elements :"
                     + Arrays.toString(propertyOrder));
             }
         }
-            
+
         if (xmlAccessorOrder != null && xmlAccessorOrder.value().equals(XmlAccessOrder.ALPHABETICAL)
             && propertyOrder == null) {
             sort(seq);
         }
-       
+
         schemas.addCrossImports();
         part.setProperty(JAXBDataBinding.class.getName() + ".CUSTOM_EXCEPTION", Boolean.TRUE);
     }
@@ -622,7 +622,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             //ignore, just won't have the message element
         }
     }
-    
+
     private boolean generateGenericType(Type type) {
         if (type instanceof ParameterizedType) {
             ParameterizedType paramType = (ParameterizedType)type;
@@ -633,7 +633,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         }
         return false;
     }
-    
+
     private void buildGenericElements(XmlSchema schema, XmlSchemaSequence seq, Field f) {
         XmlSchemaComplexType generics = new XmlSchemaComplexType(schema, true);
         Type type = f.getGenericType();
@@ -642,7 +642,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         generics.setName(typeName);
 
         Class<?> genericsClass = f.getType();
-        buildGenericSeq(schema, generics, genericsClass);   
+        buildGenericSeq(schema, generics, genericsClass);
 
         String name = Character.toLowerCase(f.getName().charAt(0)) + f.getName().substring(1);
         XmlSchemaElement newel = new XmlSchemaElement(schema, false);
@@ -653,20 +653,20 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             seq.getItems().add(newel);
         }
     }
-     
-    private void buildGenericElements(XmlSchema schema, XmlSchemaSequence seq, Method m, Type type) {       
+
+    private void buildGenericElements(XmlSchema schema, XmlSchemaSequence seq, Method m, Type type) {
         String rawType = ((ParameterizedType)type).getRawType().toString();
         String typeName = StringUtils.uncapitalize(rawType.substring(rawType.lastIndexOf(".") + 1));
-        
-        XmlSchemaComplexType generics = (XmlSchemaComplexType)schema.getTypeByName(typeName);        
+
+        XmlSchemaComplexType generics = (XmlSchemaComplexType)schema.getTypeByName(typeName);
         if (generics == null) {
             generics =  new XmlSchemaComplexType(schema, true);
             generics.setName(typeName);
         }
-        
+
         Class<?> genericsClass = m.getReturnType();
-        buildGenericSeq(schema, generics, genericsClass);  
-          
+        buildGenericSeq(schema, generics, genericsClass);
+
         int idx = m.getName().startsWith("get") ? 3 : 2;
         String name = m.getName().substring(idx);
         name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
@@ -678,19 +678,19 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             seq.getItems().add(newel);
         }
     }
-    
+
     private void buildGenericSeq(XmlSchema schema, XmlSchemaComplexType generics, Class<?> genericsClass) {
         XmlSchemaSequence genericsSeq = new XmlSchemaSequence();
         generics.setParticle(genericsSeq);
         XmlAccessType  accessType = Utils.getXmlAccessType(genericsClass);
-        
+
         for (Field f : Utils.getFields(genericsClass, accessType)) {
-            if (f.getGenericType() instanceof TypeVariable) {               
+            if (f.getGenericType() instanceof TypeVariable) {
                 String genericName = Character.toLowerCase(f.getName().charAt(0)) + f.getName().substring(1);
                 XmlSchemaElement genericEle = new XmlSchemaElement(schema, false);
                 genericEle.setName(genericName);
                 genericEle.setMinOccurs(0);
-                JAXBBeanInfo anyBean = getBeanInfo(context, f.getType()); 
+                JAXBBeanInfo anyBean = getBeanInfo(context, f.getType());
                 Iterator<QName> itr = anyBean.getTypeNames().iterator();
                 if (!itr.hasNext()) {
                     return;
@@ -700,7 +700,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 genericsSeq.getItems().add(genericEle);
             }
         }
-               
+
         for (Method genericMethod : Utils.getGetters(genericsClass, accessType)) {
             if (genericMethod.getGenericReturnType() instanceof TypeVariable) {
                 int idx = genericMethod.getName().startsWith("get") ? 3 : 2;
@@ -709,7 +709,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 XmlSchemaElement genericEle = new XmlSchemaElement(schema, false);
                 genericEle.setName(genericName);
                 genericEle.setMinOccurs(0);
-                JAXBBeanInfo anyBean = getBeanInfo(context, genericMethod.getReturnType()); 
+                JAXBBeanInfo anyBean = getBeanInfo(context, genericMethod.getReturnType());
                 Iterator<QName> itr = anyBean.getTypeNames().iterator();
                 if (!itr.hasNext()) {
                     return;
@@ -718,11 +718,11 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 genericEle.setSchemaTypeName(typeName);
                 genericsSeq.getItems().add(genericEle);
             }
-            
-        } 
+
+        }
     }
-    
-    
+
+
     static boolean isArray(Type cls) {
         if (cls instanceof Class) {
             return ((Class<?>)cls).isArray();
@@ -777,7 +777,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
 
         seq.getItems().add(el);
     }
-    
+
     private SchemaInfo createSchemaIfNeeded(String namespace, NamespaceMap nsMap) {
         SchemaInfo schemaInfo = serviceInfo.getSchema(namespace);
         if (schemaInfo == null) {
@@ -799,7 +799,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
     private boolean isExistSchemaElement(XmlSchema schema, QName qn) {
         return schema.getElementByName(qn) != null;
     }
-    
+
     private void sortItems(final XmlSchemaSequence seq, final String[] propertyOrder) {
         final List<String> propList = Arrays.asList(propertyOrder);
         Collections.sort(seq.getItems(), new Comparator<XmlSchemaSequenceMember>() {
@@ -810,7 +810,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 int index2 = propList.indexOf(element2.getName());
                 return index1 - index2;
             }
-        
+
         });
     }
     //sort to Alphabetical order
@@ -821,8 +821,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 XmlSchemaElement element2 = (XmlSchemaElement)o2;
                 return element1.getName().compareTo(element2.getName());
             }
-        
+
         });
     }
-    
+
 }

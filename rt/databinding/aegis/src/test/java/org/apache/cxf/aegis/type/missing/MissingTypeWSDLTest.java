@@ -28,7 +28,7 @@ import org.apache.cxf.service.invoker.BeanInvoker;
 import org.junit.Test;
 
 public class MissingTypeWSDLTest extends AbstractAegisTest {
-    
+
     @Test
     public void testMissingTransliteration() throws Exception {
         Server server = createService(MissingType.class, new MissingTypeImpl(), null);

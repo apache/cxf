@@ -25,17 +25,17 @@ import javax.xml.ws.WebServiceContext;
 
 
 @javax.jws.WebService(
-    serviceName = "SOAPServiceWSSecurity", 
-    portName = "TimestampSignEncrypt", 
+    serviceName = "SOAPServiceWSSecurity",
+    portName = "TimestampSignEncrypt",
     endpointInterface = "org.apache.hello_world_soap_http.Greeter",
     targetNamespace = "http://apache.org/hello_world_soap_http",
     wsdlLocation = "org/apache/cxf/systest/ws/security/hello_world.wsdl"
 )
-public class GreeterImpl 
+public class GreeterImpl
     extends org.apache.hello_world_soap_http.GreeterImpl {
-    
+
     private static Principal user;
-    
+
     public static Principal getUser() {
         return user;
     }
@@ -45,12 +45,12 @@ public class GreeterImpl
         Principal p = ctx.getUserPrincipal();
         if (p != null) {
             user = p;
-        }        
-        
+        }
+
         //System.out.println("\n\n*** GreetMe called with: " + me + "***\n\n");
         return "Hello " + me;
     }
-    
+
     public String sayHi() {
         WebServiceContext ctx = super.getContext();
         Principal p = ctx.getUserPrincipal();
@@ -59,5 +59,5 @@ public class GreeterImpl
         }
         return super.sayHi();
     }
-    
+
 }

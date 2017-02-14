@@ -35,20 +35,20 @@ public class RountripTest extends AbstractSimpleFrontendTest {
         svrBean.setAddress("http://localhost/Hello");
         svrBean.setTransportId("http://schemas.xmlsoap.org/soap/http");
         svrBean.setServiceBean(new HelloServiceImpl());
-        svrBean.setServiceClass(HelloService.class);        
+        svrBean.setServiceClass(HelloService.class);
         svrBean.setBus(getBus());
-        
+
         svrBean.create();
-        
+
         ClientProxyFactoryBean proxyFactory = new ClientProxyFactoryBean();
         ClientFactoryBean clientBean = proxyFactory.getClientFactoryBean();
         clientBean.setAddress("http://localhost/Hello");
         clientBean.setTransportId("http://schemas.xmlsoap.org/soap/http");
         clientBean.setServiceClass(HelloService.class);
         clientBean.setBus(getBus());
-        
+
         HelloService client = (HelloService) proxyFactory.create();
-        
+
         assertEquals("hello", client.sayHello());
         assertEquals("hello", client.echo("hello"));
     }
@@ -66,7 +66,7 @@ public class RountripTest extends AbstractSimpleFrontendTest {
                                          "SOAPService"));
         svrBean.setWsdlLocation("testutils/hello_world_doc_lit.wsdl");
         svrBean.setBus(getBus());
-        
+
         svrBean.create();
     }
 }

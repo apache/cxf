@@ -47,9 +47,9 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
     }
     protected void validateAuthenticationTag(JweDecryptionInput jweDecryptionInput, byte[] theCek) {
         byte[] actualAuthTag = jweDecryptionInput.getAuthTag();
-        
-        final AesCbcHmacJweEncryption.MacState macState = 
-            AesCbcHmacJweEncryption.getInitializedMacState(theCek, 
+
+        final AesCbcHmacJweEncryption.MacState macState =
+            AesCbcHmacJweEncryption.getInitializedMacState(theCek,
                                                            jweDecryptionInput.getInitVector(),
                                                            jweDecryptionInput.getAad(),
                                                            jweDecryptionInput.getJweHeaders(),
@@ -60,7 +60,7 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
             LOG.warning("Invalid authentication tag");
             throw new JweException(JweException.Error.CONTENT_DECRYPTION_FAILURE);
         }
-        
+
     }
     private static class AesCbcContentDecryptionAlgorithm extends AbstractContentEncryptionCipherProperties
         implements ContentDecryptionProvider {
@@ -81,7 +81,7 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
         }
     }
     private String validateCekAlgorithm(String cekAlgo) {
-        if (!AlgorithmUtils.isAesCbcHmac(cekAlgo) 
+        if (!AlgorithmUtils.isAesCbcHmac(cekAlgo)
             || supportedAlgo != null && !supportedAlgo.equals(cekAlgo)) {
             LOG.warning("Invalid content encryption algorithm");
             throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);

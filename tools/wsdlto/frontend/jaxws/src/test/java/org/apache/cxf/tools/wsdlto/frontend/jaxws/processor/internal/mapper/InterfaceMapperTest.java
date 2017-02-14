@@ -30,7 +30,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class InterfaceMapperTest extends Assert {
-    
+
     @Test
     public void testMap() throws Exception {
         InterfaceInfo interfaceInfo = new InterfaceInfo(new ServiceInfo(),
@@ -39,7 +39,7 @@ public class InterfaceMapperTest extends Assert {
 
         ToolContext context = new ToolContext();
         context.put(ToolConstants.CFG_WSDLURL, "http://localhost/?wsdl");
-        
+
         JavaInterface intf = new InterfaceMapper(context).map(interfaceInfo);
         assertNotNull(intf);
 
@@ -49,7 +49,7 @@ public class InterfaceMapperTest extends Assert {
         assertEquals("org.apache.hello_world_soap_http", intf.getPackageName());
         assertEquals("http://localhost/?wsdl", intf.getLocation());
     }
-    
+
     @Test
     public void testMapWithUniqueWsdlLoc() throws Exception {
         InterfaceInfo interfaceInfo = new InterfaceInfo(new ServiceInfo(),
@@ -59,7 +59,7 @@ public class InterfaceMapperTest extends Assert {
         ToolContext context = new ToolContext();
         context.put(ToolConstants.CFG_WSDLURL, "http://localhost/?wsdl");
         context.put(ToolConstants.CFG_WSDLLOCATION, "/foo/blah.wsdl");
-        
+
         JavaInterface intf = new InterfaceMapper(context).map(interfaceInfo);
         assertNotNull(intf);
 

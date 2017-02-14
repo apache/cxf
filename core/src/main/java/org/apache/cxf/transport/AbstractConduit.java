@@ -31,7 +31,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * allowing non-decoupled transports to be written without any
  * regard for the decoupled back-channel or partial response logic.
  */
-public abstract class AbstractConduit 
+public abstract class AbstractConduit
     extends AbstractObservable implements Conduit {
 
     protected final EndpointReferenceType target;
@@ -42,14 +42,14 @@ public abstract class AbstractConduit
 
     /**
      * @return the reference associated with the target Destination
-     */    
+     */
     public EndpointReferenceType getTarget() {
         return target;
     }
 
     /**
      * @param msg for which content should be closed.
-     */    
+     */
     public void close(Message msg) throws IOException {
         OutputStream os = msg.getContent(OutputStream.class);
         if (os != null) {
@@ -60,14 +60,14 @@ public abstract class AbstractConduit
             in.close();
         }
     }
-    
+
     /**
      * Close the conduit.
      */
     public void close() {
         // nothing to do by default
     }
-    
+
     public String toString() {
         return "conduit: " + this.getClass() + System.identityHashCode(this)
                + "target: "

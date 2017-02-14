@@ -25,7 +25,7 @@ import org.apache.cxf.service.model.BindingInfo;
 /**
  * An AbstractServiceConfiguration that gets the style
  * from the BindingInfo obtained parsing the WSDL.
- *  
+ *
  */
 public class WSDLBasedServiceConfiguration extends AbstractServiceConfiguration {
 

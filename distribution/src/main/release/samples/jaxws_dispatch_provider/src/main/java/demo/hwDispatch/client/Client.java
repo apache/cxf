@@ -120,14 +120,14 @@ public final class Client {
         DOMSource domRespPayload = dispDOMSrcPayload.invoke(domReqPayload);
 
         System.out.println("Response from server: "
-                           + fetchElementByName(domRespPayload.getNode(), 
+                           + fetchElementByName(domRespPayload.getNode(),
                                                 "greetMeResponse").getTextContent());
 
         System.exit(0);
     }
 
     private static Element fetchElementByName(Node parent, String name) {
-        Element ret = null;        
+        Element ret = null;
         Node node = parent.getFirstChild();
         while (node != null) {
             if (node instanceof Element && ((Element)node).getLocalName().equals(name)) {

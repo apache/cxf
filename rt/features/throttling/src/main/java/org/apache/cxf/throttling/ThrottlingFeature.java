@@ -24,11 +24,11 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
- * 
+ *
  */
 public class ThrottlingFeature extends AbstractFeature {
     final ThrottlingManager manager;
-    
+
     public ThrottlingFeature() {
         manager = null;
     }
@@ -36,7 +36,7 @@ public class ThrottlingFeature extends AbstractFeature {
     public ThrottlingFeature(ThrottlingManager manager) {
         this.manager = manager;
     }
-    
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         ThrottlingManager m = manager;

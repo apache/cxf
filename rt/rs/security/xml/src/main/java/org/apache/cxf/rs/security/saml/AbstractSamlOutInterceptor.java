@@ -30,26 +30,26 @@ import org.apache.wss4j.common.crypto.WSProviderConfig;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 
 public abstract class AbstractSamlOutInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+
     static {
         WSProviderConfig.init();
     }
-    
+
     private boolean useDeflateEncoding = true;
-    
+
     protected AbstractSamlOutInterceptor(String phase) {
         super(phase);
     }
-    
+
     public void setUseDeflateEncoding(boolean deflate) {
         useDeflateEncoding = deflate;
     }
-    
+
     protected SamlAssertionWrapper createAssertion(Message message) throws Fault {
         return SAMLUtils.createAssertion(message);
-        
+
     }
-    
+
     protected String encodeToken(String assertion) throws Base64Exception {
         byte[] tokenBytes = assertion.getBytes(StandardCharsets.UTF_8);
 

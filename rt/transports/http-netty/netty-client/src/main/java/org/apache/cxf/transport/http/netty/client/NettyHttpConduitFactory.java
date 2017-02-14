@@ -39,10 +39,10 @@ public class NettyHttpConduitFactory implements HTTPConduitFactory {
 
     //CXF specific
     public static final String USE_POLICY = "org.apache.cxf.transport.http.netty.usePolicy";
-    
+
     public enum UseAsyncPolicy {
         ALWAYS, ASYNC_ONLY, NEVER;
-        
+
         public static UseAsyncPolicy getPolicy(Object st) {
             if (st instanceof UseAsyncPolicy) {
                 return (UseAsyncPolicy)st;
@@ -64,21 +64,21 @@ public class NettyHttpConduitFactory implements HTTPConduitFactory {
             return ASYNC_ONLY;
         }
     };
-    
+
     UseAsyncPolicy policy;
     public NettyHttpConduitFactory() {
         io.netty.util.Version.identify();
         Object st = SystemPropertyAction.getPropertyOrNull(USE_POLICY);
         policy = UseAsyncPolicy.getPolicy(st);
     }
-    
+
     public UseAsyncPolicy getUseAsyncPolicy() {
         return policy;
     }
 
     @Override
-    public HTTPConduit createConduit(HTTPTransportFactory f, 
-                                     Bus bus, 
+    public HTTPConduit createConduit(HTTPTransportFactory f,
+                                     Bus bus,
                                      EndpointInfo localInfo,
                                      EndpointReferenceType target)
         throws IOException {
@@ -93,15 +93,15 @@ public class NettyHttpConduitFactory implements HTTPConduitFactory {
         }
         return new NettyHttpConduit(bus, localInfo, target, this);
     }
-    
-    
-    public HTTPConduit createConduit(Bus bus, 
+
+
+    public HTTPConduit createConduit(Bus bus,
                                      EndpointInfo localInfo,
                                      EndpointReferenceType target)
         throws IOException {
         return createConduit(null, bus, localInfo, target);
     }
-    
+
     protected void registerBusLifeListener(Bus bus, final EventLoopGroup group) {
         BusLifeCycleManager lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
         if (null != lifeCycleManager) {
@@ -122,9 +122,9 @@ public class NettyHttpConduitFactory implements HTTPConduitFactory {
                     // shutdown the EventLoopGroup
                     group.shutdownGracefully().syncUninterruptibly();
                 }
-                
+
             });
-        }  
+        }
     }
 
 }

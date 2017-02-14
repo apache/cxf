@@ -36,12 +36,12 @@ import org.junit.Test;
 
 
 /**
- * 
+ *
  */
 public class MEXTest extends Assert {
     static Server server;
     static Server mexServer;
-    
+
     @WebService(targetNamespace = "org.apache.cxf.ws.mex.test.Echo")
     public static class EchoImpl {
         @WebMethod
@@ -60,7 +60,7 @@ public class MEXTest extends Assert {
         factory.setAddress("local://Echo");
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         server = factory.create();
-        
+
         factory = new JaxWsServerFactoryBean();
         factory.setServiceBean(new MEXEndpoint(server));
         factory.setAddress("local://Echo-mex");
@@ -88,8 +88,8 @@ public class MEXTest extends Assert {
         MetadataExchange exc = proxyFac.create(MetadataExchange.class);
         Metadata metadata = exc.get2004();
         assertNotNull(metadata);
-        
-        
+
+
         proxyFac = new JaxWsProxyFactoryBean();
         proxyFac.setAddress("local://Echo");
         proxyFac.getClientFactoryBean().setTransportId(LocalTransportFactory.TRANSPORT_ID);

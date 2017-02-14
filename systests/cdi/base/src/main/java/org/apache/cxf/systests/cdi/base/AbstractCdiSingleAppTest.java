@@ -87,7 +87,7 @@ public abstract class AbstractCdiSingleAppTest extends AbstractBusClientServerTe
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         return wc;
     }
-    
+
     protected String getBasePath() {
         return "/rest/bookstore";
     }

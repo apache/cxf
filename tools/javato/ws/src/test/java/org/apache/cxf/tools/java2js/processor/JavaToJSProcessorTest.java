@@ -36,7 +36,7 @@ import org.junit.Test;
 public class JavaToJSProcessorTest extends ProcessorTestBase {
     JavaToJSProcessor processor = new JavaToJSProcessor();
     String classPath = "";
-    
+
     @Before
     public void startUp() throws Exception {
         env = new ToolContext();
@@ -46,7 +46,7 @@ public class JavaToJSProcessorTest extends ProcessorTestBase {
             System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
         }
     }
-    
+
     @After
     public void tearDown() {
         super.tearDown();

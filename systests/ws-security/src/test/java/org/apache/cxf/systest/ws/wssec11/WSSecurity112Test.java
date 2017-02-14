@@ -36,28 +36,28 @@ import org.junit.runners.Parameterized.Parameters;
 
 
 /**
- * This class runs the second half of the tests, as having all in 
+ * This class runs the second half of the tests, as having all in
  * the one class causes an out of memory problem in eclipse
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class WSSecurity112Test extends WSSecurity11Common {
     private static boolean unrestrictedPoliciesInstalled;
-    
+
     static {
         unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
     };
-    
+
     final TestParam test;
-    
+
     public WSSecurity112Test(TestParam type) {
         this.test = type;
     }
-    
+
     static class TestParam {
         final String prefix;
         final boolean streaming;
         final String port;
-        
+
         TestParam(String p, String port, boolean b) {
             prefix = p;
             this.port = port;
@@ -67,7 +67,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
             return prefix + ":" + port + ":" + (streaming ? "streaming" : "dom");
         }
     }
-      
+
     @BeforeClass
     public static void startServers() throws Exception {
         if (unrestrictedPoliciesInstalled) {
@@ -103,7 +103,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
             );
         }
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
         if (unrestrictedPoliciesInstalled) {
@@ -116,7 +116,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
                 {new TestParam("XD", Server12.PORT, false)},
                 {new TestParam("XD-ES", Server12.PORT, false)},
                 {new TestParam("XD-SEES", Server12.PORT, false)},
-                
+
                 {new TestParam("X", StaxServer12.PORT, false)},
                 {new TestParam("X-NoTimestamp", StaxServer12.PORT, false)},
                 {new TestParam("X-AES128", StaxServer12.PORT, false)},
@@ -133,7 +133,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
                 {new TestParam("XD", Server12Restricted.PORT, false)},
                 {new TestParam("XD-ES", Server12Restricted.PORT, false)},
                 {new TestParam("XD-SEES", Server12Restricted.PORT, false)},
-                
+
                 {new TestParam("X", StaxServer12Restricted.PORT, false)},
                 {new TestParam("X-NoTimestamp", StaxServer12Restricted.PORT, false)},
                 {new TestParam("XD", StaxServer12Restricted.PORT, false)},
@@ -142,7 +142,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
             });
         }
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -151,7 +151,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
 
     @Test
     public void testClientServer() throws IOException {
-        if ((!unrestrictedPoliciesInstalled) 
+        if ((!unrestrictedPoliciesInstalled)
                 && (WSSecurity11Common.isIBMJDK16())) {
             System.out.println("Not running as there is a problem with 1.6 jdk and restricted jars");
             return;
@@ -159,7 +159,7 @@ public class WSSecurity112Test extends WSSecurity11Common {
 
         runClientServer(test.prefix, test.port, unrestrictedPoliciesInstalled, test.streaming);
     }
-    
- 
-    
+
+
+
 }

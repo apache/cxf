@@ -39,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
     public boolean authenticate(Authenticate au) {
         return au.getUid().equals(au.getSid());
     }
-    
+
     public String getAuthentication(String sid) {
         return "get " + sid;
     }

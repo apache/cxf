@@ -48,7 +48,7 @@ public class XNodeTest extends Assert {
         String ns = "{http://apache.org/hello_world/messages}";
         definition.setTargetNamespace("http://apache.org/hello_world/messages");
         assertEquals(ns, definition.getPlainText());
-        
+
         XPortType portType = new XPortType();
         portType.setName("Greeter");
         portType.setParentNode(definition);

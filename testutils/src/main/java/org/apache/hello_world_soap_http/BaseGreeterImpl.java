@@ -49,7 +49,7 @@ public class BaseGreeterImpl implements Greeter {
 
     @Resource
     private WebServiceContext context;
-    
+
     private String prefix = "";
 
     private int invocationCount;
@@ -57,11 +57,11 @@ public class BaseGreeterImpl implements Greeter {
     public WebServiceContext getContext() {
         return context;
     }
-    
+
     public void setPrefix(String p) {
         prefix = p;
-    }    
-    
+    }
+
     public String getPrefix() {
         return prefix;
     }
@@ -73,8 +73,8 @@ public class BaseGreeterImpl implements Greeter {
         if ("principal".equals(me)) {
             return "Hello " + getContext().getUserPrincipal().getName();
         }
-        
-        
+
+
         LOG.info("Invoking greetMe " + prefix + me);
         invocationCount++;
         return "Hello " + me;
@@ -157,7 +157,7 @@ public class BaseGreeterImpl implements Greeter {
         /*not called */
     }
 
-    public Future<?> testDocLitFaultAsync(String faultType, 
+    public Future<?> testDocLitFaultAsync(String faultType,
         AsyncHandler<org.apache.hello_world_soap_http.types.TestDocLitFaultResponse> ah) {
         invocationCount++;
         System.err.println("In testDocLitFaultAsync 2");
@@ -218,12 +218,12 @@ public class BaseGreeterImpl implements Greeter {
                                                             int intElem) {
         return null;
     }
-    
-    public Future<?> testNillableAsync(String nillElem, 
+
+    public Future<?> testNillableAsync(String nillElem,
                                        int intElem,
                                        AsyncHandler<TestNillableResponse> asyncHandler) {
         return null;
     }
-    
+
 
 }

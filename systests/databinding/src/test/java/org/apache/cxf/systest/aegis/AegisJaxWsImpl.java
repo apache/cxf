@@ -32,7 +32,7 @@ import org.apache.cxf.systest.aegis.bean.Item;
 @Logging
 @WebService(endpointInterface = "org.apache.cxf.systest.aegis.AegisJaxWs")
 public class AegisJaxWsImpl implements AegisJaxWs {
-    
+
     Map<Integer, Item> items = new HashMap<Integer, Item>();
 
     public void addItem(Item item) {
@@ -53,8 +53,8 @@ public class AegisJaxWsImpl implements AegisJaxWs {
         fake.setData(key1 + ":" + key2);
         return fake;
     }
-    
-    
+
+
     public Integer getSimpleValue(Integer a, String b) {
         return a;
     }
@@ -62,7 +62,7 @@ public class AegisJaxWsImpl implements AegisJaxWs {
     public List<String> getStringList() {
         return Arrays.asList("a", "b", "c");
     }
-    
+
     public java.util.List<String> echoBigList(java.util.List<String> l) {
         return l;
     }

@@ -50,14 +50,14 @@ public class ServiceImpl implements Service {
         return collection;
     }
 
-    public Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>> 
+    public Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>>
     getByNames(Collection<NoDefaultConstructorBeanKey> keys) {
 
         if (keys == null) {
             throw new IllegalArgumentException("keys is null");
         }
 
-        Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>> map = 
+        Map<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>> map =
                 new HashMap<NoDefaultConstructorBeanKey, Collection<NoDefaultConstructorBean>>();
 
         Collection<NoDefaultConstructorBean> collection = new ArrayList<>();

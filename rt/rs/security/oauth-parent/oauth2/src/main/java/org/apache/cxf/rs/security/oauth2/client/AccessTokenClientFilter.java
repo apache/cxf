@@ -33,12 +33,12 @@ public class AccessTokenClientFilter extends AbstractAuthSupplier implements Cli
     public AccessTokenClientFilter() {
         super(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
     }
-    
+
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
-        requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, 
+        requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION,
                                               createAuthorizationHeader());
-        
+
     }
     protected ClientAccessToken getClientAccessToken() {
         ClientAccessToken at = super.getClientAccessToken();

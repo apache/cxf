@@ -40,7 +40,7 @@ public class OrbConfigurer  {
     public void setOrbArgs(List<String> args) {
         orbArgs = args;
     }
-    
+
     public List<String> getOrbArgs() {
         return orbArgs;
     }
@@ -48,7 +48,7 @@ public class OrbConfigurer  {
     public Properties getOrbProperties() {
         return orbProperties;
     }
-    
+
     public void setOrbProperties(Properties props) {
         orbProperties = props;
     }
@@ -67,7 +67,7 @@ public class OrbConfigurer  {
             factory = b.getExtension(CorbaBindingFactory.class);
         }
     }
-    
+
     @PostConstruct
     public void register() {
         if (factory != null) {

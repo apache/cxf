@@ -133,7 +133,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
             throw new ToolException("Did not find any services in WSDL");
         }
         Map<String, InterfaceInfo> interfaces = new LinkedHashMap<String, InterfaceInfo>();
-        
+
         ServiceInfo service0 = serviceList.get(0);
         SchemaCollection schemaCollection = service0.getXmlSchemaCollection();
         context.put(ToolConstants.XML_SCHEMA_COLLECTION, schemaCollection);

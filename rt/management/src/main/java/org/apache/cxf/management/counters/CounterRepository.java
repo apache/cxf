@@ -36,23 +36,23 @@ import org.apache.cxf.management.interceptor.ResponseTimeMessageInInterceptor;
 import org.apache.cxf.management.interceptor.ResponseTimeMessageInvokerInterceptor;
 import org.apache.cxf.management.interceptor.ResponseTimeMessageOutInterceptor;
 
-/* Counters are created and managed by CounterRepository 
+/* Counters are created and managed by CounterRepository
  * If a counter which is queried form the counterRepository is not exist,
  * the CounterRepository will create a counter and expose it to the JMX
- * Because we can get the instance of the counter object, 
- * it is not need to qurey the counter object from JMX 
+ * Because we can get the instance of the counter object,
+ * it is not need to qurey the counter object from JMX
  * */
 public class CounterRepository {
     private static final Logger LOG = LogUtils.getL7dLogger(CounterRepository.class);
-    
+
     private Map<ObjectName, Counter> counters;
     private Bus bus;
     private Lock counterCreationLock = new ReentrantLock();
-    
+
     public CounterRepository() {
         counters = new ConcurrentHashMap<ObjectName, Counter>();
     }
-    
+
     public void setBus(Bus b) {
         bus = b;
         if (bus != null) {
@@ -63,27 +63,27 @@ public class CounterRepository {
     public Bus getBus() {
         return bus;
     }
-        
+
     public Map<ObjectName, Counter> getCounters() {
         return counters;
     }
-    
+
     void registerInterceptorsToBus() {
         ResponseTimeMessageInInterceptor in = new ResponseTimeMessageInInterceptor();
         ResponseTimeMessageInvokerInterceptor invoker = new ResponseTimeMessageInvokerInterceptor();
         ResponseTimeMessageOutInterceptor out = new ResponseTimeMessageOutInterceptor();
-        
+
         bus.getInInterceptors().add(in);
         bus.getInInterceptors().add(invoker);
         bus.getOutInterceptors().add(out);
         bus.getOutFaultInterceptors().add(out);
-        bus.setExtension(this, CounterRepository.class); 
-        
+        bus.setExtension(this, CounterRepository.class);
+
         //create CounterRepositroyMoniter to writer the counter log
-        
+
         //if the service is stopped or removed, the counters should remove itself
     }
-    
+
     public void increaseCounter(ObjectName on, MessageHandlingTimeRecorder mhtr) {
         Counter counter = getCounter(on);
         if (null == counter) {
@@ -99,17 +99,17 @@ public class CounterRepository {
                 counterCreationLock.unlock();
             }
         }
-        counter.increase(mhtr);        
+        counter.increase(mhtr);
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Increase counter " + on + " with " + mhtr);
         }
     }
-    
+
     //find a counter
     public Counter getCounter(ObjectName on) {
         return counters.get(on);
     }
-    
+
     public Counter createCounter(ObjectName on) {
         Counter counter = null;
         counter = new ResponseTimeCounter(on);
@@ -121,10 +121,10 @@ public class CounterRepository {
                 LOG.log(Level.WARNING, "INSTRUMENTATION_REGISTER_FAULT_MSG",
                         new Object[]{on, e});
             }
-        }    
+        }
         return counter;
     }
-    
-    
+
+
 
 }

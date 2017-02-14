@@ -30,10 +30,10 @@ import org.apache.cxf.common.i18n.BundleUtils;
  * Encapsulation of version-specific WS-Addressing constants.
  */
 public class AddressingConstants {
-    private static final ResourceBundle BUNDLE = 
+    private static final ResourceBundle BUNDLE =
         BundleUtils.getBundle(AddressingConstants.class);
-    
-    
+
+
     public AddressingConstants() {
     }
 
@@ -73,7 +73,7 @@ public class AddressingConstants {
     public String getAnonymousURI() {
         return Names.WSA_ANONYMOUS_ADDRESS;
     }
-    
+
     /**
      * @return None address URI
      */
@@ -87,21 +87,21 @@ public class AddressingConstants {
     public QName getFromQName() {
         return Names.WSA_FROM_QNAME;
     }
-    
+
     /**
      * @return QName of the To addressing header
-     */    
+     */
     public QName getToQName() {
         return Names.WSA_TO_QNAME;
     }
-    
+
     /**
      * @return QName of the ReplyTo addressing header
      */
     public QName getReplyToQName() {
         return Names.WSA_REPLYTO_QNAME;
     }
-    
+
     /**
      * @return QName of the FaultTo addressing header
      */
@@ -115,14 +115,14 @@ public class AddressingConstants {
     public QName getActionQName() {
         return Names.WSA_ACTION_QNAME;
     }
-    
+
     /**
      * @return QName of the MessageID addressing header
      */
     public QName getMessageIDQName() {
         return Names.WSA_MESSAGEID_QNAME;
     }
-    
+
     /**
      * @return Default value for RelationshipType indicating a reply
      * to the related message
@@ -130,85 +130,85 @@ public class AddressingConstants {
     public String getRelationshipReply() {
         return Names.WSA_RELATIONSHIP_REPLY;
     }
-    
+
     /**
      * @return QName of the RelatesTo addressing header
      */
     public QName getRelatesToQName() {
         return Names.WSA_RELATESTO_QNAME;
     }
-    
+
     /**
      * @return QName of the Relationship addressing header
      */
     public QName getRelationshipTypeQName() {
         return Names.WSA_RELATIONSHIPTYPE_QNAME;
     }
-    
+
     /**
      * @return QName of the Metadata
      */
     public QName getMetadataQName() {
         return Names.WSA_METADATA_QNAME;
     }
-    
+
     /**
      * @return QName of the Address
      */
     public QName getAddressQName() {
         return Names.WSA_ADDRESS_QNAME;
     }
-    
-   
+
+
     /**
      * @return QName of the reference parameter marker
      */
     public QName getIsReferenceParameterQName() {
         return Names.WSA_IS_REFERENCE_PARAMETER_QNAME;
     }
-    
+
     /**
      * @return QName of the Invalid Message Addressing Property fault subcode
      */
     public QName getInvalidMapQName() {
         return Names.INVALID_MAP_QNAME;
     }
-    
+
     /**
      * @return QName of the Message Addressing Property Required fault subcode
      */
     public QName getMapRequiredQName() {
         return Names.MAP_REQUIRED_QNAME;
     }
-    
+
     /**
      * @return QName of the Destination Unreachable fault subcode
      */
     public QName getDestinationUnreachableQName() {
         return Names.DESTINATION_UNREACHABLE_QNAME;
     }
-    
+
     /**
      * @return QName of the Action Not Supported fault subcode
      */
     public QName getActionNotSupportedQName() {
         return Names.ACTION_NOT_SUPPORTED_QNAME;
     }
-    
+
     /**
      * @return QName of the Endpoint Unavailable fault subcode
      */
     public QName getEndpointUnavailableQName() {
         return Names.ENDPOINT_UNAVAILABLE_QNAME;
     }
-    
+
     /**
      * @return Default Fault Action
      */
     public String getDefaultFaultAction() {
         return Names.WSA_DEFAULT_FAULT_ACTION;
     }
-    
+
     /**
      * @return Action Not Supported text
      */
@@ -222,24 +222,24 @@ public class AddressingConstants {
     public String getDestinationUnreachableText() {
         return BUNDLE.getString("DESTINATION_UNREACHABLE_MSG");
     }
-    
+
     /**
      * @return Endpoint Unavailable text
      */
     public String getEndpointUnavailableText() {
         return BUNDLE.getString("ENDPOINT_UNAVAILABLE_MSG");
     }
-    
+
     /**
      * @return Invalid Message Addressing Property text
-     */    
+     */
     public String getInvalidMapText() {
         return BUNDLE.getString("INVALID_MAP_MSG");
     }
-    
+
     /**
      * @return Message Addressing Property Required text
-     */    
+     */
     public String getMapRequiredText() {
         return BUNDLE.getString("MAP_REQUIRED_MSG");
     }

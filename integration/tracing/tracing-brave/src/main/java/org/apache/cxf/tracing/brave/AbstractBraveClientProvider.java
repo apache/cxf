@@ -36,50 +36,50 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 
-public abstract class AbstractBraveClientProvider extends AbstractTracingProvider { 
+public abstract class AbstractBraveClientProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractBraveClientProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.client.brave.span";
-        
+
     private final Brave brave;
     private final SpanNameProvider spanNameProvider;
-        
+
     public AbstractBraveClientProvider(final Brave brave) {
         this.brave = brave;
         this.spanNameProvider = new ClientSpanNameProvider();
     }
 
-    protected TraceScopeHolder<Span> startTraceSpan(final Map<String, List<String>> requestHeaders, 
+    protected TraceScopeHolder<Span> startTraceSpan(final Map<String, List<String>> requestHeaders,
             URI uri, String method) {
         final HttpClientRequest request = new HttpClientRequest() {
             @Override
             public URI getUri() {
                 return uri;
             }
-            
+
             @Override
             public String getHttpMethod() {
                 return method;
             }
-            
+
             @Override
             public void addHeader(String header, String value) {
                 requestHeaders.put(header, Collections.singletonList(value));
             }
         };
-        
+
         brave.clientRequestInterceptor().handle(new HttpClientRequestAdapter(request, spanNameProvider));
         final Span span = brave.clientSpanThreadBinder().getCurrentClientSpan();
-        // In case of asynchronous client invocation, the span should be detached as JAX-RS 
+        // In case of asynchronous client invocation, the span should be detached as JAX-RS
         // client request / response filters are going to be executed in different threads.
         boolean detached = false;
         if (isAsyncInvocation() && span != null) {
             brave.clientSpanThreadBinder().setCurrentSpan(null);
             detached = true;
         }
-        
+
         return new TraceScopeHolder<Span>(span, detached);
     }
-    
+
     private boolean isAsyncInvocation() {
         return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
     }
@@ -88,15 +88,15 @@ public abstract class AbstractBraveClientProvider extends AbstractTracingProvide
         if (holder == null) {
             return;
         }
-        
+
         final Span span = holder.getScope();
         if (span != null) {
-            // If the client invocation was asynchronous , the trace span has been created 
+            // If the client invocation was asynchronous , the trace span has been created
             // in another thread and should be re-attached to the current one.
             if (holder.isDetached()) {
                 brave.clientSpanThreadBinder().setCurrentSpan(span);
             }
-            
+
             final HttpResponse response = () -> responseStatus;
             brave.clientResponseInterceptor().handle(new HttpClientResponseAdapter(response));
         }

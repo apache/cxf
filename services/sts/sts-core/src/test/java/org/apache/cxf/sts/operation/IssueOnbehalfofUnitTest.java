@@ -93,9 +93,9 @@ import org.apache.wss4j.dom.WSConstants;
  */
 public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
-    public static final QName REQUESTED_SECURITY_TOKEN = 
+    public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
-    
+
     /**
      * Test to successfully issue a SAML 2 token on-behalf-of a SAML 2 token
      */
@@ -107,7 +107,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
@@ -128,13 +128,13 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
-        
+
         TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
@@ -142,31 +142,31 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
 
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
         request.getAny().add(onbehalfofType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
 
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-    
+
     /**
      * Test to successfully issue a SAML 2 token on-behalf-of a SAML 1 token
      */
@@ -178,7 +178,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
@@ -199,13 +199,13 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
-        
+
         TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
@@ -213,14 +213,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
 
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
@@ -231,13 +231,13 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
 
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-    
+
     /**
      * Test to successfully issue a SAML 2 token on-behalf-of a SAML 2 Symmetric HOK token
      */
@@ -249,7 +249,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
@@ -273,7 +273,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
@@ -281,15 +281,15 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", 
+        Element samlToken =
+            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                             callbackHandler, null, STSConstants.SYMMETRIC_KEY_TYPE);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
 
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
@@ -300,7 +300,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
 
         // Issue a token
-        
+
         // This should fail as the default DelegationHandler does not allow HolderOfKey
         try {
             issueOperation.issue(request, null, msgCtx);
@@ -308,17 +308,17 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         } catch (STSException ex) {
             // expected
         }
-        
+
         TokenDelegationHandler delegationHandler = new HOKDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
-        
-        RequestSecurityTokenResponseCollectionType response = 
+
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-    
+
     /**
      * Test to successfully issue a SAML 2 token on-behalf-of a SAML 1 Symmetric HOK token
      */
@@ -330,7 +330,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
@@ -354,7 +354,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
@@ -362,15 +362,15 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", 
+        Element samlToken =
+            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey",
                             callbackHandler, null, STSConstants.SYMMETRIC_KEY_TYPE);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
 
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
@@ -381,7 +381,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
 
         // Issue a token
-        
+
         // This should fail as the default DelegationHandler does not allow HolderOfKey
         try {
             issueOperation.issue(request, null, msgCtx);
@@ -389,17 +389,17 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         } catch (STSException ex) {
             // expected
         }
-        
+
         TokenDelegationHandler delegationHandler = new HOKDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
-        
-        RequestSecurityTokenResponseCollectionType response = 
+
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-    
+
     /**
      * Test to successfully issue a SAML 2 token on-behalf-of a SAML 2 PublicKey HOK token
      */
@@ -411,7 +411,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
@@ -435,23 +435,23 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
-        
+
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", 
+        Element samlToken =
+            createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                             callbackHandler, null, STSConstants.PUBLIC_KEY_KEYTYPE);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
 
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
@@ -462,7 +462,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
 
         // Issue a token
-        
+
         // This should fail as the default DelegationHandler does not allow HolderOfKey
         try {
             issueOperation.issue(request, null, msgCtx);
@@ -470,17 +470,17 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         } catch (STSException ex) {
             // expected
         }
-        
+
         TokenDelegationHandler delegationHandler = new HOKDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
-        
-        RequestSecurityTokenResponseCollectionType response = 
+
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-    
+
     /**
      * Test to successfully issue a SAML 2 token on-behalf-of a SAML 1 PublicKey HOK token
      */
@@ -492,7 +492,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
@@ -516,23 +516,23 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
-        
+
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", 
+        Element samlToken =
+            createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey",
                             callbackHandler, null, STSConstants.PUBLIC_KEY_KEYTYPE);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
 
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
@@ -543,7 +543,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
 
         // Issue a token
-        
+
         // This should fail as the default DelegationHandler does not allow HolderOfKey
         try {
             issueOperation.issue(request, null, msgCtx);
@@ -551,17 +551,17 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         } catch (STSException ex) {
             // expected
         }
-        
+
         TokenDelegationHandler delegationHandler = new HOKDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
-        
-        RequestSecurityTokenResponseCollectionType response = 
+
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-    
+
     /**
      * Test to unsuccessfully issue a SAML 2 token on-behalf-of a SAML 2 token. The
      * problem is that the Audience Restriction URLs in the original token do not
@@ -575,7 +575,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
@@ -596,13 +596,13 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
-        
+
         TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
@@ -610,14 +610,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
 
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
@@ -629,7 +629,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Issue a token - this should work
         issueOperation.issue(request, null, msgCtx);
-        
+
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy2"));
         // This should fail
         try {
@@ -639,7 +639,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     /**
      * Test to unsuccessfully issue a SAML 2 token on-behalf-of a SAML 1 token. The
      * problem is that the Audience Restriction URLs in the original token do not
@@ -653,12 +653,12 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new SAMLTokenValidator());
         issueOperation.setTokenValidators(validatorList);
-        
+
         TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
@@ -680,7 +680,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
@@ -688,14 +688,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
 
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
@@ -707,7 +707,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Issue a token - this should work
         issueOperation.issue(request, null, msgCtx);
-        
+
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy2"));
         // This should fail
         try {
@@ -717,7 +717,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     /**
      * Test to successfully issue a SAML 2 token on-behalf-of a UsernameToken
      */
@@ -729,7 +729,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new UsernameTokenValidator());
@@ -753,31 +753,31 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
-        
+
         // Create a UsernameToken
         JAXBElement<UsernameTokenType> usernameTokenType = createUsernameToken("alice", "clarinet");
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(usernameTokenType);
-        
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
         request.getAny().add(onbehalfofType);
-        
+
 
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
 
         // Issue a token
-        
+
         // This should fail as the default DelegationHandler does not allow UsernameTokens
         try {
             issueOperation.issue(request, null, msgCtx);
@@ -785,17 +785,17 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         } catch (STSException ex) {
             // expected
         }
-        
+
         TokenDelegationHandler delegationHandler = new UsernameTokenDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
-        
-        RequestSecurityTokenResponseCollectionType response = 
+
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-    
+
     /**
      * Test to successfully issue a SAML 2 token on-behalf-of a UsernameToken
      */
@@ -807,7 +807,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new SAMLTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new UsernameTokenValidator());
@@ -831,29 +831,29 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
 
-        
+
         // Create a UsernameToken without password
         JAXBElement<UsernameTokenType> usernameTokenType = createUsernameToken("alice", null);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(usernameTokenType);
-        
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
         request.getAny().add(onbehalfofType);
-        
+
 
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         TokenDelegationHandler delegationHandler = new UsernameTokenDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
@@ -865,7 +865,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
 
     /**
      * Test to successfully issue a SAML 2 token (realm "B") on-behalf-of a SAML 2 token
@@ -874,16 +874,16 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testIssueSaml2TokenOnBehalfOfSaml2DifferentRealm() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
         List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         providerList.add(samlTokenProvider);
         issueOperation.setTokenProviders(providerList);
-        
+
         TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
@@ -895,7 +895,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -908,20 +908,20 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setRealmParser(new CustomRealmParser());
         stsProperties.setIdentityMapper(new CustomIdentityMapper());
         issueOperation.setStsProperties(stsProperties);
-        
+
         Map<String, RealmProperties> realms = createSamlRealms();
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
         request.getAny().add(tokenType);
-        
+
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey",
                     callbackHandler, realms, STSConstants.BEARER_KEY_KEYTYPE);
         Document doc = samlToken.getOwnerDocument();
@@ -929,17 +929,17 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
 
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
         request.getAny().add(onbehalfofType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         msgCtx.put("url", "https");
-        
+
         // Validate a token - this will fail as the tokenProvider doesn't understand how to handle
         // realm "B"
         //try {
@@ -947,36 +947,36 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         //} catch (STSException ex) {
         //    // expected
         //}
-        
+
         samlTokenProvider.setRealmMap(realms);
-        
-        RequestSecurityTokenResponseCollectionType response = 
+
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponseList = 
+        List<RequestSecurityTokenResponseType> securityTokenResponseList =
             response.getRequestSecurityTokenResponse();
 
-        assertTrue(!securityTokenResponseList.isEmpty());       
+        assertTrue(!securityTokenResponseList.isEmpty());
         RequestSecurityTokenResponseType securityTokenResponse = securityTokenResponseList.get(0);
-        
+
         // Test the generated token.
         Element assertion = null;
         for (Object tokenObject : securityTokenResponse.getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 assertion = (Element)rstType.getAny();
                 break;
             }
         }
-        
+
         assertNotNull(assertion);
         String tokenString = DOM2Writer.nodeToString(assertion);
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("ALICE"));
         assertTrue(tokenString.contains(SAML2Constants.CONF_BEARER));
     }
-    
+
     /**
      * Test to successfully issue a SAML 2 token on-behalf-of a SAML 2 token
      * but WS-Security user different than on-behalf-of subject
@@ -1010,13 +1010,13 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
-        
+
         TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
@@ -1024,14 +1024,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
 
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
@@ -1042,14 +1042,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         Principal principal = new CustomTokenPrincipal("bob");
         msgCtx.put(
-                SecurityContext.class.getName(), 
+                SecurityContext.class.getName(),
                 createSecurityContext(principal)
         );
 
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, principal, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
 
@@ -1058,7 +1058,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 assertion = (Element)rstType.getAny();
                 break;
@@ -1084,7 +1084,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Add Token Provider
         List<TokenProvider> providerList = new ArrayList<>();
-        List<AttributeStatementProvider> customProviderList = 
+        List<AttributeStatementProvider> customProviderList =
             new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
@@ -1112,7 +1112,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         issueOperation.setStsProperties(stsProperties);
-        
+
         TokenDelegationHandler delegationHandler = new SAMLDelegationHandler();
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
@@ -1124,7 +1124,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                     QNameConstants.TOKEN_TYPE, String.class, WSConstants.WSS_SAML2_TOKEN_TYPE
             );
@@ -1138,7 +1138,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         Element claimType = createClaimsType(docx);
         claimsType.getAny().add(claimType);
 
-        JAXBElement<ClaimsType> claimsTypeJaxb = 
+        JAXBElement<ClaimsType> claimsTypeJaxb =
             new JAXBElement<ClaimsType>(
                     QNameConstants.CLAIMS, ClaimsType.class, claimsType
             );
@@ -1146,14 +1146,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         // Get a SAML Token via the SAMLTokenProvider
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler);
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         OnBehalfOfType onbehalfof = new OnBehalfOfType();
         onbehalfof.setAny(samlToken);
 
-        JAXBElement<OnBehalfOfType> onbehalfofType = 
+        JAXBElement<OnBehalfOfType> onbehalfofType =
             new JAXBElement<OnBehalfOfType>(
                     QNameConstants.ON_BEHALF_OF, OnBehalfOfType.class, onbehalfof
             );
@@ -1164,14 +1164,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         Principal principal = new CustomTokenPrincipal("bob");
         msgCtx.put(
-                SecurityContext.class.getName(), 
+                SecurityContext.class.getName(),
                 createSecurityContext(principal)
         );
 
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, principal, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
 
@@ -1180,7 +1180,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         for (Object tokenObject : securityTokenResponse.get(0).getAny()) {
             if (tokenObject instanceof JAXBElement<?>
                 && REQUESTED_SECURITY_TOKEN.equals(((JAXBElement<?>)tokenObject).getName())) {
-                RequestedSecurityTokenType rstType = 
+                RequestedSecurityTokenType rstType =
                     (RequestedSecurityTokenType)((JAXBElement<?>)tokenObject).getValue();
                 assertion = (Element)rstType.getAny();
                 break;
@@ -1203,7 +1203,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
     private Element createSAMLAssertion(
             String tokenType, Crypto crypto, String signatureUsername, CallbackHandler callbackHandler
     ) throws WSSecurityException {
-        return createSAMLAssertion(tokenType, crypto, signatureUsername, 
+        return createSAMLAssertion(tokenType, crypto, signatureUsername,
                                    callbackHandler, null, STSConstants.BEARER_KEY_KEYTYPE);
     }
 
@@ -1217,7 +1217,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
 
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                     tokenType, keyType, crypto, signatureUsername, callbackHandler
             );
@@ -1232,7 +1232,7 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
     }
 
     private TokenProviderParameters createProviderParameters(
-            String tokenType, String keyType, Crypto crypto, 
+            String tokenType, String keyType, Crypto crypto,
             String signatureUsername, CallbackHandler callbackHandler
     ) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
@@ -1243,14 +1243,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
 
         KeyRequirements keyRequirements = new KeyRequirements();
         keyRequirements.setKeyType(keyType);
-        
+
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         ReceivedKey receivedKey = new ReceivedKey();
         receivedKey.setX509Cert(certs[0]);
         keyRequirements.setReceivedKey(receivedKey);
-        
+
         parameters.setKeyRequirements(keyRequirements);
 
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
@@ -1287,14 +1287,14 @@ public class IssueOnbehalfofUnitTest extends org.junit.Assert {
             PasswordString passwordString = new PasswordString();
             passwordString.setValue(password);
             passwordString.setType(WSConstants.PASSWORD_TEXT);
-            JAXBElement<PasswordString> passwordType = 
+            JAXBElement<PasswordString> passwordType =
                 new JAXBElement<PasswordString>(
                         QNameConstants.PASSWORD, PasswordString.class, passwordString
                 );
             usernameToken.getAny().add(passwordType);
         }
 
-        JAXBElement<UsernameTokenType> tokenType = 
+        JAXBElement<UsernameTokenType> tokenType =
             new JAXBElement<UsernameTokenType>(
                     QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );

@@ -27,13 +27,13 @@ import org.apache.cxf.service.model.EndpointInfo;
  * Create ordinary EndpointImpl objects.
  */
 public class SimpleEndpointImplFactory implements EndpointImplFactory {
-    
-    private static EndpointImplFactory singleton 
+
+    private static EndpointImplFactory singleton
         = new SimpleEndpointImplFactory();
 
     /** {@inheritDoc}
      */
-    public EndpointImpl newEndpointImpl(Bus bus, 
+    public EndpointImpl newEndpointImpl(Bus bus,
                                         Service service, EndpointInfo endpointInfo) throws EndpointException {
         return new EndpointImpl(bus, service, endpointInfo);
     }
@@ -46,5 +46,5 @@ public class SimpleEndpointImplFactory implements EndpointImplFactory {
     public static EndpointImplFactory getSingleton() {
         return singleton;
     }
-    
+
 }

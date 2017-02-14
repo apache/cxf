@@ -112,7 +112,7 @@ public class HTTPConduitTest extends Assert {
                      conduit.getURI().getPath(),
                      "/bar/foo");
     }
-    
+
 
 
     /**
@@ -208,7 +208,7 @@ public class HTTPConduitTest extends Assert {
         assertEquals("Wrong Authorization Token", "myauth", authorization.get(0));
 
         conduit.setAuthSupplier(null);
-        // Setting authorization policy on the message should override 
+        // Setting authorization policy on the message should override
         // conduit setting
         AuthorizationPolicy authPolicy = new AuthorizationPolicy();
         authPolicy.setUserName("Hello");

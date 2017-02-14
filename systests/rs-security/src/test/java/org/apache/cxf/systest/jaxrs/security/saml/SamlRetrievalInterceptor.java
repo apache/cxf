@@ -44,24 +44,24 @@ import org.apache.wss4j.dom.engine.WSSConfig;
  * context so that the Saml*Interceptors can write it out in a particular way.
  */
 public class SamlRetrievalInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+
     static {
         WSSConfig.init();
     }
-    
+
     protected SamlRetrievalInterceptor() {
         super(Phase.WRITE);
         addBefore(SamlFormOutInterceptor.class.getName());
         addBefore(SamlHeaderOutInterceptor.class.getName());
-    } 
+    }
 
     @Override
     public void handleMessage(Message message) throws Fault {
-        
+
         // Create a SAML Token
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(new SamlCallbackHandler(), samlCallback);
-        
+
         try {
             SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
             Document doc = DOMUtils.createDocument();
@@ -72,6 +72,6 @@ public class SamlRetrievalInterceptor extends AbstractPhaseInterceptor<Message> 
             ex.printStackTrace(new PrintWriter(sw));
             throw new Fault(new RuntimeException(ex.getMessage() + ", stacktrace: " + sw.toString()));
         }
-        
+
     }
 }

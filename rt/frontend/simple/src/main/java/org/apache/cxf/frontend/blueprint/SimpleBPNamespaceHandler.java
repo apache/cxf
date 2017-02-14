@@ -35,10 +35,10 @@ import org.osgi.service.blueprint.reflect.Metadata;
 @Namespaces("http://cxf.apache.org/blueprint/simple")
 public class SimpleBPNamespaceHandler extends BaseNamespaceHandler {
     private BlueprintContainer blueprintContainer;
-    
+
     public SimpleBPNamespaceHandler() {
     }
-    
+
     public URL getSchemaLocation(String namespace) {
         if ("http://cxf.apache.org/blueprint/simple".equals(namespace)) {
             return getClass().getClassLoader().getResource("schemas/blueprint/simple.xsd");
@@ -64,7 +64,7 @@ public class SimpleBPNamespaceHandler extends BaseNamespaceHandler {
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;
     }
-    
+
 
     public BlueprintContainer getBlueprintContainer() {
         return blueprintContainer;
@@ -73,5 +73,5 @@ public class SimpleBPNamespaceHandler extends BaseNamespaceHandler {
     public void setBlueprintContainer(BlueprintContainer blueprintContainer) {
         this.blueprintContainer = blueprintContainer;
     }
-    
+
 }

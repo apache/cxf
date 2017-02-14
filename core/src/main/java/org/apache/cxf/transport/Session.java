@@ -25,7 +25,7 @@ package org.apache.cxf.transport;
 public interface Session {
     /**
      * Get a variable from the session by the key.
-     * 
+     *
      * @param key
      * @return Value
      */
@@ -33,7 +33,7 @@ public interface Session {
 
     /**
      * Put a variable into the session with a key.
-     * 
+     *
      * @param key
      * @param value
      */

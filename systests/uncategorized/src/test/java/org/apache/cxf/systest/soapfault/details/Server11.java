@@ -29,7 +29,7 @@ public class Server11 extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server11.class);
 
 
-    protected void run()  {    
+    protected void run()  {
         Object implementor = new GreeterImpl11();
         String address = "http://localhost:"
             + PORT + "/SoapContext/GreeterPort";

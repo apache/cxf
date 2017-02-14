@@ -22,11 +22,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class OrderBean {
-    
+
     private Long id;
     private int weight;
-    private Title customerTitle; 
-    
+    private Title customerTitle;
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -39,7 +39,7 @@ public class OrderBean {
     public int getWeight() {
         return weight;
     }
-    
+
     public Title getCustomerTitle() {
         return customerTitle;
     }
@@ -50,5 +50,5 @@ public class OrderBean {
     public enum Title {
         MR,
         MS;
-    } 
+    }
 }

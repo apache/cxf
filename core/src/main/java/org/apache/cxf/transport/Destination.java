@@ -29,17 +29,17 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * unsolicited incoming messages from different peers.
  */
 public interface Destination extends Observable {
-    
+
     /**
      * @return the reference associated with this Destination
-     */    
+     */
     EndpointReferenceType getAddress();
-    
+
     /**
      * Retreive a back-channel Conduit, which must be policy-compatible
      * with the current Message and associated Destination. For example
      * compatible Quality of Protection must be asserted on the back-channel.
-     * 
+     *
      * @param inMessage the current message
      * @return a suitable Conduit
      */
@@ -50,6 +50,6 @@ public interface Destination extends Observable {
      * Shutdown the Destination, i.e. stop accepting incoming messages.
      */
     void shutdown();
-    
+
     MessageObserver getMessageObserver();
 }

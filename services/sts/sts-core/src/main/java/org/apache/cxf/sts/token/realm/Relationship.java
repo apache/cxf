@@ -35,54 +35,54 @@ public class Relationship {
 
     public static final String FED_TYPE_IDENTITY = "FederatedIdentity";
     public static final String FED_TYPE_CLAIMS = "FederatedClaims";
-    
-    
+
+
     private String sourceRealm;
     private String targetRealm;
     private IdentityMapper identityMapper;
     private ClaimsMapper claimsMapper;
     private String type;
-    
-    
+
+
     public void setSourceRealm(String sourceRealm) {
         this.sourceRealm = sourceRealm;
     }
-    
+
     public String getSourceRealm() {
         return sourceRealm;
     }
-    
+
     public void setTargetRealm(String targetRealm) {
         this.targetRealm = targetRealm;
     }
-    
+
     public String getTargetRealm() {
         return targetRealm;
     }
-    
+
     public void setIdentityMapper(IdentityMapper identityMapper) {
         this.identityMapper = identityMapper;
     }
-    
+
     public IdentityMapper getIdentityMapper() {
         return identityMapper;
     }
-    
+
     public void setClaimsMapper(ClaimsMapper claimsMapper) {
         this.claimsMapper = claimsMapper;
     }
-    
+
     public ClaimsMapper getClaimsMapper() {
         return claimsMapper;
     }
-    
+
     public void setType(String type) {
         this.type = type;
     }
-    
+
     public String getType() {
         return type;
     }
-    
+
 }
 

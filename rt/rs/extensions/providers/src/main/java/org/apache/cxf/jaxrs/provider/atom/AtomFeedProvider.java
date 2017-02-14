@@ -36,7 +36,7 @@ public class AtomFeedProvider extends AbstractAtomProvider<Feed> {
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return Feed.class.isAssignableFrom(type);
     }
-    
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return Feed.class.isAssignableFrom(type);
     }

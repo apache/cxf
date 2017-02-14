@@ -28,7 +28,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
 public class Server extends AbstractBusTestServerBase {
-    
+
     protected void run()  {
         String port = TestUtil.getPortNumber(Server.class);
 
@@ -36,17 +36,17 @@ public class Server extends AbstractBusTestServerBase {
         String address = "http://localhost:" + port + "/HandlerTest/SoapPort";
         Endpoint.publish(address, implementor);
     }
-    
+
 
 
     public static void main(String[] args) {
-        try { 
-            Server s = new Server(); 
+        try {
+            Server s = new Server();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally { 
+        } finally {
             System.out.println("done!");
         }
     }

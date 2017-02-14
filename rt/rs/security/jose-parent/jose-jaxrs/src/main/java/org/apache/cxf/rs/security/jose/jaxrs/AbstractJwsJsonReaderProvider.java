@@ -33,22 +33,22 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public class AbstractJwsJsonReaderProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJwsJsonReaderProvider.class);
-    
+
     private JwsSignatureVerifier sigVerifier;
     private String defaultMediaType;
     private Map<String, Object> entryProps;
-    
+
     public void setSignatureVerifier(JwsSignatureVerifier signatureVerifier) {
         this.sigVerifier = signatureVerifier;
     }
 
     protected JwsSignatureVerifier getInitializedSigVerifier() {
         if (sigVerifier != null) {
-            return sigVerifier;    
-        } 
+            return sigVerifier;
+        }
         return JwsUtils.loadSignatureVerifier(null, true);
     }
-    
+
     public String getDefaultMediaType() {
         return defaultMediaType;
     }
@@ -56,11 +56,11 @@ public class AbstractJwsJsonReaderProvider {
     public void setDefaultMediaType(String defaultMediaType) {
         this.defaultMediaType = defaultMediaType;
     }
-    
-    
+
+
     protected void validate(JwsJsonConsumer c, JwsSignatureVerifier theSigVerifier) throws JwsException {
-        
-        List<JwsJsonSignatureEntry> remaining = 
+
+        List<JwsJsonSignatureEntry> remaining =
             c.verifyAndGetNonValidated(Collections.singletonList(theSigVerifier), entryProps);
         if (!remaining.isEmpty()) {
             JAXRSUtils.getCurrentMessage().put("jws.json.remaining.entries", remaining);
@@ -75,5 +75,5 @@ public class AbstractJwsJsonReaderProvider {
     public void setEntryProps(Map<String, Object> entryProps) {
         this.entryProps = entryProps;
     }
-    
+
 }

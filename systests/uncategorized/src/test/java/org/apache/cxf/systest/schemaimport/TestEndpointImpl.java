@@ -20,8 +20,8 @@ package org.apache.cxf.systest.schemaimport;
 
 import javax.jws.WebService;
 
-@WebService(name = "TestEndpoint", serviceName = "TestEndpointService", 
-            targetNamespace = "http://cxf.apache.org/schemaimport", 
+@WebService(name = "TestEndpoint", serviceName = "TestEndpointService",
+            targetNamespace = "http://cxf.apache.org/schemaimport",
             wsdlLocation = "classpath:/wsdl_systest/import/TestService.wsdl")
 public class TestEndpointImpl implements TestEndpoint {
 

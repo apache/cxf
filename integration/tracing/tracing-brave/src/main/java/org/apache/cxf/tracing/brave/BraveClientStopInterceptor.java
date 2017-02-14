@@ -29,7 +29,7 @@ public class BraveClientStopInterceptor extends AbstractBraveClientInterceptor {
     public BraveClientStopInterceptor(final Brave brave) {
         this(Phase.RECEIVE, brave);
     }
-    
+
     public BraveClientStopInterceptor(final String phase, final Brave brave) {
         super(phase, brave);
     }
@@ -37,14 +37,14 @@ public class BraveClientStopInterceptor extends AbstractBraveClientInterceptor {
     @Override
     public void handleMessage(Message message) throws Fault {
         @SuppressWarnings("unchecked")
-        final TraceScopeHolder<Span> holder = 
+        final TraceScopeHolder<Span> holder =
             (TraceScopeHolder<Span>)message.getExchange().get(TRACE_SPAN);
-        
+
         Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
         if (responseCode == null) {
             responseCode = 200;
         }
-        
+
         super.stopTraceSpan(holder, responseCode);
     }
 }

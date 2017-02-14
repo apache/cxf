@@ -28,7 +28,7 @@ public class MyCustomHandler implements ValidationEventHandler {
     public boolean getUsed() {
         return used;
     }
-    
+
     public boolean handleEvent(ValidationEvent event) {
         used = true;
         return true;

@@ -30,8 +30,8 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.invoker.Factory;
 /**
  * Defines the factory used for the service.
- * 
- * Either use the factoryClass attribute to define your own 
+ *
+ * Either use the factoryClass attribute to define your own
  * factory or use one of the "value" convenience enums.
  */
 @Documented
@@ -41,24 +41,24 @@ import org.apache.cxf.service.invoker.Factory;
 public @interface FactoryType {
 
     Type value() default Type.Singleton;
-    
+
     String[] args() default { };
-    
+
     /**
      * The class for the factory.  It MUST have a constructor that takes
      * two arguments:
      *    1) The Class for the service
-     *    2) String[] of the args from above 
+     *    2) String[] of the args from above
      */
     Class<? extends Factory> factoryClass() default DEFAULT.class;
-    
+
     enum Type {
         Singleton,
         Session,
         Pooled, //args[0] is the size of the pool
         PerRequest
     };
-    
+
     final class DEFAULT implements Factory {
         public Object create(Exchange e) throws Throwable {
             return null;

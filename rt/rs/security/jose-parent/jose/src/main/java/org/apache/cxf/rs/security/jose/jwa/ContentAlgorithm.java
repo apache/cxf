@@ -26,16 +26,16 @@ public enum ContentAlgorithm {
     A128GCM(AlgorithmUtils.A128GCM_ALGO, "AES/GCM/NoPadding", 128),
     A192GCM(AlgorithmUtils.A192GCM_ALGO, "AES/GCM/NoPadding", 192),
     A256GCM(AlgorithmUtils.A256GCM_ALGO, "AES/GCM/NoPadding", 256),
-    //TODO: default to "AES/CBC/PKCS5Padding" if Cipher "AES/CBC/PKCS7Padding" 
-    // can not be initialized, apparently Java 8 has decided to settle on PKCS5Padding only 
+    //TODO: default to "AES/CBC/PKCS5Padding" if Cipher "AES/CBC/PKCS7Padding"
+    // can not be initialized, apparently Java 8 has decided to settle on PKCS5Padding only
     A128CBC_HS256(AlgorithmUtils.A128CBC_HS256_ALGO, "AES/CBC/PKCS7Padding", 128),
     A192CBC_HS384(AlgorithmUtils.A192CBC_HS384_ALGO, "AES/CBC/PKCS7Padding", 192),
     A256CBC_HS512(AlgorithmUtils.A256CBC_HS512_ALGO, "AES/CBC/PKCS7Padding", 256);
-    
+
     private final String jwaName;
     private final String javaName;
     private final int keySizeBits;
-    
+
     ContentAlgorithm(String jwaName, String javaName, int keySizeBits) {
         this.jwaName = jwaName;
         this.javaName = javaName;
@@ -49,7 +49,7 @@ public enum ContentAlgorithm {
     public String getJavaName() {
         return javaName == null ? name() : javaName;
     }
-    
+
     public String getJavaAlgoName() {
         return AlgorithmUtils.stripAlgoProperties(getJavaName());
     }
@@ -57,14 +57,14 @@ public enum ContentAlgorithm {
     public int getKeySizeBits() {
         return keySizeBits;
     }
-    
+
     public static ContentAlgorithm getAlgorithm(String algo) {
         if (algo == null) {
             return null;
         }
         return ContentAlgorithm.valueOf(algo.replace('-', '_')
                                         .replace('+', '_'));
-        
+
     }
-    
+
 }

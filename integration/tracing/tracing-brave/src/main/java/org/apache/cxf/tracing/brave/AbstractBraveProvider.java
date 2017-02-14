@@ -37,17 +37,17 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 
-public abstract class AbstractBraveProvider extends AbstractTracingProvider { 
+public abstract class AbstractBraveProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractBraveProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.brave.span";
-        
+
     protected final Brave brave;
     protected final SpanNameProvider spanNameProvider;
-            
+
     protected AbstractBraveProvider(final Brave brave) {
         this(brave, new ServerSpanNameProvider());
     }
-    
+
     protected AbstractBraveProvider(final Brave brave, final SpanNameProvider spanNameProvider) {
         this.brave = brave;
         this.spanNameProvider = spanNameProvider;
@@ -61,27 +61,27 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
             public URI getUri() {
                 return uri;
             }
-            
+
             @Override
             public String getHttpMethod() {
                 return method;
             }
-            
+
             @Override
             public String getHttpHeaderValue(String headerName) {
                 List<String> value = requestHeaders.get(headerName);
-                
+
                 if (value != null && !value.isEmpty()) {
                     return value.get(0);
                 }
-                
+
                 return null;
             }
         };
-        
+
         brave.serverRequestInterceptor().handle(new HttpServerRequestAdapter(request, spanNameProvider));
         final ServerSpan serverSpan = brave.serverSpanThreadBinder().getCurrentServerSpan();
-        
+
         // If the service resource is using asynchronous processing mode, the trace
         // scope will be closed in another thread and as such should be detached.
         boolean detached = false;
@@ -90,10 +90,10 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
             propagateContinuationSpan(serverSpan);
             detached = true;
         }
-        
+
         return new TraceScopeHolder<ServerSpan>(serverSpan, detached);
     }
-    
+
     private void transferRequestHeader(final Map<String, List<String>> requestHeaders,
             final Map<String, List<Object>> responseHeaders, final BraveHttpHeaders header) {
         if (requestHeaders.containsKey(header.getName())) {
@@ -111,29 +111,29 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
         transferRequestHeader(requestHeaders, responseHeaders, BraveHttpHeaders.Sampled);
         transferRequestHeader(requestHeaders, responseHeaders, BraveHttpHeaders.ParentSpanId);
         transferRequestHeader(requestHeaders, responseHeaders, BraveHttpHeaders.TraceId);
-        
+
         if (holder == null) {
             return;
         }
-        
+
         final ServerSpan span = holder.getScope();
         if (span != null) {
             // If the service resource is using asynchronous processing mode, the trace
-            // scope has been created in another thread and should be re-attached to the current 
+            // scope has been created in another thread and should be re-attached to the current
             // one.
             if (holder.isDetached()) {
                 brave.serverSpanThreadBinder().setCurrentSpan(span);
-            } 
-            
+            }
+
             final HttpResponse response = () -> responseStatus;
             brave.serverResponseInterceptor().handle(new HttpServerResponseAdapter(response));
         }
     }
-    
+
     private void propagateContinuationSpan(final ServerSpan continuationScope) {
         PhaseInterceptorChain.getCurrentMessage().put(ServerSpan.class, continuationScope);
     }
-    
+
     protected boolean isAsyncResponse() {
         return !PhaseInterceptorChain.getCurrentMessage().getExchange().isSynchronous();
     }

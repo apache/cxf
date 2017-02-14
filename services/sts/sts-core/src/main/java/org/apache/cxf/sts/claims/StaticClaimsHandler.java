@@ -36,7 +36,7 @@ public class StaticClaimsHandler implements ClaimsHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(StaticClaimsHandler.class);
 
     private Map<String, String> globalClaims;
-        
+
     public void setGlobalClaims(Map<String, String> globalClaims) {
         this.globalClaims = globalClaims;
     }
@@ -45,7 +45,7 @@ public class StaticClaimsHandler implements ClaimsHandler {
         return globalClaims;
     }
 
-    
+
     public List<URI> getSupportedClaimTypes() {
         List<URI> uriList = new ArrayList<>();
         for (String uri : getGlobalClaims().keySet()) {
@@ -57,11 +57,11 @@ public class StaticClaimsHandler implements ClaimsHandler {
         }
 
         return uriList;
-    }    
-    
+    }
+
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
-        
+
         ProcessedClaimCollection claimsColl = new ProcessedClaimCollection();
         for (Claim claim : claims) {
             if (getGlobalClaims().keySet().contains(claim.getClaimType().toString())) {
@@ -77,7 +77,7 @@ public class StaticClaimsHandler implements ClaimsHandler {
             }
         }
         return claimsColl;
-        
+
     }
 
 }

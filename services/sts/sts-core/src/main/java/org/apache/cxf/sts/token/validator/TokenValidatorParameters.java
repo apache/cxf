@@ -43,7 +43,7 @@ public class TokenValidatorParameters {
     private TokenStore tokenStore;
     private String realm;
     private ReceivedToken token;
-    
+
     public ReceivedToken getToken() {
         return token;
     }
@@ -59,7 +59,7 @@ public class TokenValidatorParameters {
     public void setTokenStore(TokenStore tokenStore) {
         this.tokenStore = tokenStore;
     }
-    
+
     public TokenRequirements getTokenRequirements() {
         return tokenRequirements;
     }
@@ -75,7 +75,7 @@ public class TokenValidatorParameters {
     public void setKeyRequirements(KeyRequirements keyRequirements) {
         this.keyRequirements = keyRequirements;
     }
-    
+
     public STSPropertiesMBean getStsProperties() {
         return stsProperties;
     }
@@ -83,19 +83,19 @@ public class TokenValidatorParameters {
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
+
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getPrincipal() {
         return principal;
     }
-    
+
     public void setRealm(String realm) {
         this.realm = realm;
     }
-    
+
     public String getRealm() {
         return realm;
     }
@@ -107,5 +107,5 @@ public class TokenValidatorParameters {
     public void setMessageContext(Map<String, Object> messageContext) {
         this.messageContext = messageContext;
     }
-    
+
 }

@@ -64,16 +64,16 @@ public class WSDLManagerImpl implements WSDLManager {
     final ExtensionRegistry registry;
     final WSDLFactory factory;
     final Map<Object, Definition> definitionsMap;
-    
+
     /**
      * The schemaCacheMap is used as a cache of SchemaInfo against the WSDLDefinitions.
-     * The key is the same key that is used to hold the definition object into the definitionsMap 
+     * The key is the same key that is used to hold the definition object into the definitionsMap
      */
     final Map<Object, ServiceSchemaInfo> schemaCacheMap;
     private boolean disableSchemaCache;
-    
+
     private Bus bus;
-    
+
     private XMLStreamReaderWrapper xmlStreamReaderWrapper;
 
     public WSDLManagerImpl() throws BusException {
@@ -83,22 +83,22 @@ public class WSDLManagerImpl implements WSDLManager {
         try {
             factory = WSDLFactory.newInstance();
             registry = factory.newPopulatedExtensionRegistry();
-            registry.registerSerializer(Types.class, 
+            registry.registerSerializer(Types.class,
                                         WSDLConstants.QNAME_SCHEMA,
                                         new SchemaSerializer());
             // these will replace whatever may have already been registered
-            // in these places, but there's no good way to check what was 
+            // in these places, but there's no good way to check what was
             // there before.
             QName header = new QName(WSDLConstants.NS_SOAP, "header");
-            registry.registerDeserializer(MIMEPart.class, 
-                                          header, 
+            registry.registerDeserializer(MIMEPart.class,
+                                          header,
                                           registry.queryDeserializer(BindingInput.class, header));
-            registry.registerSerializer(MIMEPart.class, 
-                                        header, 
+            registry.registerSerializer(MIMEPart.class,
+                                        header,
                                         registry.querySerializer(BindingInput.class, header));
             // get the original classname of the SOAPHeader
-            // implementation that was stored in the registry.  
-            Class<? extends ExtensibilityElement> clazz = 
+            // implementation that was stored in the registry.
+            Class<? extends ExtensibilityElement> clazz =
                 registry.createExtension(BindingInput.class, header).getClass();
             registry.mapExtensionTypes(MIMEPart.class, header, clazz);
             // register some known extension attribute types that are not recognized by the default registry
@@ -111,7 +111,7 @@ public class WSDLManagerImpl implements WSDLManager {
 
         setBus(b);
     }
-    
+
     @Resource
     public final void setBus(Bus b) {
         bus = b;
@@ -127,22 +127,22 @@ public class WSDLManagerImpl implements WSDLManager {
     public WSDLFactory getWSDLFactory() {
         return factory;
     }
-    
+
     public Map<Object, Definition> getDefinitions() {
         synchronized (definitionsMap) {
             return Collections.unmodifiableMap(definitionsMap);
         }
     }
-    
+
     protected Bus getBus() {
         return bus;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * XXX - getExtensionRegistry()
-     * 
+     *
      * @see org.apache.cxf.wsdl.WSDLManager#getExtenstionRegistry()
      */
     public ExtensionRegistry getExtensionRegistry() {
@@ -151,7 +151,7 @@ public class WSDLManagerImpl implements WSDLManager {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.cxf.wsdl.WSDLManager#getDefinition(java.lang.String)
      */
     public Definition getDefinition(String url) throws WSDLException {
@@ -175,7 +175,7 @@ public class WSDLManagerImpl implements WSDLManager {
         }
         WSDLReader reader = factory.newWSDLReader();
         reader.setFeature("javax.wsdl.verbose", false);
-        reader.setExtensionRegistry(registry);       
+        reader.setExtensionRegistry(registry);
         Definition def = reader.readWSDL("", el);
         synchronized (definitionsMap) {
             definitionsMap.put(el, def);
@@ -195,12 +195,12 @@ public class WSDLManagerImpl implements WSDLManager {
         reader.setFeature("javax.wsdl.verbose", false);
         reader.setFeature("javax.wsdl.importDocuments", true);
         reader.setExtensionRegistry(registry);
-        
+
         //we'll create a new String here to make sure the passed in key is not referenced in the loading of
-        //the wsdl and thus would be held onto from the cached map from both the weak reference (key) and 
+        //the wsdl and thus would be held onto from the cached map from both the weak reference (key) and
         //from the strong reference (Definition).  For example, the Definition sometimes keeps the original
-        //string as the documentBaseLocation which would result in it being held onto strongly 
-        //from the definition.  With this, the String the definition holds onto would be unique 
+        //string as the documentBaseLocation which would result in it being held onto strongly
+        //from the definition.  With this, the String the definition holds onto would be unique
         url = new String(url);
         CatalogWSDLLocator catLocator = new CatalogWSDLLocator(url, bus);
         ResourceManagerWSDLLocator wsdlLocator = new ResourceManagerWSDLLocator(url,
@@ -237,10 +237,10 @@ public class WSDLManagerImpl implements WSDLManager {
         } else {
             def = reader.readWSDL(wsdlLocator);
         }
-        
+
         return def;
     }
-    
+
     public void setXMLStreamReaderWrapper(XMLStreamReaderWrapper wrapper) {
         this.xmlStreamReaderWrapper = wrapper;
     }
@@ -251,7 +251,7 @@ public class WSDLManagerImpl implements WSDLManager {
         extreg.registerExtensionAttributeType(javax.wsdl.Input.class, qn, AttributeExtensible.STRING_TYPE);
         extreg.registerExtensionAttributeType(javax.wsdl.Output.class, qn, AttributeExtensible.STRING_TYPE);
         extreg.registerExtensionAttributeType(javax.wsdl.Fault.class, qn, AttributeExtensible.STRING_TYPE);
-        qn = new QName("http://www.w3.org/2007/05/addressing/metadata", "Action"); 
+        qn = new QName("http://www.w3.org/2007/05/addressing/metadata", "Action");
         extreg.registerExtensionAttributeType(javax.wsdl.Input.class, qn, AttributeExtensible.STRING_TYPE);
         extreg.registerExtensionAttributeType(javax.wsdl.Output.class, qn, AttributeExtensible.STRING_TYPE);
         extreg.registerExtensionAttributeType(javax.wsdl.Fault.class, qn, AttributeExtensible.STRING_TYPE);
@@ -286,7 +286,7 @@ public class WSDLManagerImpl implements WSDLManager {
                         schemaCacheMap.put(e.getKey(), schemas);
                     }
                 }
-            }            
+            }
         }
     }
 
@@ -316,6 +316,6 @@ public class WSDLManagerImpl implements WSDLManager {
             }
         }
     }
-    
+
 
 }

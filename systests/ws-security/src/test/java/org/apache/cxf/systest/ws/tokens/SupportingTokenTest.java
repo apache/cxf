@@ -46,16 +46,16 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
     static final String TLS_PORT = allocatePort(TLSServer.class);
     static final String STAX_PORT = allocatePort(StaxServer.class);
     static final String TLS_STAX_PORT = allocatePort(TLSStaxServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     final TestParam test;
-    
+
     public SupportingTokenTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -83,23 +83,23 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
                    launchServer(TLSStaxServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(PORT, true)},
                                                 {new TestParam(STAX_PORT, false)},
                                                 {new TestParam(STAX_PORT, true)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-    
+
     @org.junit.Test
     public void testSignedSupporting() throws Exception {
 
@@ -112,27 +112,27 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = SupportingTokenTest.class.getResource("DoubleItTokens.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItSignedSupportingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         // This should fail, as the client is not signing the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItSignedSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not signing the UsernameToken");
@@ -141,16 +141,16 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("UsernameToken not satisfied"));
         }
-        
+
         // This should fail, as the client is (encrypting) but not signing the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItSignedSupportingPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not signing the UsernameToken");
@@ -159,11 +159,11 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("UsernameToken not satisfied"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testEncryptedSupporting() throws Exception {
 
@@ -176,27 +176,27 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = SupportingTokenTest.class.getResource("DoubleItTokens.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedSupportingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         // This should fail, as the client is not encrypting the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItEncryptedSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
@@ -205,16 +205,16 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("UsernameToken not satisfied"));
         }
-        
+
         // This should fail, as the client is (signing) but not encrypting the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItEncryptedSupportingPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
@@ -223,11 +223,11 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("UsernameToken not satisfied"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testEncryptedSupportingOverTLS() throws Exception {
 
@@ -240,37 +240,37 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = SupportingTokenTest.class.getResource("DoubleItTokens.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedSupportingPort4");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
-        
+
         if (PORT.equals(test.getPort())) {
             updateAddressPort(port, TLS_PORT);
         } else if (STAX_PORT.equals(test.getPort())) {
             updateAddressPort(port, TLS_STAX_PORT);
-        } 
-        
+        }
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         // This should fail, as the client is not encrypting the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItEncryptedSupportingPort5");
         port = service.getPort(portQName, DoubleItPortType.class);
-        
+
         if (PORT.equals(test.getPort())) {
             updateAddressPort(port, TLS_PORT);
         } else if (STAX_PORT.equals(test.getPort())) {
             updateAddressPort(port, TLS_STAX_PORT);
         }
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
@@ -279,11 +279,11 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("UsernameToken not satisfied"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedEncryptedSupporting() throws Exception {
 
@@ -296,58 +296,58 @@ public class SupportingTokenTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = SupportingTokenTest.class.getResource("DoubleItTokens.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedSupportingPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         // This should fail, as the client is not encrypting the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedSupportingPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = 
+            String error =
                 "The received token does not match the signed encrypted supporting token requirement";
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("UsernameToken not satisfied"));
         }
-        
+
         // This should fail, as the client is (encrypting) but not signing the UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedSupportingPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not encrypting the UsernameToken");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
-            String error = 
+            String error =
                 "The received token does not match the signed encrypted supporting token requirement";
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("UsernameToken not satisfied"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
 }

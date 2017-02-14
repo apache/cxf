@@ -33,27 +33,27 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public class AbstractJwsWriterProvider {
     private JwsSignatureProvider sigProvider;
-    
+
     public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
         this.sigProvider = signatureProvider;
     }
-    
+
     protected JwsSignatureProvider getInitializedSigProvider(JwsHeaders headers) {
         setRequestContextProperty(headers);
         if (sigProvider != null) {
-            return sigProvider;    
-        } 
-        return JwsUtils.loadSignatureProvider(headers, true); 
+            return sigProvider;
+        }
+        return JwsUtils.loadSignatureProvider(headers, true);
     }
-    protected void setRequestContextProperty(JoseHeaders headers) {    
+    protected void setRequestContextProperty(JoseHeaders headers) {
         JoseUtils.setJoseContextProperty(headers);
     }
-    protected void writeJws(JwsCompactProducer p, JwsSignatureProvider theSigProvider, OutputStream os) 
+    protected void writeJws(JwsCompactProducer p, JwsSignatureProvider theSigProvider, OutputStream os)
         throws IOException {
         p.signWith(theSigProvider);
         JoseUtils.traceHeaders(p.getJwsHeaders());
         byte[] bytes = StringUtils.toBytesUTF8(p.getSignedEncodedJws());
         IOUtils.copy(new ByteArrayInputStream(bytes), os);
     }
-    
+
 }

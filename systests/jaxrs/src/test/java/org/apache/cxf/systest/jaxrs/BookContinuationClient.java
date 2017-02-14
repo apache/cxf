@@ -28,14 +28,14 @@ import org.apache.cxf.testutil.common.TestUtil;
 
 public class BookContinuationClient extends AbstractTestServerBase {
     public static final String PORT = TestUtil.getPortNumber(BookContinuationServlet3Server.class);
-    
+
     protected void run() {
-        
+
     }
-            
-    public static void main(String args[]) throws InterruptedException, ExecutionException {        
+
+    public static void main(String args[]) throws InterruptedException, ExecutionException {
         final String url = "http://localhost:" + PORT + "/async/bookstore/disconnect";
-        WebClient wc = WebClient.create(url);        
+        WebClient wc = WebClient.create(url);
         try {
             System.out.println("server ready");
             wc.async().get().get(500, TimeUnit.MILLISECONDS);
@@ -44,7 +44,7 @@ public class BookContinuationClient extends AbstractTestServerBase {
         } finally {
             System.out.println("server stopped");
             System.out.println("done!");
-            System.exit(0);            
-        }            
+            System.exit(0);
+        }
     }
 }

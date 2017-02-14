@@ -53,7 +53,7 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
         OAuthContext oauth = OAuthContextUtils.getContext(mc);
         UserInfo userInfo = null;
         if (userInfoProvider != null) {
-            userInfo = userInfoProvider.getUserInfo(oauth.getClientId(), oauth.getSubject(), 
+            userInfo = userInfoProvider.getUserInfo(oauth.getClientId(), oauth.getSubject(),
                 OAuthUtils.convertPermissionsToScopeList(oauth.getPermissions()));
         } else if (oauth.getSubject() instanceof OidcUserSubject) {
             OidcUserSubject oidcUserSubject = (OidcUserSubject)oauth.getSubject();
@@ -66,7 +66,7 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
             // Consider customizing the error code in case of UserInfo being not available
             return Response.serverError().build();
         }
-        
+
         Object responseEntity = null;
         // UserInfo may be returned in a clear form as JSON
         if (super.isJwsRequired() || super.isJweRequired()) {
@@ -79,9 +79,9 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
             responseEntity = convertUserInfoToResponseEntity(userInfo);
         }
         return Response.ok(responseEntity).build();
-        
+
     }
-    
+
     protected Object convertUserInfoToResponseEntity(UserInfo userInfo) {
         // By default a JAX-RS MessageBodyWriter is expected to serialize UserInfo.
         return convertClearUserInfoToString ? JwtUtils.claimsToJson(userInfo) : userInfo;
@@ -90,7 +90,7 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
     protected UserInfo createFromIdToken(IdToken idToken) {
         UserInfo userInfo = new UserInfo();
         userInfo.setSubject(idToken.getSubject());
-        
+
         if (super.isJwsRequired()) {
             userInfo.setIssuer(idToken.getIssuer());
             userInfo.setAudience(idToken.getAudience());
@@ -113,7 +113,7 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
         if (idToken.getNickName() != null) {
             userInfo.setNickName(idToken.getNickName());
         }
-        
+
         if (additionalClaims != null && !additionalClaims.isEmpty()) {
             for (String additionalClaim : additionalClaims) {
                 if (idToken.containsProperty(additionalClaim)) {
@@ -121,7 +121,7 @@ public class UserInfoService extends OAuthServerJoseJwtProducer {
                 }
             }
         }
-        
+
         //etc
         return userInfo;
     }

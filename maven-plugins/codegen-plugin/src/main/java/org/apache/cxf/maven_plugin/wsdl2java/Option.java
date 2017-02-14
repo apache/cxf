@@ -34,13 +34,13 @@ public class Option {
 
     /**
      * As maven will set null for an empty parameter we need
-     * this horrid initial value to tell if it has been 
+     * this horrid initial value to tell if it has been
      * configured or not yet.
      */
     private static final String DEFAULT_WSDL_LOCATION = "DEFAULTWSDLLOCATION - WORKAROUND";
 
     /**
-     * 
+     *
      */
     protected List<String> packagenames = new ArrayList<>();
 
@@ -55,7 +55,7 @@ public class Option {
      * For compatibility as well as to specify any extra flags not addressed by other parameters
      */
     protected List<String> xjcargs = new ArrayList<>();
-    
+
     protected String[] asyncMethods;
     protected String[] bareMethods;
     protected String[] mimeMethods;
@@ -67,7 +67,7 @@ public class Option {
 
     /**
      * Ignore the specified WSDL schema namespace when generating code.
-     * Also, optionally specifies the Java package name used by types described in the excluded 
+     * Also, optionally specifies the Java package name used by types described in the excluded
      * namespace(s) using schema-namespace[=java-packagename]
      */
     List<String> namespaceExcludes = new ArrayList<>();
@@ -78,15 +78,15 @@ public class Option {
     Boolean defaultExcludesNamespace;
 
     /**
-     * Enables or disables the loading of the default namespace package name mapping. Default is true and 
+     * Enables or disables the loading of the default namespace package name mapping. Default is true and
      * <a href=""http://www.w3.org/2005/08/addressing">
-     * http://www.w3.org/2005/08/addressing=org.apache.cxf.ws.addressingnamespace</a> 
+     * http://www.w3.org/2005/08/addressing=org.apache.cxf.ws.addressingnamespace</a>
      * package mapping will be enabled.
      */
     Boolean defaultNamespacePackageMapping;
 
     /**
-     * A set of dependent files used to detect that the generator must process WSDL, even 
+     * A set of dependent files used to detect that the generator must process WSDL, even
      * if generator marker files are up to date.
      */
     String dependencies[];
@@ -102,7 +102,7 @@ public class Option {
     Set<String> bindingFiles = new HashSet<>();
 
     /**
-     * Specifies the value of the @WebServiceClient annotation's wsdlLocation property. 
+     * Specifies the value of the @WebServiceClient annotation's wsdlLocation property.
      */
     String wsdlLocation = DEFAULT_WSDL_LOCATION;
 
@@ -133,17 +133,17 @@ public class Option {
     String catalog;
 
     /**
-     * Enables or disables processing of implicit SOAP headers (i.e. SOAP headers defined in the 
+     * Enables or disables processing of implicit SOAP headers (i.e. SOAP headers defined in the
      * wsdl:binding but not wsdl:portType section.) Default is false.
      */
     Boolean extendedSoapHeaders;
 
     /**
-     * Enables validating the WSDL before generating the code. 
+     * Enables validating the WSDL before generating the code.
      */
     String validateWsdl;
-    
-    
+
+
     /**
      * Enables or disables generation of the type classes. Default value is false.
      */
@@ -183,9 +183,9 @@ public class Option {
      * Disable generation of service address binding in the generated Java classes
      */
     Boolean noAddressBinding;
-    
+
     /**
-     * Allow element references when determining if an operation can be unwrapped or not 
+     * Allow element references when determining if an operation can be unwrapped or not
      */
     Boolean allowElementRefs;
 
@@ -229,7 +229,7 @@ public class Option {
     public String[] getBareMethods() {
         return bareMethods;
     }
-    
+
 
     public List<String> getPackagenames() {
         return packagenames;
@@ -282,7 +282,7 @@ public class Option {
     public void setOutputDir(File f) {
         outputDir = f;
     }
-    
+
     public void setBindingFiles(Set<String> files) {
         bindingFiles = files;
     }
@@ -292,7 +292,7 @@ public class Option {
     public void addBindingFile(File file) {
         bindingFiles.add(file.getAbsolutePath());
     }
-    
+
     public void addDefaultBindingFileIfExists(File baseDir) {
         File defaultBindingFile = new File(baseDir, DEFAULT_BINDING_FILE_PATH);
         if (defaultBindingFile.exists()) {
@@ -370,11 +370,11 @@ public class Option {
     public void setValidate(String v) {
         this.validateWsdl = v;
     }
-    
+
     public boolean isNoTypes() {
         return noTypes == null ? false : noTypes;
     }
-    
+
     public void setNoTypes(boolean noTypes) {
         this.noTypes = noTypes;
     }
@@ -386,18 +386,18 @@ public class Option {
     public void setFaultSerialVersionUID(String faultSerialVersionUID) {
         this.faultSerialVersionUID = faultSerialVersionUID;
     }
-    
+
     public String getExceptionSuper() {
         return exceptionSuper;
     }
-    
+
     public void setExceptionSuper(String exceptionSuper) {
         this.exceptionSuper = exceptionSuper;
     }
     public List<String> getSeiSuper() {
         return seiSuper;
     }
-    
+
     public void setSeiSuper(List<String> seiSuper) {
         this.seiSuper.clear();
         this.seiSuper.addAll(seiSuper);
@@ -491,14 +491,14 @@ public class Option {
         destination.setBareMethods(getBareMethods());
         destination.setExceptionSuper(getExceptionSuper());
     }
-    
+
     private <T> T setIfNull(T dest, T source) {
         if (dest == null) {
             dest = source;
         }
         return dest;
     }
-    
+
     public void merge(Option defaultOptions) {
         wsdlList = setIfNull(wsdlList, defaultOptions.wsdlList);
         exceptionSuper = setIfNull(exceptionSuper, defaultOptions.exceptionSuper);
@@ -512,7 +512,7 @@ public class Option {
         autoNameResolution = setIfNull(autoNameResolution, defaultOptions.autoNameResolution);
         noAddressBinding = setIfNull(noAddressBinding, defaultOptions.noAddressBinding);
         allowElementRefs = setIfNull(allowElementRefs, defaultOptions.allowElementRefs);
-        defaultExcludesNamespace = setIfNull(defaultExcludesNamespace, 
+        defaultExcludesNamespace = setIfNull(defaultExcludesNamespace,
                                              defaultOptions.defaultExcludesNamespace);
         defaultNamespacePackageMapping = setIfNull(defaultNamespacePackageMapping,
                                                    defaultOptions.defaultNamespacePackageMapping);
@@ -536,7 +536,7 @@ public class Option {
             wsdlLocation = defaultOptions.getWsdlLocation();
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     private <T> T[] mergeList(T[] l1, T[] l2, Class<T> cls) {
         if (l1 == null) {

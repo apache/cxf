@@ -70,13 +70,13 @@ public class JsonWebKeyTest extends Assert {
     private static final String HMAC_SECRET_VALUE = "AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3"
         + "Yj0iPS4hcgUuTwjAzZr1Z9CAow";
     private static final String HMAC_KID_VALUE = "HMACKey";
-    
+
     @Test
     public void testPublicSetAsList() throws Exception {
         JsonWebKeys jwks = readKeySet("jwkPublicSet.txt");
         List<JsonWebKey> keys = jwks.getKeys();
         assertEquals(3, keys.size());
-        
+
         JsonWebKey ecKey = keys.get(0);
         assertEquals(6, ecKey.asMap().size());
         validatePublicEcKey(ecKey);
@@ -89,13 +89,13 @@ public class JsonWebKeyTest extends Assert {
         List<X509Certificate> certs = JwkUtils.toX509CertificateChain(rsaKeyCert);
         assertEquals(3, certs.size());
     }
-    
+
     @Test
     public void testPublicSetAsMap() throws Exception {
         JsonWebKeys jwks = readKeySet("jwkPublicSet.txt");
         Map<String, JsonWebKey> keysMap = jwks.getKeyIdMap();
         assertEquals(3, keysMap.size());
-        
+
         JsonWebKey rsaKey = keysMap.get(RSA_KID_VALUE);
         assertEquals(5, rsaKey.asMap().size());
         validatePublicRsaKey(rsaKey);
@@ -103,7 +103,7 @@ public class JsonWebKeyTest extends Assert {
         assertEquals(6, ecKey.asMap().size());
         validatePublicEcKey(ecKey);
     }
-    
+
     @Test
     public void testPrivateSetAsList() throws Exception {
         JsonWebKeys jwks = readKeySet("jwkPrivateSet.txt");
@@ -112,7 +112,7 @@ public class JsonWebKeyTest extends Assert {
     private void validatePrivateSet(JsonWebKeys jwks) throws Exception {
         List<JsonWebKey> keys = jwks.getKeys();
         assertEquals(2, keys.size());
-        
+
         JsonWebKey ecKey = keys.get(0);
         assertEquals(7, ecKey.asMap().size());
         validatePrivateEcKey(ecKey);
@@ -123,7 +123,7 @@ public class JsonWebKeyTest extends Assert {
     @Test
     public void testEncryptDecryptPrivateSet() throws Exception {
         final String password = "Thus from my lips, by yours, my sin is purged.";
-        Security.addProvider(new BouncyCastleProvider());    
+        Security.addProvider(new BouncyCastleProvider());
         try {
             JsonWebKeys jwks = readKeySet("jwkPrivateSet.txt");
             validatePrivateSet(jwks);
@@ -147,7 +147,7 @@ public class JsonWebKeyTest extends Assert {
             + "\"alg\":\"A128KW\","
             + "\"k\":\"GawgguFyGrWKav7AX4VKUg\","
             + "\"kid\":\"AesWrapKey\"}";
-        Security.addProvider(new BouncyCastleProvider());    
+        Security.addProvider(new BouncyCastleProvider());
         try {
             JsonWebKey jwk = readKey(key);
             validateSecretAesKey(jwk);
@@ -164,7 +164,7 @@ public class JsonWebKeyTest extends Assert {
             Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
         }
     }
-    
+
     @Test
     public void testSecretSetAsList() throws Exception {
         JsonWebKeys jwks = readKeySet("jwkSecretSet.txt");
@@ -177,7 +177,7 @@ public class JsonWebKeyTest extends Assert {
         assertEquals(4, hmacKey.asMap().size());
         validateSecretHmacKey(hmacKey);
     }
-    
+
     private void validateSecretAesKey(JsonWebKey key) {
         assertEquals(AES_SECRET_VALUE, key.getProperty(JsonWebKey.OCTET_KEY_VALUE));
         assertEquals(AES_KID_VALUE, key.getKeyId());
@@ -190,7 +190,7 @@ public class JsonWebKeyTest extends Assert {
         assertEquals(KeyType.OCTET, key.getKeyType());
         assertEquals(AlgorithmUtils.HMAC_SHA_256_ALGO, key.getAlgorithm());
     }
-    
+
     private void validatePublicRsaKey(JsonWebKey key) {
         assertEquals(RSA_MODULUS_VALUE, key.getProperty(JsonWebKey.RSA_MODULUS));
         assertEquals(RSA_PUBLIC_EXP_VALUE, key.getProperty(JsonWebKey.RSA_PUBLIC_EXP));

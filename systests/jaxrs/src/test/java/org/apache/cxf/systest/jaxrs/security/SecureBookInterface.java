@@ -35,28 +35,28 @@ public interface SecureBookInterface {
     @Produces("application/xml")
     @Secured({"ROLE_USER", "ROLE_ADMIN" })
     Book getThatBook(@PathParam("bookId") Long id) throws BookNotFoundFault;
-    
-    
+
+
     @GET
     @Path("/thosebooks/{bookId}/{id}")
     @Produces("application/xml")
     @Secured("ROLE_USER")
     Book getThatBook(@PathParam("bookId") Long id, @PathParam("id") String s) throws BookNotFoundFault;
-    
+
     @GET
     @Path("/thosebooks")
     @Produces("application/xml")
     @Secured({"ROLE_ADMIN", "ROLE_BOOK_OWNER" })
     Book getThatBook() throws BookNotFoundFault;
-    
+
     @Path("/subresource")
     SecureBookInterface getBookSubResource() throws BookNotFoundFault;
-    
+
     @GET
     @Produces("application/xml")
     @Secured("ROLE_ADMIN")
     Book getDefaultBook() throws BookNotFoundFault;
-    
+
     @Path("/securebook")
     SecureBook getSecureBook() throws BookNotFoundFault;
 }

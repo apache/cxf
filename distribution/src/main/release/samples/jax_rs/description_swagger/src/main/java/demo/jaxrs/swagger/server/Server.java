@@ -38,14 +38,14 @@ public class Server {
         final ServletHolder staticHolder = new ServletHolder(new DefaultServlet());
         // Register and map the dispatcher servlet
         final ServletHolder servletHolder = new ServletHolder(new CXFNonSpringJaxrsServlet());
-        final ServletContextHandler context = new ServletContextHandler();      
+        final ServletContextHandler context = new ServletContextHandler();
         context.setContextPath("/");
         context.addServlet(staticHolder, "/static/*");
-        context.addServlet(servletHolder, "/*");  
+        context.addServlet(servletHolder, "/*");
         context.setResourceBase(
             getClass().getResource("/META-INF/resources/webjars/swagger-ui/2.0.24").toURI().toString());
-        
-        servletHolder.setInitParameter("redirects-list", 
+
+        servletHolder.setInitParameter("redirects-list",
             "/ /index.html /.*[.]js /css/.* /images/.* lib/.* .*ico");
         servletHolder.setInitParameter("redirect-servlet-name", staticHolder.getName());
         servletHolder.setInitParameter("redirect-attributes", "javax.servlet.include.request_uri");
@@ -55,9 +55,9 @@ public class Server {
             new String[] {
                 MultipartProvider.class.getName(),
                 JacksonJsonProvider.class.getName()
-            }, ",") 
-        );                
-                
+            }, ",")
+        );
+
         server.setHandler(context);
         server.start();
         server.join();

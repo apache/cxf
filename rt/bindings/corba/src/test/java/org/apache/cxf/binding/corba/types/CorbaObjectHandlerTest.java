@@ -39,12 +39,12 @@ public class CorbaObjectHandlerTest extends Assert {
     @Before
     public void setUp() throws Exception {
         java.util.Properties props = System.getProperties();
-        
-        
+
+
         props.put("yoko.orb.id", "CXF-CORBA-Server-Binding");
         orb = ORB.init(new String[0], props);
     }
-    
+
     @After
     public void tearDown() throws Exception {
         if (orb != null) {
@@ -55,7 +55,7 @@ public class CorbaObjectHandlerTest extends Assert {
             }
         }
     }
-    
+
     @Test
     public void testCreateCorbaObjectHandler() {
         QName objName = new QName("object");
@@ -64,7 +64,7 @@ public class CorbaObjectHandlerTest extends Assert {
         CorbaObjectHandler obj = new CorbaObjectHandler(objName, objIdlType, objTypeCode, null);
         assertNotNull(obj);
     }
-    
+
     @Test
     public void testGetObjectAttributes() {
         QName objName = new QName("object");
@@ -75,15 +75,15 @@ public class CorbaObjectHandlerTest extends Assert {
         QName name = obj.getName();
         assertNotNull(name);
         assertTrue(name.equals(objName));
-        
+
         QName idlType = obj.getIdlType();
         assertNotNull(idlType);
         assertTrue(idlType.equals(objIdlType));
-        
+
         TypeCode tc = obj.getTypeCode();
         assertNotNull(tc);
         assertTrue(tc.kind().value() == objTypeCode.kind().value());
-        
+
         Object objDef = obj.getType();
         assertNull(objDef);
     }

@@ -74,8 +74,8 @@ public class HTTPUndertowTransportNamespaceHandler implements NamespaceHandler {
         return null;
     }
 
-    public ComponentMetadata decorate(Node node, 
-                                      ComponentMetadata componentMetadata, 
+    public ComponentMetadata decorate(Node node,
+                                      ComponentMetadata componentMetadata,
                                       ParserContext parserContext) {
         LOG.info("Decorating node " + node + " " + componentMetadata);
         return componentMetadata;

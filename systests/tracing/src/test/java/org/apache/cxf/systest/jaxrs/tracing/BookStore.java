@@ -46,7 +46,7 @@ import org.apache.cxf.tracing.TracerContext;
 public class BookStore<T extends Closeable> {
     @Context private TracerContext tracer;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
-        
+
     @GET
     @Path("/books")
     @Produces(MediaType.APPLICATION_JSON)
@@ -58,7 +58,7 @@ public class BookStore<T extends Closeable> {
             );
         }
     }
-    
+
     @GET
     @Path("/books/async")
     @Produces(MediaType.APPLICATION_JSON)
@@ -70,26 +70,26 @@ public class BookStore<T extends Closeable> {
                     tracer.wrap("Processing books", new Traceable<Void>() {
                         @Override
                         public Void call(final TracerContext context) throws Exception {
-                            // Simulate some running job 
+                            // Simulate some running job
                             Thread.sleep(200);
-                            
+
                             response.resume(
                                 Arrays.asList(
                                     new Book("Apache CXF in Action", UUID.randomUUID().toString()),
                                     new Book("Mastering Apache CXF", UUID.randomUUID().toString())
                                 )
                             );
-                            
+
                             return null;
                         }
                     }
                 ));
-                
+
                 return null;
             }
         });
     }
-    
+
     @GET
     @Path("/books/async/notrace")
     @Produces(MediaType.APPLICATION_JSON)
@@ -98,22 +98,22 @@ public class BookStore<T extends Closeable> {
             new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    // Simulate some running job 
+                    // Simulate some running job
                     Thread.sleep(200);
-                    
+
                     response.resume(
                         Arrays.asList(
                             new Book("Apache CXF in Action", UUID.randomUUID().toString()),
                             new Book("Mastering Apache CXF", UUID.randomUUID().toString())
                         )
                     );
-                    
+
                     return null;
                 }
             }
         );
     }
-    
+
     @GET
     @Path("/books/pseudo-async")
     @Produces(MediaType.APPLICATION_JSON)
@@ -133,7 +133,7 @@ public class BookStore<T extends Closeable> {
             }
         });
     }
-    
+
     @GET
     @Path("/book/{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -141,7 +141,7 @@ public class BookStore<T extends Closeable> {
         tracer.annotate("book-id", id);
         return new Book("Apache CXF in Action", id);
     }
-    
+
     @PUT
     @Path("/process")
     @Produces(MediaType.APPLICATION_JSON)
@@ -155,7 +155,7 @@ public class BookStore<T extends Closeable> {
                 }
             })
         );
-        
+
         return Response.ok().build();
     }
 }

@@ -35,21 +35,21 @@ import org.apache.wss4j.dom.message.token.UsernameToken;
  */
 public class CustomUsernameTokenProvider implements TokenProvider {
 
-    private static final String TOKEN_TYPE = 
+    private static final String TOKEN_TYPE =
         "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#UsernameToken";
-    
+
     public boolean canHandleToken(String tokenType) {
         return TOKEN_TYPE.equals(tokenType);
     }
-    
+
     public boolean canHandleToken(String tokenType, String realm) {
         return canHandleToken(tokenType);
     }
-    
+
     public TokenProviderResponse createToken(TokenProviderParameters tokenParameters) {
         try {
             Document doc = DOMUtils.createDocument();
-            
+
             // Mock up a UsernameToken
             UsernameToken usernameToken = new UsernameToken(true, doc, WSConstants.PASSWORD_TEXT);
             usernameToken.setName("alice");
@@ -58,11 +58,11 @@ public class CustomUsernameTokenProvider implements TokenProvider {
             usernameToken.addWSSENamespace();
             usernameToken.addWSUNamespace();
             usernameToken.setID(id);
-            
+
             TokenProviderResponse response = new TokenProviderResponse();
             response.setToken(usernameToken.getElement());
             response.setTokenId(id);
-            
+
             // Store the token in the cache
             if (tokenParameters.getTokenStore() != null) {
                 SecurityToken securityToken = new SecurityToken(usernameToken.getID());
@@ -72,7 +72,7 @@ public class CustomUsernameTokenProvider implements TokenProvider {
                 securityToken.setTokenHash(hashCode);
                 tokenParameters.getTokenStore().add(identifier, securityToken);
             }
-            
+
             return response;
         } catch (Exception e) {
             e.printStackTrace();

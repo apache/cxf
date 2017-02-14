@@ -42,17 +42,17 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 @Produces("text/plain")
 public class PrimitiveTextProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyReader<T>, MessageBodyWriter<T> {
-    
-    private static boolean isSupported(Class<?> type, MediaType mt) { 
+
+    private static boolean isSupported(Class<?> type, MediaType mt) {
         boolean isPrimitive = InjectionUtils.isPrimitiveOnly(type);
         return isPrimitive && mt.isCompatible(MediaType.TEXT_PLAIN_TYPE);
     }
-    
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return isSupported(type, mt);
     }
 
-    public T readFrom(Class<T> type, Type genType, Annotation[] anns, MediaType mt, 
+    public T readFrom(Class<T> type, Type genType, Annotation[] anns, MediaType mt,
                       MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         String string = IOUtils.toString(is, HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name()));
         if (StringUtils.isEmpty(string)) {
@@ -63,13 +63,13 @@ public class PrimitiveTextProvider<T> extends AbstractConfigurableProvider
             return type.cast(Character.valueOf(character));
         }
         return InjectionUtils.handleParameter(
-                    string, 
+                    string,
                     false,
                     type,
                     genType,
                     anns,
                     ParameterType.REQUEST_BODY, null);
-        
+
     }
 
     public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
@@ -80,13 +80,13 @@ public class PrimitiveTextProvider<T> extends AbstractConfigurableProvider
         return isSupported(type, mt);
     }
 
-    public void writeTo(T obj, Class<?> type, Type genType, Annotation[] anns, 
+    public void writeTo(T obj, Class<?> type, Type genType, Annotation[] anns,
                         MediaType mt, MultivaluedMap<String, Object> headers,
                         OutputStream os) throws IOException {
         String encoding = HttpUtils.getSetEncoding(mt, headers, StandardCharsets.UTF_8.name());
         byte[] bytes = obj.toString().getBytes(encoding);
         os.write(bytes);
-        
+
     }
-    
+
 }

@@ -44,8 +44,8 @@ public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
     public EcDsaJwsSignatureVerifier(X509Certificate cert, SignatureAlgorithm supportedAlgo) {
         this(cert, null, supportedAlgo);
     }
-    public EcDsaJwsSignatureVerifier(X509Certificate cert, 
-                                     AlgorithmParameterSpec spec, 
+    public EcDsaJwsSignatureVerifier(X509Certificate cert,
+                                     AlgorithmParameterSpec spec,
                                      SignatureAlgorithm supportedAlgo) {
         super(cert, spec, supportedAlgo);
     }
@@ -53,7 +53,7 @@ public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
         final String algoName = super.getAlgorithm().getJwaName();
         if (SIGNATURE_LENGTH_MAP.get(algoName) != signature.length) {
-            LOG.warning("Algorithm " + algoName + " signature length is " + SIGNATURE_LENGTH_MAP.get(algoName) 
+            LOG.warning("Algorithm " + algoName + " signature length is " + SIGNATURE_LENGTH_MAP.get(algoName)
                         + ", actual length is " + signature.length);
             throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
         }

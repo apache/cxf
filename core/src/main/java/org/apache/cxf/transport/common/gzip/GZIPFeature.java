@@ -42,27 +42,27 @@ import org.apache.cxf.message.Message;
  * </jaxws:endpoint>
  * ]]>
  * </pre>
- * Attaching this feature to a client will cause outgoing request messages 
- * to be compressed and incoming compressed responses to be uncompressed. 
- * Accept-Encoding header is sent to let the service know 
- * that your client can accept compressed responses. 
+ * Attaching this feature to a client will cause outgoing request messages
+ * to be compressed and incoming compressed responses to be uncompressed.
+ * Accept-Encoding header is sent to let the service know
+ * that your client can accept compressed responses.
  */
 @NoJSR250Annotations
 public class GZIPFeature extends AbstractFeature {
     private static final GZIPInInterceptor IN = new GZIPInInterceptor();
     private static final GZIPOutInterceptor OUT = new GZIPOutInterceptor();
-    
+
     /**
      * The compression threshold to pass to the outgoing interceptor.
      */
     int threshold = -1;
-    
+
     /**
      * Force GZIP instead of negotiate
      */
     boolean force;
-    
-    
+
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         provider.getInInterceptors().add(IN);
@@ -93,24 +93,24 @@ public class GZIPFeature extends AbstractFeature {
     public void setThreshold(int threshold) {
         this.threshold = threshold;
     }
-    
+
     public int getThreshold() {
         return threshold;
     }
-    
-    
+
+
     /**
-     * Set if GZIP is always used without negotiation 
+     * Set if GZIP is always used without negotiation
      * @param b
      */
     public void setForce(boolean b) {
         force = b;
     }
-    
+
     /**
      * Retrieve the value set with {@link #setForce(boolean)}.
      */
     public boolean getForce() {
         return force;
-    }  
+    }
 }

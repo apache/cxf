@@ -34,9 +34,9 @@ import com.example.customerservice.NoSuchCustomer;
 import com.example.customerservice.NoSuchCustomerException;
 
 public class CustomerServiceImpl implements CustomerService {
-    
+
     /**
-     * The WebServiceContext can be used to retrieve special attributes like the 
+     * The WebServiceContext can be used to retrieve special attributes like the
      * user principal. Normally it is not needed
      */
     @Resource

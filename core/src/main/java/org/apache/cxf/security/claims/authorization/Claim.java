@@ -26,18 +26,18 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Claim {
-    
+
     String format() default "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified";
     String name() default "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
     String[] value();
-    
+
     /**
-     * If set to true then all the values of this claim have to be matched 
+     * If set to true then all the values of this claim have to be matched
      */
     boolean matchAll() default false;
     /**
      * If set to ClaimMode.LAX then the match will fail only if the incoming
-     * assertion has the same name and format claim with non-matching values  
+     * assertion has the same name and format claim with non-matching values
      */
     ClaimMode mode() default ClaimMode.STRICT;
 }

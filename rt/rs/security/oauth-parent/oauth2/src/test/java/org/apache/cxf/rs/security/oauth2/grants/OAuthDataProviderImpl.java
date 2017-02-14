@@ -74,7 +74,7 @@ public class OAuthDataProviderImpl implements OAuthDataProvider {
     @Override
     public void revokeToken(Client client, String token, String tokenTypeHint) throws OAuthServiceException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override

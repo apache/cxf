@@ -30,7 +30,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.omg.CORBA.ORB;
 
 public abstract class AbstractNoStartEndEventProducer implements CorbaTypeEventProducer {
-    
+
     protected CorbaTypeEventProducer currentEventProducer;
     protected Iterator<CorbaObjectHandler> iterator;
     protected ServiceInfo serviceInfo;
@@ -51,7 +51,7 @@ public abstract class AbstractNoStartEndEventProducer implements CorbaTypeEventP
     public boolean hasNext() {
         return (currentEventProducer != null
                 ? currentEventProducer.hasNext() : false)
-            || (iterator != null ? iterator.hasNext() : false); 
+            || (iterator != null ? iterator.hasNext() : false);
     }
 
     public int next() {

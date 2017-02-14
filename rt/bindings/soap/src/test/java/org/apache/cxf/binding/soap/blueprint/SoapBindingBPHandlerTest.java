@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class SoapBindingBPHandlerTest extends Assert {
     @Test
     public void testGetSchemaLocation() {
         SoapBindingBPHandler handler = new SoapBindingBPHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/blueprint/bindings/soap"));
     }
 }

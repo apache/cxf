@@ -22,14 +22,14 @@ package org.apache.cxf.sts.operation;
 import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
 
 /**
- * This interface defines a pluggable way of "wrapping" tokens that are issued by the STS. Some Tokens may be issued 
+ * This interface defines a pluggable way of "wrapping" tokens that are issued by the STS. Some Tokens may be issued
  * in a format that needs to be wrapped as part of the JAXB response.
  */
 public interface TokenWrapper {
-    
+
     /**
      * Wrap the Token parameter and set it on the RequestedSecurityTokenType parameter
      */
     void wrapToken(Object token, RequestedSecurityTokenType requestedTokenType);
-    
+
 }

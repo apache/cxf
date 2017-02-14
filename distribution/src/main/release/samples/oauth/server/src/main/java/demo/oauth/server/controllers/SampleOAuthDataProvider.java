@@ -58,7 +58,7 @@ public class SampleOAuthDataProvider extends MemoryOAuthDataProvider
         }
         return apps;
     }
- 
+
     public synchronized void removeRegisteredClient(String consumerKey) {
         List<String> registeredApps = this.userRegisteredClients.get(consumerKey);
         this.clientAuthInfo.remove(consumerKey);
@@ -81,5 +81,5 @@ public class SampleOAuthDataProvider extends MemoryOAuthDataProvider
                 oauthTokens.remove(token.getTokenKey());
             }
         }
-    }   
+    }
 }

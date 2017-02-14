@@ -70,10 +70,10 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
                             headers.add(header.getPart());
                         }
                     }
-                    
+
                     //find the headers as they don't contribute to the body
-                    
-                    if (inMessage != null && !isUniqueBodyPart(operation.getName(), 
+
+                    if (inMessage != null && !isUniqueBodyPart(operation.getName(),
                                                                inMessage,
                                                                headers,
                                                                binding.getQName())) {

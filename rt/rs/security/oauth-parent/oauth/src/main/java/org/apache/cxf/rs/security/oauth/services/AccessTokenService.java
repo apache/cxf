@@ -35,21 +35,21 @@ import javax.ws.rs.core.Response;
 public class AccessTokenService extends AbstractOAuthService {
 
     private AccessTokenHandler handler = new AccessTokenHandler();
-    
+
     public void setAccessTokenHandler(AccessTokenHandler h) {
         this.handler = h;
     }
-    
+
     @GET
     @Produces("application/x-www-form-urlencoded")
     public Response getAccessTokenWithGET() {
         return getAccessToken();
     }
-    
+
     @POST
     @Produces("application/x-www-form-urlencoded")
     public Response getAccessToken() {
-        return handler.handle(getMessageContext(), 
+        return handler.handle(getMessageContext(),
                               getDataProvider(),
                               getValidator());
     }

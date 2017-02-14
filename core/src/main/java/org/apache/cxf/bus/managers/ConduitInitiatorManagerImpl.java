@@ -41,7 +41,7 @@ import org.apache.cxf.transport.TransportFinder;
 @NoJSR250Annotations(unlessNull = "bus")
 public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManager {
 
-    private static final ResourceBundle BUNDLE 
+    private static final ResourceBundle BUNDLE
         = BundleUtils.getBundle(ConduitInitiatorManagerImpl.class);
 
     Map<String, ConduitInitiator> conduitInitiators;
@@ -56,7 +56,7 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
         conduitInitiators = new ConcurrentHashMap<String, ConduitInitiator>(8, 0.75f, 4);
         setBus(b);
     }
-    
+
     @Resource
     public void setBus(Bus b) {
         bus = b;
@@ -67,7 +67,7 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.cxf.bus.ConduitInitiatorManager#registerConduitInitiator(java.lang.String,
      *      org.apache.cxf.transports.ConduitInitiator)
      */
@@ -77,7 +77,7 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.cxf.bus.ConduitInitiatorManager#deregisterConduitInitiator(java.lang.String)
      */
     public void deregisterConduitInitiator(String namespace) {
@@ -86,14 +86,14 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.apache.cxf.bus.ConduitInitiatorManager#ConduitInitiator(java.lang.String)
      */
     /**
      * Returns the conduit initiator for the given namespace, constructing it
      * (and storing in the cache for future reference) if necessary, using its
      * list of factory classname to namespace mappings.
-     * 
+     *
      * @param namespace the namespace.
      */
     public ConduitInitiator getConduitInitiator(String namespace) throws BusException {
@@ -122,7 +122,7 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
             conduitInitiators,
             loaded,
             ConduitInitiator.class).findTransportForURI(uri);
-        
+
         return factory;
     }
 }

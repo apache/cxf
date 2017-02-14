@@ -28,7 +28,7 @@ import org.apache.cxf.jms.testsuite.util.JMSTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class TestSuiteServer extends AbstractBusTestServerBase {
-    
+
     private static String jndiUrl;
 
     List<Endpoint> endpoints = new LinkedList<Endpoint>();
@@ -62,7 +62,7 @@ public class TestSuiteServer extends AbstractBusTestServerBase {
         startEndpoint("test1107", new Test1107Impl());
         startEndpoint("test1108", new Test1108Impl());
     }
-    
+
     private void startEndpoint(String endpointName, Object testImpl) {
         String partAddress = JMSTestUtil.getTestCase(endpointName).getAddress().trim();
         String address = JMSTestUtil.getFullAddress(partAddress, jndiUrl);

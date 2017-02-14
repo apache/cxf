@@ -55,15 +55,15 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
 
     @Before
     public void before() throws Exception {
-        setupRhino("dlw-service-endpoint", 
-                   "/org/apache/cxf/javascript/DocLitWrappedTests.js", 
+        setupRhino("dlw-service-endpoint",
+                   "/org/apache/cxf/javascript/DocLitWrappedTests.js",
                    Boolean.TRUE);
     }
-    
+
     @Override
     protected void additionalSpringConfiguration(GenericApplicationContext context) throws Exception {
     }
-    
+
     @Override
     protected String[] getConfigLocations() {
         TestUtil.getNewPortNumber("TestPort");
@@ -71,7 +71,7 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
     }
 
     private Void beanFunctionCaller(Context context, boolean useWrapper) {
-        TestBean1 b1 = new TestBean1(); 
+        TestBean1 b1 = new TestBean1();
         b1.stringItem = "strung";
         TestBean1[] beans = new TestBean1[3];
         beans[0] = new TestBean1();
@@ -86,18 +86,18 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
         beans[2].optionalIntArrayItem = new int[2];
         beans[2].optionalIntArrayItem[0] = 4;
         beans[2].optionalIntArrayItem[1] = 6;
-        
+
         Object[] jsBeans = new Object[3];
         jsBeans[0] = testBean1ToJS(testUtilities, context, beans[0]);
         jsBeans[1] = testBean1ToJS(testUtilities, context, beans[1]);
         jsBeans[2] = testBean1ToJS(testUtilities, context, beans[2]);
-        
+
         Scriptable jsBean1 = testBean1ToJS(testUtilities, context, b1);
         Scriptable jsBeanArray = context.newArray(testUtilities.getRhinoScope(), jsBeans);
-        
+
         LOG.info("About to call test4 " + getAddress());
-        Notifier notifier = 
-            testUtilities.rhinoCallConvert("test4", Notifier.class, 
+        Notifier notifier =
+            testUtilities.rhinoCallConvert("test4", Notifier.class,
                                            testUtilities.javaToJS(getAddress()),
                                            testUtilities.javaToJS(Boolean.valueOf(useWrapper)),
                                            jsBean1,
@@ -114,14 +114,14 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
         Object responseObject = testUtilities.rhinoEvaluate("globalResponseObject");
         assertNotNull(responseObject);
         assertEquals(Context.getUndefinedValue(), responseObject);
-        SimpleDocLitWrappedImpl impl = (SimpleDocLitWrappedImpl)rawImplementor; 
+        SimpleDocLitWrappedImpl impl = (SimpleDocLitWrappedImpl)rawImplementor;
         TestBean1 b1returned = impl.getLastBean1();
         assertEquals(b1, b1returned);
         TestBean1[] beansReturned = impl.getLastBean1Array();
         assertArrayEquals(beans, beansReturned);
         return null;
     }
-    
+
     @Test
     public void callFunctionWithBeans() {
         LOG.info("about to call test4/beanFunction");
@@ -141,16 +141,16 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
             }
         });
     }
-    
+
     @Test
     public void callFunctionWithHeader() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
 
             public Void run(Context context) {
                 LOG.info("About to call testDummyHeader " + getAddress());
-                Notifier notifier = 
-                    testUtilities.rhinoCallConvert("testDummyHeader", Notifier.class, 
-                                                   testUtilities.javaToJS(getAddress()), 
+                Notifier notifier =
+                    testUtilities.rhinoCallConvert("testDummyHeader", Notifier.class,
+                                                   testUtilities.javaToJS(getAddress()),
                                                    testUtilities.javaToJS("narcissus"),
                                                    null);
                 boolean notified = notifier.waitForJavascript(1000 * 10);
@@ -162,25 +162,25 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
 
                 Scriptable responseObject = (Scriptable)testUtilities.rhinoEvaluate("globalResponseObject");
                 assertNotNull(responseObject);
-                // by default, for doc/lit/wrapped, we end up with a part object with a slot named 
+                // by default, for doc/lit/wrapped, we end up with a part object with a slot named
                 // 'return'.
                 String returnValue = testUtilities.rhinoCallMethodInContext(String.class, responseObject,
                                                                              "getReturn");
                 assertEquals("narcissus", returnValue);
                 return null;
             }
-            
+
         });
     }
-    
+
     @Test
     public void callIntReturnMethod() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
             public Void run(Context context) {
                 LOG.info("About to call test3/IntFunction" + getAddress());
-                Notifier notifier = 
-                    testUtilities.rhinoCallConvert("test3", Notifier.class, 
-                                                   testUtilities.javaToJS(getAddress()), 
+                Notifier notifier =
+                    testUtilities.rhinoCallConvert("test3", Notifier.class,
+                                                   testUtilities.javaToJS(getAddress()),
                                                    testUtilities.javaToJS(Double.valueOf(17.0)),
                                                    testUtilities.javaToJS(Float.valueOf((float)111.0)),
                                                    testUtilities.javaToJS(Integer.valueOf(142)),
@@ -195,7 +195,7 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
 
                 Scriptable responseObject = (Scriptable)testUtilities.rhinoEvaluate("globalResponseObject");
                 assertNotNull(responseObject);
-                // by default, for doc/lit/wrapped, we end up with a part object with a slot named 
+                // by default, for doc/lit/wrapped, we end up with a part object with a slot named
                 // 'return'.
                 int returnValue = testUtilities.rhinoCallMethodInContext(Integer.class, responseObject,
                                                                              "getReturn");
@@ -211,9 +211,9 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
             public Void run(Context context) {
                 LOG.info("About to call test2 " + getAddress());
-                Notifier notifier = 
-                    testUtilities.rhinoCallConvert("test2", Notifier.class, 
-                                                   testUtilities.javaToJS(getAddress()), 
+                Notifier notifier =
+                    testUtilities.rhinoCallConvert("test2", Notifier.class,
+                                                   testUtilities.javaToJS(getAddress()),
                                                    testUtilities.javaToJS(Double.valueOf(17.0)),
                                                    testUtilities.javaToJS(Float.valueOf((float)111.0)),
                                                    testUtilities.javaToJS(Integer.valueOf(142)),
@@ -228,7 +228,7 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
 
                 Scriptable responseObject = (Scriptable)testUtilities.rhinoEvaluate("globalResponseObject");
                 assertNotNull(responseObject);
-                // by default, for doc/lit/wrapped, we end up with a part object with a slot named 
+                // by default, for doc/lit/wrapped, we end up with a part object with a slot named
                 // 'return'.
                 String returnString = testUtilities.rhinoCallMethodInContext(String.class, responseObject,
                                                                              "getReturn");
@@ -269,7 +269,7 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
             }
         });
     }
-    
+
     @Test
     public void inheritedProperties() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
@@ -283,18 +283,18 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
                 assertEquals("less", impl.getLastInheritanceTestDerived().getName());
                 return null;
             }
-            
+
         });
     }
-    
+
     @Test
     public void callTest2WithNullString() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
             public Void run(Context context) {
                 LOG.info("About to call test2 with null string " + getAddress());
-                Notifier notifier = 
-                    testUtilities.rhinoCallConvert("test2", Notifier.class, 
-                                                   testUtilities.javaToJS(getAddress()), 
+                Notifier notifier =
+                    testUtilities.rhinoCallConvert("test2", Notifier.class,
+                                                   testUtilities.javaToJS(getAddress()),
                                                    testUtilities.javaToJS(Double.valueOf(17.0)),
                                                    testUtilities.javaToJS(Float.valueOf((float)111.0)),
                                                    testUtilities.javaToJS(Integer.valueOf(142)),
@@ -309,7 +309,7 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
 
                 Scriptable responseObject = (Scriptable)testUtilities.rhinoEvaluate("globalResponseObject");
                 assertNotNull(responseObject);
-                // by default, for doc/lit/wrapped, we end up with a part object with a slot named 
+                // by default, for doc/lit/wrapped, we end up with a part object with a slot named
                 // 'return'.
                 String returnString = testUtilities.rhinoCallMethodInContext(String.class, responseObject,
                                                                              "getReturn");
@@ -321,12 +321,12 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
     }
 
     public static Scriptable testBean1ToJS(JavascriptTestUtilities testUtilities,
-                                           Context context, 
+                                           Context context,
                                            TestBean1 b1) {
         if (b1 == null) {
             return null; // black is always in fashion. (Really, we can be called with a null).
         }
-        Scriptable rv = context.newObject(testUtilities.getRhinoScope(), 
+        Scriptable rv = context.newObject(testUtilities.getRhinoScope(),
                                           "org_apache_cxf_javascript_testns_testBean1");
         testUtilities.rhinoCallMethod(rv, "setStringItem", testUtilities.javaToJS(b1.stringItem));
         testUtilities.rhinoCallMethod(rv, "setIntItem", testUtilities.javaToJS(b1.intItem));
@@ -338,9 +338,9 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
         testUtilities.rhinoCallMethod(rv, "setDoubleItem", testUtilities.javaToJS(b1.doubleItem));
         testUtilities.rhinoCallMethod(rv, "setBeanTwoItem", testBean2ToJS(testUtilities,
                                                                           context, b1.beanTwoItem));
-        testUtilities.rhinoCallMethod(rv, "setBeanTwoNotRequiredItem", 
+        testUtilities.rhinoCallMethod(rv, "setBeanTwoNotRequiredItem",
                                       testBean2ToJS(testUtilities, context, b1.beanTwoNotRequiredItem));
-        return rv; 
+        return rv;
     }
 
     public static Object testBean2ToJS(JavascriptTestUtilities testUtilities,
@@ -348,10 +348,10 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
         if (beanTwoItem == null) {
             return null;
         }
-        Scriptable rv = context.newObject(testUtilities.getRhinoScope(), 
+        Scriptable rv = context.newObject(testUtilities.getRhinoScope(),
                                           "org_apache_cxf_javascript_testns3_testBean2");
         testUtilities.rhinoCallMethod(rv, "setStringItem", beanTwoItem.stringItem);
         return rv;
     }
-    
+
 }

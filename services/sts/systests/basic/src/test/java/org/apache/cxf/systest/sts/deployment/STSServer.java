@@ -26,7 +26,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class STSServer extends AbstractBusTestServerBase {
-    
+
     private String context;
 
     public STSServer() {
@@ -45,7 +45,7 @@ public class STSServer extends AbstractBusTestServerBase {
             e.printStackTrace();
         }
     }
-    
+
     public void setContext(String context) {
         this.context = context;
     }

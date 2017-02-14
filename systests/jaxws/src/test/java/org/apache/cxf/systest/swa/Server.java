@@ -29,7 +29,7 @@ public class Server extends AbstractBusTestServerBase {
 
     protected void run() {
         String port = TestUtil.getPortNumber(Server.class);
-        
+
         Object implementor = new SwAServiceImpl();
         String address = "http://localhost:" + port + "/swa";
         EndpointImpl ep;
@@ -37,8 +37,8 @@ public class Server extends AbstractBusTestServerBase {
             ep = (EndpointImpl) Endpoint.create(new SwANoMimeServiceImpl());
             ep.setWsdlLocation("classpath:wsdl/swa-mime-nomime.wsdl");
             ep.publish(address + "-nomime");
-            
-            
+
+
             ep = (EndpointImpl) Endpoint.create(implementor);
             ep.setWsdlLocation("classpath:wsdl/swa-mime.wsdl");
             ep.publish(address);

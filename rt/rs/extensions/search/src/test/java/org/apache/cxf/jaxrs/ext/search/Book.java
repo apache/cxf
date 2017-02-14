@@ -27,15 +27,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Book implements Comparable<Book> {
     private String name;
     private long id;
-    
+
     public Book() {
     }
-    
+
     public Book(String name, long id) {
         this.name = name;
         this.id = id;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
@@ -43,36 +43,36 @@ public class Book implements Comparable<Book> {
     public String getName() {
         return name;
     }
-    
+
     public void setId(long i) {
         id = i;
     }
     public long getId() {
         return id;
     }
-    
-    
+
+
     @GET
     public String getState() {
         return "";
     }
-    
-    
+
+
     public void setState(String s) {
     }
-    
-    public int hashCode() { 
+
+    public int hashCode() {
         return name.hashCode() * 37 + new Long(id).hashCode();
     }
-    
+
     public boolean equals(Object o) {
         if (!(o instanceof Book)) {
             return false;
         }
         Book other = (Book)o;
-        
+
         return other.name.equals(name) && other.id == id;
-        
+
     }
 
     public int compareTo(Book b) {

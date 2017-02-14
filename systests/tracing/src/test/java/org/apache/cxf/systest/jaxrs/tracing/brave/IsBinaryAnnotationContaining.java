@@ -44,7 +44,7 @@ public class IsBinaryAnnotationContaining extends IsCollectionContaining<BinaryA
             }
         });
     }
-    
+
     public static IsBinaryAnnotationContaining hasItem(final String key, final String value) {
         return new IsBinaryAnnotationContaining(key, value);
     }

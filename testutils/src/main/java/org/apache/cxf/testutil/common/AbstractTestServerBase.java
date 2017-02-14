@@ -27,9 +27,9 @@ import org.junit.Assert;
 
 public abstract class AbstractTestServerBase extends Assert {
     boolean inProcess;
-    
-    /** 
-     * method implemented by test servers.  Initialise 
+
+    /**
+     * method implemented by test servers.  Initialise
      * servants and publish endpoints etc.
      *
      */
@@ -38,8 +38,8 @@ public abstract class AbstractTestServerBase extends Assert {
     protected Logger getLog() {
         return LogUtils.getLogger(this.getClass());
     }
-    
-    
+
+
     public void startInProcess() throws Exception {
         inProcess = true;
         //System.out.println("running server in-process");
@@ -47,7 +47,7 @@ public abstract class AbstractTestServerBase extends Assert {
         //System.out.println("signal ready");
         ready();
     }
-    
+
     public boolean stopInProcess() throws Exception {
         boolean ret = true;
         tearDown();
@@ -59,19 +59,19 @@ public abstract class AbstractTestServerBase extends Assert {
             ret = false;
         }
         return ret;
-    }    
-    
+    }
+
     public void start() {
-        try { 
+        try {
             System.out.println("running server");
             run();
             System.out.println("signal ready");
             ready();
-            
-            // wait for a key press then shut 
+
+            // wait for a key press then shut
             // down the server
             //
-            System.in.read(); 
+            System.in.read();
             System.out.println("stopping bus");
             tearDown();
         } catch (Throwable ex) {
@@ -87,24 +87,24 @@ public abstract class AbstractTestServerBase extends Assert {
             System.exit(0);
         }
     }
-    
+
     public void setUp() throws Exception {
         // emtpy
     }
-    
+
     public void tearDown() throws Exception {
         // empty
     }
-    
+
     protected void ready() {
         if (!inProcess) {
             System.out.println("server ready");
         }
     }
-    
+
     protected void startFailed() {
         System.out.println(ServerLauncher.SERVER_FAILED);
-        System.exit(-1);        
+        System.exit(-1);
     }
 
     /**
@@ -116,7 +116,7 @@ public abstract class AbstractTestServerBase extends Assert {
     protected boolean verify(Logger log) {
         return true;
     }
-    
+
     protected static int allocatePortAsInt(Class<?> cls) {
         return Integer.parseInt(TestUtil.getPortNumber(cls));
     }
@@ -126,5 +126,5 @@ public abstract class AbstractTestServerBase extends Assert {
     protected static String allocatePort(Class<?> cls, int i) {
         return TestUtil.getPortNumber(cls, i);
     }
-    
+
 }

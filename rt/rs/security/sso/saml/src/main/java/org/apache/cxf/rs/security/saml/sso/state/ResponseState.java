@@ -29,23 +29,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ResponseState implements Serializable {
 
     private static final long serialVersionUID = -3247188797004342462L;
-    
+
     private String assertion;
     private String relayState;
     private String webAppContext;
     private String webAppDomain;
     private long createdAt;
     private long expiresAt;
-    
+
     public ResponseState() {
-        
+
     }
-    
+
     public ResponseState(String assertion,
                          String relayState,
                          String webAppContext,
                          String webAppDomain,
-                         long createdAt, 
+                         long createdAt,
                          long expiresAt) {
         this.assertion = assertion;
         this.relayState = relayState;
@@ -58,7 +58,7 @@ public class ResponseState implements Serializable {
     public long getCreatedAt() {
         return createdAt;
     }
-    
+
     public long getExpiresAt() {
         return expiresAt;
     }
@@ -66,7 +66,7 @@ public class ResponseState implements Serializable {
     public String getRelayState() {
         return relayState;
     }
-    
+
     public String getWebAppContext() {
         return webAppContext;
     }
@@ -74,7 +74,7 @@ public class ResponseState implements Serializable {
     public String getWebAppDomain() {
         return webAppDomain;
     }
-    
+
     public String getAssertion() {
         return assertion;
     }

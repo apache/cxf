@@ -26,13 +26,13 @@ public class OASISCatalogManagerHelper {
         String resolvedLocation = null;
         if (catalogResolver != null) {
             resolvedLocation  = catalogResolver.resolveSystem(target);
-            
+
             if (resolvedLocation == null) {
                 resolvedLocation = catalogResolver.resolveURI(target);
             }
             if (resolvedLocation == null) {
                 resolvedLocation = catalogResolver.resolvePublic(target, base);
-            }                
+            }
         }
         return resolvedLocation;
     }

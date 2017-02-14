@@ -29,16 +29,16 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class MediaTypeHeaderProviderTest extends Assert {
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testNullValue() throws Exception {
         MediaType.valueOf(null);
     }
-    
+
     @Test
     public void testTypeWithExtendedParameters() {
         MediaType mt = MediaType.valueOf("multipart/related;type=application/dicom+xml");
-        
+
         assertEquals("multipart", mt.getType());
         assertEquals("related", mt.getSubtype());
         Map<String, String> params2 = mt.getParameters();
@@ -49,14 +49,14 @@ public class MediaTypeHeaderProviderTest extends Assert {
     @Test
     public void testTypeWithExtendedParametersQuote() {
         MediaType mt = MediaType.valueOf("multipart/related;type=\"application/dicom+xml\"");
-        
+
         assertEquals("multipart", mt.getType());
         assertEquals("related", mt.getSubtype());
         Map<String, String> params2 = mt.getParameters();
         assertEquals(1, params2.size());
         assertEquals("\"application/dicom+xml\"", params2.get("type"));
-    }    
-    
+    }
+
     @Test
     public void testTypeWithExtendedAndBoundaryParameter() {
         MediaType mt = MediaType.valueOf(
@@ -68,44 +68,44 @@ public class MediaTypeHeaderProviderTest extends Assert {
         assertEquals("\"uuid:b9aecb2a-ab37-48d6-a1cd-b2f4f7fa63cb\"", params2.get("boundary"));
         assertEquals("application/dicom+xml", params2.get("type"));
     }
-    
+
     @Test
     public void testSimpleType() {
         MediaType m = MediaType.valueOf("text/html");
-        assertEquals("Media type was not parsed correctly", 
+        assertEquals("Media type was not parsed correctly",
                      m, new MediaType("text", "html"));
-        assertEquals("Media type was not parsed correctly", 
+        assertEquals("Media type was not parsed correctly",
                      MediaType.valueOf("text/html "), new MediaType("text", "html"));
     }
-    
+
     @Test
     public void testShortWildcard() {
         MediaType m = MediaType.valueOf("*");
-        assertEquals("Media type was not parsed correctly", 
+        assertEquals("Media type was not parsed correctly",
                      m, new MediaType("*", "*"));
     }
-    
+
     @Test
     public void testShortWildcardWithParameters() {
         MediaType m = MediaType.valueOf("*;q=0.2");
-        assertEquals("Media type was not parsed correctly", 
+        assertEquals("Media type was not parsed correctly",
                      m, new MediaType("*", "*", Collections.singletonMap("q", "0.2")));
     }
-    
+
     @Test
     public void testShortWildcardWithParameters2() {
         MediaType m = MediaType.valueOf("* ;q=0.2");
-        assertEquals("Media type was not parsed correctly", 
+        assertEquals("Media type was not parsed correctly",
                      m, new MediaType("*", "*", Collections.singletonMap("q", "0.2")));
     }
-    
+
     @Test
     public void testShortWildcardWithParameters3() {
         MediaType m = MediaType.valueOf("*; q=.2");
-        assertEquals("Media type was not parsed correctly", 
+        assertEquals("Media type was not parsed correctly",
                      m, new MediaType("*", "*", Collections.singletonMap("q", ".2")));
     }
-    
+
     @Test
     public void testBadType() {
         try {
@@ -114,9 +114,9 @@ public class MediaTypeHeaderProviderTest extends Assert {
         } catch (IllegalArgumentException pe) {
             // expected
         }
-        
+
     }
-    
+
     @Test
     public void testBadParameter() {
         try {
@@ -126,7 +126,7 @@ public class MediaTypeHeaderProviderTest extends Assert {
             // expected
         }
     }
-    
+
     @Test
     public void testIlleageMediaType() {
         try {
@@ -135,33 +135,33 @@ public class MediaTypeHeaderProviderTest extends Assert {
         } catch (IllegalArgumentException pe) {
             // expected
         }
-        
+
         try {
             new MediaTypeHeaderProvider().fromString("s//t;type=a/b");
             fail("Parse exception expected");
         } catch (IllegalArgumentException pe) {
             // expected
         }
-        
+
         try {
             new MediaTypeHeaderProvider().fromString("s/b/t;type=a/b");
             fail("Parse exception expected");
         } catch (IllegalArgumentException pe) {
             // expected
         }
-        
+
         try {
             new MediaTypeHeaderProvider().fromString("/b;type=a/b");
             fail("Parse exception expected");
         } catch (IllegalArgumentException pe) {
             // expected
-        }       
+        }
     }
-    
+
     @Test
     public void testTypeWithParameters() {
         MediaType mt = MediaType.valueOf("text/html;q=1234;b=4321");
-        
+
         assertEquals("text", mt.getType());
         assertEquals("html", mt.getSubtype());
         Map<String, String> params2 = mt.getParameters();
@@ -169,23 +169,23 @@ public class MediaTypeHeaderProviderTest extends Assert {
         assertEquals("1234", params2.get("q"));
         assertEquals("4321", params2.get("b"));
     }
-    
+
     @Test
     public void testSimpleToString() {
-        MediaTypeHeaderProvider provider = 
+        MediaTypeHeaderProvider provider =
             new MediaTypeHeaderProvider();
-        
+
         assertEquals("simple media type is not serialized", "text/plain",
                      provider.toString(new MediaType("text", "plain")));
     }
-    
+
     @Test
     public void testHeaderFileName() {
 
         String fileName = "version_2006&#65288;3&#65289;.pdf";
         String header = "application/octet-stream; name=\"%s\"";
         String value = String.format(header, fileName);
-        
+
         MediaTypeHeaderProvider provider = new MediaTypeHeaderProvider();
         MediaType mt = provider.fromString(value);
         assertEquals("application", mt.getType());
@@ -193,21 +193,21 @@ public class MediaTypeHeaderProviderTest extends Assert {
         Map<String, String> params = mt.getParameters();
         assertEquals(1, params.size());
         assertEquals("\"version_2006&#65288;3&#65289;.pdf\"", params.get("name"));
-        
+
     }
-    
+
     @Test
     public void testComplexToString() {
-        MediaTypeHeaderProvider provider = 
+        MediaTypeHeaderProvider provider =
             new MediaTypeHeaderProvider();
-        
+
         Map<String, String> params = new LinkedHashMap<String, String>();
         params.put("foo", "bar");
         params.put("q", "0.2");
-        
+
         assertEquals("complex media type is not serialized", "text/plain;foo=bar;q=0.2",
                      provider.toString(new MediaType("text", "plain", params)));
-        
+
     }
 
 }

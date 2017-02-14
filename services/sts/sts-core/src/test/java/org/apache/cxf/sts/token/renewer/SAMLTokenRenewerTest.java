@@ -62,14 +62,14 @@ import org.junit.BeforeClass;
  * Some unit tests for renewing a SAML token via the SAMLTokenRenewer.
  */
 public class SAMLTokenRenewerTest extends org.junit.Assert {
-    
+
     private static TokenStore tokenStore;
-    
+
     @BeforeClass
     public static void init() {
         tokenStore = new DefaultInMemoryTokenStore();
     }
-    
+
     /**
      * Renew a valid SAML1 Assertion
      */
@@ -78,13 +78,13 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         // Create the Assertion
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
-        
+
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
@@ -92,15 +92,15 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         ReceivedToken validateTarget = new ReceivedToken(samlToken);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
+
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
@@ -111,42 +111,42 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
         renewerParameters.setToken(validatorResponse.getToken());
-        
+
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
-        
-        TokenRenewerResponse renewerResponse = 
+
+        TokenRenewerResponse renewerResponse =
                 samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
-        
+
         String oldId = new SamlAssertionWrapper(samlToken).getId();
         String newId = new SamlAssertionWrapper((Element)renewerResponse.getToken()).getId();
         assertFalse(oldId.equals(newId));
-        
+
         // Now validate it again
         validateTarget = new ReceivedToken(renewerResponse.getToken());
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         validatorResponse = samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
+
         // Now try to renew it again!
         renewerParameters.setToken(validatorResponse.getToken());
-        
+
         samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
-        
+
         renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
     }
-    
+
     /**
      * Renew a valid SAML1 Assertion. However, the issuer does not allow renewal
      */
@@ -155,13 +155,13 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         // Create the Assertion
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, false, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
-        
+
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
@@ -169,15 +169,15 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         ReceivedToken validateTarget = new ReceivedToken(samlToken);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
+
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
@@ -188,11 +188,11 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
         renewerParameters.setToken(validatorResponse.getToken());
-        
+
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
-        
+
         try {
             samlTokenRenewer.renewToken(renewerParameters);
             fail("Failure expected on attempting to renew a token that was not allowed to be renewed");
@@ -200,7 +200,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     /**
      * Renew an expired SAML1 Assertion
      */
@@ -209,7 +209,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         // Create the Assertion
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
@@ -217,7 +217,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         samlToken = (Element)doc.appendChild(samlToken);
         // Sleep to expire the token
         Thread.sleep(100);
-        
+
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
@@ -225,15 +225,15 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         ReceivedToken validateTarget = new ReceivedToken(samlToken);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
-        
+
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
@@ -244,83 +244,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
         renewerParameters.setToken(validatorResponse.getToken());
-        
-        TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
-        samlTokenRenewer.setVerifyProofOfPossession(false);
-        assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
-        
-        try {
-            samlTokenRenewer.renewToken(renewerParameters);
-            fail("Failure expected on an expired token, which is not allowed by default");
-        } catch (Exception ex) {
-            // expected
-        }
-        
-        samlTokenRenewer.setAllowRenewalAfterExpiry(true);
-        TokenRenewerResponse renewerResponse = 
-                samlTokenRenewer.renewToken(renewerParameters);
-        assertTrue(renewerResponse != null);
-        assertTrue(renewerResponse.getToken() != null);
-        
-        String oldId = new SamlAssertionWrapper(samlToken).getId();
-        String newId = new SamlAssertionWrapper((Element)renewerResponse.getToken()).getId();
-        assertFalse(oldId.equals(newId));
-        
-        // Now validate it again
-        validateTarget = new ReceivedToken(renewerResponse.getToken());
-        tokenRequirements.setValidateTarget(validateTarget);
-        validatorParameters.setToken(validateTarget);
-        
-        validatorResponse = samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-    }
-    
-    /**
-     * Renew an expired SAML2 Assertion
-     */
-    @org.junit.Test
-    public void renewExpiredSAML2Assertion() throws Exception {
-        // Create the Assertion
-        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
-        CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
-            createSAMLAssertion(
-                WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
-            );
-        Document doc = samlToken.getOwnerDocument();
-        samlToken = (Element)doc.appendChild(samlToken);
-        // Sleep to expire the token
-        Thread.sleep(100);
-        
-        // Validate the Assertion
-        TokenValidator samlTokenValidator = new SAMLTokenValidator();
-        TokenValidatorParameters validatorParameters = createValidatorParameters();
-        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        ReceivedToken validateTarget = new ReceivedToken(samlToken);
-        tokenRequirements.setValidateTarget(validateTarget);
-        validatorParameters.setToken(validateTarget);
-        
-        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
-                samlTokenValidator.validateToken(validatorParameters);
-        assertTrue(validatorResponse != null);
-        assertTrue(validatorResponse.getToken() != null);
-        assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
-        
-        // Renew the Assertion
-        TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
-        renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
-        renewerParameters.setStsProperties(validatorParameters.getStsProperties());
-        renewerParameters.setPrincipal(new CustomTokenPrincipal("alice"));
-        renewerParameters.setMessageContext(validatorParameters.getMessageContext());
-        renewerParameters.setKeyRequirements(validatorParameters.getKeyRequirements());
-        renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
-        renewerParameters.setTokenStore(validatorParameters.getTokenStore());
-        renewerParameters.setToken(validatorResponse.getToken());
-        
+
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
@@ -331,46 +255,45 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         } catch (Exception ex) {
             // expected
         }
-        
+
         samlTokenRenewer.setAllowRenewalAfterExpiry(true);
-        TokenRenewerResponse renewerResponse = 
+        TokenRenewerResponse renewerResponse =
                 samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
-        
+
         String oldId = new SamlAssertionWrapper(samlToken).getId();
         String newId = new SamlAssertionWrapper((Element)renewerResponse.getToken()).getId();
         assertFalse(oldId.equals(newId));
-        
+
         // Now validate it again
         validateTarget = new ReceivedToken(renewerResponse.getToken());
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         validatorResponse = samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
     }
-    
+
     /**
-     * Renew an expired SAML2 Assertion. However the issuer does not allow the renewal of expired 
-     * tokens.
+     * Renew an expired SAML2 Assertion
      */
     @org.junit.Test
-    public void renewExpiredNotAllowedSAML2Assertion() throws Exception {
+    public void renewExpiredSAML2Assertion() throws Exception {
         // Create the Assertion
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
-                WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, false
+                WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
         // Sleep to expire the token
         Thread.sleep(100);
-        
+
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
@@ -378,15 +301,15 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         ReceivedToken validateTarget = new ReceivedToken(samlToken);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
-        
+
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
@@ -397,12 +320,89 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
         renewerParameters.setToken(validatorResponse.getToken());
-        
+
+        TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
+        samlTokenRenewer.setVerifyProofOfPossession(false);
+        assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
+
+        try {
+            samlTokenRenewer.renewToken(renewerParameters);
+            fail("Failure expected on an expired token, which is not allowed by default");
+        } catch (Exception ex) {
+            // expected
+        }
+
+        samlTokenRenewer.setAllowRenewalAfterExpiry(true);
+        TokenRenewerResponse renewerResponse =
+                samlTokenRenewer.renewToken(renewerParameters);
+        assertTrue(renewerResponse != null);
+        assertTrue(renewerResponse.getToken() != null);
+
+        String oldId = new SamlAssertionWrapper(samlToken).getId();
+        String newId = new SamlAssertionWrapper((Element)renewerResponse.getToken()).getId();
+        assertFalse(oldId.equals(newId));
+
+        // Now validate it again
+        validateTarget = new ReceivedToken(renewerResponse.getToken());
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+
+        validatorResponse = samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
+    }
+
+    /**
+     * Renew an expired SAML2 Assertion. However the issuer does not allow the renewal of expired
+     * tokens.
+     */
+    @org.junit.Test
+    public void renewExpiredNotAllowedSAML2Assertion() throws Exception {
+        // Create the Assertion
+        Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
+        CallbackHandler callbackHandler = new PasswordCallbackHandler();
+        Element samlToken =
+            createSAMLAssertion(
+                WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, false
+            );
+        Document doc = samlToken.getOwnerDocument();
+        samlToken = (Element)doc.appendChild(samlToken);
+        // Sleep to expire the token
+        Thread.sleep(100);
+
+        // Validate the Assertion
+        TokenValidator samlTokenValidator = new SAMLTokenValidator();
+        TokenValidatorParameters validatorParameters = createValidatorParameters();
+        TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
+        ReceivedToken validateTarget = new ReceivedToken(samlToken);
+        tokenRequirements.setValidateTarget(validateTarget);
+        validatorParameters.setToken(validateTarget);
+
+        assertTrue(samlTokenValidator.canHandleToken(validateTarget));
+
+        TokenValidatorResponse validatorResponse =
+                samlTokenValidator.validateToken(validatorParameters);
+        assertTrue(validatorResponse != null);
+        assertTrue(validatorResponse.getToken() != null);
+        assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
+
+        // Renew the Assertion
+        TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
+        renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
+        renewerParameters.setStsProperties(validatorParameters.getStsProperties());
+        renewerParameters.setPrincipal(new CustomTokenPrincipal("alice"));
+        renewerParameters.setMessageContext(validatorParameters.getMessageContext());
+        renewerParameters.setKeyRequirements(validatorParameters.getKeyRequirements());
+        renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
+        renewerParameters.setTokenStore(validatorParameters.getTokenStore());
+        renewerParameters.setToken(validatorResponse.getToken());
+
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         samlTokenRenewer.setAllowRenewalAfterExpiry(true);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
-        
+
         try {
             samlTokenRenewer.renewToken(renewerParameters);
             fail("Failure on attempting to renew an expired token, which is not allowed");
@@ -410,8 +410,8 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
             // expected
         }
     }
-    
-    
+
+
     /**
      * Renew an expired SAML2 Assertion that has expired greater than the maximum allowable time
      * for renewal.
@@ -421,7 +421,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         // Create the Assertion
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML2_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
@@ -429,7 +429,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         samlToken = (Element)doc.appendChild(samlToken);
         // Sleep to expire the token
         Thread.sleep(1500);
-        
+
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
@@ -437,15 +437,15 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         ReceivedToken validateTarget = new ReceivedToken(samlToken);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.EXPIRED);
-        
+
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
@@ -456,13 +456,13 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
         renewerParameters.setToken(validatorResponse.getToken());
-        
+
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         samlTokenRenewer.setAllowRenewalAfterExpiry(true);
         ((SAMLTokenRenewer)samlTokenRenewer).setMaxExpiry(1L);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
-        
+
         try {
             samlTokenRenewer.renewToken(renewerParameters);
             fail("Failure expected as the token expired too long ago");
@@ -470,7 +470,7 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
             // Expected
         }
     }
-    
+
     /**
      * Renew a valid SAML1 Assertion but sending a different AppliesTo address.
      */
@@ -479,13 +479,13 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         // Create the Assertion
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
-        
+
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
@@ -493,15 +493,15 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         ReceivedToken validateTarget = new ReceivedToken(samlToken);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
+
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy2");
@@ -512,11 +512,11 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
         renewerParameters.setToken(validatorResponse.getToken());
-        
+
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
-        
+
         try {
             samlTokenRenewer.renewToken(renewerParameters);
             fail("Failure expected on sending a different AppliesTo address");
@@ -525,22 +525,22 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         }
     }
 
-    
+
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {
         TokenValidatorParameters parameters = new TokenValidatorParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         parameters.setMessageContext(msgCtx);
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -552,10 +552,10 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
         parameters.setTokenStore(tokenStore);
-        
+
         return parameters;
     }
-    
+
     private Element createSAMLAssertion(
             String tokenType, Crypto crypto, String signatureUsername,
             CallbackHandler callbackHandler, long ttlMs, boolean allowRenewing,
@@ -565,11 +565,11 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setAcceptClientLifetime(true);
         samlTokenProvider.setConditionsProvider(conditionsProvider);
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                     tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
             );
-        
+
         Renewing renewing = new Renewing();
         renewing.setAllowRenewing(allowRenewing);
         renewing.setAllowRenewingAfterExpiry(allowRenewingAfterExpiry);
@@ -593,10 +593,10 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();
-    }    
-    
+    }
+
     private TokenProviderParameters createProviderParameters(
-        String tokenType, String keyType, Crypto crypto, 
+        String tokenType, String keyType, Crypto crypto,
         String signatureUsername, CallbackHandler callbackHandler
     ) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
@@ -627,10 +627,10 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
 
         parameters.setEncryptionProperties(new EncryptionProperties());
         parameters.setTokenStore(tokenStore);
-        
+
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -638,9 +638,9 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
-    
+
+
 }

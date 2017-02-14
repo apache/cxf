@@ -43,28 +43,28 @@ public class WSDLManagerImplTest extends Assert {
     public void testBuildSimpleWSDL() throws Exception {
         String qname = "http://apache.org/hello_world_soap_http";
         String wsdlUrl = getClass().getResource("hello_world.wsdl").toString();
-        
+
         WSDLManagerImpl builder = new WSDLManagerImpl();
         Definition def = builder.getDefinition(wsdlUrl);
         assertNotNull(def);
-        
+
         Map<?, ?> services = def.getServices();
         assertNotNull(services);
         assertEquals(1, services.size());
         Service service = (Service)services.get(new QName(qname, "SOAPService"));
         assertNotNull(service);
-        
+
         Map<?, ?> ports = service.getPorts();
         assertNotNull(ports);
         assertEquals(1, ports.size());
         Port port = service.getPort("SoapPort");
         assertNotNull(port);
     }
-    
+
     @Test
     public void testBuildImportedWSDL() throws Exception {
         String wsdlUrl = getClass().getResource("hello_world_services.wsdl").toString();
-        
+
         WSDLManagerImpl builder = new WSDLManagerImpl();
         Definition def = builder.getDefinition(wsdlUrl);
 
@@ -72,17 +72,17 @@ public class WSDLManagerImplTest extends Assert {
         Map<?, ?> services = def.getServices();
         assertNotNull(services);
         assertEquals(1, services.size());
-        
+
         String serviceQName = "http://apache.org/hello_world/services";
         Service service = (Service)services.get(new QName(serviceQName, "SOAPService"));
         assertNotNull(service);
-        
+
         Map<?, ?> ports = service.getPorts();
         assertNotNull(ports);
         assertEquals(1, ports.size());
         Port port = service.getPort("SoapPort");
         assertNotNull(port);
-        
+
         Binding binding = port.getBinding();
         assertNotNull(binding);
         QName bindingQName = new QName("http://apache.org/hello_world/bindings", "SOAPBinding");
@@ -95,22 +95,22 @@ public class WSDLManagerImplTest extends Assert {
         assertNotNull(op1);
         QName messageQName = new QName("http://apache.org/hello_world/messages", "sayHiRequest");
         assertEquals(messageQName, op1.getInput().getMessage().getQName());
-        
+
         Part part = op1.getInput().getMessage().getPart("in");
         assertNotNull(part);
         assertEquals(new QName("http://apache.org/hello_world/types", "sayHi"), part.getElementName());
-    }    
+    }
 
     @Test
     public void testLocalNamespacedWSDL() throws Exception {
         String wsdlUrl = getClass().getResource("hello_world_local_nsdecl.wsdl").toString();
-        
+
         WSDLManagerImpl builder = new WSDLManagerImpl();
         Definition def = builder.getDefinition(wsdlUrl);
-        java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream(); 
+        java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
         builder.getWSDLFactory().newWSDLWriter().writeWSDL(def, bos);
     }
-    
+
     @Test
     public void testXMLStreamReaderWrapper() throws Exception {
         final Map<String, String> map = new HashMap<String, String>();
@@ -124,7 +124,7 @@ public class WSDLManagerImplTest extends Assert {
             }
         });
         Definition def = builder.getDefinition(wsdlUrl);
-        java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream(); 
+        java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream();
         builder.getWSDLFactory().newWSDLWriter().writeWSDL(def, bos);
         assertTrue(bos.toString().contains("http://localhost:99999/SoapContext/SoapPort"));
     }

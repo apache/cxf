@@ -26,7 +26,7 @@ import antlr.collections.AST;
 import org.apache.cxf.tools.corba.common.ToolCorbaConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 
-public class ModuleVisitor extends VisitorBase {       
+public class ModuleVisitor extends VisitorBase {
 
     public ModuleVisitor(Scope scope,
                          Definition defn,
@@ -34,12 +34,12 @@ public class ModuleVisitor extends VisitorBase {
                          WSDLASTVisitor wsdlASTVisitor) {
         super(scope, defn, schemaRef, wsdlASTVisitor);
     }
-    
+
     public void visit(AST node) {
         // <module> ::= "module" <identifier> "{" <definition>+ "}"
-        
+
         AST identifierNode = node.getFirstChild();
-        AST definitionNode = identifierNode.getNextSibling();        
+        AST definitionNode = identifierNode.getNextSibling();
 
         while (definitionNode != null) {
             Scope moduleScope = new Scope(getScope(), identifierNode);
@@ -54,9 +54,9 @@ public class ModuleVisitor extends VisitorBase {
             } else {
                 //REVISIT, need to import excluded references.
             }
-            
+
             definitionNode = definitionNode.getNextSibling();
         }
-        
+
     }
 }

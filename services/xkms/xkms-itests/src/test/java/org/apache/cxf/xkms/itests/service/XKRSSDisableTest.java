@@ -61,5 +61,5 @@ public class XKRSSDisableTest extends BasicIntegrationTest {
         ResultDetails message = (ResultDetails)result.getMessageExtension().get(0);
         Assert.assertEquals("XKRSS Operations are disabled", message.getDetails());
     }
-    
+
 }

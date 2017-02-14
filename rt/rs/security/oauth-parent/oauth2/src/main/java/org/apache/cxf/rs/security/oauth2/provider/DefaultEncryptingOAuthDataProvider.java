@@ -50,7 +50,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     public DefaultEncryptingOAuthDataProvider(SecretKey key) {
         this.key = key;
     }
-    
+
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
         return ModelEncryptionSupport.decryptClient(clientsMap.get(clientId), key);
@@ -59,7 +59,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     @Override
     public void setClient(Client client) {
         clientsMap.put(client.getClientId(), ModelEncryptionSupport.encryptClient(client, key));
-        
+
     }
     @Override
     public void doRemoveClient(Client c) {
@@ -116,7 +116,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     protected void doRevokeAccessToken(ServerAccessToken at) {
         tokens.remove(at.getTokenKey());
     }
-    
+
     @Override
     protected void saveRefreshToken(RefreshToken refreshToken) {
         String encryptedRefreshToken = ModelEncryptionSupport.encryptRefreshToken(refreshToken, key);
@@ -142,5 +142,5 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
             throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED, ex);
         }
     }
-    
+
 }

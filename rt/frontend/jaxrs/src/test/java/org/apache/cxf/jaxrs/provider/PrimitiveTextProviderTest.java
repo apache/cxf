@@ -37,50 +37,50 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class PrimitiveTextProviderTest extends Assert {
-    
+
     @Test
     public void testNumberIsWriteable() {
         MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
         assertTrue(p.isWriteable(Byte.class, null, null, MediaType.TEXT_PLAIN_TYPE));
     }
-    
+
     @Test
     public void testNumberIsNotWriteable() {
         MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
         assertFalse(p.isWriteable(Byte.class, null, null, MediaType.valueOf("text/custom")));
     }
-    
+
     @Test
     public void testBooleanIsWriteable() {
         MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
         assertTrue(p.isWriteable(Boolean.class, null, null, MediaType.TEXT_PLAIN_TYPE));
     }
-    
+
     @Test
     public void testBooleanIsNotWriteable() {
         MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
         assertFalse(p.isWriteable(Boolean.class, null, null, MediaType.valueOf("text/custom")));
     }
-    
+
     @Test
     public void testCharacterIsWriteable() {
         MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
         assertTrue(p.isWriteable(Character.class, null, null, MediaType.TEXT_PLAIN_TYPE));
     }
-    
+
     @Test
     public void testCharacterIsNotWriteable() {
         MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
         assertFalse(p.isWriteable(Character.class, null, null, MediaType.valueOf("text/custom")));
     }
-    
+
     @Test
     public void testStringIsWriteable() {
         MessageBodyWriter<Object> p = new PrimitiveTextProvider<Object>();
         assertFalse(p.isWriteable(String.class, null, null, MediaType.TEXT_PLAIN_TYPE)
                    && p.isWriteable(String.class, null, null, MediaType.valueOf("text/custom")));
     }
-    
+
     @Test
     public void testNumberIsReadable() {
         MessageBodyReader<Object> p = new PrimitiveTextProvider<Object>();
@@ -117,21 +117,21 @@ public class PrimitiveTextProviderTest extends Assert {
         assertFalse(p.isReadable(String.class, null, null, MediaType.TEXT_PLAIN_TYPE)
                    && p.isReadable(String.class, null, null, MediaType.valueOf("text/custom")));
     }
-    
+
     @SuppressWarnings("unchecked")
     @Test
     public void testReadByte() throws Exception {
         MessageBodyReader<?> p = new PrimitiveTextProvider<Object>();
-        
+
         @SuppressWarnings("rawtypes")
-        Byte valueRead = (Byte)p.readFrom((Class)Byte.TYPE, 
-                                          null, 
-                                          null, 
-                                          null, 
-                                          null, 
+        Byte valueRead = (Byte)p.readFrom((Class)Byte.TYPE,
+                                          null,
+                                          null,
+                                          null,
+                                          null,
                                           new ByteArrayInputStream("1".getBytes()));
         assertEquals(1, valueRead.byteValue());
-        
+
     }
     @SuppressWarnings({
         "unchecked", "rawtypes"
@@ -139,28 +139,28 @@ public class PrimitiveTextProviderTest extends Assert {
     @Test(expected = NoContentException.class)
     public void testReadEmptyByte() throws Exception {
         MessageBodyReader<?> p = new PrimitiveTextProvider<Object>();
-        
-        p.readFrom((Class)Byte.TYPE, null, null, 
-                                          null, 
-                                          null, 
+
+        p.readFrom((Class)Byte.TYPE, null, null,
+                                          null,
+                                          null,
                                           new ByteArrayInputStream("".getBytes()));
-        
-        
+
+
     }
-    
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void testReadBoolean() throws Exception {
         MessageBodyReader p = new PrimitiveTextProvider();
-        
-        boolean valueRead = (Boolean)p.readFrom(Boolean.TYPE, 
-                                          null, 
-                                          null, 
-                                          null, 
-                                          null, 
+
+        boolean valueRead = (Boolean)p.readFrom(Boolean.TYPE,
+                                          null,
+                                          null,
+                                          null,
+                                          null,
                                           new ByteArrayInputStream("true".getBytes()));
         assertTrue(valueRead);
-        
+
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -170,44 +170,44 @@ public class PrimitiveTextProviderTest extends Assert {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         p.writeTo(Boolean.TRUE, null, null, null, MediaType.TEXT_PLAIN_TYPE, null, os);
         assertTrue(Arrays.equals(new String("true").getBytes(), os.toByteArray()));
-        
+
         os = new ByteArrayOutputStream();
-        
+
         final boolean value = true;
         p.writeTo(value, null, null, null, MediaType.TEXT_PLAIN_TYPE, null, os);
         assertTrue(Arrays.equals(new String("true").getBytes(), os.toByteArray()));
     }
-    
-    
+
+
     @Test
     public void testWriteStringISO() throws Exception {
         MessageBodyWriter<String> p = new PrimitiveTextProvider<String>();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         MultivaluedMap<String, Object> headers = new MetadataMap<String, Object>();
-        
+
         String eWithAcute = "\u00E9";
         String helloStringUTF16 = "Hello, my name is F" + eWithAcute + "lix Agn" + eWithAcute + "s";
-        
-        p.writeTo(helloStringUTF16, 
+
+        p.writeTo(helloStringUTF16,
                   String.class, String.class, null, MediaType.valueOf("text/plain;charset=ISO-8859-1"),
                   headers, os);
-        
+
         byte[] iso88591bytes = helloStringUTF16.getBytes("ISO-8859-1");
         String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
-        
-        assertEquals(helloStringISO88591, os.toString("ISO-8859-1")); 
+
+        assertEquals(helloStringISO88591, os.toString("ISO-8859-1"));
     }
-    
+
     @Test
     public void testReadChineeseChars() throws Exception {
         String s = "中文";
-        
+
         MessageBodyReader<String> p = new PrimitiveTextProvider<String>();
-        
+
         String value = (String)p.readFrom(String.class, null,
-                new Annotation[]{}, 
-                MediaType.valueOf(MediaType.APPLICATION_XML + ";charset=UTF-8"), null, 
+                new Annotation[]{},
+                MediaType.valueOf(MediaType.APPLICATION_XML + ";charset=UTF-8"), null,
                 new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
         assertEquals(value, value);
-    }    
+    }
 }

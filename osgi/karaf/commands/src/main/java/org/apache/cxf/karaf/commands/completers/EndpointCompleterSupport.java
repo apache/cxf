@@ -38,11 +38,11 @@ public abstract class EndpointCompleterSupport extends CXFController implements 
         StringsCompleter delegate = new StringsCompleter();
         try {
             List<Bus> busses = getBusses();
-           
+
             for (Bus b : busses) {
                 ServerRegistry reg = b.getExtension(ServerRegistry.class);
                 List<Server> servers = reg.getServers();
-                
+
                 for (Server serv : servers) {
                     if (acceptsFeature(serv)) {
                         String qname = serv.getEndpoint().getEndpointInfo().getName().getLocalPart();
@@ -50,13 +50,13 @@ public abstract class EndpointCompleterSupport extends CXFController implements 
                     }
                 }
             }
-            
+
         } catch (Exception e) {
             // Ignore
         }
         return delegate.complete(session, commandLine, list);
     }
-    
+
     /**
      * Method for filtering endpoint.
      *

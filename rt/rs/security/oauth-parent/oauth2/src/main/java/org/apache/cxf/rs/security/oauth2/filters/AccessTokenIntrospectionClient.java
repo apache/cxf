@@ -46,9 +46,9 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
     }
 
     public AccessTokenValidation validateAccessToken(MessageContext mc,
-                                                     String authScheme, 
+                                                     String authScheme,
                                                      String authSchemeData,
-                                                     MultivaluedMap<String, String> extraProps) 
+                                                     MultivaluedMap<String, String> extraProps)
         throws OAuthServiceException {
         WebClient client = WebClient.fromClient(tokenValidatorClient, true);
         MultivaluedMap<String, String> props = new MetadataMap<String, String>();
@@ -84,7 +84,7 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
         if (response.getScope() != null) {
             String[] scopes = response.getScope().split(" ");
             List<OAuthPermission> perms = new LinkedList<OAuthPermission>();
-            for (String s : scopes) {    
+            for (String s : scopes) {
                 if (!StringUtils.isEmpty(s)) {
                     perms.add(new OAuthPermission(s.trim()));
                 }
@@ -100,6 +100,6 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
     public void setTokenValidatorClient(WebClient tokenValidatorClient) {
         this.tokenValidatorClient = tokenValidatorClient;
     }
-    
+
 
 }

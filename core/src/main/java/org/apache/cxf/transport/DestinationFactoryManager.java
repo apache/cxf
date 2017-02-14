@@ -42,11 +42,11 @@ public interface DestinationFactoryManager {
      * <code>DestinationFactory</code>.
      */
     void deregisterDestinationFactory(String name);
-    
+
     /**
-     * Returns the <code>DestinationFactory</code> registered with the specified name, 
+     * Returns the <code>DestinationFactory</code> registered with the specified name,
      * loading the appropriate plugin if necessary.
-     * 
+     *
      * @param name
      * @return the registered <code>DestinationFactory</code>
      * @throws BusException

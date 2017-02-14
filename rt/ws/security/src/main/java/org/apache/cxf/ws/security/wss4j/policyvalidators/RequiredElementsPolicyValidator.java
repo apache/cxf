@@ -38,17 +38,17 @@ import org.apache.wss4j.policy.model.RequiredElements;
  * Validate a RequiredElements policy
  */
 public class RequiredElementsPolicyValidator implements SecurityPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.REQUIRED_ELEMENTS.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.REQUIRED_ELEMENTS.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
@@ -56,7 +56,7 @@ public class RequiredElementsPolicyValidator implements SecurityPolicyValidator 
         for (AssertionInfo ai : ais) {
             RequiredElements rp = (RequiredElements)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             if (rp != null && rp.getXPaths() != null && !rp.getXPaths().isEmpty()) {
                 XPathFactory factory = XPathFactory.newInstance();
                 for (org.apache.wss4j.policy.model.XPath xPath : rp.getXPaths()) {
@@ -69,7 +69,7 @@ public class RequiredElementsPolicyValidator implements SecurityPolicyValidator 
                     }
                     NodeList list;
                     try {
-                        list = (NodeList)xpath.evaluate(expression, 
+                        list = (NodeList)xpath.evaluate(expression,
                                                                  parameters.getSoapHeader(),
                                                                  XPathConstants.NODESET);
                         if (list.getLength() == 0) {
@@ -82,5 +82,5 @@ public class RequiredElementsPolicyValidator implements SecurityPolicyValidator 
             }
         }
     }
-    
+
 }

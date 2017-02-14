@@ -35,73 +35,73 @@ import org.junit.Test;
 
 public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
     public static final int PORT = BookServerSecuritySpringClass.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerSecuritySpringClass.class, true));
     }
-    
+
     @Test
     public void testFailedAuthentication() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123";
         getBook(endpointAddress, "foo", "ba", 401);
     }
-    
+
     @Test
     public void testBookFromForm() throws Exception {
-        
-        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstorestorage/bookforms", 
+
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstorestorage/bookforms",
                                         "foo", "bar", null);
         wc.accept("application/xml");
         Response r = wc.form(new Form().param("name", "CXF Rocks").param("id", "123"));
-        
+
         Book b = readBook((InputStream)r.getEntity());
         assertEquals("CXF Rocks", b.getName());
         assertEquals(123L, b.getId());
     }
-    
+
     @Test
     @Ignore("Spring Security 3 does not preserve POSTed form parameters as HTTPServletRequest parameters")
     public void testBookFromHttpRequestParameters() throws Exception {
-        
-        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstorestorage/bookforms2", 
+
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstorestorage/bookforms2",
                                         "foo", "bar", null);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
         wc.accept("application/xml");
         Response r = wc.form(new Form().param("name", "CXF Rocks").param("id", "123"));
-        
+
         Book b = readBook((InputStream)r.getEntity());
         assertEquals("CXF Rocks", b.getName());
         assertEquals(123L, b.getId());
     }
-    
+
     @Test
     public void testGetBookUserAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123";
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
-    
-    
+
+
     @Test
     public void testGetBookUser() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123/123";
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
-    
+
     @Test
     public void testGetBookAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/thosebooks"; 
-        getBook(endpointAddress, "foo", "bar", 200); 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks";
+        getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }
-    
+
     private Book readBook(InputStream is) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Unmarshaller u = c.createUnmarshaller();
@@ -111,10 +111,10 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
     @Test
     public void testGetBookSubresourceAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstorestorage/securebook/self"; 
-        getBook(endpointAddress, "foo", "bar", 200); 
+            "http://localhost:" + PORT + "/bookstorestorage/securebook/self";
+        getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }
-    
-     
+
+
 }

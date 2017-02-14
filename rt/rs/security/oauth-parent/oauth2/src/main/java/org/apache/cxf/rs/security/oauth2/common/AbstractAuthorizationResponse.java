@@ -30,7 +30,7 @@ public abstract class AbstractAuthorizationResponse {
         this.authorizationCode = authorizationCode;
     }
 
-    
+
     public long getExpiresIn() {
         return expiresIn;
     }

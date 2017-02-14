@@ -29,22 +29,22 @@ import org.apache.neethi.Policy;
 
 /**
  * Describes the policy of an inbound message. As the underlying message
- * type is not known, only the effective endpoint policy is calculated. 
+ * type is not known, only the effective endpoint policy is calculated.
  * The total of all assertions that may apply to an inbound message for an endpoint
  * (and hence the required interceptors) are available as vocabulary.
  */
 public interface EndpointPolicy {
-    
+
     Policy getPolicy();
     EndpointPolicy updatePolicy(Policy p, Message msg);
-    
+
     Collection<Assertion> getChosenAlternative();
-    
+
     Collection<Assertion> getVocabulary(Message m);
-    
+
     Collection<Assertion> getFaultVocabulary(Message m);
-    
+
     List<Interceptor<? extends Message>> getInterceptors(Message m);
-    
+
     List<Interceptor<? extends Message>> getFaultInterceptors(Message m);
 }

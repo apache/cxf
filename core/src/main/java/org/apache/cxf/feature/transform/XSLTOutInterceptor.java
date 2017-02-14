@@ -154,7 +154,7 @@ public class XSLTOutInterceptor extends AbstractXSLTInterceptor {
         }
 
         @Override
-        public void onFlush(CachedOutputStream wrapper) {            
+        public void onFlush(CachedOutputStream wrapper) {
         }
 
         @Override

@@ -38,7 +38,7 @@ public class WebResultAnnotator implements Annotator {
         } else {
             throw new RuntimeException("WebResult can only annotate JavaMethod");
         }
-            
+
         if (method.isOneWay()) {
             JAnnotation oneWayAnnotation = new JAnnotation(Oneway.class);
             method.addAnnotation("Oneway", oneWayAnnotation);
@@ -59,7 +59,7 @@ public class WebResultAnnotator implements Annotator {
         if (method.getSoapStyle() == SOAPBinding.Style.RPC) {
             name = method.getReturn().getName();
             targetNamespace = method.getInterface().getNamespace();
-           
+
         }
         if (method.getSoapStyle() == SOAPBinding.Style.DOCUMENT) {
             if (method.getReturn().getQName() != null) {
@@ -68,7 +68,7 @@ public class WebResultAnnotator implements Annotator {
             targetNamespace = method.getReturn().getTargetNamespace();
         }
 
-        
+
         resultAnnotation.addElement(new JAnnotationElement("name", name));
         if (null != targetNamespace) {
             resultAnnotation.addElement(new JAnnotationElement("targetNamespace", targetNamespace));
@@ -76,7 +76,7 @@ public class WebResultAnnotator implements Annotator {
 
         if (method.getSoapStyle() == SOAPBinding.Style.RPC
             || (method.getSoapStyle() == SOAPBinding.Style.DOCUMENT && !method.isWrapperStyle())) {
-            resultAnnotation.addElement(new JAnnotationElement("partName", 
+            resultAnnotation.addElement(new JAnnotationElement("partName",
                                                                       method.getReturn().getName()));
         }
 

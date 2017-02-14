@@ -45,12 +45,12 @@ import org.opensaml.xacml.profile.saml.XACMLAuthzDecisionQueryType;
  * Some unit tests for creating a SAML XACML Request.
  */
 public class SamlRequestComponentBuilderTest extends org.junit.Assert {
-    
+
     private DocumentBuilder docBuilder;
     static {
         OpenSAMLUtil.initSamlEngine();
     }
-    
+
     public SamlRequestComponentBuilderTest() throws ParserConfigurationException {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         docBuilderFactory.setNamespaceAware(true);
@@ -60,29 +60,29 @@ public class SamlRequestComponentBuilderTest extends org.junit.Assert {
     @org.junit.Test
     public void testCreateXACMLSamlAuthzQueryRequest() throws Exception {
         Document doc = docBuilder.newDocument();
-        
+
         //
         // Create XACML request
         //
-        
+
         // Subject
-        AttributeValueType subjectIdAttributeValue = 
+        AttributeValueType subjectIdAttributeValue =
             RequestComponentBuilder.createAttributeValueType(
                     "alice-user@apache.org"
             );
-        AttributeType subjectIdAttribute = 
+        AttributeType subjectIdAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.SUBJECT_ID,
                     XACMLConstants.RFC_822_NAME,
                     null,
                     Collections.singletonList(subjectIdAttributeValue)
             );
-        
-        AttributeValueType subjectGroupAttributeValue = 
+
+        AttributeValueType subjectGroupAttributeValue =
             RequestComponentBuilder.createAttributeValueType(
                     "manager"
             );
-        AttributeType subjectGroupAttribute = 
+        AttributeType subjectGroupAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.SUBJECT_ROLE,
                     XACMLConstants.XS_ANY_URI,
@@ -93,13 +93,13 @@ public class SamlRequestComponentBuilderTest extends org.junit.Assert {
         attributes.add(subjectIdAttribute);
         attributes.add(subjectGroupAttribute);
         SubjectType subject = RequestComponentBuilder.createSubjectType(attributes, null);
-        
+
         // Resource
-        AttributeValueType resourceAttributeValue = 
+        AttributeValueType resourceAttributeValue =
             RequestComponentBuilder.createAttributeValueType(
                     "{http://www.example.org/contract/DoubleIt}DoubleIt"
             );
-        AttributeType resourceAttribute = 
+        AttributeType resourceAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.RESOURCE_ID,
                     XACMLConstants.XS_STRING,
@@ -109,13 +109,13 @@ public class SamlRequestComponentBuilderTest extends org.junit.Assert {
         attributes.clear();
         attributes.add(resourceAttribute);
         ResourceType resource = RequestComponentBuilder.createResourceType(attributes, null);
-        
+
         // Action
-        AttributeValueType actionAttributeValue = 
+        AttributeValueType actionAttributeValue =
             RequestComponentBuilder.createAttributeValueType(
                     "execute"
             );
-        AttributeType actionAttribute = 
+        AttributeType actionAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.ACTION_ID,
                     XACMLConstants.XS_STRING,
@@ -125,29 +125,29 @@ public class SamlRequestComponentBuilderTest extends org.junit.Assert {
         attributes.clear();
         attributes.add(actionAttribute);
         ActionType action = RequestComponentBuilder.createActionType(attributes);
-        
+
         // Request
-        RequestType request = 
+        RequestType request =
             RequestComponentBuilder.createRequestType(
-                    Collections.singletonList(subject), 
-                    Collections.singletonList(resource), 
-                    action, 
+                    Collections.singletonList(subject),
+                    Collections.singletonList(resource),
+                    action,
                     null
             );
-        
+
         //
         // Create SAML wrapper
         //
-        
-        XACMLAuthzDecisionQueryType authzQuery = 
+
+        XACMLAuthzDecisionQueryType authzQuery =
             SamlRequestComponentBuilder.createAuthzDecisionQuery(
                     "Issuer", request, SAMLProfileConstants.SAML20XACML20P_NS
             );
-        
+
         Element policyElement = OpenSAMLUtil.toDom(authzQuery, doc);
         // String outputString = DOM2Writer.nodeToString(policyElement);
         assertNotNull(policyElement);
     }
-    
-    
+
+
 }

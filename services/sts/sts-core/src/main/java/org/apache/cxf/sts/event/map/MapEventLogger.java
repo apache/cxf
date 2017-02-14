@@ -32,7 +32,7 @@ import org.apache.cxf.common.logging.LogUtils;
 
 public class MapEventLogger implements MapEventListener {
     private static final Logger LOG = LogUtils.getL7dLogger(MapEventLogger.class);
-    
+
     private List<String> fieldOrder = new ArrayList<>();
     private boolean logStacktrace;
     private boolean logFieldname;
@@ -115,7 +115,7 @@ public class MapEventLogger implements MapEventListener {
     public void setLogFieldname(boolean logFieldname) {
         this.logFieldname = logFieldname;
     }
-    
+
     public void setDateFormat(String format) {
         this.dateFormat = new SimpleDateFormat(format);
     }
@@ -127,5 +127,5 @@ public class MapEventLogger implements MapEventListener {
     public void setLogLevel(String logLevel) {
         this.logLevel = Level.parse(logLevel);
     }
-    
+
 }

@@ -30,11 +30,11 @@ public interface ConditionsProvider {
      * Get a ConditionsBean object.
      */
     ConditionsBean getConditions(TokenProviderParameters providerParameters);
-    
+
     /**
      * Get the lifetime to use (in seconds)
      */
     long getLifetime();
-    
-        
+
+
 }

@@ -98,7 +98,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
     public static final String VALIDATION_EVENT_HANDLER = "jaxb-validation-event-handler";
     public static final String SET_VALIDATION_EVENT_HANDLER = "set-jaxb-validation-event-handler";
     public static final String WRITER_VALIDATION_EVENT_HANDLER = "jaxb-writer-validation-event-handler";
-    
+
     public static final String SCHEMA_RESOURCE = "SCHEMRESOURCE";
     public static final String MTOM_THRESHOLD = "org.apache.cxf.jaxb.mtomThreshold";
 
@@ -117,7 +117,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
                                                                                Node.class,
                                                                                XMLEventWriter.class,
                                                                                XMLStreamWriter.class};
-    
+
     private static class DelayedDOMResult extends DOMResult {
         private final URL resource;
         private final String publicId;
@@ -308,7 +308,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
         }
 
         contextClasses = new LinkedHashSet<Class<?>>();
-        
+
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
             JAXBContextInitializer initializer
                 = new JAXBContextInitializer(serviceInfo, contextClasses, typeRefs, this.getUnmarshallerProperties());
@@ -468,9 +468,9 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             JAXBContextCache.scanPackages(classes);
         }
         addWsAddressingTypes(classes);
-        
-        return JAXBContextCache.getCachedContextAndSchemas(classes, defaultNs,  
-                                                          contextProperties, 
+
+        return JAXBContextCache.getCachedContextAndSchemas(classes, defaultNs,
+                                                          contextProperties,
                                                           typeRefs, true);
     }
 

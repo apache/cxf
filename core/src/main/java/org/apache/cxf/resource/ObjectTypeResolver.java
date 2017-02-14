@@ -22,9 +22,9 @@ package org.apache.cxf.resource;
 import java.io.InputStream;
 
 public class ObjectTypeResolver implements ResourceResolver {
-   
+
     private final Object value;
- 
+
     public ObjectTypeResolver(Object v) {
         value = v;
     }
@@ -40,5 +40,5 @@ public class ObjectTypeResolver implements ResourceResolver {
             return resourceType.cast(value);
         }
         return null;
-    }    
+    }
 }

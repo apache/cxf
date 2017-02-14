@@ -54,27 +54,27 @@ public class ActAsAttributeStatementProvider implements AttributeStatementProvid
             if (actAs != null) {
                 List<AttributeBean> attributeList = new ArrayList<>();
                 String tokenType = tokenRequirements.getTokenType();
-                
-                AttributeBean parameterBean = 
+
+                AttributeBean parameterBean =
                     handleAdditionalParameters(actAs.getToken(), tokenType);
                 if (!parameterBean.getAttributeValues().isEmpty()) {
                     attributeList.add(parameterBean);
                 }
-                
+
                 attrBean.setSamlAttributes(attributeList);
             }
         } catch (WSSecurityException ex) {
             throw new STSException(ex.getMessage(), ex);
         }
-        
+
         return attrBean;
     }
-    
+
     /**
      * Handle an ActAs element.
      */
     private AttributeBean handleAdditionalParameters(
-        Object parameter, 
+        Object parameter,
         String tokenType
     ) throws WSSecurityException {
         AttributeBean parameterBean = new AttributeBean();
@@ -95,10 +95,10 @@ public class ActAsAttributeStatementProvider implements AttributeStatementProvid
             SamlAssertionWrapper wrapper = new SamlAssertionWrapper((Element)parameter);
             SAMLTokenPrincipal principal = new SAMLTokenPrincipalImpl(wrapper);
             parameterBean.addAttributeValue(principal.getName());
-            
+
             // Check for other ActAs attributes here + add them in
             if (wrapper.getSaml2() != null) {
-                for (org.opensaml.saml.saml2.core.AttributeStatement attributeStatement 
+                for (org.opensaml.saml.saml2.core.AttributeStatement attributeStatement
                     : wrapper.getSaml2().getAttributeStatements()) {
                     for (org.opensaml.saml.saml2.core.Attribute attribute : attributeStatement.getAttributes()) {
                         if ("ActAs".equals(attribute.getName())) {
@@ -111,7 +111,7 @@ public class ActAsAttributeStatementProvider implements AttributeStatementProvid
                     }
                 }
             } else if (wrapper.getSaml1() != null) {
-                for (org.opensaml.saml.saml1.core.AttributeStatement attributeStatement 
+                for (org.opensaml.saml.saml1.core.AttributeStatement attributeStatement
                     : wrapper.getSaml1().getAttributeStatements()) {
                     for (org.opensaml.saml.saml1.core.Attribute attribute : attributeStatement.getAttributes()) {
                         if ("ActAs".equals(attribute.getAttributeName())) {

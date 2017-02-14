@@ -42,7 +42,7 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
 
     static final Logger LOG = LogUtils.getL7dLogger(JAXWSHttpSpiDestination.class);
 
-    public JAXWSHttpSpiDestination(Bus b, 
+    public JAXWSHttpSpiDestination(Bus b,
                                    DestinationRegistry registry,
                                    EndpointInfo ei) throws IOException {
         super(b, registry, ei, ei.getAddress(), false);
@@ -52,10 +52,10 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
     protected Logger getLogger() {
         return LOG;
     }
-    
+
     /**
      * This is called by handlers for servicing requests
-     * 
+     *
      * @param context
      * @param req
      * @param resp
@@ -63,8 +63,8 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
      */
     protected void doService(HttpServletRequest req, HttpServletResponse resp)
         throws IOException {
-        
-        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus); 
+
+        Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         try {
             serviceRequest(req, resp);
         } catch (Exception e) {
@@ -78,14 +78,14 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
 
     protected void serviceRequest(final HttpServletRequest req, final HttpServletResponse resp)
         throws IOException {
-        
+
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Service http request on thread: " + Thread.currentThread());
         }
         Message inMessage = new MessageImpl();
         ExchangeImpl exchange = new ExchangeImpl();
         exchange.setInMessage(inMessage);
-        
+
         setupMessage(inMessage, null, req.getServletContext(), req, resp);
 
         ((MessageImpl)inMessage).setDestination(this);
@@ -115,7 +115,7 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
             }
         }
     }
-    
+
     protected String getBasePath(String contextPath) throws IOException {
         return contextPath + getAddress().getAddress().getValue();
     }

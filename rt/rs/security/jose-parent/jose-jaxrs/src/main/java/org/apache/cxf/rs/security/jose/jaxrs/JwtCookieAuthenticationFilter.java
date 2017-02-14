@@ -26,7 +26,7 @@ import org.apache.cxf.rs.security.jose.common.JoseException;
 public class JwtCookieAuthenticationFilter extends AbstractJwtAuthenticationFilter {
     private static final String DEFAULT_COOKIE_NAME = "access_token";
     private String cookieName = DEFAULT_COOKIE_NAME;
-    
+
     protected String getEncodedJwtToken(ContainerRequestContext requestContext) {
         Cookie cookie = requestContext.getCookies().get(cookieName);
         if (cookie == null || cookie.getValue() == null) {
@@ -34,7 +34,7 @@ public class JwtCookieAuthenticationFilter extends AbstractJwtAuthenticationFilt
         }
         return cookie.getValue();
     }
-    
+
     public void setCookieName(String cookieName) {
         this.cookieName = cookieName;
     }

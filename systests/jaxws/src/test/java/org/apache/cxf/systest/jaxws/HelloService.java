@@ -26,15 +26,15 @@ import javax.xml.ws.WebEndpoint;
 import javax.xml.ws.WebServiceClient;
 
 /**
- * 
+ *
  */
 
-@WebServiceClient(name = "HelloService", 
-                  targetNamespace = "http://cxf.apache.org/systest/jaxws/", 
+@WebServiceClient(name = "HelloService",
+                  targetNamespace = "http://cxf.apache.org/systest/jaxws/",
                   wsdlLocation = "testutils/hello.wsdl")
 public class HelloService extends Service {
     static final QName SERVICE = new QName("http://cxf.apache.org/systest/jaxws", "HelloService");
-    static final QName HELLO_PORT = 
+    static final QName HELLO_PORT =
         new QName("http://cxf.apache.org/systest/jaxws/", "HelloPort");
     public HelloService(URL wsdlLocation, QName serviceName) {
         super(wsdlLocation, serviceName);

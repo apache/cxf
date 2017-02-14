@@ -51,7 +51,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         EndpointInfo ei = setupServiceInfo("HelloWorldQueueBinMsgService", "HelloWorldQueueBinMsgPort");
         JMSDestination destination = setupJMSDestination(ei);
         assertEquals("Can't get the right AddressPolicy's Destination",
-                     "test.jmstransport.binary", 
+                     "test.jmstransport.binary",
                      destination.getJmsConfig().getTargetDestination());
         destination.shutdown();
     }
@@ -82,11 +82,11 @@ public class JMSDestinationTest extends AbstractJMSTester {
         EndpointInfo ei = setupServiceInfo("HWStaticReplyQBinMsgService", "HWStaticReplyQBinMsgPort");
         JMSDestination destination = setupJMSDestination(ei);
         destination.setMessageObserver(createMessageObserver());
-        
+
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
         Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage);
-        
+
         sendOneWayMessage(conduit, outMessage);
         // wait for the message to be get from the destination
         waitForReceiveDestMessage();
@@ -148,7 +148,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
             .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
         String inEncoding = (String) msgIn.get(Message.ENCODING);
         String outEncoding = (String) msgOut.get(Message.ENCODING);
-        
+
         assertEquals("The message encoding should be equal", inEncoding, outEncoding);
 
         JMSMessageHeadersType inHeader = (JMSMessageHeadersType)msgIn
@@ -182,29 +182,29 @@ public class JMSDestinationTest extends AbstractJMSTester {
     public void testRoundTripDestination() throws Exception {
         Message msg = testRoundTripDestination(true);
         SecurityContext securityContext = msg.get(SecurityContext.class);
-        
+
         assertNotNull("SecurityContext should be set in message received by JMSDestination", securityContext);
-        assertEquals("Principal in SecurityContext should be", "testUser", 
+        assertEquals("Principal in SecurityContext should be", "testUser",
                 securityContext.getUserPrincipal().getName());
     }
-    
+
     @Test
     public void testRoundTripDestinationDoNotCreateSecurityContext() throws Exception {
         Message msg = testRoundTripDestination(false);
         SecurityContext securityContext = msg.get(SecurityContext.class);
         assertNull("SecurityContext should not be set in message received by JMSDestination", securityContext);
     }
-    
+
     private Message testRoundTripDestination(boolean createSecurityContext) throws Exception {
         EndpointInfo ei = setupServiceInfo("HelloWorldService", "HelloWorldPort");
         JMSConduit conduit = setupJMSConduitWithObserver(ei);
         conduit.getJmsConfig().setCreateSecurityContext(createSecurityContext);
-        
+
         final Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage, null);
         final JMSDestination destination = setupJMSDestination(ei);
-        
-        
+
+
         // set up MessageObserver for handling the conduit message
         MessageObserver observer = new MessageObserver() {
             public void onMessage(Message m) {
@@ -245,7 +245,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         Thread.sleep(1000);
         conduit.close();
         destination.shutdown();
-        
+
         return inMessage;
     }
 
@@ -306,7 +306,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         assertNotNull("The inHeader should not be null", inHeader);
         assertNotNull("The property should not be null " + inHeader.getProperty());
         // TODO we need to check the SOAP JMS transport properties here
-        
+
         // wait for a while for the jms session recycling
         Thread.sleep(1000);
         conduit.close();
@@ -321,21 +321,21 @@ public class JMSDestinationTest extends AbstractJMSTester {
         assertTrue("is multiplex", destination instanceof MultiplexDestination);
         destination.shutdown();
     }
-    
+
     @Test
     public void testSecurityContext() throws Exception {
         SecurityContext ctx = testSecurityContext(true);
         assertNotNull("SecurityContext should be set in message received by JMSDestination", ctx);
-        assertEquals("Principal in SecurityContext should be", "testUser", 
+        assertEquals("Principal in SecurityContext should be", "testUser",
                 ctx.getUserPrincipal().getName());
     }
-    
+
     @Test
     public void testDoNotCreateSecurityContext() throws Exception {
         SecurityContext ctx = testSecurityContext(false);
         assertNull("SecurityContext should not be set in message received by JMSDestination", ctx);
     }
-    
+
     private SecurityContext testSecurityContext(boolean createSecurityContext) throws Exception {
         EndpointInfo ei = setupServiceInfo("HelloWorldService", "HelloWorldPort");
         final JMSDestination destination = setupJMSDestination(ei);
@@ -348,20 +348,20 @@ public class JMSDestinationTest extends AbstractJMSTester {
         sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
         SecurityContext securityContext = destMessage.get(SecurityContext.class);
-        
+
         conduit.close();
         destination.shutdown();
-        
+
         return securityContext;
     }
 
-    
+
     @Test
     @Ignore
     public void testOneWayReplyToSetUnset() throws Exception {
-        /* 1. Test that replyTo destination set in WSDL is NOT used 
+        /* 1. Test that replyTo destination set in WSDL is NOT used
          * in spec compliant mode */
-        
+
         destMessage = null;
         EndpointInfo ei = setupServiceInfo(
                          "HWStaticReplyQBinMsgService", "HWStaticReplyQBinMsgPort");
@@ -376,20 +376,20 @@ public class JMSDestinationTest extends AbstractJMSTester {
         assertTrue("The destination should have got the message ", destMessage != null);
         verifyReplyToNotSet(destMessage);
         destMessage = null;
-        
-        /* 2. Test that replyTo destination set in WSDL IS used 
+
+        /* 2. Test that replyTo destination set in WSDL IS used
          * in spec non-compliant mode */
-        
+
         sendOneWayMessage(conduit, outMessage);
         waitForReceiveDestMessage();
         assertTrue("The destination should have got the message ", destMessage != null);
         String exName = getQueueName(conduit.getJmsConfig().getReplyDestination());
         verifyReplyToSet(destMessage, Queue.class, exName);
         destMessage = null;
-        
-        /* 3. Test that replyTo destination provided via invocation context 
+
+        /* 3. Test that replyTo destination provided via invocation context
          * overrides the value set in WSDL and IS used in spec non-compliant mode */
-        
+
         String contextReplyTo = conduit.getJmsConfig().getReplyDestination() + ".context";
         exName += ".context";
         setupMessageHeader(outMessage, "cidValue", contextReplyTo);
@@ -398,9 +398,9 @@ public class JMSDestinationTest extends AbstractJMSTester {
         assertTrue("The destiantion should have got the message ", destMessage != null);
         verifyReplyToSet(destMessage, Queue.class, exName);
         destMessage = null;
-        
-        /* 4. Test that replyTo destination provided via invocation context 
-         * and the value set in WSDL are NOT used in spec non-compliant mode 
+
+        /* 4. Test that replyTo destination provided via invocation context
+         * and the value set in WSDL are NOT used in spec non-compliant mode
          * when JMSConstants.JMS_SET_REPLY_TO == false */
 
         setupMessageHeader(outMessage);
@@ -410,8 +410,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
         assertTrue("The destiantion should have got the message ", destMessage != null);
         verifyReplyToNotSet(destMessage);
         destMessage = null;
-        
-        /* 5. Test that replyTo destination set in WSDL IS used in spec non-compliant 
+
+        /* 5. Test that replyTo destination set in WSDL IS used in spec non-compliant
          * mode when JMSConstants.JMS_SET_REPLY_TO == true */
 
         setupMessageHeader(outMessage);
@@ -422,7 +422,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         exName = getQueueName(conduit.getJmsConfig().getReplyDestination());
         verifyReplyToSet(destMessage, Queue.class, exName);
         destMessage = null;
-        
+
         conduit.close();
         destination.shutdown();
     }
@@ -431,17 +431,17 @@ public class JMSDestinationTest extends AbstractJMSTester {
         if (exName == null) {
             return null;
         }
-        return (exName.indexOf('/') != -1 && exName.indexOf('/') < exName.length()) 
+        return (exName.indexOf('/') != -1 && exName.indexOf('/') < exName.length())
             ? exName.substring(exName.indexOf('/') + 1) : exName;
     }
 
-    
+
     protected void verifyReplyToNotSet(Message cxfMsg) {
-        javax.jms.Message jmsMsg = 
+        javax.jms.Message jmsMsg =
             javax.jms.Message.class.cast(cxfMsg.get(JMSConstants.JMS_REQUEST_MESSAGE));
         assertNotNull("JMS Messsage must be null", jmsMsg);
     }
-    
+
     private String getDestinationName(Destination dest) throws JMSException {
         if (dest instanceof Queue) {
             return ((Queue)dest).getQueueName();
@@ -449,20 +449,20 @@ public class JMSDestinationTest extends AbstractJMSTester {
             return ((Topic)dest).getTopicName();
         }
     }
-    
-    protected void verifyReplyToSet(Message cxfMsg, 
-                                    Class<? extends Destination> type, 
+
+    protected void verifyReplyToSet(Message cxfMsg,
+                                    Class<? extends Destination> type,
                                     String expectedName) throws Exception {
-        javax.jms.Message jmsMsg = 
+        javax.jms.Message jmsMsg =
             javax.jms.Message.class.cast(cxfMsg.get(JMSConstants.JMS_REQUEST_MESSAGE));
         assertNotNull("JMS Messsage must not be null", jmsMsg);
         assertNotNull("JMS Messsage's replyTo must not be null", jmsMsg.getJMSReplyTo());
-        assertTrue("JMS Messsage's replyTo type must be of type " + type.getName(), 
+        assertTrue("JMS Messsage's replyTo type must be of type " + type.getName(),
                    type.isAssignableFrom(jmsMsg.getJMSReplyTo().getClass()));
         String receivedName = getDestinationName(jmsMsg.getJMSReplyTo());
         assertTrue("JMS Messsage's replyTo must be named " + expectedName + " but was " + receivedName,
                    expectedName == receivedName || receivedName.equals(expectedName));
-        
+
     }
 
 }

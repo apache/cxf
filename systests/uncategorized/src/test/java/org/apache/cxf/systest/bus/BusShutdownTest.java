@@ -44,26 +44,26 @@ import org.junit.Test;
 
 public class BusShutdownTest extends Assert {
     public static final String PORT = TestUtil.getPortNumber(BusShutdownTest.class);
-    
+
     @Test
     public void testStartWorkShutdownWork() throws Exception {
-        
-        
+
+
         URL wsdlUrl = getClass().getResource("/wsdl/hello_world.wsdl");
-        assertNotNull("wsdl resource was not found", wsdlUrl); 
+        assertNotNull("wsdl resource was not found", wsdlUrl);
         // Since this test always fails in linux box, try to use other port
         String serverAddr = "http://localhost:" + PORT + "/greeter/port";
         makeTwoWayCallOnNewBus(wsdlUrl, serverAddr);
-        
-        
+
+
         // verify sutdown cleans the slate and reverts to null state
         //
         // This test should not need to workaroundHangWithDifferentAddr,
-        // and when using ADDR, the test should not need: 
+        // and when using ADDR, the test should not need:
         //  org.apache.cxf.transports.http_jetty.DontClosePort
         //
         String workaroundHangWithDifferentAddr = serverAddr;
-        
+
         // reusing same address will cause failure, hang on client invoke
         //possibleWorkaroundHandWithDifferentAddr = ADDR.replace('8', '9');
         makeTwoWayCallOnNewBus(wsdlUrl, workaroundHangWithDifferentAddr);
@@ -82,24 +82,24 @@ public class BusShutdownTest extends Assert {
 
     private void doWork(URL wsdlUrl, String address) {
         SOAPService service = new SOAPService(wsdlUrl);
-        assertNotNull(service);        
+        assertNotNull(service);
         Greeter greeter = service.getSoapPort();
-        
+
         // overwrite client address
         InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
-        BindingProvider bp = (BindingProvider)handler;    
+        BindingProvider bp = (BindingProvider)handler;
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    address);
         Client client = ClientProxy.getClient(greeter);
         HTTPConduit c = (HTTPConduit)client.getConduit();
         c.setClient(new HTTPClientPolicy());
         c.getClient().setConnection(ConnectionType.CLOSE);
-        
+
         // invoke twoway call
-        greeter.sayHi();        
+        greeter.sayHi();
     }
 
-    private Endpoint createService(String address) {        
+    private Endpoint createService(String address) {
         Object impl = new GreeterImpl();
         return Endpoint.publish(address, impl);
     }

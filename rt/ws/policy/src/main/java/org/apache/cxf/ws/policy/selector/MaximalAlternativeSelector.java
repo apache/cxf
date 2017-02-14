@@ -30,12 +30,12 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 
 /**
- * 
+ *
  */
 public class MaximalAlternativeSelector extends BaseAlternativeSelector {
 
     public Collection<Assertion> selectAlternative(
-        Policy policy, PolicyEngine engine, 
+        Policy policy, PolicyEngine engine,
         Assertor assertor,
         List<List<Assertion>> request,
         Message msg) {
@@ -43,7 +43,7 @@ public class MaximalAlternativeSelector extends BaseAlternativeSelector {
         Iterator<List<Assertion>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
             List<Assertion> alternative = alternatives.next();
-            if (engine.supportsAlternative(alternative, assertor, msg) 
+            if (engine.supportsAlternative(alternative, assertor, msg)
                 && isCompatibleWithRequest(alternative, request)
                 && (null == choice || alternative.size() > choice.size())) {
                 choice = alternative;
@@ -53,7 +53,7 @@ public class MaximalAlternativeSelector extends BaseAlternativeSelector {
             alternatives = policy.getAlternatives();
             while (alternatives.hasNext()) {
                 List<Assertion> alternative = alternatives.next();
-                if (engine.supportsAlternative(alternative, assertor, msg) 
+                if (engine.supportsAlternative(alternative, assertor, msg)
                     && (null == choice || alternative.size() > choice.size())) {
                     choice = alternative;
                 }

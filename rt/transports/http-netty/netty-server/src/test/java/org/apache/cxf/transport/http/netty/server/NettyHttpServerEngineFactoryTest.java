@@ -35,20 +35,20 @@ import org.junit.Test;
 public class NettyHttpServerEngineFactoryTest
         extends Assert {
     Bus bus;
-    
+
     @BeforeClass
     public static void classUp() {
-        // Get rid of any notion of a default bus set by other 
+        // Get rid of any notion of a default bus set by other
         // rogue tests.
         BusFactory.setDefaultBus(null);
     }
-    
+
     @AfterClass
     public static void classDown() {
         // Clean up.
         BusFactory.setDefaultBus(null);
     }
-    
+
     @After
     public void tearDown() {
         if (bus != null) {
@@ -60,14 +60,14 @@ public class NettyHttpServerEngineFactoryTest
     @Test
     public void testTransportFactoryHasEngineFactory() throws Exception {
         bus = BusFactory.getDefaultBus(true);
-        
+
         assertNotNull("Cannot get bus", bus);
-        
+
         // Make sure we got the Transport Factory.
-        DestinationFactoryManager destFM = 
+        DestinationFactoryManager destFM =
             bus.getExtension(DestinationFactoryManager.class);
         assertNotNull("Cannot get DestinationFactoryManager", destFM);
-        DestinationFactory destF = 
+        DestinationFactory destF =
             destFM.getDestinationFactory(
                     "http://cxf.apache.org/transports/http");
         assertNotNull("No DestinationFactory", destF);
@@ -78,7 +78,7 @@ public class NettyHttpServerEngineFactoryTest
             bus.getExtension(NettyHttpServerEngineFactory.class);
         assertNotNull("EngineFactory is not configured.", factory);
     }
-    
+
 
 
 }

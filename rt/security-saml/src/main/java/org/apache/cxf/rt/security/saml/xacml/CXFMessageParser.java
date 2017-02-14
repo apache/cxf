@@ -36,7 +36,7 @@ public class CXFMessageParser {
     public CXFMessageParser(Message message) {
         this.message = message;
     }
-    
+
     public boolean isSOAPService() {
         return getWSDLOperation() != null;
     }
@@ -47,14 +47,14 @@ public class CXFMessageParser {
         }
         return null;
     }
-    
+
     public QName getWSDLService() {
         if (message != null && message.get(Message.WSDL_SERVICE) != null) {
             return (QName)message.get(Message.WSDL_SERVICE);
         }
         return null;
     }
-    
+
     /**
      * @param fullRequestURL Whether to send the full Request URL as the resource or not. If set to true, the
      *        full Request URL will be sent for both a JAX-WS and JAX-RS service. If set to false (the

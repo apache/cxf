@@ -20,7 +20,7 @@ package org.apache.cxf.jms.testsuite.services;
 
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 
-@javax.jws.WebService(portName = "GreeterPort2", 
+@javax.jws.WebService(portName = "GreeterPort2",
                       serviceName = "JMSGreeterService2",
                       targetNamespace = "http://cxf.apache.org/jms_greeter",
                       endpointInterface = "org.apache.cxf.jms_greeter.JMSGreeterPortType",
@@ -37,7 +37,7 @@ public class GreeterSpecWithPortError implements JMSGreeterPortType {
         //System.out.println("Executing operation sayHi" + "\n");
         return "Bonjour";
     }
-    
+
     public void greetMeOneWay(String me) {
         //System.out.println("Executing operation greetMeOneWay\n");
         //System.out.println("Hello there " + me);

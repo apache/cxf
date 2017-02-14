@@ -40,5 +40,5 @@ public class MetricsMessageInPreInvokeInterceptor extends AbstractMetricsInterce
                 addOperationMetrics(ctx, message, ex.getBindingOperationInfo());
             }
         }
-    }               
+    }
 }

@@ -17,7 +17,7 @@
  * under the License.
  */
 /*
- * Code in this file derives from source code in Woodstox which 
+ * Code in this file derives from source code in Woodstox which
  * carries a ASL 2.0 license.
  */
 
@@ -49,18 +49,18 @@ import com.sun.msv.reader.xmlschema.XMLSchemaReader;
 import org.codehaus.stax2.validation.XMLValidationSchema;
 
 /**
- * 
+ *
  */
 public class W3CMultiSchemaFactory extends BaseSchemaFactory {
-    
-    private MultiSchemaReader multiSchemaReader;  
+
+    private MultiSchemaReader multiSchemaReader;
     private SAXParserFactory parserFactory;
     private RecursiveAllowedXMLSchemaReader xmlSchemaReader;
 
     public W3CMultiSchemaFactory() {
         super(XMLValidationSchema.SCHEMA_ID_W3C_SCHEMA);
     }
-    
+
     static class RecursiveAllowedXMLSchemaReader extends XMLSchemaReader {
         Set<String> sysIds = new TreeSet<String>();
         RecursiveAllowedXMLSchemaReader(GrammarReaderController controller,
@@ -75,7 +75,7 @@ public class W3CMultiSchemaFactory extends BaseSchemaFactory {
                             r.currentSchema = old;
                         }
                         protected void onTargetNamespaceResolved(String targetNs, boolean ignoreContents) {
-                            
+
                             RecursiveAllowedXMLSchemaReader r = (RecursiveAllowedXMLSchemaReader)reader;
                             // sets new XMLSchemaGrammar object.
                             old = r.currentSchema;
@@ -88,10 +88,10 @@ public class W3CMultiSchemaFactory extends BaseSchemaFactory {
                             }
                         }
                     };
-                }                
+                }
             }, new ExpressionPool());
         }
-        
+
         public void setLocator(Locator locator) {
             if (locator == null && getLocator() != null && getLocator().getSystemId() != null) {
                 sysIds.add(getLocator().getSystemId());
@@ -105,13 +105,13 @@ public class W3CMultiSchemaFactory extends BaseSchemaFactory {
             }
             super.switchSource(source, newState);
         }
-        
+
     }
-    
-    public XMLValidationSchema loadSchemas(String baseURI, 
+
+    public XMLValidationSchema loadSchemas(String baseURI,
                                            Map<String, EmbeddedSchema> sources) throws XMLStreamException {
         parserFactory = getSaxFactory();
-        
+
         ResolvingGrammarReaderController ctrl = new ResolvingGrammarReaderController(baseURI, sources);
         xmlSchemaReader = new RecursiveAllowedXMLSchemaReader(ctrl, parserFactory);
         multiSchemaReader = new MultiSchemaReader(xmlSchemaReader);
@@ -120,12 +120,12 @@ public class W3CMultiSchemaFactory extends BaseSchemaFactory {
             domSource.setSystemId(source.getSystemId());
             multiSchemaReader.parse(domSource);
         }
-        
+
         XMLSchemaGrammar grammar = multiSchemaReader.getResult();
         if (grammar == null) {
             throw new XMLStreamException("Failed to load schemas");
         }
-        return new W3CSchema(grammar); 
+        return new W3CSchema(grammar);
     }
 
     @Override

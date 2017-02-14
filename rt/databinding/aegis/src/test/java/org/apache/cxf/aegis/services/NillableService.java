@@ -22,14 +22,14 @@ package org.apache.cxf.aegis.services;
  * A minimal service for testing nillable annotations in Aegis XML.
  */
 public class NillableService {
-    
+
     public NillableService() {
     }
-    
+
     public boolean submitStringArray(String[] array) {
         return true;
     }
-    
+
     public void takeNotNillableString(String string) {
     }
 }

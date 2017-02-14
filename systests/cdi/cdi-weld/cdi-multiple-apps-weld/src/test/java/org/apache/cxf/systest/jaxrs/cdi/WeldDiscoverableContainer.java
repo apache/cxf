@@ -26,11 +26,11 @@ import org.jboss.weld.resources.spi.ResourceLoader;
 
 /**
  * Because we are mixing several Servlet Containers in the same project, JBoss Weld
- * needs some help to figure out the correct one we are running right now. 
+ * needs some help to figure out the correct one we are running right now.
  */
 public class WeldDiscoverableContainer implements Container {
     private final Container delegate;
-    
+
     public WeldDiscoverableContainer() {
         if (JettyContainer.class.getName().equals(System.getProperty(Container.class.getName()))) {
             delegate = JettyContainer.INSTANCE;

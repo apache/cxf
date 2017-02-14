@@ -29,22 +29,22 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 /**
- * Abstract base class factoring out common Destination logic, 
+ * Abstract base class factoring out common Destination logic,
  * allowing non-decoupled transports to be written without any
  * regard for the decoupled back-channel or partial response logic.
  */
 public abstract class AbstractDestination
     extends AbstractObservable implements Destination, DestinationWithEndpoint {
-    
+
     protected final EndpointReferenceType reference;
     protected final EndpointInfo endpointInfo;
     protected final Bus bus;
-    
+
     public AbstractDestination(EndpointReferenceType ref,
                                EndpointInfo ei) {
         this(null, ref, ei);
     }
-    
+
     public AbstractDestination(Bus b,
                                EndpointReferenceType ref,
                                EndpointInfo ei) {
@@ -52,10 +52,10 @@ public abstract class AbstractDestination
         endpointInfo = ei;
         bus = b;
     }
-    
+
     /**
      * @return the reference associated with this Destination
-     */    
+     */
     public EndpointReferenceType getAddress() {
         return reference;
     }
@@ -65,17 +65,17 @@ public abstract class AbstractDestination
      * with the current Message and associated Destination. For example
      * compatible Quality of Protection must be asserted on the back-channel.
      * This would generally only be an issue if the back-channel is decoupled.
-     * 
-     * @param inMessage the current inbound message (null to indicate a 
+     *
+     * @param inMessage the current inbound message (null to indicate a
      * disassociated back-channel)
      * @return a suitable Conduit
      */
     public Conduit getBackChannel(Message inMessage)
         throws IOException {
-        
+
         return getInbuiltBackChannel(inMessage);
     }
-        
+
     /**
      * Shutdown the Destination, i.e. stop accepting incoming messages.
      */
@@ -88,7 +88,7 @@ public abstract class AbstractDestination
      * @return the inbuilt backchannel
      */
     protected abstract Conduit getInbuiltBackChannel(Message inMessage);
-    
+
     /**
      * Backchannel conduit.
      */
@@ -100,13 +100,13 @@ public abstract class AbstractDestination
 
         /**
          * Register a message observer for incoming messages.
-         * 
+         *
          * @param observer the observer to notify on receipt of incoming
          */
         public void setMessageObserver(MessageObserver observer) {
             // shouldn't be called for a back channel conduit
         }
-        
+
         protected Logger getLogger() {
             return AbstractDestination.this.getLogger();
         }

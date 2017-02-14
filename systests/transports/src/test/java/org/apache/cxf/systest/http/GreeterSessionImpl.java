@@ -42,20 +42,20 @@ import org.apache.cxf.greeter_control.types.SayHiResponse;
 
 @WebService(serviceName = "GreeterService",
             portName = "GreeterPort",
-            endpointInterface = "org.apache.cxf.greeter_control.Greeter", 
+            endpointInterface = "org.apache.cxf.greeter_control.Greeter",
             targetNamespace = "http://cxf.apache.org/greeter_control")
 public class GreeterSessionImpl implements Greeter {
-    private static final Logger LOG = 
+    private static final Logger LOG =
         LogUtils.getLogger(GreeterSessionImpl.class,
                            null,
                            GreeterSessionImpl.class.getPackage().getName());
-    
+
     @Resource
     private WebServiceContext context;
-    
+
     // greetMe will use session to return last called name
     public String greetMe(String me) {
-        LOG.info("Executing operation greetMe");        
+        LOG.info("Executing operation greetMe");
         LOG.info("Message received: " + me);
         MessageContext mc = context.getMessageContext();
         HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
@@ -66,8 +66,8 @@ public class GreeterSessionImpl implements Greeter {
                 val += ";" + cookie.getName() + "=" + cookie.getValue();
             }
         }
-        
-        
+
+
         HttpSession session = req.getSession();
         // Get a session property "counter" from context
         if (session == null) {
@@ -77,20 +77,20 @@ public class GreeterSessionImpl implements Greeter {
         if (name == null) {
             name = me;
             LOG.info("Starting the Session");
-        } 
-        
+        }
+
         session.setAttribute("name", me);
-        
+
         return "Hello " + name + val;
     }
-    
+
 
     public String sayHi() {
         LOG.info("Executing operation sayHi");
-        
+
         return "Bonjour ";
     }
-    
+
     public void pingMe() {
     }
 
@@ -108,11 +108,11 @@ public class GreeterSessionImpl implements Greeter {
 
 
     public void greetMeOneWay(String me) {
-        LOG.info("Executing operation greetMeOneWay");        
+        LOG.info("Executing operation greetMeOneWay");
         LOG.info("Message received: " + me);
         MessageContext mc = context.getMessageContext();
         HttpServletRequest req = (HttpServletRequest)mc.get(MessageContext.SERVLET_REQUEST);
-        
+
         HttpSession session = req.getSession();
         if (session == null) {
             throw new WebServiceException("No session in WebServiceContext");
@@ -121,10 +121,10 @@ public class GreeterSessionImpl implements Greeter {
         if (name == null) {
             name = me;
             LOG.info("Starting the Session");
-        } 
-        
+        }
+
         session.setAttribute("name", me);
-                        
+
     }
 
 

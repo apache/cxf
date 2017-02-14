@@ -24,7 +24,7 @@ import java.util.List;
 import javax.ws.rs.container.AsyncResponse;
 
 public class ListAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
-    
+
     private List<T> beans = new LinkedList<T>();
     public ListAsyncSubscriber(AsyncResponse ar) {
         super(ar);
@@ -38,5 +38,5 @@ public class ListAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
     public void onNext(T bean) {
         beans.add(bean);
     }
-    
+
 }

@@ -47,51 +47,51 @@ public class FiqlCollectionsTest extends Assert {
 
     public static class Room {
         Set<Furniture> furniture;
-        public Set<Furniture> getFurniture() { 
-            return furniture; 
+        public Set<Furniture> getFurniture() {
+            return furniture;
         }
-        public void setFurniture(Set<Furniture> furniture) { 
-            this.furniture = furniture; 
+        public void setFurniture(Set<Furniture> furniture) {
+            this.furniture = furniture;
         }
     }
 
     public static class Place {
         Set<Spec> specs;
-        public Set<Spec> getSpecs() { 
-            return specs; 
+        public Set<Spec> getSpecs() {
+            return specs;
         }
-        public void setSpecs(Set<Spec> specs) { 
-            this.specs = specs; 
+        public void setSpecs(Set<Spec> specs) {
+            this.specs = specs;
         }
     }
 
     public static class Furniture {
         Spec spec;
-        public Spec getSpec() { 
-            return spec; 
+        public Spec getSpec() {
+            return spec;
         }
-        public void setSpec(Spec spec) { 
-            this.spec = spec; 
+        public void setSpec(Spec spec) {
+            this.spec = spec;
         }
     }
 
     public static class Spec {
         Set<Feature> features;
-        public Set<Feature> getFeatures() { 
-            return features; 
+        public Set<Feature> getFeatures() {
+            return features;
         }
-        public void setFeatures(Set<Feature> features) { 
-            this.features = features; 
+        public void setFeatures(Set<Feature> features) {
+            this.features = features;
         }
     }
 
     public static class Feature {
         String description;
-        public String getDescription() { 
-            return description; 
+        public String getDescription() {
+            return description;
         }
-        public void setDescription(String description) { 
-            this.description = description; 
+        public void setDescription(String description) {
+            this.description = description;
         }
     }
 }

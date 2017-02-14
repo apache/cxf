@@ -44,16 +44,16 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
     public static final String STAX_PORT = allocatePort(StaxServer.class);
     static final String PORT2 = allocatePort(XKMSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     final TestParam test;
-    
+
     public XKMSTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -75,17 +75,17 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
                    launchServer(XKMSServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(PORT, true)},
                                                 {new TestParam(STAX_PORT, false)},
                                                 {new TestParam(STAX_PORT, true)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -103,24 +103,24 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = XKMSTest.class.getResource("DoubleItXKMS.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // The client uses XKMS to locate the public key of the service with which to encrypt
     // the message. Then the client uses XKMS to both locate + validate the signing cert
     // on processing the service response
@@ -133,23 +133,23 @@ public class XKMSTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = XKMSTest.class.getResource("DoubleItXKMS.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-  
-   
+
+
 }

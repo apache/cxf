@@ -298,7 +298,7 @@ public class SchemaCollection {
             addCrossImports(schema, complexType.getContentModel());
             addCrossImportsAttributeList(schema, complexType.getAttributes());
             // could it be a choice or something else?
-            
+
             if (complexType.getParticle() instanceof XmlSchemaChoice) {
                 XmlSchemaChoice choice = (XmlSchemaChoice)complexType.getParticle();
                 addCrossImports(schema, choice);

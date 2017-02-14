@@ -29,7 +29,7 @@ import org.apache.cxf.configuration.ConfiguredBeanLocator;
 public class MyBeanLocator implements ConfiguredBeanLocator {
     ConfiguredBeanLocator cbl;
     Map<String, Object> registry = new HashMap<String, Object>();
-    
+
     public MyBeanLocator(ConfiguredBeanLocator cbl) {
         this.cbl = cbl;
     }
@@ -60,12 +60,12 @@ public class MyBeanLocator implements ConfiguredBeanLocator {
 
     public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
         return cbl.loadBeansOfType(type, listener);
-    
+
     }
     public boolean hasConfiguredPropertyValue(String beanName, String propertyName, String value) {
         return cbl.hasConfiguredPropertyValue(beanName, propertyName, value);
     }
-    
+
     public List<String> getBeanNamesOfType(Class<?> type) {
         return cbl.getBeanNamesOfType(type);
     }
@@ -76,5 +76,5 @@ public class MyBeanLocator implements ConfiguredBeanLocator {
     public void register(String name, Object object) {
         registry.put(name, object);
     }
-    
+
 }

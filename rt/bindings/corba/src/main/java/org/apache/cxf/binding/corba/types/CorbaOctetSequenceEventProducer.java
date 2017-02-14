@@ -30,7 +30,7 @@ public class CorbaOctetSequenceEventProducer implements CorbaTypeEventProducer {
     int state;
     final int[] states = {XMLStreamReader.START_ELEMENT,
                           XMLStreamReader.CHARACTERS,
-                          XMLStreamReader.END_ELEMENT};    
+                          XMLStreamReader.END_ELEMENT};
     final CorbaOctetSequenceHandler seqHandler;
     final QName name;
 
@@ -39,7 +39,7 @@ public class CorbaOctetSequenceEventProducer implements CorbaTypeEventProducer {
         name = seqHandler.getName();
     }
 
-    public String getLocalName() {        
+    public String getLocalName() {
         return seqHandler.getSimpleName();
     }
 

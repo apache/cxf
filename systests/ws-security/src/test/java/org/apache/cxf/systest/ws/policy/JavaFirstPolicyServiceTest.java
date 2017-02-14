@@ -107,7 +107,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         } catch (Exception e) {
             assertTrue(true);
         }
-        
+
         ctx.close();
     }
 
@@ -143,7 +143,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         } catch (Exception e) {
             assertTrue(true);
         }
-        
+
         ctx.close();
     }
 
@@ -177,7 +177,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
         wssOut.setProperties(getPasswordProperties("alice", "password"));
         simpleService.doStuff();
-        
+
         clientContext.close();
     }
 
@@ -208,7 +208,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
         // this is successful because the alternative policy allows a password to be specified.
         simpleService.doStuff();
-        
+
         clientContext.close();
     }
 
@@ -259,7 +259,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
         wssOut.setProperties(getPasswordProperties("alice", "password"));
         simpleService.ping();
-        
+
         clientContext.close();
     }
 
@@ -305,7 +305,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
         wssOut.setProperties(getPasswordProperties("alice", "password"));
         simpleService.ping();
-        
+
         clientContext.close();
     }
 
@@ -322,7 +322,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
         // no security on ping!
         simpleService.ping();
-        
+
         try {
             simpleService.doStuff();
             fail("Expected exception as no credentials");
@@ -343,7 +343,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         // this is successful because the alternative policy allows a password to be specified.
         wssOut.setProperties(getPasswordProperties("alice", "password"));
         simpleService.doStuff();
-        
+
         clientContext.close();
     }
 
@@ -360,7 +360,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
 
         // no security on ping!
         simpleService.ping();
-        
+
         try {
             simpleService.doStuff();
             fail("Expected exception as no credentials");
@@ -376,7 +376,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         // this is successful because the alternative policy allows a password to be specified.
         wssOut.setProperties(getPasswordProperties("alice", "password"));
         simpleService.doStuff();
-        
+
         clientContext.close();
     }
 

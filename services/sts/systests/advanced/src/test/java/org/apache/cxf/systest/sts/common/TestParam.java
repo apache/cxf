@@ -25,17 +25,17 @@ public final class TestParam {
     final String port;
     final boolean streaming;
     final String stsPort;
-    
+
     public TestParam(String p, boolean b) {
         this(p, b, null);
     }
-    
+
     public TestParam(String p, boolean b, String stsPort) {
         port = p;
         streaming = b;
         this.stsPort = stsPort;
     }
-    
+
     public String toString() {
         return port + ":" + (streaming ? "streaming" : "dom") + ":" + stsPort;
     }
@@ -51,5 +51,5 @@ public final class TestParam {
     public String getStsPort() {
         return stsPort;
     }
-    
+
 }

@@ -75,21 +75,21 @@ public class CxfAutoConfiguration {
     protected static class SpringBusConfiguration {
 
     }
-    
+
     @Configuration
     @ConditionalOnClass(JAXRSServerFactoryBean.class)
     @ConditionalOnExpression("'${cxf.jaxrs.component-scan}'=='true' && '${cxf.jaxrs.classes-scan}'!='true'")
     @Import(SpringComponentScanServer.class)
     protected static class JaxRsComponentConfiguration {
-     
+
     }
-    
+
     @Configuration
     @ConditionalOnClass(JAXRSServerFactoryBean.class)
     @ConditionalOnExpression("'${cxf.jaxrs.classes-scan}'=='true' && '${cxf.jaxrs.component-scan}'!='true'")
     @Import(SpringJaxrsClassesScanServer.class)
     protected static class JaxRsClassesConfiguration {
-     
+
     }
 
 }

@@ -48,14 +48,14 @@ public final class JavaUtils {
 
     private JavaUtils() {
     }
-    
+
     /**
      * checks if the input string is a valid java keyword.
-     * 
+     *
      * @return boolean true/false
      */
     public static boolean isJavaKeyword(String keyword) {
-        return KEYWORDS.contains(keyword); 
+        return KEYWORDS.contains(keyword);
     }
 
     /**

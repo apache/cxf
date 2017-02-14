@@ -29,11 +29,11 @@ import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-public class JAXWSProviderMethodDispatcher 
+public class JAXWSProviderMethodDispatcher
     implements org.apache.cxf.service.invoker.MethodDispatcher {
 
     Method invoke;
-    
+
     public JAXWSProviderMethodDispatcher(JaxWsImplementorInfo implInfo) {
         try {
             invoke = Provider.class.getMethod("invoke", new Class[] {Object.class});
@@ -53,5 +53,5 @@ public class JAXWSProviderMethodDispatcher
     public void bind(OperationInfo o, Method... methods) {
     }
 
-    
+
 }

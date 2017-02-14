@@ -57,51 +57,51 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 
 public class IntegrationBaseTest {
-    
+
     public static final String RESOURCE_FACTORY_ADDRESS = "local://ResourceFactory";
-    
+
     public static final String RESOURCE_ADDRESS = "local://ResourceLocal";
-    
+
     public static final String RESOURCE_REMOTE_ADDRESS = "local://ResourceRemote";
-    
+
     public static final String RESOURCE_REMOTE_MANAGER_ADDRESS = "local://ResourceRemote"
             + TransferConstants.RESOURCE_REMOTE_SUFFIX;
-    
+
     public static final String RESOURCE_LOCAL_ADDRESS = "local://ResourceLocal";
-    
+
     protected static DocumentBuilderFactory documentBuilderFactory;
-    
+
     protected static DocumentBuilder documentBuilder;
-    
+
     protected static Document document;
-    
+
     protected Bus bus;
-    
+
     @BeforeClass
     public static void beforeClass() throws ParserConfigurationException {
         documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilder = documentBuilderFactory.newDocumentBuilder();
         document = documentBuilder.newDocument();
     }
-    
+
     @AfterClass
     public static void afterClass() {
         documentBuilderFactory = null;
         documentBuilder = null;
         document = null;
     }
-    
+
     @Before
     public void before() {
         bus = BusFactory.getDefaultBus();
     }
-    
+
     @After
     public void after() {
         bus.shutdown(true);
         bus = null;
     }
-    
+
     protected Server createLocalResourceFactory(ResourceManager manager) {
         ResourceFactoryImpl implementor = new ResourceFactoryImpl();
         implementor.setResourceResolver(new SimpleResourceResolver(RESOURCE_ADDRESS, manager));
@@ -110,10 +110,10 @@ public class IntegrationBaseTest {
         factory.setServiceClass(ResourceFactory.class);
         factory.setAddress(RESOURCE_FACTORY_ADDRESS);
         factory.setServiceBean(implementor);
-        
+
         return factory.create();
     }
-    
+
     protected Server createRemoteResourceFactory() {
         ResourceFactoryImpl implementor = new ResourceFactoryImpl();
         implementor.setResourceResolver(new SimpleResourceResolver(RESOURCE_REMOTE_ADDRESS, null));
@@ -124,34 +124,34 @@ public class IntegrationBaseTest {
         factory.setServiceBean(implementor);
         return factory.create();
     }
-    
+
     protected Server createRemoteResource(ResourceManager manager) {
         ResourceRemote implementor = new ResourceRemote();
         implementor.setManager(manager);
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
-        
+
         Map<String, Object> props = factory.getProperties(true);
         props.put("jaxb.additionalContextClasses",
                 org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType.class);
         factory.setProperties(props);
-        
+
         factory.setBus(bus);
         factory.setServiceClass(ResourceFactory.class);
         factory.setAddress(RESOURCE_REMOTE_MANAGER_ADDRESS);
         factory.setServiceBean(implementor);
         return factory.create();
     }
-    
+
     protected Server createLocalResource(ResourceManager manager) {
         ResourceLocal implementor = new ResourceLocal();
         implementor.setManager(manager);
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
-        
+
         Map<String, Object> props = factory.getProperties(true);
         props.put("jaxb.additionalContextClasses",
                 org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType.class);
         factory.setProperties(props);
-        
+
         factory.setBus(bus);
         factory.setServiceClass(Resource.class);
         factory.setAddress(RESOURCE_LOCAL_ADDRESS);

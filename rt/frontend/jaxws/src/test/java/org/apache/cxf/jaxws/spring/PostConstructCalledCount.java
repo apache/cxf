@@ -31,7 +31,7 @@ public class PostConstructCalledCount {
 
     @Resource
     WebServiceContext context;
-    
+
     public static int getCount() {
         return count;
     }
@@ -42,8 +42,8 @@ public class PostConstructCalledCount {
         count = 0;
         injectedCount = 0;
     }
-    
-    
+
+
     @PostConstruct
     public void postConstruct() {
         count++;
@@ -55,7 +55,7 @@ public class PostConstructCalledCount {
     public WebServiceContext getContext() {
         return context;
     }
-    
+
     public int doubleIt(int i) {
         return i * 2;
     }

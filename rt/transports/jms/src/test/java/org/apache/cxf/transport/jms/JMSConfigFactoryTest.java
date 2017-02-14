@@ -63,7 +63,7 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
         TransactionManager tm = jmsConfig.getTransactionManager();
         Assert.assertEquals(tmExpected, tm);
     }
-    
+
     private void tmByClass(Bus bus, TransactionManager tmExpected) {
         JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar");
         JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpoint(bus, endpoint);
@@ -74,12 +74,12 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
 
     @Test
     public void testTransactionManagerFromJndi() throws XAException, NamingException {
-        JMSEndpoint endpoint = 
+        JMSEndpoint endpoint =
             new JMSEndpoint("jms:queue:Foo.Bar?jndiTransactionManagerName=java:/comp/TransactionManager");
         Assert.assertEquals("java:/comp/TransactionManager", endpoint.getJndiTransactionManagerName());
         // TODO Check JNDI lookup
     }
-    
+
     @Test
     public void testConcurrentConsumers() {
         JMSEndpoint endpoint = new JMSEndpoint("jms:queue:Foo.Bar?concurrentConsumers=4");
@@ -87,11 +87,11 @@ public class JMSConfigFactoryTest extends AbstractJMSTester {
         Assert.assertEquals(4, jmsConfig.getConcurrentConsumers());
 
     }
-    
+
     @Test
     public void testMessageSelectorIsSet() {
         EndpointInfo ei = setupServiceInfo("HelloWorldSelectorService", "HelloWorldPort");
         JMSConfiguration config = JMSConfigFactory.createFromEndpointInfo(bus, ei, target);
-        Assert.assertEquals("customJMSAttribute=helloWorld", config.getMessageSelector());        
+        Assert.assertEquals("customJMSAttribute=helloWorld", config.getMessageSelector());
     }
 }

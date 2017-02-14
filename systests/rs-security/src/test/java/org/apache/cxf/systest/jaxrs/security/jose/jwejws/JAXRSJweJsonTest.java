@@ -42,39 +42,39 @@ import org.junit.Test;
 
 public class JAXRSJweJsonTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJweJson.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerJweJson.class, true));
         registerBouncyCastle();
     }
-    
+
     private static void registerBouncyCastle() throws Exception {
-        Security.addProvider(new BouncyCastleProvider());    
+        Security.addProvider(new BouncyCastleProvider());
     }
     @AfterClass
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);    
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
     }
-    
+
     @Test
     public void testJweJsonPlainTextHmac() throws Exception {
         String address = "https://localhost:" + PORT + "/jwejsonhmac";
-        BookStore bs = createBookStore(address, 
+        BookStore bs = createBookStore(address,
                                        "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties",
                                        null);
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
-    
+
     private BookStore createBookStore(String address, Object properties,
                                       List<?> extraProviders) throws Exception {
-        return createBookStore(address, 
+        return createBookStore(address,
                                Collections.singletonMap(JoseConstants.RSSEC_ENCRYPTION_PROPS, properties),
                                extraProviders);
     }
-    private BookStore createBookStore(String address, 
+    private BookStore createBookStore(String address,
                                       Map<String, Object> mapProperties,
                                       List<?> extraProviders) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
@@ -95,5 +95,5 @@ public class JAXRSJweJsonTest extends AbstractBusClientServerTestBase {
         bean.getProperties(true).putAll(mapProperties);
         return bean.create(BookStore.class);
     }
-    
+
 }

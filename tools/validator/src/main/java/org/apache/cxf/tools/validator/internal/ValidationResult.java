@@ -38,7 +38,7 @@ public final class ValidationResult {
     public void addError(final Message msg) {
         addError(msg.toString());
     }
-    
+
     public void addError(final String error) {
         this.errors.push(error);
     }
@@ -54,7 +54,7 @@ public final class ValidationResult {
     public boolean hasWarnings() {
         return warnings.size() > 0;
     }
-    
+
     public boolean isSuccessful() {
         return errors.size() == 0 && warnings.size() == 0;
     }
@@ -77,9 +77,9 @@ public final class ValidationResult {
             sb.append("\n <<< WARNING! \n");
             while (!warnings.empty()) {
                 sb.append(warnings.pop());
-                sb.append("\n");                    
+                sb.append("\n");
             }
         }
         return sb.toString();
-    }    
+    }
 }

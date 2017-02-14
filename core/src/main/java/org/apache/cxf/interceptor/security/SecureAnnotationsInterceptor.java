@@ -37,24 +37,24 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(SecureAnnotationsInterceptor.class);
     private static final String DEFAULT_ANNOTATION_CLASS_NAME = "javax.annotation.security.RolesAllowed";
-    
+
     private static final Set<String> SKIP_METHODS;
     static {
         SKIP_METHODS = new HashSet<>();
         SKIP_METHODS.addAll(Arrays.asList(
-            new String[] {"wait", "notify", "notifyAll", 
+            new String[] {"wait", "notify", "notifyAll",
                           "equals", "toString", "hashCode"}));
     }
-    
+
     private String annotationClassName = DEFAULT_ANNOTATION_CLASS_NAME;
-    
+
     public SecureAnnotationsInterceptor() {
         this(true);
     }
     public SecureAnnotationsInterceptor(boolean uniqueId) {
         super(uniqueId);
     }
-    
+
     public void setAnnotationClassName(String name) {
         try {
             ClassLoaderUtils.loadClass(name, SecureAnnotationsInterceptor.class);
@@ -64,7 +64,7 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
             throw new IllegalArgumentException("Annotation class " + name + " is not available");
         }
     }
-    
+
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);
         Map<String, String> rolesMap = new HashMap<String, String>();
@@ -98,18 +98,18 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
         if (!rolesMap.isEmpty()) {
             return;
         }
-        
+
         findRoles(cls.getSuperclass(), rolesMap);
-        
+
         if (!rolesMap.isEmpty()) {
             return;
         }
-        
+
         for (Class<?> interfaceCls : cls.getInterfaces()) {
             findRoles(interfaceCls, rolesMap);
         }
     }
-    
+
     private String getRoles(Annotation[] anns, String annName) {
         for (Annotation ann : anns) {
             if (ann.annotationType().getName().equals(annName)) {
@@ -125,7 +125,7 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
                     }
                     return sb.toString();
                 } catch (Exception ex) {
-                    // ignore    
+                    // ignore
                 }
                 break;
             }

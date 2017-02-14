@@ -28,7 +28,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jca.cxf.CXFInvocationHandlerData;
 
 /**
- * delegates invocations to the target object 
+ * delegates invocations to the target object
  */
 public class InvokingInvocationHandler extends CXFInvocationHandlerBase {
 
@@ -38,8 +38,8 @@ public class InvokingInvocationHandler extends CXFInvocationHandlerBase {
         super(data);
     }
 
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable { 
-        
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
         Object ret = null;
         if (!isConnectionCloseMethod(method)) {
             ret = invokeTargetMethod(proxy, method, args);
@@ -48,7 +48,7 @@ public class InvokingInvocationHandler extends CXFInvocationHandlerBase {
         }
 
         return ret;
-    } 
+    }
 
 
     private boolean isConnectionCloseMethod(Method m) {
@@ -59,7 +59,7 @@ public class InvokingInvocationHandler extends CXFInvocationHandlerBase {
         LOG.fine("calling close on managed connection with handle");
         getData().getManagedConnection().close(handle);
     }
-    
+
     private Object invokeTargetMethod(Object proxy, Method method, Object args[]) throws Throwable {
 
         Object ret = null;

@@ -29,22 +29,22 @@ import org.apache.cxf.ws.security.wss4j.UsernameTokenInterceptor;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 
 public class CustomUsernameTokenInterceptor extends UsernameTokenInterceptor {
-    
-    protected Subject createSubject(String name, 
-                                    String password, 
+
+    protected Subject createSubject(String name,
+                                    String password,
                                     boolean isDigest,
                                     String nonce,
                                     String created) throws SecurityException {
         Subject subject = new Subject();
-        
+
         // delegate to the external security system if possible
-        
+
         // authenticate the user somehow
         subject.getPrincipals().add(new SimplePrincipal(name));
-        
+
         // add roles this user is in
         String roleName = "Alice".equals(name) ? "developers" : "pms";
-        String expectedPassword = "Alice".equals(name) ? "ecilA" 
+        String expectedPassword = "Alice".equals(name) ? "ecilA"
             : UsernameToken.doPasswordDigest(nonce, created, "invalid-password");
         if (!password.equals(expectedPassword)) {
             throw new SecurityException("Wrong Password");
@@ -53,20 +53,20 @@ public class CustomUsernameTokenInterceptor extends UsernameTokenInterceptor {
         subject.setReadOnly();
         return subject;
     }
-    
+
     public void handleMessage(SoapMessage message) throws Fault {
         message.put(SecurityConstants.VALIDATE_TOKEN, Boolean.FALSE);
         super.handleMessage(message);
     }
-    
+
     //  or, if needed
-    
+
     // protected WSUsernameTokenPrincipal getPrincipal(Element tokenElement, SoapMessage message)
     //    throws WSSecurityException {
     //    return super.parseTokenAndCreatePrincipal(tokenElement);
     //}
-    
-    
+
+
 }
 
 

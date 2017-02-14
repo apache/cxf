@@ -71,31 +71,31 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
             ep = Endpoint.publish("http://localhost:" + port + "/SoapContext/ControlPort", implementor);
             LOG.fine("Published control endpoint.");
             BusFactory.setDefaultBus(null);
-            BusFactory.setThreadDefaultBus(null);            
+            BusFactory.setThreadDefaultBus(null);
         }
         public void tearDown() {
             ep.stop();
             ep = null;
         }
     }
-    
+
     private Bus controlBus;
     private Control control;
     private Bus greeterBus;
     private Greeter greeter;
-    
+
     public abstract String getPort();
-    
+
     public String getPrefix() {
         return "rmdb";
     }
 
     public static void startServer(String port, String pfx) throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(Server.class, null, new String[] {port, pfx}, true));
     }
-    
-    
+
+
     @After
     public void tearDown() {
         if (null != greeter) {
@@ -103,7 +103,7 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
             greeterBus.shutdown(true);
             greeterBus = null;
         }
-        if (null != control) {  
+        if (null != control) {
             assertTrue("Failed to stop greeter", control.stopGreeter(null));
             controlBus.shutdown(true);
         }
@@ -111,47 +111,47 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
 
     protected void setupGreeter() throws Exception {
     }
-    
+
     @Test
     public void testDefaultInvocationHandling() throws Exception {
         setupGreeter();
 
         control.setRobustInOnlyMode(false);
-        
+
         FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
             .createFaultLocation();
         location.setPhase(Phase.INVOKE);
         location.setBefore(ServiceInvokerInterceptor.class.getName());
-        
+
         RMManager manager = greeterBus.getExtension(RMManager.class);
 
         // the message is acked and the invocation takes place
         greeter.greetMeOneWay("one");
         waitForEmpty(manager.getRetransmissionQueue());
-    
+
         control.setFaultLocation(location);
 
         // the invocation fails but the message is acked because the delivery succeeds
         greeter.greetMeOneWay("two");
         waitForEmpty(manager.getRetransmissionQueue());
     }
-    
-    
+
+
 
     @Test
     public void testRobustInvocationHandling() throws Exception {
         setupGreeter();
 
         control.setRobustInOnlyMode(true);
-        
+
         FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
             .createFaultLocation();
         location.setPhase(Phase.INVOKE);
         location.setBefore(ServiceInvokerInterceptor.class.getName());
-        
+
         RMManager manager = greeterBus.getExtension(RMManager.class);
 
-        
+
         // the message is acked and the invocation takes place
         greeter.greetMeOneWay("one");
         waitForEmpty(manager.getRetransmissionQueue());
@@ -167,7 +167,7 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
 
         // the retransmission succeeds and the invocation succeeds, the message is acked
         waitForEmpty(manager.getRetransmissionQueue());
-        
+
     }
 
     private void waitForNotEmpty(RetransmissionQueue retransmissionQueue) throws Exception {
@@ -199,24 +199,24 @@ public abstract class ServiceInvocationAckBase extends AbstractBusClientServerTe
     }
 
     protected void setupGreeter(String cfgResource) throws NumberFormatException, MalformedURLException {
-        
+
         SpringBusFactory bf = new SpringBusFactory();
-        
+
         controlBus = bf.createBus();
         BusFactory.setDefaultBus(controlBus);
 
         ControlService cs = new ControlService();
         control = cs.getControlPort();
         updateAddressPort(control, getPort());
-        
+
         assertTrue("Failed to start greeter", control.startGreeter(cfgResource));
-        
+
         System.setProperty("db.name", getPrefix());
         greeterBus = bf.createBus(cfgResource);
         BusFactory.setDefaultBus(greeterBus);
         System.clearProperty("db.name");
         LOG.fine("Initialised greeter bus with configuration: " + cfgResource);
-        
+
         GreeterService gs = new GreeterService();
 
         greeter = gs.getGreeterPort();

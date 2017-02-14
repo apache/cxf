@@ -78,7 +78,7 @@ public class ClientImpl
     public static final String THREAD_LOCAL_REQUEST_CONTEXT = "thread.local.request.context";
     /**
      * When a synchronous request/response invoke is done using an asynchronous transport mechanism,
-     * this is the timeout used for waiting for the response.  Default is 60 seconds. 
+     * this is the timeout used for waiting for the response.  Default is 60 seconds.
      */
     public static final String SYNC_TIMEOUT = "cxf.synchronous.timeout";
 
@@ -95,10 +95,10 @@ public class ClientImpl
     protected PhaseChainCache inboundChainCache = new PhaseChainCache();
 
     protected Map<String, Object> currentRequestContext = new ConcurrentHashMap<String, Object>(8, 0.75f, 4);
-    protected Map<Thread, EchoContext> requestContext 
+    protected Map<Thread, EchoContext> requestContext
         = Collections.synchronizedMap(new WeakHashMap<Thread, EchoContext>());
 
-    protected Map<Thread, Map<String, Object>> responseContext 
+    protected Map<Thread, Map<String, Object>> responseContext
         = Collections.synchronizedMap(new WeakHashMap<Thread, Map<String, Object>>());
 
     protected Executor executor;
@@ -117,7 +117,7 @@ public class ClientImpl
         getConduitSelector(sc).setEndpoint(e);
         notifyLifecycleManager();
     }
-    
+
     /**
      * Create a Client that uses a specific EndpointImpl.
      * @param bus
@@ -142,7 +142,7 @@ public class ClientImpl
         }
         notifyLifecycleManager();
     }
-    
+
     public Bus getBus() {
         return bus;
     }
@@ -174,7 +174,7 @@ public class ClientImpl
                 getConduit().close();
             }
         }
-        
+
         bus = null;
         conduitSelector = null;
         outFaultObserver = null;
@@ -186,7 +186,7 @@ public class ClientImpl
         requestContext = null;
         responseContext.clear();
         responseContext = null;
-        executor = null;            
+        executor = null;
     }
 
     private void notifyLifecycleManager() {
@@ -393,14 +393,14 @@ public class ClientImpl
                        Object... params) throws Exception {
         invoke(callback, oi, params, null, null);
     }
-    
+
     public void invoke(ClientCallback callback,
                        BindingOperationInfo oi,
                        Object[] params,
                        Map<String, Object> context) throws Exception {
         invoke(callback, oi, params, context, null);
     }
-    
+
     public void invoke(ClientCallback callback,
                        BindingOperationInfo oi,
                        Object[] params,
@@ -444,7 +444,7 @@ public class ClientImpl
                 LOG.fine("Invoke, operation info: " + oi + ", params: " + Arrays.toString(params));
             }
             Message message = endpoint.getBinding().createMessage();
-            
+
             // Make sure INVOCATION CONTEXT, REQUEST_CONTEXT and RESPONSE_CONTEXT are present
             // on message
             Map<String, Object> reqContext = null;
@@ -454,7 +454,7 @@ public class ClientImpl
             }
             reqContext = CastUtils.cast((Map<?, ?>)context.get(REQUEST_CONTEXT));
             resContext = CastUtils.cast((Map<?, ?>)context.get(RESPONSE_CONTEXT));
-            if (reqContext == null) { 
+            if (reqContext == null) {
                 reqContext = new HashMap<String, Object>(getRequestContext());
                 context.put(REQUEST_CONTEXT, reqContext);
             }
@@ -462,11 +462,11 @@ public class ClientImpl
                 resContext = new HashMap<String, Object>();
                 context.put(RESPONSE_CONTEXT, resContext);
             }
-            
+
             message.put(Message.INVOCATION_CONTEXT, context);
             setContext(reqContext, message);
             exchange.putAll(reqContext);
-            
+
             setParameters(params, message);
 
             if (null != oi) {
@@ -475,7 +475,7 @@ public class ClientImpl
 
             exchange.setOutMessage(message);
             exchange.put(ClientCallback.class, callback);
-            
+
             setOutMessageProperties(message, oi);
             setExchangeProperties(exchange, endpoint, oi);
 
@@ -516,7 +516,7 @@ public class ClientImpl
                 enrichFault(fault);
                 throw fault;
             }
-            
+
             if (callback != null) {
                 return null;
             } else {
@@ -536,11 +536,11 @@ public class ClientImpl
         getConduitSelector().complete(exchange);
         Message outMessage = exchange.getOutMessage();
         if (outMessage != null && outMessage.get("transport.retransmit.url") != null) {
-            //FIXME: target address has been updated at the transport level, 
+            //FIXME: target address has been updated at the transport level,
             //       update the the current client accordingly
         }
     }
-    
+
     /**
      * TODO This is SOAP specific code and should not be in cxf core
      * @param fault
@@ -551,8 +551,8 @@ public class ClientImpl
             String soap11NS = "http://schemas.xmlsoap.org/soap/envelope/";
             String soap12NS = "http://www.w3.org/2003/05/soap-envelope";
             QName faultCode = fault.getFaultCode();
-            //for SoapFault, if it's underlying cause is IOException, 
-            //it means something like server is down or can't create 
+            //for SoapFault, if it's underlying cause is IOException,
+            //it means something like server is down or can't create
             //connection, according to soap spec we should set fault as
             //Server Fault
             if (faultCode.getNamespaceURI().equals(
@@ -594,10 +594,10 @@ public class ClientImpl
             }
             throw ex;
         }
-        
-        //REVISIT 
+
+        //REVISIT
         // - use a protocol neutral no-content marker instead of 202?
-        // - move the decoupled destination property name into api 
+        // - move the decoupled destination property name into api
         Integer responseCode = (Integer)exchange.get(Message.RESPONSE_CODE);
         if (null != responseCode && 202 == responseCode) {
             Endpoint ep = exchange.getEndpoint();
@@ -749,7 +749,7 @@ public class ClientImpl
         chain.setFaultObserver(outFaultObserver);
         modifyChain(chain, message, true);
         modifyChain(chain, message.getExchange().getOutMessage(), true);
-        
+
         Bus origBus = BusFactory.getAndSetThreadDefaultBus(bus);
         // execute chain
         ClientCallback callback = message.getExchange().get(ClientCallback.class);
@@ -779,7 +779,7 @@ public class ClientImpl
                     try {
                         chain.doIntercept(message);
                     } catch (Throwable error) {
-                        //so that asyn callback handler get chance to 
+                        //so that asyn callback handler get chance to
                         //handle non-runtime exceptions
                         message.getExchange().setInMessage(message);
                         Map<String, Object> resCtx = CastUtils
@@ -800,7 +800,7 @@ public class ClientImpl
                 } else {
                     chain.doIntercept(message);
                 }
-                 
+
             }
 
             callback = message.getExchange().get(ClientCallback.class);
@@ -834,7 +834,7 @@ public class ClientImpl
                 BusFactory.setThreadDefaultBus(origBus);
             }
             synchronized (message.getExchange()) {
-                if (!isPartialResponse(message) 
+                if (!isPartialResponse(message)
                     || message.getContent(Exception.class) != null) {
                     message.getExchange().put(FINISHED, Boolean.TRUE);
                     message.getExchange().setInMessage(message);
@@ -887,7 +887,7 @@ public class ClientImpl
                 public void onMessage(final Message message) {
                     if (!message.getExchange()
                         .containsKey(Executor.class.getName() + ".USING_SPECIFIED")) {
-                        
+
                         executor.execute(new Runnable() {
                             public void run() {
                                 ClientImpl.this.onMessage(message);
@@ -968,7 +968,7 @@ public class ClientImpl
         if (ctx == null) {
             return;
         }
-        Collection<InterceptorProvider> providers 
+        Collection<InterceptorProvider> providers
             = CastUtils.cast((Collection<?>)ctx.get(Message.INTERCEPTOR_PROVIDERS));
         if (providers != null) {
             for (InterceptorProvider p : providers) {
@@ -980,7 +980,7 @@ public class ClientImpl
             }
         }
         String key = in ? Message.IN_INTERCEPTORS : Message.OUT_INTERCEPTORS;
-        Collection<Interceptor<? extends Message>> is 
+        Collection<Interceptor<? extends Message>> is
             = CastUtils.cast((Collection<?>)ctx.get(key));
         if (is != null) {
             chain.add(is);

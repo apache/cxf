@@ -37,11 +37,11 @@ import org.apache.cxf.tools.java2js.processor.JavaToJSProcessor;
 public class JavaToJS extends AbstractCXFToolContainer {
 
     public static final String TOOL_NAME = "java2js";
-    
+
     public JavaToJS(ToolSpec toolspec) throws Exception {
         super(TOOL_NAME, toolspec);
     }
-    
+
     public void execute(boolean exitOnFinish) {
         Processor processor = new JavaToJSProcessor();
         try {
@@ -59,7 +59,7 @@ public class JavaToJS extends AbstractCXFToolContainer {
                 env.put(ToolConstants.CFG_CMD_ARG, getArgument());
 
                 validate(env);
-                
+
                 processor.setEnvironment(env);
                 processor.process();
             }

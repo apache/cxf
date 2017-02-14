@@ -30,11 +30,11 @@ import org.apache.cxf.ws.security.SecurityConstants;
  * A factory to return an EHCacheTokenStore instance.
  */
 public class EHCacheTokenStoreFactory extends TokenStoreFactory {
-    
+
     public TokenStore newTokenStore(String key, Message message) {
         URL configFileURL = SecurityUtils.getConfigFileURL(message, SecurityConstants.CACHE_CONFIG_FILE,
                                                            "cxf-ehcache.xml");
         return new EHCacheTokenStore(key, message.getExchange().getBus(), configFileURL);
     }
-    
+
 }

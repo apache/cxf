@@ -72,7 +72,7 @@ public  final class MapNamespaceContext implements NamespaceContext {
             if (uri != null) {
                 return uri;
             }
-            
+
         }
         return namespaces.get(prefix);
     }

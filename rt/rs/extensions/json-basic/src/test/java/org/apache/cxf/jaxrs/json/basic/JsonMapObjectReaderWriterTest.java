@@ -37,7 +37,7 @@ public class JsonMapObjectReaderWriterTest extends Assert {
         map.put("c", Collections.singletonList("cValue"));
         map.put("claim", null);
         String json = new JsonMapObjectReaderWriter().toJson(map);
-        assertEquals("{\"a\":\"aValue\",\"b\":123,\"c\":[\"cValue\"],\"claim\":null}", 
+        assertEquals("{\"a\":\"aValue\",\"b\":123,\"c\":[\"cValue\"],\"claim\":null}",
                      json);
     }
     @Test

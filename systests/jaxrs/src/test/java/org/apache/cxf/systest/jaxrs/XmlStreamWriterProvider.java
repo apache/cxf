@@ -38,7 +38,7 @@ public class XmlStreamWriterProvider implements ContainerResponseFilter {
         OperationResourceInfo ori = m.getExchange().get(OperationResourceInfo.class);
         String method = ori.getHttpMethod();
         if ("PUT".equals(method)) {
-            XMLStreamWriter writer = 
+            XMLStreamWriter writer =
                 StaxUtils.createXMLStreamWriter(m.getContent(OutputStream.class));
             m.setContent(XMLStreamWriter.class, new CustomXmlStreamWriter(writer));
         }

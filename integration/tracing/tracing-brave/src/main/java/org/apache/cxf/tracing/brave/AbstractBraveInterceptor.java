@@ -38,14 +38,14 @@ import org.apache.cxf.phase.PhaseInterceptor;
 
 public abstract class AbstractBraveInterceptor extends AbstractBraveProvider implements PhaseInterceptor<Message> {
     private final String phase;
-    
+
     protected static class ParsedMessage {
         private Message message;
 
         ParsedMessage(Message message) {
             this.message = message;
         }
-        
+
         String safeGet(String key) {
             if (!message.containsKey(key)) {
                 return null;
@@ -53,7 +53,7 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
             Object value = message.get(key);
             return (value instanceof String) ? value.toString() : null;
         }
-        
+
         private String getUriSt() {
             String uri = safeGet(Message.REQUEST_URL);
             if (uri == null) {
@@ -77,7 +77,7 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
                 return uri;
             }
         }
-        
+
         URI getUri() {
             try {
                 String uriSt = getUriSt();
@@ -86,7 +86,7 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-        
+
         Message getEffectiveMessage() {
             boolean isRequestor = MessageUtils.isRequestor(message);
             boolean isOutbound = MessageUtils.isOutbound(message);
@@ -96,7 +96,7 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
                 return isOutbound ? message.getExchange().getInMessage() : message;
             }
         }
-        
+
         Map<String, List<String>> getHeaders() {
             Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
 
@@ -106,7 +106,7 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
 
             return headers;
         }
-        
+
         void addHeader(String key, String value) {
             Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
             if (headers == null) {
@@ -126,7 +126,7 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
         super(brave, spanNameProvider);
         this.phase = phase;
     }
-    
+
     @Override
     public Set<String> getAfter() {
         return Collections.emptySet();
@@ -146,12 +146,12 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
     public String getPhase() {
         return phase;
     }
-    
+
     @Override
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         return null;
     }
-    
+
     @Override
     public void handleFault(Message message) {
     }

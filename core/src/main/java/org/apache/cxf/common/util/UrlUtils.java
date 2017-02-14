@@ -34,31 +34,31 @@ import java.util.StringTokenizer;
  *
  */
 public final class UrlUtils {
-    
+
     private static final int RADIX = 16;
     private static final byte ESCAPE_CHAR = '%';
     private static final byte PLUS_CHAR = '+';
-    
+
     private UrlUtils() {
-        
+
     }
 
     public static String urlEncode(String value) {
-        
+
         return urlEncode(value, StandardCharsets.UTF_8.name());
     }
-    
+
     public static String urlEncode(String value, String enc) {
-        
+
         try {
             value = URLEncoder.encode(value, enc);
         } catch (UnsupportedEncodingException ex) {
             throw new RuntimeException(ex);
         }
-        
+
         return value;
     }
-    
+
     /**
      * Decodes using URLDecoder - use when queries or form post values are decoded
      * @param value value to decode
@@ -69,7 +69,7 @@ public final class UrlUtils {
     }
 
     private static String urlDecode(String value, String enc, boolean isPath) {
-        
+
         boolean needDecode = false;
         int escapesCount = 0;
         int i = 0;
@@ -120,11 +120,11 @@ public final class UrlUtils {
         return i;
     }
 
-    
+
     public static String urlDecode(String value) {
         return urlDecode(value, StandardCharsets.UTF_8.name());
     }
-    
+
     /**
      * URL path segments may contain '+' symbols which should not be decoded into ' '
      * This method replaces '+' with %2B and delegates to URLDecoder
@@ -133,8 +133,8 @@ public final class UrlUtils {
     public static String pathDecode(String value) {
         return urlDecode(value, StandardCharsets.UTF_8.name(), true);
     }
-    
-    
+
+
     /**
      * Create a map from String to String that represents the contents of the query
      * portion of a URL. For each x=y, x is the key and y is the value.
@@ -156,11 +156,11 @@ public final class UrlUtils {
         }
         return ht;
     }
-    
+
     /**
      * Return everything in the path up to the last slash in a URI.
      * @param baseURI
-     * @return the trailing 
+     * @return the trailing
      */
     public static String getStem(String baseURI) {
         int idx = baseURI.lastIndexOf('/');
@@ -170,6 +170,6 @@ public final class UrlUtils {
         }
         return result;
     }
-    
-    
+
+
 }

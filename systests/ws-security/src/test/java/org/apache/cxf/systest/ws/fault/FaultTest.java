@@ -48,7 +48,7 @@ import org.junit.BeforeClass;
  */
 public class FaultTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
@@ -61,7 +61,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
             launchServer(Server.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -81,14 +81,14 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap11Port");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        
+
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put("security.username", "alice");
         utPort.doubleIt(25);
-        
+
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put("security.username", "bob");
         ((BindingProvider)utPort).getRequestContext().put("security.password", "password");
@@ -101,7 +101,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSoap12() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -114,14 +114,14 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap12Port");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        
+
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put("security.username", "alice");
         utPort.doubleIt(25);
-        
+
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put("security.username", "bob");
         ((BindingProvider)utPort).getRequestContext().put("security.password", "password");
@@ -134,7 +134,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSoap12Mtom() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -147,14 +147,14 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap12MtomPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        
+
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put("security.username", "alice");
         utPort.doubleIt(25);
-        
+
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put("security.username", "bob");
         ((BindingProvider)utPort).getRequestContext().put("security.password", "password");
@@ -167,7 +167,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSoap12Dispatch() throws Exception {
         createBus();
@@ -176,9 +176,9 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap12DispatchPort");
 
-        Dispatch<DOMSource> dispatch = 
+        Dispatch<DOMSource> dispatch =
             service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD);
-        
+
         // Creating a DOMSource Object for the request
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         dbf.setNamespaceAware(true);
@@ -199,18 +199,18 @@ public class FaultTest extends AbstractBusClientServerTestBase {
             "org.apache.cxf.systest.ws.common.KeystorePasswordCallback"
         );
         client.getRequestContext().put(
-            "security.encryption.properties", 
+            "security.encryption.properties",
             "bob.properties"
         );
         client.getRequestContext().put("security.encryption.username", "bob");
 
         updateAddressPort(dispatch, PORT);
-        
+
         // Make a successful request
         client.getRequestContext().put("security.username", "alice");
         DOMSource response = dispatch.invoke(request);
         assertNotNull(response);
-        
+
         // Now make an invocation using another username
         client.getRequestContext().put("security.username", "bob");
         client.getRequestContext().put("security.password", "password");
@@ -220,10 +220,10 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             assertTrue(ex.getMessage().contains("This is a fault"));
         }
-        
+
         client.destroy();
     }
-    
+
     @org.junit.Test
     public void testSoap11PolicyWithParts() throws Exception {
 
@@ -237,14 +237,14 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSoap11PolicyWithPartsPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        
+
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put("security.username", "alice");
         utPort.doubleIt(25);
-        
+
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put("security.username", "bob");
         ((BindingProvider)utPort).getRequestContext().put("security.password", "password");
@@ -254,11 +254,11 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             assertTrue(ex.getMessage().contains("This is a fault"));
         }
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     // See DoubleItPortTypeImplJavaFirst
     @org.junit.Test
     public void testJavaFirst() throws Exception {
@@ -273,14 +273,14 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         URL wsdl = FaultTest.class.getResource("DoubleItFault.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItJavaFirstPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT);
-        
+
         // Make a successful invocation
         ((BindingProvider)utPort).getRequestContext().put("security.username", "alice");
         utPort.doubleIt(25);
-        
+
         // Now make an invocation using another username
         ((BindingProvider)utPort).getRequestContext().put("security.username", "bob");
         ((BindingProvider)utPort).getRequestContext().put("security.password", "password");
@@ -290,7 +290,7 @@ public class FaultTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             assertTrue(ex.getMessage().contains("This is a fault"));
         }
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }

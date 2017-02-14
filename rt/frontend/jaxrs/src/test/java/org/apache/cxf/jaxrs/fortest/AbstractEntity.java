@@ -24,26 +24,26 @@ import javax.ws.rs.PUT;
 
 
 public class AbstractEntity<T, E> {
-    
+
     private T entity1;
     private E entity2;
-    
+
     @POST
     public void postEntity(T object) {
-        entity1 = object;   
+        entity1 = object;
     }
-    
+
     @PUT
     public void putEntity(E object) {
-        entity2 = object;   
+        entity2 = object;
     }
-    
+
     public T getEntity1() {
         return entity1;
     }
-    
+
     public E getEntity2() {
         return entity2;
     }
-    
+
 }

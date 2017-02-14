@@ -31,10 +31,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Books {
 
     private List<Book> books = new ArrayList<>();
-    
+
     public Books() {
     }
-    
+
     public Books(Book b) {
         books.add(b);
     }

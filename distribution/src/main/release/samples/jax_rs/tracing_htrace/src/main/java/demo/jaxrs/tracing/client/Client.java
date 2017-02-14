@@ -37,22 +37,22 @@ import demo.jaxrs.tracing.conf.TracingConfiguration;
 public final class Client {
     private Client() {
     }
-    
+
     public static void main(final String[] args) throws Exception {
         final Map<String, String> properties = new HashMap<String, String>();
         properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, TracingConfiguration.SPAN_RECEIVER.getName());
         properties.put(Tracer.SAMPLER_CLASSES_KEY, AlwaysSampler.class.getName());
-        
+
         final Tracer tracer = new Tracer.Builder("catalog-client")
             .conf(HTraceConfiguration.fromMap(properties))
             .build();
-        
+
         final HTraceClientProvider provider = new HTraceClientProvider(tracer);
         final Response response = WebClient
             .create("http://localhost:9000/catalog", Arrays.asList(provider))
             .accept(MediaType.APPLICATION_JSON)
             .get();
-        
+
         System.out.println(response.readEntity(String.class));
         response.close();
     }

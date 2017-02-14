@@ -37,14 +37,14 @@ import org.apache.neethi.Constants;
  * Encapsulation of version-specific WS-Policy constants.
  */
 public final class PolicyConstants {
-    
+
     public static final String WSU_NAMESPACE_URI = Constants.URI_WSU_NS;
     public static final String WSU_ID_ATTR_NAME = Constants.ATTR_ID;
-    
 
-    public static final String POLICY_OVERRIDE 
+
+    public static final String POLICY_OVERRIDE
         = "org.apache.cxf.ws.policy.override";
-        
+
     public static final String POLICY_IN_INTERCEPTOR_ID
         = "org.apache.cxf.ws.policy.PolicyInInterceptor";
     public static final String POLICY_OUT_INTERCEPTOR_ID
@@ -53,26 +53,26 @@ public final class PolicyConstants {
         = "org.apache.cxf.ws.policy.ClientPolicyInFaultInterceptor";
     public static final String SERVER_POLICY_OUT_FAULT_INTERCEPTOR_ID
         = "org.apache.cxf.ws.policy.ServerPolicyOutFaultInterceptor";
-    
+
     public static final String CLIENT_OUT_ASSERTIONS
         = "org.apache.cxf.ws.policy.client.out.assertions";
     public static final String CLIENT_IN_ASSERTIONS
         = "org.apache.cxf.ws.policy.client.in.assertions";
     public static final String CLIENT_INFAULT_ASSERTIONS
         = "org.apache.cxf.ws.policy.client.infault.assertions";
-    
+
     public static final String SERVER_IN_ASSERTIONS
         = "org.apache.cxf.ws.policy.server.in.assertions";
     public static final String SERVER_OUT_ASSERTIONS
         = "org.apache.cxf.ws.policy.server.out.assertions";
     public static final String SERVER_OUTFAULT_ASSERTIONS
         = "org.apache.cxf.ws.policy.server.outfault.assertions";
-    
-    
+
+
     private PolicyConstants() {
         //utility class
     }
-    
+
     public static List<Element> findAllPolicyElementsOfLocalName(Document doc, String localName) {
         return findAllPolicyElementsOfLocalName(doc.getDocumentElement(), localName);
     }
@@ -113,7 +113,7 @@ public final class PolicyConstants {
         return null;
     }
 
-    
+
     public static boolean isIgnorable(Element e) {
         Attr at = findIgnorableAttribute(e);
         if (at != null) {
@@ -133,8 +133,8 @@ public final class PolicyConstants {
         }
         return null;
     }
-    
-    
+
+
     public static Element findPolicyElement(Element parent) {
         Node nd = parent.getFirstChild();
         while (nd != null) {

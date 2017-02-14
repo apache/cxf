@@ -44,7 +44,7 @@ import org.apache.hello_world_doc_lit.GreeterImplDoc;
 import org.junit.Test;
 
 public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
-    
+
     @Test
     public void testBean() {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
@@ -52,11 +52,11 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
         sf.setAddress("http://localhost:9000/test");
         sf.setServiceClass(Hello.class);
         sf.setStart(false);
-        
+
         Server server = sf.create();
         assertNotNull(server);
     }
-    
+
     @Test
     public void testJaxbExtraClass() {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
@@ -68,7 +68,7 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
         if (props == null) {
             props = new HashMap<String, Object>();
         }
-        props.put("jaxb.additionalContextClasses", 
+        props.put("jaxb.additionalContextClasses",
                   new Class[] {DescriptionType.class, DisplayNameType.class});
         sf.setProperties(props);
         Server server = sf.create();
@@ -78,14 +78,14 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
         assertEquals(extraClass[0], DescriptionType.class);
         assertEquals(extraClass[1], DisplayNameType.class);
     }
-    
+
     @Test
     public void testBareGreeter() throws Exception {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setBus(getBus());
         sf.setServiceClass(GreeterImplDoc.class);
         sf.setStart(false);
-        
+
         Server server = sf.create();
         assertNotNull(server);
     }
@@ -159,7 +159,7 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
                         doc,
                         XPathConstants.NODE);
     }
-    
+
     @Test
     public void testPostConstructCalled() throws Exception {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
@@ -171,7 +171,7 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
         factory.create();
         assertTrue("PostConstruct is not called", bean.isPostConstructCalled());
     }
-    
+
     @Test
     public void testPostConstructBlocked() throws Exception {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();

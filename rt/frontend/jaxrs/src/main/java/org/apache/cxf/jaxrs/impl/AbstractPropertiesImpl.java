@@ -30,7 +30,7 @@ public abstract class AbstractPropertiesImpl {
         holder = PropertyHolderFactory.getPropertyHolder(message);
         this.m = message;
     }
-    
+
     public Object getProperty(String name) {
         return holder.getProperty(name);
     }

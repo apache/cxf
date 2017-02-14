@@ -86,16 +86,16 @@ public class CorbaConduit implements Conduit {
     public OrbConfig getOrbConfig() {
         return orbConfig;
     }
-    
+
     public synchronized void prepareOrb() {
         if (orb == null) {
             orb = CorbaBindingHelper.getDefaultORB(orbConfig);
         }
     }
-    public void prepare(Message message) throws IOException {    
+    public void prepare(Message message) throws IOException {
         try {
             prepareOrb();
-            
+
             String address = null;
             if (target != null) {
                 address = target.getAddress().getValue();
@@ -123,11 +123,11 @@ public class CorbaConduit implements Conduit {
             message.put(CorbaConstants.CORBA_ENDPOINT_OBJECT, targetObject);
             message.setContent(OutputStream.class,
                                new CorbaOutputStream(message));
-            
+
             if (message instanceof CorbaMessage) {
                 ((CorbaMessage)message).setCorbaTypeMap(typeMap);
             }
-           
+
         } catch (java.lang.Exception ex) {
             LOG.log(Level.SEVERE, "Could not resolve target object");
             throw new CorbaBindingException(ex);
@@ -140,7 +140,7 @@ public class CorbaConduit implements Conduit {
             OperationType opType = boi.getExtensor(OperationType.class);
             try {
                 if (message instanceof CorbaMessage) {
-                    buildRequest((CorbaMessage)message, opType);            
+                    buildRequest((CorbaMessage)message, opType);
                 }
                 message.getContent(OutputStream.class).close();
             } catch (Exception ex) {
@@ -155,7 +155,7 @@ public class CorbaConduit implements Conduit {
     }
 
     public void close() {
-        
+
     }
 
     public void setMessageObserver(MessageObserver observer) {
@@ -178,8 +178,8 @@ public class CorbaConduit implements Conduit {
     public final String getAddress() {
         return endpointInfo.getAddress();
     }
-        
-    public void buildRequest(CorbaMessage message, OperationType opType) throws Exception {        
+
+    public void buildRequest(CorbaMessage message, OperationType opType) throws Exception {
         ServiceInfo service = message.getExchange().getEndpoint().getEndpointInfo().getService();
         NVList nvlist = getArguments(message);
         NamedValue ret = getReturn(message);
@@ -216,7 +216,7 @@ public class CorbaConduit implements Conduit {
                                                               raises.getException(),
                                                               typeMap,
                                                               service);
-                
+
                 CorbaStreamable exStreamable = message.createStreamableObject(handler, elName);
                 exStreamable._read(except.create_input_stream());
                 message.setStreamableException(exStreamable);
@@ -226,7 +226,7 @@ public class CorbaConduit implements Conduit {
             }
         }
     }
-       
+
     public NVList getArguments(CorbaMessage message) {
         if (orb == null) {
             prepareOrb();
@@ -246,9 +246,9 @@ public class CorbaConduit implements Conduit {
             list = orb.create_list(0);
         }
 
-        return list;        
+        return list;
     }
-    
+
     public NamedValue getReturn(CorbaMessage message) {
         if (orb == null) {
             prepareOrb();
@@ -261,15 +261,15 @@ public class CorbaConduit implements Conduit {
             ret = orb.create_named_value(retVal.getName(), returnAny, org.omg.CORBA.ARG_OUT.value);
         } else {
             // TODO: REVISIT: for some reason,some ORBs do not like to
-            // have a null NamedValue return value. Create this 'empty' 
+            // have a null NamedValue return value. Create this 'empty'
             // one if a void return type is used.
             ret = orb.create_named_value("return", orb.create_any(), org.omg.CORBA.ARG_OUT.value);
         }
-        return ret;        
+        return ret;
     }
-    
+
     public ExceptionList getExceptionList(Map<TypeCode, RaisesType> exceptions,
-                                             CorbaMessage message, 
+                                             CorbaMessage message,
                                              OperationType opType) {
         if (orb == null) {
             prepareOrb();
@@ -279,23 +279,23 @@ public class CorbaConduit implements Conduit {
         // These are defined in the operation definition from WSDL.
         ExceptionList exList = orb.create_exception_list();
 
-               
+
         if (exceptions != null) {
             Object[] tcs = null;
             tcs = exceptions.keySet().toArray();
-        
+
             for (int i = 0; i < exceptions.size(); ++i) {
                 exList.add((TypeCode)tcs[i]);
             }
         }
         return exList;
     }
-            
+
     public Request getRequest(CorbaMessage message,
                                  String opName,
-                                 org.omg.CORBA.NVList nvlist, 
-                                 org.omg.CORBA.NamedValue ret, 
-                                 org.omg.CORBA.ExceptionList exList) 
+                                 org.omg.CORBA.NVList nvlist,
+                                 org.omg.CORBA.NamedValue ret,
+                                 org.omg.CORBA.ExceptionList exList)
         throws Exception {
         Request request = null;
         if (orb == null) {
@@ -304,7 +304,7 @@ public class CorbaConduit implements Conduit {
         ContextList ctxList = orb.create_context_list();
         Context ctx = null;
         try {
-            ctx = orb.get_default_context();            
+            ctx = orb.get_default_context();
         } catch (Exception ex) {
             //ignore?
         }
@@ -316,15 +316,15 @@ public class CorbaConduit implements Conduit {
         }
         return request;
     }
-        
+
     public Map<TypeCode, RaisesType> getOperationExceptions(
-                                         OperationType operation, 
+                                         OperationType operation,
                                          CorbaTypeMap map) {
         if (orb == null) {
             prepareOrb();
         }
         Map<TypeCode, RaisesType> exceptions = new HashMap<TypeCode, RaisesType>();
-        List<RaisesType> exList = operation.getRaises(); 
+        List<RaisesType> exList = operation.getRaises();
         if (exList != null) {
             for (int i = 0; i < exList.size(); ++i) {
                 RaisesType ex = exList.get(i);
@@ -335,14 +335,14 @@ public class CorbaConduit implements Conduit {
 
         return exceptions;
     }
-    
+
     private class CorbaOutputStream extends CachedOutputStream {
-       
+
         private Message message;
         private boolean isOneWay;
 
         CorbaOutputStream(Message m) {
-            message = m;        
+            message = m;
         }
 
         /**
@@ -356,18 +356,18 @@ public class CorbaConduit implements Conduit {
         /**
          * Perform any actions required on stream closure (handle response etc.)
          */
-        public void doClose() throws IOException {            
+        public void doClose() throws IOException {
             if (ContextUtils.isRequestor(message) && ContextUtils.isOutbound(message)) {
                 try {
                     isOneWay = message.getExchange().isOneWay();
-                    
-                    if (!isOneWay) {                
+
+                    if (!isOneWay) {
                         handleResponse();
                     }
                 } catch (Exception ex) {
                     LOG.log(Level.WARNING, "Connection failed with Exception : ", ex);
                     throw new IOException(ex.toString());
-                }            
+                }
             }
         }
 
@@ -384,7 +384,7 @@ public class CorbaConduit implements Conduit {
             inMessage.setDestination(destination);
             exchange.put(ORB.class, orb);
             inMessage.setExchange(exchange);
-            CorbaMessage inCorbaMsg = new CorbaMessage(inMessage);       
+            CorbaMessage inCorbaMsg = new CorbaMessage(inMessage);
             inCorbaMsg.setCorbaTypeMap(typeMap);
             if (corbaMsg.getStreamableException() != null) {
                 exchange.setInFaultMessage(corbaMsg);

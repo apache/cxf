@@ -28,11 +28,11 @@ import javax.crypto.SecretKey;
  * SecretKey object.
  */
 public class ReceivedKey {
-    
+
     private X509Certificate x509Cert;
     private PublicKey publicKey;
     private SecretKey secretKey;
-    
+
     public X509Certificate getX509Cert() {
         return x509Cert;
     }
@@ -51,5 +51,5 @@ public class ReceivedKey {
     public void setSecretKey(SecretKey secretKey) {
         this.secretKey = secretKey;
     }
-    
+
 }

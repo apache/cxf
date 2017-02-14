@@ -34,7 +34,7 @@ public class Server {
         System.out.println("Starting Server");
         Object implementor = new GreeterJMSImpl();
         ep = Endpoint.publish(null, implementor);
-        
+
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 shutdown();

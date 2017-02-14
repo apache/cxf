@@ -90,7 +90,7 @@ public final class SOAPBindingUtil {
             proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
                                               new Class[] {cls}, ih);
         } catch (Throwable ex) {
-            // Using cls classloader as a fallback to make it work within OSGi  
+            // Using cls classloader as a fallback to make it work within OSGi
             ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
             if (contextLoader != cls.getClassLoader()) {
                 proxy = Proxy.newProxyInstance(cls.getClassLoader(),
@@ -336,7 +336,7 @@ public final class SOAPBindingUtil {
         String bindingStyle = "";
         String previousOpStyle = "";
         String style = "";
-        
+
         for (Object obj : binding.getExtensibilityElements()) {
             if (isSOAPBinding(obj)) {
                 SoapBinding soapBinding = getSoapBinding(obj);

@@ -48,21 +48,21 @@ import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelp
  * @see org.apache.cxf.ws.transfer.resourcefactory.resolver.ResourceResolver
  */
 public class ResourceLocal implements Resource {
-    
+
     @javax.annotation.Resource
     protected WebServiceContext context;
-    
+
     protected ResourceManager manager;
-    
+
     protected List<ResourceTypeIdentifier> resourceTypeIdentifiers;
-    
+
     protected Map<String, Dialect> dialects;
 
     public ResourceLocal() {
         dialects = new HashMap<String, Dialect>();
         dialects.put(FragmentDialectConstants.FRAGMENT_2011_03_IRI, new FragmentDialect());
     }
-    
+
     public ResourceManager getManager() {
         return manager;
     }
@@ -81,11 +81,11 @@ public class ResourceLocal implements Resource {
     public void setResourceTypeIdentifiers(List<ResourceTypeIdentifier> resourceTypeIdentifiers) {
         this.resourceTypeIdentifiers = resourceTypeIdentifiers;
     }
-    
+
     /**
      * Register Dialect object for URI.
      * @param iri
-     * @param dialect 
+     * @param dialect
      */
     public void registerDialect(String iri, Dialect dialect) {
         if (dialects.containsKey(iri)) {
@@ -93,10 +93,10 @@ public class ResourceLocal implements Resource {
         }
         dialects.put(iri, dialect);
     }
-    
+
     /**
      * Unregister dialect URI.
-     * @param iri 
+     * @param iri
      */
     public void unregisterDialect(String iri) {
         if (!dialects.containsKey(iri)) {
@@ -104,7 +104,7 @@ public class ResourceLocal implements Resource {
         }
         dialects.remove(iri);
     }
-    
+
     @Override
     public GetResponse get(Get body) {
         // Getting reference paramaters
@@ -187,5 +187,5 @@ public class ResourceLocal implements Resource {
         response.setRepresentation(putRepresentation);
         return response;
     }
-    
+
 }

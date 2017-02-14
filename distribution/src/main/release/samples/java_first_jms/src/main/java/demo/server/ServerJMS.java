@@ -50,10 +50,10 @@ public final class ServerJMS {
         for (String arg : args) {
             if ("-activemqbroker".equals(arg)) {
                 launchAmqBroker = true;
-            } 
+            }
             if ("-jaxws".equals(arg)) {
                 jaxws = true;
-            } 
+            }
         }
 
         if (launchAmqBroker) {

@@ -29,18 +29,18 @@ public class OperationDeferredAction implements SchemaDeferredAction {
 
     protected ArgType argType;
     protected XmlSchemaElement element;
-        
+
     public OperationDeferredAction() {
     };
-        
+
     public OperationDeferredAction(ArgType arg) {
-        argType = arg;         
+        argType = arg;
     }
-    
+
     public OperationDeferredAction(XmlSchemaElement elem) {
-        element = elem;               
-    }        
-    
+        element = elem;
+    }
+
     public void execute(XmlSchemaType stype, CorbaTypeImpl ctype) {
         if (argType != null) {
             argType.setIdltype(ctype.getQName());
@@ -50,9 +50,9 @@ public class OperationDeferredAction implements SchemaDeferredAction {
             if (stype.getQName().equals(ReferenceConstants.WSADDRESSING_TYPE)) {
                 element.setNillable(true);
             }
-        }                
+        }
     }
-       
+
 }
 
 

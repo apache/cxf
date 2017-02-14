@@ -32,7 +32,7 @@ import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 
 public class CustomJaxbElementProvider extends JAXBElementProvider<Book> {
-    @Context 
+    @Context
     private UriInfo ui;
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
@@ -46,11 +46,11 @@ public class CustomJaxbElementProvider extends JAXBElementProvider<Book> {
         } else {
             return super.isWriteable(type, genericType, anns, mt);
         }
-        
+
     }
     @Override
-    public void writeTo(Book obj, Class<?> cls, Type genericType, Annotation[] anns,  
-                        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
+    public void writeTo(Book obj, Class<?> cls, Type genericType, Annotation[] anns,
+                        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         headers.putSingle("Content-Type", MediaType.valueOf(m.toString() + ";a=b"));
         super.writeTo(obj, cls, genericType, anns, m, headers, os);

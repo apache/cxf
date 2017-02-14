@@ -52,7 +52,7 @@ public class BookStore {
             )
         ).build();
     }
-    
+
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("/{id}")
     @GET

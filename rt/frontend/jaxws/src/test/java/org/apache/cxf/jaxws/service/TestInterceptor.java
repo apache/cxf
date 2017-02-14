@@ -28,9 +28,9 @@ public class TestInterceptor extends AbstractPhaseInterceptor<Message> {
     public TestInterceptor() {
         super(Phase.SEND);
     }
-    
+
     public void handleMessage(Message message) {
         System.out.println("Handle Message in TestInterceptor");
     }
-        
+
 }

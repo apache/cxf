@@ -41,13 +41,13 @@ import org.osgi.service.blueprint.reflect.Metadata;
 
 
 public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefinitionParser {
-    
+
     public JAXRSServerFactoryBeanDefinitionParser() {
         super(JAXRSServerFactoryBean.class);
     }
     @Override
-    protected void mapAttribute(MutableBeanMetadata bean, 
-                                Element e, String name, 
+    protected void mapAttribute(MutableBeanMetadata bean,
+                                Element e, String name,
                                 String val, ParserContext context) {
         if ("beanNames".equals(name)) {
             String[] values = StringUtils.split(val, " ");
@@ -69,7 +69,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
                     tempFactories.addValue(resourceBean);
                 }
             }
-            bean.addProperty("tempFactories", tempFactories); 
+            bean.addProperty("tempFactories", tempFactories);
         } else if ("serviceName".equals(name)) {
             QName q = parseQName(e, val);
             bean.addProperty(name, createValue(context, q));
@@ -82,7 +82,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
 
     @Override
     protected void mapElement(ParserContext ctx, MutableBeanMetadata bean, Element el, String name) {
-        if ("properties".equals(name) 
+        if ("properties".equals(name)
             || "extensionMappings".equals(name)
             || "languageMappings".equals(name)) {
             bean.addProperty(name, this.parseMapData(ctx, bean, el));
@@ -95,7 +95,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
         } else if ("inInterceptors".equals(name) || "inFaultInterceptors".equals(name)
             || "outInterceptors".equals(name) || "outFaultInterceptors".equals(name)) {
             bean.addProperty(name, this.parseListData(ctx, bean, el));
-        } else if ("features".equals(name) || "schemaLocations".equals(name) 
+        } else if ("features".equals(name) || "schemaLocations".equals(name)
             || "providers".equals(name) || "serviceBeans".equals(name)
             || "modelBeans".equals(name)) {
             bean.addProperty(name, this.parseListData(ctx, bean, el));
@@ -125,10 +125,10 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
             }
             bean.addProperty("modelBeans", list);
         } else {
-            setFirstChildAsProperty(el, ctx, bean, name);            
-        }        
+            setFirstChildAsProperty(el, ctx, bean, name);
+        }
     }
-    
+
 
     @Override
     public Metadata parse(Element element, ParserContext context) {
@@ -145,7 +145,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
     protected boolean hasBusProperty() {
         return true;
     }
-    
+
     public static class PassThroughCallable<T> implements Callable<T> {
 
         private T value;
@@ -168,7 +168,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
         }
         return resources;
     }
-    
+
     private static String getResourceClassFromElement(Element e) {
         return e.getAttribute("name");
     }

@@ -25,20 +25,20 @@ import java.util.WeakHashMap;
 
 
 /**
- * Implements a useful caching map. It weakly references the keys, 
+ * Implements a useful caching map. It weakly references the keys,
  * but strongly references the data. It works much like the WeakHashMap,
- * in that when the keys are garbage collected, the data is removed from 
+ * in that when the keys are garbage collected, the data is removed from
  * the map.
- * 
+ *
  * The main difference is that keys used for lookups don't have to be "=="
- * the same to maintain the data in the cache.  Basically, lookups in this 
- * map use a ".equals" compare, but the keys are then stored with a "==" 
+ * the same to maintain the data in the cache.  Basically, lookups in this
+ * map use a ".equals" compare, but the keys are then stored with a "=="
  * compare so if the original key is garbage collected, the other keys that
  * may reference the data keep the data in the cache.
  *
  * <b>
- * Note that this implementation is not synchronized. Not even a little. 
- * 'Read-only' operations can trigger internal modifications. If you share this 
+ * Note that this implementation is not synchronized. Not even a little.
+ * 'Read-only' operations can trigger internal modifications. If you share this
  * class between threads, you must protect every operation.
  * </b>
  */
@@ -47,16 +47,16 @@ public class CacheMap<K, V> implements Map<K, V> {
     Map<K, V> extraKeyMap = new WeakIdentityHashMap<K, V>();
 
     public CacheMap() {
-        
+
     }
-    
+
     public void clear() {
         mainDataMap.clear();
         extraKeyMap.clear();
     }
 
     private void updateMainDataMap() {
-        //if the singleton in the mainDataMap has been garbage collected, 
+        //if the singleton in the mainDataMap has been garbage collected,
         //we'll copy another version of it from the extraKeyMap
         for (Map.Entry<K, V> entry : extraKeyMap.entrySet()) {
             if (!mainDataMap.containsKey(entry.getKey())) {
@@ -64,7 +64,7 @@ public class CacheMap<K, V> implements Map<K, V> {
             }
         }
     }
-    
+
     public boolean containsKey(Object key) {
         if (!mainDataMap.containsKey(key)) {
             updateMainDataMap();
@@ -132,7 +132,7 @@ public class CacheMap<K, V> implements Map<K, V> {
         updateMainDataMap();
         return mainDataMap.values();
     }
-    
+
     public String toString() {
         updateMainDataMap();
         return mainDataMap.toString();

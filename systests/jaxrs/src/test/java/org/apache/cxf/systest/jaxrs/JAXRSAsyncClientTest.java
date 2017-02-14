@@ -66,7 +66,7 @@ import org.junit.Test;
 
 public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerAsyncClient.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -74,7 +74,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServerAsyncClient.class, true));
         createStaticBus();
     }
-    
+
     @Before
     public void setUp() throws Exception {
         String property = System.getProperty("test.delay");
@@ -86,7 +86,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
     public void testRetrieveBookCustomMethodAsyncSync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/retrieve";
         WebClient wc = WebClient.create(address);
-        // Setting this property is not needed given that 
+        // Setting this property is not needed given that
         // we have the async conduit loaded in the test module:
         // WebClient.getConfig(wc).getRequestContext().put("use.async.http.conduit", true);
         wc.type("application/xml").accept("application/xml");
@@ -94,7 +94,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         assertEquals("Retrieve", book.getName());
         wc.close();
     }
-    
+
     @Test
     public void testPatchBook() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/patch";
@@ -105,7 +105,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         assertEquals("Patch", book.getName());
         wc.close();
     }
-    
+
     @Test
     public void testPatchBookTimeout() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/patch";
@@ -123,21 +123,21 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             //expected!!!
         }
     }
-    
+
     @Test
     public void testPatchBookInputStream() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/patch";
         WebClient wc = WebClient.create(address);
         wc.type("application/xml");
         WebClient.getConfig(wc).getRequestContext().put("use.async.http.conduit", true);
-        Book book = wc.invoke("PATCH", 
+        Book book = wc.invoke("PATCH",
                               new ByteArrayInputStream(
-                                  "<Book><name>Patch</name><id>123</id></Book>".getBytes()), 
+                                  "<Book><name>Patch</name><id>123</id></Book>".getBytes()),
                               Book.class);
         assertEquals("Patch", book.getName());
         wc.close();
     }
-    
+
     @Test
     public void testDeleteWithBody() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/deletebody";
@@ -148,18 +148,18 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         assertEquals("Delete", book.getName());
         wc.close();
     }
-    
+
     @Test
     public void testRetrieveBookCustomMethodAsync() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/retrieve";
         WebClient wc = WebClient.create(address);
         wc.accept("application/xml");
-        Future<Book> book = wc.async().method("RETRIEVE", Entity.xml(new Book("Retrieve", 123L)), 
+        Future<Book> book = wc.async().method("RETRIEVE", Entity.xml(new Book("Retrieve", 123L)),
                                               Book.class);
         assertEquals("Retrieve", book.get().getName());
         wc.close();
     }
-    
+
     @Test
     public void testGetBookAsyncResponse404() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
@@ -168,7 +168,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         assertEquals(404, future.get().getStatus());
         wc.close();
     }
-    
+
     @Test
     public void testGetBookAsync404() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
@@ -182,7 +182,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         }
         wc.close();
     }
-    
+
     @Test
     public void testNonExistent() throws Exception {
         String address = "http://168.168.168.168/bookstore";
@@ -219,7 +219,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             c.close();
         }
     }
-    
+
     @Test
     public void testNonExistentJaxrs20WithPost() throws Exception {
         Client client = ClientBuilder.newClient();
@@ -231,7 +231,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             new GenericType<String>() {
             }
         );
-        
+
         try {
             future.get();
         } catch (Exception ex) {
@@ -239,14 +239,14 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             assertTrue(cause instanceof ProcessingException);
         }
     }
-    
+
     @Test
     public void testPostBookProcessingException() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/";
         List<Object> providers = new ArrayList<>();
         providers.add(new FaultyBookWriter());
         WebClient wc = WebClient.create(address, providers);
-        
+
         Future<Book> future = wc.async().post(Entity.xml(new Book()), Book.class);
         try {
             future.get();
@@ -256,14 +256,14 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         }
         wc.close();
     }
-    
+
     @Test
     public void testGetBookResponseProcessingException() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/123";
         List<Object> providers = new ArrayList<>();
         providers.add(new FaultyBookReader());
         WebClient wc = WebClient.create(address, providers);
-        
+
         Future<Book> future = wc.async().get(Book.class);
         try {
             future.get();
@@ -273,7 +273,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         }
         wc.close();
     }
-    
+
     @SuppressWarnings("rawtypes")
     @Test
     public void testGenericInvocationCallback() throws Exception {
@@ -284,8 +284,8 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             .request().accept("text/boolean").async().get(callback).get();
         assertTrue(((GenericInvocationCallback)callback).getResult().readEntity(Boolean.class));
     }
-    
-       
+
+
     @Test
     public void testAsyncProxyPrimitiveResponse() throws Exception {
         String address = "http://localhost:" + PORT;
@@ -297,7 +297,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             public void failed(Throwable error) {
             }
         };
-        
+
         BookStore store = JAXRSClientFactory.create(address, BookStore.class);
         WebClient.getConfig(store).getRequestContext().put(InvocationCallback.class.getName(), callback);
         store.checkBook(123L);
@@ -315,7 +315,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             public void failed(Throwable error) {
             }
         };
-        
+
         BookStore store = JAXRSClientFactory.create(address, BookStore.class);
         WebClient.getConfig(store).getRequestContext().put(InvocationCallback.class.getName(), callback);
         Book book = store.getBookByMatrixParams("12", "3");
@@ -346,23 +346,23 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         List<InvocationCallback<?>> callbacks = new ArrayList<InvocationCallback<?>>();
         callbacks.add(bookCallback);
         callbacks.add(booleanCallback);
-        
+
         BookStore store = JAXRSClientFactory.create(address, BookStore.class);
         WebClient.getConfig(store).getRequestContext().put(InvocationCallback.class.getName(), callbacks);
-        
-        
-        
+
+
+
         Book book = store.getBookByMatrixParams("12", "3");
         assertNull(book);
         Thread.sleep(3000);
         assertNotNull(bookHolder.value);
         assertEquals(123L, bookHolder.value.getId());
-        
+
         store.checkBook(123L);
         Thread.sleep(3000);
         assertTrue(booleanHolder.value);
     }
-    
+
     @SuppressWarnings({
      "unchecked", "rawtypes"
     })
@@ -385,8 +385,8 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         }
         wc.close();
     }
-    
-    
+
+
     @Test
     public void testGetBookAsyncStage() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books";
@@ -410,7 +410,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         Thread.sleep(3000);
         assertEquals(246L, holder.value.getId());
     }
-    
+
     @Test
     public void testGetBookAsyncStage404() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
@@ -422,13 +422,13 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         } catch (ExecutionException ex) {
             assertTrue(ex.getCause() instanceof NotFoundException);
         }
-        
+
     }
     private WebClient createWebClient(String address) {
         List<Object> providers = new ArrayList<>();
         return WebClient.create(address, providers);
     }
-    
+
     private InvocationCallback<Object> createCallback(final Holder<Object> holder) {
         return new InvocationCallback<Object>() {
             public void completed(Object response) {
@@ -439,7 +439,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             }
         };
     }
-    
+
     private static class FaultyBookWriter implements MessageBodyWriter<Book> {
 
         @Override
@@ -458,9 +458,9 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
                             MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException,
             WebApplicationException {
             throw new RuntimeException();
-            
+
         }
-        
+
     }
     @Consumes("application/xml")
     private static class FaultyBookReader implements MessageBodyReader<Book> {
@@ -477,18 +477,18 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             throw new RuntimeException();
         }
 
-                
+
     }
-    
+
     public static class TestResponseFilter implements ClientResponseFilter {
 
         @Override
         public void filter(ClientRequestContext requestContext, ClientResponseContext responseContext)
             throws IOException {
             // TODO Auto-generated method stub
-            
+
         }
-        
+
     }
     private static class GenericInvocationCallback<T> implements InvocationCallback<T> {
         private Object result;
@@ -507,6 +507,6 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
             return (Response)result;
         }
 
-        
+
     }
 }

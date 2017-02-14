@@ -40,17 +40,17 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
 
     private MessageBodyReader<?> reader;
     private Message m;
-    
+
     public ReaderInterceptorMBR(MessageBodyReader<?> reader,
                                 Message m) {
         this.reader = reader;
         this.m = m;
     }
-    
+
     public MessageBodyReader<?> getMBR() {
         return reader;
     }
-    
+
     @SuppressWarnings({
         "unchecked", "rawtypes"
     })
@@ -60,9 +60,9 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
         Type entityType = c.getGenericType();
         MediaType entityMt = c.getMediaType();
         Annotation[] entityAnns = c.getAnnotations();
-        
+
         if ((reader == null || m.get(ProviderFactory.PROVIDER_SELECTION_PROPERTY_CHANGED) == Boolean.TRUE
-            && !reader.isReadable(entityCls, entityType, entityAnns, entityMt)) 
+            && !reader.isReadable(entityCls, entityType, entityAnns, entityMt))
             && entityStreamAvailable(c.getInputStream())) {
             reader = ProviderFactory.getInstance(m)
                 .createMessageBodyReader(entityCls, entityType, entityAnns, entityMt, m);
@@ -71,9 +71,9 @@ public class ReaderInterceptorMBR implements ReaderInterceptor {
             String errorMessage = JAXRSUtils.logMessageHandlerProblem("NO_MSG_READER", entityCls, entityMt);
             throw new ProcessingException(errorMessage);
         }
-        
-        
-        return reader.readFrom(entityCls, entityType, entityAnns, entityMt, 
+
+
+        return reader.readFrom(entityCls, entityType, entityAnns, entityMt,
                                new HttpHeadersImpl(m).getRequestHeaders(),
                                c.getInputStream());
     }

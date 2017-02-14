@@ -28,7 +28,7 @@ import java.io.InputStream;
  */
 public interface ResourceResolver {
 
-    
+
     /**
      * Resolve a resource given its name and type.
      *

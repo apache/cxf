@@ -30,11 +30,11 @@ import org.junit.Assert;
 
 public class MessageReplayObserver implements MessageObserver {
     String responseMessage;
-    
+
     public MessageReplayObserver(String responseMessage) {
         this.responseMessage = responseMessage;
     }
-    
+
     public void onMessage(Message message) {
         try {
 
@@ -43,7 +43,7 @@ public class MessageReplayObserver implements MessageObserver {
                 // do nothing
             }
             in.close();
-            
+
             Conduit backChannel = message.getDestination().getBackChannel(message);
 
             backChannel.prepare(message);

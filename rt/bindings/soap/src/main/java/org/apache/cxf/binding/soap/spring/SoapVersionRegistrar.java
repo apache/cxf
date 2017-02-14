@@ -25,7 +25,7 @@ import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.beans.PropertyEditorRegistry;
 
 /**
- * 
+ *
  */
 public class SoapVersionRegistrar implements PropertyEditorRegistrar {
 

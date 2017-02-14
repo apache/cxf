@@ -31,12 +31,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class HttpHandlerImplTest extends Assert {
-    
+
     private IMocksControl control;
     private HttpHandler handler;
     private JAXWSHttpSpiDestination destination;
     private HttpExchange exchange;
-    
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
@@ -44,7 +44,7 @@ public class HttpHandlerImplTest extends Assert {
         handler = new HttpHandlerImpl(destination);
         exchange = control.createMock(HttpExchange.class);
     }
-    
+
     @After
     public void tearDown() {
         exchange = null;
@@ -52,16 +52,16 @@ public class HttpHandlerImplTest extends Assert {
         destination = null;
         control = null;
     }
-    
+
     @Test
     public void testHttpHandlerImpl() throws Exception {
         exchange.close();
         destination.doService(EasyMock.isA(HttpServletRequest.class),
                               EasyMock.isA(HttpServletResponse.class));
         control.replay();
-        
+
         handler.handle(exchange);
         control.verify();
     }
-    
+
 }

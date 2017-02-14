@@ -38,8 +38,8 @@ public class URLRealmParser implements RealmParser {
         } else if (url.contains("realmC")) {
             return "C";
         }
-        
+
         return null;
     }
-    
+
 }

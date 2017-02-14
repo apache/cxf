@@ -50,21 +50,21 @@ import org.junit.Test;
 /**
  * Tests whether the stax transformer is correctly engaged and it does not interfere with logging.
  * This test uses a simple transformation. More complex transformation tests are found in the api package.
- *  
+ *
  */
 public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
     private static final Logger LOG = LogUtils.getLogger(StaxTransformFeatureTest.class);
     private static final String GREETER_PORT_ADDRESS = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-    
+
     private static TestLoggingEventSender serverlogIn = new TestLoggingEventSender();
     private static TestLoggingEventSender serverlogOut = new TestLoggingEventSender();
     private static TransformInInterceptor servertransIn = new TransformInInterceptor();
     private static TransformOutInterceptor servertransOut = new TransformOutInterceptor();
-    
+
     private Greeter greeter;
 
-    
+
     public static class Server extends AbstractBusTestServerBase {
 
         Endpoint ep;
@@ -80,14 +80,14 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
 
 
             Map<String, String> inElements = new HashMap<String, String>();
-            inElements.put("{http://cxf.apache.org/greeter_control/types}dontPingMe", 
+            inElements.put("{http://cxf.apache.org/greeter_control/types}dontPingMe",
                            "{http://cxf.apache.org/greeter_control/types}pingMe");
             servertransIn.setInTransformElements(inElements);
             bus.getInInterceptors().add(servertransIn);
-            
+
 
             Map<String, String> outElements = new HashMap<String, String>();
-            outElements.put("{http://cxf.apache.org/greeter_control/types}faultDetail", 
+            outElements.put("{http://cxf.apache.org/greeter_control/types}faultDetail",
                 "{http://cxf.apache.org/greeter_control/types}noFaultDetail");
             servertransOut.setOutTransformElements(outElements);
             bus.getOutInterceptors().add(servertransOut);
@@ -97,7 +97,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
             ep = Endpoint.publish(GREETER_PORT_ADDRESS, implementor);
             LOG.fine("Published control endpoint.");
         }
-        
+
         public void tearDown() {
             ep.stop();
             ep = null;
@@ -115,7 +115,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
             }
         }
     }
-    
+
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -123,7 +123,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
         LOG.setLevel(Level.INFO);
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @AfterClass
     public static void reset() {
         Bus b = BusFactory.getDefaultBus(false);
@@ -135,7 +135,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
         }
         b.shutdown(true);
     }
-    
+
     @After
     public void tearDown() throws Exception {
         if (null != greeter) {
@@ -158,13 +158,13 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
 
         TransformInInterceptor transIn = new TransformInInterceptor();
         Map<String, String> inElements = new HashMap<String, String>();
-        inElements.put("{http://cxf.apache.org/greeter_control/types}noFaultDetail", 
+        inElements.put("{http://cxf.apache.org/greeter_control/types}noFaultDetail",
             "{http://cxf.apache.org/greeter_control/types}faultDetail");
         bus.getInInterceptors().add(transIn);
-        
+
         TransformOutInterceptor transOut = new TransformOutInterceptor();
         Map<String, String> outElements = new HashMap<String, String>();
-        outElements.put("{http://cxf.apache.org/greeter_control/types}pingMe", 
+        outElements.put("{http://cxf.apache.org/greeter_control/types}pingMe",
             "{http://cxf.apache.org/greeter_control/types}dontPingMe");
         transOut.setOutTransformElements(outElements);
 
@@ -173,7 +173,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
 
         GreeterService gs = new GreeterService();
         greeter = gs.getGreeterPort();
-        
+
         updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");
 
@@ -183,7 +183,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
         verifyPayload(logIn.getMessage(), "pingMeResponse");
         verifyPayload(serverlogIn.getMessage(), "dontPingMe");
         verifyPayload(serverlogOut.getMessage(), "pingMeResponse");
-        
+
         serverlogOut.cleaerMessage();
         serverlogIn.cleaerMessage();
         logOut.cleaerMessage();
@@ -200,7 +200,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
         verifyPayload(logIn.getMessage(), "noFaultDetail");
         verifyPayload(serverlogIn.getMessage(), "dontPingMe");
         verifyPayload(serverlogOut.getMessage(), "noFaultDetail");
-        
+
         // ping 3: idle
         greeter.pingMe();
 
@@ -225,7 +225,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
 
         bus.shutdown(true);
     }
-    
+
     private void verifyPayload(String m, String value) {
         assertNotNull("message not logged", m);
         // the entire soap envelope is logged
@@ -236,7 +236,7 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
 
     static class TestLoggingEventSender implements LogEventSender {
         private String logMessage;
-        
+
         public String getMessage() {
             return logMessage;
         }

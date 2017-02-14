@@ -22,7 +22,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
-@WebService(targetNamespace = "http://ws.samples.apache.org/", serviceName = "GreetingService", 
+@WebService(targetNamespace = "http://ws.samples.apache.org/", serviceName = "GreetingService",
             portName = "GreetingServicePort")
 public interface Greeting {
     @WebMethod

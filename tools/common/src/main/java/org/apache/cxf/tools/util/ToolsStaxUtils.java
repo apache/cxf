@@ -37,7 +37,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.Tag;
 
 public final class ToolsStaxUtils {
-   
+
     private ToolsStaxUtils() {
     }
 
@@ -69,7 +69,7 @@ public final class ToolsStaxUtils {
                     }
 
                     for (int i = 0; i < reader.getAttributeCount(); i++) {
-                        newTag.getAttributes().put(reader.getAttributeName(i), 
+                        newTag.getAttributes().put(reader.getAttributeName(i),
                                 reader.getAttributeValue(i));
                     }
                     stack.push(newTag);
@@ -112,9 +112,9 @@ public final class ToolsStaxUtils {
                                  final List<String> ignoreAttr,
                                  Map<QName, Set<String>> types) throws Exception {
         try (InputStream is = new BufferedInputStream(new FileInputStream(source))) {
-            return getTagTree(is, ignoreAttr, types);        
+            return getTagTree(is, ignoreAttr, types);
         }
-    }    
+    }
     public static Tag getTagTree(final InputStream is,
                                  final List<String> ignoreAttr,
                                  Map<QName, Set<String>> types) throws Exception {
@@ -125,7 +125,7 @@ public final class ToolsStaxUtils {
         Tag newTag = null;
 
         Tag currentTag = root;
-        
+
         while (reader.hasNext()) {
             int event = reader.next();
 
@@ -147,14 +147,14 @@ public final class ToolsStaxUtils {
                             if (ns != null) {
                                 tp = "{" + ns + "}" + tp.substring(idx + 1);
                             }
-                        } else { 
+                        } else {
                             String ns = reader.getNamespaceURI("");
                             if (ns != null) {
                                 tp = "{" + ns + "}" + tp.substring(idx + 1);
                             }
                         }
                     }
-                    newTag.getAttributes().put(reader.getAttributeName(i), 
+                    newTag.getAttributes().put(reader.getAttributeName(i),
                                                tp);
                 }
 

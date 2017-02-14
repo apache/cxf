@@ -25,7 +25,7 @@ import javax.resource.spi.ManagedConnectionMetaData;
 
 public class CXFManagedConnectionMetaData implements ManagedConnectionMetaData {
 
-    
+
     public String getEISProductName() throws ResourceException {
         return "WS-based-EIS";
     }

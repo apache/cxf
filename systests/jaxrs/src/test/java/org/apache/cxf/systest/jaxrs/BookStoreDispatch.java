@@ -32,25 +32,25 @@ public class BookStoreDispatch {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();
     private Long mainId = 123L;
-    
+
     public BookStoreDispatch() {
         init();
     }
-    
+
     @GET
     @Path("/books/html/{bookid}")
     @Produces("text/html")
     public Book getBookHtml() {
         return books.get(123L);
     }
-    
+
     final void init() {
         Book book = new Book();
         book.setId(mainId);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
-    
+
 }
 
 

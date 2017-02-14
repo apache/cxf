@@ -38,35 +38,35 @@ import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
 
 /**
- * Validate a SignedEncryptedSupportingToken policy. 
+ * Validate a SignedEncryptedSupportingToken policy.
  */
 public class SignedEncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS.equals(assertionInfo.getAssertion().getName());
     }
-    
+
     /**
-     * Validate policies. 
+     * Validate policies.
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         // Tokens must be encrypted even if TLS is used unless we have a TransportBinding policy available
         if (isTLSInUse(parameters.getMessage())) {
-            AssertionInfo transportAi = 
-                PolicyUtils.getFirstAssertionByLocalname(parameters.getAssertionInfoMap(), 
+            AssertionInfo transportAi =
+                PolicyUtils.getFirstAssertionByLocalname(parameters.getAssertionInfoMap(),
                                                          SPConstants.TRANSPORT_BINDING);
             super.setEnforceEncryptedTokens(transportAi == null);
         }
-        
+
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             setSignedParts(binding.getSignedParts());
             setEncryptedParts(binding.getEncryptedParts());
             setSignedElements(binding.getSignedElements());
@@ -77,7 +77,7 @@ public class SignedEncryptedTokenPolicyValidator extends AbstractSupportingToken
                 if (!isTokenRequired(token, parameters.getMessage())) {
                     continue;
                 }
-                
+
                 boolean processingFailed = false;
                 if (token instanceof UsernameToken) {
                     if (!processUsernameTokens(parameters, false)) {
@@ -107,7 +107,7 @@ public class SignedEncryptedTokenPolicyValidator extends AbstractSupportingToken
                 } else if (!(token instanceof IssuedToken)) {
                     processingFailed = true;
                 }
-                
+
                 if (processingFailed) {
                     ai.setNotAsserted(
                         "The received token does not match the signed encrypted supporting token requirement"
@@ -117,15 +117,15 @@ public class SignedEncryptedTokenPolicyValidator extends AbstractSupportingToken
             }
         }
     }
-    
+
     protected boolean isSigned() {
         return true;
     }
-    
+
     protected boolean isEncrypted() {
         return true;
     }
-    
+
     protected boolean isEndorsing() {
         return false;
     }

@@ -31,7 +31,7 @@ import org.apache.hello_world_mixedstyle.GreeterImplMixedStyle;
 
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
-    
+
     protected void run() {
         setBus(BusFactory.getDefaultBus());
         getBus().getInInterceptors().add(new LoggingInInterceptor());
@@ -48,7 +48,7 @@ public class Server extends AbstractBusTestServerBase {
         Object implementor2 = new GreeterImplMixedStyle(" version2");
         EndpointImpl ep2 = (EndpointImpl) Endpoint.publish(address, implementor2);
         ep2.getServer().getEndpoint().put("version", "2");
-        
+
         MultipleEndpointObserver meo = (MultipleEndpointObserver)
             ep1.getServer().getDestination().getMessageObserver();
         meo.getRoutingInterceptors().clear();

@@ -116,7 +116,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
         SoapBody outSoapBody = SOAPBindingUtil.getBindingOutputSOAPBody(bop);
         if (inSoapBody != null && StringUtils.isEmpty(inSoapBody.getNamespaceURI())
             || outSoapBody != null && StringUtils.isEmpty(outSoapBody.getNamespaceURI())) {
-            addErrorMessage(getErrorPrefix("WSI-BP-1.0 R2717")  
+            addErrorMessage(getErrorPrefix("WSI-BP-1.0 R2717")
                 + "soapBody in the input/output of the binding operation '"
                 + bop.getName() + "' MUST have namespace attribute");
             return false;
@@ -244,9 +244,9 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
 
     private boolean checkR2209(final Operation operation,
                                final BindingOperation bop) {
-        if ((bop.getBindingInput() == null && operation.getInput() != null) 
+        if ((bop.getBindingInput() == null && operation.getInput() != null)
             || (bop.getBindingOutput() == null && operation.getOutput() != null)) {
-            addErrorMessage(getErrorPrefix("WSI-BP-1.0 R2209") 
+            addErrorMessage(getErrorPrefix("WSI-BP-1.0 R2209")
                             + "Unbound PortType elements in Operation '" + operation.getName() + "'");
             return false;
         }
@@ -313,7 +313,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
         for (Binding binding : bindings) {
 
             String style = SOAPBindingUtil.getCanonicalBindingStyle(binding);
-            
+
             if (binding.getPortType() == null) {
                 return true;
             }
@@ -431,7 +431,7 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
                     Collection<Part> parts = CastUtils.cast(message.getParts().values());
                     for (Part part : parts) {
                         if (part.getElementName() == null) {
-                            addErrorMessage(getErrorPrefix("WSI-BP-1.0 R2205") + "In Message " 
+                            addErrorMessage(getErrorPrefix("WSI-BP-1.0 R2205") + "In Message "
                                 + message.getQName() + ", part " + part.getName()
                                     + " must specify a 'element' attribute");
                             return false;

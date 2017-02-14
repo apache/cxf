@@ -76,47 +76,47 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerSpring.class, true));
         createStaticBus();
     }
-    
+
     @Test
     public void testGetGenericBook() throws Exception {
-        String baseAddress = "http://localhost:" + PORT + "/the/thebooks8/books"; 
+        String baseAddress = "http://localhost:" + PORT + "/the/thebooks8/books";
         WebClient wc = WebClient.create(baseAddress);
         Long id = wc.type("application/xml").accept("text/plain").post(new Book("CXF", 1L), Long.class);
         assertEquals(new Long(1), id);
         Book book = wc.replaceHeader("Accept", "application/xml").query("id", 1L).get(Book.class);
         assertEquals("CXF", book.getName());
     }
-    
+
     @Test
     public void testGetBookWebEx() throws Exception {
-        final String address = "http://localhost:" + PORT + "/the/thebooks/bookstore/books/webex"; 
+        final String address = "http://localhost:" + PORT + "/the/thebooks/bookstore/books/webex";
         doTestGetBookWebEx(address);
-        
+
     }
-    
+
     @Test
     public void testGetBookText() throws Exception {
-        final String address = "http://localhost:" + PORT + "/the/thebooks/bookstore/books/text"; 
+        final String address = "http://localhost:" + PORT + "/the/thebooks/bookstore/books/text";
         WebClient wc = WebClient.create(address).accept("text/*");
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
         assertEquals(406, wc.get().getStatus());
-        
+
     }
-    
+
     @Test
     public void testGetServicesPageNotFound() throws Exception {
-        final String address = "http://localhost:" + PORT + "/the/services;a=b"; 
+        final String address = "http://localhost:" + PORT + "/the/services;a=b";
         WebClient wc = WebClient.create(address).accept("text/*");
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
         assertEquals(404, wc.get().getStatus());
     }
     @Test
     public void testGetServicesPage() throws Exception {
-        final String address = "http://localhost:" + PORT + "/the/services"; 
+        final String address = "http://localhost:" + PORT + "/the/services";
         WebClient wc = WebClient.create(address).accept("text/*");
         String s = wc.get(String.class);
         assertTrue(s.contains("href=\"/the/services/?stylesheet=1\""));
@@ -125,7 +125,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     @Test
     public void testGetServicesPageWithServletPatternMatchOnly() throws Exception {
-        final String address = "http://localhost:" + PORT + "/the/;a=b"; 
+        final String address = "http://localhost:" + PORT + "/the/;a=b";
         WebClient wc = WebClient.create(address).accept("text/*");
         String s = wc.get(String.class);
         assertTrue(s.contains("href=\"/the/?stylesheet=1\""));
@@ -135,7 +135,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     @Test
     public void testGetServicesPageWithServletPatternMatchOnly2() throws Exception {
-        final String address = "http://localhost:" + PORT + "/services;a=b;/list;a=b/;a=b"; 
+        final String address = "http://localhost:" + PORT + "/services;a=b;/list;a=b/;a=b";
         WebClient wc = WebClient.create(address).accept("text/*");
         String s = wc.get(String.class);
         assertTrue(s.contains("href=\"/services/list/?stylesheet=1\""));
@@ -143,7 +143,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertFalse(s.contains(";a=b"));
         assertTrue(s.contains("<a href=\"http://localhost:" + PORT + "/services/list/"));
     }
-    
+
     @Test
     public void testEchoBookForm() throws Exception {
         String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform";
@@ -167,8 +167,8 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     private void doTestEchoBookForm(String address) throws Exception {
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
-        
-        Book b = 
+
+        Book b =
             wc.form(new Form().param("name", "CXFForm").param("id", "125"))
                 .readEntity(Book.class);
         assertEquals("CXFForm", b.getName());
@@ -178,20 +178,20 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public void testEchoBookFormXml() throws Exception {
         String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform";
         WebClient wc = WebClient.create(address);
-        Book b = 
+        Book b =
             wc.type("application/xml").post(new Book("CXFFormXml", 125L))
                 .readEntity(Book.class);
         assertEquals("CXFFormXml", b.getName());
         assertEquals(125L, b.getId());
     }
-    
+
     @Test
     public void testGetBookWebEx4() throws Exception {
-        final String address = "http://localhost:" + PORT + "/the/thebooks%203/bookstore/books/webex2"; 
+        final String address = "http://localhost:" + PORT + "/the/thebooks%203/bookstore/books/webex2";
         doTestGetBookWebEx(address);
-        
+
     }
-    
+
     private void doTestGetBookWebEx(String address) throws Exception {
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
@@ -202,33 +202,33 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
             String errorMessage = ex.getResponse().readEntity(String.class);
             assertEquals("Book web exception", errorMessage);
         }
-        
+
     }
-    
+
     @Test
     public void testPostGeneratedBook() throws Exception {
         String baseAddress = "http://localhost:" + PORT + "/the/generated";
         JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
         provider.setJaxbElementClassMap(Collections.singletonMap(
-                                          "org.apache.cxf.systest.jaxrs.codegen.schema.Book", 
+                                          "org.apache.cxf.systest.jaxrs.codegen.schema.Book",
                                           "{http://superbooks}thebook"));
-        
-        org.apache.cxf.systest.jaxrs.codegen.service.BookStore bookStore = 
-            JAXRSClientFactory.create(baseAddress, 
+
+        org.apache.cxf.systest.jaxrs.codegen.service.BookStore bookStore =
+            JAXRSClientFactory.create(baseAddress,
                 org.apache.cxf.systest.jaxrs.codegen.service.BookStore.class,
                 Collections.singletonList(provider));
-        
-        org.apache.cxf.systest.jaxrs.codegen.schema.Book book = 
+
+        org.apache.cxf.systest.jaxrs.codegen.schema.Book book =
             new org.apache.cxf.systest.jaxrs.codegen.schema.Book();
         book.setId(123);
         bookStore.addBook(123, book);
         Response r = WebClient.client(bookStore).getResponse();
         assertEquals(204, r.getStatus());
     }
-    
+
     @Test
     public void testGetWadlFromWadlLocation() throws Exception {
-        String address = "http://localhost:" + PORT + "/the/generated";    
+        String address = "http://localhost:" + PORT + "/the/generated";
         WebClient client = WebClient.create(address + "/bookstore" + "?_wadl&_type=xml");
         Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), StandardCharsets.UTF_8));
         List<Element> resources = checkWadlResourcesInfo(doc, address, "/schemas/book.xsd", 2);
@@ -236,13 +236,13 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String type = resources.get(1).getAttribute("type");
         String resourceTypeAddress = address + "/bookstoreImportResourceType.wadl#bookstoreType";
         assertEquals(resourceTypeAddress, type);
-        
+
         checkSchemas(address, "/schemas/book.xsd", "/schemas/chapter.xsd", "include");
         checkSchemas(address, "/schemas/chapter.xsd", null, null);
-        
+
         // check resource type resource
         checkWadlResourcesType(address, resourceTypeAddress, "/schemas/book.xsd");
-        
+
         String templateRef = null;
         NodeList nd = doc.getChildNodes();
         for (int i = 0; i < nd.getLength(); i++) {
@@ -263,17 +263,17 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertNotNull(template);
         assertTrue(template.indexOf("<xsl:stylesheet") != -1);
     }
-    
+
     @Test
     public void testGetGeneratedWadlWithExternalSchemas() throws Exception {
-        String address = "http://localhost:" + PORT + "/the/bookstore";    
+        String address = "http://localhost:" + PORT + "/the/bookstore";
         checkWadlResourcesInfo(address, address, "/book.xsd", 2);
-    
+
         checkSchemas(address, "/book.xsd", "/bookid.xsd", "import");
         checkSchemas(address, "/bookid.xsd", null, null);
         checkWadlResourcesInfo(address, address, "/book.xsd", 2);
     }
-    
+
     @Test
     public void testGetBookISOJson() throws Exception {
         doTestGetBookISO("ISO-8859-1", "1");
@@ -298,7 +298,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public void testGetBookISOXML3() throws Exception {
         doTestGetBookISOXML(null, "1");
     }
-    
+
     @Test
     public void testGetBookLink() throws Exception {
         String address = "http://localhost:" + PORT + "/the/bookstore/link";
@@ -309,41 +309,41 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                      l.toString());
     }
     private void doTestGetBookISO(String charset, String pathSegment) throws Exception {
-        String address = "http://localhost:" + PORT + "/the/bookstore/ISO-8859-1/" + pathSegment;    
+        String address = "http://localhost:" + PORT + "/the/bookstore/ISO-8859-1/" + pathSegment;
         WebClient wc = WebClient.create(address);
         wc.accept("application/json" + (charset == null ? "" : ";charset=ISO-8859-1"));
         byte[] iso88591bytes = wc.get(byte[].class);
         String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
-        
+
         String name = helloStringISO88591.substring(
             helloStringISO88591.indexOf("\"name\":\"") + "\"name\":\"".length(),
             helloStringISO88591.lastIndexOf("\""));
-        
+
         compareNames(name);
     }
     private void doTestGetBookISOXML(String charset, String pathSegment) throws Exception {
-        String address = "http://localhost:" + PORT + "/the/bookstore/ISO-8859-1/" + pathSegment;    
+        String address = "http://localhost:" + PORT + "/the/bookstore/ISO-8859-1/" + pathSegment;
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         wc.accept("application/xml" + (charset == null ? "" : ";charset=ISO-8859-1"));
         byte[] iso88591bytes = wc.get(byte[].class);
         String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
-        
+
         String name = helloStringISO88591.substring(
             helloStringISO88591.indexOf("<name>") + "<name>".length(),
             helloStringISO88591.indexOf("</name>"));
-        
+
         compareNames(name);
     }
-    
+
     private void compareNames(String name) throws Exception  {
         String eWithAcute = "\u00E9";
         String nameUTF16 = "F" + eWithAcute + "lix";
         String nameExpected = new String(nameUTF16.getBytes("ISO-8859-1"), "ISO-8859-1");
         assertEquals(nameExpected, name);
     }
-    
-    private void checkSchemas(String address, String schemaSegment, 
+
+    private void checkSchemas(String address, String schemaSegment,
                               String includedSchema,
                               String refAttrName) throws Exception {
         WebClient client = WebClient.create(address + schemaSegment);
@@ -353,101 +353,101 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals(Constants.URI_2001_SCHEMA_XSD, root.getNamespaceURI());
         assertEquals("schema", root.getLocalName());
         if (includedSchema != null) {
-            List<Element> includeEls = DOMUtils.getChildrenWithName(root, 
+            List<Element> includeEls = DOMUtils.getChildrenWithName(root,
                                                                     Constants.URI_2001_SCHEMA_XSD,
                                                                     refAttrName);
             assertEquals(1, includeEls.size());
             String href = includeEls.get(0).getAttribute("schemaLocation");
             assertEquals(address + includedSchema, href);
         }
-        
+
     }
-    
+
     private void checkWadlResourcesType(String baseURI, String requestTypeURI, String schemaRef) throws Exception {
         WebClient client = WebClient.create(requestTypeURI);
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(1000000);
-        
+
         Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), StandardCharsets.UTF_8));
         Element root = doc.getDocumentElement();
         assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
         assertEquals("application", root.getLocalName());
-        List<Element> grammarEls = DOMUtils.getChildrenWithName(root, 
+        List<Element> grammarEls = DOMUtils.getChildrenWithName(root,
             WadlGenerator.WADL_NS, "grammars");
         assertEquals(1, grammarEls.size());
-        List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
+        List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0),
             WadlGenerator.WADL_NS, "include");
         assertEquals(1, includeEls.size());
         String href = includeEls.get(0).getAttribute("href");
         assertEquals(baseURI + schemaRef, href);
-        List<Element> resourcesEls = DOMUtils.getChildrenWithName(root, 
+        List<Element> resourcesEls = DOMUtils.getChildrenWithName(root,
             WadlGenerator.WADL_NS, "resources");
         assertEquals(0, resourcesEls.size());
-        List<Element> resourceTypeEls = 
+        List<Element> resourceTypeEls =
             DOMUtils.getChildrenWithName(root, WadlGenerator.WADL_NS, "resource_type");
         assertEquals(1, resourceTypeEls.size());
     }
-    
-    private List<Element> checkWadlResourcesInfo(String baseURI, String requestURI, 
+
+    private List<Element> checkWadlResourcesInfo(String baseURI, String requestURI,
                                         String schemaRef, int size) throws Exception {
         WebClient client = WebClient.create(requestURI + "?_wadl&_type=xml");
         Document doc = StaxUtils.read(new InputStreamReader(client.get(InputStream.class), StandardCharsets.UTF_8));
         return checkWadlResourcesInfo(doc, baseURI, schemaRef, size);
     }
-    private List<Element> checkWadlResourcesInfo(Document doc, String baseURI, String schemaRef, int size) 
+    private List<Element> checkWadlResourcesInfo(Document doc, String baseURI, String schemaRef, int size)
         throws Exception {
-                 
+
         Element root = doc.getDocumentElement();
         assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
         assertEquals("application", root.getLocalName());
-        List<Element> grammarEls = DOMUtils.getChildrenWithName(root, 
+        List<Element> grammarEls = DOMUtils.getChildrenWithName(root,
                                                                 WadlGenerator.WADL_NS, "grammars");
         assertEquals(1, grammarEls.size());
-        List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
+        List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0),
                                                                 WadlGenerator.WADL_NS, "include");
         assertEquals(1, includeEls.size());
         String href = includeEls.get(0).getAttribute("href");
         assertEquals(baseURI + schemaRef, href);
-        List<Element> resourcesEls = DOMUtils.getChildrenWithName(root, 
+        List<Element> resourcesEls = DOMUtils.getChildrenWithName(root,
                                                                   WadlGenerator.WADL_NS, "resources");
         assertEquals(1, resourcesEls.size());
         Element resourcesEl =  resourcesEls.get(0);
         assertEquals(baseURI, resourcesEl.getAttribute("base"));
-        List<Element> resourceEls = 
-            DOMUtils.getChildrenWithName(resourcesEl, 
+        List<Element> resourceEls =
+            DOMUtils.getChildrenWithName(resourcesEl,
                                          WadlGenerator.WADL_NS, "resource");
         assertEquals(size, resourceEls.size());
         return resourceEls;
     }
-    
+
     @Test
     public void testGetBookByUriInfo() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks/bookstore/bookinfo?"
-                               + "param1=12&param2=3"; 
+                               + "param1=12&param2=3";
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
     }
-    
+
     @Test
     public void testGetBookWithEncodedSemicolon() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks/bookstore/semicolon%3B"; 
+            "http://localhost:" + PORT + "/the/thebooks/bookstore/semicolon%3B";
         WebClient client = WebClient.create(endpointAddress);
         Book book = client.get(Book.class);
         assertEquals(333L, book.getId());
         assertEquals(";", book.getName());
     }
-    
+
     @Test
     public void testGetBookWithEncodedSemicolonAndMatrixParam() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks/bookstore/semicolon2%3B;a=b"; 
+            "http://localhost:" + PORT + "/the/thebooks/bookstore/semicolon2%3B;a=b";
         WebClient client = WebClient.create(endpointAddress);
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(1000000);
         Book book = client.get(Book.class);
         assertEquals(333L, book.getId());
         assertEquals(";b", book.getName());
     }
-    
+
     @Test
     public void testGetBookXSLTHtml() throws Exception {
 
@@ -468,96 +468,96 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     public void testGetBookByUriInfo2() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/the/thebooks%203/bookstore/bookinfo?"
-                               + "param1=12&param2=3"; 
+                               + "param1=12&param2=3";
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
     }
-    
+
     @Test
     public void testGetBook123() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/bookstore/books/123"; 
+            "http://localhost:" + PORT + "/the/bookstore/books/123";
         getBook(endpointAddress, "resources/expected_get_book123json.txt");
         getBook(endpointAddress, "resources/expected_get_book123json.txt",
                 "application/vnd.example-com.foo+json");
     }
-    
+
     @Test
     public void testBookDepthExceededXML() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks9/depth"; 
+            "http://localhost:" + PORT + "/the/thebooks9/depth";
         WebClient wc = WebClient.create(endpointAddress);
         Response r = wc.post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
-    
+
     @Test
     public void testBookDepthExceededXMLStax() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks9stax/depth"; 
+            "http://localhost:" + PORT + "/the/thebooks9stax/depth";
         WebClient wc = WebClient.create(endpointAddress);
         Response r = wc.post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
-    
+
     @Test
     public void testBookDepthExceededXMLSource() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks9/depth-source"; 
+            "http://localhost:" + PORT + "/the/thebooks9/depth-source";
         WebClient wc = WebClient.create(endpointAddress);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         Response r = wc.post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
-    
+
     @Test
     public void testBookDepthExceededXMLSourceStax() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks9stax/depth-source"; 
+            "http://localhost:" + PORT + "/the/thebooks9stax/depth-source";
         WebClient wc = WebClient.create(endpointAddress);
         Response r = wc.post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
-    
+
     @Test
     public void testBookDepthExceededXMLDom() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks9/depth-dom"; 
+            "http://localhost:" + PORT + "/the/thebooks9/depth-dom";
         WebClient wc = WebClient.create(endpointAddress);
         Response r = wc.post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
-    
+
     @Test
     public void testBookDepthExceededXMLDomStax() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks9stax/depth-dom"; 
+            "http://localhost:" + PORT + "/the/thebooks9stax/depth-dom";
         WebClient wc = WebClient.create(endpointAddress);
         Response r = wc.post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
-    
+
     @Test
     public void testBookDepthExceededJettison() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks10/depth"; 
+            "http://localhost:" + PORT + "/the/thebooks10/depth";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("application/json").type("application/json");
         Response r = wc.post(new Book("CXF", 123L));
         assertEquals(413, r.getStatus());
     }
-    
+
     @Test
     public void testTooManyFormParams() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks9/depth-form"; 
+            "http://localhost:" + PORT + "/the/thebooks9/depth-form";
         WebClient wc = WebClient.create(endpointAddress);
         Response r = wc.form(new Form().param("a", "b"));
         assertEquals(204, r.getStatus());
         r = wc.form(new Form().param("a", "b").param("c", "b"));
         assertEquals(413, r.getStatus());
     }
-    
-    
+
+
     @Test
     public void testGetBookJsonp() throws Exception {
         String url = "http://localhost:" + PORT + "/the/jsonp/books/123";
@@ -569,7 +569,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals("callback({\"Book\":{\"id\":123,\"name\":\"CXF in Action\"}});",
                      IOUtils.readStringFromStream((InputStream)r.getEntity()));
     }
-    
+
     @Test
     public void testGetBookJsonpJackson() throws Exception {
         String url = "http://localhost:" + PORT + "/bus/jsonp2/books/123";
@@ -585,7 +585,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertTrue(response.contains("\"id\":123"));
         assertTrue(response.contains("\"name\":\"CXF in Action\""));
     }
-    
+
     @Test
     public void testGetBookWithoutJsonpCallback() throws Exception {
         String url = "http://localhost:" + PORT + "/the/jsonp/books/123";
@@ -597,19 +597,19 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals("{\"Book\":{\"id\":123,\"name\":\"CXF in Action\"}}",
                      IOUtils.readStringFromStream((InputStream)r.getEntity()));
     }
-    
+
     @Test
     public void testGetBookAsArray() throws Exception {
         URL url = new URL("http://localhost:" + PORT + "/the/bookstore/books/list/123");
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");
-        InputStream in = connect.getInputStream();           
+        InputStream in = connect.getInputStream();
 
-        assertEquals("{\"Books\":{\"books\":[{\"id\":123,\"name\":\"CXF in Action\"}]}}", 
-                     getStringFromInputStream(in)); 
-        
+        assertEquals("{\"Books\":{\"books\":[{\"id\":123,\"name\":\"CXF in Action\"}]}}",
+                     getStringFromInputStream(in));
+
     }
-    
+
     @Test
     public void testGetBookXsiType() throws Exception {
         String address = "http://localhost:" + PORT + "/the/thebooksxsi/bookstore/books/xsitype";
@@ -618,9 +618,9 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         wc.accept("application/xml");
         Book book = wc.get(Book.class);
         assertEquals("SuperBook", book.getName());
-        
+
     }
-    
+
     @Test
     public void testPostBookXsiType() throws Exception {
         String address = "http://localhost:" + PORT + "/the/thebooksxsi/bookstore/books/xsitype";
@@ -633,55 +633,55 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         SuperBook book = new SuperBook("SuperBook2", 999L, true);
         Book book2 = wc.invoke("POST", book, Book.class, Book.class);
         assertEquals("SuperBook2", book2.getName());
-        
+
     }
-    
+
     @Test
     public void testPostBookXsiTypeProxy() throws Exception {
         String address = "http://localhost:" + PORT + "/the/thebooksxsi/bookstore";
         JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
         provider.setExtraClass(new Class[]{SuperBook.class});
         provider.setJaxbElementClassNames(Collections.singletonList(Book.class.getName()));
-        BookStoreSpring bookStore = JAXRSClientFactory.create(address, BookStoreSpring.class, 
+        BookStoreSpring bookStore = JAXRSClientFactory.create(address, BookStoreSpring.class,
                                                               Collections.singletonList(provider));
         SuperBook book = new SuperBook("SuperBook2", 999L, true);
         Book book2 = bookStore.postGetBookXsiType(book);
         assertEquals("SuperBook2", book2.getName());
-        
+
     }
-    
+
     @Test
     public void testGetBookWithEncodedQueryValue() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/bookstore/booksquery?id=12%2B3"; 
-        getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
+            "http://localhost:" + PORT + "/the/bookstore/booksquery?id=12%2B3";
+        getBook(endpointAddress, "resources/expected_get_book123json.txt");
     }
-    
+
     @Test
     public void testGetBookWithEncodedPathValue() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/bookstore/id=12%2B3"; 
-        getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
+            "http://localhost:" + PORT + "/the/bookstore/id=12%2B3";
+        getBook(endpointAddress, "resources/expected_get_book123json.txt");
     }
-    
+
     @Test
     public void testGetBookWithEncodedPathValue2() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/bookstore/id=12+3"; 
-        getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
+            "http://localhost:" + PORT + "/the/bookstore/id=12+3";
+        getBook(endpointAddress, "resources/expected_get_book123json.txt");
     }
-    
+
     @Test
     public void testGetDefaultBook() throws Exception {
-        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore"; 
+        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("application/json");
         Book book = wc.get(Book.class);
-        assertEquals(123L, book.getId()); 
+        assertEquals(123L, book.getId());
     }
     @Test
     public void testGetDefaultBook2() throws Exception {
-        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore/2/"; 
+        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore/2/";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("application/json");
         Book book = wc.get(Book.class);
@@ -690,7 +690,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     @Test
     public void testGetDefaultBookMatrixParam() throws Exception {
-        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore/2/"; 
+        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore/2/";
         WebClient wc = WebClient.create(endpointAddress);
         wc.matrix("a", "b");
         wc.accept("application/json");
@@ -701,7 +701,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     }
     @Test
     public void testGetBookById() throws Exception {
-        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore/2/123"; 
+        String endpointAddress = "http://localhost:" + PORT + "/the/bookstore/2/123";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("application/json");
         Book book = wc.get(Book.class);
@@ -712,20 +712,20 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @Test
     public void testGetDefaultBookJSessionID() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/bookstore/;JSESSIONID=123"; 
-        getBook(endpointAddress, "resources/expected_get_book123json.txt"); 
+            "http://localhost:" + PORT + "/the/bookstore/;JSESSIONID=123";
+        getBook(endpointAddress, "resources/expected_get_book123json.txt");
     }
-    
-    
+
+
     private void getBook(String endpointAddress, String resource) throws Exception {
         getBook(endpointAddress, resource, "application/json");
     }
-    
+
     private void getBook(String endpointAddress, String resource, String type) throws Exception {
         getBook(endpointAddress, resource, type, null);
     }
-    
-    private void getBook(String endpointAddress, String resource, String type, String mHeader) 
+
+    private void getBook(String endpointAddress, String resource, String type, String mHeader)
         throws Exception {
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
@@ -735,17 +735,17 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         if (mHeader != null) {
             connect.addRequestProperty("X-HTTP-Method-Override", mHeader);
         }
-        InputStream in = connect.getInputStream();           
+        InputStream in = connect.getInputStream();
 
         InputStream expected = getClass().getResourceAsStream(resource);
-        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
                      stripXmlInstructionIfNeeded(getStringFromInputStream(in)));
     }
-    
+
     private void getBookAegis(String endpointAddress, String type) throws Exception {
         getBookAegis(endpointAddress, type, null);
     }
-    
+
     private void getBookAegis(String endpointAddress, String type, String mHeader) throws Exception {
         WebClient client = WebClient.create(endpointAddress,
             Collections.singletonList(new AegisElementProvider<Object>()));
@@ -757,138 +757,138 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals(124L, book.getId());
         assertEquals("CXF in Action - 2", book.getName());
     }
-    
+
     @Test
     public void testAddInvalidXmlBook() throws Exception {
-        
+
         doPost("http://localhost:" + PORT + "/the/bookstore/books/convert",
                400,
                "application/xml",
                "resources/add_book.txt",
                null);
-        
+
         doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
                400,
                "application/xml",
                "resources/add_book.txt",
                null);
-                
+
     }
-    
+
     @Test
     public void testAddInvalidJsonBook() throws Exception {
-        
+
         doPost("http://localhost:" + PORT + "/the/bookstore/books/convert",
                400,
                "application/json",
                "resources/add_book2json_invalid.txt",
                null);
-        
+
         doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
                400,
                "application/json",
                "resources/add_book2json_invalid.txt",
                null);
-                
+
     }
-    
+
     @Test
     public void testAddValidXmlBook() throws Exception {
-        
+
         doPost("http://localhost:" + PORT + "/the/bookstore/books/convert",
                200,
                "application/xml",
                "resources/add_book2.txt",
                "resources/expected_get_book123.txt");
-        
+
         doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
                200,
                "application/xml",
                "resources/add_book2.txt",
                "resources/expected_get_book123.txt");
-                
+
     }
 
     @Test
     public void testGetBookAegis() throws Exception {
-        
+
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis"; 
-        getBookAegis(endpointAddress, "application/xml"); 
+            "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis";
+        getBookAegis(endpointAddress, "application/xml");
     }
-    
+
     @Test
     public void testRetrieveBookAegis1() throws Exception {
-        
+
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis/retrieve?_method=RETRIEVE"; 
-        getBookAegis(endpointAddress, "application/xml"); 
+            "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis/retrieve?_method=RETRIEVE";
+        getBookAegis(endpointAddress, "application/xml");
     }
-    
+
     @Test
     public void testRetrieveBookAegis2() throws Exception {
-        
+
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis/retrieve"; 
-        getBookAegis(endpointAddress, "application/xml", "RETRIEVE"); 
+            "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis/retrieve";
+        getBookAegis(endpointAddress, "application/xml", "RETRIEVE");
     }
-    
+
     @Test
     public void testRetrieveGetBookAegis() throws Exception {
-        
+
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis/retrieve/get"; 
-        getBookAegis(endpointAddress, "application/xml"); 
+            "http://localhost:" + PORT + "/the/thebooks4/bookstore/books/aegis/retrieve/get";
+        getBookAegis(endpointAddress, "application/xml");
     }
-    
+
     @Test
     public void testRetrieveBookAegis3() throws Exception {
-        
+
         try (Socket s = new Socket("localhost", Integer.parseInt(PORT));
             InputStream is = this.getClass().getResourceAsStream("resources/retrieveRequest.txt")) {
-        
+
             byte[] bytes = IOUtils.readBytesFromStream(is);
             s.getOutputStream().write(bytes);
             s.getOutputStream().flush();
-        
+
             BufferedReader r = new BufferedReader(new InputStreamReader(s.getInputStream()));
             StringBuilder sb = new StringBuilder();
             String str = null;
             while ((str = r.readLine()) != null) {
                 sb.append(str);
             }
-        
+
             String aegisData = sb.toString();
             s.getInputStream().close();
             s.close();
             assertTrue(aegisData.contains("CXF in Action - 2"));
         }
-        
+
     }
-    
+
     @Test
     public void testGetBookUserResource() throws Exception {
-        
+
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks6/bookstore/books/123"; 
-        getBook(endpointAddress, "resources/expected_get_book123.txt", "application/xml"); 
+            "http://localhost:" + PORT + "/the/thebooks6/bookstore/books/123";
+        getBook(endpointAddress, "resources/expected_get_book123.txt", "application/xml");
     }
-    
+
     @Test
     public void testGetBookUserResource2() throws Exception {
-        
+
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks7/bookstore/books/123"; 
-        getBook(endpointAddress, "resources/expected_get_book123.txt", "application/xml"); 
+            "http://localhost:" + PORT + "/the/thebooks7/bookstore/books/123";
+        getBook(endpointAddress, "resources/expected_get_book123.txt", "application/xml");
     }
-    
+
     @Test
     public void testGetBookUserResourceFromProxy() throws Exception {
-        
+
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/thebooks6"; 
+            "http://localhost:" + PORT + "/the/thebooks6";
         BookStoreNoAnnotations bStore = JAXRSClientFactory.createFromModel(
-                                         endpointAddress, 
+                                         endpointAddress,
                                          BookStoreNoAnnotations.class,
                                          "classpath:/org/apache/cxf/systest/jaxrs/resources/resources.xml",
                                          Collections.singletonList(new LongTypeParamConverterProvider()),
@@ -903,7 +903,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals(1, c.getId());
         assertEquals("chapter 1", c.getTitle());
     }
-    
+
     @Test
     public void testGetBookXSLTXml() throws Exception {
         String endpointAddress =
@@ -914,7 +914,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals(666, b.getId());
         assertEquals("CXF in Action - 2", b.getName());
     }
-    
+
     @Test
     public void testReaderWriterFromJaxrsFilters() throws Exception {
         String endpointAddress =
@@ -929,7 +929,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals(777, b2.getId());
         assertEquals("CXF - 777", b2.getName());
     }
-    
+
     @Test
     public void testReaderWriterFromInterceptors() throws Exception {
         String endpointAddress =
@@ -944,7 +944,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals(777, b2.getId());
         assertEquals("CXF - 777", b2.getName());
     }
-    
+
     @Test
     public void testAddValidBookJson() throws Exception {
         doPost("http://localhost:" + PORT + "/the/bookstore/books/convert",
@@ -952,20 +952,20 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                "application/json",
                "resources/add_book2json.txt",
                "resources/expected_get_book123.txt");
-        
+
         doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
                200,
                "application/json",
                "resources/add_book2json.txt",
                "resources/expected_get_book123.txt");
-        
+
         doPost("http://localhost:" + PORT + "/the/thebooks/bookstore/books/convert",
                200,
                "application/vnd.example-com.foo+json",
                "resources/add_book2json.txt",
                "resources/expected_get_book123.txt");
     }
-    
+
     @Test
     public void testAddInvalidBookDuplicateElementJson() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/the/bookstore/books/convert");
@@ -977,24 +977,24 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String content = IOUtils.readStringFromStream((InputStream)r.getEntity());
         assertTrue(content, content.contains("Invalid content was found starting with element"));
     }
-    
+
     private void doPost(String endpointAddress, int expectedStatus, String contentType,
                         String inResource, String expectedResource) throws Exception {
-        
-        File input = new File(getClass().getResource(inResource).toURI());         
+
+        File input = new File(getClass().getResource(inResource).toURI());
         PostMethod post = new PostMethod(endpointAddress);
         post.setRequestHeader("Content-Type", contentType);
         RequestEntity entity = new FileRequestEntity(input, "text/xml");
         post.setRequestEntity(entity);
         HttpClient httpclient = new HttpClient();
-        
+
         try {
             int result = httpclient.executeMethod(post);
             assertEquals(expectedStatus, result);
-            
+
             if (expectedStatus != 400) {
                 InputStream expected = getClass().getResourceAsStream(expectedResource);
-                assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
                              stripXmlInstructionIfNeeded(post.getResponseBodyAsString()));
             } else {
                 assertTrue(post.getResponseBodyAsString()
@@ -1005,7 +1005,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
             post.releaseConnection();
         }
     }
-    
+
     private String stripXmlInstructionIfNeeded(String str) {
         if (str != null && str.startsWith("<?xml")) {
             int index = str.indexOf("?>");
@@ -1013,12 +1013,12 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         }
         return str;
     }
-    
-    private String getStringFromInputStream(InputStream in) throws Exception {        
+
+    private String getStringFromInputStream(InputStream in) throws Exception {
         return IOUtils.toString(in);
     }
 
-        
+
     @Ignore
     @XmlRootElement(name = "Book", namespace = "http://www.w3.org/1999/xhtml")
     public static class Book2 {
@@ -1027,24 +1027,24 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         @XmlElement(name = "name", namespace = "http://www.w3.org/1999/xhtml")
         private String name1;
         public Book2() {
-            
+
         }
         public long getId() {
             return id1;
         }
-        
+
         public void setId(Long theId) {
             id1 = theId;
         }
-        
+
         public String getName() {
             return name1;
         }
-        
+
         public void setName(String n) {
             name1 = n;
         }
-        
+
     }
     static class LongTypeParamConverterProvider implements ParamConverterProvider, ParamConverter<Long> {
 
@@ -1063,6 +1063,6 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         public String toString(Long l) {
             return l == null ? "123" : String.valueOf(l);
         }
-        
+
     }
 }

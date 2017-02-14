@@ -72,9 +72,9 @@ public class WebFaultOutInterceptorTestCase {
 
         interceptor.handleMessage(message);
 
-        
-        
-        
+
+
+
         Assert.assertNotNull(soapFault.getSubCodes());
         Assert.assertEquals(1, soapFault.getSubCodes().size());
         Assert.assertEquals(SUBCODE, soapFault.getSubCodes().get(0));

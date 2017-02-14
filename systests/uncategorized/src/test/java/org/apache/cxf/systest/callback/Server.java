@@ -29,7 +29,7 @@ public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
 
     Endpoint ep;
-    
+
     protected void run() {
         setBus(BusFactory.getDefaultBus());
         Object implementor = new ServerImpl();
@@ -42,13 +42,13 @@ public class Server extends AbstractBusTestServerBase {
     }
 
     public static void main(String[] args) {
-        try { 
-            Server s = new Server(); 
+        try {
+            Server s = new Server();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally { 
+        } finally {
             System.out.println("done!");
         }
     }

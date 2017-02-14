@@ -56,7 +56,7 @@ public class JMSEndpoint {
 
     private Map<String, String> jndiParameters = new HashMap<String, String>();
     private Map<String, String> parameters = new HashMap<String, String>();
-    
+
     private String endpointUri;
     private ConnectionFactory connectionFactory;
     private String jmsVariant;
@@ -95,23 +95,23 @@ public class JMSEndpoint {
     public JMSEndpoint(String endpointUri) {
         this(null, endpointUri);
     }
-    
+
     /**
      * Get the extensors from the wsdl and/or configuration that will
-     * then be used to configure the JMSConfiguration object 
-     * @param target 
+     * then be used to configure the JMSConfiguration object
+     * @param target
      */
     public JMSEndpoint(EndpointInfo endpointInfo, EndpointReferenceType target) {
         this(endpointInfo,  target == null ? endpointInfo.getAddress() : target.getAddress().getValue());
     }
-    
+
     /**
      * @param uri
      * @param subject
      */
     public JMSEndpoint(EndpointInfo ei, String endpointUri) {
         this.jmsVariant = JMSEndpoint.QUEUE;
-        
+
         if (ei != null) {
             JMSEndpointWSDLUtil.retrieveWSDLInformation(this, ei);
         }
@@ -122,7 +122,7 @@ public class JMSEndpoint {
             this.destinationName = parsed.getDestination();
             Map<String, Object> query = parsed.parseQuery();
             configureProperties(query);
-            
+
             // Use the properties like e.g. from JAXWS properties with "jms." prefix
             Map<String, Object> jmsProps = new HashMap<String, Object>();
             if (ei != null) {
@@ -157,7 +157,7 @@ public class JMSEndpoint {
             throw new RuntimeException("Error setting property " + name + ":" + e.getMessage(), e);
         }
     }
-    
+
     private String getPropSetterName(String name) {
         String first = name.substring(0, 1);
         String rest = name.substring(1);
@@ -168,9 +168,9 @@ public class JMSEndpoint {
      * Configure properties form map.
      * For each key of the map first a property with the same name in the endpoint is tried.
      * If that does not match then the value is either stored in the jndiParameters or the parameters
-     * depending on the prefix of the key. If it matches JNDI_PARAMETER_NAME_PREFIX it is stored in the 
+     * depending on the prefix of the key. If it matches JNDI_PARAMETER_NAME_PREFIX it is stored in the
      * jndiParameters else in the parameters
-     * 
+     *
      * @param endpoint
      * @param params
      */
@@ -195,7 +195,7 @@ public class JMSEndpoint {
                 putParameter(key, valueSt);
             }
         }
-        
+
         if (replyToName != null && topicReplyToName != null) {
             throw new IllegalArgumentException(
                 "The replyToName and topicReplyToName should not be defined at the same time.");
@@ -364,19 +364,19 @@ public class JMSEndpoint {
     public void setUsername(String username) {
         this.username = username;
     }
-    
+
     public int getConcurrentConsumers() {
         return concurrentConsumers;
     }
-    
+
     public void setConcurrentConsumers(int concurrentConsumers) {
         this.concurrentConsumers = concurrentConsumers;
     }
-    
+
     public void setConcurrentConsumers(String concurrentConsumers) {
         this.concurrentConsumers = Integer.parseInt(concurrentConsumers);
     }
-    
+
     public String getPassword() {
         return password;
     }
@@ -407,7 +407,7 @@ public class JMSEndpoint {
     public void setReceiveTimeout(long receiveTimeout) {
         this.receiveTimeout = receiveTimeout;
     }
-    
+
     public void setReceiveTimeout(String receiveTimeout) {
         this.receiveTimeout = Long.parseLong(receiveTimeout);
     }
@@ -435,15 +435,15 @@ public class JMSEndpoint {
     public boolean isUseConduitIdSelector() {
         return useConduitIdSelector;
     }
-    
+
     public void setUseConduitIdSelector(String useConduitIdSelectorSt) {
         this.useConduitIdSelector = Boolean.valueOf(useConduitIdSelectorSt);
     }
-    
+
     public void setUseConduitIdSelector(boolean useConduitIdSelector) {
         this.useConduitIdSelector = useConduitIdSelector;
     }
-    
+
     public String getJndiTransactionManagerName() {
         return jndiTransactionManagerName;
     }
@@ -453,7 +453,7 @@ public class JMSEndpoint {
     }
 
     public enum DeliveryModeType { PERSISTENT, NON_PERSISTENT };
-    
+
     public enum MessageType {
         BYTE("byte"),
         BINARY("binary"),
@@ -485,7 +485,7 @@ public class JMSEndpoint {
     public void setMessageSelector(String messageSelector) {
         this.messageSelector = messageSelector;
     }
-    
-    
-    
+
+
+
 }

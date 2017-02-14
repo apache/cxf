@@ -29,13 +29,13 @@ import org.apache.cxf.helpers.CastUtils;
  */
 public abstract class AbstractTransportFactory {
     private List<String> transportIds;
-    
+
     public AbstractTransportFactory() {
     }
     public AbstractTransportFactory(List<String> ids) {
         transportIds = ids;
     }
-    
+
     public final List<String> getTransportIds() {
         return transportIds;
     }

@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @WebService
 public interface Greeter {
-    
+
     int sayHi(@WebParam
                 @XmlJavaTypeAdapter(value = org.apache.xmladapter.CurrencyAdapter.class)
                 Currency tickerSymbol);

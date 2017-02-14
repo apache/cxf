@@ -38,8 +38,8 @@ public final class HeaderTesterUtil {
     public static final String INOUT_REQUEST_TYPE_IN = "inout request type in";
     public static final String INOUT_REQUEST_TYPE_OUT = "inout request type out";
     static final String EX_STRING = "CXF RUNTIME EXCEPTION";
-    
-    
+
+
     private HeaderTesterUtil() {
         //utility class
     }

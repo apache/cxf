@@ -36,15 +36,15 @@ public class ThrottlingCounterTest {
         ThrottlingCounter counter = new ThrottlingCounter(0, 1);
         counter.setListenerContainer(listenerContainer);
         assertTrue(listenerContainer.isRunning());
-        
+
         counter.incrementAndGet();
         assertFalse(listenerContainer.isRunning());
-        
+
         counter.decrementAndGet();
         assertTrue(listenerContainer.isRunning());
-        
+
     }
-    
+
     public class DummyJMSListener implements JMSListenerContainer {
         boolean running = true;
 

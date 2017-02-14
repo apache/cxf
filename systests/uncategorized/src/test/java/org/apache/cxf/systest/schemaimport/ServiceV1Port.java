@@ -28,9 +28,9 @@ import javax.jws.soap.SOAPBinding;
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public interface ServiceV1Port {
 
-    @WebResult(name = "responseMessage", targetNamespace = "http://cxf.apache.org/xsd/test/messages", 
+    @WebResult(name = "responseMessage", targetNamespace = "http://cxf.apache.org/xsd/test/messages",
         partName = "response")
     @WebMethod(action = "http://cxf.apache.org/xsd/test/requestMessage")
-    ResponseType testRequest(@WebParam(partName = "request", name = "requestMessage", 
+    ResponseType testRequest(@WebParam(partName = "request", name = "requestMessage",
         targetNamespace = "http://cxf.apache.org/xsd/test/messages") RequestType request);
 }

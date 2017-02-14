@@ -52,8 +52,8 @@ public class AbstractWSATestBase extends AbstractBusClientServerTestBase {
             }
         }
     }
-    
-    
+
+
     protected ByteArrayOutputStream setupInLogging() {
         PayloadLogEventSender sender = new PayloadLogEventSender();
         LoggingInInterceptor in = new LoggingInInterceptor(sender);
@@ -69,12 +69,12 @@ public class AbstractWSATestBase extends AbstractBusClientServerTestBase {
         this.bus.getOutFaultInterceptors().add(out);
         return sender.bos;
     }
-    
-    
+
+
     protected String getLogValue(String log, String xpath) throws XMLStreamException {
         String s = log.substring(log.indexOf("Payload: ") + 9);
         Document doc = StaxUtils.read(new StringReader(s));
-        
+
         Map<String, String> ns = new HashMap<String, String>();
         ns.put("wsa", "http://www.w3.org/2005/08/addressing");
         ns.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
@@ -84,7 +84,7 @@ public class AbstractWSATestBase extends AbstractBusClientServerTestBase {
     protected void assertLogNotContains(String log, String xpath) throws XMLStreamException {
         String s = log.substring(log.indexOf("Payload: ") + 9);
         Document doc = StaxUtils.read(new StringReader(s));
-        
+
         Map<String, String> ns = new HashMap<String, String>();
         ns.put("wsa", "http://www.w3.org/2005/08/addressing");
         ns.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");

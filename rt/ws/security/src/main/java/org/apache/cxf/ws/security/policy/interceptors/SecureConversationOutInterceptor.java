@@ -48,20 +48,20 @@ import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
 
 class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(SecureConversationOutInterceptor.class);
-    
+
     SecureConversationOutInterceptor() {
         super(Phase.PREPARE_SEND);
         addBefore(SpnegoContextTokenOutInterceptor.class.getName());
         addBefore(IssuedTokenOutInterceptor.class.getName());
     }
-    
+
     public void handleMessage(SoapMessage message) throws Fault {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         // extract Assertion information
         if (aim != null) {
-            Collection<AssertionInfo> ais = 
+            Collection<AssertionInfo> ais =
                 PolicyUtils.getAllAssertionsByLocalname(aim, SPConstants.SECURE_CONVERSATION_TOKEN);
             if (ais.isEmpty()) {
                 return;
@@ -69,7 +69,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
             if (isRequestor(message)) {
                 SecureConversationToken itok = (SecureConversationToken)ais.iterator()
                     .next().getAssertion();
-                
+
                 SecurityToken tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
                 if (tok == null) {
                     String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
@@ -102,23 +102,23 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
             }
         }
     }
-    
-    
+
+
     private SecurityToken renewToken(SoapMessage message,
-                            AssertionInfoMap aim, 
+                            AssertionInfoMap aim,
                             SecurityToken tok,
                             SecureConversationToken itok) {
         if (!tok.isExpired()) {
             return tok;
         }
-        
+
         // Remove the old token
         message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN);
         message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN);
         TokenStoreUtils.getTokenStore(message).remove(tok.getId());
-        
+
         STSClient client = STSUtils.getClient(message, "sct");
         AddressingProperties maps =
             (AddressingProperties)message
@@ -135,7 +135,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
 
                 String s = message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
                 client.setLocation(s);
-                
+
                 Map<String, Object> ctx = client.getRequestContext();
                 ctx.put(SecurityConstants.TOKEN_ID, tok.getId());
                 if (maps != null) {
@@ -144,7 +144,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 return client.renewSecurityToken(tok);
             } catch (RuntimeException ex) {
                 LOG.log(Level.WARNING, "Error renewing a token", ex);
-                boolean issueAfterFailedRenew = 
+                boolean issueAfterFailedRenew =
                     MessageUtils.getContextualBoolean(
                         message, SecurityConstants.STS_ISSUE_AFTER_FAILED_RENEW, true
                     );
@@ -156,7 +156,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 }
             } catch (Exception ex) {
                 LOG.log(Level.WARNING, "Error renewing a token", ex);
-                boolean issueAfterFailedRenew = 
+                boolean issueAfterFailedRenew =
                     MessageUtils.getContextualBoolean(
                         message, SecurityConstants.STS_ISSUE_AFTER_FAILED_RENEW, true
                     );
@@ -173,7 +173,7 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                 client.setLocation(null);
                 client.setAddressingNamespace(null);
             }
-        }            
+        }
     }
     private SecurityToken issueToken(SoapMessage message,
                                      AssertionInfoMap aim,

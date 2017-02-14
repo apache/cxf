@@ -26,7 +26,7 @@ import org.apache.cxf.rs.security.jose.common.JoseException;
 public class JwtAuthenticationFilter extends AbstractJwtAuthenticationFilter {
     private static final String DEFAULT_AUTH_SCHEME = "JWT";
     private String expectedAuthScheme = DEFAULT_AUTH_SCHEME;
-    
+
     protected String getEncodedJwtToken(ContainerRequestContext requestContext) {
         String auth = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         String[] parts = auth == null ? null : auth.split(" ");
@@ -39,6 +39,6 @@ public class JwtAuthenticationFilter extends AbstractJwtAuthenticationFilter {
     public void setExpectedAuthScheme(String expectedAuthScheme) {
         this.expectedAuthScheme = expectedAuthScheme;
     }
-    
+
 
 }

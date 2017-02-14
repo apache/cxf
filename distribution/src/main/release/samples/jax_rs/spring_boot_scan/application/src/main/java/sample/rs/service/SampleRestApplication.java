@@ -37,7 +37,7 @@ public class SampleRestApplication {
     public MetricRegistry metricRegistry() {
         return new MetricRegistry();
     }
-    
+
     @Bean
     public MetricsEndpoint metricsEndpoint(final MetricRegistry registry) {
         return new MetricsEndpoint(Collections.singleton(new MetricReaderPublicMetrics(

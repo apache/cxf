@@ -38,7 +38,7 @@ public class SwaggerUtilsTest extends Assert {
         assertEquals("/services/helloservice", ap.getBasePath());
         Map<String, UserResource> map = ap.getResourcesAsMap();
         assertEquals(2, map.size());
-        
+
         UserResource ur = map.get("sayHello");
         assertNotNull(ur);
         assertEquals("/sayHello", ur.getPath());
@@ -48,13 +48,13 @@ public class SwaggerUtilsTest extends Assert {
         assertEquals("/{a}", op.getPath());
         assertEquals("GET", op.getVerb());
         assertEquals("text/plain", op.getProduces());
-        
+
         assertEquals(1, op.getParameters().size());
         Parameter param1 = op.getParameters().get(0);
         assertEquals("a", param1.getName());
         assertEquals(ParameterType.PATH, param1.getType());
         assertEquals(String.class, param1.getJavaType());
-        
+
         UserResource ur2 = map.get("sayHello2");
         assertNotNull(ur2);
         assertEquals("/sayHello2", ur2.getPath());
@@ -64,12 +64,12 @@ public class SwaggerUtilsTest extends Assert {
         assertEquals("/{a}", op2.getPath());
         assertEquals("GET", op2.getVerb());
         assertEquals("text/plain", op2.getProduces());
-        
+
         assertEquals(1, op2.getParameters().size());
         Parameter param2 = op.getParameters().get(0);
         assertEquals("a", param2.getName());
         assertEquals(ParameterType.PATH, param2.getType());
         assertEquals(String.class, param2.getJavaType());
-        
+
     }
 }

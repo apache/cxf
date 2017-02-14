@@ -34,7 +34,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
-public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl 
+public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl
     implements WriterInterceptorContext {
 
     private List<WriterInterceptor> writers;
@@ -48,14 +48,14 @@ public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl
                                         OutputStream os,
                                         Message message,
                                         List<WriterInterceptor> writers) {
-    //CHECKSTYLE:ON    
+    //CHECKSTYLE:ON
         super(cls, type, anns, message);
         this.entity = entity;
         this.os = os;
         this.writers = writers;
     }
-    
-    
+
+
     @Override
     public Object getEntity() {
         return entity;
@@ -87,7 +87,7 @@ public class WriterInterceptorContextImpl extends AbstractInterceptorContextImpl
     @Override
     public void setEntity(Object object) {
         entity = object;
-        super.setType(entity != null ? entity.getClass() : null);   
+        super.setType(entity != null ? entity.getClass() : null);
     }
 
     @Override

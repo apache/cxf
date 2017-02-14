@@ -30,17 +30,17 @@ import javax.json.JsonObject;
 
 public class CatalogStore {
     private final Map<String, String> books = new ConcurrentHashMap<>();
-    
+
     public CatalogStore() {
     }
-    
+
     public boolean remove(final String key) throws IOException {
         return books.remove(key) != null;
     }
-    
+
     public JsonObject get(final String key) throws IOException {
         final String title = books.get(key);
-        
+
         if (title != null) {
             return Json.createObjectBuilder()
                 .add("id", key)
@@ -50,21 +50,21 @@ public class CatalogStore {
 
         return null;
     }
-    
+
     public void put(final String key, final String title) throws IOException {
         books.put(key, title);
     }
-    
+
     public JsonArray scan() throws IOException {
         final JsonArrayBuilder builder = Json.createArrayBuilder();
-        
+
         for (final Map.Entry<String, String> entry: books.entrySet()) {
             builder.add(Json.createObjectBuilder()
                 .add("id", entry.getKey())
                 .add("title", entry.getValue())
             );
         }
-        
+
         return builder.build();
     }
 

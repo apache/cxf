@@ -27,7 +27,7 @@ public class JweDecryptionInput {
     private byte[] authTag;
     private byte[] aad;
     private JweHeaders jweHeaders;
-    
+
     public JweDecryptionInput(byte[] encryptedCEK,
                               byte[] initVector,
                               byte[] encryptedContent,

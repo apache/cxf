@@ -20,7 +20,7 @@
 package org.apache.cxf.common.jaxb;
 
 /**
- * 
+ *
  */
 public interface JAXBContextProxy {
 

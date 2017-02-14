@@ -45,26 +45,26 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
 
     private Bus bus;
-    private List<EndpointResolver> resolvers 
+    private List<EndpointResolver> resolvers
         = new CopyOnWriteArrayList<EndpointResolver>();
-    
+
     public EndpointResolverRegistryImpl() {
-        
+
     }
     public EndpointResolverRegistryImpl(Bus b) {
         setBus(b);
     }
-    
+
     /**
      * @param b Bus to encapsulate
-     */ 
+     */
     public final void setBus(Bus b) {
         bus = b;
         if (bus != null) {
             bus.setExtension(this, EndpointResolverRegistry.class);
         }
     }
-    
+
     /**
      * Register an endpoint resolver.
      *
@@ -73,7 +73,7 @@ public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
     public synchronized void register(EndpointResolver resolver) {
         resolvers.add(resolver);
     }
-    
+
     /**
      * Unregister an endpoint resolver.
      *
@@ -91,7 +91,7 @@ public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
      * This API is used by any actor that requires a concrete EPR (e.g.
      * a transport-level Conduit), and must be called each and every
      * time the EPR content is to be accessed (e.g. before each connection
-     * establishment attempt). 
+     * establishment attempt).
      *
      * @param logical the abstract EPR to resolve
      * @return the resolved concrete EPR if appropriate, null otherwise
@@ -106,17 +106,17 @@ public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
         }
         return physical;
     }
-    
+
     /**
-     * Walk the list of registered EndpointResolvers, so as to force a fresh 
-     * resolution of the given abstract EPR, discarding any previously cached 
+     * Walk the list of registered EndpointResolvers, so as to force a fresh
+     * resolution of the given abstract EPR, discarding any previously cached
      * reference.
      * <p>
      * This API may be used by say the transport-level Conduit when it
      * detects a non-transient error on the outgoing connection, or
      * by any other actor in the dispatch with the ability to infer
      * server-side unavailability.
-     * 
+     *
      * @param logical the previously resolved abstract EPR
      * @param physical the concrete EPR to refresh
      * @return the renewed concrete EPR if appropriate, null otherwise
@@ -132,11 +132,11 @@ public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
         }
         return fresh;
     }
-    
+
     /**
-     * Walk the list of registered EndpointResolvers, so as to mint a new 
+     * Walk the list of registered EndpointResolvers, so as to mint a new
      * abstract EPR for a given service name.
-     * 
+     *
      * @param serviceName
      * @return the newly minted EPR if appropriate, null otherwise
      */
@@ -150,11 +150,11 @@ public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
         }
         return logical;
     }
-    
+
     /**
-     * Walk the list of registered EndpointResolvers, so as to mint a new 
+     * Walk the list of registered EndpointResolvers, so as to mint a new
      * abstract EPR for a given physical EPR.
-     * 
+     *
      * @param physical
      * @return the newly minted EPR if appropriate, null otherwise
      */
@@ -166,15 +166,15 @@ public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
                 break;
             }
         }
-        return logical;        
+        return logical;
     }
-    
+
     /**
      * @return the encapsulated list of registered resolvers
      */
     protected List<EndpointResolver> getResolvers() {
         return resolvers;
     }
-    
+
 
 }

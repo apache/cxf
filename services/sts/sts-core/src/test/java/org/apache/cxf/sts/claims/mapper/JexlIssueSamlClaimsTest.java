@@ -101,7 +101,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
      */
     private List<RequestSecurityTokenResponseType> issueToken(TokenIssueOperation issueOperation,
         RequestSecurityTokenType request, Principal principal, Map<String, Object> messageContext) {
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, principal, messageContext);
         List<RequestSecurityTokenResponseType> securityTokenResponse = response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());

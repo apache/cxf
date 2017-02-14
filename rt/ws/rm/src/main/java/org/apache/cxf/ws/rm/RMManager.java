@@ -83,28 +83,28 @@ import org.apache.cxf.ws.rm.v200702.SequenceType;
 import org.apache.cxf.ws.security.SecurityConstants;
 
 /**
- * 
+ *
  */
 public class RMManager {
-    
+
     /** Message contextual property giving WS-ReliableMessaging namespace. */
     public static final String WSRM_VERSION_PROPERTY = "org.apache.cxf.ws.rm.namespace";
-    
+
     /** Message contextual property giving addressing namespace to be used by WS-RM implementation. */
     public static final String WSRM_WSA_VERSION_PROPERTY = "org.apache.cxf.ws.rm.wsa-namespace";
 
     /** Message contextual property giving the last message flag (Boolean). */
     public static final String WSRM_LAST_MESSAGE_PROPERTY = "org.apache.cxf.ws.rm.last-message";
-    
+
     /** Message contextual property giving WS-ReliableMessaging inactivity timeout (Long). */
     public static final String WSRM_INACTIVITY_TIMEOUT_PROPERTY = "org.apache.cxf.ws.rm.inactivity-timeout";
-    
+
     /** Message contextual property giving WS-ReliableMessaging base retransmission interval (Long). */
     public static final String WSRM_RETRANSMISSION_INTERVAL_PROPERTY = "org.apache.cxf.ws.rm.retransmission-interval";
-    
+
     /** Message contextual property giving WS-ReliableMessaging exponential backoff flag (Boolean). */
     public static final String WSRM_EXPONENTIAL_BACKOFF_PROPERTY = "org.apache.cxf.ws.rm.exponential-backoff";
-    
+
     /** Message contextual property giving WS-ReliableMessaging acknowledgement interval (Long). */
     public static final String WSRM_ACKNOWLEDGEMENT_INTERVAL_PROPERTY = "org.apache.cxf.ws.rm.acknowledgement-interval";
 
@@ -124,31 +124,31 @@ public class RMManager {
     private DestinationPolicyType destinationPolicy;
     private InstrumentationManager instrumentationManager;
     private ManagedRMManager managedManager;
-    
+
     // ServerLifeCycleListener
-    
+
     public void startServer(Server server) {
         recoverReliableEndpoint(server.getEndpoint(), (Conduit)null);
     }
 
     public void stopServer(Server server) {
     }
-    
+
     // ClientLifeCycleListener
-    
+
     public void clientCreated(final Client client) {
         if (null == store || null == retransmissionQueue) {
             return;
-        }        
+        }
         String id = RMUtils.getEndpointIdentifier(client.getEndpoint(), getBus());
         Collection<SourceSequence> sss = store.getSourceSequences(id/*, protocol*/);
-        if (null == sss || 0 == sss.size()) {                        
+        if (null == sss || 0 == sss.size()) {
             return;
         }
         LOG.log(Level.FINE, "Number of source sequences: {0}", sss.size());
         recoverReliableEndpoint(client.getEndpoint(), client.getConduit()/*, protocol*/);
     }
-    
+
     public void clientDestroyed(Client client) {
     }
 
@@ -161,7 +161,7 @@ public class RMManager {
     public void setRM10AddressingNamespace(RM10AddressingNamespaceType addrns) {
         getConfiguration().setRM10AddressingNamespace(addrns.getUri());
     }
-    
+
     public Bus getBus() {
         return bus;
     }
@@ -169,7 +169,7 @@ public class RMManager {
     @Resource
     public void setBus(Bus b) {
         bus = b;
-        if (null != bus) { 
+        if (null != bus) {
             bus.setExtension(this, RMManager.class);
         }
     }
@@ -280,10 +280,10 @@ public class RMManager {
         }
         this.configuration = configuration;
     }
-    
+
     /**
      * Get configuration after applying policies.
-     * 
+     *
      * @param msg
      * @return configuration (non-<code>null</code>)
      */
@@ -298,13 +298,13 @@ public class RMManager {
         setConfiguration(RMPolicyUtilities.intersect(rma, getConfiguration()));
     }
 
-    /** 
+    /**
      * @return Returns the sourcePolicy.
      */
     public SourcePolicyType getSourcePolicy() {
         return sourcePolicy;
     }
-    
+
     /**
      * @param sp The sourcePolicy to set.
      */
@@ -319,7 +319,7 @@ public class RMManager {
         }
         sourcePolicy = sp;
     }
-    
+
     // The real stuff ...
 
     public RMEndpoint getReliableEndpoint(Message message) throws RMException {
@@ -346,7 +346,7 @@ public class RMManager {
                 addrUri = maps.getNamespaceURI();
             }
         }
-        
+
         RMConfiguration config = getConfiguration();
         if (rmUri != null) {
             config.setRMNamespace(rmUri);
@@ -384,7 +384,7 @@ public class RMManager {
                 if (rme != null) {
                     return rme;
                 }
-                rme = createReliableEndpoint(endpoint);                
+                rme = createReliableEndpoint(endpoint);
                 org.apache.cxf.transport.Destination destination = message.getExchange().getDestination();
                 EndpointReferenceType replyTo = null;
                 if (null != destination) {
@@ -392,9 +392,9 @@ public class RMManager {
                     replyTo = maps.getReplyTo();
                 }
                 Endpoint ei = message.getExchange().getEndpoint();
-                org.apache.cxf.transport.Destination dest 
+                org.apache.cxf.transport.Destination dest
                     = ei == null ? null : ei.getEndpointInfo()
-                        .getProperty(MAPAggregator.DECOUPLED_DESTINATION, 
+                        .getProperty(MAPAggregator.DECOUPLED_DESTINATION,
                                  org.apache.cxf.transport.Destination.class);
                 config = RMPolicyUtilities.getRMConfiguration(config, message);
                 rme.initialise(config, message.getExchange().getConduit(message), replyTo, dest, message);
@@ -449,9 +449,9 @@ public class RMManager {
                 acksTo = maps.getReplyTo();
                 if (RMUtils.getAddressingConstants().getNoneURI().equals(acksTo.getAddress().getValue())) {
                     Endpoint ei = message.getExchange().getEndpoint();
-                    org.apache.cxf.transport.Destination dest 
+                    org.apache.cxf.transport.Destination dest
                         = ei == null ? null : ei.getEndpointInfo()
-                                .getProperty(MAPAggregator.DECOUPLED_DESTINATION, 
+                                .getProperty(MAPAggregator.DECOUPLED_DESTINATION,
                                          org.apache.cxf.transport.Destination.class);
                     if (null == dest) {
                         acksTo = RMUtils.createAnonymousReference();
@@ -463,8 +463,8 @@ public class RMManager {
 
             if (ContextUtils.isGenericAddress(to)) {
                 org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
-                    "CREATE_SEQ_ANON_TARGET", LOG, 
-                    to != null && to.getAddress() != null 
+                    "CREATE_SEQ_ANON_TARGET", LOG,
+                    to != null && to.getAddress() != null
                     ? to.getAddress().getValue() : null);
                 LOG.log(Level.INFO, msg.toString());
                 throw new RMException(msg);
@@ -476,16 +476,16 @@ public class RMManager {
             for (String key : message.getContextualPropertyKeys()) {
                 //copy other properties?
                 if (key.startsWith("ws-security")) {
-                    context.put(key, message.getContextualProperty(key));                  
+                    context.put(key, message.getContextualProperty(key));
                 }
             }
-            
-            CreateSequenceResponseType createResponse = 
+
+            CreateSequenceResponseType createResponse =
                 proxy.createSequence(acksTo, relatesTo, isServer, protocol, exchange, context);
             if (!isServer) {
                 Servant servant = source.getReliableEndpoint().getServant();
                 servant.createSequenceResponse(createResponse, protocol);
-                
+
                 // propagate security properties to application endpoint, in case we're using WS-SecureConversation
                 Exchange appex = message.getExchange();
                 if (appex.get(SecurityConstants.TOKEN) == null) {
@@ -503,12 +503,12 @@ public class RMManager {
 
     @PreDestroy
     public void shutdown() {
-        // shutdown remaining endpoints 
+        // shutdown remaining endpoints
         if (reliableEndpoints.size() > 0) {
             LOG.log(Level.FINE,
                     "Shutting down RMManager with {0} remaining endpoints.",
                     new Object[] {Integer.valueOf(reliableEndpoints.size())});
-            for (RMEndpoint rme : reliableEndpoints.values()) {            
+            for (RMEndpoint rme : reliableEndpoints.values()) {
                 rme.shutdown();
             }
         }
@@ -523,40 +523,40 @@ public class RMManager {
 
         // unregistring of this managed bean from the server is done by the bus itself
     }
-    
+
     void shutdownReliableEndpoint(Endpoint e) {
         RMEndpoint rme = reliableEndpoints.get(e);
         if (rme == null) {
             // not found
             return;
         }
-        rme.shutdown();        
-        
+        rme.shutdown();
+
         // remove references to timer tasks cancelled above to make them
         // eligible for garbage collection
         Timer t = getTimer(false);
         if (t != null) {
             t.purge();
         }
-        
+
         reliableEndpoints.remove(e);
     }
-    
+
     void recoverReliableEndpoint(Endpoint endpoint, Conduit conduit) {
         if (null == store || null == retransmissionQueue) {
             return;
-        }        
-        
+        }
+
         String id = RMUtils.getEndpointIdentifier(endpoint, getBus());
-        
+
         Collection<SourceSequence> sss = store.getSourceSequences(id);
         Collection<DestinationSequence> dss = store.getDestinationSequences(id);
-        if ((null == sss || 0 == sss.size()) && (null == dss || 0 == dss.size())) {                        
+        if ((null == sss || 0 == sss.size()) && (null == dss || 0 == dss.size())) {
             return;
         }
         LOG.log(Level.FINE, "Number of source sequences: {0}", sss.size());
         LOG.log(Level.FINE, "Number of destination sequences: {0}", dss.size());
-        
+
         LOG.log(Level.FINE, "Recovering {0} endpoint with id: {1}",
                 new Object[] {null == conduit ? "client" : "server", id});
         RMEndpoint rme = createReliableEndpoint(endpoint);
@@ -564,18 +564,18 @@ public class RMManager {
         synchronized (reliableEndpoints) {
             reliableEndpoints.put(endpoint, rme);
         }
-        for (SourceSequence ss : sss) {            
+        for (SourceSequence ss : sss) {
             recoverSourceSequence(endpoint, conduit, rme.getSource(), ss);
         }
-        
+
         for (DestinationSequence ds : dss) {
             recoverDestinationSequence(endpoint, conduit, rme.getDestination(), ds);
         }
         retransmissionQueue.start();
         redeliveryQueue.start();
     }
-    
-    private void recoverSourceSequence(Endpoint endpoint, Conduit conduit, Source s, 
+
+    private void recoverSourceSequence(Endpoint endpoint, Conduit conduit, Source s,
                                        SourceSequence ss) {
         Collection<RMMessage> ms = store.getMessages(ss.getIdentifier(), true);
         if (null == ms || 0 == ms.size()) {
@@ -589,8 +589,8 @@ public class RMManager {
         if (s.getAssociatedSequence(null) == null && !ss.isExpired() && !ss.isLastMessage()) {
             s.setCurrent(ss);
         }
-        for (RMMessage m : ms) {                
-            
+        for (RMMessage m : ms) {
+
             Message message = new MessageImpl();
             Exchange exchange = new ExchangeImpl();
             message.setExchange(exchange);
@@ -603,7 +603,7 @@ public class RMManager {
             exchange.put(Service.class, endpoint.getService());
             exchange.put(Binding.class, endpoint.getBinding());
             exchange.put(Bus.class, bus);
-            
+
             SequenceType st = new SequenceType();
             st.setIdentifier(ss.getIdentifier());
             st.setMessageNumber(m.getMessageNumber());
@@ -616,14 +616,14 @@ public class RMManager {
                 close.setIdentifier(ss.getIdentifier());
                 rmps.setCloseSequence(close);
             }
-            RMContextUtils.storeRMProperties(message, rmps, true);                
+            RMContextUtils.storeRMProperties(message, rmps, true);
             if (null == conduit) {
                 String to = m.getTo();
                 AddressingProperties maps = new AddressingProperties();
                 maps.setTo(RMUtils.createReference(to));
                 RMContextUtils.storeMAPs(maps, message, true, false);
             }
-                                    
+
             try {
                 // RMMessage is stored in a serialized way, therefore
                 // RMMessage content must be splitted into soap root message
@@ -634,21 +634,21 @@ public class RMManager {
             } catch (IOException e) {
                 LOG.log(Level.SEVERE, "Error reading persisted message data", e);
             }
-        }            
+        }
     }
 
-    private void recoverDestinationSequence(Endpoint endpoint, Conduit conduit, Destination d, 
+    private void recoverDestinationSequence(Endpoint endpoint, Conduit conduit, Destination d,
                                              DestinationSequence ds) {
-        // always recover the sequence 
+        // always recover the sequence
         d.addSequence(ds, false);
-        
+
         Collection<RMMessage> ms = store.getMessages(ds.getIdentifier(), false);
         if (null == ms || 0 == ms.size()) {
             return;
         }
         LOG.log(Level.FINE, "Number of messages in sequence: {0}", ms.size());
 
-        for (RMMessage m : ms) {                
+        for (RMMessage m : ms) {
             Message message = new MessageImpl();
             Exchange exchange = new ExchangeImpl();
             message.setExchange(exchange);
@@ -664,14 +664,14 @@ public class RMManager {
             exchange.put(Binding.class, endpoint.getBinding());
             exchange.put(BindingInfo.class, endpoint.getEndpointInfo().getBinding());
             exchange.put(Bus.class, bus);
-            
+
             SequenceType st = new SequenceType();
             st.setIdentifier(ds.getIdentifier());
             st.setMessageNumber(m.getMessageNumber());
             RMProperties rmps = new RMProperties();
             rmps.setSequence(st);
             rmps.setCreatedTime(m.getCreatedTime());
-            RMContextUtils.storeRMProperties(message, rmps, false);                
+            RMContextUtils.storeRMProperties(message, rmps, false);
             try {
                 // RMMessage is stored in a serialized way, therefore
                 // RMMessage content must be splitted into soap root message
@@ -699,14 +699,14 @@ public class RMManager {
             }
         });
         return new RMEndpoint(this, endpoint);
-    }  
-    
+    }
+
     public void init(Bus b) {
         setBus(b);
         initialise();
         registerListeners();
     }
-    
+
     @PostConstruct
     void initialise() {
         if (configuration == null) {
@@ -718,7 +718,7 @@ public class RMManager {
         }
         if (null == sourcePolicy) {
             setSourcePolicy(null);
-        }       
+        }
         if (null == destinationPolicy) {
             DestinationPolicyType dp = new DestinationPolicyType();
             dp.setAcksPolicy(new AcksPolicyType());
@@ -735,8 +735,8 @@ public class RMManager {
         }
         if (null != bus) {
             managedManager = new ManagedRMManager(this);
-            instrumentationManager = bus.getExtension(InstrumentationManager.class);        
-            if (instrumentationManager != null) {   
+            instrumentationManager = bus.getExtension(InstrumentationManager.class);
+            if (instrumentationManager != null) {
                 try {
                     instrumentationManager.register(managedManager);
                 } catch (JMException jmex) {
@@ -745,7 +745,7 @@ public class RMManager {
             }
         }
     }
-    
+
     @PostConstruct
     void registerListeners() {
         if (null == bus) {
@@ -778,7 +778,7 @@ public class RMManager {
     Map<Endpoint, RMEndpoint> getReliableEndpointsMap() {
         return reliableEndpoints;
     }
-    
+
     void setReliableEndpointsMap(Map<Endpoint, RMEndpoint> map) {
         reliableEndpoints = map;
     }
@@ -796,7 +796,7 @@ public class RMManager {
     /**
      * Clones and saves the interceptor chain the first time this is called, so that it can be used for retransmission.
      * Calls after the first are ignored.
-     * 
+     *
      * @param msg
      */
     public void initializeInterceptorChain(Message msg) {
@@ -810,10 +810,10 @@ public class RMManager {
             }
         }
     }
-    
+
     /**
      * Get interceptor chain for retransmitting a message.
-     * 
+     *
      * @return chain (<code>null</code> if none set)
      */
     public PhaseInterceptorChain getRetransmitChain(Message msg) {

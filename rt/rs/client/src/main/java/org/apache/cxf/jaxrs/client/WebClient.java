@@ -93,19 +93,19 @@ public class WebClient extends AbstractClient implements AsyncClient {
     protected WebClient(String baseAddress) {
         this(convertStringToURI(baseAddress));
     }
-    
+
     protected WebClient(URI baseURI) {
         this(new LocalClientState(baseURI));
     }
-    
+
     protected WebClient(ClientState state) {
         super(state);
         cfg.getInInterceptors().add(new ClientAsyncResponseInterceptor());
     }
-    
-    
-    
-    
+
+
+
+
     /**
      * Creates WebClient
      * @param baseAddress baseAddress
@@ -115,7 +115,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
         bean.setAddress(baseAddress);
         return bean.createWebClient();
     }
-    
+
     /**
      * Creates WebClient
      * @param baseURI baseURI
@@ -123,7 +123,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
     public static WebClient create(URI baseURI) {
         return create(baseURI.toString());
     }
-    
+
     /**
      * Creates WebClient
      * @param baseURI baseURI
@@ -131,16 +131,16 @@ public class WebClient extends AbstractClient implements AsyncClient {
     public static WebClient create(String baseURI, boolean threadSafe) {
         return create(baseURI, Collections.emptyList(), threadSafe);
     }
-    
+
     /**
      * Creates WebClient
      * @param baseURI baseURI
      * @param providers list of providers
      */
     public static WebClient create(String baseAddress, List<?> providers) {
-        return create(baseAddress, providers, null);        
+        return create(baseAddress, providers, null);
     }
-    
+
     /**
      * Creates WebClient
      * @param baseURI baseURI
@@ -152,9 +152,9 @@ public class WebClient extends AbstractClient implements AsyncClient {
         if (threadSafe) {
             bean.setInitialState(new ThreadLocalClientState(baseAddress));
         }
-        return bean.createWebClient();        
+        return bean.createWebClient();
     }
-    
+
     /**
      * Creates a thread safe WebClient
      * @param baseURI baseURI
@@ -165,14 +165,14 @@ public class WebClient extends AbstractClient implements AsyncClient {
         JAXRSClientFactoryBean bean = getBean(baseAddress, null);
         bean.setProviders(providers);
         bean.setInitialState(new ThreadLocalClientState(baseAddress, timeToKeepState));
-        return bean.createWebClient();        
+        return bean.createWebClient();
     }
-    
+
     /**
      * Creates WebClient
      * @param baseAddress baseAddress
      * @param providers list of providers
-     * @param configLocation classpath location of the configuration resource, can be null  
+     * @param configLocation classpath location of the configuration resource, can be null
      * @return WebClient instance
      */
     public static WebClient create(String baseAddress, List<?> providers, String configLocation) {
@@ -180,7 +180,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
         bean.setProviders(providers);
         return bean.createWebClient();
     }
-    
+
     /**
      * Creates WebClient with a list of custom features
      * @param baseAddress baseAddress
@@ -189,8 +189,8 @@ public class WebClient extends AbstractClient implements AsyncClient {
      * @param configLocation classpath location of the configuration resource, can be null
      * @return WebClient instance
      */
-    public static WebClient create(String baseAddress, 
-                                   List<?> providers, 
+    public static WebClient create(String baseAddress,
+                                   List<?> providers,
                                    List<? extends Feature> features,
                                    String configLocation) {
         JAXRSClientFactoryBean bean = getBean(baseAddress, configLocation);
@@ -198,56 +198,56 @@ public class WebClient extends AbstractClient implements AsyncClient {
         bean.setFeatures(features);
         return bean.createWebClient();
     }
-    
+
     /**
      * Creates WebClient
      * @param baseAddress baseAddress
-     * @param configLocation classpath location of the configuration resource, can be null  
+     * @param configLocation classpath location of the configuration resource, can be null
      * @return WebClient instance
      */
     public static WebClient create(String baseAddress, String configLocation) {
         JAXRSClientFactoryBean bean = getBean(baseAddress, configLocation);
-        
+
         return bean.createWebClient();
     }
-    
+
     /**
      * Creates WebClient which will do basic authentication
      * @param baseAddress baseAddress
      * @param username username
      * @param password password
-     * @param configLocation classpath location of the configuration resource, can be null  
+     * @param configLocation classpath location of the configuration resource, can be null
      * @return WebClient instance
      */
-    public static WebClient create(String baseAddress, String username, String password, 
+    public static WebClient create(String baseAddress, String username, String password,
                                          String configLocation) {
         JAXRSClientFactoryBean bean = getBean(baseAddress, configLocation);
-        
+
         bean.setUsername(username);
         bean.setPassword(password);
-        
+
         return bean.createWebClient();
     }
-    
+
     /**
      * Creates WebClient which will do basic authentication
      * @param baseAddress baseAddress
      * @param providers list of providers
      * @param username username
      * @param password password
-     * @param configLocation classpath location of the configuration resource, can be null  
+     * @param configLocation classpath location of the configuration resource, can be null
      * @return WebClient instance
      */
-    public static WebClient create(String baseAddress, List<?> providers, 
+    public static WebClient create(String baseAddress, List<?> providers,
                                    String username, String password, String configLocation) {
         JAXRSClientFactoryBean bean = getBean(baseAddress, configLocation);
-        
+
         bean.setUsername(username);
         bean.setPassword(password);
         bean.setProviders(providers);
         return bean.createWebClient();
     }
-    
+
     /**
      * Creates WebClient, baseURI will be set to Client currentURI
      * @param client existing client
@@ -256,7 +256,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
         Client client = client(object);
         return client == null ? null : fromClient(client, false);
     }
-    
+
     /**
      * Creates WebClient, baseURI will be set to Client currentURI
      * @param client existing client
@@ -264,16 +264,16 @@ public class WebClient extends AbstractClient implements AsyncClient {
     public static WebClient fromClient(Client client) {
         return fromClient(client, false);
     }
-    
+
     /**
      * Creates WebClient, baseURI will be set to Client currentURI
      * @param client existing client
-     * @param inheritHeaders  if existing Client headers can be inherited by new client 
+     * @param inheritHeaders  if existing Client headers can be inherited by new client
      */
     public static WebClient fromClient(Client client, boolean inheritHeaders) {
-        
+
         WebClient webClient = null;
-        
+
         ClientState clientState = getClientState(client);
         if (clientState == null) {
             webClient = create(client.getCurrentURI());
@@ -287,11 +287,11 @@ public class WebClient extends AbstractClient implements AsyncClient {
         copyProperties(webClient, client);
         return webClient;
     }
-    
+
     /**
      * Converts object to Client
      * @param object the object
-     * @return Client object converted to Client 
+     * @return Client object converted to Client
      */
     public static Client client(Object object) {
         if (object instanceof Client) {
@@ -299,21 +299,21 @@ public class WebClient extends AbstractClient implements AsyncClient {
         }
         return null;
     }
-    
+
     /**
      * Retrieves ClientConfiguration
      * @param client proxy or http-centric Client
-     * @return underlying ClientConfiguration instance 
+     * @return underlying ClientConfiguration instance
      */
     public static ClientConfiguration getConfig(Object client) {
         if (client instanceof WebTargetImpl) {
             client = ((WebTargetImpl)client).getWebClient();
         } else if (client instanceof InvocationBuilderImpl) {
             client = ((InvocationBuilderImpl)client).getWebClient();
-        } 
-        
+        }
+
         if (client instanceof Client) {
-            if (client instanceof WebClient) { 
+            if (client instanceof WebClient) {
                 return ((AbstractClient)client).getConfiguration();
             } else if (client instanceof InvocationHandlerAware) {
                 Object handler = ((InvocationHandlerAware)client).getInvocationHandler();
@@ -322,18 +322,18 @@ public class WebClient extends AbstractClient implements AsyncClient {
         }
         throw new IllegalArgumentException("Not a valid Client");
     }
-    
+
     /**
      * Does HTTP invocation
      * @param httpMethod HTTP method
      * @param body request body, can be null
-     * @return JAXRS Response, entity may hold a string representaion of 
+     * @return JAXRS Response, entity may hold a string representaion of
      *         error message if client or server error occured
      */
     public Response invoke(String httpMethod, Object body) {
         return doInvoke(httpMethod, body, null, Response.class, Response.class);
     }
-    
+
     /**
      * Does HTTP POST invocation
      * @param body request body, can be null
@@ -342,7 +342,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
     public Response post(Object body) {
         return invoke(HttpMethod.POST, body);
     }
-    
+
     /**
      * Does HTTP PUT invocation
      * @param body request body, can be null
@@ -393,7 +393,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
         type(MediaType.APPLICATION_FORM_URLENCODED);
         return doInvoke(HttpMethod.POST, values, null, Response.class, Response.class);
     }
-    
+
     /**
      * Posts form data
      * @param form form values
@@ -403,13 +403,13 @@ public class WebClient extends AbstractClient implements AsyncClient {
         type(MediaType.APPLICATION_FORM_URLENCODED);
         return doInvoke(HttpMethod.POST, form.asMap(), null, Response.class, Response.class);
     }
-    
+
     /**
-     * Does HTTP invocation and returns types response object 
-     * @param httpMethod HTTP method 
+     * Does HTTP invocation and returns types response object
+     * @param httpMethod HTTP method
      * @param body request body, can be null
      * @param responseType generic response type
-     * @return typed object, can be null. Response status code and headers 
+     * @return typed object, can be null. Response status code and headers
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T invoke(String httpMethod, Object body, GenericType<T> responseType) {
@@ -418,34 +418,34 @@ public class WebClient extends AbstractClient implements AsyncClient {
         Response r = doInvoke(httpMethod, body, null, responseClass, responseType.getType());
         return castResponse(r, responseClass);
     }
-    
+
     /**
-     * Does HTTP invocation and returns types response object 
-     * @param httpMethod HTTP method 
+     * Does HTTP invocation and returns types response object
+     * @param httpMethod HTTP method
      * @param body request body, can be null
      * @param responseClass expected type of response object
-     * @return typed object, can be null. Response status code and headers 
+     * @return typed object, can be null. Response status code and headers
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T invoke(String httpMethod, Object body, Class<T> responseClass) {
         Response r = doInvoke(httpMethod, body, null, responseClass, responseClass);
         return castResponse(r, responseClass);
     }
-    
+
     /**
-     * Does HTTP invocation and returns types response object 
-     * @param httpMethod HTTP method 
+     * Does HTTP invocation and returns types response object
+     * @param httpMethod HTTP method
      * @param body request body, can be null
      * @param requestClass request body class
      * @param responseClass expected type of response object
-     * @return typed object, can be null. Response status code and headers 
+     * @return typed object, can be null. Response status code and headers
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T invoke(String httpMethod, Object body, Class<?> requestClass, Class<T> responseClass) {
         Response r = doInvoke(httpMethod, body, requestClass, null, responseClass, responseClass);
         return castResponse(r, responseClass);
     }
-    
+
     @SuppressWarnings("unchecked")
     private <T> T castResponse(Response r, Class<T> responseClass) {
         return (T)(responseClass == Response.class ? r : r.getEntity());
@@ -454,83 +454,83 @@ public class WebClient extends AbstractClient implements AsyncClient {
      * Does HTTP POST invocation and returns typed response object
      * @param body request body, can be null
      * @param responseClass expected type of response object
-     * @return typed object, can be null. Response status code and headers 
+     * @return typed object, can be null. Response status code and headers
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T post(Object body, Class<T> responseClass) {
         return invoke(HttpMethod.POST, body, responseClass);
     }
-    
+
     /**
      * Does HTTP POST invocation and returns typed response object
      * @param body request body, can be null
      * @param responseType generic response type
-     * @return typed object, can be null. Response status code and headers 
+     * @return typed object, can be null. Response status code and headers
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T post(Object body, GenericType<T> responseType) {
         return invoke(HttpMethod.POST, body, responseType);
     }
-    
+
     /**
      * Does HTTP Async POST invocation and returns Future.
      * Shortcut for async().post(Entity, InvocationCallback)
-     * @param callback invocation callback 
+     * @param callback invocation callback
      * @return the future
      */
     public <T> Future<T> post(Object body, InvocationCallback<T> callback) {
         return doInvokeAsyncCallback(HttpMethod.POST, body, body.getClass(), null, callback);
     }
-    
+
     /**
      * Does HTTP PUT invocation and returns typed response object
      * @param body request body, can be null
      * @param responseClass expected type of response object
-     * @return typed object, can be null. Response status code and headers 
+     * @return typed object, can be null. Response status code and headers
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T put(Object body, Class<T> responseClass) {
         return invoke(HttpMethod.PUT, body, responseClass);
     }
-    
+
 
     /**
      * Does HTTP PUT invocation and returns typed response object
      * @param body request body, can be null
      * @param responseType generic response type
-     * @return typed object, can be null. Response status code and headers 
+     * @return typed object, can be null. Response status code and headers
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T put(Object body, GenericType<T> responseType) {
         return invoke(HttpMethod.PUT, body, responseType);
     }
-    
+
     /**
      * Does HTTP Async PUT invocation and returns Future.
      * Shortcut for async().put(Entity, InvocationCallback)
-     * @param callback invocation callback 
+     * @param callback invocation callback
      * @return the future
      */
     public <T> Future<T> put(Object body, InvocationCallback<T> callback) {
         return doInvokeAsyncCallback(HttpMethod.PUT, body, body.getClass(), null, callback);
     }
-    
+
     /**
-     * Does HTTP invocation and returns a collection of typed objects 
-     * @param httpMethod HTTP method 
+     * Does HTTP invocation and returns a collection of typed objects
+     * @param httpMethod HTTP method
      * @param body request body, can be null
      * @param memberClass expected type of collection member class
      * @return typed collection
      */
-    public <T> Collection<? extends T> invokeAndGetCollection(String httpMethod, Object body, 
+    public <T> Collection<? extends T> invokeAndGetCollection(String httpMethod, Object body,
                                                     Class<T> memberClass) {
-        Response r = doInvoke(httpMethod, body, null, 
+        Response r = doInvoke(httpMethod, body, null,
                               Collection.class, new ParameterizedCollectionType(memberClass));
         return CastUtils.cast((Collection<?>)r.getEntity(), memberClass);
     }
-    
+
     /**
-     * Posts a collection of typed objects 
+     * Posts a collection of typed objects
      * @param collection request body
      * @param memberClass type of collection member class
      * @return JAX-RS Response
@@ -539,21 +539,21 @@ public class WebClient extends AbstractClient implements AsyncClient {
         return doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType(memberClass),
                         Response.class, Response.class);
     }
-    
+
     /**
-     * Posts a collection of typed objects 
+     * Posts a collection of typed objects
      * @param collection request body
      * @param memberClass type of collection member class
      * @param responseClass expected type of response object
      * @return JAX-RS Response
      */
-    public <T1, T2> T2 postCollection(Object collection, Class<T1> memberClass, 
+    public <T1, T2> T2 postCollection(Object collection, Class<T1> memberClass,
                                             Class<T2> responseClass) {
         Response r = doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType(memberClass),
                               responseClass, responseClass);
         return responseClass.cast(responseClass == Response.class ? r : r.getEntity());
     }
-    
+
     /**
      * Posts collection of typed objects and returns a collection of typed objects
      * @param collection request body
@@ -561,14 +561,14 @@ public class WebClient extends AbstractClient implements AsyncClient {
      * @param responseClass expected type of response object
      * @return JAX-RS Response
      */
-    public <T1, T2> Collection<? extends T2> postAndGetCollection(Object collection, 
-                                                                  Class<T1> memberClass, 
+    public <T1, T2> Collection<? extends T2> postAndGetCollection(Object collection,
+                                                                  Class<T1> memberClass,
                                                                   Class<T2> responseClass) {
-        Response r = doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType(memberClass), 
+        Response r = doInvoke(HttpMethod.POST, collection, new ParameterizedCollectionType(memberClass),
                               Collection.class, new ParameterizedCollectionType(responseClass));
         return CastUtils.cast((Collection<?>)r.getEntity(), responseClass);
     }
-    
+
     /**
      * Posts the object and returns a collection of typed objects
      * @param body request body
@@ -576,15 +576,15 @@ public class WebClient extends AbstractClient implements AsyncClient {
      * @param responseClass expected type of response object
      * @return JAX-RS Response
      */
-    public <T> Collection<? extends T> postObjectGetCollection(Object body, 
+    public <T> Collection<? extends T> postObjectGetCollection(Object body,
                                                                   Class<T> responseClass) {
-        Response r = doInvoke(HttpMethod.POST, body, null, Collection.class, 
+        Response r = doInvoke(HttpMethod.POST, body, null, Collection.class,
                               new ParameterizedCollectionType(responseClass));
         return CastUtils.cast((Collection<?>)r.getEntity(), responseClass);
     }
-        
+
     /**
-     * Posts request body and returns a collection of typed objects 
+     * Posts request body and returns a collection of typed objects
      * @param body request body, can be null
      * @param memberClass expected type of collection member class
      * @return typed collection
@@ -592,9 +592,9 @@ public class WebClient extends AbstractClient implements AsyncClient {
     public <T> Collection<? extends T> postAndGetCollection(Object body, Class<T> memberClass) {
         return invokeAndGetCollection(HttpMethod.POST, body, memberClass);
     }
-    
+
     /**
-     * Does HTTP GET invocation and returns a collection of typed objects 
+     * Does HTTP GET invocation and returns a collection of typed objects
      * @param body request body, can be null
      * @param memberClass expected type of collection member class
      * @return typed collection
@@ -602,39 +602,39 @@ public class WebClient extends AbstractClient implements AsyncClient {
     public <T> Collection<? extends T> getCollection(Class<T> memberClass) {
         return invokeAndGetCollection(HttpMethod.GET, null, memberClass);
     }
-    
+
     /**
      * Does HTTP GET invocation and returns typed response object
      * @param body request body, can be null
      * @param responseClass expected type of response object
-     * @return typed object, can be null. Response status code and headers 
+     * @return typed object, can be null. Response status code and headers
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T get(Class<T> responseClass) {
         return invoke(HttpMethod.GET, null, responseClass);
     }
-    
+
 
     /**
      * Does HTTP GET invocation and returns typed response object
      * @param responseType generic response type
-     * @return typed object, can be null. Response status code and headers 
+     * @return typed object, can be null. Response status code and headers
      *         can be obtained too, see Client.getResponse()
      */
     public <T> T get(GenericType<T> responseType) {
         return invoke(HttpMethod.GET, null, responseType);
     }
-    
+
     /**
      * Does HTTP Async GET invocation and returns Future.
      * Shortcut for async().get(InvocationCallback)
-     * @param callback invocation callback 
+     * @param callback invocation callback
      * @return the future
      */
     public <T> Future<T> get(InvocationCallback<T> callback) {
         return doInvokeAsyncCallback(HttpMethod.GET, null, null, null, callback);
     }
-    
+
     /**
      * Updates the current URI path
      * @param path new relative path segment
@@ -642,10 +642,10 @@ public class WebClient extends AbstractClient implements AsyncClient {
      */
     public WebClient path(Object path) {
         getCurrentBuilder().path(convertParamValue(path, null));
-        
+
         return this;
     }
-    
+
     /**
      * Updates the current URI path with path segment which may contain template variables
      * @param path new relative path segment
@@ -657,12 +657,12 @@ public class WebClient extends AbstractClient implements AsyncClient {
         getState().setTemplates(getTemplateParametersMap(new URITemplate(path), Arrays.asList(values)));
         return path(u.getRawPath());
     }
-    
+
     @Override
     public WebClient query(String name, Object ...values) {
         return (WebClient)super.query(name, values);
     }
-    
+
     /**
      * Updates the current URI matrix parameters
      * @param name matrix name
@@ -673,7 +673,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
         addMatrixQueryParamsToBuilder(getCurrentBuilder(), name, ParameterType.MATRIX, null, values);
         return this;
     }
-    
+
     /**
      * Updates the current URI fragment
      * @param name fragment name
@@ -683,17 +683,17 @@ public class WebClient extends AbstractClient implements AsyncClient {
         getCurrentBuilder().fragment(name);
         return this;
     }
-    
+
     /**
-     * Moves WebClient to a new baseURI or forwards to new currentURI  
+     * Moves WebClient to a new baseURI or forwards to new currentURI
      * @param newAddress new URI
-     * @param forward if true then currentURI will be based on baseURI  
+     * @param forward if true then currentURI will be based on baseURI
      * @return updated WebClient
      */
     public WebClient to(String newAddress, boolean forward) {
         getState().setTemplates(null);
         if (forward) {
-            if (!newAddress.startsWith("/") 
+            if (!newAddress.startsWith("/")
                 && !newAddress.startsWith(getBaseURI().toString())) {
                 throw new IllegalArgumentException("Base address can not be preserved");
             }
@@ -703,10 +703,10 @@ public class WebClient extends AbstractClient implements AsyncClient {
         }
         return this;
     }
-    
+
     /**
      * Goes back
-     * @param fast if true then goes back to baseURI otherwise to a previous path segment 
+     * @param fast if true then goes back to baseURI otherwise to a previous path segment
      * @return updated WebClient
      */
     public WebClient back(boolean fast) {
@@ -723,17 +723,17 @@ public class WebClient extends AbstractClient implements AsyncClient {
             for (int i = 0; i < segments.size() - 1; i++) {
                 getCurrentBuilder().path(HttpUtils.fromPathSegment(segments.get(i)));
             }
-            
+
         }
         return this;
     }
-    
+
     /**
      * Replaces the current path with the new value.
      * @param path new path value. If it starts from "/" then all the current
-     * path starting from the base URI will be replaced, otherwise only the 
+     * path starting from the base URI will be replaced, otherwise only the
      * last path segment will be replaced. Providing a null value is equivalent
-     * to calling back(true)  
+     * to calling back(true)
      * @return updated WebClient
      */
     public WebClient replacePath(String path) {
@@ -743,7 +743,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
         back(path.startsWith("/") ? true : false);
         return path(path);
     }
-    
+
     /**
      * Resets the current query
      * @return updated WebClient
@@ -751,18 +751,18 @@ public class WebClient extends AbstractClient implements AsyncClient {
     public WebClient resetQuery() {
         return replaceQuery(null);
     }
-    
+
     /**
      * Replaces the current query with the new value.
      * @param queryString the new value, providing a null is
-     *        equivalent to calling resetQuery().  
+     *        equivalent to calling resetQuery().
      * @return updated WebClient
      */
     public WebClient replaceQuery(String queryString) {
         getCurrentBuilder().replaceQuery(queryString);
         return this;
     }
-    
+
     /**
      * Replaces the header value with the new values.
      * @param headerName headerValues
@@ -777,105 +777,105 @@ public class WebClient extends AbstractClient implements AsyncClient {
         }
         return this;
     }
-    
+
     /**
      * Replaces the current query with the new value.
      * @param queryString the new value, providing a null is
-     *        equivalent to calling resetQuery().  
+     *        equivalent to calling resetQuery().
      * @return updated WebClient
      */
     public WebClient replaceQueryParam(String queryParam, Object... value) {
         getCurrentBuilder().replaceQueryParam(queryParam, value);
         return this;
     }
-    
+
     @Override
     public WebClient type(MediaType ct) {
         return (WebClient)super.type(ct);
     }
-    
+
     @Override
     public WebClient type(String type) {
         return (WebClient)super.type(type);
     }
-    
+
     @Override
     public WebClient accept(MediaType... types) {
         return (WebClient)super.accept(types);
     }
-    
+
     @Override
     public WebClient accept(String... types) {
         return (WebClient)super.accept(types);
     }
-    
+
     @Override
     public WebClient language(String language) {
         return (WebClient)super.language(language);
     }
-    
+
     @Override
     public WebClient acceptLanguage(String ...languages) {
         return (WebClient)super.acceptLanguage(languages);
     }
-    
+
     @Override
     public WebClient encoding(String encoding) {
         return (WebClient)super.encoding(encoding);
     }
-    
+
     @Override
     public WebClient acceptEncoding(String ...encodings) {
         return (WebClient)super.acceptEncoding(encodings);
     }
-    
+
     @Override
     public WebClient match(EntityTag tag, boolean ifNot) {
         return (WebClient)super.match(tag, ifNot);
     }
-    
+
     @Override
     public WebClient modified(Date date, boolean ifNot) {
         return (WebClient)super.modified(date, ifNot);
     }
-    
+
     @Override
     public WebClient cookie(Cookie cookie) {
         return (WebClient)super.cookie(cookie);
     }
-    
+
     @Override
     public WebClient header(String name, Object... values) {
         return (WebClient)super.header(name, values);
     }
-    
+
     @Override
     public WebClient headers(MultivaluedMap<String, String> map) {
         return (WebClient)super.headers(map);
     }
-    
+
     @Override
     public WebClient reset() {
         //clearTemplates();
         return (WebClient)super.reset();
     }
-    
-    protected Response doInvoke(String httpMethod, 
-                                Object body, 
+
+    protected Response doInvoke(String httpMethod,
+                                Object body,
                                 Type inGenericType,
-                                Class<?> responseClass, 
+                                Class<?> responseClass,
                                 Type outGenericType) {
-        return doInvoke(httpMethod, body, body == null ? null : body.getClass(), inGenericType, 
+        return doInvoke(httpMethod, body, body == null ? null : body.getClass(), inGenericType,
             responseClass, outGenericType);
     }
-    
-    
-    
-    protected Response doInvoke(String httpMethod, 
-                                Object body, 
+
+
+
+    protected Response doInvoke(String httpMethod,
+                                Object body,
                                 Class<?> requestClass,
                                 Type inGenericType,
-                                Class<?> responseClass, 
+                                Class<?> responseClass,
                                 Type outGenericType) {
         Annotation[] inAnns = null;
         if (body instanceof Entity) {
@@ -894,39 +894,39 @@ public class WebClient extends AbstractClient implements AsyncClient {
         }
         MultivaluedMap<String, String> headers = prepareHeaders(responseClass, body);
         resetResponse();
-        Response r = doChainedInvocation(httpMethod, headers, body, requestClass, inGenericType, 
+        Response r = doChainedInvocation(httpMethod, headers, body, requestClass, inGenericType,
                                          inAnns, responseClass, outGenericType, null, null);
         if (r.getStatus() >= 300 && responseClass != Response.class) {
             throw convertToWebApplicationException(r);
         }
         return r;
     }
-    
-    protected <T> Future<T> doInvokeAsyncCallback(String httpMethod, 
-                                                  Object body, 
+
+    protected <T> Future<T> doInvokeAsyncCallback(String httpMethod,
+                                                  Object body,
                                                   Class<?> requestClass,
                                                   Type inType,
                                                   InvocationCallback<T> callback) {
-        
+
         Type outType = getCallbackType(callback);
         Class<?> respClass = getCallbackClass(outType);
         return doInvokeAsync(httpMethod, body, requestClass, inType, respClass, outType, callback);
     }
-    
-    protected <T> Future<T> doInvokeAsync(String httpMethod, 
-                                          Object body, 
+
+    protected <T> Future<T> doInvokeAsync(String httpMethod,
+                                          Object body,
                                           Class<?> requestClass,
                                           Type inType,
                                           Class<?> respClass,
                                           Type outType,
                                           InvocationCallback<T> callback) {
         JaxrsClientCallback<T> cb = new JaxrsClientCallback<T>(callback, respClass, outType);
-        prepareAsyncClient(httpMethod, body, requestClass, inType, respClass, outType, cb);        
+        prepareAsyncClient(httpMethod, body, requestClass, inType, respClass, outType, cb);
         return cb.createFuture();
     }
-    
-    protected <T> CompletionStage<T> doInvokeAsyncStage(String httpMethod, 
-                                          Object body, 
+
+    protected <T> CompletionStage<T> doInvokeAsyncStage(String httpMethod,
+                                          Object body,
                                           Class<?> respClass,
                                           Type outType,
                                           ExecutorService ex) {
@@ -934,9 +934,9 @@ public class WebClient extends AbstractClient implements AsyncClient {
         prepareAsyncClient(httpMethod, body, null, null, respClass, outType, cb);
         return cb.getCompletionStage();
     }
-    
+
     @Override
-    public void prepareAsyncClient(String httpMethod, 
+    public void prepareAsyncClient(String httpMethod,
                                    Object body,
                                    Class<?> requestClass,
                                    Type inType,
@@ -951,42 +951,42 @@ public class WebClient extends AbstractClient implements AsyncClient {
             requestClass = body.getClass();
             inType = body.getClass();
             inAnns = entity.getAnnotations();
-        } 
+        }
         if (body instanceof GenericEntity) {
             GenericEntity<?> genericEntity = (GenericEntity<?>)body;
             body = genericEntity.getEntity();
             requestClass = genericEntity.getRawType();
             inType = genericEntity.getType();
         }
-      
+
         MultivaluedMap<String, String> headers = prepareHeaders(respClass, body);
         resetResponse();
 
-        Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType, 
+        Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType,
                                   inAnns, respClass, outType, null, null);
-      
+
         m.getExchange().setSynchronous(false);
         m.getExchange().put(JaxrsClientCallback.class, cb);
-      
+
         doRunInterceptorChain(m);
     }
 
-    
+
     private MultivaluedMap<String, String> prepareHeaders(Class<?> responseClass, Object body) {
         MultivaluedMap<String, String> headers = getHeaders();
         if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null && body != null) {
-            String contentType = body instanceof Form ? MediaType.APPLICATION_FORM_URLENCODED 
+            String contentType = body instanceof Form ? MediaType.APPLICATION_FORM_URLENCODED
                                      : MediaType.APPLICATION_XML;
             headers.putSingle(HttpHeaders.CONTENT_TYPE, contentType);
         }
-        
-        if (responseClass != null && responseClass != Response.class 
+
+        if (responseClass != null && responseClass != Response.class
             && headers.getFirst(HttpHeaders.ACCEPT) == null) {
             headers.putSingle(HttpHeaders.ACCEPT, MediaType.WILDCARD);
         }
         return headers;
     }
-    
+
     class ClientAsyncResponseInterceptor extends AbstractClientAsyncResponseInterceptor {
         @Override
         protected void doHandleAsyncResponse(Message message, Response r, JaxrsClientCallback<?> cb) {
@@ -1012,17 +1012,17 @@ public class WebClient extends AbstractClient implements AsyncClient {
             }
         }
     }
-    
-    
+
+
 
     //TODO: retry invocation will not work in case of async request failures for the moment
     @Override
-    protected Object retryInvoke(URI newRequestURI, 
+    protected Object retryInvoke(URI newRequestURI,
                                  MultivaluedMap<String, String> headers,
                                  Object body,
-                                 Exchange exchange, 
+                                 Exchange exchange,
                                  Map<String, Object> invContext) throws Throwable {
-        
+
         Map<String, Object> reqContext = CastUtils.cast((Map<?, ?>)invContext.get(REQUEST_CONTEXT));
         String httpMethod = (String)reqContext.get(Message.HTTP_REQUEST_METHOD);
         Class<?> requestClass = (Class<?>)reqContext.get(REQUEST_CLASS);
@@ -1030,21 +1030,21 @@ public class WebClient extends AbstractClient implements AsyncClient {
         Annotation[] inAnns = (Annotation[])reqContext.get(REQUEST_ANNS);
         Class<?> respClass = (Class<?>)reqContext.get(RESPONSE_CLASS);
         Type outType = (Type)reqContext.get(RESPONSE_TYPE);
-        return doChainedInvocation(httpMethod, headers, body, requestClass, inType, 
+        return doChainedInvocation(httpMethod, headers, body, requestClass, inType,
                                    inAnns, respClass, outType, exchange, invContext);
     }
     //CHECKSTYLE:OFF
-    protected Response doChainedInvocation(String httpMethod, 
-                                           MultivaluedMap<String, String> headers, 
-                                           Object body, 
+    protected Response doChainedInvocation(String httpMethod,
+                                           MultivaluedMap<String, String> headers,
+                                           Object body,
                                            Class<?> requestClass,
                                            Type inType,
                                            Annotation[] inAnns,
-                                           Class<?> respClass, 
+                                           Class<?> respClass,
                                            Type outType,
                                            Exchange exchange,
                                            Map<String, Object> invContext) {
-    //CHECKSTYLE:ON    
+    //CHECKSTYLE:ON
         Bus configuredBus = getConfiguration().getBus();
         Bus origBus = BusFactory.getAndSetThreadDefaultBus(configuredBus);
         ClassLoaderHolder origLoader = null;
@@ -1053,7 +1053,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
             if (loader != null) {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
-            Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType, 
+            Message m = finalizeMessage(httpMethod, headers, body, requestClass, inType,
                                         inAnns, respClass, outType, exchange, invContext);
             doRunInterceptorChain(m);
             return doResponse(m, respClass, outType);
@@ -1064,23 +1064,23 @@ public class WebClient extends AbstractClient implements AsyncClient {
             if (origBus != configuredBus) {
                 BusFactory.setThreadDefaultBus(origBus);
             }
-        }    
+        }
     }
-    
+
     //CHECKSTYLE:OFF
-    private Message finalizeMessage(String httpMethod, 
-                                   MultivaluedMap<String, String> headers, 
-                                   Object body, 
+    private Message finalizeMessage(String httpMethod,
+                                   MultivaluedMap<String, String> headers,
+                                   Object body,
                                    Class<?> requestClass,
                                    Type inGenericType,
                                    Annotation[] inAnns,
-                                   Class<?> responseClass, 
+                                   Class<?> responseClass,
                                    Type outGenericType,
                                    Exchange exchange,
                                    Map<String, Object> invContext) {
-   //CHECKSTYLE:ON    
+   //CHECKSTYLE:ON
         URI uri = getCurrentURI();
-        Message m = createMessage(body, httpMethod, headers, uri, exchange, 
+        Message m = createMessage(body, httpMethod, headers, uri, exchange,
                 invContext, false);
         setSupportOnewayResponseProperty(m);
         if (inAnns != null) {
@@ -1093,17 +1093,17 @@ public class WebClient extends AbstractClient implements AsyncClient {
         reqContext.put(REQUEST_ANNS, inAnns);
         reqContext.put(RESPONSE_CLASS, responseClass);
         reqContext.put(RESPONSE_TYPE, outGenericType);
-        
+
         if (body != null) {
             m.put(Type.class, inGenericType);
         }
         m.getInterceptorChain().add(bodyWriter);
-        
+
         setWebClientOperationProperty(m, httpMethod);
-        
+
         return m;
     }
-    
+
     private void setWebClientOperationProperty(Message m, String httpMethod) {
         Object prop = m.getContextualProperty(WEB_CLIENT_OPERATION_REPORTING);
         // Enable the operation reporting by default
@@ -1112,11 +1112,11 @@ public class WebClient extends AbstractClient implements AsyncClient {
             absPathUri.replaceQuery(null);
             setPlainOperationNameProperty(m, httpMethod + ":" + absPathUri.build().toString());
         }
-        
+
     }
 
-    protected Response doResponse(Message m, 
-                                  Class<?> responseClass, 
+    protected Response doResponse(Message m,
+                                  Class<?> responseClass,
                                   Type outGenericType) {
         try {
             Object[] results = preProcessResult(m);
@@ -1124,28 +1124,28 @@ public class WebClient extends AbstractClient implements AsyncClient {
                 return (Response)results[0];
             }
         } catch (Exception ex) {
-            throw ex instanceof WebApplicationException 
-                ? (WebApplicationException)ex 
-                : ex instanceof ProcessingException 
-                ? (ProcessingException)ex : new ProcessingException(ex); 
+            throw ex instanceof WebApplicationException
+                ? (WebApplicationException)ex
+                : ex instanceof ProcessingException
+                ? (ProcessingException)ex : new ProcessingException(ex);
         }
-        
+
         try {
             return handleResponse(m, responseClass, outGenericType);
         } finally {
             completeExchange(m.getExchange(), false);
         }
     }
-    
+
     protected Response handleResponse(Message outMessage, Class<?> responseClass, Type genericType) {
         try {
             ResponseBuilder rb = setResponseBuilder(outMessage, outMessage.getExchange());
             Response currentResponse = rb.clone().build();
             ((ResponseImpl)currentResponse).setOutMessage(outMessage);
-            
+
             Object entity = readBody(currentResponse, outMessage, responseClass, genericType,
                                      new Annotation[]{});
-            
+
             if (entity == null) {
                 int status = currentResponse.getStatus();
                 if (status >= 400) {
@@ -1153,10 +1153,10 @@ public class WebClient extends AbstractClient implements AsyncClient {
                 }
             }
             rb = JAXRSUtils.fromResponse(currentResponse);
-            
-            rb.entity(entity instanceof Response 
+
+            rb.entity(entity instanceof Response
                       ? ((Response)entity).getEntity() : entity);
-            
+
             Response r = rb.build();
             getState().setResponse(r);
             ((ResponseImpl)r).setOutMessage(outMessage);
@@ -1168,16 +1168,16 @@ public class WebClient extends AbstractClient implements AsyncClient {
             ClientProviderFactory.getInstance(outMessage).clearThreadLocalProxies();
         }
     }
-    
-    
+
+
     private class BodyWriter extends AbstractBodyWriter {
 
-        protected void doWriteBody(Message outMessage, 
+        protected void doWriteBody(Message outMessage,
                                    Object body,
                                    Type bodyType,
                                    Annotation[] customAnns,
-                                   OutputStream os) throws Fault {    
-            
+                                   OutputStream os) throws Fault {
+
             Map<String, Object> requestContext = WebClient.this.getRequestContext(outMessage);
             Class<?> requestClass = null;
             Type requestType = null;
@@ -1188,13 +1188,13 @@ public class WebClient extends AbstractClient implements AsyncClient {
             if (bodyType != null) {
                 requestType = bodyType;
             }
-            
+
             Annotation[] anns = customAnns != null ? customAnns : new Annotation[]{};
             boolean isAssignable = requestClass != null && requestClass.isAssignableFrom(body.getClass());
             try {
-                writeBody(body, outMessage, 
+                writeBody(body, outMessage,
                           requestClass == null || !isAssignable ? body.getClass() : requestClass,
-                          requestType == null || !isAssignable ? body.getClass() : requestType, 
+                          requestType == null || !isAssignable ? body.getClass() : requestType,
                           anns, os);
             } catch (Exception ex) {
                 throw new Fault(ex);
@@ -1207,9 +1207,9 @@ public class WebClient extends AbstractClient implements AsyncClient {
         AbstractClient oldClient = toAbstractClient(fromClient);
         newClient.setConfiguration(oldClient.getConfiguration());
     }
-    
+
     private static AbstractClient toAbstractClient(Object client) {
-        
+
         if (client instanceof AbstractClient) {
             return (AbstractClient)client;
         } else if (client instanceof InvocationHandlerAware) {
@@ -1222,10 +1222,10 @@ public class WebClient extends AbstractClient implements AsyncClient {
         }
         return null;
     }
-    
+
     static JAXRSClientFactoryBean getBean(String baseAddress, String configLocation) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        
+
         if (configLocation != null) {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus(configLocation);
@@ -1234,21 +1234,21 @@ public class WebClient extends AbstractClient implements AsyncClient {
         bean.setAddress(baseAddress);
         return bean;
     }
-    
+
     static ClientState getClientState(Client client) {
         AbstractClient newClient = toAbstractClient(client);
-        if (newClient == null) { 
+        if (newClient == null) {
             return null;
         } else  {
             return newClient.getState();
         }
     }
-    
+
     static URI convertStringToURI(String baseAddress) {
         try {
             return URI.create(baseAddress);
         } catch (RuntimeException ex) {
-            // no need to check "https" scheme or indeed ':' 
+            // no need to check "https" scheme or indeed ':'
             // as the relative address will not work as the base address
             if (baseAddress.startsWith(HTTP_SCHEME)) {
                 return new UriBuilderImpl().uriAsTemplate(baseAddress).build();
@@ -1257,17 +1257,17 @@ public class WebClient extends AbstractClient implements AsyncClient {
             }
         }
     }
-    
+
     // Link to JAX-RS 2.0 AsyncInvoker
     public AsyncInvoker async() {
         return new AsyncInvokerImpl(this);
     }
-    
+
     // Link to JAX-RS 2.0 SyncInvoker
     public SyncInvoker sync() {
         return new SyncInvokerImpl(this);
     }
-    
+
     // Link to JAX-RS 2.1 CompletionStageRxInvoker
     public CompletionStageRxInvoker rx() {
         return rx((ExecutorService)null);
@@ -1288,7 +1288,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
         if (CompletionStageRxInvoker.class.isAssignableFrom(rxCls)) {
             return (T)rx(executorService);
         }
-        ClientProviderFactory pf = 
+        ClientProviderFactory pf =
             ClientProviderFactory.getInstance(WebClient.getConfig(this).getEndpoint());
         RxInvokerProvider rxProvider = pf.getRxInvokerProvider();
         if (rxProvider != null && rxProvider.isProviderFor(rxCls)) {
@@ -1296,7 +1296,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
         }
         throw new IllegalStateException("Provider for " + rxCls.getName() + " is not available");
     }
-    
+
     private void setEntityHeaders(Entity<?> entity) {
         type(entity.getMediaType());
         if (entity.getLanguage() != null) {
@@ -1306,5 +1306,5 @@ public class WebClient extends AbstractClient implements AsyncClient {
             encoding(entity.getEncoding());
         }
     }
-    
+
 }

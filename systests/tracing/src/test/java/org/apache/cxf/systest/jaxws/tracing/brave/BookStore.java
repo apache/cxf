@@ -36,20 +36,20 @@ import zipkin.Constants;
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.tracing.BookStoreService", serviceName = "BookStore")
 public class BookStore implements BookStoreService {
     private final Brave brave;
-    
+
     public BookStore() {
         brave = new Brave.Builder("book-store")
             .reporter(new TestSpanReporter())
             .build();
     }
-    
+
     @WebMethod
     public Collection< Book > getBooks() {
         try {
             brave
                 .localTracer()
                 .startNewSpan(Constants.LOCAL_COMPONENT, "Get Books");
-            
+
             return Arrays.asList(
                     new Book("Apache CXF in Action", UUID.randomUUID().toString()),
                     new Book("Mastering Apache CXF", UUID.randomUUID().toString())
@@ -60,7 +60,7 @@ public class BookStore implements BookStoreService {
                 .finishSpan();
         }
     }
-    
+
     @WebMethod
     public int removeBooks() {
         throw new RuntimeException("Unable to remove books");

@@ -29,10 +29,10 @@ import org.apache.cxf.phase.Phase;
  */
 public class SimpleThrottlingManager extends ThrottleResponse implements ThrottlingManager {
     private static final String THROTTLED_KEY = "THROTTLED";
-        
+
     private int threshold;
     private ThrottlingCounter counter = new ThrottlingCounter();
-    
+
     @Override
     public List<String> getDecisionPhases() {
         return Collections.singletonList(Phase.PRE_STREAM);

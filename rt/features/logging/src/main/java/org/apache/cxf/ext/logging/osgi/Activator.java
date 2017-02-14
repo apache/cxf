@@ -48,7 +48,7 @@ public class Activator implements BundleActivator {
     public void stop(BundleContext context) throws Exception {
 
     }
-    
+
     private static final class ConfigUpdater implements ManagedService {
         private BundleContext bundleContext;
         private ServiceRegistration serviceReg;
@@ -84,7 +84,7 @@ public class Activator implements BundleActivator {
                 properties.put("org.apache.cxf.dosgi.IntentName", "logging");
                 bundleContext.registerService(AbstractFeature.class.getName(), logging, properties);
             }
-            
+
             if (enabled) {
                 if (serviceReg == null) {
                     Dictionary<String, Object> properties = new Hashtable<>();
@@ -98,7 +98,7 @@ public class Activator implements BundleActivator {
                 }
             }
         }
-        
+
         @SuppressWarnings("rawtypes")
         private String getValue(Dictionary config, String key, String defaultValue) {
             if (config == null) {

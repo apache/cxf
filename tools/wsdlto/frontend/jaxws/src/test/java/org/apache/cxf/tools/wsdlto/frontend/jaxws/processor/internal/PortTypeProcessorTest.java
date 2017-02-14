@@ -24,7 +24,7 @@ import org.junit.Test;
 
 
 public class PortTypeProcessorTest extends Assert {
-    
+
     @Test
     public void testProcess() throws Exception {
     }

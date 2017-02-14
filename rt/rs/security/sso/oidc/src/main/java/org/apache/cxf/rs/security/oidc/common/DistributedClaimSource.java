@@ -21,7 +21,7 @@ package org.apache.cxf.rs.security.oidc.common;
 public class DistributedClaimSource {
     private String endpoint;
     private String accessToken;
-    
+
     public String getEndpoint() {
         return endpoint;
     }
@@ -37,5 +37,5 @@ public class DistributedClaimSource {
     public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
-    
+
 }

@@ -36,46 +36,46 @@ import org.junit.Test;
 
 public class ServerProviderFactoryTest extends Assert {
 
-    
+
     @Before
     public void setUp() {
         ServerProviderFactory.getInstance().clearProviders();
         AbstractResourceInfo.clearAllMaps();
     }
-    
-    
+
+
     @Test
     public void testCustomWadlHandler() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
         assertEquals(1, pf.getPreMatchContainerRequestFilters().size());
         assertTrue(pf.getPreMatchContainerRequestFilters().get(0).getProvider() instanceof WadlGenerator);
-        
+
         WadlGenerator wg = new WadlGenerator();
         pf.setUserProviders(Collections.singletonList(wg));
         assertEquals(1, pf.getPreMatchContainerRequestFilters().size());
         assertTrue(pf.getPreMatchContainerRequestFilters().get(0).getProvider() instanceof WadlGenerator);
         assertSame(wg, pf.getPreMatchContainerRequestFilters().get(0).getProvider());
     }
-    
+
     @Test
     public void testCustomTestHandler() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
         assertEquals(1, pf.getPreMatchContainerRequestFilters().size());
         assertTrue(pf.getPreMatchContainerRequestFilters().get(0).getProvider() instanceof WadlGenerator);
-        
+
         TestHandler th = new TestHandler();
         pf.setUserProviders(Collections.singletonList(th));
         assertEquals(2, pf.getPreMatchContainerRequestFilters().size());
         assertTrue(pf.getPreMatchContainerRequestFilters().get(0).getProvider() instanceof WadlGenerator);
         assertSame(th, pf.getPreMatchContainerRequestFilters().get(1).getProvider());
     }
-    
+
     @Test
     public void testCustomTestAndWadlHandler() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
         assertEquals(1, pf.getPreMatchContainerRequestFilters().size());
         assertTrue(pf.getPreMatchContainerRequestFilters().get(0).getProvider() instanceof WadlGenerator);
-        
+
         List<Object> providers = new ArrayList<>();
         WadlGenerator wg = new WadlGenerator();
         providers.add(wg);
@@ -86,7 +86,7 @@ public class ServerProviderFactoryTest extends Assert {
         assertSame(wg, pf.getPreMatchContainerRequestFilters().get(0).getProvider());
         assertSame(th, pf.getPreMatchContainerRequestFilters().get(1).getProvider());
     }
-    
+
     @PreMatching
     private static class TestHandler implements ContainerRequestFilter {
 
@@ -94,8 +94,8 @@ public class ServerProviderFactoryTest extends Assert {
         public void filter(ContainerRequestContext context) {
             // complete
         }
-        
+
     }
-    
-    
+
+
 }

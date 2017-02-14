@@ -32,11 +32,11 @@ public class TestDispatchFeature extends AbstractFeature {
     private static final TestInInterceptor IN = new TestInInterceptor();
     private static final TestOutInterceptor OUT = new TestOutInterceptor();
     private static int count;
-    
+
     TestDispatchFeature() {
         ++count;
     }
-    
+
     public static int getCount() {
         return count;
     }
@@ -71,7 +71,7 @@ public class TestDispatchFeature extends AbstractFeature {
             super(Phase.SEND);
         }
         public void handleMessage(Message message) throws Fault {
-            ++count;            
+            ++count;
         }
     }
 }

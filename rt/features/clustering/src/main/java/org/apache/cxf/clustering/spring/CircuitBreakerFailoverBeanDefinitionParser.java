@@ -30,7 +30,7 @@ public class CircuitBreakerFailoverBeanDefinitionParser extends AbstractBeanDefi
     protected Class<?> getBeanClass(Element element) {
         return CircuitBreakerFailoverFeature.class;
     }
- 
+
     @Override
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element e, String name) {
         setFirstChildAsProperty(e, ctx, bean, name);

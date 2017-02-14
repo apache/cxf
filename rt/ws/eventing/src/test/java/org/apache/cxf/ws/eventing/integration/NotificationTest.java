@@ -49,7 +49,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class NotificationTest extends SimpleEventingIntegrationTest {
-    
+
     static final String NOTIFICATION_TEST_PORT = allocatePort(NotificationTest.class);
 
     @Test
@@ -98,7 +98,7 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
                 + TestingEventSinkImpl.RECEIVED_FIRES.get());
         }
     }
-    
+
     @Test
     public void basicReceptionOfWrappedEvents() throws IOException {
         NotificatorService service = createNotificatorService();
@@ -200,11 +200,11 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
 
         EndpointReferenceType eventSinkERT = new EndpointReferenceType();
 
-        JAXBElement<String> idqn 
+        JAXBElement<String> idqn
             = new JAXBElement<String>(new QName("http://www.example.org", "MyReferenceParameter"),
                 String.class,
                 "380");
-        JAXBElement<String> idqn2 
+        JAXBElement<String> idqn2
             = new JAXBElement<String>(new QName("http://www.example.org", "MyReferenceParameter2"),
                 String.class,
                 "381");
@@ -266,7 +266,7 @@ public class NotificationTest extends SimpleEventingIntegrationTest {
         eventSinkERT.setAddress(eventSinkAddr);
         subscribe.setDelivery(new DeliveryType());
         subscribe.getDelivery().getContent().add(new ObjectFactory().createNotifyTo(eventSinkERT));
-        
+
         subscribe.setFilter(new FilterType());
         subscribe.getFilter().getContent().add("//*[local-name()='fire' and "
                 + "namespace-uri()='http://www.events.com']/location[text()='Canada']");

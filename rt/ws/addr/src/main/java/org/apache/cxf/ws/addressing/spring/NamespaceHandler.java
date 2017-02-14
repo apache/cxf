@@ -22,6 +22,6 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 public class NamespaceHandler extends NamespaceHandlerSupport {
     public void init() {
-        registerBeanDefinitionParser("addressing", new AddressingBeanDefinitionParser());        
+        registerBeanDefinitionParser("addressing", new AddressingBeanDefinitionParser());
     }
 }

@@ -24,15 +24,15 @@ import javax.jws.WebService;
 import org.apache.hello_world_rpclit.GreeterRPCLit;
 import org.apache.hello_world_rpclit.types.MyComplexStruct;
 
-@WebService(name = "GreeterRPCLit", serviceName = "SOAPServiceRPCLit", 
+@WebService(name = "GreeterRPCLit", serviceName = "SOAPServiceRPCLit",
                 portName = "SoapPortRPCLit",
                 targetNamespace = "http://apache.org/hello_world_rpclit",
                 endpointInterface = "org.apache.hello_world_rpclit.GreeterRPCLit",
                 wsdlLocation = "testutils/hello_world_rpc_lit.wsdl")
-                
+
 public class RPCLitGreeterImpl implements GreeterRPCLit {
 
-    
+
 
     public String greetMe(String me) {
         //System.out.println("Executing operation greetMe");

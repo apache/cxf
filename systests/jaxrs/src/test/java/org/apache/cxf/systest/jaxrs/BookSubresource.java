@@ -37,21 +37,21 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 public interface BookSubresource {
-    
+
     @GET
     @Path("/subresource")
     @Produces("application/xml")
     Book getTheBook() throws BookNotFoundFault;
-    
+
     @GET
     @Path("/subresource")
     @Produces("application/xml")
     Book getTheBookWithContext(@Context UriInfo ui) throws BookNotFoundFault;
-    
+
     @GET
     @Path("/subresource/noproduces")
     Book getTheBookNoProduces() throws BookNotFoundFault;
-    
+
     @POST
     @Path("/subresource2/{n1:.*}")
     @Consumes("text/plain")
@@ -63,13 +63,13 @@ public interface BookSubresource {
                      @HeaderParam("N4") String name4,
                      @CookieParam("n5") String name5,
                      String name6) throws BookNotFoundFault;
-    
+
     @POST
     @Path("/subresource3")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     Book getTheBook3(@FormParam("id") String id,
                      @FormParam("name") List<String> nameParts) throws BookNotFoundFault;
-    
+
     @POST
     @Path("/subresource4/{id}/{name}")
     @Produces("application/xml")
@@ -78,23 +78,23 @@ public interface BookSubresource {
                      @QueryParam("") Book bookQuery,
                      @MatrixParam("") Book matrixBook,
                      @FormParam("") Book formBook) throws BookNotFoundFault;
-    
+
     @POST
     @Path("/subresource5/{id}/{name}")
     @Produces("application/xml")
     @Consumes("application/xml")
     Book getTheBook5(@PathParam("name") String name,
                      @PathParam("id") long id) throws BookNotFoundFault;
-    
+
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("application/xml")
     OrderBean addOrder(@FormParam("") OrderBean order);
-    
+
     @GET
     @Path("/thebook5")
     @Produces("application/xml")
     BookBean getTheBookQueryBean(@QueryParam("") BookBean book) throws BookNotFoundFault;
-    
+
 }
 

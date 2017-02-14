@@ -29,17 +29,17 @@ import org.apache.cxf.ws.transfer.shared.faults.InvalidRepresentation;
 public class MyResourceResolver implements ResourceResolver {
 
     protected String studentURL;
-    
+
     protected ResourceManager studentManager;
-    
+
     protected String teachersURL;
-    
+
     public MyResourceResolver(String studentURL, ResourceManager studentManager, String teachersURL) {
         this.studentURL = studentURL;
         this.studentManager = studentManager;
         this.teachersURL = teachersURL;
     }
-    
+
     @Override
     public ResourceReference resolve(Create body) {
         Element representationEl = (Element) body.getRepresentation().getAny();
@@ -51,5 +51,5 @@ public class MyResourceResolver implements ResourceResolver {
             throw new InvalidRepresentation();
         }
     }
-    
+
 }

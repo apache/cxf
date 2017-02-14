@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class ModCountCopyOnWriteArrayList<T> extends CopyOnWriteArrayList<T> {
     private static final long serialVersionUID = 1783937035760941219L;
     private AtomicInteger modCount = new AtomicInteger();
-    
+
     public ModCountCopyOnWriteArrayList() {
         super();
     }
@@ -36,15 +36,15 @@ public final class ModCountCopyOnWriteArrayList<T> extends CopyOnWriteArrayList<
             modCount.set(((ModCountCopyOnWriteArrayList<?>)c).getModCount());
         }
     }
-    
+
     public int getModCount() {
         return modCount.get();
     }
-    
+
     public void setModCount(int i) {
         modCount.set(i);
     }
-    
+
     @Override
     public void add(int index, T element) {
         super.add(index, element);
@@ -137,14 +137,14 @@ public final class ModCountCopyOnWriteArrayList<T> extends CopyOnWriteArrayList<
         }
         return false;
     }
-    
+
     public int hashCode() {
         return super.hashCode() + modCount.get();
     }
-    
+
     public boolean equals(Object o) {
         if (o instanceof ModCountCopyOnWriteArrayList) {
-            return super.equals(o) && modCount.get() 
+            return super.equals(o) && modCount.get()
                 == ((ModCountCopyOnWriteArrayList<?>)o).getModCount();
         }
         return false;

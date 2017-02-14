@@ -36,7 +36,7 @@ import zipkin.Span;
 import zipkin.reporter.Reporter;
 
 public class BraveTraceTest {
-    
+
     private static final String ADDRESS = "http://localhost:8182";
     private Server server;
     private BraveFeature logging;
@@ -61,12 +61,12 @@ public class BraveTraceTest {
         Assert.assertEquals(2, localReporter.spans.size());
 
     }
-    
+
     @After
     public void stopServer() {
         server.destroy();
     }
-    
+
     private static Server createServer(Feature logging) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setAddress(ADDRESS);
@@ -74,7 +74,7 @@ public class BraveTraceTest {
         factory.setFeatures(Arrays.asList(logging));
         return factory.create();
     }
-    
+
     private static MyService createProxy(Feature trace) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(MyService.class);
@@ -87,12 +87,12 @@ public class BraveTraceTest {
         Brave brave = new Brave.Builder("myservice").reporter(reporter).build();
         return new BraveFeature(brave);
     }
-    
+
     private static BraveClientFeature createClientLoggingFeature(Reporter<Span> reporter) {
         Brave brave = new Brave.Builder("myservice").reporter(reporter).build();
         return new BraveClientFeature(brave);
     }
-    
+
     static final class Localreporter implements Reporter<Span> {
         List<Span> spans = new ArrayList<>();
 
@@ -100,7 +100,7 @@ public class BraveTraceTest {
         public void report(Span span) {
             spans.add(span);
         }
-        
+
     }
 
 }

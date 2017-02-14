@@ -55,15 +55,15 @@ import org.apache.xml.security.keys.content.X509Data;
  * DOM Element). The cert must be known (or trusted) by the STS crypto object.
  */
 public class X509TokenValidator implements TokenValidator {
-    
+
     public static final String X509_V3_TYPE = WSConstants.X509TOKEN_NS + "#X509v3";
-    
+
     public static final String BASE64_ENCODING = WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(X509TokenValidator.class);
-    
+
     private Validator validator = new SignatureTrustValidator();
-    
+
     private CertConstraintsParser certConstraints = new CertConstraintsParser();
 
     /**
@@ -73,7 +73,7 @@ public class X509TokenValidator implements TokenValidator {
     public void setSubjectConstraints(List<String> subjectConstraints) {
         certConstraints.setSubjectConstraints(subjectConstraints);
     }
-    
+
     /**
      * Set the WSS4J Validator instance to use to validate the token.
      * @param validator the WSS4J Validator instance to use to validate the token
@@ -81,7 +81,7 @@ public class X509TokenValidator implements TokenValidator {
     public void setValidator(Validator validator) {
         this.validator = validator;
     }
-    
+
     /**
      * Return true if this TokenValidator implementation is capable of validating the
      * ReceivedToken argument.
@@ -89,7 +89,7 @@ public class X509TokenValidator implements TokenValidator {
     public boolean canHandleToken(ReceivedToken validateTarget) {
         return canHandleToken(validateTarget, null);
     }
-    
+
     /**
      * Return true if this TokenValidator implementation is capable of validating the
      * ReceivedToken argument. The realm is ignored in this token Validator.
@@ -106,7 +106,7 @@ public class X509TokenValidator implements TokenValidator {
         }
         return false;
     }
-    
+
     /**
      * Validate a Token using the given TokenValidatorParameters.
      */
@@ -127,18 +127,18 @@ public class X509TokenValidator implements TokenValidator {
         ReceivedToken validateTarget = tokenParameters.getToken();
         validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
-        
+
         BinarySecurity binarySecurity = null;
         if (validateTarget.isBinarySecurityToken()) {
             BinarySecurityTokenType binarySecurityType = (BinarySecurityTokenType)validateTarget.getToken();
-    
+
             // Test the encoding type
             String encodingType = binarySecurityType.getEncodingType();
             if (!BASE64_ENCODING.equals(encodingType)) {
                 LOG.fine("Bad encoding type attribute specified: " + encodingType);
                 return response;
             }
-            
+
             //
             // Turn the received JAXB object into a DOM element
             //
@@ -147,7 +147,7 @@ public class X509TokenValidator implements TokenValidator {
             binarySecurity.setEncodingType(encodingType);
             binarySecurity.setValueType(binarySecurityType.getValueType());
             String data = binarySecurityType.getValue();
-            
+
             Node textNode = doc.createTextNode(data);
             binarySecurity.getElement().appendChild(textNode);
         } else if (validateTarget.isDOMElement()) {
@@ -195,5 +195,5 @@ public class X509TokenValidator implements TokenValidator {
         }
         return response;
     }
-    
+
 }

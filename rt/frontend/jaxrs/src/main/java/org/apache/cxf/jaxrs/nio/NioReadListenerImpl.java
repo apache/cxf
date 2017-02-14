@@ -36,14 +36,14 @@ public final class NioReadListenerImpl implements ReadListener {
         this.entity = entity;
         this.in = new DelegatingNioInputStream(in);
     }
-    
+
     @Override
     public void onError(Throwable t) {
         try {
             entity.getError().error(t);
         } catch (final Throwable ex) {
             LOG.warning("NIO NioReadListener error: " + ExceptionUtils.getStackTrace(ex));
-        } 
+        }
     }
 
     @Override

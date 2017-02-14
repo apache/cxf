@@ -63,7 +63,7 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
         rmOut.setBus(bus);
         rmCaptureOut.setBus(bus);
         rmDelivery.setBus(bus);
-        
+
         getInInterceptors().add(rmIn);
         getInInterceptors().add(rmInSoap);
         getInInterceptors().add(rmDelivery);

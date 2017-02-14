@@ -57,10 +57,10 @@ public class AtmosphereSseServletDestination extends ServletDestination {
 
     private AtmosphereFramework framework;
 
-    public AtmosphereSseServletDestination(Bus bus, DestinationRegistry registry, 
+    public AtmosphereSseServletDestination(Bus bus, DestinationRegistry registry,
             EndpointInfo ei, String path) throws IOException {
         super(bus, registry, ei, path);
-        
+
         framework = new AtmosphereFramework(true, false);
         framework.interceptor(new SseAtmosphereInterceptor());
         framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
@@ -70,7 +70,7 @@ public class AtmosphereSseServletDestination extends ServletDestination {
         framework.setBroadcasterCacheClassName(UUIDBroadcasterCache.class.getName());
         framework.addAtmosphereHandler("/", new DestinationHandler());
         framework.init();
-        
+
         bus.getFeatures().add(new SseFeature());
     }
 
@@ -83,7 +83,7 @@ public class AtmosphereSseServletDestination extends ServletDestination {
             throw new IOException(e);
         }
     }
-    
+
     @Override
     public void shutdown() {
         try {
@@ -107,7 +107,7 @@ public class AtmosphereSseServletDestination extends ServletDestination {
             }
         }
     }
-    
+
     @Override
     protected OutputStream flushHeaders(Message outMessage, boolean getStream) throws IOException {
         adjustContentLength(outMessage);
@@ -119,17 +119,17 @@ public class AtmosphereSseServletDestination extends ServletDestination {
         adjustContentLength(outMessage);
         return super.flushHeaders(outMessage);
     }
-    
+
     /**
-     * It has been noticed that Jetty checks the "Content-Length" header and completes the 
+     * It has been noticed that Jetty checks the "Content-Length" header and completes the
      * response if its value is 0 (or matches the number of bytes written). However, in case
-     * of SSE the content length is unknown so we are setting it to -1 before flushing the 
+     * of SSE the content length is unknown so we are setting it to -1 before flushing the
      * response. Otherwise, only the first event is going to be sent and response is going to
      * be closed.
      */
     private void adjustContentLength(Message outMessage) {
         final String contentType = (String)outMessage.get(Message.CONTENT_TYPE);
-        
+
         if (MediaType.SERVER_SENT_EVENTS.equalsIgnoreCase(contentType)) {
             final Map<String, List<String>> headers = Headers.getSetProtocolHeaders(outMessage);
             headers.put(HttpHeaders.CONTENT_LENGTH, Collections.singletonList("-1"));

@@ -37,21 +37,21 @@ public class JaxRsWebClientConfiguration extends AbstractJaxRsClientConfiguratio
 
     @Value("${cxf.jaxrs.client.classes-scan-packages:}")
     private String scanPackages;
-    
+
     @Bean
     protected Client jaxRsWebClient() {
         return super.createClient();
     }
-    
+
     @Override
     protected void setJaxrsResources(JAXRSClientFactoryBean factory) {
         factory.setServiceClass(WebClient.class);
-        
+
         if (!StringUtils.isEmpty(scanPackages)) {
             try {
-                final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes = 
+                final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
                     ClasspathScanner.findClasses(scanPackages, Provider.class);
-                
+
                 factory.setProviders(
                     JAXRSClientFactoryBeanDefinitionParser.getProviders(context, classes.get(Provider.class)));
             } catch (Exception ex) {
@@ -60,5 +60,5 @@ public class JaxRsWebClientConfiguration extends AbstractJaxRsClientConfiguratio
         }
     }
 
-    
+
 }

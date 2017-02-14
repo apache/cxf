@@ -82,7 +82,7 @@ public class TokenRequestController {
             OAuthAccessor accessor = new OAuthAccessor(consumer);
             accessor.requestToken = oauthToken;
             accessor.tokenSecret = Common.findCookieValue(request, "tokenSec");
-            
+
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, oAuthParams.getSignatureMethod());
             parameters.put(OAuth.OAUTH_NONCE, UUID.randomUUID().toString());

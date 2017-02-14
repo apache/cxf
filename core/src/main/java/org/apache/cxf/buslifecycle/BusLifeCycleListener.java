@@ -35,7 +35,7 @@ public interface BusLifeCycleListener {
      *
      */
     void initComplete();
-    
+
     /**
      * Invoked before the <code>Bus</code> is shutdown.
      *

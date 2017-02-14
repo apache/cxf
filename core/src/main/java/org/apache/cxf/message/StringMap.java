@@ -22,7 +22,7 @@ package org.apache.cxf.message;
 import java.util.Map;
 
 public interface StringMap extends Map<String, Object> {
-    
+
     /**
      * Convenience method for storing/retrieving typed objects from the map.
      * equivalent to:  (T)get(key.getName());
@@ -30,7 +30,7 @@ public interface StringMap extends Map<String, Object> {
      * @return the value
      */
     <T> T get(Class<T> key);
-    
+
     /**
      * Convenience method for storing/retrieving typed objects from the map.
      * equivalent to:  put(key.getName(), value);

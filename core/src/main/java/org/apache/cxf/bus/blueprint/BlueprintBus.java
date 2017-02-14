@@ -31,23 +31,23 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 
 /**
- * 
+ *
  */
 public class BlueprintBus extends ExtensionManagerBus {
     BundleContext context;
     BlueprintContainer container;
-    
+
     public BlueprintBus() {
         // Using the BlueprintBus Classloader to load the extensions
         super(null, null, BlueprintBus.class.getClassLoader());
     }
-    
+
     public void setBundleContext(final BundleContext c) {
         context = c;
         ClassLoader bundleClassLoader =
             AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
                 public ClassLoader run() {
-                    return new BundleDelegatingClassLoader(c.getBundle(), 
+                    return new BundleDelegatingClassLoader(c.getBundle(),
                                                            this.getClass().getClassLoader());
                 }
             });
@@ -69,7 +69,7 @@ public class BlueprintBus extends ExtensionManagerBus {
             if (context == null) {
                 id = super.getId();
             } else {
-                id = context.getBundle().getSymbolicName() + "-" 
+                id = context.getBundle().getSymbolicName() + "-"
                     + DEFAULT_BUS_ID + Integer.toString(this.hashCode());
             }
         }

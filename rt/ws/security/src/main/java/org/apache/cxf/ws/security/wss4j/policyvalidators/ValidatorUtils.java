@@ -35,22 +35,22 @@ import org.apache.wss4j.policy.SP12Constants;
  * Configure the Validators
  */
 public final class ValidatorUtils {
-    
+
     // The default security policy validators
     private static final Map<QName, SecurityPolicyValidator> DEFAULT_SECURITY_POLICY_VALIDATORS =
         new HashMap<>();
-    
+
     static {
         configureTokenValidators();
         configureBindingValidators();
         configureSupportingTokenValidators();
         configurePartsValidators();
     }
-    
+
     private ValidatorUtils() {
         // complete
     }
-    
+
     private static void configureTokenValidators() {
         SecurityPolicyValidator validator = new X509TokenPolicyValidator();
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.X509_TOKEN, validator);
@@ -74,7 +74,7 @@ public final class ValidatorUtils {
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.KERBEROS_TOKEN, validator);
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.KERBEROS_TOKEN, validator);
     }
-    
+
     private static void configureBindingValidators() {
         SecurityPolicyValidator validator = new TransportBindingPolicyValidator();
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.TRANSPORT_BINDING, validator);
@@ -92,7 +92,7 @@ public final class ValidatorUtils {
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.LAYOUT, validator);
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.LAYOUT, validator);
     }
-    
+
     private static void configureSupportingTokenValidators() {
         SecurityPolicyValidator validator = new ConcreteSupportingTokenPolicyValidator();
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.SUPPORTING_TOKENS, validator);
@@ -115,7 +115,7 @@ public final class ValidatorUtils {
         validator = new SignedEndorsingEncryptedTokenPolicyValidator();
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS, validator);
     }
-    
+
     private static void configurePartsValidators() {
         SecurityPolicyValidator validator = new SecuredPartsPolicyValidator();
         ((SecuredPartsPolicyValidator)validator).setCoverageType(CoverageType.SIGNED);
@@ -146,17 +146,17 @@ public final class ValidatorUtils {
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP12Constants.REQUIRED_ELEMENTS, validator);
         DEFAULT_SECURITY_POLICY_VALIDATORS.put(SP11Constants.REQUIRED_ELEMENTS, validator);
     }
-    
+
     public static Map<QName, SecurityPolicyValidator> getSecurityPolicyValidators(Message message) {
-        Map<QName, SecurityPolicyValidator> mapToReturn = new HashMap<>(DEFAULT_SECURITY_POLICY_VALIDATORS); 
-        Map<QName, SecurityPolicyValidator> policyMap = 
+        Map<QName, SecurityPolicyValidator> mapToReturn = new HashMap<>(DEFAULT_SECURITY_POLICY_VALIDATORS);
+        Map<QName, SecurityPolicyValidator> policyMap =
             CastUtils.cast((Map<?, ?>)message.getContextualProperty(SecurityConstants.POLICY_VALIDATOR_MAP));
-        
+
         // Allow overriding the default policies
         if (policyMap != null && !policyMap.isEmpty()) {
             mapToReturn.putAll(policyMap);
         }
-        
+
         return mapToReturn;
     }
 }

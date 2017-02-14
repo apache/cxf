@@ -39,7 +39,7 @@ public class WebMethodAnnotator implements Annotator {
         }
         String operationName = method.getOperationName();
         JAnnotation methodAnnotation = new JAnnotation(WebMethod.class);
-        
+
         if (!method.getName().equals(operationName)) {
             methodAnnotation.addElement(new JAnnotationElement("operationName", operationName));
         }

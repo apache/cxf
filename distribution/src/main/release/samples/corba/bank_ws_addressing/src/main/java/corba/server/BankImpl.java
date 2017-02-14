@@ -30,11 +30,11 @@ import corba.common.BankPOA;
 
 
 public class BankImpl extends BankPOA {
-    
+
     private POA poa_;
 
     private Map<String, Account> accountList;
-    
+
     BankImpl(POA poa) {
         poa_ = poa;
 
@@ -45,12 +45,12 @@ public class BankImpl extends BankPOA {
         if (accountList.containsKey(accountName)) {
             return accountList.get(accountName);
         }
-        
+
         System.out.println("[Bank] Called create_account( " + accountName + " )...");
-        System.out.println();        
+        System.out.println();
         AccountImpl accountImpl = new AccountImpl(poa_);
         String name = "Account-" + accountName;
-        byte[] oid = name.getBytes();       
+        byte[] oid = name.getBytes();
         try {
             poa_.activate_object_with_id(oid, accountImpl);
         } catch (Exception ex) {
@@ -73,7 +73,7 @@ public class BankImpl extends BankPOA {
 
         AccountImpl accountImpl = new AccountImpl(poa_);
         String name = "Account-" + accountName;
-        byte[] oid = name.getBytes();       
+        byte[] oid = name.getBytes();
         try {
             poa_.activate_object_with_id(oid, accountImpl);
         } catch (Exception ex) {
@@ -117,7 +117,7 @@ public class BankImpl extends BankPOA {
         System.out.println();
         accountList.remove(accountName);
     }
-    
+
     public POA _default_POA() {
         return poa_;
     }

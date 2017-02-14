@@ -24,20 +24,20 @@ public class Subject {
     private String name;
     private String spQualifier;
     private String spId;
-    
+
     public Subject() {
-        
+
     }
-    
+
     public Subject(String name) {
         this.name = name;
     }
-    
+
     public Subject(String nameFormat, String name) {
         this.nameFormat = nameFormat;
         this.name = name;
     }
-    
+
     public void setNameFormat(String nameFormat) {
         this.nameFormat = nameFormat;
     }

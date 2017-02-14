@@ -44,7 +44,7 @@ public final class FaultBeanGenerator extends BeanGenerator {
             return pkg;
         }
     }
-    
+
     protected Collection<JavaClass> generateBeanClasses(final ServiceInfo serviceInfo) {
         Set<Class<?>> exceptionClasses = new HashSet<Class<?>>();
         String seiPackageName = null;
@@ -72,8 +72,8 @@ public final class FaultBeanGenerator extends BeanGenerator {
         for (int i = 0; i < exceptionClasses.length; i++) {
             boolean exclude = false;
             Class<?> exClazz = exceptionClasses[i];
-            
-            if (exClazz.equals(Exception.class) 
+
+            if (exClazz.equals(Exception.class)
                 || Fault.class.isAssignableFrom(exClazz)
                 || exClazz.equals(RuntimeException.class)
                 || exClazz.equals(Throwable.class)

@@ -69,9 +69,9 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             byte[] headerBytes = StringUtils.toBytesUTF8(writer.toJson(headers));
             Base64UrlUtility.encodeAndStream(headerBytes, 0, headerBytes.length, jwsStream);
             jwsStream.write(new byte[]{'.'});
-            
+
             Base64UrlOutputStream base64Stream = null;
-            if (encodePayload) {           
+            if (encodePayload) {
                 base64Stream = new Base64UrlOutputStream(jwsStream);
                 ctx.setOutputStream(base64Stream);
             } else {
@@ -84,7 +84,7 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             }
             jwsStream.flush();
         } else {
-            CachedOutputStream cos = new CachedOutputStream(); 
+            CachedOutputStream cos = new CachedOutputStream();
             ctx.setOutputStream(cos);
             ctx.proceed();
             JwsCompactProducer p = new JwsCompactProducer(headers, new String(cos.getBytes(), StandardCharsets.UTF_8));
@@ -92,18 +92,18 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             writeJws(p, sigProvider, actualOs);
         }
     }
-    
+
     public void setContentTypeRequired(boolean contentTypeRequired) {
         this.contentTypeRequired = contentTypeRequired;
     }
-    
+
     public void setUseJwsOutputStream(boolean useJwsOutputStream) {
         this.useJwsOutputStream = useJwsOutputStream;
     }
-    private void setContentTypeIfNeeded(JoseHeaders headers, WriterInterceptorContext ctx) {    
+    private void setContentTypeIfNeeded(JoseHeaders headers, WriterInterceptorContext ctx) {
         if (contentTypeRequired) {
             MediaType mt = ctx.getMediaType();
-            if (mt != null 
+            if (mt != null
                 && !JAXRSUtils.mediaTypeToString(mt).equals(JoseConstants.MEDIA_TYPE_JOSE)) {
                 if ("application".equals(mt.getType())) {
                     headers.setContentType(mt.getSubtype());
@@ -113,7 +113,7 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
             }
         }
     }
-    
+
     private void setJoseMediaType(WriterInterceptorContext ctx) {
         MediaType joseMediaType = JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE);
         ctx.setMediaType(joseMediaType);

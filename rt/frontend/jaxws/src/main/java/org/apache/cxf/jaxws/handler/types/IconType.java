@@ -35,7 +35,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * Java class for iconType complex type.
  * <p>
  * The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="iconType">
  *   &lt;complexContent>
@@ -69,7 +69,7 @@ public class IconType {
 
     /**
      * Gets the value of the smallIcon property.
-     * 
+     *
      * @return possible object is {@link PathType }
      */
     public PathType getSmallIcon() {
@@ -78,7 +78,7 @@ public class IconType {
 
     /**
      * Sets the value of the smallIcon property.
-     * 
+     *
      * @param value allowed object is {@link PathType }
      */
     public void setSmallIcon(PathType value) {
@@ -87,7 +87,7 @@ public class IconType {
 
     /**
      * Gets the value of the largeIcon property.
-     * 
+     *
      * @return possible object is {@link PathType }
      */
     public PathType getLargeIcon() {
@@ -96,7 +96,7 @@ public class IconType {
 
     /**
      * Sets the value of the largeIcon property.
-     * 
+     *
      * @param value allowed object is {@link PathType }
      */
     public void setLargeIcon(PathType value) {
@@ -105,7 +105,7 @@ public class IconType {
 
     /**
      * Gets the value of the id property.
-     * 
+     *
      * @return possible object is {@link java.lang.String }
      */
     public java.lang.String getId() {
@@ -114,7 +114,7 @@ public class IconType {
 
     /**
      * Sets the value of the id property.
-     * 
+     *
      * @param value allowed object is {@link java.lang.String }
      */
     public void setId(java.lang.String value) {
@@ -123,7 +123,7 @@ public class IconType {
 
     /**
      * Gets the value of the lang property.
-     * 
+     *
      * @return possible object is {@link java.lang.String }
      */
     public java.lang.String getLang() {
@@ -132,7 +132,7 @@ public class IconType {
 
     /**
      * Sets the value of the lang property.
-     * 
+     *
      * @param value allowed object is {@link java.lang.String }
      */
     public void setLang(java.lang.String value) {

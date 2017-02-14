@@ -48,11 +48,11 @@ public class XMLFaultOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
 
     public void handleMessage(Message message) throws Fault {
-        
+
         if (mustPropogateException(message)) {
             throw (Fault) message.getContent(Exception.class);
         }
-        
+
         Fault f = (Fault) message.getContent(Exception.class);
         message.put(org.apache.cxf.message.Message.RESPONSE_CODE, f.getStatusCode());
         NSStack nsStack = new NSStack();
@@ -63,21 +63,21 @@ public class XMLFaultOutInterceptor extends AbstractOutDatabindingInterceptor {
         try {
             nsStack.add(XMLConstants.NS_XML_FORMAT);
             String prefix = nsStack.getPrefix(XMLConstants.NS_XML_FORMAT);
-            StaxUtils.writeStartElement(writer, prefix, XMLFault.XML_FAULT_ROOT, 
+            StaxUtils.writeStartElement(writer, prefix, XMLFault.XML_FAULT_ROOT,
                     XMLConstants.NS_XML_FORMAT);
-            StaxUtils.writeStartElement(writer, prefix, XMLFault.XML_FAULT_STRING, 
+            StaxUtils.writeStartElement(writer, prefix, XMLFault.XML_FAULT_STRING,
                     XMLConstants.NS_XML_FORMAT);
             Throwable t = xmlFault.getCause();
             writer.writeCharacters(t == null ? xmlFault.getMessage() : t.toString());
             // fault string
             writer.writeEndElement();
             // call StaxUtils to write Fault detail.
-            
+
             if (xmlFault.getDetail() != null) {
                 Element detail = xmlFault.getDetail();
                 StaxUtils.writeStartElement(writer, prefix, XMLFault.XML_FAULT_DETAIL,
                         XMLConstants.NS_XML_FORMAT);
-                
+
                 Node node = detail.getFirstChild();
                 while (node != null) {
                     StaxUtils.writeNode(node, writer, false);
@@ -92,14 +92,14 @@ public class XMLFaultOutInterceptor extends AbstractOutDatabindingInterceptor {
             throw new Fault(new org.apache.cxf.common.i18n.Message("XML_WRITE_EXC", BUNDLE), xe);
         }
     }
-    
+
     @Override
     public void handleFault(Message message) throws Fault {
         if (mustPropogateException(message)) {
             throw (Fault) message.getContent(Exception.class);
         }
     }
-    
+
     protected boolean mustPropogateException(Message m) {
         return Boolean.TRUE.equals(m.getExchange().get(Message.PROPOGATE_EXCEPTION));
     }

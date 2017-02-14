@@ -36,7 +36,7 @@ import org.slf4j.spi.LocationAwareLogger;
  * <p>
  * Level mapping inspired by {@link org.slf4j.bridge.SLF4JBridgeHandler}:
  * </p>
- * 
+ *
  * <pre>
  * FINEST  -&gt; TRACE
  * FINER   -&gt; DEBUG
@@ -53,7 +53,7 @@ public class Slf4jLogger extends AbstractDelegatingLogger {
 
     private final org.slf4j.Logger logger;
     private LocationAwareLogger locationAwareLogger;
-    
+
 
     public Slf4jLogger(String name, String resourceBundleName) {
         super(name, resourceBundleName);
@@ -111,7 +111,7 @@ public class Slf4jLogger extends AbstractDelegatingLogger {
 
         Level level = record.getLevel();
         Throwable t = record.getThrown();
-        
+
         Handler targets[] = getHandlers();
         if (targets != null) {
             for (Handler h : targets) {
@@ -121,7 +121,7 @@ public class Slf4jLogger extends AbstractDelegatingLogger {
         if (!getUseParentHandlers()) {
             return;
         }
-        
+
         /*
          * As we can not use a "switch ... case" block but only a "if ... else if ..." block, the order of the
          * comparisons is important. We first try log level FINE then INFO, WARN, FINER, etc

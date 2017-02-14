@@ -47,7 +47,7 @@ public class BookServiceImpl implements BookService {
 
     public Book getBook(GetBook getBook) throws BookNotFoundFault {
         for (Map.Entry<Long, Book> me : books.entrySet()) {
-            System.out.println("getBook -> " + me.getKey() + " : " 
+            System.out.println("getBook -> " + me.getKey() + " : "
                                + me.getValue().getName() + ", " + me.getValue().getId());
         }
         System.out.println("Book de id " + getBook.getId());
@@ -63,7 +63,7 @@ public class BookServiceImpl implements BookService {
 
     public Book getAnotherBook(GetAnotherBook getAnotherBook) throws BookNotFoundFault {
         for (Map.Entry<Long, Book> me : books.entrySet()) {
-            System.out.println("getBook -> " + me.getKey() + " : " 
+            System.out.println("getBook -> " + me.getKey() + " : "
                                + me.getValue().getName() + ", " + me.getValue().getId());
         }
         System.out.println("Book de id " + getAnotherBook.getId());
@@ -90,7 +90,7 @@ public class BookServiceImpl implements BookService {
         b.setId(id);
         books.put(id, b);
         for (Map.Entry<Long, Book> me : books.entrySet()) {
-            System.out.println("addBook -> " + me.getKey() + " : " 
+            System.out.println("addBook -> " + me.getKey() + " : "
                                + me.getValue().getName() + ", " + me.getValue().getId());
         }
 

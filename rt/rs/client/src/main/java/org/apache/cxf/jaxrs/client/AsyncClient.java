@@ -22,7 +22,7 @@ import java.lang.reflect.Type;
 
 //Work in progress. May be removed once the Rx client work is finalized
 public interface AsyncClient {
-    void prepareAsyncClient(String httpMethod, 
+    void prepareAsyncClient(String httpMethod,
                             Object body,
                             Class<?> requestClass,
                             Type inType,

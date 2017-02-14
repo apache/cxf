@@ -29,13 +29,13 @@ import org.w3c.dom.Element;
 //import org.w3c.dom.Text;
 
 /**
- * 
+ *
  */
 public class BeanWithDOM {
     private Document document;
 //    private Node node;
-    
-    
+
+
     public void fillWithSomeData() {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder db;
@@ -58,14 +58,14 @@ public class BeanWithDOM {
         node = beetText;
         */
     }
-    
+
     public Document getDocument() {
         return document;
     }
     public void setDocument(Document document) {
         this.document = document;
     }
-    
+
     /*
     public Node getNode() {
         return node;

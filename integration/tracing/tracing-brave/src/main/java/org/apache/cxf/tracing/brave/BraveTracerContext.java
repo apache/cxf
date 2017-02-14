@@ -33,26 +33,26 @@ public class BraveTracerContext implements TracerContext {
     private final Brave brave;
     private final ServerSpan continuationSpan;
     private final ServerSpanThreadBinder serverSpanThreadBinder;
-    
+
     public BraveTracerContext(final Brave brave) {
         this(brave, null);
     }
-    
+
     public BraveTracerContext(final Brave brave, final ServerSpan continuationSpan) {
         this.brave = brave;
         this.continuationSpan = continuationSpan;
         this.serverSpanThreadBinder = brave.serverSpanThreadBinder();
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public TraceScope startSpan(final String description) {
-        return new TraceScope(brave, 
+        return new TraceScope(brave,
             brave
                 .localTracer()
                 .startNewSpan(Constants.LOCAL_COMPONENT, description));
     }
-    
+
     @Override
     public <T> T continueSpan(final Traceable<T> traceable) throws Exception {
         boolean attached = false;
@@ -60,7 +60,7 @@ public class BraveTracerContext implements TracerContext {
             serverSpanThreadBinder.setCurrentSpan(continuationSpan);
             attached = true;
         }
-        
+
         try {
             return traceable.call(new BraveTracerContext(brave));
         } finally {
@@ -69,7 +69,7 @@ public class BraveTracerContext implements TracerContext {
             }
         }
     }
-    
+
     @Override
     public <T> Callable<T> wrap(final String description, final Traceable<T> traceable) {
         final Callable<T> callable = new Callable<T>() {
@@ -78,7 +78,7 @@ public class BraveTracerContext implements TracerContext {
                 return traceable.call(new BraveTracerContext(brave));
             }
         };
-        
+
         return () -> {
             try {
                 startSpan(description);
@@ -88,7 +88,7 @@ public class BraveTracerContext implements TracerContext {
             }
         };
     }
-    
+
     @Override
     public void annotate(String key, String value) {
         if (brave.localSpanThreadBinder().getCurrentLocalSpan() != null) {
@@ -97,7 +97,7 @@ public class BraveTracerContext implements TracerContext {
             brave.serverTracer().submitBinaryAnnotation(key, value);
         }
     }
-    
+
     @Override
     public void timeline(String message) {
         if (brave.localSpanThreadBinder().getCurrentLocalSpan() != null) {

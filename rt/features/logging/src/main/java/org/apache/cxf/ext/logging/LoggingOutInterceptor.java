@@ -41,7 +41,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
 public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
@@ -65,7 +65,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             message.setContent(OutputStream.class, createCachingOut(message, os, callback));
         } else {
             final Writer iowriter = message.getContent(Writer.class);
-            if (iowriter != null) { 
+            if (iowriter != null) {
                 message.setContent(Writer.class, new LogEventSendingWriter(sender, message, iowriter, limit));
             }
         }
@@ -130,7 +130,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             if (w2 == null) {
                 w2 = (StringWriter)out;
             }
-            
+
             String payload = shouldLogContent(event) ? getPayload(event, w2) : CONTENT_SUPPRESSED;
             event.setPayload(payload);
             sender.send(event);
@@ -148,7 +148,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             }
             return payload.toString();
         }
-        
+
         protected void writePayload(StringBuilder builder, StringWriter stringWriter, String contentType)
             throws Exception {
             StringBuffer buffer = stringWriter.getBuffer();
@@ -207,7 +207,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 // ignore
             }
         }
-        
+
         protected void writePayload(StringBuilder builder, CachedOutputStream cos, String encoding,
                                     String contentType) throws Exception {
             if (StringUtils.isEmpty(encoding)) {

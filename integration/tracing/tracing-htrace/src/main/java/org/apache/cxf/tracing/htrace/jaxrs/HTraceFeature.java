@@ -30,7 +30,7 @@ import org.apache.htrace.core.Tracer;
 public class HTraceFeature extends AbstractFeature {
     private HTraceConfiguration configuration;
     private String name;
-    
+
     public HTraceFeature() {
         this(HTraceConfiguration.EMPTY, "");
     }
@@ -49,25 +49,25 @@ public class HTraceFeature extends AbstractFeature {
         final Tracer tracer = new Tracer.Builder(name)
             .conf(configuration)
             .build();
-        
+
         if (providerFactory != null) {
-            providerFactory.setUserProviders(Arrays.asList(new HTraceProvider(tracer), 
+            providerFactory.setUserProviders(Arrays.asList(new HTraceProvider(tracer),
                 new HTraceContextProvider(tracer)));
         }
     }
-    
+
     public void setConfiguration(final HTraceConfiguration configuration) {
         this.configuration = configuration;
     }
-    
+
     public HTraceConfiguration getConfiguration() {
         return configuration;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String getName() {
         return name;
     }

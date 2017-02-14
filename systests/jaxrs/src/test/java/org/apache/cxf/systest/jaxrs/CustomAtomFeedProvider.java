@@ -36,10 +36,10 @@ import org.apache.cxf.jaxrs.provider.atom.AtomFeedProvider;
 @Consumes({"application/atom+xml", "application/atom+xml;type=feed" })
 @Provider
 public class CustomAtomFeedProvider extends AtomFeedProvider {
-    
+
     @Override
-    public void writeTo(Feed element, Class<?> clazz, Type type, Annotation[] a, 
-                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
+    public void writeTo(Feed element, Class<?> clazz, Type type, Annotation[] a,
+                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         os.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>".getBytes());
         super.writeTo(element, clazz, type, a, mt, headers, os);

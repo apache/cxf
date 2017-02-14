@@ -54,7 +54,7 @@ public class DecoupledClientServerOnewayTest extends AbstractBusClientServerTest
 
     public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
-        protected void run()  {            
+        protected void run()  {
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("/org/apache/cxf/systest/ws/rm/exactlyonce-inorder-decoupled.xml");
             BusFactory.setDefaultBus(bus);
@@ -67,12 +67,12 @@ public class DecoupledClientServerOnewayTest extends AbstractBusClientServerTest
             out.setPrettyLogging(true);
             bus.getOutInterceptors().add(out);
             bus.getOutFaultInterceptors().add(out);
-            
+
             GreeterImpl implementor = new GreeterImpl();
             implementor.useLastOnewayArg(true);
             implementor.setDelay(5000);
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
-            
+
             ep = Endpoint.create(implementor);
             Map<String, Object> properties = new HashMap<String, Object>();
             properties.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
@@ -85,14 +85,14 @@ public class DecoupledClientServerOnewayTest extends AbstractBusClientServerTest
             ep.stop();
             ep = null;
         }
-    }    
-    
+    }
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(Server.class, true));
     }
-            
+
     @Test
     public void testDecoupledOneway() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -106,16 +106,16 @@ public class DecoupledClientServerOnewayTest extends AbstractBusClientServerTest
         out.setPrettyLogging(true);
         bus.getOutInterceptors().add(out);
         bus.getOutFaultInterceptors().add(out);
-        
+
         GreeterService gs = new GreeterService();
         final Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
-        ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED, 
+        ((BindingProvider)greeter).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
                                                            Boolean.TRUE);
         LOG.fine("Created greeter client.");
-       
+
         ConnectionHelper.setKeepAliveConnection(greeter, true);
         greeter.greetMeOneWay("oneway");
-        
+
     }
 }

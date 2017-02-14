@@ -122,7 +122,7 @@ public class ManagedConnectionFactoryImplTest extends Assert {
 
     @Test
     public void testGetSetLogWriter() throws Exception {
-        PrintWriter writer = EasyMock.createMock(PrintWriter.class); 
+        PrintWriter writer = EasyMock.createMock(PrintWriter.class);
         writer.write(EasyMock.isA(String.class));
         EasyMock.expectLastCall().anyTimes();
         writer.flush();

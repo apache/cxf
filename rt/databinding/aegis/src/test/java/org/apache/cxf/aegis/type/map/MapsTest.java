@@ -41,10 +41,10 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class MapsTest extends AbstractAegisTest {
-    
+
     private static MapTest clientInterface;
     private static Server server;
 
@@ -60,16 +60,16 @@ public class MapsTest extends AbstractAegisTest {
         //        server.getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
 //        server.getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
         server.start();
-        
+
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
         proxyFac.setAddress("local://MapTest");
         proxyFac.setServiceClass(MapTest.class);
         proxyFac.setBus(getBus());
         setupAegis(proxyFac.getClientFactoryBean());
 
-        clientInterface = (MapTest)proxyFac.create(); 
+        clientInterface = (MapTest)proxyFac.create();
     }
-    
+
     @Ignore
     @Test
     public void testMapWsdl() throws WSDLException {
@@ -78,36 +78,36 @@ public class MapsTest extends AbstractAegisTest {
         WSDLFactory.newInstance().newWSDLWriter().writeWSDL(wsdlDef, sink);
         System.out.println(sink.toString());
     }
-    
+
     @Test
     public void testInvocations() throws Exception {
         Map<Long, String> lts = clientInterface.getMapLongToString();
         assertEquals("twenty-seven", lts.get(Long.valueOf(27)));
     }
-    
+
     @Test
     public void testNull() throws Exception {
         ObjectWithAMap obj1 = clientInterface.returnObjectWithAMap();
         assertNull(obj1.getTheMap().get("raw"));
         Map<Long, String> m = clientInterface.getMapLongToString();
-        String str2 = m.get(Long.valueOf(2)); 
+        String str2 = m.get(Long.valueOf(2));
         assertNull("value for 2 should be null, was " + str2, str2);
-                  
+
     }
-    
+
     @Test
     public void testObjectsWithMaps() throws Exception {
         ObjectWithAMap obj1 = clientInterface.returnObjectWithAMap();
         ObjectWithAMapNs2 obj2 = clientInterface.returnObjectWithAMapNs2();
         assertNotNull(obj1);
         assertNotNull(obj2);
-        
+
         assertNotNull(obj1.getTheMap());
-        assertNotNull(obj2.getTheMap()); 
-        
+        assertNotNull(obj2.getTheMap());
+
         assertEquals(3, obj1.getTheMap().size());
         assertEquals(3, obj2.getTheMap().size());
-        
+
         assertTrue(obj1.getTheMap().get("rainy"));
         assertTrue(obj2.getTheMap().get("rainy"));
         assertFalse(obj1.getTheMap().get("sunny"));

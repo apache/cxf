@@ -28,7 +28,7 @@ public class SoapBodyInfo {
     private List <MessagePartInfo> parts = new ArrayList<>();
     private List <MessagePartInfo> attachments = new ArrayList<>();
     private String use;
-    
+
     public List<MessagePartInfo> getParts() {
         return parts;
     }
@@ -52,5 +52,5 @@ public class SoapBodyInfo {
     public void setAttachments(List<MessagePartInfo> attachments) {
         this.attachments = attachments;
     }
-    
+
 }

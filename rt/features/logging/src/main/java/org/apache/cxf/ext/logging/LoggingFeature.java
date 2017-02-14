@@ -29,7 +29,7 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
- * This class is used to control message-on-the-wire logging. 
+ * This class is used to control message-on-the-wire logging.
  * By attaching this feature to an endpoint, you
  * can specify logging. If this feature is present, an endpoint will log input
  * and output of ordinary and log messages.
@@ -59,10 +59,10 @@ public class LoggingFeature extends AbstractFeature {
         in = new LoggingInInterceptor(prettyFilter);
         out = new LoggingOutInterceptor(prettyFilter);
     }
-    
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        
+
         provider.getInInterceptors().add(wireTapIn);
         provider.getInInterceptors().add(in);
         provider.getInFaultInterceptors().add(in);
@@ -76,13 +76,13 @@ public class LoggingFeature extends AbstractFeature {
         out.setLimit(limit);
         wireTapIn.setLimit(limit);
     }
-    
+
     public void setInMemThreshold(long inMemThreshold) {
         in.setInMemThreshold(inMemThreshold);
         out.setInMemThreshold(inMemThreshold);
         wireTapIn.setThreshold(inMemThreshold);
     }
-    
+
     public void setSender(LogEventSender sender) {
         this.prettyFilter.setNext(sender);
     }
@@ -90,18 +90,18 @@ public class LoggingFeature extends AbstractFeature {
     public void setPrettyLogging(boolean prettyLogging) {
         this.prettyFilter.setPrettyLogging(prettyLogging);
     }
-    
+
     /**
      * Log binary content?
-     * @param logBinary defaults to false 
+     * @param logBinary defaults to false
      */
     public void setLogBinary(boolean logBinary) {
         in.setLogBinary(logBinary);
         out.setLogBinary(logBinary);
     }
-    
+
     /**
-     * Log multipart content? 
+     * Log multipart content?
      * @param logMultipart defaults to true
      */
     public void setLogMultipart(boolean logMultipart) {

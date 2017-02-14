@@ -34,14 +34,14 @@ import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
-public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageContext> 
+public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageContext>
     implements MessageContext {
 
     public Object get(Object key) {
         MessageContext mc = getCurrentMessageContext();
         return mc != null ? mc.get(key) : null;
     }
-    
+
     public <T> T getContext(Class<T> contextClass) {
         MessageContext mc = getCurrentMessageContext();
         return mc != null ? mc.getContext(contextClass) : null;

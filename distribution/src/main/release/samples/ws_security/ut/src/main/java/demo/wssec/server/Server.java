@@ -43,7 +43,7 @@ public class Server {
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/GreeterPort";
         EndpointImpl impl = (EndpointImpl)Endpoint.publish(address, implementor);
-        
+
         Map<String, Object> outProps = new HashMap<String, Object>();
         outProps.put("action", "UsernameToken Timestamp");
 

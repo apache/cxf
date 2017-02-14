@@ -27,15 +27,15 @@ import org.apache.hello_world_soap12_http.Greeter;
 import org.apache.hello_world_soap12_http.PingMeFault;
 import org.apache.hello_world_soap12_http.types.FaultDetail;
 
-@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService", 
-                      targetNamespace = "http://apache.org/hello_world_soap12_http", 
+@javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService",
+                      targetNamespace = "http://apache.org/hello_world_soap12_http",
                       endpointInterface = "org.apache.hello_world_soap12_http.Greeter",
                       wsdlLocation = "testutils/hello_world_soap12.wsdl")
-                  
+
 public class GreeterImpl12 implements Greeter {
 
     private static final Logger LOG = LogUtils.getLogger(GreeterImpl12.class);
-    
+
     /* (non-Javadoc)
      * @see org.apache.hello_world_soap12_http.Greeter#sayHi()
      */
@@ -44,13 +44,13 @@ public class GreeterImpl12 implements Greeter {
         Exception cause = new IllegalArgumentException("Get a wrong name <sayHi>");
         throw new Fault("sayHiFault", LOG, cause);
     }
-    
+
     public void pingMe() throws PingMeFault {
         FaultDetail faultDetail = new FaultDetail();
         faultDetail.setMajor((short)2);
         faultDetail.setMinor((short)1);
         LOG.info("Executing operation pingMe, throwing PingMeFault exception");
         System.out.println("Executing operation pingMe, throwing PingMeFault exception\n");
-        throw new PingMeFault("PingMeFault raised by server", faultDetail);        
+        throw new PingMeFault("PingMeFault raised by server", faultDetail);
     }
 }

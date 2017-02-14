@@ -38,13 +38,13 @@ public class HTraceTracerContext implements TracerContext {
         this.tracer = tracer;
         this.continuationScope = continuationScope;
     }
-        
+
     @Override
     @SuppressWarnings("unchecked")
     public TraceScope startSpan(final String description) {
         return tracer.newScope(description);
     }
-    
+
     @Override
     public <T> T continueSpan(final Traceable<T> traceable) throws Exception {
         boolean attached = false;
@@ -52,7 +52,7 @@ public class HTraceTracerContext implements TracerContext {
             continuationScope.reattach();
             attached = true;
         }
-        
+
         try {
             return traceable.call(new HTraceTracerContext(tracer));
         } finally {
@@ -61,7 +61,7 @@ public class HTraceTracerContext implements TracerContext {
             }
         }
     }
-    
+
     @Override
     public <T> Callable<T> wrap(final String description, final Traceable<T> traceable) {
         final Callable<T> callable = new Callable<T>() {
@@ -70,10 +70,10 @@ public class HTraceTracerContext implements TracerContext {
                 return traceable.call(new HTraceTracerContext(tracer));
             }
         };
-        
+
         return tracer.wrap(callable, description);
     }
-    
+
     @Override
     public void annotate(String key, String value) {
         final Span currentSpan = Tracer.getCurrentSpan();
@@ -81,7 +81,7 @@ public class HTraceTracerContext implements TracerContext {
             currentSpan.addKVAnnotation(key, value);
         }
     }
-    
+
     @Override
     public void timeline(String message) {
         final Span currentSpan = Tracer.getCurrentSpan();
@@ -89,7 +89,7 @@ public class HTraceTracerContext implements TracerContext {
             currentSpan.addTimelineAnnotation(message);
         }
     }
-    
+
     private boolean isTracing() {
         return Tracer.getCurrentSpan() != null;
     }

@@ -57,14 +57,14 @@ import org.junit.BeforeClass;
  * Some unit tests for renewing SAML Tokens with lifetime
  */
 public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
-    
+
     private static TokenStore tokenStore;
-    
+
     @BeforeClass
     public static void init() {
         tokenStore = new DefaultInMemoryTokenStore();
     }
-    
+
     /**
      * Renew SAML 2 token with a valid requested lifetime
      */
@@ -74,13 +74,13 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         SAMLTokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         samlTokenRenewer.setAllowRenewalAfterExpiry(true);
-        
+
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setAcceptClientLifetime(true);
         samlTokenRenewer.setConditionsProvider(conditionsProvider);
-               
+
         TokenRenewerParameters renewerParameters = createRenewerParameters();
-        
+
         // Set expected lifetime to 1 minute
         Date creationTime = new Date();
         Date expirationTime = new Date();
@@ -89,32 +89,32 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         lifetime.setCreated(fmt.format(creationTime));
         lifetime.setExpires(fmt.format(expirationTime));
-        renewerParameters.getTokenRequirements().setLifetime(lifetime);    
-        
+        renewerParameters.getTokenRequirements().setLifetime(lifetime);
+
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         // Create token.
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);
-        
+
         ReceivedToken renewTarget = new ReceivedToken(samlToken);
         renewTarget.setState(STATE.VALID);
         renewerParameters.getTokenRequirements().setRenewTarget(renewTarget);
         renewerParameters.setToken(renewTarget);
-        
+
         assertTrue(samlTokenRenewer.canHandleToken(renewTarget));
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
-        assertEquals(requestedLifetime * 1000L, renewerResponse.getExpires().getTime() 
+        assertEquals(requestedLifetime * 1000L, renewerResponse.getExpires().getTime()
                      - renewerResponse.getCreated().getTime());
     }
-    
-    
+
+
     /**
      * Renew SAML 2 token with a lifetime configured in SAMLTokenProvider
      * No specific lifetime requested
@@ -124,38 +124,38 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         SAMLTokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         samlTokenRenewer.setAllowRenewalAfterExpiry(true);
-        
+
         long providerLifetime = 10 * 600L;
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setLifetime(providerLifetime);
         samlTokenRenewer.setConditionsProvider(conditionsProvider);
-               
+
         TokenRenewerParameters renewerParameters = createRenewerParameters();
-        
+
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         // Create token.
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);
-        
+
         ReceivedToken renewTarget = new ReceivedToken(samlToken);
         renewTarget.setState(STATE.VALID);
         renewerParameters.getTokenRequirements().setRenewTarget(renewTarget);
         renewerParameters.setToken(renewTarget);
-        
+
         assertTrue(samlTokenRenewer.canHandleToken(renewTarget));
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
-        assertEquals(providerLifetime * 1000L, renewerResponse.getExpires().getTime() 
+        assertEquals(providerLifetime * 1000L, renewerResponse.getExpires().getTime()
                      - renewerResponse.getCreated().getTime());
     }
-    
-    
+
+
     /**
      * Renew SAML 2 token with a with a lifetime
      * which exceeds configured maximum lifetime
@@ -166,14 +166,14 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         SAMLTokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         samlTokenRenewer.setAllowRenewalAfterExpiry(true);
-        
+
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setMaxLifetime(maxLifetime);
         conditionsProvider.setAcceptClientLifetime(true);
         samlTokenRenewer.setConditionsProvider(conditionsProvider);
-               
+
         TokenRenewerParameters renewerParameters = createRenewerParameters();
-        
+
         // Set expected lifetime to 35 minutes
         long requestedLifetime = 35 * 60L;
         Date creationTime = new Date();
@@ -184,22 +184,22 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         lifetime.setCreated(fmt.format(creationTime));
         lifetime.setExpires(fmt.format(expirationTime));
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
-        
+
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         // Create token.
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);
-        
+
         ReceivedToken renewTarget = new ReceivedToken(samlToken);
         renewTarget.setState(STATE.VALID);
         renewerParameters.getTokenRequirements().setRenewTarget(renewTarget);
         renewerParameters.setToken(renewTarget);
-        
+
         assertTrue(samlTokenRenewer.canHandleToken(renewTarget));
         try {
             samlTokenRenewer.renewToken(renewerParameters);
@@ -208,7 +208,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
             //expected
         }
     }
-    
+
     /**
      * Renew SAML 2 token with a with a lifetime
      * which exceeds default maximum lifetime
@@ -218,13 +218,13 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         SAMLTokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         samlTokenRenewer.setAllowRenewalAfterExpiry(true);
-        
+
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setAcceptClientLifetime(true);
         samlTokenRenewer.setConditionsProvider(conditionsProvider);
-               
+
         TokenRenewerParameters renewerParameters = createRenewerParameters();
-        
+
         // Set expected lifetime to Default max lifetime plus 1
         long requestedLifetime = DefaultConditionsProvider.DEFAULT_MAX_LIFETIME + 1;
         Date creationTime = new Date();
@@ -235,22 +235,22 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         lifetime.setCreated(fmt.format(creationTime));
         lifetime.setExpires(fmt.format(expirationTime));
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
-        
+
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         // Create token.
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);
-        
+
         ReceivedToken renewTarget = new ReceivedToken(samlToken);
         renewTarget.setState(STATE.VALID);
         renewerParameters.getTokenRequirements().setRenewTarget(renewTarget);
         renewerParameters.setToken(renewTarget);
-        
+
         assertTrue(samlTokenRenewer.canHandleToken(renewTarget));
         try {
             samlTokenRenewer.renewToken(renewerParameters);
@@ -259,7 +259,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
             //expected
         }
     }
-    
+
     /**
      * Renew SAML 2 token with a with a lifetime
      * which exceeds configured maximum lifetime
@@ -267,20 +267,20 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
      */
     @org.junit.Test
     public void testSaml2ExceededConfiguredMaxLifetimeButUpdated() throws Exception {
-        
+
         long maxLifetime = 30 * 60L;  // 30 minutes
         SAMLTokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         samlTokenRenewer.setVerifyProofOfPossession(false);
         samlTokenRenewer.setAllowRenewalAfterExpiry(true);
-        
+
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setMaxLifetime(maxLifetime);
         conditionsProvider.setFailLifetimeExceedance(false);
         conditionsProvider.setAcceptClientLifetime(true);
         samlTokenRenewer.setConditionsProvider(conditionsProvider);
-               
+
         TokenRenewerParameters renewerParameters = createRenewerParameters();
-        
+
         // Set expected lifetime to 35 minutes
         long requestedLifetime = 35 * 60L;
         Date creationTime = new Date();
@@ -291,31 +291,31 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         lifetime.setCreated(fmt.format(creationTime));
         lifetime.setExpires(fmt.format(expirationTime));
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
-        
+
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         // Create token.
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50, true, true
             );
         // Sleep to expire the token
         Thread.sleep(100);
-        
+
         ReceivedToken renewTarget = new ReceivedToken(samlToken);
         renewTarget.setState(STATE.VALID);
         renewerParameters.getTokenRequirements().setRenewTarget(renewTarget);
         renewerParameters.setToken(renewTarget);
-        
+
         assertTrue(samlTokenRenewer.canHandleToken(renewTarget));
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
-        assertEquals(maxLifetime * 1000L, renewerResponse.getExpires().getTime() 
+        assertEquals(maxLifetime * 1000L, renewerResponse.getExpires().getTime()
                      - renewerResponse.getCreated().getTime());
     }
-    
-    
+
+
     private TokenRenewerParameters createRenewerParameters() throws WSSecurityException {
         TokenRenewerParameters parameters = new TokenRenewerParameters();
 
@@ -343,12 +343,12 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         parameters.setStsProperties(stsProperties);
 
         parameters.setEncryptionProperties(new EncryptionProperties());
-        
+
         parameters.setTokenStore(tokenStore);
 
         return parameters;
     }
-    
+
     private Element createSAMLAssertion(
         String tokenType, Crypto crypto, String signatureUsername,
          CallbackHandler callbackHandler, long ttlMs, boolean allowRenewing,
@@ -358,7 +358,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setAcceptClientLifetime(true);
         samlTokenProvider.setConditionsProvider(conditionsProvider);
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                 tokenType, STSConstants.BEARER_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
             );
@@ -367,7 +367,7 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         renewing.setAllowRenewing(allowRenewing);
         renewing.setAllowRenewingAfterExpiry(allowRenewingAfterExpiry);
         providerParameters.getTokenRequirements().setRenewing(renewing);
-        
+
         if (ttlMs != 0) {
             Lifetime lifetime = new Lifetime();
             Date creationTime = new Date();
@@ -386,10 +386,10 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();
-    }    
+    }
 
     private TokenProviderParameters createProviderParameters(
-        String tokenType, String keyType, Crypto crypto, 
+        String tokenType, String keyType, Crypto crypto,
         String signatureUsername, CallbackHandler callbackHandler
     ) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
@@ -431,10 +431,10 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
-  
-    
+
+
+
 }

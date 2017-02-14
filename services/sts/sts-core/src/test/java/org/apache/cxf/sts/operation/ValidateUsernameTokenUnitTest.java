@@ -52,24 +52,24 @@ import org.apache.wss4j.dom.WSConstants;
  * Some unit tests for the validate operation to validate UsernameTokens.
  */
 public class ValidateUsernameTokenUnitTest extends org.junit.Assert {
-    
-    public static final QName REQUESTED_SECURITY_TOKEN = 
+
+    public static final QName REQUESTED_SECURITY_TOKEN =
         QNameConstants.WS_TRUST_FACTORY.createRequestedSecurityToken(null).getName();
-    private static final QName QNAME_WST_STATUS = 
+    private static final QName QNAME_WST_STATUS =
         QNameConstants.WS_TRUST_FACTORY.createStatus(null).getName();
-    
+
     /**
      * Test to successfully validate a UsernameToken.
      */
     @org.junit.Test
     public void testValidateUsernameToken() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new UsernameTokenValidator());
         validateOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -80,53 +80,53 @@ public class ValidateUsernameTokenUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
             );
         request.getAny().add(tokenType);
-        
+
         // Create a UsernameToken
         JAXBElement<UsernameTokenType> usernameTokenType = createUsernameToken("alice", "clarinet");
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(usernameTokenType);
-        
-        JAXBElement<ValidateTargetType> validateTargetType = 
+
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Validate a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             validateOperation.validate(request, principal, msgCtx);
         assertTrue(validateResponse(response));
     }
-    
+
     /**
      * Test to validate an invalid UsernameToken.
      */
     @org.junit.Test
     public void testValidateInvalidUsernameToken() throws Exception {
         TokenValidateOperation validateOperation = new TokenValidateOperation();
-        
+
         // Add Token Validator
         List<TokenValidator> validatorList = new ArrayList<>();
         validatorList.add(new UsernameTokenValidator());
         validateOperation.setTokenValidators(validatorList);
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -137,42 +137,42 @@ public class ValidateUsernameTokenUnitTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         validateOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, STSConstants.STATUS
             );
         request.getAny().add(tokenType);
-        
+
         // Create a UsernameToken
         JAXBElement<UsernameTokenType> usernameTokenType = createUsernameToken("alice", "badpassword");
         ValidateTargetType validateTarget = new ValidateTargetType();
         validateTarget.setAny(usernameTokenType);
-        
-        JAXBElement<ValidateTargetType> validateTargetType = 
+
+        JAXBElement<ValidateTargetType> validateTargetType =
             new JAXBElement<ValidateTargetType>(
                 QNameConstants.VALIDATE_TARGET, ValidateTargetType.class, validateTarget
             );
         request.getAny().add(validateTargetType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         Principal principal = new CustomTokenPrincipal("alice");
         msgCtx.put(
-            SecurityContext.class.getName(), 
+            SecurityContext.class.getName(),
             createSecurityContext(principal)
         );
-        
+
         // Validate a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             validateOperation.validate(request, principal, msgCtx);
         assertFalse(validateResponse(response));
     }
-    
-    
+
+
     /*
      * Create a security context object
      */
@@ -186,13 +186,13 @@ public class ValidateUsernameTokenUnitTest extends org.junit.Assert {
             }
         };
     }
-    
+
     /**
      * Return true if the response has a valid status, false otherwise
      */
     private boolean validateResponse(RequestSecurityTokenResponseType response) {
         assertTrue(response != null && response.getAny() != null && !response.getAny().isEmpty());
-        
+
         for (Object requestObject : response.getAny()) {
             if (requestObject instanceof JAXBElement<?>) {
                 JAXBElement<?> jaxbElement = (JAXBElement<?>) requestObject;
@@ -206,7 +206,7 @@ public class ValidateUsernameTokenUnitTest extends org.junit.Assert {
         }
         return false;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -214,32 +214,32 @@ public class ValidateUsernameTokenUnitTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
+
     private JAXBElement<UsernameTokenType> createUsernameToken(String name, String password) {
         UsernameTokenType usernameToken = new UsernameTokenType();
         AttributedString username = new AttributedString();
         username.setValue(name);
         usernameToken.setUsername(username);
-        
+
         // Add a password
         PasswordString passwordString = new PasswordString();
         passwordString.setValue(password);
         passwordString.setType(WSConstants.PASSWORD_TEXT);
-        JAXBElement<PasswordString> passwordType = 
+        JAXBElement<PasswordString> passwordType =
             new JAXBElement<PasswordString>(
                 QNameConstants.PASSWORD, PasswordString.class, passwordString
             );
         usernameToken.getAny().add(passwordType);
-        
-        JAXBElement<UsernameTokenType> tokenType = 
+
+        JAXBElement<UsernameTokenType> tokenType =
             new JAXBElement<UsernameTokenType>(
                 QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );
-        
+
         return tokenType;
     }
-    
+
 }

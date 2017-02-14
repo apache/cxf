@@ -26,11 +26,11 @@ public class UserApplication {
 
     private String name;
     private String basePath;
-    private List<UserResource> resources; 
-    
+    private List<UserResource> resources;
+
     public UserApplication() {
     }
-    
+
     public UserApplication(String name) {
         this(name, null);
     }
@@ -41,19 +41,19 @@ public class UserApplication {
     public String getName() {
         return name;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public void setResources(List<UserResource> resources) {
         this.resources = resources;
     }
-    
+
     public List<UserResource> getResources() {
         return resources;
     }
-    
+
     public Map<String, UserResource> getResourcesAsMap() {
         Map<String, UserResource> map = new HashMap<String, UserResource>();
         if (resources != null) {

@@ -31,12 +31,12 @@ public class OidcInvoker extends OAuthInvoker {
     protected void validateRefreshedToken(ClientTokenContext tokenContext, ClientAccessToken refreshedToken) {
         if (refreshedToken.getParameters().containsKey(OidcUtils.ID_TOKEN)) {
             IdToken newIdToken = idTokenReader.getIdToken(refreshedToken, getConsumer());
-            
+
             OidcClientTokenContextImpl oidcContext = (OidcClientTokenContextImpl)tokenContext;
             IdToken currentIdToken = oidcContext.getIdToken();
-            
+
             if (!newIdToken.getIssuer().equals(currentIdToken.getIssuer())) {
-                throw new OAuthServiceException("Invalid id token issuer");    
+                throw new OAuthServiceException("Invalid id token issuer");
             }
             if (!newIdToken.getSubject().equals(currentIdToken.getSubject())) {
                 throw new OAuthServiceException("Invalid id token subject");
@@ -50,7 +50,7 @@ public class OidcInvoker extends OAuthInvoker {
             }
             String newAzp = newIdToken.getAuthorizedParty();
             String origAzp = currentIdToken.getAuthorizedParty();
-            if (newAzp != null && origAzp == null 
+            if (newAzp != null && origAzp == null
                 || newAzp == null && origAzp != null
                 || newAzp != null && origAzp != null && !newAzp.equals(origAzp)) {
                 throw new OAuthServiceException("Invalid id token authorized party");
@@ -60,9 +60,9 @@ public class OidcInvoker extends OAuthInvoker {
             if (newIssuedTime < origIssuedTime) {
                 throw new OAuthServiceException("Invalid id token issued time");
             }
-            
+
             oidcContext.setIdToken(newIdToken);
-            
+
         }
     }
     public void setIdTokenReader(IdTokenReader idTokenReader) {

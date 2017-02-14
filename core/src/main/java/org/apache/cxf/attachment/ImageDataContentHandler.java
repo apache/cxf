@@ -43,7 +43,7 @@ import javax.imageio.stream.ImageOutputStream;
 import org.apache.cxf.helpers.IOUtils;
 
 /**
- * 
+ *
  */
 public class ImageDataContentHandler implements DataContentHandler {
     private static final DataFlavor[] FLAVORS;
@@ -57,9 +57,9 @@ public class ImageDataContentHandler implements DataContentHandler {
     }
 
     public ImageDataContentHandler() {
-        
+
     }
-    
+
     public Object getContent(DataSource ds) throws IOException {
         return ImageIO.read(ds.getInputStream());
     }
@@ -83,9 +83,9 @@ public class ImageDataContentHandler implements DataContentHandler {
             Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mimeType);
             if (writers.hasNext()) {
                 ImageWriter writer = writers.next();
-                
+
                 BufferedImage bimg = convertToBufferedImage((Image)obj);
-                ImageOutputStream out = ImageIO.createImageOutputStream(os); 
+                ImageOutputStream out = ImageIO.createImageOutputStream(os);
                 writer.setOutput(out);
                 writer.write(bimg);
                 writer.dispose();
@@ -101,7 +101,7 @@ public class ImageDataContentHandler implements DataContentHandler {
             FileInputStream file = new FileInputStream((File)obj);
             IOUtils.copyAndCloseInput(file, os);
         } else {
-            throw new IOException("Attachment type not spported " + obj.getClass());                    
+            throw new IOException("Attachment type not spported " + obj.getClass());
         }
 
     }
@@ -109,10 +109,10 @@ public class ImageDataContentHandler implements DataContentHandler {
         if (image instanceof BufferedImage) {
             return (BufferedImage)image;
         }
-        
+
         // Wait until the image is completely loaded
         MediaTracker tracker = new MediaTracker(new Component() {
-            private static final long serialVersionUID = 977142547536262901L; 
+            private static final long serialVersionUID = 977142547536262901L;
         });
         tracker.addImage(image, 0);
         try {
@@ -122,7 +122,7 @@ public class ImageDataContentHandler implements DataContentHandler {
             ioe.initCause(e);
             throw ioe;
         }
-        
+
         // Create a BufferedImage so we can write it out later
         BufferedImage bufImage = new BufferedImage(
                 image.getWidth(null),

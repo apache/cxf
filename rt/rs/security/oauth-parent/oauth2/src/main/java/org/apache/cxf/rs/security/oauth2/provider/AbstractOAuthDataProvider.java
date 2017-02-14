@@ -49,14 +49,14 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private List<String> requiredScopes;
     private List<String> invisibleToClientScopes;
     private boolean supportPreauthorizedTokens;
-    
+
     private boolean useJwtFormatForAccessTokens;
     private OAuthJoseJwtProducer jwtAccessTokenProducer;
     private Map<String, String> jwtAccessTokenClaimMap;
-    
+
     protected AbstractOAuthDataProvider() {
     }
-    
+
     @Override
     public ServerAccessToken createAccessToken(AccessTokenRegistration reg)
         throws OAuthServiceException {
@@ -67,13 +67,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
         return at;
     }
-    
+
     protected ServerAccessToken doCreateAccessToken(AccessTokenRegistration atReg) {
         ServerAccessToken at = createNewAccessToken(atReg.getClient(), atReg.getSubject());
         at.setAudiences(atReg.getAudiences());
         at.setGrantType(atReg.getGrantType());
         List<String> theScopes = atReg.getApprovedScope();
-        List<OAuthPermission> thePermissions = 
+        List<OAuthPermission> thePermissions =
             convertScopeToPermissions(atReg.getClient(), theScopes);
         at.setScopes(thePermissions);
         at.setSubject(atReg.getSubject());
@@ -82,23 +82,23 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         at.setResponseType(atReg.getResponseType());
         at.setGrantCode(atReg.getGrantCode());
         at.getExtraProperties().putAll(atReg.getExtraProperties());
-        
+
         if (isUseJwtFormatForAccessTokens()) {
             JwtClaims claims = createJwtAccessToken(at);
             String jose = processJwtAccessToken(claims);
             at.setTokenKey(jose);
         }
-        
+
         return at;
     }
-    
+
     protected JwtClaims createJwtAccessToken(ServerAccessToken at) {
         JwtClaims claims = new JwtClaims();
         claims.setTokenId(at.getTokenKey());
-        
+
         // 'client_id' or 'cid', default client_id
-        String clientIdClaimName = 
-            JwtTokenUtils.getClaimName(OAuthConstants.CLIENT_ID, OAuthConstants.CLIENT_ID, 
+        String clientIdClaimName =
+            JwtTokenUtils.getClaimName(OAuthConstants.CLIENT_ID, OAuthConstants.CLIENT_ID,
                                              getJwtAccessTokenClaimMap());
         claims.setClaim(clientIdClaimName, at.getClient().getClientId());
         claims.setIssuedAt(at.getIssuedAt());
@@ -110,10 +110,10 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             if (userSubject.getId() != null) {
                 claims.setSubject(userSubject.getId());
             }
-            
+
             // 'username' by default to be consistent with the token introspection response
             final String usernameProp = "username";
-            String usernameClaimName = 
+            String usernameClaimName =
                 JwtTokenUtils.getClaimName(usernameProp, usernameProp, getJwtAccessTokenClaimMap());
             claims.setClaim(usernameClaimName, userSubject.getLogin());
         }
@@ -121,7 +121,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             claims.setIssuer(at.getIssuer());
         }
         if (!at.getScopes().isEmpty()) {
-            claims.setClaim(OAuthConstants.SCOPE, 
+            claims.setClaim(OAuthConstants.SCOPE,
                             OAuthUtils.convertPermissionsToScopeList(at.getScopes()));
         }
         // OAuth2 resource indicators (resource server audience)
@@ -156,17 +156,17 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
         return claims;
     }
-    
+
     protected ServerAccessToken createNewAccessToken(Client client, UserSubject userSub) {
         return new BearerAccessToken(client, accessTokenLifetime);
     }
-    
+
     @Override
     public ServerAccessToken refreshAccessToken(Client client, String refreshTokenKey,
                                                 List<String> restrictedScopes) throws OAuthServiceException {
-        RefreshToken currentRefreshToken = recycleRefreshTokens 
+        RefreshToken currentRefreshToken = recycleRefreshTokens
             ? revokeRefreshToken(refreshTokenKey) : getRefreshToken(refreshTokenKey);
-        if (currentRefreshToken == null) { 
+        if (currentRefreshToken == null) {
             throw new OAuthServiceException(OAuthConstants.ACCESS_DENIED);
         }
         if (OAuthUtils.isExpired(currentRefreshToken.getIssuedAt(), currentRefreshToken.getExpiresIn())) {
@@ -178,7 +178,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (recycleRefreshTokens) {
             revokeAccessTokens(currentRefreshToken);
         }
-        
+
         ServerAccessToken at = doRefreshAccessToken(client, currentRefreshToken, restrictedScopes);
         saveAccessToken(at);
         if (recycleRefreshTokens) {
@@ -188,11 +188,11 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
         return at;
     }
-    
+
     @Override
     public void revokeToken(Client client, String tokenKey, String tokenTypeHint) throws OAuthServiceException {
         ServerAccessToken accessToken = null;
-        if (!OAuthConstants.REFRESH_TOKEN.equals(tokenTypeHint)) { 
+        if (!OAuthConstants.REFRESH_TOKEN.equals(tokenTypeHint)) {
             accessToken = revokeAccessToken(tokenKey);
         }
         if (accessToken != null) {
@@ -208,7 +208,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             if (rt == null) {
                 return;
             }
-            
+
             unlinkRefreshAccessToken(rt, accessToken.getTokenKey());
             if (rt.getAccessTokens().isEmpty()) {
                 revokeRefreshToken(rt.getTokenKey());
@@ -216,7 +216,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                 saveRefreshToken(rt);
             }
         }
-        
+
     }
 
     protected void revokeAccessTokens(RefreshToken currentRefreshToken) {
@@ -237,8 +237,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
     }
 
-        
-    
+
+
     @Override
     public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScopes) {
         if (requiredScopes != null && !requestedScopes.containsAll(requiredScopes)) {
@@ -254,12 +254,12 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             if (!list.isEmpty()) {
                 return list;
             }
-        } 
+        }
         throw new OAuthServiceException("Requested scopes can not be mapped");
-        
+
     }
 
-    protected void convertSingleScopeToPermission(Client client, 
+    protected void convertSingleScopeToPermission(Client client,
                                                   String scope,
                                                   List<OAuthPermission> perms) {
         OAuthPermission permission = permissionMap.get(scope);
@@ -270,9 +270,9 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
 
     @Override
-    public ServerAccessToken getPreauthorizedToken(Client client, 
+    public ServerAccessToken getPreauthorizedToken(Client client,
                                                    List<String> requestedScopes,
-                                                   UserSubject sub, 
+                                                   UserSubject sub,
                                                    String grantType) throws OAuthServiceException {
         if (!isSupportPreauthorizedTokens()) {
             return null;
@@ -287,15 +287,15 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                 break;
             }
         }
-        if (token != null 
+        if (token != null
             && OAuthUtils.isExpired(token.getIssuedAt(), token.getExpiresIn())) {
             revokeToken(client, token.getTokenKey(), OAuthConstants.ACCESS_TOKEN);
             token = null;
         }
         return token;
-        
+
     }
-    
+
     protected boolean isRefreshTokenSupported(List<String> theScopes) {
         return theScopes.contains(OAuthConstants.REFRESH_TOKEN_SCOPE);
     }
@@ -335,7 +335,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         rt.setClientCodeVerifier(at.getClientCodeVerifier());
         return rt;
     }
-    
+
     protected void linkAccessTokenToRefreshToken(RefreshToken rt, ServerAccessToken at) {
         rt.getAccessTokens().add(at.getTokenKey());
     }
@@ -343,8 +343,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         at.setRefreshToken(rt.getTokenKey());
     }
 
-    protected ServerAccessToken doRefreshAccessToken(Client client, 
-                                                     RefreshToken oldRefreshToken, 
+    protected ServerAccessToken doRefreshAccessToken(Client client,
+                                                     RefreshToken oldRefreshToken,
                                                      List<String> restrictedScopes) {
         ServerAccessToken at = createNewAccessToken(client, oldRefreshToken.getSubject());
         at.setAudiences(oldRefreshToken.getAudiences());
@@ -365,7 +365,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
         return at;
     }
-    
+
     public void setAccessTokenLifetime(long accessTokenLifetime) {
         this.accessTokenLifetime = accessTokenLifetime;
     }
@@ -373,11 +373,11 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     public void setRefreshTokenLifetime(long refreshTokenLifetime) {
         this.refreshTokenLifetime = refreshTokenLifetime;
     }
-    
+
     public void setRecycleRefreshTokens(boolean recycleRefreshTokens) {
         this.recycleRefreshTokens = recycleRefreshTokens;
     }
-    
+
     public void init() {
         for (OAuthPermission perm : permissionMap.values()) {
             if (defaultScopes != null && defaultScopes.contains(perm.getPermission())) {
@@ -388,10 +388,10 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             }
         }
     }
-    
+
     public void close() {
     }
-    
+
     public Map<String, OAuthPermission> getPermissionMap() {
         return permissionMap;
     }
@@ -399,7 +399,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     public void setPermissionMap(Map<String, OAuthPermission> permissionMap) {
         this.permissionMap = permissionMap;
     }
-    
+
     public void setSupportedScopes(Map<String, String> scopes) {
         for (Map.Entry<String, String> entry : scopes.entrySet()) {
             OAuthPermission permission = new OAuthPermission(entry.getKey(), entry.getValue());
@@ -414,7 +414,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     public void setMessageContext(MessageContext messageContext) {
         this.messageContext = messageContext;
     }
-    
+
     protected void removeClientTokens(Client c) {
         List<RefreshToken> refreshTokens = getRefreshTokens(c, null);
         if (refreshTokens != null) {
@@ -429,7 +429,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             }
         }
     }
-    
+
     @Override
     public Client removeClient(String clientId) {
         Client c = getClient(clientId);
@@ -437,7 +437,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         doRemoveClient(c);
         return c;
     }
-    
+
     protected ServerAccessToken revokeAccessToken(String accessTokenKey) {
         ServerAccessToken at = getAccessToken(accessTokenKey);
         if (at != null) {
@@ -445,15 +445,15 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
         return at;
     }
-    protected RefreshToken revokeRefreshToken(String refreshTokenKey) { 
+    protected RefreshToken revokeRefreshToken(String refreshTokenKey) {
         RefreshToken refreshToken = getRefreshToken(refreshTokenKey);
         if (refreshToken != null) {
             doRevokeRefreshToken(refreshToken);
         }
         return refreshToken;
     }
-    
-    
+
+
     protected abstract void saveAccessToken(ServerAccessToken serverToken);
     protected abstract void saveRefreshToken(RefreshToken refreshToken);
     protected abstract void doRevokeAccessToken(ServerAccessToken accessToken);
@@ -493,8 +493,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         this.supportPreauthorizedTokens = supportPreauthorizedTokens;
     }
     protected static boolean isClientMatched(Client c, UserSubject resourceOwner) {
-        return resourceOwner == null 
-            || c.getResourceOwnerSubject() != null 
+        return resourceOwner == null
+            || c.getResourceOwnerSubject() != null
                 && c.getResourceOwnerSubject().getLogin().equals(resourceOwner.getLogin());
     }
     protected static boolean isTokenMatched(ServerAccessToken token, Client c, UserSubject sub) {
@@ -506,7 +506,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
         return false;
     }
-    public void setClients(List<Client> clients) {    
+    public void setClients(List<Client> clients) {
         for (Client c : clients) {
             setClient(c);
         }
@@ -527,11 +527,11 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     public void setJwtAccessTokenProducer(OAuthJoseJwtProducer jwtAccessTokenProducer) {
         this.jwtAccessTokenProducer = jwtAccessTokenProducer;
     }
-    
+
     protected String processJwtAccessToken(JwtClaims jwtCliams) {
         // It will JWS-sign (default) and/or JWE-encrypt
-        OAuthJoseJwtProducer processor = 
-            getJwtAccessTokenProducer() == null ? new OAuthJoseJwtProducer() : getJwtAccessTokenProducer(); 
+        OAuthJoseJwtProducer processor =
+            getJwtAccessTokenProducer() == null ? new OAuthJoseJwtProducer() : getJwtAccessTokenProducer();
         return processor.processJwt(new JwtToken(jwtCliams));
     }
 

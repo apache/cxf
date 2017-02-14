@@ -32,7 +32,7 @@ public class AesWrapKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgo
         Arrays.asList(KeyAlgorithm.A128KW.getJwaName(),
                       KeyAlgorithm.A192KW.getJwaName(),
                       KeyAlgorithm.A256KW.getJwaName()));
-    public AesWrapKeyEncryptionAlgorithm(String encodedKey, KeyAlgorithm keyAlgoJwt) {    
+    public AesWrapKeyEncryptionAlgorithm(String encodedKey, KeyAlgorithm keyAlgoJwt) {
         this(CryptoUtils.decodeSequence(encodedKey), keyAlgoJwt);
     }
     public AesWrapKeyEncryptionAlgorithm(byte[] keyBytes, KeyAlgorithm keyAlgoJwt) {
@@ -42,7 +42,7 @@ public class AesWrapKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgo
     public AesWrapKeyEncryptionAlgorithm(SecretKey key, KeyAlgorithm keyAlgoJwt) {
         super(key, keyAlgoJwt, SUPPORTED_ALGORITHMS);
     }
-    
-    
-    
+
+
+
 }

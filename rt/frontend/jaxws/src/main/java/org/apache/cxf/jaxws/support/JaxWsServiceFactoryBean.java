@@ -170,7 +170,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         }
 
         if (addressing != null) {
-            features.add(new AddressingFeature(addressing.enabled(), 
+            features.add(new AddressingFeature(addressing.enabled(),
                                                addressing.required(),
                                                addressing.responses()));
         }
@@ -278,7 +278,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             getMethodDispatcher().bind(op, method);
         }
     }
-    
+
     @Override
     protected void initializeWSDLOperations() {
         if (implInfo.isWebServiceProvider()) {

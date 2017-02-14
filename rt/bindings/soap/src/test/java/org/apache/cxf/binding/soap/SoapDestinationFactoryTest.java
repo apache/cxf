@@ -33,7 +33,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class SoapDestinationFactoryTest extends Assert {
-    
+
     @Test
     public void testDestination() throws Exception {
         String wsdlSoapNs = "http://schemas.xmlsoap.org/wsdl/soap/";
@@ -43,7 +43,7 @@ public class SoapDestinationFactoryTest extends Assert {
         ServiceInfo si = new ServiceInfo();
         EndpointInfo ei = new EndpointInfo(si, wsdlSoapNs);
         // this code used to call "new SOAPAddressImpl()", but the test
-        // is currently not testing anything, and needlessly ties the 
+        // is currently not testing anything, and needlessly ties the
         // code to a specific implementation of wsdl4j. When the SOAPAddress
         // is really needed, it should be mocked.
         SOAPAddress add = null;

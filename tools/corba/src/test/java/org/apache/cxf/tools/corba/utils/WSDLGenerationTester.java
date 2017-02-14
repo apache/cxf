@@ -103,13 +103,13 @@ public class WSDLGenerationTester {
                                                    origAttrName.getLocalPart());
                 String s2 = actual.getAttributeValue(origAttrName.getNamespaceURI(),
                                                      origAttrName.getLocalPart());
-                
+
                 if (!s1.equals(s2)
                     && (s1.contains(":") || s2.contains(":"))) {
                     s1 = mapToQName(orig, s1);
                     s2 = mapToQName(actual, s2);
                 }
-                
+
                 Assert.assertEquals("Attribute " + origAttrName + " not found or value not matching",
                                     s1, s2);
             }
@@ -167,7 +167,7 @@ public class WSDLGenerationTester {
         CatalogWSDLLocator locator = new CatalogWSDLLocator(url, (Bus)null);
 
         Definition wsdlDefn = reader.readWSDL(locator);
-        
+
         WSDLWriter wsdlWriter = factory.newWSDLWriter();
         wsdlWriter.writeWSDL(wsdlDefn, writer);
         writer.close();

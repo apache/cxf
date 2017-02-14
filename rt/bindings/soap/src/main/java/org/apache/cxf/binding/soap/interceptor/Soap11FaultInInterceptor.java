@@ -40,7 +40,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(Soap11FaultInInterceptor.class);
-    
+
     public Soap11FaultInInterceptor() {
         super(Phase.UNMARSHAL);
         addBefore(ClientFaultConverter.class.getName());
@@ -52,7 +52,7 @@ public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
         message.setContent(Exception.class, unmarshalFault(message, reader));
     }
 
-    public static SoapFault unmarshalFault(SoapMessage message, 
+    public static SoapFault unmarshalFault(SoapMessage message,
                                            XMLStreamReader reader) {
         String exMessage = "";
         QName faultCode = null;

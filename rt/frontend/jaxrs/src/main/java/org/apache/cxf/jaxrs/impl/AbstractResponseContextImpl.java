@@ -45,7 +45,7 @@ public abstract class AbstractResponseContextImpl {
         this.m = m;
         this.r = r;
     }
-    
+
     public Set<String> getAllowedMethods() {
         return r.getAllowedMethods();
     }
@@ -62,7 +62,7 @@ public abstract class AbstractResponseContextImpl {
         return r.getEntity();
     }
 
-       
+
     public EntityTag getEntityTag() {
         return r.getEntityTag();
     }
@@ -130,16 +130,16 @@ public abstract class AbstractResponseContextImpl {
             m.put(Message.CONTENT_TYPE, mt.toString());
         }
     }
-    
+
     public void setEntity(Object entity) {
         ((ResponseImpl)r).setEntity(entity, getResponseEntityAnnotations());
     }
-    
+
     protected Annotation[] getResponseEntityAnnotations() {
         return ((ResponseImpl)r).getEntityAnnotations();
     }
-    
-        
+
+
     public void setStatus(int status) {
         m.getExchange().put(Message.RESPONSE_CODE, status);
         m.put(Message.RESPONSE_CODE, status);

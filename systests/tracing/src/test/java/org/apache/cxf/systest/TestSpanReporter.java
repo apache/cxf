@@ -35,7 +35,7 @@ public class TestSpanReporter implements Reporter<Span> {
     public static List<Span> getAllSpans() {
         return spans;
     }
-    
+
     public static void clear() {
         spans.clear();
     }

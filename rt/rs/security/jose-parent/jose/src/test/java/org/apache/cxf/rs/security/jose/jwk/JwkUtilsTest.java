@@ -73,7 +73,7 @@ public class JwkUtilsTest extends Assert {
         JsonWebKey jwk = JwkUtils.readJwkKey(RSA_KEY);
         String modulus = jwk.getStringProperty(JsonWebKey.RSA_MODULUS);
         assertEquals(256, JoseUtils.decode(modulus).length);
-        
+
         RSAPublicKey pk = JwkUtils.toRSAPublicKey(jwk);
         JsonWebKey jwk2 = JwkUtils.fromRSAPublicKey(pk, jwk.getAlgorithm());
         String modulus2 = jwk2.getStringProperty(JsonWebKey.RSA_MODULUS);
@@ -82,24 +82,24 @@ public class JwkUtilsTest extends Assert {
     }
     @Test
     public void testFromToPrivateRsaKey() throws Exception {
-        RSAPrivateKey privateKey1 = 
-            (RSAPrivateKey)KeyManagementUtils.loadPrivateKey("org/apache/cxf/rs/security/jose/jws/alice.jks", 
-                                              "password", 
-                                              "alice", 
+        RSAPrivateKey privateKey1 =
+            (RSAPrivateKey)KeyManagementUtils.loadPrivateKey("org/apache/cxf/rs/security/jose/jws/alice.jks",
+                                              "password",
+                                              "alice",
                                               "password",
                                               null);
         JsonWebKey jwk1 = JwkUtils.fromRSAPrivateKey(privateKey1, KeyAlgorithm.RSA_OAEP_256.getJwaName());
         assertNotNull(jwk1.getProperty(JsonWebKey.RSA_PUBLIC_EXP));
         RSAPrivateKey privateKey2 = JwkUtils.toRSAPrivateKey(jwk1);
         assertEquals(privateKey2, privateKey1);
-        
+
     }
     @Test
     public void testToPrivateRsaKeyWithoutE() throws Exception {
-        RSAPrivateKey privateKey1 = 
-            (RSAPrivateKey)KeyManagementUtils.loadPrivateKey("org/apache/cxf/rs/security/jose/jws/alice.jks", 
-                                              "password", 
-                                              "alice", 
+        RSAPrivateKey privateKey1 =
+            (RSAPrivateKey)KeyManagementUtils.loadPrivateKey("org/apache/cxf/rs/security/jose/jws/alice.jks",
+                                              "password",
+                                              "alice",
                                               "password",
                                               null);
         JsonWebKey jwk1 = JwkUtils.fromRSAPrivateKey(privateKey1, KeyAlgorithm.RSA_OAEP_256.getJwaName());
@@ -142,5 +142,5 @@ public class JwkUtilsTest extends Assert {
         String thumbprint = JwkUtils.getThumbprint(EC_521_KEY);
         assertEquals("rz4Ohmpxg-UOWIWqWKHlOe0bHSjNUFlHW5vwG_M7qYg", thumbprint);
     }
-    
+
 }

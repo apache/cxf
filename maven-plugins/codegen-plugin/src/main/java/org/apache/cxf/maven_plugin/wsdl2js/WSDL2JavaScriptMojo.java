@@ -64,17 +64,17 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
      */
     @Parameter
     Option defaultOptions = new Option();
-    
+
     /**
-     * Options that specify WSDLs to process and/or control the processing of wsdls. 
+     * Options that specify WSDLs to process and/or control the processing of wsdls.
      * If you have enabled wsdl scanning, these elements attach options to particular wsdls.
-     * If you have not enabled wsdl scanning, these options call out the wsdls to process. 
+     * If you have not enabled wsdl scanning, these options call out the wsdls to process.
      */
     @Parameter
     WsdlOption wsdlOptions[];
 
     @Override
-    protected Bus generate(GenericWsdlOption genericWsdlOption, 
+    protected Bus generate(GenericWsdlOption genericWsdlOption,
                            Bus bus, Set<URI> classPath)
         throws MojoExecutionException {
 
@@ -188,7 +188,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
     }
 
     protected void mergeOptions(List<GenericWsdlOption> effectiveWsdlOptions) {
-        File outputDirFile = getGeneratedTestRoot() == null 
+        File outputDirFile = getGeneratedTestRoot() == null
             ? getGeneratedSourceRoot() : getGeneratedTestRoot();
         for (GenericWsdlOption wo : effectiveWsdlOptions) {
             WsdlOption option = (WsdlOption)wo;
@@ -204,13 +204,13 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
         throws MojoExecutionException {
         List<GenericWsdlOption> effectiveWsdlOptions = new ArrayList<>();
         List<GenericWsdlOption> temp;
-        
+
         if (wsdlOptions != null) {
             for (WsdlOption wo : wsdlOptions) {
                 effectiveWsdlOptions.add(wo);
             }
         }
-        
+
         if (wsdlRoot != null && wsdlRoot.exists() && !disableDirectoryScan) {
             temp = loadWsdlOptionsFromFiles(wsdlRoot, getGeneratedSourceRoot());
             effectiveWsdlOptions.addAll(temp);
@@ -253,7 +253,7 @@ public class WSDL2JavaScriptMojo extends AbstractCodegenMoho {
     public static List<GenericWsdlOption> loadWsdlOptionsFromDependencies(MavenProject project,
                                                                           Option defaultOptions,
                                                                           File outputDir) {
-        List<GenericWsdlOption> options 
+        List<GenericWsdlOption> options
             = new ArrayList<>();
         Set<Artifact> dependencies = CastUtils.cast(project.getDependencyArtifacts());
         for (Artifact artifact : dependencies) {

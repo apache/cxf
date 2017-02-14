@@ -61,7 +61,7 @@ public class SwaggerFeature extends AbstractSwaggerFeature {
         providers.add(new ApiDeclarationProvider());
         ((ServerProviderFactory)server.getEndpoint().get(
                 ServerProviderFactory.class.getName())).setUserProviders(providers);
-        
+
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setResourcePackage(getResourcePackage());
         beanConfig.setVersion(getVersion());
@@ -74,7 +74,7 @@ public class SwaggerFeature extends AbstractSwaggerFeature {
         beanConfig.setTermsOfServiceUrl(getTermsOfServiceUrl());
         beanConfig.setScan(isScan());
         beanConfig.setFilterClass(getFilterClass());
-    }    
+    }
 
     @Override
     protected void setBasePathByAddress(String address) {
@@ -85,7 +85,7 @@ public class SwaggerFeature extends AbstractSwaggerFeature {
     private static class SwaggerContainerRequestFilter implements ContainerRequestFilter {
         private static final String APIDOCS_LISTING_PATH = "api-docs";
         private static final Pattern APIDOCS_RESOURCE_PATH = Pattern.compile(APIDOCS_LISTING_PATH + "(/.+)");
-        
+
         private ApiListingResourceJSON apiListingResource;
         @Context
         private MessageContext mc;
@@ -97,20 +97,20 @@ public class SwaggerFeature extends AbstractSwaggerFeature {
         public void filter(ContainerRequestContext requestContext) throws IOException {
             UriInfo ui = mc.getUriInfo();
             if (ui.getPath().endsWith(APIDOCS_LISTING_PATH)) {
-                Response r = 
+                Response r =
                     apiListingResource.resourceListing(null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
                 requestContext.abortWith(r);
             } else {
                 final Matcher matcher = APIDOCS_RESOURCE_PATH.matcher(ui.getPath());
-                
+
                 if (matcher.find()) {
-                    Response r = 
-                        apiListingResource.apiDeclaration(matcher.group(1), 
+                    Response r =
+                        apiListingResource.apiDeclaration(matcher.group(1),
                             null, mc.getServletConfig(), mc.getHttpHeaders(), ui);
-                    requestContext.abortWith(r);                
+                    requestContext.abortWith(r);
                 }
             }
         }
-        
+
     }
 }

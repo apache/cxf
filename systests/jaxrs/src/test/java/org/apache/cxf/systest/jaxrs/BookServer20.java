@@ -70,21 +70,21 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-    
+
 public class BookServer20 extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookServer20.class);
- 
-    org.apache.cxf.endpoint.Server server; 
-    
+
+    org.apache.cxf.endpoint.Server server;
+
     protected void run() {
         Bus bus = BusFactory.getDefaultBus();
         setBus(bus);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
         sf.setResourceClasses(BookStore.class);
-        
+
         List<Object> providers = new ArrayList<>();
-        
+
         providers.add(new PreMatchContainerRequestFilter2());
         providers.add(new PreMatchContainerRequestFilter());
         providers.add(new PostMatchContainerResponseFilter());
@@ -107,7 +107,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
     }
-    
+
     public void tearDown() throws Exception {
         server.stop();
         server.destroy();
@@ -125,7 +125,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
             System.out.println("done!");
         }
     }
-    
+
     @PreMatching
     @Priority(1)
     private static class PreMatchContainerRequestFilter implements ContainerRequestFilter {
@@ -134,8 +134,8 @@ public class BookServer20 extends AbstractBusTestServerBase {
         public void filter(ContainerRequestContext context) throws IOException {
             UriInfo ui = context.getUriInfo();
             String path = ui.getPath(false);
-            
-            if (context.getMethod().equals("POST") 
+
+            if (context.getMethod().equals("POST")
                 && "bookstore/bookheaders/simple".equals(path) && !context.hasEntity()) {
                 byte[] bytes = StringUtils.toBytesUTF8("<Book><name>Book</name><id>126</id></Book>");
                 context.getHeaders().putSingle(HttpHeaders.CONTENT_LENGTH, Integer.toString(bytes.length));
@@ -147,7 +147,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 throw new RuntimeException();
             }
             context.setProperty("FirstPrematchingFilter", "true");
-            
+
             if ("wrongpath".equals(path)) {
                 context.setRequestUri(URI.create("/bookstore/bookheaders/simple"));
             } else if ("throwException".equals(path)) {
@@ -156,7 +156,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
                     Response.status(500).type("text/plain")
                         .entity("Prematch filter error").build());
             }
-            
+
             MediaType mt = context.getMediaType();
             if (mt != null && mt.toString().equals("text/xml")) {
                 String method = context.getMethod();
@@ -175,9 +175,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 context.getHeaders().putSingle("Accept", "text/xml");
             }
         }
-        
+
     }
-    
+
     @PreMatching
     @Priority(3)
     private static class PreMatchContainerRequestFilter2 implements ContainerRequestFilter {
@@ -193,9 +193,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
             }
             context.getHeaders().add("BOOK", "12");
         }
-        
+
     }
-    
+
     @PreMatching
     private static class PreMatchReplaceStreamOrAddress implements ContainerRequestFilter {
         @Context
@@ -206,12 +206,12 @@ public class BookServer20 extends AbstractBusTestServerBase {
             if (path.endsWith("books/checkN")) {
                 URI requestURI = URI.create(path.replace("N", "2"));
                 context.setRequestUri(requestURI);
-                
+
                 String body = IOUtils.readStringFromStream(context.getEntityStream());
                 if (!"s".equals(body)) {
                     throw new RuntimeException();
                 }
-                
+
                 replaceStream(context);
             } else if (path.endsWith("books/check2")) {
                 replaceStream(context);
@@ -220,15 +220,15 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 context.setRequestUri(requestURI);
                 replaceStream(context);
             }
-            
+
         }
         private void replaceStream(ContainerRequestContext context) {
             InputStream is = new ByteArrayInputStream("123".getBytes());
             context.setEntityStream(is);
         }
     }
-    
-        
+
+
     @PreMatching
     @Priority(2)
     private static class PreMatchDynamicContainerRequestFilter implements ContainerRequestFilter {
@@ -240,9 +240,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
             }
             context.setProperty("DynamicPrematchingFilter", "true");
         }
-        
+
     }
-    
+
     @CustomHeaderAdded
     private static class PostMatchContainerRequestFilter implements ContainerRequestFilter {
         @Context
@@ -260,9 +260,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 context.getHeaders().addFirst("Book", value + "3");
             }
         }
-        
+
     }
-    
+
     @Faulty
     @CustomHeaderAdded
     private static class FaultyContainerRequestFilter implements ContainerRequestFilter {
@@ -271,9 +271,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
         public void filter(ContainerRequestContext context) throws IOException {
             throw new RuntimeException();
         }
-        
+
     }
-    
+
     @Priority(3)
     public static class PostMatchContainerResponseFilter implements ContainerResponseFilter {
 
@@ -287,7 +287,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 if (!"text/plain".equals(ct)) {
                     throw new RuntimeException();
                 }
-                responseContext.getHeaders().putSingle("FilterException", 
+                responseContext.getHeaders().putSingle("FilterException",
                                                        requestContext.getProperty("filterexception"));
             }
             Object entity = responseContext.getEntity();
@@ -308,9 +308,9 @@ public class BookServer20 extends AbstractBusTestServerBase {
             responseContext.getHeaders().putSingle("Content-Type", ct);
             responseContext.getHeaders().add("Response", "OK");
         }
-        
+
     }
-    
+
     @Priority(1)
     public static class PostMatchContainerResponseFilter2 implements ContainerResponseFilter {
         @Context
@@ -325,16 +325,16 @@ public class BookServer20 extends AbstractBusTestServerBase {
             if (!responseContext.getHeaders().containsKey("Response")) {
                 throw new RuntimeException();
             }
-        
+
             if ((!responseContext.getHeaders().containsKey("DynamicResponse")
                 || !responseContext.getHeaders().containsKey("DynamicResponse2"))
                 && !"Prematch filter error".equals(responseContext.getEntity())) {
                 throw new RuntimeException();
             }
             responseContext.getHeaders().add("Response2", "OK2");
-            
+
         }
-        
+
     }
     @Priority(4)
     @CustomHeaderAdded
@@ -350,10 +350,10 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 responseContext.setEntity(new Book(book.getName(), 1 + book.getId()), null, null);
             }
         }
-        
+
     }
-    
-    public static class PostMatchDynamicContainerRequestResponseFilter 
+
+    public static class PostMatchDynamicContainerRequestResponseFilter
         implements ContainerRequestFilter, ContainerResponseFilter {
 
         @Override
@@ -363,15 +363,15 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 throw new RuntimeException();
             }
             responseContext.getHeaders().add("DynamicResponse2", "Dynamic2");
-            
+
         }
 
         @Override
         public void filter(ContainerRequestContext requestContext) throws IOException {
             throw new RuntimeException();
-            
+
         }
-        
+
     }
     public static class PostMatchDynamicEchoBookFilter implements ContainerResponseFilter {
         private int supplement;
@@ -385,11 +385,11 @@ public class BookServer20 extends AbstractBusTestServerBase {
             responseContext.setEntity(new Book(book.getName(), book.getId() + supplement));
         }
     }
-    
+
     @Priority(2)
-    public static class PostMatchDynamicContainerResponseFilter 
+    public static class PostMatchDynamicContainerResponseFilter
         implements ContainerResponseFilter {
-    
+
         @Override
         public void filter(ContainerRequestContext requestContext,
                            ContainerResponseContext responseContext) throws IOException {
@@ -397,39 +397,39 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 throw new RuntimeException();
             }
             responseContext.getHeaders().add("DynamicResponse", "Dynamic");
-            
+
         }
-        
+
     }
-    
+
     @Target({ ElementType.TYPE, ElementType.METHOD })
     @Retention(value = RetentionPolicy.RUNTIME)
     @NameBinding
-    public @interface CustomHeaderAdded { 
-        
+    public @interface CustomHeaderAdded {
+
     }
-    
+
     @Target({ ElementType.TYPE, ElementType.METHOD })
     @Retention(value = RetentionPolicy.RUNTIME)
     @NameBinding
-    public @interface CustomHeaderAddedAsync { 
-        
+    public @interface CustomHeaderAddedAsync {
+
     }
-    
+
     @Target({ ElementType.TYPE, ElementType.METHOD })
     @Retention(value = RetentionPolicy.RUNTIME)
     @NameBinding
-    public @interface PostMatchMode { 
-        
+    public @interface PostMatchMode {
+
     }
-    
+
     @Target({ ElementType.TYPE, ElementType.METHOD })
     @Retention(value = RetentionPolicy.RUNTIME)
     @NameBinding
-    public @interface Faulty { 
-        
+    public @interface Faulty {
+
     }
-    
+
     @Priority(1)
     public static class CustomReaderInterceptor implements ReaderInterceptor {
         @Context
@@ -441,11 +441,11 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 context.getHeaders().add("ServerReaderInterceptor", "serverRead");
             }
             return context.proceed();
-            
+
         }
-        
+
     }
-    
+
     @Priority(2)
     @CustomHeaderAddedAsync
     public static class CustomReaderBoundInterceptor implements ReaderInterceptor {
@@ -466,11 +466,11 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 }
             }
             return context.proceed();
-            
+
         }
-        
+
     }
-    
+
     public static class CustomWriterInterceptor implements WriterInterceptor {
 
         @Context
@@ -487,22 +487,22 @@ public class BookServer20 extends AbstractBusTestServerBase {
             context.setMediaType(MediaType.valueOf(ct));
             context.proceed();
         }
-        
+
     }
-    
+
     public static class CustomDynamicFeature implements DynamicFeature {
 
         private static final ContainerResponseFilter RESPONSE_FILTER =
             new PostMatchDynamicContainerResponseFilter();
-        
+
         @Override
         public void configure(ResourceInfo resourceInfo, FeatureContext configurable) {
-            
+
             configurable.register(new PreMatchDynamicContainerRequestFilter());
             configurable.register(RESPONSE_FILTER);
             Map<Class<?>, Integer> contracts = new HashMap<Class<?>, Integer>();
             contracts.put(ContainerResponseFilter.class, 2);
-            configurable.register(new PostMatchDynamicContainerRequestResponseFilter(), 
+            configurable.register(new PostMatchDynamicContainerRequestResponseFilter(),
                                   contracts);
             Method m = resourceInfo.getResourceMethod();
             if ("echoBookElement".equals(m.getName())) {
@@ -512,7 +512,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
                 }
             }
         }
-        
+
     }
     private static class ServerTestFeature implements Feature {
 
@@ -521,6 +521,6 @@ public class BookServer20 extends AbstractBusTestServerBase {
             context.register(new GenericHandlerWriter());
             return true;
         }
-        
+
     }
 }

@@ -22,12 +22,12 @@ package org.apache.cxf.javascript.fortest;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * 
+ *
  */
 @XmlType(namespace = "uri:org.apache.cxf.javascript.testns")
 public class GenericGenericClass<T> implements GenericInterface<T> {
     private T value;
-    
+
     public void doSomethingGeneric(T t) {
         value = t;
     }

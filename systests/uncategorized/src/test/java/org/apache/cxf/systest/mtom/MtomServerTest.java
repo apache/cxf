@@ -65,7 +65,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         createStaticBus();
         testUtilities.setBus(getStaticBus());
     }
-    
+
     @Test
     public void testMtomRequest() throws Exception {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();

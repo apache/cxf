@@ -38,7 +38,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class MTOMTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(MTOMTest.class);
@@ -50,12 +50,12 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
 
         public ObjectWithHashMapData() {
         }
-        
+
         @XmlJavaTypeAdapter(HashMapAdapter.class)
         public Map<String, byte[]> getKeyData() {
             return keyData;
         }
-        
+
         public void setKeyData(Map<String, byte[]> d) {
             keyData = d;
         }
@@ -68,7 +68,7 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
             this.name = name;
         }
     }
-    
+
     @Logging(pretty = true)
     @WebService
     @MTOM(threshold = 1)
@@ -96,9 +96,9 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
                 bytes[y] = (byte)z;
             }
             return bytes;
-        }        
+        }
     }
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
             Endpoint.publish(ADDRESS, new MTOMServer());
@@ -119,15 +119,15 @@ public class MTOMTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testMTOMInHashMap() throws Exception {
         Service service = Service.create(new QName("http://foo", "bar"));
-        service.addPort(new QName("http://foo", "bar"), SOAPBinding.SOAP11HTTP_BINDING, 
+        service.addPort(new QName("http://foo", "bar"), SOAPBinding.SOAP11HTTP_BINDING,
                         ADDRESS);
         MTOMService port = service.getPort(new QName("http://foo", "bar"),
                                            MTOMService.class);
-        
+
         final int count = 99;
         ObjectWithHashMapData data = port.getHashMapData(count);
         for (int y = 1;  y < count; y++) {

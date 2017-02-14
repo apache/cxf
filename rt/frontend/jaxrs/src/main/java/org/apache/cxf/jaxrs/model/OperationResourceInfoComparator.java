@@ -38,7 +38,7 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
     private String httpMethod;
     private boolean getMethod;
     private Message message;
-    private ResourceComparator rc;  
+    private ResourceComparator rc;
     private MediaType contentType = MediaType.WILDCARD_TYPE;
     private List<MediaType> acceptTypes = Collections.singletonList(MediaType.WILDCARD_TYPE);
 
@@ -52,8 +52,8 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
         }
         this.httpMethod = method;
     }
-    
-    public OperationResourceInfoComparator(Message m, 
+
+    public OperationResourceInfoComparator(Message m,
                                            String httpMethod,
                                            boolean getMethod,
                                            MediaType contentType,
@@ -63,7 +63,7 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
         this.acceptTypes = acceptTypes;
         this.getMethod = getMethod;
     }
-    
+
     public int compare(OperationResourceInfo e1, OperationResourceInfo e2) {
         if (e1 == e2) {
             return 0;
@@ -76,7 +76,7 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
         }
         String e1HttpMethod = e1.getHttpMethod();
         String e2HttpMethod = e2.getHttpMethod();
-        
+
         int result = 0;
         if (!getMethod && HttpMethod.HEAD.equals(httpMethod)) {
             result = compareWithHead(e1HttpMethod, e2HttpMethod);
@@ -84,31 +84,31 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
                 return result;
             }
         }
-            
+
         result = URITemplate.compareTemplates(
                           e1.getURITemplate(),
                           e2.getURITemplate());
-        
+
         if (result == 0 && (e1HttpMethod != null && e2HttpMethod == null
                 || e1HttpMethod == null && e2HttpMethod != null)) {
             // resource method takes precedence over a subresource locator
             return e1.getHttpMethod() != null ? -1 : 1;
         }
-        
+
         if (result == 0 && !getMethod) {
             result = JAXRSUtils.compareSortedConsumesMediaTypes(
-                          e1.getConsumeTypes(), 
+                          e1.getConsumeTypes(),
                           e2.getConsumeTypes(),
                           contentType);
         }
-        
+
         if (result == 0) {
             //use the media type of output data as the secondary key.
-            result = JAXRSUtils.compareSortedAcceptMediaTypes(e1.getProduceTypes(), 
+            result = JAXRSUtils.compareSortedAcceptMediaTypes(e1.getProduceTypes(),
                                                               e2.getProduceTypes(),
                                                               acceptTypes);
         }
-        
+
         if (result == 0 && e1HttpMethod != null && e2HttpMethod != null) {
             boolean e1IsDefault = DefaultMethod.class.getSimpleName().equals(e1HttpMethod);
             boolean e2IsDefault = DefaultMethod.class.getSimpleName().equals(e2HttpMethod);
@@ -116,12 +116,12 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
                 result = 1;
             } else if (!e1IsDefault && e2IsDefault) {
                 result = -1;
-            } 
+            }
         }
         if (result == 0) {
-            String m1Name = 
+            String m1Name =
                 e1.getClassResourceInfo().getServiceClass().getName() + "#" + e1.getMethodToInvoke().getName();
-            String m2Name = 
+            String m2Name =
                 e2.getClassResourceInfo().getServiceClass().getName() + "#" + e2.getMethodToInvoke().getName();
             LOG.warning("Both " + m1Name + " and " + m2Name + " are equal candidates for handling the current request"
                         + " which can lead to unpredictable results");

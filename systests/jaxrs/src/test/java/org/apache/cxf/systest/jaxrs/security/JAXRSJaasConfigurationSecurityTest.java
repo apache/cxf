@@ -29,36 +29,36 @@ import org.junit.Test;
 
 public class JAXRSJaasConfigurationSecurityTest extends AbstractSpringSecurityTest {
     public static final int PORT = BookServerJaasSecurity.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
-                   launchServer(BookServerJaasSecurity.class, 
+        assertTrue("server did not launch correctly",
+                   launchServer(BookServerJaasSecurity.class,
                                 true));
     }
-    
+
     @Test
     public void testJaasInterceptorAuthenticationFailure() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/service/jaasConfig/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/service/jaasConfig/bookstorestorage/thosebooks/123";
         getBook(endpointAddress, "foo", "bar1", 401);
     }
-    
+
     @Test
     public void testGetBookUserAdminJaasInterceptor() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/service/jaasConfig/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/service/jaasConfig/bookstorestorage/thosebooks/123";
         getBook(endpointAddress, "foo", "bar", 403);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
-    
+
     @Test
     public void testJaasFilterAuthenticationFailure() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/service/jaasConfigFilter/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/service/jaasConfigFilter/bookstorestorage/thosebooks/123";
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("text/xml");
-        wc.header(HttpHeaders.AUTHORIZATION, 
+        wc.header(HttpHeaders.AUTHORIZATION,
                   "Basic " + base64Encode("foo" + ":" + "bar1"));
         Response r = wc.get();
         assertEquals(401, r.getStatus());
@@ -66,11 +66,11 @@ public class JAXRSJaasConfigurationSecurityTest extends AbstractSpringSecurityTe
         assertNotNull(wwwAuthHeader);
         assertEquals("Basic", wwwAuthHeader.toString());
     }
-    
+
     @Test
     public void testGetBookUserAdminJaasFilter() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/service/jaasConfigFilter/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/service/jaasConfigFilter/bookstorestorage/thosebooks/123";
         getBook(endpointAddress, "foo", "bar", 403);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }

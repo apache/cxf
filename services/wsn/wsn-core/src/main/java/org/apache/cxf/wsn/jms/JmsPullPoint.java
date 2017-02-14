@@ -56,7 +56,7 @@ public class JmsPullPoint extends AbstractPullPoint {
     private Connection connection;
 
     private Session producerSession;
-    
+
     private Session consumerSession;
 
     private Queue queue;
@@ -83,7 +83,7 @@ public class JmsPullPoint extends AbstractPullPoint {
             consumer = consumerSession.createConsumer(queue);
         }
     }
-    
+
     protected synchronized void closeSession() {
         if (producerSession != null) {
             try {
@@ -94,7 +94,7 @@ public class JmsPullPoint extends AbstractPullPoint {
                 producerSession = null;
             }
         }
-        
+
         if (consumerSession != null) {
             try {
                 consumerSession.close();
@@ -121,14 +121,14 @@ public class JmsPullPoint extends AbstractPullPoint {
         } catch (JMSException e) {
             LOGGER.log(Level.WARNING, "Error storing message", e);
             closeSession();
-            
+
         } catch (JAXBException e) {
             LOGGER.log(Level.WARNING, "Error storing message", e);
         }
     }
 
     @Override
-    protected List<NotificationMessageHolderType> getMessages(int max) 
+    protected List<NotificationMessageHolderType> getMessages(int max)
         throws ResourceUnknownFault, UnableToGetMessagesFault {
         try {
             if (max == 0) {

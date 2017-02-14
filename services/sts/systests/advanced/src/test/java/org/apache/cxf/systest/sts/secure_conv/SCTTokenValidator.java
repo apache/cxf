@@ -31,10 +31,10 @@ import org.apache.wss4j.dom.validate.Credential;
  * checks that we get back a SAML2 Assertion from the STS, and extracts the secret from it.
  */
 public class SCTTokenValidator extends STSTokenValidator {
-    
+
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential validatedCredential = super.validate(credential, data);
-        
+
         SamlAssertionWrapper transformedToken = validatedCredential.getTransformedToken();
         if (transformedToken == null || transformedToken.getSaml2() == null
             || !"DoubleItSTSIssuer".equals(transformedToken.getIssuerString())) {
@@ -42,13 +42,13 @@ public class SCTTokenValidator extends STSTokenValidator {
         }
 
         transformedToken.parseSubject(
-            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto(), 
+            new WSSSAMLKeyInfoProcessor(data), data.getSigVerCrypto(),
             data.getCallbackHandler()
         );
         SAMLKeyInfo keyInfo = transformedToken.getSubjectKeyInfo();
         byte[] secret = keyInfo.getSecret();
         validatedCredential.setSecretKey(secret);
-        
+
         return validatedCredential;
     }
 

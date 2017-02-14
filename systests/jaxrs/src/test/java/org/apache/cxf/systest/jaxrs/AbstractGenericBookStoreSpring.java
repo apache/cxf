@@ -44,7 +44,7 @@ public abstract class AbstractGenericBookStoreSpring<T extends SuperBookInterfac
         }
         throw new WebApplicationException(400);
     }
-    
+
     @POST
     @Path("/books/superbooks")
     public List<T> echoSuperBookCollectionJson(List<T> book) {
@@ -53,7 +53,7 @@ public abstract class AbstractGenericBookStoreSpring<T extends SuperBookInterfac
         }
         throw new WebApplicationException(400);
     }
-     
+
     @SuppressWarnings("unchecked")
     @GET
     @Path("/books/superbooks2")
@@ -62,7 +62,7 @@ public abstract class AbstractGenericBookStoreSpring<T extends SuperBookInterfac
             new SuperBook("Super", 124L, true))) {
         };
     }
-    
+
 }
 
 

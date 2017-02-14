@@ -36,8 +36,8 @@ public class CustomOutFaultInterceptor extends AbstractPhaseInterceptor<Message>
 
     public CustomOutFaultInterceptor(String s) {
         super(Phase.MARSHAL);
-        
-    } 
+
+    }
 
     public void handleMessage(Message message) throws Fault {
         if (message.getExchange().get("org.apache.cxf.systest.for-out-fault-interceptor") == null) {
@@ -58,11 +58,11 @@ public class CustomOutFaultInterceptor extends AbstractPhaseInterceptor<Message>
         try {
             response.getOutputStream().write("<nobook/>".getBytes());
             response.getOutputStream().flush();
-            message.getInterceptorChain().abort();           
+            message.getInterceptorChain().abort();
         } catch (IOException ioex) {
             throw new RuntimeException("Error writing the response");
         }
-        
+
     }
 
     protected boolean handleMessageCalled() {

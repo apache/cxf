@@ -73,7 +73,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         //make sure the interceptors get ordered correctly
         SortedSet<Phase> phases = new TreeSet<Phase>();
         phases.add(new Phase(Phase.PRE_PROTOCOL, 1));
-        
+
         List<Interceptor<? extends Message>> lst = new ArrayList<Interceptor<? extends Message>>();
         lst.add(new MustUnderstandInterceptor());
         lst.add(new WSS4JInInterceptor());
@@ -83,8 +83,8 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         String output = chain.toString();
         assertTrue(output.contains("MustUnderstandInterceptor, SAAJInInterceptor, WSS4JInInterceptor"));
     }
-    
-    
+
+
     @Test
     public void testSignature() throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
@@ -92,25 +92,25 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         outProperties.put(WSHandlerConstants.USER, "myalias");
         outProperties.put("password", "myAliasPassword");
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
-        
+
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/ds:Signature");
 
-        List<WSHandlerResult> handlerResults = 
+        List<WSHandlerResult> handlerResults =
             getResults(makeInvocation(outProperties, xpaths, inProperties));
         WSSecurityEngineResult actionResult =
             handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
-         
-        X509Certificate certificate = 
+
+        X509Certificate certificate =
             (X509Certificate) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertNotNull(certificate);
     }
-    
+
     @Test
     public void testDirectReferenceSignature() throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
@@ -119,26 +119,26 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         outProperties.put(WSHandlerConstants.USER, "myalias");
         outProperties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         outProperties.put("password", "myAliasPassword");
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
-        
+
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/wsse:BinarySecurityToken");
         xpaths.add("//wsse:Security/ds:Signature");
 
-        List<WSHandlerResult> handlerResults = 
+        List<WSHandlerResult> handlerResults =
             getResults(makeInvocation(outProperties, xpaths, inProperties));
         WSSecurityEngineResult actionResult =
             handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
-         
-        X509Certificate certificate = 
+
+        X509Certificate certificate =
             (X509Certificate) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         assertNotNull(certificate);
     }
-    
+
     @Test
     public void testEncryption() throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
@@ -146,17 +146,17 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         outProperties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
         outProperties.put(WSHandlerConstants.USER, "myalias");
         outProperties.put("password", "myAliasPassword");
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback()); 
-        
+        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//s:Body/xenc:EncryptedData");
 
-        List<WSHandlerResult> handlerResults = 
+        List<WSHandlerResult> handlerResults =
             getResults(makeInvocation(outProperties, xpaths, inProperties));
 
         assertNotNull(handlerResults);
@@ -186,7 +186,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
             )
         );
     }
-    
+
     @Test
     public void testEncryptedUsernameToken() throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
@@ -199,18 +199,18 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         outProperties.put("password", "alicePassword");
         outProperties.put(WSHandlerConstants.ENCRYPTION_USER, "myalias");
         outProperties.put(
-            WSHandlerConstants.ENCRYPTION_PARTS, 
+            WSHandlerConstants.ENCRYPTION_PARTS,
             "{Content}{" + WSConstants.WSSE_NS + "}UsernameToken"
         );
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(
-            WSHandlerConstants.ACTION, 
+            WSHandlerConstants.ACTION,
             WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT
         );
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback()); 
-        
+        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
 
@@ -219,7 +219,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
 
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
-        
+
         //
         // This should contain exactly 2 protection results
         //
@@ -227,18 +227,18 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
             handlerResults.get(0).getResults();
         assertNotNull(protectionResults);
         assertSame(protectionResults.size(), 2);
-        
+
         final Principal p1 = (Principal)protectionResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
         final Principal p2 = (Principal)protectionResults.get(1).get(WSSecurityEngineResult.TAG_PRINCIPAL);
         assertTrue(p1 instanceof UsernameTokenPrincipal || p2 instanceof UsernameTokenPrincipal);
-        
+
         Principal utPrincipal = p1 instanceof UsernameTokenPrincipal ? p1 : p2;
-        
+
         SecurityContext securityContext = inmsg.get(SecurityContext.class);
         assertNotNull(securityContext);
         assertSame(securityContext.getUserPrincipal(), utPrincipal);
     }
-    
+
     @Test
     public void testUsernameToken() throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
@@ -246,12 +246,12 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         outProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         outProperties.put(WSHandlerConstants.USER, "alice");
         outProperties.put("password", "alicePassword");
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
-        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback()); 
-        
+        inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
+
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
 
@@ -265,7 +265,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
             // expected
         }
     }
-    
+
     @Test
     public void testCustomProcessor() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
@@ -284,7 +284,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
 
         SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
         doc = saajMsg.getSOAPPart();
-        
+
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/ds:Signature", doc);
 
@@ -317,14 +317,14 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.NO_SECURITY);
 
         inHandler.handleMessage(inmsg);
-        
+
         List<WSHandlerResult> results = getResults(inmsg);
         assertTrue(results != null && results.size() == 1);
-        List<WSSecurityEngineResult> signatureResults = 
+        List<WSSecurityEngineResult> signatureResults =
             results.get(0).getActionResults().get(WSConstants.SIGN);
         assertTrue(signatureResults == null || signatureResults.size() == 0);
     }
-    
+
     @Test
     public void testCustomProcessorObject() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
@@ -343,7 +343,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
 
         SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
         doc = saajMsg.getSOAPPart();
-        
+
         assertValid("//wsse:Security", doc);
         assertValid("//wsse:Security/ds:Signature", doc);
 
@@ -380,22 +380,22 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
-        
+
         inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
 
         inHandler.handleMessage(inmsg);
-        
+
         List<WSHandlerResult> results = getResults(inmsg);
         assertTrue(results != null && results.size() == 1);
-        List<WSSecurityEngineResult> signatureResults = 
+        List<WSSecurityEngineResult> signatureResults =
             results.get(0).getActionResults().get(WSConstants.SIGN);
         assertTrue(signatureResults.size() == 1);
-        
+
         Object obj = signatureResults.get(0).get("foo");
         assertNotNull(obj);
         assertEquals(obj.getClass().getName(), CustomProcessor.class.getName());
     }
-    
+
     @Test
     public void testPKIPath() throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
@@ -405,54 +405,54 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         outProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
         outProperties.put(WSHandlerConstants.SIG_KEY_ID, "DirectReference");
         outProperties.put(WSHandlerConstants.USE_SINGLE_CERTIFICATE, "false");
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "cxfca.properties");
-        
+
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/ds:Signature");
 
-        List<WSHandlerResult> handlerResults = 
+        List<WSHandlerResult> handlerResults =
             getResults(makeInvocation(outProperties, xpaths, inProperties));
         WSSecurityEngineResult actionResult =
             handlerResults.get(0).getActionResults().get(WSConstants.SIGN).get(0);
-         
-        X509Certificate[] certificates = 
+
+        X509Certificate[] certificates =
             (X509Certificate[]) actionResult.get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
         assertNotNull(certificates);
         assertEquals(certificates.length, 2);
     }
-    
+
     @Test
     public void testUsernameTokenSignature() throws Exception {
         Map<String, Object> outProperties = new HashMap<String, Object>();
         outProperties.put(
-            WSHandlerConstants.ACTION, 
+            WSHandlerConstants.ACTION,
             WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.SIGNATURE);
         outProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         outProperties.put(WSHandlerConstants.USER, "alice");
-        
+
         outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
         outProperties.put(WSHandlerConstants.SIGNATURE_USER, "myalias");
         outProperties.put(
-            WSHandlerConstants.PW_CALLBACK_CLASS, 
+            WSHandlerConstants.PW_CALLBACK_CLASS,
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
         );
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(
-            WSHandlerConstants.ACTION, 
+            WSHandlerConstants.ACTION,
             WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.SIGNATURE
         );
         inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         inProperties.put(
-            WSHandlerConstants.PW_CALLBACK_CLASS, 
+            WSHandlerConstants.PW_CALLBACK_CLASS,
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
         );
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
-        
+
         List<String> xpaths = new ArrayList<>();
         xpaths.add("//wsse:Security");
         xpaths.add("//wsse:Security/ds:Signature");
@@ -460,7 +460,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
 
         makeInvocation(outProperties, xpaths, inProperties);
     }
-    
+
     /**
      * @return      a processor map suitable for custom processing of
      *              signatures (in this case, the actual processor is
@@ -478,13 +478,13 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         );
         return ret;
     }
-    
+
     private List<WSHandlerResult> getResults(SoapMessage inmsg) {
-        final List<WSHandlerResult> handlerResults = 
+        final List<WSHandlerResult> handlerResults =
             CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
         return handlerResults;
     }
-    
+
     // FOR DEBUGGING ONLY
     /*private*/ static String serialize(Document doc) {
         return StaxUtils.toString(doc);

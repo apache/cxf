@@ -27,16 +27,16 @@ import com.github.kristofa.brave.Brave;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
 
-public abstract class AbstractBraveClientInterceptor extends AbstractBraveClientProvider 
+public abstract class AbstractBraveClientInterceptor extends AbstractBraveClientProvider
         implements PhaseInterceptor<Message> {
-    
+
     private String phase;
 
     protected AbstractBraveClientInterceptor(final String phase, final Brave brave) {
         super(brave);
         this.phase = phase;
     }
-    
+
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         return null;
     }
@@ -56,7 +56,7 @@ public abstract class AbstractBraveClientInterceptor extends AbstractBraveClient
     public String getPhase() {
         return phase;
     }
-    
+
     public void handleFault(Message message) {
     }
 

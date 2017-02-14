@@ -39,7 +39,7 @@ import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.apache.cxf.transport.websocket.WebSocketUtils;
 
 /**
- * 
+ *
  */
 public class WebSocketVirtualServletResponse implements HttpServletResponse {
     private static final Logger LOG = LogUtils.getL7dLogger(WebSocketVirtualServletResponse.class);
@@ -117,7 +117,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
 
     @Override
     public void setCharacterEncoding(String charset) {
-        // TODO 
+        // TODO
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "setCharacterEncoding({0})", charset);
         }
@@ -346,7 +346,7 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
                 } else {
                     // unbuffered write to the socket
                     String respid = responseHeaders.get(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY);
-                    byte[] headers = respid != null 
+                    byte[] headers = respid != null
                         ? WebSocketUtils.buildHeaderLine(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, respid) : null;
                     data = WebSocketUtils.buildResponse(headers, data, offset, length);
                     webSocketHolder.write(data, 0, data.length);
@@ -383,6 +383,6 @@ public class WebSocketVirtualServletResponse implements HttpServletResponse {
     @Override
     public void setContentLengthLong(long arg0) {
         throw new UnsupportedOperationException();
-        
+
     }
 }

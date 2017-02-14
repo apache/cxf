@@ -27,21 +27,21 @@ import java.util.concurrent.Executor;
  */
 public final class OneShotAsyncExecutor implements Executor {
 
-    private static final OneShotAsyncExecutor INSTANCE 
+    private static final OneShotAsyncExecutor INSTANCE
         = new OneShotAsyncExecutor();
-    
+
     private OneShotAsyncExecutor() {
     }
-    
+
     public void execute(Runnable command) {
         new Thread(command).start();
     }
-    
+
     public static OneShotAsyncExecutor getInstance() {
         return INSTANCE;
     }
-    
+
     public static boolean isA(Executor executor) {
-        return executor == INSTANCE; 
+        return executor == INSTANCE;
     }
 }

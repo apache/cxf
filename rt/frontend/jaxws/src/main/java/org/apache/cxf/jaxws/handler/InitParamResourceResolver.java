@@ -29,16 +29,16 @@ import org.apache.cxf.resource.ResourceResolver;
 public class InitParamResourceResolver implements ResourceResolver {
 
     private static final Logger LOG = LogUtils.getL7dLogger(InitParamResourceResolver.class);
-    
+
     Map<String, String> params;
-    
+
     public InitParamResourceResolver(Map<String, String> map) {
         params = map;
     }
-    
-    
+
+
     public <T> T resolve(String resourceName, Class<T> resourceType) {
-        
+
         String value = params.get(resourceName);
         return convertToType(value, resourceType);
     }
@@ -53,12 +53,12 @@ public class InitParamResourceResolver implements ResourceResolver {
      * Convert the string representation of value to type T
      */
     private <T> T convertToType(String value, Class<T> type) {
-        
+
         /*
         char, byte, short, long, float, double, boolean
         */
         T ret = null;
-        try { 
+        try {
             if (String.class.equals(type)) {
                 ret = type.cast(value);
             } else if (Integer.class.equals(type) || Integer.TYPE.equals(type)) {
@@ -79,7 +79,7 @@ public class InitParamResourceResolver implements ResourceResolver {
                 ret = type.cast(value.charAt(0));
             } else {
                 LOG.severe("do not know how to treat type: " + type);
-            } 
+            }
         } catch (NumberFormatException ex) {
             LOG.severe("badly formed init param: " + value);
         }

@@ -33,7 +33,7 @@ import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
 @NoJSR250Annotations
 public final class MC11PolicyLoader implements PolicyInterceptorProviderLoader, AssertionBuilderLoader {
     Bus bus;
-    
+
     public MC11PolicyLoader(Bus b) {
         bus = b;
         registerBuilders();
@@ -44,7 +44,7 @@ public final class MC11PolicyLoader implements PolicyInterceptorProviderLoader, 
             // that point. If nothing uses WS-MakeConnection no warnings/errors will display
         }
     }
-    
+
     public void registerBuilders() {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg == null) {
@@ -52,7 +52,7 @@ public final class MC11PolicyLoader implements PolicyInterceptorProviderLoader, 
         }
         reg.registerBuilder(new MC11AssertionBuilder());
     }
-    
+
     public void registerProviders() {
         //interceptor provider for the policy
         PolicyInterceptorProviderRegistry reg = bus.getExtension(PolicyInterceptorProviderRegistry.class);

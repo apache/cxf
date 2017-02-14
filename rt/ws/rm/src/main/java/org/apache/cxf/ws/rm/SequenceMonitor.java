@@ -54,18 +54,18 @@ public class SequenceMonitor {
                 }
             }
             mpm = receiveTimes.size();
-        } 
-        
+        }
+
         return mpm;
     }
-        
+
     public synchronized long getLastArrivalTime() {
         if (receiveTimes.size() > 0) {
             return receiveTimes.get(receiveTimes.size() - 1).longValue();
         }
         return 0;
     }
-    
+
     protected void setMonitorInterval(long i) {
         if (receiveTimes.size() == 0) {
             firstCheck = 0;

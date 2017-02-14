@@ -100,9 +100,9 @@ public class XKMSService implements XKMSPortType {
     public RegisterResultType register(RegisterRequestType request) {
         RegisterResultType response = XKMSResponseFactory.createResponse(request, new RegisterResultType());
         try {
-            assertXKRSSAllowed();            
+            assertXKRSSAllowed();
             validateRequest(request);
-            
+
             for (Register handler : keyRegisterHandlers) {
                 if (handler.canProcess(request)) {
                     return handler.register(request, response);
@@ -206,7 +206,7 @@ public class XKMSService implements XKMSPortType {
             return handleException("recover", e, response);
         }
     }
-    
+
     private <T extends ResultType> T handleException(String method, Exception e, T response) {
         if (logExceptions) {
             LOG.log(Level.SEVERE, "Error during " + method + ": " + e.getMessage(), e);
@@ -252,7 +252,7 @@ public class XKMSService implements XKMSPortType {
         resultStatus.getInvalidReason().addAll(status.getInvalidReason());
         resultStatus.getIndeterminateReason().addAll(status.getIndeterminateReason());
     }
-    
+
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }

@@ -44,7 +44,7 @@ public class Cxf993Test extends AbstractBusClientServerTestBase {
         assertEquals("dummy", getPort().sendNotification(new SendNotification()));
     }
 
-    private NotificationServicePort getPort() 
+    private NotificationServicePort getPort()
         throws NumberFormatException, MalformedURLException {
         URL wsdl = getClass().getResource("/wsdl_systest/cxf-993.wsdl");
         assertNotNull("WSDL is null", wsdl);

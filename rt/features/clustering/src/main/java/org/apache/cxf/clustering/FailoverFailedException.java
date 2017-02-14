@@ -22,15 +22,15 @@ package org.apache.cxf.clustering;
 
 public class FailoverFailedException extends RuntimeException {
     private static final long serialVersionUID = 6987181998625258047L;
-    
+
     public FailoverFailedException() {
         super();
     }
-    
+
     public FailoverFailedException(String message) {
         super(message);
     }
-    
+
     public FailoverFailedException(String message, Throwable cause) {
         super(message, cause);
     }

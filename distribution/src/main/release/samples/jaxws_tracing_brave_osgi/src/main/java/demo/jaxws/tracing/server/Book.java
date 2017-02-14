@@ -21,7 +21,7 @@ package demo.jaxws.tracing.server;
 public class Book {
     private String id;
     private String title;
-    
+
     public Book() {
     }
 
@@ -33,7 +33,7 @@ public class Book {
     public String getId() {
         return id;
     }
-    
+
     public void setId(String id) {
         this.id = id;
     }

@@ -32,8 +32,8 @@ import org.apache.headers.OutHeaderResponse;
 import org.apache.headers.SOAPHeaderData;
 
 
-@javax.jws.WebService(serviceName = "HeaderService", 
-            portName = "SoapPort", 
+@javax.jws.WebService(serviceName = "HeaderService",
+            portName = "SoapPort",
             endpointInterface = "org.apache.headers.HeaderTester",
             targetNamespace = "http://apache.org/headers")
 
@@ -52,7 +52,7 @@ public class HeaderTesterImpl implements HeaderTester {
         return ihr;
     }
 
-    public void outHeader(OutHeader me, 
+    public void outHeader(OutHeader me,
                           Holder<OutHeaderResponse> theResponse,
                           Holder<SOAPHeaderData> headerInfo) {
         System.out.println("outHeader invoked");
@@ -87,5 +87,5 @@ public class HeaderTesterImpl implements HeaderTester {
         iohr.setResponseType("Hello " + me.getRequestType());
 
         return iohr;
-    }    
+    }
 }

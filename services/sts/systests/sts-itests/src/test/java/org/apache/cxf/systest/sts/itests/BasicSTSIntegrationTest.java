@@ -45,7 +45,7 @@ public class BasicSTSIntegrationTest {
     public Option[] getConfig() {
         String karafVersion = System.getProperty("karaf.version", "3.0.4");
         String localRepository = System.getProperty("localRepository");
-        
+
         MavenArtifactUrlReference karafUrl = maven() //
                         .groupId("org.apache.karaf") //
                         .artifactId("apache-karaf") //

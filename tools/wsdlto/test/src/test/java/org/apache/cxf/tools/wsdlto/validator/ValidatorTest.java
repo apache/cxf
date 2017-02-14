@@ -28,7 +28,7 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.JAXWSContainer;
 import org.junit.Before;
 import org.junit.Test;
 
-    
+
 public class ValidatorTest extends ProcessorTestBase {
     private WSDLToJavaContainer processor;
 
@@ -38,7 +38,7 @@ public class ValidatorTest extends ProcessorTestBase {
         env.put(FrontEndProfile.class, PluginLoader.getInstance().getFrontEndProfile("jaxws"));
         env.put(DataBindingProfile.class, PluginLoader.getInstance().getDataBindingProfile("jaxb"));
     }
-    
+
     @Test
     public void testXMLFormat() throws Exception {
         processor = new JAXWSContainer(null);
@@ -49,7 +49,7 @@ public class ValidatorTest extends ProcessorTestBase {
             processor.execute();
             fail("xml_format_root.wsdl is not a valid wsdl, should throws exception here");
         } catch (Exception e) {
-            String expected = "Binding(Greeter_XMLBinding):BindingOperation" 
+            String expected = "Binding(Greeter_XMLBinding):BindingOperation"
                 + "({http://apache.org/xml_http_bare}sayHi)-input: empty value of rootNode attribute, "
                 + "the value should be {http://apache.org/xml_http_bare}sayHi";
             assertEquals(expected, e.getMessage().trim());

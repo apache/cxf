@@ -34,7 +34,7 @@ import org.junit.Test;
 public class JAXRSPerRequestValidationTest extends AbstractJAXRSValidationTest {
     public static final String PORT = allocatePort(JAXRSPerRequestValidationTest.class);
     @Ignore
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
 
@@ -59,7 +59,7 @@ public class JAXRSPerRequestValidationTest extends AbstractJAXRSValidationTest {
             }
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -67,31 +67,31 @@ public class JAXRSPerRequestValidationTest extends AbstractJAXRSValidationTest {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
         createStaticBus();
     }
-    
+
     @Test
     public void testThatNoValidationConstraintsAreViolatedWhenBookIdIsSet()  {
         final Response r = createWebClient("/bookstore/book").query("id", "123").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatValidationConstraintsAreViolatedWhenBookIdIsNotSet()  {
         final Response r = createWebClient("/bookstore/book").get();
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatValidationConstraintsAreViolatedWhenBookDoesNotExist()  {
         final Response r = createWebClient("/bookstore/book").query("id", "3333").get();
         assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
     }
-    
-    @Test    
+
+    @Test
     public void testThatValidationConstraintsAreViolatedWhenBookDoesNotExistResponse()  {
         final Response r = createWebClient("/bookstore/bookResponse").query("id", "3333").get();
         assertEquals(Status.INTERNAL_SERVER_ERROR.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testThatValidationConstraintsAreViolatedWhenBookNameIsNotSet()  {
         final Response r = createWebClient("/bookstore/book").query("id", "124").get();

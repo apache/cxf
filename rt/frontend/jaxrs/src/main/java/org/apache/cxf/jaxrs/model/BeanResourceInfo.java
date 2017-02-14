@@ -33,7 +33,7 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
     protected List<Field> paramFields;
     protected List<Method> paramMethods;
     private boolean paramsAvailable;
-    
+
     protected BeanResourceInfo(Bus bus) {
         super(bus);
     }
@@ -41,8 +41,8 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
     protected BeanResourceInfo(Class<?> resourceClass, Class<?> serviceClass, boolean isRoot, Bus bus) {
         this(resourceClass, serviceClass, isRoot, true, bus);
     }
-    
-    protected BeanResourceInfo(Class<?> resourceClass, Class<?> serviceClass, 
+
+    protected BeanResourceInfo(Class<?> resourceClass, Class<?> serviceClass,
                                boolean isRoot, boolean checkContexts, Bus bus) {
         super(resourceClass, serviceClass, isRoot, checkContexts, bus);
         if (checkContexts && resourceClass != null) {
@@ -50,11 +50,11 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
             setParamMethods(serviceClass);
         }
     }
-    
+
     public boolean paramsAvailable() {
         return paramsAvailable;
     }
-    
+
     private void setParamField(Class<?> cls) {
         if (Object.class == cls || cls == null) {
             return;
@@ -72,11 +72,11 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
         }
         setParamField(cls.getSuperclass());
     }
-    
+
     private void setParamMethods(Class<?> cls) {
-        
+
         for (Method m : cls.getMethods()) {
-        
+
             if (!m.getName().startsWith("set") || m.getParameterTypes().length != 1) {
                 continue;
             }
@@ -92,7 +92,7 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
             setParamMethods(i);
         }
     }
-    
+
     private void addParamMethod(Method m) {
         if (paramMethods == null) {
             paramMethods = new ArrayList<>();
@@ -100,14 +100,14 @@ public abstract class BeanResourceInfo extends AbstractResourceInfo {
         paramsAvailable = true;
         paramMethods.add(m);
     }
-    
+
     public List<Method> getParameterMethods() {
-        return paramMethods == null ? Collections.<Method>emptyList() 
+        return paramMethods == null ? Collections.<Method>emptyList()
                                     : Collections.unmodifiableList(paramMethods);
     }
-    
+
     public List<Field> getParameterFields() {
-        return paramFields == null ? Collections.<Field>emptyList() 
+        return paramFields == null ? Collections.<Field>emptyList()
                                     : Collections.unmodifiableList(paramFields);
     }
 }

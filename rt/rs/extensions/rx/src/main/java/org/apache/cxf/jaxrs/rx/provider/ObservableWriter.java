@@ -40,11 +40,11 @@ import rx.Observable;
 
 @Provider
 public class ObservableWriter<T> implements MessageBodyWriter<Observable<T>> {
-    
+
     @Context
     private Providers providers;
     private boolean writeSingleElementAsList;
-    
+
     @Override
     public long getSize(Observable<T> arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
         // TODO Auto-generated method stub
@@ -64,7 +64,7 @@ public class ObservableWriter<T> implements MessageBodyWriter<Observable<T>> {
         obs.subscribe(value -> entities.add(value),
             throwable -> throwError(throwable));
         if (!entities.isEmpty()) {
-            
+
             if (entities.get(0) instanceof List) {
                 List<T> allEntities = new LinkedList<T>();
                 for (T obj : entities) {
@@ -84,7 +84,7 @@ public class ObservableWriter<T> implements MessageBodyWriter<Observable<T>> {
     private void writeToOutputStream(Object value,
                                      Annotation[] anns,
                                      MediaType mt,
-                                     MultivaluedMap<String, Object> headers, 
+                                     MultivaluedMap<String, Object> headers,
                                      OutputStream os) {
         Class<?> valueCls = value.getClass();
         Type valueType = null;
@@ -95,19 +95,19 @@ public class ObservableWriter<T> implements MessageBodyWriter<Observable<T>> {
             valueType = valueCls;
         }
         @SuppressWarnings("unchecked")
-        MessageBodyWriter<Object> writer = 
+        MessageBodyWriter<Object> writer =
             (MessageBodyWriter<Object>)providers.getMessageBodyWriter(valueCls, valueType, anns, mt);
         if (writer == null) {
             throwError(null);
         }
-    
+
         try {
-            writer.writeTo(value, valueCls, valueType, anns, mt, headers, os);    
+            writer.writeTo(value, valueCls, valueType, anns, mt, headers, os);
         } catch (IOException ex) {
             throwError(ex);
         }
     }
-    
+
     private static void throwError(Throwable cause) {
         throw ExceptionUtils.toInternalServerErrorException(cause, null);
     }

@@ -35,98 +35,98 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class PutTest {
-    
+
     static final String PORT = TestUtil.getPortNumber(CreateStudentTest.class);
     static final String PORT2 = TestUtil.getPortNumber(CreateStudentTest.class, 2);
-    
+
     @Before
     public void before() {
         TestUtils.createStudentsServers(PORT, PORT2);
         TestUtils.createTeachersServers(PORT2);
     }
-    
+
     @After
     public void after() {
         TestUtils.destroyStudentsServers();
         TestUtils.destroyTeachersServers();
     }
-    
+
     @Test
     public void rightStudentPutTest() throws XMLStreamException {
         CreateResponse createResponse = createStudent();
-        
+
         Document putStudentXML = StaxUtils.read(
                 getClass().getResourceAsStream("/xml/putStudent.xml"));
         Put request = new Put();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(putStudentXML.getDocumentElement());
-        
+
         Resource client = TestUtils.createResourceClient(createResponse.getResourceCreated());
         client.put(request);
     }
-    
+
     @Test(expected = SOAPFaultException.class)
     public void wrongStudentPutTest() throws XMLStreamException {
         createStudent();
         CreateResponse createResponse = createStudent();
-        
+
         Document putStudentXML = StaxUtils.read(
                 getClass().getResourceAsStream("/xml/putStudent.xml"));
         Put request = new Put();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(putStudentXML.getDocumentElement());
-        
+
         Resource client = TestUtils.createResourceClient(createResponse.getResourceCreated());
         client.put(request);
     }
-    
+
     @Test
     public void rightTeacherPutTest() throws XMLStreamException {
         CreateResponse createResponse = createTeacher();
-        
+
         Document putStudentXML = StaxUtils.read(
                 getClass().getResourceAsStream("/xml/putTeacher.xml"));
         Put request = new Put();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(putStudentXML.getDocumentElement());
-        
+
         Resource client = TestUtils.createResourceClient(createResponse.getResourceCreated());
         client.put(request);
     }
-    
+
     @Test(expected = SOAPFaultException.class)
     public void wrongTeacherPutTest() throws XMLStreamException {
         createStudent();
         CreateResponse createResponse = createTeacher();
-        
+
         Document putStudentXML = StaxUtils.read(
                 getClass().getResourceAsStream("/xml/putTeacher.xml"));
         Put request = new Put();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(putStudentXML.getDocumentElement());
-        
+
         Resource client = TestUtils.createResourceClient(createResponse.getResourceCreated());
         client.put(request);
     }
-    
+
     private CreateResponse createStudent() throws XMLStreamException {
         Document createStudentXML = StaxUtils.read(
                 getClass().getResourceAsStream("/xml/createStudent.xml"));
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createStudentXML.getDocumentElement());
-        
+
         ResourceFactory rf = TestUtils.createResourceFactoryClient(PORT);
         return rf.create(request);
     }
-    
+
     private CreateResponse createTeacher() throws XMLStreamException {
         Document createTeacherXML = StaxUtils.read(
                 getClass().getResourceAsStream("/xml/createTeacher.xml"));
         Create request = new Create();
         request.setRepresentation(new Representation());
         request.getRepresentation().setAny(createTeacherXML.getDocumentElement());
-        
+
         ResourceFactory rf = TestUtils.createResourceFactoryClient(PORT);
         return rf.create(request);
     }

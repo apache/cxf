@@ -24,13 +24,13 @@ import org.apache.cxf.sts.request.ReceivedToken;
  * An interface that can validate a security token.
  */
 public interface TokenValidator {
-    
+
     /**
      * Return true if this TokenValidator implementation is capable of validating the
      * ReceivedToken argument.
      */
     boolean canHandleToken(ReceivedToken validateTarget);
-    
+
     /**
      * Return true if this TokenValidator implementation is capable of validating the
      * ReceivedToken argument in the given realm.

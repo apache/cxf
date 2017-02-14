@@ -25,19 +25,19 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class AhcWebSocketConduitTest extends Assert {
-    private static final String TEST_RESPONSE1 = 
+    private static final String TEST_RESPONSE1 =
         "200\r\nresponseId: 59610eed-d9de-4692-96d4-bb95a36c41ea\r\nContent-Type: text/plain\r\n\r\nHola!";
-    private static final String TEST_RESPONSE2 = 
+    private static final String TEST_RESPONSE2 =
         "responseId: 59610eed-d9de-4692-96d4-bb95a36c41ea\r\n\r\nNada!";
 
     @Test
     public void testResponseParsing() throws Exception {
 
         // with all the headers using type string
-        AhcWebSocketConduit.Response resp = 
+        AhcWebSocketConduit.Response resp =
             new AhcWebSocketConduit.Response(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, TEST_RESPONSE1);
         assertEquals(200, resp.getStatusCode());
         assertEquals("59610eed-d9de-4692-96d4-bb95a36c41ea", resp.getId());

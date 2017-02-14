@@ -38,7 +38,7 @@ public class AbstractJweJsonDecryptingFilter {
     private String defaultMediaType;
     private Map<String, Object> recipientProperties;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
-        JweJsonConsumer c = new JweJsonConsumer(new String(IOUtils.readBytesFromStream(is), 
+        JweJsonConsumer c = new JweJsonConsumer(new String(IOUtils.readBytesFromStream(is),
                                                                    StandardCharsets.UTF_8));
         JweDecryptionProvider theProvider = getInitializedDecryptionProvider(c.getProtectedHeader());
         JweJsonEncryptionEntry entry = c.getJweDecryptionEntry(theProvider, recipientProperties);
@@ -46,7 +46,7 @@ public class AbstractJweJsonDecryptingFilter {
             throw new JweException(JweException.Error.INVALID_JSON_JWE);
         }
         JweDecryptionOutput out = c.decryptWith(theProvider, entry);
-        
+
         JAXRSUtils.getCurrentMessage().put(JweJsonConsumer.class, c);
         JAXRSUtils.getCurrentMessage().put(JweJsonEncryptionEntry.class, entry);
         return out;
@@ -60,8 +60,8 @@ public class AbstractJweJsonDecryptingFilter {
     }
     protected JweDecryptionProvider getInitializedDecryptionProvider(JweHeaders headers) {
         if (decryption != null) {
-            return decryption;    
-        } 
+            return decryption;
+        }
         return JweUtils.loadDecryptionProvider(headers, true);
     }
     public String getDefaultMediaType() {
@@ -74,6 +74,6 @@ public class AbstractJweJsonDecryptingFilter {
 
     public void setRecipientProperties(Map<String, Object> recipientProperties) {
         this.recipientProperties = recipientProperties;
-    } 
-    
+    }
+
 }

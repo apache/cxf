@@ -33,5 +33,5 @@ public class MetricsMessageInPostInvokeInterceptor extends AbstractMetricsInterc
         if (isRequestor(message)) {
             stop(message);
         }
-    }               
+    }
 }

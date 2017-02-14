@@ -29,21 +29,21 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 public class FaultHandlingInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+
     public FaultHandlingInterceptor() {
         super(Phase.USER_LOGICAL);
     }
-    
+
     public synchronized void handleMessage(Message message) throws Fault {
         FaultMode mode = MessageUtils.getFaultMode(message);
         if (null != mode) {
             Throwable cause = message.getContent(Exception.class).getCause();
-            
+
             if (FaultMode.CHECKED_APPLICATION_FAULT == mode) {
-                PingMeFault original = (PingMeFault)cause;                
+                PingMeFault original = (PingMeFault)cause;
                 FaultDetail detail = new FaultDetail();
                 detail.setMajor((short)20);
                 detail.setMinor((short)10);
@@ -52,7 +52,7 @@ public class FaultHandlingInterceptor extends AbstractPhaseInterceptor<Message> 
             } else {
                 RuntimeException original = (RuntimeException)cause;
                 RuntimeException replaced = new RuntimeException(original.getMessage().toUpperCase());
-                message.setContent(Exception.class, new Fault(replaced));                
+                message.setContent(Exception.class, new Fault(replaced));
             }
         }
     }

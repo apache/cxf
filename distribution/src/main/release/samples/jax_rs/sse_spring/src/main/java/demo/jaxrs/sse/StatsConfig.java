@@ -35,9 +35,9 @@ import org.springframework.context.annotation.DependsOn;
 @Configuration
 @ComponentScan(basePackageClasses = StatsRestServiceImpl.class)
 public class StatsConfig {
-    @Inject 
+    @Inject
     private StatsRestServiceImpl statsRestService;
-    
+
     @Bean(destroyMethod = "shutdown")
     SpringBus cxf() {
         return new SpringBus();

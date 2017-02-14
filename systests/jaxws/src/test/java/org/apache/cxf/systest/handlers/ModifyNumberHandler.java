@@ -36,7 +36,7 @@ import org.apache.handlers.types.ObjectFactory;
  * handles addition of small numbers.
  */
 public class ModifyNumberHandler implements LogicalHandler<LogicalMessageContext> {
-    
+
     public final boolean handleMessage(LogicalMessageContext messageContext) {
         //System.out.println("LogicalMessageHandler handleMessage called");
 

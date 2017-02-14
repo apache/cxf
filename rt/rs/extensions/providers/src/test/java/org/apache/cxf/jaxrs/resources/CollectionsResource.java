@@ -23,34 +23,34 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 
 public class CollectionsResource {
-    
+
     @GET
     public List<Book> getBooks() {
         return null;
     }
-    
+
     @GET
     public List<AegisTestBean> getAegisBeans() {
         return null;
     }
-    
+
     @GET
     public List<TagVO2> getTags() {
         return null;
     }
-    
+
     @POST
     public void setBooks(List<Book> books) {
     }
-    
+
     @POST
     public void setBooksArray(Book[] books) {
     }
-    
+
     @POST
     public void setTags(List<TagVO2> tags) {
     }
-    
+
     @POST
     public void setTagsArray(TagVO2[] tags) {
     }

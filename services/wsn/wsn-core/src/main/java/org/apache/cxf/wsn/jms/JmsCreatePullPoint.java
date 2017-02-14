@@ -71,7 +71,7 @@ public class JmsCreatePullPoint extends AbstractCreatePullPoint {
         }
         // For JMS, avoid using dashes in the pullpoint name (which is also the queue name,
         // as it will lead to problems with some JMS providers
-        
+
         name = name.replace("-", "");
         return name;
     }
@@ -91,5 +91,5 @@ public class JmsCreatePullPoint extends AbstractCreatePullPoint {
     public void setConnectionFactory(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
     }
-   
+
 }

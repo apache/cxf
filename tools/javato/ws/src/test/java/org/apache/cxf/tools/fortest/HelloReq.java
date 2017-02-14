@@ -20,7 +20,7 @@
 package org.apache.cxf.tools.fortest;
 
 /**
- * 
+ *
  */
 public class HelloReq extends HelloBase {
 

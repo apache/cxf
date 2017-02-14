@@ -46,7 +46,7 @@ public class CustomResponse extends Response {
     @Override
     public void close() {
         // TODO Auto-generated method stub
-        
+
     }
     @Override
     public Set<String> getAllowedMethods() {

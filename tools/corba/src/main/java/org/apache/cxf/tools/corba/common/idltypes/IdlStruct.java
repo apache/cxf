@@ -31,10 +31,10 @@ public final class IdlStruct extends IdlStructBase {
     private IdlStruct(IdlScopeBase parent, String name) {
         super(parent, name, "struct");
     }
-    
+
     public static IdlStruct create(IdlScopeBase parent, String name) {
         return new IdlStruct(parent, name);
-    }    
+    }
 
     public void write(PrintWriter pw) {
         if (!isEmptyDef()) {

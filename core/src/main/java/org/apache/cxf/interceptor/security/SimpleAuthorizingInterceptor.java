@@ -35,22 +35,22 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
     protected Map<String, List<String>> userRolesMap = Collections.emptyMap();
     protected List<String> globalRoles = Collections.emptyList();
     private boolean checkConfiguredRolesOnly;
-    
+
     public SimpleAuthorizingInterceptor() {
         this(true);
     }
     public SimpleAuthorizingInterceptor(boolean uniqueId) {
         super(uniqueId);
     }
-    
-    @Override 
+
+    @Override
     protected boolean isUserInRole(SecurityContext sc, List<String> roles, boolean deny) {
         if (!checkConfiguredRolesOnly && !super.isUserInRole(sc, roles, deny)) {
             return false;
         }
         // Additional check.
         if (!userRolesMap.isEmpty()) {
-            List<String> userRoles = userRolesMap.get(sc.getUserPrincipal().getName());    
+            List<String> userRoles = userRolesMap.get(sc.getUserPrincipal().getName());
             if (userRoles == null) {
                 return false;
             }
@@ -64,7 +64,7 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
             return !checkConfiguredRolesOnly;
         }
     }
-    
+
     protected String createMethodSig(Method method) {
         StringBuilder b = new StringBuilder(method.getReturnType().getName());
         b.append(' ').append(method.getName()).append('(');
@@ -79,7 +79,7 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
         b.append(')');
         return b.toString();
     }
-    
+
     @Override
     protected List<String> getExpectedRoles(Method method) {
         List<String> roles = methodRolesMap.get(createMethodSig(method));
@@ -94,21 +94,21 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
 
 
     public void setMethodRolesMap(Map<String, String> rolesMap) {
-        methodRolesMap.putAll(parseRolesMap(rolesMap)); 
+        methodRolesMap.putAll(parseRolesMap(rolesMap));
     }
-    
+
     public void setUserRolesMap(Map<String, String> rolesMap) {
         userRolesMap = parseRolesMap(rolesMap);
     }
-    
+
     public void setGlobalRoles(String roles) {
         globalRoles = Arrays.asList(StringUtils.split(roles, " "));
     }
-    
+
     public void setCheckConfiguredRolesOnly(boolean checkConfiguredRolesOnly) {
         this.checkConfiguredRolesOnly = checkConfiguredRolesOnly;
     }
-    
+
     private static Map<String, List<String>> parseRolesMap(Map<String, String> rolesMap) {
         Map<String, List<String>> map = new HashMap<String, List<String>>();
         for (Map.Entry<String, String> entry : rolesMap.entrySet()) {

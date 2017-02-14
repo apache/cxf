@@ -25,32 +25,32 @@ import org.apache.cxf.rs.security.oauth2.services.DynamicRegistrationService;
 
 public class OidcDynamicRegistrationService extends DynamicRegistrationService {
     private boolean protectIdTokenWithClientSecret;
-    
+
     @Override
     protected Client createNewClient(ClientRegistration request) {
-        //TODO: set OIDC specific properties as Client extra properties 
+        //TODO: set OIDC specific properties as Client extra properties
         return super.createNewClient(request);
     }
-    
+
     @Override
     protected ClientRegistrationResponse fromClientToRegistrationResponse(Client client) {
         //TODO: check OIDC specific properties in Client extra properties
         return super.fromClientToRegistrationResponse(client);
     }
-    
+
     @Override
     protected ClientRegistration fromClientToClientRegistration(Client client) {
         //TODO: check OIDC specific properties in Client extra properties
         return super.fromClientToClientRegistration(client);
     }
-    
+
     protected int getClientSecretSizeInBytes(ClientRegistration request) {
-           
+
         // TODO: may need to be 384/8 or 512/8 if not a default HS256 but HS384 or HS512
         int keySizeOctets = protectIdTokenWithClientSecret
             ? 32
             : super.getClientSecretSizeInBytes(request);
-       
+
         return keySizeOctets;
     }
     public void setProtectIdTokenWithClientSecret(boolean protectIdTokenWithClientSecret) {

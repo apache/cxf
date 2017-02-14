@@ -27,16 +27,16 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-    
+
 
 public class MultipartServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(MultipartServer.class);
     Server server;
-    
+
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(MultipartStore.class);
-        
+
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(AttachmentDeserializer.ATTACHMENT_MAX_SIZE, String.valueOf(1024 * 10));
         props.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, String.valueOf(1024 * 5));
@@ -46,7 +46,7 @@ public class MultipartServer extends AbstractBusTestServerBase {
                                new SingletonResourceProvider(new MultipartStore()));
         sf.setAddress("http://localhost:" + PORT + "/");
 
-        server = sf.create();        
+        server = sf.create();
     }
     public void tearDown() throws Exception {
         server.stop();
@@ -64,5 +64,5 @@ public class MultipartServer extends AbstractBusTestServerBase {
             System.out.println("done!");
         }
     }
-    
+
 }

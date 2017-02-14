@@ -40,7 +40,7 @@ import org.apache.cxf.throttling.ThrottlingManager;
 
 public class Server {
     Map<String, Customer> customers = new HashMap<>();
-    
+
     protected Server() throws Exception {
         System.out.println("Starting Server");
 
@@ -49,15 +49,15 @@ public class Server {
         customers.put("Vince", new Customer.RegularCustomer("Vince"));
         customers.put("Malcolm", new Customer.CheapCustomer("Malcolm"));
         customers.put("Jonas", new Customer.TrialCustomer("Jonas"));
-        
+
         Map<String, Object> properties = new HashMap<>();
         properties.put("bus.jmx.usePlatformMBeanServer", Boolean.TRUE);
         properties.put("bus.jmx.enabled", Boolean.TRUE);
         Bus b = new CXFBusFactory().createBus(null, properties);
         MetricRegistry registry = new MetricRegistry();
         CodahaleMetricsProvider.setupJMXReporter(b, registry);
-        b.setExtension(registry, MetricRegistry.class);        
-        
+        b.setExtension(registry, MetricRegistry.class);
+
         ThrottlingManager manager = new ThrottlingManager() {
             @Override
             public ThrottleResponse getThrottleResponse(String phase, Message m) {
@@ -78,10 +78,10 @@ public class Server {
 
         };
         b.getInInterceptors().add(new CustomerMetricsInterceptor(registry, customers));
-        
+
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9001/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor, 
+        Endpoint.publish(address, implementor,
                          new MetricsFeature(),
                          new ThrottlingFeature(manager));
     }

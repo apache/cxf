@@ -35,14 +35,14 @@ import org.apache.cxf.common.util.StringUtils;
  */
 final class JMSURIParser {
     private static final Logger LOG = LogUtils.getL7dLogger(JMSURIParser.class);
-    
+
     String uri;
     int pos;
     private String scheme;
     private String variant;
     private String destination;
     private String query;
-    
+
     JMSURIParser(String uri) {
         this.uri = UnsafeUriCharactersEncoder.encode(uri);
         this.scheme = parseUntil(":");
@@ -58,7 +58,7 @@ final class JMSURIParser {
         LOG.log(Level.FINE, "Creating endpoint uri=[" + uri + "], destination=[" + destination
                 + "], query=[" + query + "]");
     }
-    
+
     private String parseToEnd() {
         return uri.substring(pos, uri.length());
     }
@@ -92,7 +92,7 @@ final class JMSURIParser {
         return rc;
 
     }
-    
+
     private static String urldecode(String s) {
         try {
             return URLDecoder.decode(s, StandardCharsets.UTF_8.name());
@@ -113,5 +113,5 @@ final class JMSURIParser {
         return destination;
     }
 
-    
+
 }

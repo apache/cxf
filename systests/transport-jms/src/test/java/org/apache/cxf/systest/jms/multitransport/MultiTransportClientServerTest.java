@@ -65,7 +65,7 @@ public class MultiTransportClientServerTest {
         ep1.getFeatures().add(cff);
         ep1.publish();
     }
-    
+
     @AfterClass
     public static void stopServers() throws Exception {
         bus.shutdown(false);

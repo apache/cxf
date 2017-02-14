@@ -33,19 +33,19 @@ import org.junit.Test;
 
 public class DeflateEncoderDecoderTest extends Assert {
 
-    @Test(expected = DataFormatException.class) 
+    @Test(expected = DataFormatException.class)
     public void testInvalidContent() throws Exception {
         DeflateEncoderDecoder inflater = new DeflateEncoderDecoder();
         inflater.inflateToken("invalid_grant".getBytes());
     }
-    
+
     @Test(expected = DataFormatException.class)
     public void testInvalidContentAfterBase64() throws Exception {
         DeflateEncoderDecoder inflater = new DeflateEncoderDecoder();
         byte[] base64decoded = Base64Utility.decode("invalid_grant");
         inflater.inflateToken(base64decoded);
     }
-    
+
     @Test
     public void testInflateDeflate() throws Exception {
         DeflateEncoderDecoder inflater = new DeflateEncoderDecoder();
@@ -54,7 +54,7 @@ public class DeflateEncoderDecoderTest extends Assert {
         assertNotNull(is);
         assertEquals("valid_grant", IOUtils.readStringFromStream(is));
     }
-    
+
     @Test
     public void testInflateDeflateBase64() throws Exception {
         DeflateEncoderDecoder inflater = new DeflateEncoderDecoder();

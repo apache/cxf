@@ -18,7 +18,7 @@
  */
 
 package org.apache.cxf.tools.fortest.withannotation.rpc;
- 
+
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
@@ -28,7 +28,7 @@ import javax.jws.soap.SOAPBinding.Use;
 @WebService(name = "Hello", targetNamespace = "http://cxf.com/")
 @SOAPBinding(style = Style.RPC, use = Use.LITERAL)
 public interface Hello {
-      
+
     @WebMethod(operationName = "sayHi", exclude = false)
     String sayHi();
 }

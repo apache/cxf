@@ -33,5 +33,5 @@ public class DefaultInMemoryTokenStore extends EHCacheTokenStore {
         super("STS", BusFactory.getDefaultBus(),
               ClassLoaderUtils.getResource("cxf-ehcache.xml", DefaultInMemoryTokenStore.class));
     }
-    
+
 }

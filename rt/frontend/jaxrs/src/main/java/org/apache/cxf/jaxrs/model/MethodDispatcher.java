@@ -26,24 +26,24 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class MethodDispatcher {
-    private Map<OperationResourceInfo, Method> oriToMethod = 
+    private Map<OperationResourceInfo, Method> oriToMethod =
         new LinkedHashMap<OperationResourceInfo, Method>();
-    private Map<Method, OperationResourceInfo> methodToOri = 
+    private Map<Method, OperationResourceInfo> methodToOri =
         new LinkedHashMap<Method, OperationResourceInfo>();
     private ConcurrentHashMap<Method, Method> proxyMethodMap = new ConcurrentHashMap<Method, Method>();
-    
+
     public MethodDispatcher() {
-        
+
     }
-    
+
     MethodDispatcher(MethodDispatcher md, ClassResourceInfo cri) {
-        for (OperationResourceInfo ori : md.getOperationResourceInfos()) {    
+        for (OperationResourceInfo ori : md.getOperationResourceInfos()) {
             OperationResourceInfo clone = new OperationResourceInfo(ori, cri);
             oriToMethod.put(clone, clone.getMethodToInvoke());
             methodToOri.put(clone.getMethodToInvoke(), clone);
         }
     }
-    
+
     public void bind(OperationResourceInfo o, Method... methods) {
         Method primary = methods[0];
 
@@ -65,11 +65,11 @@ public class MethodDispatcher {
     public Method getMethod(OperationResourceInfo op) {
         return oriToMethod.get(op);
     }
-    
+
     public Method getProxyMethod(Method m) {
         return proxyMethodMap.get(m);
     }
-    
+
     public void addProxyMethod(Method m, Method proxyM) {
         proxyMethodMap.putIfAbsent(m, proxyM);
     }

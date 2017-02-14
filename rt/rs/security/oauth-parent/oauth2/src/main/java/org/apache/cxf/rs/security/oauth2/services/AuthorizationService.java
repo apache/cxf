@@ -40,11 +40,11 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 @Path("authorize")
 public class AuthorizationService {
-    
-    private Map<String, RedirectionBasedGrantService> servicesMap = 
+
+    private Map<String, RedirectionBasedGrantService> servicesMap =
         new HashMap<String, RedirectionBasedGrantService>();
-    
-    @Context 
+
+    @Context
     public void setMessageContext(MessageContext context) {
         for (RedirectionBasedGrantService service : servicesMap.values()) {
             service.setMessageContext(context);
@@ -60,7 +60,7 @@ public class AuthorizationService {
             return reportInvalidResponseType();
         }
     }
-    
+
     @GET
     @Path("/decision")
     public Response authorizeDecision(@QueryParam(OAuthConstants.RESPONSE_TYPE) String responseType) {
@@ -71,7 +71,7 @@ public class AuthorizationService {
             return reportInvalidResponseType();
         }
     }
-    
+
     /**
      * Processes the end user decision
      * @return The grant value, authorization code or the token
@@ -88,20 +88,20 @@ public class AuthorizationService {
             return reportInvalidResponseType();
         }
     }
-    
+
     private RedirectionBasedGrantService getService(String responseType) {
         return responseType == null ? null : servicesMap.get(responseType);
     }
-    
+
     public void setServices(List<RedirectionBasedGrantService> services) {
         for (RedirectionBasedGrantService service : services) {
             for (String responseType : service.getSupportedResponseTypes()) {
                 servicesMap.put(responseType, service);
             }
         }
-        
+
     }
-    
+
     protected Response reportInvalidResponseType() {
         return JAXRSUtils.toResponseBuilder(400)
             .type("application/json").entity(new OAuthError(OAuthConstants.UNSUPPORTED_RESPONSE_TYPE)).build();

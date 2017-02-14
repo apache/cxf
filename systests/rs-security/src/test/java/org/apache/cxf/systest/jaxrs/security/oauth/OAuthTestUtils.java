@@ -33,7 +33,7 @@ public final class OAuthTestUtils {
     public static final String APPLICATION_NAME = "Test Oauth 1.0 application";
     public static final String CLIENT_ID = "12345678";
     public static final String CLIENT_SECRET = "secret";
-    
+
 
     private OAuthTestUtils() {
     }

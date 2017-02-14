@@ -51,7 +51,7 @@ public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter
     private BootstrapContext ctx;
     private Set<Bus> busCache = new HashSet<>();
     private Map<String, InboundEndpoint> endpoints = new ConcurrentHashMap<String, InboundEndpoint>();
-    
+
     public ResourceAdapterImpl() {
         super();
     }
@@ -59,7 +59,7 @@ public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter
     public ResourceAdapterImpl(Properties props) {
         super(props);
     }
-    
+
     public void registerBus(Bus bus) {
         LOG.fine("Bus " + bus + " initialized and added to ResourceAdapter busCache");
         busCache.add(bus);
@@ -71,8 +71,8 @@ public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter
 
     protected void setBusCache(Set<Bus> cache) {
         this.busCache = cache;
-    } 
-   
+    }
+
     public void start(BootstrapContext aCtx) throws ResourceAdapterInternalException {
         LOG.fine("Resource Adapter is starting by appserver...");
         if (aCtx == null) {
@@ -87,14 +87,14 @@ public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter
             for (Bus bus : busCache) {
                 bus.shutdown(true);
             }
-        }   
-        
+        }
+
         // shutdown all the inbound endpoints
         for (Map.Entry<String, InboundEndpoint> entry : endpoints.entrySet()) {
             try {
                 entry.getValue().shutdown();
             } catch (Exception e) {
-                LOG.log(Level.WARNING, "Failed to stop endpoint " + entry.getKey(), e); 
+                LOG.log(Level.WARNING, "Failed to stop endpoint " + entry.getKey(), e);
             }
         }
         endpoints.clear();
@@ -107,37 +107,37 @@ public class ResourceAdapterImpl extends ResourceBean implements ResourceAdapter
 
     public void endpointActivation(MessageEndpointFactory mef, ActivationSpec as)
         throws ResourceException {
-        
+
         if  (!(as instanceof MDBActivationSpec)) {
             LOG.fine("Ignored unknown activation spec " + as);
             return;
         }
-        
+
         MDBActivationSpec spec = (MDBActivationSpec)as;
         LOG.info("CXF resource adapter is activating " + spec.getDisplayName());
 
         Work work = new MDBActivationWork(spec, mef, endpoints);
-        ctx.getWorkManager().scheduleWork(work);        
+        ctx.getWorkManager().scheduleWork(work);
 
     }
 
     public void endpointDeactivation(MessageEndpointFactory mef, ActivationSpec as) {
-        
+
         if  (!(as instanceof MDBActivationSpec)) {
             LOG.fine("Ignored unknown activation spec " + as);
             return;
         }
-        
+
         MDBActivationSpec spec = (MDBActivationSpec)as;
         LOG.info("CXF resource adapter is deactivating " + spec.getDisplayName());
-        
+
         InboundEndpoint endpoint = endpoints.remove(spec.getDisplayName());
         if (endpoint != null) {
             try {
                 endpoint.shutdown();
             } catch (Exception e) {
-                LOG.log(Level.WARNING, "Failed to stop endpoint " 
-                        + spec.getDisplayName(), e); 
+                LOG.log(Level.WARNING, "Failed to stop endpoint "
+                        + spec.getDisplayName(), e);
             }
         }
     }

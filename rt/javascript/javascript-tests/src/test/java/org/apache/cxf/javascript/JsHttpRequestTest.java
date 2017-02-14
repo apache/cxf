@@ -50,12 +50,12 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
 
     // shadow declaration from base class.
     private JavascriptTestUtilities testUtilities;
-    
+
     public JsHttpRequestTest() throws Exception {
         testUtilities = new JavascriptTestUtilities(getClass());
         testUtilities.addDefaultNamespaces();
     }
-    
+
     public void additionalSpringConfiguration(GenericApplicationContext applicationContext) throws Exception {
         // bring in some property values from a Properties file
         PropertyPlaceholderConfigurer cfg = new PropertyPlaceholderConfigurer();
@@ -63,8 +63,8 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
         properties.setProperty("staticResourceURL", getStaticResourceURL());
         cfg.setProperties(properties);
         // now actually do the replacement
-        cfg.postProcessBeanFactory(applicationContext.getBeanFactory());  
-        
+        cfg.postProcessBeanFactory(applicationContext.getBeanFactory());
+
     }
 
     @Override
@@ -72,15 +72,15 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
         TestUtil.getPortNumber(JsHttpRequestTest.class);
         return new String[] {"classpath:XMLHttpRequestTestBeans.xml"};
     }
-    
-    
+
+
     @Before
     public void setupRhino() throws Exception {
         testUtilities.setBus(getBean(Bus.class, "cxf"));
         testUtilities.initializeRhino();
         testUtilities.readResourceIntoRhino("/org/apache/cxf/javascript/XMLHttpRequestTests.js");
     }
-    
+
     // just one test function to avoid muddles with engine startup/shutdown
     @Test
     public void runTests() throws Exception {
@@ -93,15 +93,15 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
         testUtilities.rhinoCallInContext("testAsyncHttpFetch2");
         boolean notified = notifier.waitForJavascript(2 * 10000);
         assertTrue(notified);
-        assertEquals("HEADERS_RECEIVED", Boolean.TRUE, 
+        assertEquals("HEADERS_RECEIVED", Boolean.TRUE,
                      testUtilities.rhinoEvaluateConvert("asyncGotHeadersReceived", Boolean.class));
-        assertEquals("LOADING", Boolean.TRUE, 
+        assertEquals("LOADING", Boolean.TRUE,
                      testUtilities.rhinoEvaluateConvert("asyncGotLoading", Boolean.class));
-        assertEquals("DONE", Boolean.TRUE, 
+        assertEquals("DONE", Boolean.TRUE,
                      testUtilities.rhinoEvaluateConvert("asyncGotDone", Boolean.class));
         String outOfOrder = testUtilities.rhinoEvaluateConvert("outOfOrderError", String.class);
-        assertEquals("OutOfOrder", null, outOfOrder); 
-        assertEquals("status 200", Integer.valueOf(200), 
+        assertEquals("OutOfOrder", null, outOfOrder);
+        assertEquals("status 200", Integer.valueOf(200),
                      testUtilities.rhinoEvaluateConvert("asyncStatus", Integer.class));
         assertEquals("status text", "OK",
                      testUtilities.rhinoEvaluateConvert("asyncStatusText", String.class));
@@ -116,9 +116,9 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
         Reader r = getResourceAsReader("/org/apache/cxf/javascript/XML_GreetMeDocLiteralReq.xml");
         String xml = IOUtils.toString(r);
         EndpointImpl endpoint = this.getBean(EndpointImpl.class, "greeter-service-endpoint");
-        JsSimpleDomNode xmlResponse = 
-            testUtilities.rhinoCallConvert("testSyncXml", 
-                                           JsSimpleDomNode.class, 
+        JsSimpleDomNode xmlResponse =
+            testUtilities.rhinoCallConvert("testSyncXml",
+                                           JsSimpleDomNode.class,
                                            testUtilities.javaToJS(endpoint.getAddress()),
                                            testUtilities.javaToJS(xml));
         assertNotNull(xmlResponse);
@@ -128,7 +128,7 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
         String nodeText = (String)textPath.evaluate("//t:responseType/text()", doc, XPathConstants.STRING);
         assertEquals("Hello \u05e9\u05dc\u05d5\u05dd", nodeText);
     }
-    
+
     public String getStaticResourceURL() throws Exception {
         File staticFile = new File(this.getClass().getResource("test.html").toURI());
         staticFile = staticFile.getParentFile();

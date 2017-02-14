@@ -27,7 +27,7 @@ public enum ParameterType {
     COOKIE,
     FORM,
     BEAN,
-    
+
     REQUEST_BODY,
     CONTEXT
 }

@@ -62,7 +62,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     private static final long serialVersionUID = -8916352798780577499L;
 
     private static final Logger LOG = LogUtils.getL7dLogger(CXFNonSpringJaxrsServlet.class);
-    
+
     private static final String USER_MODEL_PARAM = "user.model";
     private static final String SERVICE_ADDRESS_PARAM = "jaxrs.address";
     private static final String IGNORE_APP_PATH_PARAM = "jaxrs.application.address.ignore";
@@ -82,58 +82,58 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     private static final String STATIC_SUB_RESOLUTION_PARAM = "jaxrs.static.subresources";
     private static final String SERVICE_SCOPE_SINGLETON = "singleton";
     private static final String SERVICE_SCOPE_REQUEST = "prototype";
-    
+
     private static final String PARAMETER_SPLIT_CHAR = "class.parameter.split.char";
     private static final String DEFAULT_PARAMETER_SPLIT_CHAR = ",";
     private static final String SPACE_PARAMETER_SPLIT_CHAR = "space";
-    
+
     private static final String JAXRS_APPLICATION_PARAM = "javax.ws.rs.Application";
-    
+
     private ClassLoader classLoader;
     private Application application;
-    
+
     public CXFNonSpringJaxrsServlet() {
-        
+
     }
-    
+
     public CXFNonSpringJaxrsServlet(Application app) {
         this.application = app;
     }
-    
+
     public CXFNonSpringJaxrsServlet(Object singletonService) {
         this(Collections.singleton(singletonService));
     }
     public CXFNonSpringJaxrsServlet(Set<Object> applicationSingletons) {
         this(new ApplicationImpl(applicationSingletons));
     }
-    
+
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
-        
+
         if (getApplication() != null) {
             createServerFromApplication(servletConfig);
-            return; 
+            return;
         }
-        
+
         String applicationClass = servletConfig.getInitParameter(JAXRS_APPLICATION_PARAM);
         if (applicationClass != null) {
             createServerFromApplication(applicationClass, servletConfig);
             return;
         }
-        
+
         String splitChar = getParameterSplitChar(servletConfig);
         JAXRSServerFactoryBean bean = new JAXRSServerFactoryBean();
         bean.setBus(getBus());
-        
+
         String address = servletConfig.getInitParameter(SERVICE_ADDRESS_PARAM);
         if (address == null) {
             address = "/";
         }
         bean.setAddress(address);
-        
+
         bean.setStaticSubresourceResolution(getStaticSubResolutionValue(servletConfig));
-        
+
         String modelRef = servletConfig.getInitParameter(USER_MODEL_PARAM);
         if (modelRef != null) {
             bean.setModelRef(modelRef.trim());
@@ -142,24 +142,24 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         setSchemasLocations(bean, servletConfig);
         setAllInterceptors(bean, servletConfig, splitChar);
         setInvoker(bean, servletConfig);
-        
-        Map<Class<?>, Map<String, List<String>>> resourceClasses = 
+
+        Map<Class<?>, Map<String, List<String>>> resourceClasses =
             getServiceClasses(servletConfig, modelRef != null, splitChar);
-        Map<Class<?>, ResourceProvider> resourceProviders = 
+        Map<Class<?>, ResourceProvider> resourceProviders =
             getResourceProviders(servletConfig, resourceClasses);
-        
+
         List<?> providers = getProviders(servletConfig, splitChar);
-                
+
         bean.setResourceClasses(new ArrayList<Class<?>>(resourceClasses.keySet()));
         bean.setProviders(providers);
         for (Map.Entry<Class<?>, ResourceProvider> entry : resourceProviders.entrySet()) {
             bean.setResourceProvider(entry.getKey(), entry.getValue());
         }
         setExtensions(bean, servletConfig);
-                
+
         List<? extends Feature> features = getFeatures(servletConfig, splitChar);
         bean.setFeatures(features);
-        
+
         bean.create();
     }
 
@@ -179,7 +179,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             return false;
         }
     }
-    
+
     protected void setExtensions(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
         bean.setExtensionMappings(
              CastUtils.cast((Map<?, ?>)parseMapSequence(servletConfig.getInitParameter(EXTENSIONS_PARAM))));
@@ -189,15 +189,15 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 parseMapSequence(servletConfig.getInitParameter(PROPERTIES_PARAM)),
                 String.class, Object.class));
     }
-    
-    protected void setAllInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig, 
-                                      String splitChar) 
+
+    protected void setAllInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig,
+                                      String splitChar)
         throws ServletException {
         setInterceptors(bean, servletConfig, OUT_INTERCEPTORS_PARAM, splitChar);
         setInterceptors(bean, servletConfig, OUT_FAULT_INTERCEPTORS_PARAM, splitChar);
         setInterceptors(bean, servletConfig, IN_INTERCEPTORS_PARAM, splitChar);
     }
-    
+
     protected void setSchemasLocations(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
         String schemas = servletConfig.getInitParameter(SCHEMAS_PARAM);
         if (schemas == null) {
@@ -215,14 +215,14 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             bean.setSchemaLocations(list);
         }
     }
-    
+
     protected void setDocLocation(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
         String wadlLoc = servletConfig.getInitParameter(DOC_LOCATION_PARAM);
         if (wadlLoc != null) {
             bean.setDocLocation(wadlLoc);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     protected void setInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig,
                                    String paramName,
@@ -260,8 +260,8 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             }
         }
     }
-    
-    protected void setInvoker(JAXRSServerFactoryBean bean, ServletConfig servletConfig) 
+
+    protected void setInvoker(JAXRSServerFactoryBean bean, ServletConfig servletConfig)
         throws ServletException {
         String value  = servletConfig.getInitParameter(INVOKER_PARAM);
         if (value == null) {
@@ -282,10 +282,10 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 throw new ServletException(ex);
             }
         }
-        
-        
+
+
     }
-    
+
     protected Map<Class<?>, Map<String, List<String>>> getServiceClasses(ServletConfig servletConfig,
                                             boolean modelAvailable,
                                             String splitChar) throws ServletException {
@@ -297,7 +297,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             throw new ServletException("At least one resource class should be specified");
         }
         String[] classNames = StringUtils.split(serviceBeans, splitChar);
-        Map<Class<?>, Map<String, List<String>>> map = 
+        Map<Class<?>, Map<String, List<String>>> map =
             new HashMap<Class<?>, Map<String, List<String>>>();
         for (String cName : classNames) {
             Map<String, List<String>> props = new HashMap<String, List<String>>();
@@ -312,10 +312,10 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         return map;
     }
-    
-    protected List<? extends Feature> getFeatures(ServletConfig servletConfig, String splitChar) 
+
+    protected List<? extends Feature> getFeatures(ServletConfig servletConfig, String splitChar)
         throws ServletException {
-                
+
         String featuresList = servletConfig.getInitParameter(FEATURES_PARAM);
         if (featuresList == null) {
             return Collections.< Feature >emptyList();
@@ -334,7 +334,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         return features;
     }
-    
+
     protected List<?> getProviders(ServletConfig servletConfig, String splitChar) throws ServletException {
         String providersList = servletConfig.getInitParameter(PROVIDERS_PARAM);
         if (providersList == null) {
@@ -352,7 +352,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         return providers;
     }
-    
+
     private String getClassNameAndProperties(String cName, Map<String, List<String>> props) {
         String theName = cName.trim();
         int ind = theName.indexOf("(");
@@ -362,7 +362,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         return theName;
     }
-    
+
     protected static Map<String, List<String>> parseMapListSequence(String sequence) {
         if (sequence != null) {
             sequence = sequence.trim();
@@ -395,7 +395,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             return Collections.emptyMap();
         }
     }
-    
+
     protected Map<Class<?>, ResourceProvider> getResourceProviders(ServletConfig servletConfig,
             Map<Class<?>, Map<String, List<String>>> resourceClasses) throws ServletException {
         String scope = servletConfig.getInitParameter(SERVICE_SCOPE_PARAM);
@@ -409,14 +409,14 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             Class<?> c = entry.getKey();
             map.put(c, isPrototype ? new PerRequestResourceProvider(c)
                                    : new SingletonResourceProvider(
-                                         createSingletonInstance(c, entry.getValue(), servletConfig), 
+                                         createSingletonInstance(c, entry.getValue(), servletConfig),
                                          true));
         }
         return map;
-    }    
-    
-    
-    protected Object createSingletonInstance(Class<?> cls, Map<String, List<String>> props, ServletConfig sc) 
+    }
+
+
+    protected Object createSingletonInstance(Class<?> cls, Map<String, List<String>> props, ServletConfig sc)
         throws ServletException {
         Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
         if (c == null) {
@@ -429,7 +429,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 if (isApplication) {
                     provider = new ApplicationInfo((Application)c.newInstance(), getBus());
                 } else {
-                    provider = new ProviderInfo<Object>(c.newInstance(), getBus(), false, true);    
+                    provider = new ProviderInfo<Object>(c.newInstance(), getBus(), false, true);
                 }
             } else {
                 Map<Class<?>, Object> values = new HashMap<Class<?>, Object>();
@@ -444,18 +444,18 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         } catch (InstantiationException ex) {
             ex.printStackTrace();
             throw new ServletException("Resource class " + cls.getName()
-                                       + " can not be instantiated"); 
+                                       + " can not be instantiated");
         } catch (IllegalAccessException ex) {
             ex.printStackTrace();
             throw new ServletException("Resource class " + cls.getName()
-                                       + " can not be instantiated due to IllegalAccessException"); 
+                                       + " can not be instantiated due to IllegalAccessException");
         } catch (InvocationTargetException ex) {
             ex.printStackTrace();
             throw new ServletException("Resource class " + cls.getName()
-                                       + " can not be instantiated due to InvocationTargetException"); 
+                                       + " can not be instantiated due to InvocationTargetException");
         }
     }
-    
+
     private void injectProperties(Object instance, Map<String, List<String>> props) {
         if (props == null || props.isEmpty()) {
             return;
@@ -475,32 +475,32 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                     value = PrimitiveUtils.read(entry.getValue().get(0), type);
                 } else {
                     value = entry.getValue();
-                } 
+                }
                 InjectionUtils.injectThroughMethod(instance, m, value);
             }
         }
     }
-    
+
     protected void configureSingleton(Object instance) {
-        
+
     }
-    
-    protected void createServerFromApplication(String applicationNames, ServletConfig servletConfig) 
+
+    protected void createServerFromApplication(String applicationNames, ServletConfig servletConfig)
         throws ServletException {
-        
+
         boolean ignoreApplicationPath = isIgnoreApplicationPath(servletConfig);
-        
+
         String[] classNames = StringUtils.split(applicationNames, getParameterSplitChar(servletConfig));
-        
+
         if (classNames.length > 1 && ignoreApplicationPath) {
-            throw new ServletException("\"" + IGNORE_APP_PATH_PARAM 
+            throw new ServletException("\"" + IGNORE_APP_PATH_PARAM
                 + "\" parameter must be set to false for multiple Applications be supported");
         }
-        
+
         for (String cName : classNames) {
             ApplicationInfo providerApp = createApplicationInfo(cName, servletConfig);
-            
-            JAXRSServerFactoryBean bean = ResourceUtils.createApplication(providerApp.getProvider(), 
+
+            JAXRSServerFactoryBean bean = ResourceUtils.createApplication(providerApp.getProvider(),
                                                 ignoreApplicationPath,
                                                 getStaticSubResolutionValue(servletConfig));
             String splitChar = getParameterSplitChar(servletConfig);
@@ -514,30 +514,30 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             bean.create();
         }
     }
-    
+
     protected boolean isIgnoreApplicationPath(ServletConfig servletConfig) {
         String ignoreParam = servletConfig.getInitParameter(IGNORE_APP_PATH_PARAM);
         return ignoreParam == null || MessageUtils.isTrue(ignoreParam);
-    }    
-    
-    protected void createServerFromApplication(ServletConfig servletConfig) 
+    }
+
+    protected void createServerFromApplication(ServletConfig servletConfig)
         throws ServletException {
-        
-        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(getApplication(), 
+
+        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(getApplication(),
                                                                       isIgnoreApplicationPath(servletConfig),
                                                                       getStaticSubResolutionValue(servletConfig));
         bean.setBus(getBus());
         bean.setApplication(getApplication());
         bean.create();
     }
-    
+
     protected Application createApplicationInstance(String appClassName, ServletConfig servletConfig)
         throws ServletException {
         return null;
     }
-    protected ApplicationInfo createApplicationInfo(String appClassName, ServletConfig servletConfig) 
+    protected ApplicationInfo createApplicationInfo(String appClassName, ServletConfig servletConfig)
         throws ServletException {
-        
+
         Application customApp = createApplicationInstance(appClassName, servletConfig);
         if (customApp != null) {
             return new ApplicationInfo(customApp, getBus());
@@ -559,34 +559,34 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         appInfo.setOverridingProps(servletProps);
         return appInfo;
     }
-    
+
     protected Class<?> loadApplicationClass(String appClassName) throws ServletException {
         return loadClass(appClassName, "Application");
     }
-    
+
     protected Class<?> loadClass(String cName) throws ServletException {
         return loadClass(cName, "Resource");
     }
-    
+
     protected Class<?> loadClass(String cName, String classType) throws ServletException {
         try {
-            
+
             Class<?> cls = null;
             if (classLoader == null) {
                 cls = ClassLoaderUtils.loadClass(cName, CXFNonSpringJaxrsServlet.class);
             } else {
-                cls = classLoader.loadClass(cName); 
+                cls = classLoader.loadClass(cName);
             }
             return cls;
         } catch (ClassNotFoundException ex) {
-            throw new ServletException("No " + classType + " class " + cName.trim() + " can be found", ex); 
+            throw new ServletException("No " + classType + " class " + cName.trim() + " can be found", ex);
         }
     }
-    
+
     public void setClassLoader(ClassLoader loader) {
         this.classLoader = loader;
     }
-    
+
     protected Application getApplication() {
         return application;
     }

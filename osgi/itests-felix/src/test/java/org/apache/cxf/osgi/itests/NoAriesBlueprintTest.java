@@ -37,7 +37,7 @@ import static org.ops4j.pax.exam.CoreOptions.when;
 public class NoAriesBlueprintTest extends OSGiTestSupport {
     /**
      * Make sure cxf bundles start up without aries blueprint
-     * 
+     *
      * @throws Exception
      */
     @Test

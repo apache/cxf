@@ -55,7 +55,7 @@ class XercesXsdValidationImpl  {
         } catch (TransformerException e) {
             LOG.log(Level.SEVERE, "TraX failure converting DOM to string", e);
         } catch (Exception e) {
-            LOG.log(Level.SEVERE, "XML failure", e);            
+            LOG.log(Level.SEVERE, "XML failure", e);
         }
     }
 }

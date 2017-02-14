@@ -88,7 +88,7 @@ public class UniqueBodyValidator extends ServiceValidator {
                     opName = null;
                 }
                 if (opName != null) {
-                    Message msg = new Message("NON_UNIQUE_BODY", LOG, 
+                    Message msg = new Message("NON_UNIQUE_BODY", LOG,
                                               endpoint.getName(), op.getName(), opName, mName);
                     addErrorMessage(msg.toString());
                     return false;
@@ -103,10 +103,10 @@ public class UniqueBodyValidator extends ServiceValidator {
                     }
                 }
             }
-            
+
             for (BindingFaultInfo fault : bo.getFaults()) {
                 if (fault.getFaultInfo().getMessagePartsNumber() > 1) {
-                    Message msg = new Message("FAULT_WITH_MULTIPLE_PARTS", LOG, 
+                    Message msg = new Message("FAULT_WITH_MULTIPLE_PARTS", LOG,
                                               fault.getFaultInfo().getName()
                                                   .getLocalPart());
                     addErrorMessage(msg.toString());

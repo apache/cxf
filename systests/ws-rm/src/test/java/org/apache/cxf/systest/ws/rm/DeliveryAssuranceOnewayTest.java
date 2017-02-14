@@ -61,7 +61,7 @@ import org.junit.Test;
  */
 public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(DeliveryAssuranceOnewayTest.class);
-    private static final String GREETER_ADDRESS 
+    private static final String GREETER_ADDRESS
         = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
 
     private static final Logger LOG = LogUtils.getLogger(DeliveryAssuranceOnewayTest.class);
@@ -70,7 +70,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
     private Endpoint endpoint;
     private Bus greeterBus;
     private Greeter greeter;
-    
+
     @After
     public void tearDown() throws Exception {
         try {
@@ -86,19 +86,19 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         Thread.sleep(100);
     }
 
-    @Test    
+    @Test
     public void testAtLeastOnce() throws Exception {
         testOnewayAtLeastOnce(null);
     }
-    
-    @Test    
+
+    @Test
     public void testAtLeastOnceAsyncExecutor() throws Exception {
         testOnewayAtLeastOnce(Executors.newSingleThreadExecutor());
-    } 
+    }
 
     private void testOnewayAtLeastOnce(Executor executor) throws Exception {
         init("org/apache/cxf/systest/ws/rm/atleastonce.xml", executor);
-        
+
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(new Long(1000));
@@ -107,9 +107,9 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
-        
+
         awaitMessages(callArgs.length, 1, 3000);
-        
+
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
         int checkCount = 0;
         for (int i = 0; i < callArgs.length; i++) {
@@ -132,19 +132,19 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         assertTrue("Too few messages " + actualArgs.size(), callArgs.length <= actualArgs.size());
     }
 
-    @Test    
+    @Test
     public void testAtMostOnce() throws Exception {
         testOnewayAtMostOnce(null);
     }
-    
-    @Test    
+
+    @Test
     public void testAtMostOnceAsyncExecutor() throws Exception {
         testOnewayAtMostOnce(Executors.newSingleThreadExecutor());
-    } 
+    }
 
     private void testOnewayAtMostOnce(Executor executor) throws Exception {
         init("org/apache/cxf/systest/ws/rm/atmostonce.xml", executor);
-        
+
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
@@ -152,7 +152,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
-        
+
         awaitMessages(callArgs.length, 1000, 60000);
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
         assertTrue("Too many messages", callArgs.length >= actualArgs.size());
@@ -163,22 +163,22 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
                 }
             }
         }
-        
+
     }
 
-    @Test    
+    @Test
     public void testExactlyOnce() throws Exception {
         testOnewayExactlyOnce(null);
     }
-    
-    @Test    
+
+    @Test
     public void testExactlyOnceAsyncExecutor() throws Exception {
         testOnewayExactlyOnce(Executors.newSingleThreadExecutor());
-    } 
+    }
 
     private void testOnewayExactlyOnce(Executor executor) throws Exception {
         init("org/apache/cxf/systest/ws/rm/exactlyonce.xml", executor);
-        
+
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
@@ -186,7 +186,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
-        
+
         awaitMessages(callArgs.length, 1000, 60000);
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
         assertEquals("Wrong message count", callArgs.length, actualArgs.size());
@@ -202,22 +202,22 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
                 fail("No match for request " + callArgs[i]);
             }
         }
-        
+
     }
 
-    @Test    
+    @Test
     public void testInOrder() throws Exception {
         testOnewayInOrder(null);
     }
-    
-    @Test    
+
+    @Test
     public void testInOrderAsyncExecutor() throws Exception {
         testOnewayInOrder(Executors.newSingleThreadExecutor());
-    } 
+    }
 
     private void testOnewayInOrder(Executor executor) throws Exception {
         init("org/apache/cxf/systest/ws/rm/inorder.xml", executor);
-        
+
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
@@ -225,7 +225,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
-        
+
         awaitMessages(callArgs.length - 2, 1000, 60000);
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
         int argNum = 0;
@@ -237,19 +237,19 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         }
     }
 
-    @Test    
+    @Test
     public void testAtMostOnceInOrder() throws Exception {
         testOnewayAtMostOnceInOrder(null);
     }
-    
-    @Test    
+
+    @Test
     public void testAtMostOnceInOrderAsyncExecutor() throws Exception {
         testOnewayAtMostOnceInOrder(Executors.newSingleThreadExecutor());
-    } 
+    }
 
     private void testOnewayAtMostOnceInOrder(Executor executor) throws Exception {
         init("org/apache/cxf/systest/ws/rm/atmostonce-inorder.xml", executor);
-        
+
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
@@ -257,7 +257,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
-        
+
         awaitMessages(callArgs.length - 2, 1000, 60000);
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
         assertTrue("Too many messages", callArgs.length >= actualArgs.size());
@@ -270,19 +270,19 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         }
     }
 
-    @Test    
+    @Test
     public void testExactlyOnceInOrder() throws Exception {
         testOnewayExactlyOnceInOrder(null);
     }
-    
-    @Test    
+
+    @Test
     public void testExactlyOnceInOrderAsyncExecutor() throws Exception {
         testOnewayExactlyOnceInOrder(Executors.newSingleThreadExecutor());
     }
 
     private void testOnewayExactlyOnceInOrder(Executor executor) throws Exception {
         init("org/apache/cxf/systest/ws/rm/exactlyonce-inorder.xml", executor);
-        
+
         greeterBus.getOutInterceptors().add(new MessageLossSimulator());
         RMManager manager = greeterBus.getExtension(RMManager.class);
         manager.getConfiguration().setBaseRetransmissionInterval(new Long(2000));
@@ -290,7 +290,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         for (int i = 0; i < callArgs.length; i++) {
             greeter.greetMeOneWay(callArgs[i]);
         }
-        
+
         awaitMessages(callArgs.length, 1000, 60000);
         List<String> actualArgs = GreeterProvider.CALL_ARGS;
         assertEquals("Wrong number of messages", callArgs.length, actualArgs.size());
@@ -306,20 +306,20 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
     // --- test utilities ---
 
     private void init(String cfgResource, Executor executor) {
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         initServer(bf, cfgResource);
         initGreeterBus(bf, cfgResource);
         initProxy(executor);
     }
-    
+
     private void initServer(SpringBusFactory bf, String cfgResource) {
-        String derbyHome = System.getProperty("derby.system.home"); 
+        String derbyHome = System.getProperty("derby.system.home");
         try {
             synchronized (GreeterProvider.CALL_ARGS) {
                 GreeterProvider.CALL_ARGS.clear();
             }
-            System.setProperty("derby.system.home", derbyHome + "-server");   
+            System.setProperty("derby.system.home", derbyHome + "-server");
             serverBus = bf.createBus(cfgResource);
             BusFactory.setDefaultBus(serverBus);
             LOG.info("Initialised bus " + serverBus + " with cfg file resource: " + cfgResource);
@@ -333,7 +333,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             }
         }
     }
-    
+
     private void initGreeterBus(SpringBusFactory bf,
                                 String cfgResource) {
         greeterBus = bf.createBus(cfgResource);
@@ -341,13 +341,13 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         LOG.fine("Initialised greeter bus with configuration: " + cfgResource);
     }
 
-    private void initProxy(Executor executor) {        
+    private void initProxy(Executor executor) {
         GreeterService gs = new GreeterService();
 
         if (null != executor) {
             gs.setExecutor(executor);
         }
-   
+
         greeter = gs.getGreeterPort();
         try {
             updateAddressPort(greeter, PORT);
@@ -358,10 +358,10 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
 
         ConnectionHelper.setKeepAliveConnection(greeter, false);
     }
-    
+
     private void stopClient() {
         if (null != greeterBus) {
-            
+
             //ensure we close the decoupled destination of the conduit,
             //so that release the port if the destination reference count hit zero
             if (greeter != null) {
@@ -372,7 +372,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             greeterBus = null;
         }
     }
-    
+
     private void stopServer() {
         if (null != endpoint) {
             LOG.info("Stopping Greeter endpoint");
@@ -386,7 +386,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             serverBus = null;
         }
     }
-    
+
     /**
      * @param nExpectedIn number of messages to wait for
      * @param delay added delay before return (in case more are coming)
@@ -396,7 +396,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         int waited = 0;
         int nIn = 0;
         long start = System.currentTimeMillis();
-        while (waited <= timeout) {                
+        while (waited <= timeout) {
             synchronized (GreeterProvider.CALL_ARGS) {
                 nIn = GreeterProvider.CALL_ARGS.size();
             }
@@ -429,7 +429,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
                 wsdlLocation = "/wsdl/greeter_control.wsdl")
     @ServiceMode(Mode.PAYLOAD)
     public static class GreeterProvider implements Provider<Source> {
-        
+
         public static final List<String> CALL_ARGS = new ArrayList<>();
 
         public Source invoke(Source obj) {
@@ -443,7 +443,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
             if (el instanceof Document) {
                 el = ((Document)el).getDocumentElement();
             }
-            
+
             Map<String, String> ns = new HashMap<String, String>();
             ns.put("ns", "http://cxf.apache.org/greeter_control/types");
             XPathUtils xp = new XPathUtils(ns);
@@ -471,5 +471,5 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
                 return new StreamSource(new StringReader(resp));
             }
         }
-    }    
+    }
 }

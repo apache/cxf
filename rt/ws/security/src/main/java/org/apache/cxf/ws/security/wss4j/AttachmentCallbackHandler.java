@@ -41,9 +41,9 @@ import org.apache.wss4j.common.ext.AttachmentResultCallback;
  * A CallbackHandler to be used to sign/encrypt SOAP Attachments.
  */
 public class AttachmentCallbackHandler implements CallbackHandler {
-    
+
     private final SoapMessage soapMessage;
-    
+
     public AttachmentCallbackHandler(SoapMessage soapMessage) {
         this.soapMessage = soapMessage;
     }
@@ -56,7 +56,7 @@ public class AttachmentCallbackHandler implements CallbackHandler {
 
                 List<org.apache.wss4j.common.ext.Attachment> attachmentList = new ArrayList<>();
                 attachmentRequestCallback.setAttachments(attachmentList);
-                
+
                 String attachmentId = attachmentRequestCallback.getAttachmentId();
                 if ("Attachments".equals(attachmentId)) {
                     // Load all attachments
@@ -65,7 +65,7 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 loadAttachments(attachmentList, attachmentId, attachmentRequestCallback.isRemoveAttachments());
             } else if (callback instanceof AttachmentResultCallback) {
                 AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callback;
-                
+
                 if (soapMessage.getAttachments() == null) {
                     soapMessage.setAttachments(new ArrayList<Attachment>());
                 }
@@ -81,7 +81,7 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                                 attachmentResultCallback.getAttachment().getSourceStream())
                         )
                     );
-                
+
                 Map<String, String> headers = attachmentResultCallback.getAttachment().getHeaders();
                 for (Map.Entry<String, String> entry : headers.entrySet()) {
                     securedAttachment.setHeader(entry.getKey(), entry.getValue());
@@ -102,7 +102,7 @@ public class AttachmentCallbackHandler implements CallbackHandler {
         final Collection<org.apache.cxf.message.Attachment> attachments = soapMessage.getAttachments();
         // Calling LazyAttachmentCollection.size() here to force it to load the attachments
         if (attachments != null && attachments.size() > 0) {
-            for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator(); 
+            for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator();
                 iterator.hasNext();) {
                 org.apache.cxf.message.Attachment attachment = iterator.next();
 

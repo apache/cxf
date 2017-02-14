@@ -38,7 +38,7 @@ import org.apache.header_test.types.TestHeader5ResponseBody;
 import org.junit.Test;
 
 public class HeaderTest extends AbstractJaxWsTest {
-    
+
     @Test
     public void testInvocation() throws Exception {
         JaxWsServiceFactoryBean bean = new JaxWsServiceFactoryBean();
@@ -46,33 +46,33 @@ public class HeaderTest extends AbstractJaxWsTest {
         Bus bus = getBus();
         bean.setBus(bus);
         bean.setServiceClass(TestHeaderImpl.class);
-        
+
         Service service = bean.create();
-        
+
         OperationInfo op = service.getServiceInfos().get(0).getInterface().getOperation(
             new QName(service.getName().getNamespaceURI(), "testHeader5"));
         assertNotNull(op);
         List<MessagePartInfo> parts = op.getInput().getMessageParts();
         assertEquals(1, parts.size());
-        
+
         MessagePartInfo part = parts.get(0);
         assertNotNull(part.getTypeClass());
         assertEquals(TestHeader5.class, part.getTypeClass());
-        
+
         parts = op.getOutput().getMessageParts();
         assertEquals(2, parts.size());
-        
+
         part = parts.get(1);
         assertNotNull(part.getTypeClass());
         assertEquals(TestHeader5ResponseBody.class, part.getTypeClass());
-        
+
         part = parts.get(0);
         assertNotNull(part.getTypeClass());
         assertEquals(TestHeader5.class, part.getTypeClass());
-          
+
 //        part = parts.get(1);
 //        assertNotNull(part.getTypeClass());
-        
+
         ServerFactoryBean svr = new ServerFactoryBean();
         svr.setBus(bus);
         svr.setServiceFactory(bean);
@@ -80,11 +80,11 @@ public class HeaderTest extends AbstractJaxWsTest {
         svr.setAddress("http://localhost:9104/SoapHeaderContext/SoapHeaderPort");
         svr.setBindingConfig(new JaxWsSoapBindingConfiguration(bean));
 
-        
+
         svr.create();
-        
+
         Node response = invoke("http://localhost:9104/SoapHeaderContext/SoapHeaderPort",
-                               LocalTransportFactory.TRANSPORT_ID, 
+                               LocalTransportFactory.TRANSPORT_ID,
                                "testHeader5.xml");
 
         assertNotNull(response);

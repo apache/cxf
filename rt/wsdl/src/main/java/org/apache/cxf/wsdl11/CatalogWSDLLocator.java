@@ -40,10 +40,10 @@ public class CatalogWSDLLocator implements WSDLLocator {
     private ExtendedURIResolver resolver;
     private OASISCatalogManager manager;
     private String baseUri;
-    
+
     public CatalogWSDLLocator(String wsdlUrl) {
         this.baseUri = wsdlUrl;
-        this.resolver = new ExtendedURIResolver();        
+        this.resolver = new ExtendedURIResolver();
     }
     public CatalogWSDLLocator(String wsdlUrl, OASISCatalogManager catalogManager) {
         this.baseUri = wsdlUrl;
@@ -102,12 +102,12 @@ public class CatalogWSDLLocator implements WSDLLocator {
     public InputSource getImportInputSource(String parent, String importLocation) {
         String resolvedImportLocation = null;
         try {
-            resolvedImportLocation = new OASISCatalogManagerHelper().resolve(manager, 
+            resolvedImportLocation = new OASISCatalogManagerHelper().resolve(manager,
                                          importLocation, parent);
         } catch (IOException e) {
             throw new RuntimeException("Catalog resolution failed", e);
         }
-        
+
 
         InputSource in = null;
         if (resolvedImportLocation == null) {
@@ -117,7 +117,7 @@ public class CatalogWSDLLocator implements WSDLLocator {
         }
 
         // XXX: If we return null (as per javadoc), a NPE is raised in WSDL4J code.
-        // So let's return new InputSource() and let WSDL4J fail. Optionally, 
+        // So let's return new InputSource() and let WSDL4J fail. Optionally,
         // we can throw a similar exception as in CatalogXmlSchemaURIResolver.
         if (in == null) {
             in = new InputSource();

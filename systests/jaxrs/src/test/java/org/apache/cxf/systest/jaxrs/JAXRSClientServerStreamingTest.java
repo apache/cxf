@@ -56,7 +56,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
     public static final String PORT = allocatePort(Server.class);
 
     @Ignore
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
@@ -66,10 +66,10 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             JAXBElementProvider<?> p1 = new JAXBElementProvider<Object>();
             p1.setEnableBuffering(true);
             p1.setEnableStreaming(true);
-            
+
             JAXBElementProvider<?> p2 = new CustomJaxbProvider();
             p2.setProduceMediaTypes(Collections.singletonList("text/xml"));
-            
+
             List<Object> providers = new ArrayList<>();
             providers.add(p1);
             providers.add(p2);
@@ -94,7 +94,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             }
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -103,13 +103,13 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
                    launchServer(Server.class));
         createStaticBus();
     }
-    
+
     @Test
     public void testGetBook123() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstore/books/123",
                       "application/xml", 200);
     }
-    
+
     @Test
     public void testGetBook123Fail() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/text/xml/123");
@@ -118,14 +118,14 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
         Response r = wc.get();
         assertEquals(500, r.getStatus());
     }
-    
+
     @Test
     public void testGetBookUsingStaxWriter() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstore/books/text/xml/123",
                       "text/xml", 200);
     }
-    
-    private void getAndCompare(String address, 
+
+    private void getAndCompare(String address,
                                String acceptType,
                                int expectedStatus) throws Exception {
         GetMethod get = new GetMethod(address);
@@ -141,13 +141,13 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             get.releaseConnection();
         }
     }
-    
+
     private Book readBook(InputStream is) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Unmarshaller u = c.createUnmarshaller();
         return (Book)u.unmarshal(is);
     }
-    
+
     @Ignore
     public static class CustomJaxbProvider extends JAXBElementProvider<Object> {
         @Override
@@ -159,7 +159,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             }
         }
         @Override
-        public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
+        public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,
             MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) throws IOException {
             List<String> failHeaders = getContext().getHttpHeaders().getRequestHeader("fail-write");
             if (failHeaders != null && failHeaders.size() > 0) {

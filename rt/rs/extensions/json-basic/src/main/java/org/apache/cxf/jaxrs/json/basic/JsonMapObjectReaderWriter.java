@@ -37,34 +37,34 @@ import org.apache.cxf.helpers.IOUtils;
 public class JsonMapObjectReaderWriter {
     private static final String NULL_VALUE = "null";
     private boolean format;
-    
+
     public JsonMapObjectReaderWriter() {
-        
+
     }
     public JsonMapObjectReaderWriter(boolean format) {
         this.format = format;
     }
-    
+
     public String toJson(JsonMapObject obj) {
         return toJson(obj.asMap());
     }
-    
+
     public String toJson(Map<String, Object> map) {
         StringBuilder sb = new StringBuilder();
         toJsonInternal(new StringBuilderOutput(sb), map);
         return sb.toString();
     }
-    
+
     public String toJson(List<Object> list) {
         StringBuilder sb = new StringBuilder();
         toJsonInternal(new StringBuilderOutput(sb), list);
         return sb.toString();
     }
-    
+
     public void toJson(JsonMapObject obj, OutputStream os) {
         toJson(obj.asMap(), os);
     }
-    
+
     public void toJson(Map<String, Object> map, OutputStream os) {
         toJsonInternal(new StreamOutput(os), map);
     }
@@ -79,11 +79,11 @@ public class JsonMapObjectReaderWriter {
         }
         out.append("}");
     }
-    
+
     protected void toJsonInternal(Output out, Object[] array) {
         toJsonInternal(out, Arrays.asList(array));
     }
-    
+
     protected void toJsonInternal(Output out, Collection<?> coll) {
         out.append("[");
         formatIfNeeded(out);
@@ -93,7 +93,7 @@ public class JsonMapObjectReaderWriter {
         formatIfNeeded(out);
         out.append("]");
     }
-    
+
     @SuppressWarnings("unchecked")
     protected void toJsonInternal(Output out, Object value, boolean hasNext) {
         if (value == null) {
@@ -120,9 +120,9 @@ public class JsonMapObjectReaderWriter {
             out.append(",");
             formatIfNeeded(out);
         }
-        
+
     }
-    
+
     private boolean checkQuotesNeeded(Object value) {
         Class<?> cls = value.getClass();
         return !(Number.class.isAssignableFrom(cls) || Boolean.class == cls
@@ -140,7 +140,7 @@ public class JsonMapObjectReaderWriter {
         JsonMapObject obj = new JsonMapObject();
         fromJson(obj, json);
         return obj;
-    }    
+    }
     public void fromJson(JsonMapObject obj, String json) {
         String theJson = json.trim();
         JsonObjectSettable settable = new JsonObjectSettable(obj);
@@ -167,12 +167,12 @@ public class JsonMapObjectReaderWriter {
             if (isWhiteSpace(json.charAt(i))) {
                 continue;
             }
-            
+
             int closingQuote = json.indexOf('"', i + 1);
             int from = json.charAt(i) == '"' ? i + 1 : i;
             String name = json.substring(from, closingQuote);
             int sepIndex = json.indexOf(':', closingQuote + 1);
-            
+
             int j = 1;
             while (isWhiteSpace(json.charAt(sepIndex + j))) {
                 j++;
@@ -195,7 +195,7 @@ public class JsonMapObjectReaderWriter {
                 values.put(name, value);
                 i = commaIndex + 1;
             }
-            
+
         }
     }
     protected List<Object> internalFromJsonAsList(String name, String json) {
@@ -217,12 +217,12 @@ public class JsonMapObjectReaderWriter {
                 i = commaIndex;
             }
         }
-        
+
         return values;
     }
     protected Object readPrimitiveValue(String name, String json, int from, int to) {
         Object value = json.substring(from, to);
-        String valueStr = value.toString().trim(); 
+        String valueStr = value.toString().trim();
         if (valueStr.startsWith("\"")) {
             value = valueStr.substring(1, valueStr.length() - 1);
         } else if ("true".equals(valueStr) || "false".equals(valueStr)) {
@@ -238,7 +238,7 @@ public class JsonMapObjectReaderWriter {
         }
         return value;
     }
-    
+
     protected static int getCommaIndex(String json, int from) {
         int commaIndex = json.indexOf(",", from);
         if (commaIndex == -1) {
@@ -271,7 +271,7 @@ public class JsonMapObjectReaderWriter {
         public void put(String key, Object value) {
             map.put(key, value);
         }
-        
+
     }
     private static class JsonObjectSettable implements Settable {
         private JsonMapObject obj;
@@ -295,7 +295,7 @@ public class JsonMapObjectReaderWriter {
             sb.append(str);
             return this;
         }
-        
+
     }
     private class StreamOutput implements Output {
         private OutputStream os;
@@ -314,7 +314,7 @@ public class JsonMapObjectReaderWriter {
             }
             return this;
         }
-        
+
     }
-    
+
 }

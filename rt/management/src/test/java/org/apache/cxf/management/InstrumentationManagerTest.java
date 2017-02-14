@@ -40,12 +40,12 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class InstrumentationManagerTest extends Assert {
     InstrumentationManager im;
     Bus bus;
-    
+
     @Before
     public void setUp() throws Exception {
 
     }
-    
+
     @After
     public void tearDown() throws Exception {
         //test case had done the bus.shutdown
@@ -53,7 +53,7 @@ public class InstrumentationManagerTest extends Assert {
             bus.shutdown(true);
         }
     }
-    
+
     @Test
     public void testInstrumentationNotEnabled() {
         SpringBusFactory factory = new SpringBusFactory();
@@ -63,7 +63,7 @@ public class InstrumentationManagerTest extends Assert {
         MBeanServer mbs = im.getMBeanServer();
         assertNull("MBeanServer should not be available.", mbs);
     }
-    
+
     @Test
     public void testInstrumentationEnabledSetBeforeBusSet() {
         SpringBusFactory factory = new SpringBusFactory();
@@ -73,7 +73,7 @@ public class InstrumentationManagerTest extends Assert {
         MBeanServer mbs = im.getMBeanServer();
         assertNotNull("MBeanServer should be available.", mbs);
     }
-    
+
     @Test
     // try to get WorkQueue information
     public void testWorkQueueInstrumentation() throws Exception {
@@ -84,20 +84,20 @@ public class InstrumentationManagerTest extends Assert {
         WorkQueueManagerImpl wqm = new WorkQueueManagerImpl();
         wqm.setBus(bus);
         wqm.getAutomaticWorkQueue();
-        
+
         MBeanServer mbs = im.getMBeanServer();
         assertNotNull("MBeanServer should be available.", mbs);
-        ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
+        ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME
                                          + ":type=WorkQueues,*");
         Set<ObjectName> s = mbs.queryNames(name, null);
         assertEquals(2, s.size());
         Iterator<ObjectName> it = s.iterator();
         while (it.hasNext()) {
             ObjectName n = it.next();
-            Long result = 
+            Long result =
                 (Long)mbs.invoke(n, "getWorkQueueMaxSize", new Object[0], new String[0]);
             assertEquals(result, Long.valueOf(256));
-            Integer hwm = 
+            Integer hwm =
                 (Integer)mbs.invoke(n, "getHighWaterMark", new Object[0], new String[0]);
             if (n.getCanonicalName().contains("test-wq")) {
                 assertEquals(10, hwm.intValue());
@@ -123,7 +123,7 @@ public class InstrumentationManagerTest extends Assert {
             CounterRepository cr1 = cxf1.getExtension(CounterRepository.class);
             assertNotNull("CounterRepository of cxf1 should not be null", cr1);
             assertEquals("CounterRepository of cxf1 has the wrong bus", cxf1, cr1.getBus());
-            
+
             cxf2 = (Bus)context.getBean("cxf2");
             InstrumentationManager im2 = cxf2.getExtension(InstrumentationManager.class);
             assertNotNull("Instrumentation Manager of cxf2 should not be null", im2);
@@ -143,7 +143,7 @@ public class InstrumentationManagerTest extends Assert {
             }
         }
     }
-    
+
     @Test
     public void testInstrumentBusWithBusProperties() {
         ClassPathXmlApplicationContext context = null;
@@ -153,21 +153,21 @@ public class InstrumentationManagerTest extends Assert {
             context = new ClassPathXmlApplicationContext("managed-spring-twobuses2.xml");
 
             cxf1 = (Bus)context.getBean("cxf1");
-            InstrumentationManagerImpl im1 = 
+            InstrumentationManagerImpl im1 =
                 (InstrumentationManagerImpl)cxf1.getExtension(InstrumentationManager.class);
             assertNotNull("Instrumentation Manager of cxf1 should not be null", im1);
-            
+
             assertTrue(im1.isEnabled());
             assertEquals("service:jmx:rmi:///jndi/rmi://localhost:9914/jmxrmi", im1.getJMXServiceURL());
-            
+
             cxf2 = (Bus)context.getBean("cxf2");
-            InstrumentationManagerImpl im2 = 
+            InstrumentationManagerImpl im2 =
                 (InstrumentationManagerImpl)cxf2.getExtension(InstrumentationManager.class);
             assertNotNull("Instrumentation Manager of cxf2 should not be null", im2);
 
             assertFalse(im2.isEnabled());
             assertEquals("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi", im2.getJMXServiceURL());
-            
+
         } finally {
             if (cxf1 != null) {
                 cxf1.shutdown(true);

@@ -33,7 +33,7 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
 public class BraveStopInterceptor extends AbstractBraveInterceptor {
@@ -44,27 +44,27 @@ public class BraveStopInterceptor extends AbstractBraveInterceptor {
     @Override
     public void handleMessage(Message message) throws Fault {
         Map<String, List<Object>> responseHeaders = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-        
+
         if (responseHeaders == null) {
             responseHeaders = new HashMap<String, List<Object>>();
             message.put(Message.PROTOCOL_HEADERS, responseHeaders);
         }
-        
+
         boolean isRequestor = MessageUtils.isRequestor(message);
-        Message requestMessage = isRequestor ? message.getExchange().getOutMessage() 
+        Message requestMessage = isRequestor ? message.getExchange().getOutMessage()
             : message.getExchange().getInMessage();
-        Map<String, List<String>> requestHeaders =  
+        Map<String, List<String>> requestHeaders =
             CastUtils.cast((Map<?, ?>)requestMessage.get(Message.PROTOCOL_HEADERS));
-        
+
         @SuppressWarnings("unchecked")
-        final TraceScopeHolder<ServerSpan> holder = 
+        final TraceScopeHolder<ServerSpan> holder =
             (TraceScopeHolder<ServerSpan>)message.getExchange().get(TRACE_SPAN);
-        
+
         Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
         if (responseCode == null) {
-            responseCode = 200; 
+            responseCode = 200;
         }
-        
+
         super.stopTraceSpan(requestHeaders, responseHeaders, responseCode, holder);
     }
 }

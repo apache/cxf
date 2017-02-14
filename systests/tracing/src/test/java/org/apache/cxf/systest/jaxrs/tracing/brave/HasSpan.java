@@ -30,7 +30,7 @@ public class HasSpan extends IsCollectionContaining<Span> {
     public HasSpan(final String name) {
         this(name, null);
     }
-    
+
     public HasSpan(final String name, final Matcher<Iterable<? super Annotation>> matcher) {
         super(new TypeSafeMatcher<Span>() {
             @Override
@@ -39,7 +39,7 @@ public class HasSpan extends IsCollectionContaining<Span> {
                     .appendText("span with name ")
                     .appendValue(name)
                     .appendText(" ");
-                
+
                 if (matcher != null) {
                     description.appendText(" and ");
                     matcher.describeTo(description);
@@ -51,20 +51,20 @@ public class HasSpan extends IsCollectionContaining<Span> {
                 if (!name.equals(item.name)) {
                     return false;
                 }
-                
+
                 if (matcher != null) {
                     return matcher.matches(item.annotations);
                 }
-                
+
                 return true;
             }
         });
     }
-    
+
     public static HasSpan hasSpan(final String name) {
         return new HasSpan(name);
     }
-    
+
     public static HasSpan hasSpan(final String name, final Matcher<Iterable<? super Annotation>> matcher) {
         return new HasSpan(name, matcher);
     }

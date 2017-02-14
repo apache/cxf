@@ -40,7 +40,7 @@ public class IsTimelineContaining extends IsCollectionContaining<TimelineAnnotat
             }
         });
     }
-    
+
     public static IsTimelineContaining hasItem(final String value) {
         return new IsTimelineContaining(value);
     }

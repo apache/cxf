@@ -112,7 +112,7 @@ public class DelegatingInputStream extends InputStream implements Transferable {
         this.is = inputStream;
     }
 
-    
+
     public InputStream getInputStream() {
         return is;
     }

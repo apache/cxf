@@ -47,16 +47,16 @@ public class ThreadContextCheckerHome implements EJBHome {
                             current, cl);
         return ejb;
     }
-    
+
     // default impemenations
     public void remove(Handle handle) throws RemoteException, RemoveException {
         // do nothing here
     }
-    
+
     public void remove(Object primaryKey) throws RemoteException, RemoveException {
         // do nothing here
     }
-    
+
     public EJBMetaData getEJBMetaData() throws RemoteException {
         return null;
     }

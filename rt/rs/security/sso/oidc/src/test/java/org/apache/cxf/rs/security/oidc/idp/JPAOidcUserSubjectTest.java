@@ -61,43 +61,43 @@ public class JPAOidcUserSubjectTest extends Assert {
     protected String getPersistenceUnitName() {
         return "testUnitHibernate";
     }
-    
+
     @Test
     public void testAccessTokenWithOidcUserSubject() {
         Client c = addClient("101", "bob");
-        
+
         AccessTokenRegistration atr = new AccessTokenRegistration();
         atr.setClient(c);
         atr.setApprovedScope(Collections.singletonList("a"));
-        
+
         OidcUserSubject oidcSubject = new OidcUserSubject();
         oidcSubject.setLogin("bob");
         IdToken idToken = new IdToken();
         idToken.setAudience(c.getClientId());
         oidcSubject.setIdToken(idToken);
         atr.setSubject(oidcSubject);
-        
+
         ServerAccessToken at = getProvider().createAccessToken(atr);
         ServerAccessToken at2 = getProvider().getAccessToken(at.getTokenKey());
         assertEquals(at.getTokenKey(), at2.getTokenKey());
-                
+
         OidcUserSubject oidcSubject2 = (OidcUserSubject)at2.getSubject();
         assertEquals(c.getClientId(), oidcSubject2.getIdToken().getAudience());
-        
+
         OidcUserSubject oidcSubject3 = new OidcUserSubject();
         oidcSubject3.setLogin("bob");
         IdToken idToken2 = new IdToken();
         idToken2.setAudience(c.getClientId());
         oidcSubject3.setIdToken(idToken2);
         atr.setSubject(oidcSubject3);
-        
+
         ServerAccessToken at3 = getProvider().createAccessToken(atr);
         ServerAccessToken at4 = getProvider().getAccessToken(at3.getTokenKey());
         OidcUserSubject oidcSubject4 = (OidcUserSubject)at4.getSubject();
         assertEquals(c.getClientId(), oidcSubject4.getIdToken().getAudience());
     }
-    
-    
+
+
     private Client addClient(String clientId, String userLogin) {
         Client c = new Client();
         c.setRedirectUris(Collections.singletonList("http://client/redirect"));
@@ -106,7 +106,7 @@ public class JPAOidcUserSubjectTest extends Assert {
         getProvider().setClient(c);
         return c;
     }
-    
+
     @After
     public void tearDown() throws Exception {
         try {
@@ -114,8 +114,8 @@ public class JPAOidcUserSubjectTest extends Assert {
                 getProvider().close();
             }
         } catch (Throwable ex) {
-            ex.printStackTrace();    
-        } finally {    
+            ex.printStackTrace();
+        } finally {
             try {
                 if (getProvider() != null) {
                     getProvider().close();

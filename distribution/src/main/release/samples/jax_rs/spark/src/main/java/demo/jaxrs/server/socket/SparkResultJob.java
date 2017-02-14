@@ -33,7 +33,7 @@ public class SparkResultJob implements Runnable {
         this.sparkInputStream = sparkInputStream;
     }
 
-    
+
     @Override
     public void run() {
         try {
@@ -45,7 +45,7 @@ public class SparkResultJob implements Runnable {
                 sparkResponses.get(jobId).offer(value);
             }
         } catch (IOException ex) {
-            // ignore    
+            // ignore
         }
 
     }

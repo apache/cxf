@@ -44,7 +44,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
 public class LoggingInInterceptor extends AbstractLoggingInterceptor {
@@ -62,9 +62,9 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 message.remove(LogEvent.class);
                 sender.send(event);
             }
-        }  
+        }
     }
-    
+
     public LoggingInInterceptor() {
         this(new Slf4jEventSender());
     }
@@ -77,8 +77,8 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         return Collections.singleton(new SendLogEventInterceptor());
     }
-    
-    
+
+
     public void handleFault(Message message) {
         LogEvent event = message.get(LogEvent.class);
         if (event != null) {
@@ -99,8 +99,8 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             } else {
                 event.setPayload(AbstractLoggingInterceptor.CONTENT_SUPPRESSED);
             }
-            // at this point, we have the payload.  However, we may not have the endpoint yet. Delay sending 
-            // the event till a little bit later 
+            // at this point, we have the payload.  However, we may not have the endpoint yet. Delay sending
+            // the event till a little bit later
             message.put(LogEvent.class, event);
         }
     }
@@ -116,7 +116,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             }
         }
     }
-    
+
     protected void logInputStream(Message message, InputStream is, LogEvent event) {
         CachedOutputStream bos = new CachedOutputStream();
         if (threshold > 0) {
@@ -125,16 +125,16 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         String encoding = event.getEncoding();
         try {
             // use the appropriate input stream and restore it later
-            InputStream bis = is instanceof DelegatingInputStream 
+            InputStream bis = is instanceof DelegatingInputStream
                 ? ((DelegatingInputStream)is).getInputStream() : is;
-            
+
 
             //only copy up to the limit since that's all we need to log
             //we can stream the rest
             IOUtils.copyAtLeast(bis, bos, limit == -1 ? Integer.MAX_VALUE : limit);
             bos.flush();
             bis = new SequenceInputStream(bos.getInputStream(), bis);
-            
+
             // restore the delegating input stream or the input stream
             if (is instanceof DelegatingInputStream) {
                 ((DelegatingInputStream)is).setInputStream(bis);
@@ -149,7 +149,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             if (bos.size() > limit && limit != -1) {
                 event.setTruncated(true);
             }
-            
+
             StringBuilder builder = new StringBuilder(limit);
             if (StringUtils.isEmpty(encoding)) {
                 bos.writeCacheTo(builder, limit);
@@ -168,7 +168,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             CachedWriter writer = new CachedWriter();
             IOUtils.copyAndCloseInput(reader, writer);
             message.setContent(Reader.class, writer.getReader());
-            
+
             if (writer.getTempFile() != null) {
                 //large thing on disk...
                 event.setFullContentFile(writer.getTempFile());
@@ -179,7 +179,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             int max = writer.size() > limit ? (int)limit : (int)writer.size();
             StringBuilder b = new StringBuilder(max);
             writer.writeCacheTo(b);
-            event.setPayload(b.toString());            
+            event.setPayload(b.toString());
         } catch (Exception e) {
             throw new Fault(e);
         }

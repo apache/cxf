@@ -43,7 +43,7 @@ public final class IdlRoot extends IdlScopeBase {
         primitiveTypes.put("string", IdlString.create());
         primitiveTypes.put("wstring", IdlWString.create());
     }
-    
+
     public static IdlRoot create() {
         return new IdlRoot();
     }
@@ -87,5 +87,5 @@ public final class IdlRoot extends IdlScopeBase {
         super.writeFwd(pw);
         super.write(pw);
     }
-    
+
 }

@@ -39,14 +39,14 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {    
+public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
-    
+
     private final QName serviceName = new QName("http://apache.org/hello_world_doc_lit_bare",
                                                 "SOAPService");
     private final QName portName = new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort");
-    
-    
+
+
     @BeforeClass
     public static void startServers() throws Exception {
         System.setProperty("org.apache.cxf.bus.factory", "org.apache.cxf.bus.CXFBusFactory");
@@ -70,7 +70,7 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
         updateAddressPort(putLastTradedPrice, PORT);
         String response = putLastTradedPrice.bareNoParam();
         assertEquals("testResponse", response);
-        
+
         TradePriceData priceData = new TradePriceData();
         priceData.setTickerPrice(1.0f);
         priceData.setTickerSymbol("CELTIX");
@@ -106,7 +106,7 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
             }
         }
     }
-    
+
     @Test
     public void testNillableParameter() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/doc_lit_bare.wsdl");
@@ -120,7 +120,7 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
         updateAddressPort(port, PORT);
         String result = port.nillableParameter(null);
         assertNull(result);
-    } 
+    }
 
 
 }

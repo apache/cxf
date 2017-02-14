@@ -87,14 +87,14 @@ import org.apache.cxf.ws.discovery.wsdl.ScopesType;
 
 public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     private static final Logger LOG = LogUtils.getL7dLogger(WSDiscoveryService.class);
-    
+
     Bus bus;
     Endpoint udpEndpoint;
     WSDiscoveryClient client;
     List<HelloType> registered = new CopyOnWriteArrayList<HelloType>();
     ObjectFactory factory = new ObjectFactory();
     boolean started;
-    
+
     public WSDiscoveryServiceImpl(Bus b) {
         bus = b == null ? BusFactory.newInstance().createBus() : b;
         client = new WSDiscoveryClient();
@@ -110,7 +110,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         client = new WSDiscoveryClient();
         update(props);
     }
-    
+
     public final synchronized void update(Map<String, Object> props) {
         String address = (String)props.get("org.apache.cxf.service.ws-discovery.address");
         if (address != null) {
@@ -125,19 +125,19 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     public WSDiscoveryClient getClient() {
         return client;
     }
-    
+
     public HelloType register(EndpointReference ref) {
         startup(false);
-        HelloType ht = client.register(ref); 
+        HelloType ht = client.register(ref);
         registered.add(ht);
         return ht;
     }
     public void register(HelloType ht) {
         startup(false);
-        client.register(ht); 
+        client.register(ht);
         registered.add(ht);
     }
-    
+
     private Object getProperty(Server server, String s) {
         Object o = server.getEndpoint().get(s);
         if (o == null) {
@@ -145,7 +145,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         }
         return o;
     }
-    
+
     public void serverStarted(Server server) {
         Object o = getProperty(server, "ws-discovery-disable");
         if (o == Boolean.TRUE || Boolean.valueOf((String)o)) {
@@ -157,7 +157,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         HelloType ht = new HelloType();
         ht.setScopes(new ScopesType());
         ht.setMetadataVersion(1);
-        
+
 
         o = getProperty(server, "ws-discovery-types");
         if (o instanceof QName) {
@@ -172,13 +172,13 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
             }
         } else if (o instanceof String) {
             ht.getTypes().add(QName.valueOf((String)o));
-        } 
+        }
         if (ht.getTypes().isEmpty()) {
             QName sn = ServiceModelUtil.getServiceQName(server.getEndpoint().getEndpointInfo());
             ht.getTypes().add(sn);
         }
 
-        
+
         o = getProperty(server, "ws-discovery-scopes");
         if (o != null) {
             setScopes(ht, o);
@@ -225,18 +225,18 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         if (ht != null) {
             unregister(ht);
         }
-    }    
-    
-    
+    }
+
+
     public void unregister(HelloType ht) {
         registered.remove(ht);
-        client.unregister(ht); 
+        client.unregister(ht);
     }
-    
-    
+
+
     public synchronized void startup() {
         startup(false);
-    }    
+    }
     public synchronized boolean startup(boolean optional) {
         String preferIPv4StackValue = System.getProperty("java.net.preferIPv4Stack");
         String preferIPv6AddressesValue = System.getProperty("java.net.preferIPv6Addresses");
@@ -273,8 +273,8 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         }
         return true;
     }
-    
-    
+
+
     public ProbeMatchesType handleProbe(ProbeType pt) {
         List<HelloType> consider = new LinkedList<HelloType>(registered);
         //step one, consider the "types"
@@ -312,16 +312,16 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         }
         return pmt;
     }
-    
-    
+
+
     private UUID toUUID(String scope) {
         URI uri = URI.create(scope);
         if (uri.getScheme() == null) {
             return UUID.fromString(scope);
         } else {
             if (uri.getScheme().equals("urn")) {
-                uri = URI.create(uri.getSchemeSpecificPart()); 
-            } 
+                uri = URI.create(uri.getSchemeSpecificPart());
+            }
             if (uri.getScheme().equals("uuid")) {
                 return UUID.fromString(uri.getSchemeSpecificPart());
             }
@@ -336,24 +336,24 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         return false;
     }
     private boolean matchURIs(URI probe, URI target) {
-        if (compare(target.getScheme(), probe.getScheme()) 
+        if (compare(target.getScheme(), probe.getScheme())
             && compare(target.getAuthority(), probe.getAuthority())) {
             String[] ppath = StringUtils.split(probe.getPath(), "/");
             String[] tpath = StringUtils.split(target.getPath(), "/");
-                    
+
             if (ppath.length <= tpath.length) {
                 for (int i = 0; i < ppath.length; i++) {
-                    if (!ppath[i].equals(tpath[i])) { 
+                    if (!ppath[i].equals(tpath[i])) {
                         return false;
                     }
                 }
                 return true;
             }
-        }                    
+        }
         return false;
     }
 
-    
+
     private void matchScopes(ProbeType pt, List<HelloType> consider) {
         if (pt.getScopes() == null || pt.getScopes().getValue().isEmpty()) {
             return;
@@ -362,23 +362,23 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
         if (mb == null) {
             mb = "http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01/rfc3986";
         }
-        
+
         if (mb.startsWith(WSDVersion.NS_1_0)) {
             mb = mb.substring(WSDVersion.NS_1_0.length());
         } else if (mb.startsWith(WSDVersion.NS_1_1)) {
             mb = mb.substring(WSDVersion.NS_1_1.length());
         }
-        
+
         ListIterator<HelloType> cit = consider.listIterator();
         while (cit.hasNext()) {
             HelloType ht = cit.next();
             boolean matches = false;
-            
+
             if ("/rfc3986".equals(mb)) {
                 matches = true;
                 if (!pt.getScopes().getValue().isEmpty()) {
                     for (String ps : pt.getScopes().getValue()) {
-                        boolean foundOne = false; 
+                        boolean foundOne = false;
                         URI psuri = URI.create(ps);
                         for (String hts : ht.getScopes().getValue()) {
                             URI hturi = URI.create(hts);
@@ -393,7 +393,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                 matches = true;
                 if (!pt.getScopes().getValue().isEmpty()) {
                     for (String ps : pt.getScopes().getValue()) {
-                        boolean foundOne = false; 
+                        boolean foundOne = false;
                         UUID psuuid = toUUID(ps);
                         for (String hts : ht.getScopes().getValue()) {
                             UUID htuuid = toUUID(hts);
@@ -427,7 +427,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
             }
         }
     }
-    
+
 
     @WebServiceProvider(wsdlLocation = "classpath:/org/apache/cxf/ws/discovery/wsdl/wsdd-discovery-1.1-wsdl-os.wsdl",
         targetNamespace = "http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01",
@@ -436,7 +436,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
     @XmlSeeAlso(ObjectFactory.class)
     @Addressing(required = true)
     class WSDiscoveryProvider implements Provider<Source> {
-        
+
         JAXBContext context;
         WSDiscoveryProvider() {
             try {
@@ -445,23 +445,23 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                 e.printStackTrace();
             }
         }
-        
+
         private Source mapToOld(Document doc, JAXBElement<?> mt) throws JAXBException, XMLStreamException {
             doc.removeChild(doc.getDocumentElement());
             DOMResult result = new DOMResult(doc);
             XMLStreamWriter r = StaxUtils.createXMLStreamWriter(result);
             context.createMarshaller().marshal(mt, r);
-            
+
             XMLStreamReader domReader = StaxUtils.createXMLStreamReader(doc);
             Map<String, String> inMap = new HashMap<String, String>();
             inMap.put("{" + WSDVersion.INSTANCE_1_1.getNamespace() + "}*",
                       "{" + WSDVersion.INSTANCE_1_0.getNamespace() + "}*");
             inMap.put("{" + WSDVersion.INSTANCE_1_1.getAddressingNamespace() + "}*",
                       "{" + WSDVersion.INSTANCE_1_0.getAddressingNamespace() + "}*");
-            
+
             InTransformReader reader = new InTransformReader(domReader, inMap, null, false);
             doc = StaxUtils.read(reader);
-            return new DOMSource(doc);            
+            return new DOMSource(doc);
         }
         private void updateOutputAction(String append) {
             AddressingProperties p = ContextUtils.retrieveMAPs(PhaseInterceptorChain.getCurrentMessage(),
@@ -474,7 +474,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
             ContextUtils.storeMAPs(pout, PhaseInterceptorChain.getCurrentMessage(), true);
 
         }
-        
+
         private Document mapFromOld(Document doc) throws XMLStreamException {
             XMLStreamReader domReader = StaxUtils.createXMLStreamReader(doc);
             Map<String, String> inMap = new HashMap<String, String>();
@@ -485,7 +485,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
             InTransformReader reader = new InTransformReader(domReader, inMap, null, false);
             doc = StaxUtils.read(reader);
             //System.out.println(StaxUtils.toString(doc));
-           
+
             return doc;
         }
 
@@ -504,13 +504,13 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
                     doc = mapFromOld(doc);
                     mapToOld = true;
                 }
-                
+
                 if (!"http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01"
                     .equals(doc.getDocumentElement().getNamespaceURI())) {
                     //not a proper ws-discovery message, ignore it
                     return null;
                 }
-                
+
                 Object obj = JAXBUtils.unmarshall(context, doc.getDocumentElement());
                 if (obj instanceof JAXBElement) {
                     obj = ((JAXBElement)obj).getValue();
@@ -602,7 +602,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
             QName snc = EndpointReferenceUtils.getServiceName(cref, bus);
             String addr = EndpointReferenceUtils.getAddress(ref);
             String addc = EndpointReferenceUtils.getAddress(cref);
-            
+
             if (addr == null) {
                 return false;
             }

@@ -25,7 +25,7 @@ public class CollectionCheckInfo {
         this.checkType = checkType;
         this.checkValue = checkValue;
     }
-    
+
     public Object getCollectionCheckValue() {
         return checkValue;
     }

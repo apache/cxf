@@ -34,21 +34,21 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
 
 /**
- * Utility interceptor for dealing with faults occurred during processing 
+ * Utility interceptor for dealing with faults occurred during processing
  * the one way requests with WSA FaultTo EPR pointing to a decoupled destination.
- * 
- * Note that this interceptor is not currently installed by default. 
+ *
+ * Note that this interceptor is not currently installed by default.
  * It can be installed using @InInterceptors and @OutInterceptors
- * annotations or explicitly added to the list of interceptors. 
+ * annotations or explicitly added to the list of interceptors.
  */
 public class DecoupledFaultHandler extends AbstractSoapInterceptor {
-    
+
     public static final String WSA_ACTION = "http://schemas.xmlsoap.org/wsdl/soap/envelope/fault";
 
     public DecoupledFaultHandler() {
         super(Phase.PRE_PROTOCOL);
         addBefore(MAPCodec.class.getName());
-    } 
+    }
 
     public void handleMessage(SoapMessage message) {
         // complete
@@ -59,12 +59,12 @@ public class DecoupledFaultHandler extends AbstractSoapInterceptor {
     // a two way request for a fault chain be invoked
     public void handleFault(SoapMessage message) {
         if (!ContextUtils.isRequestor(message)) {
-            
+
             Exchange exchange = message.getExchange();
             Message inMessage = exchange.getInMessage();
-            final AddressingProperties maps = 
+            final AddressingProperties maps =
                 ContextUtils.retrieveMAPs(inMessage, false, false, true);
-            
+
             if (maps != null && !ContextUtils.isGenericAddress(maps.getFaultTo())) {
                 //Just keep the wsa headers to remove the not understand headers
                 if (exchange.getOutMessage() != null) {
@@ -85,14 +85,14 @@ public class DecoupledFaultHandler extends AbstractSoapInterceptor {
                                                exchange, maps.getFaultTo());
                 exchange.setDestination(destination);
             }
-            
+
         }
     }
-    
+
     protected Destination createDecoupledDestination(Exchange exchange, EndpointReferenceType epr) {
         return ContextUtils.createDecoupledDestination(exchange, epr);
     }
-    
+
     private boolean isWSAHeader(Header header) {
         return header.getName().getNamespaceURI().startsWith(Names.WSA_NAMESPACE_NAME);
     }

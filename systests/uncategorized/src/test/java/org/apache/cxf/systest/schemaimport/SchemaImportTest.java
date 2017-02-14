@@ -104,8 +104,8 @@ public class SchemaImportTest extends AbstractBusClientServerTestBase {
 
         }
     }
-    
-    
+
+
     @Test
     public void testSchemaInclude() throws Exception {
         String schemaURL = "http://localhost:" + PORT + "/schemainclude/service?xsd=d1/d1/test.xsd";

@@ -55,7 +55,7 @@ import io.netty.handler.ssl.SslHandler;
 import static io.netty.handler.codec.http.HttpHeaders.Names.COOKIE;
 
 public class NettyHttpServletRequest implements HttpServletRequest {
-    
+
     private static final String SSL_CIPHER_SUITE_ATTRIBUTE = "javax.servlet.request.cipher_suite";
     private static final String SSL_PEER_CERT_CHAIN_ATTRIBUTE = "javax.servlet.request.X509Certificate";
 
@@ -72,11 +72,11 @@ public class NettyHttpServletRequest implements HttpServletRequest {
     private QueryStringDecoder queryStringDecoder;
 
     private Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
-  
+
     private String characterEncoding;
 
     private String contextPath;
-    
+
     private ChannelHandlerContext channelHandlerContext;
 
     public NettyHttpServletRequest(HttpRequest request, String contextPath, ChannelHandlerContext ctx) {

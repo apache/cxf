@@ -23,23 +23,23 @@ import org.junit.Ignore;
 
 public class SwaggerFilterServiceDescriptionTest extends AbstractSwaggerServiceDescriptionTest {
     private static final String PORT = allocatePort(SwaggerFilterServiceDescriptionTest.class);
-    
+
     @Ignore
     public static class SwaggerFilter extends Server {
         public SwaggerFilter() {
             super(PORT, true);
-        }       
-        
+        }
+
         public static void main(String[] args) {
             start(new SwaggerFilter());
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         startServers(SwaggerFilter.class);
     }
-    
+
     @Override
     protected String getPort() {
         return PORT;

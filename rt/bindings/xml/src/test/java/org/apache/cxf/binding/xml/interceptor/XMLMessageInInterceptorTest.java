@@ -51,11 +51,11 @@ public class XMLMessageInInterceptorTest extends TestBase {
         prepareMessage("/message-bare-multi-param.xml");
         common("/wsdl/hello_world_xml_bare.wsdl", new QName(ns, "XMLPort"),
                         MyComplexStructType.class);
-        
+
         OperationInfo op = serviceInfo.getInterface().getOperation(new QName(ns, "testMultiParamPart"));
         op.getInput().getMessagePartByIndex(0).setTypeClass(String.class);
         op.getInput().getMessagePartByIndex(1).setTypeClass(MyComplexStructType.class);
-        
+
         in.handleMessage(xmlMessage);
         docLitIn.handleMessage(xmlMessage);
         List<?> list = xmlMessage.getContent(List.class);
@@ -71,10 +71,10 @@ public class XMLMessageInInterceptorTest extends TestBase {
         String ns = "http://apache.org/hello_world_xml_http/bare";
         prepareMessage("/message-bare-single-param-element.xml");
         common("/wsdl/hello_world_xml_bare.wsdl", new QName(ns, "XMLPort"));
-        
+
         OperationInfo op = serviceInfo.getInterface().getOperation(new QName(ns, "greetMe"));
         op.getInput().getMessagePartByIndex(0).setTypeClass(String.class);
-        
+
         in.handleMessage(xmlMessage);
         docLitIn.handleMessage(xmlMessage);
         List<?> list = xmlMessage.getContent(List.class);
@@ -89,10 +89,10 @@ public class XMLMessageInInterceptorTest extends TestBase {
         prepareMessage("/message-wrap.xml");
         common("/wsdl/hello_world_xml_wrapped.wsdl", new QName(ns, "XMLPort"),
                GreetMe.class);
-        
+
         OperationInfo op = serviceInfo.getInterface().getOperation(new QName(ns, "greetMe"));
         op.getInput().getMessagePartByIndex(0).setTypeClass(GreetMe.class);
-        
+
         in.handleMessage(xmlMessage);
         docLitIn.handleMessage(xmlMessage);
         List<?> list = xmlMessage.getContent(List.class);

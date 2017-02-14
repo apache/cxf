@@ -42,7 +42,7 @@ import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 
 public class Destination extends AbstractEndpoint {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(Destination.class);
 
     private Map<String, DestinationSequence> map;
@@ -102,7 +102,7 @@ public class Destination extends AbstractEndpoint {
      * sequence, sends an out-of-band SequenceAcknowledgement unless there a
      * response will be sent to the acksTo address onto which the acknowldegment
      * can be piggybacked.
-     * 
+     *
      * @param sequenceType the sequenceType object that includes identifier and
      *            message number (and possibly a lastMessage element) for the
      *            message to be acknowledged)
@@ -117,7 +117,7 @@ public class Destination extends AbstractEndpoint {
         if (null == sequenceType) {
             return;
         }
-        
+
         DestinationSequence seq = getSequence(sequenceType.getIdentifier());
 
         if (null != seq) {
@@ -125,7 +125,7 @@ public class Destination extends AbstractEndpoint {
                 if (MessageUtils.isTrue(message.get(RMMessageConstants.DELIVERING_ROBUST_ONEWAY))) {
                     return;
                 }
-    
+
                 seq.acknowledge(message);
 
                 if (null != rmps.getCloseSequence()) {
@@ -167,7 +167,7 @@ public class Destination extends AbstractEndpoint {
         }
 
     }
-    
+
     void ackRequested(Message message) throws SequenceFault, RMException {
         // TODO
         Collection<AckRequestedType> ars = RMContextUtils.retrieveRMProperties(message, false)
@@ -184,9 +184,9 @@ public class Destination extends AbstractEndpoint {
             ackImmediately(seq, message);
         }
     }
-    
+
     void ackImmediately(DestinationSequence seq, Message message) throws RMException {
-        
+
         seq.scheduleImmediateAcknowledgement();
 
         // if we cannot expect an outgoing message to which the
@@ -200,17 +200,17 @@ public class Destination extends AbstractEndpoint {
             replyToAddress = maps.getReplyTo().getAddress().getValue();
         }
         if (!(seq.getAcksTo().getAddress().getValue().equals(replyToAddress) || seq
-            .canPiggybackAckOnPartialResponse())) { 
-            getReliableEndpoint().getProxy().acknowledge(seq);                    
+            .canPiggybackAckOnPartialResponse())) {
+            getReliableEndpoint().getProxy().acknowledge(seq);
         }
     }
-    
+
     void processingComplete(Message message) {
         SequenceType sequenceType = RMContextUtils.retrieveRMProperties(message, false).getSequence();
         if (null == sequenceType) {
             return;
         }
-        
+
         DestinationSequence seq = getSequence(sequenceType.getIdentifier());
 
         if (null != seq) {
@@ -233,7 +233,7 @@ public class Destination extends AbstractEndpoint {
             }
         }
     }
-    
+
     void releaseDeliveringStatus(Message message) {
         RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
         SequenceType sequenceType = rmps.getSequence();
@@ -244,7 +244,7 @@ public class Destination extends AbstractEndpoint {
             }
         }
     }
-    
+
     private static Message createMessage(Exchange exchange) {
         Endpoint ep = exchange.getEndpoint();
         Message msg = null;

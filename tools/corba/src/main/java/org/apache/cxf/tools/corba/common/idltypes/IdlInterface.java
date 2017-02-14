@@ -26,7 +26,7 @@ public final class IdlInterface extends IdlScopeBase implements IdlType {
     private IdlInterface(IdlScopeBase parent, String name) {
         super(parent, name);
     }
-    
+
     public static IdlInterface create(IdlScopeBase parent, String name) {
         return new IdlInterface(parent, name);
     }
@@ -49,5 +49,5 @@ public final class IdlInterface extends IdlScopeBase implements IdlType {
         indentLess();
         pw.println(indent() + "};");
     }
-    
+
 }

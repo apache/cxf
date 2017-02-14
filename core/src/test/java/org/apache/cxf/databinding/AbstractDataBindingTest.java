@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class AbstractDataBindingTest extends Assert {
     @Test(expected = IllegalArgumentException.class)
@@ -36,7 +36,7 @@ public class AbstractDataBindingTest extends Assert {
         testMap.put("urn:high.temperature", "ht");
         AbstractDataBinding.checkNamespaceMap(testMap);
     }
-    
+
     @Test
     public void testNamespaceMapOK() {
         Map<String, String> testMap = new HashMap<String, String>();

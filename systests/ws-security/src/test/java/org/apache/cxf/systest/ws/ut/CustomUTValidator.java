@@ -32,21 +32,21 @@ import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 /**
  * A custom UsernameToken Validator that wraps the default Validator in WSS4J and set a Subject
  * on the context as well. It adds a role for "Alice" of "manager", and a role for everyone of
- * "worker". 
+ * "worker".
  */
 public class CustomUTValidator extends UsernameTokenValidator {
 
     public Credential validate(Credential credential, RequestData data) throws WSSecurityException {
         Credential cred = super.validate(credential, data);
-        
+
         UsernameToken ut = credential.getUsernametoken();
-        WSUsernameTokenPrincipalImpl principal = 
+        WSUsernameTokenPrincipalImpl principal =
             new WSUsernameTokenPrincipalImpl(ut.getName(), ut.isHashed());
         principal.setCreatedTime(ut.getCreated());
         principal.setNonce(principal.getNonce());
         principal.setPassword(ut.getPassword());
         principal.setPasswordType(ut.getPasswordType());
-        
+
         Subject subject = new Subject();
         subject.getPrincipals().add(principal);
         if ("Alice".equals(ut.getName())) {
@@ -54,7 +54,7 @@ public class CustomUTValidator extends UsernameTokenValidator {
         }
         subject.getPrincipals().add(new SimpleGroup("worker", ut.getName()));
         cred.setSubject(subject);
-        
+
         return cred;
     }
 }

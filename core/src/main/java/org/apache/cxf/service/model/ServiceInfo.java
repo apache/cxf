@@ -46,7 +46,7 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     public ServiceInfo() {
         xmlSchemaCollection = new SchemaCollection();
     }
-    
+
     public DescriptionInfo getDescription() {
         return description;
     }
@@ -159,7 +159,7 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     public void addSchema(SchemaInfo schemaInfo) {
         schemas.add(schemaInfo);
     }
-    
+
     public SchemaInfo addNewSchema(String namespaceURI) {
         SchemaInfo schemaInfo = new SchemaInfo(namespaceURI);
         schemaInfo.setSchema(getXmlSchemaCollection().

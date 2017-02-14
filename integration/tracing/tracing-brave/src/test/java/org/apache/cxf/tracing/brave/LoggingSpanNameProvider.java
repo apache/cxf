@@ -25,7 +25,7 @@ public class LoggingSpanNameProvider implements SpanNameProvider {
 
     @Override
     public String spanName(HttpRequest request) {
-        return (request instanceof SpanNameProvider) ? ((SpanNameProvider)request).spanName(request) : ""; 
+        return (request instanceof SpanNameProvider) ? ((SpanNameProvider)request).spanName(request) : "";
     }
 
 }

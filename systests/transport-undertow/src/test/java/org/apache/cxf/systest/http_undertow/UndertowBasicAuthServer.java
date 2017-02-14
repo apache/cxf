@@ -36,7 +36,7 @@ public class UndertowBasicAuthServer extends AbstractBusTestServerBase  {
     static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
     Endpoint ep;
-    
+
     protected void run()  {
         String configurationFile = "undertowBasicAuthServer.xml";
         URL configure =
@@ -50,17 +50,17 @@ public class UndertowBasicAuthServer extends AbstractBusTestServerBase  {
         GreeterImpl implementor = new GreeterImpl();
         ep = Endpoint.publish(ADDRESS, implementor);
     }
-    
+
     public void tearDown() throws Exception {
         if (ep != null) {
             ep.stop();
             ep = null;
         }
     }
-    
+
     public static void main(String[] args) {
-        try { 
-            UndertowBasicAuthServer s = new UndertowBasicAuthServer(); 
+        try {
+            UndertowBasicAuthServer s = new UndertowBasicAuthServer();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();

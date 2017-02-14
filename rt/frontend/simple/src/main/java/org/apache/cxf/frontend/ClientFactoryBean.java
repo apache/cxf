@@ -43,14 +43,14 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
     public ClientFactoryBean(ReflectionServiceFactoryBean factory) {
         super(factory);
     }
-    
+
     @Override
     protected String detectTransportIdFromAddress(String ad) {
         ConduitInitiatorManager cim = getBus().getExtension(ConduitInitiatorManager.class);
         ConduitInitiator ci = cim.getConduitInitiatorForUri(getAddress());
         if (ci != null) {
             return ci.getTransportIds().get(0);
-        }    
+        }
         return null;
     }
     @Override
@@ -67,7 +67,7 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
         } catch (Throwable t) {
             //ignore
         }
-        
+
         if (destinationFactory == null) {
             try {
                 destinationFactory = getBus().getExtension(DestinationFactoryManager.class)
@@ -75,7 +75,7 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
             } catch (Throwable t) {
                 //ignore
             }
-        } 
+        }
         return null;
     }
     public Client create() {

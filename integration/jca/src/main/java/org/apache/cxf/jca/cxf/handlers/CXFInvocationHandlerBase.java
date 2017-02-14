@@ -107,7 +107,7 @@ class CXFInvocationHandlerDataImpl implements CXFInvocationHandlerData {
     private CXFManagedConnection managedConnection;
     private Subject subject;
     private Object target;
-    
+
     public final void setSubject(Subject sub) {
         this.subject = sub;
     }
@@ -133,11 +133,11 @@ class CXFInvocationHandlerDataImpl implements CXFInvocationHandlerData {
     }
 
     public void setTarget(Object t) {
-        this.target = t; 
-        
+        this.target = t;
+
     }
 
-    public Object getTarget() {        
+    public Object getTarget() {
         return target;
     }
 

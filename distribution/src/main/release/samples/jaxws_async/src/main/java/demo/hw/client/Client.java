@@ -35,18 +35,18 @@ import org.apache.hello_world_async_soap_http.types.GreetMeSometimeResponse;
 
 public final class Client {
 
-    private static final QName SERVICE_NAME 
+    private static final QName SERVICE_NAME
         = new QName("http://apache.org/hello_world_async_soap_http", "SOAPService");
 
 
     private Client() {
-    } 
+    }
 
     public static void main(String args[]) throws Exception {
-        
-        if (args.length == 0) { 
+
+        if (args.length == 0) {
             System.out.println("please specify wsdl");
-            System.exit(1); 
+            System.exit(1);
         }
         URL url = null;
         File wsdl = new File(args[0]);
@@ -55,36 +55,36 @@ public final class Client {
         } else {
             url = new URL(args[0]);
         }
-        
+
         SOAPService ss = new SOAPService(url, SERVICE_NAME);
         ExecutorService executor = Executors.newFixedThreadPool(5);
         ss.setExecutor(executor);
         GreeterAsync port = ss.getSoapPort();
-        String resp; 
-        
+        String resp;
+
         // callback method
         TestAsyncHandler testAsyncHandler = new TestAsyncHandler();
         System.out.println("Invoking greetMeSometimeAsync using callback object...");
         Future<?> response = port.greetMeSometimeAsync(System.getProperty("user.name"), testAsyncHandler);
         while (!response.isDone()) {
             Thread.sleep(100);
-        }  
+        }
         resp = testAsyncHandler.getResponse();
         System.out.println();
         System.out.println("Server responded through callback with: " + resp);
         System.out.println();
-        
+
         //polling method
         System.out.println("Invoking greetMeSometimeAsync using polling...");
-        Response<GreetMeSometimeResponse> greetMeSomeTimeResp = 
+        Response<GreetMeSometimeResponse> greetMeSomeTimeResp =
             port.greetMeSometimeAsync(System.getProperty("user.name"));
         while (!greetMeSomeTimeResp.isDone()) {
             Thread.sleep(100);
         }
         GreetMeSometimeResponse reply = greetMeSomeTimeResp.get();
-        System.out.println("Server responded through polling with: " + reply.getResponseType());    
+        System.out.println("Server responded through polling with: " + reply.getResponseType());
 
-        System.exit(0); 
+        System.exit(0);
 
     }
 

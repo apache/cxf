@@ -38,8 +38,8 @@ import org.apache.tests.type_test.choice.SimpleChoice;
 import org.apache.tests.type_test.sequence.SimpleStruct;
 
 
-@WebService(serviceName = "SOAPHeaderService", 
-            portName = "SoapHeaderPort", 
+@WebService(serviceName = "SOAPHeaderService",
+            portName = "SoapHeaderPort",
             endpointInterface = "org.apache.header_test.TestHeader",
             targetNamespace = "http://apache.org/header_test",
             wsdlLocation = "testutils/soapheader.wsdl")
@@ -52,13 +52,13 @@ public class TestHeaderImpl implements TestHeader {
             throw new IllegalArgumentException("TestHeader1 part not found.");
         }
         TestHeader1Response returnVal = new TestHeader1Response();
-        
+
         returnVal.setResponseType(inHeader.getClass().getSimpleName());
-        return returnVal;        
+        return returnVal;
     }
 
     /**
-     * 
+     *
      * @param out
      * @param outHeader
      * @param in
@@ -70,33 +70,33 @@ public class TestHeaderImpl implements TestHeader {
         TestHeader2Response outVal = new TestHeader2Response();
         outVal.setResponseType(in.getRequestType());
         out.value = outVal;
-        
+
         TestHeader2Response outHeaderVal = new TestHeader2Response();
         outHeaderVal.setResponseType(in.getRequestType());
-        outHeader.value = outHeaderVal;        
+        outHeader.value = outHeaderVal;
     }
 
     public TestHeader3Response testHeader3(
         TestHeader3 in,
         Holder<TestHeader3> inoutHeader) {
-        
+
         if (inoutHeader.value == null) {
             throw new IllegalArgumentException("TestHeader3 part not found.");
         }
         TestHeader3Response returnVal = new TestHeader3Response();
         returnVal.setResponseType(inoutHeader.value.getRequestType());
-        
+
         inoutHeader.value.setRequestType(in.getRequestType());
         return returnVal;
     }
 
     /**
-     * 
+     *
      * @param requestType
      */
     public void testHeader4(
         String requestType) {
-        
+
     }
 
     public void testHeader5(Holder<TestHeader5ResponseBody> out,
@@ -105,23 +105,23 @@ public class TestHeaderImpl implements TestHeader {
         TestHeader5ResponseBody outVal = new TestHeader5ResponseBody();
         outVal.setResponseType(1000);
         out.value = outVal;
-        
+
         TestHeader5 outHeaderVal = new TestHeader5();
         outHeaderVal.setRequestType(in.getRequestType());
         outHeader.value = outHeaderVal;
-        
+
     }
-    
+
     public TestHeader6Response testHeaderPartBeforeBodyPart(
         Holder<TestHeader3> inoutHeader,
         TestHeader6 in) {
-        
+
         if (inoutHeader.value == null) {
             throw new IllegalArgumentException("TestHeader3 part not found.");
         }
         TestHeader6Response returnVal = new TestHeader6Response();
         returnVal.setResponseType(inoutHeader.value.getRequestType());
-        
+
         inoutHeader.value.setRequestType(in.getRequestType());
         return returnVal;
     }
@@ -129,7 +129,7 @@ public class TestHeaderImpl implements TestHeader {
     public SimpleStruct sendReceiveAnyType(Holder<SimpleAll> x, SimpleChoice y) {
         SimpleAll sa = new SimpleAll();
         sa.setVarString(y.getVarString());
-        
+
         SimpleStruct ss = new SimpleStruct();
         ss.setVarAttrString(x.value.getVarAttrString() + "Ret");
         ss.setVarInt(x.value.getVarInt() + 100);

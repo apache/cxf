@@ -36,17 +36,17 @@ import org.apache.wss4j.policy.model.TransportBinding;
  * Validate a TransportBinding policy.
  */
 public class TransportBindingPolicyValidator extends AbstractBindingPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.TRANSPORT_BINDING.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.TRANSPORT_BINDING.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
@@ -54,7 +54,7 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
         for (AssertionInfo ai : ais) {
             TransportBinding binding = (TransportBinding)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             // Check that TLS is in use if we are not the requestor
             boolean initiator = MessageUtils.isRequestor(parameters.getMessage());
             TLSSessionInfo tlsInfo = parameters.getMessage().get(TLSSessionInfo.class);
@@ -62,14 +62,14 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
                 ai.setNotAsserted("TLS is not enabled");
                 continue;
             }
-            
+
             // HttpsToken is validated by the HttpsTokenInterceptorProvider
             if (binding.getTransportToken() != null) {
                 PolicyUtils.assertPolicy(parameters.getAssertionInfoMap(), binding.getTransportToken().getName());
             }
-            
+
             // Check the IncludeTimestamp
-            if (!validateTimestamp(binding.isIncludeTimestamp(), true, parameters.getResults(), 
+            if (!validateTimestamp(binding.isIncludeTimestamp(), true, parameters.getResults(),
                                    parameters.getSignedResults(), parameters.getMessage())) {
                 String error = "Received Timestamp does not match the requirements";
                 ai.setNotAsserted(error);
@@ -87,5 +87,5 @@ public class TransportBindingPolicyValidator extends AbstractBindingPolicyValida
             PolicyUtils.assertPolicy(parameters.getAssertionInfoMap(), SP11Constants.SIGNED_PARTS);
         }
     }
-    
+
 }

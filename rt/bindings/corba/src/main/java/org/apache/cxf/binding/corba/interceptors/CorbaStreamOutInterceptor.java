@@ -105,9 +105,9 @@ public class CorbaStreamOutInterceptor extends AbstractPhaseInterceptor<Message>
             }
         }
         CorbaStreamWriter writer = new CorbaStreamWriter(orb, params, typeMap, service, wrap);
-        message.setContent(XMLStreamWriter.class, writer);      
+        message.setContent(XMLStreamWriter.class, writer);
     }
 
-    
+
 
 }

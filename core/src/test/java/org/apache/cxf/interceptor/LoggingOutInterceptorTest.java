@@ -63,7 +63,7 @@ public class LoggingOutInterceptorTest extends Assert {
         control.replay();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintWriter pw = new PrintWriter(baos);
-        
+
         LoggingOutInterceptor p = new LoggingOutInterceptor(pw);
         //p.setPrettyLogging(true);
         CachedOutputStream cos = new CachedOutputStream();
@@ -82,42 +82,42 @@ public class LoggingOutInterceptorTest extends Assert {
         assertTrue(str.contains("<today>"));
 
     }
-    
+
     @Test
     public void testFormattingOverride() throws Exception {
         control.replay();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         // create a custom logging interceptor that overrides how formatting is done
         LoggingOutInterceptor p = new CustomFormatLoggingOutInterceptor(new PrintWriter(baos));
         CachedOutputStream cos = new CachedOutputStream();
         String s = "<today><is><the><twenty> <second> <of> <january> <two> <thousand> <and> <nine></nine> "
             + "</and></thousand></two></january></of></second></twenty></the></is></today>";
         cos.write(s.getBytes());
-        
+
         Message message = new MessageImpl();
         message.setExchange(new ExchangeImpl());
         message.put(Message.CONTENT_TYPE, "application/xml");
         Logger logger = LogUtils.getL7dLogger(this.getClass());
         LoggingOutInterceptor.LoggingCallback l = p.new LoggingCallback(logger, message, cos);
         l.onClose(cos);
-        
+
         String str = baos.toString();
         assertTrue(str.contains("<tomorrow/>"));
 
     }
-    
+
     @Test
     public void testFormattingOverrideLogWriter() throws Exception {
         // create a custom logging interceptor that overrides how formatting is done
         LoggingOutInterceptor p = new CustomFormatLoggingOutInterceptor();
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         p.setPrintWriter(new PrintWriter(baos));
-        
+
         StringWriter sw = new StringWriter();
         sw.append("<today/>");
-        
+
         Endpoint endpoint = control.createMock(Endpoint.class);
         EndpointInfo endpointInfo = control.createMock(EndpointInfo.class);
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(endpointInfo).anyTimes();
@@ -127,12 +127,12 @@ public class LoggingOutInterceptorTest extends Assert {
         message.setExchange(new ExchangeImpl());
         message.put(Message.CONTENT_TYPE, "application/xml");
         message.setContent(Writer.class, sw);
-        
+
         p.handleMessage(message);
-        
+
         Writer w = message.getContent(Writer.class);
         w.close();
-        
+
         String str = baos.toString();
         assertTrue(str.contains("<tomorrow/>"));
     }
@@ -180,11 +180,11 @@ public class LoggingOutInterceptorTest extends Assert {
         CustomFormatLoggingOutInterceptor() {
             super();
         }
-        
+
         CustomFormatLoggingOutInterceptor(PrintWriter w) {
             super(w);
         }
-        
+
         @Override
         protected String formatLoggingMessage(LoggingMessage loggingMessage) {
             loggingMessage.getPayload().append("<tomorrow/>");

@@ -31,7 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-    
+
 
 
 
@@ -44,7 +44,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * (not thread safe)
- * 
+ *
  */
 public class ExtendedDocumentBuilder {
 
@@ -78,7 +78,7 @@ public class ExtendedDocumentBuilder {
                     //old version, not supported.
                 }
                 parserFactory.setNamespaceAware(true);
-                parserFactory.setSchema(this.schema);                
+                parserFactory.setSchema(this.schema);
             } catch (UnsupportedOperationException e) {
                 LOG.log(Level.WARNING, "DOC_PARSER_NOT_SUPPORTED", e);
             }

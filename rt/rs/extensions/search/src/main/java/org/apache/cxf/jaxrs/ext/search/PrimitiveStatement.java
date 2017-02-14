@@ -30,29 +30,29 @@ public class PrimitiveStatement {
     private Object value;
     private Type propertyType;
     private ConditionType condition;
-    
+
     public PrimitiveStatement(String property, Object value, Type type, ConditionType condition) {
         this.property = property;
         this.value = value;
         this.condition = condition;
         this.propertyType = type;
     }
-    
+
     public String getProperty() {
         return property;
     }
-    
+
     public Object getValue() {
         return value;
     }
-    
+
     public Type getValueType() {
         return propertyType;
     }
-    
+
     public ConditionType getCondition() {
         return condition;
     }
 
-    
+
 }

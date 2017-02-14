@@ -40,7 +40,7 @@ import org.apache.intfault.SOAPService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {    
+public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
     private final QName serviceName = new QName("http://apache.org/intfault",
                                                 "SOAPService");
@@ -57,7 +57,7 @@ public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {
 
         SOAPService service = new SOAPService(wsdl, serviceName);
         assertNotNull("Service is null", service);
-        
+
         Greeter greeter = service.getSoapPort();
         ClientProxy.getClient(greeter).getInInterceptors().add(new LoggingInInterceptor());
         ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor());
@@ -70,7 +70,7 @@ public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {
         }
 
     }
-    
+
     private void assertSoapHeader(BindingProvider serviceProxy) {
         List<?> headers = (List<?>) serviceProxy.getResponseContext().get(Header.HEADER_LIST);
         QName testQName = new QName("http://test", "test");

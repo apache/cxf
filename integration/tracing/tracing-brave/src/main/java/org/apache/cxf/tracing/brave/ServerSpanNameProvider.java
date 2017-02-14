@@ -28,7 +28,7 @@ public class ServerSpanNameProvider implements SpanNameProvider {
     public String spanName(HttpRequest request) {
         return buildSpanDescription(request.getUri().getPath(), request.getHttpMethod());
     }
-    
+
     private String buildSpanDescription(final String path, final String method) {
         if (StringUtils.isEmpty(method)) {
             return path;

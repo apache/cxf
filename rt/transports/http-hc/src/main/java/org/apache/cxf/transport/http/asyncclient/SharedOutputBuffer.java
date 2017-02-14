@@ -33,7 +33,7 @@ import org.apache.http.nio.util.ByteBufferAllocator;
 import org.apache.http.nio.util.ExpandableBuffer;
 
 /**
- * Content buffer that can be shared by multiple threads, usually the I/O dispatch of 
+ * Content buffer that can be shared by multiple threads, usually the I/O dispatch of
  * an I/O reactor and a worker thread.
  * <p/>
  * The I/O dispatch thread is expected to transfer data from the buffer to
@@ -54,7 +54,7 @@ public class SharedOutputBuffer extends ExpandableBuffer {
     private volatile IOControl ioctrl;
     private volatile boolean shutdown;
     private volatile boolean endOfStream;
-    
+
     private volatile ByteBuffer largeWrapper;
 
     public SharedOutputBuffer(int buffersize, final ByteBufferAllocator allocator) {
@@ -146,7 +146,7 @@ public class SharedOutputBuffer extends ExpandableBuffer {
                     this.ioctrl.suspendOutput();
                 }
             }
-            // no need to signal if the large wrapper is present and has data remaining 
+            // no need to signal if the large wrapper is present and has data remaining
             if (largeWrapper == null || !largeWrapper.hasRemaining()) {
                 this.condition.signalAll();
             }
@@ -210,7 +210,7 @@ public class SharedOutputBuffer extends ExpandableBuffer {
                         buffer.position(p + i);
                     }
                     /*
-                    System.out.println("p: " + p + "  " + i + " " + this.buffer.position() 
+                    System.out.println("p: " + p + "  " + i + " " + this.buffer.position()
                                        + " " + this.buffer.hasRemaining());
                                        */
                 }
@@ -255,7 +255,7 @@ public class SharedOutputBuffer extends ExpandableBuffer {
             this.lock.unlock();
         }
     }
-    
+
     public int write(ByteBuffer b) throws IOException {
         if (b == null) {
             return 0;
@@ -266,7 +266,7 @@ public class SharedOutputBuffer extends ExpandableBuffer {
                 throw new IllegalStateException("Buffer already closed for writing");
             }
             setInputMode();
-            
+
             if (!this.buffer.hasRemaining()) {
                 flushContent();
                 setInputMode();
@@ -346,6 +346,6 @@ public class SharedOutputBuffer extends ExpandableBuffer {
         }
     }
 
-    
+
 
 }

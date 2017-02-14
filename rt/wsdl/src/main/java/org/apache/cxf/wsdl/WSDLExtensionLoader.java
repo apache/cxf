@@ -21,7 +21,7 @@ package org.apache.cxf.wsdl;
 
 /**
  * Marker interface to mark beans in the config that register
- * addition WSDLExtensors so the WSDLManager can load the 
+ * addition WSDLExtensors so the WSDLManager can load the
  * additional extensors on demand
  */
 public interface WSDLExtensionLoader {

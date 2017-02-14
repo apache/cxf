@@ -40,7 +40,7 @@ public class SOAPRpcLitClientTypeTest extends AbstractTypeTestClient5 {
 
     protected static final QName PORT_NAME = new QName("http://apache.org/type_test/rpc", "SOAPPort");
     static final String PORT = SOAPRpcLitServerImpl.PORT;
-    
+
     @Before
     public void updatePort() throws Exception {
         updateAddressPort(rpcClient, PORT);
@@ -51,8 +51,8 @@ public class SOAPRpcLitClientTypeTest extends AbstractTypeTestClient5 {
         boolean ok = launchServer(SOAPRpcLitServerImpl.class, true);
         assertTrue("failed to launch server", ok);
         initClient(AbstractTypeTestClient5.class, SERVICE_NAME, PORT_NAME, WSDL_PATH);
-    }                
-    
+    }
+
     @Test
     public void testStructWithAnyStrict() throws Exception {
         SOAPFactory factory = SOAPFactory.newInstance();

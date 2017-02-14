@@ -263,7 +263,7 @@ public class BeanType extends AegisType {
     /**
      * Write the specified property to a field.
      */
-    protected void writeProperty(QName name, Object object, Object property, 
+    protected void writeProperty(QName name, Object object, Object property,
                                  Class<?> impl, BeanTypeInfo inf)
         throws DatabindingException {
 
@@ -596,7 +596,7 @@ public class BeanType extends AegisType {
         /*
          * Don't dig any deeper than Object or Exception
          */
-        if (c != null && c != Object.class && c != Exception.class && c != RuntimeException.class 
+        if (c != null && c != Object.class && c != Exception.class && c != RuntimeException.class
             && c != Enum.class && c != Serializable.class && c != Cloneable.class) {
             TypeMapping tm = inf.getTypeMapping();
             AegisType superType = tm.getType(c);

@@ -20,7 +20,7 @@
 package org.apache.cxf.aegis.databinding;
 
 /**
- * 
+ *
  */
 public class InconsistentInitializationException extends RuntimeException {
 

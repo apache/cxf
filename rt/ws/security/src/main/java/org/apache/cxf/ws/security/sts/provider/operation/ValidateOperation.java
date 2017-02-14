@@ -30,5 +30,5 @@ public interface ValidateOperation {
     RequestSecurityTokenResponseType validate(RequestSecurityTokenType request,
                                               Principal principal,
                                               Map<String, Object> messageContext);
-    
+
 }

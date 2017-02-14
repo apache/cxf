@@ -53,7 +53,7 @@ public class LoadDistributorTest extends FailoverTest {
             return response;
         }
     }
-    
+
     private void incrementResponseCount(Map< String, Integer > responseCounts,
                                         String response) {
         String responder = responseFrom(response);
@@ -70,9 +70,9 @@ public class LoadDistributorTest extends FailoverTest {
     public void testRevertExceptionOnUnsucessfulFailover() throws Exception {
         targets.add(REPLICA_A);
         super.testRevertExceptionOnUnsucessfulFailover();
-        
+
     }
-    
+
     @Test
     public void testDistributedSequentialStrategy() throws Exception {
         startTarget(REPLICA_A);
@@ -90,8 +90,8 @@ public class LoadDistributorTest extends FailoverTest {
         } else {
             fail("unexpected conduit selector: " + conduitSelector);
         }
-        
-        
+
+
         Map< String, Integer > responseCounts = new HashMap< String, Integer >();
         for (int i = 0; i < 12; ++i) {
             String response = greeter.greetMe("fred");
@@ -107,7 +107,7 @@ public class LoadDistributorTest extends FailoverTest {
         stopTarget(REPLICA_C);
         stopTarget(REPLICA_E);
     }
-    
+
     @Test
     public void testDistributedSequentialStrategyWithFailover() throws Exception {
         startTarget(REPLICA_A);
@@ -135,7 +135,7 @@ public class LoadDistributorTest extends FailoverTest {
         stopTarget(REPLICA_A);
         stopTarget(REPLICA_C);
     }
-    
+
     @Test
     public void testDistributedSequentialStrategyWithoutFailover() throws Exception {
         startTarget(REPLICA_A);
@@ -153,7 +153,7 @@ public class LoadDistributorTest extends FailoverTest {
         } else {
             fail("unexpected conduit selector: " + conduitSelector);
         }
-        
+
         Map< String, Integer > responseCounts = new HashMap< String, Integer >();
         for (int i = 0; i < 12; ++i) {
             try {
@@ -173,6 +173,6 @@ public class LoadDistributorTest extends FailoverTest {
         stopTarget(REPLICA_C);
         stopTarget(REPLICA_E);
     }
-    
-    
+
+
 }

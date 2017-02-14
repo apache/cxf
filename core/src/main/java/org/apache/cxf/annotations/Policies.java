@@ -29,9 +29,9 @@ import java.lang.annotation.Target;
 
 
 /**
- * Used to attach multiple Policy annotations 
+ * Used to attach multiple Policy annotations
  * to a method or type if policies need to be added
- * to more than one place in the wsdl. 
+ * to more than one place in the wsdl.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

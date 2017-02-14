@@ -81,11 +81,11 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
             return null;
         }
 
-        fw = new FileWriterUtil(getOutputDir(), 
+        fw = new FileWriterUtil(getOutputDir(),
                                 (OutputStreamCreator)env.get(OutputStreamCreator.class));
         try {
             if (".java".equals(ext)) {
-                writer = fw.getWriter(packageName, filename + ext, 
+                writer = fw.getWriter(packageName, filename + ext,
                                       (String)getEnvironment().get(ToolConstants.CFG_ENCODING));
             } else {
                 writer = fw.getWriter(packageName, filename + ext);
@@ -138,7 +138,7 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
     }
 
     public String getOutputDir() {
-        return (String)env.get(ToolConstants.CFG_OUTPUTDIR);           
+        return (String)env.get(ToolConstants.CFG_OUTPUTDIR);
     }
 
     public String getName() {

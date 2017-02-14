@@ -26,15 +26,15 @@ import org.apache.cxf.message.Message;
 
 public abstract class AbstractBasicInterceptorProvider  implements InterceptorProvider {
 
-    private List<Interceptor<? extends Message>> in 
+    private List<Interceptor<? extends Message>> in
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> out 
+    private List<Interceptor<? extends Message>> out
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> outFault  
+    private List<Interceptor<? extends Message>> outFault
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private List<Interceptor<? extends Message>> inFault 
+    private List<Interceptor<? extends Message>> inFault
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    
+
     public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         return outFault;
     }
@@ -70,6 +70,6 @@ public abstract class AbstractBasicInterceptorProvider  implements InterceptorPr
         outFault.clear();
         outFault.addAll(interceptors);
     }
-    
-    
+
+
 }

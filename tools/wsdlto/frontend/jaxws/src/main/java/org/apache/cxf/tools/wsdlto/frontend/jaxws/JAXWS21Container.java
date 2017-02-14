@@ -25,7 +25,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.toolspec.ToolSpec;
 
 /**
- * 
+ *
  */
 public class JAXWS21Container extends JAXWSContainer {
     public JAXWS21Container(ToolSpec toolspec) throws Exception {

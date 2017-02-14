@@ -24,7 +24,7 @@ import org.apache.cxf.systest.jaxrs.sse.AbstractSseTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 
-public class JettyWarTest extends AbstractSseTest {  
+public class JettyWarTest extends AbstractSseTest {
     @Ignore
     public static class EmbeddedJettyServer extends AbstractJettyServer {
         public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
@@ -33,14 +33,14 @@ public class JettyWarTest extends AbstractSseTest {
             super("/jaxrs_sse", "/", PORT);
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
         createStaticBus();
     }
-    
+
     @Override
     protected int getPort() {
         return EmbeddedJettyServer.PORT;

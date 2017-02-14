@@ -39,34 +39,34 @@ public class ClientRegistration extends JsonMapObject {
     public static final String TOKEN_ENDPOINT_AUTH_METHOD = "token_endpoint_auth_method";
     public static final String SCOPE = OAuthConstants.SCOPE;
     // Extension - an array of resource audiences, the name is based on combining
-    // a property 'resource' (the resource indicators draft) and "_uris", similar to 
+    // a property 'resource' (the resource indicators draft) and "_uris", similar to
     // a "redirect_uris" property. This property name may change in the future.
     public static final String RESOURCE_URIS = "resource_uris";
-    
-    
+
+
     private static final long serialVersionUID = 7903976943604132150L;
 
     public ClientRegistration() {
     }
-    
+
     public ClientRegistration(Map<String, Object> props) {
         super(new LinkedHashMap<String, Object>(props));
     }
-    
+
     public void setRedirectUris(List<String> redirectUris) {
         super.setProperty(REDIRECT_URIS, redirectUris);
     }
     public List<String> getRedirectUris() {
         return getListStringProperty(REDIRECT_URIS);
     }
-    
+
     public void setResourceUris(List<String> redirectUris) {
         super.setProperty(RESOURCE_URIS, redirectUris);
     }
     public List<String> getResourceUris() {
         return getListStringProperty(RESOURCE_URIS);
     }
-    
+
     public void setResponseTypes(List<String> responseTypes) {
         super.setProperty(RESPONSE_TYPES, responseTypes);
     }
@@ -133,5 +133,5 @@ public class ClientRegistration extends JsonMapObject {
     public String getScope() {
         return getStringProperty(SCOPE);
     }
-    
+
 }

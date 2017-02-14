@@ -26,10 +26,10 @@ import org.apache.handlers.AddNumbers;
 import org.apache.handlers.AddNumbersFault;
 //import org.apache.handlers.types.FaultDetail;
 
-@WebService(name = "AddNumbers", 
-            targetNamespace = "http://apache.org/handlers", 
-            portName = "AddNumbersPort", 
-            endpointInterface = "org.apache.handlers.AddNumbers", 
+@WebService(name = "AddNumbers",
+            targetNamespace = "http://apache.org/handlers",
+            portName = "AddNumbersPort",
+            endpointInterface = "org.apache.handlers.AddNumbers",
             serviceName = "AddNumbersService")
 @HandlerChain(file = "./handlers.xml", name = "TestHandlerChain")
 public class AddNumbersImpl implements AddNumbers {

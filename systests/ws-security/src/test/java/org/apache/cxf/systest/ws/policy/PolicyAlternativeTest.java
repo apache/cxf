@@ -38,18 +38,18 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This is a test for policy alternatives. The endpoint requires either a UsernameToken (insecured) OR
- * a message signature using the Asymmetric binding. 
+ * a message signature using the Asymmetric binding.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String PORT2 = allocatePort(Server.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     final TestParam test;
-    
+
     public PolicyAlternativeTest(TestParam type) {
         this.test = type;
     }
@@ -63,22 +63,22 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
             launchServer(Server.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(PORT, true)},
         });
     }
-    
-    
+
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-    
+
     /**
      * The client uses the Asymmetric policy - this should succeed.
      */
@@ -95,20 +95,20 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         utPort.doubleIt(25);
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * The client uses no security - this should fail.
      */
@@ -125,25 +125,25 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItNoSecurityPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         try {
             utPort.doubleIt(25);
             fail("Failure expected on no Security");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * The client uses the UsernameToken policy - this should succeed.
      */
@@ -160,23 +160,23 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         utPort.doubleIt(25);
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
 
     /**
      * The client does not require a client cert so invocation should fail
-     * 
+     *
      * @throws Exception
      */
     @org.junit.Test
@@ -191,14 +191,14 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItClientCertPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, PORT2);
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         try {
             utPort.doubleIt(25);
             fail("Failure expected because no client certificate");
@@ -207,11 +207,11 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
                 assertTrue(ex.getMessage().contains("HttpsToken"));
             }
         }
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * The client uses a Transport binding policy with a Endorsing Supporting X509 Token. The client does
      * not sign part of the WSA header though and so the invocation should fail.
@@ -229,10 +229,10 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSupportingSignedPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT2);
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportPort);
         }
@@ -243,14 +243,14 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
-     * The client uses a Transport binding policy with a Endorsing Supporting X509 Token as well as a 
-     * Signed Endorsing UsernameToken. Here the client is trying to trick the Service Provider as 
+     * The client uses a Transport binding policy with a Endorsing Supporting X509 Token as well as a
+     * Signed Endorsing UsernameToken. Here the client is trying to trick the Service Provider as
      * the UsernameToken signs the wsa:To Header, not the X.509 Token.
      */
     @org.junit.Test
@@ -266,10 +266,10 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         URL wsdl = PolicyAlternativeTest.class.getResource("DoubleItPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportUTSupportingSignedPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT2);
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportPort);
         }
@@ -280,9 +280,9 @@ public class PolicyAlternativeTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
-    
+
 }

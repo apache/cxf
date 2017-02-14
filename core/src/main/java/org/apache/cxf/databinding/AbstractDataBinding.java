@@ -95,8 +95,8 @@ public abstract class AbstractDataBinding implements DataBinding {
                                        String systemId) {
         return addSchemaDocument(serviceInfo, col, d, systemId, null);
     }
-    public XmlSchema addSchemaDocument(ServiceInfo serviceInfo, 
-                                       SchemaCollection col, 
+    public XmlSchema addSchemaDocument(ServiceInfo serviceInfo,
+                                       SchemaCollection col,
                                        Document d,
                                        String systemId,
                                        Collection<String> ids) {

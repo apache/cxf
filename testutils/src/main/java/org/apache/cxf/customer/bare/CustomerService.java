@@ -39,10 +39,10 @@ import org.apache.cxf.customer.Customers;
 public class CustomerService {
     long currentId = 1;
     Map<Long, Customer> customers = new HashMap<Long, Customer>();
-    
-    @Resource 
-    private WebServiceContext context; 
-    
+
+    @Resource
+    private WebServiceContext context;
+
     public CustomerService() {
         Customer customer = createCustomer();
         customers.put(customer.getId(), customer);
@@ -53,17 +53,17 @@ public class CustomerService {
     public Customers getCustomers(@WebParam(name = "GetCustomers") GetCustomers req) {
         Customers cbean = new Customers();
         cbean.setCustomer(customers.values());
-        
+
         if (context == null || context.getMessageContext() == null) {
             throw new WebServiceException("WebServiceContext is null!");
         }
-        
+
         return cbean;
     }
 
     @WebMethod
     @WebResult(name = "customer")
-    public Customer getCustomer(@WebParam(name = "getCustomer") GetCustomer getCustomer) 
+    public Customer getCustomer(@WebParam(name = "getCustomer") GetCustomer getCustomer)
         throws CustomerNotFoundFault {
         Customer c = customers.get(getCustomer.getId());
         if (c == null) {
@@ -75,11 +75,11 @@ public class CustomerService {
     }
 
     @WebMethod
-    public String getSomeDetails(@WebParam(name = "getSomeDetails") GetCustomer getCustomer) 
+    public String getSomeDetails(@WebParam(name = "getSomeDetails") GetCustomer getCustomer)
         throws CustomerNotFoundFault {
         return "some details";
     }
-    
+
     @WebMethod
     public void updateCustomer(@WebParam(name = "customer") Customer c) {
         customers.put(c.getId(), c);

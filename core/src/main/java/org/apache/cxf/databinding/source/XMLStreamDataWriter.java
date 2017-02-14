@@ -49,7 +49,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLStreamDataWriter.class);
 
     private Schema schema;
-    
+
     public void write(Object obj, MessagePartInfo part, XMLStreamWriter output) {
         write(obj, output);
     }
@@ -68,7 +68,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                     StaxUtils.copy(reader, writer);
                     reader.close();
                 }
-                
+
             } else if (obj instanceof Node) {
                 if (schema != null) {
                     schema.newValidator().validate(new DOMSource((Node)obj));
@@ -104,7 +104,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
     private void writeNode(Node nd, XMLStreamWriter writer) throws XMLStreamException {
         if (writer instanceof W3CDOMStreamWriter) {
             W3CDOMStreamWriter dw = (W3CDOMStreamWriter)writer;
-            
+
             if (dw.getCurrentNode() != null) {
                 if (nd instanceof DocumentFragment
                     && nd.getOwnerDocument() == dw.getCurrentNode().getOwnerDocument()) {
@@ -137,7 +137,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
             StaxUtils.writeDocument((Document)nd,
                                     writer, false, true);
         } else {
-            StaxUtils.writeNode(nd, writer, true);                    
+            StaxUtils.writeNode(nd, writer, true);
         }
 
     }
@@ -148,9 +148,9 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
 
     public void setAttachments(Collection<Attachment> attachments) {
 
-    }   
+    }
 
     public void setProperty(String key, Object value) {
     }
-    
+
 }

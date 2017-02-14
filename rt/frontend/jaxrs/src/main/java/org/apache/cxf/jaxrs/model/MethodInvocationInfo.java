@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A triple of {@link OperationResourceInfo} representing a resource method being invoked, 
+ * A triple of {@link OperationResourceInfo} representing a resource method being invoked,
  * actual {@link Class} of the object this method is invoked upon, and a list of template variable values
  * matched during the selection of this method
  */
@@ -30,21 +30,21 @@ public class MethodInvocationInfo {
     private OperationResourceInfo ori;
     private Class<?> realClass;
     private List<String> templateValues;
-    
+
     public MethodInvocationInfo(OperationResourceInfo ori, Class<?> realClass, List<String> templateValues) {
         this.ori = ori;
         this.realClass = realClass;
         this.templateValues = Collections.unmodifiableList(templateValues);
     }
-    
+
     public OperationResourceInfo getMethodInfo() {
         return ori;
     }
-    
+
     public Class<?> getRealClass() {
         return realClass;
     }
-    
+
     public List<String> getTemplateValues() {
         return templateValues;
     }

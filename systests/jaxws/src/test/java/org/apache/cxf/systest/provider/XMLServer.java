@@ -29,10 +29,10 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
 public class XMLServer extends AbstractBusTestServerBase {
-    public static final String ADDRESS 
-        = "http://localhost:" + TestUtil.getPortNumber(XMLServer.class) 
+    public static final String ADDRESS
+        = "http://localhost:" + TestUtil.getPortNumber(XMLServer.class)
             + "/XMLService/XMLProviderPort";
-    
+
     protected void run() {
         Object implementor = new HWDOMSourcePayloadXMLBindingProvider();
         Endpoint ep = Endpoint.create(implementor);

@@ -44,24 +44,24 @@ import org.junit.BeforeClass;
  */
 public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerReference.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerReference.class, true));
         registerBouncyCastleIfNeeded();
     }
-    
+
     private static void registerBouncyCastleIfNeeded() throws Exception {
         // Still need it for Oracle Java 7 and Java 8
-        Security.addProvider(new BouncyCastleProvider());    
+        Security.addProvider(new BouncyCastleProvider());
     }
-    
+
     @AfterClass
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);    
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
     }
-    
+
     //
     // Encryption tests
     //
@@ -77,7 +77,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweincludekey/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
@@ -93,7 +93,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testEncryptionIncludeCert() throws Exception {
 
@@ -104,7 +104,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweincludecert/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
@@ -123,14 +123,14 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
 
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
-        
+
         // Now it should work
         properties.put("rs.security.encryption.include.cert", "true");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
         response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testEncryptionIncludeCertNegativeTest() throws Exception {
 
@@ -141,7 +141,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweincludecert/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
@@ -160,7 +160,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testEncryptionIncludeCertSha1() throws Exception {
 
@@ -171,7 +171,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweincludecert/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
@@ -184,20 +184,20 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         properties.put("rs.security.encryption.content.algorithm", "A128GCM");
         properties.put("rs.security.encryption.key.algorithm", "RSA-OAEP");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
-        
+
         // First test that it fails without adding a cert (reference). This is because
         // the service side does not have an alias configured
 
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
-        
+
         // Now it should work
         properties.put("rs.security.encryption.include.cert.sha1", "true");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
         response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testEncryptionIncludeCertSha1NegativeTest() throws Exception {
 
@@ -208,7 +208,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         providers.add(new JweWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jweincludecert/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
@@ -227,11 +227,11 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     //
     // Signature tests
     //
-    
+
     @org.junit.Test
     public void testSignatureIncludeCert() throws Exception {
 
@@ -242,7 +242,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwsincludecert/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
@@ -259,14 +259,14 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
 
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
-        
+
         // Now it should work
         properties.put("rs.security.signature.include.cert", "true");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
         response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testSignatureIncludeCertNegativeTest() throws Exception {
 
@@ -277,7 +277,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwsincludecert/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
@@ -294,7 +294,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testSignatureIncludeCertSha1() throws Exception {
 
@@ -305,7 +305,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwsincludecertsha1/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
@@ -322,15 +322,15 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
 
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
-        
+
         // Now it should work
         properties.put("rs.security.signature.include.cert.sha1", "true");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
         response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
     }
-    
-    
+
+
     @org.junit.Test
     public void testSignatureIncludeCertSha1NegativeTest() throws Exception {
 
@@ -341,7 +341,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         providers.add(new JwsWriterInterceptor());
 
         String address = "http://localhost:" + PORT + "/jwsincludecertsha1/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
@@ -358,5 +358,5 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
 }

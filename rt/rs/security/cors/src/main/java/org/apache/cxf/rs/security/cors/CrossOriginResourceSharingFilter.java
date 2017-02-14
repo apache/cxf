@@ -61,8 +61,8 @@ import org.apache.cxf.phase.Phase;
  * information in the Exchange to allow the response handler to add the appropriate headers to the response.
  * If you need complex or subtle control of the behavior here (e.g. clearing the prefight cache) you might be
  * better off reading the source of this class and implementing this inside your service.
- * 
- * This class will perform preflight processing even if there is a resource method annotated 
+ *
+ * This class will perform preflight processing even if there is a resource method annotated
  * to handle @OPTIONS,
  * <em>unless</em> that method is annotated as follows:
  * <pre>
@@ -72,19 +72,19 @@ import org.apache.cxf.phase.Phase;
  */
 @PreMatching
 @Priority(Priorities.AUTHENTICATION - 1)
-public class CrossOriginResourceSharingFilter implements ContainerRequestFilter, 
+public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     ContainerResponseFilter {
     private static final Pattern SPACE_PATTERN = Pattern.compile(" ");
     private static final Pattern FIELD_COMMA_PATTERN = Pattern.compile(",");
-    
+
     private static final String LOCAL_PREFLIGHT = "local_preflight";
     private static final String LOCAL_PREFLIGHT_ORIGIN = "local_preflight.origin";
     private static final String LOCAL_PREFLIGHT_METHOD = "local_preflight.method";
-    
+
     private static final String PREFLIGHT_PASSED = "preflight_passed";
     private static final String PREFLIGHT_FAILED = "preflight_failed";
     private static final String SIMPLE_REQUEST = "simple_request";
-    
+
     @Context
     private HttpHeaders headers;
 
@@ -100,8 +100,8 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     private Integer preflightFailStatus = 200;
     private boolean defaultOptionsMethodsHandlePreflight;
     private boolean findResourceMethod = true;
-    private boolean blockCorsIfUnauthorized; 
-    
+    private boolean blockCorsIfUnauthorized;
+
     private <T extends Annotation> T  getAnnotation(Method m,
                                                     Class<T> annClass) {
         if (m == null) {
@@ -113,7 +113,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     @Override
     public void filter(ContainerRequestContext context) {
         Message m = JAXRSUtils.getCurrentMessage();
-        
+
         String httpMethod = (String)m.get(Message.HTTP_REQUEST_METHOD);
         if (HttpMethod.OPTIONS.equals(httpMethod)) {
             Response r = preflightRequest(m);
@@ -126,26 +126,26 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         } else {
             m.getInterceptorChain().add(new CorsInInterceptor());
         }
-        
+
     }
 
     private Response simpleRequest(Message m, Method resourceMethod) {
-        CrossOriginResourceSharing ann = 
+        CrossOriginResourceSharing ann =
             getAnnotation(resourceMethod, CrossOriginResourceSharing.class);
         List<String> headerOriginValues = getHeaderValues(CorsHeaderConstants.HEADER_ORIGIN, true);
         // 5.1.1 there has to be an origin
         if (headerOriginValues == null || headerOriginValues.size() == 0) {
             return null;
         }
-        
+
         // 5.1.2 check all the origins
         if (!effectiveAllowOrigins(ann, headerOriginValues)) {
             return null;
         }
-        
+
         // handle 5.1.3
         setAllowOriginAndCredentials(m, ann, headerOriginValues);
-        
+
         // 5.1.4
         List<String> effectiveExposeHeaders = effectiveExposeHeaders(ann);
         if (effectiveExposeHeaders != null && effectiveExposeHeaders.size() != 0) {
@@ -159,13 +159,13 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
 
     /**
      * handle preflight.
-     * 
+     *
      * Note that preflight is a bit of a parasite on OPTIONS. The class may still have an options method,
      * and, if it does, it will be invoked, and it will respond however it likes. The response will
      * have additional headers based on what happens here.
-     * 
+     *
      * @param m the incoming message.
-     * @param opResInfo 
+     * @param opResInfo
      * @param ann the annotation, if any, derived from a method that matched the OPTIONS request for the
      *            preflight. probably completely useless.
      * @param resourceClass the resource class passed into the filter.
@@ -174,9 +174,9 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     //CHECKSTYLE:OFF
     private Response preflightRequest(Message m) {
 
-        // Validate main CORS preflight properties (origin, method) 
+        // Validate main CORS preflight properties (origin, method)
         // even if Local preflight is requested
-        
+
         // 5.2.1 -- must have origin, must have one origin.
         List<String> headerOriginValues = getHeaderValues(CorsHeaderConstants.HEADER_ORIGIN, true);
         if (headerOriginValues == null || headerOriginValues.size() != 1) {
@@ -191,11 +191,11 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             return createPreflightResponse(m, false);
         }
         String requestMethod = requestMethodValues.get(0);
-        
+
         /*
          * Ask JAX-RS runtime to validate that the matching resource method actually exists.
          */
-        
+
         Method method = null;
         if (findResourceMethod) {
             method = getResourceMethod(m, requestMethod);
@@ -203,9 +203,9 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
                 return null;
             }
         }
-        
+
         /*
-         * What to do if the resource class indeed has a method annotated with @OPTIONS 
+         * What to do if the resource class indeed has a method annotated with @OPTIONS
          * that is matched by this request? We go ahead and do this job unless the request
          * has one of our annotations on it (or its parent class) indicating 'localPreflight' --
          * or the defaultOptionsMethodsHandlePreflight flag is true.
@@ -217,16 +217,16 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
                 preflightAnnotation = getAnnotation(optionsMethod, LocalPreflight.class);
             }
         }
-                
-        if (preflightAnnotation != null || defaultOptionsMethodsHandlePreflight) { 
+
+        if (preflightAnnotation != null || defaultOptionsMethodsHandlePreflight) {
             m.put(LOCAL_PREFLIGHT, "true");
             m.put(LOCAL_PREFLIGHT_ORIGIN, origin);
             m.put(LOCAL_PREFLIGHT_METHOD, method);
             return null; // let the resource method take all responsibility.
         }
-        
+
         CrossOriginResourceSharing ann = getAnnotation(method, CrossOriginResourceSharing.class);
-        
+
         /* We aren't required to have any annotation at all. If no annotation,
          * the properties of this filter make all the decisions.
          */
@@ -249,10 +249,10 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
 
         // 5.2.9 add allow-methods; we pass them from here to the output filter which actually adds them.
         m.getExchange().put(CorsHeaderConstants.HEADER_AC_ALLOW_METHODS, Arrays.asList(requestMethod));
-        
+
         // 5.2.10 add allow-headers; we pass them from here to the output filter which actually adds them.
         m.getExchange().put(CorsHeaderConstants.HEADER_AC_ALLOW_HEADERS, requestHeaders);
-        
+
         // 5.2.8 max-age lives in the output filter.
         if (effectiveMaxAge(ann) != null) {
             m.getExchange().put(CorsHeaderConstants.HEADER_AC_MAX_AGE,effectiveMaxAge(ann).toString());
@@ -266,17 +266,17 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     //CHECKSTYLE:ON
 
     private Response createPreflightResponse(Message m, boolean passed) {
-        m.getExchange().put(CrossOriginResourceSharingFilter.class.getName(), 
+        m.getExchange().put(CrossOriginResourceSharingFilter.class.getName(),
                             passed ? PREFLIGHT_PASSED : PREFLIGHT_FAILED);
         int status = passed ? 200 : preflightFailStatus;
         return Response.status(status).build();
     }
-    
+
     private Method getResourceMethod(Message m, String httpMethod) {
         String requestUri = HttpUtils.getPathToMatch(m, true);
-        
+
         List<ClassResourceInfo> resources = JAXRSUtils.getRootResources(m);
-        Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources = 
+        Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources =
             JAXRSUtils.selectResourceClass(resources, requestUri, m);
         if (matchedResources == null) {
             return null;
@@ -285,20 +285,20 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         OperationResourceInfo ori = findPreflightMethod(matchedResources, requestUri, httpMethod, values, m);
         return ori == null ? null : ori.getAnnotatedMethod();
     }
-    
-    
+
+
     private OperationResourceInfo findPreflightMethod(
-        Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources, 
+        Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources,
                                                       String requestUri,
                                                       String httpMethod,
-                                                      MultivaluedMap<String, String> values, 
+                                                      MultivaluedMap<String, String> values,
                                                       Message m) {
         final String contentType = MediaType.WILDCARD;
         final MediaType acceptType = MediaType.WILDCARD_TYPE;
-        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(matchedResources, 
-                                    m, httpMethod, values, 
-                                    contentType, 
-                                    Collections.singletonList(acceptType), false); 
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(matchedResources,
+                                    m, httpMethod, values,
+                                    contentType,
+                                    Collections.singletonList(acceptType), false);
         if (ori == null) {
             return null;
         }
@@ -310,39 +310,39 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             } else {
                 MultivaluedMap<String, String> newValues = new MetadataMap<String, String>();
                 newValues.putAll(values);
-                return findPreflightMethod(Collections.singletonMap(subcri, newValues), 
+                return findPreflightMethod(Collections.singletonMap(subcri, newValues),
                                            values.getFirst(URITemplate.FINAL_MATCH_GROUP),
-                                           httpMethod, 
-                                           newValues, 
+                                           httpMethod,
+                                           newValues,
                                            m);
             }
         } else {
             return ori;
         }
     }
-    
-    private void setAllowOriginAndCredentials(Message m, 
+
+    private void setAllowOriginAndCredentials(Message m,
                                               CrossOriginResourceSharing ann,
                                               List<String> headerOriginValues) {
-     
+
         boolean allowCreds = effectiveAllowCredentials(ann);
         m.getExchange().put(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS, allowCreds);
-        
+
         String originResponse;
         if (!allowCreds && effectiveAllowAllOrigins(ann)) {
             originResponse = "*";
         } else {
             originResponse = concatValues(headerOriginValues, true);
         }
-        
+
         m.getExchange().put(CorsHeaderConstants.HEADER_ORIGIN, originResponse);
-        
+
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext,
                        ContainerResponseContext responseContext) {
-        
+
         Message m = JAXRSUtils.getCurrentMessage();
         String op = (String)m.getExchange().get(CrossOriginResourceSharingFilter.class.getName());
         if (op == null || op == PREFLIGHT_FAILED) {
@@ -352,19 +352,19 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             && blockCorsIfUnauthorized) {
             return;
         }
-         
+
         /* Common to simple and preflight */
-        responseContext.getHeaders().putSingle(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN, 
+        responseContext.getHeaders().putSingle(CorsHeaderConstants.HEADER_AC_ALLOW_ORIGIN,
                         m.getExchange().get(CorsHeaderConstants.HEADER_ORIGIN));
         responseContext.getHeaders().putSingle(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS,
                         m.getExchange().get(CorsHeaderConstants.HEADER_AC_ALLOW_CREDENTIALS));
-        
+
         if (SIMPLE_REQUEST.equals(op)) {
             /* 5.1.4 expose headers */
-            List<String> effectiveExposeHeaders 
+            List<String> effectiveExposeHeaders
                 = getHeadersFromInput(m, CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS);
             if (effectiveExposeHeaders != null) {
-                addHeaders(responseContext, CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS, 
+                addHeaders(responseContext, CorsHeaderConstants.HEADER_AC_EXPOSE_HEADERS,
                            effectiveExposeHeaders, false);
             }
             // if someone wants to clear the cache, we can't help them.
@@ -409,18 +409,18 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         if (effectiveAllowAllOrigins(ann)) {
             return true;
         }
-        List<String> actualOrigins = Collections.emptyList(); 
+        List<String> actualOrigins = Collections.emptyList();
         if (ann != null) {
             actualOrigins = Arrays.asList(ann.allowOrigins());
-        } 
-        
+        }
+
         if (actualOrigins.isEmpty()) {
             actualOrigins = allowOrigins;
         }
-        
+
         return actualOrigins.containsAll(origins);
     }
-    
+
     private boolean effectiveAllowAnyHeaders(CrossOriginResourceSharing ann) {
         if (ann != null) {
             return ann.allowHeaders().length == 0;
@@ -428,12 +428,12 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             return allowHeaders.isEmpty();
         }
     }
-    
+
     private boolean effectiveAllowHeaders(CrossOriginResourceSharing ann, List<String> aHeaders) {
         if (effectiveAllowAnyHeaders(ann)) {
             return true;
         }
-        List<String> actualHeaders = null; 
+        List<String> actualHeaders = null;
         if (ann != null) {
             actualHeaders = Arrays.asList(ann.allowHeaders());
         } else {
@@ -445,13 +445,13 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     }
 
     private List<String> effectiveExposeHeaders(CrossOriginResourceSharing ann) {
-        List<String> actualExposeHeaders = null; 
+        List<String> actualExposeHeaders = null;
         if (ann != null) {
             actualExposeHeaders = Arrays.asList(ann.exposeHeaders());
         } else {
             actualExposeHeaders = exposeHeaders;
         }
-        
+
         return actualExposeHeaders;
     }
 
@@ -467,7 +467,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
             return maxAge;
         }
     }
-    
+
     /**
      * Function called to grab a list of strings left behind by the input side.
      * @param m
@@ -509,8 +509,8 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         }
         return results;
     }
-    
-    private void addHeaders(ContainerResponseContext responseContext, 
+
+    private void addHeaders(ContainerResponseContext responseContext,
                             String key, List<String> values, boolean spaceSeparated) {
         String sb = concatValues(values, spaceSeparated);
         responseContext.getHeaders().putSingle(key, sb);
@@ -533,7 +533,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
 
     /**
      * The origin strings to allow. An empty list allows all origins.
-     * 
+     *
      * @param allowedOrigins a list of case-sensitive origin strings.
      */
     public void setAllowOrigins(List<String> allowedOrigins) {
@@ -551,7 +551,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
 
     /**
      * The list of allowed headers for preflight checks. Section 5.2.6
-     * 
+     *
      * @param allowedHeaders a list of permitted headers.
      */
     public void setAllowHeaders(List<String> allowedHeaders) {
@@ -573,7 +573,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     /**
      * The value for the Access-Control-Allow-Credentials header. If false, no header is added. If true, the
      * header is added with the value 'true'.
-     * 
+     *
      * @param allowCredentials
      */
     public void setAllowCredentials(boolean allowCredentials) {
@@ -582,7 +582,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
 
     /**
      * A list of non-simple headers to be exposed via Access-Control-Expose-Headers.
-     * 
+     *
      * @param exposeHeaders the list of (case-sensitive) header names.
      */
     public void setExposeHeaders(List<String> exposeHeaders) {
@@ -591,16 +591,16 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
 
     /**
      * The value for Access-Control-Max-Age.
-     * 
+     *
      * @param maxAge An integer 'delta-seconds' or null. If null, no header is added.
      */
     public void setMaxAge(Integer maxAge) {
         this.maxAge = maxAge;
     }
-    
+
     /**
      * Preflight error response status, default is 200.
-     * 
+     *
      * @param status HTTP status code.
      */
     public void setPreflightErrorStatus(Integer status) {
@@ -610,7 +610,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     /**
      * What to do when a preflight request comes along for a resource that has a handler method for
      * \@OPTIONS and there is no <tt>@{@link CrossResourceSharing}(localPreflight = val)</tt>
-     * annotation on the method. If this is <tt>true</tt>, then the filter 
+     * annotation on the method. If this is <tt>true</tt>, then the filter
      * defers to the resource class method.
      * If this is false, then this filter performs preflight processing.
      * @param defaultOptionsMethodsHandlePreflight true to defer to resource methods.
@@ -622,7 +622,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     public void setFindResourceMethod(boolean findResourceMethod) {
         this.findResourceMethod = findResourceMethod;
     }
-    
+
     public void setBlockCorsIfUnauthorized(boolean blockCorsIfUnauthorized) {
         this.blockCorsIfUnauthorized = blockCorsIfUnauthorized;
     }
@@ -636,7 +636,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         @Override
         public void handleMessage(Message message) {
             OperationResourceInfo ori = message.getExchange().get(OperationResourceInfo.class);
-            simpleRequest(message, ori.getAnnotatedMethod());    
+            simpleRequest(message, ori.getAnnotatedMethod());
         }
     }
 }

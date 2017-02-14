@@ -59,13 +59,13 @@ public class CollectionType extends ArrayType {
     @SuppressWarnings("unchecked")
     protected Collection<Object> createCollection() {
         Collection<Object> values = null;
-        
+
         /*
          * getTypeClass returns the type of the object. These 'if's asked if the proposed
          * type can be assigned to the object, not the other way around. Thus List before
          * Vector and Set before SortedSet.
          */
-        
+
         Class<?> userTypeClass = getTypeClass();
         if (userTypeClass.isAssignableFrom(List.class)) {
             values = new ArrayList<>();

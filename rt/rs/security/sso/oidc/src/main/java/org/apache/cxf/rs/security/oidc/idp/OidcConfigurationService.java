@@ -33,21 +33,21 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
     // Recommended - but optional
     private boolean userInfoEndpointNotAvailable;
     private String userInfoEndpointAddress;
-        
+
     @Override
     protected void prepareConfigurationData(Map<String, Object> cfg, String baseUri) {
         super.prepareConfigurationData(cfg, baseUri);
         // UriInfo Endpoint
         if (!isUserInfoEndpointNotAvailable()) {
-            String theUserInfoEndpointAddress = 
+            String theUserInfoEndpointAddress =
                 calculateEndpointAddress(userInfoEndpointAddress, baseUri, "/users/userinfo");
             cfg.put("userinfo_endpoint", theUserInfoEndpointAddress);
         }
-        
+
         Properties sigProps = JwsUtils.loadSignatureOutProperties(false);
         if (sigProps != null && sigProps.containsKey(JoseConstants.RSSEC_SIGNATURE_ALGORITHM)) {
-            cfg.put("id_token_signing_alg_values_supported", 
-                    Collections.singletonList(sigProps.get(JoseConstants.RSSEC_SIGNATURE_ALGORITHM)));    
+            cfg.put("id_token_signing_alg_values_supported",
+                    Collections.singletonList(sigProps.get(JoseConstants.RSSEC_SIGNATURE_ALGORITHM)));
         }
     }
 
@@ -58,5 +58,5 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
     public void setUserInfoEndpointNotAvailable(boolean userInfoEndpointNotAvailable) {
         this.userInfoEndpointNotAvailable = userInfoEndpointNotAvailable;
     }
-    
+
 }

@@ -22,11 +22,11 @@ package org.apache.cxf.systest.jaxws.types;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
- * 
+ *
  */
 @XmlJavaTypeAdapter(BarAdapter.class)
 public interface Bar {
-    
+
     String getName();
     void setName(String s);
 }

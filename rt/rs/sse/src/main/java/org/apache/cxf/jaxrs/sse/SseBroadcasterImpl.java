@@ -32,21 +32,21 @@ import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.SseBroadcaster;
 
 public class SseBroadcasterImpl implements SseBroadcaster {
-    private final Map<Flow.Subscriber<? super OutboundSseEvent>, Subscription> subscribers = 
+    private final Map<Flow.Subscriber<? super OutboundSseEvent>, Subscription> subscribers =
             new ConcurrentHashMap<>();
-    
-    private final Set<Consumer<Subscriber<? super OutboundSseEvent>>> closers = 
+
+    private final Set<Consumer<Subscriber<? super OutboundSseEvent>>> closers =
             new CopyOnWriteArraySet<>();
-    
-    private final Set<BiConsumer<Subscriber<? super OutboundSseEvent>, Exception>> exceptioners = 
+
+    private final Set<BiConsumer<Subscriber<? super OutboundSseEvent>, Exception>> exceptioners =
             new CopyOnWriteArraySet<>();
-            
+
     @Override
     public void subscribe(Flow.Subscriber<? super OutboundSseEvent> subscriber) {
         final Subscription subscription =  new Subscription() {
             public void request(long n) {
             }
-            
+
             @Override
             public void cancel() {
             }
@@ -56,7 +56,7 @@ public class SseBroadcasterImpl implements SseBroadcaster {
             subscriber.onSubscribe(subscription);
             subscribers.put(subscriber, subscription);
         } catch (final Exception ex) {
-            subscriber.onError(ex); 
+            subscriber.onError(ex);
         }
     }
 
@@ -70,12 +70,12 @@ public class SseBroadcasterImpl implements SseBroadcaster {
             }
         }
     }
-    
+
     @Override
     public void onClose(Consumer<Subscriber<? super OutboundSseEvent>> subscriber) {
         closers.add(subscriber);
     }
-    
+
     @Override
     public void onException(BiConsumer<Subscriber<? super OutboundSseEvent>, Exception> exceptioner) {
         exceptioners.add(exceptioner);

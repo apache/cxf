@@ -22,7 +22,7 @@ package demo.jaxrs.swagger.server;
 public class Item {
     private String name;
     private String value;
-    
+
     public Item() {
     }
 
@@ -34,7 +34,7 @@ public class Item {
     public String getName() {
         return name;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
@@ -45,5 +45,5 @@ public class Item {
 
     public void setValue(String value) {
         this.value = value;
-    }       
+    }
 }

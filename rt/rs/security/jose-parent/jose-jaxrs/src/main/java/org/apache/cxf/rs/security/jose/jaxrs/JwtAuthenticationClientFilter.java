@@ -40,7 +40,7 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 @Priority(Priorities.AUTHENTICATION)
-public class JwtAuthenticationClientFilter extends JoseJwtProducer 
+public class JwtAuthenticationClientFilter extends JoseJwtProducer
     implements ClientRequestFilter {
 
     private static final String DEFAULT_AUTH_SCHEME = "JWT";
@@ -63,10 +63,10 @@ public class JwtAuthenticationClientFilter extends JoseJwtProducer
             throw new JoseException("JWT token is not available");
         }
         String data = super.processJwt(jwt);
-        requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION, 
+        requestContext.getHeaders().putSingle(HttpHeaders.AUTHORIZATION,
                                               authScheme + " " + data);
     }
-    
+
     protected JwtToken getJwtToken(ClientRequestContext requestContext) {
         // Try the filter properties first, then the message properties
         JwtToken token = (JwtToken)requestContext.getProperty(JwtConstants.JWT_TOKEN);
@@ -74,33 +74,33 @@ public class JwtAuthenticationClientFilter extends JoseJwtProducer
             Message m = PhaseInterceptorChain.getCurrentMessage();
             token = (JwtToken)m.getContextualProperty(JwtConstants.JWT_TOKEN);
         }
-        
+
         if (token != null) {
             return token;
         }
-        
+
         // Otherwise check to see if we have some claims + construct the header ourselves
         JwtClaims claims = (JwtClaims)requestContext.getProperty(JwtConstants.JWT_CLAIMS);
         if (claims == null) {
             Message m = PhaseInterceptorChain.getCurrentMessage();
             claims = (JwtClaims)m.getContextualProperty(JwtConstants.JWT_CLAIMS);
         }
-        
+
         if (claims != null) {
             token = new JwtToken(claims);
         }
-        
+
         return token;
     }
-    
+
     protected String getContextPropertyValue() {
         return Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(16));
     }
-    
+
     public void setAuthScheme(String authScheme) {
         this.authScheme = authScheme;
     }
-    
-    
-    
+
+
+
 }

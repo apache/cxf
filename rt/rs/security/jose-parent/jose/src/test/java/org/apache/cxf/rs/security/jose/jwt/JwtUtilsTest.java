@@ -34,12 +34,12 @@ public class JwtUtilsTest extends Assert {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        
+
         // Set the expiry date to be yesterday
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, -1);
         claims.setExpiryTime(cal.getTimeInMillis() / 1000L);
-        
+
         try {
             JwtUtils.validateJwtExpiry(claims, 0, true);
             fail("Failure expected on an expired token");
@@ -47,19 +47,19 @@ public class JwtUtilsTest extends Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testFutureToken() throws Exception {
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        
+
         // Set the issued date to be in the future
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DATE, 1);
         claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
-        
+
         try {
             JwtUtils.validateJwtIssuedAt(claims, 300, 0, true);
             fail("Failure expected on a token issued in the future");
@@ -67,72 +67,72 @@ public class JwtUtilsTest extends Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testNearFutureToken() throws Exception {
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        
+
         // Set the issued date to be in the near future
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.SECOND, 30);
         claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
-        
+
         try {
             JwtUtils.validateJwtIssuedAt(claims, 0, 0, true);
             fail("Failure expected on a token issued in the future");
         } catch (JwtException ex) {
             // expected
         }
-        
+
         // Now set the clock offset
         JwtUtils.validateJwtIssuedAt(claims, 0, 60, true);
     }
-    
+
     @org.junit.Test
     public void testNotBefore() throws Exception {
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        
+
         // Set the issued date to be in the near future
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.SECOND, 30);
         claims.setIssuedAt(new Date().getTime() / 1000L);
         claims.setNotBefore(cal.getTimeInMillis() / 1000L);
-        
+
         try {
             JwtUtils.validateJwtNotBefore(claims, 0, true);
             fail("Failure expected on not before");
         } catch (JwtException ex) {
             // expected
         }
-        
+
         // Now set the clock offset
         JwtUtils.validateJwtNotBefore(claims, 60, true);
     }
-    
+
     @org.junit.Test
     public void testIssuedAtTTL() throws Exception {
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        
+
         // Set the issued date to be now
         claims.setIssuedAt(new Date().getTime() / 1000L);
-        
+
         // Now test the TTL
         JwtUtils.validateJwtIssuedAt(claims, 60, 0, true);
-        
+
         // Now create the token 70 seconds ago
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.SECOND, -70);
         claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
-        
+
         try {
             JwtUtils.validateJwtIssuedAt(claims, 60, 0, true);
             fail("Failure expected on an expired token");

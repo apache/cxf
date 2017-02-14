@@ -33,7 +33,7 @@ public class JAXRSClientBeanValidationOutInterceptor extends ClientBeanValidatio
         message.getExchange().put("wrap.in.processing.exception", wrapInProcessingException);
         super.handleValidation(message, resourceInstance, method, arguments);
     }
-    
+
     public void setWrapInProcessingException(boolean wrapInProcessingException) {
         this.wrapInProcessingException = wrapInProcessingException;
     }

@@ -26,7 +26,7 @@ import javax.jws.soap.SOAPBinding;
 
 import org.apache.cxf.systest.jaxws.base.WrapperString;
 
-@WebService(name = "TestService", portName = "TestServicePort", 
+@WebService(name = "TestService", portName = "TestServicePort",
     serviceName = "TestService", targetNamespace = "http://cxf.apache.org/systest/jaxws")
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public interface TestService {

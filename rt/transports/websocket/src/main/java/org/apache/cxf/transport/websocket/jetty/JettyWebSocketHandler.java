@@ -40,7 +40,7 @@ class JettyWebSocketHandler extends JettyHTTPHandler {
         super(jhd, cmExact);
         this.webSocketFactory = webSocketFactory;
     }
-    
+
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {

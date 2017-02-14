@@ -26,15 +26,15 @@ import java.util.List;
 import org.apache.cxf.common.i18n.Message;
 
 public class DatabindingException extends RuntimeException {
-    
+
     private static final long serialVersionUID = -2595633596348811788L;
     private final List<String> extraMessages = new LinkedList<String>();
-    
+
 
     /**
      * Constructs a new exception with the specified detail
      * message.
-     * 
+     *
      * @param message the detail message.
      */
     public DatabindingException(String message) {
@@ -44,14 +44,14 @@ public class DatabindingException extends RuntimeException {
     /**
      * Constructs a new exception with the specified detail
      * message and cause.
-     * 
+     *
      * @param message the detail message.
      * @param cause the cause.
      */
     public DatabindingException(String message, Throwable cause) {
         super(message, cause);
     }
-    
+
     public DatabindingException(Message message) {
         super(message.toString());
     }
@@ -64,7 +64,7 @@ public class DatabindingException extends RuntimeException {
     /**
      * Return the detail message, including the message from the
      * {@link #getCause() nested exception} if there is one.
-     * 
+     *
      * @return the detail message.
      */
     public String getMessage() {
@@ -92,7 +92,7 @@ public class DatabindingException extends RuntimeException {
 
     /**
      * Prints this throwable and its backtrace to the specified print stream.
-     * 
+     *
      * @param s <code>PrintStream</code> to use for output
      */
     @Override
@@ -107,7 +107,7 @@ public class DatabindingException extends RuntimeException {
 
     /**
      * Prints this throwable and its backtrace to the specified print writer.
-     * 
+     *
      * @param w <code>PrintWriter</code> to use for output
      */
     @Override

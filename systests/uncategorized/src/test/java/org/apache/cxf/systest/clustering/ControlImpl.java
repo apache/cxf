@@ -38,17 +38,17 @@ import org.apache.cxf.greeter_control.types.StartGreeterResponse;
 import org.apache.cxf.greeter_control.types.StopGreeterResponse;
 
 
-@WebService(serviceName = "ControlService", 
-            portName = "ControlPort", 
-            endpointInterface = "org.apache.cxf.greeter_control.Control", 
+@WebService(serviceName = "ControlService",
+            portName = "ControlPort",
+            endpointInterface = "org.apache.cxf.greeter_control.Control",
             targetNamespace = "http://cxf.apache.org/greeter_control")
 public class ControlImpl implements Control {
-    
+
     private static final Logger LOG = LogUtils.getLogger(ControlImpl.class);
-    
-    private Map<String, Greeter> implementors; 
+
+    private Map<String, Greeter> implementors;
     private Map<String, Endpoint> endpoints;
-    
+
     ControlImpl() {
         implementors = new HashMap<String, Greeter>();
         implementors.put(FailoverTest.REPLICA_A, new GreeterImplA());
@@ -58,15 +58,15 @@ public class ControlImpl implements Control {
         implementors.put(FailoverTest.REPLICA_E, new GreeterImplE());
         endpoints = new HashMap<String, Endpoint>();
     }
-    
+
     public boolean startGreeter(String address) {
         endpoints.put(address,
                       Endpoint.publish(address, implementors.get(address)));
         LOG.info("Published greeter endpoint on: " + address);
-        return true;        
+        return true;
     }
 
-    public boolean stopGreeter(String address) {  
+    public boolean stopGreeter(String address) {
         Endpoint endpoint = endpoints.get(address);
         if (null != endpoint) {
             LOG.info("Stopping Greeter endpoint on: " + address);
@@ -77,13 +77,13 @@ public class ControlImpl implements Control {
         endpoint = null;
         return true;
     }
-    
+
     //--Irrelevant Boilerplate
 
     public void setFaultLocation(FaultLocation fl) {
         // never called
     }
-    
+
     public Future<?> startGreeterAsync(String requestType, AsyncHandler<StartGreeterResponse> asyncHandler) {
         // never called
         return null;
@@ -127,6 +127,6 @@ public class ControlImpl implements Control {
 
     public void setRobustInOnlyMode(boolean in) {
         // TODO Auto-generated method stub
-        
+
     }
 }

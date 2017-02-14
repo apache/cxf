@@ -24,7 +24,7 @@ public class NoneJwsSignatureVerifier implements JwsSignatureVerifier {
 
     @Override
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
-        return headers.getSignatureAlgorithm() == getAlgorithm() 
+        return headers.getSignatureAlgorithm() == getAlgorithm()
             && signature.length == 0;
     }
 

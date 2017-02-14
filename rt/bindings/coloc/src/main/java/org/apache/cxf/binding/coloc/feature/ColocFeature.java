@@ -38,7 +38,7 @@ public class ColocFeature extends AbstractFeature {
         client.setConduitSelector(selector);
         initializeProvider(client, bus);
     }
-    
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         provider.getInInterceptors().add(new ColocInInterceptor());

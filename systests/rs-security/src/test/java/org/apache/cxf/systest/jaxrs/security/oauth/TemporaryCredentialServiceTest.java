@@ -40,30 +40,30 @@ public class TemporaryCredentialServiceTest extends AbstractBusClientServerTestB
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(OAuthServer.class, true));
     }
-    
-    
+
+
     @Test
     public void testGetTemporaryCredentialsURIQuery() throws Exception {
         Map<String, String> parameters = new HashMap<String, String>();
-        
+
         parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, "HMAC-SHA1");
         parameters.put(OAuth.OAUTH_NONCE, UUID.randomUUID().toString());
         parameters.put(OAuth.OAUTH_TIMESTAMP, String.valueOf(System.currentTimeMillis() / 1000));
-        
+
         String uri = HOST + OAuthServer.PORT + TEMPORARY_CREDENTIALS_URL;
         WebClient wc = WebClient.create(uri);
-        
-        Token t = OAuthClientUtils.getRequestToken(wc, 
-            new OAuthClientUtils.Consumer(OAuthTestUtils.CLIENT_ID, OAuthTestUtils.CLIENT_SECRET), 
-                                         URI.create(OAuthTestUtils.CALLBACK), 
+
+        Token t = OAuthClientUtils.getRequestToken(wc,
+            new OAuthClientUtils.Consumer(OAuthTestUtils.CLIENT_ID, OAuthTestUtils.CLIENT_SECRET),
+                                         URI.create(OAuthTestUtils.CALLBACK),
                                          parameters);
         assertNotNull(t);
         assertNotNull(t.getToken());
         assertNotNull(t.getSecret());
-        
+
     }
 
 }

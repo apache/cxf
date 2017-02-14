@@ -23,7 +23,7 @@ import javax.jws.WebService;
 
 @WebService
 public interface Echo {
-    
+
     String echo(String request);
-    
+
 }

@@ -55,22 +55,22 @@ import org.junit.Test;
 import org.yaml.snakeyaml.Yaml;
 
 public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBusClientServerTestBase {
-    
+
     @Ignore
     public abstract static class Server extends AbstractBusTestServerBase {
         protected final String port;
         protected final boolean runAsFilter;
-        
+
         Server(final String port, final boolean runAsFilter) {
             this.port = port;
             this.runAsFilter = runAsFilter;
         }
-        
+
         @Override
         protected void run() {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStoreSwagger2.class);
-            sf.setResourceProvider(BookStoreSwagger2.class, 
+            sf.setResourceProvider(BookStoreSwagger2.class,
                 new SingletonResourceProvider(new BookStoreSwagger2()));
             sf.setProvider(new JacksonJsonProvider());
             final Swagger2Feature feature = new Swagger2Feature();
@@ -81,7 +81,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
                  Collections.singletonMap("json", "application/json;charset=UTF-8"));
             sf.create();
         }
-        
+
         protected static void start(final Server s) {
             try {
                 s.start();
@@ -93,7 +93,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             }
         }
     }
-    
+
     protected static void startServers(final Class< ? extends Server> serverClass) throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
@@ -104,14 +104,14 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
     protected abstract String getPort();
 
     protected abstract String getExpectedFileYaml();
-    
+
     protected void doTestApiListingIsProperlyReturnedJSON() throws Exception {
         final WebClient client = createWebClient("/swagger.json");
         try {
             String swaggerJson = client.get(String.class);
             UserApplication ap = SwaggerUtils.getUserApplicationFromJson(swaggerJson);
             assertNotNull(ap);
-            
+
             List<UserResource> urs = ap.getResources();
             assertNotNull(urs);
             assertEquals(1, urs.size());
@@ -139,7 +139,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             List<Parameter> delOpParams = deleteOp.getParameters();
             assertEquals(1, delOpParams.size());
             assertEquals(ParameterType.PATH, delOpParams.get(0).getType());
-            
+
         } finally {
             client.close();
         }
@@ -149,18 +149,18 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
     @Ignore
     public void testApiListingIsProperlyReturnedYAML() throws Exception {
         final WebClient client = createWebClient("/swagger.yaml");
-        
+
         try {
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             //REVISIT find a better way of reliably comparing two yaml instances.
             // I noticed that yaml.load instantiates a Map and
-            // for an integer valued key, an Integer or a String is arbitrarily instantiated, 
+            // for an integer valued key, an Integer or a String is arbitrarily instantiated,
             // which leads to the assertion error. So, we serilialize the yamls and compare the re-serialized texts.
             Yaml yaml = new Yaml();
             assertEquals(yaml.load(getExpectedValue(getExpectedFileYaml(), getPort())).toString(),
                          yaml.load(IOUtils.readStringFromStream((InputStream)r.getEntity())).toString());
-            
+
         } finally {
             client.close();
         }
@@ -168,7 +168,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
 
     protected WebClient createWebClient(final String url) {
         return WebClient
-            .create("http://localhost:" + getPort() + url, 
+            .create("http://localhost:" + getPort() + url,
                 Arrays.< Object >asList(new JacksonJsonProvider()),
                 Arrays.< Feature >asList(new LoggingFeature()),
                 null)

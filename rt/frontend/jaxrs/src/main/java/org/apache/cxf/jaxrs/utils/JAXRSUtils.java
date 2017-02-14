@@ -153,8 +153,8 @@ public final class JAXRSUtils {
     public static final String ROOT_PROVIDER = "service.root.provider";
     public static final String EXCEPTION_FROM_MAPPER = "exception.from.mapper";
     public static final String SECOND_JAXRS_EXCEPTION = "second.jaxrs.exception";
-    public static final String PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK = 
-        "media.subtype.partial.check"; 
+    public static final String PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK =
+        "media.subtype.partial.check";
     public static final String DOC_LOCATION = "wadl.location";
     public static final String MEDIA_TYPE_Q_PARAM = "q";
     public static final String MEDIA_TYPE_QS_PARAM = "qs";
@@ -167,22 +167,22 @@ public final class JAXRSUtils {
     private static final String REPORT_FAULT_MESSAGE_PROPERTY = "org.apache.cxf.jaxrs.report-fault-message";
     private static final String NO_CONTENT_EXCEPTION = "javax.ws.rs.core.NoContentException";
     private static final String HTTP_CHARSET_PARAM = "charset";
-    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0]; 
+    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
     private static final Set<Class<?>> STREAMING_OUT_TYPES = new HashSet<Class<?>>(
         Arrays.asList(InputStream.class, Reader.class, StreamingOutput.class));
-    
-    private JAXRSUtils() {        
+
+    private JAXRSUtils() {
     }
-    
+
     public static boolean isStreamingOutType(Class<?> type) {
         return STREAMING_OUT_TYPES.contains(type);
     }
-    
+
     public static List<PathSegment> getPathSegments(String thePath, boolean decode) {
         return getPathSegments(thePath, decode, true);
     }
-    
-    public static List<PathSegment> getPathSegments(String thePath, boolean decode, 
+
+    public static List<PathSegment> getPathSegments(String thePath, boolean decode,
                                                     boolean ignoreLastSlash) {
         String[] segments = StringUtils.split(thePath, "/");
         List<PathSegment> theList = new ArrayList<>();
@@ -215,17 +215,17 @@ public final class JAXRSUtils {
         }
         return values;
     }
-    
+
     public static List<MediaType> getProviderConsumeTypes(MessageBodyReader<?> provider) {
         String[] values = getUserMediaTypes(provider, true);
-        
+
         if (values == null) {
             return getConsumeTypes(provider.getClass().getAnnotation(Consumes.class));
         } else {
             return JAXRSUtils.getMediaTypes(values);
         }
     }
-    
+
     public static List<MediaType> getProviderProduceTypes(MessageBodyWriter<?> provider) {
         String[] values = getUserMediaTypes(provider, false);
         if (values == null) {
@@ -234,43 +234,43 @@ public final class JAXRSUtils {
             return JAXRSUtils.getMediaTypes(values);
         }
     }
-    
+
     public static List<MediaType> getMediaTypes(String[] values) {
         List<MediaType> supportedMimeTypes = new ArrayList<>(values.length);
         for (int i = 0; i < values.length; i++) {
-            supportedMimeTypes.addAll(parseMediaTypes(values[i]));    
+            supportedMimeTypes.addAll(parseMediaTypes(values[i]));
         }
         return supportedMimeTypes;
     }
-    
+
     public static void injectParameters(OperationResourceInfo ori,
                                         Object requestObject,
                                         Message message) {
-        injectParameters(ori, ori.getClassResourceInfo(), requestObject, message);    
+        injectParameters(ori, ori.getClassResourceInfo(), requestObject, message);
     }
-    
+
     @SuppressWarnings("unchecked")
     public static void injectParameters(OperationResourceInfo ori,
                                         BeanResourceInfo bri,
                                         Object requestObject,
                                         Message message) {
-                
-        if (bri.isSingleton() 
+
+        if (bri.isSingleton()
             && (!bri.getParameterMethods().isEmpty() || !bri.getParameterFields().isEmpty())) {
             LOG.fine("Injecting request parameters into singleton resource is not thread-safe");
         }
         // Param methods
-        MultivaluedMap<String, String> values = 
+        MultivaluedMap<String, String> values =
             (MultivaluedMap<String, String>)message.get(URITemplate.TEMPLATE_PARAMETERS);
         for (Method m : bri.getParameterMethods()) {
-            Parameter p = ResourceUtils.getParameter(0, m.getAnnotations(), 
+            Parameter p = ResourceUtils.getParameter(0, m.getAnnotations(),
                                                      m.getParameterTypes()[0]);
             Object o;
-            
+
             if (p.getType() == ParameterType.BEAN) {
-                o = createBeanParamValue(message, m.getParameterTypes()[0], ori);    
+                o = createBeanParamValue(message, m.getParameterTypes()[0], ori);
             } else {
-                o = createHttpParameterValue(p, 
+                o = createHttpParameterValue(p,
                                                 m.getParameterTypes()[0],
                                                 m.getGenericParameterTypes()[0],
                                                 m.getParameterAnnotations()[0],
@@ -282,14 +282,14 @@ public final class JAXRSUtils {
         }
         // Param fields
         for (Field f : bri.getParameterFields()) {
-            Parameter p = ResourceUtils.getParameter(0, f.getAnnotations(), 
+            Parameter p = ResourceUtils.getParameter(0, f.getAnnotations(),
                                                      f.getType());
             Object o = null;
-            
+
             if (p.getType() == ParameterType.BEAN) {
-                o = createBeanParamValue(message, f.getType(), ori);    
+                o = createBeanParamValue(message, f.getType(), ori);
             } else {
-                o = createHttpParameterValue(p, 
+                o = createHttpParameterValue(p,
                                                 f.getType(),
                                                 f.getGenericType(),
                                                 f.getAnnotations(),
@@ -300,14 +300,14 @@ public final class JAXRSUtils {
             InjectionUtils.injectFieldValue(f, requestObject, o);
         }
     }
-    
+
     public static Map<ClassResourceInfo, MultivaluedMap<String, String>> selectResourceClass(
         List<ClassResourceInfo> resources, String path, Message message) {
-        
-        boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE); 
+
+        boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE);
         if (isFineLevelLoggable) {
-            LOG.fine(new org.apache.cxf.common.i18n.Message("START_CRI_MATCH", 
-                                                        BUNDLE, 
+            LOG.fine(new org.apache.cxf.common.i18n.Message("START_CRI_MATCH",
+                                                        BUNDLE,
                                                         path).toString());
         }
         if (resources.size() == 1) {
@@ -315,32 +315,32 @@ public final class JAXRSUtils {
             return resources.get(0).getURITemplate().match(path, values)
                    ? Collections.singletonMap(resources.get(0), values) : null;
         }
-        
-        SortedMap<ClassResourceInfo, MultivaluedMap<String, String>> candidateList = 
+
+        SortedMap<ClassResourceInfo, MultivaluedMap<String, String>> candidateList =
             new TreeMap<ClassResourceInfo, MultivaluedMap<String, String>>(
                 new ClassResourceInfoComparator(message));
-        
+
         for (ClassResourceInfo cri : resources) {
             MultivaluedMap<String, String> map = new MetadataMap<String, String>();
             if (cri.getURITemplate().match(path, map)) {
                 candidateList.put(cri, map);
                 if (isFineLevelLoggable) {
-                    LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED_POSSIBLY", 
-                                                                BUNDLE, 
+                    LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED_POSSIBLY",
+                                                                BUNDLE,
                                                                 cri.getServiceClass().getName(),
-                                                                path, 
+                                                                path,
                                                                 cri.getURITemplate().getValue()).toString());
                 }
             } else if (isFineLevelLoggable) {
-                LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_NO_MATCH", 
-                                                                BUNDLE, 
+                LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_NO_MATCH",
+                                                                BUNDLE,
                                                                 path,
                                                                 cri.getServiceClass().getName()).toString());
             }
         }
-        
+
         if (!candidateList.isEmpty()) {
-            Map<ClassResourceInfo, MultivaluedMap<String, String>> cris = 
+            Map<ClassResourceInfo, MultivaluedMap<String, String>> cris =
                 new LinkedHashMap<ClassResourceInfo, MultivaluedMap<String, String>>(candidateList.size());
             ClassResourceInfo firstCri = null;
             for (Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> entry : candidateList.entrySet()) {
@@ -354,23 +354,23 @@ public final class JAXRSUtils {
                     break;
                 }
                 if (isFineLevelLoggable) {
-                    LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED", 
-                                                             BUNDLE, 
+                    LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED",
+                                                             BUNDLE,
                                                              cri.getServiceClass().getName(),
                                                              path, cri.getURITemplate().getValue()).toString());
                 }
             }
             return cris;
         }
-        
+
         return null;
     }
     public static OperationResourceInfo findTargetMethod(
         Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources,
         Message message,
-        String httpMethod, 
+        String httpMethod,
         MultivaluedMap<String, String> matchedValues,
-        String requestContentType, 
+        String requestContentType,
         List<MediaType> acceptContentTypes) {
         return findTargetMethod(matchedResources, message, httpMethod, matchedValues,
                                 requestContentType, acceptContentTypes, true);
@@ -378,55 +378,55 @@ public final class JAXRSUtils {
     public static OperationResourceInfo findTargetMethod(
         Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources,
         Message message,
-        String httpMethod, 
+        String httpMethod,
         MultivaluedMap<String, String> matchedValues,
-        String requestContentType, 
+        String requestContentType,
         List<MediaType> acceptContentTypes,
         boolean throwException) {
-        
-        final boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE); 
+
+        final boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE);
         final boolean getMethod = HttpMethod.GET.equals(httpMethod);
-        
+
         MediaType requestType;
         try {
             requestType = toMediaType(requestContentType);
         } catch (IllegalArgumentException ex) {
             throw ExceptionUtils.toNotSupportedException(ex, null);
         }
-        
-        SortedMap<OperationResourceInfo, MultivaluedMap<String, String>> candidateList = 
+
+        SortedMap<OperationResourceInfo, MultivaluedMap<String, String>> candidateList =
             new TreeMap<OperationResourceInfo, MultivaluedMap<String, String>>(
-                new OperationResourceInfoComparator(message, httpMethod, 
+                new OperationResourceInfoComparator(message, httpMethod,
                                                     getMethod, requestType, acceptContentTypes));
 
         int pathMatched = 0;
         int methodMatched = 0;
         int consumeMatched = 0;
-        
+
         List<OperationResourceInfo> finalPathSubresources = null;
         for (Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> rEntry : matchedResources.entrySet()) {
             ClassResourceInfo resource = rEntry.getKey();
             MultivaluedMap<String, String> values = rEntry.getValue();
-            
+
             String path = getCurrentPath(values);
             if (isFineLevelLoggable) {
-                org.apache.cxf.common.i18n.Message msg = 
-                    new org.apache.cxf.common.i18n.Message("START_OPER_MATCH", 
+                org.apache.cxf.common.i18n.Message msg =
+                    new org.apache.cxf.common.i18n.Message("START_OPER_MATCH",
                                                            BUNDLE,
                                                            resource.getServiceClass().getName());
                 LOG.fine(msg.toString());
-                
+
             }
-            
+
             for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
                 boolean added = false;
-                
+
                 URITemplate uriTemplate = ori.getURITemplate();
                 MultivaluedMap<String, String> map = new MetadataMap<String, String>(values);
                 if (uriTemplate != null && uriTemplate.match(path, map)) {
                     String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
                     boolean finalPath = StringUtils.isEmpty(finalGroup) || PATH_SEGMENT_SEP.equals(finalGroup);
-                    
+
                     if (ori.isSubResourceLocator()) {
                         candidateList.put(ori, map);
                         if (finalPath) {
@@ -454,11 +454,11 @@ public final class JAXRSUtils {
                             //CHECKSTYLE:ON
                         }
                     }
-                } 
+                }
                 if (isFineLevelLoggable) {
                     if (added) {
-                        LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED_POSSIBLY", 
-                                  BUNDLE, 
+                        LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED_POSSIBLY",
+                                  BUNDLE,
                                   ori.getMethodToInvoke().getName()).toString());
                     } else {
                         logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
@@ -471,41 +471,41 @@ public final class JAXRSUtils {
             for (OperationResourceInfo key : finalPathSubresources) {
                 candidateList.remove(key);
             }
-        }        
+        }
         if (!candidateList.isEmpty()) {
-            Map.Entry<OperationResourceInfo, MultivaluedMap<String, String>> firstEntry = 
+            Map.Entry<OperationResourceInfo, MultivaluedMap<String, String>> firstEntry =
                 candidateList.entrySet().iterator().next();
             matchedValues.clear();
             matchedValues.putAll(firstEntry.getValue());
             OperationResourceInfo ori = firstEntry.getKey();
             if (headMethodPossible(ori.getHttpMethod(), httpMethod)) {
-                LOG.info(new org.apache.cxf.common.i18n.Message("GET_INSTEAD_OF_HEAD", 
-                         BUNDLE, ori.getClassResourceInfo().getServiceClass().getName(), 
+                LOG.info(new org.apache.cxf.common.i18n.Message("GET_INSTEAD_OF_HEAD",
+                         BUNDLE, ori.getClassResourceInfo().getServiceClass().getName(),
                          ori.getMethodToInvoke().getName()).toString());
             }
             if (isFineLevelLoggable) {
-                LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED", 
-                               BUNDLE, ori.getMethodToInvoke().getName(), 
+                LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED",
+                               BUNDLE, ori.getMethodToInvoke().getName(),
                                ori.getClassResourceInfo().getServiceClass().getName()).toString());
             }
             if (!ori.isSubResourceLocator()) {
                 MediaType responseMediaType = intersectSortMediaTypes(acceptContentTypes,
                                                                       ori.getProduceTypes(),
                                                                       false).get(0);
-                message.getExchange().put(Message.CONTENT_TYPE, mediaTypeToString(responseMediaType, 
-                                                                                  MEDIA_TYPE_Q_PARAM, 
+                message.getExchange().put(Message.CONTENT_TYPE, mediaTypeToString(responseMediaType,
+                                                                                  MEDIA_TYPE_Q_PARAM,
                                                                                   MEDIA_TYPE_QS_PARAM));
             }
             pushOntoStack(ori, matchedValues, message);
             return ori;
         }
-        
+
         if (!throwException) {
             return null;
         }
-        
+
         int status;
-        
+
         // criteria matched the least number of times will determine the error code;
         // priority : path, method, consumes, produces;
         if (pathMatched == 0) {
@@ -518,11 +518,11 @@ public final class JAXRSUtils {
             // Not a single Produces match
             status = 406;
         }
-        Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> firstCri = 
+        Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> firstCri =
             matchedResources.entrySet().iterator().next();
         String name = firstCri.getKey().isRoot() ? "NO_OP_EXC" : "NO_SUBRESOURCE_METHOD_FOUND";
-        org.apache.cxf.common.i18n.Message errorMsg = 
-            new org.apache.cxf.common.i18n.Message(name, 
+        org.apache.cxf.common.i18n.Message errorMsg =
+            new org.apache.cxf.common.i18n.Message(name,
                                                    BUNDLE,
                                                    message.get(Message.REQUEST_URI),
                                                    getCurrentPath(firstCri.getValue()),
@@ -532,11 +532,11 @@ public final class JAXRSUtils {
         if (!"OPTIONS".equalsIgnoreCase(httpMethod)) {
             LOG.warning(errorMsg.toString());
         }
-        Response response = 
+        Response response =
             createResponse(getRootResources(message), message, errorMsg.toString(), status, methodMatched == 0);
         throw ExceptionUtils.toHttpException(null, response);
-        
-    }    
+
+    }
 
     private static List<MediaType> intersectSortMediaTypes(List<MediaType> acceptTypes,
                                                            List<MediaType> producesTypes,
@@ -552,12 +552,12 @@ public final class JAXRSUtils {
                     }
                     return result;
                 }
-                
-            });    
+
+            });
         }
         return all;
     }
-    
+
     private static int compareQualityAndDistance(MediaType mt1, MediaType mt2, boolean checkDistance) {
         int result = compareMediaTypesQualityFactors(mt1, mt2, MEDIA_TYPE_Q_PARAM);
         if (result == 0) {
@@ -570,26 +570,26 @@ public final class JAXRSUtils {
         }
         return result;
     }
-    
+
     private static String getCurrentPath(MultivaluedMap<String, String> values) {
         String path = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
         return path == null ?  "/" : path;
     }
-    
+
     public static List<ClassResourceInfo> getRootResources(Message message) {
         Service service = message.getExchange().getService();
         return ((JAXRSServiceImpl)service).getClassResourceInfos();
     }
-    
+
     public static boolean noResourceMethodForOptions(Response exResponse, String httpMethod) {
-        return exResponse != null && exResponse.getStatus() == 405 
+        return exResponse != null && exResponse.getStatus() == 405
             && "OPTIONS".equalsIgnoreCase(httpMethod);
     }
-    
-    private static void logNoMatchMessage(OperationResourceInfo ori, 
+
+    private static void logNoMatchMessage(OperationResourceInfo ori,
         String path, String httpMethod, MediaType requestType, List<MediaType> acceptContentTypes) {
-        org.apache.cxf.common.i18n.Message errorMsg = 
-            new org.apache.cxf.common.i18n.Message("OPER_NO_MATCH", 
+        org.apache.cxf.common.i18n.Message errorMsg =
+            new org.apache.cxf.common.i18n.Message("OPER_NO_MATCH",
                                                    BUNDLE,
                                                    ori.getMethodToInvoke().getName(),
                                                    path,
@@ -611,7 +611,7 @@ public final class JAXRSUtils {
             for (ClassResourceInfo cri : cris) {
                 allowedMethods.addAll(cri.getAllowedMethods());
             }
-            
+
             for (String m : allowedMethods) {
                 rb.header("Allow", m);
             }
@@ -628,17 +628,17 @@ public final class JAXRSUtils {
         }
         return rb.build();
     }
-    
+
     private static boolean matchHttpMethod(String expectedMethod, String httpMethod) {
-        return expectedMethod.equalsIgnoreCase(httpMethod) 
+        return expectedMethod.equalsIgnoreCase(httpMethod)
             || headMethodPossible(expectedMethod, httpMethod)
             || expectedMethod.equals(DefaultMethod.class.getSimpleName());
     }
-    
+
     public static boolean headMethodPossible(String expectedMethod, String httpMethod) {
-        return HttpMethod.HEAD.equalsIgnoreCase(httpMethod) && HttpMethod.GET.equals(expectedMethod);        
+        return HttpMethod.HEAD.equalsIgnoreCase(httpMethod) && HttpMethod.GET.equals(expectedMethod);
     }
-    
+
     private static String convertTypesToString(List<MediaType> types) {
         StringBuilder sb = new StringBuilder();
         for (MediaType type : types) {
@@ -646,24 +646,24 @@ public final class JAXRSUtils {
         }
         return sb.toString();
     }
-    
+
     public static List<MediaType> getConsumeTypes(Consumes cm) {
         return cm == null ? Collections.singletonList(ALL_TYPES)
                           : getMediaTypes(cm.value());
     }
-    
+
     public static List<MediaType> getProduceTypes(Produces pm) {
         return pm == null ? Collections.singletonList(ALL_TYPES)
                           : getMediaTypes(pm.value());
     }
-    
+
     public static int compareSortedConsumesMediaTypes(List<MediaType> mts1, List<MediaType> mts2, MediaType ct) {
         List<MediaType> actualMts1 = getCompatibleMediaTypes(mts1, ct);
         List<MediaType> actualMts2 = getCompatibleMediaTypes(mts2, ct);
         return compareSortedMediaTypes(actualMts1, actualMts2, null);
     }
-    
-    public static int compareSortedAcceptMediaTypes(List<MediaType> mts1, List<MediaType> mts2, 
+
+    public static int compareSortedAcceptMediaTypes(List<MediaType> mts1, List<MediaType> mts2,
                                                     List<MediaType> acceptTypes) {
         List<MediaType> actualMts1 = intersectSortMediaTypes(mts1, acceptTypes, true);
         List<MediaType> actualMts2 = intersectSortMediaTypes(mts2, acceptTypes, true);
@@ -680,7 +680,7 @@ public final class JAXRSUtils {
         }
         return size1 == size2 ? 0 : size1 < size2 ? -1 : 1;
     }
-    
+
     private static List<MediaType> getCompatibleMediaTypes(List<MediaType> mts, MediaType ct) {
         List<MediaType> actualMts;
         if (mts.size() == 1) {
@@ -689,13 +689,13 @@ public final class JAXRSUtils {
             actualMts = new LinkedList<MediaType>();
             for (MediaType mt : mts) {
                 if (isMediaTypeCompatible(mt, ct)) {
-                    actualMts.add(mt);    
+                    actualMts.add(mt);
                 }
             }
         }
         return actualMts;
     }
-    
+
     public static int compareSortedMediaTypes(List<MediaType> mts1, List<MediaType> mts2, String qs) {
         int size1 = mts1.size();
         int size2 = mts2.size();
@@ -711,7 +711,7 @@ public final class JAXRSUtils {
         return compareMediaTypes(mt1, mt2, MEDIA_TYPE_Q_PARAM);
     }
     public static int compareMediaTypes(MediaType mt1, MediaType mt2, String qs) {
-        
+
         boolean mt1TypeWildcard = mt1.isWildcardType();
         boolean mt2TypeWildcard = mt2.isWildcardType();
         if (mt1TypeWildcard && !mt2TypeWildcard) {
@@ -720,7 +720,7 @@ public final class JAXRSUtils {
         if (!mt1TypeWildcard && mt2TypeWildcard) {
             return -1;
         }
-         
+
         boolean mt1SubTypeWildcard = mt1.getSubtype().contains(MediaType.MEDIA_TYPE_WILDCARD);
         boolean mt2SubTypeWildcard = mt2.getSubtype().contains(MediaType.MEDIA_TYPE_WILDCARD);
         if (mt1SubTypeWildcard && !mt2SubTypeWildcard) {
@@ -728,17 +728,17 @@ public final class JAXRSUtils {
         }
         if (!mt1SubTypeWildcard && mt2SubTypeWildcard) {
             return -1;
-        }       
-        
+        }
+
         return qs != null ? compareMediaTypesQualityFactors(mt1, mt2, qs) : 0;
     }
-    
+
     public static int compareMediaTypesQualityFactors(MediaType mt1, MediaType mt2) {
         float q1 = getMediaTypeQualityFactor(mt1.getParameters().get(MEDIA_TYPE_Q_PARAM));
         float q2 = getMediaTypeQualityFactor(mt2.getParameters().get(MEDIA_TYPE_Q_PARAM));
         return Float.compare(q1, q2) * -1;
     }
-    
+
     public static int compareMediaTypesQualityFactors(MediaType mt1, MediaType mt2, String qs) {
         float q1 = getMediaTypeQualityFactor(mt1.getParameters().get(qs));
         float q2 = getMediaTypeQualityFactor(mt2.getParameters().get(qs));
@@ -759,20 +759,20 @@ public final class JAXRSUtils {
         }
         return 1;
     }
-    
+
     //Message contains following information: PATH, HTTP_REQUEST_METHOD, CONTENT_TYPE, InputStream.
-    public static List<Object> processParameters(OperationResourceInfo ori, 
-                                                 MultivaluedMap<String, String> values, 
+    public static List<Object> processParameters(OperationResourceInfo ori,
+                                                 MultivaluedMap<String, String> values,
                                                  Message message)
         throws IOException, WebApplicationException {
-        
+
         Class<?>[] parameterTypes = ori.getInParameterTypes();
-        List<Parameter> paramsInfo = ori.getParameters();  
-        boolean preferModelParams = paramsInfo.size() > parameterTypes.length 
+        List<Parameter> paramsInfo = ori.getParameters();
+        boolean preferModelParams = paramsInfo.size() > parameterTypes.length
             && !PropertyUtils.isTrue(message.getContextualProperty("org.apache.cxf.preferMethodParameters"));
-        
+
         int parameterTypesLengh = preferModelParams ? paramsInfo.size() : parameterTypes.length;
-        
+
         Type[] genericParameterTypes = ori.getInGenericParameterTypes();
         Annotation[][] anns = ori.getInParameterAnnotations();
         List<Object> params = new ArrayList<>(parameterTypesLengh);
@@ -782,7 +782,7 @@ public final class JAXRSUtils {
             Type genericParam = null;
             Annotation[] paramAnns = null;
             if (!preferModelParams) {
-                param = parameterTypes[i]; 
+                param = parameterTypes[i];
                 genericParam = InjectionUtils.processGenericTypeIfNeeded(
                     ori.getClassResourceInfo().getServiceClass(), param, genericParameterTypes[i]);
                 param = InjectionUtils.updateParamClassToTypeIfNeeded(param, genericParam);
@@ -792,12 +792,12 @@ public final class JAXRSUtils {
                 genericParam = param;
                 paramAnns = EMPTY_ANNOTATIONS;
             }
-            
-            Object paramValue = processParameter(param, 
+
+            Object paramValue = processParameter(param,
                                                  genericParam,
                                                  paramAnns,
-                                                 paramsInfo.get(i), 
-                                                 values, 
+                                                 paramsInfo.get(i),
+                                                 values,
                                                  message,
                                                  ori);
             params.add(paramValue);
@@ -806,22 +806,22 @@ public final class JAXRSUtils {
         return params;
     }
 
-    private static Object processParameter(Class<?> parameterClass, 
+    private static Object processParameter(Class<?> parameterClass,
                                            Type parameterType,
                                            Annotation[] parameterAnns,
-                                           Parameter parameter, 
+                                           Parameter parameter,
                                            MultivaluedMap<String, String> values,
                                            Message message,
-                                           OperationResourceInfo ori) 
+                                           OperationResourceInfo ori)
         throws IOException, WebApplicationException {
         InputStream is = message.getContent(InputStream.class);
 
         if (parameter.getType() == ParameterType.REQUEST_BODY) {
-            
+
             if (parameterClass == AsyncResponse.class) {
                 return new AsyncResponseImpl(message);
             }
-            
+
             String contentType = (String)message.get(Message.CONTENT_TYPE);
 
             if (contentType == null) {
@@ -832,7 +832,7 @@ public final class JAXRSUtils {
             return readFromMessageBody(parameterClass,
                                        parameterType,
                                        parameterAnns,
-                                       is, 
+                                       is,
                                        toMediaType(contentType),
                                        ori,
                                        message);
@@ -841,7 +841,7 @@ public final class JAXRSUtils {
         } else if (parameter.getType() == ParameterType.BEAN) {
             return createBeanParamValue(message, parameterClass, ori);
         } else {
-            
+
             return createHttpParameterValue(parameter,
                                             parameterClass,
                                             parameterType,
@@ -851,46 +851,46 @@ public final class JAXRSUtils {
                                             ori);
         }
     }
-    
-    public static Object createHttpParameterValue(Parameter parameter, 
-                                            Class<?> parameterClass, 
+
+    public static Object createHttpParameterValue(Parameter parameter,
+                                            Class<?> parameterClass,
                                             Type genericParam,
                                             Annotation[] paramAnns,
                                             Message message,
                                             MultivaluedMap<String, String> values,
                                             OperationResourceInfo ori) {
-       
+
         boolean isEncoded = parameter.isEncoded() || ori != null && ori.isEncodedEnabled();
         String defaultValue = parameter.getDefaultValue();
         if (defaultValue == null && ori != null) {
             defaultValue = ori.getDefaultParameterValue();
         }
-        
+
         if (parameter.getType() == ParameterType.PATH) {
             return readFromUriParam(message, parameter.getName(), parameterClass, genericParam,
                                       paramAnns, values, defaultValue, !isEncoded);
-        } 
-        
+        }
+
         if (parameter.getType() == ParameterType.QUERY) {
-            return readQueryString(parameter.getName(), parameterClass, genericParam, 
+            return readQueryString(parameter.getName(), parameterClass, genericParam,
                                      paramAnns, message, defaultValue, !isEncoded);
         }
-        
+
         if (parameter.getType() == ParameterType.MATRIX) {
             return processMatrixParam(message, parameter.getName(), parameterClass, genericParam,
                                         paramAnns, defaultValue, !isEncoded);
         }
-        
+
         if (parameter.getType() == ParameterType.FORM) {
-            return processFormParam(message, parameter.getName(), parameterClass, genericParam, 
+            return processFormParam(message, parameter.getName(), parameterClass, genericParam,
                                       paramAnns, defaultValue, !isEncoded);
         }
-        
+
         if (parameter.getType() == ParameterType.COOKIE) {
             return processCookieParam(message, parameter.getName(), parameterClass, genericParam,
                                         paramAnns, defaultValue);
-        } 
-        
+        }
+
         Object result = null;
         if (parameter.getType() == ParameterType.HEADER) {
             result = processHeaderParam(message, parameter.getName(), parameterClass, genericParam,
@@ -898,8 +898,8 @@ public final class JAXRSUtils {
         }
         return result;
     }
-    
-    private static Object processMatrixParam(Message m, String key, 
+
+    private static Object processMatrixParam(Message m, String key,
                                              Class<?> pClass, Type genericType,
                                              Annotation[] paramAnns,
                                              String defaultValue,
@@ -907,139 +907,139 @@ public final class JAXRSUtils {
         List<PathSegment> segments = JAXRSUtils.getPathSegments(
                                       (String)m.get(Message.REQUEST_URI), decode);
         if (segments.size() > 0) {
-            MultivaluedMap<String, String> params = new MetadataMap<String, String>(); 
+            MultivaluedMap<String, String> params = new MetadataMap<String, String>();
             for (PathSegment ps : segments) {
                 MultivaluedMap<String, String> matrix = ps.getMatrixParameters();
                 for (Map.Entry<String, List<String>> entry : matrix.entrySet()) {
-                    for (String value : entry.getValue()) {                    
+                    for (String value : entry.getValue()) {
                         params.add(entry.getKey(), value);
                     }
                 }
             }
-            
+
             if ("".equals(key)) {
                 return InjectionUtils.handleBean(pClass, paramAnns, params, ParameterType.MATRIX, m, false);
             } else {
                 List<String> values = params.get(key);
-                return InjectionUtils.createParameterObject(values, 
-                                                            pClass, 
+                return InjectionUtils.createParameterObject(values,
+                                                            pClass,
                                                             genericType,
-                                                            paramAnns, 
+                                                            paramAnns,
                                                             defaultValue,
                                                             false,
                                                             ParameterType.MATRIX,
                                                             m);
             }
         }
-        
+
         return null;
     }
-    
-    private static Object processFormParam(Message m, String key, 
+
+    private static Object processFormParam(Message m, String key,
                                            Class<?> pClass, Type genericType,
                                            Annotation[] paramAnns,
                                            String defaultValue,
                                            boolean decode) {
-        
+
         MessageContext mc = new MessageContextImpl(m);
         MediaType mt = mc.getHttpHeaders().getMediaType();
-        
+
         @SuppressWarnings("unchecked")
-        MultivaluedMap<String, String> params = 
-            (MultivaluedMap<String, String>)m.get(FormUtils.FORM_PARAM_MAP); 
-        
+        MultivaluedMap<String, String> params =
+            (MultivaluedMap<String, String>)m.get(FormUtils.FORM_PARAM_MAP);
+
         if (params == null) {
             params = new MetadataMap<String, String>();
             m.put(FormUtils.FORM_PARAM_MAP, params);
-        
+
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
                 String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
                 String body = FormUtils.readBody(m.getContent(InputStream.class), enc);
                 HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
                 FormUtils.populateMapFromString(params, m, body, enc, decode, request);
             } else {
-                if ("multipart".equalsIgnoreCase(mt.getType()) 
+                if ("multipart".equalsIgnoreCase(mt.getType())
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
                     MultipartBody body = AttachmentUtils.getMultipartBody(mc);
                     FormUtils.populateMapFromMultipart(params, body, m, decode);
                 } else {
-                    org.apache.cxf.common.i18n.Message errorMsg = 
-                        new org.apache.cxf.common.i18n.Message("WRONG_FORM_MEDIA_TYPE", 
-                                                               BUNDLE, 
+                    org.apache.cxf.common.i18n.Message errorMsg =
+                        new org.apache.cxf.common.i18n.Message("WRONG_FORM_MEDIA_TYPE",
+                                                               BUNDLE,
                                                                mt.toString());
                     LOG.warning(errorMsg.toString());
                     throw ExceptionUtils.toNotSupportedException(null, null);
                 }
             }
         }
-        
+
         if ("".equals(key)) {
             return InjectionUtils.handleBean(pClass, paramAnns, params, ParameterType.FORM, m, false);
         } else {
             List<String> results = params.get(key);
-    
-            return InjectionUtils.createParameterObject(results, 
-                                                        pClass, 
+
+            return InjectionUtils.createParameterObject(results,
+                                                        pClass,
                                                         genericType,
                                                         paramAnns,
                                                         defaultValue,
                                                         false,
                                                         ParameterType.FORM,
                                                         m);
-             
+
         }
     }
-    
-    
+
+
     public static MultivaluedMap<String, String> getMatrixParams(String path, boolean decode) {
         int index = path.indexOf(';');
         return index == -1 ? new MetadataMap<String, String>()
                            : JAXRSUtils.getStructuredParams(path.substring(index + 1), ";", decode, false);
     }
-    
-    private static Object processHeaderParam(Message m, 
-                                             String header, 
+
+    private static Object processHeaderParam(Message m,
+                                             String header,
                                              Class<?> pClass,
-                                             Type genericType, 
+                                             Type genericType,
                                              Annotation[] paramAnns,
                                              String defaultValue) {
-        
+
         List<String> values = new HttpHeadersImpl(m).getRequestHeader(header);
         if (values != null && values.isEmpty()) {
             values = null;
         }
-        return InjectionUtils.createParameterObject(values, 
-                                                    pClass, 
+        return InjectionUtils.createParameterObject(values,
+                                                    pClass,
                                                     genericType,
                                                     paramAnns,
                                                     defaultValue,
                                                     false,
                                                     ParameterType.HEADER,
                                                     m);
-             
-        
+
+
     }
 
-    private static Object processCookieParam(Message m, String cookieName, 
-                              Class<?> pClass, Type genericType, 
+    private static Object processCookieParam(Message m, String cookieName,
+                              Class<?> pClass, Type genericType,
                               Annotation[] paramAnns, String defaultValue) {
         Cookie c = new HttpHeadersImpl(m).getCookies().get(cookieName);
-        
+
         if (c == null && defaultValue != null) {
             c = Cookie.valueOf(cookieName + '=' + defaultValue);
         }
         if (c == null) {
             return null;
         }
-        
+
         if (pClass.isAssignableFrom(Cookie.class)) {
             return c;
         }
-        String value = InjectionUtils.isSupportedCollectionOrArray(pClass) 
+        String value = InjectionUtils.isSupportedCollectionOrArray(pClass)
             && InjectionUtils.getActualType(genericType) == Cookie.class
             ? c.toString() : c.getValue();
-        return InjectionUtils.createParameterObject(Collections.singletonList(value), 
-                                                    pClass, 
+        return InjectionUtils.createParameterObject(Collections.singletonList(value),
+                                                    pClass,
                                                     genericType,
                                                     paramAnns,
                                                     null,
@@ -1047,12 +1047,12 @@ public final class JAXRSUtils {
                                                     ParameterType.COOKIE,
                                                     m);
     }
-    
+
     public static Object createBeanParamValue(Message m, Class<?> clazz, OperationResourceInfo ori) {
         BeanParamInfo bmi = ServerProviderFactory.getInstance(m).getBeanParamInfo(clazz);
         if (bmi == null) {
-            // we could've started introspecting now but the fact no bean info 
-            // is available indicates that the one created at start up has been 
+            // we could've started introspecting now but the fact no bean info
+            // is available indicates that the one created at start up has been
             // lost and hence it is 500
             LOG.warning("Bean parameter info is not available");
             throw ExceptionUtils.toInternalServerErrorException(null, null);
@@ -1061,26 +1061,26 @@ public final class JAXRSUtils {
         try {
             instance = clazz.newInstance();
         } catch (Throwable t) {
-            throw ExceptionUtils.toInternalServerErrorException(t, null); 
+            throw ExceptionUtils.toInternalServerErrorException(t, null);
         }
         JAXRSUtils.injectParameters(ori, bmi, instance, m);
-        
+
         InjectionUtils.injectContexts(instance, bmi, m);
-        
+
         return instance;
     }
-    
+
     public static Message getContextMessage(Message m) {
-        
+
         Message contextMessage = m.getExchange() != null ? m.getExchange().getInMessage() : m;
         if (contextMessage == null && !PropertyUtils.isTrue(m.get(Message.INBOUND_MESSAGE))) {
             contextMessage = m;
         }
         return contextMessage;
     }
-    
+
     public static <T> T createContextValue(Message m, Type genericType, Class<T> clazz) {
- 
+
         Message contextMessage = getContextMessage(m);
         Object o = null;
         if (UriInfo.class.isAssignableFrom(clazz)) {
@@ -1106,11 +1106,11 @@ public final class JAXRSUtils {
         } else if (Configuration.class.isAssignableFrom(clazz)) {
             o = ProviderFactory.getInstance(contextMessage).getConfiguration(contextMessage);
         } else if (Application.class.isAssignableFrom(clazz)) {
-            ProviderInfo<?> providerInfo = 
+            ProviderInfo<?> providerInfo =
                 (ProviderInfo<?>)contextMessage.getExchange().getEndpoint().get(Application.class.getName());
             o = providerInfo == null ? null : providerInfo.getProvider();
         } else if (contextMessage != null) {
-            ContextProvider<?> provider = 
+            ContextProvider<?> provider =
                 ProviderFactory.getInstance(contextMessage).createContextProvider(clazz, contextMessage);
             if (provider != null) {
                 o = provider.createContext(contextMessage);
@@ -1121,7 +1121,7 @@ public final class JAXRSUtils {
         }
         return clazz.cast(o);
     }
-    
+
     @SuppressWarnings("unchecked")
     private static UriInfo createUriInfo(Message m) {
         if (MessageUtils.isRequestor(m)) {
@@ -1131,7 +1131,7 @@ public final class JAXRSUtils {
             (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS);
         return new UriInfoImpl(m, templateParams);
     }
-    
+
     private static Object createHttpHeaders(Message m, Class<?> ctxClass) {
         if (MessageUtils.isRequestor(m)) {
             m = m.getExchange() != null ? m.getExchange().getOutMessage() : m;
@@ -1139,7 +1139,7 @@ public final class JAXRSUtils {
         return HttpHeaders.class.isAssignableFrom(ctxClass) ? new HttpHeadersImpl(m)
             : new ProtocolHeadersImpl(m);
     }
-    
+
     public static ContextResolver<?> createContextResolver(Type genericType, Message m) {
         if (genericType instanceof ParameterizedType) {
             return ProviderFactory.getInstance(m).createContextResolver(
@@ -1152,14 +1152,14 @@ public final class JAXRSUtils {
     }
 
     public static Object createResourceValue(Message m, Type genericType, Class<?> clazz) {
-                
+
         // lets assume we're aware of servlet types only that can be @Resource-annotated
         return createContextValue(m, genericType, clazz);
     }
-    
+
     public static <T> T createServletResourceValue(Message m, Class<T> clazz) {
-        
-        Object value = null; 
+
+        Object value = null;
         if (clazz == HttpServletRequest.class) {
             HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
             value = request != null ? new HttpServletRequestFilter(request, m) : null;
@@ -1171,7 +1171,7 @@ public final class JAXRSUtils {
         } else if (clazz == ServletConfig.class) {
             value = m.get(AbstractHTTPDestination.HTTP_CONFIG);
         }
-        
+
         return clazz.cast(value);
     }
     //CHECKSTYLE:OFF
@@ -1183,13 +1183,13 @@ public final class JAXRSUtils {
                                            MultivaluedMap<String, String> values,
                                            String defaultValue,
                                            boolean decoded) {
-    //CHECKSTYLE:ON    
+    //CHECKSTYLE:ON
         if ("".equals(parameterName)) {
             return InjectionUtils.handleBean(paramType, paramAnns, values, ParameterType.PATH, m, decoded);
         } else {
             List<String> results = values.get(parameterName);
-            return InjectionUtils.createParameterObject(results, 
-                                                    paramType, 
+            return InjectionUtils.createParameterObject(results,
+                                                    paramType,
                                                     genericType,
                                                     paramAnns,
                                                     defaultValue,
@@ -1198,25 +1198,25 @@ public final class JAXRSUtils {
                                                     m);
         }
     }
-    
-    
-    
+
+
+
     //TODO : multiple query string parsing, do it once
     private static Object readQueryString(String queryName,
                                           Class<?> paramType,
                                           Type genericType,
                                           Annotation[] paramAnns,
-                                          Message m, 
+                                          Message m,
                                           String defaultValue,
                                           boolean decode) {
-        
+
         MultivaluedMap<String, String> queryMap = new UriInfoImpl(m, null).getQueryParameters(decode);
-        
+
         if ("".equals(queryName)) {
             return InjectionUtils.handleBean(paramType, paramAnns, queryMap, ParameterType.QUERY, m, false);
         } else {
-            return InjectionUtils.createParameterObject(queryMap.get(queryName), 
-                                                        paramType, 
+            return InjectionUtils.createParameterObject(queryMap.get(queryName),
+                                                        paramType,
                                                         genericType,
                                                         paramAnns,
                                                         defaultValue,
@@ -1225,40 +1225,40 @@ public final class JAXRSUtils {
         }
     }
 
-    
-    
+
+
     /**
      * Retrieve map of query parameters from the passed in message
      * @param message
      * @return a Map of query parameters.
      */
-    public static MultivaluedMap<String, String> getStructuredParams(String query, 
-                                                                    String sep, 
+    public static MultivaluedMap<String, String> getStructuredParams(String query,
+                                                                    String sep,
                                                                     boolean decode,
                                                                     boolean decodePlus) {
-        MultivaluedMap<String, String> map = 
+        MultivaluedMap<String, String> map =
             new MetadataMap<String, String>(new LinkedHashMap<String, List<String>>());
-        
+
         getStructuredParams(map, query, sep, decode, decodePlus);
-        
+
         return map;
     }
-    
+
     public static void getStructuredParams(MultivaluedMap<String, String> queries,
-                                           String query, 
-                                           String sep, 
+                                           String query,
+                                           String sep,
                                            boolean decode,
                                            boolean decodePlus) {
         getStructuredParams(queries, query, sep, decode, decodePlus, false);
     }
-        
+
     public static void getStructuredParams(MultivaluedMap<String, String> queries,
-                                           String query, 
-                                           String sep, 
+                                           String query,
+                                           String sep,
                                            boolean decode,
                                            boolean decodePlus,
-                                           boolean valueIsCollection) {    
-        if (!StringUtils.isEmpty(query)) {            
+                                           boolean valueIsCollection) {
+        if (!StringUtils.isEmpty(query)) {
             List<String> parts = Arrays.asList(StringUtils.split(query, sep));
             for (String part : parts) {
                 int index = part.indexOf('=');
@@ -1281,37 +1281,37 @@ public final class JAXRSUtils {
             }
         }
     }
-    
+
     private static void addStructuredPartToMap(MultivaluedMap<String, String> queries,
-                                               String sep, 
+                                               String sep,
                                                String name,
                                                String value,
                                                boolean decode,
-                                               boolean decodePlus) {    
-        
+                                               boolean decodePlus) {
+
         if (decodePlus && value.contains("+")) {
             value = value.replace('+', ' ');
         }
         if (decode) {
             value = (";".equals(sep))
-                ? HttpUtils.pathDecode(value) : HttpUtils.urlDecode(value); 
+                ? HttpUtils.pathDecode(value) : HttpUtils.urlDecode(value);
         }
-        
+
         queries.add(HttpUtils.urlDecode(name), value);
     }
 
     private static Object readFromMessageBody(Class<?> targetTypeClass,
                                                   Type parameterType,
                                                   Annotation[] parameterAnnotations,
-                                                  InputStream is, 
-                                                  MediaType contentType, 
+                                                  InputStream is,
+                                                  MediaType contentType,
                                                   OperationResourceInfo ori,
                                                   Message m) throws IOException, WebApplicationException {
-        
+
         List<MediaType> types = JAXRSUtils.intersectMimeTypes(ori.getConsumeTypes(), contentType);
-        
+
         final ProviderFactory pf = ServerProviderFactory.getInstance(m);
-        for (MediaType type : types) { 
+        for (MediaType type : types) {
             List<ReaderInterceptor> readers = pf.createMessageBodyReaderInterceptor(
                                          targetTypeClass,
                                          parameterType,
@@ -1322,16 +1322,16 @@ public final class JAXRSUtils {
                                          ori.getNameBindings());
             if (readers != null) {
                 try {
-                    return readFromMessageBodyReader(readers, 
-                                                     targetTypeClass, 
-                                                     parameterType, 
-                                                     parameterAnnotations, 
-                                                     is, 
+                    return readFromMessageBodyReader(readers,
+                                                     targetTypeClass,
+                                                     parameterType,
+                                                     parameterAnnotations,
+                                                     is,
                                                      type,
-                                                     m);    
+                                                     m);
                 } catch (IOException e) {
                     if (e.getClass().getName().equals(NO_CONTENT_EXCEPTION)) {
-                        throw ExceptionUtils.toBadRequestException(e, null);    
+                        throw ExceptionUtils.toBadRequestException(e, null);
                     } else {
                         throw e;
                     }
@@ -1346,26 +1346,26 @@ public final class JAXRSUtils {
         logMessageHandlerProblem("NO_MSG_READER", targetTypeClass, contentType);
         throw new WebApplicationException(Response.Status.UNSUPPORTED_MEDIA_TYPE);
     }
-    
+
     @SuppressWarnings("unchecked")
     public static Object readFromMessageBodyReader(List<ReaderInterceptor> readers,
                                                    Class<?> targetTypeClass,
                                                    Type parameterType,
                                                    Annotation[] parameterAnnotations,
-                                                   InputStream is, 
-                                                   MediaType mediaType, 
+                                                   InputStream is,
+                                                   MediaType mediaType,
                                                    Message m) throws IOException, WebApplicationException {
-        
+
         // Verbose but avoids an extra context instantiation for the typical path
         if (readers.size() > 1) {
             ReaderInterceptor first = readers.remove(0);
-            ReaderInterceptorContext context = new ReaderInterceptorContextImpl(targetTypeClass, 
-                                                                            parameterType, 
-                                                                            parameterAnnotations, 
+            ReaderInterceptorContext context = new ReaderInterceptorContextImpl(targetTypeClass,
+                                                                            parameterType,
+                                                                            parameterAnnotations,
                                                                             is,
                                                                             m,
                                                                             readers);
-            
+
             return first.aroundReadFrom(context);
         } else {
             MessageBodyReader<?> provider = ((ReaderInterceptorMBR)readers.get(0)).getMBR();
@@ -1377,28 +1377,28 @@ public final class JAXRSUtils {
         }
     }
 
-    
+
     //CHECKSTYLE:OFF
-    public static void writeMessageBody(List<WriterInterceptor> writers, 
+    public static void writeMessageBody(List<WriterInterceptor> writers,
                                 Object entity,
                                 Class<?> type, Type genericType,
-                                Annotation[] annotations, 
+                                Annotation[] annotations,
                                 MediaType mediaType,
                                 MultivaluedMap<String, Object> httpHeaders,
-                                Message message) 
+                                Message message)
         throws WebApplicationException, IOException {
-        
+
         OutputStream entityStream = message.getContent(OutputStream.class);
         if (writers.size() > 1) {
             WriterInterceptor first = writers.remove(0);
             WriterInterceptorContext context = new WriterInterceptorContextImpl(entity,
-                                                                                type, 
-                                                                            genericType, 
+                                                                                type,
+                                                                            genericType,
                                                                             annotations,
                                                                             entityStream,
                                                                             message,
                                                                             writers);
-            
+
             first.aroundWriteTo(context);
         } else {
             MessageBodyWriter<Object> writer = ((WriterInterceptorMBW)writers.get(0)).getMBW();
@@ -1410,36 +1410,36 @@ public final class JAXRSUtils {
             }
             HttpUtils.convertHeaderValuesToString(httpHeaders, true);
             writer.writeTo(entity, type, genericType, annotations, mediaType,
-                           httpHeaders, 
+                           httpHeaders,
                            entityStream);
         }
     }
     //CHECKSTYLE:ON
-    
 
-    public static boolean matchConsumeTypes(MediaType requestContentType, 
+
+    public static boolean matchConsumeTypes(MediaType requestContentType,
                                             OperationResourceInfo ori) {
-        
+
         return !intersectMimeTypes(ori.getConsumeTypes(), requestContentType).isEmpty();
     }
-    
-    public static boolean matchProduceTypes(MediaType acceptContentType, 
+
+    public static boolean matchProduceTypes(MediaType acceptContentType,
                                               OperationResourceInfo ori) {
-        
+
         return !intersectMimeTypes(ori.getProduceTypes(), acceptContentType).isEmpty();
     }
-    
-    public static boolean matchMimeTypes(MediaType requestContentType, 
-                                         MediaType acceptContentType, 
+
+    public static boolean matchMimeTypes(MediaType requestContentType,
+                                         MediaType acceptContentType,
                                          OperationResourceInfo ori) {
-        
+
         return intersectMimeTypes(ori.getConsumeTypes(), requestContentType).size() != 0
             && intersectMimeTypes(ori.getProduceTypes(), acceptContentType).size() != 0;
     }
 
     public static List<MediaType> parseMediaTypes(String types) {
         List<MediaType> acceptValues = new ArrayList<>();
-        
+
         if (types != null) {
             int x = 0;
             int y = types.indexOf(',');
@@ -1455,23 +1455,23 @@ public final class JAXRSUtils {
         } else {
             acceptValues.add(ALL_TYPES);
         }
-        
+
         return acceptValues;
     }
-    
+
     /**
      * intersect two mime types
-     * 
-     * @param mimeTypesA 
-     * @param mimeTypesB 
+     *
+     * @param mimeTypesA
+     * @param mimeTypesB
      * @return return a list of intersected mime types
-     */   
-    public static List<MediaType> intersectMimeTypes(List<MediaType> requiredMediaTypes, 
+     */
+    public static List<MediaType> intersectMimeTypes(List<MediaType> requiredMediaTypes,
                                                      List<MediaType> userMediaTypes,
                                                      boolean addRequiredParamsIfPossible) {
         return intersectMimeTypes(requiredMediaTypes, userMediaTypes, addRequiredParamsIfPossible, false);
     }
-    public static List<MediaType> intersectMimeTypes(List<MediaType> requiredMediaTypes, 
+    public static List<MediaType> intersectMimeTypes(List<MediaType> requiredMediaTypes,
                                                      List<MediaType> userMediaTypes,
                                                      boolean addRequiredParamsIfPossible,
                                                      boolean addDistanceParameter) {
@@ -1485,7 +1485,7 @@ public final class JAXRSUtils {
                     for (Map.Entry<String, String> entry : userType.getParameters().entrySet()) {
                         String value = requiredType.getParameters().get(entry.getKey());
                         if (value != null && !value.equals(entry.getValue())) {
-                            if (HTTP_CHARSET_PARAM.equals(entry.getKey()) 
+                            if (HTTP_CHARSET_PARAM.equals(entry.getKey())
                                 && value.equalsIgnoreCase(entry.getValue())) {
                                 continue;
                             }
@@ -1498,10 +1498,10 @@ public final class JAXRSUtils {
                     }
                     boolean requiredTypeWildcard = requiredType.getType().equals(MediaType.MEDIA_TYPE_WILDCARD);
                     boolean requiredSubTypeWildcard = requiredType.getSubtype().contains(MediaType.MEDIA_TYPE_WILDCARD);
-                    
+
                     String type = requiredTypeWildcard ? userType.getType() : requiredType.getType();
                     String subtype = requiredSubTypeWildcard ? userType.getSubtype() : requiredType.getSubtype();
-                    
+
                     Map<String, String> parameters = userType.getParameters();
                     if (addRequiredParamsIfPossible) {
                         parameters = new LinkedHashMap<String, String>(parameters);
@@ -1527,9 +1527,9 @@ public final class JAXRSUtils {
         }
 
         return new ArrayList<>(supportedMimeTypeList);
-        
+
     }
-    
+
     private static boolean isMediaTypeCompatible(MediaType requiredType, MediaType userType) {
         boolean isCompatible = requiredType.isCompatible(userType);
         if (!requiredType.isCompatible(userType) && requiredType.getType().equalsIgnoreCase(userType.getType())) {
@@ -1538,23 +1538,23 @@ public final class JAXRSUtils {
         }
         return isCompatible;
     }
-    
+
     static boolean compareCompositeSubtypes(String requiredType, String userType,
                                             Message message) {
         return compareCompositeSubtypes(toMediaType(requiredType), toMediaType(userType), message);
     }
-    
+
     private static boolean compareCompositeSubtypes(MediaType requiredType, MediaType userType,
                                             Message message) {
         boolean isCompatible = false;
         // check if we have composite subtypes
         String subType1 = requiredType.getSubtype();
         String subType2 = userType.getSubtype();
-        
-        String subTypeAfterPlus1 = splitMediaSubType(subType1, true); 
+
+        String subTypeAfterPlus1 = splitMediaSubType(subType1, true);
         String subTypeAfterPlus2 = splitMediaSubType(subType2, true);
         if (message != null && MessageUtils.isTrue(
-            message.getContextualProperty(PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK))) {     
+            message.getContextualProperty(PARTIAL_HIERARCHICAL_MEDIA_SUBTYPE_CHECK))) {
             if (subTypeAfterPlus1 != null || subTypeAfterPlus2 != null) {
                 boolean nullPossible = subTypeAfterPlus1 == null || subTypeAfterPlus2 == null;
                 isCompatible = subTypeAfterPlus1 == null && subTypeAfterPlus2.equals(subType1)
@@ -1563,7 +1563,7 @@ public final class JAXRSUtils {
                     isCompatible = subTypeAfterPlus1.equalsIgnoreCase(subTypeAfterPlus2)
                         && (subType1.charAt(0) == '*' || subType2.charAt(0) == '*');
                 }
-                
+
                 if (!isCompatible) {
                     String subTypeBeforePlus1 = splitMediaSubType(subType1, false);
                     String subTypeBeforePlus2 = splitMediaSubType(subType2, false);
@@ -1572,48 +1572,48 @@ public final class JAXRSUtils {
                         || subTypeBeforePlus2 == null && subTypeBeforePlus1.equals(subType2);
                     if (!isCompatible && !nullPossible) {
                         isCompatible = subTypeBeforePlus1.equalsIgnoreCase(subTypeBeforePlus2)
-                            && (subType1.charAt(subType1.length() - 1) == '*' 
+                            && (subType1.charAt(subType1.length() - 1) == '*'
                                 || subType2.charAt(subType2.length() - 1) == '*');
                     }
                 }
             }
         } else {
             if (subTypeAfterPlus1 != null && subTypeAfterPlus2 != null) {
-                
+
                 isCompatible = subTypeAfterPlus1.equalsIgnoreCase(subTypeAfterPlus2)
                     && (subType1.charAt(0) == '*' || subType2.charAt(0) == '*');
-                
+
                 if (!isCompatible) {
                     String subTypeBeforePlus1 = splitMediaSubType(subType1, false);
                     String subTypeBeforePlus2 = splitMediaSubType(subType2, false);
-                    
+
                     isCompatible = subTypeBeforePlus1.equalsIgnoreCase(subTypeBeforePlus2)
-                        && (subType1.charAt(subType1.length() - 1) == '*' 
+                        && (subType1.charAt(subType1.length() - 1) == '*'
                             || subType2.charAt(subType2.length() - 1) == '*');
                 }
             }
         }
         return isCompatible;
     }
-    
+
     private static String splitMediaSubType(String type, boolean after) {
         int index = type.indexOf('+');
         return index == -1 ? null : after ? type.substring(index + 1) : type.substring(0, index);
     }
-    
-    public static List<MediaType> intersectMimeTypes(List<MediaType> mimeTypesA, 
+
+    public static List<MediaType> intersectMimeTypes(List<MediaType> mimeTypesA,
                                                      MediaType mimeTypeB) {
-        return intersectMimeTypes(mimeTypesA, 
+        return intersectMimeTypes(mimeTypesA,
                                   Collections.singletonList(mimeTypeB), false);
     }
-    
-    public static List<MediaType> intersectMimeTypes(String mimeTypesA, 
+
+    public static List<MediaType> intersectMimeTypes(String mimeTypesA,
                                                      String mimeTypesB) {
         return intersectMimeTypes(parseMediaTypes(mimeTypesA),
                                   parseMediaTypes(mimeTypesB),
                                   false);
     }
-    
+
     public static List<MediaType> sortMediaTypes(String mediaTypes, String qs) {
         return sortMediaTypes(JAXRSUtils.parseMediaTypes(mediaTypes), qs);
     }
@@ -1624,17 +1624,17 @@ public final class JAXRSUtils {
                 public int compare(MediaType mt1, MediaType mt2) {
                     return JAXRSUtils.compareMediaTypes(mt1, mt2, qs);
                 }
-                
+
             });
         }
         return types;
     }
-    
+
 
     public static <T extends Throwable> Response convertFaultToResponse(T ex, Message currentMessage) {
         return ExceptionUtils.convertFaultToResponse(ex, currentMessage);
     }
-    
+
     public static void setMessageContentType(Message message, Response response) {
         if (response != null) {
             Object ct = response.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE);
@@ -1647,26 +1647,26 @@ public final class JAXRSUtils {
                 }
             }
         }
-        
+
     }
-    
+
     public static QName getClassQName(Class<?> type) {
         String nsURI = PackageUtils.getNamespace(PackageUtils.getPackageName(type));
         if (nsURI.endsWith("/")) {
             nsURI = nsURI.substring(0, nsURI.length() - 1);
         }
-        return new QName(nsURI, type.getSimpleName(), "ns1"); 
+        return new QName(nsURI, type.getSimpleName(), "ns1");
     }
 
     public static QName convertStringToQName(String name) {
         return DOMUtils.convertStringToQName(name, "");
     }
-    
-    public static boolean runContainerRequestFilters(ServerProviderFactory pf, 
-                                                     Message m, 
-                                                     boolean preMatch, 
+
+    public static boolean runContainerRequestFilters(ServerProviderFactory pf,
+                                                     Message m,
+                                                     boolean preMatch,
                                                      Set<String> names) {
-        List<ProviderInfo<ContainerRequestFilter>> containerFilters = preMatch 
+        List<ProviderInfo<ContainerRequestFilter>> containerFilters = preMatch
             ? pf.getPreMatchContainerRequestFilters() : pf.getPostMatchContainerRequestFilters(names);
         if (!containerFilters.isEmpty()) {
             ContainerRequestContext context = new ContainerRequestContextImpl(m, preMatch, false);
@@ -1675,7 +1675,7 @@ public final class JAXRSUtils {
                     InjectionUtils.injectContexts(filter.getProvider(), filter, m);
                     filter.getProvider().filter(context);
                 } catch (IOException ex) {
-                    throw ExceptionUtils.toInternalServerErrorException(ex, null); 
+                    throw ExceptionUtils.toInternalServerErrorException(ex, null);
                 }
                 Response response = m.getExchange().get(Response.class);
                 if (response != null) {
@@ -1686,21 +1686,21 @@ public final class JAXRSUtils {
         }
         return false;
     }
-    
+
     public static void runContainerResponseFilters(ServerProviderFactory pf,
                                                    ResponseImpl r,
-                                                   Message m, 
+                                                   Message m,
                                                    OperationResourceInfo ori,
                                                    Method invoked) throws IOException, Throwable {
-        List<ProviderInfo<ContainerResponseFilter>> containerFilters =  
+        List<ProviderInfo<ContainerResponseFilter>> containerFilters =
             pf.getContainerResponseFilters(ori == null ? null : ori.getNameBindings());
         if (!containerFilters.isEmpty()) {
-            ContainerRequestContext requestContext = 
-                new ContainerRequestContextImpl(m.getExchange().getInMessage(), 
+            ContainerRequestContext requestContext =
+                new ContainerRequestContextImpl(m.getExchange().getInMessage(),
                                                false,
                                                true);
-            ContainerResponseContext responseContext = 
-                new ContainerResponseContextImpl(r, m, 
+            ContainerResponseContext responseContext =
+                new ContainerResponseContextImpl(r, m,
                     ori == null ? null : ori.getClassResourceInfo().getServiceClass(), invoked);
             for (ProviderInfo<ContainerResponseFilter> filter : containerFilters) {
                 InjectionUtils.injectContexts(filter.getProvider(), filter, m);
@@ -1708,14 +1708,14 @@ public final class JAXRSUtils {
             }
         }
     }
-    
+
     public static String mediaTypeToString(MediaType mt, String... ignoreParams) {
-        List<String> list = ignoreParams == null || ignoreParams.length == 0 ? null 
+        List<String> list = ignoreParams == null || ignoreParams.length == 0 ? null
             : Arrays.asList(ignoreParams);
-            
+
         return MediaTypeHeaderProvider.typeToString(mt, list);
     }
-    
+
     public static MediaType toMediaType(String value) {
         if (value == null) {
             return ALL_TYPES;
@@ -1723,23 +1723,23 @@ public final class JAXRSUtils {
             return MediaTypeHeaderProvider.valueOf(value);
         }
     }
-    
+
     public static Response toResponse(int status) {
         return toResponseBuilder(status).build();
     }
-    
+
     public static Response toResponse(Response.Status status) {
         return toResponse(status.getStatusCode());
     }
-    
+
     public static ResponseBuilder toResponseBuilder(int status) {
         return new ResponseBuilderImpl().status(status);
     }
-    
+
     public static ResponseBuilder toResponseBuilder(Response.Status status) {
         return toResponseBuilder(status.getStatusCode());
     }
-    
+
     public static ResponseBuilder fromResponse(Response response) {
         ResponseBuilder rb = toResponseBuilder(response.getStatus());
         rb.entity(response.getEntity());
@@ -1760,7 +1760,7 @@ public final class JAXRSUtils {
                 Class<?> declClass = f.getType();
                 if (declClass == Annotation[].class) {
                     try {
-                        Annotation[] fieldAnnotations = 
+                        Annotation[] fieldAnnotations =
                             ReflectionUtil.accessDeclaredField(f, response, Annotation[].class);
                         ((ResponseImpl)r).setEntityAnnotations(fieldAnnotations);
                     } catch (Throwable ex) {
@@ -1774,15 +1774,15 @@ public final class JAXRSUtils {
             return response;
         }
     }
-    
+
     public static Message getCurrentMessage() {
         return PhaseInterceptorChain.getCurrentMessage();
     }
-    
+
     public static ClassResourceInfo getRootResource(Message m) {
         return (ClassResourceInfo)m.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
     }
-    
+
     public static void pushOntoStack(OperationResourceInfo ori,
                                      MultivaluedMap<String, String> params,
                                      Message msg) {
@@ -1791,8 +1791,8 @@ public final class JAXRSUtils {
             stack = new OperationResourceInfoStack();
             msg.put(OperationResourceInfoStack.class, stack);
         }
-        
-        
+
+
         List<String> values = null;
         if (params.size() <= 1) {
             values = Collections.emptyList();
@@ -1804,20 +1804,20 @@ public final class JAXRSUtils {
                     if (paramValues != null) {
                         values.addAll(paramValues);
                     }
-                    
+
                 }
             }
         }
         Class<?> realClass = ori.getClassResourceInfo().getServiceClass();
         stack.push(new MethodInvocationInfo(ori, realClass, values));
     }
-    
+
     public static String logMessageHandlerProblem(String name, Class<?> cls, MediaType ct) {
-        org.apache.cxf.common.i18n.Message errorMsg = 
+        org.apache.cxf.common.i18n.Message errorMsg =
             new org.apache.cxf.common.i18n.Message(name, BUNDLE, cls.getName(), mediaTypeToString(ct));
         String errorMessage = errorMsg.toString();
         LOG.severe(errorMessage);
         return errorMessage;
     }
-    
+
 }

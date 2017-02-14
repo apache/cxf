@@ -31,7 +31,7 @@ import org.apache.cxf.transport.http.HttpDestinationFactory;
 
 @NoJSR250Annotations()
 public class NettyHttpDestinationFactory implements HttpDestinationFactory {
-    
+
     public NettyHttpDestinationFactory() {
         io.netty.util.Version.identify();
     }

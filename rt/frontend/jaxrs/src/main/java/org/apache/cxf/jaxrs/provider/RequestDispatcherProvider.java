@@ -57,30 +57,30 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 @Provider
 public class RequestDispatcherProvider extends AbstractConfigurableProvider
     implements MessageBodyWriter<Object> {
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(RequestDispatcherProvider.class);
     private static final Logger LOG = LogUtils.getL7dLogger(RequestDispatcherProvider.class);
-    
+
     private static final String ABSOLUTE_PATH_PARAMETER = "absolute.path";
     private static final String BASE_PATH_PARAMETER = "base.path";
     private static final String WEBAPP_BASE_PATH_PARAMETER = "webapp.base.path";
     private static final String RELATIVE_PATH_PARAMETER = "relative.path";
-    
+
     private static final String REQUEST_SCOPE = "request";
     private static final String SESSION_SCOPE = "session";
-    
+
     private static final String MESSAGE_RESOURCE_PATH_PROPERTY = "redirect.resource.path";
-    
+
     private static final String DEFAULT_RESOURCE_EXTENSION = ".jsp";
     private static final String DEFAULT_LOCATION_PREFIX = "/WEB-INF/";
-    
-    private String servletContextPath; 
+
+    private String servletContextPath;
     private String resourcePath;
     private Map<String, String> resourcePaths = Collections.emptyMap();
     private Map<String, String> classResources = Collections.emptyMap();
     private Map<? extends Enum<?>, String> enumResources = Collections.emptyMap();
     private boolean useClassNames;
-    
+
     private String scope = REQUEST_SCOPE;
     private Map<String, String> beanNames = Collections.emptyMap();
     private String beanName;
@@ -92,9 +92,9 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     private boolean strictPathCheck;
     private String locationPrefix;
     private String resourceExtension;
-    private boolean includeResource; 
-    
-    private MessageContext mc; 
+    private boolean includeResource;
+
+    private MessageContext mc;
 
     @Context
     public void setMessageContext(MessageContext context) {
@@ -104,11 +104,11 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     public void setStrictPathCheck(boolean use) {
         strictPathCheck = use;
     }
-    
+
     public void setUseClassNames(boolean use) {
         useClassNames = use;
     }
-    
+
     public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
@@ -138,9 +138,9 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             return null;
         }
     }
-    
+
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        
+
         if (useClassNames && getClassResourceName(type) != null) {
             return true;
         }
@@ -150,7 +150,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         if (!resourcePaths.isEmpty()) {
             String path = getRequestPath();
             for (String requestPath : resourcePaths.keySet()) {
-                boolean result = strictPathCheck ? path.endsWith(requestPath) : path.contains(requestPath);  
+                boolean result = strictPathCheck ? path.endsWith(requestPath) : path.contains(requestPath);
                 if (result) {
                     return true;
                 }
@@ -177,34 +177,34 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             return classResources.containsKey(typeName);
         }
     }
-    
-    public void writeTo(Object o, Class<?> clazz, Type genericType, Annotation[] annotations, 
+
+    public void writeTo(Object o, Class<?> clazz, Type genericType, Annotation[] annotations,
                         MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
-        
+
         ServletContext sc = getServletContext();
         HttpServletRequest servletRequest = mc.getHttpServletRequest();
-        
+
         String path = getResourcePath(clazz, o);
-        
-        String theServletPath = servletPath != null ? servletPath 
+
+        String theServletPath = servletPath != null ? servletPath
             : useCurrentServlet ? servletRequest.getServletPath() : "/";
-                
+
         if (theServletPath.endsWith("/") && path != null && path.startsWith("/")) {
-            theServletPath = theServletPath.length() == 1 ? "" 
+            theServletPath = theServletPath.length() == 1 ? ""
                 : theServletPath.substring(0, theServletPath.length() - 1);
         } else if (!theServletPath.endsWith("/") && path != null && !path.startsWith("/")) {
             path = "/" + path;
         }
-        
-        
+
+
         RequestDispatcher rd = getRequestDispatcher(sc, clazz, theServletPath + path);
-        
+
         try {
             if (!includeResource) {
                 mc.put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.TRUE);
             }
-            
+
             HttpServletRequestFilter requestFilter = new HttpServletRequestFilter(
                 servletRequest, path, theServletPath, saveParametersAsAttributes);
             String attributeName = getBeanName(o);
@@ -212,7 +212,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 requestFilter.setAttribute(attributeName, o);
             } else if (SESSION_SCOPE.equals(scope)) {
                 requestFilter.getSession(true).setAttribute(attributeName, o);
-            } 
+            }
             setRequestParameters(requestFilter);
             logRedirection(path, attributeName, o);
             if (includeResource) {
@@ -223,28 +223,28 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         } catch (Throwable ex) {
             mc.put(AbstractHTTPDestination.REQUEST_REDIRECTED, Boolean.FALSE);
             LOG.warning(ExceptionUtils.getStackTrace(ex));
-            throw ExceptionUtils.toInternalServerErrorException(ex, null); 
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
 
     private void logRedirection(String path, String attributeName, Object o) {
-        Level level = logRedirects ? Level.INFO : Level.FINE;  
+        Level level = logRedirects ? Level.INFO : Level.FINE;
         if (LOG.isLoggable(level)) {
-            String message = 
-                new org.apache.cxf.common.i18n.Message("RESPONSE_REDIRECTED_TO", 
+            String message =
+                new org.apache.cxf.common.i18n.Message("RESPONSE_REDIRECTED_TO",
                     BUNDLE, o.getClass().getName(), attributeName, path).toString();
             LOG.log(level, message);
         }
     }
-    
+
     String getResourcePath(Class<?> cls, Object o) {
         String currentResourcePath = getPathFromMessageContext();
         if (currentResourcePath != null) {
             return currentResourcePath;
         }
-        
+
         if (!resourcePaths.isEmpty()) {
-            
+
             String path = getRequestPath();
             for (Map.Entry<String, String> entry : resourcePaths.entrySet()) {
                 if (path.endsWith(entry.getKey())) {
@@ -259,22 +259,22 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 if (enumResource != null) {
                     return enumResource;
                 }
-                name += "." + o.toString();     
+                name += "." + o.toString();
             }
-            
+
             String clsResourcePath = classResources.get(name);
             if (clsResourcePath != null) {
                 return clsResourcePath;
             }
         }
-        
+
         if (useClassNames) {
-            return getClassResourceName(cls);     
+            return getClassResourceName(cls);
         }
-        
+
         return resourcePath;
     }
-    
+
     private String getPathFromMessageContext() {
         if (mc != null) {
             Object resourcePathProp = (String)mc.get(MESSAGE_RESOURCE_PATH_PROPERTY);
@@ -292,34 +292,34 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         }
         return null;
     }
-    
+
     private String getRequestPath() {
         Message inMessage = PhaseInterceptorChain.getCurrentMessage().getExchange().getInMessage();
         return (String)inMessage.get(Message.REQUEST_URI);
     }
-    
+
     protected ServletContext getServletContext() {
         ServletContext sc = mc.getServletContext();
         if (servletContextPath != null) {
             sc = sc.getContext(servletContextPath);
             if (sc == null) {
-                String message = 
-                    new org.apache.cxf.common.i18n.Message("RESOURCE_DISPATCH_NOT_FOUND", 
+                String message =
+                    new org.apache.cxf.common.i18n.Message("RESOURCE_DISPATCH_NOT_FOUND",
                                                            BUNDLE, servletContextPath).toString();
                 LOG.severe(message);
                 throw ExceptionUtils.toInternalServerErrorException(null, null);
             }
         }
-        return sc; 
+        return sc;
     }
-    
+
     protected RequestDispatcher getRequestDispatcher(ServletContext sc, Class<?> clazz, String path) {
-        
+
         RequestDispatcher rd = dispatcherName != null ? sc.getNamedDispatcher(dispatcherName)
                                                       : sc.getRequestDispatcher(path);
         if (rd == null) {
-            String message = 
-                new org.apache.cxf.common.i18n.Message("RESOURCE_PATH_NOT_FOUND", 
+            String message =
+                new org.apache.cxf.common.i18n.Message("RESOURCE_PATH_NOT_FOUND",
                                                        BUNDLE, path).toString();
             LOG.severe(message);
             throw ExceptionUtils.toInternalServerErrorException(null, null);
@@ -346,7 +346,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     public void setBeanName(String beanName) {
         this.beanName = beanName;
     }
-    
+
     public void setLogRedirects(String value) {
         this.logRedirects = Boolean.valueOf(value);
     }
@@ -358,7 +358,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         String name = beanNames.get(bean.getClass().getName());
         if (name != null) {
             return name;
-        } 
+        }
         Class<?> resourceClass = bean.getClass();
         if (useClassNames && doGetClassResourceName(resourceClass) == null) {
             for (Class<?> cls : bean.getClass().getInterfaces()) {
@@ -368,7 +368,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 }
             }
         }
-        
+
         return resourceClass.getSimpleName().toLowerCase();
     }
 
@@ -384,7 +384,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 }
                 request.setParameter(entry.getKey(), value);
             }
-            
+
             List<PathSegment> segments = ui.getPathSegments();
             if (segments.size() > 0) {
                 doSetRequestParameters(request, segments.get(segments.size() - 1).getMatrixParameters());
@@ -396,18 +396,18 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             request.setParameter(WEBAPP_BASE_PATH_PARAMETER, (String)mc.get("http.base.path"));
         }
     }
-    
-    protected void doSetRequestParameters(HttpServletRequestFilter req, 
+
+    protected void doSetRequestParameters(HttpServletRequestFilter req,
                                           MultivaluedMap<String, String> params) {
         for (Map.Entry<String, List<String>> entry : params.entrySet()) {
             req.setParameters(entry.getKey(), entry.getValue());
         }
     }
-    
+
     public void setDispatcherName(String name) {
         this.dispatcherName = name;
     }
-    
+
     public void setServletPath(String path) {
         this.servletPath = path;
     }
@@ -415,7 +415,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     public void setResourcePaths(Map<String, String> resourcePaths) {
         this.resourcePaths = resourcePaths;
     }
-    
+
     public void setClassResources(Map<String, String> resources) {
         this.classResources = resources;
     }
@@ -445,14 +445,14 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
     }
 
     protected static class HttpServletRequestFilter extends HttpServletRequestWrapper {
-        
+
         private Map<String, String[]> params;
         private String path;
         private String servletPath;
         private boolean saveParamsAsAttributes;
-        
-        public HttpServletRequestFilter(HttpServletRequest request, 
-                                        String path, 
+
+        public HttpServletRequestFilter(HttpServletRequest request,
+                                        String path,
                                         String servletPath,
                                         boolean saveParamsAsAttributes) {
             super(request);
@@ -461,25 +461,25 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             this.saveParamsAsAttributes = saveParamsAsAttributes;
             params = new HashMap<String, String[]>(request.getParameterMap());
         }
-        
+
         @Override
         public String getServletPath() {
             return servletPath;
         }
-        
+
         @Override
         public String getPathInfo() {
             return path;
         }
-        
+
         public void setParameter(String name, String value) {
             doSetParameters(name, new String[]{value});
         }
-        
+
         public void setParameters(String name, List<String> values) {
             doSetParameters(name, values.toArray(new String[values.size()]));
         }
-        
+
         private void doSetParameters(String name, String[] values) {
             if (saveParamsAsAttributes) {
                 super.setAttribute(name, values);
@@ -487,7 +487,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
                 params.put(name, values);
             }
         }
-        
+
         @Override
         public String getParameter(String name) {
             String[] values = params.get(name);
@@ -496,11 +496,11 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             }
             return values[0];
         }
-        
+
         @Override
         public Map<String, String[]> getParameterMap() {
             return params;
         }
-        
+
     }
 }

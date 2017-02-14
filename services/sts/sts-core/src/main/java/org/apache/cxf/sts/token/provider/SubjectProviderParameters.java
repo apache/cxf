@@ -36,53 +36,53 @@ public class SubjectProviderParameters {
     private List<AttributeStatementBean> attrBeanList;
     private List<AuthenticationStatementBean> authBeanList;
     private List<AuthDecisionStatementBean> authDecisionBeanList;
-    
+
     public TokenProviderParameters getProviderParameters() {
         return providerParameters;
     }
-    
+
     public void setProviderParameters(TokenProviderParameters providerParameters) {
         this.providerParameters = providerParameters;
     }
-    
+
     public Document getDoc() {
         return doc;
     }
-    
+
     public void setDoc(Document doc) {
         this.doc = doc;
     }
-    
+
     public byte[] getSecret() {
         return secret;
     }
-    
+
     public void setSecret(byte[] secret) {
         this.secret = secret;
     }
-    
+
     public List<AttributeStatementBean> getAttrBeanList() {
         return attrBeanList;
     }
-    
+
     public void setAttrBeanList(List<AttributeStatementBean> attrBeanList) {
         this.attrBeanList = attrBeanList;
     }
-    
+
     public List<AuthenticationStatementBean> getAuthBeanList() {
         return authBeanList;
     }
-    
+
     public void setAuthBeanList(List<AuthenticationStatementBean> authBeanList) {
         this.authBeanList = authBeanList;
     }
-    
+
     public List<AuthDecisionStatementBean> getAuthDecisionBeanList() {
         return authDecisionBeanList;
     }
-    
+
     public void setAuthDecisionBeanList(List<AuthDecisionStatementBean> authDecisionBeanList) {
         this.authDecisionBeanList = authDecisionBeanList;
     }
-        
+
 }

@@ -35,12 +35,12 @@ public class CachedWriterTest extends CachedStreamTestBase {
     protected Object createCache() {
         return new CachedWriter();
     }
-    
+
     @Override
     protected Object createCache(long threshold) {
         return createCache(threshold, null);
     }
-    
+
     @Override
     protected Object createCache(long threshold, String transformation) {
         CachedWriter cos = new CachedWriter();
@@ -48,7 +48,7 @@ public class CachedWriterTest extends CachedStreamTestBase {
         cos.setCipherTransformation(transformation);
         return cos;
     }
-    
+
     @Override
     protected String getResetOutValue(String result, Object cache) throws IOException {
         CachedWriter cos = (CachedWriter)cache;
@@ -57,7 +57,7 @@ public class CachedWriterTest extends CachedStreamTestBase {
         cos.resetOut(out, true);
         return out.toString();
     }
-    
+
     @Override
     protected File getTmpFile(String result, Object cache) throws IOException {
         CachedWriter cos = (CachedWriter)cache;
@@ -82,5 +82,5 @@ public class CachedWriterTest extends CachedStreamTestBase {
         return readPartiallyFromReader((Reader)cache, len);
     }
 }
-    
-   
+
+

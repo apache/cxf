@@ -25,18 +25,18 @@ import org.apache.cxf.Bus;
  * The listener interface for receiving notification of when <code>Bus</code>
  * objects are created.
  *
- * It's a simplified form of BusLifeCycleListener that takes the 
- * target Bus as a parameter which is appropriate if the listener needs 
- * to be a singleton that works with multiple Bus objects.   
- * 
+ * It's a simplified form of BusLifeCycleListener that takes the
+ * target Bus as a parameter which is appropriate if the listener needs
+ * to be a singleton that works with multiple Bus objects.
+ *
  * A common pattern would be to register a full BusLifeCycleListener on the
  * target Bus to receive full Bus events
  */
 public interface BusCreationListener {
 
     /**
-     * Invoked to create a BusLifeCycleListener.   
+     * Invoked to create a BusLifeCycleListener.
      */
     void busCreated(Bus b);
-    
+
 }

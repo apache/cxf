@@ -42,18 +42,18 @@ public interface CollectionServiceInterface {
     void takeDoubleList(List<Double> doublesList);
 
     String takeSortedStrings(SortedSet<String> strings);
-    
+
     //CHECKSTYLE:OFF
     String takeUnsortedSet(HashSet<String> strings);
     String takeStack(Stack<String> strings);
     String takeArrayList(ArrayList<String> strings);
     //CHECKSTYLE:ON
-    
+
     void method1(List<String> headers1);
-    
-    void mapOfMapWithStringAndPojo(Map<String, Map<String, BeanWithGregorianDate>> bigParam); 
-    
+
+    void mapOfMapWithStringAndPojo(Map<String, Map<String, BeanWithGregorianDate>> bigParam);
+
     Collection<double[]> returnCollectionOfPrimitiveArrays();
-    
+
     Collection<Document[]> returnCollectionOfDOMFragments();
 }

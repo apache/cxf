@@ -34,27 +34,27 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 @Path("/")
 public class OAuthDefaultServices {
 
-    private AuthorizationRequestService authorizeService = 
+    private AuthorizationRequestService authorizeService =
         new AuthorizationRequestService();
     private AccessTokenService accessTokenService =
         new AccessTokenService();
-    private RequestTokenService requestTokenService = 
+    private RequestTokenService requestTokenService =
         new RequestTokenService();
-    
+
     public OAuthDefaultServices() {
     }
 
-    @Context 
+    @Context
     public void setMessageContext(MessageContext mc) {
         this.authorizeService.setMessageContext(mc);
         this.accessTokenService.setMessageContext(mc);
         this.requestTokenService.setMessageContext(mc);
     }
-    
+
     public void setAuthorizationService(AuthorizationRequestService service) {
         this.authorizeService = service;
     }
-    
+
     public void setAccessTokenService(AccessTokenService service) {
         this.accessTokenService = service;
     }
@@ -69,7 +69,7 @@ public class OAuthDefaultServices {
     public Response getRequestToken() {
         return requestTokenService.getRequestToken();
     }
-    
+
     @GET
     @Path("/initiate")
     @Produces("application/x-www-form-urlencoded")
@@ -83,13 +83,13 @@ public class OAuthDefaultServices {
     public Response authorize() {
         return authorizeService.authorize();
     }
-    
+
     @GET
     @Path("/authorize/decision")
     public Response authorizeDecision() {
         return authorizeService.authorizeDecision();
     }
-    
+
     @POST
     @Path("/authorize/decision")
     @Consumes("application/x-www-form-urlencoded")
@@ -103,7 +103,7 @@ public class OAuthDefaultServices {
     public Response getAccessTokenWithGET() {
         return accessTokenService.getAccessToken();
     }
-    
+
     @POST
     @Path("/token")
     @Produces("application/x-www-form-urlencoded")

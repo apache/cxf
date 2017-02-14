@@ -35,7 +35,7 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     private AlgorithmParameterSpec signatureSpec;
     private SignatureAlgorithm supportedAlgo;
     private X509Certificate cert;
-    
+
     public PublicKeyJwsSignatureVerifier(PublicKey key, SignatureAlgorithm supportedAlgorithm) {
         this(key, null, supportedAlgorithm);
     }
@@ -48,8 +48,8 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     public PublicKeyJwsSignatureVerifier(X509Certificate cert, SignatureAlgorithm supportedAlgorithm) {
         this(cert, null, supportedAlgorithm);
     }
-    public PublicKeyJwsSignatureVerifier(X509Certificate cert, 
-                                         AlgorithmParameterSpec spec, 
+    public PublicKeyJwsSignatureVerifier(X509Certificate cert,
+                                         AlgorithmParameterSpec spec,
                                          SignatureAlgorithm supportedAlgo) {
         if (cert != null) {
             this.key = cert.getPublicKey();
@@ -62,9 +62,9 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
     @Override
     public boolean verify(JwsHeaders headers, String unsignedText, byte[] signature) {
         try {
-            return CryptoUtils.verifySignature(StringUtils.toBytesUTF8(unsignedText), 
-                                               signature, 
-                                               key, 
+            return CryptoUtils.verifySignature(StringUtils.toBytesUTF8(unsignedText),
+                                               signature,
+                                               key,
                                                AlgorithmUtils.toJavaName(checkAlgorithm(
                                                                               headers.getSignatureAlgorithm())),
                                                signatureSpec);

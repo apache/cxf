@@ -53,11 +53,11 @@ import org.junit.Test;
 
 
 /**
- * 
+ *
  */
 public final class WSDiscoveryClientTest {
     public static final String PORT = TestUtil.getPortNumber(WSDiscoveryClientTest.class);
-   
+
     static NetworkInterface findIpv4Interface() throws Exception {
         Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
         List<NetworkInterface> possibles = new ArrayList<>();
@@ -76,22 +76,22 @@ public final class WSDiscoveryClientTest {
         }
         return possibles.isEmpty() ? null : possibles.get(possibles.size() - 1);
     }
-    
+
     @Test
     public void testMultiResponses() throws Exception {
         // Disable the test on Redhat Enterprise Linux which doesn't enable the UDP broadcast by default
-        if (System.getProperties().getProperty("os.name").equals("Linux") 
+        if (System.getProperties().getProperty("os.name").equals("Linux")
             && System.getProperties().getProperty("os.version").indexOf("el") > 0) {
             System.out.println("Skipping MultiResponse test for REL");
             return;
         }
-        
+
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         int count = 0;
         while (interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
             if (!networkInterface.isUp() || networkInterface.isLoopback()) {
-                continue;  
+                continue;
             }
             count++;
         }
@@ -100,7 +100,7 @@ public final class WSDiscoveryClientTest {
             System.out.println("Skipping MultiResponse test");
             return;
         }
-        
+
         new Thread(new Runnable() {
             public void run() {
                 try {
@@ -133,15 +133,15 @@ public final class WSDiscoveryClientTest {
                         DatagramPacket outp = new DatagramPacket(out, 0, out.length, sa);
                         s.send(outp);
                     }
-                    
+
                     s.close();
                 } catch (Throwable t) {
                     t.printStackTrace();
                 }
             }
         }).start();
-        
-        
+
+
         Bus bus  = BusFactory.newInstance().createBus();
         WSDiscoveryClient c = new WSDiscoveryClient(bus);
         c.setVersion10();
@@ -154,10 +154,10 @@ public final class WSDiscoveryClientTest {
 
         Assert.assertEquals(2, pmts.getProbeMatch().size());
         c.close();
-        bus.shutdown(true);        
+        bus.shutdown(true);
     }
-    
-    
+
+
     //this is a standalone test
     public static void main(String[] arg) throws Exception {
         try {
@@ -165,7 +165,7 @@ public final class WSDiscoveryClientTest {
             Endpoint ep = Endpoint.publish("http://localhost:51919/Foo/Snarf", new FooImpl());
             WSDiscoveryServiceImpl service = new WSDiscoveryServiceImpl(bus);
             service.startup();
-            
+
             //this service will just generate an error.  However, the probes should still
             //work to probe the above stuff.
             WSDiscoveryServiceImpl s2 = new WSDiscoveryServiceImpl() {
@@ -175,12 +175,12 @@ public final class WSDiscoveryClientTest {
             };
             s2.startup();
             HelloType h = service.register(ep.getEndpointReference());
-            
+
             bus  = BusFactory.newInstance().createBus();
             WSDiscoveryClient c = new WSDiscoveryClient(bus);
             c.setVersion10();
-            
-            
+
+
             System.out.println("1");
             ProbeType pt = new ProbeType();
             ScopesType scopes = new ScopesType();
@@ -198,9 +198,9 @@ public final class WSDiscoveryClientTest {
                 System.exit(0);
             }
             pmts = c.probe(pt);
-            
+
             System.out.println("Size:" + pmts.getProbeMatch().size());
-            
+
             System.out.println("3");
 
             W3CEndpointReference ref = null;
@@ -212,7 +212,7 @@ public final class WSDiscoveryClientTest {
                     System.out.println(pmt.getXAddrs());
                 }
             }
-            
+
             ResolveMatchType rmt = c.resolve(ref);
             System.out.println("Resolved " + rmt.getEndpointReference());
             System.out.println(rmt.getTypes());
@@ -221,14 +221,14 @@ public final class WSDiscoveryClientTest {
             service.unregister(h);
             System.out.println("4");
             c.close();
-            
+
             System.exit(0);
         } catch (Throwable t) {
             t.printStackTrace();
             System.exit(1);
         }
     }
-    
+
 
     @WebService
     public static class FooImpl {
@@ -238,5 +238,5 @@ public final class WSDiscoveryClientTest {
         }
     }
 
-    
+
 }

@@ -29,7 +29,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * Tibco Business Works uses SoapAction instead of the standard spelling SOAPAction. 
+ * Tibco Business Works uses SoapAction instead of the standard spelling SOAPAction.
  * So this interceptor adds a SoapAction header if SOAPAction is set in protocol header
  */
 public class TibcoSoapActionInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
@@ -45,7 +45,7 @@ public class TibcoSoapActionInterceptor extends AbstractPhaseInterceptor<SoapMes
         Map<String, Object> headers = (Map<String, Object>)soapMessage.get(Message.PROTOCOL_HEADERS);
         if (headers != null && headers.containsKey(SoapBindingConstants.SOAP_ACTION)) {
             //need to flip to a case sensitive map.  The default
-            //is a case insensitive map, but in this case, we need 
+            //is a case insensitive map, but in this case, we need
             //to use a case sensitive map to make sure both versions go out
             headers = new TreeMap<String, Object>(headers);
             soapMessage.put(Message.PROTOCOL_HEADERS, headers);

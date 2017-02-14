@@ -26,23 +26,23 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
-    
+
 public class OIDCNegativeServer extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-oidc");
     private static final URL SERVER_CONFIG_FILE =
         OIDCNegativeServer.class.getResource("oidc-negative-server.xml");
-    
+
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();
         Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
         BusFactory.setDefaultBus(springBus);
         setBus(springBus);
-        
+
         try {
             new OIDCNegativeServer();
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }        
+        }
     }
 
 }

@@ -49,45 +49,45 @@ import org.ops4j.pax.exam.junit.PaxExam;
  */
 @RunWith(PaxExam.class)
 public class STSUnitTest extends BasicSTSIntegrationTest {
-    
-    private static final String SAML2_TOKEN_TYPE = 
+
+    private static final String SAML2_TOKEN_TYPE =
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0";
-    private static final String BEARER_KEYTYPE = 
+    private static final String BEARER_KEYTYPE =
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
-    
+
     @Test
     public void testBearerSAML2Token() throws URISyntaxException, Exception {
         Bus bus = BusFactory.getDefaultBus();
 
         // Get a token
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus, STS_ENDPOINT);
         Assert.assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
         Assert.assertTrue(token.getToken() != null);
-        
+
         // Process the token
         List<WSSecurityEngineResult> results = processToken(token);
 
         Assert.assertTrue(results != null && results.size() == 1);
-        SamlAssertionWrapper assertion = 
+        SamlAssertionWrapper assertion =
             (SamlAssertionWrapper)results.get(0).get(WSSecurityEngineResult.TAG_SAML_ASSERTION);
         Assert.assertTrue(assertion != null);
         Assert.assertTrue(assertion.getSaml1() == null && assertion.getSaml2() != null);
         Assert.assertTrue(assertion.isSigned());
-        
+
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
         if (methods != null && methods.size() > 0) {
             confirmMethod = methods.get(0);
         }
         Assert.assertTrue(confirmMethod.contains("bearer"));
-        
+
         bus.shutdown(true);
     }
-    
+
     private SecurityToken requestSecurityToken(
-        String tokenType, 
-        String keyType, 
+        String tokenType,
+        String keyType,
         Bus bus,
         String endpointAddress
     ) throws Exception {
@@ -119,13 +119,13 @@ public class STSUnitTest extends BasicSTSIntegrationTest {
         RequestData requestData = new RequestData();
         CallbackHandler callbackHandler = new CommonCallbackHandler();
         requestData.setCallbackHandler(callbackHandler);
-        Crypto crypto = CryptoFactory.getInstance("clientKeystore.properties", 
+        Crypto crypto = CryptoFactory.getInstance("clientKeystore.properties",
                                                   this.getClass().getClassLoader());
         requestData.setSigVerCrypto(crypto);
         requestData.setWsDocInfo(new WSDocInfo(token.getToken().getOwnerDocument()));
-        
+
         Processor processor = new SAMLTokenProcessor();
         return processor.handleToken(token.getToken(), requestData);
     }
-    
+
 }

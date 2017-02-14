@@ -34,11 +34,11 @@ public class CustomAuthenticationProvider implements AuthenticationStatementProv
      */
     public AuthenticationStatementBean getStatement(TokenProviderParameters providerParameters) {
         AuthenticationStatementBean authBean = new AuthenticationStatementBean();
-        
+
         SubjectLocalityBean subjectLocality = new SubjectLocalityBean();
         subjectLocality.setIpAddress("127.0.0.1");
         authBean.setSubjectLocality(subjectLocality);
-        
+
         if (WSConstants.WSS_SAML_TOKEN_TYPE.equals(
                 providerParameters.getTokenRequirements().getTokenType())) {
             authBean.setAuthenticationMethod(SAML1Constants.AUTH_METHOD_X509);
@@ -47,5 +47,5 @@ public class CustomAuthenticationProvider implements AuthenticationStatementProv
         }
         return authBean;
     }
-    
+
 }

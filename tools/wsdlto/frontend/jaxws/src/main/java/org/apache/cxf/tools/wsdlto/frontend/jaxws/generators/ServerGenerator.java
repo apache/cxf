@@ -58,13 +58,13 @@ public class ServerGenerator extends AbstractJAXWSGenerator {
         if (passthrough()) {
             return;
         }
-        
+
         Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
-        
+
             String address = "CHANGE_ME";
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
-    
+
             if (javaModel.getServiceClasses().size() == 0) {
                 ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
@@ -85,19 +85,19 @@ public class ServerGenerator extends AbstractJAXWSGenerator {
                     address = StringUtils.isEmpty(jp.getBindingAdress()) ? address : jp.getBindingAdress();
                     String serverClassName = interfaceName + "_"
                                              + NameUtil.mangleNameToClassName(jp.getPortName()) + "_Server";
-    
+
                     serverClassName = mapClassName(intf.getPackageName(), serverClassName, penv);
                     clearAttributes();
                     setAttributes("serverClassName", serverClassName);
                     setAttributes("intf", intf);
-                    
+
                     String name = getImplName(jp.getPortName(), js.getServiceName(), intf, penv);
                     setAttributes("impl", name);
-                    
+
                     setAttributes("address", address);
                     setCommonAttributes();
-    
-                    doWrite(SRV_TEMPLATE, parseOutputName(intf.getPackageName(), serverClassName));           
+
+                    doWrite(SRV_TEMPLATE, parseOutputName(intf.getPackageName(), serverClassName));
                 }
             }
         }
@@ -116,7 +116,7 @@ public class ServerGenerator extends AbstractJAXWSGenerator {
         }
         return name;
     }
-    
+
     private String mapClassName(String packageName, String name, ToolContext context) {
         ClassCollector collector = context.get(ClassCollector.class);
         int count = 0;

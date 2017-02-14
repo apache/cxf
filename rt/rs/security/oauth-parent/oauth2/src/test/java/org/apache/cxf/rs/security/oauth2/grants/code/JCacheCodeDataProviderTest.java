@@ -41,27 +41,27 @@ public class JCacheCodeDataProviderTest extends Assert {
     @Test
     public void testAddGetDeleteCodeGrants() {
         Client c = addClient("111", "bob");
-        
+
         AuthorizationCodeRegistration atr = new AuthorizationCodeRegistration();
         atr.setClient(c);
         atr.setApprovedScope(Collections.singletonList("a"));
         atr.setSubject(c.getResourceOwnerSubject());
-        
+
         ServerAuthorizationCodeGrant grant = provider.createCodeGrant(atr);
-        
+
         List<ServerAuthorizationCodeGrant> grants = provider.getCodeGrants(c, c.getResourceOwnerSubject());
         assertNotNull(grants);
         assertEquals(1, grants.size());
         assertEquals(grant.getCode(), grants.get(0).getCode());
-        
+
         grants = provider.getCodeGrants(c, null);
         assertNotNull(grants);
         assertEquals(1, grants.size());
         assertEquals(grant.getCode(), grants.get(0).getCode());
-        
+
         ServerAuthorizationCodeGrant grant2 = provider.removeCodeGrant(grant.getCode());
         assertEquals(grant.getCode(), grant2.getCode());
-        
+
         grants = provider.getCodeGrants(c, null);
         assertNotNull(grants);
         assertEquals(0, grants.size());
@@ -71,14 +71,14 @@ public class JCacheCodeDataProviderTest extends Assert {
     @Test
     public void testAddGetDeleteCodeGrants2() {
         Client c = addClient("111", "bob");
-        
+
         AuthorizationCodeRegistration atr = new AuthorizationCodeRegistration();
         atr.setClient(c);
         atr.setApprovedScope(Collections.singletonList("a"));
         atr.setSubject(c.getResourceOwnerSubject());
-        
+
         provider.createCodeGrant(atr);
-        
+
         List<ServerAuthorizationCodeGrant> grants = provider.getCodeGrants(c, c.getResourceOwnerSubject());
         assertNotNull(grants);
         assertEquals(1, grants.size());
@@ -87,7 +87,7 @@ public class JCacheCodeDataProviderTest extends Assert {
         assertNotNull(grants);
         assertEquals(0, grants.size());
     }
-    
+
     private Client addClient(String clientId, String userLogin) {
         Client c = new Client();
         c.setRedirectUris(Collections.singletonList("http://client/redirect"));

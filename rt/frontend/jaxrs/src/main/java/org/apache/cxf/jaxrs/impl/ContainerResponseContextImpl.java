@@ -29,13 +29,13 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 
-public class ContainerResponseContextImpl extends AbstractResponseContextImpl 
+public class ContainerResponseContextImpl extends AbstractResponseContextImpl
     implements ContainerResponseContext {
 
     private Class<?> serviceCls;
     private Method invoked;
-    
-    public ContainerResponseContextImpl(ResponseImpl r, 
+
+    public ContainerResponseContextImpl(ResponseImpl r,
                                         Message m,
                                         Class<?> serviceCls,
                                         Method invoked) {
@@ -43,7 +43,7 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
         this.serviceCls = serviceCls;
         this.invoked = invoked;
     }
-    
+
     @Override
     public Annotation[] getEntityAnnotations() {
         return super.getResponseEntityAnnotations();
@@ -57,17 +57,17 @@ public class ContainerResponseContextImpl extends AbstractResponseContextImpl
     @Override
     public Type getEntityType() {
         return InjectionUtils.getGenericResponseType(invoked,
-                                              serviceCls,       
-                                              super.r.getActualEntity(), 
-                                              getEntityClass(), 
+                                              serviceCls,
+                                              super.r.getActualEntity(),
+                                              getEntityClass(),
                                               super.m.getExchange());
     }
-    
+
     @Override
     public MultivaluedMap<String, Object> getHeaders() {
         return r.getMetadata();
     }
-    
+
     @Override
     public OutputStream getEntityStream() {
         return m.getContent(OutputStream.class);

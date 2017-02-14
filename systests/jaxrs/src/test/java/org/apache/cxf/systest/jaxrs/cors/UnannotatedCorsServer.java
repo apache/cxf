@@ -47,17 +47,17 @@ public class UnannotatedCorsServer {
     public Response deleteSomething() {
         return Response.ok().build();
     }
-    
+
     @GET
     @CrossOriginResourceSharing(allowOrigins = {
-            "http://area51.mil:31415" }, 
+            "http://area51.mil:31415" },
              exposeHeaders = {"X-custom-3", "X-custom-4" })
     @Produces("text/plain")
     @Path("/annotatedGet/{echo}")
     public String annotatedGet(@PathParam("echo") String echo) {
         return echo;
     }
-    
+
     /**
      * A method annotated to test preflight.
      * @param input
@@ -68,24 +68,24 @@ public class UnannotatedCorsServer {
     @Produces("text/plain")
     @Path("/annotatedPut")
     @CrossOriginResourceSharing(
-        allowOrigins = { "http://area51.mil:31415" }, 
-        allowCredentials = true, 
-        maxAge = 1, 
+        allowOrigins = { "http://area51.mil:31415" },
+        allowCredentials = true,
+        maxAge = 1,
         allowHeaders = { "X-custom-1", "X-custom-2" },
         exposeHeaders = {"X-custom-3", "X-custom-4" }
     )
     public String annotatedPut(String input) {
         return input;
     }
-    
+
     @PUT
     @Consumes("text/plain")
     @Produces("text/plain")
     @Path("/annotatedPut2")
     @CrossOriginResourceSharing(
-        allowAllOrigins = true, 
-        allowCredentials = true, 
-        maxAge = 1, 
+        allowAllOrigins = true,
+        allowCredentials = true,
+        maxAge = 1,
         allowHeaders = { "X-custom-1", "X-custom-2" },
         exposeHeaders = {"X-custom-3", "X-custom-4" }
     )

@@ -35,7 +35,7 @@ public class DuplicateArrayServiceBean implements DuplicateArrayService {
     public List<List<DuplicateArrayReturnItem>> lookupBatch(String indexid) {
         return null;
     }
-    
+
     @WebMethod
     public Foo<String> doFoo(Foo<Integer> foo) {
         return null;

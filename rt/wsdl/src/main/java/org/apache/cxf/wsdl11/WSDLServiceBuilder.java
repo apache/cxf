@@ -153,7 +153,7 @@ public class WSDLServiceBuilder {
             info.setExtensionAttributes(attrs);
         }
     }
-    
+
     private void copyDocumentation(AbstractPropertiesHolder info, WSDLElement el) {
         if (el.getDocumentationElement() != null) {
             String doc = DOMUtils.getRawContent(el.getDocumentationElement());
@@ -462,7 +462,7 @@ public class WSDLServiceBuilder {
         }
         if (factory instanceof WSDLEndpointFactory) {
             WSDLEndpointFactory wFactory = (WSDLEndpointFactory)factory;
-            ei = wFactory.createEndpointInfo(bus, service, bi, 
+            ei = wFactory.createEndpointInfo(bus, service, bi,
                                              port.getExtensibilityElements());
         }
 
@@ -665,7 +665,7 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
-            org.apache.cxf.common.i18n.Message message 
+            org.apache.cxf.common.i18n.Message message
                 = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_1", LOG, opInfo.getName());
             LOG.log(logLevel, message.toString());
             return;
@@ -691,7 +691,7 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
-            org.apache.cxf.common.i18n.Message message 
+            org.apache.cxf.common.i18n.Message message
                 = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_2", LOG, opInfo.getName());
             LOG.log(logLevel, message.toString());
             return;
@@ -712,7 +712,7 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
-            org.apache.cxf.common.i18n.Message message 
+            org.apache.cxf.common.i18n.Message message
                 = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_3", LOG, opInfo.getName());
             LOG.log(logLevel, message.toString());
             return;
@@ -742,7 +742,7 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
-            org.apache.cxf.common.i18n.Message message 
+            org.apache.cxf.common.i18n.Message message
                 = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_4", LOG, opInfo.getName());
             LOG.log(logLevel, message.toString());
             return;
@@ -768,7 +768,7 @@ public class WSDLServiceBuilder {
         }
 
         if (!passedRule) {
-            org.apache.cxf.common.i18n.Message message 
+            org.apache.cxf.common.i18n.Message message
                 = new org.apache.cxf.common.i18n.Message("WRAPPED_RULE_5", LOG, opInfo.getName());
             LOG.log(logLevel, message.toString());
             return;
@@ -808,12 +808,12 @@ public class WSDLServiceBuilder {
                                                 allowRefs)) {
                         return false;
                     }
-                                 
+
                     if (extension.getParticle() instanceof XmlSchemaSequence) {
                         XmlSchemaSequence seq = (XmlSchemaSequence)extension.getParticle();
                         return buildMessageParts(seq, namespaceURI, wrapper, allowRefs);
-                    }  
-                    
+                    }
+
                 }
                 return true;
             }
@@ -821,7 +821,7 @@ public class WSDLServiceBuilder {
         return false;
     }
 
-        
+
     private static boolean buildMessageParts(XmlSchemaSequence seq, String namespaceURI, MessageInfo wrapper,
                                              boolean allowRefs) {
         List<XmlSchemaSequenceMember> items = seq.getItems();
@@ -861,8 +861,8 @@ public class WSDLServiceBuilder {
         }
         return ret;
     }
-        
-        
+
+
     private void buildMessage(AbstractMessageContainer minfo, Message msg) {
         SchemaCollection schemas = minfo.getOperation().getInterface().getService()
             .getXmlSchemaCollection();

@@ -33,12 +33,12 @@ import org.apache.cxf.extension.BusExtension;
 
 @NoJSR250Annotations
 public class ServerLifeCycleManagerImpl implements ServerLifeCycleManager, BusExtension {
-    
-    private CopyOnWriteArrayList<ServerLifeCycleListener> listeners = 
+
+    private CopyOnWriteArrayList<ServerLifeCycleListener> listeners =
             new CopyOnWriteArrayList<ServerLifeCycleListener>();
 
     public ServerLifeCycleManagerImpl() {
-        
+
     }
     public ServerLifeCycleManagerImpl(Bus b) {
         Collection<? extends ServerLifeCycleListener> l = b.getExtension(ConfiguredBeanLocator.class)
@@ -51,7 +51,7 @@ public class ServerLifeCycleManagerImpl implements ServerLifeCycleManager, BusEx
         return ServerLifeCycleManager.class;
     }
 
-    
+
     public synchronized void registerListener(ServerLifeCycleListener listener) {
         listeners.addIfAbsent(listener);
     }

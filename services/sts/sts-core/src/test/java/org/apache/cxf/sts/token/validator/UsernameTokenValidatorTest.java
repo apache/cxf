@@ -53,7 +53,7 @@ import org.apache.wss4j.dom.message.token.UsernameToken;
  * Some unit tests for validating a UsernameToken via the UsernameTokenValidator.
  */
 public class UsernameTokenValidatorTest extends org.junit.Assert {
-    
+
     /**
      * Test a valid UsernameToken with password text
      */
@@ -62,25 +62,25 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         TokenValidator usernameTokenValidator = new UsernameTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a UsernameToken
         UsernameTokenType usernameToken = new UsernameTokenType();
         AttributedString username = new AttributedString();
         username.setValue("alice");
         usernameToken.setUsername(username);
-        JAXBElement<UsernameTokenType> tokenType = 
+        JAXBElement<UsernameTokenType> tokenType =
             new JAXBElement<UsernameTokenType>(
                 QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );
-        
+
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(usernameTokenValidator.canHandleToken(validateTarget));
-        
+
         // This will fail as there is no password
-        TokenValidatorResponse validatorResponse = 
+        TokenValidatorResponse validatorResponse =
                 usernameTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
@@ -90,21 +90,21 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         PasswordString password = new PasswordString();
         password.setValue("clarinet");
         password.setType(WSConstants.PASSWORD_TEXT);
-        JAXBElement<PasswordString> passwordType = 
+        JAXBElement<PasswordString> passwordType =
             new JAXBElement<PasswordString>(
                 QNameConstants.PASSWORD, PasswordString.class, password
             );
         usernameToken.getAny().add(passwordType);
-        
+
         validatorResponse = usernameTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
+
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
     }
-    
+
     /**
      * Test an invalid UsernameToken with password text
      */
@@ -113,40 +113,40 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         TokenValidator usernameTokenValidator = new UsernameTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a UsernameToken
         UsernameTokenType usernameToken = new UsernameTokenType();
         AttributedString username = new AttributedString();
         username.setValue("eve");
         usernameToken.setUsername(username);
-        JAXBElement<UsernameTokenType> tokenType = 
+        JAXBElement<UsernameTokenType> tokenType =
             new JAXBElement<UsernameTokenType>(
                 QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );
-        
+
         // Add a password
         PasswordString password = new PasswordString();
         password.setValue("clarinet");
         password.setType(WSConstants.PASSWORD_TEXT);
-        JAXBElement<PasswordString> passwordType = 
+        JAXBElement<PasswordString> passwordType =
             new JAXBElement<PasswordString>(
                 QNameConstants.PASSWORD, PasswordString.class, password
             );
         usernameToken.getAny().add(passwordType);
-        
+
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(usernameTokenValidator.canHandleToken(validateTarget));
-        
+
         // This will fail as the username is bad
-        TokenValidatorResponse validatorResponse = 
+        TokenValidatorResponse validatorResponse =
             usernameTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
-        
+
         // This will fail as the password is bad
         username.setValue("alice");
         password.setValue("badpassword");
@@ -155,7 +155,7 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
-    
+
     /**
      * Test a valid UsernameToken with password digest
      */
@@ -164,17 +164,17 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         TokenValidator usernameTokenValidator = new UsernameTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a UsernameToken
         UsernameTokenType usernameToken = new UsernameTokenType();
         AttributedString username = new AttributedString();
         username.setValue("alice");
         usernameToken.setUsername(username);
-        JAXBElement<UsernameTokenType> tokenType = 
+        JAXBElement<UsernameTokenType> tokenType =
             new JAXBElement<UsernameTokenType>(
                 QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );
-        
+
         // Create a WSS4J UsernameToken
         Document doc = DOMUtils.createDocument();
         UsernameToken ut = new UsernameToken(true, doc, WSConstants.PASSWORD_DIGEST);
@@ -187,44 +187,44 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         PasswordString password = new PasswordString();
         password.setValue(ut.getPassword());
         password.setType(WSConstants.PASSWORD_DIGEST);
-        JAXBElement<PasswordString> passwordType = 
+        JAXBElement<PasswordString> passwordType =
             new JAXBElement<PasswordString>(
                 QNameConstants.PASSWORD, PasswordString.class, password
             );
         usernameToken.getAny().add(passwordType);
-        
+
         // Add a nonce
         EncodedString nonce = new EncodedString();
         nonce.setValue(ut.getNonce());
         nonce.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
-        JAXBElement<EncodedString> nonceType = 
+        JAXBElement<EncodedString> nonceType =
             new JAXBElement<EncodedString>(
                 QNameConstants.NONCE, EncodedString.class, nonce
             );
         usernameToken.getAny().add(nonceType);
-        
+
         // Add Created value
         String created = ut.getCreated();
         Element createdElement = doc.createElementNS(WSConstants.WSU_NS, "Created");
         createdElement.setAttributeNS(WSConstants.XMLNS_NS, "xmlns", WSConstants.WSU_NS);
         createdElement.setTextContent(created);
         usernameToken.getAny().add(createdElement);
-        
+
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(usernameTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
                 usernameTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
+
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
-        
+
         // Expected failure on a bad password
         password.setValue("badpassword");
         validatorResponse = usernameTokenValidator.validateToken(validatorParameters);
@@ -232,23 +232,23 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
-    
+
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {
         TokenValidatorParameters parameters = new TokenValidatorParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(STSConstants.STATUS);
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         parameters.setMessageContext(msgCtx);
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -259,10 +259,10 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -270,9 +270,9 @@ public class UsernameTokenValidatorTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
-    
+
+
 }

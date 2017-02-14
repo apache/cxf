@@ -43,5 +43,5 @@ public abstract class AbstractWSDLBuilder implements WSDLBuilder<Definition> {
     public abstract boolean validate(Definition t) throws ToolException;
 
     public abstract Definition getWSDLModel();
-    
+
 }

@@ -50,17 +50,17 @@ public class Compiler {
     private File classpathTmpFile;
     private List<String> errors = new LinkedList<String>();
     private List<String> warnings = new LinkedList<String>();
-    
+
     public Compiler() {
     }
-    
+
     public List<String> getErrors() {
         return errors;
     }
     public List<String> getWarnings() {
         return warnings;
     }
-    
+
     public void setMaxMemory(long l) {
         maxMemory = l;
     }
@@ -83,7 +83,7 @@ public class Compiler {
     public void setClassPath(String s) {
         classPath = StringUtils.isEmpty(s) ? null : s;
     }
-    
+
     protected void addArgs(List<String> list) {
         if (!StringUtils.isEmpty(encoding)) {
             list.add("-encoding");
@@ -100,7 +100,7 @@ public class Compiler {
             list.add("-d");
             list.add(outputDir);
         }
-        
+
         if (StringUtils.isEmpty(classPath)) {
             String javaClasspath = SystemPropertyAction.getProperty("java.class.path");
             boolean classpathSetted = javaClasspath != null ? true : false;
@@ -109,7 +109,7 @@ public class Compiler {
                 f = new File(f, "../lib");
                 if (f.exists() && f.isDirectory()) {
                     list.add("-extdirs");
-                    list.add(f.toString());                    
+                    list.add(f.toString());
                 }
             } else {
                 list.add("-classpath");
@@ -140,7 +140,7 @@ public class Compiler {
         if (!forceFork) {
             return useJava6Compiler(files);
         }
-        
+
         List<String> list = new ArrayList<>();
 
         // Start of honoring java.home for used javac
@@ -176,7 +176,7 @@ public class Compiler {
 
         //fix for CXF-2081, set maximum heap of this VM to javac.
         list.add("-J-Xmx" + maxMemory);
-        
+
         if (System.getProperty("java.version").startsWith("9")) {
             list.add("--add-modules");
             list.add("java.activation,java.annotations.common,java.corba,java.transaction,java.xml.bind,java.xml.ws");
@@ -205,11 +205,11 @@ public class Compiler {
         return internalJava6Compile(compiler, wrapJavaFileManager(fileManager), setupDiagnosticListener(),
                                     fileList);
     }
-    
+
     protected JavaFileManager wrapJavaFileManager(StandardJavaFileManager standardJavaFileManger) {
         return standardJavaFileManger;
     }
-    
+
     protected DiagnosticListener<JavaFileObject> setupDiagnosticListener() {
         return new DiagnosticListener<JavaFileObject>() {
             public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
@@ -229,11 +229,11 @@ public class Compiler {
                     break;
                 default:
                     break;
-                }   
+                }
             }
         };
     }
-    
+
     protected boolean internalJava6Compile(JavaCompiler compiler, JavaFileManager fileManager,
                                            DiagnosticListener<JavaFileObject> listener,
                                            Iterable<? extends JavaFileObject> fileList) {
@@ -336,11 +336,11 @@ public class Compiler {
         }
         return strBuffer.toString().length() > 4096 ? true : false;
     }
-    
+
     private boolean isLongClasspath(String classpath) {
         return classpath.length() > 2048 ? true : false;
-    }   
-    
+    }
+
     private void checkLongClasspath(String classpath, List<String> list, int classpathIdx) {
         if (isLongClasspath(classpath)) {
             PrintWriter out = null;
@@ -354,12 +354,12 @@ public class Compiler {
             } catch (IOException e) {
                 System.err.print("[ERROR] can't write long classpath to @argfile");
             }
-        } 
+        }
     }
 
     public void setEncoding(String string) {
         encoding = string;
     }
 
-    
+
 }

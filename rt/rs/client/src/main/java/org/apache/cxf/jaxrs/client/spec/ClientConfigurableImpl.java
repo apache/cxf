@@ -31,20 +31,20 @@ import org.apache.cxf.jaxrs.impl.ConfigurableImpl;
 import org.apache.cxf.jaxrs.impl.ConfigurationImpl;
 
 public class ClientConfigurableImpl<C extends Configurable<C>> extends ConfigurableImpl<C> {
-    private static final Class<?>[] CLIENT_FILTER_INTERCEPTOR_CLASSES = 
+    private static final Class<?>[] CLIENT_FILTER_INTERCEPTOR_CLASSES =
         new Class<?>[] {ClientRequestFilter.class,
                         ClientResponseFilter.class,
                         ReaderInterceptor.class,
                         WriterInterceptor.class};
-    
-    
+
+
     public ClientConfigurableImpl(C configurable) {
         this(configurable, null);
     }
-    
+
     public ClientConfigurableImpl(C configurable, Configuration config) {
         super(configurable,
-              CLIENT_FILTER_INTERCEPTOR_CLASSES, 
+              CLIENT_FILTER_INTERCEPTOR_CLASSES,
               config == null ? new ConfigurationImpl(RuntimeType.CLIENT)
                   : new ConfigurationImpl(config, CLIENT_FILTER_INTERCEPTOR_CLASSES));
     }

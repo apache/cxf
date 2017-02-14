@@ -42,23 +42,23 @@ import org.apache.cxf.rs.security.jose.jws.JwsJsonProducer;
 
 public class AbstractJweJsonWriterProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJweJsonWriterProvider.class);
-    
+
     private List<JweEncryptionProvider> encProviders;
-    
+
     public void setEncryptionProvider(JweEncryptionProvider provider) {
         setEncryptionProviders(Collections.singletonList(provider));
     }
     public void setEncryptionProviders(List<JweEncryptionProvider> providers) {
         this.encProviders = providers;
     }
-    
+
     protected List<JweEncryptionProvider> getInitializedEncryptionProviders() {
         if (encProviders != null) {
-            return encProviders;    
-        } 
+            return encProviders;
+        }
         Message m = JAXRSUtils.getCurrentMessage();
-        Object propLocsProp = 
-            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_OUT_PROPS, 
+        Object propLocsProp =
+            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_ENCRYPTION_OUT_PROPS,
                                                JoseConstants.RSSEC_ENCRYPTION_PROPS);
         if (propLocsProp == null) {
             LOG.warning("JWE JSON init properties resource is not identified");
@@ -77,10 +77,10 @@ public class AbstractJweJsonWriterProvider {
         }
         return theEncProviders;
     }
-    protected void writeJws(JwsJsonProducer p, OutputStream os) 
+    protected void writeJws(JwsJsonProducer p, OutputStream os)
         throws IOException {
         byte[] bytes = StringUtils.toBytesUTF8(p.getJwsJsonSignedDocument());
         IOUtils.copy(new ByteArrayInputStream(bytes), os);
     }
-    
+
 }

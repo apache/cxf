@@ -95,10 +95,10 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
-    private static boolean unrestrictedPoliciesInstalled = 
+
+    private static boolean unrestrictedPoliciesInstalled =
             SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
-    
+
     private static boolean runTests;
     private static boolean portUpdated;
 
@@ -109,25 +109,25 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
             if (basedir == null) {
                 basedir = new File(".").getCanonicalPath();
             }
-            
+
             // Read in krb5.conf and substitute in the correct port
             Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/krb5.conf");
             String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
             content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
-            
+
             Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/wssec.spnego.krb5.conf");
             Files.write(path2, content.getBytes());
-            
+
             System.setProperty("java.security.krb5.conf", path2.toString());
-            
+
             portUpdated = true;
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         WSSConfig.init();
-        
+
         //
         // This test fails with the IBM JDK
         //
@@ -139,11 +139,11 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
             }
 
             // System.setProperty("sun.security.krb5.debug", "true");
-            System.setProperty("java.security.auth.login.config", 
+            System.setProperty("java.security.auth.login.config",
                                basedir + "/src/test/resources/kerberos.jaas");
-            
+
         }
-        
+
         // Launch servers
         org.junit.Assert.assertTrue(
             "Server failed to launch",
@@ -151,7 +151,7 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
             // set this to false to fork
             AbstractBusClientServerTestBase.launchServer(Server.class, true)
         );
-        
+
         org.junit.Assert.assertTrue(
             "Server failed to launch",
             // run the server in the same process
@@ -159,7 +159,7 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
             AbstractBusClientServerTestBase.launchServer(StaxServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -171,46 +171,46 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
         if (!runTests || !unrestrictedPoliciesInstalled) {
             return;
         }
-        
+
         String portName = "DoubleItSpnegoSymmetricPort";
         runKerberosTest(portName, false, PORT);
         runKerberosTest(portName, false, STAX_PORT);
         runKerberosTest(portName, true, PORT);
         runKerberosTest(portName, true, STAX_PORT);
     }
-    
+
     @org.junit.Test
     public void testSpnegoOverSymmetricDerived() throws Exception {
         if (!runTests || !unrestrictedPoliciesInstalled) {
             return;
         }
-        
+
         String portName = "DoubleItSpnegoSymmetricDerivedPort";
         runKerberosTest(portName, false, PORT);
         runKerberosTest(portName, false, STAX_PORT);
         runKerberosTest(portName, true, PORT);
         runKerberosTest(portName, true, STAX_PORT);
     }
-    
+
     @org.junit.Test
     public void testSpnegoOverSymmetricEncryptBeforeSigning() throws Exception {
         if (!runTests || !unrestrictedPoliciesInstalled) {
             return;
         }
-        
+
         String portName = "DoubleItSpnegoSymmetricEncryptBeforeSigningPort";
         runKerberosTest(portName, false, PORT);
         runKerberosTest(portName, false, STAX_PORT);
         runKerberosTest(portName, true, PORT);
         runKerberosTest(portName, true, STAX_PORT);
     }
-    
+
     @org.junit.Test
     public void testSpnegoOverTransport() throws Exception {
         if (!runTests || !unrestrictedPoliciesInstalled) {
             return;
         }
-        
+
         String portName = "DoubleItSpnegoTransportPort";
         runKerberosTest(portName, false, PORT2);
         runKerberosTest(portName, false, STAX_PORT2);
@@ -218,13 +218,13 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
         // runKerberosTest(portName, true, PORT2);
         // runKerberosTest(portName, true, STAX_PORT2);
     }
-    
+
     @org.junit.Test
     public void testSpnegoOverTransportEndorsing() throws Exception {
         if (!runTests || !unrestrictedPoliciesInstalled) {
             return;
         }
-        
+
         String portName = "DoubleItSpnegoTransportEndorsingPort";
         runKerberosTest(portName, false, PORT2);
         runKerberosTest(portName, false, STAX_PORT2);
@@ -232,13 +232,13 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
         // runKerberosTest(portName, true, PORT2);
         // runKerberosTest(portName, true, STAX_PORT2);
     }
-  
+
     @org.junit.Test
     public void testSpnegoOverTransportEndorsingSP11() throws Exception {
         if (!runTests || !unrestrictedPoliciesInstalled) {
             return;
         }
-        
+
         String portName = "DoubleItSpnegoTransportEndorsingSP11Port";
         runKerberosTest(portName, false, PORT2);
         runKerberosTest(portName, false, STAX_PORT2);
@@ -246,21 +246,21 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
         // runKerberosTest(portName, true, PORT2);
         // runKerberosTest(portName, true, STAX_PORT2);
     }
-    
+
     @org.junit.Test
     @org.junit.Ignore
     public void testSpnegoOverSymmetricSecureConversation() throws Exception {
         if (!runTests || !unrestrictedPoliciesInstalled) {
             return;
         }
-        
+
         String portName = "DoubleItSpnegoSymmetricSecureConversationPort";
         runKerberosTest(portName, false, PORT);
         //runKerberosTest(portName, false, STAX_PORT);
         //runKerberosTest(portName, true, PORT);
         //runKerberosTest(portName, true, STAX_PORT);
     }
-    
+
     private void runKerberosTest(String portName, boolean streaming, String portNumber) throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -273,17 +273,17 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
         URL wsdl = SpnegoTokenTest.class.getResource("DoubleItSpnego.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, portName);
-        DoubleItPortType kerberosPort = 
+        DoubleItPortType kerberosPort =
                 service.getPort(portQName, DoubleItPortType.class);
-        
+
         TestUtil.updateAddressPort(kerberosPort, portNumber);
-        
+
         if (streaming) {
             SecurityTestUtil.enableStreaming(kerberosPort);
         }
-        
+
         Assert.assertEquals(50, kerberosPort.doubleIt(25));
-        
+
         ((java.io.Closeable)kerberosPort).close();
         bus.shutdown(true);
     }

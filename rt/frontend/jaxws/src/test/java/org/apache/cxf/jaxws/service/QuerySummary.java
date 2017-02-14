@@ -28,5 +28,5 @@ public class QuerySummary {
     public void setText(String text) {
         this.text = text;
     }
-    
+
 }

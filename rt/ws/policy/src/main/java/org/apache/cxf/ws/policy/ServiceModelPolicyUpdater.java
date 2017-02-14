@@ -72,11 +72,11 @@ public class ServiceModelPolicyUpdater {
     public void addPolicyAttachments(Collection<PolicyAttachment> attachments) {
         for (PolicyAttachment pa : attachments) {
             boolean policyUsed = false;
-            
+
             for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
                 BindingMessageInfo inputMessage = boi.getInput();
                 BindingMessageInfo outputMessage = boi.getOutput();
-                
+
                 if (pa.appliesTo(boi)) {
                     // Add wsp:PolicyReference to wsdl:binding/wsdl:operation
                     addPolicyRef(boi, pa.getPolicy());
@@ -130,7 +130,7 @@ public class ServiceModelPolicyUpdater {
             if (!StringUtils.isEmpty(ei.getAddress())) {
                 description.setBaseURI(ei.getAddress() + "?wsdl");
             }
-            
+
             ei.getService().setDescription(description);
         }
         ei.getService().getDescription().addExtensor(uee);

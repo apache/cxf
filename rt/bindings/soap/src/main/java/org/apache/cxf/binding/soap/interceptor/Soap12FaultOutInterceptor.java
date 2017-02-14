@@ -54,21 +54,21 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
             message.getInterceptorChain().add(Soap12FaultOutInterceptorInternal.INSTANCE);
         }
     }
-    
+
     static class Soap12FaultOutInterceptorInternal extends AbstractSoapInterceptor {
         static final Soap12FaultOutInterceptorInternal INSTANCE = new Soap12FaultOutInterceptorInternal();
-        
+
         Soap12FaultOutInterceptorInternal() {
             super(Phase.MARSHAL);
         }
         public void handleMessage(SoapMessage message) throws Fault {
             LOG.info(getClass() + (String) message.get(SoapMessage.CONTENT_TYPE));
-            
+
             XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
             Fault f = (Fault)message.getContent(Exception.class);
             message.put(org.apache.cxf.message.Message.RESPONSE_CODE, f.getStatusCode());
-    
-            SoapFault fault = SoapFault.createFault(f, message.getVersion());       
+
+            SoapFault fault = SoapFault.createFault(f, message.getVersion());
 
             try {
                 Map<String, String> namespaces = fault.getNamespaces();
@@ -88,8 +88,8 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
 
                 writer.writeStartElement(defaultPrefix, "Code", ns);
                 writer.writeStartElement(defaultPrefix, "Value", ns);
-           
-                writer.writeCharacters(fault.getCodeString(getFaultCodePrefix(writer, fault.getFaultCode()), 
+
+                writer.writeCharacters(fault.getCodeString(getFaultCodePrefix(writer, fault.getFaultCode()),
                                                            defaultPrefix));
                 writer.writeEndElement();
 
@@ -98,7 +98,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                     for (QName fsc : fault.getSubCodes()) {
                         writer.writeStartElement(defaultPrefix, "Subcode", ns);
                         writer.writeStartElement(defaultPrefix, "Value", ns);
-                        writer.writeCharacters(getCodeString(getFaultCodePrefix(writer, fsc), 
+                        writer.writeCharacters(getCodeString(getFaultCodePrefix(writer, fsc),
                                                              defaultPrefix, fsc));
                         writer.writeEndElement();
                         fscCount++;
@@ -127,7 +127,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
                 }
 
                 prepareStackTrace(message, fault);
-                
+
                 if (fault.hasDetails()) {
                     Element detail = fault.getDetail();
                     writer.writeStartElement(defaultPrefix, "Detail", ns);
@@ -150,7 +150,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
             }
         }
 
-        private String getLangCode() {        
+        private String getLangCode() {
             String code = LOG.getResourceBundle().getLocale().getLanguage();
             if (StringUtils.isEmpty(code)) {
                 return "en";
@@ -169,8 +169,8 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
             } else {
                 codePrefix = prefix;
             }
-            
-            return codePrefix + ":" + code.getLocalPart();        
+
+            return codePrefix + ":" + code.getLocalPart();
         }
     }
 }

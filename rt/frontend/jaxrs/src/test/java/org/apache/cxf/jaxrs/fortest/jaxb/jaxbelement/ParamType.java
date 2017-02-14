@@ -30,11 +30,11 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "paramType", propOrder = {"comment"} )
 public class ParamType implements Serializable {
     private static final long serialVersionUID = 4935166047393324749L;
-    
+
     @XmlElement(name = "comment")
     protected String comment;
 
-    
+
     public String getComment() {
         return comment;
     }

@@ -45,38 +45,38 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly",
                    launchServer(BookCxfContinuationServer.class));
     }
-    
+
     @Test
     public void testContinuation() throws Exception {
-        
+
         doTestContinuation("books");
     }
-    
+
     @Test
     public void testContinuationSubresource() throws Exception {
-        
+
         doTestContinuation("books/subresources");
     }
-    
+
     private void doTestContinuation(String pathSegment) throws Exception {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(10));
         CountDownLatch startSignal = new CountDownLatch(1);
         CountDownLatch doneSignal = new CountDownLatch(1);
-        
-        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/" + pathSegment + "/1", 
-                                        "1", 
+
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/" + pathSegment + "/1",
+                                        "1",
                                         "CXF in Action1", startSignal, doneSignal));
         startSignal.countDown();
         doneSignal.await(60, TimeUnit.SECONDS);
         executor.shutdownNow();
         assertEquals("Not all invocations have completed", 0, doneSignal.getCount());
     }
-    
+
     private void checkBook(String address, String id, String expected) throws Exception {
         GetMethod get = new GetMethod(address);
         HttpClient httpclient = new HttpClient();
-        
+
         try {
             int result = httpclient.executeMethod(get);
             assertEquals(200, result);
@@ -87,7 +87,7 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
             get.releaseConnection();
         }
     }
-    
+
     @Ignore
     private class BookWorker implements Runnable {
 
@@ -107,9 +107,9 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
             this.startSignal = startSignal;
             this.doneSignal = doneSignal;
         }
-        
+
         public void run() {
-            
+
             try {
                 startSignal.await();
                 checkBook(address, id, expected);
@@ -119,10 +119,10 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
             } catch (Exception ex) {
                 ex.printStackTrace();
                 Assert.fail("Book thread failed for : " + id);
-            } 
-            
+            }
+
         }
-        
+
     }
 
     @Test

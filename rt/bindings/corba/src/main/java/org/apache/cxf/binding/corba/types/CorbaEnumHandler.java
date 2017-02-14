@@ -30,18 +30,18 @@ public class CorbaEnumHandler extends CorbaObjectHandler {
 
     private String value;
     private long index;
-    
+
     public CorbaEnumHandler(QName enumName, QName enumIdlType, TypeCode enumTC, Object enumType) {
         super(enumName, enumIdlType, enumTC, enumType);
     }
-    
+
     public String getValue() {
         return value;
     }
-    
+
     public void setValue(String val) {
         value = val;
-        
+
         Enum enumType = (Enum)this.type;
         List<Enumerator> enumerators = enumType.getEnumerator();
         index = -1;
@@ -53,7 +53,7 @@ public class CorbaEnumHandler extends CorbaObjectHandler {
             }
         }
     }
-    
+
     public long getIndex() {
         return index;
     }

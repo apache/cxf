@@ -28,23 +28,23 @@ import java.util.List;
 public abstract class AbstractAnnotationVisitor implements AnnotationVisitor {
     protected Object target;
     protected Class<?> targetClass;
-    
 
-    private final List<Class<? extends Annotation>> targetAnnotations = 
-                                 new ArrayList<Class<? extends Annotation>>(); 
-    
-    
+
+    private final List<Class<? extends Annotation>> targetAnnotations =
+                                 new ArrayList<Class<? extends Annotation>>();
+
+
     protected AbstractAnnotationVisitor(Class<? extends Annotation> ann) {
         addTargetAnnotation(ann);
     }
-    
+
     protected AbstractAnnotationVisitor(List<Class<? extends Annotation>> ann) {
         targetAnnotations.addAll(ann);
     }
 
-    protected final void addTargetAnnotation(Class<? extends Annotation> ann) { 
-        targetAnnotations.add(ann); 
-    } 
+    protected final void addTargetAnnotation(Class<? extends Annotation> ann) {
+        targetAnnotations.add(ann);
+    }
 
     public void visitClass(Class<?> clz, Annotation annotation) {
         // complete
@@ -70,12 +70,12 @@ public abstract class AbstractAnnotationVisitor implements AnnotationVisitor {
         target = object;
         targetClass = cls;
     }
-    
-    public Object getTarget() { 
+
+    public Object getTarget() {
         return target;
-    } 
-    public Class<?> getTargetClass() { 
+    }
+    public Class<?> getTargetClass() {
         return targetClass;
-    } 
+    }
 
 }

@@ -32,10 +32,10 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * 
+ *
  */
 public class HashMapAdapter extends XmlAdapter<HashMapAdapter.HashMapType, Map<String, byte[]>> {
-    
+
     @XmlType()
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class HashMapEntryType {
@@ -72,7 +72,7 @@ public class HashMapAdapter extends XmlAdapter<HashMapAdapter.HashMapType, Map<S
             this.entry = entry;
         }
     }
-    
+
     public HashMapType marshal(Map<String, byte[]> arg0) throws Exception {
         HashMapType myHashMapType = new HashMapType();
         if (arg0 != null && arg0.size() > 0) {

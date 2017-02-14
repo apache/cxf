@@ -25,13 +25,13 @@ import javax.xml.namespace.QName;
 
 
 public class EJBServantConfig {
-    
+
     private String jndiName;
-    
+
     private QName serviceName;
-    
+
     private String wsdlURL;
-    
+
     public EJBServantConfig(String jndiName, String value) {
         this.jndiName = jndiName;
         StringTokenizer st = new StringTokenizer(value, "@", true);
@@ -48,9 +48,9 @@ public class EJBServantConfig {
                 }
             }
         }
-        
+
     }
-    
+
     public String getJNDIName() {
         return jndiName;
     }
@@ -74,8 +74,8 @@ public class EJBServantConfig {
     public void setWsdlURL(String wsdlURL) {
         this.wsdlURL = wsdlURL;
     }
-    
-    
+
+
     private QName getServiceName(String sname) {
         StringTokenizer st = new StringTokenizer(sname, "}", false);
         String namespace = "";

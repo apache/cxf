@@ -40,23 +40,23 @@ import org.atmosphere.cpr.Broadcaster;
 
 public class SseAtmosphereEventSinkImpl implements SseEventSink {
     private static final Logger LOG = LogUtils.getL7dLogger(SseAtmosphereEventSinkImpl.class);
-    
+
     private final AtmosphereResource resource;
     private final MessageBodyWriter<OutboundSseEvent> writer;
-    
+
     private volatile boolean closed;
-    
-    public SseAtmosphereEventSinkImpl(final MessageBodyWriter<OutboundSseEvent> writer, 
+
+    public SseAtmosphereEventSinkImpl(final MessageBodyWriter<OutboundSseEvent> writer,
             final AtmosphereResource resource) {
         this.writer = writer;
         this.resource = resource;
-        
+
         if (!resource.isSuspended()) {
             LOG.fine("Atmosphere resource is not suspended, suspending");
             resource.suspend();
         }
     }
-    
+
     @Override
     public void close() throws IOException {
         if (!closed) {
@@ -70,14 +70,14 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
 
             final Broadcaster broadcaster = resource.getBroadcaster();
             resource.removeFromAllBroadcasters();
-            
+
             try {
                 final AtmosphereResponse response = resource.getResponse();
                 if (!response.isCommitted()) {
                     LOG.fine("Response is not committed, flushing buffer");
                     response.flushBuffer();
                 }
-                
+
                 response.closeStreamOrWriter();
             } finally {
                 resource.close();
@@ -86,23 +86,23 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
             }
         }
     }
-    
+
     @Override
     public void onNext(OutboundSseEvent event) {
         if (!closed && writer != null) {
             try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
                 writer.writeTo(event, event.getClass(), null, new Annotation [] {}, event.getMediaType(), null, os);
-                
+
                 // Atmosphere broadcasts asynchronously which is acceptable in most cases.
                 // Unfortunately, calling close() may lead to response stream being closed
                 // while there are still some SSE delivery scheduled.
                 final Future<Object> future = resource
                     .getBroadcaster()
                     .broadcast(os.toString(StandardCharsets.UTF_8.name()));
-                
+
                 try {
                     if (!future.isDone()) {
-                        // Let us wait at least 200 milliseconds before returning to ensure 
+                        // Let us wait at least 200 milliseconds before returning to ensure
                         // that SSE had the opportunity to be delivered.
                         LOG.info("Waiting 200ms to ensure SSE Atmosphere response is delivered");
                         future.get(200, TimeUnit.MILLISECONDS);
@@ -117,12 +117,12 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
             }
         }
     }
-    
+
     @Override
     public void onError(Throwable throwable) {
         // TODO: Should we close the response?
     }
-    
+
     @Override
     public void onComplete() {
         try {
@@ -131,7 +131,7 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
             LOG.warning("While closing the SSE connection, an exception was raised: " + ex);
         }
     }
-    
+
     @Override
     public void onSubscribe(Subscription subscription) {
         subscription.request(Long.MAX_VALUE);

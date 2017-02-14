@@ -24,88 +24,88 @@ import java.util.Map;
  * Represents the current search expression.
  */
 public interface SearchContext {
-    
+
     /**
-     * Returns the typed search condition representing 
-     * the search expression which is extracted from 
+     * Returns the typed search condition representing
+     * the search expression which is extracted from
      * the request URI
-     * 
-     * @param cls the type of the bean(s) the new search condition will 
+     *
+     * @param cls the type of the bean(s) the new search condition will
      *        attempt to match
      * @return the search condition
      */
     <T> SearchCondition<T> getCondition(Class<T> cls);
-    
+
     /**
-     * Returns the typed search condition representing 
-     * the search expression which is extracted from 
+     * Returns the typed search condition representing
+     * the search expression which is extracted from
      * the request URI
-     * 
-     * @param cls the type of the bean(s) the new search condition will 
+     *
+     * @param cls the type of the bean(s) the new search condition will
      *        attempt to match
-     * @param beanProperties mapping between search and bean properties       
+     * @param beanProperties mapping between search and bean properties
      * @return the search condition
      */
     <T> SearchCondition<T> getCondition(Class<T> cls, Map<String, String> beanProperties);
-    
+
     /**
-     * Returns the typed search condition representing 
-     * the search expression which is extracted from 
+     * Returns the typed search condition representing
+     * the search expression which is extracted from
      * the request URI
-     * 
-     * @param cls the type of the bean(s) the new search condition will 
+     *
+     * @param cls the type of the bean(s) the new search condition will
      *        attempt to match
      * @param beanProperties mapping between search and bean properties
-     * @param parserProperties parser properties       
+     * @param parserProperties parser properties
      * @return the search condition
      */
-    <T> SearchCondition<T> getCondition(Class<T> cls, 
-                                        Map<String, String> beanProperties, 
+    <T> SearchCondition<T> getCondition(Class<T> cls,
+                                        Map<String, String> beanProperties,
                                         Map<String, String> parserProperties);
-    
-    
+
+
     /**
-     * Returns the typed search condition representing 
+     * Returns the typed search condition representing
      * the provided search expression
-     * 
+     *
      * @param expression the search expression
-     * @param cls the type of the bean(s) the new search condition will 
+     * @param cls the type of the bean(s) the new search condition will
      *        attempt to match
      * @return the search condition
      */
     <T> SearchCondition<T> getCondition(String expression, Class<T> cls);
-    
+
     /**
-     * Returns the typed search condition representing 
+     * Returns the typed search condition representing
      * the provided search expression
-     * 
+     *
      * @param expression the search expression
-     * @param cls the type of the bean(s) the new search condition will 
+     * @param cls the type of the bean(s) the new search condition will
      *        attempt to match
-     * @param beanProperties mapping between search and bean properties       
+     * @param beanProperties mapping between search and bean properties
      * @return the search condition
      */
     <T> SearchCondition<T> getCondition(String expression, Class<T> cls, Map<String, String> beanProperties);
-    
+
     /**
-     * Returns the typed search condition representing 
+     * Returns the typed search condition representing
      * the provided search expression
-     * 
+     *
      * @param expression the search expression
-     * @param cls the type of the bean(s) the new search condition will 
+     * @param cls the type of the bean(s) the new search condition will
      *        attempt to match
      * @param beanProperties mapping between search and bean properties
-     * @param parserProperties parser properties       
+     * @param parserProperties parser properties
      * @return the search condition
      */
-    <T> SearchCondition<T> getCondition(String expression, Class<T> cls, 
+    <T> SearchCondition<T> getCondition(String expression, Class<T> cls,
                                         Map<String, String> beanProperties,
                                         Map<String, String> parserProperties);
-    
-    
+
+
     /**
      * Returns the search expression
-     * @return the expression which is extracted from 
+     * @return the expression which is extracted from
      *         the request URI, can be null
      */
     String getSearchExpression();

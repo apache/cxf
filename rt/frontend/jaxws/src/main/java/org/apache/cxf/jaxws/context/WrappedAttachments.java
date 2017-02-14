@@ -39,12 +39,12 @@ import org.apache.cxf.message.Attachment;
 class WrappedAttachments implements Set<Attachment> {
     private Map<String, DataHandler> attachments;
     private Map<String, Attachment> cache;
-        
+
     WrappedAttachments(Map<String, DataHandler> attachments) {
         this.attachments = attachments;
         this.cache = new HashMap<String, Attachment>();
     }
-        
+
     public int size() {
         return attachments.size();
     }
@@ -70,7 +70,7 @@ class WrappedAttachments implements Set<Attachment> {
 
     @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) {
-        T[] copy = a.length == attachments.size() 
+        T[] copy = a.length == attachments.size()
             ? a : (T[])Array.newInstance(a.getClass(), attachments.size());
         int i = 0;
         for (Map.Entry<String, DataHandler> entry : attachments.entrySet()) {
@@ -81,7 +81,7 @@ class WrappedAttachments implements Set<Attachment> {
             }
             copy[i++] = (T)o;
         }
-        return copy;        
+        return copy;
     }
 
     public boolean add(Attachment e) {
@@ -96,7 +96,7 @@ class WrappedAttachments implements Set<Attachment> {
     public boolean remove(Object o) {
         if (o instanceof Attachment) {
             cache.remove(((Attachment) o).getId());
-            return attachments.remove(((Attachment) o).getId()) != null; 
+            return attachments.remove(((Attachment) o).getId()) != null;
         }
         return false;
     }
@@ -135,7 +135,7 @@ class WrappedAttachments implements Set<Attachment> {
                 ids.add(((Attachment)o).getId());
             }
         }
-        
+
         for (Iterator<String> it = attachments.keySet().iterator(); it.hasNext();) {
             String k = it.next();
             if (!ids.contains(k)) {
@@ -168,15 +168,15 @@ class WrappedAttachments implements Set<Attachment> {
     Map<String, DataHandler> getAttachments() {
         return attachments;
     }
-    
+
     class WrappedAttachmentsIterator implements Iterator<Attachment> {
         private Iterator<Map.Entry<String, DataHandler>> iterator;
         private String key;
-        
-        WrappedAttachmentsIterator(Iterator<Map.Entry<String, DataHandler>> iterator) { 
+
+        WrappedAttachmentsIterator(Iterator<Map.Entry<String, DataHandler>> iterator) {
             this.iterator = iterator;
         }
-            
+
         public boolean hasNext() {
             return iterator.hasNext();
         }

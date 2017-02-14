@@ -26,7 +26,7 @@ import org.apache.cxf.sts.request.ReceivedToken;
  */
 public class TokenCancellerResponse {
     private ReceivedToken token;
-    
+
     public ReceivedToken getToken() {
         return token;
     }
@@ -34,5 +34,5 @@ public class TokenCancellerResponse {
     public void setToken(ReceivedToken token) {
         this.token = token;
     }
-    
+
 }

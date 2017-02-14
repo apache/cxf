@@ -39,12 +39,12 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
     private String address;
     private Endpoint ep;
     private Class<?> cls;
- 
+
     public Server(String[] args) throws Exception {
         address = args[0];
         cls = Class.forName(args[1]);
     }
-    
+
     protected void run() {
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/systest/ws/addressing/server.xml");
@@ -61,7 +61,7 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
             throw new RuntimeException(ex);
         }
     }
-     
+
     public void tearDown() {
         ep.stop();
         ep = null;
@@ -86,15 +86,15 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
         }
     }
 
-        
+
     public static void main(String[] args) {
-        try { 
-            Server s = new Server(args); 
+        try {
+            Server s = new Server(args);
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally { 
+        } finally {
             System.out.println("done!");
         }
     }
@@ -116,7 +116,7 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
     protected boolean verify(Logger log) {
         if (verified != null) {
             System.out.println("MAP/Header verification failed: " + verified);
-            log.log(Level.WARNING, 
+            log.log(Level.WARNING,
                     "MAP/Header verification failed: {0}",
                     verified);
         }

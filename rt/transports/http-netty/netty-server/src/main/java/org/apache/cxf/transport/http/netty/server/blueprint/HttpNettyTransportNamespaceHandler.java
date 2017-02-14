@@ -36,9 +36,9 @@ import org.osgi.service.blueprint.reflect.Metadata;
 @Namespaces("http://cxf.apache.org/transports/http-netty-server/configuration")
 public class HttpNettyTransportNamespaceHandler extends BaseNamespaceHandler {
 
-    public static final String NETTY_SERVER_TRANSPORT = 
+    public static final String NETTY_SERVER_TRANSPORT =
         "http://cxf.apache.org/transports/http-netty-server/configuration";
-    
+
     private static final String NETTY_SERVER_ENGINE_FACTORY = "engine-factory";
 
     private static final Logger LOG = LogUtils.getL7dLogger(HttpNettyTransportNamespaceHandler.class);
@@ -70,8 +70,8 @@ public class HttpNettyTransportNamespaceHandler extends BaseNamespaceHandler {
         return null;
     }
 
-    public ComponentMetadata decorate(Node node, 
-                                      ComponentMetadata componentMetadata, 
+    public ComponentMetadata decorate(Node node,
+                                      ComponentMetadata componentMetadata,
                                       ParserContext parserContext) {
         LOG.info("Decorating node " + node + " " + componentMetadata);
         return componentMetadata;

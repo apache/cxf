@@ -31,24 +31,24 @@ import org.apache.cxf.systest.jaxrs.security.Book;
 
 @Path("/bookstore")
 public class SecureClaimBookStore {
-    
+
     public SecureClaimBookStore() {
     }
-    
+
     @POST
     @Path("/books")
     @Produces("application/xml")
     @Consumes("application/xml")
-    @Claims({ 
+    @Claims({
         @Claim({"admin" }),
-        @Claim(name = "http://claims/authentication", 
-               format = "http://claims/authentication-format", 
+        @Claim(name = "http://claims/authentication",
+               format = "http://claims/authentication-format",
                value = {"fingertip", "smartcard" })
     })
     public Book addBook(Book book) {
         return book;
     }
-    
+
 }
 
 

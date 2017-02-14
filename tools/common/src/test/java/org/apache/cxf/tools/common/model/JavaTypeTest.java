@@ -28,7 +28,7 @@ public class JavaTypeTest extends Assert {
         assertEquals("0", new JavaType("i", int.class.getName(), null).getDefaultTypeValue());
         assertEquals("false", new JavaType("i", boolean.class.getName(), null).getDefaultTypeValue());
         assertEquals("new javax.xml.namespace.QName(\"\", \"\")",
-                     new JavaType("i", 
+                     new JavaType("i",
                                   javax.xml.namespace.QName.class.getName(), null).getDefaultTypeValue());
     }
 

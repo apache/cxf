@@ -28,7 +28,7 @@ import org.apache.cxf.message.Exchange;
 
 /**
  * This invoker implementation calls a Factory to create the service object.
- * 
+ *
  */
 public class FactoryInvoker extends AbstractInvoker {
     static final ResourceBundle BUNDLE = BundleUtils.getBundle(FactoryInvoker.class);
@@ -37,7 +37,7 @@ public class FactoryInvoker extends AbstractInvoker {
 
     /**
      * Create a FactoryInvoker object.
-     * 
+     *
      * @param factory the factory used to create service object.
      */
     public FactoryInvoker(Factory factory) {
@@ -58,12 +58,12 @@ public class FactoryInvoker extends AbstractInvoker {
             throw new Fault(new Message("CREATE_SERVICE_OBJECT_EXC", BUNDLE), e);
         }
     }
-    
+
     public void releaseServiceObject(final Exchange ex, Object obj) {
         factory.release(ex, obj);
     }
-    
+
     public boolean isSingletonFactory() {
-        return factory instanceof SingletonFactory; 
+        return factory instanceof SingletonFactory;
     }
 }

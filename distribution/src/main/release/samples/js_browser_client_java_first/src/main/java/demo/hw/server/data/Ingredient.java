@@ -20,7 +20,7 @@ package demo.hw.server.data;
 
 public class Ingredient {
     private String name;
-    private Category category;     
+    private Category category;
 
     @Override
     public boolean equals(Object obj) {
@@ -31,8 +31,8 @@ public class Ingredient {
             return false;
         }
     }
-    
-        
+
+
     public String getName() {
         return name;
     }
@@ -45,7 +45,7 @@ public class Ingredient {
     public void setCategory(Category category) {
         this.category = category;
     }
-    
+
     @Override
     public int hashCode() {
         return name.hashCode() + (37 * category.hashCode());

@@ -44,23 +44,23 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ServiceModelUtilsTest extends AbstractJaxWsTest {
-   
+
     Message message;
     Exchange exchange;
     ReflectionServiceFactoryBean bean;
-    
+
     @Before
     public void setUp() throws Exception {
         super.setUpBus();
-        
-        message = new MessageImpl();        
+
+        message = new MessageImpl();
         exchange = new ExchangeImpl();
-        message.setExchange(exchange); 
-        
+        message.setExchange(exchange);
+
         bean = new JaxWsServiceFactoryBean();
         bean.setBus(getBus());
     }
-    
+
     private Service getService(URL wsdl, Class<?> implClz, QName port) throws EndpointException {
         assertNotNull(wsdl);
         bean.setWsdlURL(wsdl.toString());
@@ -78,27 +78,27 @@ public class ServiceModelUtilsTest extends AbstractJaxWsTest {
         getService(getClass().getResource("/wsdl/hello_world.wsdl"),
                    GreeterImpl.class,
                    new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
-        
+
         BindingOperationInfo operation = ServiceModelUtil.getOperation(message.getExchange(), "greetMe");
         assertNotNull(operation);
         List<String> names = ServiceModelUtil.getOperationInputPartNames(operation.getOperationInfo());
         assertNotNull(names);
         assertEquals(1, names.size());
         assertEquals("requestType", names.get(0));
-        
+
         operation = ServiceModelUtil.getOperation(message.getExchange(), "sayHi");
         assertNotNull(operation);
         names = ServiceModelUtil.getOperationInputPartNames(operation.getOperationInfo());
         assertNotNull(names);
         assertEquals(0, names.size());
     }
-    
+
     @Test
     public void testGetOperationInputPartNamesWrapped2() throws Exception {
         getService(getClass().getResource("/wsdl/calculator.wsdl"),
                    CalculatorImpl.class,
                    new QName("http://apache.org/cxf/calculator", "CalculatorPort"));
-        
+
         BindingOperationInfo operation = ServiceModelUtil.getOperation(message.getExchange(), "add");
         assertNotNull(operation);
         List<String> names = ServiceModelUtil.getOperationInputPartNames(operation.getOperationInfo());
@@ -119,15 +119,15 @@ public class ServiceModelUtilsTest extends AbstractJaxWsTest {
         assertNotNull(names);
         assertEquals(1, names.size());
         assertEquals("requestType", names.get(0));
-        
+
         operation = ServiceModelUtil.getOperation(message.getExchange(), "sayHi");
         assertNotNull(operation);
         names = ServiceModelUtil.getOperationInputPartNames(operation.getOperationInfo());
         assertNotNull(names);
-        assertEquals(0, names.size());        
+        assertEquals(0, names.size());
     }
-    
-    
+
+
     @Test
     public void testGetOperationInputPartNamesRpc() throws Exception {
         getService(getClass().getResource("/wsdl/hello_world_rpc_lit.wsdl"),
@@ -139,13 +139,13 @@ public class ServiceModelUtilsTest extends AbstractJaxWsTest {
         assertNotNull(names);
         assertEquals(1, names.size());
         assertEquals("in", names.get(0));
-        
+
         operation = ServiceModelUtil.getOperation(message.getExchange(), "sayHi");
         assertNotNull(operation);
         names = ServiceModelUtil.getOperationInputPartNames(operation.getOperationInfo());
         assertNotNull(names);
         assertEquals(0, names.size());
-        
+
         operation = ServiceModelUtil.getOperation(message.getExchange(), "greetUs");
         assertNotNull(operation);
         names = ServiceModelUtil.getOperationInputPartNames(operation.getOperationInfo());

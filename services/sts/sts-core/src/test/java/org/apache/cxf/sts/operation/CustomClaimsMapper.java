@@ -35,9 +35,9 @@ public class CustomClaimsMapper implements ClaimsMapper {
     public ProcessedClaimCollection mapClaims(String sourceRealm,
             ProcessedClaimCollection sourceClaims, String targetRealm,
             ClaimsParameters parameters) {
-        
+
         ProcessedClaimCollection targetClaims = new ProcessedClaimCollection();
-        
+
         for (ProcessedClaim c : sourceClaims) {
             ProcessedClaim nc = new ProcessedClaim();
             nc.setClaimType(c.getClaimType());
@@ -51,7 +51,7 @@ public class CustomClaimsMapper implements ClaimsMapper {
             }
             targetClaims.add(nc);
         }
-        
+
         return targetClaims;
     }
 

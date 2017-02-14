@@ -43,16 +43,16 @@ public class StaxServer {
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/GreeterPort";
         EndpointImpl impl = (EndpointImpl)Endpoint.publish(address, implementor);
-        
+
         WSSSecurityProperties properties = new WSSSecurityProperties();
         properties.addAction(WSSConstants.USERNAMETOKEN);
         properties.addAction(WSSConstants.TIMESTAMP);
 
         properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
         properties.setTokenUser("Alice");
-        
+
         properties.setCallbackHandler(new UTPasswordCallback());
-        
+
         impl.getOutInterceptors().add(new WSS4JStaxOutInterceptor(properties));
 
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
@@ -60,7 +60,7 @@ public class StaxServer {
         inProperties.addAction(WSSConstants.TIMESTAMP);
         inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
         inProperties.setCallbackHandler(new UTPasswordCallback());
-        
+
         impl.getInInterceptors().add(new WSS4JStaxInInterceptor(inProperties));
     }
 

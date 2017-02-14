@@ -51,7 +51,7 @@ public class AccessTokenGrantWriter implements MessageBodyWriter<AccessTokenGran
     public void writeTo(AccessTokenGrant t, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
                         OutputStream entityStream) throws IOException, WebApplicationException {
-        String form = FormUtils.formToString(new Form(t.toMap()));    
+        String form = FormUtils.formToString(new Form(t.toMap()));
         entityStream.write(form.getBytes());
     }
 

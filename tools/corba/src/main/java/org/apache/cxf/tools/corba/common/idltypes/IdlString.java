@@ -28,12 +28,12 @@ public final class IdlString extends IdlDefnImplBase implements IdlType {
         super(null, "string<" + boundValue + "> ");
         this.bound = boundValue;
     }
-    
+
     private IdlString() {
         super(null, "string");
         bound = 0;
     }
-    
+
     public static IdlString create() {
         return new IdlString();
     }
@@ -58,6 +58,6 @@ public final class IdlString extends IdlDefnImplBase implements IdlType {
         if (bound != 0) {
             pw.print("<" + bound + "> ");
         }
-    }    
-    
+    }
+
 }

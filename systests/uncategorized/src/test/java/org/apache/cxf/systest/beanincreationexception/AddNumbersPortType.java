@@ -40,7 +40,7 @@ public interface AddNumbersPortType {
     @RequestWrapper(localName = "addNumbers", targetNamespace = "http://apache.org/xmllist")
     @ResponseWrapper(localName = "addNumbersResponse", targetNamespace = "http://apache.org/xmllist")
     List<Integer> addNumbers(
-        @WebParam(name = "arg", targetNamespace = "http://apache.org/xmllist") 
+        @WebParam(name = "arg", targetNamespace = "http://apache.org/xmllist")
         @XmlList List<String> arg);
 
     // test for CXF-1752

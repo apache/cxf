@@ -28,26 +28,26 @@ import io.swagger.jaxrs.config.SwaggerContextService;
 
 class SyntheticServletConfig implements ServletConfig {
     private final ServletContext delegate;
-    
+
     SyntheticServletConfig(final ServletContext context) {
         this.delegate = context;
     }
-    
+
     @Override
     public String getServletName() {
         return null; /* no servlet available */
     }
-    
+
     @Override
     public ServletContext getServletContext() {
         return delegate;
     }
-    
+
     @Override
     public Enumeration<String> getInitParameterNames() {
         return delegate.getInitParameterNames();
     }
-    
+
     @Override
     public String getInitParameter(String name) {
         if (Objects.equals(SwaggerContextService.USE_PATH_BASED_CONFIG, name)) {

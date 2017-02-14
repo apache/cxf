@@ -30,7 +30,7 @@ public class ExceptionType {
 
     /**
      * Gets the value of the message property.
-     * 
+     *
      * @return possible object is {@link String }
      */
     public String getMessage() {
@@ -39,7 +39,7 @@ public class ExceptionType {
 
     /**
      * Sets the value of the message property.
-     * 
+     *
      * @param value allowed object is {@link String }
      */
     public void setMessage(String value) {

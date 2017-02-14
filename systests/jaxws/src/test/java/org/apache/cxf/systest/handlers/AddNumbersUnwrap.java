@@ -25,15 +25,15 @@ import javax.jws.WebService;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
-//CHECKSTYLE:OFF 
+//CHECKSTYLE:OFF
 @WebService(targetNamespace = "http://apache.org/handlers", name = "AddNumbers")
 public interface AddNumbersUnwrap {
 
     @WebResult(name = "return", targetNamespace = "http://apache.org/handlers/types")
-    @RequestWrapper(localName = "addNumbers", targetNamespace = "http://apache.org/handlers/types", 
+    @RequestWrapper(localName = "addNumbers", targetNamespace = "http://apache.org/handlers/types",
                     className = "org.apache.cxf.systest.handlers.types.AddNumbers")
     @WebMethod
-    @ResponseWrapper(localName = "addNumbersResponse", targetNamespace = "http://apache.org/handlers/types", 
+    @ResponseWrapper(localName = "addNumbersResponse", targetNamespace = "http://apache.org/handlers/types",
                      className = "org.apache.cxf.systest.handlers.types.AddNumbersResponse")
     public int addNumbers(
         @WebParam(name = "arg0", targetNamespace = "http://apache.org/handlers/types")

@@ -39,7 +39,7 @@ public class BraveFeature extends AbstractFeature {
     public BraveFeature() {
         this("cxf-svc-" + UUID.randomUUID().toString());
     }
-    
+
     public BraveFeature(final String name) {
         this(new Brave.Builder(name).build());
     }

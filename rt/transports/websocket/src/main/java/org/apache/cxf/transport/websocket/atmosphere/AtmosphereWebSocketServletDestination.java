@@ -43,7 +43,7 @@ import org.atmosphere.cpr.AtmosphereResponseImpl;
 import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
 
 /**
- * 
+ *
  */
 public class AtmosphereWebSocketServletDestination extends ServletDestination implements
     WebSocketDestinationService {
@@ -51,7 +51,7 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
 
     private AtmosphereFramework framework;
 
-    public AtmosphereWebSocketServletDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei, 
+    public AtmosphereWebSocketServletDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                                  String path) throws IOException {
         super(bus, registry, ei, path);
         framework = new AtmosphereFramework(false, true);
@@ -72,7 +72,7 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
                        HttpServletResponse resp) throws IOException {
         if (AtmosphereUtils.useAtmosphere(req)) {
             try {
-                framework.doCometSupport(AtmosphereRequestImpl.wrap(req), 
+                framework.doCometSupport(AtmosphereRequestImpl.wrap(req),
                                          AtmosphereResponseImpl.wrap(resp));
             } catch (ServletException e) {
                 throw new IOException(e);
@@ -105,14 +105,14 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
         public void onRequest(final AtmosphereResource resource) throws IOException {
             LOG.fine("onRequest");
             try {
-                invokeInternal(null, 
+                invokeInternal(null,
                     resource.getRequest().getServletContext(), resource.getRequest(), resource.getResponse());
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Failed to invoke service", e);
             }
         }
     }
-    
+
     // used for internal tests
     AtmosphereFramework getAtmosphereFramework() {
         return framework;

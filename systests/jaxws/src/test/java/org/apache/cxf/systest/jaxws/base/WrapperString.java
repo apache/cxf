@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * Wrapper class for Strings. This is necessary when sending/receiving Strings in Web Services.
- * 
+ *
  * @author joshua.shannon
  */
 @XmlRootElement

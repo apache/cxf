@@ -39,7 +39,7 @@ import org.junit.Test;
 
 public class AttachmentProviderXMLClientServerTest extends AbstractBusClientServerTestBase {
     private static final String ADDRESS = AttachmentServer.ADDRESS;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
@@ -48,17 +48,17 @@ public class AttachmentProviderXMLClientServerTest extends AbstractBusClientServ
 
     @Test
     public void testRequestWithAttachment() throws Exception {
-        
-        HttpURLConnection connection =  
+
+        HttpURLConnection connection =
             (HttpURLConnection)new URL(ADDRESS).openConnection();
         connection.setRequestMethod("POST");
-        
+
         String ct = "multipart/related; type=\"text/xml\"; " + "start=\"rootPart\"; "
                     + "boundary=\"----=_Part_4_701508.1145579811786\"";
         connection.addRequestProperty("Content-Type", ct);
-        
+
         connection.setDoOutput(true);
-        
+
         InputStream is = getClass().getResourceAsStream("attachmentData");
         IOUtils.copy(is, connection.getOutputStream());
         connection.getOutputStream().close();
@@ -68,22 +68,22 @@ public class AttachmentProviderXMLClientServerTest extends AbstractBusClientServ
                    connection.getContentType().contains("multipart/related"));
         String input = IOUtils.toString(connection.getInputStream());
         connection.getInputStream().close();
-        
+
         int idx = input.indexOf("--uuid");
         int idx2 = input.indexOf("--uuid", idx + 5);
         String root = input.substring(idx, idx2);
         idx = root.indexOf("\r\n\r\n");
         root = root.substring(idx).trim();
-        
+
 
         Document result = StaxUtils.read(new StringReader(root));
-        
+
         List<Element> resList = DOMUtils.findAllElementsByTagName(result.getDocumentElement(), "att");
         assertEquals("Two attachments must've been encoded", 2, resList.size());
-        
+
         verifyAttachment(resList, "foo", "foobar");
         verifyAttachment(resList, "bar", "barbaz");
-        
+
         input = input.substring(idx2);
         assertTrue(input.contains("<foo>"));
         assertTrue(input.contains("ABCDEFGHIJKLMNOP"));
@@ -97,10 +97,10 @@ public class AttachmentProviderXMLClientServerTest extends AbstractBusClientServ
             if (contentId.equals(contentIdVal)
                 && (Base64Utility.encode(value.getBytes()).equals(child)
                     || Base64Utility.encode((value + "\n").getBytes()).equals(child))) {
-                return;    
+                return;
             }
         }
-        
+
         fail("No encoded attachment with id " + contentId + " found");
     }
 }

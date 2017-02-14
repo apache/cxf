@@ -52,7 +52,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
     }
 
     /**
-     * Test for WSS4JInInterceptor when it receives a message with no security header. 
+     * Test for WSS4JInInterceptor when it receives a message with no security header.
      */
     @Test
     public void testNoSecurity() throws Exception {
@@ -61,7 +61,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         SoapMessage msg = getSoapMessageForDom(doc);
         SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
         doc = saajMsg.getSOAPPart();
-        
+
         byte[] docbytes = getMessageBytes(doc);
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
 
@@ -86,9 +86,9 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
-        
+
         inmsg.put(SecurityConstants.RETURN_SECURITY_ERROR, Boolean.TRUE);
-        
+
         try {
             inHandler.handleMessage(inmsg);
             fail("Expected failure on an message with no security header");
@@ -99,9 +99,9 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
             assertTrue(fault.getFaultCode().equals(faultCode));
         }
     }
-    
+
     /**
-     * Test that an invalid Timestamp gets mapped to a proper fault code 
+     * Test that an invalid Timestamp gets mapped to a proper fault code
      */
     @Test
     public void testInvalidTimestamp() throws Exception {
@@ -119,7 +119,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
 
         SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
         doc = saajMsg.getSOAPPart();
-        
+
         assertValid("//wsse:Security", doc);
 
         byte[] docbytes = getMessageBytes(doc);
@@ -160,9 +160,9 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
             assertTrue(fault.getFaultCode().equals(faultCode));
         }
     }
-    
+
     /**
-     * Test that an action mismatch gets mapped to a proper fault code 
+     * Test that an action mismatch gets mapped to a proper fault code
      */
     @Test
     public void testActionMismatch() throws Exception {
@@ -179,7 +179,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
 
         SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
         doc = saajMsg.getSOAPPart();
-        
+
         assertValid("//wsse:Security", doc);
 
         byte[] docbytes = getMessageBytes(doc);
@@ -203,12 +203,12 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
-        inHandler.setProperty(WSHandlerConstants.ACTION, 
+        inHandler.setProperty(WSHandlerConstants.ACTION,
             WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.USERNAME_TOKEN);
         inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
 
         inmsg.put(SecurityConstants.RETURN_SECURITY_ERROR, Boolean.TRUE);
-        
+
         try {
             inHandler.handleMessage(inmsg);
             fail("Expected failure on an action mismatch");
@@ -219,7 +219,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
             assertTrue(fault.getFaultCode().equals(faultCode));
         }
     }
-    
+
     // See CXF-6900.
     @Test
     public void testSignedEncryptedSOAP12Fault() throws Exception {
@@ -228,7 +228,7 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         SoapMessage msg = getSoapMessageForDom(doc, SOAPConstants.SOAP_1_2_PROTOCOL);
         SOAPMessage saajMsg = msg.getContent(SOAPMessage.class);
         doc = saajMsg.getSOAPPart();
-        
+
         byte[] docbytes = getMessageBytes(doc);
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(docbytes));
 
@@ -250,18 +250,18 @@ public class WSS4JFaultCodeTest extends AbstractSecurityTest {
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
-        inHandler.setProperty(WSHandlerConstants.ACTION, 
+        inHandler.setProperty(WSHandlerConstants.ACTION,
                               WSHandlerConstants.SIGNATURE + " "  + WSHandlerConstants.ENCRYPT);
         inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
         inHandler.setProperty(
-            WSHandlerConstants.PW_CALLBACK_CLASS, 
+            WSHandlerConstants.PW_CALLBACK_CLASS,
             "org.apache.cxf.ws.security.wss4j.TestPwdCallback"
         );
-        
+
         inHandler.handleMessage(inmsg);
         // StaxUtils.print(saajMsg.getSOAPPart());
     }
-    
+
 }

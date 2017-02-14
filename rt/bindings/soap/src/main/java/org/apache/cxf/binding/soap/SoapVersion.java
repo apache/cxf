@@ -23,7 +23,7 @@ import javax.xml.namespace.QName;
 
 public interface SoapVersion {
     String getBindingId();
-    
+
     double getVersion();
 
     String getNamespace();
@@ -33,34 +33,34 @@ public interface SoapVersion {
     QName getHeader();
 
     QName getBody();
-    
+
     QName getFault();
-    
+
     QName getReceiver();
-    
+
     QName getSender();
-    
+
     QName getMustUnderstand();
-    
+
     QName getVersionMismatch();
-    
+
     QName getDateEncodingUnknown();
 
     String getSoapEncodingStyle();
 
     String getAttrNameMustUnderstand();
-    
+
     String getAttrValueMustUnderstand(boolean value);
-    
+
     // Role related properties
     //-------------------------------------------------------------------------
     String getAttrNameRole();
-    
+
     String getNoneRole();
 
     String getUltimateReceiverRole();
 
     String getNextRole();
-    
+
     String getContentType();
 }

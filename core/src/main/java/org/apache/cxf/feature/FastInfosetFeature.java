@@ -50,11 +50,11 @@ public class FastInfosetFeature extends AbstractFeature {
     public FastInfosetFeature() {
         //
     }
-    
-    
+
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        
+
         FIStaxInInterceptor in = new FIStaxInInterceptor();
 
         FIStaxOutInterceptor out = new FIStaxOutInterceptor(force);
@@ -78,7 +78,7 @@ public class FastInfosetFeature extends AbstractFeature {
         if (serializerMaxCharacterContentChunkSize != null && serializerMaxCharacterContentChunkSize.intValue() > 0) {
             out.setSerializerMaxCharacterContentChunkSize(serializerMaxCharacterContentChunkSize);
         }
-        
+
         provider.getInInterceptors().add(in);
         provider.getInFaultInterceptors().add(in);
         provider.getOutInterceptors().add(out);
@@ -86,17 +86,17 @@ public class FastInfosetFeature extends AbstractFeature {
     }
 
     /**
-     * Set if FastInfoset is always used without negotiation 
+     * Set if FastInfoset is always used without negotiation
      * @param b
      */
     public void setForce(boolean b) {
         force = b;
     }
-    
+
     /**
      * Retrieve the value set with {@link #setForce(boolean)}.
      */
     public boolean getForce() {
         return force;
-    }    
+    }
 }

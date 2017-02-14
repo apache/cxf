@@ -27,50 +27,50 @@ import org.junit.Test;
 
 public class PropertyUtilsTest extends Assert {
     private static final String TEST_KEY = "my.key";
-    
+
     @Test
     public void testIsTrueWithMap() {
         Map<String, Object> props = new HashMap<String, Object>();
         assertFalse(PropertyUtils.isTrue(props, TEST_KEY));
-        
+
         props.put(TEST_KEY, "false");
         assertFalse(PropertyUtils.isTrue(props, TEST_KEY));
-        
+
         props.put(TEST_KEY, Boolean.FALSE);
         assertFalse(PropertyUtils.isTrue(props, TEST_KEY));
-        
+
         props.put(TEST_KEY, "true");
         assertTrue(PropertyUtils.isTrue(props, TEST_KEY));
-        
+
         props.put(TEST_KEY, Boolean.TRUE);
         assertTrue(PropertyUtils.isTrue(props, TEST_KEY));
     }
-    
+
     @Test
     public void testIsFalseWithMap() {
         Map<String, Object> props = new HashMap<String, Object>();
         assertFalse(PropertyUtils.isFalse(props, TEST_KEY));
-        
+
         props.put(TEST_KEY, "true");
         assertFalse(PropertyUtils.isFalse(props, TEST_KEY));
-        
+
         props.put(TEST_KEY, Boolean.TRUE);
         assertFalse(PropertyUtils.isFalse(props, TEST_KEY));
-        
+
         props.put(TEST_KEY, "false");
         assertTrue(PropertyUtils.isFalse(props, TEST_KEY));
-        
+
         props.put(TEST_KEY, Boolean.FALSE);
         assertTrue(PropertyUtils.isFalse(props, TEST_KEY));
     }
-    
+
     @Test
     public void testTrue() {
         assertTrue(PropertyUtils.isTrue(Boolean.TRUE));
         assertTrue(PropertyUtils.isTrue("true"));
         assertTrue(PropertyUtils.isTrue("TRUE"));
         assertTrue(PropertyUtils.isTrue("TrUe"));
-        
+
         assertFalse(PropertyUtils.isTrue(Boolean.FALSE));
         assertFalse(PropertyUtils.isTrue("false"));
         assertFalse(PropertyUtils.isTrue("FALSE"));
@@ -86,7 +86,7 @@ public class PropertyUtilsTest extends Assert {
         assertTrue(PropertyUtils.isFalse("false"));
         assertTrue(PropertyUtils.isFalse("FALSE"));
         assertTrue(PropertyUtils.isFalse("FaLSE"));
-        
+
         assertFalse(PropertyUtils.isFalse(Boolean.TRUE));
         assertFalse(PropertyUtils.isFalse("true"));
         assertFalse(PropertyUtils.isFalse("TRUE"));

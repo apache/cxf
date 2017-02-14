@@ -49,7 +49,7 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         super(phase);
         providers = p;
     }
-    
+
     protected Collection<? extends MetricsProvider> getMetricProviders(Bus bus) {
         if (providers != null) {
             return Arrays.asList(providers);
@@ -60,13 +60,13 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         }
         return b.getBeansOfType(MetricsProvider.class);
     }
-    
+
     protected ExchangeMetrics getExchangeMetrics(Message m, boolean create) {
         ExchangeMetrics ctx = m.getExchange().get(ExchangeMetrics.class);
         if (ctx == null && create) {
             ctx = new ExchangeMetrics(m.getExchange());
             m.getExchange().put(ExchangeMetrics.class, ctx);
-            
+
             addEndpointMetrics(ctx, m);
         }
         return ctx;
@@ -157,7 +157,7 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
             ctx.addContext((MetricsContext)metrics);
         }
     }
-    
+
     private synchronized Object createMetricsContextForRestResource(Message message, String resource) {
         Map<String, Object> restMap = getRestMetricsMap(message.getExchange().getEndpoint());
         Object o = restMap.get(resource);
@@ -208,7 +208,7 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         }
         return o;
     }
-   
+
     public void stop(Message m) {
         ExchangeMetrics ctx = getExchangeMetrics(m, false);
         if (ctx != null) {

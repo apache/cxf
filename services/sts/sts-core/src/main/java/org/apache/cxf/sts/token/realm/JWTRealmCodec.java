@@ -25,12 +25,12 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
  * This interface defines a pluggable way to return a realm associated with a JWT Token.
  */
 public interface JWTRealmCodec {
-    
+
     /**
      * Get the realm associated with the JwtToken parameter
      * @param token a JwtToken Object
      * @return the realm associated with the JwtToken parameter
      */
     String getRealmFromToken(JwtToken token);
-    
+
 }

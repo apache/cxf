@@ -40,7 +40,7 @@ public class DefaultLogEventMapperTest {
         LogEvent event = mapper.map(message);
         Assert.assertEquals("GET[test]", event.getOperationName());
     }
-    
+
     /**
      * Test for NPE described in CXF-6436
      */
@@ -55,6 +55,6 @@ public class DefaultLogEventMapperTest {
         LogEvent event = mapper.map(message);
         Assert.assertEquals("", event.getOperationName());
     }
-    
+
 
 }

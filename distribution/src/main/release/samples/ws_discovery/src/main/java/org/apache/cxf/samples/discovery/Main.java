@@ -32,7 +32,7 @@ public final class Main {
 
     public static void main(String[] args) throws Exception {
         //find a randomish port to use.   The clients will
-        //use WS-Discovery to find these services so 
+        //use WS-Discovery to find these services so
         //it really doesn't matter what port we publish them
         //on (or what URL or anything like that)
         ServerSocket sock = new ServerSocket();
@@ -40,7 +40,7 @@ public final class Main {
         sock.bind(s);
         int port = sock.getLocalPort();
         sock.close();
-        
+
         String address = "http://localhost:" + port + "/Greeter";
         System.out.println("Publishing on " + address);
         Endpoint.publish(address, new GreeterImpl(port));

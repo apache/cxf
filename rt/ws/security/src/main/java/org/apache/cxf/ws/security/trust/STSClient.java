@@ -38,7 +38,7 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
  */
 public class STSClient extends AbstractSTSClient {
     private static final Logger LOG = LogUtils.getL7dLogger(STSClient.class);
-    
+
     public STSClient(Bus b) {
         super(b);
     }
@@ -50,19 +50,19 @@ public class STSClient extends AbstractSTSClient {
     public SecurityToken requestSecurityToken(String appliesTo) throws Exception {
         return requestSecurityToken(appliesTo, null);
     }
-    
+
     public SecurityToken requestSecurityToken(String appliesTo, String binaryExchange) throws Exception {
         return requestSecurityToken(appliesTo, null, "/Issue", binaryExchange);
     }
-    
+
     public SecurityToken requestSecurityToken(
         String appliesTo, String action, String requestType, String binaryExchange
     ) throws Exception {
         STSResponse response = issue(appliesTo, action, requestType, binaryExchange);
 
-        SecurityToken token = 
+        SecurityToken token =
             createSecurityToken(getDocumentElement(response.getResponse()), response.getEntropy());
-        
+
         if (response.getCert() != null) {
             token.setX509Certificate(response.getCert(), response.getCrypto());
         }
@@ -76,7 +76,7 @@ public class STSClient extends AbstractSTSClient {
         }
         return token;
     }
-    
+
     public SecurityToken renewSecurityToken(SecurityToken tok) throws Exception {
         STSResponse response = renew(tok);
 
@@ -99,11 +99,11 @@ public class STSClient extends AbstractSTSClient {
         }
         return validateSecurityToken(tok, validateTokenType);
     }
-    
-    protected List<SecurityToken> validateSecurityToken(SecurityToken tok, String tokentype) 
+
+    protected List<SecurityToken> validateSecurityToken(SecurityToken tok, String tokentype)
         throws Exception {
         STSResponse response = validate(tok, tokentype);
-        
+
         Element el = getDocumentElement(response.getResponse());
         if ("RequestSecurityTokenResponseCollection".equals(el.getLocalName())) {
             el = DOMUtils.getFirstElement(el);
@@ -120,15 +120,15 @@ public class STSClient extends AbstractSTSClient {
                 Element e2 = DOMUtils.getFirstChildWithName(el, el.getNamespaceURI(), "Code");
                 String s = DOMUtils.getContent(e2);
                 valid = s.endsWith("/status/valid");
-                
+
                 e2 = DOMUtils.getFirstChildWithName(el, el.getNamespaceURI(), "Reason");
                 if (e2 != null) {
                     reason = DOMUtils.getContent(e2);
                 }
             } else if ("RequestedSecurityToken".equals(el.getLocalName())) {
-                SecurityToken token = 
+                SecurityToken token =
                     createSecurityToken(getDocumentElement(response.getResponse()), response.getEntropy());
-                
+
                 if (response.getCert() != null) {
                     token.setX509Certificate(response.getCert(), response.getCrypto());
                 }
@@ -140,7 +140,7 @@ public class STSClient extends AbstractSTSClient {
                         token.setTokenType(tokenType);
                     }
                 }
-                
+
                 tokens.add(token);
             }
             el = DOMUtils.getNextElement(el);
@@ -163,7 +163,7 @@ public class STSClient extends AbstractSTSClient {
             return false;
         }
     }
-    
+
     private String getTokenTypeFromTemplate() {
         if (template != null && DOMUtils.getFirstElement(template) != null) {
             Element tl = DOMUtils.getFirstElement(template);
@@ -176,5 +176,5 @@ public class STSClient extends AbstractSTSClient {
         }
         return null;
     }
-    
+
 }

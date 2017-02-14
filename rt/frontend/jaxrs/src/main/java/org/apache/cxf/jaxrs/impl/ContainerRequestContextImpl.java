@@ -33,11 +33,11 @@ import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
-public class ContainerRequestContextImpl extends AbstractRequestContextImpl 
+public class ContainerRequestContextImpl extends AbstractRequestContextImpl
     implements ContainerRequestContext {
 
     private static final String ENDPOINT_ADDRESS_PROPERTY = "org.apache.cxf.transport.endpoint.address";
-    
+
     private boolean preMatch;
     public ContainerRequestContextImpl(Message message, boolean preMatch, boolean responseContext) {
         super(message, responseContext);
@@ -110,11 +110,11 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
                 }
                 requestUri = URI.create(requestUriString);
             }
-                
+
         }
         doSetRequestUri(requestUri);
     }
-    
+
     protected void doSetRequestUri(URI requestUri) throws IllegalStateException {
         checkNotPreMatch();
         HttpUtils.resetRequestURI(m, requestUri.getRawPath());
@@ -139,7 +139,7 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
         checkContext();
         m.put(SecurityContext.class, sc);
         if (sc instanceof org.apache.cxf.security.SecurityContext) {
-            m.put(org.apache.cxf.security.SecurityContext.class, 
+            m.put(org.apache.cxf.security.SecurityContext.class,
                   (org.apache.cxf.security.SecurityContext)sc);
         }
     }
@@ -149,8 +149,8 @@ public class ContainerRequestContextImpl extends AbstractRequestContextImpl
             throw new IllegalStateException();
         }
     }
-    
-    @Override 
+
+    @Override
     public void setMethod(String method) throws IllegalStateException {
         checkNotPreMatch();
         super.setMethod(method);

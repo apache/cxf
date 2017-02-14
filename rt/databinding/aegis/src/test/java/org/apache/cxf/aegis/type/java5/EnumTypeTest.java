@@ -48,7 +48,7 @@ public class EnumTypeTest extends AbstractAegisTest {
         public String toString() {
             return name() + "*";
         }
-        
+
     };
 
     @Before
@@ -60,7 +60,7 @@ public class EnumTypeTest extends AbstractAegisTest {
         creator.setConfiguration(new TypeCreationOptions());
         tm.setTypeCreator(creator);
     }
-    
+
     @Test
     public void testType() throws Exception {
         EnumType type = new EnumType();
@@ -72,7 +72,7 @@ public class EnumTypeTest extends AbstractAegisTest {
         Element element = writeObjectToElement(type, SmallEnum.VALUE1, getContext());
 
         assertEquals("VALUE1", element.getTextContent());
-        
+
         XMLStreamReader xreader = StaxUtils.createXMLStreamReader(element);
         ElementReader reader = new ElementReader(xreader);
         Object value = type.readObject(reader, getContext());

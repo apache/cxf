@@ -73,7 +73,7 @@ public class StringVisitor extends VisitorBase {
 
         stringNode = node;
         boundNode = stringNode.getFirstChild();
-        
+
         //get chance to check if bound is symbol name which defined as const,
         //if so, replace the symbol name with defined const
         if (boundNode != null) {

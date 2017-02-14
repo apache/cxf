@@ -36,79 +36,79 @@ import org.junit.Test;
 
 public class TokenGrantHandlerTest extends Assert {
 
-    
-    
+
+
     @Test
     public void testSimpleGrantSupported() {
-        SimpleGrantHandler handler = new SimpleGrantHandler(); 
+        SimpleGrantHandler handler = new SimpleGrantHandler();
         handler.setDataProvider(new OAuthDataProviderImpl());
         ServerAccessToken t = handler.createAccessToken(createClient("a"), createMap("a"));
         assertTrue(t instanceof BearerAccessToken);
     }
-    
+
     @Test
     public void testSimpleGrantBug() {
         try {
-            new SimpleGrantHandler(Arrays.asList("a", "b")).createAccessToken(createClient("a"), 
+            new SimpleGrantHandler(Arrays.asList("a", "b")).createAccessToken(createClient("a"),
                                                        createMap("a"));
             fail("Grant handler bug");
         } catch (WebApplicationException ex) {
             assertEquals(500, ex.getResponse().getStatus());
         }
     }
-    
+
     @Test
     public void testComplexGrantSupported() {
-        ComplexGrantHandler handler = new ComplexGrantHandler(Arrays.asList("a", "b")); 
+        ComplexGrantHandler handler = new ComplexGrantHandler(Arrays.asList("a", "b"));
         handler.setDataProvider(new OAuthDataProviderImpl());
         ServerAccessToken t = handler.createAccessToken(createClient("a"), createMap("a"));
         assertTrue(t instanceof BearerAccessToken);
     }
-    
+
     private Client createClient(String... grants) {
         Client c = new Client("alice", "password", true);
-        for (String grant : grants) { 
+        for (String grant : grants) {
             c.getAllowedGrantTypes().add(grant);
         }
         return c;
     }
-    
+
     private MultivaluedMap<String, String> createMap(String grant) {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
         map.putSingle(OAuthConstants.GRANT_TYPE, grant);
         return map;
     }
-    
+
     private static class SimpleGrantHandler extends AbstractGrantHandler {
 
         SimpleGrantHandler() {
             super("a");
         }
-        
+
         SimpleGrantHandler(List<String> grants) {
             super(grants);
         }
-        
+
         @Override
         public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
             throws OAuthServiceException {
             return super.doCreateAccessToken(client, client.getSubject(), params);
-        } 
-        
+        }
+
     }
-    
+
     private static class ComplexGrantHandler extends AbstractGrantHandler {
 
         ComplexGrantHandler(List<String> grants) {
             super(grants);
         }
-        
+
         @Override
         public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
             throws OAuthServiceException {
-            return super.doCreateAccessToken(client, client.getSubject(), 
+            return super.doCreateAccessToken(client, client.getSubject(),
                                              params.getFirst(OAuthConstants.GRANT_TYPE), null);
-        } 
-        
+        }
+
     }
 }

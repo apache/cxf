@@ -21,25 +21,25 @@ package org.apache.cxf.clustering.circuitbreaker;
 
 import org.qi4j.library.circuitbreaker.CircuitBreaker;
 
-public class ZestCircuitBreaker extends CircuitBreaker 
+public class ZestCircuitBreaker extends CircuitBreaker
         implements org.apache.cxf.clustering.circuitbreaker.CircuitBreaker {
-    
+
     private final CircuitBreaker delegate;
-    
+
     public ZestCircuitBreaker(final int threshold, final long timeout) {
         delegate = new CircuitBreaker(threshold, timeout);
     }
-    
+
     @Override
     public boolean allowRequest() {
         return delegate.isOn();
     }
-    
+
     @Override
     public void markFailure(Throwable cause) {
         delegate.throwable(cause);
     }
-    
+
     @Override
     public void markSuccess() {
         delegate.success();

@@ -109,10 +109,10 @@ public class HttpServletRequestFilter extends HttpServletRequestWrapper {
             public String nextElement() {
                 return it.next();
             }
-            
+
         };
     }
-    
+
     private void readFromParamsIfNeeded() {
         if (formParams == null) {
             formParams = new MetadataMap<String, String>();
@@ -121,7 +121,7 @@ public class HttpServletRequestFilter extends HttpServletRequestWrapper {
             String body = FormUtils.readBody(m.getContent(InputStream.class), enc);
             FormUtils.populateMapFromString(formParams, m, body, enc, true);
         }
-        
+
     }
 }
 

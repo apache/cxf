@@ -33,11 +33,11 @@ public class XMLStreamReaderInInterceptor extends AbstractPhaseInterceptor<Messa
     public XMLStreamReaderInInterceptor() {
         super(Phase.POST_STREAM);
     }
-    
+
     public void handleMessage(Message m) throws Fault {
         String method = m.get(Message.HTTP_REQUEST_METHOD).toString();
         if ("POST".equals(method)) {
-            XMLStreamReader reader = 
+            XMLStreamReader reader =
                 StaxUtils.createXMLStreamReader(m.getContent(InputStream.class));
             m.setContent(XMLStreamReader.class, new CustomXmlStreamReader(reader));
         }

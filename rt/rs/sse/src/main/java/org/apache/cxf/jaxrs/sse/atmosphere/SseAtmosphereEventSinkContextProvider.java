@@ -38,21 +38,21 @@ public class SseAtmosphereEventSinkContextProvider implements ContextProvider<Ss
         if (request == null) {
             throw new IllegalStateException("Unable to retrieve HTTP request from the context");
         }
-        
+
         final AtmosphereResource resource = (AtmosphereResource)request
             .getAttribute(AtmosphereResource.class.getName());
         if (resource == null) {
             throw new IllegalStateException("AtmosphereResource is not present, "
                     + "is AtmosphereServlet configured properly?");
         }
-        
+
         final Broadcaster broadcaster = resource.getAtmosphereConfig()
             .getBroadcasterFactory()
             .lookup(resource.uuid(), true);
-        
+
         resource.removeFromAllBroadcasters();
         resource.setBroadcaster(broadcaster);
-        
+
         final MessageBodyWriter<OutboundSseEvent> writer = new OutboundSseEventBodyWriter(
             ServerProviderFactory.getInstance(message), message.getExchange());
 

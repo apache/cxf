@@ -49,28 +49,28 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /**
- * 
+ *
  */
 public class URLConnectionHTTPConduit extends HTTPConduit {
     public static final String HTTPURL_CONNECTION_METHOD_REFLECTION = "use.httpurlconnection.method.reflection";
 
     private static final boolean DEFAULT_USE_REFLECTION;
     static {
-        DEFAULT_USE_REFLECTION = 
+        DEFAULT_USE_REFLECTION =
             Boolean.valueOf(SystemPropertyAction.getProperty(HTTPURL_CONNECTION_METHOD_REFLECTION, "false"));
     }
-    
+
     /**
-     * This field holds the connection factory, which primarily is used to 
+     * This field holds the connection factory, which primarily is used to
      * factor out SSL specific code from this implementation.
      * <p>
      * This field is "protected" to facilitate some contrived UnitTesting so
      * that an extended class may alter its value with an EasyMock URLConnection
-     * Factory. 
+     * Factory.
      */
     protected HttpsURLConnectionFactory connectionFactory;
-        
-    
+
+
     public URLConnectionHTTPConduit(Bus b, EndpointInfo ei) throws IOException {
         super(b, ei);
         connectionFactory = new HttpsURLConnectionFactory();
@@ -82,7 +82,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         connectionFactory = new HttpsURLConnectionFactory();
         CXFAuthenticator.addAuthenticator();
     }
-    
+
     /**
      * Close the conduit
      */
@@ -99,8 +99,8 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             }
             //defaultEndpointURL = null;
         }
-    }    
-    
+    }
+
     private HttpURLConnection createConnection(Message message, Address address, HTTPClientPolicy csPolicy)
         throws IOException {
         URL url = address.getURL();
@@ -117,14 +117,14 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
     }
     protected void setupConnection(Message message, Address address, HTTPClientPolicy csPolicy) throws IOException {
         HttpURLConnection connection = createConnection(message, address, csPolicy);
-        connection.setDoOutput(true);       
-        
+        connection.setDoOutput(true);
+
         int ctimeout = determineConnectionTimeout(message, csPolicy);
         connection.setConnectTimeout(ctimeout);
-        
+
         int rtimeout = determineReceiveTimeout(message, csPolicy);
         connection.setReadTimeout(rtimeout);
-        
+
         connection.setUseCaches(false);
         // We implement redirects in this conduit. We do not
         // rely on the underlying URLConnection implementation
@@ -132,7 +132,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         connection.setInstanceFollowRedirects(false);
 
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
-        String httpRequestMethod = 
+        String httpRequestMethod =
             (String)message.get(Message.HTTP_REQUEST_METHOD);
         if (httpRequestMethod == null) {
             httpRequestMethod = "POST";
@@ -178,27 +178,27 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                 throw ex;
             }
         }
-        
+
         // We place the connection on the message to pick it up
         // in the WrappedOutputStream.
         message.put(KEY_HTTP_CONNECTION, connection);
         message.put(KEY_HTTP_CONNECTION_ADDRESS, address);
     }
 
-    
-    protected OutputStream createOutputStream(Message message, 
-                                              boolean needToCacheRequest, 
+
+    protected OutputStream createOutputStream(Message message,
+                                              boolean needToCacheRequest,
                                               boolean isChunking,
                                               int chunkThreshold) throws IOException {
         HttpURLConnection connection = (HttpURLConnection)message.get(KEY_HTTP_CONNECTION);
-        
+
         if (isChunking && chunkThreshold <= 0) {
             chunkThreshold = 0;
-            connection.setChunkedStreamingMode(-1);                    
+            connection.setChunkedStreamingMode(-1);
         }
         try {
             return new URLConnectionWrappedOutputStream(message, connection,
-                                           needToCacheRequest, 
+                                           needToCacheRequest,
                                            isChunking,
                                            chunkThreshold,
                                            getConduitName());
@@ -206,12 +206,12 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             throw new IOException(e);
         }
     }
-    
+
     private static URI computeURI(Message message, HttpURLConnection connection) throws URISyntaxException {
         Address address = (Address)message.get(KEY_HTTP_CONNECTION_ADDRESS);
         return address != null ? address.getURI() : connection.getURL().toURI();
     }
-    
+
     class URLConnectionWrappedOutputStream extends WrappedOutputStream {
         HttpURLConnection connection;
         URLConnectionWrappedOutputStream(Message message, HttpURLConnection connection,
@@ -222,8 +222,8 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                   computeURI(message, connection));
             this.connection = connection;
         }
-        
-        // This construction makes extending the HTTPConduit more easier 
+
+        // This construction makes extending the HTTPConduit more easier
         protected URLConnectionWrappedOutputStream(URLConnectionWrappedOutputStream wos) {
             super(wos);
             this.connection = wos.connection;
@@ -238,13 +238,13 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                     java.lang.reflect.Field f = ReflectionUtil.getDeclaredField(HttpURLConnection.class, "method");
                     ReflectionUtil.setAccessible(f).set(connection, "POST");
                     cout = connection.getOutputStream();
-                    ReflectionUtil.setAccessible(f).set(connection, method);                        
+                    ReflectionUtil.setAccessible(f).set(connection, method);
                 } catch (Throwable t) {
                     logStackTrace(t);
                 }
-                
+
             } else {
-                cout = connection.getOutputStream(); 
+                cout = connection.getOutputStream();
             }
             return cout;
         }
@@ -257,12 +257,12 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                     cout = connection.getOutputStream();
                 } catch (ProtocolException pe) {
                     Boolean b =  (Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION);
-                    cout = connectAndGetOutputStream(b); 
+                    cout = connectAndGetOutputStream(b);
                 }
             } catch (SocketException e) {
                 if ("Socket Closed".equals(e.getMessage())) {
                     connection.connect();
-                    cout = connectAndGetOutputStream((Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION)); 
+                    cout = connectAndGetOutputStream((Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION));
                 } else {
                     throw e;
                 }
@@ -288,8 +288,8 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             super.onFirstWrite();
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Sending "
-                    + connection.getRequestMethod() 
-                    + " Message with Headers to " 
+                    + connection.getRequestMethod()
+                    + " Message with Headers to "
                     + url
                     + " Conduit :"
                     + conduitName
@@ -318,7 +318,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             h.readFromConnection(connection);
             cookies.readFromHeaders(h);
         }
-        
+
         protected InputStream getInputStream() throws IOException {
             InputStream in = null;
             if (getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
@@ -337,7 +337,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             return in;
         }
 
-        
+
         protected void closeInputStream() throws IOException {
             //try and consume any content so that the connection might be reusable
             InputStream ins = connection.getErrorStream();
@@ -390,9 +390,9 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
         @Override
         protected void retransmitStream() throws IOException {
             Boolean b =  (Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION);
-            OutputStream out = connectAndGetOutputStream(b); 
+            OutputStream out = connectAndGetOutputStream(b);
             cachedStream.writeCacheTo(out);
         }
     }
-    
+
 }

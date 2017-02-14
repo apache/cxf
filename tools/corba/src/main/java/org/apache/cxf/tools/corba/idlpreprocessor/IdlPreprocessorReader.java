@@ -29,7 +29,7 @@ import java.util.Stack;
  * A Reader that implements the #include functionality of the preprocessor.
  * Starting from one URL, it generates one stream of characters by tracking
  * #defines, #ifdefs, etc. and following #includes accordingly.
- * 
+ *
  * <p>
  * This reader augments the stream with
  * <a href="http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Preprocessor-Output.html">
@@ -48,14 +48,14 @@ public final class IdlPreprocessorReader extends Reader {
 
     /**
      * GNU standard preprocessor output flag for signalling a new file.
-     * 
+     *
      * @see http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Preprocessor-Output.html
      */
     private static final char PUSH = '1';
 
     /**
      * GNU standard preprocessor output flag for signalling returning to a file.
-     * 
+     *
      * @see http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Preprocessor-Output.html
      */
     private static final char POP = '2';
@@ -69,7 +69,7 @@ public final class IdlPreprocessorReader extends Reader {
     /**
      * Stack of Booleans, corresponding to nested 'if' preprocessor directives.
      * The top of the stack signals whether the current idl code is skipped.
-     * 
+     *
      * @see #skips()
      */
     private final Stack<Boolean> ifStack = new Stack<Boolean>();
@@ -79,12 +79,12 @@ public final class IdlPreprocessorReader extends Reader {
     private final StringBuilder buf = new StringBuilder();
 
     private int readPos;
-    
+
     private String pragmaPrefix;
 
     /**
      * Creates a new IncludeReader.
-     * 
+     *
      * @param startURL
      * @param startLocation
      * @param includeResolver
@@ -159,7 +159,7 @@ public final class IdlPreprocessorReader extends Reader {
                 continue;
             }
             line = processComments(line);
-            
+
             if (!line.trim().startsWith("#")) {
                 if (!skips()) {
                     buf.append(line);
@@ -217,9 +217,9 @@ public final class IdlPreprocessorReader extends Reader {
         }
         return line;
     }
-    
+
     /**
-     * TODO: support multiline definitions, functions, etc. 
+     * TODO: support multiline definitions, functions, etc.
      */
     private void handleDefine(String line) {
         buf.append(LF);
@@ -260,7 +260,7 @@ public final class IdlPreprocessorReader extends Reader {
         registerIf(!isDefined);
         buf.append(LF);
     }
-    
+
     private void handleIf(String line) {
         String symbol = line.substring("#if".length()).trim();
         boolean notSkip = true;
@@ -285,9 +285,9 @@ public final class IdlPreprocessorReader extends Reader {
             symbol = symbol.substring(0, symbol.length() - 1);
         }
         setPragmaPrefix(symbol);
-        buf.append(LF);     
+        buf.append(LF);
     }
-    
+
     private void handleIfndef(String line) {
         String symbol = line.substring("#ifndef".length()).trim();
         boolean isDefined = defineState.isDefined(symbol);
@@ -296,7 +296,7 @@ public final class IdlPreprocessorReader extends Reader {
     }
 
     private void handleInclude(String line, int lineNo, final IncludeStackEntry ise) throws IOException {
-        
+
         if (skips()) {
             buf.append(LF);
             return;
@@ -367,7 +367,7 @@ public final class IdlPreprocessorReader extends Reader {
 
     /**
      * Creates GNU standard preprocessor flag for signalling a file change.
-     * 
+     *
      * @see http://gcc.gnu.org/onlinedocs/gcc-3.2.3/cpp/Preprocessor-Output.html
      */
     private void signalFileChange(String location, int lineNumber, char flag) {

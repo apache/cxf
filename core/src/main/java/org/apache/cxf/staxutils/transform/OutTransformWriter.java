@@ -44,7 +44,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private Map<QName, ElementProperty> appendMap = new HashMap<QName, ElementProperty>(5);
     private Map<String, String> nsMap = new HashMap<String, String>(5);
     private List<Set<String>> writtenUris = new LinkedList<Set<String>>();
-    
+
     private Set<QName> dropElements;
     private List<List<ParsingEvent>> pushedAheadEvents = new LinkedList<List<ParsingEvent>>();
     private List<QName> elementsStack = new LinkedList<QName>();
@@ -55,12 +55,12 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
     private boolean attributesToElements;
     private DelegatingNamespaceContext namespaceContext;
 
-    public OutTransformWriter(XMLStreamWriter writer, 
+    public OutTransformWriter(XMLStreamWriter writer,
                               Map<String, String> outMap) {
         this(writer, outMap, null, null, null, false, null);
     }
-    
-    public OutTransformWriter(XMLStreamWriter writer, 
+
+    public OutTransformWriter(XMLStreamWriter writer,
                               Map<String, String> outMap,
                               Map<String, String> append,
                               List<String> dropEls,
@@ -68,8 +68,8 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
                               String defaultNamespace) {
         this(writer, outMap, append, dropEls, null, attributesToElements, defaultNamespace);
     }
-    
-    public OutTransformWriter(XMLStreamWriter writer, 
+
+    public OutTransformWriter(XMLStreamWriter writer,
                               Map<String, String> outEMap,
                               Map<String, String> append,
                               List<String> dropEls,
@@ -104,14 +104,14 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             || uri.equals(replaceNamespace)) {
             return;
         }
-        
+
         uri = value != null ? value : uri;
-        
-        if (writtenUris.get(0).contains(uri) 
+
+        if (writtenUris.get(0).contains(uri)
             && (prefix.length() == 0 || prefix.equals(namespaceContext.getPrefix(uri)))) {
             return;
         }
-        
+
         if (defaultNamespace != null && defaultNamespace.equals(uri)) {
             super.writeDefaultNamespace(uri);
             namespaceContext.addPrefix("", uri);
@@ -124,7 +124,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         }
         writtenUris.get(0).add(uri);
     }
-    
+
 
     @Override
     public void writeDefaultNamespace(String uri) throws XMLStreamException {
@@ -132,14 +132,14 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             return;
         }
         String value = nsMap.get(uri);
-        if ((value != null && value.length() == 0) 
+        if ((value != null && value.length() == 0)
             || (isDefaultNamespaceRedefined() && !isDefaultNamespaceRedefined(uri))
             || uri.equals(replaceNamespace)) {
             return;
         }
-        
+
         uri = value != null ? value : uri;
-        
+
         if (writtenUris.get(0).contains(uri) && "".equals(namespaceContext.getPrefix(uri))) {
             return;
         }
@@ -158,7 +158,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             || (isDefaultNamespaceRedefined() && !isDefaultNamespaceRedefined(uri))) {
             return;
         }
-        
+
         uri = value != null ? value : uri;
 
         super.setDefaultNamespace(uri);
@@ -178,7 +178,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             s = new HashSet<>(writtenUris.get(0));
         }
         writtenUris.add(0, s);
-        
+
         final QName theName = new QName(uri, local, prefix);
         final ElementProperty appendProp = appendMap.remove(theName);
         final boolean replaceContent = appendProp != null && theName.equals(appendProp.getName());
@@ -190,7 +190,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         } else {
             if (prefix.length() == 0 && expected.getNamespaceURI().length() > 0
                 && theName.getNamespaceURI().length() == 0) {
-                // if the element is promoted to a qualified element, use the prefix bound 
+                // if the element is promoted to a qualified element, use the prefix bound
                 // to that namespace. If the namespace is unbound, generate a new prefix and
                 // write its declaration later.
                 prefix = namespaceContext.getPrefix(expected.getNamespaceURI());
@@ -208,13 +208,13 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             if (!appendProp.isChild()) {
                 // ap-pre-*
                 QName appendQName = appendProp.getName();
-                String theprefix = namespaceContext.getPrefix(appendQName.getNamespaceURI()); 
+                String theprefix = namespaceContext.getPrefix(appendQName.getNamespaceURI());
                 boolean nsadded = false;
                 if (theprefix == null) {
                     nsadded = true;
                     theprefix = namespaceContext.getPrefix(appendQName.getNamespaceURI());
-                    if (theprefix == null 
-                        && (appendQName.getNamespaceURI().equals(expected.getNamespaceURI()) 
+                    if (theprefix == null
+                        && (appendQName.getNamespaceURI().equals(expected.getNamespaceURI())
                             && expected.getPrefix().length() > 0)) {
                         theprefix = expected.getPrefix();
                     } else if (theprefix == null) {
@@ -261,17 +261,17 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         }
         pushedAheadEvents.add(0, pe);
         elementsStack.add(0, expected);
-        replaceNamespace = expected.getNamespaceURI().equals(theName.getNamespaceURI()) 
+        replaceNamespace = expected.getNamespaceURI().equals(theName.getNamespaceURI())
             ? null : theName.getNamespaceURI();
 
         if (appendProp != null && !replaceContent && appendProp.isChild()) {
             // ap-post-*
             QName appendQName = appendProp.getName();
             String theprefix = namespaceContext.getPrefix(appendQName.getNamespaceURI());
-                
+
             if (appendProp.getText() == null) {
                 // ap-post-wrap
-                write(new QName(appendQName.getNamespaceURI(), appendQName.getLocalPart(), 
+                write(new QName(appendQName.getNamespaceURI(), appendQName.getLocalPart(),
                                 theprefix == null ? "" : theprefix), false);
                 if (namespaceContext.getPrefix(appendQName.getNamespaceURI()) == null) {
                     this.writeNamespace(theprefix, uri);
@@ -295,7 +295,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         }
     }
 
-    
+
     @Override
     public void writeStartElement(String uri, String local) throws XMLStreamException {
         /*
@@ -349,7 +349,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             }
         }
     }
-    
+
     @Override
     public void writeCharacters(String text) throws XMLStreamException {
         if (matchesDropped(false)) {
@@ -361,14 +361,14 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
         }
         super.writeCharacters(text);
     }
-    
+
     private void write(QName qname, boolean replacePrefix) throws XMLStreamException {
         boolean writeNs = false;
         String prefix = "";
         if (qname.getNamespaceURI().length() > 0) {
-            if ((replacePrefix || isDefaultNamespaceRedefined()) 
+            if ((replacePrefix || isDefaultNamespaceRedefined())
                 && qname.getPrefix().length() == 0) {
-                // if the default namespace is configured to be replaced, a non-empty prefix must be assigned 
+                // if the default namespace is configured to be replaced, a non-empty prefix must be assigned
                 prefix = namespaceContext.getPrefix(qname.getNamespaceURI());
                 if (prefix == null) {
                     prefix = namespaceContext.findUniquePrefix(qname.getNamespaceURI());
@@ -377,44 +377,44 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             } else {
                 prefix = qname.getPrefix();
             }
-            
-        } 
+
+        }
         if (isDefaultNamespaceRedefined(qname.getNamespaceURI())) {
             prefix = "";
         }
         super.writeStartElement(prefix, qname.getLocalPart(), qname.getNamespaceURI());
-        if (writeNs 
+        if (writeNs
             || !qname.getNamespaceURI().equals(namespaceContext.getNamespaceURI(prefix))) {
             this.writeNamespace(prefix, qname.getNamespaceURI());
         }
     }
-    
+
     private boolean isDefaultNamespaceRedefined() {
         return defaultNamespace != null;
     }
-    
+
     private boolean isDefaultNamespaceRedefined(String uri) {
         return isDefaultNamespaceRedefined() && defaultNamespace.equals(uri);
     }
 
     private boolean matchesDropped(boolean shallow) {
-        return (dropDepth > 0 && dropDepth <= currentDepth) 
+        return (dropDepth > 0 && dropDepth <= currentDepth)
             || (shallow && (elementsStack.size() > 0 && dropElements.contains(elementsStack.get(0))));
     }
-    
-    
+
+
     @Override
     public NamespaceContext getNamespaceContext() {
-        return namespaceContext; 
+        return namespaceContext;
     }
-    
+
     @Override
-    public void writeAttribute(String prefix, String uri, String local, String value) 
+    public void writeAttribute(String prefix, String uri, String local, String value)
         throws XMLStreamException {
         if (matchesDropped(false)) {
             return;
         }
-        
+
         QName expected = attributesMap.get(new QName(uri, local, prefix));
         if (expected != null) {
             if (TransformUtils.isEmptyQName(expected)) {
@@ -448,13 +448,13 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
             if (uri.length() > 0) {
                 super.writeAttribute(uri, local, value);
             } else {
-                super.writeAttribute(local, value);                
+                super.writeAttribute(local, value);
             }
         } else {
             writeAttributeAsElement(uri, local, value);
         }
     }
-    
+
     private void writeAttributeAsElement(String uri, String local, String value)
         throws XMLStreamException {
         this.writeStartElement(uri, local);

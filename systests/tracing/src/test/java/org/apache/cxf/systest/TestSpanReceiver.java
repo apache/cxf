@@ -48,11 +48,11 @@ public class TestSpanReceiver extends SpanReceiver {
     public void receiveSpan(Span span) {
         spans.add(span);
     }
-    
+
     public static void clear() {
         spans.clear();
     }
-    
+
     public static List<Span> getAllSpans() {
         return spans;
     }

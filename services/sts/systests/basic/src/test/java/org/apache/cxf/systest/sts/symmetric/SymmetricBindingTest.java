@@ -58,29 +58,29 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the Symmetric binding. The CXF client gets a token from the STS by authenticating via a
- * Username Token over the symmetric binding, and then sends it to the CXF endpoint using 
+ * Username Token over the symmetric binding, and then sends it to the CXF endpoint using
  * the symmetric binding.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
     static final String STAX_STSPORT2 = allocatePort(StaxSTSServer.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static final String PORT = allocatePort(Server.class);
     private static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     final TestParam test;
-    
+
     public SymmetricBindingTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -98,41 +98,41 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         STSServer stsServer = new STSServer();
         stsServer.setContext("cxf-ut.xml");
         assertTrue(launchServer(stsServer));
-        
+
         stsServer = new STSServer();
         stsServer.setContext("cxf-ut-encrypted.xml");
         assertTrue(launchServer(stsServer));
-        
+
         StaxSTSServer staxStsServer = new StaxSTSServer();
         staxStsServer.setContext("stax-cxf-ut.xml");
         assertTrue(launchServer(staxStsServer));
-        
+
         staxStsServer = new StaxSTSServer();
         staxStsServer.setContext("stax-cxf-ut-encrypted.xml");
         assertTrue(launchServer(staxStsServer));
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT2)},
                                                 {new TestParam(PORT, true, STSPORT2)},
                                                 {new TestParam(STAX_PORT, false, STSPORT2)},
                                                 {new TestParam(STAX_PORT, true, STSPORT2)},
-                                                
+
                                                 {new TestParam(PORT, false, STAX_STSPORT2)},
                                                 {new TestParam(PORT, true, STAX_STSPORT2)},
                                                 {new TestParam(STAX_PORT, false, STAX_STSPORT2)},
                                                 {new TestParam(STAX_PORT, true, STAX_STSPORT2)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-    
+
     @org.junit.Test
     public void testUsernameTokenSAML1() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -145,19 +145,19 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1Port");
-        DoubleItPortType symmetricSaml1Port = 
+        DoubleItPortType symmetricSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml1Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(symmetricSaml1Port);
         }
 
         doubleIt(symmetricSaml1Port, 25);
         TokenTestUtils.verifyToken(symmetricSaml1Port);
-        
+
         ((java.io.Closeable)symmetricSaml1Port).close();
         bus.shutdown(true);
     }
@@ -175,23 +175,23 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2Port");
-        DoubleItPortType symmetricSaml2Port = 
+        DoubleItPortType symmetricSaml2Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml2Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(symmetricSaml2Port);
         }
-        
+
         doubleIt(symmetricSaml2Port, 30);
         TokenTestUtils.verifyToken(symmetricSaml2Port);
-        
+
         ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUsernameTokenSAML1Encrypted() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -204,22 +204,22 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1EncryptedPort");
-        DoubleItPortType symmetricSaml1Port = 
+        DoubleItPortType symmetricSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml1Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(symmetricSaml1Port);
         }
 
         doubleIt(symmetricSaml1Port, 25);
-        
+
         ((java.io.Closeable)symmetricSaml1Port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUsernameTokenSAML2SecureConversation() throws Exception {
 
@@ -233,22 +233,22 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2SecureConversationPort");
-        DoubleItPortType symmetricSaml2Port = 
+        DoubleItPortType symmetricSaml2Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml2Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(symmetricSaml2Port);
         }
-        
+
         doubleIt(symmetricSaml2Port, 30);
-        
+
         ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUsernameTokenSAML2Dispatch() throws Exception {
 
@@ -262,34 +262,34 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2Port");
-       
-        Dispatch<DOMSource> dispatch = 
+
+        Dispatch<DOMSource> dispatch =
             service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD, new AddressingFeature());
         updateAddressPort(dispatch, test.getPort());
-        
+
         // Setup STSClient
         STSClient stsClient = createDispatchSTSClient(bus);
         String wsdlLocation = "http://localhost:" + test.getStsPort() + "/SecurityTokenService/UT?wsdl";
         stsClient.setWsdlLocation(wsdlLocation);
-        
+
         // Creating a DOMSource Object for the request
         DOMSource request = createDOMRequest();
-        
+
         // Make a successful request
         Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
         client.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
-        
+
         if (test.isStreaming()) {
             client.getRequestContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
             client.getResponseContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
         }
-        
+
         DOMSource response = dispatch.invoke(request);
         assertNotNull(response);
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUsernameTokenSAML1Dispatch() throws Exception {
 
@@ -303,36 +303,36 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1Port");
-       
-        Dispatch<DOMSource> dispatch = 
+
+        Dispatch<DOMSource> dispatch =
             service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD, new AddressingFeature());
         updateAddressPort(dispatch, test.getPort());
-        
+
         // Setup STSClient
         STSClient stsClient = createDispatchSTSClient(bus);
         String wsdlLocation = "http://localhost:" + test.getStsPort() + "/SecurityTokenService/UT?wsdl";
         stsClient.setWsdlLocation(wsdlLocation);
-        
+
         // Creating a DOMSource Object for the request
         DOMSource request = createDOMRequest();
-        
+
         // Make a successful request
         Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
         client.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         //client.getRequestContext().put("find.dispatch.operation", Boolean.TRUE);
-        
-        
+
+
         if (test.isStreaming()) {
             client.getRequestContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
             client.getResponseContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
         }
-        
+
         DOMSource response = dispatch.invoke(request);
         assertNotNull(response);
-        
+
         bus.shutdown(true);
     }
-    
+
     private DOMSource createDOMRequest() throws ParserConfigurationException {
         // Creating a DOMSource Object for the request
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -346,12 +346,12 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         requestDoc.appendChild(root);
         return new DOMSource(requestDoc);
     }
-    
+
     private STSClient createDispatchSTSClient(Bus bus) {
         STSClient stsClient = new STSClient(bus);
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}UT_Port");
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("security.username", "alice");
         properties.put("security.callback-handler",
@@ -360,7 +360,7 @@ public class SymmetricBindingTest extends AbstractBusClientServerTestBase {
         properties.put("security.encryption.properties", "clientKeystore.properties");
         properties.put("ws-security.is-bsp-compliant", "false");
         stsClient.setProperties(properties);
-        
+
         return stsClient;
     }
 

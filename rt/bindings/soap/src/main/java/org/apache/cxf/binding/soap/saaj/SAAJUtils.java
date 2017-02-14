@@ -30,14 +30,14 @@ import javax.xml.soap.SOAPMessage;
 import org.apache.cxf.common.util.StringUtils;
 
 /**
- * 
+ *
  */
 public final class SAAJUtils {
-    
+
     private SAAJUtils() {
         //not constructed
     }
-    
+
     public static SOAPHeader getHeader(SOAPMessage m) throws SOAPException {
         try {
             return m.getSOAPHeader();
@@ -69,9 +69,9 @@ public final class SAAJUtils {
             }
             f.setFaultCode(pfx + ":" + code.getLocalPart());
         }
-        
+
     }
-    
+
     public static SOAPElement adjustPrefix(SOAPElement e, String prefix) {
         if (prefix == null) {
             prefix = "";

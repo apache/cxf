@@ -40,7 +40,7 @@ import org.junit.Test;
 public class SoapOutInterceptorTest extends TestBase {
     private ReadHeadersInterceptor rhi;
     private SoapOutInterceptor soi;
-    private StartBodyInterceptor sbi; 
+    private StartBodyInterceptor sbi;
 
     @Before
     public void setUp() throws Exception {
@@ -64,9 +64,9 @@ public class SoapOutInterceptorTest extends TestBase {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         soapMessage.setContent(OutputStream.class, out);
         soapMessage.setContent(XMLStreamWriter.class, StaxUtils.createXMLStreamWriter(out));
-        
+
         soapMessage.getInterceptorChain().doIntercept(soapMessage);
-        
+
         assertNotNull(soapMessage.getHeaders());
 
         Exception oe = soapMessage.getContent(Exception.class);
@@ -86,9 +86,9 @@ public class SoapOutInterceptorTest extends TestBase {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         soapMessage.setContent(OutputStream.class, out);
         soapMessage.setContent(XMLStreamWriter.class, StaxUtils.createXMLStreamWriter(out));
-        
+
         soapMessage.getInterceptorChain().doIntercept(soapMessage);
-        
+
         assertNotNull(soapMessage.getHeaders());
 
         Exception oe = soapMessage.getContent(Exception.class);
@@ -110,8 +110,8 @@ public class SoapOutInterceptorTest extends TestBase {
 
         assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.nextTag());
         assertEquals("reservation", xmlReader.getLocalName());
-        assertEquals(version.getAttrValueMustUnderstand(true), 
-                     xmlReader.getAttributeValue(version.getNamespace(), 
+        assertEquals(version.getAttrValueMustUnderstand(true),
+                     xmlReader.getAttributeValue(version.getNamespace(),
                                                  version.getAttrNameMustUnderstand()));
 
         assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.nextTag());
@@ -122,7 +122,7 @@ public class SoapOutInterceptorTest extends TestBase {
         // assertEquals(Soap12.getInstance().getBody(), xmlReader.getName());
     }
 
-    
+
     private void prepareSoapMessage(String payloadFileName) throws IOException {
         soapMessage = TestUtil.createEmptySoapMessage(Soap12.getInstance(), chain);
 

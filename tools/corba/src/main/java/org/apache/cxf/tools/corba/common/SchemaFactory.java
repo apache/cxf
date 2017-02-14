@@ -92,7 +92,7 @@ public abstract class SchemaFactory {
                                                                        + "implementation.");
         }
     }
-   
+
     /**
      * Create a new instance of a WSDLWriter.
      */

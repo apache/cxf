@@ -26,4 +26,4 @@ import javax.jws.WebService;
 public interface BookStoreJaxws {
     @WebMethod
     int getId();
-} 
+}

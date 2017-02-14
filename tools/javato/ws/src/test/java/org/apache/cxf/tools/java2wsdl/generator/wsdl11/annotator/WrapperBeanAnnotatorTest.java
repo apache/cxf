@@ -39,40 +39,40 @@ public class WrapperBeanAnnotatorTest extends Assert {
 
         clz.annotate(new WrapperBeanAnnotator());
         List<JAnnotation> annotations = clz.getAnnotations();
-        
+
         String expectedNamespace = "http://doc.withannotation.fortest.tools.cxf.apache.org/";
-                
+
         JAnnotation rootElementAnnotation = annotations.get(0);
-        assertEquals("@XmlRootElement(name = \"sayHi\", " 
-                     + "namespace = \"" + expectedNamespace + "\")", 
+        assertEquals("@XmlRootElement(name = \"sayHi\", "
+                     + "namespace = \"" + expectedNamespace + "\")",
                      rootElementAnnotation.toString());
-        
+
         JAnnotation xmlTypeAnnotation = annotations.get(2);
         assertEquals("@XmlType(name = \"sayHi\", "
-                     + "namespace = \"" + expectedNamespace + "\")", 
+                     + "namespace = \"" + expectedNamespace + "\")",
                      xmlTypeAnnotation.toString());
-        
+
         JAnnotation accessorTypeAnnotation = annotations.get(1);
-        assertEquals("@XmlAccessorType(XmlAccessType.FIELD)", 
+        assertEquals("@XmlAccessorType(XmlAccessType.FIELD)",
                      accessorTypeAnnotation.toString());
-        
+
         WrapperBeanClass resWrapperClass = new WrapperBeanClass();
         resWrapperClass.setFullClassName(pkgName + ".SayHiResponse");
         resWrapperClass.setElementName(new QName(expectedNamespace,
                                      "sayHiResponse"));
-        
+
         resWrapperClass.annotate(new WrapperBeanAnnotator());
         annotations = resWrapperClass.getAnnotations();
-        
+
         rootElementAnnotation = annotations.get(0);
-        assertEquals("@XmlRootElement(name = \"sayHiResponse\", " 
-                     + "namespace = \"" + expectedNamespace + "\")", 
+        assertEquals("@XmlRootElement(name = \"sayHiResponse\", "
+                     + "namespace = \"" + expectedNamespace + "\")",
                      rootElementAnnotation.toString());
-        
+
         accessorTypeAnnotation = annotations.get(1);
-        assertEquals("@XmlAccessorType(XmlAccessType.FIELD)", 
+        assertEquals("@XmlAccessorType(XmlAccessType.FIELD)",
                      accessorTypeAnnotation.toString());
-        
+
         xmlTypeAnnotation = annotations.get(2);
         assertEquals("@XmlType(name = \"sayHiResponse\", "
                      + "namespace = \"" + expectedNamespace + "\")",

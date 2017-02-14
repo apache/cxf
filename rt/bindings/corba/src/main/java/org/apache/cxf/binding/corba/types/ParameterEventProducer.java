@@ -59,7 +59,7 @@ public class ParameterEventProducer implements CorbaTypeEventProducer {
     public boolean hasNext() {
         return (currentEventProducer != null
                 ? currentEventProducer.hasNext() : false)
-            || (iterator != null ? iterator.hasNext() : false); 
+            || (iterator != null ? iterator.hasNext() : false);
     }
 
     public int next() {

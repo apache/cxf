@@ -30,20 +30,20 @@ import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 
 /**
- * 
+ *
  */
 public class LocalServiceModelReferenceResolver implements ReferenceResolver {
 
     private DescriptionInfo descriptionInfo;
     private PolicyBuilder builder;
-    
+
     public LocalServiceModelReferenceResolver(DescriptionInfo d, PolicyBuilder b) {
         descriptionInfo = d;
         builder = b;
     }
-    
+
     public Policy resolveReference(String uri) {
-        List<UnknownExtensibilityElement> extensions = 
+        List<UnknownExtensibilityElement> extensions =
             descriptionInfo.getExtensors(UnknownExtensibilityElement.class);
         if (extensions != null) {
             for (UnknownExtensibilityElement e : extensions) {

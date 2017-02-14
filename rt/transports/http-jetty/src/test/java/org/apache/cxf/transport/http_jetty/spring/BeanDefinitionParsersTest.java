@@ -33,37 +33,37 @@ import org.junit.Test;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
-@org.junit.Ignore("Not valid as the parser shouldn't be generating the beans themselves, thats the" 
+@org.junit.Ignore("Not valid as the parser shouldn't be generating the beans themselves, thats the"
                   + "job of the factory later on.  Need to update this test to do that.")
 public class BeanDefinitionParsersTest extends Assert {
     @Test
     public void testDest()throws Exception {
         BeanDefinitionBuilder bd = BeanDefinitionBuilder.childBeanDefinition("child");
-        
+
         HttpDestinationBeanDefinitionParser parser = new HttpDestinationBeanDefinitionParser();
 
         Document d = StaxUtils.read(getClass().getResourceAsStream("destination.xml"));
         parser.doParse(d.getDocumentElement(), null, bd);
-        
+
         PropertyValue[] pvs = bd.getRawBeanDefinition().getPropertyValues().getPropertyValues();
         assertEquals(2, pvs.length);
         assertEquals("foobar", ((HTTPServerPolicy) pvs[0].getValue()).getContentEncoding());
         assertEquals("exact", pvs[1].getValue());
     }
-    
+
     @Test
     public void testConduit()throws Exception {
         BeanDefinitionBuilder bd = BeanDefinitionBuilder.childBeanDefinition("child");
-        
+
         HttpConduitBeanDefinitionParser parser = new HttpConduitBeanDefinitionParser();
 
         Document d = StaxUtils.read(getClass().getResourceAsStream("conduit.xml"));
         parser.doParse(d.getDocumentElement(), null, bd);
-        
+
         PropertyValue[] pvs = bd.getRawBeanDefinition().getPropertyValues().getPropertyValues();
         assertEquals(1, pvs.length);
         assertEquals(97, ((HTTPClientPolicy) pvs[0].getValue()).getConnectionTimeout(), 0);
     }
-    
-    
+
+
 }

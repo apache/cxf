@@ -35,10 +35,10 @@ import org.junit.BeforeClass;
 
 public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase {
     public static final String PORT = OIDCDynRegistrationServer.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(OIDCDynRegistrationServer.class, true));
     }
 
@@ -46,7 +46,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
     public void testGetClientRegNotAvail() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
         String address = "https://localhost:" + PORT + "/services/dynamic/register";
-        WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()), 
+        WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
                          busFile.toString());
         Response r = wc.accept("application/json").path("some-client-id").get();
         assertEquals(401, r.getStatus());
@@ -59,7 +59,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
     public void testRegisterClientInitialAccessToken() throws Exception {
         doTestRegisterClient("123456789");
     }
-    
+
     private void doTestRegisterClient(String initialAccessToken) throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
         String address = "https://localhost:" + PORT + "/services";
@@ -68,9 +68,9 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         } else {
             address = address + "/dynamic/register";
         }
-        WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()), 
+        WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
                          busFile.toString());
-        
+
         wc.accept("application/json").type("application/json");
         ClientRegistration reg = new ClientRegistration();
         reg.setApplicationType("web");
@@ -78,7 +78,7 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         reg.setClientName("dynamic_client");
         reg.setGrantTypes(Collections.singletonList("authorization_code"));
         reg.setRedirectUris(Collections.singletonList("https://a/b/c"));
-        
+
         ClientRegistrationResponse resp = null;
         Response r = wc.post(reg);
         if (initialAccessToken == null) {
@@ -90,27 +90,27 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         }
         assertNotNull(resp.getClientId());
         assertNotNull(resp.getClientSecret());
-        assertEquals(address + "/" + resp.getClientId(), 
+        assertEquals(address + "/" + resp.getClientId(),
                      resp.getRegistrationClientUri());
         String regAccessToken = resp.getRegistrationAccessToken();
         assertNotNull(regAccessToken);
-        
+
         wc.reset();
         wc.path(resp.getClientId());
         assertEquals(401, wc.get().getStatus());
-        
+
         wc.authorization(new ClientAccessToken("Bearer", regAccessToken));
         ClientRegistration clientRegResp = wc.get(ClientRegistration.class);
         assertNotNull(clientRegResp);
         assertEquals("web", clientRegResp.getApplicationType());
         assertEquals("dynamic_client", clientRegResp.getClientName());
         assertEquals("openid", clientRegResp.getScope());
-        assertEquals(Collections.singletonList("authorization_code"), 
+        assertEquals(Collections.singletonList("authorization_code"),
                      clientRegResp.getGrantTypes());
-        assertEquals(Collections.singletonList("https://a/b/c"), 
+        assertEquals(Collections.singletonList("https://a/b/c"),
                      clientRegResp.getRedirectUris());
-        
+
         assertEquals(200, wc.delete().getStatus());
     }
-        
+
 }

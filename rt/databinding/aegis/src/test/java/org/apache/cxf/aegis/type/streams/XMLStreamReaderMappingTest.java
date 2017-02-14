@@ -51,13 +51,13 @@ public class XMLStreamReaderMappingTest extends AbstractAegisTest {
         // create a different mapping than the context creates.
         TypeMapping baseMapping = DefaultTypeMapping.createSoap11TypeMapping(true, false, false);
         mapping = new DefaultTypeMapping(Constants.URI_2001_SCHEMA_XSD, baseMapping);
-        mapping.register(XMLStreamReader.class, 
+        mapping.register(XMLStreamReader.class,
                          new QName("urn:Bean", "SimpleBean"), new XMLStreamReaderType());
         mapping.setTypeCreator(context.createTypeCreator());
         context.setTypeMapping(mapping);
         context.initialize();
     }
-    
+
     @Test
     public void testReadStream() throws Exception {
         // Test reading
@@ -71,7 +71,7 @@ public class XMLStreamReaderMappingTest extends AbstractAegisTest {
         beanReader.nextTag();
         assertEquals("bleh", beanReader.getLocalName());
     }
-    
+
     protected Context getContext() {
         AegisContext globalContext = new AegisContext();
         globalContext.initialize();
@@ -79,6 +79,6 @@ public class XMLStreamReaderMappingTest extends AbstractAegisTest {
         return new Context(globalContext);
     }
 
-    
-    
+
+
 }

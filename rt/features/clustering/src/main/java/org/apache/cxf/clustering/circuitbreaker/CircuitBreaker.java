@@ -28,14 +28,14 @@ public interface CircuitBreaker {
      * @return "false" if circuit breaker is open, "true" otherwise
      */
     boolean allowRequest();
-    
+
     /**
      * Reports about failure conditions to circuit breaker.
      * @param cause exception happened (could be null in case the error is deducted
      * from response status/code).
      */
     void markFailure(Throwable cause);
-    
+
     /**
      * Reports about successful invocation to circuit breaker.
      */

@@ -42,15 +42,15 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
  */
 public class SamlElementCallbackHandler implements CallbackHandler {
     private boolean saml2 = true;
-    
+
     public SamlElementCallbackHandler() {
         //
     }
-    
+
     public SamlElementCallbackHandler(boolean saml2) {
         this.saml2 = saml2;
     }
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
@@ -66,10 +66,10 @@ public class SamlElementCallbackHandler implements CallbackHandler {
             }
         }
     }
-    
+
     /**
      * Mock up a SAML Assertion by using another SAMLCallbackHandler
-     * @throws Exception 
+     * @throws Exception
      */
     private Element getSAMLAssertion(Document doc) throws Exception {
         SAMLCallback samlCallback = new SAMLCallback();
@@ -79,5 +79,5 @@ public class SamlElementCallbackHandler implements CallbackHandler {
         return assertionWrapper.toDOM(doc);
     }
 
-    
+
 }

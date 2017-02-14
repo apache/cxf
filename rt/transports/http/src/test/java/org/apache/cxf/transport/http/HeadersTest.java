@@ -70,7 +70,7 @@ public class HeadersTest extends Assert {
         Headers headers = new Headers(message);
         headers.copyFromRequest(req);
 
-        Map<String, List<String>> protocolHeaders = 
+        Map<String, List<String>> protocolHeaders =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
 
         assertTrue("unexpected size", protocolHeaders.size() == headerNames.length);
@@ -103,9 +103,9 @@ public class HeadersTest extends Assert {
 
         String loggedString = Headers.toString(headerMap, false);
         assertFalse("The value of a sensitive header could be logged: " + loggedString, loggedString.contains("FAIL"));
-        assertTrue("The value of a non-sensitive header would not be logged: " + loggedString, 
+        assertTrue("The value of a non-sensitive header would not be logged: " + loggedString,
                    loggedString.contains("application/xml") && loggedString.contains("text/plain"));
-        assertTrue("Expected header keys were not logged: " + loggedString, 
+        assertTrue("Expected header keys were not logged: " + loggedString,
                    loggedString.contains("Authorization") && loggedString.contains("Proxy-Authorization")
                    && loggedString.contains("Accept") && loggedString.contains("Content-Type"));
     }
@@ -124,7 +124,7 @@ public class HeadersTest extends Assert {
         logger.setUseParentHandlers(false);
         logger.setLevel(Level.INFO);
         for (Handler h : logger.getHandlers()) {
-            logger.removeHandler(h); 
+            logger.removeHandler(h);
         }
         logger.addHandler(new Handler() {
 
@@ -135,7 +135,7 @@ public class HeadersTest extends Assert {
                     assertTrue("Unexpected output for normal header - expected Normal-Header: normal, received " + msg,
                                "Normal-Header: normal".equals(msg));
                 } else if (msg.startsWith("Multivalue-Header")) {
-                    assertTrue("Unexpected output for multi-value header - expected Multivalue-Header: first or " 
+                    assertTrue("Unexpected output for multi-value header - expected Multivalue-Header: first or "
                         + "Multivalue-Header: second, received: " + msg,
                         "Multivalue-Header: first".equals(msg) || "Multivalue-Header: second".equals(msg));
                 } else if (msg.startsWith("Authorization")) {
@@ -173,7 +173,7 @@ public class HeadersTest extends Assert {
         // expect that determineContentType will return the default value of text/xml
         message.put(Message.CONTENT_TYPE, null);
         Headers headers = new Headers(message);
-        assertEquals("Unexpected content-type determined - expected text/xml", "text/xml", 
+        assertEquals("Unexpected content-type determined - expected text/xml", "text/xml",
                      headers.determineContentType());
 
         // second check - null specified in request, valid content-type specified in message
@@ -186,7 +186,7 @@ public class HeadersTest extends Assert {
         message.put(Message.CONTENT_TYPE, "application/json");
         headers = new Headers(message);
         headers.copyFromRequest(req);
-        assertEquals("Unexpected content-type determined - expected application/json", "application/json", 
+        assertEquals("Unexpected content-type determined - expected application/json", "application/json",
                      headers.determineContentType());
 
         control.verify();
@@ -202,7 +202,7 @@ public class HeadersTest extends Assert {
         message.put(Message.CONTENT_TYPE, null);
         headers = new Headers(message);
         headers.copyFromRequest(req);
-        assertEquals("Unexpected content-type determined - expected text/xml", "text/xml", 
+        assertEquals("Unexpected content-type determined - expected text/xml", "text/xml",
                      headers.determineContentType());
 
         control.verify();

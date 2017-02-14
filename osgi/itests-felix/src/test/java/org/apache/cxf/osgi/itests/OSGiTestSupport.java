@@ -29,19 +29,19 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 /**
- * 
+ *
  */
 public class OSGiTestSupport {
 
     @Inject
     protected BundleContext bundleContext;
-    
+
     protected void assertBundleStarted(String name) {
         Bundle bundle = findBundleByName(name);
         Assert.assertNotNull("Bundle " + name + " should be installed", bundle);
         Assert.assertEquals("Bundle " + name + " should be started", Bundle.ACTIVE, bundle.getState());
     }
-    
+
     protected Bundle findBundleByName(String symbolicName) {
         for (Bundle bundle : bundleContext.getBundles()) {
             if (bundle.getSymbolicName().equals(symbolicName)) {

@@ -64,15 +64,15 @@ public final class LogEvent {
     public void setExchangeId(String exchangeId) {
         this.exchangeId = exchangeId;
     }
-    
+
     public EventType getType() {
         return type;
     }
-    
+
     public void setType(EventType type) {
         this.type = type;
     }
-    
+
     public String getAddress() {
         return address;
     }
@@ -112,15 +112,15 @@ public final class LogEvent {
     public void setResponseCode(String responseCode) {
         this.responseCode = responseCode;
     }
-    
+
     public String getPrincipal() {
         return principal;
     }
-    
+
     public void setPrincipal(String principal) {
         this.principal = principal;
     }
-    
+
     public QName getServiceName() {
         return serviceName;
     }
@@ -144,11 +144,11 @@ public final class LogEvent {
     public void setPortTypeName(QName portTypeName) {
         this.portTypeName = portTypeName;
     }
-    
+
     public String getOperationName() {
         return operationName;
     }
-    
+
     public void setOperationName(String operationName) {
         this.operationName = operationName;
     }
@@ -168,11 +168,11 @@ public final class LogEvent {
     public void setBinaryContent(boolean binaryContent) {
         this.binaryContent = binaryContent;
     }
-    
+
     public boolean isMultipartContent() {
         return multipartContent;
     }
-    
+
     public void setMultipartContent(boolean multipartContent) {
         this.multipartContent = multipartContent;
     }
@@ -184,7 +184,7 @@ public final class LogEvent {
     public void setPayload(String payload) {
         this.payload = payload;
     }
-    
+
     public boolean isTruncated() {
         return truncated;
     }

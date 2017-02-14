@@ -36,33 +36,33 @@ import org.apache.cxf.ws.security.trust.claims.ClaimsCallback;
  * stores it on the ClaimsCallback object.
  */
 public class ClaimsCallbackHandler implements CallbackHandler {
-    
+
     public void handle(Callback[] callbacks)
         throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof ClaimsCallback) {
                 ClaimsCallback callback = (ClaimsCallback) callbacks[i];
                 callback.setClaims(createClaims());
-                
+
             } else {
                 throw new UnsupportedCallbackException(callbacks[i], "Unrecognized Callback");
             }
         }
     }
-    
+
     /**
      * Create a Claims Element for a "role"
      */
     private Element createClaims() {
         Document doc = DOMUtils.createDocument();
-        Element claimsElement = 
+        Element claimsElement =
             doc.createElementNS("http://docs.oasis-open.org/ws-sx/ws-trust/200512", "Claims");
         claimsElement.setAttributeNS(null, "Dialect", "http://schemas.xmlsoap.org/ws/2005/05/identity");
-        Element claimType = 
+        Element claimType =
             doc.createElementNS("http://schemas.xmlsoap.org/ws/2005/05/identity", "ClaimType");
         claimType.setAttributeNS(null, "Uri", "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
         claimsElement.appendChild(claimType);
         return claimsElement;
     }
-    
+
 }

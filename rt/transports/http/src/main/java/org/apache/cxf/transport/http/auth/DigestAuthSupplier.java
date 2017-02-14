@@ -31,7 +31,7 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 
 /**
- * 
+ *
  */
 public class DigestAuthSupplier implements HttpAuthSupplier {
     private static final char[] HEXADECIMAL = {
@@ -39,7 +39,7 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
     };
 
     final MessageDigest md5Helper;
-    Map<URI, DigestInfo> authInfo = new ConcurrentHashMap<URI, DigestInfo>(); 
+    Map<URI, DigestInfo> authInfo = new ConcurrentHashMap<URI, DigestInfo>();
 
     public DigestAuthSupplier() {
         MessageDigest md = null;
@@ -67,16 +67,16 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
         if (authPolicy == null || (authPolicy.getUserName() == null && authPolicy.getPassword() == null)) {
             return null;
         }
-        
+
         if (fullHeader == null) {
             DigestInfo di = authInfo.get(currentURI);
             if (di != null) {
                 /* Preemptive authentication is only possible if we have a cached
                  * challenge
                  */
-                return di.generateAuth(getAuthURI(currentURI), 
+                return di.generateAuth(getAuthURI(currentURI),
                                        authPolicy.getUserName(),
-                                       authPolicy.getPassword());            
+                                       authPolicy.getPassword());
             } else {
                 return null;
             }
@@ -102,12 +102,12 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
                     di.method = "POST";
                 }
                 authInfo.put(currentURI, di);
-                
-                return di.generateAuth(getAuthURI(currentURI), 
+
+                return di.generateAuth(getAuthURI(currentURI),
                                        authPolicy.getUserName(),
                                        authPolicy.getPassword());
             }
-            
+
         }
         return null;
     }
@@ -138,13 +138,13 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
         String algorithm = "MD5";
         String charset = "ISO-8859-1";
         String method = "POST";
-        
+
         synchronized String generateAuth(String uri, String username, String password) {
             try {
                 nc++;
                 String ncstring = String.format("%08d", nc);
                 String cnonce = createCnonce();
-                
+
                 String digAlg = algorithm;
                 if (digAlg.equalsIgnoreCase("MD5-sess")) {
                     digAlg = "MD5";
@@ -162,7 +162,7 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
                 if (qop == null) {
                     serverDigestValue = hasha1 + ":" + nonce + ":" + hasha2;
                 } else {
-                    serverDigestValue = hasha1 + ":" + nonce + ":" + ncstring + ":" + cnonce + ":" 
+                    serverDigestValue = hasha1 + ":" + nonce + ":" + ncstring + ":" + cnonce + ":"
                         + qop + ":" + hasha2;
                 }
                 String response = encode(digester.digest(serverDigestValue.getBytes("US-ASCII")));
@@ -185,18 +185,18 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
             }
         }
 
-        
+
     }
 
     /**
-     * Encodes the 128 bit (16 bytes) MD5 digest into a 32 characters long 
+     * Encodes the 128 bit (16 bytes) MD5 digest into a 32 characters long
      * <CODE>String</CODE> according to RFC 2617.
-     * 
+     *
      * @param binaryData array containing the digest
      * @return encoded MD5, or <CODE>null</CODE> if encoding failed
      */
     private static String encode(byte[] binaryData) {
-        int n = binaryData.length; 
+        int n = binaryData.length;
         char[] buffer = new char[n * 2];
         for (int i = 0; i < n; i++) {
             int low = binaryData[i] & 0x0f;

@@ -55,7 +55,7 @@ public class EvaluatePreconditionsTest {
         service = new SimpleService();
         service.setEntityTag(ETAG_OLD);
         DATE_FMT_822.setTimeZone(TimeZone.getTimeZone("GMT"));
-        
+
         service.setLastModified(DATE_OLD);
     }
 

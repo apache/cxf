@@ -42,22 +42,22 @@ import org.apache.cxf.staxutils.StaxUtils;
 
 public final class Client {
 
-    private static final QName SERVICE_NAME 
+    private static final QName SERVICE_NAME
         = new QName("http://apache.org/callback", "SOAPService");
 
     private Client() {
-    } 
+    }
 
     public static void main(String args[]) throws Exception {
-        
-        
+
+
         Object implementor = new CallbackImpl();
         String address = "http://localhost:9005/CallbackContext/CallbackPort";
         Endpoint endpoint = Endpoint.publish(address, implementor);
-        
-        if (args.length == 0) { 
+
+        if (args.length == 0) {
             System.out.println("please specify wsdl");
-            System.exit(1); 
+            System.exit(1);
         }
 
         URL wsdlURL;
@@ -67,22 +67,22 @@ public final class Client {
         } else {
             wsdlURL = new URL(args[0]);
         }
-        
+
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         ServerPortType port = ss.getSOAPPort();
-        
+
         InputStream is = demo.callback.client.Client.class.getResourceAsStream("/callback_infoset.xml");
         Document doc = StaxUtils.read(is);
         Element referenceParameters = DOMUtils.findChildWithAtt(doc.getDocumentElement(),
                                                                 "wsa:ReferenceParameters",
                                                                 "name", "");
         W3CEndpointReference ref = (W3CEndpointReference)endpoint.getEndpointReference(referenceParameters);
-        
+
 
         String resp = port.registerCallback(ref);
         System.out.println("Response from server: " + resp);
-        
-        System.exit(0); 
+
+        System.exit(0);
     }
 
 }

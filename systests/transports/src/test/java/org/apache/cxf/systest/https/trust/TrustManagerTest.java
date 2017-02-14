@@ -43,7 +43,7 @@ import org.junit.BeforeClass;
  */
 public class TrustManagerTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(TrustServer.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -53,7 +53,7 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
             launchServer(TrustServer.class, true)
         );
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         stopAllServers();
@@ -68,32 +68,32 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT);
-        
+
         TLSClientParameters tlsParams = new TLSClientParameters();
         X509TrustManager trustManager = new NoOpX509TrustManager();
         TrustManager[] trustManagers = new TrustManager[1];
         trustManagers[0] = trustManager;
         tlsParams.setTrustManagers(trustManagers);
         tlsParams.setDisableCNCheck(true);
-        
+
         Client client = ClientProxy.getClient(port);
         HTTPConduit http = (HTTPConduit) client.getConduit();
         http.setTlsClientParameters(tlsParams);
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Here the Trust Manager checks the server cert
     @org.junit.Test
     public void testValidServerCertX509TrustManager() throws Exception {
@@ -103,35 +103,35 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT);
-        
+
         String validPrincipalName = "CN=Bethal,OU=Bethal,O=ApacheTest,L=Syracuse,C=US";
-        
+
         TLSClientParameters tlsParams = new TLSClientParameters();
-        X509TrustManager trustManager = 
+        X509TrustManager trustManager =
             new ServerCertX509TrustManager(validPrincipalName);
         TrustManager[] trustManagers = new TrustManager[1];
         trustManagers[0] = trustManager;
         tlsParams.setTrustManagers(trustManagers);
         tlsParams.setDisableCNCheck(true);
-        
+
         Client client = ClientProxy.getClient(port);
         HTTPConduit http = (HTTPConduit) client.getConduit();
         http.setTlsClientParameters(tlsParams);
 
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testInvalidServerCertX509TrustManager() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -140,25 +140,25 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT);
-        
+
         String invalidPrincipalName = "CN=Bethal2,OU=Bethal,O=ApacheTest,L=Syracuse,C=US";
-        
+
         TLSClientParameters tlsParams = new TLSClientParameters();
-        X509TrustManager trustManager = 
+        X509TrustManager trustManager =
             new ServerCertX509TrustManager(invalidPrincipalName);
         TrustManager[] trustManagers = new TrustManager[1];
         trustManagers[0] = trustManager;
         tlsParams.setTrustManagers(trustManagers);
         tlsParams.setDisableCNCheck(true);
-        
+
         Client client = ClientProxy.getClient(port);
         HTTPConduit http = (HTTPConduit) client.getConduit();
         http.setTlsClientParameters(tlsParams);
@@ -169,11 +169,11 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     public static class NoOpX509TrustManager implements X509TrustManager {
 
         public NoOpX509TrustManager() {
@@ -194,9 +194,9 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         }
 
     }
-    
+
     public static class ServerCertX509TrustManager implements X509TrustManager {
-        
+
         private String requiredServerPrincipalName;
 
         public ServerCertX509TrustManager(String principalName) {
@@ -213,11 +213,11 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
                 throw new CertificateException("X509 Certificate chain is empty");
             }
             X509Certificate serverCert = chain[0];
-            if (requiredServerPrincipalName != null 
+            if (requiredServerPrincipalName != null
                 && !requiredServerPrincipalName.equals(serverCert.getSubjectX500Principal().getName())) {
                 throw new CertificateException("X509 server certificate does not match requirement");
             }
-            
+
         }
 
         @Override

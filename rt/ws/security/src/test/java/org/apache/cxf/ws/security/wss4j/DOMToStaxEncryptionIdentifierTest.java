@@ -42,172 +42,172 @@ import org.junit.Test;
  * for different Encryption Key Identifier methods.
  */
 public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
-    
+
     @Test
     public void testEncryptDirectReference() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setCallbackHandler(new TestPwdCallback());
-        Properties cryptoProperties = 
+        Properties cryptoProperties =
             CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
         inProperties.setDecryptionCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(WSHandlerConstants.USER, "myalias");
         properties.put(WSHandlerConstants.ENC_KEY_ID, "DirectReference");
-        
+
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testEncryptIssuerSerial() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setCallbackHandler(new TestPwdCallback());
-        Properties cryptoProperties = 
+        Properties cryptoProperties =
             CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
         inProperties.setDecryptionCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(WSHandlerConstants.USER, "myalias");
         properties.put(WSHandlerConstants.ENC_KEY_ID, "IssuerSerial");
-        
+
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testEncryptThumbprint() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setCallbackHandler(new TestPwdCallback());
-        Properties cryptoProperties = 
+        Properties cryptoProperties =
             CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
         inProperties.setDecryptionCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(WSHandlerConstants.USER, "myalias");
         properties.put(WSHandlerConstants.ENC_KEY_ID, "Thumbprint");
-        
+
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testEncryptX509() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setCallbackHandler(new TestPwdCallback());
-        Properties cryptoProperties = 
+        Properties cryptoProperties =
             CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
         inProperties.setDecryptionCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(WSHandlerConstants.USER, "myalias");
         properties.put(WSHandlerConstants.ENC_KEY_ID, "X509KeyIdentifier");
-        
+
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testEncryptEncryptedKeySHA1() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.setCallbackHandler(new TestPwdCallback());
-        Properties cryptoProperties = 
+        Properties cryptoProperties =
             CryptoFactory.getProperties("insecurity.properties", this.getClass().getClassLoader());
         inProperties.setDecryptionCryptoProperties(cryptoProperties);
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         service.getInInterceptors().add(inhandler);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
         properties.put(WSHandlerConstants.USER, "myalias");
         properties.put(WSHandlerConstants.ENC_KEY_ID, "EncryptedKeySHA1");
-        
+
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     private Service createService() {
         // Create the Service
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
@@ -215,20 +215,20 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         factory.setAddress("local://Echo");
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         Server server = factory.create();
-        
+
         Service service = server.getEndpoint().getService();
         service.getInInterceptors().add(new LoggingInInterceptor());
         service.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         return service;
     }
-    
+
     private Echo createClientProxy() {
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
         proxyFac.setServiceClass(Echo.class);
         proxyFac.setAddress("local://Echo");
         proxyFac.getClientFactoryBean().setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        
+
         return (Echo)proxyFac.create();
     }
 }

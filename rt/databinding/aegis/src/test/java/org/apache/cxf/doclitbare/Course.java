@@ -20,23 +20,23 @@
 package org.apache.cxf.doclitbare;
 
 /**
- * 
+ *
  */
 public class Course {
     private long id;
     private String name;
     private String description;
-    
+
     public Course() {
         id = 0;
     }
-    
+
     public Course(long id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
     }
-    
+
     public long getId() {
         return id;
     }
@@ -55,6 +55,6 @@ public class Course {
     public void setDescription(String description) {
         this.description = description;
     }
-    
+
 
 }

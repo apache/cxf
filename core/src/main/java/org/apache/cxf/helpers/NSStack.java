@@ -28,8 +28,8 @@ public class NSStack {
     private static final String NS_PREFIX_PREFIX = "ns";
 
     private final List<List<NSDecl>> stack = new ArrayList<List<NSDecl>>();
-    private List<NSDecl> top; 
-    private int size; 
+    private List<NSDecl> top;
+    private int size;
     private int nsPrefixCount = 1;
 
     public synchronized void push() {
@@ -107,7 +107,7 @@ public class NSStack {
         }
         return null;
     }
-   
+
     /**
      * Return the namespace name associated with the given prefix by
      * looking thru all the namespace declarations that are in scope.

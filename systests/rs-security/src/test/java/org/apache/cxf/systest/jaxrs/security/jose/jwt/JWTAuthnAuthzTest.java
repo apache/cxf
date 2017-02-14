@@ -49,24 +49,24 @@ import org.junit.BeforeClass;
  */
 public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
     public static final String PORT = BookServerJwtAuthnAuthz.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerJwtAuthnAuthz.class, true));
         registerBouncyCastleIfNeeded();
     }
-    
+
     private static void registerBouncyCastleIfNeeded() throws Exception {
         // Still need it for Oracle Java 7 and Java 8
-        Security.addProvider(new BouncyCastleProvider());    
+        Security.addProvider(new BouncyCastleProvider());
     }
-    
+
     @AfterClass
     public static void unregisterBouncyCastleIfNeeded() throws Exception {
-        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);    
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
     }
-    
+
     @org.junit.Test
     public void testAuthentication() throws Exception {
 
@@ -77,23 +77,23 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwt/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setIssuedAt(new Date().getTime() / 1000L);
         claims.setAudiences(toList(address));
-        
+
         JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
-        properties.put("rs.security.keystore.file", 
+        properties.put("rs.security.keystore.file",
                        "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
@@ -101,12 +101,12 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
 
         Response response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
-        
+
         Book returnedBook = response.readEntity(Book.class);
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
     }
-    
+
     @org.junit.Test
     public void testAuthenticationFailure() throws Exception {
 
@@ -117,17 +117,17 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwt/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setIssuedAt(new Date().getTime() / 1000L);
         claims.setAudiences(toList(address));
-        
+
         JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
@@ -143,7 +143,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testAuthorization() throws Exception {
 
@@ -154,10 +154,10 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
@@ -166,13 +166,13 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         claims.setAudiences(toList(address));
         // The endpoint requires a role of "boss"
         claims.setProperty("role", "boss");
-        
+
         JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
-        properties.put("rs.security.keystore.file", 
+        properties.put("rs.security.keystore.file",
                        "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
@@ -180,12 +180,12 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
 
         Response response = client.post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
-        
+
         Book returnedBook = response.readEntity(Book.class);
         assertEquals(returnedBook.getName(), "book");
         assertEquals(returnedBook.getId(), 123L);
     }
-    
+
     @org.junit.Test
     public void testAuthorizationNoRole() throws Exception {
 
@@ -196,23 +196,23 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setIssuedAt(new Date().getTime() / 1000L);
         claims.setAudiences(toList(address));
-        
+
         JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
-        properties.put("rs.security.keystore.file", 
+        properties.put("rs.security.keystore.file",
                        "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
@@ -221,7 +221,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     @org.junit.Test
     public void testAuthorizationWrongRole() throws Exception {
 
@@ -232,10 +232,10 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         providers.add(new JwtAuthenticationClientFilter());
 
         String address = "https://localhost:" + PORT + "/signedjwtauthz/bookstore/books";
-        WebClient client = 
+        WebClient client =
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
-        
+
         // Create the JWT Token
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
@@ -243,13 +243,13 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         claims.setIssuedAt(new Date().getTime() / 1000L);
         claims.setProperty("role", "manager");
         claims.setAudiences(toList(address));
-        
+
         JwtToken token = new JwtToken(claims);
 
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
-        properties.put("rs.security.keystore.file", 
+        properties.put("rs.security.keystore.file",
                        "org/apache/cxf/systest/jaxrs/security/certs/jwkPrivateSet.txt");
         properties.put("rs.security.signature.algorithm", "RS256");
         properties.put(JwtConstants.JWT_TOKEN, token);
@@ -258,7 +258,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
         Response response = client.post(new Book("book", 123L));
         assertNotEquals(response.getStatus(), 200);
     }
-    
+
     private List<String> toList(String address) {
         return Collections.singletonList(address);
     }

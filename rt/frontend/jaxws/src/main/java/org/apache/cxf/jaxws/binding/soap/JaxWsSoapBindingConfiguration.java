@@ -34,15 +34,15 @@ import org.apache.cxf.service.model.OperationInfo;
  */
 public class JaxWsSoapBindingConfiguration extends SoapBindingConfiguration {
     JaxWsServiceFactoryBean serviceFactory;
-    
+
     public JaxWsSoapBindingConfiguration(JaxWsServiceFactoryBean sifb) {
         serviceFactory = sifb;
     }
-    
+
     public void setJaxWsServiceFactoryBean(JaxWsServiceFactoryBean b) {
         serviceFactory = b;
     }
-    
+
     public String getStyle(OperationInfo op) {
         Method m = op.getProperty("operation.method", Method.class);
         if (m != null) {
@@ -72,7 +72,7 @@ public class JaxWsSoapBindingConfiguration extends SoapBindingConfiguration {
     private JaxWsServiceFactoryBean getJaxWsServiceFactory() {
         return serviceFactory;
     }
-    
+
     @Override
     public String getUse() {
         SOAPBinding sb = getServiceClass().getAnnotation(SOAPBinding.class);

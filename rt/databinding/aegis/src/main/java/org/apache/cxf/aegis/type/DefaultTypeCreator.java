@@ -56,7 +56,7 @@ public class DefaultTypeCreator extends AbstractTypeCreator {
     @Override
     public AegisType createCollectionType(TypeClassInfo info) {
         if (!(info.getType() instanceof ParameterizedType)) {
-            throw new DatabindingException("Cannot create mapping for " + info.getType() 
+            throw new DatabindingException("Cannot create mapping for " + info.getType()
                                            + ", unspecified component type for " + info.getDescription());
         }
 

@@ -37,17 +37,17 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
 
 public final class ClientProviderFactory extends ProviderFactory {
-    private List<ProviderInfo<ClientRequestFilter>> clientRequestFilters = 
+    private List<ProviderInfo<ClientRequestFilter>> clientRequestFilters =
         new ArrayList<ProviderInfo<ClientRequestFilter>>(1);
-    private List<ProviderInfo<ClientResponseFilter>> clientResponseFilters = 
+    private List<ProviderInfo<ClientResponseFilter>> clientResponseFilters =
         new ArrayList<ProviderInfo<ClientResponseFilter>>(1);
-    private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers = 
+    private List<ProviderInfo<ResponseExceptionMapper<?>>> responseExceptionMappers =
         new ArrayList<ProviderInfo<ResponseExceptionMapper<?>>>(1);
     private RxInvokerProvider<?> rxInvokerProvider;
     private ClientProviderFactory(Bus bus) {
         super(bus);
     }
-    
+
     public static ClientProviderFactory createInstance(Bus bus) {
         if (bus == null) {
             bus = BusFactory.getThreadDefaultBus();
@@ -57,20 +57,20 @@ public final class ClientProviderFactory extends ProviderFactory {
         factory.setBusProviders();
         return factory;
     }
-    
+
     public static ClientProviderFactory getInstance(Message m) {
         Endpoint e = m.getExchange().getEndpoint();
         return (ClientProviderFactory)e.get(CLIENT_FACTORY_NAME);
     }
-    
+
     public static ClientProviderFactory getInstance(Endpoint e) {
         return (ClientProviderFactory)e.get(CLIENT_FACTORY_NAME);
     }
-       
-    
+
+
     @Override
     protected void setProviders(boolean custom, boolean busGlobal, Object... providers) {
-        List<ProviderInfo<? extends Object>> theProviders = 
+        List<ProviderInfo<? extends Object>> theProviders =
             prepareProviders(custom, busGlobal, (Object[])providers, null);
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
@@ -78,33 +78,33 @@ public final class ClientProviderFactory extends ProviderFactory {
             if (filterContractSupported(provider, providerCls, ClientRequestFilter.class)) {
                 addProviderToList(clientRequestFilters, provider);
             }
-            
+
             if (filterContractSupported(provider, providerCls, ClientResponseFilter.class)) {
                 addProviderToList(clientResponseFilters, provider);
             }
-            
+
             if (ResponseExceptionMapper.class.isAssignableFrom(providerCls)) {
                 addProviderToList(responseExceptionMappers, provider);
             }
-            
+
             if (RxInvokerProvider.class.isAssignableFrom(providerCls)) {
                 this.rxInvokerProvider = RxInvokerProvider.class.cast(provider.getProvider());
             }
         }
-        Collections.sort(clientRequestFilters, 
+        Collections.sort(clientRequestFilters,
                          new BindingPriorityComparator(ClientRequestFilter.class, true));
-        Collections.sort(clientResponseFilters, 
+        Collections.sort(clientResponseFilters,
                          new BindingPriorityComparator(ClientResponseFilter.class, false));
-        
+
         injectContextProxies(responseExceptionMappers, clientRequestFilters, clientResponseFilters);
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T extends Throwable> ResponseExceptionMapper<T> createResponseExceptionMapper(
                                  Message m, Class<?> paramType) {
-        
+
         List<ResponseExceptionMapper<?>> candidates = new LinkedList<ResponseExceptionMapper<?>>();
-        
+
         for (ProviderInfo<ResponseExceptionMapper<?>> em : responseExceptionMappers) {
             if (handleMapper(em, paramType, m, ResponseExceptionMapper.class, true)) {
                 candidates.add(em.getProvider());
@@ -116,7 +116,7 @@ public final class ClientProviderFactory extends ProviderFactory {
         Collections.sort(candidates, new ProviderFactory.ClassComparator(paramType));
         return (ResponseExceptionMapper<T>) candidates.get(0);
     }
-    
+
     @Override
     public void clearProviders() {
         super.clearProviders();
@@ -124,11 +124,11 @@ public final class ClientProviderFactory extends ProviderFactory {
         clientRequestFilters.clear();
         clientResponseFilters.clear();
     }
-    
+
     public List<ProviderInfo<ClientRequestFilter>> getClientRequestFilters() {
         return Collections.unmodifiableList(clientRequestFilters);
     }
-    
+
     public List<ProviderInfo<ClientResponseFilter>> getClientResponseFilters() {
         return Collections.unmodifiableList(clientResponseFilters);
     }

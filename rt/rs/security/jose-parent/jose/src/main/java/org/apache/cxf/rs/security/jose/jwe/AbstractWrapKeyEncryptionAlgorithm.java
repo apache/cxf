@@ -44,7 +44,7 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
     protected AbstractWrapKeyEncryptionAlgorithm(Key key, KeyAlgorithm jweAlgo, Set<String> supportedAlgorithms) {
         this(key, jweAlgo, true, supportedAlgorithms);
     }
-    protected AbstractWrapKeyEncryptionAlgorithm(Key key, KeyAlgorithm jweAlgo, boolean wrap, 
+    protected AbstractWrapKeyEncryptionAlgorithm(Key key, KeyAlgorithm jweAlgo, boolean wrap,
                                                  Set<String> supportedAlgorithms) {
         this.keyEncryptionKey = key;
         this.algorithm = jweAlgo;
@@ -59,16 +59,16 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek) {
         checkAlgorithms(headers);
         KeyProperties secretKeyProperties = new KeyProperties(getKeyEncryptionAlgoJava(headers));
-        AlgorithmParameterSpec spec = getAlgorithmParameterSpec(headers); 
+        AlgorithmParameterSpec spec = getAlgorithmParameterSpec(headers);
         if (spec != null) {
             secretKeyProperties.setAlgoSpec(spec);
         }
         if (!wrap) {
             return CryptoUtils.encryptBytes(cek, keyEncryptionKey, secretKeyProperties);
         } else {
-            return CryptoUtils.wrapSecretKey(cek, 
+            return CryptoUtils.wrapSecretKey(cek,
                                              getContentEncryptionAlgoJava(headers),
-                                             keyEncryptionKey, 
+                                             keyEncryptionKey,
                                              secretKeyProperties);
         }
     }
@@ -101,5 +101,5 @@ public abstract class AbstractWrapKeyEncryptionAlgorithm implements KeyEncryptio
             headers.setKeyEncryptionAlgorithm(algorithm);
         }
     }
-    
+
 }

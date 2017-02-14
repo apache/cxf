@@ -49,70 +49,70 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
         assertTrue("server did not launch correctly",
                    launchServer(BookServer.class, true));
     }
-    
+
     @Test
     public void testStatefulWebClientWithCopy() throws Exception {
         runWebClients(WebClient.create("http://localhost:" + PORT + "/bookstore"), 10, false, true);
     }
-    
+
     @Test
     public void testStatefulWebClientThreadLocal() throws Exception {
         runWebClients(WebClient.create("http://localhost:" + PORT + "/bookstore", true), 10, true, true);
     }
-    
+
     @Test
     public void testStatefulWebClientThreadLocalWithCopy() throws Exception {
         runWebClients(WebClient.create("http://localhost:" + PORT + "/bookstore", true), 10, false, true);
     }
-    
+
     @Test
     public void testSimpleWebClient() throws Exception {
         WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/booksecho");
         client.type("text/plain").accept("text/plain").header("CustomHeader", "CustomValue");
         runWebClients(client, 10, true, false);
     }
-    
+
     @Test
     public void testSimpleProxy() throws Exception {
         BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         runProxies(proxy, 10, true, false);
     }
-    
+
     @Test
     public void testThreadSafeProxy() throws Exception {
         BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class,
                                                     Collections.emptyList(), true);
         runProxies(proxy, 10, true, true);
     }
-    
+
     @Test
     public void testThreadSafeProxyWithCopy() throws Exception {
         BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class,
                                                     Collections.emptyList(), true);
         runProxies(proxy, 10, false, true);
     }
-    
+
     @Test
     public void testThreadSafeSubProxy() throws Exception {
         BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class,
                                                     Collections.emptyList(), true);
-        
+
         runProxies(proxy.echoThroughBookStoreSub(), 10, true, true);
     }
-    
-    private void runWebClients(WebClient client, int numberOfClients, 
+
+    private void runWebClients(WebClient client, int numberOfClients,
         boolean threadSafe, boolean stateCanBeChanged) throws Exception {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(10));
         CountDownLatch startSignal = new CountDownLatch(1);
         CountDownLatch doneSignal = new CountDownLatch(numberOfClients);
-        
+
         for (int i = 1; i <= numberOfClients; i++) {
             WebClient wc = !threadSafe ? WebClient.fromClient(client) : client;
             String bookName = stateCanBeChanged ? Integer.toString(i) : "TheBook";
             String bookHeader = stateCanBeChanged ? "value" + i : "CustomValue";
-            
-            executor.execute(new WebClientWorker(wc, bookName, bookHeader, 
+
+            executor.execute(new WebClientWorker(wc, bookName, bookHeader,
                              startSignal, doneSignal, stateCanBeChanged));
         }
         startSignal.countDown();
@@ -120,22 +120,22 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
         executor.shutdownNow();
         assertEquals("Not all invocations have completed", 0, doneSignal.getCount());
     }
-    
-    private void runProxies(BookStore proxy, int numberOfClients, 
+
+    private void runProxies(BookStore proxy, int numberOfClients,
                             boolean threadSafe, boolean stateCanBeChanged) throws Exception {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                             new ArrayBlockingQueue<Runnable>(10));
         CountDownLatch startSignal = new CountDownLatch(1);
         CountDownLatch doneSignal = new CountDownLatch(numberOfClients);
-       
+
         for (int i = 1; i <= numberOfClients; i++) {
-            // here we do a double copy : from proxy to web client and back to proxy  
+            // here we do a double copy : from proxy to web client and back to proxy
             BookStore bs = !threadSafe ? JAXRSClientFactory.fromClient(
                    WebClient.fromClient(WebClient.client(proxy)), BookStore.class) : proxy;
             String bookName = stateCanBeChanged ? Integer.toString(i) : "TheBook";
             String bookHeader = stateCanBeChanged ? "value" + i : "CustomValue";
-           
-            executor.execute(new RootProxyWorker(bs, bookName, bookHeader, 
+
+            executor.execute(new RootProxyWorker(bs, bookName, bookHeader,
                             startSignal, doneSignal, stateCanBeChanged));
         }
         startSignal.countDown();
@@ -143,7 +143,7 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
         executor.shutdownNow();
         assertEquals("Not all invocations have completed", 0, doneSignal.getCount());
     }
-    
+
     @Ignore
     private class WebClientWorker implements Runnable {
 
@@ -153,7 +153,7 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
         private CountDownLatch startSignal;
         private CountDownLatch doneSignal;
         private boolean stateCanBeChanged;
-        
+
         WebClientWorker(WebClient client,
                         String bookName,
                         String bookHeader,
@@ -167,12 +167,12 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
             this.doneSignal = doneSignal;
             this.stateCanBeChanged = stateCanBeChanged;
         }
-        
+
         public void run() {
-            
+
             try {
                 startSignal.await();
-                
+
                 for (int i = 0; i < 5; i++) {
                     if (stateCanBeChanged) {
                         invoke(i);
@@ -180,43 +180,43 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
                         doInvoke(bookName, bookHeader);
                     }
                 }
-                
+
                 doneSignal.countDown();
             } catch (InterruptedException ex) {
                 // ignore
             } catch (Exception ex) {
                 ex.printStackTrace();
                 Assert.fail("WebClientWorker thread failed for " + bookName + "," + bookHeader);
-            } 
-            
+            }
+
         }
-        
+
         private void invoke(int ind) throws Exception {
             client.type("text/plain").accept("text/plain");
-            
+
             String actualHeaderName = bookHeader + ind;
             String actualBookName = bookName + ind;
-            
+
             MultivaluedMap<String, String> map = client.getHeaders();
             map.putSingle("CustomHeader", actualHeaderName);
             client.headers(map).path("booksecho");
-                        
+
             doInvoke(actualBookName, actualHeaderName);
-            
+
             // reset current path
             client.back(true);
         }
-        
+
         private void doInvoke(String actualBookName, String actualHeaderName) throws Exception {
             Response response = client.post(actualBookName);
-            
-            assertEquals(actualHeaderName, 
+
+            assertEquals(actualHeaderName,
                 response.getMetadata().getFirst("CustomHeader").toString());
             String responseValue = IOUtils.readStringFromStream((InputStream)response.getEntity());
             assertEquals(actualBookName, responseValue);
         }
     }
-    
+
     @Ignore
     private class RootProxyWorker implements Runnable {
 
@@ -226,7 +226,7 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
         private CountDownLatch startSignal;
         private CountDownLatch doneSignal;
         private boolean stateCanBeChanged;
-        
+
         RootProxyWorker(BookStore proxy,
                         String bookName,
                         String bookHeader,
@@ -240,31 +240,31 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
             this.doneSignal = doneSignal;
             this.stateCanBeChanged = stateCanBeChanged;
         }
-        
+
         public void run() {
-            
+
             try {
                 startSignal.await();
-                
+
                 for (int i = 0; i < 5; i++) {
                     invoke(i);
                 }
-                
+
                 doneSignal.countDown();
             } catch (InterruptedException ex) {
                 // ignore
             } catch (Exception ex) {
                 ex.printStackTrace();
                 Assert.fail("WebClientWorker thread failed for " + bookName + "," + bookHeader);
-            } 
-            
+            }
+
         }
-        
+
         private void invoke(int ind) throws Exception {
-            
+
             String actualHeaderName = bookHeader + ind;
             String actualBookName = bookName + ind;
-            
+
             if (stateCanBeChanged) {
                 Client c = WebClient.client(proxy);
                 MultivaluedMap<String, String> map = c.getHeaders();
@@ -277,9 +277,9 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
                                actualBookName, actualHeaderName);
             }
         }
-        
-        private void verifyResponse(Response response, String actualBookName, String actualHeaderName) 
-            throws Exception { 
+
+        private void verifyResponse(Response response, String actualBookName, String actualHeaderName)
+            throws Exception {
             List<Object> customHeaders = response.getMetadata().get("CustomHeader");
             assertEquals(customHeaders.size(), 1);
             assertEquals(actualHeaderName, customHeaders.get(0).toString());

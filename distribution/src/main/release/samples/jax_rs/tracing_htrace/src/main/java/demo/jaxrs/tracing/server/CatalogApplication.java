@@ -53,7 +53,7 @@ public class CatalogApplication extends Application {
             throw new RuntimeException("Failed to initaliaze JAX-RS application", ex);
         }
     }
-    
+
     private static Map<String, String> getTracingProperties() {
         final Map<String, String> properties = new HashMap<String, String>();
         properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, TracingConfiguration.SPAN_RECEIVER.getName());

@@ -54,10 +54,10 @@ public final class CustomizationParser {
     private final List<InputSource> jaxbBindings = new ArrayList<>();
     private final List<InputSource> packageFiles = new ArrayList<>();
     private final List<String> compilerArgs = new ArrayList<>();
-    
+
     private Bus bus;
     private String wadlPath;
-    
+
     public CustomizationParser(ToolContext env) {
         bus = env.get(Bus.class);
         wadlPath = (String)env.get(WadlToolConstants.CFG_WADLURL);
@@ -66,7 +66,7 @@ public final class CustomizationParser {
     public void parse(ToolContext env) {
         // JAXB schema customizations
         String[] bindingFiles = getBindingFiles(env);
-        
+
         for (int i = 0; i < bindingFiles.length; i++) {
             try {
                 addBinding(bindingFiles[i]);
@@ -75,7 +75,7 @@ public final class CustomizationParser {
                 throw new ToolException(msg, xse);
             }
         }
-        
+
         if (env.get(WadlToolConstants.CFG_NO_ADDRESS_BINDING) == null) {
             //hard code to enable jaxb extensions
             compilerArgs.add("-extension");
@@ -91,11 +91,11 @@ public final class CustomizationParser {
         //pass additional JAXB compiler arguments
         Object jaxbCompilerArgs = env.get(WadlToolConstants.CFG_XJC_ARGS);
         if (jaxbCompilerArgs != null) {
-            
+
             String[] jaxbArgs = jaxbCompilerArgs instanceof String
                     ? new String[]{(String)jaxbCompilerArgs} : (String[])jaxbCompilerArgs;
             List<String> jaxbArgsList = new LinkedList<String>();
-            for (String jaxbArg : jaxbArgs) {        
+            for (String jaxbArg : jaxbArgs) {
                 String[] allArgs = jaxbArg.split(" ");
                 for (String arg : allArgs) {
                     String s = arg.trim();
@@ -106,7 +106,7 @@ public final class CustomizationParser {
             }
             compilerArgs.addAll(jaxbArgsList);
         }
-        
+
         // Schema Namespace to Package customizations
         for (String ns : env.getNamespacePackageMap().keySet()) {
             File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, env.mapPackageName(ns));
@@ -130,7 +130,7 @@ public final class CustomizationParser {
             String schemaLocation = root.getAttribute("schemaLocation");
             String resolvedSchemaLocation = resolveByCatalog(schemaLocation);
             if (resolvedSchemaLocation == null) {
-                resolvedSchemaLocation = schemaLocation.length() == 0 
+                resolvedSchemaLocation = schemaLocation.length() == 0
                     ? wadlPath : getBaseWadlPath() + schemaLocation;
             }
             InputSource tmpIns = null;
@@ -141,7 +141,7 @@ public final class CustomizationParser {
                 throw new ToolException(msg, e1);
             }
             jaxbBindings.add(tmpIns);
-             
+
         }
     }
 
@@ -149,7 +149,7 @@ public final class CustomizationParser {
         int lastSep = wadlPath.lastIndexOf("/");
         return lastSep != -1 ? wadlPath.substring(0, lastSep + 1) : wadlPath;
     }
-    
+
     private InputSource convertToTmpInputSource(Element ele, String schemaLoc) throws Exception {
         InputSource result = null;
         ele.setAttribute("schemaLocation", schemaLoc);
@@ -165,16 +165,16 @@ public final class CustomizationParser {
             return null;
         }
         OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
-        
+
         try {
-            return new OASISCatalogManagerHelper().resolve(catalogResolver, 
+            return new OASISCatalogManagerHelper().resolve(catalogResolver,
                                                            url, null);
         } catch (Exception e1) {
             Message msg = new Message("FAILED_RESOLVE_CATALOG", LOG, url);
             throw new ToolException(msg, e1);
         }
     }
-    
+
     private boolean isValidJaxbBindingFile(XMLStreamReader reader) {
         return ToolConstants.JAXB_BINDINGS.equals(reader.getName());
     }
@@ -188,7 +188,7 @@ public final class CustomizationParser {
             return new String[] {};
         }
     }
-    
+
     public List<InputSource> getJaxbBindings() {
         return this.jaxbBindings;
     }
@@ -196,7 +196,7 @@ public final class CustomizationParser {
     public List<InputSource> getSchemaPackageFiles() {
         return this.packageFiles;
     }
-    
+
     public List<String> getCompilerArgs() {
         return this.compilerArgs;
     }

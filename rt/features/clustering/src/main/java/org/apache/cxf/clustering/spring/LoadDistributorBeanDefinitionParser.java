@@ -31,7 +31,7 @@ public class LoadDistributorBeanDefinitionParser extends AbstractBeanDefinitionP
     protected Class<?> getBeanClass(Element element) {
         return LoadDistributorFeature.class;
     }
- 
+
     @Override
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element e, String name) {
         setFirstChildAsProperty(e, ctx, bean, name);

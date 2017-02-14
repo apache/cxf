@@ -34,7 +34,7 @@ import org.apache.cxf.endpoint.ServiceContractResolver;
 public class JarServiceContractResolver implements ServiceContractResolver {
 
     private URI uri;
-    
+
     public URI getContractLocation(QName qname) {
         URI ns = null;
         try {

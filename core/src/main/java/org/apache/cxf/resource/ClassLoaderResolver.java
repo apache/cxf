@@ -28,16 +28,16 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 @NoJSR250Annotations
 public class ClassLoaderResolver implements ResourceResolver {
 
-    private final ClassLoader loader; 
+    private final ClassLoader loader;
 
-    public ClassLoaderResolver() { 
+    public ClassLoaderResolver() {
         this(ClassLoaderResolver.class.getClassLoader());
     }
 
-    public ClassLoaderResolver(ClassLoader l) { 
+    public ClassLoaderResolver(ClassLoader l) {
         loader = l;
     }
- 
+
     public <T> T resolve(String resourceName, Class<T> resourceType) {
         if (resourceName == null || resourceType == null) {
             return null;
@@ -47,10 +47,10 @@ public class ClassLoaderResolver implements ResourceResolver {
             return resourceType.cast(url);
         }
         return null;
-    } 
+    }
 
-    public InputStream getAsStream(String name) { 
+    public InputStream getAsStream(String name) {
         return loader.getResourceAsStream(name);
-    } 
+    }
 
 }

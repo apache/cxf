@@ -44,14 +44,14 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final QName X509_ENDPOINT = new QName(WS_TRUST_NS, "X509_Port");
     private static final QName TRANSPORT_ENDPOINT = new QName(WS_TRUST_NS, "Transport_Port");
     private static final QName UT_ENDPOINT = new QName(WS_TRUST_NS, "UT_Port");
-    
+
     private STSClient stsClient;
     private TokenRequestParams tokenParams;
 
     public STSTokenOutInterceptor(STSAuthParams authParams, String stsWsdlLocation, Bus bus) {
         this(Phase.PREPARE_SEND, authParams, stsWsdlLocation, bus);
     }
-    
+
     public STSTokenOutInterceptor(String phase, STSAuthParams authParams, String stsWsdlLocation, Bus bus) {
         super(phase);
         this.stsClient = STSUtils.createSTSClient(authParams, stsWsdlLocation, bus);
@@ -83,34 +83,34 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         processToken(message, tok);
     }
-    
+
     // An extension point to allow custom processing of the token
     protected void processToken(Message message, SecurityToken tok) {
-        
+
     }
-    
+
     public STSClient getSTSClient() {
         return stsClient;
     }
-    
+
     /**
      * A enumeration to specify authentication mode in communication with STS.
      * @deprecated use {@link org.apache.cxf.ws.security.trust.STSAuthParams.AuthMode}
      */
     @Deprecated
     public enum AuthMode {
-        X509_ASSYMETRIC(X509_ENDPOINT, KEY_TYPE_X509), 
+        X509_ASSYMETRIC(X509_ENDPOINT, KEY_TYPE_X509),
         UT_TRANSPORT(TRANSPORT_ENDPOINT, null),
         UT_SYMMETRIC(UT_ENDPOINT, null);
-        
+
         private final QName endpointName;
         private final String keyType;
-        
+
         AuthMode(QName endpointName, String keyType) {
             this.endpointName = endpointName;
             this.keyType = keyType;
         }
-        
+
         public QName getEndpointName() {
             return endpointName;
         }
@@ -119,7 +119,7 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
             return keyType;
         }
     }
-    
+
     /**
      * A class to specify authentication parameters for communication with STS.
      * @deprecated use {@link org.apache.cxf.ws.security.trust.STSAuthParams}
@@ -131,7 +131,7 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         private final String callbackHandler;
         private final String alias;
         private final String keystoreProperties;
-        
+
         public AuthParams(AuthMode authMode, String userName, String callbackHandler) {
             this(authMode, userName, callbackHandler, null, null);
         }
@@ -144,7 +144,7 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
             this.alias = alias;
             this.keystoreProperties = keystoreProperties;
         }
-        
+
         public AuthMode getAuthMode() {
             return authMode;
         }

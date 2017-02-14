@@ -36,7 +36,7 @@ import org.junit.rules.ExternalResource;
 public abstract class AbstractCodeGenTest extends ProcessorTestBase {
 
     //CHECKSTYLE:OFF
-    @Rule 
+    @Rule
     public ExternalResource envRule = new ExternalResource() {
         protected void before() throws Throwable {
             File classFile = tmpDir.newFolder("classes");
@@ -54,8 +54,8 @@ public abstract class AbstractCodeGenTest extends ProcessorTestBase {
         }
     };
     //CHECKSTYLE:ON
-    
-    
+
+
     protected JAXWSContainer processor;
     protected ClassLoader classLoader;
 

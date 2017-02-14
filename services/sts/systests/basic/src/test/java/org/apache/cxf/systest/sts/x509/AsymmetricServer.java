@@ -43,7 +43,7 @@ public class AsymmetricServer extends AbstractBusTestServerBase {
             e.printStackTrace();
         }
     }
-    
+
     public static void main(String args[]) {
         new AsymmetricServer().run();
     }

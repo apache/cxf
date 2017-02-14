@@ -53,10 +53,10 @@ import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 public class SCTCanceller implements TokenCanceller {
 
     private static final Logger LOG = LogUtils.getL7dLogger(SCTCanceller.class);
-    
+
     // boolean to enable/disable the check of proof of possession
     private boolean verifyProofOfPossession = true;
-    
+
     /**
      * Return true if this TokenCanceller implementation is capable of cancelling the
      * ReceivedToken argument.
@@ -67,7 +67,7 @@ public class SCTCanceller implements TokenCanceller {
             Element tokenElement = (Element)token;
             String namespace = tokenElement.getNamespaceURI();
             String localname = tokenElement.getLocalName();
-            if ((STSUtils.SCT_NS_05_02.equals(namespace) 
+            if ((STSUtils.SCT_NS_05_02.equals(namespace)
                 || STSUtils.SCT_NS_05_12.equals(namespace))
                 && "SecurityContextToken".equals(localname)) {
                 return true;
@@ -83,7 +83,7 @@ public class SCTCanceller implements TokenCanceller {
         LOG.fine("Trying to cancel a SecurityContextToken");
         TokenCancellerResponse response = new TokenCancellerResponse();
         ReceivedToken cancelTarget = tokenParameters.getToken();
-        
+
         if (tokenParameters.getTokenStore() == null) {
             LOG.log(Level.FINE, "A cache must be configured to use the SCTCanceller");
             return response;
@@ -92,10 +92,10 @@ public class SCTCanceller implements TokenCanceller {
             LOG.log(Level.FINE, "Cancel Target is null");
             return response;
         }
-        
+
         cancelTarget.setState(STATE.NONE);
         response.setToken(cancelTarget);
-        
+
         if (cancelTarget.isDOMElement()) {
             try {
                 Element cancelTargetElement = (Element)cancelTarget.getToken();
@@ -122,14 +122,14 @@ public class SCTCanceller implements TokenCanceller {
         }
         return response;
     }
-    
+
     private boolean matchKey(TokenCancellerParameters tokenParameters, byte[] secretKey) {
         Map<String, Object> messageContext = tokenParameters.getMessageContext();
 
         if (matchDOMSignatureSecret(messageContext, secretKey)) {
             return true;
         }
-        
+
         try {
             if (matchStreamingSignatureSecret(messageContext, secretKey)) {
                 return true;
@@ -148,16 +148,16 @@ public class SCTCanceller implements TokenCanceller {
     public void setVerifyProofOfPossession(boolean verifyProofOfPossession) {
         this.verifyProofOfPossession = verifyProofOfPossession;
     }
-    
+
     private boolean matchDOMSignatureSecret(
         Map<String, Object> messageContext, byte[] secretToMatch
     ) {
-        final List<WSHandlerResult> handlerResults = 
+        final List<WSHandlerResult> handlerResults =
             CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
 
         if (handlerResults != null && handlerResults.size() > 0) {
             WSHandlerResult handlerResult = handlerResults.get(0);
-            List<WSSecurityEngineResult> signedResults = 
+            List<WSSecurityEngineResult> signedResults =
                 handlerResult.getActionResults().get(WSConstants.SIGN);
 
             if (signedResults != null) {
@@ -165,7 +165,7 @@ public class SCTCanceller implements TokenCanceller {
                     byte[] receivedKey = (byte[])engineResult.get(WSSecurityEngineResult.TAG_SECRET);
                     if (Arrays.equals(secretToMatch, receivedKey)) {
                         LOG.log(
-                                Level.FINE, 
+                                Level.FINE,
                                 "Verification of the proof of possession of the key associated with "
                                 + "the security context successful."
                         );
@@ -174,22 +174,22 @@ public class SCTCanceller implements TokenCanceller {
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     private boolean matchStreamingSignatureSecret(
         Map<String, Object> messageContext, byte[] secretToMatch
     ) throws XMLSecurityException {
         @SuppressWarnings("unchecked")
-        final List<SecurityEvent> incomingEventList = 
+        final List<SecurityEvent> incomingEventList =
             (List<SecurityEvent>) messageContext.get(SecurityEvent.class.getName() + ".in");
         if (incomingEventList != null) {
             for (SecurityEvent incomingEvent : incomingEventList) {
                 if (WSSecurityEventConstants.SIGNED_PART == incomingEvent.getSecurityEventType()
-                    || WSSecurityEventConstants.SignedElement 
+                    || WSSecurityEventConstants.SignedElement
                         == incomingEvent.getSecurityEventType()) {
-                    org.apache.xml.security.stax.securityToken.SecurityToken token = 
+                    org.apache.xml.security.stax.securityToken.SecurityToken token =
                         ((AbstractSecuredElementSecurityEvent)incomingEvent).getSecurityToken();
                     if (token != null && token.getSecretKey() != null) {
                         for (String key : token.getSecretKey().keySet()) {
@@ -197,7 +197,7 @@ public class SCTCanceller implements TokenCanceller {
                             if (keyObject instanceof SecretKey
                                 && Arrays.equals(secretToMatch, ((SecretKey)keyObject).getEncoded())) {
                                 LOG.log(
-                                    Level.FINE, 
+                                    Level.FINE,
                                     "Verification of the proof of possession of the key associated with "
                                     + "the security context successful."
                                 );
@@ -208,7 +208,7 @@ public class SCTCanceller implements TokenCanceller {
                 }
             }
         }
-        
+
         return false;
     }
 }

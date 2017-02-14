@@ -64,7 +64,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
 
     /**
      * Constructor.
-     * 
+     *
      * @param mapCodec the MAPCodec to use
      */
     public VersionTransformer(MAPCodec mapCodec) {
@@ -73,7 +73,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
 
     /**
      * Encode message in exposed version.
-     * 
+     *
      * @param exposeAs specifies the WS-Addressing version to expose
      * @param value the value to encode
      * @param localName the localName for the header
@@ -109,7 +109,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
                     codec.encodeMAP(message,
                                     convertTo200403((AttributedURIType)value),
                                     new QName(exposeAs, localName),
-                                    org.apache.cxf.ws.addressing.v200403.AttributedURI.class, 
+                                    org.apache.cxf.ws.addressing.v200403.AttributedURI.class,
                                     marshaller, mustUnderstand);
                 } else if (EndpointReferenceType.class.equals(clz)) {
                     codec.encodeMAP(message,
@@ -128,7 +128,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
 
     /**
      * Decodes a MAP from a exposed version.
-     * 
+     *
      * @param encodedAs specifies the encoded version
      * @param clz the class
      * @param headerElement the SOAP header element
@@ -183,7 +183,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
     /**
      * Holder for 2004/08 Names
      */
-    public static final class Names200408 
+    public static final class Names200408
         extends org.apache.cxf.ws.addressing.VersionTransformer.Names200408 {
 
         protected Names200408() {
@@ -191,7 +191,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
 
         /**
          * Adds 2004/08 headers to set.
-         * 
+         *
          * @param headers set of headers
          */
         private static void addHeaders(Set<QName> headers) {
@@ -206,10 +206,10 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
 
     /**
      * Adds 2004/03 headers to set.
-     * 
+     *
      * @param headers set of headers
      */
-    public static final class Names200403 
+    public static final class Names200403
         extends org.apache.cxf.ws.addressing.VersionTransformer.Names200403 {
 
         protected Names200403() {
@@ -217,7 +217,7 @@ public class VersionTransformer extends org.apache.cxf.ws.addressing.VersionTran
 
         /**
          * Adds 2004/08 headers to set.
-         * 
+         *
          * @param headers set of headers
          */
         private static void addHeaders(Set<QName> headers) {

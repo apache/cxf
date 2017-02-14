@@ -22,7 +22,7 @@ import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
 public class NoneJwsSignatureProvider implements JwsSignatureProvider {
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[] {};
-    
+
     @Override
     public SignatureAlgorithm getAlgorithm() {
         return SignatureAlgorithm.NONE;
@@ -48,7 +48,7 @@ public class NoneJwsSignatureProvider implements JwsSignatureProvider {
         public byte[] sign() {
             return EMPTY_BYTE_ARRAY;
         }
-        
+
     }
 }
 

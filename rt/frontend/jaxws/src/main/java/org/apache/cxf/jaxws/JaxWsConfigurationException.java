@@ -23,7 +23,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;
 
 /**
- * This exception is thrown when CXF discovers inconsistent or unsupported JAX-WS annotations. 
+ * This exception is thrown when CXF discovers inconsistent or unsupported JAX-WS annotations.
  */
 public class JaxWsConfigurationException extends UncheckedException {
 

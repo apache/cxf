@@ -32,7 +32,7 @@ public interface FooService {
 //             Foo foo);
 
     @WebMethod(operationName = "FooEcho2", action = "http://namespace4")
-    @WebResult(name = "FooEcho2HeaderResult", partName = "fooPart", header = true, 
+    @WebResult(name = "FooEcho2HeaderResult", partName = "fooPart", header = true,
                targetNamespace = "http://namespace5")
     Foo echo2(@WebParam(name = "FooEcho2HeaderRequest", header = true, partName = "fooPart",
                         targetNamespace = "http://namespace3")

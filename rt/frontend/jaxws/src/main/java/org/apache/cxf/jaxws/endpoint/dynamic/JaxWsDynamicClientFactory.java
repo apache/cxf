@@ -28,13 +28,13 @@ import org.apache.cxf.jaxws.support.JaxWsEndpointImplFactory;
 /**
  * This class reads a WSDL and creates a dynamic client from it with JAX-WS
  * functionality.
- * This provides support for attachments and other useful things that 
+ * This provides support for attachments and other useful things that
  * come with JAX-WS.
- * 
+ *
  * Use {@link #newInstance} to obtain an instance, and then
  * {@link #createClient(String)} (or other overloads) to create a client.
- * 
- * This factory uses the JAXB data binding. 
+ *
+ * This factory uses the JAXB data binding.
  **/
 public class JaxWsDynamicClientFactory extends DynamicClientFactory {
 
@@ -52,7 +52,7 @@ public class JaxWsDynamicClientFactory extends DynamicClientFactory {
 
     /**
      * Create a new instance using a specific <tt>Bus</tt>.
-     * 
+     *
      * @param b the <tt>Bus</tt> to use in subsequent operations with the
      *            instance
      * @return the new instance
@@ -63,7 +63,7 @@ public class JaxWsDynamicClientFactory extends DynamicClientFactory {
 
     /**
      * Create a new instance using a default <tt>Bus</tt>.
-     * 
+     *
      * @return the new instance
      * @see CXFBusFactory#getDefaultBus()
      */

@@ -36,14 +36,14 @@ import org.junit.BeforeClass;
  * a CXF client invokes on an STS and obtains a security token, which is sent to a service provider.
  * The service provider is configured to validate the received token against a second STS instance.
  * Both STS instances must have a shared distributed cache, and enough time must have elapsed for
- * the first STS instance to replicate the credential to the second STS instance for the test to 
+ * the first STS instance to replicate the credential to the second STS instance for the test to
  * work.
  */
 public class DistributedCachingTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
@@ -70,7 +70,7 @@ public class DistributedCachingTest extends AbstractBusClientServerTestBase {
                 launchServer(STSServer2.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -89,17 +89,17 @@ public class DistributedCachingTest extends AbstractBusClientServerTestBase {
         URL wsdl = DistributedCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSCTPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
 
         // Transport port
         doubleIt(transportPort, 25);
-        
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSAMLToken() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -112,17 +112,17 @@ public class DistributedCachingTest extends AbstractBusClientServerTestBase {
         URL wsdl = DistributedCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSAMLPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
 
         // Transport port
         doubleIt(transportPort, 25);
-        
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUsernameToken() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -135,13 +135,13 @@ public class DistributedCachingTest extends AbstractBusClientServerTestBase {
         URL wsdl = DistributedCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
 
         // Transport port
         doubleIt(transportPort, 25);
-        
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }

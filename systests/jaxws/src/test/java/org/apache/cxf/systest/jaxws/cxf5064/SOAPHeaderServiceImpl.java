@@ -25,7 +25,7 @@ import javax.jws.WebService;
 public class SOAPHeaderServiceImpl implements SOAPHeaderSEI {
 
     /**
-     * 
+     *
      */
     public SOAPHeaderServiceImpl() {
         // TODO Auto-generated constructor stub

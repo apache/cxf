@@ -22,5 +22,5 @@ import javax.ws.rs.Path;
 
 @Path("/bookstore/")
 public interface BookStoreInterface {
-    
+
 }

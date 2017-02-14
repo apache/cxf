@@ -56,9 +56,9 @@ import org.opensaml.saml.common.SAMLVersion;
  * A TokenProvider implementation that provides a SAML Token.
  */
 public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements TokenProvider {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(SAMLTokenProvider.class);
-    
+
     private List<AttributeStatementProvider> attributeStatementProviders;
     private List<AuthenticationStatementProvider> authenticationStatementProviders;
     private List<AuthDecisionStatementProvider> authDecisionStatementProviders;
@@ -67,7 +67,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
     private boolean signToken = true;
     private Map<String, RealmProperties> realmMap = new HashMap<>();
     private SamlCustomHandler samlCustomHandler;
-    
+
     /**
      * Return true if this TokenProvider implementation is capable of providing a token
      * that corresponds to the given TokenType.
@@ -75,7 +75,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
     public boolean canHandleToken(String tokenType) {
         return canHandleToken(tokenType, null);
     }
-    
+
     /**
      * Return true if this TokenProvider implementation is capable of providing a token
      * that corresponds to the given TokenType in a given realm.
@@ -87,7 +87,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         return WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML2_NS.equals(tokenType)
             || WSConstants.WSS_SAML_TOKEN_TYPE.equals(tokenType) || WSConstants.SAML_NS.equals(tokenType);
     }
-    
+
     /**
      * Create a token given a TokenProviderParameters
      */
@@ -98,7 +98,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Handling token of type: " + tokenRequirements.getTokenType());
         }
-        
+
         byte[] secret = null;
         byte[] entropyBytes = null;
         long keySize = 0;
@@ -110,13 +110,13 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             entropyBytes = keyHandler.getEntropyBytes();
             keySize = keyHandler.getKeySize();
             computedKey = keyHandler.isComputedKey();
-        } 
-        
+        }
+
         try {
             Document doc = DOMUtils.createDocument();
             SamlAssertionWrapper assertion = createSamlToken(tokenParameters, secret, doc);
             Element token = assertion.toDOM(doc);
-            
+
             // set the token in cache (only if the token is signed)
             byte[] signatureValue = assertion.getSignatureValue();
             if (tokenParameters.getTokenStore() != null && signatureValue != null
@@ -127,34 +127,34 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 } else {
                     validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
                 }
-                
-                SecurityToken securityToken = 
-                    CacheUtils.createSecurityTokenForStorage(token, assertion.getId(), 
+
+                SecurityToken securityToken =
+                    CacheUtils.createSecurityTokenForStorage(token, assertion.getId(),
                         validTill.toDate(), tokenParameters.getPrincipal(), tokenParameters.getRealm(),
                         tokenParameters.getTokenRequirements().getRenewing());
                 CacheUtils.storeTokenInCache(
                     securityToken, tokenParameters.getTokenStore(), signatureValue);
             }
-            
+
             TokenProviderResponse response = new TokenProviderResponse();
-            
+
             String tokenType = tokenRequirements.getTokenType();
-            if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType) 
+            if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
                 || WSConstants.SAML2_NS.equals(tokenType)) {
                 response.setTokenId(token.getAttributeNS(null, "ID"));
             } else {
                 response.setTokenId(token.getAttributeNS(null, "AssertionID"));
             }
-            
+
             if (tokenParameters.isEncryptToken()) {
-                token = TokenProviderUtils.encryptToken(token, response.getTokenId(), 
-                                                        tokenParameters.getStsProperties(), 
-                                                        tokenParameters.getEncryptionProperties(), 
+                token = TokenProviderUtils.encryptToken(token, response.getTokenId(),
+                                                        tokenParameters.getStsProperties(),
+                                                        tokenParameters.getEncryptionProperties(),
                                                         keyRequirements,
                                                         tokenParameters.getMessageContext());
             }
             response.setToken(token);
-            
+
             DateTime validFrom = null;
             DateTime validTill = null;
             if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
@@ -166,13 +166,13 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             }
             response.setCreated(validFrom.toDate());
             response.setExpires(validTill.toDate());
-            
+
             response.setEntropy(entropyBytes);
             if (keySize > 0) {
                 response.setKeySize(keySize);
             }
             response.setComputedKey(computedKey);
-            
+
             LOG.fine("SAML Token successfully created");
             return response;
         } catch (Exception e) {
@@ -180,7 +180,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             throw new STSException("Can't serialize SAML assertion", e, STSException.REQUEST_FAILED);
         }
     }
-    
+
     /**
      * Set the List of AttributeStatementProviders.
      */
@@ -189,14 +189,14 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
     ) {
         this.attributeStatementProviders = attributeStatementProviders;
     }
-    
+
     /**
      * Get the List of AttributeStatementProviders.
      */
     public List<AttributeStatementProvider> getAttributeStatementProviders() {
         return attributeStatementProviders;
     }
-    
+
     /**
      * Set the List of AuthenticationStatementProviders.
      */
@@ -205,14 +205,14 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
     ) {
         this.authenticationStatementProviders = authnStatementProviders;
     }
-    
+
     /**
      * Get the List of AuthenticationStatementProviders.
      */
     public List<AuthenticationStatementProvider> getAuthenticationStatementProviders() {
         return authenticationStatementProviders;
     }
-    
+
     /**
      * Set the List of AuthDecisionStatementProviders.
      */
@@ -221,7 +221,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
     ) {
         this.authDecisionStatementProviders = authDecisionStatementProviders;
     }
-    
+
     /**
      * Get the List of AuthDecisionStatementProviders.
      */
@@ -235,21 +235,21 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
     public void setSubjectProvider(SubjectProvider subjectProvider) {
         this.subjectProvider = subjectProvider;
     }
-    
+
     /**
      * Get the SubjectProvider.
      */
     public SubjectProvider getSubjectProvider() {
         return subjectProvider;
     }
-    
+
     /**
      * Set the ConditionsProvider
      */
     public void setConditionsProvider(ConditionsProvider conditionsProvider) {
         this.conditionsProvider = conditionsProvider;
     }
-    
+
     /**
      * Get the ConditionsProvider
      */
@@ -270,7 +270,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
     public void setSignToken(boolean signToken) {
         this.signToken = signToken;
     }
-    
+
     /**
      * Set the map of realm->RealmProperties for this token provider
      * @param realms the map of realm->RealmProperties for this token provider
@@ -281,7 +281,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             this.realmMap.putAll(realms);
         }
     }
-    
+
     /**
      * Get the map of realm->RealmProperties for this token provider
      * @return the map of realm->RealmProperties for this token provider
@@ -302,31 +302,31 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         if (realm != null && realmMap.containsKey(realm)) {
             samlRealm = realmMap.get(realm);
         }
-        
+
         SamlCallbackHandler handler = createCallbackHandler(tokenParameters, secret, samlRealm, doc);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(handler, samlCallback);
-        
+
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
-        
+
         if (samlCustomHandler != null) {
             samlCustomHandler.handle(assertion, tokenParameters);
         }
-        
+
         if (signToken) {
             STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
             signToken(assertion, samlRealm, stsProperties, tokenParameters.getKeyRequirements());
         }
-        
+
         return assertion;
     }
-    
+
     public SamlCallbackHandler createCallbackHandler(
         TokenProviderParameters tokenParameters, byte[] secret, RealmProperties samlRealm, Document doc
     ) throws Exception {
         boolean statementAdded = false;
-        
+
         // Parse the AttributeStatements
         List<AttributeStatementBean> attrBeanList = null;
         if (attributeStatementProviders != null && attributeStatementProviders.size() > 0) {
@@ -336,8 +336,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 if (statementBean != null) {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine(
-                            "AttributeStatements" + statementBean.toString() 
-                            + "returned by AttributeStatementProvider " 
+                            "AttributeStatements" + statementBean.toString()
+                            + "returned by AttributeStatementProvider "
                             + statementProvider.getClass().getName()
                         );
                     }
@@ -346,7 +346,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 }
             }
         }
-        
+
         // Parse the AuthenticationStatements
         List<AuthenticationStatementBean> authBeanList = null;
         if (authenticationStatementProviders != null && authenticationStatementProviders.size() > 0) {
@@ -356,8 +356,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 if (statementBean != null) {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine(
-                            "AuthenticationStatement" + statementBean.toString() 
-                            + "returned by AuthenticationStatementProvider " 
+                            "AuthenticationStatement" + statementBean.toString()
+                            + "returned by AuthenticationStatementProvider "
                             + statementProvider.getClass().getName()
                         );
                     }
@@ -366,10 +366,10 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 }
             }
         }
-        
+
         // Parse the AuthDecisionStatements
         List<AuthDecisionStatementBean> authDecisionBeanList = null;
-        if (authDecisionStatementProviders != null 
+        if (authDecisionStatementProviders != null
             && authDecisionStatementProviders.size() > 0) {
             authDecisionBeanList = new ArrayList<>();
             for (AuthDecisionStatementProvider statementProvider : authDecisionStatementProviders) {
@@ -377,8 +377,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 if (statementBean != null) {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine(
-                            "AuthDecisionStatement" + statementBean.toString() 
-                            + "returned by AuthDecisionStatementProvider " 
+                            "AuthDecisionStatement" + statementBean.toString()
+                            + "returned by AuthDecisionStatementProvider "
                             + statementProvider.getClass().getName()
                         );
                     }
@@ -387,7 +387,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 }
             }
         }
-        
+
         // If no providers have been configured, then default to the ClaimsAttributeStatementProvider
         // If no Claims are available then use the DefaultAttributeStatementProvider
         // Also handle "ActAs" via the ActAsAttributeStatementProvider
@@ -403,15 +403,15 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 attributeBean = attributeProvider.getStatement(tokenParameters);
                 attrBeanList.add(attributeBean);
             }
-            
+
             attributeProvider = new ActAsAttributeStatementProvider();
             attributeBean = attributeProvider.getStatement(tokenParameters);
             if (attributeBean != null && attributeBean.getSamlAttributes() != null
                 && !attributeBean.getSamlAttributes().isEmpty()) {
                 attrBeanList.add(attributeBean);
-            } 
+            }
         }
-        
+
         // Get the Subject and Conditions
         SubjectProviderParameters subjectProviderParameters = new SubjectProviderParameters();
         subjectProviderParameters.setProviderParameters(tokenParameters);
@@ -421,9 +421,9 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         subjectProviderParameters.setAuthBeanList(authBeanList);
         subjectProviderParameters.setAuthDecisionBeanList(authDecisionBeanList);
         SubjectBean subjectBean = subjectProvider.getSubject(subjectProviderParameters);
-        
+
         ConditionsBean conditionsBean = conditionsProvider.getConditions(tokenParameters);
-        
+
         // Set all of the beans on the SamlCallbackHandler
         SamlCallbackHandler handler = new SamlCallbackHandler();
         handler.setTokenProviderParameters(tokenParameters);
@@ -432,14 +432,14 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         handler.setAttributeBeans(attrBeanList);
         handler.setAuthenticationBeans(authBeanList);
         handler.setAuthDecisionStatementBeans(authDecisionBeanList);
-        
+
         if (samlRealm != null) {
             handler.setIssuer(samlRealm.getIssuer());
         }
-        
+
         return handler;
     }
-    
+
     /**
      * Do some tests on the KeyType parameter.
      */
@@ -461,8 +461,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             LOG.log(Level.WARNING, "An unknown KeyType was requested: " + keyType);
             throw new STSException("Unknown KeyType", STSException.INVALID_REQUEST);
         }
-        
+
     }
-    
-    
+
+
 }

@@ -71,13 +71,13 @@ public class IDLToWSDLProcessor extends IDLProcessor {
     private String physical;
     private String outputDir;
     private Writer outputWriter;
-    private Writer schemaOutputWriter;   
+    private Writer schemaOutputWriter;
     private Writer logicalOutputWriter;
     private Writer physicalOutputWriter;
     private Map<String, File> importDefnWriters;
     private Map<String, File> importSchemaWriters;
     private boolean ignoreImports;
-    
+
     public void process() throws ToolException {
         super.process();
         process(getIDLTree());
@@ -96,15 +96,15 @@ public class IDLToWSDLProcessor extends IDLProcessor {
     public void setOutputWriter(Writer writer) {
         outputWriter = writer;
     }
-    
+
     public void setSchemaOutputWriter(Writer writer) {
         schemaOutputWriter = writer;
     }
-    
+
     public void setLogicalOutputWriter(Writer writer) {
         logicalOutputWriter = writer;
     }
-    
+
     public void setPhysicalOutputWriter(Writer writer) {
         physicalOutputWriter = writer;
     }
@@ -124,31 +124,31 @@ public class IDLToWSDLProcessor extends IDLProcessor {
     protected void setIgnoreImports(boolean flag) {
         ignoreImports = flag;
     }
-    
+
     private void checkFileOptions() {
-                
+
         if (env.optionSet(ToolCorbaConstants.CFG_LOGICAL)) {
-            // set the logical filename 
-            logical = env.get(ToolCorbaConstants.CFG_LOGICAL).toString();        
+            // set the logical filename
+            logical = env.get(ToolCorbaConstants.CFG_LOGICAL).toString();
         }
         if (env.optionSet(ToolCorbaConstants.CFG_PHYSICAL)) {
             // set the physical file name
-            physical = env.get(ToolCorbaConstants.CFG_PHYSICAL).toString();            
+            physical = env.get(ToolCorbaConstants.CFG_PHYSICAL).toString();
         }
         if (env.optionSet(ToolCorbaConstants.CFG_SCHEMA)) {
             // deal with writing schema types to the schema specified file
             schemaFilename = env.get(ToolCorbaConstants.CFG_SCHEMA).toString();
         }
         if (env.optionSet(ToolCorbaConstants.CFG_IMPORTSCHEMA)) {
-            // deal with importing schema types 
+            // deal with importing schema types
             importSchemaFilename = env.get(ToolCorbaConstants.CFG_IMPORTSCHEMA).toString();
-        }                
-    }    
+        }
+    }
 
     public void parseIDL(AST idlTree) throws Exception {
         if (env.isVerbose()) {
             System.out.println(idlTree.toStringTree());
-        }               
+        }
 
         // target namespace
         String tns = (String) env.get(ToolCorbaConstants.CFG_TNS);
@@ -157,20 +157,20 @@ public class IDLToWSDLProcessor extends IDLProcessor {
         }
         // XmlSchema namespace
         String schemans = (String) env.get(ToolCorbaConstants.CFG_SCHEMA_NAMESPACE);
-        
+
         // corba typemap namespace
         String corbatypemaptns = (String) env.get(ToolCorbaConstants.CFG_CORBATYPEMAP_NAMESPACE);
-        
+
         outputDir = ".";
 
         try {
-            WSDLASTVisitor visitor = new WSDLASTVisitor(tns, schemans, corbatypemaptns, 
+            WSDLASTVisitor visitor = new WSDLASTVisitor(tns, schemans, corbatypemaptns,
                                                         preprocessor.getPragmaPrefix());
             visitor.getManager().setIgnoreImports(ignoreImports);
             if (env.optionSet(ToolConstants.CFG_OUTPUTDIR)) {
                 outputDir =  (String) env.get(ToolConstants.CFG_OUTPUTDIR);
             }
-            visitor.setOutputDir(outputDir); 
+            visitor.setOutputDir(outputDir);
             Definition def = visitor.getDefinition();
             if (env.optionSet(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE)) {
                 visitor.setSequenceOctetType((String) env.get(ToolCorbaConstants.CFG_SEQUENCE_OCTET_TYPE));
@@ -183,17 +183,17 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             if (env.optionSet(ToolCorbaConstants.CFG_BOUNDEDSTRINGS)) {
                 visitor.setBoundedStringOverride(true);
             }
-            
+
             if (env.optionSet(ToolCorbaConstants.CFG_MODULETONS)) {
                 String mapping = (String) env.get(ToolCorbaConstants.CFG_MODULETONS);
                 //parse the mapping & set a map of module to namespace mapping in the visitor
                 visitor.setModuleToNSMapping(getModuleToNSMapping(mapping));
             }
-            
+
             if (env.optionSet(ToolCorbaConstants.CFG_QUALIFIED)) {
                 visitor.setQualified(true);
             }
-            
+
             if (env.optionSet(ToolCorbaConstants.CFG_POLYMORPHIC_FACTORIES)) {
                 visitor.setSupportPolymorphicFactories(true);
             }
@@ -213,32 +213,32 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 //parse the mapping & set a map of module to namespace mapping in the visitor
                 visitor.setExcludedModules(getExcludedModules(modules));
             }
-            visitor.visit(idlTree);  
-            
+            visitor.visit(idlTree);
+
             cleanUpTypeMap(visitor.getTypeMap());
-            
+
             Binding[] bindings = visitor.getCorbaBindings();
             generateCORBAService(def, bindings, visitor.getModuleToNSMapper().isDefaultMapping());
-            writeDefinitions(visitor);           
-        } catch (Exception ex) {           
+            writeDefinitions(visitor);
+        } catch (Exception ex) {
             throw new ToolException(ex.getMessage(), ex);
         }
     }
-    
+
     // Sets the output directory and the generated filenames.
-    // Output directory is specified 
+    // Output directory is specified
     //     - File names have no path specified
     //     - File names do have specified so they take precedence.
     // Output directory is not specified
     //     - File names have no path specified so use current directory.
     //     - File names have full path specified.
-    private void writeDefinitions(WSDLASTVisitor visitor) 
-        throws Exception {                              
+    private void writeDefinitions(WSDLASTVisitor visitor)
+        throws Exception {
         if (env.optionSet(ToolCorbaConstants.CFG_LOGICAL)
             || env.optionSet(ToolCorbaConstants.CFG_PHYSICAL)
             || env.optionSet(ToolCorbaConstants.CFG_SCHEMA)
             || env.optionSet(ToolCorbaConstants.CFG_IMPORTSCHEMA)) {
-                        
+
             if (logical == null || physical == null) {
                 if (outputWriter == null) {
                     outputWriter = getOutputWriter(idl + ".wsdl", outputDir);
@@ -246,41 +246,41 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 String separator = System.getProperty("file.separator");
                 File file = null;
                 if (env.get(ToolConstants.CFG_OUTPUTDIR) != null) {
-                    file = new File(outputDir + separator + idl + ".wsdl");                        
+                    file = new File(outputDir + separator + idl + ".wsdl");
                 } else {
-                    file = new File(idl + ".wsdl");                        
-                }   
-                visitor.setIdlFile(file.getAbsolutePath());                                    
-            }            
-            
-            if (logical != null) {                
+                    file = new File(idl + ".wsdl");
+                }
+                visitor.setIdlFile(file.getAbsolutePath());
+            }
+
+            if (logical != null) {
                 logical = getFilePath(logical).getAbsolutePath();
                 if  (logicalOutputWriter == null) {
-                    logicalOutputWriter = createOutputWriter(logical);                    
-                }                                  
+                    logicalOutputWriter = createOutputWriter(logical);
+                }
             }
-                            
-            if (physical != null) {               
+
+            if (physical != null) {
                 physical = getFilePath(physical).getAbsolutePath();
-                if (physicalOutputWriter == null) {            
-                    physicalOutputWriter = createOutputWriter(physical); 
-                }                                
-            }            
-            
-            if (schemaFilename != null) {                
-                schemaFilename = getFilePath(schemaFilename).getAbsolutePath();
-                if (schemaOutputWriter == null) {            
-                    schemaOutputWriter = createOutputWriter(schemaFilename); 
-                }    
+                if (physicalOutputWriter == null) {
+                    physicalOutputWriter = createOutputWriter(physical);
+                }
             }
-                        
+
+            if (schemaFilename != null) {
+                schemaFilename = getFilePath(schemaFilename).getAbsolutePath();
+                if (schemaOutputWriter == null) {
+                    schemaOutputWriter = createOutputWriter(schemaFilename);
+                }
+            }
+
             if (importSchemaFilename != null) {
-                importSchemaFilename = getImportFile(importSchemaFilename);               
+                importSchemaFilename = getImportFile(importSchemaFilename);
                 visitor.setImportSchema(importSchemaFilename);
-            }                     
-                        
+            }
+
             visitor.writeDefinitions(outputWriter, schemaOutputWriter,
-                                     logicalOutputWriter, physicalOutputWriter, 
+                                     logicalOutputWriter, physicalOutputWriter,
                                      schemaFilename, logical, physical);
         } else {
             if (outputWriter == null) {
@@ -291,14 +291,14 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                         outputFile = outputFile + ".wsdl";
                     }
                 }
-                outputWriter = getOutputWriter(outputFile, outputDir); 
+                outputWriter = getOutputWriter(outputFile, outputDir);
             }
             Definition defn = visitor.getDefinition();
             if (!visitor.getModuleToNSMapper().isDefaultMapping()) {
                 addTypeMapSchemaImports(defn, visitor);
                 visitor.getManager().attachDeferredSchemasToWSDL();
             }
-            
+
             visitor.writeDefinition(defn, outputWriter);
             writeImportedDefinitionsAndSchemas(visitor);
         }
@@ -315,7 +315,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
         if (importSchemaWriters != null) {
             assert importSchemaWriters.size() == schemas.size();
         }
-        
+
         for (Entry<File, Definition> entry : defns.entrySet()) {
             Writer writer = null;
             if (importDefnWriters != null) {
@@ -339,49 +339,49 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             writer.close();
         }
     }
-    
+
     // Get the imported schema file.
     private String getImportFile(String importFilename) {
-        // check that file exists        
-        File file = new File(importFilename);                        
-        
-        if (!file.exists()) {            
+        // check that file exists
+        File file = new File(importFilename);
+
+        if (!file.exists()) {
             if (!file.isAbsolute()) {
                 String separator = System.getProperty("file.separator");
-                String userdir = System.getProperty("user.dir");                
+                String userdir = System.getProperty("user.dir");
                 file = new File(userdir + separator + importFilename);
             }
             if (!file.exists()) {
                 String msg = importFilename + " File not found";
                 FileNotFoundException ex = new FileNotFoundException(msg);
                 System.err.println("IDLToWsdl Error : " + ex.getMessage());
-                System.err.println();            
-                ex.printStackTrace();            
+                System.err.println();
+                ex.printStackTrace();
                 System.exit(1);
             } else {
                 URI url = file.toURI();
                 return url.toString();
-                
-            }            
+
+            }
         } else {
             URI url = file.toURI();
             return url.toString();
         }
         return null;
     }
-    
-    private Writer createOutputWriter(String name) throws Exception {        
+
+    private Writer createOutputWriter(String name) throws Exception {
         String outDir = outputDir;
         int index = name.lastIndexOf(System.getProperty("file.separator"));
         outDir = name.substring(0, index);
-        String filename = name.substring(index + 1, name.length());                        
-        return getOutputWriter(filename, outDir);        
+        String filename = name.substring(index + 1, name.length());
+        return getOutputWriter(filename, outDir);
     }
-    
+
     // Gets the fully qualified path of a file.
-    private File getFilePath(String ifile) {        
+    private File getFilePath(String ifile) {
         String separator = System.getProperty("file.separator");
-        StringTokenizer token = new StringTokenizer(ifile, separator);        
+        StringTokenizer token = new StringTokenizer(ifile, separator);
 
         if (token.countTokens() == 1) {
             if (env.get(ToolConstants.CFG_OUTPUTDIR) != null) {
@@ -391,30 +391,30 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             }
         } else {
             return new File(ifile);
-        }                           
-    }           
-    
-    public Writer getOutputWriter(String filename, String outputDirectory) throws Exception {
-
-        
-        if (env.optionSet(ToolCorbaConstants.CFG_WSDL_ENCODING)) { 
-            String encoding = env.get(ToolCorbaConstants.CFG_WSDL_ENCODING).toString();            
-            return new FileWriterUtil()
-                .getWriter(new File(outputDirectory, filename), encoding); 
-        } else {
-            FileWriterUtil fw = new FileWriterUtil(outputDirectory, null);        
-            return fw.getWriter("", filename); 
-        }       
+        }
     }
 
-    public Writer getOutputWriter(File file) throws Exception {        
-        if (env.optionSet(ToolCorbaConstants.CFG_WSDL_ENCODING)) { 
-            String encoding = env.get(ToolCorbaConstants.CFG_WSDL_ENCODING).toString();            
-            return new FileWriterUtil().getWriter(file, encoding); 
+    public Writer getOutputWriter(String filename, String outputDirectory) throws Exception {
+
+
+        if (env.optionSet(ToolCorbaConstants.CFG_WSDL_ENCODING)) {
+            String encoding = env.get(ToolCorbaConstants.CFG_WSDL_ENCODING).toString();
+            return new FileWriterUtil()
+                .getWriter(new File(outputDirectory, filename), encoding);
+        } else {
+            FileWriterUtil fw = new FileWriterUtil(outputDirectory, null);
+            return fw.getWriter("", filename);
+        }
+    }
+
+    public Writer getOutputWriter(File file) throws Exception {
+        if (env.optionSet(ToolCorbaConstants.CFG_WSDL_ENCODING)) {
+            String encoding = env.get(ToolCorbaConstants.CFG_WSDL_ENCODING).toString();
+            return new FileWriterUtil().getWriter(file, encoding);
         } else {
             return new FileWriterUtil().getWriter(file, StandardCharsets.UTF_8.name());
-        }       
-    }    
+        }
+    }
 
     public String getBaseFilename(String ifile) {
         String fileName = ifile;
@@ -496,9 +496,9 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             AddressType address =
                 (AddressType) def.getExtensionRegistry().createExtension(Port.class,
                                                                          CorbaConstants.NE_CORBA_ADDRESS);
-            
+
             String addr = null;
-            String addrFileName = (String) env.get(ToolCorbaConstants.CFG_ADDRESSFILE); 
+            String addrFileName = (String) env.get(ToolCorbaConstants.CFG_ADDRESSFILE);
             if (addrFileName != null) {
                 BufferedReader bufferedReader = null;
                 try {
@@ -538,14 +538,14 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             }
         }
     }
-    
+
     public void addTypeMapSchemaImports(Definition def, WSDLASTVisitor visitor) {
         List<CorbaType> types = visitor.getTypeMap().getStructOrExceptionOrUnion();
         ModuleToNSMapper mapper = visitor.getModuleToNSMapper();
         WSDLSchemaManager manager = visitor.getManager();
         Collection<String> namespaces = CastUtils.cast(def.getNamespaces().values());
         Set<Map.Entry<String, String>> userModuleMappings = mapper.getUserMapping().entrySet();
-        
+
         if (types != null) {
             for (int i = 0; i < types.size(); i++) {
                 CorbaType type = types.get(i);
@@ -553,26 +553,26 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 if (schemaType != null) {
                     String typeNamespace = schemaType.getNamespaceURI();
                     try {
-                        // WS-Addressing namespace is a special case.  We need to import the schema from 
+                        // WS-Addressing namespace is a special case.  We need to import the schema from
                         // a remote location.
-                        if (!namespaces.contains(typeNamespace) 
+                        if (!namespaces.contains(typeNamespace)
                             && typeNamespace.equals(ReferenceConstants.WSADDRESSING_NAMESPACE)) {
-                            
+
                             // build up the ws-addressing schema import
-                            Schema wsdlSchema = 
+                            Schema wsdlSchema =
                                 (Schema)def.getExtensionRegistry().createExtension(Types.class,
                                                      new QName(Constants.URI_2001_SCHEMA_XSD, "schema"));
                             SchemaImport schemaimport =  wsdlSchema.createImport();
                             schemaimport.setNamespaceURI(ReferenceConstants.WSADDRESSING_NAMESPACE);
                             schemaimport.setSchemaLocationURI(ReferenceConstants.WSADDRESSING_LOCATION);
                             wsdlSchema.addImport(schemaimport);
-                            
+
                             // add the import and the prefix to the definition
                             def.getTypes().addExtensibilityElement(wsdlSchema);
                             CastUtils.cast(def.getNamespaces(), String.class, String.class)
                                 .put(ReferenceConstants.WSADDRESSING_PREFIX, typeNamespace);
                         } else if (!namespaces.contains(typeNamespace)) {
-                            String prefix = getModulePrefixForNamespace(userModuleMappings, mapper, 
+                            String prefix = getModulePrefixForNamespace(userModuleMappings, mapper,
                                                                         typeNamespace);
                             //prefix = mapper.mapNSToPrefix(typeNamespace);
                             XmlSchema schema = manager.getXmlSchema(typeNamespace);
@@ -594,11 +594,11 @@ public class IDLToWSDLProcessor extends IDLProcessor {
             }
         }
     }
-    
-    private String getModulePrefixForNamespace(Set<Map.Entry<String, String>> map, 
+
+    private String getModulePrefixForNamespace(Set<Map.Entry<String, String>> map,
                                                ModuleToNSMapper mapper, String namespace) {
         String prefix = null;
-        
+
         for (Iterator<Map.Entry<String, String>> iter = map.iterator(); iter.hasNext();) {
             Map.Entry<String, String> entry = iter.next();
             if (entry.getValue().equals(namespace)) {
@@ -606,11 +606,11 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                 break;
             }
         }
-        
+
         if (prefix == null) {
-            prefix = mapper.mapNSToPrefix(namespace);   
+            prefix = mapper.mapNSToPrefix(namespace);
         }
-        
+
         return prefix;
     }
 
@@ -673,7 +673,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                     String token = tokens.nextToken();
                     //Revisit, Do we also take in the imports of the wsdl/schema?
                     exModules.put(token, new ArrayList<>());
-                }               
+                }
             } else if (modules.startsWith(":")) {
                 //TO DO
             } else {
@@ -684,5 +684,5 @@ public class IDLToWSDLProcessor extends IDLProcessor {
         }
         return exModules;
     }
-    
+
 }

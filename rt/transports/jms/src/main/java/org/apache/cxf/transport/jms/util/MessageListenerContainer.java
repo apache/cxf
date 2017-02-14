@@ -32,7 +32,7 @@ import javax.jms.Topic;
 /**
  * Listen for messages on a queue or topic asynchronously by registering a
  * MessageListener.
- * 
+ *
  * Warning: This class does not refresh connections when the server goes away
  * This has to be handled outside.
  */
@@ -45,7 +45,7 @@ public class MessageListenerContainer extends AbstractMessageListenerContainer {
         this.destination = destination;
         this.listenerHandler = listenerHandler;
     }
-    
+
     @Override
     public void start() {
         try {
@@ -56,11 +56,11 @@ public class MessageListenerContainer extends AbstractMessageListenerContainer {
             } else {
                 consumer = session.createConsumer(destination, messageSelector);
             }
-            
-            MessageListener intListener = new LocalTransactionalMessageListener(session, listenerHandler); 
+
+            MessageListener intListener = new LocalTransactionalMessageListener(session, listenerHandler);
             // new DispachingListener(getExecutor(), listenerHandler);
             consumer.setMessageListener(intListener);
-            
+
             running = true;
         } catch (JMSException e) {
             throw JMSUtil.convertJmsException(e);
@@ -75,7 +75,7 @@ public class MessageListenerContainer extends AbstractMessageListenerContainer {
         consumer = null;
         session = null;
     }
-    
+
     @Override
     public void shutdown() {
         stop();
@@ -85,7 +85,7 @@ public class MessageListenerContainer extends AbstractMessageListenerContainer {
     static class LocalTransactionalMessageListener implements MessageListener {
         private MessageListener listenerHandler;
         private Session session;
-        
+
         LocalTransactionalMessageListener(Session session, MessageListener listenerHandler) {
             this.session = session;
             this.listenerHandler = listenerHandler;
@@ -102,7 +102,7 @@ public class MessageListenerContainer extends AbstractMessageListenerContainer {
                 safeRollback(e);
             }
         }
-        
+
         private void safeRollback(Throwable t) {
             LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", t);
             try {
@@ -113,7 +113,7 @@ public class MessageListenerContainer extends AbstractMessageListenerContainer {
                 LOG.log(Level.WARNING, "Rollback of Local transaction failed", e);
             }
         }
-        
+
     }
-    
+
 }

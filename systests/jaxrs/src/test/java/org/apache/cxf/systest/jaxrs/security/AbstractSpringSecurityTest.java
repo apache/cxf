@@ -29,21 +29,21 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 public abstract class AbstractSpringSecurityTest extends AbstractBusClientServerTestBase {
 
-    private String getStringFromInputStream(InputStream in) throws Exception {        
-        return IOUtils.toString(in); 
+    private String getStringFromInputStream(InputStream in) throws Exception {
+        return IOUtils.toString(in);
     }
-    
+
     protected String base64Encode(String value) {
         return Base64Utility.encode(value.getBytes());
     }
-    
-    protected void getBook(String endpointAddress, String user, String password, 
-                         int expectedStatus) 
+
+    protected void getBook(String endpointAddress, String user, String password,
+                         int expectedStatus)
         throws Exception {
-        
+
         GetMethod get = new GetMethod(endpointAddress);
         get.setRequestHeader("Accept", "application/xml");
-        get.setRequestHeader("Authorization", 
+        get.setRequestHeader("Authorization",
                              "Basic " + base64Encode(user + ":" + password));
         HttpClient httpClient = new HttpClient();
         try {
@@ -53,14 +53,14 @@ public abstract class AbstractSpringSecurityTest extends AbstractBusClientServer
                 String content = getStringFromInputStream(get.getResponseBodyAsStream());
                 String resource = "/org/apache/cxf/systest/jaxrs/resources/expected_get_book123.txt";
                 InputStream expected = getClass().getResourceAsStream(resource);
-                assertEquals("Expected value is wrong", 
-                             stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
+                assertEquals("Expected value is wrong",
+                             stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
                              stripXmlInstructionIfNeeded(content));
             }
         } finally {
             get.releaseConnection();
         }
-        
+
     }
     private String stripXmlInstructionIfNeeded(String str) {
         if (str != null && str.startsWith("<?xml")) {
@@ -68,5 +68,5 @@ public abstract class AbstractSpringSecurityTest extends AbstractBusClientServer
             str = str.substring(index + 2);
         }
         return str;
-    }   
+    }
 }

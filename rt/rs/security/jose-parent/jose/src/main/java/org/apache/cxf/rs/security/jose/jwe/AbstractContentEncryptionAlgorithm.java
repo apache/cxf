@@ -30,17 +30,17 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
     private byte[] cek;
     private byte[] iv;
     private AtomicInteger providedIvUsageCount;
-    
-    
-    protected AbstractContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) { 
+
+
+    protected AbstractContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) {
         super(algo);
         this.cek = cek;
         this.iv = iv;
         if (iv != null && iv.length > 0) {
             providedIvUsageCount = new AtomicInteger();
-        }    
+        }
     }
-    
+
     public byte[] getContentEncryptionKey(JweHeaders headers) {
         return cek;
     }
@@ -54,7 +54,7 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
             return iv;
         }
     }
-    protected int getIvSize() { 
+    protected int getIvSize() {
         return DEFAULT_IV_SIZE;
     }
 }

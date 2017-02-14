@@ -49,7 +49,7 @@ class HttpConduitConfigApplier {
 
     HttpConduitConfigApplier() {
     }
-    
+
     void apply(Dictionary<String, String> d, HTTPConduit c, String address) {
         applyClientPolicies(d, c);
         applyAuthorization(d, c);
@@ -155,7 +155,7 @@ class HttpConduitConfigApplier {
                 }
             }
         }
-        
+
         try {
             if (srp != null) {
                 p.setSecureRandom(TLSParameterJaxBUtils.getSecureRandom(srp));
@@ -257,7 +257,7 @@ class HttpConduitConfigApplier {
                 }
                 String v = d.get(k);
                 k = k.substring("proxyAuthorization.".length());
-                
+
                 if ("UserName".equals(k)) {
                     p.setUserName(v);
                 } else if ("Password".equals(k)) {
@@ -283,7 +283,7 @@ class HttpConduitConfigApplier {
                 }
                 String v = d.get(k);
                 k = k.substring("authorization.".length());
-                
+
                 if ("UserName".equals(k)) {
                     p.setUserName(v);
                 } else if ("Password".equals(k)) {
@@ -296,8 +296,8 @@ class HttpConduitConfigApplier {
             }
         }
     }
-    
-    
+
+
     private void applyClientPolicies(Dictionary<String, String> d, HTTPConduit c) {
         Enumeration<String> keys = d.keys();
         HTTPClientPolicy p = c.getClient();

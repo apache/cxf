@@ -78,18 +78,18 @@ public class STSClientTest extends Assert {
         assertEquals(new QName("http://docs.oasis-open.org/ws-sx/ws-trust/200512/", "UT_Port"),
                      client.getEndpointQName());
     }
-    
+
     // A unit test to make sure that we can parse a WCF wsdl properly. See CXF-5817.
     @Test
     public void testWCFWsdl() throws Exception {
         Bus bus = BusFactory.getThreadDefaultBus();
-        
+
         // Load WSDL
         InputStream inStream = getClass().getResourceAsStream("wcf.wsdl");
         Document doc = StaxUtils.read(inStream);
-        
-        
-        NodeList metadataSections = 
+
+
+        NodeList metadataSections =
             doc.getElementsByTagNameNS("http://schemas.xmlsoap.org/ws/2004/09/mex", "MetadataSection");
         Element wsdlDefinition = null;
         List<Element> schemas = new ArrayList<>();
@@ -105,28 +105,28 @@ public class STSClientTest extends Assert {
                 }
             }
         }
-        
+
         assertNotNull(wsdlDefinition);
         assertTrue(!schemas.isEmpty());
-        
+
         WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
         Definition definition = wsdlManager.getDefinition(wsdlDefinition);
-        
+
         for (Element schemaElement : schemas) {
-            QName schemaName = 
+            QName schemaName =
                 new QName(schemaElement.getNamespaceURI(), schemaElement.getLocalName());
             ExtensibilityElement
                 exElement = wsdlManager.getExtensionRegistry().createExtension(Types.class, schemaName);
             ((Schema)exElement).setElement(schemaElement);
             definition.getTypes().addExtensibilityElement(exElement);
         }
-        
+
         WSDLServiceFactory factory = new WSDLServiceFactory(bus, definition);
         SourceDataBinding dataBinding = new SourceDataBinding();
         factory.setDataBinding(dataBinding);
         Service service = factory.create();
         service.setDataBinding(dataBinding);
-        
+
     }
-    
+
 }

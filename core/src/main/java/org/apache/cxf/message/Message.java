@@ -26,13 +26,13 @@ import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.transport.Destination;
 
 /**
- * The base interface for all all message implementations. 
+ * The base interface for all all message implementations.
  * All message objects passed to interceptors use this interface.
  */
 public interface Message extends StringMap {
-    
+
     String TRANSPORT = "org.apache.cxf.transport";
-    
+
     /*
      * Boolean property which can be used to check that the current request
      * is part of the SOAP (JAX-WS) or non-SOAP/REST (JAX-RS) execution context.
@@ -48,32 +48,32 @@ public interface Message extends StringMap {
      * Boolean property specifying if the message is inbound.
      */
     String INBOUND_MESSAGE = "org.apache.cxf.message.inbound";
-    
+
     /**
-     * A Map keyed by a string that stores optional context information 
+     * A Map keyed by a string that stores optional context information
      * associated with the invocation that spawned the message.
      */
     String INVOCATION_CONTEXT = "org.apache.cxf.invocation.context";
-    
+
     /**
      *  Current Service Object
      */
     String SERVICE_OBJECT = "org.apache.cxf.service.object";
-    
+
     /**
      * A Map containing the MIME headers for a SOAP message.
      */
     String MIME_HEADERS = "org.apache.cxf.mime.headers";
-    
+
     /**
-     * Boolean property specifying if the server should send the response 
+     * Boolean property specifying if the server should send the response
      * asynchronously.
      */
     String ASYNC_POST_RESPONSE_DISPATCH =
         "org.apache.cxf.async.post.response.dispatch";
 
     /**
-     * Boolean property specifying if this message arrived via a 
+     * Boolean property specifying if this message arrived via a
      * decoupled endpoint.
      */
     String DECOUPLED_CHANNEL_MESSAGE = "decoupled.channel.message";
@@ -85,20 +85,20 @@ public interface Message extends StringMap {
      * Boolean property specifying if oneWay response must be processed.
      */
     String PROCESS_ONEWAY_RESPONSE = "org.apache.cxf.transport.processOneWayResponse";
-    
+
     /**
-     * Boolean property specifying if the thread which runs a request is 
+     * Boolean property specifying if the thread which runs a request is
      * different to the thread which created this Message.
      */
     String THREAD_CONTEXT_SWITCHED = "thread.context.switched";
-    
-    
+
+
     String ROBUST_ONEWAY = "org.apache.cxf.oneway.robust";
-    
+
     String HTTP_REQUEST_METHOD = "org.apache.cxf.request.method";
     String REQUEST_URI = "org.apache.cxf.request.uri";
     String REQUEST_URL = "org.apache.cxf.request.url";
-    
+
     String PROTOCOL_HEADERS = Message.class.getName() + ".PROTOCOL_HEADERS";
     String RESPONSE_CODE = Message.class.getName() + ".RESPONSE_CODE";
     String ERROR_MESSAGE = Message.class.getName() + ".ERROR_MESSAGE";
@@ -108,41 +108,41 @@ public interface Message extends StringMap {
 
     String PROPOGATE_EXCEPTION = Message.class.getName() + ".PROPOGATE_EXCEPTION";
     /**
-     * Boolean property specifying in the runtime is configured to process 
+     * Boolean property specifying in the runtime is configured to process
      * MTOM attachments.
      */
     String MTOM_ENABLED = "mtom-enabled";
     String MTOM_THRESHOLD = "mtom-threshold";
-        
+
     /**
      * Runtime schema validation property
      */
     String SCHEMA_VALIDATION_ENABLED = "schema-validation-enabled";
-    
+
     /**
      * The default values for schema validation will be set in the service model using this property
      */
     String SCHEMA_VALIDATION_TYPE = "schema-validation-type";
-     
+
     /**
-     * Boolean property specifying if the Java stack trace is returned as a  
+     * Boolean property specifying if the Java stack trace is returned as a
      * SOAP fault message.
      */
     String FAULT_STACKTRACE_ENABLED = "faultStackTraceEnabled";
     /**
-     * Boolean property specifying if the name of the exception that caused 
+     * Boolean property specifying if the name of the exception that caused
      * the Java stack trace is returned.
      */
     String EXCEPTION_MESSAGE_CAUSE_ENABLED = "exceptionMessageCauseEnabled";
-    
+
     /**
-     * A very unique delimiter used for exception with FAULT_STACKTRACE_ENABLED enable, 
-     * which is easy for client to differentiate the cause and stacktrace when unmarsall 
-     * a fault message 
+     * A very unique delimiter used for exception with FAULT_STACKTRACE_ENABLED enable,
+     * which is easy for client to differentiate the cause and stacktrace when unmarsall
+     * a fault message
      */
     String EXCEPTION_CAUSE_SUFFIX = "#*#";
 
-    String CONTENT_TYPE = "Content-Type";    
+    String CONTENT_TYPE = "Content-Type";
     String ACCEPT_CONTENT_TYPE = "Accept";
     String BASE_PATH = Message.class.getName() + ".BASE_PATH";
     String ENCODING = Message.class.getName() + ".ENCODING";
@@ -158,7 +158,7 @@ public interface Message extends StringMap {
 
     /**
      * Some properties to allow adding interceptors to the chain
-     * on a per-request basis.  All are a Collection<Interceptor> 
+     * on a per-request basis.  All are a Collection<Interceptor>
      * These are NOT contextual properties (ie: not searched outside the message).
      * They must exist on the message itself at time of Chain creation
      */
@@ -167,30 +167,30 @@ public interface Message extends StringMap {
     String FAULT_IN_INTERCEPTORS = Message.class.getName() + ".FAULT_IN_INTERCEPTORS";
     String FAULT_OUT_INTERCEPTORS = Message.class.getName() + ".FAULT_OUT_INTERCEPTORS";
     /**
-     * As above, but Collection<InterceptorProvider> 
+     * As above, but Collection<InterceptorProvider>
      */
     String INTERCEPTOR_PROVIDERS = Message.class.getName() + ".INTERCEPTOR_PROVIDER";
-    
+
     /**
      * Content-Transfer-Encoding used for MTOM attachment
      * binary, base64, etc
      */
     String CONTENT_TRANSFER_ENCODING = Message.class.getName() + ".CONTENT_TRANSFER_ENCODING";
-    
+
     /*
      * The properties to allow configure the client timeout
      */
     String CONNECTION_TIMEOUT = "javax.xml.ws.client.connectionTimeout";
     String RECEIVE_TIMEOUT = "javax.xml.ws.client.receiveTimeout";
-    
+
     String getId();
     void setId(String id);
-    
+
     /**
-     * Returns a live copy of the messages interceptor chain. This is 
-     * useful when an interceptor wants to modify the interceptor chain on the 
+     * Returns a live copy of the messages interceptor chain. This is
+     * useful when an interceptor wants to modify the interceptor chain on the
      * fly.
-     * 
+     *
      * @return the interceptor chain used to process the message
      */
     InterceptorChain getInterceptorChain();
@@ -200,67 +200,67 @@ public interface Message extends StringMap {
      * @return the associated Destination if message is inbound, null otherwise
      */
     Destination getDestination();
-    
+
     Exchange getExchange();
 
     void setExchange(Exchange exchange);
-    
+
     /**
      * Retrieve any binary attachments associated with the message.
-     *  
+     *
      * @return a collection containing the attachments
      */
     Collection<Attachment> getAttachments();
 
     void setAttachments(Collection<Attachment> attachments);
-    
+
     /**
-     * Retrieve the encapsulated content as a particular type. The content is 
-     * available as a result type if the message is outbound. The content 
-     * is available as a source type if message is inbound. If the content is 
+     * Retrieve the encapsulated content as a particular type. The content is
+     * available as a result type if the message is outbound. The content
+     * is available as a source type if message is inbound. If the content is
      * not available as the specified type null is returned.
-     * 
-     * @param format the expected content format 
+     *
+     * @param format the expected content format
      * @return the encapsulated content
-     */    
+     */
     <T> T getContent(Class<T> format);
 
     /**
      * Provide the encapsulated content as a particular type (a result type
      * if message is outbound, a source type if message is inbound)
-     * 
-     * @param format the provided content format 
+     *
+     * @param format the provided content format
      * @param content the content to be encapsulated
-     */    
+     */
     <T> void setContent(Class<T> format, Object content);
-    
+
     /**
      * @return the set of currently encapsulated content formats
      */
     Set<Class<?>> getContentFormats();
-    
+
     /**
      * Removes a content from a message.  If some contents are completely consumed,
      * removing them is a good idea
      * @param format the format to remove
      */
     <T> void removeContent(Class<T> format);
-    
+
     /**
      * Queries the Message object's metadata for a specific property.
-     * 
-     * @param key the Message interface's property strings that 
-     * correlates to the desired property 
+     *
+     * @param key the Message interface's property strings that
+     * correlates to the desired property
      * @return the property's value
      */
-    Object getContextualProperty(String key);   
-    
+    Object getContextualProperty(String key);
+
     /**
      * Resets the cache of contextual properties that messages may contain.  Subsequent
      * calls to getContextualProperty will likely recalculate the cache.
      */
     void resetContextCache();
-    
+
     /**
      * @return set of defined contextual property keys
      */

@@ -32,7 +32,7 @@ import javax.resource.spi.ManagedConnectionFactory;
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
- * Default Connection Manager which does not support connection pool.  
+ * Default Connection Manager which does not support connection pool.
  * Connection will be destroyed upon closing by application.
  */
 public class DefaultConnectionManager implements ConnectionManager, ConnectionEventListener {

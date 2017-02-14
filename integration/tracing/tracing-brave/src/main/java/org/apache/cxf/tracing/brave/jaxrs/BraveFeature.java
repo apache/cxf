@@ -27,11 +27,11 @@ import com.github.kristofa.brave.Brave;
 
 public class BraveFeature implements Feature {
     private final Brave brave;
-    
+
     public BraveFeature() {
         this("cxf-svc-" + UUID.randomUUID().toString());
     }
-    
+
     public BraveFeature(final String name) {
         this(new Brave.Builder(name).build());
     }
@@ -39,7 +39,7 @@ public class BraveFeature implements Feature {
     public BraveFeature(final Brave brave) {
         this.brave = brave;
     }
-    
+
     @Override
     public boolean configure(FeatureContext context) {
         context.register(new BraveProvider(brave));

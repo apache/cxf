@@ -20,11 +20,11 @@
 package demo.throttling.server;
 
 
-@javax.jws.WebService(name = "Greeter", serviceName = "SOAPService", 
-                      targetNamespace = "http://apache.org/hello_world_soap_http", 
+@javax.jws.WebService(name = "Greeter", serviceName = "SOAPService",
+                      targetNamespace = "http://apache.org/hello_world_soap_http",
                       wsdlLocation = "file:./src/main/config/hello_world.wsdl",
                       endpointInterface = "org.apache.hello_world_soap_http.Greeter")
-                  
+
 public class GreeterImpl {
 
     public String greetMe(String me) {

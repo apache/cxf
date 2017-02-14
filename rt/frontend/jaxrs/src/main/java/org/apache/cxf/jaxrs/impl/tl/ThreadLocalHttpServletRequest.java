@@ -43,7 +43,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
-public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<HttpServletRequest> 
+public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<HttpServletRequest>
     implements HttpServletRequest {
 
     public String getAuthType() {

@@ -37,7 +37,7 @@ public class ColocWrappedDocLitTest extends AbstractWrappedDocLitTest {
     protected String getTransportURI() {
         return TRANSPORT_URI;
     }
-    
+
     @Test
     public void testDummy() { }
 }

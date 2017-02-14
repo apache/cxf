@@ -36,24 +36,24 @@ import org.junit.BeforeClass;
 
 /**
  * In this test case, a CXF client sends a Username Token via (1-way) TLS to a STS instance, and
- * receives a (HOK) SAML 1.1 Assertion. This is then sent via (1-way) TLS to an Intermediary 
- * service provider. The intermediary service provider validates the token, and then the 
- * Intermediary client uses delegation to dispatch the received token (via OnBehalfOf) to another 
- * STS instance. This returns another (HOK) SAML 2 Assertion which is sent to the service provider 
+ * receives a (HOK) SAML 1.1 Assertion. This is then sent via (1-way) TLS to an Intermediary
+ * service provider. The intermediary service provider validates the token, and then the
+ * Intermediary client uses delegation to dispatch the received token (via OnBehalfOf) to another
+ * STS instance. This returns another (HOK) SAML 2 Assertion which is sent to the service provider
  * via (2-way) TLS.
  */
 public class IntermediaryTransformationTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
-    
+
     static final String PORT2 = allocatePort(Server.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static final String PORT = allocatePort(Intermediary.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -72,7 +72,7 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         stsServer.setContext("cxf-transport.xml");
         assertTrue(launchServer(stsServer));
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -88,23 +88,23 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = IntermediaryTransformationTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1EndorsingPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
 
         ((BindingProvider)transportPort).getRequestContext().put(SecurityConstants.USERNAME, "alice");
         doubleIt(transportPort, 25);
-        
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testIntermediaryTransformationBadClient() throws Exception {
 
@@ -118,10 +118,10 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         URL wsdl = IntermediaryTransformationTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1EndorsingPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportPort, STSPORT);
 
         try {
@@ -130,11 +130,11 @@ public class IntermediaryTransformationTest extends AbstractBusClientServerTestB
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportPort).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

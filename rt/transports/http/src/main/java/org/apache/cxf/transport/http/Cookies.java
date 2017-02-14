@@ -32,11 +32,11 @@ public class Cookies {
      */
     private final Map<String, Cookie> sessionCookies = new ConcurrentHashMap<String, Cookie>(4, 0.75f, 4);
     private boolean maintainSession;
-    
+
     public Map<String, Cookie> getSessionCookies() {
         return sessionCookies;
     }
-    
+
     public void readFromHeaders(Headers headers) {
         if (maintainSession) {
             List<String> c = headers.headerMap().get("Set-Cookie");
@@ -45,12 +45,12 @@ public class Cookies {
             }
         }
     }
-    
+
     public void writeToMessageHeaders(Message message) {
         //Do we need to maintain a session?
         maintainSession = MessageUtils.getContextualBoolean(message, Message.MAINTAIN_SESSION, false);
-        
-        //If we have any cookies and we are maintaining sessions, then use them        
+
+        //If we have any cookies and we are maintaining sessions, then use them
         if (maintainSession && sessionCookies.size() > 0) {
             new Headers(message).writeSessionCookies(sessionCookies);
         }
@@ -67,12 +67,12 @@ public class Cookies {
         if (headers == null || headers.size() == 0) {
             return;
         }
-    
+
         for (String header : headers) {
             String[] cookies = StringUtils.split(header, ",");
             for (String cookie : cookies) {
                 String[] parts = StringUtils.split(cookie, ";");
-    
+
                 String[] kv = StringUtils.split(parts[0], "=", 2);
                 if (kv.length != 2) {
                     continue;
@@ -80,7 +80,7 @@ public class Cookies {
                 String name = kv[0].trim();
                 String value = kv[1].trim();
                 Cookie newCookie = new Cookie(name, value);
-    
+
                 for (int i = 1; i < parts.length; i++) {
                     kv = StringUtils.split(parts[i], "=", 2);
                     name = kv[0].trim();
@@ -98,7 +98,7 @@ public class Cookies {
                     }
                 }
                 if (newCookie.getMaxAge() != 0) {
-                    sessionCookies.put(newCookie.getName(), newCookie);                    
+                    sessionCookies.put(newCookie.getName(), newCookie);
                 } else {
                     sessionCookies.remove(newCookie.getName());
                 }

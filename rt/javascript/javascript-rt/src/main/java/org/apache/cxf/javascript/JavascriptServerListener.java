@@ -25,7 +25,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 
 /**
- * 
+ *
  */
 public class JavascriptServerListener implements ServerLifeCycleListener {
 

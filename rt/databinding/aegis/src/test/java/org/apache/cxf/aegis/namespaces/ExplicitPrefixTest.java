@@ -44,7 +44,7 @@ import org.junit.Test;
  * map.
  */
 public class ExplicitPrefixTest extends AbstractAegisTest {
-    
+
     private static final String AEGIS_TEST_NAMESPACE_PREFIX_XYZZY = "xyzzy";
     private static final String URN_AEGIS_NAMESPACE_TEST = "urn:aegis:namespace:test";
 
@@ -53,10 +53,10 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
         private TypeMapping typeMapping;
         private Service service;
         private Server server;
-        
+
         /**
          * *
-         * 
+         *
          * @return Returns the server.
          */
         public Server getServer() {
@@ -70,7 +70,7 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
         }
         /**
          * *
-         * 
+         *
          * @return Returns the typeMapping.
          */
         public TypeMapping getTypeMapping() {
@@ -84,7 +84,7 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
         }
         /**
          * *
-         * 
+         *
          * @return Returns the service.
          */
         public Service getService() {
@@ -97,7 +97,7 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
             this.service = service;
         }
     }
-        
+
     private ServiceAndMapping setupService(Class<?> seiClass, Map<String, String> namespaces) {
         AegisDatabinding db = new AegisDatabinding();
         db.setNamespaceMap(namespaces);
@@ -109,11 +109,11 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
                                          serviceAndMapping.getService().get(TypeMapping.class.getName()));
         return serviceAndMapping;
     }
-    
+
     /**
      * The W3C dom is not helpful in looking at declarations. We could convert
      * to JDOM, but this is enough to get the job done.
-     * 
+     *
      * @param node
      * @return
      */
@@ -129,7 +129,7 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
         }
         return result;
     }
-    
+
     /**
      * This substitutes for using the commons-collection BiDiMap.
      * @param nsmap
@@ -144,7 +144,7 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
         }
         return null;
     }
-    
+
     @Test
     public void testOnePrefix() throws Exception {
         Map<String, String> mappings = new HashMap<String, String>();
@@ -164,11 +164,11 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
         // xyzzy.
         assertFalse(namePrefixes.containsKey("tns"));
         Element serviceSchema = (Element)
-            assertValid("//xsd:schema[@targetNamespace='http://impl.namespaces.aegis.cxf.apache.org']", 
+            assertValid("//xsd:schema[@targetNamespace='http://impl.namespaces.aegis.cxf.apache.org']",
                         rootElement).item(0);
         Map<String, String> servicePrefixes = getNodeNamespaceDeclarations(serviceSchema);
         String testPrefix = lookupPrefix(servicePrefixes, URN_AEGIS_NAMESPACE_TEST);
-        assertEquals(AEGIS_TEST_NAMESPACE_PREFIX_XYZZY, testPrefix);        
+        assertEquals(AEGIS_TEST_NAMESPACE_PREFIX_XYZZY, testPrefix);
 
         serviceAndMapping.getServer().destroy();
     }

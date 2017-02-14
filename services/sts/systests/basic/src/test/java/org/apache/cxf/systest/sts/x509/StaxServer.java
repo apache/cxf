@@ -43,7 +43,7 @@ public class StaxServer extends AbstractBusTestServerBase {
             e.printStackTrace();
         }
     }
-    
+
     public static void main(String args[]) {
         new StaxServer().run();
     }

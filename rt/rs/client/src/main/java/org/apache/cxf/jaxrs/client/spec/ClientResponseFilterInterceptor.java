@@ -45,20 +45,20 @@ public class ClientResponseFilterInterceptor extends AbstractInDatabindingInterc
     public ClientResponseFilterInterceptor() {
         super(Phase.PRE_PROTOCOL_FRONTEND);
     }
-    
+
     public void handleMessage(Message inMessage) throws Fault {
         ClientProviderFactory pf = ClientProviderFactory.getInstance(inMessage);
         if (pf == null) {
             return;
         }
-        
+
         List<ProviderInfo<ClientResponseFilter>> filters = pf.getClientResponseFilters();
         if (!filters.isEmpty()) {
             ClientRequestContext reqContext = new ClientRequestContextImpl(inMessage.getExchange().getOutMessage(),
                                                                         true);
-            
-            ClientResponseContext respContext = 
-                new ClientResponseContextImpl((ResponseImpl)getResponse(inMessage), 
+
+            ClientResponseContext respContext =
+                new ClientResponseContextImpl((ResponseImpl)getResponse(inMessage),
                                               inMessage);
             for (ProviderInfo<ClientResponseFilter> filter : filters) {
                 InjectionUtils.injectContexts(filter.getProvider(), filter, inMessage);
@@ -70,7 +70,7 @@ public class ClientResponseFilterInterceptor extends AbstractInDatabindingInterc
             }
         }
     }
-    
+
     protected Response getResponse(Message inMessage) {
         Response resp = inMessage.getExchange().get(Response.class);
         if (resp != null) {
@@ -78,9 +78,9 @@ public class ClientResponseFilterInterceptor extends AbstractInDatabindingInterc
         }
         ResponseBuilder rb = JAXRSUtils.toResponseBuilder((Integer)inMessage.get(Message.RESPONSE_CODE));
         rb.entity(inMessage.get(InputStream.class));
-        
+
         @SuppressWarnings("unchecked")
-        Map<String, List<String>> protocolHeaders = 
+        Map<String, List<String>> protocolHeaders =
             (Map<String, List<String>>)inMessage.get(Message.PROTOCOL_HEADERS);
         for (Map.Entry<String, List<String>> entry : protocolHeaders.entrySet()) {
             if (null == entry.getKey()) {
@@ -92,8 +92,8 @@ public class ClientResponseFilterInterceptor extends AbstractInDatabindingInterc
                 }
             }
         }
-        
-                
+
+
         return rb.build();
     }
 }

@@ -34,52 +34,52 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
     private String table;
     private String tableAlias;
     private List<String> columns;
-    
+
     // Can be useful when some other code will build Select and From clauses.
     public SQLPrinterVisitor() {
         this(null, null, Collections.<String>emptyList());
     }
-    
+
     public SQLPrinterVisitor(String table, String... columns) {
         this(null, table, Arrays.asList(columns));
     }
-    
-    public SQLPrinterVisitor(Map<String, String> fieldMap, 
+
+    public SQLPrinterVisitor(Map<String, String> fieldMap,
                              String table,
                              List<String> columns) {
         this(fieldMap, table, null, columns);
     }
-    
-    public SQLPrinterVisitor(Map<String, String> fieldMap, 
-                             String table, 
+
+    public SQLPrinterVisitor(Map<String, String> fieldMap,
+                             String table,
                              String tableAlias,
                              List<String> columns) {
         super(fieldMap);
-        
+
         this.columns = columns;
         this.table = table;
         this.tableAlias = tableAlias;
     }
-    
+
     public void visit(SearchCondition<T> sc) {
         StringBuilder sb = getStringBuilder();
-        
+
         PrimitiveStatement statement = sc.getStatement();
         if (statement != null) {
             if (statement.getProperty() != null) {
                 String name = getRealPropertyName(statement.getProperty());
                 String originalValue = getPropertyValue(name, statement.getValue());
                 validatePropertyValue(name, originalValue);
-                
+
                 String value = SearchUtils.toSqlWildcardString(originalValue, isWildcardStringMatch());
                 value = SearchUtils.duplicateSingleQuoteIfNeeded(value);
-                
+
                 if (tableAlias != null) {
                     name = tableAlias + "." + name;
                 }
-                
+
                 sb.append(name).append(" ").append(
-                            SearchUtils.conditionTypeToSqlOperator(sc.getConditionType(), value, 
+                            SearchUtils.conditionTypeToSqlOperator(sc.getConditionType(), value,
                                                                    originalValue))
                             .append(" ").append("'").append(value).append("'");
             }
@@ -98,10 +98,10 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
                 sb.append(")");
             }
         }
-        
+
         saveStringBuilder(sb);
     }
-    
+
     protected StringBuilder getStringBuilder() {
         StringBuilder sb = super.getStringBuilder();
         if (sb == null) {
@@ -112,7 +112,7 @@ public class SQLPrinterVisitor<T> extends AbstractUntypedSearchConditionVisitor<
         }
         return sb;
     }
-    
-    
-    
+
+
+
 }

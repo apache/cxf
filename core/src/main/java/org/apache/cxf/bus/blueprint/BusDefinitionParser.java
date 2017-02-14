@@ -28,12 +28,12 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.blueprint.AbstractBPBeanDefinitionParser;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-public class BusDefinitionParser 
+public class BusDefinitionParser
     extends AbstractBPBeanDefinitionParser {
 
     public BusDefinitionParser() {
     }
-    
+
     public Metadata parse(Element element, ParserContext context) {
         String bname = element.hasAttribute("bus") ? element.getAttribute("bus") : "cxf";
         String id = element.hasAttribute("id") ? element.getAttribute("id") : null;
@@ -46,7 +46,7 @@ public class BusDefinitionParser
         }
         return cxfBean;
     }
-    protected void processBusAttribute(Element element, ParserContext ctx, 
+    protected void processBusAttribute(Element element, ParserContext ctx,
                                        MutableBeanMetadata bean, String val) {
         //nothing
     }
@@ -61,7 +61,7 @@ public class BusDefinitionParser
             || "outInterceptors".equals(name) || "outFaultInterceptors".equals(name)
             || "features".equals(name)) {
             bean.addProperty(name, parseListData(ctx, bean, el));
-        } else if ("properties".equals(name)) { 
+        } else if ("properties".equals(name)) {
             bean.addProperty(name, parseMapData(ctx, bean, el));
         }
     }

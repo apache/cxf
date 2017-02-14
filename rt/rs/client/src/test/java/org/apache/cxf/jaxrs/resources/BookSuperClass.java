@@ -33,7 +33,7 @@ public abstract class BookSuperClass {
     @Produces("text/bar")
     @Consumes("text/foo")
     public abstract String getDescription();
-    
+
     @Path("/books/{bookId}/{new}")
     public abstract  Book getNewBook(@PathParam("bookId") String id,
                                      @PathParam("new") Boolean isNew);

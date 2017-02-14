@@ -86,11 +86,11 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
     private Topic jmsTopic;
 
     private JAXBContext jaxbContext;
-    
+
     private boolean checkTermination = true;
-    
+
     private boolean isSessionActive = true;
-    
+
     private Thread terminationThread;
 
     public JmsSubscription(String name) {
@@ -214,7 +214,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
     public void onMessage(Message jmsMessage) {
         try {
             TextMessage text = (TextMessage) jmsMessage;
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(text.getText())); 
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(text.getText()));
             Notify notify = (Notify) jaxbContext.createUnmarshaller()
                     .unmarshal(reader);
             reader.close();
@@ -267,7 +267,7 @@ public abstract class JmsSubscription extends AbstractSubscription implements Me
     }
 
     protected abstract void doNotify(Notify notify);
-    
+
     class TerminationThread extends Thread {
         public void run() {
             while (checkTermination) {

@@ -58,10 +58,10 @@ public class UndertowHTTPServerEngineFactoryHolder {
 
     private String parsedElement;
     private UndertowHTTPServerEngineFactory factory;
-    
+
     private Map<String, List<CXFUndertowHttpHandler>> handlersMap;
-    
-    
+
+
     private JAXBContext jaxbContext;
     private Set<Class<?>> jaxbClasses;
 
@@ -71,14 +71,14 @@ public class UndertowHTTPServerEngineFactoryHolder {
     public void init() {
         try {
             Element element = StaxUtils.read(new StringReader(parsedElement)).getDocumentElement();
-            
-            UndertowHTTPServerEngineFactoryConfigType config 
+
+            UndertowHTTPServerEngineFactoryConfigType config
                 = (UndertowHTTPServerEngineFactoryConfigType) getJaxbObject(element,
                     UndertowHTTPServerEngineFactoryConfigType.class);
 
             factory = new UndertowHTTPServerEngineFactory();
 
-            Map<String, ThreadingParameters> threadingParametersMap 
+            Map<String, ThreadingParameters> threadingParametersMap
                 = new TreeMap<String, ThreadingParameters>();
 
             if (config.getIdentifiedThreadingParameters() != null) {
@@ -100,7 +100,7 @@ public class UndertowHTTPServerEngineFactoryHolder {
 
                 for (TLSServerParametersIdentifiedType t : config.getIdentifiedTLSServerParameters()) {
                     try {
-                        TLSServerParameters parameter 
+                        TLSServerParameters parameter
                             = new TLSServerParametersConfig(t.getTlsServerParameters());
                         sslMap.put(t.getId(), parameter);
                     } catch (Exception e) {
@@ -114,7 +114,7 @@ public class UndertowHTTPServerEngineFactoryHolder {
             List<UndertowHTTPServerEngine> engineList = new ArrayList<>();
             for (UndertowHTTPServerEngineConfigType engine : config.getEngine()) {
                 UndertowHTTPServerEngine eng = new UndertowHTTPServerEngine();
-                
+
                 if (engine.getHandlers() != null && handlersMap != null) {
                     List<CXFUndertowHttpHandler> handlers = handlersMap.get(engine.getPort().toString());
                     if (handlers != null) {
@@ -124,12 +124,12 @@ public class UndertowHTTPServerEngineFactoryHolder {
                             + engine.getPort().toString());
                     }
                 }
-                
+
                 if (engine.isContinuationsEnabled() != null) {
                     eng.setContinuationsEnabled(engine.isContinuationsEnabled());
                 }
 
-                
+
                 if (engine.getHost() != null && !StringUtils.isEmpty(engine.getHost())) {
                     eng.setHost(engine.getHost());
                 }
@@ -139,7 +139,7 @@ public class UndertowHTTPServerEngineFactoryHolder {
                 if (engine.getPort() != null) {
                     eng.setPort(engine.getPort());
                 }
-                
+
                 if (engine.getThreadingParameters() != null) {
                     ThreadingParametersType threads = engine.getThreadingParameters();
                     ThreadingParameters rThreads = new ThreadingParameters();
@@ -149,14 +149,14 @@ public class UndertowHTTPServerEngineFactoryHolder {
                     eng.setThreadingParameters(rThreads);
                 }
 
-                
+
                 if (engine.getTlsServerParameters() != null) {
                     TLSServerParameters parameter = null;
                     try {
                         parameter = new TLSServerParametersConfig(engine.getTlsServerParameters());
                         eng.setTlsServerParameters(parameter);
                     } catch (Exception e) {
-                        throw new RuntimeException("Could not configure TLS for engine on  " 
+                        throw new RuntimeException("Could not configure TLS for engine on  "
                             + eng.getHost() + ":" + eng.getPort(), e);
                     }
                 }
@@ -187,8 +187,8 @@ public class UndertowHTTPServerEngineFactoryHolder {
     public void setParsedElement(String parsedElement) {
         this.parsedElement = parsedElement;
     }
-    
-    
+
+
     protected <T> T getJaxbObject(Element parent, Class<T> c) {
 
         try {
@@ -207,7 +207,7 @@ public class UndertowHTTPServerEngineFactoryHolder {
                 if (jaxbClasses != null) {
                     tmp.addAll(jaxbClasses);
                 }
-                JAXBContextCache.addPackage(tmp, PackageUtils.getPackageName(cls), 
+                JAXBContextCache.addPackage(tmp, PackageUtils.getPackageName(cls),
                                             cls == null ? getClass().getClassLoader() : cls.getClassLoader());
                 if (cls != null) {
                     boolean hasOf = false;
@@ -221,7 +221,7 @@ public class UndertowHTTPServerEngineFactoryHolder {
                     }
                 }
                 JAXBContextCache.scanPackages(tmp);
-                JAXBContextCache.CachedContextAndSchemas ccs 
+                JAXBContextCache.CachedContextAndSchemas ccs
                     = JAXBContextCache.getCachedContextAndSchemas(tmp, null, null, null, false);
                 jaxbClasses = ccs.getClasses();
                 jaxbContext = ccs.getContext();

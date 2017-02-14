@@ -36,7 +36,7 @@ public class CxfUndertowServlet extends AbstractHTTPServlet {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-  
+
     }
 
     @Override
@@ -46,7 +46,7 @@ public class CxfUndertowServlet extends AbstractHTTPServlet {
 
     @Override
     protected void invoke(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-        UndertowHTTPDestination undertowHTTPDestination = 
+        UndertowHTTPDestination undertowHTTPDestination =
             (UndertowHTTPDestination)request.getAttribute("UNDERTOW_DESTINATION");
         try {
             undertowHTTPDestination.doService(request.getServletContext(), request, response);

@@ -28,11 +28,11 @@ public class AddNumbersException extends Exception {
     public AddNumbersException() {
     }
 
-    public AddNumbersException(String info) { 
-        this.info = info; 
+    public AddNumbersException(String info) {
+        this.info = info;
     }
 
-    public String getInfo() { 
-        return info; 
+    public String getInfo() {
+        return info;
     }
 }

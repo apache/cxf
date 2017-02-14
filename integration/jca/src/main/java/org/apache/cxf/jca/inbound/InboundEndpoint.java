@@ -23,20 +23,20 @@ import org.apache.cxf.endpoint.Server;
 
 /**
  * An inbound endpoint is a CXF service endpoint facade exposed by
- * the JCA connector.  Its role is to accept service requests from 
- * ordinary CXF clients and forward them to an invoker (running in 
+ * the JCA connector.  Its role is to accept service requests from
+ * ordinary CXF clients and forward them to an invoker (running in
  * the context of the activating message driven bean).  The invoker
  * either contains the service implementation or dispatches the call
- * to a Stateless Session Bean.  This class holds objects that are 
- * needed to accomplish the task and provides a shutdown method to 
- * clean up the endpoint. 
- * 
+ * to a Stateless Session Bean.  This class holds objects that are
+ * needed to accomplish the task and provides a shutdown method to
+ * clean up the endpoint.
+ *
  */
 public class InboundEndpoint {
-    
+
     private Server server;
     private MDBInvoker invoker;
-    
+
     /**
      * @param server the server object that has already been started
      * @param invoker the invoker that invoker an EJB
@@ -45,7 +45,7 @@ public class InboundEndpoint {
         this.server = server;
         this.invoker = invoker;
     }
-    
+
     /**
      * @return the invoker
      */
@@ -79,16 +79,16 @@ public class InboundEndpoint {
 
     /**
      * Shuts down the endpoint
-     * 
+     *
      * @throws Exception
      */
     public void shutdown() throws Exception {
         invoker = null;
-        
+
         if (server != null) {
             server.destroy();
             server = null;
-        }     
+        }
     }
-   
+
 }

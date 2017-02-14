@@ -38,15 +38,15 @@ public class JweJsonConsumer {
     private JweHeaders protectedHeaderJwe;
     private JweHeaders sharedUnprotectedHeader;
     private List<JweJsonEncryptionEntry> recipients = new LinkedList<JweJsonEncryptionEntry>();
-    private Map<JweJsonEncryptionEntry, JweHeaders> recipientsMap = 
+    private Map<JweJsonEncryptionEntry, JweHeaders> recipientsMap =
         new LinkedHashMap<JweJsonEncryptionEntry, JweHeaders>();
     private byte[] aad;
     private byte[] iv;
     private byte[] cipherBytes;
     private byte[] authTag;
-    
+
     private JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
-    
+
     public JweJsonConsumer(String payload) {
         prepare(payload);
     }
@@ -54,7 +54,7 @@ public class JweJsonConsumer {
     public JweDecryptionOutput decryptWith(JweDecryptionProvider jwe) {
         return decryptWith(jwe, (Map<String, Object>)null);
     }
-    public JweDecryptionOutput decryptWith(JweDecryptionProvider jwe, 
+    public JweDecryptionOutput decryptWith(JweDecryptionProvider jwe,
                                            Map<String, Object> recipientProps) {
         JweJsonEncryptionEntry entry = getJweDecryptionEntry(jwe, recipientProps);
         return decryptWith(jwe, entry);
@@ -64,7 +64,7 @@ public class JweJsonConsumer {
         byte[] content = jwe.decrypt(jweDecryptionInput);
         return new JweDecryptionOutput(jweDecryptionInput.getJweHeaders(), content);
     }
-    
+
     private JweDecryptionInput getJweDecryptionInput(JweDecryptionProvider jwe, JweJsonEncryptionEntry entry) {
         if (entry == null) {
             LOG.warning("JWE JSON Entry is not available");
@@ -88,19 +88,19 @@ public class JweJsonConsumer {
     public JweJsonEncryptionEntry getJweDecryptionEntry(JweDecryptionProvider jwe) {
         return getJweDecryptionEntry(jwe, null);
     }
-    
+
     public JweJsonEncryptionEntry getJweDecryptionEntry(JweDecryptionProvider jwe,
                                                         Map<String, Object> recipientProps) {
         for (Map.Entry<JweJsonEncryptionEntry, JweHeaders> entry : recipientsMap.entrySet()) {
             KeyAlgorithm keyAlgo = entry.getValue().getKeyEncryptionAlgorithm();
             if (keyAlgo != null && keyAlgo.equals(jwe.getKeyAlgorithm())
                 || keyAlgo == null && jwe.getKeyAlgorithm() == null) {
-                if (recipientProps != null 
+                if (recipientProps != null
                     && !entry.getValue().asMap().entrySet().containsAll(recipientProps.entrySet())) {
                     continue;
                 }
-                return entry.getKey();        
-            }    
+                return entry.getKey();
+            }
         }
         return null;
     }
@@ -110,7 +110,7 @@ public class JweJsonConsumer {
         String encodedProtectedHeader = (String)jsonObjectMap.get("protected");
         if (encodedProtectedHeader != null) {
             protectedHeaderJson = JoseUtils.decodeToString(encodedProtectedHeader);
-            protectedHeaderJwe = 
+            protectedHeaderJwe =
                 new JweHeaders(reader.fromJson(protectedHeaderJson));
         }
         Map<String, Object> unprotectedHeader = CastUtils.cast((Map<?, ?>)jsonObjectMap.get("unprotected"));
@@ -137,14 +137,14 @@ public class JweJsonConsumer {
         JweHeaders recipientUnprotected = header == null ? null : new JweHeaders(header);
         String encodedKey = (String)encryptionEntry.get("encrypted_key");
         JweJsonEncryptionEntry entry = new JweJsonEncryptionEntry(recipientUnprotected, encodedKey);
-        
+
         JweHeaders unionHeaders = new JweHeaders();
         if (protectedHeaderJwe != null) {
             unionHeaders.asMap().putAll(protectedHeaderJwe.asMap());
             unionHeaders.setProtectedHeaders(protectedHeaderJwe);
         }
         if (sharedUnprotectedHeader != null) {
-            if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
+            if (!Collections.disjoint(unionHeaders.asMap().keySet(),
                                       sharedUnprotectedHeader.asMap().keySet())) {
                 LOG.warning("Protected and unprotected headers have duplicate values");
                 throw new JweException(JweException.Error.INVALID_JSON_JWE);
@@ -152,17 +152,17 @@ public class JweJsonConsumer {
             unionHeaders.asMap().putAll(sharedUnprotectedHeader.asMap());
         }
         if (recipientUnprotected != null) {
-            if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
+            if (!Collections.disjoint(unionHeaders.asMap().keySet(),
                                       recipientUnprotected.asMap().keySet())) {
                 LOG.warning("Union and recipient unprotected headers have duplicate values");
                 throw new JweException(JweException.Error.INVALID_JSON_JWE);
             }
             unionHeaders.asMap().putAll(recipientUnprotected.asMap());
         }
-        
+
         recipientsMap.put(entry, unionHeaders);
         return entry;
-        
+
     }
     protected byte[] getDecodedBytes(Map<String, Object> map, String name) {
         String value = (String)map.get(name);

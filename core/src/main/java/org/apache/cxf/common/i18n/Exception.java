@@ -22,32 +22,32 @@ package org.apache.cxf.common.i18n;
 
 
 public class Exception extends java.lang.Exception {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private final Message message;
-    
+
     public Exception(Message msg) {
         message = msg;
     }
-    
+
     public Exception(Message msg, Throwable t) {
         super(t);
         message = msg;
     }
-    
+
     public Exception(Throwable cause) {
         super(cause);
         message = null;
-    } 
-    
+    }
+
     public String getCode() {
         if (null != message) {
             return message.getCode();
         }
         return null;
     }
-    
+
     public String getMessage() {
         if (null != message) {
             return message.toString();

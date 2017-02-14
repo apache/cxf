@@ -40,14 +40,14 @@ public class Book implements FormInterface {
     private int id;
     @XmlElement(name = "thechapter", namespace = "http://superbooks")
     private Chapter chapter;
-    
+
     public Book() {
     }
-    
+
     public Book(int id) {
         this.id = id;
     }
-    
+
     @GET
     @Path("/book")
     @Produces({"application/xml", "application/json" })
@@ -55,23 +55,23 @@ public class Book implements FormInterface {
     public Book getIt() {
         return this;
     }
-    
+
     public void setId(int ident) {
         id = ident;
     }
-    
+
     public int getId() {
         return id;
     }
-    
+
     @Path("/chapter/{cid}")
     public Chapter getChapter(@PathParam("cid") int cid) {
         return chapter;
     }
-    
+
     public void form1(MultivaluedMap<String, String> map) {
     }
-    
+
     public String form2(String f1, String f2) {
         return "";
     }
@@ -83,5 +83,5 @@ public class Book implements FormInterface {
     public String form4(String theid, String f1, String f2) {
         return "";
     }
-    
+
 }

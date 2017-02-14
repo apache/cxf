@@ -47,11 +47,11 @@ public class FrontEndProfile {
     public String getToolspec() {
         return this.toolspec;
     }
-    
+
     public List<FrontEndGenerator> getGenerators() {
         return generators;
     }
-    
+
     public void registerGenerator(FrontEndGenerator generator) {
         generators.add(generator);
     }

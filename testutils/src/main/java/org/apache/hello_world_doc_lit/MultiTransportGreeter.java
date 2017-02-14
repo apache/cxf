@@ -35,7 +35,7 @@ public class MultiTransportGreeter implements Greeter {
     }
 
     public void greetMeOneWay(String requestType) {
-        //System.out.println("*********  greetMeOneWay: " + requestType);        
+        //System.out.println("*********  greetMeOneWay: " + requestType);
     }
 
     public void pingMe() throws PingMeFault {
@@ -43,7 +43,7 @@ public class MultiTransportGreeter implements Greeter {
         faultDetail.setMajor((short)2);
         faultDetail.setMinor((short)1);
         throw new PingMeFault("PingMeFault raised by server", faultDetail);
-        
+
     }
 
 }

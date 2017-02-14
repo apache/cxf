@@ -29,11 +29,11 @@ import java.util.Set;
 
 @SuppressWarnings("unchecked")
 public final class CastUtils {
-    
+
     private CastUtils() {
         //utility class, never constructed
     }
-    
+
     public static <T, U> Map<T, U> cast(Map<?, ?> p) {
         return (Map<T, U>)p;
     }
@@ -47,7 +47,7 @@ public final class CastUtils {
     public static <T, U> Dictionary<T, U> cast(Dictionary<?, ?> p, Class<T> t, Class<U> u) {
         return (Dictionary<T, U>)p;
     }
-    
+
     public static <T> Collection<T> cast(Collection<?> p) {
         return (Collection<T>)p;
     }
@@ -57,7 +57,7 @@ public final class CastUtils {
     public static <T> List<T> cast(List<?> p) {
         return (List<T>)p;
     }
-    
+
     public static <T> List<T> cast(List<?> p, Class<T> cls) {
         return (List<T>)p;
     }
@@ -65,7 +65,7 @@ public final class CastUtils {
     public static <T> Iterator<T> cast(Iterator<?> p) {
         return (Iterator<T>)p;
     }
-    
+
     public static <T> Iterator<T> cast(Iterator<?> p, Class<T> cls) {
         return (Iterator<T>)p;
     }
@@ -73,7 +73,7 @@ public final class CastUtils {
     public static <T> Enumeration<T> cast(Enumeration<?> p) {
         return (Enumeration<T>)p;
     }
-    
+
     public static <T> Enumeration<T> cast(Enumeration<?> p, Class<T> cls) {
         return (Enumeration<T>)p;
     }
@@ -92,5 +92,5 @@ public final class CastUtils {
         return (Map.Entry<T, U>)p;
     }
 
-    
+
 }

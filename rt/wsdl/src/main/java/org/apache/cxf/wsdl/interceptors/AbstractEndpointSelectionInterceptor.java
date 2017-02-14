@@ -32,7 +32,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.MultipleEndpointObserver;
 
 public abstract class AbstractEndpointSelectionInterceptor extends AbstractPhaseInterceptor<Message> {
-        
+
     public AbstractEndpointSelectionInterceptor(String phase) {
         super(phase);
     }
@@ -64,7 +64,7 @@ public abstract class AbstractEndpointSelectionInterceptor extends AbstractPhase
 
     /**
      * Select an Endpoint which will be used for the rest of the invocation.
-     * 
+     *
      * @param message
      * @param eps
      */

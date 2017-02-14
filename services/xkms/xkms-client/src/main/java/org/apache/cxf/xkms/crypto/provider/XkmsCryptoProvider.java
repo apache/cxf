@@ -60,7 +60,7 @@ public class XkmsCryptoProvider extends CryptoBase {
     public XkmsCryptoProvider(XKMSPortType xkmsConsumer, Crypto fallbackCrypto) {
         this(xkmsConsumer, fallbackCrypto, new EHCacheXKMSClientCache(), true);
     }
-    
+
     public XkmsCryptoProvider(XKMSPortType xkmsConsumer, Crypto fallbackCrypto, boolean allowX509FromJKS) {
         this(xkmsConsumer, fallbackCrypto, new EHCacheXKMSClientCache(), allowX509FromJKS);
     }
@@ -75,7 +75,7 @@ public class XkmsCryptoProvider extends CryptoBase {
         this.xkmsClientCache = xkmsClientCache;
         this.allowX509FromJKS = allowX509FromJKS;
     }
-    
+
     @Override
     public X509Certificate[] getX509Certificates(CryptoType cryptoType) throws WSSecurityException {
         if (LOG.isLoggable(Level.INFO)) {
@@ -121,15 +121,15 @@ public class XkmsCryptoProvider extends CryptoBase {
 
     @Override
     public void verifyTrust(
-        X509Certificate[] certs, 
-        boolean enableRevocation, 
+        X509Certificate[] certs,
+        boolean enableRevocation,
         Collection<Pattern> subjectCertConstraints,
         Collection<Pattern> issuerCertConstraints
     ) throws WSSecurityException {
         if (certs != null) {
             LOG.fine(String.format("Verifying certificate id: %s", certs[0].getSubjectDN()));
         }
-        
+
         XKMSCacheToken cachedToken = null;
         // Try local cache first
         if (certs != null && certs.length > 0 && xkmsClientCache != null) {
@@ -149,12 +149,12 @@ public class XkmsCryptoProvider extends CryptoBase {
         if (certs == null || certs[0] == null || !xkmsInvoker.validateCertificate(certs[0])) {
             throw new CryptoProviderException("The given certificate is not valid");
         }
-        
+
         // Validate Cached token
         if (cachedToken != null) {
             cachedToken.setXkmsValidated(true);
         }
-        
+
         // Otherwise, Store in the cache as a validated certificate
         storeCertificateInCache(certs[0], null, true);
     }
@@ -192,7 +192,7 @@ public class XkmsCryptoProvider extends CryptoBase {
                 appId = Applications.SERVICE_NAME;
             }
             return getX509FromXKMSByID(appId, cryptoType.getAlias());
-            
+
         } else if (type == TYPE.ISSUER_SERIAL) {
             return getX509FromXKMSByIssuerSerial(cryptoType.getIssuer(), cryptoType.getSerial());
         }
@@ -205,49 +205,49 @@ public class XkmsCryptoProvider extends CryptoBase {
         if (id == null) {
             throw new IllegalArgumentException("Id is not specified for certificate request");
         }
-        
+
         // Try local cache first
         X509Certificate[] certs = checkX509Cache(id.toLowerCase());
         if (certs != null) {
             return certs;
         }
-        
+
         // Now ask the XKMS Service
         X509Certificate cert = xkmsInvoker.getCertificateForId(application, id);
-        
+
         return buildX509GetResult(id.toLowerCase(), cert);
     }
 
     private X509Certificate[] getX509FromXKMSByIssuerSerial(String issuer, BigInteger serial) {
         LOG.fine(String.format("Getting public certificate from XKMS for issuer:%s; serial: %x",
                                issuer, serial));
-        
+
         String key = getKeyForIssuerSerial(issuer, serial);
         // Try local cache first
         X509Certificate[] certs = checkX509Cache(key);
         if (certs != null) {
             return certs;
         }
-        
+
         // Now ask the XKMS Service
         X509Certificate cert = xkmsInvoker.getCertificateForIssuerSerial(issuer, serial);
-        
+
         return buildX509GetResult(key, cert);
     }
 
     private X509Certificate[] getX509FromXKMSByEndpoint(String endpoint) {
         LOG.fine(String.format("Getting public certificate from XKMS for endpoint:%s",
                                endpoint));
-        
+
         // Try local cache first
         X509Certificate[] certs = checkX509Cache(endpoint);
         if (certs != null) {
             return certs;
         }
-        
+
         // Now ask the XKMS Service
         X509Certificate cert = xkmsInvoker.getCertificateForEndpoint(endpoint);
-        
+
         return buildX509GetResult(endpoint, cert);
     }
 
@@ -255,7 +255,7 @@ public class XkmsCryptoProvider extends CryptoBase {
         if (xkmsClientCache == null) {
             return null;
         }
-        
+
         XKMSCacheToken cachedToken = xkmsClientCache.get(key);
         if (cachedToken != null && cachedToken.getX509Certificate() != null) {
             return new X509Certificate[] {
@@ -284,7 +284,7 @@ public class XkmsCryptoProvider extends CryptoBase {
      * Try to get certificate locally. First try using the supplied CryptoType. If this
      * does not work, and if the supplied CryptoType is a ALIAS, then try again with SUBJECT_DN
      * in case the supplied Alias is actually a Certificate's Subject DN
-     * 
+     *
      * @param cryptoType
      * @return if found certificate otherwise null returned
      */
@@ -293,23 +293,23 @@ public class XkmsCryptoProvider extends CryptoBase {
         if (fallbackCrypto == null) {
             return null;
         }
-        
+
         // First try using the supplied CryptoType instance
         X509Certificate[] localCerts = null;
         try {
             localCerts = fallbackCrypto.getX509Certificates(cryptoType);
         } catch (Exception e) {
-            LOG.info("Certificate is not found in local keystore using desired CryptoType: " 
+            LOG.info("Certificate is not found in local keystore using desired CryptoType: "
                      + cryptoType.getType().name());
         }
-        
+
         if (localCerts == null && cryptoType.getType() == CryptoType.TYPE.ALIAS) {
-            // If none found then try using either the Subject DN. This is because an 
-            // Encryption username in CXF is configured as an Alias in WSS4J, but may in fact 
+            // If none found then try using either the Subject DN. This is because an
+            // Encryption username in CXF is configured as an Alias in WSS4J, but may in fact
             // be a Subject DN
             CryptoType newCryptoType = new CryptoType(CryptoType.TYPE.SUBJECT_DN);
             newCryptoType.setSubjectDN(cryptoType.getAlias());
-            
+
             try {
                 localCerts = fallbackCrypto.getX509Certificates(newCryptoType);
             } catch (Exception e) {
@@ -322,18 +322,18 @@ public class XkmsCryptoProvider extends CryptoBase {
 
     /**
      * Service Aliases contain namespace
-     * 
+     *
      * @param cryptoType
      * @return
      */
     private boolean isServiceName(CryptoType cryptoType) {
         return cryptoType.getAlias().contains("{");
     }
-    
+
     private String getKeyForIssuerSerial(String issuer, BigInteger serial) {
         return issuer + "-" + serial.toString(16);
     }
-    
+
     private void storeCertificateInCache(X509Certificate certificate, String key, boolean validated) {
         // Store in the cache
         if (certificate != null && xkmsClientCache != null) {
@@ -344,8 +344,8 @@ public class XkmsCryptoProvider extends CryptoBase {
                 xkmsClientCache.put(key, cacheToken);
             }
             // Store it using IssuerSerial as well
-            String issuerSerialKey = 
-                getKeyForIssuerSerial(certificate.getIssuerX500Principal().getName(), 
+            String issuerSerialKey =
+                getKeyForIssuerSerial(certificate.getIssuerX500Principal().getName(),
                                       certificate.getSerialNumber());
             if (!issuerSerialKey.equals(key)) {
                 xkmsClientCache.put(issuerSerialKey, cacheToken);

@@ -28,19 +28,19 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class JaxWsImplementorInfoTest extends Assert {
-    
+
     @Test
     public void testGetWSDLLocation() throws Exception {
         JaxWsImplementorInfo info = new JaxWsImplementorInfo(CalculatorImpl.class);
         assertEquals("testutils/calculator.wsdl", info.getWsdlLocation());
     }
-    
+
     @Test
     public void testWebServiceAnnotation() throws Exception {
         assertTrue(JaxWsImplementorInfo.
                    ifAnnotationLoadedByOtherClassLoader(CalculatorImpl.class, WebService.class));
         assertFalse(JaxWsImplementorInfo.
                     ifAnnotationLoadedByOtherClassLoader(CalculatorImpl.class, WebServiceProvider.class));
-        
+
     }
 }

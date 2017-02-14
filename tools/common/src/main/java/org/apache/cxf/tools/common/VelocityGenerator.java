@@ -42,10 +42,10 @@ import org.apache.velocity.runtime.RuntimeConstants;
 public final class VelocityGenerator {
     private static final Logger LOG = LogUtils.getL7dLogger(VelocityGenerator.class);
     private static boolean initialized;
-    
+
     private final Map<String, Object> attributes = new HashMap<String, Object>();
     private String baseDir;
-    
+
     public VelocityGenerator() {
         this(false);
     }
@@ -73,7 +73,7 @@ public final class VelocityGenerator {
             props.put("class.resource.loader.class", clzName);
             props.put("runtime.log", getVelocityLogFile("velocity.log"));
             if (!log) {
-                props.put(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS, 
+                props.put(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM_CLASS,
                           "org.apache.velocity.runtime.log.NullLogSystem");
             }
             Velocity.init(props);
@@ -113,7 +113,7 @@ public final class VelocityGenerator {
     public void setBaseDir(String dir) {
         this.baseDir = dir;
     }
-    
+
     public File parseOutputName(String packageName, String filename) throws ToolException {
         return parseOutputName(packageName, filename, ".java");
     }
@@ -128,7 +128,7 @@ public final class VelocityGenerator {
             throw new ToolException(msg, ioe);
         }
     }
-    
+
     public void setCommonAttributes() {
         attributes.put("currentdate", Calendar.getInstance().getTime());
         attributes.put("version", Version.getCurrentVersion());

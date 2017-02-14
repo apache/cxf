@@ -22,10 +22,10 @@ package org.apache.cxf.rt.security.crypto;
  * Simple helper for dynamically registering BouncyCastle inside a Blueprint or Spring context
  */
 public class BouncyCastleInstaller {
-    public void install() throws Exception { 
+    public void install() throws Exception {
         CryptoUtils.installBouncyCastleProvider();
     }
-    public void uninstall() { 
+    public void uninstall() {
         CryptoUtils.removeBouncyCastleProvider();
     }
 }

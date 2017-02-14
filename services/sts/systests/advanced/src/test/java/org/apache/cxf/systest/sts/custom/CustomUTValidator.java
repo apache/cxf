@@ -35,7 +35,7 @@ import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 import org.apache.wss4j.dom.validate.Validator;
 
 /**
- * A Validator that checks for a custom "realm" parameter in the RST request and only allows 
+ * A Validator that checks for a custom "realm" parameter in the RST request and only allows
  * authentication if the value is equal to "custom-realm".
  */
 public class CustomUTValidator implements Validator {
@@ -44,19 +44,19 @@ public class CustomUTValidator implements Validator {
         if (credential == null || credential.getUsernametoken() == null) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
         }
-        
+
         // Need to use SAAJ to get the SOAP Body as we are just using the UsernameTokenInterceptor
         SOAPMessage soapMessage = getSOAPMessage((SoapMessage)data.getMsgContext());
         try {
             Element soapBody = SAAJUtils.getBody(soapMessage);
-        
+
             if (soapBody != null) {
                 // Find custom Element in the SOAP Body
                 Element realm = XMLUtils.findElement(soapBody, "realm", "http://cxf.apache.org/custom");
                 if (realm != null) {
                     String realmStr = realm.getTextContent();
                     if ("custom-realm".equals(realmStr)) {
-        
+
                         UsernameTokenValidator validator = new UsernameTokenValidator();
                         return validator.validate(credential, data);
                     }
@@ -65,7 +65,7 @@ public class CustomUTValidator implements Validator {
         } catch (SOAPException ex) {
             // ignore
         }
-        
+
         throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "noCredential");
     }
 

@@ -41,65 +41,65 @@ public class JAXRSClientServerResourceCreatedSpringBookTest extends AbstractBusC
                    launchServer(BookServerResourceCreatedSpring.class, true));
         createStaticBus();
     }
-    
+
     @Test
     public void testGetBookSimple() throws Exception {
-        
+
         String address =
             "http://localhost:" + PORT + "/webapp/rest/simplebooks/444";
         assertEquals(444L, WebClient.create(address).get(Book.class).getId());
     }
-    
+
     @Test
     public void testGetBookSimpleMatrixEnd() throws Exception {
-        
+
         String address =
             "http://localhost:" + PORT + "/webapp/rest/simplebooks/444;bookId=ssn";
         assertEquals(444L, WebClient.create(address).get(Book.class).getId());
     }
-    
+
     @Test
     public void testGetBookSimpleMatrixMiddle() throws Exception {
-        
+
         String address =
             "http://localhost:" + PORT + "/webapp/rest/simplebooks/444;bookId=ssn/book";
         assertEquals(444L, WebClient.create(address).get(Book.class).getId());
     }
-    
+
     @Test
     public void testGetBookSimpleProxy() throws Exception {
-        
+
         String address = "http://localhost:" + PORT + "/webapp/rest";
         BookStoreSimple bookStore = JAXRSClientFactory.create(address, BookStoreSimple.class);
         Book book = bookStore.getBook(444L);
         assertEquals(444L, book.getId());
     }
-    
+
     @Test
     public void testGetBookSimpleBeanParamProxy() throws Exception {
-        
+
         String address = "http://localhost:" + PORT + "/webapp/rest";
         BookStoreSimple bookStore = JAXRSClientFactory.create(address, BookStoreSimple.class);
         Book book = bookStore.getBookBeanParam(new BookStoreSimple.BookBean(444));
         assertEquals(444L, book.getId());
     }
-    
+
     @Test
     public void testGetBook123() throws Exception {
-        
+
         String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/rest/bookstore/books/123"; 
+            "http://localhost:" + PORT + "/webapp/rest/bookstore/books/123";
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/xml");
         InputStream in = connect.getInputStream();
-        assertNotNull(in);           
+        assertNotNull(in);
 
         InputStream expected = getClass()
             .getResourceAsStream("resources/expected_get_book123.txt");
 
-        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
-                     stripXmlInstructionIfNeeded(getStringFromInputStream(in))); 
+        assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
+                     stripXmlInstructionIfNeeded(getStringFromInputStream(in)));
     }
     private String stripXmlInstructionIfNeeded(String str) {
         if (str != null && str.startsWith("<?xml")) {
@@ -108,21 +108,21 @@ public class JAXRSClientServerResourceCreatedSpringBookTest extends AbstractBusC
         }
         return str;
     }
-    
+
     @Test
     public void testPetStore() throws Exception {
-        
+
         String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/rest/petstore/pets/24"; 
+            "http://localhost:" + PORT + "/webapp/rest/petstore/pets/24";
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "text/xml");
         InputStream in = connect.getInputStream();
         assertNotNull(in);
-        assertEquals(PetStore.CLOSED, getStringFromInputStream(in)); 
+        assertEquals(PetStore.CLOSED, getStringFromInputStream(in));
     }
-    
-    private String getStringFromInputStream(InputStream in) throws Exception {        
+
+    private String getStringFromInputStream(InputStream in) throws Exception {
         return IOUtils.toString(in);
     }
 

@@ -35,11 +35,11 @@ public final class DefaultBasicAuthSupplier implements HttpAuthSupplier {
     public boolean requiresRequestCaching() {
         return false;
     }
-    
+
     public static String getBasicAuthHeader(String userName, String passwd) {
         return getBasicAuthHeader(userName, passwd, false);
     }
-    
+
     public static String getBasicAuthHeader(String userName, String passwd, boolean useIso8859) {
         String userAndPass = userName + ":" + passwd;
         byte[] authBytes = useIso8859 ? userAndPass.getBytes(StandardCharsets.ISO_8859_1) : userAndPass.getBytes();
@@ -53,7 +53,7 @@ public final class DefaultBasicAuthSupplier implements HttpAuthSupplier {
         if (authPolicy.getUserName() != null && authPolicy.getPassword() != null) {
             boolean encodeBasicAuthWithIso8859 = PropertyUtils.isTrue(
                 message.getContextualProperty(ENCODE_BASIC_AUTH_WITH_ISO8859));
-            return getBasicAuthHeader(authPolicy.getUserName(), 
+            return getBasicAuthHeader(authPolicy.getUserName(),
                                       authPolicy.getPassword(),
                                       encodeBasicAuthWithIso8859);
         } else {

@@ -80,7 +80,7 @@ public class CXF6655Test extends AbstractClientServerTestBase {
                                            new HashMap<String, HttpFilter>());
         proxy.start();
     }
-    
+
     @Test
     public void testConnection() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws/", "HelloService");

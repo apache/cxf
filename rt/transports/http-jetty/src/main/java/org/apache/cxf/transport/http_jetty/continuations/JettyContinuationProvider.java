@@ -30,17 +30,17 @@ public class JettyContinuationProvider implements ContinuationProvider {
 
     private HttpServletRequest request;
     private HttpServletResponse response;
-    private Message inMessage; 
+    private Message inMessage;
     private JettyContinuationWrapper wrapper;
-    
+
     public JettyContinuationProvider(HttpServletRequest req,
-                                     HttpServletResponse resp, 
+                                     HttpServletResponse resp,
                                      Message m) {
         request = req;
         response = resp;
         this.inMessage = m;
     }
-    
+
     public void complete() {
         JettyContinuationWrapper r = getContinuation(false);
         if (r != null) {
@@ -50,7 +50,7 @@ public class JettyContinuationProvider implements ContinuationProvider {
     }
     public Continuation getContinuation() {
         return getContinuation(true);
-    }    
+    }
     public JettyContinuationWrapper getContinuation(boolean create) {
         Message m = inMessage;
         // Get the real message which is used in the interceptor chain
@@ -59,7 +59,7 @@ public class JettyContinuationProvider implements ContinuationProvider {
         }
         if (m == null || m.getExchange() == null || m.getExchange().isOneWay()) {
             return null;
-        }        
+        }
         if (wrapper == null && create) {
             wrapper = new JettyContinuationWrapper(request, response, m);
         }

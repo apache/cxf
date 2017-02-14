@@ -40,7 +40,7 @@ public class WrapperAnnotator implements Annotator {
         wrapperRequest = request;
         wrapperResponse = response;
     }
-    
+
     public void annotate(JavaAnnotatable ja) {
         JavaMethod method;
         if (ja instanceof JavaMethod) {
@@ -54,7 +54,7 @@ public class WrapperAnnotator implements Annotator {
                                                                        wrapperRequest.getType()));
             requestAnnotation.addElement(new JAnnotationElement("targetNamespace",
                                                                        wrapperRequest.getTargetNamespace()));
-            requestAnnotation.addElement(new JAnnotationElement("className", 
+            requestAnnotation.addElement(new JAnnotationElement("className",
                                                                        wrapperRequest.getClassName()));
 
             method.addAnnotation("RequestWrapper", requestAnnotation);

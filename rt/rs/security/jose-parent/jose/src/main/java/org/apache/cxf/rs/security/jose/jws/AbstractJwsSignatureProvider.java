@@ -27,11 +27,11 @@ import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJwsSignatureProvider.class);
     private SignatureAlgorithm algorithm;
-    
+
     protected AbstractJwsSignatureProvider(SignatureAlgorithm algo) {
         this.algorithm = algo;
     }
-    
+
     protected JwsHeaders prepareHeaders(JwsHeaders headers) {
         if (headers == null) {
             headers = new JwsHeaders();
@@ -47,7 +47,7 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
     }
     @Override
     public SignatureAlgorithm getAlgorithm() {
-        return algorithm;    
+        return algorithm;
     }
     @Override
     public byte[] sign(JwsHeaders headers, byte[] content) {
@@ -59,9 +59,9 @@ public abstract class AbstractJwsSignatureProvider implements JwsSignatureProvid
     public JwsSignature createJwsSignature(JwsHeaders headers) {
         return doCreateJwsSignature(prepareHeaders(headers));
     }
-    
+
     protected abstract JwsSignature doCreateJwsSignature(JwsHeaders headers);
-    
+
     protected void checkAlgorithm(String algo) {
         if (algo == null) {
             LOG.warning("Signature algorithm is not set");

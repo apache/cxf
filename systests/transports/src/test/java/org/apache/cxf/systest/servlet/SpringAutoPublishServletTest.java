@@ -51,15 +51,15 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
             "text/xml; charset=utf-8");
 
         invokingEndpoint(req);
-        
+
         req = new PostMethodWebRequest(CONTEXT_URL + "/services/DerivedGreeterService",
             getClass().getResourceAsStream("GreeterMessage.xml"), "text/xml; charset=utf-8");
-        
+
         invokingEndpoint(req);
     }
-    
+
     public void invokingEndpoint(WebRequest req) throws Exception {
-        
+
         WebResponse response = newClient().getResponse(req);
         assertEquals("text/xml", response.getContentType());
         assertTrue("utf-8".equalsIgnoreCase(response.getCharacterSet()));
@@ -71,39 +71,39 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
         assertValid("/s:Envelope/s:Body", doc);
         assertValid("//h:sayHiResponse", doc);
     }
-     
-        
+
+
     @Test
     public void testGetWSDL() throws Exception {
         ServletUnitClient client = newClient();
         client.setExceptionsThrownOnErrorStatus(true);
-        
-        WebRequest req = 
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/SOAPService?wsdl"); 
-       
-        WebResponse res = client.getResponse(req);        
+
+        WebRequest req =
+            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/SOAPService?wsdl");
+
+        WebResponse res = client.getResponse(req);
         assertEquals(200, res.getResponseCode());
         assertEquals("text/xml", res.getContentType());
-        
+
         Document doc = StaxUtils.read(res.getInputStream());
         assertNotNull(doc);
-        
+
         assertValid("//wsdl:operation[@name='greetMe']", doc);
         assertValid("//wsdlsoap:address[@location='" + CONTEXT_URL + "/services/SOAPService']", doc);
-        
-        req = 
+
+        req =
             new GetMethodQueryWebRequest(CONTEXT_URL + "/services/DerivedGreeterService?wsdl");
-        res = client.getResponse(req);    
+        res = client.getResponse(req);
         assertEquals(200, res.getResponseCode());
         assertEquals("text/xml", res.getContentType());
-        
+
         doc = StaxUtils.read(res.getInputStream());
         assertNotNull(doc);
-        
+
         assertValid("//wsdl:operation[@name='greetMe']", doc);
         assertValid("//wsdlsoap:address"
-                    + "[@location='http://localhost/mycontext/services/DerivedGreeterService']", 
+                    + "[@location='http://localhost/mycontext/services/DerivedGreeterService']",
                     doc);
-        
+
     }
 }

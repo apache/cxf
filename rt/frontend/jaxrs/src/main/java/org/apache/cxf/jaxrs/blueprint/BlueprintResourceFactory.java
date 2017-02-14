@@ -69,7 +69,7 @@ public class BlueprintResourceFactory implements ResourceProvider {
         Object component = blueprintContainer.getComponentMetadata(beanId);
         if (component instanceof BeanMetadata) {
             BeanMetadata local = (BeanMetadata) component;
-            isSingleton = BeanMetadata.SCOPE_SINGLETON.equals(local.getScope())  
+            isSingleton = BeanMetadata.SCOPE_SINGLETON.equals(local.getScope())
                 || (local.getScope() == null && local.getId() != null);
         }
     }
@@ -78,11 +78,11 @@ public class BlueprintResourceFactory implements ResourceProvider {
         //TODO -- This is not the BP way.
         ProviderInfo<?> application = m == null ? null
             : (ProviderInfo<?>)m.getExchange().getEndpoint().get(Application.class.getName());
-        Map<Class<?>, Object> mapValues = CastUtils.cast(application == null ? null 
+        Map<Class<?>, Object> mapValues = CastUtils.cast(application == null ? null
             : Collections.singletonMap(Application.class, application.getProvider()));
         Object[] values = ResourceUtils.createConstructorArguments(c, m, !isSingleton(), mapValues);
         //TODO Very springish...
-        Object instance = values.length > 0 ? blueprintContainer.getComponentInstance(beanId) 
+        Object instance = values.length > 0 ? blueprintContainer.getComponentInstance(beanId)
             : blueprintContainer.getComponentInstance(beanId);
         if (!isSingleton() || m == null) {
             InjectionUtils.invokeLifeCycleMethod(instance, postConstructMethod);

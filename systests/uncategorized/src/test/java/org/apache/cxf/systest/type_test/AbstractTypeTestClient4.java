@@ -113,7 +113,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         SimpleContentExtWithAnyAttribute ret;
         if (testDocLiteral) {
             ret = docClient.testSimpleContentExtWithAnyAttribute(x, yh, zh);
-        } else if (testXMLBinding) {            
+        } else if (testXMLBinding) {
             ret = xmlClient.testSimpleContentExtWithAnyAttribute(x, yh, zh);
         } else {
             ret = rpcClient.testSimpleContentExtWithAnyAttribute(x, yh, zh);
@@ -489,7 +489,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         // Test 1
         //
         // x: non-nil choice
-        // y: nil choice 
+        // y: nil choice
         //
         StructWithNillableChoice x = new StructWithNillableChoice();
         x.setVarInteger(2);
@@ -522,7 +522,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
 
         // Test 2
         //
-        // x: nil choice 
+        // x: nil choice
         // y: non-nil choice
         //
         y = new Holder<StructWithNillableChoice>(x);
@@ -603,7 +603,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         StructWithOccuringChoice x = new StructWithOccuringChoice();
         x.setVarInteger(2);
         x.getVarIntOrVarString().add(3);
-        x.getVarIntOrVarString().add("hello"); 
+        x.getVarIntOrVarString().add("hello");
 
         StructWithOccuringChoice yOriginal = new StructWithOccuringChoice();
         yOriginal.setVarInteger(1);
@@ -731,7 +731,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
                 return false;
             }
         }
-        return x.getVarFloat().compareTo(y.getVarFloat()) == 0 
+        return x.getVarFloat().compareTo(y.getVarFloat()) == 0
             && x.getVarInt() == y.getVarInt();
     }
 
@@ -874,7 +874,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         return x.getVarIntAndVarFloat() != null;
     }
 
-    
+
     @Test
     public void testStructWithOccuringStruct() throws Exception {
         if (!shouldRunTest("StructWithOccuringStruct")) {
@@ -1136,9 +1136,9 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
      *  {min occurs} = {max occurs} = 1, and that particle must be part of a
      *  pair which constitutes the {content type} of a complex type definition.
      *
-     
+
     //org.apache.type_test.types1.ComplexArray
-     
+
     protected boolean equals(ComplexArray x, ComplexArray y) {
         List<DerivedAllBaseStruct> xx = x.getVarDerivedItem();
         List<DerivedAllBaseStruct> yy = y.getVarDerivedItem();
@@ -1205,7 +1205,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             assertTrue("testComplexArray(): Incorrect return value", equals(ret, x));
         }
     }
-    
+
     //org.apache.type_test.types1.ComplexChoice
 
     protected boolean equals(ComplexChoice x, ComplexChoice y) {
@@ -1322,7 +1322,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             assertTrue("testComplexStruct(): Incorrect return value", equals(ret, x));
         }
     }
-    
+
     //org.apache.type_test.types1.DerivedChoiceBaseComplex
 
     protected boolean equals(DerivedChoiceBaseComplex x, DerivedChoiceBaseComplex y) {
@@ -1382,7 +1382,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             assertTrue("testDerivedChoiceBaseComplex(): Incorrect return value", equals(x, ret));
         }
     }
-    
+
     //org.apache.type_test.types1.DerivedAllBaseAll
 
     protected boolean equals(DerivedAllBaseAll x, DerivedAllBaseAll y) {
@@ -1435,7 +1435,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             assertTrue("testDerivedAllBaseAll(): Incorrect return value", equals(x, ret));
         }
     }
-    
+
     //org.apache.type_test.types1.DerivedAllBaseChoice
 
     protected boolean equals(DerivedAllBaseChoice x, DerivedAllBaseChoice y) {
@@ -1482,7 +1482,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             assertTrue("testDerivedAllBaseChoice(): Incorrect return value", equals(x, ret));
         }
     }
-    
+
     //org.apache.type_test.types1.DerivedAllBaseStruct
 
     protected boolean equals(DerivedAllBaseStruct x, DerivedAllBaseStruct y) {
@@ -1536,7 +1536,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
                        equals(x, ret));
         }
     }
-     
+
     //org.apache.type_test.types1.DerivedChoiceBaseAll
 
     protected boolean equals(DerivedChoiceBaseAll x, DerivedChoiceBaseAll y) {
@@ -1592,7 +1592,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             assertTrue("testDerivedChoiceBaseAll(): Incorrect return value", equals(x, ret));
         }
     }
-    
+
     //org.apache.type_test.types1.DerivedStructBaseAll
 
     protected boolean equals(DerivedStructBaseAll x, DerivedStructBaseAll y) {
@@ -1653,7 +1653,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         equals(msg, (Document)x, (Document)y);
         assertEquals(msg, x.getAttrStringExt(), y.getAttrStringExt());
         if (x.getVarStringExt() != null) {
-            assertNotNull(msg, y.getVarStringExt());               
+            assertNotNull(msg, y.getVarStringExt());
             assertEquals(msg, x.getVarStringExt(), y.getVarStringExt());
             assertTrue(msg, x.getVarFloatExt() == y.getVarFloatExt());
         }
@@ -1737,7 +1737,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             assertTrue("testRestrictedStructBaseStruct(): Incorrect return value", equals(x, ret));
         }
     }
-    
+
     //org.apache.type_test.types1.RestrictedAllBaseAll;
 
     protected boolean equals(RestrictedAllBaseAll x, RestrictedAllBaseAll y) {
@@ -1794,7 +1794,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             // Invoke testUnionWithStringList
             Holder<List<String>> y = new Holder<List<String>>(yOrig);
             Holder<List<String>> z = new Holder<List<String>>();
-            List<String> ret = testDocLiteral ? docClient.testUnionWithStringList(x, y, z) 
+            List<String> ret = testDocLiteral ? docClient.testUnionWithStringList(x, y, z)
                     : xmlClient.testUnionWithStringList(x, y, z);
             if (!perfTestOnly) {
                 assertEquals("testUnionWithStringList(): Incorrect value for inout param",
@@ -1836,7 +1836,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             // Invoke testUnionWithStringListRestriction
             Holder<List<String>> y = new Holder<List<String>>(yOrig);
             Holder<List<String>> z = new Holder<List<String>>();
-            List<String> ret = testDocLiteral ? docClient.testUnionWithStringListRestriction(x, y, z) 
+            List<String> ret = testDocLiteral ? docClient.testUnionWithStringListRestriction(x, y, z)
                     : xmlClient.testUnionWithStringListRestriction(x, y, z);
             if (!perfTestOnly) {
                 assertEquals("testUnionWithStringListRestriction(): Incorrect value for inout param",
@@ -1883,7 +1883,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             // Invoke testUnionWithAnonList
             Holder<List<String>> y = new Holder<List<String>>(yOrig);
             Holder<List<String>> z = new Holder<List<String>>();
-            List<String> ret = testDocLiteral ? docClient.testUnionWithAnonList(x, y, z) 
+            List<String> ret = testDocLiteral ? docClient.testUnionWithAnonList(x, y, z)
                     : xmlClient.testUnionWithAnonList(x, y, z);
             if (!perfTestOnly) {
                 assertEquals("testUnionWithAnonList(): Incorrect value for inout param", x, y.value);
@@ -1942,7 +1942,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
             y = new Holder<String>(yOrig);
             z = new Holder<String>();
             try {
-                ret = testDocLiteral ? docClient.testAnyURIRestriction(x, y, z) 
+                ret = testDocLiteral ? docClient.testAnyURIRestriction(x, y, z)
                         : xmlClient.testAnyURIRestriction(x, y, z);
                 fail("maxLength=50 restriction is violated.");
             } catch (Exception ex) {
@@ -2051,7 +2051,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
 
         SimpleStruct ret;
         if (testDocLiteral) {
-            ret = docClient.testSimpleStruct(x, y, z); 
+            ret = docClient.testSimpleStruct(x, y, z);
         } else if (testXMLBinding) {
             ret = xmlClient.testSimpleStruct(x, y, z);
         } else {
@@ -2169,7 +2169,7 @@ public abstract class AbstractTypeTestClient4 extends AbstractTypeTestClient3 {
         assertNotNull("testInheritanceEmptyAllDerivedEmpty()", y.value);
         assertNotNull("testInheritanceEmptyAllDerivedEmpty()", z.value);
         assertNotNull("testInheritanceEmptyAllDerivedEmpty()", ret);
-        
+
         assertTrue(y.value.getClass().getName(), y.value instanceof DerivedEmptyBaseEmptyAll);
         assertTrue(z.value.getClass().getName(), z.value instanceof DerivedEmptyBaseEmptyAll);
         assertTrue(ret.getClass().getName(), ret instanceof DerivedEmptyBaseEmptyAll);

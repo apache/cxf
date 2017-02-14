@@ -40,7 +40,7 @@ public class JAXRSBPNamespaceHandler implements NamespaceHandler {
     public JAXRSBPNamespaceHandler() {
         jaxRSBPNamespaceHandler = new org.apache.cxf.jaxrs.blueprint.JAXRSBPNamespaceHandler();
     }
-    
+
     public URL getSchemaLocation(String namespace) {
         if ("http://cxf.apache.org/blueprint/jaxrs-client".equals(namespace)) {
             return getClass().getClassLoader().getResource("schemas/blueprint/jaxrs-client.xsd");
@@ -64,7 +64,7 @@ public class JAXRSBPNamespaceHandler implements NamespaceHandler {
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;
     }
-    
+
 
     public BlueprintContainer getBlueprintContainer() {
         return blueprintContainer;
@@ -73,5 +73,5 @@ public class JAXRSBPNamespaceHandler implements NamespaceHandler {
     public void setBlueprintContainer(BlueprintContainer blueprintContainer) {
         this.blueprintContainer = blueprintContainer;
     }
-    
+
 }

@@ -17,7 +17,7 @@
  * under the License.
  */
 /**
- * 
+ *
  */
 package org.apache.cxf.aegis.util.stax;
 

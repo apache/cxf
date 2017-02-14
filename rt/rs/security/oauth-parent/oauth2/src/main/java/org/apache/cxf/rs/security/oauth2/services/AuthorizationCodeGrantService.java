@@ -47,7 +47,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * This resource handles the End User authorizing
  * or denying the Client to access its resources.
  * If End User approves the access this resource will
- * redirect End User back to the Client, supplying 
+ * redirect End User back to the Client, supplying
  * the authorization code.
  */
 @Path("/authorize")
@@ -57,20 +57,20 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
     private boolean canSupportEmptyRedirectForPrivateClients;
     private OOBResponseDeliverer oobDeliverer;
     private AuthorizationCodeResponseFilter codeResponseFilter;
-    
+
     public AuthorizationCodeGrantService() {
         super(OAuthConstants.CODE_RESPONSE_TYPE, OAuthConstants.AUTHORIZATION_CODE_GRANT);
     }
     @Override
-    protected OAuthAuthorizationData createAuthorizationData(Client client, 
+    protected OAuthAuthorizationData createAuthorizationData(Client client,
                                                              MultivaluedMap<String, String> params,
                                                              String redirectUri,
                                                              UserSubject subject,
                                                              List<OAuthPermission> requestedPerms,
                                                              List<OAuthPermission> alreadyAuthorizedPerms,
                                                              boolean authorizationCanBeSkipped) {
-        OAuthAuthorizationData data = 
-            super.createAuthorizationData(client, params, redirectUri, subject, 
+        OAuthAuthorizationData data =
+            super.createAuthorizationData(client, params, redirectUri, subject,
                                           requestedPerms, alreadyAuthorizedPerms, authorizationCanBeSkipped);
         setCodeChallenge(data, params);
         return data;
@@ -111,7 +111,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             bean.setAuthorizationCode(grantCode);
             bean.setUserId(userSubject.getLogin());
             bean.setExpiresIn(grant.getExpiresIn());
-            return deliverOOBResponse((OOBAuthorizationResponse)bean);    
+            return deliverOOBResponse((OOBAuthorizationResponse)bean);
         } else if (isFormResponse(state)) {
             FormAuthorizationResponse bean = new FormAuthorizationResponse();
             bean.setAuthorizationCode(grantCode);
@@ -126,7 +126,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             return Response.seeOther(ub.build()).build();
         }
     }
-    
+
     public ServerAuthorizationCodeGrant getGrantRepresentation(OAuthRedirectionState state,
                            Client client,
                            List<String> requestedScope,
@@ -139,22 +139,22 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
                                                                        approvedScope,
                                                                        userSubject,
                                                                        preauthorizedToken);
-        
-        ServerAuthorizationCodeGrant grant = 
+
+        ServerAuthorizationCodeGrant grant =
             ((AuthorizationCodeDataProvider)getDataProvider()).createCodeGrant(codeReg);
         if (grant.getExpiresIn() > RECOMMENDED_CODE_EXPIRY_TIME_SECS) {
             LOG.warning("Code expiry time exceeds 10 minutes");
         }
         return grant;
     }
-    
-    protected AuthorizationCodeRegistration createCodeRegistration(OAuthRedirectionState state, 
-                                                                   Client client, 
-                                                                   List<String> requestedScope, 
-                                                                   List<String> approvedScope, 
-                                                                   UserSubject userSubject, 
+
+    protected AuthorizationCodeRegistration createCodeRegistration(OAuthRedirectionState state,
+                                                                   Client client,
+                                                                   List<String> requestedScope,
+                                                                   List<String> approvedScope,
+                                                                   UserSubject userSubject,
                                                                    ServerAccessToken preauthorizedToken) {
-        AuthorizationCodeRegistration codeReg = new AuthorizationCodeRegistration(); 
+        AuthorizationCodeRegistration codeReg = new AuthorizationCodeRegistration();
         codeReg.setPreauthorizedTokenAvailable(preauthorizedToken != null);
         codeReg.setClient(client);
         codeReg.setRedirectUri(state.getRedirectUri());
@@ -175,13 +175,13 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
         return code;
     }
     protected Response deliverOOBResponse(OOBAuthorizationResponse response) {
-        if (oobDeliverer != null) {    
+        if (oobDeliverer != null) {
             return oobDeliverer.deliver(response);
         } else {
             return createHtmlResponse(response);
         }
     }
-    
+
     protected Response createErrorResponse(String state,
                                            String redirectUri,
                                            String error) {
@@ -193,10 +193,10 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             return Response.seeOther(ub.build()).build();
         }
     }
-    
+
     protected UriBuilder getRedirectUriBuilder(String state, String redirectUri) {
         UriBuilder ub = UriBuilder.fromUri(redirectUri);
-        if (state != null) { 
+        if (state != null) {
             ub.queryParam(OAuthConstants.STATE, state);
         }
         return ub;
@@ -209,12 +209,12 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
 
     @Override
     protected boolean canRedirectUriBeEmpty(Client c) {
-        // If a redirect URI is empty then the code will be returned out of band, 
+        // If a redirect URI is empty then the code will be returned out of band,
         // typically will be returned directly to a human user
-        return (c.isConfidential() && canSupportEmptyRedirectForPrivateClients || canSupportPublicClient(c)) 
+        return (c.isConfidential() && canSupportEmptyRedirectForPrivateClients || canSupportPublicClient(c))
                 && c.getRedirectUris().isEmpty();
     }
-    
+
     public void setCanSupportPublicClients(boolean support) {
         this.canSupportPublicClients = support;
     }
@@ -225,8 +225,8 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
     public void setCanSupportEmptyRedirectForPrivateClients(boolean canSupportEmptyRedirectForPrivateClients) {
         this.canSupportEmptyRedirectForPrivateClients = canSupportEmptyRedirectForPrivateClients;
     }
-    
-    
+
+
 }
 
 

@@ -39,9 +39,9 @@ import org.junit.Test;
 public class CorbaTest extends AbstractBusClientServerTestBase {
 
     public static final String PORT = Server.PERSIST_PORT;
-    
-    private static final QName SERVICE_NAME = 
-        new QName("http://cxf.apache.org/hello_world_corba", 
+
+    private static final QName SERVICE_NAME =
+        new QName("http://cxf.apache.org/hello_world_corba",
                   "GreeterCORBAService");
 
     @BeforeClass
@@ -51,7 +51,7 @@ public class CorbaTest extends AbstractBusClientServerTestBase {
             launchServer(Server.class)
         );
     }
-    
+
     @AfterClass
     public static void cleanupFile() throws Exception {
         File file = new File("./HelloWorld.ref");
@@ -74,7 +74,7 @@ public class CorbaTest extends AbstractBusClientServerTestBase {
         String output = port.greetMe("Betty");
         assertTrue("Unexpected returned string: " + output, "Hello Betty".equals(output));
     }
-    
+
     @Test
     public void testException() throws Exception {
         System.getProperties().remove("com.sun.CORBA.POA.ORBServerId");
@@ -95,5 +95,5 @@ public class CorbaTest extends AbstractBusClientServerTestBase {
         fail("Didn't catch an exception");
     }
 
-    
+
 }

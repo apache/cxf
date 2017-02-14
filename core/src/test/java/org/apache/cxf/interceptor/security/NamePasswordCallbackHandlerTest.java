@@ -27,14 +27,14 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class NamePasswordCallbackHandlerTest extends Assert {
 
     @Test
     public void testHandleCallback() throws Exception {
         NamePasswordCallbackHandler handler = new NamePasswordCallbackHandler("Barry", "dog");
-        Callback[] callbacks = 
+        Callback[] callbacks =
             new Callback[]{new NameCallback("name"), new PasswordCallback("password", false)};
         handler.handle(callbacks);
         assertEquals("Barry", ((NameCallback)callbacks[0]).getName());
@@ -44,7 +44,7 @@ public class NamePasswordCallbackHandlerTest extends Assert {
     @Test
     public void testHandleCallback2() throws Exception {
         NamePasswordCallbackHandler handler = new NamePasswordCallbackHandler("Barry", "dog");
-        Callback[] callbacks = 
+        Callback[] callbacks =
             new Callback[]{new NameCallback("name"), new ObjectCallback()};
         handler.handle(callbacks);
         assertEquals("Barry", ((NameCallback)callbacks[0]).getName());
@@ -56,7 +56,7 @@ public class NamePasswordCallbackHandlerTest extends Assert {
     @Test
     public void testHandleCallback3() throws Exception {
         NamePasswordCallbackHandler handler = new NamePasswordCallbackHandler("Barry", "dog");
-        Callback[] callbacks = 
+        Callback[] callbacks =
             new Callback[]{new NameCallback("name"), new StringObjectCallback()};
         handler.handle(callbacks);
         assertEquals("Barry", ((NameCallback)callbacks[0]).getName());
@@ -66,7 +66,7 @@ public class NamePasswordCallbackHandlerTest extends Assert {
     @Test
     public void testHandleCallback4() throws Exception {
         NamePasswordCallbackHandler handler = new NamePasswordCallbackHandler("Barry", "dog", "setValue");
-        Callback[] callbacks = 
+        Callback[] callbacks =
             new Callback[]{new NameCallback("name"), new CharArrayCallback()};
         handler.handle(callbacks);
         assertEquals("Barry", ((NameCallback)callbacks[0]).getName());
@@ -75,7 +75,7 @@ public class NamePasswordCallbackHandlerTest extends Assert {
 
     static class ObjectCallback implements Callback {
         private Object obj;
-        
+
         public Object getObject() {
             return obj;
         }
@@ -87,7 +87,7 @@ public class NamePasswordCallbackHandlerTest extends Assert {
 
     static class StringObjectCallback implements Callback {
         private String obj;
-        
+
         public String getObject() {
             return obj;
         }
@@ -99,7 +99,7 @@ public class NamePasswordCallbackHandlerTest extends Assert {
 
     static class CharArrayCallback implements Callback {
         private char[] obj;
-        
+
         public char[] getValue() {
             return obj;
         }

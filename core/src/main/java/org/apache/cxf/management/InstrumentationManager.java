@@ -23,8 +23,8 @@ import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-/** 
- *  InstrumentationManager interface for the instrumentations query, register 
+/**
+ *  InstrumentationManager interface for the instrumentations query, register
  *  and unregister
  */
 public interface InstrumentationManager {
@@ -35,7 +35,7 @@ public interface InstrumentationManager {
      * @throws JMException
      */
     ObjectName register(ManagedComponent component) throws JMException;
-    
+
     /**
      * Register a component with management infrastructure. Component will supply registration name.
      * @param component
@@ -46,16 +46,16 @@ public interface InstrumentationManager {
     ObjectName register(ManagedComponent component, boolean forceRegistration) throws JMException;
 
     /**
-     * Registers object with management infrastructure with a specific name. Object must be annotated or 
+     * Registers object with management infrastructure with a specific name. Object must be annotated or
      * implement standard MBean interface.
      * @param obj
      * @param name
      * @throws JMException
      */
     void register(Object obj, ObjectName name) throws JMException;
-    
+
     /**
-     * Registers object with management infrastructure with a specific name. Object must be annotated or 
+     * Registers object with management infrastructure with a specific name. Object must be annotated or
      * implement standard MBean interface.
      * @param obj
      * @param name
@@ -63,14 +63,14 @@ public interface InstrumentationManager {
      * @throws JMException
      */
     void register(Object obj, ObjectName name, boolean forceRegistration) throws JMException;
-    
+
     /**
      * Unregisters component with management infrastructure
      * @param component
      * @throws JMException
      */
     void unregister(ManagedComponent component) throws JMException;
-    
+
     /**
      * Unregisters component based upon registered name
      * @param name
@@ -82,16 +82,16 @@ public interface InstrumentationManager {
      * Cleans up and shutsdown management infrastructure.
      */
     void shutdown();
-    
+
     /**
      * Get the MBeanServer which hosts managed components
      * NOTE: if the configuration is not set the JMXEnabled to be true, this method
      * will return null
-     * @return the MBeanServer 
+     * @return the MBeanServer
      */
     MBeanServer getMBeanServer();
 
     String getPersistentBusId();
-    
+
     void setPersistentBusId(String id);
 }

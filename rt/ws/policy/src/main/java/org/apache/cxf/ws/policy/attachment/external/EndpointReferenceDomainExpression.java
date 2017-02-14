@@ -27,12 +27,12 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /**
- * 
+ *
  */
 public class EndpointReferenceDomainExpression implements DomainExpression {
 
-    private EndpointReferenceType epr;    
-    
+    private EndpointReferenceType epr;
+
     public EndpointReferenceType getEndpointReference() {
         return epr;
     }

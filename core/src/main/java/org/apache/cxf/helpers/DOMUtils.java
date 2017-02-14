@@ -78,7 +78,7 @@ public final class DOMUtils {
         }
         return factory;
     }
-    
+
     /**
      * Creates a new Document object
      * @throws ParserConfigurationException
@@ -94,10 +94,10 @@ public final class DOMUtils {
         }
     }
 
-    
+
     /**
      * This function is much like getAttribute, but returns null, not "", for a nonexistent attribute.
-     * 
+     *
      * @param e
      * @param attributeName
      */
@@ -159,7 +159,7 @@ public final class DOMUtils {
                     b = new StringBuilder(s).append(((Text)n1).getNodeValue());
                     s = null;
                 }
-            } 
+            }
             n1 = n1.getNextSibling();
         }
         if (b != null) {
@@ -170,7 +170,7 @@ public final class DOMUtils {
 
     /**
      * Get the first element child.
-     * 
+     *
      * @param parent lookup direct childs
      * @param name name of the element. If null return the first element.
      */
@@ -200,7 +200,7 @@ public final class DOMUtils {
         return null;
     }
 
-    
+
     public static boolean hasAttribute(Element element, String value) {
         NamedNodeMap attributes = element.getAttributes();
         for (int i = 0; i < attributes.getLength(); i++) {
@@ -210,7 +210,7 @@ public final class DOMUtils {
             }
         }
         return false;
-    }    
+    }
     public static String getAttribute(Node element, String attName) {
         NamedNodeMap attrs = element.getAttributes();
         if (attrs == null) {
@@ -261,7 +261,7 @@ public final class DOMUtils {
 
     /**
      * Find the first direct child with a given attribute.
-     * 
+     *
      * @param parent
      * @param elemName name of the element, or null for any
      * @param attName attribute we're looking for
@@ -305,7 +305,7 @@ public final class DOMUtils {
     public static QName getElementQName(Element el) {
         return new QName(el.getNamespaceURI(), el.getLocalName());
     }
-    
+
     /**
      * Creates a QName object based on the qualified name
      * and using the Node as a base to lookup the namespace
@@ -334,17 +334,17 @@ public final class DOMUtils {
 
         return new QName(ns, localName, prefix);
     }
-    
+
     public static QName convertStringToQName(String expandedQName) {
         return convertStringToQName(expandedQName, "");
     }
-    
+
     public static QName convertStringToQName(String expandedQName, String prefix) {
         int ind1 = expandedQName.indexOf('{');
         if (ind1 != 0) {
             return new QName(expandedQName);
         }
-        
+
         int ind2 = expandedQName.indexOf('}');
         if (ind2 <= ind1 + 1 || ind2 >= expandedQName.length() - 1) {
             return null;
@@ -362,8 +362,8 @@ public final class DOMUtils {
             }
         }
         return dropElements;
-    }    
-    
+    }
+
 
     /**
      * Get the first direct child with a given type
@@ -392,7 +392,7 @@ public final class DOMUtils {
 
     /**
      * Return the first element child with the specified qualified name.
-     * 
+     *
      * @param parent
      * @param q
      */
@@ -404,7 +404,7 @@ public final class DOMUtils {
 
     /**
      * Return the first element child with the specified qualified name.
-     * 
+     *
      * @param parent
      * @param ns
      * @param lp
@@ -424,7 +424,7 @@ public final class DOMUtils {
 
     /**
      * Return child elements with specified name.
-     * 
+     *
      * @param parent
      * @param ns
      * @param localName
@@ -442,10 +442,10 @@ public final class DOMUtils {
         }
         return r;
     }
-    
+
     /**
      * Returns all child elements with specified namespace.
-     * 
+     *
      * @param parent the element to search under
      * @param ns the namespace to find elements in
      * @return all child elements with specified namespace
@@ -466,7 +466,7 @@ public final class DOMUtils {
 
     /**
      * Get the first child of the specified type.
-     * 
+     *
      * @param parent
      * @param type
      */
@@ -520,7 +520,7 @@ public final class DOMUtils {
             return new InputSource(new StringReader(""));
         }
     }
-    
+
     public static String getPrefixRecursive(Element el, String ns) {
         String prefix = getPrefix(el, ns);
         if (prefix == null && el.getParentNode() instanceof Element) {
@@ -544,7 +544,7 @@ public final class DOMUtils {
 
     /**
      * Get all prefixes defined, up to the root, for a namespace URI.
-     * 
+     *
      * @param element
      * @param namespaceUri
      * @param prefixes
@@ -559,7 +559,7 @@ public final class DOMUtils {
 
     /**
      * Get all prefixes defined on this element for the specified namespace.
-     * 
+     *
      * @param element
      * @param namespaceUri
      * @param prefixes
@@ -590,7 +590,7 @@ public final class DOMUtils {
     /**
      * Starting from a node, find the namespace declaration for a prefix. for a matching namespace
      * declaration.
-     * 
+     *
      * @param node search up from here to search for namespace definitions
      * @param searchPrefix the prefix we are searching for
      * @return the namespace if found.
@@ -623,7 +623,7 @@ public final class DOMUtils {
 
         return null;
     }
-  
+
     public static List<Element> findAllElementsByTagNameNS(Element elem, String nameSpaceURI,
                                                            String localName) {
         List<Element> ret = new LinkedList<Element>();
@@ -694,7 +694,7 @@ public final class DOMUtils {
      * Set a namespace/prefix on an element if it is not set already. First off, it searches for the element
      * for the prefix associated with the specified namespace. If the prefix isn't null, then this is
      * returned. Otherwise, it creates a new attribute using the namespace/prefix passed as parameters.
-     * 
+     *
      * @param element
      * @param namespace
      * @param prefix
@@ -711,7 +711,7 @@ public final class DOMUtils {
 
     /**
      * Add a namespace prefix definition to an element.
-     * 
+     *
      * @param element
      * @param namespaceUri
      * @param prefix

@@ -93,7 +93,7 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
 
         return service.getPizzaPort();
     }
-    
+
     private PizzaNoHeader getPortNoHeader() {
         URL wsdl = getClass().getResource("/wsdl_systest/pizza_service.wsdl");
         assertNotNull("WSDL is null", wsdl);
@@ -103,8 +103,8 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
 
         return service.getPort(PizzaNoHeader.class);
     }
-    
-    
+
+
     @WebService(targetNamespace = "http://cxf.apache.org/pizza", name = "Pizza")
     @XmlSeeAlso({ org.apache.cxf.pizza.types.ObjectFactory.class })
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)

@@ -26,15 +26,15 @@ import org.apache.cxf.common.security.SimplePrincipal;
 public class SimpleSubjectCreatingInterceptor extends AbstractUsernameTokenAuthenticatingInterceptor {
 
     @Override
-    protected Subject createSubject(String name, 
-                                    String password, 
+    protected Subject createSubject(String name,
+                                    String password,
                                     boolean isDigest,
                                     String nonce,
                                     String created) throws SecurityException {
         Subject subject = new Subject();
-         
+
         // delegate to the external security system if possible
-         
+
         subject.getPrincipals().add(new SimplePrincipal(name));
         subject.getPrincipals().add(new SimpleGroup("developers", name));
         subject.setReadOnly();

@@ -25,7 +25,7 @@ public interface FlatArrayServiceInterface {
     void submitStringArray(String[] array);
 
     void takeBeanWithFlatArray(BeanWithFlatArray bwfa);
-    
+
     BeanWithFlatCollection echoBeanWithFlatCollection(BeanWithFlatCollection c);
 }
 

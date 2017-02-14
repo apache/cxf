@@ -59,16 +59,16 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
     public static final String PORT_C = allocatePort(Server.class, 3);
     public static final String PORT_D = allocatePort(Server.class, 4);
     public static final String PORT_EXTRA = allocatePort(Server.class, 99);
-    
-    
+
+
     protected static final String REPLICA_A =
         "http://localhost:" + PORT_A + "/SoapContext/ReplicatedPortA";
     protected static final String REPLICA_B =
-        "http://localhost:" + PORT_B + "/SoapContext/ReplicatedPortB"; 
+        "http://localhost:" + PORT_B + "/SoapContext/ReplicatedPortB";
     protected static final String REPLICA_C =
-        "http://localhost:" + PORT_C + "/SoapContext/ReplicatedPortC"; 
+        "http://localhost:" + PORT_C + "/SoapContext/ReplicatedPortC";
     protected static final String REPLICA_D =
-        "http://localhost:" + PORT_D + "/SoapContext/ReplicatedPortD"; 
+        "http://localhost:" + PORT_D + "/SoapContext/ReplicatedPortD";
 
     private static final Logger LOG =
         LogUtils.getLogger(FailoverAddressOverrideTest.class);
@@ -88,19 +88,19 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         assertTrue("server did not launch correctly",
                    launchServer(Server.class));
     }
-    
+
     protected String getConfig() {
         return FAILOVER_CONFIG;
     }
-            
+
     @Before
     public void setUp() {
-        SpringBusFactory bf = new SpringBusFactory();    
+        SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus(getConfig());
         BusFactory.setDefaultBus(bus);
         targets = new ArrayList<>();
     }
-    
+
     @After
     public void tearDown() {
         if (null != control) {
@@ -129,7 +129,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         verifyCurrentEndpoint(REPLICA_C);
         stopTarget(REPLICA_C);
     }
-    
+
     @Test
     public void testOverriddenRandomStrategy() throws Exception {
         startTarget(REPLICA_B);
@@ -157,7 +157,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
                 cause = cause.getCause();
             }
             if (!(cause instanceof ConnectException)) {
-                if (cause.getMessage() != null 
+                if (cause.getMessage() != null
                     && cause.getMessage().contains("404")) {
                     return;
                 }
@@ -166,7 +166,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         }
         stopTarget(REPLICA_A);
     }
-    
+
 
     protected void startTarget(String address) throws Exception {
         ControlService cs = new ControlService();
@@ -177,7 +177,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         assertTrue("Failed to start greeter", control.startGreeter(address));
         targets.add(address);
     }
-    
+
     protected void stopTarget(String address) {
         if (control != null
             && targets.contains(address)) {
@@ -192,7 +192,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
                      replica,
                      getCurrentEndpoint(greeter));
     }
-    
+
     protected String getCurrentEndpoint(Object proxy) {
         return ClientProxy.getClient(proxy).getEndpoint().getEndpointInfo().getAddress();
     }
@@ -214,7 +214,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         updateAddressPort(greeter, PORT_C);
         verifyConduitSelector(greeter);
     }
-        
+
     protected void verifyConduitSelector(Greeter g) {
         assertTrue("unexpected conduit slector",
                    ClientProxy.getClient(g).getConduitSelector()
@@ -225,7 +225,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         ConduitSelector conduitSelector =
             ClientProxy.getClient(proxy).getConduitSelector();
         if (conduitSelector instanceof FailoverTargetSelector) {
-            AbstractStaticFailoverStrategy strategy = 
+            AbstractStaticFailoverStrategy strategy =
                 (AbstractStaticFailoverStrategy)
                     ((FailoverTargetSelector)conduitSelector).getStrategy();
             assertTrue("unexpected strategy", clz.isInstance(strategy));
@@ -243,25 +243,25 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         mapCodec = new MAPCodec();
         provider.getInInterceptors().add(mapAggregator);
         provider.getInInterceptors().add(mapCodec);
-        
+
         provider.getOutInterceptors().add(mapAggregator);
         provider.getOutInterceptors().add(mapCodec);
-        
+
         provider.getInFaultInterceptors().add(mapAggregator);
         provider.getInFaultInterceptors().add(mapCodec);
-        
+
         provider.getOutFaultInterceptors().add(mapAggregator);
         provider.getOutFaultInterceptors().add(mapCodec);
     }
-    
+
     protected boolean isWSAEnabledForCurrentEndpoint() {
         Endpoint provider = ClientProxy.getClient(greeter).getEndpoint();
-        boolean enabledIn = 
+        boolean enabledIn =
             provider.getInInterceptors().contains(mapAggregator)
             && provider.getInInterceptors().contains(mapCodec)
             && provider.getInFaultInterceptors().contains(mapAggregator)
             && provider.getInFaultInterceptors().contains(mapCodec);
-        boolean enabledOut = 
+        boolean enabledOut =
             provider.getOutInterceptors().contains(mapAggregator)
             && provider.getOutInterceptors().contains(mapCodec)
             && provider.getOutFaultInterceptors().contains(mapAggregator)

@@ -23,7 +23,7 @@ import java.util.List;
 
 import javax.jws.WebService;
 
-@WebService(endpointInterface = "org.apache.cxf.systest.type_substitution.AppleFinder", 
+@WebService(endpointInterface = "org.apache.cxf.systest.type_substitution.AppleFinder",
             serviceName = "AppleFinder")
 public class AppleFinderImpl implements AppleFinder {
 
@@ -36,8 +36,8 @@ public class AppleFinderImpl implements AppleFinder {
         } else {
             return null;
         }
-        
+
     }
 
-    
+
 }

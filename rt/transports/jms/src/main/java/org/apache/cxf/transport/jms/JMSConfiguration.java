@@ -66,22 +66,22 @@ public class JMSConfiguration {
     private String durableSubscriptionName;
 
     private String targetDestination;
-    
+
     /**
      * Destination name to listen on for reply messages
      */
     private String replyDestination;
     private volatile Destination replyDestinationDest;
-    
+
     /**
-     * Destination name to send out as replyTo address in the message 
+     * Destination name to send out as replyTo address in the message
      */
     private String replyToDestination;
     private volatile Destination replyToDestinationDest;
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
     private boolean replyPubSubDomain;
-    
+
     /**
      *  Default to use conduitIdSelector as it allows to receive using a listener
      *  which improves performance.
@@ -108,7 +108,7 @@ public class JMSConfiguration {
             throw new IllegalArgumentException("targetDestination may not be null");
         }
     }
-    
+
     public Properties getJndiEnvironment() {
         return jndiEnvironment;
     }
@@ -283,11 +283,11 @@ public class JMSConfiguration {
     public void setPubSubDomain(boolean pubSubDomain) {
         this.pubSubDomain = pubSubDomain;
     }
-    
+
     public boolean isReplyPubSubDomain() {
         return replyPubSubDomain;
     }
-    
+
     public void setReplyPubSubDomain(boolean replyPubSubDomain) {
         this.replyPubSubDomain = replyPubSubDomain;
     }
@@ -311,11 +311,11 @@ public class JMSConfiguration {
     public boolean isCreateSecurityContext() {
         return createSecurityContext;
     }
-    
+
     public void setCreateSecurityContext(boolean b) {
         this.createSecurityContext = b;
     }
-    
+
     /**
      * For compatibility with old spring based code
      * @param transactionManager
@@ -374,10 +374,10 @@ public class JMSConfiguration {
         }
         return factory;
     }
-    
+
     /**
      * Retrieve connection factory from JNDI
-     * 
+     *
      * @param jmsConfig
      * @param jndiConfig
      * @return
@@ -395,7 +395,7 @@ public class JMSConfiguration {
         }
     }
 
-    
+
     public String getDurableSubscriptionClientId() {
         return durableSubscriptionClientId;
     }
@@ -469,7 +469,7 @@ public class JMSConfiguration {
             synchronized (this) {
                 result = replyDestinationDest;
                 if (result == null) {
-                    result = replyDestination == null 
+                    result = replyDestination == null
                         ? session.createTemporaryQueue()
                         : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
                     replyDestinationDest = result;

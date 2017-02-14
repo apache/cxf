@@ -48,7 +48,7 @@ import org.apache.wss4j.dom.WSConstants;
  * Some unit tests for validating an X.509 Token via the X509TokenValidator.
  */
 public class X509TokenValidatorTest extends org.junit.Assert {
-    
+
     /**
      * Test a valid certificate
      */
@@ -57,10 +57,10 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         TokenValidator x509TokenValidator = new X509TokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of an X509Certificate
         BinarySecurityTokenType binarySecurityToken = new BinarySecurityTokenType();
-        JAXBElement<BinarySecurityTokenType> tokenType = 
+        JAXBElement<BinarySecurityTokenType> tokenType =
             new JAXBElement<BinarySecurityTokenType>(
                 QNameConstants.BINARY_SECURITY_TOKEN, BinarySecurityTokenType.class, binarySecurityToken
             );
@@ -70,34 +70,34 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         assertTrue(certs != null && certs.length > 0);
         binarySecurityToken.setValue(Base64.getMimeEncoder().encodeToString(certs[0].getEncoded()));
-        
+
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         // It can't handle the token as the value type is not set
         assertFalse(x509TokenValidator.canHandleToken(validateTarget));
-        
+
         binarySecurityToken.setValueType(X509TokenValidator.X509_V3_TYPE);
         assertTrue(x509TokenValidator.canHandleToken(validateTarget));
-        
+
         // This will fail as the encoding type is not set
         TokenValidatorResponse validatorResponse = null;
         validatorResponse = x509TokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
-        
+
         binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
-        
+
         validatorResponse = x509TokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
+
         Principal principal = validatorResponse.getPrincipal();
         assertTrue(principal != null && principal.getName() != null);
     }
-    
+
     /**
      * Test an invalid certificate
      */
@@ -106,52 +106,52 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         TokenValidator x509TokenValidator = new X509TokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of an X509Certificate
         BinarySecurityTokenType binarySecurityToken = new BinarySecurityTokenType();
-        JAXBElement<BinarySecurityTokenType> tokenType = 
+        JAXBElement<BinarySecurityTokenType> tokenType =
             new JAXBElement<BinarySecurityTokenType>(
                 QNameConstants.BINARY_SECURITY_TOKEN, BinarySecurityTokenType.class, binarySecurityToken
             );
-        
+
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("eve");
         Crypto crypto = CryptoFactory.getInstance(getEveCryptoProperties());
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
         assertTrue(certs != null && certs.length > 0);
-        
+
         binarySecurityToken.setValue(Base64.getMimeEncoder().encodeToString(certs[0].getEncoded()));
         binarySecurityToken.setValueType(X509TokenValidator.X509_V3_TYPE);
         binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
-        
+
         ReceivedToken validateTarget = new ReceivedToken(tokenType);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(x509TokenValidator.canHandleToken(validateTarget));
-        
+
         TokenValidatorResponse validatorResponse = x509TokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
-    
+
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {
         TokenValidatorParameters parameters = new TokenValidatorParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(STSConstants.STATUS);
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         parameters.setMessageContext(msgCtx);
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -162,10 +162,10 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -173,10 +173,10 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
+
     private Properties getEveCryptoProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -184,10 +184,10 @@ public class X509TokenValidatorTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "evespass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "eve.jks");
-        
+
         return properties;
     }
-    
-  
-    
+
+
+
 }

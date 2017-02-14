@@ -33,7 +33,7 @@ public final class WSAContextUtils {
         "org.apache.cxf.ws.addressing.decoupled.endpoint.base";
 
     private static final String USING_PROPERTY =
-        "org.apache.cxf.ws.addressing.using";    
+        "org.apache.cxf.ws.addressing.using";
 
     /**
      * Prevents instantiation.
@@ -46,7 +46,7 @@ public final class WSAContextUtils {
      *
      * @param message the current message
      * @return true if UsingAddressing should be overridden
-     */   
+     */
     public static boolean retrieveUsingAddressing(Message message) {
         Boolean override = (Boolean)message.get(USING_PROPERTY);
         return override == null || override.booleanValue();

@@ -23,10 +23,10 @@ import javax.xml.namespace.QName;
 
 /**
  * Singleton object that represents the SOAP 1.1 VERSION.
- * 
+ *
  */
 public final class Soap11 implements SoapVersion {
-    
+
     // some constants that don't fit into the SoapVersion paradigm.
     public static final String SOAP_NAMESPACE = "http://schemas.xmlsoap.org/soap/envelope/";
     public static final String SOAP_ENCODING_URI = "http://schemas.xmlsoap.org/soap/encoding/";
@@ -50,7 +50,7 @@ public final class Soap11 implements SoapVersion {
     private static final String NONE_ROLE = SOAP_NAMESPACE + "/role/none";
 
     private static final String ULTIMATE_RECEIVER_ROLE = SOAP_NAMESPACE + "/role/ultimateReceiver";
-    
+
     private static final String NEXT_ROLE = "http://schemas.xmlsoap.org/soap/actor/next";
 
     private static final String SOAP_ENCODING_STYLE = SOAP_ENCODING_URI;
@@ -61,12 +61,12 @@ public final class Soap11 implements SoapVersion {
 
     private final QName body = new QName(SOAP_NAMESPACE, "Body");
 
-    private final QName fault = new QName(SOAP_NAMESPACE, "Fault");      
+    private final QName fault = new QName(SOAP_NAMESPACE, "Fault");
 
     private Soap11() {
-        // Singleton 
+        // Singleton
     }
-    
+
 
     public static Soap11 getInstance() {
         return INSTANCE;
@@ -129,7 +129,7 @@ public final class Soap11 implements SoapVersion {
     public String getAttrValueMustUnderstand(boolean value) {
         return value ? "1" : "0";
     }
-    
+
     public QName getReceiver() {
         return new QName(SOAP_NAMESPACE, "Server");
     }
@@ -150,7 +150,7 @@ public final class Soap11 implements SoapVersion {
         // There is no such fault code in soap11
         return null;
     }
-    
+
     public String getContentType() {
         return "text/xml";
     }

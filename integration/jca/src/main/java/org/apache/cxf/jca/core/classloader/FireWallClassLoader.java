@@ -42,23 +42,23 @@ import java.security.SecureClassLoader;
  * because someone put them on the classpath or in the extensions directory).
  * <P>
  * For these cases, the FireWallClassLoader can be used.
- * 
+ *
  * <PRE>
- * 
+ *
  * System ClassLoader | FireWallClassLoader | User's ClassLoader
- * 
+ *
  * </PRE>
- * 
+ *
  * The FireWallClassLoader is placed between the user's class loader and the
  * parent class loader. It has a set of filters that define what classes are
  * allowed to go through. These filters describe (a groups of) packages, or a
  * specific classes or resources that are allowed through to the parent
  * classloader. Take as example this filter set:
- * 
+ *
  * <pre>
  * [&quot;com.iona.&quot;, &quot;javax.servlet.jsp.&quot;]
  * </pre>
- * 
+ *
  * This will allow requests to any class/resource staring with com.iona. or
  * javax.servlet.jsp. through to the parent classloader and block all other
  * requests.
@@ -77,7 +77,7 @@ public class FireWallClassLoader extends SecureClassLoader {
 
     /**
      * Constructor.
-     * 
+     *
      * @param parent The Parent ClassLoader to use.
      * @param fs A set of filters to let through. The filters and be either in
      *            package form (<CODE>org.omg.</CODE> or <CODE>org.omg.*</CODE>)
@@ -98,7 +98,7 @@ public class FireWallClassLoader extends SecureClassLoader {
 
     /**
      * Constructor.
-     * 
+     *
      * @param parent The Parent ClassLoader to use.
      * @param fs A set of filters to let through. The filters and be either in
      *            package form (<CODE>org.omg.</CODE> or <CODE>org.omg.*</CODE>)
@@ -151,8 +151,8 @@ public class FireWallClassLoader extends SecureClassLoader {
         }
 
         if (!javaCovered) {
-            throw new SecurityException("It's unsafe to construct a " 
-                        + "FireWallClassLoader that does not let the java. " 
+            throw new SecurityException("It's unsafe to construct a "
+                        + "FireWallClassLoader that does not let the java. "
                         + "package through.");
         }
     }
@@ -227,7 +227,7 @@ public class FireWallClassLoader extends SecureClassLoader {
         throw new ClassNotFoundException(name);
     }*/
 
-    
+
     public java.net.URL getResource(String name) {
         if (negativeFNFilters != null) {
             for (int i = 0; i < negativeFNFilters.length; i++) {
@@ -252,7 +252,7 @@ public class FireWallClassLoader extends SecureClassLoader {
     /**
      * Returns the list of filters used by this FireWallClassLoader. The list is
      * a copy of the array internally used.
-     * 
+     *
      * @return The filters used.
      */
     public String[] getFilters() {
@@ -266,7 +266,7 @@ public class FireWallClassLoader extends SecureClassLoader {
     /**
      * Returns the list of negative filters used by this FireWallClassLoader.
      * The list is a copy of the array internally used.
-     * 
+     *
      * @return The filters used.
      */
     public String[] getNegativeFilters() {

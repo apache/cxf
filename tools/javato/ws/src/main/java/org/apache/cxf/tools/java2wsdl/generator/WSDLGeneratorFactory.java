@@ -25,7 +25,7 @@ import org.apache.cxf.wsdl.WSDLConstants;
 
 public final class WSDLGeneratorFactory {
     private WSDLConstants.WSDLVersion wsdlVersion;
-    
+
     public  WSDLGeneratorFactory() {
     }
 

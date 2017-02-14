@@ -45,10 +45,10 @@ public class PooledConnectionTempQueueTest {
 
         Connection con1 = cf.createConnection();
         con1.start();
-        
+
         // This order seems to matter to reproduce the issue
         con1.close();
-        
+
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             public void run() {
                 try {
@@ -59,7 +59,7 @@ public class PooledConnectionTempQueueTest {
             }
         });
 
-        sendWithReplyToTemp(cf, SERVICE_QUEUE);        
+        sendWithReplyToTemp(cf, SERVICE_QUEUE);
     }
 
     private void sendWithReplyToTemp(ConnectionFactory cf, String serviceQueue) throws JMSException,
@@ -75,12 +75,12 @@ public class PooledConnectionTempQueueTest {
 
         // This sleep also seems to matter
         Thread.sleep(500);
-        
+
         MessageConsumer consumer = session.createConsumer(tempQueue);
         Message replyMsg = consumer.receive();
         Assert.assertNotNull(replyMsg);
         //System.out.println(replyMsg.getJMSCorrelationID());
-        
+
         consumer.close();
 
         producer.close();
@@ -102,7 +102,7 @@ public class PooledConnectionTempQueueTest {
         final MessageProducer producer = session.createProducer(inMessage.getJMSReplyTo());
         //System.out.println("Sending reply to " + inMessage.getJMSReplyTo());
         producer.send(replyMessage);
-        
+
         producer.close();
         consumer.close();
         session.close();

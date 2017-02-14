@@ -52,7 +52,7 @@ public class ClassTest extends AbstractAegisTest {
         AegisContext context = new AegisContext();
         context.initialize();
         context.getTypeMapping().register(new ClassAsStringType());
-        
+
         ServerFactoryBean b = new ServerFactoryBean();
         b.setDataBinding(new AegisDatabinding(context));
         b.setServiceClass(GenericsService.class);
@@ -80,21 +80,21 @@ public class ClassTest extends AbstractAegisTest {
             return type.newInstance();
         }
     }
-    
-    
+
+
     public static class ClassAsStringType extends AegisType {
-        
-        public static final QName CLASS_AS_STRING_TYPE_QNAME 
+
+        public static final QName CLASS_AS_STRING_TYPE_QNAME
             = new QName("http://cxf.apache.org/my/class/test", "class");
-             
+
         private StringType stringType;
-             
+
         public ClassAsStringType() {
             stringType = new StringType();
             super.setTypeClass(Class.class);
             super.setSchemaType(CLASS_AS_STRING_TYPE_QNAME);
         }
-         
+
         public Object readObject(MessageReader reader, Context context)
             throws DatabindingException {
             String className = (String) stringType.readObject(reader, context);
@@ -107,8 +107,8 @@ public class ClassTest extends AbstractAegisTest {
             }
             return cls;
         }
-         
-        public void writeObject(Object object, MessageWriter writer, Context context) 
+
+        public void writeObject(Object object, MessageWriter writer, Context context)
             throws DatabindingException {
             if (object == null) {
                 stringType.writeObject(null, writer, context);
@@ -120,15 +120,15 @@ public class ClassTest extends AbstractAegisTest {
         public void writeSchema(XmlSchema root) {
             XmlSchemaSimpleType xst = new XmlSchemaSimpleType(root, true);
             xst.setName("class");
-            
+
             XmlSchemaSimpleTypeRestriction content = new XmlSchemaSimpleTypeRestriction();
             content.setBaseTypeName(Constants.XSD_STRING);
             xst.setContent(content);
         }
-                 
+
         public boolean usesUtilityTypes() {
             return true;
         }
-    }    
+    }
 
 }

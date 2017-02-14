@@ -31,12 +31,12 @@ public class Library {
     private int id;
     private String address;
     @OneToMany
-    private List<Book> books = new LinkedList<Book>(); 
-    
+    private List<Book> books = new LinkedList<Book>();
+
     public int getId() {
         return id;
     }
-    
+
     public void setId(int id) {
         this.id = id;
     }

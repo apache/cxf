@@ -24,10 +24,10 @@ import javax.xml.validation.Schema;
 
 /**
  * Aegis abstraction for reading.
- * 
+ *
  *  Note that this interface does not include the 'read' method. Since the caller of a reader has to know
  *  the type of the source object, the read method is not specified here in the interface, but is provided
- *  in the specific type. 
+ *  in the specific type.
  */
 public interface AegisIo {
     /**

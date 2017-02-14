@@ -42,7 +42,7 @@ import org.springframework.context.annotation.Import;
 
 @Import(JaxRsConfig.class)
 @ComponentScan(
-               includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, 
+               includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION,
                                                       value = {Provider.class,
                                                                org.apache.cxf.annotations.Provider.class})
            )
@@ -59,23 +59,23 @@ public abstract class AbstractJaxRsClientConfiguration implements ApplicationCon
     private String accept;
     @Value("${cxf.jaxrs.client.headers.content-type:}")
     private String contentType;
-    
-    
+
+
     protected Client createClient() {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setBus(bus);        
+        bean.setBus(bus);
         bean.setAddress(address);
         bean.setThreadSafe(threadSafe);
         setJaxrsResources(bean);
-        
+
         for (String beanName : context.getBeanDefinitionNames()) {
             if (context.findAnnotationOnBean(beanName, Provider.class) != null) {
                 bean.setProvider(context.getBean(beanName));
             } else if (context.findAnnotationOnBean(beanName, org.apache.cxf.annotations.Provider.class) != null) {
                 addCxfProvider(bean, context.getBean(beanName));
-            } 
+            }
         }
-        
+
         Map<String, String> extraHeaders = new HashMap<String, String>();
         if (!StringUtils.isEmpty(accept)) {
             extraHeaders.put("Accept", accept);
@@ -89,7 +89,7 @@ public abstract class AbstractJaxRsClientConfiguration implements ApplicationCon
         return bean.create();
     }
     protected void addCxfProvider(JAXRSClientFactoryBean factory, Object provider) {
-        org.apache.cxf.annotations.Provider ann = 
+        org.apache.cxf.annotations.Provider ann =
             provider.getClass().getAnnotation(org.apache.cxf.annotations.Provider.class);
         if (ann.scope() == Scope.Server) {
             return;
@@ -101,13 +101,13 @@ public abstract class AbstractJaxRsClientConfiguration implements ApplicationCon
         } else if (ann.value() == org.apache.cxf.annotations.Provider.Type.OutInterceptor) {
             factory.getOutInterceptors().add((Interceptor<?>)provider);
         }
-        
+
     }
     protected abstract void setJaxrsResources(JAXRSClientFactoryBean factory);
-    
+
     @Override
     public void setApplicationContext(ApplicationContext ac) throws BeansException {
         this.context = ac;
-        
+
     }
 }

@@ -180,7 +180,7 @@ public class ServerAppTest extends Assert {
             pout.flush();
             assertTrue(new String(bout.toByteArray()).contains("processing file"));
         } finally {
-            System.setOut(orig);            
+            System.setOut(orig);
         }
     }
 
@@ -201,7 +201,7 @@ public class ServerAppTest extends Assert {
         PrintStream orig = System.out;
         try {
             System.setOut(pout);
-            
+
             phMock.createAndPublish(new File(emptyFile), epAddr, true);
             EasyMock.replay(phMock);
             ServerApp app = createServerApp();
@@ -210,7 +210,7 @@ public class ServerAppTest extends Assert {
             EasyMock.verify(phMock);
             assertTrue(new String(bout.toByteArray()).contains("processing file"));
         } finally {
-            System.setOut(orig);            
+            System.setOut(orig);
         }
     }
 

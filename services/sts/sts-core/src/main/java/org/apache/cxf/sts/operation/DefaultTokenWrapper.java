@@ -31,7 +31,7 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestedSecurityTokenType;
  * token.
  */
 public class DefaultTokenWrapper implements TokenWrapper {
-    
+
     /**
      * Wrap the Token parameter and set it on the RequestedSecurityTokenType parameter
      */
@@ -45,5 +45,5 @@ public class DefaultTokenWrapper implements TokenWrapper {
             requestedTokenType.setAny(token);
         }
     }
-    
+
 }

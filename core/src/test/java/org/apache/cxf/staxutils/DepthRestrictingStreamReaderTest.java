@@ -27,90 +27,90 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class DepthRestrictingStreamReaderTest extends Assert {
-    
+
     @Test
     public void testReaderOK() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(getClass().getResourceAsStream("./resources/amazon.xml"));
-        
+
         DepthRestrictingStreamReader dr = new DepthRestrictingStreamReader(reader,
-                                                                           7, 
+                                                                           7,
                                                                            4,
                                                                            4);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         StaxUtils.copy(dr, bos);
         assertTrue(bos.toString().contains("ItemLookup"));
     }
-    
+
     @Test
     public void testReaderOKComplex() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(getClass().getResourceAsStream("./resources/wstrustReqSTRC.xml"));
-        
+
         DepthRestrictingStreamReader dr = new DepthRestrictingStreamReader(reader,
-                                                                           -1, 
+                                                                           -1,
                                                                            8,
                                                                            3);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         StaxUtils.copy(dr, bos);
         assertTrue(bos.toString().contains("RequestSecurityTokenResponse"));
     }
-    
+
     @Test(expected = DepthExceededStaxException.class)
     public void testElementCountExceeded() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(getClass().getResourceAsStream("./resources/amazon.xml"));
-        
+
         DepthRestrictingStreamReader dr = new DepthRestrictingStreamReader(reader,
-                                                                           6, 
+                                                                           6,
                                                                            4,
                                                                            4);
         StaxUtils.copy(dr, new ByteArrayOutputStream());
     }
-    
+
     @Test(expected = DepthExceededStaxException.class)
     public void testElementLevelExceeded() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(getClass().getResourceAsStream("./resources/amazon.xml"));
-        
+
         DepthRestrictingStreamReader dr = new DepthRestrictingStreamReader(reader,
-                                                                           7, 
+                                                                           7,
                                                                            3,
                                                                            4);
         StaxUtils.copy(dr, new ByteArrayOutputStream());
     }
-    
+
     @Test(expected = DepthExceededStaxException.class)
     public void testElementLevelExceededComplex() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(getClass().getResourceAsStream("./resources/wstrustReqSTRC.xml"));
-        
+
         DepthRestrictingStreamReader dr = new DepthRestrictingStreamReader(reader,
-                                                                           -1, 
+                                                                           -1,
                                                                            7,
                                                                            3);
         StaxUtils.copy(dr, new ByteArrayOutputStream());
     }
-    
+
     @Test(expected = DepthExceededStaxException.class)
     public void testInnerElementCountExceeded() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(getClass().getResourceAsStream("./resources/amazon.xml"));
-        
+
         DepthRestrictingStreamReader dr = new DepthRestrictingStreamReader(reader,
-                                                                           7, 
+                                                                           7,
                                                                            4,
                                                                            3);
         StaxUtils.copy(dr, new ByteArrayOutputStream());
     }
-    
+
     @Test(expected = DepthExceededStaxException.class)
     public void testInnerElementCountExceededComplex() throws Exception {
-        XMLStreamReader reader = 
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(getClass().getResourceAsStream("./resources/wstrustReqSTRC.xml"));
-        
+
         DepthRestrictingStreamReader dr = new DepthRestrictingStreamReader(reader,
-                                                                           -1, 
+                                                                           -1,
                                                                            7,
                                                                            2);
         StaxUtils.copy(dr, new ByteArrayOutputStream());

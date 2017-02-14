@@ -51,7 +51,7 @@ import org.apache.ws.commons.schema.constants.Constants;
  */
 public final class XmlSchemaUtils {
     public static final String XSI_NIL = "xsi:nil='true'";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSchemaUtils.class);
 
     private XmlSchemaUtils() {
@@ -238,7 +238,7 @@ public final class XmlSchemaUtils {
         return ext.getAttributes();
     }
 
-    public static List<XmlSchemaAnnotated> getContentAttributes(XmlSchemaComplexType type, 
+    public static List<XmlSchemaAnnotated> getContentAttributes(XmlSchemaComplexType type,
                                                                 SchemaCollection collection) {
         List<XmlSchemaAnnotated> results = new ArrayList<>();
         QName baseTypeName = getBaseType(type);

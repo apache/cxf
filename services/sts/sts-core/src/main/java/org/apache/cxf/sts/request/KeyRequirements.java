@@ -19,11 +19,11 @@
 package org.apache.cxf.sts.request;
 
 /**
- * This class contains values that have been extracted from a RequestSecurityToken corresponding to 
+ * This class contains values that have been extracted from a RequestSecurityToken corresponding to
  * various key and encryption requirements.
  */
 public class KeyRequirements {
-    
+
     private String authenticationType;
     private String keyType;
     private long keySize;
@@ -36,79 +36,79 @@ public class KeyRequirements {
     private Entropy entropy;
     private String encryptWith;
     private String signWith;
-    
+
     public String getAuthenticationType() {
         return authenticationType;
     }
-    
+
     public void setAuthenticationType(String authenticationType) {
         this.authenticationType = authenticationType;
     }
-    
+
     public String getKeyType() {
         return keyType;
     }
-    
+
     public void setKeyType(String keyType) {
         this.keyType = keyType;
     }
-    
+
     public long getKeySize() {
         return keySize;
     }
-    
+
     public void setKeySize(long keySize) {
         this.keySize = keySize;
     }
-    
+
     /**
      * This input parameter is ignored for the moment.
      */
     public String getSignatureAlgorithm() {
         return signatureAlgorithm;
     }
-    
+
     /**
      * This input parameter is ignored for the moment.
      */
     public void setSignatureAlgorithm(String signatureAlgorithm) {
         this.signatureAlgorithm = signatureAlgorithm;
     }
-    
+
     public String getEncryptionAlgorithm() {
         return encryptionAlgorithm;
     }
-    
+
     public void setEncryptionAlgorithm(String encryptionAlgorithm) {
         this.encryptionAlgorithm = encryptionAlgorithm;
     }
-    
+
     /**
      * This input parameter is ignored for the moment.
      */
     public String getC14nAlgorithm() {
         return c14nAlgorithm;
     }
-    
+
     /**
      * This input parameter is ignored for the moment.
      */
     public void setC14nAlgorithm(String c14nAlgorithm) {
         this.c14nAlgorithm = c14nAlgorithm;
     }
-    
+
     public String getComputedKeyAlgorithm() {
         return computedKeyAlgorithm;
     }
-    
+
     public void setComputedKeyAlgorithm(String computedKeyAlgorithm) {
         this.computedKeyAlgorithm = computedKeyAlgorithm;
     }
-    
+
     public String getKeywrapAlgorithm() {
         return keywrapAlgorithm;
     }
-    
+
     public void setKeywrapAlgorithm(String keywrapAlgorithm) {
         this.keywrapAlgorithm = keywrapAlgorithm;
     }
@@ -120,11 +120,11 @@ public class KeyRequirements {
     public void setReceivedKey(ReceivedKey receivedKey) {
         this.receivedKey = receivedKey;
     }
-    
+
     public Entropy getEntropy() {
         return entropy;
     }
-    
+
     public void setEntropy(Entropy entropy) {
         this.entropy = entropy;
     }
@@ -144,6 +144,6 @@ public class KeyRequirements {
     public void setSignWith(String signWith) {
         this.signWith = signWith;
     }
-    
-    
+
+
 }

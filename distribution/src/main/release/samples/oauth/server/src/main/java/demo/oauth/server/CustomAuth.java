@@ -31,7 +31,7 @@ public class CustomAuth extends LoginUrlAuthenticationEntryPoint {
     public CustomAuth(String v) {
         super(v);
     }
-    
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {

@@ -40,34 +40,34 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 
 /**
- * 
+ *
  */
 @ContextConfiguration(locations = { "classpath:aegisSportsServiceBeans.xml" })
 public class CharacterSchemaTest extends AbstractJUnit4SpringContextTests {
     static final String PORT = TestUtil.getPortNumber(CharacterSchemaTest.class);
 
     private TestUtilities testUtilities;
-    
+
     public CharacterSchemaTest() {
         testUtilities = new TestUtilities(getClass());
     }
-    
+
     @Test
     public void testSchema() throws Exception {
         testUtilities.setBus((Bus)applicationContext.getBean("cxf"));
         testUtilities.addDefaultNamespaces();
         testUtilities.addNamespace("aegis", "http://cxf.apache.org/aegisTypes");
         Server s = testUtilities.
-            getServerForService(new QName("http://aegis.systest.cxf.apache.org/", 
+            getServerForService(new QName("http://aegis.systest.cxf.apache.org/",
                                           "SportsService"));
         Assert.assertNotNull(s);
-        Document wsdl = testUtilities.getWSDLDocument(s); 
+        Document wsdl = testUtilities.getWSDLDocument(s);
         Assert.assertNotNull(wsdl);
-        NodeList typeAttrList = 
+        NodeList typeAttrList =
             testUtilities.assertValid("//xsd:complexType[@name='BeanWithCharacter']/xsd:sequence"
                                       + "/xsd:element[@name='character']"
-                                      + "/@type", 
-                                      wsdl); 
+                                      + "/@type",
+                                      wsdl);
         Attr typeAttr = (Attr)typeAttrList.item(0);
         String typeAttrValue = typeAttr.getValue();
         // now, this thing is a qname with a :, and we have to work out if it's correct.

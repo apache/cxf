@@ -77,11 +77,11 @@ public class ProcessorTestBase extends Assert {
     protected File output;
     protected ToolContext env = new ToolContext();
     protected Map<QName, Set<String>> qnameAtts = new HashMap<QName, Set<String>>();
-    
+
     public ProcessorTestBase() {
         addQNameAttribute(new QName(Constants.URI_2001_SCHEMA_XSD, "element"), "type");
     }
-    
+
     protected final void addQNameAttribute(QName element, String local) {
         Set<String> a = qnameAtts.get(element);
         if (a == null) {
@@ -90,7 +90,7 @@ public class ProcessorTestBase extends Assert {
         }
         a.add(local);
     }
-    
+
     @Before
     public void setUp() throws Exception {
         if (System.getProperty("java.version").startsWith("9")) {
@@ -102,7 +102,7 @@ public class ProcessorTestBase extends Assert {
     public void tearDown() {
         env = null;
     }
-    
+
 
     protected boolean isMOXy() {
         try {

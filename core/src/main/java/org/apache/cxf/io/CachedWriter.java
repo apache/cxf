@@ -53,9 +53,9 @@ public class CachedWriter extends Writer {
     private static int defaultThreshold;
     private static long defaultMaxSize;
     private static String defaultCipherTransformation;
-    
+
     static {
-        
+
         String s = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.io.CachedOutputStream.OutputDirectory");
         if (s == null) {
             // lookup the deprecated property
@@ -96,10 +96,10 @@ public class CachedWriter extends Writer {
     private CipherPair ciphers;
 
     private List<CachedWriterCallback> callbacks;
-    
+
     private List<Object> streamList = new ArrayList<>();
 
-    
+
     static class LoadingCharArrayWriter extends CharArrayWriter {
         LoadingCharArrayWriter() {
             super(1024);
@@ -108,7 +108,7 @@ public class CachedWriter extends Writer {
             return super.buf;
         }
     }
-    
+
 
     public CachedWriter() {
         this(defaultThreshold);
@@ -152,14 +152,14 @@ public class CachedWriter extends Writer {
     public void releaseTempFileHold() {
         allowDeleteOfFile = true;
     }
-    
+
     public void registerCallback(CachedWriterCallback cb) {
         if (null == callbacks) {
             callbacks = new ArrayList<>();
         }
         callbacks.add(cb);
     }
-    
+
     public void deregisterCallback(CachedWriterCallback cb) {
         if (null != callbacks) {
             callbacks.remove(cb);
@@ -175,14 +175,14 @@ public class CachedWriter extends Writer {
      * output stream ... etc.)
      */
     protected void doFlush() throws IOException {
-        
+
     }
 
     public void flush() throws IOException {
         if (!cosClosed) {
             currentStream.flush();
         }
-        
+
         if (null != callbacks) {
             for (CachedWriterCallback cb : callbacks) {
                 cb.onFlush(this);
@@ -195,14 +195,14 @@ public class CachedWriter extends Writer {
      * Perform any actions required on stream closure (handle response etc.)
      */
     protected void doClose() throws IOException {
-        
+
     }
-    
+
     /**
      * Perform any actions required after stream closure (close the other related stream etc.)
      */
     protected void postClose() throws IOException {
-        
+
     }
 
     /**
@@ -224,7 +224,7 @@ public class CachedWriter extends Writer {
         doClose();
         streamList.remove(currentStream);
     }
-    
+
     public void close() throws IOException {
         if (!cosClosed) {
             currentStream.flush();
@@ -257,7 +257,7 @@ public class CachedWriter extends Writer {
      * When with Attachment, needs to replace the xml writer stream with the stream used by
      * AttachmentSerializer or copy the cached output stream to the "real"
      * output stream, i.e. onto the wire.
-     * 
+     *
      * @param out the new output stream
      * @param copyOldContent flag indicating if the old content should be copied
      * @throws IOException
@@ -345,7 +345,7 @@ public class CachedWriter extends Writer {
             }
         }
     }
-    
+
     public void writeCacheTo(StringBuilder out, long limit) throws IOException {
         flush();
         if (totalLength < limit
@@ -383,7 +383,7 @@ public class CachedWriter extends Writer {
             }
         }
     }
-    
+
     public void writeCacheTo(StringBuilder out) throws IOException {
         flush();
         if (inmem) {
@@ -440,10 +440,10 @@ public class CachedWriter extends Writer {
         }
         if (inmem && totalLength > threshold && currentStream instanceof LoadingCharArrayWriter) {
             createFileOutputStream();
-        }       
+        }
     }
 
-    
+
     public void write(char[] cbuf, int off, int len) throws IOException {
         if (!outputLocked) {
             onWrite();
@@ -524,7 +524,7 @@ public class CachedWriter extends Writer {
             }
         }
     }
-    
+
     private synchronized void deleteTempFile() {
         if (tempFile != null) {
             File file = tempFile;
@@ -563,7 +563,7 @@ public class CachedWriter extends Writer {
     public void setCipherTransformation(String cipherTransformation) {
         this.cipherTransformation = cipherTransformation;
     }
-    
+
     public static void setDefaultMaxSize(long l) {
         if (l == -1) {
             String s = System.getProperty("org.apache.cxf.io.CachedOutputStream.MaxSize");
@@ -588,7 +588,7 @@ public class CachedWriter extends Writer {
             }
         }
         defaultThreshold = i;
-        
+
     }
 
     public static void setDefaultCipherTransformation(String n) {

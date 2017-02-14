@@ -36,9 +36,9 @@ import java.lang.annotation.Target;
 public @interface Scopes {
 
     String[] value();
-    
+
     /**
-     * If set to true then all the values of this scope have to be matched 
+     * If set to true then all the values of this scope have to be matched
      */
     boolean matchAll() default false;
 }

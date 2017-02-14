@@ -37,7 +37,7 @@ public final class MessageUtils {
 
     /**
      * Determine if message is outbound.
-     * 
+     *
      * @param message the current Message
      * @return true if the message direction is outbound
      */
@@ -53,7 +53,7 @@ public final class MessageUtils {
 
     /**
      * Determine if message is fault.
-     * 
+     *
      * @param message the current Message
      * @return true if the message is a fault
      */
@@ -63,11 +63,11 @@ public final class MessageUtils {
                && (message == message.getExchange().getInFaultMessage() || message == message.getExchange()
                    .getOutFaultMessage());
     }
-    
+
     /**
-     * Determine the fault mode for the underlying (fault) message 
+     * Determine the fault mode for the underlying (fault) message
      * (for use on server side only).
-     * 
+     *
      * @param message the fault message
      * @return the FaultMode
      */
@@ -82,12 +82,12 @@ public final class MessageUtils {
                 return FaultMode.RUNTIME_FAULT;
             }
         }
-        return null;    
+        return null;
     }
 
     /**
      * Determine if current messaging role is that of requestor.
-     * 
+     *
      * @param message the current Message
      * @return true if the current messaging role is that of requestor
      */
@@ -98,21 +98,21 @@ public final class MessageUtils {
         }
         return false;
     }
-    
+
     /**
      * Determine if the current message is a partial response.
-     * 
+     *
      * @param message the current message
      * @return true if the current messags is a partial response
      */
     public static boolean isPartialResponse(Message message) {
         return message != null && Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE));
     }
-    
+
     /**
      * Determines if the current message is an empty partial response, which
      * is a partial response with an empty content.
-     * 
+     *
      * @param message the current message
      * @return true if the current messags is a partial empty response
      */
@@ -129,7 +129,7 @@ public final class MessageUtils {
         // TODO - consider deprecation as this really belongs in PropertyUtils
         return PropertyUtils.isTrue(value);
     }
-    
+
     public static boolean getContextualBoolean(Message m, String key, boolean defaultValue) {
         if (m != null) {
             Object o = m.getContextualProperty(key);
@@ -139,7 +139,7 @@ public final class MessageUtils {
         }
         return defaultValue;
     }
-    
+
     public static Object getContextualProperty(Message m, String propPreferred, String propDefault) {
         Object prop = null;
         if (m != null) {
@@ -150,7 +150,7 @@ public final class MessageUtils {
         }
         return prop;
     }
-    
+
     /**
      * Returns true if the underlying content format is a W3C DOM or a SAAJ message.
      */
@@ -160,7 +160,7 @@ public final class MessageUtils {
         for (Class c : m.getContentFormats()) {
             if (c.equals(Node.class) || c.getName().equals("javax.xml.soap.SOAPMessage")) {
                 return true;
-            }   
+            }
         }
         return false;
         */
