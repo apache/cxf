@@ -27,7 +27,7 @@ import javax.xml.namespace.QName;
 //CHECKSTYLE:OFF
 public class ObjectFactory {
 
-    private final static QName _ParamJAXBElement_QNAME = new QName("http://jaxbelement/10", "comment");
+    private static final QName _ParamJAXBElement_QNAME = new QName("http://jaxbelement/10", "comment");
 
 
     public ObjectFactory() {
