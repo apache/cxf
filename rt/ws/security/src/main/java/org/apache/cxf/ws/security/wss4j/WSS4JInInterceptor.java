@@ -176,6 +176,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void handleMessageInternal(SoapMessage msg) throws Fault {
         boolean utWithCallbacks =
             MessageUtils.getContextualBoolean(msg, SecurityConstants.VALIDATE_TOKEN, true);
@@ -250,9 +251,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             // Only search for and expand (Signed) XOP Elements if MTOM is enabled (and not
             // explicitly specified by the user)
-            String expandXOP = getString(WSHandlerConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE, msg);
-            if (expandXOP == null) {
-                reqData.setExpandXopIncludeForSignature(AttachmentUtil.isMtomEnabled(msg));
+            if (getString(WSHandlerConstants.EXPAND_XOP_INCLUDE_FOR_SIGNATURE, msg) == null
+                && getString(WSHandlerConstants.EXPAND_XOP_INCLUDE, msg) == null) {
+                reqData.setExpandXopInclude(AttachmentUtil.isMtomEnabled(msg));
             }
 
             /*get chance to check msg context enableRevocation setting
