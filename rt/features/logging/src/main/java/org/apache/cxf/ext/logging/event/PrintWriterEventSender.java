@@ -20,7 +20,7 @@
 package org.apache.cxf.ext.logging.event;
 
 import java.io.PrintWriter;
-import java.time.Instant;
+import java.util.Date;
 
 import javax.xml.namespace.QName;
 
@@ -44,7 +44,7 @@ public class PrintWriterEventSender implements LogEventSender {
     public void send(LogEvent event) {
         StringBuilder b = new StringBuilder();
         
-        b.append(Instant.now().toString()).append(" - PrintWriterEventSender\n");
+        b.append(new Date().toString()).append(" - PrintWriterEventSender\n");
         put(b, "type", event.getType().toString());
         put(b, "address", event.getAddress());
         put(b, "content-type", event.getContentType());

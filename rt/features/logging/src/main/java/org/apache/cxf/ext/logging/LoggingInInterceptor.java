@@ -23,7 +23,6 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.SequenceInputStream;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
@@ -75,7 +74,10 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         super(Phase.RECEIVE, sender);
     }
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
-        return Collections.singleton(new SendLogEventInterceptor());
+        PhaseInterceptor<Message> intc = new SendLogEventInterceptor();
+        java.util.Set<PhaseInterceptor<? extends Message>> ret = new java.util.HashSet<>();
+        ret.add(intc);
+        return ret;
     }
     
     
