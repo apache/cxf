@@ -66,7 +66,7 @@ import org.junit.Test;
  */
 public class MessageCallbackOnewayTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(MessageCallbackOnewayTest.class);
-    private static final String GREETER_ADDRESS = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
+    private static final String GREETER_ADDRESS  = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
     private static final Long RETRANSMISSION_INTERVAL = new Long(2000);
 
     private static final Logger LOG = LogUtils.getLogger(MessageCallbackOnewayTest.class);

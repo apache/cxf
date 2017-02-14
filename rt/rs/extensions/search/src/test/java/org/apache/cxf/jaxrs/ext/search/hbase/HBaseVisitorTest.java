@@ -46,7 +46,7 @@ public class HBaseVisitorTest extends Assert {
     @Before
     public void setUp() throws Exception {
         try {
-            Configuration hBaseConfig = HBaseConfiguration.create();
+            Configuration hBaseConfig =  HBaseConfiguration.create();
             Connection connection = ConnectionFactory.createConnection(hBaseConfig);
             table = connection.getTable(TableName.valueOf("books"));
         } catch (Throwable t) {

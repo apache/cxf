@@ -1224,7 +1224,7 @@ public final class InjectionUtils {
                     continue;
                 }
 
-                String propertyName = methodName.substring(minLen);
+                String propertyName =  methodName.substring(minLen);
                 if (propertyName.length() == 1) {
                     propertyName = propertyName.toLowerCase();
                 } else {
@@ -1390,7 +1390,7 @@ public final class InjectionUtils {
 
     private static Object invokeValueOf(String value, Class<?> cls) {
         try {
-            Method m = cls.getMethod("valueOf", new Class[]{String.class});
+            Method m  = cls.getMethod("valueOf", new Class[]{String.class});
             return m.invoke(null, value);
         } catch (Exception ex) {
             throw new RuntimeException(ex);

@@ -479,7 +479,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         final String expectedSignatureMethod = binding.getAlgorithmSuite().getAsymmetricSignature();
         final String expectedDigestAlgorithm =
             binding.getAlgorithmSuite().getAlgorithmSuiteType().getDigest();
-        final String expectedCanonAlgorithm = binding.getAlgorithmSuite().getC14n().getValue();
+        final String expectedCanonAlgorithm  = binding.getAlgorithmSuite().getC14n().getValue();
 
         XPathFactory factory = XPathFactory.newInstance();
         XPath xpath = factory.newXPath();
@@ -491,7 +491,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
             xpath.compile("/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo"
                               + "/ds:SignatureMethod/@Algorithm");
 
-        final String sigMethod = (String) sigAlgoExpr.evaluate(signedDoc, XPathConstants.STRING);
+        final String sigMethod =  (String) sigAlgoExpr.evaluate(signedDoc, XPathConstants.STRING);
         assertEquals(expectedSignatureMethod, sigMethod);
 
         // Digest Method Algorithm
@@ -511,7 +511,7 @@ public abstract class AbstractPolicySecurityTest extends AbstractSecurityTest {
         final XPathExpression canonAlgoExpr =
             xpath.compile("/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo"
                               + "/ds:CanonicalizationMethod/@Algorithm");
-        final String canonMethod = (String) canonAlgoExpr.evaluate(signedDoc, XPathConstants.STRING);
+        final String canonMethod =  (String) canonAlgoExpr.evaluate(signedDoc, XPathConstants.STRING);
         assertEquals(expectedCanonAlgorithm, canonMethod);
     }
 

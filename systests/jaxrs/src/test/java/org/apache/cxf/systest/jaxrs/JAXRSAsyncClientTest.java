@@ -188,7 +188,7 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         String address = "http://168.168.168.168/bookstore";
         List<Object> providers = new ArrayList<>();
         providers.add(new TestResponseFilter());
-        WebClient wc = WebClient.create(address, providers);
+        WebClient wc =  WebClient.create(address, providers);
         Future<Book> future = wc.async().get(Book.class);
         try {
             future.get();

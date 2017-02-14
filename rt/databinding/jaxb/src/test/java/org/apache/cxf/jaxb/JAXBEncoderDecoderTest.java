@@ -97,7 +97,7 @@ public class JAXBEncoderDecoderTest extends Assert {
         Method method = getMethod("greetMe");
         wrapperAnnotation = method.getAnnotation(RequestWrapper.class);
 
-        InputStream is = getClass().getResourceAsStream("resources/StringStruct.xsd");
+        InputStream is =  getClass().getResourceAsStream("resources/StringStruct.xsd");
         StreamSource schemaSource = new StreamSource(is);
         assertNotNull(schemaSource);
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -336,7 +336,7 @@ public class JAXBEncoderDecoderTest extends Assert {
                                  wrapperAnnotation.localName());
         MessagePartInfo part = new MessagePartInfo(elName, null);
 
-        InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
+        InputStream is =  getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         XMLInputFactory factory = XMLInputFactory.newInstance();
         XMLStreamReader reader = factory.createXMLStreamReader(is);
 
@@ -367,7 +367,7 @@ public class JAXBEncoderDecoderTest extends Assert {
                                  wrapperAnnotation.localName());
         MessagePartInfo part = new MessagePartInfo(elName, null);
 
-        InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
+        InputStream is =  getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         XMLInputFactory factory = XMLInputFactory.newInstance();
         FixNamespacesXMLEventReader reader = new FixNamespacesXMLEventReader(factory.createXMLEventReader(is));
 

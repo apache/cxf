@@ -298,9 +298,9 @@ public class Proxy {
         if (params.length > 0 && params[0] instanceof DestinationSequence) {
             EndpointReferenceType acksTo = ((DestinationSequence)params[0]).getAcksTo();
             String acksAddress = acksTo.getAddress().getValue();
-            AttributedURIType attrURIType = new AttributedURIType();
+            AttributedURIType attrURIType =  new AttributedURIType();
             attrURIType.setValue(acksAddress);
-            EndpointReferenceType acks = new EndpointReferenceType();
+            EndpointReferenceType acks =  new EndpointReferenceType();
             acks.setAddress(attrURIType);
             client = createClient(bus, endpoint, protocol, c, acks);
             params = new Object[] {};

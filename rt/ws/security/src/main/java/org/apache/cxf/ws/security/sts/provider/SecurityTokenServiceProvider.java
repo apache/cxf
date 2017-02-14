@@ -230,7 +230,7 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
                                 WSTRUST_REQUESTTYPE_ELEMENTNAME))) {
                             String val = ((JAXBElement<?>) o).getValue().toString();
                             operationImpl = operationMap.get(val);
-                            method = OPERATION_METHODS.get(val);
+                            method =  OPERATION_METHODS.get(val);
                             break;
                         }
                     }

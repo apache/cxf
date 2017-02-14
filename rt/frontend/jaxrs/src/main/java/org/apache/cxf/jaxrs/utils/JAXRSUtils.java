@@ -1269,7 +1269,7 @@ public final class JAXRSUtils {
                     value = "";
                 } else {
                     name = part.substring(0, index);
-                    value = index < part.length() ? part.substring(index + 1) : "";
+                    value =  index < part.length() ? part.substring(index + 1) : "";
                 }
                 if (valueIsCollection) {
                     for (String s : value.split(",")) {

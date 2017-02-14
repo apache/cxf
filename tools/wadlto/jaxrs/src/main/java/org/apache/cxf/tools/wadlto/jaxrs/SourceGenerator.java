@@ -1348,7 +1348,7 @@ public class SourceGenerator {
                 elementParamType = addImportsAndGetSimpleName(imports, mediaTypesMap.get(requestMediaType));
             } else {
                 String fullClassName = !multipart ? MultivaluedMap.class.getName() : MultipartBody.class.getName();
-                elementParamType = addImportsAndGetSimpleName(imports, fullClassName);
+                elementParamType =  addImportsAndGetSimpleName(imports, fullClassName);
             }
             elementParamName = !multipart ? "map" : "body";
         }

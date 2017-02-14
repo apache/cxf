@@ -168,7 +168,7 @@ public class BeanType extends AegisType {
                         if (type.isFlatArray()) {
                             ArrayType aType = (ArrayType) type;
                             PropertyDescriptor desc = inf.getPropertyDescriptorFromMappedName(name);
-                            boolean isList = List.class.isAssignableFrom(desc.getPropertyType());
+                            boolean isList =  List.class.isAssignableFrom(desc.getPropertyType());
                             writeObj = aType.readObject(childReader, name, context, !isList);
                         } else {
                             writeObj = type.readObject(childReader, context);

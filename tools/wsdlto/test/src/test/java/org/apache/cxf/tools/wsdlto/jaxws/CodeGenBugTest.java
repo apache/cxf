@@ -575,9 +575,9 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
                                                               "org/apache/sayhi/SayHi.java"));
         assertTrue(results.trim().length() > 0);
 
-        assertTrue(results.indexOf("@WebResult(name = \"return\",  "
-                                   + "targetNamespace = \"http://apache.org/sayHi\")") != -1);
-        assertTrue(results.indexOf("@WebResult(name = \"return\",  targetNamespace  =  \"\")") != -1);
+        assertTrue(results.indexOf("@WebResult(name  =  \"return\",  "
+                                   + "targetNamespace  =  \"http://apache.org/sayHi\")") != -1);
+        assertTrue(results.indexOf("@WebResult(name  =  \"return\",  targetNamespace  =  \"\")") != -1);
     }
 
     @Test
@@ -767,7 +767,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
             String results = FileUtils.getStringFromFile(new File(output.getCanonicalPath(),
                                                                   "org/tempuri/GreeterRPCLit.java"));
-            assertTrue(results.indexOf("@WebParam(partName = \"inInt\",  name  =  \"inInt\")") != -1);
+            assertTrue(results.indexOf("@WebParam(partName  =  \"inInt\",  name  =  \"inInt\")") != -1);
             assertTrue(results.indexOf("Style.RPC") != -1);
 
         } catch (Exception e) {
@@ -804,8 +804,8 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
             .getStringFromFile(new File(output.getCanonicalPath(),
                                         "soapinterface/ems/esendex/com/AccountServiceSoap.java"));
         assertTrue(results.indexOf("public  int  getMessageLimit") != -1);
-        assertTrue(results.indexOf("name = \"MessengerHeader") != -1);
-        assertTrue(results.indexOf("header = true") != -1);
+        assertTrue(results.indexOf("name  =  \"MessengerHeader") != -1);
+        assertTrue(results.indexOf("header  =  true") != -1);
     }
 
     @Test

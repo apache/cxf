@@ -630,7 +630,7 @@ public class DynamicClientFactory {
                     int idx = fileName.indexOf(' ');
                     if (idx != -1) {
                         fileName = fileName.substring(0, idx);
-                        cp = cp.substring(idx + 1).trim();
+                        cp =  cp.substring(idx + 1).trim();
                     } else {
                         cp = null;
                     }

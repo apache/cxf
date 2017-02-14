@@ -69,13 +69,13 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
         try {
             MessageFactory factory = MessageFactory.newInstance();
             InputStream is = getClass().getResourceAsStream("resources/sayHiDocLiteralResp.xml");
-            sayHiResponse = factory.createMessage(null, is);
+            sayHiResponse =  factory.createMessage(null, is);
             is.close();
             is = getClass().getResourceAsStream("resources/GreetMeDocLiteralResp.xml");
-            greetMeResponse = factory.createMessage(null, is);
+            greetMeResponse =  factory.createMessage(null, is);
             is.close();
             is = getClass().getResourceAsStream("resources/GreetMeDocLiteralRespExceedLength.xml");
-            greetMeResponseExceedMaxLengthRestriction = factory.createMessage(null, is);
+            greetMeResponseExceedMaxLengthRestriction =  factory.createMessage(null, is);
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();

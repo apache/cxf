@@ -509,7 +509,7 @@ public class ManagedEndpointsTest extends AbstractClientServerTestBase {
     }
 
     private ObjectName getEndpointName(MBeanServer mbs, RMManager manager) throws Exception {
-        ObjectName serviceEndpointQueryName = new ObjectName(
+        ObjectName serviceEndpointQueryName =  new ObjectName(
             ManagementConstants.DEFAULT_DOMAIN_NAME + ":" + ManagementConstants.BUS_ID_PROP
             + "=" + manager.getBus().getId() + "," + ManagementConstants.TYPE_PROP + "=WSRM.Endpoint,*");
         Set<?> s = mbs.queryNames(serviceEndpointQueryName, null);

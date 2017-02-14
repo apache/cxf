@@ -69,7 +69,7 @@ public class JaxbAssertionBuilderTest extends Assert {
         assertNotNull(ab);
         InputStream is = JaxbAssertionBuilderTest.class.getResourceAsStream("foo.xml");
         Document doc = StaxUtils.read(is);
-        Element elem = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+        Element elem =  DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                           "http://cxf.apache.org/test/assertions/foo",
                                                           "foo").get(0);
         Assertion a = ab.build(elem, null);

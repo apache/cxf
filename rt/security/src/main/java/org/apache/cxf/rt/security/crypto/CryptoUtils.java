@@ -151,8 +151,8 @@ public final class CryptoUtils {
 
     public static RSAPrivateKey getRSAPrivateKey(byte[] modulusBytes,
                                                  byte[] privateExponentBytes) {
-        BigInteger modulus = toBigInteger(modulusBytes);
-        BigInteger privateExponent = toBigInteger(privateExponentBytes);
+        BigInteger modulus =  toBigInteger(modulusBytes);
+        BigInteger privateExponent =  toBigInteger(privateExponentBytes);
         try {
             KeyFactory factory = KeyFactory.getInstance("RSA");
             return (RSAPrivateKey)factory.generatePrivate(

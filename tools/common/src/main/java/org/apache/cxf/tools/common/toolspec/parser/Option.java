@@ -60,7 +60,7 @@ public class Option implements TokenConsumer {
         }
 
         if (annotation == null && argument != null) {
-            elemList = DOMUtils.findAllElementsByTagNameNS(argument, Tool.TOOL_SPEC_PUBLIC_ID, "annotation");
+            elemList =  DOMUtils.findAllElementsByTagNameNS(argument, Tool.TOOL_SPEC_PUBLIC_ID, "annotation");
 
             if (elemList != null && elemList.size() > 0) {
                 annotation = elemList.get(0);

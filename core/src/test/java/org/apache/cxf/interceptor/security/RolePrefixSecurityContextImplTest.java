@@ -77,7 +77,7 @@ public class RolePrefixSecurityContextImplTest extends Assert {
         assertTrue(context.isUserInRole("role_admin"));
         assertFalse(context.isUserInRole("role_bar"));
 
-        Set<Principal> roles2 = context.getUserRoles();
+        Set<Principal> roles2 =  context.getUserRoles();
         assertEquals(roles2, roles);
     }
 

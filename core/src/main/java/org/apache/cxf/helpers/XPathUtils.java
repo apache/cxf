@@ -36,7 +36,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 
 public class XPathUtils {
 
-    private static XPathFactory xpathFactory = XPathFactory.newInstance();
+    private static XPathFactory xpathFactory =  XPathFactory.newInstance();
 
     private XPath xpath;
 

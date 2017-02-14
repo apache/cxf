@@ -98,10 +98,10 @@ public class ArrayTypeInfo {
         }
 
         // arrayTypeValue = atype , asize ;
-        // atype = QName , [ rank ] ;
-        // rank = "[" , { "," } , "]" ;
-        // asize = "[" , length , { ","  length} , "]" ;
-        // length = DIGIT , { DIGIT } ;
+        // atype          = QName , [ rank ] ;
+        // rank           = "[" , { "," } , "]" ;
+        // asize          = "[" , length , { ","  length} , "]" ;
+        // length         = DIGIT , { DIGIT } ;
         //
         // x:foo[,,,][1,2,3,4]
 

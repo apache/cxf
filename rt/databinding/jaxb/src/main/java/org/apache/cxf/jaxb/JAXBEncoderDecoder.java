@@ -964,7 +964,7 @@ public final class JAXBEncoderDecoder {
         } catch (Throwable t) {
             //internal JDK/xerces version
             try {
-                Field f = ReflectionUtil.getDeclaredField(c.getClass(), "fNamespaceContext");
+                Field f =  ReflectionUtil.getDeclaredField(c.getClass(), "fNamespaceContext");
                 ReflectionUtil.setAccessible(f);
                 Object c2 = f.get(c);
                 Enumeration<?> enm = (Enumeration<?>)c2.getClass().getMethod("getAllPrefixes").invoke(c2);

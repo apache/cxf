@@ -57,7 +57,7 @@ public class CorbaBindingFactoryConfigurerTest extends AbstractBusClientServerTe
             (CorbaBindingFactory)bfm.getBindingFactory("http://cxf.apache.org/bindings/corba");
         OrbConfig orbConfig = factory.getOrbConfig();
         assertTrue("CorbaBindingFactoryConfigurer is null", orbConfig != null);
-        Properties props = orbConfig.getOrbProperties();
+        Properties props  = orbConfig.getOrbProperties();
         assertTrue("probs is null", props != null);
         assertTrue("prob1 is not equal to value1",
                 "value1".equals(props.get("prop1")));

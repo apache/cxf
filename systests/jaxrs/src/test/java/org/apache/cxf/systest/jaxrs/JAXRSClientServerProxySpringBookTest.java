@@ -66,7 +66,7 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
         List<Element> resourcesEls = DOMUtils.getChildrenWithName(root,
                                                                   WadlGenerator.WADL_NS, "resources");
         assertEquals(1, resourcesEls.size());
-        Element resourcesEl = resourcesEls.get(0);
+        Element resourcesEl =  resourcesEls.get(0);
         assertEquals("http://localhost:" + PORT + "/test/", resourcesEl.getAttribute("base"));
         List<Element> resourceEls =
             DOMUtils.getChildrenWithName(resourcesEl,

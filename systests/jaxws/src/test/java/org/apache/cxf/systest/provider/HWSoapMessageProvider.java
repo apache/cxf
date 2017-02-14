@@ -59,10 +59,10 @@ public class HWSoapMessageProvider implements Provider<SOAPMessage> {
         try {
             MessageFactory factory = MessageFactory.newInstance();
             InputStream is = getClass().getResourceAsStream("resources/sayHiRpcLiteralResp.xml");
-            sayHiResponse = factory.createMessage(null, is);
+            sayHiResponse =  factory.createMessage(null, is);
             is.close();
             is = getClass().getResourceAsStream("resources/GreetMeRpcLiteralResp.xml");
-            greetMeResponse = factory.createMessage(null, is);
+            greetMeResponse =  factory.createMessage(null, is);
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -83,7 +83,7 @@ public class HWSoapMessageProvider implements Provider<SOAPMessage> {
                 if (request.countAttachments() > 0) {
                     MessageFactory factory = MessageFactory.newInstance();
                     InputStream is = getClass().getResourceAsStream("resources/sayHiRpcLiteralResp.xml");
-                    response = factory.createMessage(null, is);
+                    response =  factory.createMessage(null, is);
                     is.close();
                     Iterator<AttachmentPart> it = CastUtils.cast(request.getAttachments(),
                                                                  AttachmentPart.class);

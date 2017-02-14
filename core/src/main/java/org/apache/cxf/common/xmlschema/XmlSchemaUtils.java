@@ -120,7 +120,7 @@ public final class XmlSchemaUtils {
      * @param namespaceUri
      */
     public static boolean schemaImportsNamespace(XmlSchema schema, String namespaceUri) {
-        List<XmlSchemaExternal> externals = schema.getExternals();
+        List<XmlSchemaExternal> externals =  schema.getExternals();
         for (XmlSchemaExternal what : externals) {
             if (what instanceof XmlSchemaImport) {
                 XmlSchemaImport imp = (XmlSchemaImport)what;

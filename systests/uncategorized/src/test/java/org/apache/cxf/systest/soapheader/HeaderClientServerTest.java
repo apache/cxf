@@ -64,7 +64,7 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
         header.setName("mao");
         header.setPhoneNumber("108");
 
-        OrderPizzaResponseType res = port.orderPizza(req, header);
+        OrderPizzaResponseType res =  port.orderPizza(req, header);
 
         assertEquals(208, res.getMinutesUntilReady());
     }
@@ -79,7 +79,7 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
         t.getTopping().add("test");
         req.setToppings(t);
 
-        OrderPizzaResponseType res = port.orderPizza(req);
+        OrderPizzaResponseType res =  port.orderPizza(req);
 
         assertEquals(100, res.getMinutesUntilReady());
     }

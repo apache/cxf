@@ -555,7 +555,7 @@ public class WSDLToCorbaHelper {
                         if (!isDuplicate(attType)) {
                             typeMappingType.getStructOrExceptionOrUnion().add(attType);
                         }
-                        QName name = createQNameTargetNamespace(typeName.getLocalPart() + "_nil");
+                        QName name =  createQNameTargetNamespace(typeName.getLocalPart() + "_nil");
                         membertype = createNillableUnion(name,
                                                          checkPrefix(attrName),
                                                          createQNameCorbaNamespace(typeName.getLocalPart()),
@@ -566,7 +566,7 @@ public class WSDLToCorbaHelper {
                     //REVISIT, bravi, attType is null for the wsaddr type
                     //{http://www.w3.org/2005/08/addressing}RelationshipTypeOpenEnum
                     if (attType != null) {
-                        QName name = createQNameTargetNamespace(attType.getQName().getLocalPart() + "_nil");
+                        QName name =  createQNameTargetNamespace(attType.getQName().getLocalPart() + "_nil");
                         //REVISIT, Edell - bug in Xmlschema 1.2
                         // https://issues.apache.org/jira/browse/WSCOMMONS-208
                         membertype = createNillableUnion(name,

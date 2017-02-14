@@ -43,7 +43,7 @@ public class SseBroadcasterImpl implements SseBroadcaster {
 
     @Override
     public void subscribe(Flow.Subscriber<? super OutboundSseEvent> subscriber) {
-        final Subscription subscription = new Subscription() {
+        final Subscription subscription =  new Subscription() {
             public void request(long n) {
             }
 

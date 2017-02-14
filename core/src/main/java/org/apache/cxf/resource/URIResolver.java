@@ -150,7 +150,7 @@ public class URIResolver {
                 }
             }
             if (!SecurityActions.fileExists(uriFile, CXFPermissions.RESOLVE_URI)) {
-                relative = new URI(uriStr.replaceAll(" ", "%20"));
+                relative =  new URI(uriStr.replaceAll(" ", "%20"));
             } else {
                 relative = uriFile.getAbsoluteFile().toURI();
             }
@@ -181,7 +181,7 @@ public class URIResolver {
                     }
                     huc.setConnectTimeout(30000);
                     huc.setReadTimeout(60000);
-                    is = huc.getInputStream();
+                    is =  huc.getInputStream();
                 } catch (ClassCastException ex) {
                     is = url.openStream();
                 }

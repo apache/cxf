@@ -40,7 +40,7 @@ public class Server extends AbstractBusTestServerBase {
     }
 
     public Server(String n, String addr, String conf) throws Exception {
-        name = n;
+        name    = n;
         address = addr;
         configFileURL = new URL(conf);
         //System.out.println("Starting " + name

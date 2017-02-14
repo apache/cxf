@@ -83,7 +83,7 @@ public class ServerImpl implements ServerPortType  {
 
             Service service = Service.create(null, serviceName);
             service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, address);
-            CallbackPortType port = (CallbackPortType)service.getPort(portName, sei);
+            CallbackPortType port =  (CallbackPortType)service.getPort(portName, sei);
 
             port.serverSayHi("Sean");
 

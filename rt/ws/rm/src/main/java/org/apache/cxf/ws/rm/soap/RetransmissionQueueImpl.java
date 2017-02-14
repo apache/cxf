@@ -895,7 +895,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             public synchronized Conduit selectConduit(Message message) {
                 Conduit conduit = null;
                 EndpointInfo endpointInfo = endpoint.getEndpointInfo();
-                EndpointReferenceType original = endpointInfo.getTarget();
+                EndpointReferenceType original =  endpointInfo.getTarget();
                 try {
                     if (null != address) {
                         endpointInfo.setAddress(address);

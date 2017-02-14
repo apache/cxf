@@ -58,7 +58,7 @@ public class FixedPtConstVisitor implements Visitor {
         XmlSchemaType stype = null;
         CorbaType ctype = null;
 
-        QName corbaTypeQName = CorbaConstants.NE_CORBA_FIXED;
+        QName corbaTypeQName =  CorbaConstants.NE_CORBA_FIXED;
 
         if (corbaTypeQName != null) {
             QName schemaTypeQName = Constants.XSD_DECIMAL;

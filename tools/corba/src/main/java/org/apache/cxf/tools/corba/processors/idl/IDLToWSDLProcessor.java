@@ -168,7 +168,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                                                         preprocessor.getPragmaPrefix());
             visitor.getManager().setIgnoreImports(ignoreImports);
             if (env.optionSet(ToolConstants.CFG_OUTPUTDIR)) {
-                outputDir = (String) env.get(ToolConstants.CFG_OUTPUTDIR);
+                outputDir =  (String) env.get(ToolConstants.CFG_OUTPUTDIR);
             }
             visitor.setOutputDir(outputDir);
             Definition def = visitor.getDefinition();
@@ -562,7 +562,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                             Schema wsdlSchema =
                                 (Schema)def.getExtensionRegistry().createExtension(Types.class,
                                                      new QName(Constants.URI_2001_SCHEMA_XSD, "schema"));
-                            SchemaImport schemaimport = wsdlSchema.createImport();
+                            SchemaImport schemaimport =  wsdlSchema.createImport();
                             schemaimport.setNamespaceURI(ReferenceConstants.WSADDRESSING_NAMESPACE);
                             schemaimport.setSchemaLocationURI(ReferenceConstants.WSADDRESSING_LOCATION);
                             wsdlSchema.addImport(schemaimport);

@@ -83,7 +83,7 @@ public class ManagedRMManagerTest extends Assert {
     @Test
     public void testManagedRMManager() throws Exception {
         final SpringBusFactory factory = new SpringBusFactory();
-        bus = factory.createBus("org/apache/cxf/ws/rm/managed-manager-bean.xml");
+        bus =  factory.createBus("org/apache/cxf/ws/rm/managed-manager-bean.xml");
         im = bus.getExtension(InstrumentationManager.class);
         manager = bus.getExtension(RMManager.class);
         endpoint = createTestEndpoint();

@@ -67,7 +67,7 @@ public class DefaultSecurityContextTest extends Assert {
         assertTrue(context.isUserInRole("admin"));
         assertFalse(context.isUserInRole("bar"));
 
-        Set<Principal> roles2 = context.getUserRoles();
+        Set<Principal> roles2 =  context.getUserRoles();
         assertEquals(roles2, roles);
     }
 

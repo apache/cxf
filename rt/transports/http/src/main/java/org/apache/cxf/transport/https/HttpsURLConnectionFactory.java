@@ -196,7 +196,7 @@ public class HttpsURLConnectionFactory {
                 //Ignore this one
             }
             try {
-                Method getSSLSocketFactory = connection.getClass().getMethod("getSSLSocketFactory");
+                Method getSSLSocketFactory =  connection.getClass().getMethod("getSSLSocketFactory");
                 Method setSSLSocketFactory = connection.getClass()
                     .getMethod("setSSLSocketFactory", getSSLSocketFactory.getReturnType());
                 if (getSSLSocketFactory.getReturnType().isInstance(socketFactory)) {

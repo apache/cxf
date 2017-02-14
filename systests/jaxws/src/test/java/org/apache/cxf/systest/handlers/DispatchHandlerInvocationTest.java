@@ -181,7 +181,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         TestSOAPHandler soapHandler = new TestSOAPHandler();
         addHandlersProgrammatically(disp, handler, soapHandler);
 
-        InputStream is2 = this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReqPayload.xml");
+        InputStream is2 =  this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReqPayload.xml");
         MessageFactory factory = MessageFactory.newInstance();
         SOAPMessage soapReq = factory.createMessage(null, is2);
         DOMSource domReqMessage = new DOMSource(soapReq.getSOAPPart());
@@ -205,7 +205,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         TestSOAPHandler soapHandler = new TestSOAPHandler();
         addHandlersProgrammatically(disp, handler, soapHandler);
 
-        InputStream is2 = this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
+        InputStream is2 =  this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         MessageFactory factory = MessageFactory.newInstance();
         SOAPMessage soapReq = factory.createMessage(null, is2);
 
@@ -229,7 +229,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         TestSOAPHandler soapHandler = new TestSOAPHandler();
         addHandlersProgrammatically(disp, handler, soapHandler);
 
-        InputStream is2 = this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
+        InputStream is2 =  this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
         MessageFactory factory = MessageFactory.newInstance();
         SOAPMessage soapReq = factory.createMessage(null, is2);
 

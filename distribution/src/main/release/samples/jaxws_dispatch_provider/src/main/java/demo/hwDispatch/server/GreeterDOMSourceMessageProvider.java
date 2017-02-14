@@ -48,7 +48,7 @@ public class GreeterDOMSourceMessageProvider implements Provider<DOMSource> {
             System.out.println("\n");
 
             InputStream is = getClass().getResourceAsStream("/GreetMeDocLiteralResp2.xml");
-            SOAPMessage greetMeResponse = factory.createMessage(null, is);
+            SOAPMessage greetMeResponse =  factory.createMessage(null, is);
             is.close();
 
             response.setNode(greetMeResponse.getSOAPPart());

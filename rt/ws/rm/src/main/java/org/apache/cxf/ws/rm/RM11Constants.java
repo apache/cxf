@@ -85,7 +85,7 @@ public final class RM11Constants extends RMConstants {
     public static final QName CREATE_SEQUENCE_RESPONSE_ONEWAY_QNAME =
         new QName(NAMESPACE_URI, "CreateSequenceResponseOneway");
 
-    public static final QName RMASSERTION_QNAME = new QName(WSRMP_NAMESPACE_URI, RMASSERTION_NAME);
+    public static final QName RMASSERTION_QNAME =  new QName(WSRMP_NAMESPACE_URI, RMASSERTION_NAME);
 
     // actions
 

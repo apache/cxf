@@ -124,7 +124,7 @@ public final class Client {
             int statusCode = client.executeMethod(httpMethod);
             System.out.println("Response status : " + statusCode);
 
-            Response.Status status = Response.Status.fromStatusCode(statusCode);
+            Response.Status status =  Response.Status.fromStatusCode(statusCode);
 
             if (status == Response.Status.OK) {
                 System.out.println(httpMethod.getResponseBodyAsString());

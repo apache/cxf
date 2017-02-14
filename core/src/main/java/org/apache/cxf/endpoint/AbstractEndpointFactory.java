@@ -182,7 +182,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     }
 
     public void setBindingFactory(BindingFactory bf) {
-        this.bindingFactory = bf;
+        this.bindingFactory  = bf;
     }
 
     public ConduitSelector getConduitSelector() {

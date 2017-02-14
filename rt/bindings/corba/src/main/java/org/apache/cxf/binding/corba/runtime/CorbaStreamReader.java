@@ -107,7 +107,7 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public int getAttributeCount() {
-        List<Attribute> currentAttributes = eventProducer.getAttributes();
+        List<Attribute> currentAttributes =  eventProducer.getAttributes();
         if (currentAttributes != null) {
             return currentAttributes.size();
         }

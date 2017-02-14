@@ -89,7 +89,7 @@ public class Activator implements BundleActivator {
                 if (serviceReg == null) {
                     Dictionary<String, Object> properties = new Hashtable<>();
                     properties.put("name", "logging");
-                    serviceReg = bundleContext.registerService(Feature.class.getName(), logging, properties);
+                    serviceReg =  bundleContext.registerService(Feature.class.getName(), logging, properties);
                 }
             } else {
                 if (serviceReg != null) {

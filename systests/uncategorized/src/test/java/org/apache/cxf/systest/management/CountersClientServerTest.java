@@ -103,7 +103,7 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals("The Counters are not export to JMX: " + counterNames,
                      4 + 3, counterNames.size());
 
-        ObjectName sayHiCounter = new ObjectName(
+        ObjectName sayHiCounter =  new ObjectName(
             ManagementConstants.DEFAULT_DOMAIN_NAME + ":operation=\"sayHi\",*");
 
         Set<?> s = mbs.queryNames(sayHiCounter, null);
@@ -147,7 +147,7 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
         counterNames = mbs.queryNames(name, null);
         assertEquals("The Counters are not export to JMX " + counterNames, 6 + 4, counterNames.size());
 
-        ObjectName greetMeOneWayCounter = new ObjectName(
+        ObjectName greetMeOneWayCounter =  new ObjectName(
             ManagementConstants.DEFAULT_DOMAIN_NAME + ":operation=\"greetMeOneWay\",*");
 
         s = mbs.queryNames(greetMeOneWayCounter, null);

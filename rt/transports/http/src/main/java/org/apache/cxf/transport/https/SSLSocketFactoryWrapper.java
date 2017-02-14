@@ -48,8 +48,8 @@ class SSLSocketFactoryWrapper extends SSLSocketFactory {
         String           protocolParam
     ) {
         sslSocketFactory = sslSocketFactoryParam;
-        ciphers = ciphersParam;
-        protocol = protocolParam;
+        ciphers          = ciphersParam;
+        protocol         = protocolParam;
     }
 
     public String[] getDefaultCipherSuites() {

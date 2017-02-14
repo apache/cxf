@@ -52,7 +52,7 @@ public class Cxf993Test extends AbstractBusClientServerTestBase {
         NotificationService service = new NotificationService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
 
-        NotificationServicePort port = service.getNotificationServicePort();
+        NotificationServicePort port =  service.getNotificationServicePort();
         updateAddressPort(port, PORT);
         return port;
     }

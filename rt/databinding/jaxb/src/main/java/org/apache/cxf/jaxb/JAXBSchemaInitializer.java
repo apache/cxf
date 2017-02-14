@@ -577,7 +577,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                     int idx = m.getName().startsWith("get") ? 3 : 2;
                     String name = m.getName().substring(idx);
                     name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-                    XmlElement  xmlElementAnno = m.getAnnotation(XmlElement.class);
+                    XmlElement  xmlElementAnno =  m.getAnnotation(XmlElement.class);
                     addElement(schema, seq, beanInfo, new QName(namespace, name), isArray(type), xmlElementAnno);
                 }
             }
@@ -660,7 +660,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
 
         XmlSchemaComplexType generics = (XmlSchemaComplexType)schema.getTypeByName(typeName);
         if (generics == null) {
-            generics = new XmlSchemaComplexType(schema, true);
+            generics =  new XmlSchemaComplexType(schema, true);
             generics.setName(typeName);
         }
 

@@ -36,7 +36,7 @@ import org.apache.cxf.common.logging.LogUtils;
 
 
 public class PlugInClassLoader extends SecureClassLoader {
-    private static final Logger LOG = LogUtils.getL7dLogger(PlugInClassLoader.class);
+    private static final Logger LOG =  LogUtils.getL7dLogger(PlugInClassLoader.class);
     private static final String FILE_COLON = "file:";
     private static final String ZIP_COLON = "zip:";
     private static final String URL_SCHEME_COLON = "classloader:";

@@ -326,7 +326,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
             @Override
             public ManagedNHttpClientConnection create(final IOSession iosession, final ConnectionConfig config) {
-                ManagedNHttpClientConnection conn = super.create(iosession, config);
+                ManagedNHttpClientConnection conn =  super.create(iosession, config);
                 return conn;
             }
         };

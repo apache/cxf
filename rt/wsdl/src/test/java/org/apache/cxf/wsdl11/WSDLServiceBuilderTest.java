@@ -456,7 +456,7 @@ public class WSDLServiceBuilderTest extends Assert {
         Node node = doc.getFirstChild();
         while (node != null) {
             if (node instanceof Element) {
-                schemaImport = DOMUtils.getFirstElement(node);
+                schemaImport  = DOMUtils.getFirstElement(node);
             }
             node = node.getNextSibling();
         }

@@ -59,10 +59,10 @@ public class HWDOMSourceMessageProvider implements Provider<DOMSource> {
         try {
             factory = MessageFactory.newInstance();
             InputStream is = getClass().getResourceAsStream("resources/sayHiRpcLiteralResp.xml");
-            sayHiResponse = factory.createMessage(null, is);
+            sayHiResponse =  factory.createMessage(null, is);
             is.close();
             is = getClass().getResourceAsStream("resources/GreetMeRpcLiteralResp.xml");
-            greetMeResponse = factory.createMessage(null, is);
+            greetMeResponse =  factory.createMessage(null, is);
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();

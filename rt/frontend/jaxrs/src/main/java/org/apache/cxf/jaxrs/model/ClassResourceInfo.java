@@ -311,7 +311,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
                     }
                 }
             }
-            List<Method> methods = super.getParameterMethods();
+            List<Method> methods =  super.getParameterMethods();
             for (Method m : methods) {
                 if (m.getAnnotation(BeanParam.class) != null) {
                     BeanParamInfo bpi = new BeanParamInfo(m.getParameterTypes()[0], getBus());

@@ -55,7 +55,7 @@ public class WrapperClassGeneratorTest extends Assert {
         Service service = jaxwsFac.create();
 
 
-        ServiceInfo serviceInfo = service.getServiceInfos().get(0);
+        ServiceInfo serviceInfo =  service.getServiceInfos().get(0);
 
         InterfaceInfo interfaceInfo = serviceInfo.getInterface();
         OperationInfo inf = interfaceInfo.getOperations().iterator().next();

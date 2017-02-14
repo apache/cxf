@@ -256,7 +256,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
                 try {
                     cout = connection.getOutputStream();
                 } catch (ProtocolException pe) {
-                    Boolean b = (Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION);
+                    Boolean b =  (Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION);
                     cout = connectAndGetOutputStream(b);
                 }
             } catch (SocketException e) {
@@ -389,7 +389,7 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
 
         @Override
         protected void retransmitStream() throws IOException {
-            Boolean b = (Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION);
+            Boolean b =  (Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION);
             OutputStream out = connectAndGetOutputStream(b);
             cachedStream.writeCacheTo(out);
         }

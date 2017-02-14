@@ -58,7 +58,7 @@ public class ResponseWrapperTest extends Assert {
         MessageInfo message = opInfo.getUnwrappedOperation().getOutput();
         Method method = (Method)opInfo.getProperty("operation.method");
 
-        JavaField field = responseWrapper.buildFields(method, message).get(0);
+        JavaField field  = responseWrapper.buildFields(method, message).get(0);
         assertEquals("_return", field.getParaName());
         assertEquals("String[]", field.getType());
 

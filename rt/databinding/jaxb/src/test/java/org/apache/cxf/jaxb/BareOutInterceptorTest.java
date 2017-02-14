@@ -56,7 +56,7 @@ public class BareOutInterceptorTest extends TestBase {
         super.setUp();
 
         interceptor = new BareOutInterceptor();
-        baos = new ByteArrayOutputStream();
+        baos =  new ByteArrayOutputStream();
         writer = getXMLStreamWriter(baos);
         message.setContent(XMLStreamWriter.class, writer);
         message.getExchange().put(BindingOperationInfo.class, operation);

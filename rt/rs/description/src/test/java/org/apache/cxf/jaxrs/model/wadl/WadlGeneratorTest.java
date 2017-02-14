@@ -795,7 +795,7 @@ public class WadlGeneratorTest extends Assert {
         List<Element> resourcesEls = DOMUtils.getChildrenWithName(root,
                                                                   WadlGenerator.WADL_NS, "resources");
         assertEquals(1, resourcesEls.size());
-        Element resourcesEl = resourcesEls.get(0);
+        Element resourcesEl =  resourcesEls.get(0);
         assertEquals(baseURI, resourcesEl.getAttribute("base"));
         List<Element> resourceEls =
             DOMUtils.getChildrenWithName(resourcesEl,

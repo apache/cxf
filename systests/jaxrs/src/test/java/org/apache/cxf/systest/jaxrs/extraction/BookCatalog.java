@@ -70,7 +70,7 @@ public class BookCatalog {
     @Consumes("multipart/form-data")
     public Response addBook(final MultipartBody body) throws Exception {
         for (final Attachment attachment: body.getAllAttachments()) {
-            final DataHandler handler = attachment.getDataHandler();
+            final DataHandler handler =  attachment.getDataHandler();
 
             if (handler != null) {
                 final String source = handler.getName();

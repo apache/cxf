@@ -118,7 +118,7 @@ public class Catalog {
         executor.submit(new Runnable() {
             public void run() {
                 for (final Attachment attachment: body.getAllAttachments()) {
-                    final DataHandler handler = attachment.getDataHandler();
+                    final DataHandler handler =  attachment.getDataHandler();
 
                     if (handler != null) {
                         final String source = handler.getName();

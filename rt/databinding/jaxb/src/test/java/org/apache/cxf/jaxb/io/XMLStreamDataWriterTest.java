@@ -56,7 +56,7 @@ public class XMLStreamDataWriterTest extends Assert {
 
     @Before
     public void setUp() throws Exception {
-        baos = new ByteArrayOutputStream();
+        baos =  new ByteArrayOutputStream();
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         streamWriter = factory.createXMLStreamWriter(baos);
         assertNotNull(streamWriter);

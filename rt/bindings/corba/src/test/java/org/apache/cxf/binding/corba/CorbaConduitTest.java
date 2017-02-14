@@ -289,7 +289,7 @@ public class CorbaConduitTest extends Assert {
         assertEquals("name should be equal", ret.name(), "return");
 
         message.setStreamableReturn(arg);
-        NamedValue ret2 = conduit.getReturn(message);
+        NamedValue ret2  = conduit.getReturn(message);
         assertNotNull("Return2 should not be null", ret2 != null);
         assertEquals("name should be equal", ret2.name(), "returnName");
     }

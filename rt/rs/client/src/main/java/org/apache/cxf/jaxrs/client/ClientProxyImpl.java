@@ -172,7 +172,7 @@ public class ClientProxyImpl extends AbstractClient implements
         }
 
         MultivaluedMap<ParameterType, Parameter> types = getParametersInfo(m, params, ori);
-        List<Parameter> beanParamsList = getParameters(types, ParameterType.BEAN);
+        List<Parameter> beanParamsList =  getParameters(types, ParameterType.BEAN);
 
         int bodyIndex = getBodyIndex(types, ori);
 
@@ -407,7 +407,7 @@ public class ClientProxyImpl extends AbstractClient implements
         List<Object> list = new LinkedList<Object>();
 
         List<String> methodVars = ori.getURITemplate().getVariables();
-        List<Parameter> paramsList = getParameters(map, ParameterType.PATH);
+        List<Parameter> paramsList =  getParameters(map, ParameterType.PATH);
         Map<String, BeanPair> beanParamValues = new HashMap<String, BeanPair>(beanParams.size());
         for (Parameter p : beanParams) {
             beanParamValues.putAll(getValuesFromBeanParam(params[p.getIndex()], PathParam.class));

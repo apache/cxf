@@ -62,13 +62,13 @@ public class InitParamResourceResolver implements ResourceResolver {
             if (String.class.equals(type)) {
                 ret = type.cast(value);
             } else if (Integer.class.equals(type) || Integer.TYPE.equals(type)) {
-                ret = type.cast(Integer.valueOf(value));
+                ret =  type.cast(Integer.valueOf(value));
             } else if (Byte.class.equals(type) || Byte.TYPE.equals(type)) {
                 ret = type.cast(Byte.valueOf(value));
             } else if (Short.class.equals(type) || Short.TYPE.equals(type)) {
                 ret = type.cast(Short.valueOf(value));
             } else if (Long.class.equals(type) || Long.TYPE.equals(type)) {
-                ret = type.cast(Long.valueOf(value));
+                ret =  type.cast(Long.valueOf(value));
             } else if (Float.class.equals(type) || Float.TYPE.equals(type)) {
                 ret = type.cast(Float.valueOf(value));
             } else if (Double.class.equals(type) || Double.TYPE.equals(type)) {

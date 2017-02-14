@@ -301,7 +301,7 @@ public class CorbaObjectWriterTest extends Assert {
         }
 
         OutputStream oStream = orb.create_output_stream();
-        CorbaObjectWriter writer = new CorbaObjectWriter(oStream);
+        CorbaObjectWriter writer =  new CorbaObjectWriter(oStream);
         writer.writeSequence(obj);
 
         InputStream iStream = oStream.create_input_stream();

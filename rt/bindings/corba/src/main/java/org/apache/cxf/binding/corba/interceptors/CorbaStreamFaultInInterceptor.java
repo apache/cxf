@@ -132,7 +132,7 @@ public class CorbaStreamFaultInInterceptor extends AbstractPhaseInterceptor<Mess
     }
 
     private void createFaultDetail(Document faultData, FaultInfo faultInfo, Fault faultEx) {
-        MessagePartInfo partInfo = faultInfo.getMessageParts().get(0);
+        MessagePartInfo partInfo =  faultInfo.getMessageParts().get(0);
         QName partInfoName = partInfo.getElementQName();
         Document faultDoc = DOMUtils.createDocument();
         Element faultElement = faultDoc.createElement("detail");

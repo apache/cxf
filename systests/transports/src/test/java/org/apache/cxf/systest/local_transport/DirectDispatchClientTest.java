@@ -78,7 +78,7 @@ public class DirectDispatchClientTest extends AbstractBusClientServerTestBase {
             Client client = ClientProxy.getClient(greeter);
             client.getOutInterceptors().add(new GZIPOutInterceptor(50));
             client.getInInterceptors().add(new GZIPInInterceptor());
-            InvocationHandler handler = Proxy.getInvocationHandler(greeter);
+            InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
             BindingProvider  bp = null;
             if (handler instanceof BindingProvider) {
                 bp = (BindingProvider)handler;
