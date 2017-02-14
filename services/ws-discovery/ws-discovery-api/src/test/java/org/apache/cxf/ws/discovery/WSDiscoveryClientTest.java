@@ -142,7 +142,7 @@ public final class WSDiscoveryClientTest {
         }).start();
 
 
-        Bus bus  = BusFactory.newInstance().createBus();
+        Bus bus = BusFactory.newInstance().createBus();
         WSDiscoveryClient c = new WSDiscoveryClient(bus);
         c.setVersion10();
         c.setAddress("soap.udp://239.255.255.250:" + PORT);
@@ -176,7 +176,7 @@ public final class WSDiscoveryClientTest {
             s2.startup();
             HelloType h = service.register(ep.getEndpointReference());
 
-            bus  = BusFactory.newInstance().createBus();
+            bus = BusFactory.newInstance().createBus();
             WSDiscoveryClient c = new WSDiscoveryClient(bus);
             c.setVersion10();
 

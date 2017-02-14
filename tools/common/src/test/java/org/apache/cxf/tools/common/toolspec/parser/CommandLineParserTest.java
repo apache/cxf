@@ -247,7 +247,7 @@ public class CommandLineParserTest extends Assert {
         try {
             Class<?> c = Class.forName("org.apache.xerces.impl.Version");
             Object o = c.newInstance();
-            String v =  (String) c.getMethod("getVersion").invoke(o);
+            String v = (String) c.getMethod("getVersion").invoke(o);
             v = StringUtils.getFirstFound(v, "(\\d+.\\d+)").trim();
             if (v.charAt(0) >= '3') {
                 return true;
@@ -262,7 +262,7 @@ public class CommandLineParserTest extends Assert {
 
     @Test
     public void testDetailedUsage() throws Exception {
-        String specialItem  = "[ -p <[wsdl namespace =]Package Name> ]*";
+        String specialItem = "[ -p <[wsdl namespace =]Package Name> ]*";
         if (!isQuolifiedVersion()) {
             specialItem = "-p <[wsdl namespace =]Package Name>*";
         }

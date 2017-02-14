@@ -52,8 +52,8 @@ import org.apache.cxf.helpers.CastUtils;
 public final class PartialWSDLProcessor  {
     private static String bindingName = "SoapBinding";
     private static String style = "document";
-    private static String useLiteral =  "literal";
-    private static String serviceName =  "Service";
+    private static String useLiteral = "literal";
+    private static String serviceName = "Service";
     private static String portName = "Port";
 
 
@@ -203,7 +203,7 @@ public final class PartialWSDLProcessor  {
 
     public static SOAPAddress setAddrElement(Definition wsdlDefinition, Port port,
                                              ExtensionRegistry extReg) throws Exception {
-        SOAPAddress address  = SOAPBindingUtil.createSoapAddress(extReg, false);
+        SOAPAddress address = SOAPBindingUtil.createSoapAddress(extReg, false);
         address.setLocationURI("dummy");
         return address;
     }

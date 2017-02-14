@@ -96,7 +96,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
         MultipartStore proxy = JAXRSClientFactory.create(endpointAddress, MultipartStore.class,
             Collections.singletonList(new JacksonJsonProvider()));
         Book json = new Book("json", 1L);
-        InputStream is1 =  getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
+        InputStream is1 = getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
 
         Map<String, Object> attachments = proxy.addBookJsonImageStream(json, is1);
         assertEquals(2, attachments.size());

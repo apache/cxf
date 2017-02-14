@@ -379,7 +379,7 @@ public abstract class AbstractClient implements Client {
                                                                       List<Object> values) {
         if (values != null && values.size() != 0) {
             List<String> vars = template.getVariables();
-            MultivaluedMap<String, String> templatesMap =  new MetadataMap<String, String>(vars.size());
+            MultivaluedMap<String, String> templatesMap = new MetadataMap<String, String>(vars.size());
             for (int i = 0; i < vars.size(); i++) {
                 if (i < values.size()) {
                     templatesMap.add(vars.get(i), values.get(i).toString());

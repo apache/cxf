@@ -539,7 +539,7 @@ public final class EndpointReferenceUtils {
                             } catch (Exception ex) {
                                 //ignore - not DOM level 3
                             }
-                            node =  node.getFirstChild();
+                            node = node.getFirstChild();
                         }
 
                         while (node.getNodeType() != Node.ELEMENT_NODE) {
@@ -840,7 +840,7 @@ public final class EndpointReferenceUtils {
 
     private static String getNameSpaceUri(Node node, String content, String namespaceURI) {
         if (namespaceURI == null) {
-            namespaceURI =  node.lookupNamespaceURI(content.substring(0,
+            namespaceURI = node.lookupNamespaceURI(content.substring(0,
                                                                   content.indexOf(":")));
         }
         return namespaceURI;

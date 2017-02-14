@@ -173,7 +173,7 @@ public final class FileUtils {
                 f = new File(checkExists, "cxf-tmp-" + x);
                 count++;
             }
-            newTmpDir  = f;
+            newTmpDir = f;
         }
         if (addHook) {
             final File f2 = newTmpDir;

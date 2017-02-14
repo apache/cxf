@@ -325,7 +325,7 @@ public class JettyHTTPServerEngineFactory {
             return mBeanContainer;
         }
 
-        MBeanServer mbs =  getMBeanServer();
+        MBeanServer mbs = getMBeanServer();
         if (mbs != null) {
             try {
                 Class<?> cls = ClassLoaderUtils.loadClass("org.eclipse.jetty.jmx.MBeanContainer",

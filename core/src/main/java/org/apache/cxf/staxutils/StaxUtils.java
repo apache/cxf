@@ -204,7 +204,7 @@ public final class StaxUtils {
     }
     private static int getInteger(String prop, int def) {
         try {
-            String s =  SystemPropertyAction.getPropertyOrNull(prop);
+            String s = SystemPropertyAction.getPropertyOrNull(prop);
             if (StringUtils.isEmpty(s)) {
                 return def;
             }
@@ -220,7 +220,7 @@ public final class StaxUtils {
     }
     private static long getLong(String prop, long def) {
         try {
-            String s =  SystemPropertyAction.getPropertyOrNull(prop);
+            String s = SystemPropertyAction.getPropertyOrNull(prop);
             if (StringUtils.isEmpty(s)) {
                 return def;
             }

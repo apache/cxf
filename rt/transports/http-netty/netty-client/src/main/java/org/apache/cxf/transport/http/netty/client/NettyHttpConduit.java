@@ -211,7 +211,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
                                            boolean isChunking, int chunkThreshold, String conduitName, URI url) {
             super(message, possibleRetransmit, isChunking, chunkThreshold, conduitName, url);
             csPolicy = getClient(message);
-            entity  = message.get(NettyHttpClientRequest.class);
+            entity = message.get(NettyHttpClientRequest.class);
             int bufSize = csPolicy.getChunkLength() > 0 ? csPolicy.getChunkLength() : 16320;
             outBuffer = Unpooled.buffer(bufSize);
             outputStream = new ByteBufOutputStream(outBuffer);
@@ -287,7 +287,7 @@ public class NettyHttpConduit extends URLConnectionHTTPConduit implements BusLif
         @Override
         protected void setupWrappedStream() throws IOException {
             connect(true);
-            wrappedStream =  new OutputStream() {
+            wrappedStream = new OutputStream() {
                 public void write(byte b[], int off, int len) throws IOException {
                     outputStream.write(b, off, len);
                 }

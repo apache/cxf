@@ -114,7 +114,7 @@ public class JAXWSBindingParser {
                         Node messageNode = node.getParentNode();
                         if (messageNode != null) {
                             Element messageEle = (Element)messageNode;
-                            messageName =  messageEle.getAttribute("name");
+                            messageName = messageEle.getAttribute("name");
                         }
                     }
 

@@ -25,7 +25,7 @@ public class OASISCatalogManagerHelper {
                           String target, String base) throws IOException {
         String resolvedLocation = null;
         if (catalogResolver != null) {
-            resolvedLocation  = catalogResolver.resolveSystem(target);
+            resolvedLocation = catalogResolver.resolveSystem(target);
 
             if (resolvedLocation == null) {
                 resolvedLocation = catalogResolver.resolveURI(target);

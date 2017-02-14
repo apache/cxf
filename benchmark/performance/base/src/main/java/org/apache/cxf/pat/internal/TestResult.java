@@ -50,7 +50,7 @@ public class TestResult {
         duration = convertToSeconds(endTime - startTime);
 
         throughput = numOfInvocations / duration;
-        avgResponseTime  = duration / numOfInvocations;
+        avgResponseTime = duration / numOfInvocations;
         System.out.println();
         System.out.println("--------------Test Result of " +  this.getName() + "-------------");
         System.out.println("Throughput: " + testCase.getOperationName() + " " + throughput + THROUGHPUT_UNIT);

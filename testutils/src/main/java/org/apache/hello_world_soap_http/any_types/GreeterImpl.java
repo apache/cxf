@@ -38,7 +38,7 @@ public class GreeterImpl implements Greeter {
         String ret = null;
         if (port.get(0).getAny() instanceof Element) {
             Element ele = (Element)port.get(0).getAny();
-            ret =  ele.getFirstChild().getTextContent();
+            ret = ele.getFirstChild().getTextContent();
         }
         if (port.get(1).getAny() instanceof Element) {
             Element ele = (Element)port.get(1).getAny();

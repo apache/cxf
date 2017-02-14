@@ -158,7 +158,7 @@ public final class WrapperClassGenerator extends ASMHelper {
         boolean anonymous = factory.getAnonymousWrapperTypes();
 
         String pkg = getPackageName(method) + ".jaxws_asm" + (anonymous ? "_an" : "");
-        String className =  pkg + "."
+        String className = pkg + "."
             + StringUtils.capitalize(op.getName().getLocalPart());
         if (!isRequest) {
             className = className + "Response";

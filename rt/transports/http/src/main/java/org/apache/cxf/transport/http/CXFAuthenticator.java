@@ -124,7 +124,7 @@ public class CXFAuthenticator extends Authenticator {
                 if (getRequestorType() == RequestorType.PROXY
                     && httpConduit.getProxyAuthorization() != null) {
                     String un = httpConduit.getProxyAuthorization().getUserName();
-                    String pwd =  httpConduit.getProxyAuthorization().getPassword();
+                    String pwd = httpConduit.getProxyAuthorization().getPassword();
                     if (un != null && pwd != null) {
                         auth = new PasswordAuthentication(un, pwd.toCharArray());
                     }
@@ -136,7 +136,7 @@ public class CXFAuthenticator extends Authenticator {
                     }
 
                     String un = httpConduit.getAuthorization().getUserName();
-                    String pwd =  httpConduit.getAuthorization().getPassword();
+                    String pwd = httpConduit.getAuthorization().getPassword();
                     if (un != null && pwd != null) {
                         auth = new PasswordAuthentication(un, pwd.toCharArray());
                     }

@@ -119,7 +119,7 @@ public class StreamingService {
             JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, Durations.seconds(1));
 
             SparkStreamingOutput streamOut = new SparkStreamingOutput(jssc);
-            SparkStreamingListener sparkListener =  new SparkStreamingListener(streamOut);
+            SparkStreamingListener sparkListener = new SparkStreamingListener(streamOut);
             jssc.addStreamingListener(sparkListener);
 
             JavaDStream<String> receiverStream = null;

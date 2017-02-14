@@ -102,7 +102,7 @@ public class  TestSOAPHandler extends TestHandlerBase
             methodCalled("handleMessage");
             printHandlerInfo("handleMessage", isOutbound(ctx));
 
-            Object b  = ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+            Object b = ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
             boolean outbound = (Boolean)b;
             SOAPMessage msg = ctx.getMessage();
 
@@ -181,7 +181,7 @@ public class  TestSOAPHandler extends TestHandlerBase
     private boolean getReturnValue(boolean outbound, SOAPMessageContext ctx) {
         boolean ret = true;
         try {
-            SOAPMessage msg  = ctx.getMessage();
+            SOAPMessage msg = ctx.getMessage();
             SOAPBody body = msg.getSOAPPart().getEnvelope().getBody();
 
             if (body.getFirstChild().getFirstChild() == null) {

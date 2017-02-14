@@ -486,7 +486,7 @@ public class MessageFlow extends Assert {
 
     public void verifyPartialResponses(int nExpected, boolean[] piggybackedAcks) throws Exception {
         int npr = 0;
-        for (int i =  0; i < inboundMessages.size(); i++) {
+        for (int i = 0; i < inboundMessages.size(); i++) {
             if (isPartialResponse(inboundMessages.get(i))) {
                 if (piggybackedAcks != null) {
                     Element ack = getAcknowledgment(inboundMessages.get(i));

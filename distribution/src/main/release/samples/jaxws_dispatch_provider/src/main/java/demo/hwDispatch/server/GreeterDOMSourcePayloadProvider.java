@@ -50,7 +50,7 @@ public class GreeterDOMSourcePayloadProvider implements Provider<DOMSource> {
 
             InputStream is = getClass().getResourceAsStream("/GreetMeDocLiteralResp3.xml");
 
-            SOAPMessage greetMeResponse =  MessageFactory.newInstance().createMessage(null, is);
+            SOAPMessage greetMeResponse = MessageFactory.newInstance().createMessage(null, is);
             is.close();
             response.setNode(greetMeResponse.getSOAPBody().extractContentAsDocument());
         } catch (Exception ex) {

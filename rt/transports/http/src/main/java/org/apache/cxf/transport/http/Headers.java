@@ -376,7 +376,7 @@ public class Headers {
         if (ctList != null && ctList.size() == 1 && ctList.get(0) != null) {
             ct = ctList.get(0).toString();
         } else {
-            ct  = (String)message.get(Message.CONTENT_TYPE);
+            ct = (String)message.get(Message.CONTENT_TYPE);
         }
 
         String enc = (String)message.get(Message.ENCODING);
@@ -466,7 +466,7 @@ public class Headers {
         return PropertyUtils.isTrue(message.getContextualProperty(ALLOW_LOGGING_SENSITIVE_HEADERS));
     }
     private String getContentTypeFromMessage() {
-        final String ct  = (String)message.get(Message.CONTENT_TYPE);
+        final String ct = (String)message.get(Message.CONTENT_TYPE);
         final String enc = (String)message.get(Message.ENCODING);
 
         if (null != ct

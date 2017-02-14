@@ -209,7 +209,7 @@ public class RMOutInterceptorTest extends Assert {
 
     private AddressingProperties createMAPs(String action, String to, String replyTo) {
         AddressingProperties maps = new AddressingProperties();
-        AttributedURIType actionuri =  new AttributedURIType();
+        AttributedURIType actionuri = new AttributedURIType();
         actionuri.setValue(action);
         maps.setAction(actionuri);
         maps.setTo(RMUtils.createReference(to));

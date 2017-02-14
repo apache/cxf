@@ -159,7 +159,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testInovationWithHCAddress() throws Exception {
-        String address =  "hc://http://localhost:" + PORT + "/SoapContext/SoapPort";
+        String address = "hc://http://localhost:" + PORT + "/SoapContext/SoapPort";
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress(address);
@@ -170,7 +170,7 @@ public class AsyncHTTPConduitTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testInvocationWithTransportId() throws Exception {
-        String address =  "http://localhost:" + PORT + "/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress(address);

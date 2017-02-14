@@ -95,7 +95,7 @@ public class NSStack {
     public synchronized String getPrefix(String uri) {
         for (int i = size - 1; i >= 0; i--) {
             List<NSDecl> scope = stack.get(i);
-            ListIterator<NSDecl> lsIterator =  scope.listIterator();
+            ListIterator<NSDecl> lsIterator = scope.listIterator();
 
             while (lsIterator.hasNext()) {
                 NSDecl nsd = lsIterator.next();

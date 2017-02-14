@@ -91,7 +91,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
 
         if (!PolicyUtils.isEmptyPolicy(p)) {
             Policy normalizedPolicy
-                = p.normalize(engine == null ? null : engine.getRegistry(), true);
+ = p.normalize(engine == null ? null : engine.getRegistry(), true);
             epi.setPolicy(getPolicy().merge(normalizedPolicy));
         } else {
             Policy clonedPolicy = new Policy();

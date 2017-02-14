@@ -357,7 +357,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
     private void encodeReferenceParameters(AddressingProperties maps,
                                            SoapMessage msg,
                                            JAXBContext ctx) throws JAXBException {
-        Element header =  null;
+        Element header = null;
 
         EndpointReferenceType toEpr = maps.getToEndpointReference();
         if (null != toEpr) {

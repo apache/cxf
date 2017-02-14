@@ -38,7 +38,7 @@ import org.junit.Test;
  * returns true instead.
  */
 public class TrivialSOAPHandlerTest extends AbstractClientServerTestBase {
-    static String address =  "http://localhost:"
+    static String address = "http://localhost:"
         + TestUtil.getPortNumber(Server.class)
         + "/SoapContext/GreeterPort";
 

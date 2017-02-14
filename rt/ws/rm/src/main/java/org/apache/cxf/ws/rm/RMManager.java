@@ -393,7 +393,7 @@ public class RMManager {
                 }
                 Endpoint ei = message.getExchange().getEndpoint();
                 org.apache.cxf.transport.Destination dest
-                    = ei == null ? null : ei.getEndpointInfo()
+ = ei == null ? null : ei.getEndpointInfo()
                         .getProperty(MAPAggregator.DECOUPLED_DESTINATION,
                                  org.apache.cxf.transport.Destination.class);
                 config = RMPolicyUtilities.getRMConfiguration(config, message);
@@ -450,7 +450,7 @@ public class RMManager {
                 if (RMUtils.getAddressingConstants().getNoneURI().equals(acksTo.getAddress().getValue())) {
                     Endpoint ei = message.getExchange().getEndpoint();
                     org.apache.cxf.transport.Destination dest
-                        = ei == null ? null : ei.getEndpointInfo()
+ = ei == null ? null : ei.getEndpointInfo()
                                 .getProperty(MAPAggregator.DECOUPLED_DESTINATION,
                                          org.apache.cxf.transport.Destination.class);
                     if (null == dest) {

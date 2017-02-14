@@ -60,7 +60,7 @@ public final class XmlSchemaPrimitiveUtils {
     }
 
     public static String getSchemaRepresentation(Class<?> type, String xsdPrefix) {
-        String value =  XML_SCHEMA_PRIMITIVE_MAP.get(type);
+        String value = XML_SCHEMA_PRIMITIVE_MAP.get(type);
         return value == null ? value : xsdPrefix + ":" + value;
     }
 

@@ -141,7 +141,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
         if (executor == null && bus != null) {
             WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
             if (manager != null) {
-                Executor ex =  manager.getNamedWorkQueue("local-transport");
+                Executor ex = manager.getNamedWorkQueue("local-transport");
                 if (ex == null) {
                     ex = manager.getAutomaticWorkQueue();
                 }
@@ -200,7 +200,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
             filter = messageFilterProperties;
         }
 
-        Set<String> includes =  CastUtils.cast((Set<?>)message.get(MESSAGE_INCLUDE_PROPERTIES));
+        Set<String> includes = CastUtils.cast((Set<?>)message.get(MESSAGE_INCLUDE_PROPERTIES));
         if (includes == null) {
             includes = messageIncludeProperties;
         }

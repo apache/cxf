@@ -67,7 +67,7 @@ public class StringArrayTest extends AbstractBusClientServerTestBase {
         StringListTest port = service.getSoapPortRPCLit();
         updateAddressPort(port, PORT);
         String[] strs = new String[]{"org", "apache", "cxf"};
-        String[] res =  port.stringListTest(strs);
+        String[] res = port.stringListTest(strs);
         assertArrayEquals(strs, res);
 
         assertTrue("Request message is not marshalled correctly and @XmlList does not take effect:\n"

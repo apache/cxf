@@ -87,7 +87,7 @@ public class ServerImpl implements ServerPortType  {
 
             URL wsdlURL = new URL(wsdlLocation);
             Service service = Service.create(wsdlURL, serviceName);
-            CallbackPortType port =  (CallbackPortType)service.getPort(portName, sei);
+            CallbackPortType port = (CallbackPortType)service.getPort(portName, sei);
             ((BindingProvider)port).getRequestContext()
                 .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
 

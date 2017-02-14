@@ -148,11 +148,11 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         NumberService numService = new NumberService();
         ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);
 
-        Number num =  serviceImpl.getPort(numberTwoRef, Number.class);
+        Number num = serviceImpl.getPort(numberTwoRef, Number.class);
         assertTrue("20 is even", num.isEven().isEven());
         w3cEpr = factory.create("23");
         EndpointReferenceType numberTwentyThreeRef = ProviderImpl.convertToInternal(w3cEpr);
-        num =  serviceImpl.getPort(numberTwentyThreeRef, Number.class);
+        num = serviceImpl.getPort(numberTwentyThreeRef, Number.class);
         assertTrue("23 is not even", !num.isEven().isEven());
     }
 
@@ -160,7 +160,7 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
 
         String address = EndpointReferenceUtils.getAddress(epr);
 
-        InvocationHandler handler  = Proxy.getInvocationHandler(num);
+        InvocationHandler handler = Proxy.getInvocationHandler(num);
         BindingProvider  bp = null;
         if (handler instanceof BindingProvider) {
             bp = (BindingProvider)handler;

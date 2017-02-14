@@ -64,10 +64,10 @@ public class HWDOMSourcePayloadProvider implements Provider<DOMSource> {
         try {
             factory = MessageFactory.newInstance();
             InputStream is = getClass().getResourceAsStream("resources/sayHiRpcLiteralResp.xml");
-            sayHiResponse =  factory.createMessage(null, is).getSOAPBody().extractContentAsDocument();
+            sayHiResponse = factory.createMessage(null, is).getSOAPBody().extractContentAsDocument();
             is.close();
             is = getClass().getResourceAsStream("resources/GreetMeRpcLiteralResp.xml");
-            greetMeResponse =  factory.createMessage(null, is).getSOAPBody().extractContentAsDocument();
+            greetMeResponse = factory.createMessage(null, is).getSOAPBody().extractContentAsDocument();
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();

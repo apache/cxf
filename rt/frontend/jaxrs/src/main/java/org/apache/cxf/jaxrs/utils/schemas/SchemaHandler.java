@@ -124,7 +124,7 @@ public class SchemaHandler {
                             public LSInput resolveResource(String type, String namespaceURI, String publicId,
                                                            String systemId, String baseURI) {
                                 try {
-                                    String resolvedLocation  = catalogResolver.resolveSystem(systemId);
+                                    String resolvedLocation = catalogResolver.resolveSystem(systemId);
 
                                     if (resolvedLocation == null) {
                                         resolvedLocation = catalogResolver.resolveURI(namespaceURI);
