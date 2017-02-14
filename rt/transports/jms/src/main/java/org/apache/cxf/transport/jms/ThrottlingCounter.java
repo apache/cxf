@@ -38,7 +38,7 @@ public class ThrottlingCounter implements Counter {
 
     public ThrottlingCounter(int lowWatermark, int highWatermark) {
         this.counter = new AtomicInteger();
-        this.lowWatermark =  lowWatermark;
+        this.lowWatermark = lowWatermark;
         this.highWatermark = highWatermark;
     }
 

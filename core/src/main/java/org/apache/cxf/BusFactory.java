@@ -387,7 +387,7 @@ public abstract class BusFactory {
             if (isValidBusFactoryClass(busFactoryClass)
                 && busFactoryCondition != null) {
                 try {
-                    Class<?> cls =  ClassLoaderUtils.loadClass(busFactoryClass, BusFactory.class)
+                    Class<?> cls = ClassLoaderUtils.loadClass(busFactoryClass, BusFactory.class)
                         .asSubclass(BusFactory.class);
                     if (busFactoryCondition.startsWith("#")) {
                         busFactoryCondition = busFactoryCondition.substring(1);

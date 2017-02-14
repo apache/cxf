@@ -57,7 +57,7 @@ public class InstrumentationManagerTest extends Assert {
     @Test
     public void testInstrumentationNotEnabled() {
         SpringBusFactory factory = new SpringBusFactory();
-        bus =  factory.createBus();
+        bus = factory.createBus();
         im = bus.getExtension(InstrumentationManager.class);
         assertTrue("Instrumentation Manager should not be null", im != null);
         MBeanServer mbs = im.getMBeanServer();
@@ -67,7 +67,7 @@ public class InstrumentationManagerTest extends Assert {
     @Test
     public void testInstrumentationEnabledSetBeforeBusSet() {
         SpringBusFactory factory = new SpringBusFactory();
-        bus =  factory.createBus("managed-spring3.xml", true);
+        bus = factory.createBus("managed-spring3.xml", true);
         im = bus.getExtension(InstrumentationManager.class);
         assertTrue("Instrumentation Manager should not be null", im != null);
         MBeanServer mbs = im.getMBeanServer();
@@ -78,7 +78,7 @@ public class InstrumentationManagerTest extends Assert {
     // try to get WorkQueue information
     public void testWorkQueueInstrumentation() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
-        bus =  factory.createBus("managed-spring.xml", true);
+        bus = factory.createBus("managed-spring.xml", true);
         im = bus.getExtension(InstrumentationManager.class);
         assertTrue("Instrumentation Manager should not be null", im != null);
         WorkQueueManagerImpl wqm = new WorkQueueManagerImpl();

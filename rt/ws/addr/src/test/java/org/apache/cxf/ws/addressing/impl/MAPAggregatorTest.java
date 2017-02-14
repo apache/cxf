@@ -462,9 +462,9 @@ public class MAPAggregatorTest extends Assert {
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
 
-        final String localReplyTo =  "/SoapContext/decoupled";
+        final String localReplyTo = "/SoapContext/decoupled";
         final String decoupledEndpointBase = "http://localhost:8181/cxf";
-        final String replyTo =  decoupledEndpointBase + localReplyTo;
+        final String replyTo = decoupledEndpointBase + localReplyTo;
 
         ServiceInfo s = new ServiceInfo();
         Service svc = new ServiceImpl(s);

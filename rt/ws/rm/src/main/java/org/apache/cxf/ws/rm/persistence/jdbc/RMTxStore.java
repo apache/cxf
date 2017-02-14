@@ -1142,7 +1142,7 @@ public class RMTxStore implements RMStore {
                     }
                 }
             }
-            con =  connection;
+            con = connection;
         }
 
         return con;

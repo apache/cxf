@@ -52,7 +52,7 @@ public class OAuthInvoker extends JAXRSInvoker {
                 && ex.getCause() instanceof NotAuthorizedException
                 && !inMessage.containsKey(OAUTH2_CALL_RETRIED)) {
                 ClientAccessToken accessToken = tokenContext.getToken();
-                String refreshToken  = accessToken.getRefreshToken();
+                String refreshToken = accessToken.getRefreshToken();
                 if (refreshToken != null) {
                     accessToken = OAuthClientUtils.refreshAccessToken(accessTokenServiceClient,
                                                         consumer,

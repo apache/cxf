@@ -449,7 +449,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             }
         }
 
-        TemplatesImpl templ =  new TemplatesImpl(templates, uriResolver);
+        TemplatesImpl templ = new TemplatesImpl(templates, uriResolver);
         MessageContext mc = getContext();
         if (mc != null) {
             UriInfo ui = mc.getUriInfo();

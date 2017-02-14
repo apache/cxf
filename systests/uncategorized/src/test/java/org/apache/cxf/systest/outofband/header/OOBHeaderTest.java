@@ -77,7 +77,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
     }
 
     private void addOutOfBoundHeader(PutLastTradedPricePortType portType, boolean invalid, boolean mu) {
-        InvocationHandler handler  = Proxy.getInvocationHandler(portType);
+        InvocationHandler handler = Proxy.getInvocationHandler(portType);
         BindingProvider  bp = null;
 
         try {
@@ -109,7 +109,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
     }
 
     private void checkReturnedOOBHeader(PutLastTradedPricePortType portType) {
-        InvocationHandler handler  = Proxy.getInvocationHandler(portType);
+        InvocationHandler handler = Proxy.getInvocationHandler(portType);
         BindingProvider  bp = null;
         if (handler instanceof BindingProvider) {
             bp = (BindingProvider)handler;

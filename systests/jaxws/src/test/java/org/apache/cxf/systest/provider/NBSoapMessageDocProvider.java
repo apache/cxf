@@ -43,7 +43,7 @@ public class NBSoapMessageDocProvider implements Provider<SOAPMessage> {
         try {
             MessageFactory factory = MessageFactory.newInstance();
             InputStream is = getClass().getResourceAsStream("resources/sayHiDocLiteralResp.xml");
-            sayHiResponse =  factory.createMessage(null, is);
+            sayHiResponse = factory.createMessage(null, is);
             is.close();
         } catch (Exception ex) {
             ex.printStackTrace();

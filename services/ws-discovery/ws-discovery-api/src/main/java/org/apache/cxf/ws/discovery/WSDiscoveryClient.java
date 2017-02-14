@@ -136,7 +136,7 @@ public class WSDiscoveryClient implements Closeable {
     }
 
     public void setVersion(boolean version10) {
-        WSDVersion newv =  version10 ? WSDVersion.INSTANCE_1_0 : WSDVersion.INSTANCE_1_1;
+        WSDVersion newv = version10 ? WSDVersion.INSTANCE_1_0 : WSDVersion.INSTANCE_1_1;
         if (newv != version) {
             version = newv;
             uncache();

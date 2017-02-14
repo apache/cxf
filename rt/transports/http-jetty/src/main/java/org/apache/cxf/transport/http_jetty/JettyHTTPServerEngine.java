@@ -147,8 +147,8 @@ public class JettyHTTPServerEngine implements ServerEngine {
         Container.Listener mBeanContainer,
         String host,
         int port) {
-        this.host    = host;
-        this.port    = port;
+        this.host = host;
+        this.port = port;
         this.mBeanContainer = mBeanContainer;
     }
 

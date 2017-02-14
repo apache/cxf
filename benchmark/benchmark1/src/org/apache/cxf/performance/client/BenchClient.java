@@ -584,7 +584,7 @@ public class BenchClient {
             }
             this.serverName = serverName;
             this.serverLocation = location;
-            //this.direction =  direction;
+            //this.direction = direction;
             //this.method = method;
             this.elementsToSend = elementsToSend;
             //this.arrSizeToSend = arrSizeToSend;

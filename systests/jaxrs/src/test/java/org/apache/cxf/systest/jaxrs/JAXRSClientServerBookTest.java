@@ -2129,7 +2129,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookAdapterInterfaceList() throws Exception {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
-        List<? extends BookInfoInterface> list =  store.getBookAdapterInterfaceList();
+        List<? extends BookInfoInterface> list = store.getBookAdapterInterfaceList();
         assertEquals(1, list.size());
         BookInfoInterface info = list.get(0);
         assertEquals(123L, info.getId());
@@ -2145,7 +2145,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookAdapterInfoList() throws Exception {
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
-        List<? extends BookInfo> list =  store.getBookAdapterList();
+        List<? extends BookInfo> list = store.getBookAdapterList();
         assertEquals(1, list.size());
         BookInfo info = list.get(0);
         assertEquals(123L, info.getId());

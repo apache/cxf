@@ -535,7 +535,7 @@ public class HttpHeadersImplTest extends Assert {
         languages = h.getAcceptableLanguages();
         assertEquals(3, languages.size());
 
-        MultivaluedMap<String, String> rHeaders  = h.getRequestHeaders();
+        MultivaluedMap<String, String> rHeaders = h.getRequestHeaders();
         List<String> acceptL = rHeaders.get(HttpHeaders.ACCEPT_LANGUAGE);
         assertEquals(3, acceptL.size());
         try {

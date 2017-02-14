@@ -227,7 +227,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     protected void setInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig,
                                    String paramName,
                                    String splitChar) throws ServletException {
-        String value  = servletConfig.getInitParameter(paramName);
+        String value = servletConfig.getInitParameter(paramName);
         if (value == null) {
             return;
         }
@@ -263,7 +263,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
     protected void setInvoker(JAXRSServerFactoryBean bean, ServletConfig servletConfig)
         throws ServletException {
-        String value  = servletConfig.getInitParameter(INVOKER_PARAM);
+        String value = servletConfig.getInitParameter(INVOKER_PARAM);
         if (value == null) {
             return;
         }

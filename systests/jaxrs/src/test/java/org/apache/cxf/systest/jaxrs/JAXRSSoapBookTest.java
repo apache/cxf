@@ -197,12 +197,12 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT
                          + "/test/v1/rest-transform/bookstore/books";
 
-        TransformOutInterceptor out =  new TransformOutInterceptor();
+        TransformOutInterceptor out = new TransformOutInterceptor();
         out.setOutTransformElements(
             Collections.singletonMap("{http://www.example.org/books}*",
                                      "{http://www.example.org/super-books}*"));
 
-        TransformInInterceptor in =  new TransformInInterceptor();
+        TransformInInterceptor in = new TransformInInterceptor();
         Map<String, String> map = new HashMap<String, String>();
 
         // If Book2 didn't have {http://www.example.org/books}Book
@@ -793,7 +793,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
                                 new QName("http://books.com", "BookService"));
         BookStoreJaxrsJaxws store = service.getBookPort();
 
-        TransformOutInterceptor out =  new TransformOutInterceptor();
+        TransformOutInterceptor out = new TransformOutInterceptor();
         Map<String, String> mapOut = new HashMap<String, String>();
         // Book content (id, name) is unqualified, thus the following works
         // because JAXB will report
@@ -805,7 +805,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         mapOut.put("{http://jaxws.jaxrs.systest.cxf.apache.org/}*", "*");
         out.setOutTransformElements(mapOut);
 
-        TransformInInterceptor in =  new TransformInInterceptor();
+        TransformInInterceptor in = new TransformInInterceptor();
         Map<String, String> mapIn = new HashMap<String, String>();
         // mapIn.put("*", "{http://jaxws.jaxrs.systest.cxf.apache.org/}*");
         // won't work for a case where a totally unqualified getBookResponse needs to be

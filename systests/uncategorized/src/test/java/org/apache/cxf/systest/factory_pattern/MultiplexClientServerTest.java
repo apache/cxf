@@ -122,13 +122,13 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
         W3CEndpointReference numberTwoRef = factory.create("20");
         assertNotNull("reference", numberTwoRef);
 
-        Number num =  serviceImpl.getPort(numberTwoRef, Number.class);
+        Number num = serviceImpl.getPort(numberTwoRef, Number.class);
         assertTrue("20 is even", num.isEven().isEven());
 
         close(num);
 
         W3CEndpointReference numberTwentyThreeRef = factory.create("23");
-        num =  serviceImpl.getPort(numberTwentyThreeRef, Number.class);
+        num = serviceImpl.getPort(numberTwentyThreeRef, Number.class);
         assertTrue("23 is not even", !num.isEven().isEven());
 
         close(num);
@@ -153,7 +153,7 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
 
         assertNotNull("reference", ref);
         ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);
-        Number num =  serviceImpl.getPort(ref, Number.class);
+        Number num = serviceImpl.getPort(ref, Number.class);
         try {
             num.isEven().isEven();
             fail("there should be a fault on val 999");
@@ -165,7 +165,7 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
 
         ref = factory.create("37");
         assertNotNull("reference", ref);
-        num =  serviceImpl.getPort(ref, Number.class);
+        num = serviceImpl.getPort(ref, Number.class);
         assertTrue("37 is not even", !num.isEven().isEven());
 
         ClientProxy.getClient(num).getConduit().close();

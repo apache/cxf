@@ -169,7 +169,7 @@ public final class ProcessorUtil {
     }
 
     public static String mangleNameToVariableName(String vName) {
-        String result  = NameUtil.mangleNameToVariableName(vName);
+        String result = NameUtil.mangleNameToVariableName(vName);
         if (JavaUtils.isJavaKeyword(result)) {
             return KEYWORDS_PREFIX + result;
         } else {

@@ -46,7 +46,7 @@ public class AccessTokenValidatorService extends AbstractAccessTokenValidator {
     public AccessTokenValidation getTokenValidationInfo(@Encoded MultivaluedMap<String, String> params) {
         checkSecurityContext();
         String authScheme = params.getFirst(OAuthConstants.AUTHORIZATION_SCHEME_TYPE);
-        String authSchemeData  = params.getFirst(OAuthConstants.AUTHORIZATION_SCHEME_DATA);
+        String authSchemeData = params.getFirst(OAuthConstants.AUTHORIZATION_SCHEME_DATA);
         try {
             return super.getAccessTokenValidation(authScheme, authSchemeData, params);
         } catch (NotAuthorizedException ex) {

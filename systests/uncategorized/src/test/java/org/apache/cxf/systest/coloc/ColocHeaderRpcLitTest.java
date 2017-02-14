@@ -38,7 +38,7 @@ public class ColocHeaderRpcLitTest extends AbstractHeaderServiceRpcLitTest {
     }
 
     protected Object getServiceImpl() {
-        HttpServiceImpl impl =  new HttpServiceImpl();
+        HttpServiceImpl impl = new HttpServiceImpl();
         impl.init(getLogger());
         return impl;
     }

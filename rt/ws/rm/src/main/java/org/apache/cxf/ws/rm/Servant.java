@@ -199,7 +199,7 @@ public class Servant implements Invoker {
         SourceSequence seq = new SourceSequence(createResponse.getIdentifier(),
             protocol);
         seq.setExpires(createResponse.getExpires());
-        Source source  = reliableEndpoint.getSource();
+        Source source = reliableEndpoint.getSource();
         source.addSequence(seq);
 
         // the incoming sequence ID is either used as the requestor sequence
@@ -218,7 +218,7 @@ public class Servant implements Invoker {
                 Destination dest = reliableEndpoint.getDestination();
                 String address = accept.getAcksTo().getAddress().getValue();
                 if (!RMUtils.getAddressingConstants().getNoneURI().equals(address)) {
-                    DestinationSequence ds =  new DestinationSequence(offeredId, accept.getAcksTo(), dest,
+                    DestinationSequence ds = new DestinationSequence(offeredId, accept.getAcksTo(), dest,
                                                                       protocol);
                     dest.addSequence(ds);
                 }

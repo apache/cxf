@@ -69,7 +69,7 @@ public class CatalogStore {
     public JsonObject get(final String key) throws IOException {
         try (final Table table = connection.getTable(TableName.valueOf(tableName))) {
             final Get get = new Get(Bytes.toBytes(key));
-            final Result result =  table.get(get);
+            final Result result = table.get(get);
 
             if (!result.isEmpty()) {
                 final Cell cell = result.getColumnLatestCell(Bytes.toBytes("c"), Bytes.toBytes("title"));

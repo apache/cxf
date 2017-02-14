@@ -118,7 +118,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
             return;
         }
         CXFNonSpringJaxrsServlet cxfServlet = new CXFNonSpringJaxrsServlet(app);
-        final Dynamic servlet =  ctx.addServlet(servletName, cxfServlet);
+        final Dynamic servlet = ctx.addServlet(servletName, cxfServlet);
         servlet.addMapping(servletMapping);
     }
 

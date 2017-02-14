@@ -89,7 +89,7 @@ public class JwsJoseCookBookTest {
         + "}"
         + "]"
         + "}").replaceAll(" ", "");
-    private static final String RSA_V1_5_JSON_FLATTENED_SERIALIZATION =  ("{"
+    private static final String RSA_V1_5_JSON_FLATTENED_SERIALIZATION = ("{"
         + "\"payload\": \"SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywg"
         + "Z29pbmcgb3V0IHlvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9h"
         + "ZCwgYW5kIGlmIHlvdSBkb24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXi"

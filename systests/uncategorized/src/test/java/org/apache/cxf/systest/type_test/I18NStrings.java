@@ -27,7 +27,7 @@ public final class I18NStrings {
         String tmp;
         try {
             // GoogleSearchPreferences with Search and Preferences in japanese :)
-            tmp =  new String(new byte[] {
+            tmp = new String(new byte[] {
                 (byte)0xfe, (byte)0xff, (byte)0x0, (byte)0x47, (byte)0x0, (byte)0x6f,
                 (byte)0x0, (byte)0x6f, (byte)0x0, (byte)0x67, (byte)0x0, (byte)0x6c,
                 (byte)0x0, (byte)0x65, (byte)0x69, (byte)0x1c, (byte)0x7d, (byte)0x22,

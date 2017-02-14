@@ -132,7 +132,7 @@ public class PersistenceUtilsTest extends Assert {
         PersistenceUtils.decodeRMContent(msg, messageImpl);
 
         assertEquals(1, messageImpl.getAttachments().size());
-        CachedOutputStream cos1 =  (CachedOutputStream)messageImpl
+        CachedOutputStream cos1 = (CachedOutputStream)messageImpl
             .get(RMMessageConstants.SAVED_CONTENT);
         assertStartsWith(cos1.getInputStream(), "<soap:Envelope");
     }

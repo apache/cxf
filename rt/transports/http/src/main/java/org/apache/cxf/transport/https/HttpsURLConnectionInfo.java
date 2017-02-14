@@ -96,10 +96,10 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
         if (connection instanceof HttpsURLConnection) {
             HttpsURLConnection conn = (HttpsURLConnection) connection;
             enabledCipherSuite = conn.getCipherSuite();
-            localCertificates  = conn.getLocalCertificates();
-            localPrincipal     = conn.getLocalPrincipal();
+            localCertificates = conn.getLocalCertificates();
+            localPrincipal = conn.getLocalPrincipal();
             serverCertificates = conn.getServerCertificates();
-            peerPrincipal      = conn.getPeerPrincipal();
+            peerPrincipal = conn.getPeerPrincipal();
         } else {
             Exception ex = null;
             try {

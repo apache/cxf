@@ -510,7 +510,7 @@ public class UndertowHTTPServerEngine implements ServerEngine {
     }
 
     public void setContinuationsEnabled(boolean enabled) {
-        continuationsEnabled  = enabled;
+        continuationsEnabled = enabled;
     }
 
     public boolean getContinuationsEnabled() {

@@ -28,7 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class SchemaImportTest extends AbstractBusClientServerTestBase {
-    public static final String PORT =  Server.PORT;
+    public static final String PORT = Server.PORT;
 
     @BeforeClass
     public static void startservers() throws Exception {

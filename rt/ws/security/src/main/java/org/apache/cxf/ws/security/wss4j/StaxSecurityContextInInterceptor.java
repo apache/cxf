@@ -137,7 +137,7 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
                             roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
                         }
 
-                        receivedAssertion =  ((SAMLTokenPrincipal)token.getPrincipal()).getToken();
+                        receivedAssertion = ((SAMLTokenPrincipal)token.getPrincipal()).getToken();
                         if (receivedAssertion != null) {
                             ClaimCollection claims =
                                 SAMLUtils.getClaims((SamlAssertionWrapper)receivedAssertion);

@@ -641,8 +641,8 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
 
         MyBasicAuthSupplier(String r, String u, String p) {
             realm = r;
-            user  = u;
-            pass  = p;
+            user = u;
+            pass = p;
         }
 
         /**

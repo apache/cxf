@@ -159,7 +159,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         List<Element> resourcesEls = DOMUtils.getChildrenWithName(root,
                                                                   WadlGenerator.WADL_NS, "resources");
         assertEquals(1, resourcesEls.size());
-        Element resourcesEl =  resourcesEls.get(0);
+        Element resourcesEl = resourcesEls.get(0);
         assertEquals("http://proxy", resourcesEl.getAttribute("base"));
 
     }
@@ -187,7 +187,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         List<Element> resourcesEls = DOMUtils.getChildrenWithName(root,
                                                                   WadlGenerator.WADL_NS, "resources");
         assertEquals(1, resourcesEls.size());
-        Element resourcesEl =  resourcesEls.get(0);
+        Element resourcesEl = resourcesEls.get(0);
         assertEquals(baseURI, resourcesEl.getAttribute("base"));
         List<Element> resourceEls =
             DOMUtils.getChildrenWithName(resourcesEl,

@@ -362,7 +362,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
         assertNotNull(accessToken.getRefreshToken());
         accessToken.getParameters().get("id_token");
         assertNotNull(idToken);
-        String newAccessToken =  accessToken.getTokenKey();
+        String newAccessToken = accessToken.getTokenKey();
 
         // Now test the UserInfoService.
 

@@ -1353,10 +1353,10 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
 
-        Class<?> sei =  classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.tns.soap.Greeter");
+        Class<?> sei = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.tns.soap.Greeter");
         assertNotNull("Greeter class from wsdl targetNamespace could not be found", sei);
 
-        Class<?> tc =  classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.tns.types.GreetMe");
+        Class<?> tc = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.tns.types.GreetMe");
         assertNotNull("GreetMe class from schema targetNamespace could not be found", tc);
     }
 
@@ -1366,10 +1366,10 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
 
-        Class<?> sei =  classLoader.loadClass("apache.cxf.issue._6527.Greeter");
+        Class<?> sei = classLoader.loadClass("apache.cxf.issue._6527.Greeter");
         assertNotNull("Greeter class from wsdl targetNamespace could not be found", sei);
 
-        Class<?> tc =  classLoader.loadClass("apache.cxf.issue._6527.types.GreetMe");
+        Class<?> tc = classLoader.loadClass("apache.cxf.issue._6527.types.GreetMe");
         assertNotNull("GreetMe class from schema targetNamespace could not be found", tc);
     }
 
@@ -1398,7 +1398,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
 
-        Class<?> sei =  classLoader.loadClass("org.apache.stringarray.StringListTest");
+        Class<?> sei = classLoader.loadClass("org.apache.stringarray.StringListTest");
         Method method = sei.getMethods()[0];
         assertNotNull("@XmlList is not generated for method", method.getAnnotation(XmlList.class));
         boolean xmlListGenerated = false;
@@ -1416,7 +1416,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf-1404/hello_world.wsdl"));
         processor.setContext(env);
         processor.execute();
-        Class<?> sei =  classLoader.loadClass("org.apache.cxf.cxf1404.hello_world_soap_http.Greeter");
+        Class<?> sei = classLoader.loadClass("org.apache.cxf.cxf1404.hello_world_soap_http.Greeter");
         assertEquals(1, sei.getMethods().length);
         assertFalse(Void.TYPE.equals(sei.getMethods()[0].getReturnType()));
     }
@@ -1429,7 +1429,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
 
         File seif = new File(output, "org/apache/cxf/helloworld/HelloWorldServiceImpl.java");
         assertTrue(seif.exists());
-        Class<?> sei =  classLoader.loadClass("org.apache.cxf.helloworld.HelloWorldServiceImpl");
+        Class<?> sei = classLoader.loadClass("org.apache.cxf.helloworld.HelloWorldServiceImpl");
         Method m[] = sei.getDeclaredMethods();
         assertEquals(1, m.length);
         assertTrue(m[0].getParameterAnnotations()[1][0] instanceof WebParam);

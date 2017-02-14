@@ -86,7 +86,7 @@ public class BusShutdownTest extends Assert {
         Greeter greeter = service.getSoapPort();
 
         // overwrite client address
-        InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
+        InvocationHandler handler = Proxy.getInvocationHandler(greeter);
         BindingProvider bp = (BindingProvider)handler;
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    address);

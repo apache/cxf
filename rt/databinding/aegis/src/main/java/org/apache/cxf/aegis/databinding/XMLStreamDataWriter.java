@@ -79,7 +79,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
          * We arrive here with a 'type' of the inner type if isWriteOuter is null.
          * However, in that case, the original type is available.
          */
-        AegisType outerType  = null;
+        AegisType outerType = null;
         if (part != null) {
             outerType = part.getProperty("org.apache.cxf.aegis.outerType", AegisType.class);
         }

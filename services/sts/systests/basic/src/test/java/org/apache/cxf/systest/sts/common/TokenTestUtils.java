@@ -53,7 +53,7 @@ public final class TokenTestUtils {
         assertNotNull(tok);
         STSClient sts = (STSClient)ep.get(SecurityConstants.STS_CLIENT);
         if (sts == null) {
-            sts  = (STSClient)ep.get("ws-" + SecurityConstants.STS_CLIENT);
+            sts = (STSClient)ep.get("ws-" + SecurityConstants.STS_CLIENT);
         }
 
         List<SecurityToken> validTokens = sts.validateSecurityToken(tok);
