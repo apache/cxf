@@ -33,6 +33,7 @@ public class SseFeature extends AbstractFeature {
         final List<Object> providers = new ArrayList<>();
 
         providers.add(new SseAtmosphereEventSinkContextProvider());
+        providers.add(new SseContextProvider());
 
         ((ServerProviderFactory) server.getEndpoint().get(
             ServerProviderFactory.class.getName())).setUserProviders(providers);

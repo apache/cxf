@@ -22,8 +22,12 @@ import javax.ws.rs.sse.OutboundSseEvent.Builder;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
 
-class SseImpl implements Sse {
+public class SseImpl implements Sse {
     SseImpl() {
+    }
+    
+    public static Sse create() {
+        return new SseImpl();
     }
 
     @Override

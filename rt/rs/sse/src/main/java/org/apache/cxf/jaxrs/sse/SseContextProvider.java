@@ -20,8 +20,12 @@ package org.apache.cxf.jaxrs.sse;
 
 import javax.ws.rs.sse.Sse;
 
-public interface SseFactory {
-    static Sse create() {
+import org.apache.cxf.jaxrs.ext.ContextProvider;
+import org.apache.cxf.message.Message;
+
+public class SseContextProvider implements ContextProvider<Sse> {
+    @Override
+    public Sse createContext(Message message) {
         return new SseImpl();
     }
 }

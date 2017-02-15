@@ -33,14 +33,14 @@ import javax.ws.rs.sse.OutboundSseEvent.Builder;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 
-import org.apache.cxf.jaxrs.sse.SseFactory;
+import org.apache.cxf.jaxrs.sse.SseImpl;
 import org.springframework.stereotype.Component;
 
 @Path("/stats")
 @Component
 public class StatsRestServiceImpl {
     private static final Random RANDOM = new Random();
-    private final Sse sse = SseFactory.create();
+    private final Sse sse = SseImpl.create();
 
     @GET
     @Path("sse/{id}")
