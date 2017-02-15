@@ -27,7 +27,6 @@
         </property>
         <property name="address" value="/services/Greeter"/>
         <property name="bus" ref="cxf"/>
-        <property name="bindingId" value="http://apache.org/cxf/binding/http"/>
     </bean>
     <jaxws:endpoint id="endpoint1" implementor="org.apache.hello_world_soap_http.GreeterImpl" address="/services/Greeter1" wsdlLocation="/wsdl/hello_world.wsdl"/>
     <jaxws:endpoint id="endpoint2" implementor="org.apache.hello_world_soap_http.GreeterImpl" address="/services/Greeter2" publishedEndpointUrl="http://cxf.apache.org/Greeter"/>

@@ -37,11 +37,11 @@ public class ProviderJMSContinuationTest extends AbstractVmJMSTest {
         startBusAndJMS(ProviderJMSContinuationTest.class);
         Object implementor = new HWSoapMessageDocProvider();        
         String address = "jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply";
-        EndpointImpl ep = (EndpointImpl)Endpoint.create(address, implementor);
+        EndpointImpl ep = (EndpointImpl)Endpoint.create(implementor);
         ep.getInInterceptors().add(new IncomingMessageCounterInterceptor());
         ep.setBus(bus);
         ep.getFeatures().add(cff);
-        ep.publish();
+        ep.publish(address);
     }
         
     @Test

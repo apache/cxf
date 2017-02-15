@@ -54,9 +54,11 @@ import org.apache.cxf.anonymous_complex_type.SplitName;
 import org.apache.cxf.anonymous_complex_type.SplitNameResponse.Names;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.xml.XMLBinding;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XPathUtils;
@@ -473,6 +475,30 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         String echoMsg = port.echo("Hello");
         assertEquals("Hello", echoMsg);
     }
+    
+    @Test
+    public void testSimpleClientWithWsdlAndBindingId() throws Exception {
+        QName portName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService",
+            "DocLitWrappedCodeFirstServicePort");
+        QName servName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService",
+            "DocLitWrappedCodeFirstService");
+
+        ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
+        factory.setBindingId("http://cxf.apache.org/bindings/xformat");
+        factory.setWsdlURL(ServerMisc.DOCLIT_CODEFIRST_URL_XMLBINDING + "?wsdl");
+        factory.setServiceName(servName);
+        factory.setServiceClass(DocLitWrappedCodeFirstService.class);
+        factory.setEndpointName(portName);
+        factory.setAddress(ServerMisc.DOCLIT_CODEFIRST_URL_XMLBINDING);
+        DocLitWrappedCodeFirstService port = (DocLitWrappedCodeFirstService) factory.create();
+        assertNotNull(port);
+        assertEquals(factory.getBindingId(), "http://cxf.apache.org/bindings/xformat");
+        assertTrue(ClientProxy.getClient(port).getEndpoint().getBinding() instanceof XMLBinding);
+        
+        String echoMsg = port.echo("Hello");
+        assertEquals("Hello", echoMsg);
+    }
+    
     private void runDocLitTest(DocLitWrappedCodeFirstService port) throws Exception {
         assertEquals("snarf", port.doBug2692("snarf"));
         CXF2411Result<CXF2411SubClass> o = port.doCXF2411();
