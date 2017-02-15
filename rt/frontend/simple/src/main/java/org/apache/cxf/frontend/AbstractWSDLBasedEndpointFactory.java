@@ -108,8 +108,9 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         EndpointInfo ei = service.getEndpointInfo(endpointName);
 
         if (ei != null) {
-            if (transportId != null
-                && !ei.getTransportId().equals(transportId)) {
+            if ((transportId != null
+                && !ei.getTransportId().equals(transportId))
+                || (bindingId != null && !ei.getBinding().getBindingId().equals(bindingId))) {
                 ei = null;
             } else {
                 BindingFactoryManager bfm = getBus().getExtension(BindingFactoryManager.class);
@@ -148,6 +149,10 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
                     + endpointName + " in wsdl doesn't match " + transportId + ".");
                 BindingInfo bi = ei.getBinding();
                 ei = createEndpointInfo(bi);
+            } else if (bindingId != null && !ei.getBinding().getBindingId().equals(bindingId)) {
+                LOG.warning("Binding for endpoint/port "
+                    + endpointName + " in wsdl doesn't match " + bindingId + ".");
+                ei = createEndpointInfo(null);
             } else if (getAddress() != null) {
                 ei.setAddress(getAddress());
                 if (ei.getAddress().startsWith("camel")

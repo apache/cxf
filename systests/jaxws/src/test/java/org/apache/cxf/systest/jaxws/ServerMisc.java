@@ -65,6 +65,8 @@ public class ServerMisc extends AbstractBusTestServerBase {
         "http://localhost:" + PORT + "/DocLitWrappedCodeFirstServiceSettings/";
     public static final String CXF_5064_URL =
         "http://localhost:" + PORT + "/CXF5064/";
+    public static final String DOCLIT_CODEFIRST_URL_XMLBINDING = 
+        "http://localhost:" + PORT + "/XMLBindingCodeFirstService/";
 
 
     List<org.apache.cxf.endpoint.Server> servers = new LinkedList<org.apache.cxf.endpoint.Server>();
@@ -105,6 +107,16 @@ public class ServerMisc extends AbstractBusTestServerBase {
         factoryBean.setServiceClass(DocLitWrappedCodeFirstServiceImpl.class);
         factoryBean.setFeatures(Arrays.asList(new MetricsFeature()));
         factoryBean.setInvoker(invoker);
+        servers.add(factoryBean.create());
+        
+        factoryBean = new JaxWsServerFactoryBean();
+        factoryBean.setBus(b);
+        factoryBean.setAddress(DOCLIT_CODEFIRST_URL_XMLBINDING);
+        factoryBean.setServiceClass(DocLitWrappedCodeFirstServiceImpl.class);
+        factoryBean.setFeatures(Arrays.asList(new MetricsFeature()));
+        factoryBean.setInvoker(invoker);
+        factoryBean.setBindingId("http://cxf.apache.org/bindings/xformat");
+        factoryBean.setWsdlURL("cxf6866.wsdl");
         servers.add(factoryBean.create());
 
         factoryBean = new JaxWsServerFactoryBean();

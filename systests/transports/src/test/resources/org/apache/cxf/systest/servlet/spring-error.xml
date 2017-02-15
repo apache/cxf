@@ -27,6 +27,5 @@
         </property>
         <property name="address" value="/services/Greeter"/>
         <property name="bus" ref="cxf"/>
-        <property name="bindingId" value="http://apache.org/cxf/binding/http"/>
     </bean>
 </beans>
