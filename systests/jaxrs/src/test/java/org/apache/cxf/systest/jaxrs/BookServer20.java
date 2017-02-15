@@ -458,7 +458,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
             WebApplicationException {
             if (ri.getResourceClass() == BookStore.class) {
                 String serverRead = context.getHeaders().getFirst("ServerReaderInterceptor");
-                if (serverRead == null || !serverRead.equals("serverRead")) {
+                if (serverRead == null || !"serverRead".equals(serverRead)) {
                     throw new RuntimeException();
                 }
                 if (ui.getPath().endsWith("/async")) {

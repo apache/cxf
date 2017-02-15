@@ -174,7 +174,7 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
                                                                           String protocol) throws IOException {
         LOG.log(Level.FINE, "CREATING_NETTY_SERVER_ENGINE",  port);
         TLSServerParameters tlsServerParameters = null;
-        if (protocol.equals("https") && tlsServerParametersMap != null) {
+        if ("https".equals(protocol) && tlsServerParametersMap != null) {
             tlsServerParameters = tlsServerParametersMap.get(Integer.toString(port));
         }
         NettyHttpServerEngine ref = getOrCreate(this, host, port, tlsServerParameters);

@@ -210,7 +210,7 @@ public abstract class AbstractBPBeanDefinitionParser {
     }
 
     protected boolean isAttribute(String pre, String name) {
-        return !"xmlns".equals(name) && (pre == null || !pre.equals("xmlns"))
+        return !"xmlns".equals(name) && (pre == null || !"xmlns".equals(pre))
             && !"abstract".equals(name) && !"lazy-init".equals(name)
             && !"id".equals(name);
     }

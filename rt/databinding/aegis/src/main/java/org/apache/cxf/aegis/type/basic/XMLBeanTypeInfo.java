@@ -68,7 +68,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
 
         if (e != null) {
             String ignore = DOMUtils.getAttributeValueEmptyNull(e, "ignore");
-            if (ignore != null && ignore.equals("true")) {
+            if ("true".equals(ignore)) {
                 return;
             }
 
