@@ -180,7 +180,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             }
 
             ServerProviderFactory factory = setupFactory(ep);
-            injectContexts(factory);
+            
             ep.put(Application.class.getName(), appProvider);
             factory.setRequestPreprocessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
@@ -193,10 +193,13 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             }
             checkPrivateEndpoint(ep);
 
-            factory.applyDynamicFeatures(getServiceFactory().getClassResourceInfo());
             applyBusFeatures(getBus());
             applyFeatures();
 
+            injectContexts(factory);
+            factory.applyDynamicFeatures(getServiceFactory().getClassResourceInfo());
+            
+            
             getServiceFactory().sendEvent(FactoryBeanListener.Event.SERVER_CREATED,
                                           server,
                                           null,
