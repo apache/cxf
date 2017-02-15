@@ -91,7 +91,6 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
 
     // Sign an attachment without inlining
     @org.junit.Test
-    @org.junit.Ignore
     public void testSignedMTOMAction() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -194,7 +193,6 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
     // The difference between this test + the testAsymmetricBytesInAttachment test above is that
     // the SOAP Body already contains BASE-64 encoded content.
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricBinaryBytesInAttachment() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -221,7 +219,6 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricBinaryEncryptBeforeSigningBytesInAttachment() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -248,7 +245,6 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
     }
 
     @org.junit.Test
-    @org.junit.Ignore
     public void testSymmetricBinaryBytesInAttachment() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();

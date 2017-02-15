@@ -452,6 +452,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     encr.setCallbackLookup(callbackLookup);
                     encr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
                     encr.setStoreBytesInAttachment(storeBytesInAttachment);
+                    encr.setExpandXopInclude(isExpandXopInclude());
+                    encr.setWsDocInfo(wsDocInfo);
 
                     Crypto crypto = getEncryptionCrypto();
 
@@ -559,6 +561,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             dkEncr.setCallbackLookup(callbackLookup);
             dkEncr.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
             dkEncr.setStoreBytesInAttachment(storeBytesInAttachment);
+            dkEncr.setExpandXopInclude(isExpandXopInclude());
+            dkEncr.setWsDocInfo(wsDocInfo);
             if (recToken.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkEncr.setWscVersion(ConversationConstants.VERSION_05_02);
             }
@@ -643,6 +647,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             dkSign.setCallbackLookup(callbackLookup);
             dkSign.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
             dkSign.setStoreBytesInAttachment(storeBytesInAttachment);
+            dkSign.setExpandXopInclude(isExpandXopInclude());
+            dkSign.setWsDocInfo(wsDocInfo);
             if (wrapper.getToken().getVersion() == SPConstants.SPVersion.SP11) {
                 dkSign.setWscVersion(ConversationConstants.VERSION_05_02);
             }

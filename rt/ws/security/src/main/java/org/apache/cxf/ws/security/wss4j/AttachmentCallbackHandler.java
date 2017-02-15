@@ -34,6 +34,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.attachment.AttachmentDataSource;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Attachment;
+import org.apache.wss4j.common.ext.AttachmentRemovalCallback;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 
@@ -88,6 +89,24 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 }
                 attachments.add(securedAttachment);
 
+            } else if (callback instanceof AttachmentRemovalCallback) {
+                AttachmentRemovalCallback attachmentRemovalCallback = (AttachmentRemovalCallback) callback;
+                String attachmentId = attachmentRemovalCallback.getAttachmentId();
+                if (attachmentId != null) {
+                    final Collection<org.apache.cxf.message.Attachment> attachments = soapMessage.getAttachments();
+                    // Calling LazyAttachmentCollection.size() here to force it to load the attachments
+                    if (attachments != null && attachments.size() > 0) {
+                        for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator(); 
+                            iterator.hasNext();) {
+                            org.apache.cxf.message.Attachment attachment = iterator.next();
+
+                            if (attachmentId.equals(attachment.getId())) {
+                                iterator.remove();
+                                break;
+                            }
+                        }
+                    }
+                }
             } else {
                 throw new UnsupportedCallbackException(callback, "Unsupported callback");
             }

@@ -37,6 +37,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.wss4j.AttachmentCallbackHandler;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.bsp.BSPEnforcer;
@@ -366,6 +367,11 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
 
             dkSig.setSigCanonicalization(binding.getAlgorithmSuite().getC14n().getValue());
             dkSig.setSignatureAlgorithm(binding.getAlgorithmSuite().getSymmetricSignature());
+            dkSig.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+            dkSig.setStoreBytesInAttachment(storeBytesInAttachment);
+            dkSig.setExpandXopInclude(isExpandXopInclude());
+            dkSig.setWsDocInfo(wsDocInfo);
+            
             AlgorithmSuiteType algType = binding.getAlgorithmSuite().getAlgorithmSuiteType();
             dkSig.setDerivedKeyLength(algType.getSignatureDerivedKeyLength() / 8);
 
@@ -451,6 +457,11 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         WSSecDKSign dkSign = new WSSecDKSign(secHeader);
         dkSign.setIdAllocator(wssConfig.getIdAllocator());
         dkSign.setCallbackLookup(callbackLookup);
+        dkSign.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+        dkSign.setStoreBytesInAttachment(storeBytesInAttachment);
+        dkSign.setExpandXopInclude(isExpandXopInclude());
+        dkSign.setWsDocInfo(wsDocInfo);
+        
         AlgorithmSuite algorithmSuite = tbinding.getAlgorithmSuite();
 
         //Setting the AttachedReference or the UnattachedReference according to the flag
@@ -501,6 +512,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
         WSSecSignature sig = new WSSecSignature(secHeader);
         sig.setIdAllocator(wssConfig.getIdAllocator());
         sig.setCallbackLookup(callbackLookup);
+        sig.setAttachmentCallbackHandler(new AttachmentCallbackHandler(message));
+        sig.setStoreBytesInAttachment(storeBytesInAttachment);
+        sig.setExpandXopInclude(isExpandXopInclude());
+        sig.setWsDocInfo(wsDocInfo);
 
         //Setting the AttachedReference or the UnattachedReference according to the flag
         Element ref;

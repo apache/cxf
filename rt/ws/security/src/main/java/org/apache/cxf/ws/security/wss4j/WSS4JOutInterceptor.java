@@ -194,10 +194,12 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 reqData.setMsgContext(mc);
                 reqData.setAttachmentCallbackHandler(new AttachmentCallbackHandler(mc));
 
-                if (AttachmentUtil.isMtomEnabled(mc) && hasAttachments(mc)) {
-                    LOG.warning("MTOM is enabled with WS-Security. Please note that if an attachment is "
-                        + "referenced in the SOAP Body, only the reference will be signed and not the "
-                        + "SOAP Body!");
+                // Enable XOP Include unless the user has explicitly configured it
+                if (getString(WSHandlerConstants.EXPAND_XOP_INCLUDE, mc) == null) {
+                    reqData.setExpandXopInclude(AttachmentUtil.isMtomEnabled(mc));
+                }
+                if (getString(WSHandlerConstants.STORE_BYTES_IN_ATTACHMENT, mc) == null) {
+                    reqData.setStoreBytesInAttachment(AttachmentUtil.isMtomEnabled(mc));
                 }
 
                 /*
@@ -289,11 +291,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
 
         public void handleFault(SoapMessage message) {
             //nothing
-        }
-
-        private boolean hasAttachments(SoapMessage mc) {
-            final Collection<org.apache.cxf.message.Attachment> attachments = mc.getAttachments();
-            return attachments != null && !attachments.isEmpty();
         }
 
         private void configureActions(SoapMessage mc, boolean doDebug,
