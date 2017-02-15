@@ -50,7 +50,7 @@ public abstract class AbstractBeanValidationInterceptor extends AbstractValidati
     @Override
     protected void handleValidation(final Message message, final Object resourceInstance,
                                     final Method method, final List<Object> arguments) {
-        if (arguments.size() > 0) {
+        if (!arguments.isEmpty()) {
             BeanValidationProvider provider = getProvider(message);
             provider.validateParameters(resourceInstance, method, unwrapArgs(arguments).toArray());
             message.getExchange().put(BeanValidationProvider.class, provider);

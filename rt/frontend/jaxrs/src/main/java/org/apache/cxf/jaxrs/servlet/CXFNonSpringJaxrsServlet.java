@@ -211,7 +211,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 list.add(theLoc);
             }
         }
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             bean.setSchemaLocations(list);
         }
     }
@@ -250,7 +250,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
                 }
             }
         }
-        if (list.size() > 0) {
+        if (!list.isEmpty()) {
             if (OUT_INTERCEPTORS_PARAM.equals(paramName)) {
                 bean.setOutInterceptors(list);
             } else if (OUT_FAULT_INTERCEPTORS_PARAM.equals(paramName)) {

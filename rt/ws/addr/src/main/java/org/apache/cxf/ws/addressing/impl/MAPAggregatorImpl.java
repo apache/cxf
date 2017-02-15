@@ -525,7 +525,7 @@ public class MAPAggregatorImpl extends MAPAggregator {
                 if (aim == null || aim.size() == 0) {
                     missingWsaHeader = true;
                 }
-                if (aim != null && aim.size() > 0) {
+                if (aim != null && !aim.isEmpty()) {
                     missingWsaHeader = true;
                     QName[] types = new QName[] {
                         MetadataConstants.ADDRESSING_ASSERTION_QNAME,

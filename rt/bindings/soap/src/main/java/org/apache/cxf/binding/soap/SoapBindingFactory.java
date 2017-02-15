@@ -243,7 +243,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
             if (b.getInput() != null) {
                 List<String> bodyParts = null;
                 List<SoapHeaderInfo> headerInfos = b.getInput().getExtensors(SoapHeaderInfo.class);
-                if (headerInfos != null && headerInfos.size() > 0) {
+                if (headerInfos != null && !headerInfos.isEmpty()) {
                     bodyParts = new ArrayList<>();
                     for (MessagePartInfo part : b.getInput().getMessageParts()) {
                         bodyParts.add(part.getName().getLocalPart());
@@ -279,7 +279,7 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
             if (b.getOutput() != null) {
                 List<String> bodyParts = null;
                 List<SoapHeaderInfo> headerInfos = b.getOutput().getExtensors(SoapHeaderInfo.class);
-                if (headerInfos != null && headerInfos.size() > 0) {
+                if (headerInfos != null && !headerInfos.isEmpty()) {
                     bodyParts = new ArrayList<>();
                     for (MessagePartInfo part : b.getOutput().getMessageParts()) {
                         bodyParts.add(part.getName().getLocalPart());

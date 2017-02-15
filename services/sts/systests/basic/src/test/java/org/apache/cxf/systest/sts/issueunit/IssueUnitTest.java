@@ -165,7 +165,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
@@ -205,7 +205,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
@@ -244,7 +244,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));
@@ -283,7 +283,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertNotNull(confirmMethod);
@@ -343,7 +343,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));
@@ -380,7 +380,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));
@@ -447,7 +447,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(confirmMethod != null && confirmMethod.contains("bearer"));

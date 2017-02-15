@@ -62,7 +62,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
 
-        if (claims != null && claims.size() > 0) {
+        if (claims != null && !claims.isEmpty()) {
             ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
             for (Claim requestClaim : claims) {
                 ProcessedClaim claim = new ProcessedClaim();

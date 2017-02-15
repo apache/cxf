@@ -756,7 +756,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(200, wc.getResponse().getStatus());
         assertEquals(123L, book.getId());
         MultivaluedMap<String, Object> headers = wc.getResponse().getMetadata();
-        assertTrue(headers.size() > 0);
+        assertTrue(!headers.isEmpty());
         Object etag = headers.getFirst("ETag");
         assertNotNull(etag);
         assertTrue(etag.toString().startsWith("\""));

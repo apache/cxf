@@ -184,7 +184,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             features.add(new RespectBindingFeature(respectBinding.enabled()));
         }
 
-        if (features.size() > 0) {
+        if (!features.isEmpty()) {
             wsFeatures = features;
             if (setWsFeatures != null) {
                 wsFeatures.addAll(setWsFeatures);

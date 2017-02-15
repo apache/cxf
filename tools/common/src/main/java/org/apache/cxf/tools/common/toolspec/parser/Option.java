@@ -48,21 +48,21 @@ public class Option implements TokenConsumer {
         List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(element,
                                                                      Tool.TOOL_SPEC_PUBLIC_ID,
                                                                      "associatedArgument");
-        if (elemList != null && elemList.size() > 0) {
+        if (elemList != null && !elemList.isEmpty()) {
             argument = elemList.get(0);
         }
 
         elemList = DOMUtils.findAllElementsByTagNameNS(element,
                                                        Tool.TOOL_SPEC_PUBLIC_ID,
                                                        "annotation");
-        if (elemList != null && elemList.size() > 0) {
+        if (elemList != null && !elemList.isEmpty()) {
             annotation = elemList.get(0);
         }
 
         if (annotation == null && argument != null) {
             elemList = DOMUtils.findAllElementsByTagNameNS(argument, Tool.TOOL_SPEC_PUBLIC_ID, "annotation");
 
-            if (elemList != null && elemList.size() > 0) {
+            if (elemList != null && !elemList.isEmpty()) {
                 annotation = elemList.get(0);
             }
         }
@@ -165,7 +165,7 @@ public class Option implements TokenConsumer {
         //NodeList list = argument.getElementsByTagNameNS(Tool.TOOL_SPEC_PUBLIC_ID, "valuetype");
         String valuetypeStr = null;
 
-        if (list != null && list.size() > 0) {
+        if (list != null && !list.isEmpty()) {
             valueType = list.get(0);
             valuetypeStr = valueType.getFirstChild().getNodeValue();
 

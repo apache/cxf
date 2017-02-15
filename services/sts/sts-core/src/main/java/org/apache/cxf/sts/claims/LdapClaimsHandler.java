@@ -209,7 +209,7 @@ public class LdapClaimsHandler implements ClaimsHandler, RealmSupport {
                 for (String userBase : userBaseDNs) {
                     ldapAttributes = LdapUtils.getAttributesOfEntry(ldap, userBase, this.getObjectClass(), this
                         .getUserNameAttribute(), user, searchAttributes);
-                    if (ldapAttributes != null && ldapAttributes.size() > 0) {
+                    if (ldapAttributes != null && !ldapAttributes.isEmpty()) {
                         break; // User found
                     }
                 }

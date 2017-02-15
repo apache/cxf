@@ -103,7 +103,7 @@ public class JaxWsImplementorInfo {
         String namespace = null;
 
         // serviceName cannot be specified on SEI so check impl class only
-        if (wsAnnotations.size() > 0) {
+        if (!wsAnnotations.isEmpty()) {
             int offset = 1;
             if (seiClass == null) {
                 offset = 0;
@@ -148,7 +148,7 @@ public class JaxWsImplementorInfo {
         String name = null;
 
         // portName cannot be specified on SEI so check impl class only
-        if (wsAnnotations.size() > 0) {
+        if (!wsAnnotations.isEmpty()) {
             int offset = 1;
             if (seiClass == null) {
                 offset = 0;

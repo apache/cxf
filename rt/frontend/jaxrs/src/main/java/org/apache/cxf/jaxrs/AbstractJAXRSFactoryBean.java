@@ -345,7 +345,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     protected void setDataBindingProvider(ProviderFactory factory, Service s) {
 
         List<ClassResourceInfo> cris = serviceFactory.getRealClassResourceInfo();
-        if (getDataBinding() == null && cris.size() > 0) {
+        if (getDataBinding() == null && !cris.isEmpty()) {
             org.apache.cxf.annotations.DataBinding ann =
                 cris.get(0).getServiceClass().getAnnotation(org.apache.cxf.annotations.DataBinding.class);
             if (ann != null) {

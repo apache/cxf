@@ -79,7 +79,7 @@ public class MultipartBody {
     }
 
     public Attachment getRootAttachment() {
-        return atts.size() > 0 ? atts.get(0) : null;
+        return !atts.isEmpty() ? atts.get(0) : null;
     }
 
     public Attachment getAttachment(String contentId) {

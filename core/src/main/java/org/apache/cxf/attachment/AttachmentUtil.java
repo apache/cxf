@@ -350,13 +350,13 @@ public final class AttachmentUtil {
     }
 
     static String getHeaderValue(List<String> v) {
-        if (v != null && v.size() > 0) {
+        if (v != null && !v.isEmpty()) {
             return v.get(0);
         }
         return null;
     }
     static String getHeaderValue(List<String> v, String delim) {
-        if (v != null && v.size() > 0) {
+        if (v != null && !v.isEmpty()) {
             StringBuilder b = new StringBuilder();
             for (String s : v) {
                 if (b.length() > 0) {

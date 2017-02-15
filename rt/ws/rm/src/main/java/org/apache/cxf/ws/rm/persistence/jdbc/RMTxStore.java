@@ -905,7 +905,7 @@ public class RMTxStore implements RMStore {
                     newCols.add(col);
                 }
             }
-            if (newCols.size() > 0) {
+            if (!newCols.isEmpty()) {
                 // need to add the new columns
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.log(Level.FINE, "Table " + tableName + " needs additional columns");

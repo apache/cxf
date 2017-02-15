@@ -435,7 +435,7 @@ public class JettyHTTPServerEngine implements ServerEngine {
              * one to start, or it is now one containing only the single handler
              * that was there to begin with.
              */
-            if (handlers != null && handlers.size() > 0) {
+            if (handlers != null && !handlers.isEmpty()) {
                 for (Handler h : handlers) {
                     // Filtering out the jetty default handler
                     // which should not be added at this point.

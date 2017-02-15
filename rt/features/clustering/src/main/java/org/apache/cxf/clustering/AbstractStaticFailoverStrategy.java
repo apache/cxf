@@ -76,7 +76,7 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
      */
     public String selectAlternateAddress(List<String> alternates) {
         String selected = null;
-        if (alternates != null && alternates.size() > 0) {
+        if (alternates != null && !alternates.isEmpty()) {
             selected = getNextAlternate(alternates);
             Level level = getLogLevel();
             if (LOG.isLoggable(level)) {
@@ -108,7 +108,7 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
      */
     public Endpoint selectAlternateEndpoint(List<Endpoint> alternates) {
         Endpoint selected = null;
-        if (alternates != null && alternates.size() > 0) {
+        if (alternates != null && !alternates.isEmpty()) {
             selected = getNextAlternate(alternates);
             Level level = getLogLevel();
             if (LOG.isLoggable(level)) {

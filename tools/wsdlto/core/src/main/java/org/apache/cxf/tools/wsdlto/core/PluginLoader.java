@@ -56,8 +56,8 @@ import org.apache.cxf.tools.plugin.Generator;
 import org.apache.cxf.tools.plugin.Plugin;
 
 public final class PluginLoader {
-    private static final Logger LOG = LogUtils.getL7dLogger(PluginLoader.class);
     public static final String DEFAULT_PROVIDER_NAME = "cxf.apache.org";
+    public static final Logger LOG = LogUtils.getL7dLogger(PluginLoader.class);
     private static PluginLoader pluginLoader;
     private static final String PLUGIN_FILE_NAME = "META-INF/tools-plugin.xml";
 

@@ -412,7 +412,7 @@ public class WSDLServiceBuilder {
         DestinationFactory factory = null;
         EndpointInfo ei = null;
 
-        if (null != elements && elements.size() > 0) {
+        if (null != elements && !elements.isEmpty()) {
             for (ExtensibilityElement el : CastUtils.cast(elements, ExtensibilityElement.class)) {
                 ns = el.getElementType().getNamespaceURI();
                 try {
@@ -431,7 +431,7 @@ public class WSDLServiceBuilder {
 
         if (factory == null) { // get the transport id from bindingInfo
             elements = port.getBinding().getExtensibilityElements();
-            if (null != elements && elements.size() > 0) {
+            if (null != elements && !elements.isEmpty()) {
                 for (ExtensibilityElement el : CastUtils.cast(elements, ExtensibilityElement.class)) {
                     if (el instanceof SOAPBinding) {
                         ns = ((SOAPBinding)el).getTransportURI();

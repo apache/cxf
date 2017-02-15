@@ -163,6 +163,6 @@ public class ProcessorEnvironment {
     }
 
     public boolean isExcludeNamespaceEnabled() {
-        return excludeNamespacePackageMap.size() > 0;
+        return !excludeNamespacePackageMap.isEmpty();
     }
 }

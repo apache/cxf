@@ -88,7 +88,7 @@ public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
             if (openTag != null) {
                 writer.getEntityStream().write(StringUtils.toBytesUTF8(openTag));
             }
-            while (!completed || queue.size() > 0) {
+            while (!completed || !queue.isEmpty()) {
                 try {
                     T bean = queue.poll(pollTimeout, TimeUnit.MILLISECONDS);
                     if (bean != null) {

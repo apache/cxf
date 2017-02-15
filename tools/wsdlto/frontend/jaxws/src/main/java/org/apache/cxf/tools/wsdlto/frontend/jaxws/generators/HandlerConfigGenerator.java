@@ -75,7 +75,7 @@ public class HandlerConfigGenerator extends AbstractJAXWSGenerator {
         List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(e,
                                                                      ToolConstants.HANDLER_CHAINS_URI,
                                                                      ToolConstants.HANDLER_CHAIN);
-        if (elemList.size() > 0) {
+        if (!elemList.isEmpty()) {
             String fName = ProcessorUtil.getHandlerConfigFileName(this.intf.getName());
             handlerChainAnnotation = new JAnnotation(HandlerChain.class);
             handlerChainAnnotation.addElement(new JAnnotationElement("name",

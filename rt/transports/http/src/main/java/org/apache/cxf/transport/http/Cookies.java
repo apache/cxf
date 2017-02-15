@@ -51,7 +51,7 @@ public class Cookies {
         maintainSession = MessageUtils.getContextualBoolean(message, Message.MAINTAIN_SESSION, false);
 
         //If we have any cookies and we are maintaining sessions, then use them
-        if (maintainSession && sessionCookies.size() > 0) {
+        if (maintainSession && !sessionCookies.isEmpty()) {
             new Headers(message).writeSessionCookies(sessionCookies);
         }
     }

@@ -505,7 +505,7 @@ final class JMSMessageUtils {
 
         if (headers != null) {
             List<String> action = headers.remove("SOAPAction");
-            if (action != null && action.size() > 0) {
+            if (action != null && !action.isEmpty()) {
                 soapAction = action.get(0);
             }
         }

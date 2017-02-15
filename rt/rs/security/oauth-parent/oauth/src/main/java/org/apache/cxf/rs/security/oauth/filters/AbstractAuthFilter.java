@@ -187,7 +187,7 @@ public class AbstractAuthFilter {
             }
         }
 
-        if (permissions.size() > 0 && matchingPermissions.isEmpty()) {
+        if (!permissions.isEmpty() && matchingPermissions.isEmpty()) {
             String message = "Client has no valid permissions";
             LOG.warning(message);
             throw new OAuthProblemException(message);

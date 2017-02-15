@@ -386,7 +386,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             }
 
             List<PathSegment> segments = ui.getPathSegments();
-            if (segments.size() > 0) {
+            if (!segments.isEmpty()) {
                 doSetRequestParameters(request, segments.get(segments.size() - 1).getMatrixParameters());
             }
             doSetRequestParameters(request, ui.getQueryParameters());

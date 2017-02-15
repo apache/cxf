@@ -85,7 +85,7 @@ public final class LdapUtils {
 
         result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
             SearchControls.SUBTREE_SCOPE, searchAttributes, mapper);
-        if (result != null && result.size() > 0) {
+        if (result != null && !result.isEmpty()) {
             ldapAttributes = CastUtils.cast((Map<?, ?>)result.get(0));
         }
 
@@ -133,7 +133,7 @@ public final class LdapUtils {
 
         result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
             SearchControls.SUBTREE_SCOPE, searchAttributes, mapper);
-        if (result != null && result.size() > 0) {
+        if (result != null && !result.isEmpty()) {
             ldapAttributes = CastUtils.cast((List<?>)result);
         }
 
@@ -158,7 +158,7 @@ public final class LdapUtils {
         List<Name> result = ldapTemplate.search((baseDN == null) ? "" : baseDN, filter.toString(),
             SearchControls.SUBTREE_SCOPE, mapper);
 
-        if (result != null && result.size() > 0) {
+        if (result != null && !result.isEmpty()) {
             //not only the first one....
             return result.get(0);
         }

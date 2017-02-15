@@ -174,7 +174,7 @@ public class JDOMStreamReader extends AbstractDOMStreamReader<Element, Integer> 
 
     @Override
     protected void endElement() {
-        if (namespaceStack.size() > 0) {
+        if (!namespaceStack.isEmpty()) {
             prefix2decNs = namespaceStack.pop();
         }
     }

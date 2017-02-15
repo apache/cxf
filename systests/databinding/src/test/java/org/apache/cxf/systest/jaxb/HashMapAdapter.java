@@ -75,7 +75,7 @@ public class HashMapAdapter extends XmlAdapter<HashMapAdapter.HashMapType, Map<S
 
     public HashMapType marshal(Map<String, byte[]> arg0) throws Exception {
         HashMapType myHashMapType = new HashMapType();
-        if (arg0 != null && arg0.size() > 0) {
+        if (arg0 != null && !arg0.isEmpty()) {
             for (Map.Entry<String, byte[]> entry : arg0.entrySet()) {
                 if (entry != null) {
                     HashMapEntryType myHashEntryType = new HashMapEntryType();

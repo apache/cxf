@@ -554,7 +554,7 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
                 CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
 
             List<WSSecurityEngineResult> signedResults = new ArrayList<>();
-            if (handlerResults != null && handlerResults.size() > 0) {
+            if (handlerResults != null && !handlerResults.isEmpty()) {
                 WSHandlerResult handlerResult = handlerResults.get(0);
 
                 if (handlerResult.getActionResults().containsKey(WSConstants.SIGN)) {

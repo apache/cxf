@@ -364,7 +364,7 @@ public class CorbaObjectReader {
         Union unionType = (Union)unionHandler.getType();
         List<Unionbranch> branches = unionType.getUnionbranch();
         CorbaObjectHandler discriminator = unionHandler.getDiscriminator();
-        if (branches.size() > 0) {
+        if (!branches.isEmpty()) {
             String discLabel = null;
             if (discriminator.getTypeCodeKind().value() == TCKind._tk_enum) {
                 CorbaEnumHandler disc = (CorbaEnumHandler) discriminator;

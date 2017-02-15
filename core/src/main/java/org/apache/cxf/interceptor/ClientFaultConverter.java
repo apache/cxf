@@ -255,7 +255,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                 }
                 stackTraceList.add(parseStackTrackLine(oneLine));
             }
-            if (stackTraceList.size() > 0 || cause != null) {
+            if (!stackTraceList.isEmpty() || cause != null) {
                 Exception e = msg.getContent(Exception.class);
                 if (!stackTraceList.isEmpty()) {
                     StackTraceElement[] stackTraceElement = new StackTraceElement[stackTraceList.size()];

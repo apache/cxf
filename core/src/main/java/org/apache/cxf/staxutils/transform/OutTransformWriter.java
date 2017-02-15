@@ -399,7 +399,7 @@ public class OutTransformWriter extends DelegatingXMLStreamWriter {
 
     private boolean matchesDropped(boolean shallow) {
         return (dropDepth > 0 && dropDepth <= currentDepth)
-            || (shallow && (elementsStack.size() > 0 && dropElements.contains(elementsStack.get(0))));
+            || (shallow && (!elementsStack.isEmpty() && dropElements.contains(elementsStack.get(0))));
     }
 
 

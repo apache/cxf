@@ -138,7 +138,7 @@ public class WSDLToCorbaBinding {
         helper.setXMLSchemaList(xmlSchemaList);
 
         List<PortType> intfs = null;
-        if (interfaceNames.size() > 0) {
+        if (!interfaceNames.isEmpty()) {
             intfs = new ArrayList<>(interfaceNames.size());
 
             for (String interfaceName : interfaceNames) {

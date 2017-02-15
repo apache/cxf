@@ -47,7 +47,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
 
-        if (claims != null && claims.size() > 0) {
+        if (claims != null && !claims.isEmpty()) {
             ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
             List<Element> customContent = parameters.getTokenRequirements().getCustomContent();
             boolean foundContent = false;

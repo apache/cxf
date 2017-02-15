@@ -464,7 +464,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             }
 
             List<PathSegment> segments = ui.getPathSegments();
-            if (segments.size() > 0) {
+            if (!segments.isEmpty()) {
                 setTransformParameters(templ, segments.get(segments.size() - 1).getMatrixParameters());
             }
             setTransformParameters(templ, ui.getQueryParameters());

@@ -226,7 +226,7 @@ public class SCTSAMLTokenProvider implements TokenProvider {
     ) throws Exception {
         // Parse the AttributeStatements
         List<AttributeStatementBean> attrBeanList = null;
-        if (attributeStatementProviders != null && attributeStatementProviders.size() > 0) {
+        if (attributeStatementProviders != null && !attributeStatementProviders.isEmpty()) {
             attrBeanList = new ArrayList<>();
             for (AttributeStatementProvider statementProvider : attributeStatementProviders) {
                 AttributeStatementBean statementBean = statementProvider.getStatement(tokenParameters);

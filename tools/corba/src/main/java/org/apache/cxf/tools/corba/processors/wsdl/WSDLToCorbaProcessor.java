@@ -167,7 +167,7 @@ public class WSDLToCorbaProcessor extends WSDLToProcessor {
                 } else {
                     //try to get the binding name from the wsdlToCorbaBinding
                     java.util.List<String> bindingNames = wsdlToCorbaBinding.getGeneratedBindingNames();
-                    if ((bindingNames != null) && (bindingNames.size() > 0)) {
+                    if ((bindingNames != null) && (!bindingNames.isEmpty())) {
                         idlAction.setBindingName(bindingNames.get(0));
                         if (bindingNames.size() > 1) {
                             System.err.println("Warning: Generating idl only for the binding "

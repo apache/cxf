@@ -136,7 +136,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
             }
             LOG.fine("Completed purging redeliver candidates.");
         }
-        if (purged.size() > 0) {
+        if (!purged.isEmpty()) {
             RMStore store = manager.getStore();
             if (null != store) {
                 store.removeMessages(seq.getIdentifier(), purged, false);

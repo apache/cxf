@@ -147,7 +147,7 @@ public final class AttachmentUtils {
             }
         }
 
-        return infos.size() > 0 ? infos.get(0) : null;
+        return !infos.isEmpty() ? infos.get(0) : null;
     }
 
     public static List<Attachment> getMatchingAttachments(Multipart id,

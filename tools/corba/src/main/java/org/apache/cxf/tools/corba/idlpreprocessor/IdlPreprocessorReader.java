@@ -336,7 +336,7 @@ public final class IdlPreprocessorReader extends Reader {
             buf.append(LF);
         }
         try {
-            if (includeStack.size() > 0) {
+            if (!includeStack.isEmpty()) {
                 final IncludeStackEntry newTopEntry = includeStack.peek();
                 final LineNumberReader reader = getReader();
                 final int lineNumber = reader.getLineNumber();

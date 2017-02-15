@@ -213,7 +213,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
 
                 //Sign the message
                 //We should use the same key in the case of EncryptBeforeSig
-                if (sigParts.size() > 0) {
+                if (!sigParts.isEmpty()) {
                     addSig(this.doSignature(sigParts, encryptionWrapper, encryptionToken,
                                                     tok, attached));
                 }
@@ -224,7 +224,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
 
                 //Check for signature protection and encryption of UsernameToken
                 if (sbinding.isEncryptSignature()
-                    || encryptedTokensList.size() > 0 && isRequestor()) {
+                    || !encryptedTokensList.isEmpty() && isRequestor()) {
                     List<WSEncryptionPart> secondEncrParts = new ArrayList<>();
 
                     //Now encrypt the signature using the above token
@@ -509,7 +509,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                                    List<WSEncryptionPart> encrParts,
                                    boolean atEnd) {
         //Do encryption
-        if (recToken != null && recToken.getToken() != null && encrParts.size() > 0) {
+        if (recToken != null && recToken.getToken() != null && !encrParts.isEmpty()) {
             AbstractToken encrToken = recToken.getToken();
             assertPolicy(recToken);
             assertPolicy(encrToken);

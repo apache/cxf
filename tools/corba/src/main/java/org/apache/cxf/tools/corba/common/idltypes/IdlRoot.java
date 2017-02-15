@@ -80,7 +80,7 @@ public final class IdlRoot extends IdlScopeBase {
             pw.println("#include " + s);
         }
 
-        if (includeList.size() > 0) {
+        if (!includeList.isEmpty()) {
             pw.println();
         }
 

@@ -121,7 +121,7 @@ public class CommandLineParser {
             LOG.fine("Found " + usageForms.size()
                       + " alternative forms of usage, will use default form");
         }
-        if (usageForms.size() > 0) {
+        if (!usageForms.isEmpty()) {
             ErrorVisitor errors = new ErrorVisitor();
 
             for (Element elem : usageForms) {
@@ -333,7 +333,7 @@ public class CommandLineParser {
                                                                      "annotation");
 
 
-        if ((annotations != null) && (annotations.size() > 0)) {
+        if ((annotations != null) && (!annotations.isEmpty())) {
             result = annotations.get(0).getFirstChild().getNodeValue();
         }
         return result;

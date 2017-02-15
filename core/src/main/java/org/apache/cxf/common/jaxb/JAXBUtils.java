@@ -92,6 +92,8 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
 
 public final class JAXBUtils {
+    public static final String JAXB_URI = "http://java.sun.com/xml/ns/jaxb";
+
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
 
     public enum IdentifierType {
@@ -102,9 +104,6 @@ public final class JAXBUtils {
         VARIABLE,
         CONSTANT
     };
-
-    public static final String JAXB_URI = "http://java.sun.com/xml/ns/jaxb";
-
 
     private static final char[] XML_NAME_PUNCTUATION_CHARS = new char[] {
         /* hyphen                       */ '\u002D',

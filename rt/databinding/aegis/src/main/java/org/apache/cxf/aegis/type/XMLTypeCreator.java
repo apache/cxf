@@ -350,7 +350,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         List<Element> mappings = findMappings(info.getType());
         Class<?> relatedClass = TypeUtil.getTypeRelatedClass(info.getType());
 
-        if (mapping != null || mappings.size() > 0) {
+        if (mapping != null || !mappings.isEmpty()) {
             String typeNameAtt = null;
             if (mapping != null) {
                 typeNameAtt = DOMUtils.getAttributeValueEmptyNull(mapping, "name");

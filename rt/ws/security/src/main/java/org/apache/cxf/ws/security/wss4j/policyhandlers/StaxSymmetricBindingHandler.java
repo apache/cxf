@@ -227,7 +227,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
 
             addSupportingTokens();
 
-            if (encryptionToken != null && encrParts.size() > 0) {
+            if (encryptionToken != null && !encrParts.isEmpty()) {
                 if (isRequestor()) {
                     encrParts.addAll(encryptedTokensList);
                 }
@@ -255,7 +255,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
             }
             sigParts.addAll(this.getSignedParts());
 
-            if (sigParts.size() > 0) {
+            if (!sigParts.isEmpty()) {
                 AbstractTokenWrapper sigAbstractTokenWrapper = getSignatureToken();
                 if (sigAbstractTokenWrapper != null) {
                     AbstractToken sigToken = sigAbstractTokenWrapper.getToken();

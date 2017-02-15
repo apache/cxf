@@ -302,7 +302,7 @@ public final class WSDLParameter {
 
     private void processReturnParams(List<ParamType> outputs, List<ArgType> returns) {
 
-        if (outputs.size() > 0) {
+        if (!outputs.isEmpty()) {
             ParamType d2 = outputs.get(0);
 
             if (d2.getMode().value().equals("out")) {

@@ -52,7 +52,7 @@ public final class ValidationResult {
     }
 
     public boolean hasWarnings() {
-        return warnings.size() > 0;
+        return !warnings.isEmpty();
     }
 
     public boolean isSuccessful() {
@@ -66,14 +66,14 @@ public final class ValidationResult {
         sb.append(errors.size());
         sb.append(", Warnings: ");
         sb.append(warnings.size());
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             sb.append("\n\n <<< ERROR! \n");
             while (!errors.empty()) {
                 sb.append(errors.pop());
                 sb.append("\n");
             }
         }
-        if (warnings.size() > 0) {
+        if (!warnings.isEmpty()) {
             sb.append("\n <<< WARNING! \n");
             while (!warnings.empty()) {
                 sb.append(warnings.pop());

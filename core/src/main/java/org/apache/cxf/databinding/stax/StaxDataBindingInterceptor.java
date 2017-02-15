@@ -77,7 +77,7 @@ public class StaxDataBindingInterceptor extends AbstractInDatabindingInterceptor
         }
 
 
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             message.setContent(List.class, parameters);
         }
     }

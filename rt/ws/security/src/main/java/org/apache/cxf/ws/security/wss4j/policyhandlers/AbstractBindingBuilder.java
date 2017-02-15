@@ -2182,7 +2182,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         // prepare a SignatureConfirmation token
         WSSecSignatureConfirmation wsc = new WSSecSignatureConfirmation(secHeader);
         wsc.setIdAllocator(wssConfig.getIdAllocator());
-        if (signatureActions.size() > 0) {
+        if (!signatureActions.isEmpty()) {
             for (WSSecurityEngineResult wsr : signatureActions) {
                 byte[] sigVal = (byte[]) wsr.get(WSSecurityEngineResult.TAG_SIGNATURE_VALUE);
                 wsc.setSignatureValue(sigVal);

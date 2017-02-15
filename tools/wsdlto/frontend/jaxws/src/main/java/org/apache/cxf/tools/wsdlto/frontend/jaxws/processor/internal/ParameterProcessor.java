@@ -601,7 +601,7 @@ public class ParameterProcessor extends AbstractProcessor {
 
             if (inputMessage != null) {
                 List<MessagePartInfo> inputParts = inputMessage.getMessageParts();
-                MessagePartInfo inputPart = inputParts.size() > 0 ? inputParts.iterator().next() : null;
+                MessagePartInfo inputPart = !inputParts.isEmpty() ? inputParts.iterator().next() : null;
                 List<QName> inputWrapElement = null;
                 if (inputPart != null && inputPart.isElement()) {
                     inputWrapElement = ProcessorUtil.getWrappedElementQNames(context,
@@ -620,7 +620,7 @@ public class ParameterProcessor extends AbstractProcessor {
             }
             if (outputMessage != null) {
                 List<MessagePartInfo> outputParts = outputMessage.getMessageParts();
-                MessagePartInfo outputPart = outputParts.size() > 0 ? outputParts.iterator().next() : null;
+                MessagePartInfo outputPart = !outputParts.isEmpty() ? outputParts.iterator().next() : null;
                 List<QName> outputWrapElement = null;
                 if (outputPart != null && outputPart.isElement()) {
                     outputWrapElement = ProcessorUtil.getWrappedElementQNames(context,

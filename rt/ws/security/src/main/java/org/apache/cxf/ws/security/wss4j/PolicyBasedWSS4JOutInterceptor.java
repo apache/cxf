@@ -205,7 +205,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
 
         private boolean hasAttachments(SoapMessage mc) {
             final Collection<org.apache.cxf.message.Attachment> attachments = mc.getAttachments();
-            return attachments != null && attachments.size() > 0;
+            return attachments != null && !attachments.isEmpty();
         }
 
         public Set<String> getAfter() {

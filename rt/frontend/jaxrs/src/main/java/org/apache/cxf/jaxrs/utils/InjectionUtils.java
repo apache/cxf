@@ -610,7 +610,7 @@ public final class InjectionUtils {
             value.put(memberKey, entry.getValue());
         }
 
-        if (parsedValues.size() > 0) {
+        if (!parsedValues.isEmpty()) {
             for (Map.Entry<String, MultivaluedMap<String, String>> entry : parsedValues.entrySet()) {
                 String memberKey = entry.getKey();
 
@@ -999,7 +999,7 @@ public final class InjectionUtils {
                                                 paramValuesMap, false, decoded, pathParam, message);
         } else {
             String result = null;
-            if (paramValues.size() > 0) {
+            if (!paramValues.isEmpty()) {
                 boolean isLast = pathParam == ParameterType.PATH ? true : false;
                 result = isLast ? paramValues.get(paramValues.size() - 1)
                                 : paramValues.get(0);

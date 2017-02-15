@@ -75,7 +75,7 @@ public class RealmSupportClaimsHandler implements ClaimsHandler, RealmSupport {
                     + "' not in supportedRealm list: " + supportedRealms);
         }
 
-        if (claims != null && claims.size() > 0) {
+        if (claims != null && !claims.isEmpty()) {
             ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
             for (Claim requestClaim : claims) {
                 if (getSupportedClaimTypes().indexOf(requestClaim.getClaimType()) != -1) {

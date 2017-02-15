@@ -78,11 +78,11 @@ public class VariantListBuilderImpl extends VariantListBuilder {
     }
 
     private void addVariants() {
-        if (mediaTypes.size() > 0) {
+        if (!mediaTypes.isEmpty()) {
             handleMediaTypes();
-        } else if (languages.size() > 0) {
+        } else if (!languages.isEmpty()) {
             handleLanguages(null);
-        } else if (encodings.size() > 0) {
+        } else if (!encodings.isEmpty()) {
             for (String enc : encodings) {
                 variants.add(new Variant(null, (Locale)null, enc));
             }
@@ -91,9 +91,9 @@ public class VariantListBuilderImpl extends VariantListBuilder {
 
     private void handleMediaTypes() {
         for (MediaType type : mediaTypes) {
-            if (languages.size() > 0) {
+            if (!languages.isEmpty()) {
                 handleLanguages(type);
-            } else if (encodings.size() > 0) {
+            } else if (!encodings.isEmpty()) {
                 for (String enc : encodings) {
                     variants.add(new Variant(type, (Locale)null, enc));
                 }
@@ -105,7 +105,7 @@ public class VariantListBuilderImpl extends VariantListBuilder {
 
     private void handleLanguages(MediaType type) {
         for (Locale lang : languages) {
-            if (encodings.size() > 0) {
+            if (!encodings.isEmpty()) {
                 for (String enc : encodings) {
                     variants.add(new Variant(type, lang, enc));
                 }

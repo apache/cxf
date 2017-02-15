@@ -60,7 +60,7 @@ public class SequenceMonitor {
     }
 
     public synchronized long getLastArrivalTime() {
-        if (receiveTimes.size() > 0) {
+        if (!receiveTimes.isEmpty()) {
             return receiveTimes.get(receiveTimes.size() - 1).longValue();
         }
         return 0;

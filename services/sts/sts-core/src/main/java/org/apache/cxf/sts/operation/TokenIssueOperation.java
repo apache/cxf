@@ -383,7 +383,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
             CastUtils.cast((List<?>) messageContext.get(WSHandlerConstants.RECV_RESULTS));
 
         // Try DOM results first
-        if (handlerResults != null && handlerResults.size() > 0) {
+        if (handlerResults != null && !handlerResults.isEmpty()) {
             WSHandlerResult handlerResult = handlerResults.get(0);
             List<WSSecurityEngineResult> engineResults = handlerResult.getResults();
 

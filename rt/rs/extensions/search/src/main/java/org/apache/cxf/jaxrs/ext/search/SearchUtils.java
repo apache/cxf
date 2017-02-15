@@ -145,7 +145,7 @@ public final class SearchUtils {
                                      String tableAlias,
                                      List<String> columns) {
         sb.append("SELECT ");
-        if (columns != null && columns.size() > 0) {
+        if (columns != null && !columns.isEmpty()) {
             for (int i = 0; i < columns.size(); i++) {
                 sb.append(columns.get(i));
                 if (i + 1 < columns.size()) {

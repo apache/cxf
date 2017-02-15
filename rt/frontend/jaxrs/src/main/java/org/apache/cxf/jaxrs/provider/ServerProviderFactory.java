@@ -357,7 +357,7 @@ public final class ServerProviderFactory extends ProviderFactory {
     }
 
     public void applyDynamicFeatures(List<ClassResourceInfo> list) {
-        if (dynamicFeatures.size() > 0) {
+        if (!dynamicFeatures.isEmpty()) {
             for (ClassResourceInfo cri : list) {
                 doApplyDynamicFeatures(cri);
             }

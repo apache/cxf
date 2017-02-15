@@ -167,7 +167,7 @@ public class ToolSpec {
         List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                                      Tool.TOOL_SPEC_PUBLIC_ID,
                                                                      "streams");
-        if (elemList.size() > 0) {
+        if (!elemList.isEmpty()) {
             return elemList.get(0);
         } else {
             return null;
@@ -223,7 +223,7 @@ public class ToolSpec {
         List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                             Tool.TOOL_SPEC_PUBLIC_ID,
                                             "pipeline");
-        if (elemList.size() > 0) {
+        if (!elemList.isEmpty()) {
             return elemList.get(0);
         } else {
             return null;
@@ -283,7 +283,7 @@ public class ToolSpec {
                     DOMUtils.findAllElementsByTagNameNS(el,
                                                         "http://cxf.apache.org/Xpipe/ToolSpecification",
                                                         "associatedArgument");
-                if (elemList.size() > 0) {
+                if (!elemList.isEmpty()) {
                     Element assArg = elemList.get(0);
                     if (assArg.hasAttribute("default")) {
                         return assArg.getAttribute("default");

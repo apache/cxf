@@ -199,7 +199,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }
             LOG.fine("Completed purging resend candidates.");
         }
-        if (purged.size() > 0) {
+        if (!purged.isEmpty()) {
             RMStore store = manager.getStore();
             if (null != store) {
                 store.removeMessages(sid, purged, true);

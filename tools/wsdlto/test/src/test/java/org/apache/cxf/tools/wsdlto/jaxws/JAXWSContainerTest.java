@@ -226,7 +226,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
         JAXWSContainer container = new JAXWSContainer(null);
         List<ServiceValidator> validators = container.getServiceValidators();
         assertNotNull(validators);
-        assertTrue(validators.size() > 0);
+        assertTrue(!validators.isEmpty());
     }
 
     protected String getLocation(String wsdlFile) throws URISyntaxException {

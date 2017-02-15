@@ -209,7 +209,7 @@ public final class JAXRSUtils {
                 types = ((AbstractConfigurableProvider)provider).getProduceMediaTypes();
             }
             if (types != null) {
-                values = types.size() > 0 ? types.toArray(new String[types.size()])
+                values = !types.isEmpty() ? types.toArray(new String[types.size()])
                                            : new String[]{"*/*"};
             }
         }
@@ -906,7 +906,7 @@ public final class JAXRSUtils {
                                              boolean decode) {
         List<PathSegment> segments = JAXRSUtils.getPathSegments(
                                       (String)m.get(Message.REQUEST_URI), decode);
-        if (segments.size() > 0) {
+        if (!segments.isEmpty()) {
             MultivaluedMap<String, String> params = new MetadataMap<String, String>();
             for (PathSegment ps : segments) {
                 MultivaluedMap<String, String> matrix = ps.getMatrixParameters();

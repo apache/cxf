@@ -33,11 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.resource.ObjectTypeResolver;
@@ -46,9 +44,6 @@ import org.apache.cxf.resource.ResourceResolver;
 import org.apache.cxf.resource.SinglePropertyResolver;
 
 public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLocator {
-    private static final Logger LOG = LogUtils.getL7dLogger(ExtensionManagerImpl.class);
-
-
     public static final String EXTENSIONMANAGER_PROPERTY_NAME = "extensionManager";
     public static final String ACTIVATION_NAMESPACES_PROPERTY_NAME = "activationNamespaces";
     public static final String ACTIVATION_NAMESPACES_SETTER_METHOD_NAME = "setActivationNamespaces";

@@ -202,10 +202,10 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
                     }
                 }
             }
-            if (acks.size() > 0) {
+            if (!acks.isEmpty()) {
                 rmps.setAcks(acks);
             }
-            if (requested.size() > 0) {
+            if (!requested.isEmpty()) {
                 rmps.setAcksRequested(requested);
             }
         } catch (JAXBException ex) {

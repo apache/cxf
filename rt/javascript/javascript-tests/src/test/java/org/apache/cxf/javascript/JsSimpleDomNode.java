@@ -83,7 +83,7 @@ public class JsSimpleDomNode extends ScriptableObject {
 
     public Object jsGet_firstChild() {
         establishChildren();
-        if (children.size() > 0)
+        if (!children.isEmpty())
             return children.get(0);
         else
             return null;

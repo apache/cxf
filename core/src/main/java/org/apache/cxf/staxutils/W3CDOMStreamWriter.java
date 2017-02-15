@@ -183,7 +183,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeEndElement() throws XMLStreamException {
-        if (stack.size() > 0) {
+        if (!stack.isEmpty()) {
             currentNode = stack.pop();
         } else {
             currentNode = null;

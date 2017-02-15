@@ -570,7 +570,7 @@ public abstract class HTTPConduit
             return true;
         } else if (!HTTP_GET_METHOD.equals(httpMethod)) {
             MessageContentsList objs = MessageContentsList.getContentsList(message);
-            if (objs != null && objs.size() > 0) {
+            if (objs != null && !objs.isEmpty()) {
                 Object obj = objs.get(0);
                 if (obj.getClass() != String.class
                     || (obj.getClass() == String.class && ((String)obj).length() > 0)) {
@@ -997,7 +997,7 @@ public abstract class HTTPConduit
         for (Map.Entry<String, List<String>> head : headers.entrySet()) {
             if ("Location".equalsIgnoreCase(head.getKey())) {
                 List<String> locs = head.getValue();
-                if (locs != null && locs.size() > 0) {
+                if (locs != null && !locs.isEmpty()) {
                     String location = locs.get(0);
                     if (location != null) {
                         return location;

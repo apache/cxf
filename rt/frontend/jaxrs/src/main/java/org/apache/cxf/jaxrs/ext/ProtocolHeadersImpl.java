@@ -42,7 +42,7 @@ public class ProtocolHeadersImpl implements ProtocolHeaders {
 
     public String getRequestHeaderValue(String name) {
         List<String> values = getRequestHeader(name);
-        return values.size() > 0 ? values.get(0) : null;
+        return !values.isEmpty() ? values.get(0) : null;
     }
 
     public MultivaluedMap<String, String> getRequestHeaders() {

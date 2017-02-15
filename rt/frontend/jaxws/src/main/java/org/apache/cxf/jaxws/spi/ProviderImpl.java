@@ -278,7 +278,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             if (wsdlDocumentLocation != null
                 || interfaceName != null
                 || serviceName != null
-                || (metadata != null && metadata.size() > 0)) {
+                || (metadata != null && !metadata.isEmpty())) {
 
 
                 writer.writeStartElement(JAXWSAConstants.WSA_PREFIX, JAXWSAConstants.WSA_METADATA_NAME,

@@ -326,7 +326,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
 
         WSSecBase encrBase = null;
-        if (encryptionToken != null && encrParts.size() > 0) {
+        if (encryptionToken != null && !encrParts.isEmpty()) {
             encrBase = doEncryption(wrapper, encrParts, true);
             handleEncryptedSignedHeaders(encrParts, sigParts);
         }
@@ -336,7 +336,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         }
 
         try {
-            if (sigParts.size() > 0) {
+            if (!sigParts.isEmpty()) {
                 if (initiatorWrapper != null && isRequestor()) {
                     doSignature(initiatorWrapper, sigParts, attached);
                 } else if (!isRequestor()) {
@@ -437,7 +437,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                                     List<WSEncryptionPart> encrParts,
                                     boolean externalRef) {
         //Do encryption
-        if (recToken != null && recToken.getToken() != null && encrParts.size() > 0) {
+        if (recToken != null && recToken.getToken() != null && !encrParts.isEmpty()) {
             AbstractToken encrToken = recToken.getToken();
             assertPolicy(recToken);
             assertPolicy(encrToken);

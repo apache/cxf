@@ -77,7 +77,7 @@ public class STSUnitTest extends BasicSTSIntegrationTest {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         Assert.assertTrue(confirmMethod.contains("bearer"));

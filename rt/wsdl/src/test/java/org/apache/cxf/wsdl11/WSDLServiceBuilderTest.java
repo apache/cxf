@@ -160,7 +160,7 @@ public class WSDLServiceBuilderTest extends Assert {
 
         control.replay();
         serviceInfos = wsdlServiceBuilder.buildServices(def, service, endpointName);
-        if (serviceInfos.size() > 0) {
+        if (!serviceInfos.isEmpty()) {
             serviceInfo = serviceInfos.get(0);
         } else {
             serviceInfo = null;

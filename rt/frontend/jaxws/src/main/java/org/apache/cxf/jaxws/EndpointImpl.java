@@ -451,7 +451,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                 if (executor != null) {
                     serverFactory.getServiceFactory().setExecutor(executor);
                 }
-                if (handlers.size() > 0) {
+                if (!handlers.isEmpty()) {
                     serverFactory.addHandlers(handlers);
                 }
 

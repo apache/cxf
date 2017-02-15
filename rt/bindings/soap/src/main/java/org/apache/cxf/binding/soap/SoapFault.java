@@ -104,7 +104,7 @@ public class SoapFault extends Fault {
     }
 
     private QName getRootSubCode() {
-        return subCodes != null && subCodes.size() > 0 ? subCodes.get(0) : null;
+        return subCodes != null && !subCodes.isEmpty() ? subCodes.get(0) : null;
     }
 
     private void setRootSubCode(QName subCode) {

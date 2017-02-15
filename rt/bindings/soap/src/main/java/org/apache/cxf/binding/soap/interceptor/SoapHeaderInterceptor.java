@@ -160,7 +160,7 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
                 parameters.put(mpi, object);
             }
         }
-        if (parameters.size() > 0) {
+        if (!parameters.isEmpty()) {
             message.setContent(List.class, parameters);
         }
     }

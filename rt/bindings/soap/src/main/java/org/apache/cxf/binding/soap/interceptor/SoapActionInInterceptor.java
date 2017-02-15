@@ -65,7 +65,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                 = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
             if (headers != null) {
                 List<String> sa = headers.get(SoapBindingConstants.SOAP_ACTION);
-                if (sa != null && sa.size() > 0) {
+                if (sa != null && !sa.isEmpty()) {
                     String action = sa.get(0);
                     if (action.startsWith("\"")) {
                         action = action.substring(1, action.length() - 1);
@@ -86,7 +86,7 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                 // but skip searching if the start-info property is set
                 List<String> cts = CastUtils.cast((List<?>)(((Map<?, ?>)
                     message.get(AttachmentDeserializer.ATTACHMENT_PART_HEADERS)).get(Message.CONTENT_TYPE)));
-                if (cts != null && cts.size() > 0) {
+                if (cts != null && !cts.isEmpty()) {
                     ct = cts.get(0);
                     start = ct.indexOf("action=");
                 }

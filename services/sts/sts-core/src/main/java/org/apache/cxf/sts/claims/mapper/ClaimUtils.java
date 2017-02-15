@@ -225,7 +225,7 @@ public class ClaimUtils {
             ProcessedClaim c = get(processedClaims, sc);
             if (c != null) {
                 List<Object> values = c.getValues();
-                if (values != null && values.size() > 0) {
+                if (values != null && !values.isEmpty()) {
                     if (mergedProcessedClaim == null) {
                         // First match TODO refactor for better method override
                         mergedProcessedClaim = c.clone();

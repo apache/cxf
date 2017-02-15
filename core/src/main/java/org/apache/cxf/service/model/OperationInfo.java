@@ -189,7 +189,7 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
     }
 
     public boolean hasFaults() {
-        return faults != null && faults.size() > 0;
+        return faults != null && !faults.isEmpty();
     }
 
     /**

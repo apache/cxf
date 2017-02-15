@@ -197,7 +197,7 @@ public final class SchemaUtil {
         }
 
         Map<String, List<?>> imports = CastUtils.cast(schema.getImports());
-        if (imports != null && imports.size() > 0) {
+        if (imports != null && !imports.isEmpty()) {
             for (Map.Entry<String, List<?>> entry : imports.entrySet()) {
                 String importNamespace = entry.getKey();
                 List<SchemaImport> schemaImports = CastUtils.cast(entry.getValue());

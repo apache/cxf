@@ -1148,7 +1148,7 @@ public class SourceGenerator {
         if (!suspendedAsync && !responseRequired && responseEls.size() == 1 && generateResponseIfHeadersSet) {
             List<Element> outResponseParamElements =
                 getParameters(responseEls.get(0), Collections.<Element>emptyList(), false);
-            if (outResponseParamElements.size() > 0) {
+            if (!outResponseParamElements.isEmpty()) {
                 writeJaxrResponse(sbCode, imports);
                 return true;
             }
@@ -1268,7 +1268,7 @@ public class SourceGenerator {
             if (generateEnums) {
                 List<Element> options =
                     DOMUtils.findAllElementsByTagNameNS(paramEl, getWadlNamespace(), "option");
-                if (options.size() > 0) {
+                if (!options.isEmpty()) {
                     generateEnumClass(getTypicalClassName(name), options, info.getSrcDir(), classPackage);
                     enumCreated = true;
                 }
@@ -1353,7 +1353,7 @@ public class SourceGenerator {
             elementParamName = !multipart ? "map" : "body";
         }
         if (elementParamType != null) {
-            if (inParamEls.size() > 0) {
+            if (!inParamEls.isEmpty()) {
                 sbCode.append(", ");
             }
             if (writeBeanValidation) {
@@ -1367,7 +1367,7 @@ public class SourceGenerator {
             writeMethodParamDocs(repElement, elementParamName, sbMethodDocs);
         }
         if (suspendedAsync) {
-            if (inParamEls.size() > 0 || elementParamType != null) {
+            if (!inParamEls.isEmpty() || elementParamType != null) {
                 sbCode.append(", ");
             }
             if (writeAnnotations) {
@@ -1883,7 +1883,7 @@ public class SourceGenerator {
         compiler.setErrorListener(elForRun);
         compiler.setEntityResolver(OASISCatalogManager.getCatalogManager(bus)
                                        .getEntityResolver());
-        if (compilerArgs.size() > 0) {
+        if (!compilerArgs.isEmpty()) {
             compiler.getOptions().addGrammar(new InputSource("null"));
             compiler.getOptions().parseArguments(compilerArgs.toArray(new String[compilerArgs.size()]));
         }

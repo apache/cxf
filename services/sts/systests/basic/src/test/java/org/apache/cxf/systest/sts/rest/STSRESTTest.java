@@ -206,7 +206,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
@@ -248,7 +248,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
@@ -290,7 +290,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
@@ -332,7 +332,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(OpenSAMLUtil.isMethodHolderOfKey(confirmMethod));
@@ -374,7 +374,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(confirmMethod.contains("bearer"));
@@ -414,7 +414,7 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
 
         List<String> methods = assertion.getConfirmationMethods();
         String confirmMethod = null;
-        if (methods != null && methods.size() > 0) {
+        if (methods != null && !methods.isEmpty()) {
             confirmMethod = methods.get(0);
         }
         assertTrue(confirmMethod.contains("bearer"));

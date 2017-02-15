@@ -246,7 +246,7 @@ public class ToolContext {
     }
 
     public boolean isExcludeNamespaceEnabled() {
-        return excludeNamespacePackageMap.size() > 0;
+        return !excludeNamespacePackageMap.isEmpty();
     }
 
     public List<String> getExcludePkgList() {

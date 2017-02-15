@@ -96,7 +96,7 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
             // parser the engine list
             List<Object> list =
                 getRequiredElementsList(element, ctx, new QName(HTTP_JETTY_NS, "engine"), bean);
-            if (list.size() > 0) {
+            if (!list.isEmpty()) {
                 bean.addPropertyValue("enginesList", list);
             }
         } catch (Exception e) {

@@ -872,7 +872,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                                                XmlJavaTypeAdapter adapter) throws JAXBException {
             List<?> theList = getList();
             boolean adapterChecked = false;
-            if (theList.size() > 0) {
+            if (!theList.isEmpty()) {
                 Object first = theList.get(0);
 
                 if (first instanceof Element) {

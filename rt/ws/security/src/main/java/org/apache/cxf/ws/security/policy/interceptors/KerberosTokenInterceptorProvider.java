@@ -173,7 +173,7 @@ public class KerberosTokenInterceptorProvider extends AbstractPolicyInterceptorP
                 if (!isRequestor(message)) {
                     List<WSHandlerResult> results =
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
-                    if (results != null && results.size() > 0) {
+                    if (results != null && !results.isEmpty()) {
                         parseHandlerResults(results.get(0), message, aim, ais);
                     }
                 } else {

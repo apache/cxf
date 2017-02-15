@@ -173,7 +173,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                     assertTokenWrapper(recipientSignatureToken);
                     assertToken(recipientSignatureToken.getToken());
                 }
-                if (recipientSignatureToken != null && sigs.size() > 0) {
+                if (recipientSignatureToken != null && !sigs.isEmpty()) {
                     doSignature(recipientSignatureToken, sigs);
                 }
             }
@@ -289,7 +289,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
 
             addSupportingTokens();
 
-            if (encryptionToken != null && encrParts.size() > 0) {
+            if (encryptionToken != null && !encrParts.isEmpty()) {
                 if (isRequestor()) {
                     encrParts.addAll(encryptedTokensList);
                 } else {
@@ -319,7 +319,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                 sigParts.add(part);
             }
 
-            if (sigParts.size() > 0) {
+            if (!sigParts.isEmpty()) {
                 if (initiatorWrapper != null && isRequestor()) {
                     doSignature(initiatorWrapper, sigParts);
                 } else if (!isRequestor()) {
@@ -350,7 +350,7 @@ public class StaxAsymmetricBindingHandler extends AbstractStaxBindingHandler {
                                     List<SecurePart> encrParts,
                                     boolean externalRef) throws SOAPException {
         //Do encryption
-        if (recToken != null && recToken.getToken() != null && encrParts.size() > 0) {
+        if (recToken != null && recToken.getToken() != null && !encrParts.isEmpty()) {
             AbstractToken encrToken = recToken.getToken();
             AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
 

@@ -184,7 +184,7 @@ public class MessageImpl extends StringMapImpl implements Message {
             private static final long serialVersionUID = 7067290677790419348L;
 
             public void putAll(Map<? extends String, ? extends Object> m) {
-                if (m != null && m.size() > 0) {
+                if (m != null && !m.isEmpty()) {
                     super.putAll(m);
                 }
             }

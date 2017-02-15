@@ -223,7 +223,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                 aegisContext.setTypeCreationOptions(configuration);
             }
 
-            if (implMap.size() > 0) {
+            if (!implMap.isEmpty()) {
                 aegisContext.setBeanImplementationMap(implMap);
             }
         }

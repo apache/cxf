@@ -293,7 +293,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
 
         private boolean hasAttachments(SoapMessage mc) {
             final Collection<org.apache.cxf.message.Attachment> attachments = mc.getAttachments();
-            return attachments != null && attachments.size() > 0;
+            return attachments != null && !attachments.isEmpty();
         }
 
         private void configureActions(SoapMessage mc, boolean doDebug,

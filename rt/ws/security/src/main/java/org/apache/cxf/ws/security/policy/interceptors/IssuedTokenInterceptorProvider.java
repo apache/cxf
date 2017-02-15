@@ -174,7 +174,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     message.getExchange().remove(SecurityConstants.TOKEN);
                     List<WSHandlerResult> results =
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
-                    if (results != null && results.size() > 0) {
+                    if (results != null && !results.isEmpty()) {
                         parseHandlerResults(results.get(0), message, ais);
                     }
                 } else {

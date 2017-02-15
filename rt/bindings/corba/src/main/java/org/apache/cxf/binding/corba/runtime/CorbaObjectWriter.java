@@ -311,7 +311,7 @@ public class CorbaObjectWriter {
     public void writeUnion(CorbaObjectHandler obj) throws CorbaBindingException {
         Union unionType = (Union) obj.getType();
         List<Unionbranch> branches = unionType.getUnionbranch();
-        if (branches.size() > 0) {
+        if (!branches.isEmpty()) {
             CorbaObjectHandler discriminator = ((CorbaUnionHandler)obj).getDiscriminator();
             this.write(discriminator);
             CorbaObjectHandler unionValue = ((CorbaUnionHandler)obj).getValue();

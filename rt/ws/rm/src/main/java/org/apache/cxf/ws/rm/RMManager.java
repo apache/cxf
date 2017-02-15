@@ -504,7 +504,7 @@ public class RMManager {
     @PreDestroy
     public void shutdown() {
         // shutdown remaining endpoints
-        if (reliableEndpoints.size() > 0) {
+        if (!reliableEndpoints.isEmpty()) {
             LOG.log(Level.FINE,
                     "Shutting down RMManager with {0} remaining endpoints.",
                     new Object[] {Integer.valueOf(reliableEndpoints.size())});

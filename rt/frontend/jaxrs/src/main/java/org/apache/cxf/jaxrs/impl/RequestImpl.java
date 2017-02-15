@@ -107,7 +107,7 @@ public class RequestImpl implements Request {
                 matchingVars.add(var);
             }
         }
-        if (matchingVars.size() > 0) {
+        if (!matchingVars.isEmpty()) {
             addVaryHeader(varyValues);
             Collections.sort(matchingVars, new VariantComparator());
             return matchingVars.get(0);

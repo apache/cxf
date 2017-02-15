@@ -329,7 +329,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
 
         // Parse the AttributeStatements
         List<AttributeStatementBean> attrBeanList = null;
-        if (attributeStatementProviders != null && attributeStatementProviders.size() > 0) {
+        if (attributeStatementProviders != null && !attributeStatementProviders.isEmpty()) {
             attrBeanList = new ArrayList<>();
             for (AttributeStatementProvider statementProvider : attributeStatementProviders) {
                 AttributeStatementBean statementBean = statementProvider.getStatement(tokenParameters);
@@ -349,7 +349,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
 
         // Parse the AuthenticationStatements
         List<AuthenticationStatementBean> authBeanList = null;
-        if (authenticationStatementProviders != null && authenticationStatementProviders.size() > 0) {
+        if (authenticationStatementProviders != null && !authenticationStatementProviders.isEmpty()) {
             authBeanList = new ArrayList<>();
             for (AuthenticationStatementProvider statementProvider : authenticationStatementProviders) {
                 AuthenticationStatementBean statementBean = statementProvider.getStatement(tokenParameters);
@@ -370,7 +370,7 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
         // Parse the AuthDecisionStatements
         List<AuthDecisionStatementBean> authDecisionBeanList = null;
         if (authDecisionStatementProviders != null
-            && authDecisionStatementProviders.size() > 0) {
+            && !authDecisionStatementProviders.isEmpty()) {
             authDecisionBeanList = new ArrayList<>();
             for (AuthDecisionStatementProvider statementProvider : authDecisionStatementProviders) {
                 AuthDecisionStatementBean statementBean = statementProvider.getStatement(tokenParameters);
