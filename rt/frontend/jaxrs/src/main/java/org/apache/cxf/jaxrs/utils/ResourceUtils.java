@@ -790,7 +790,7 @@ public final class ResourceUtils {
             if (AnnotationUtils.getAnnotation(anns[i], Context.class) != null) {
                 Object contextValue = contextValues != null ? contextValues.get(params[i]) : null;
                 if (contextValue == null) {
-                    if (perRequest) {
+                    if (perRequest || InjectionUtils.VALUE_CONTEXTS.contains(params[i].getName())) {
                         values[i] = JAXRSUtils.createContextValue(m, genericTypes[i], params[i]);
                     } else {
                         values[i] = InjectionUtils.createThreadLocalProxy(params[i]);

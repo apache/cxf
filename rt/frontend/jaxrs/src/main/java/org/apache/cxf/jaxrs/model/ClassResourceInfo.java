@@ -176,7 +176,7 @@ public class ClassResourceInfo extends BeanResourceInfo {
                             app = (Application)appProvider.getProvider();
                         }
                     }
-                    InjectionUtils.injectContextProxiesAndApplication(cri, instance, app);
+                    InjectionUtils.injectContextProxiesAndApplication(cri, instance, app, null);
                     injectedSubInstances.add(instance.toString());
                 }
             }

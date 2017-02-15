@@ -180,6 +180,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             }
 
             ServerProviderFactory factory = setupFactory(ep);
+            injectContexts(factory);
             ep.put(Application.class.getName(), appProvider);
             factory.setRequestPreprocessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
@@ -407,18 +408,19 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         this.start = start;
     }
 
-    protected void injectContexts() {
+    protected void injectContexts(ServerProviderFactory factory) {
         Application application = appProvider == null ? null : appProvider.getProvider();
         for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
             if (cri.isSingleton()) {
                 InjectionUtils.injectContextProxiesAndApplication(cri,
                                                     cri.getResourceProvider().getInstance(null),
-                                                    application);
+                                                    application,
+                                                    factory);
             }
         }
         if (application != null) {
             InjectionUtils.injectContextProxiesAndApplication(appProvider,
-                                                              application, null);
+                                                              application, null, null);
         }
     }
 
@@ -435,7 +437,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                 setDefaultResourceProvider(cri);
             }
         }
-        injectContexts();
     }
 
     protected void setDefaultResourceProvider(ClassResourceInfo cri) {

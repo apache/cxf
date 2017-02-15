@@ -25,21 +25,13 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -52,25 +44,6 @@ public abstract class AbstractResourceInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractResourceInfo.class);
     private static final String FIELD_PROXY_MAP = "jaxrs-field-proxy-map";
     private static final String SETTER_PROXY_MAP = "jaxrs-setter-proxy-map";
-
-    private static final Set<String> STANDARD_CONTEXT_CLASSES = new HashSet<>();
-    static {
-        // JAX-RS 1.0-1.1
-        STANDARD_CONTEXT_CLASSES.add(Application.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(UriInfo.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(HttpHeaders.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(Request.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(SecurityContext.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(Providers.class.getName());
-        STANDARD_CONTEXT_CLASSES.add(ContextResolver.class.getName());
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.http.HttpServletRequest");
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.http.HttpServletResponse");
-        STANDARD_CONTEXT_CLASSES.add("javax.servlet.ServletContext");
-        // JAX-RS 2.0
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.container.ResourceContext");
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.container.ResourceInfo");
-        STANDARD_CONTEXT_CLASSES.add("javax.ws.rs.core.Configuration");
-    }
 
     protected boolean root;
     protected Class<?> resourceClass;
@@ -148,10 +121,11 @@ public abstract class AbstractResourceInfo {
         }
         for (Field f : cls.getDeclaredFields()) {
             for (Annotation a : f.getAnnotations()) {
-                if (a.annotationType() == Context.class) {
+                if (a.annotationType() == Context.class
+                    && (f.getType().isInterface() || f.getType() == Application.class)) {
                     contextFields = addContextField(contextFields, f);
-                    if (f.getType().isInterface()) {
-                        checkContextClass(f.getType());
+                    checkContextClass(f.getType());
+                    if (!InjectionUtils.VALUE_CONTEXTS.contains(f.getType().getName())) {
                         addToMap(getFieldProxyMap(true), f, getFieldThreadLocalProxy(f, provider));
                     }
                 }
@@ -277,7 +251,7 @@ public abstract class AbstractResourceInfo {
         }
     }
     private void checkContextClass(Class<?> type) {
-        if (!STANDARD_CONTEXT_CLASSES.contains(type.getName())) {
+        if (!InjectionUtils.STANDARD_CONTEXT_CLASSES.contains(type.getName())) {
             LOG.fine("Injecting a custom context " + type.getName()
                      + ", ContextProvider is required for this type");
         }
@@ -295,7 +269,7 @@ public abstract class AbstractResourceInfo {
             contextMethods = new HashMap<Class<?>, Map<Class<?>, Method>>();
         }
         addToMap(contextMethods, contextClass, m);
-        if (m.getParameterTypes()[0] != Application.class) {
+        if (!InjectionUtils.VALUE_CONTEXTS.contains(m.getParameterTypes()[0].getName())) {
             addToMap(getSetterProxyMap(true), m, getMethodThreadLocalProxy(m, provider));
         }
     }

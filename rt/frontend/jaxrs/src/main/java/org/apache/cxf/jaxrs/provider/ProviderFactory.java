@@ -647,7 +647,7 @@ public abstract class ProviderFactory {
 
     void injectContextProxiesIntoProvider(ProviderInfo<?> pi, Application app) {
         if (pi.contextsAvailable()) {
-            InjectionUtils.injectContextProxiesAndApplication(pi, pi.getProvider(), app);
+            InjectionUtils.injectContextProxiesAndApplication(pi, pi.getProvider(), app, this);
             injectedProviders.add(pi);
         }
     }
