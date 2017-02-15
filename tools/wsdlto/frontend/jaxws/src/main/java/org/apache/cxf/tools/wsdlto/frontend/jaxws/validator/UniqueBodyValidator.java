@@ -40,7 +40,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.validator.ServiceValidator;
 
 public class UniqueBodyValidator extends ServiceValidator {
-    public static final Logger LOG = LogUtils.getL7dLogger(UniqueBodyValidator.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(UniqueBodyValidator.class);
 
     public UniqueBodyValidator() {
     }

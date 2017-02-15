@@ -39,7 +39,7 @@ import org.apache.ws.commons.schema.constants.Constants;
  * Static methods/constants for Aegis.
  */
 public final class TypeUtil {
-    public static final Logger LOG = LogUtils.getL7dLogger(TypeUtil.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(TypeUtil.class);
 
     private TypeUtil() {
         //utility class

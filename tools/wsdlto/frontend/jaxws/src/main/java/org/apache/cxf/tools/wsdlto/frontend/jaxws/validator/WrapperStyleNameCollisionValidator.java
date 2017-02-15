@@ -41,7 +41,7 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.ProcessorUt
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.WrapperElement;
 
 public class WrapperStyleNameCollisionValidator extends ServiceValidator {
-    public static final Logger LOG = LogUtils.getL7dLogger(WrapperStyleNameCollisionValidator.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(WrapperStyleNameCollisionValidator.class);
 
     public WrapperStyleNameCollisionValidator() {
     }

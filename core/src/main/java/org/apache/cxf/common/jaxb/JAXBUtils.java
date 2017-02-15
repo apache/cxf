@@ -92,7 +92,7 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
 
 public final class JAXBUtils {
-    public static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
 
     public enum IdentifierType {
         CLASS,

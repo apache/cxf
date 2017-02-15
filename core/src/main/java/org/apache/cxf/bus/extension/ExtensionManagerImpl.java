@@ -46,7 +46,7 @@ import org.apache.cxf.resource.ResourceResolver;
 import org.apache.cxf.resource.SinglePropertyResolver;
 
 public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLocator {
-    public static final Logger LOG = LogUtils.getL7dLogger(ExtensionManagerImpl.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(ExtensionManagerImpl.class);
 
 
     public static final String EXTENSIONMANAGER_PROPERTY_NAME = "extensionManager";

@@ -51,7 +51,7 @@ import org.apache.cxf.common.util.StringUtils;
  * CXF provides {@link Log4jLogger} to use log4j instead of java.util.logging.
  */
 public final class LogUtils {
-    public static final String KEY = "org.apache.cxf.Logger";
+    private static final String KEY = "org.apache.cxf.Logger";
 
     private static final Object[] NO_PARAMETERS = new Object[0];
 
