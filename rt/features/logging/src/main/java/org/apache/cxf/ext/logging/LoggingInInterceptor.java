@@ -18,171 +18,111 @@
  */
 package org.apache.cxf.ext.logging;
 
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.SequenceInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
-import org.apache.cxf.ext.logging.event.EventType;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
 import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedWriter;
-import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 
 /**
- *
+ * 
  */
 @NoJSR250Annotations
 public class LoggingInInterceptor extends AbstractLoggingInterceptor {
-    class SendLogEventInterceptor extends AbstractPhaseInterceptor<Message> {
-        SendLogEventInterceptor() {
-            super(Phase.PRE_INVOKE);
+    class LoggingInFaultInterceptor extends AbstractPhaseInterceptor<Message> {
+        LoggingInFaultInterceptor() {
+            super(Phase.RECEIVE);
         }
         @Override
         public void handleMessage(Message message) throws Fault {
-            LogEvent event = message.get(LogEvent.class);
-            if (event != null) {
-                DefaultLogEventMapper mapper = new DefaultLogEventMapper();
-                mapper.setEpInfo(message, event);
-                event.setType(mapper.getEventType(message));
-                message.remove(LogEvent.class);
-                sender.send(event);
-            }
+        }
+        @Override
+        public void handleFault(Message message) throws Fault {
+            LoggingInInterceptor.this.handleMessage(message);
         }
     }
-
+    
+    
     public LoggingInInterceptor() {
         this(new Slf4jEventSender());
+    }
+    public LoggingInInterceptor(LogEventSender sender) {
+        super(Phase.PRE_INVOKE, sender);
     }
     public LoggingInInterceptor(PrintWriter writer) {
         this(new PrintWriterEventSender(writer));
     }
-    public LoggingInInterceptor(LogEventSender sender) {
-        super(Phase.RECEIVE, sender);
-    }
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
-        return Collections.singleton(new SendLogEventInterceptor());
+        Collection<PhaseInterceptor<? extends Message>> ret = new ArrayList<>();
+        ret.add(new WireTapIn(limit, threshold));
+        ret.add(new LoggingInFaultInterceptor());
+        return ret;
     }
 
-
-    public void handleFault(Message message) {
-        LogEvent event = message.get(LogEvent.class);
-        if (event != null) {
-            DefaultLogEventMapper mapper = new DefaultLogEventMapper();
-            mapper.setEpInfo(message, event);
-            event.setType(EventType.FAULT_IN);
-            message.remove(LogEvent.class);
-            sender.send(event);
-        }
-    }
     public void handleMessage(Message message) throws Fault {
-        LogEvent event = message.get(LogEvent.class);
-        if (event == null) {
-            createExchangeId(message);
-            event = new DefaultLogEventMapper().map(message);
-            if (shouldLogContent(event)) {
-                addContent(message, event);
-            } else {
-                event.setPayload(AbstractLoggingInterceptor.CONTENT_SUPPRESSED);
-            }
-            // at this point, we have the payload.  However, we may not have the endpoint yet. Delay sending
-            // the event till a little bit later
-            message.put(LogEvent.class, event);
+        createExchangeId(message);
+        final LogEvent event = new DefaultLogEventMapper().map(message);
+        if (shouldLogContent(event)) {
+            addContent(message, event);
+        } else {
+            event.setPayload(AbstractLoggingInterceptor.CONTENT_SUPPRESSED);
         }
+        sender.send(event);
     }
 
     private void addContent(Message message, final LogEvent event) {
-        InputStream is = message.getContent(InputStream.class);
-        if (is != null) {
-            logInputStream(message, is, event);
-        } else {
-            Reader reader = message.getContent(Reader.class);
-            if (reader != null) {
-                logReader(message, reader, event);
-            }
-        }
-    }
-
-    protected void logInputStream(Message message, InputStream is, LogEvent event) {
-        CachedOutputStream bos = new CachedOutputStream();
-        if (threshold > 0) {
-            bos.setThreshold(threshold);
-        }
-        String encoding = event.getEncoding();
         try {
-            // use the appropriate input stream and restore it later
-            InputStream bis = is instanceof DelegatingInputStream
-                ? ((DelegatingInputStream)is).getInputStream() : is;
-
-
-            //only copy up to the limit since that's all we need to log
-            //we can stream the rest
-            IOUtils.copyAtLeast(bis, bos, limit == -1 ? Integer.MAX_VALUE : limit);
-            bos.flush();
-            bis = new SequenceInputStream(bos.getInputStream(), bis);
-
-            // restore the delegating input stream or the input stream
-            if (is instanceof DelegatingInputStream) {
-                ((DelegatingInputStream)is).setInputStream(bis);
+            CachedOutputStream cos = message.getContent(CachedOutputStream.class);
+            if (cos != null) {
+                handleOutputStream(event, message, cos);
             } else {
-                message.setContent(InputStream.class, bis);
+                CachedWriter writer = message.getContent(CachedWriter.class);
+                if (writer != null) {
+                    handleWriter(event, writer);
+                }
             }
-
-            if (bos.getTempFile() != null) {
-                //large thing on disk...
-                event.setFullContentFile(bos.getTempFile());
-            }
-            if (bos.size() > limit && limit != -1) {
-                event.setTruncated(true);
-            }
-
-            StringBuilder builder = new StringBuilder(limit);
-            if (StringUtils.isEmpty(encoding)) {
-                bos.writeCacheTo(builder, limit);
-            } else {
-                bos.writeCacheTo(builder, encoding, limit);
-            }
-            bos.close();
-            event.setPayload(builder.toString());
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new Fault(e);
         }
     }
 
-    protected void logReader(Message message, Reader reader, LogEvent event) {
-        try {
-            CachedWriter writer = new CachedWriter();
-            IOUtils.copyAndCloseInput(reader, writer);
-            message.setContent(Reader.class, writer.getReader());
-
-            if (writer.getTempFile() != null) {
-                //large thing on disk...
-                event.setFullContentFile(writer.getTempFile());
-            }
-            if (writer.size() > limit && limit != -1) {
-                event.setTruncated(true);
-            }
-            int max = writer.size() > limit ? (int)limit : (int)writer.size();
-            StringBuilder b = new StringBuilder(max);
-            writer.writeCacheTo(b);
-            event.setPayload(b.toString());
-        } catch (Exception e) {
-            throw new Fault(e);
+    private void handleOutputStream(final LogEvent event, Message message, CachedOutputStream cos) throws IOException {
+        String encoding = (String)message.get(Message.ENCODING);
+        if (StringUtils.isEmpty(encoding)) {
+            encoding = StandardCharsets.UTF_8.name();
         }
+        StringBuilder payload = new StringBuilder();
+        cos.writeCacheTo(payload, encoding, limit);
+        cos.close();
+        event.setPayload(payload.toString());
+        boolean isTruncated = cos.size() > limit && limit != -1;
+        event.setTruncated(isTruncated);
+        event.setFullContentFile(cos.getTempFile());
     }
+
+    private void handleWriter(final LogEvent event, CachedWriter writer) throws IOException {
+        boolean isTruncated = writer.size() > limit && limit != -1;
+        StringBuilder payload = new StringBuilder();
+        writer.writeCacheTo(payload, limit);
+        event.setPayload(payload.toString());
+        event.setTruncated(isTruncated);
+        event.setFullContentFile(writer.getTempFile());
+    }
+
 
 }

@@ -49,13 +49,11 @@ public class LoggingFeature extends AbstractFeature {
     private LogEventSender sender;
     private LoggingInInterceptor in;
     private LoggingOutInterceptor out;
-    private WireTapIn wireTapIn;
     private PrettyLoggingFilter prettyFilter;
 
     public LoggingFeature() {
         this.sender = new Slf4jEventSender();
         prettyFilter = new PrettyLoggingFilter(sender);
-        wireTapIn = new WireTapIn();
         in = new LoggingInInterceptor(prettyFilter);
         out = new LoggingOutInterceptor(prettyFilter);
     }
@@ -63,7 +61,6 @@ public class LoggingFeature extends AbstractFeature {
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
 
-        provider.getInInterceptors().add(wireTapIn);
         provider.getInInterceptors().add(in);
         provider.getInFaultInterceptors().add(in);
 
@@ -74,13 +71,11 @@ public class LoggingFeature extends AbstractFeature {
     public void setLimit(int limit) {
         in.setLimit(limit);
         out.setLimit(limit);
-        wireTapIn.setLimit(limit);
     }
 
     public void setInMemThreshold(long inMemThreshold) {
         in.setInMemThreshold(inMemThreshold);
         out.setInMemThreshold(inMemThreshold);
-        wireTapIn.setThreshold(inMemThreshold);
     }
 
     public void setSender(LogEventSender sender) {
