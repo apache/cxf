@@ -24,7 +24,7 @@ import org.apache.cxf.common.i18n.UncheckedException;
 
 /**
  * RMStoreException is the type of RuntimeException thrown by the RMStore
- * when  encountering problems.
+ * when encountering problems.
  */
 public class RMStoreException extends UncheckedException {
 

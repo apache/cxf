@@ -57,7 +57,7 @@ public class ExternalServicesServletTest extends AbstractServletTest {
         client.setExceptionsThrownOnErrorStatus(false);
 
         //test the '/' context get service list
-        WebResponse  res = client.getResponse(CONTEXT_URL + "/");
+        WebResponse res = client.getResponse(CONTEXT_URL + "/");
         WebLink[] links = res.getLinks();
         assertEquals("Wrong number of service links", 6, links.length);
 

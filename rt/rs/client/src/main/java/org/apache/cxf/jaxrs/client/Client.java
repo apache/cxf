@@ -144,7 +144,7 @@ public interface Client {
 
     /**
      * Reset the headers and response state if any
-     * @return  the updated Client
+     * @return the updated Client
      */
     Client reset();
 

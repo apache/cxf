@@ -37,7 +37,7 @@ public class ExtensionManagerTest extends Assert {
     private Map<Class<?>, Object> extensions;
 
     @Before
-    public  void setUp() {
+    public void setUp() {
         ResourceResolver resolver = new SinglePropertyResolver(EXTENSIONMANAGER_TEST_RESOURECE_NAME, this);
         ResourceManager rm = new DefaultResourceManager(resolver);
 

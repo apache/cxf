@@ -51,7 +51,7 @@ public class CorbaDestinationTest extends Assert {
                         "SimpleCORBAPort");
         CorbaDestination destination = new CorbaDestination(endpointInfo, orbConfig);
 
-        EndpointReferenceType  rtype = destination.getAddress();
+        EndpointReferenceType rtype = destination.getAddress();
         assertTrue("EndpointReferenceType should not be null", rtype != null);
         BindingInfo bindingInfo = destination.getBindingInfo();
         assertTrue("BindingInfo should not be null", bindingInfo != null);

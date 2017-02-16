@@ -42,7 +42,7 @@ public class HugeResponseInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message message) throws Fault {
         if (type.equals(ResponseInterceptorType.overflow)) {
             throw new StackOverflowError();
-        } else  if (type.equals(ResponseInterceptorType.ElementLevelThreshold)) {
+        } else if (type.equals(ResponseInterceptorType.ElementLevelThreshold)) {
             InputStream is = message.getContent(InputStream.class);
             if (is != null) {
                 CachedOutputStream bos = new CachedOutputStream();
@@ -59,7 +59,7 @@ public class HugeResponseInterceptor extends AbstractPhaseInterceptor<Message> {
                     throw new Fault(e);
                 }
             }
-        } else  if (type.equals(ResponseInterceptorType.ElementCountThreshold)) {
+        } else if (type.equals(ResponseInterceptorType.ElementCountThreshold)) {
             InputStream is = message.getContent(InputStream.class);
             if (is != null) {
                 CachedOutputStream bos = new CachedOutputStream();

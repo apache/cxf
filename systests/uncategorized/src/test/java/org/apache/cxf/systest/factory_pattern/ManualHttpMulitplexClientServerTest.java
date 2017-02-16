@@ -161,7 +161,7 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         String address = EndpointReferenceUtils.getAddress(epr);
 
         InvocationHandler handler = Proxy.getInvocationHandler(num);
-        BindingProvider  bp = null;
+        BindingProvider bp = null;
         if (handler instanceof BindingProvider) {
             bp = (BindingProvider)handler;
             bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);

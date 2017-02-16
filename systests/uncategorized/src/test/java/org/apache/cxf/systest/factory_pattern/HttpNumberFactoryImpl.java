@@ -51,7 +51,7 @@ public class HttpNumberFactoryImpl extends NumberFactoryImpl {
                                                                  bus);
 
         Source source = EndpointReferenceUtils.convertToXML(epr);
-        return  new W3CEndpointReference(source);
+        return new W3CEndpointReference(source);
 
     }
 

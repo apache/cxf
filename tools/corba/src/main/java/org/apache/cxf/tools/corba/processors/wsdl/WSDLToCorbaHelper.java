@@ -1068,7 +1068,7 @@ public class WSDLToCorbaHelper {
             if (basetype == null) {
                 return null;
             }
-            // process  ext types ????
+            // process ext types ????
             MemberType basemember = new MemberType();
             basemember.setName("_simpleTypeValue");
             QName baseTypeName = checkPrefix(basetype.getQName());

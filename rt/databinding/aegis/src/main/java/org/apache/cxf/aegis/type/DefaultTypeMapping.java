@@ -78,7 +78,7 @@ import org.apache.ws.commons.schema.constants.Constants;
  * also indexed by the XML Schema QName of each type.
  */
 public class DefaultTypeMapping implements TypeMapping {
-    public  static final String DEFAULT_MAPPING_URI = "urn:org.apache.cxf.aegis.types";
+    public static final String DEFAULT_MAPPING_URI = "urn:org.apache.cxf.aegis.types";
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultTypeMapping.class);
     private Map<Type, AegisType> class2Type;
     private Map<QName, AegisType> xml2Type;

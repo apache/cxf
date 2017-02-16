@@ -403,7 +403,7 @@ public class WSDLToIDLAction {
             return IdlInterface.create(null, "Object");
         }
 
-        CorbaType  corbaTypeImpl = corbaType;
+        CorbaType corbaTypeImpl = corbaType;
         if (corbaTypeImpl == null) {
             corbaTypeImpl = getCorbaType(idlType);
         }

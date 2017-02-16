@@ -37,7 +37,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class IDLToWSDLPlugin extends AbstractMojo {
 
     /**
-     * @parameter  expression="${project.build.directory}/generated/src/main/java"
+     * @parameter expression="${project.build.directory}/generated/src/main/java"
      * @required
      */
     String outputDir;

@@ -56,7 +56,7 @@ public class  ProxyInvocationHandlerTest extends AbstractInvocationHandlerTest {
 
         testObject.invoke(target, testMethod, new Object[] {});
 
-        Bus  newBus = BusFactory.getDefaultBus();
+        Bus newBus = BusFactory.getDefaultBus();
 
         assertSame("Current Bus has been set and is as expected, val=" + newBus, newBus, mockBus);
          // set back the JVM current local variable

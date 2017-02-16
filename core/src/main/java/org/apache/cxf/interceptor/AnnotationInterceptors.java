@@ -43,7 +43,7 @@ public class AnnotationInterceptors {
     private <T> List<T> getAnnotationObject(Class<? extends Annotation> annotationClazz, Class<T> type) {
 
         for (Class<?> cls : clazzes) {
-            Annotation  annotation = cls.getAnnotation(annotationClazz);
+            Annotation annotation = cls.getAnnotation(annotationClazz);
             if (annotation != null) {
                 return initializeAnnotationObjects(annotation, type);
             }

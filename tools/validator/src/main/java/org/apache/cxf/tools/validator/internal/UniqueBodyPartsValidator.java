@@ -98,7 +98,7 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
             String opName = getOperationNameWithSamePart(operationName, part);
             if (opName != null) {
                 addErrorMessage("Non unique body parts, operation " + "[ " + opName + " ] "
-                                + "and  operation [ " + operationName + " ] in binding "
+                                + "and operation [ " + operationName + " ] in binding "
                                 + bindingName.toString()
                                 + " have the same body block: "
                                 + part.getElementName());

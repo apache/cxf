@@ -419,7 +419,7 @@ public class CachedOutputStream extends OutputStream {
 
     }
 
-    private  void enforceLimits() throws IOException {
+    private void enforceLimits() throws IOException {
         if (maxSize > 0 && totalLength > maxSize) {
             throw new CacheSizeExceededException();
         }

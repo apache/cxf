@@ -148,7 +148,7 @@ final class InternalContextUtils {
      * @param inMAPs the inbound MAPs
      * @param inMessage the current message
      */
-    //CHECKSTYLE:OFF  Max executable statement count limitation
+    //CHECKSTYLE:OFF Max executable statement count limitation
     public static void rebaseResponse(EndpointReferenceType reference,
                                       AddressingProperties inMAPs,
                                       final Message inMessage) {

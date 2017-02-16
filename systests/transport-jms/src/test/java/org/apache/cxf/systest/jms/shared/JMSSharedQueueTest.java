@@ -100,7 +100,7 @@ public class JMSSharedQueueTest extends AbstractVmJMSTest {
         }
 
         private void callGreetMe() {
-            BindingProvider  bp = (BindingProvider)port;
+            BindingProvider bp = (BindingProvider)port;
             Map<String, Object> requestContext = bp.getRequestContext();
             JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
             requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);

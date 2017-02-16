@@ -158,7 +158,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 if (soapFault == null) {
                     throw new WebServiceException(ex);
                 }
-                SOAPFaultException  exception = new SOAPFaultException(soapFault);
+                SOAPFaultException exception = new SOAPFaultException(soapFault);
                 if (ex instanceof Fault && ex.getCause() != null) {
                     exception.initCause(ex.getCause());
                 } else {

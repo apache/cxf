@@ -88,7 +88,7 @@ public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
         NestedCallback callbackObject = new NestedCallback();
 
         Source source = EndpointReferenceUtils.convertToXML(ref);
-        W3CEndpointReference  w3cEpr = new W3CEndpointReference(source);
+        W3CEndpointReference w3cEpr = new W3CEndpointReference(source);
 
 
         callbackObject.setCallback(w3cEpr);

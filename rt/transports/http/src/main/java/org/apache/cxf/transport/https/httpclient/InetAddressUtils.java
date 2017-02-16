@@ -103,7 +103,7 @@ public final class InetAddressUtils {
                 colonCount++;
             }
         }
-        return  colonCount <= MAX_COLON_COUNT && IPV6_HEX_COMPRESSED_PATTERN.matcher(input).matches();
+        return colonCount <= MAX_COLON_COUNT && IPV6_HEX_COMPRESSED_PATTERN.matcher(input).matches();
     }
 
     /**

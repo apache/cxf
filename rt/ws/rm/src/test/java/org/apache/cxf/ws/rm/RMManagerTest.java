@@ -334,7 +334,7 @@ public class RMManagerTest extends Assert {
 
     @Test
     public void testGetDestination() throws NoSuchMethodException, RMException {
-        Method  m = RMManager.class
+        Method m = RMManager.class
             .getDeclaredMethod("getReliableEndpoint", new Class[] {Message.class});
         manager = control.createMock(RMManager.class, new Method[] {m});
         Message message = control.createMock(Message.class);

@@ -76,7 +76,7 @@ public class SubscriptionManagerImpl implements SubscriptionManager {
         this.url = url;
     }
 
-    public  SubscriptionManagerImpl(String url, String namespace, String elementName) {
+    public SubscriptionManagerImpl(String url, String namespace, String elementName) {
         database = new SubscriptionDatabaseImpl();
         this.url = url;
         this.subscriptionIdNamespace = namespace;

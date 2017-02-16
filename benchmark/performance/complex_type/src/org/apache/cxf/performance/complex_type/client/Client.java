@@ -93,7 +93,7 @@ public final class Client extends TestCaseBase<ComplexPortType> {
 
 
     public void initTestData() {
-        NestedComplexType  complexType = new NestedComplexType();
+        NestedComplexType complexType = new NestedComplexType();
         complexType.setVarString("#12345ABc");
         complexType.setVarUByte(Short.MAX_VALUE);
         complexType.setVarUnsignedLong(new BigInteger("13691056728"));

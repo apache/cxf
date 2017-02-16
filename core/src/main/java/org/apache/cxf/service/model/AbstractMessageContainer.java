@@ -230,7 +230,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
     public MessagePartInfo getFirstMessagePart() {
         if (!messageParts.isEmpty()) {
             return messageParts.values().iterator().next();
-        } else  if (outOfBandParts != null && !outOfBandParts.isEmpty()) {
+        } else if (outOfBandParts != null && !outOfBandParts.isEmpty()) {
             return outOfBandParts.get(0);
         } else {
             return null;

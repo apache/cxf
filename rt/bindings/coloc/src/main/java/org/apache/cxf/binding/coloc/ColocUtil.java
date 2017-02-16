@@ -172,7 +172,7 @@ public final class ColocUtil {
     }
 
     public static boolean isSameOperationInfo(OperationInfo oi1, OperationInfo oi2) {
-        return  oi1.getName().equals(oi2.getName())
+        return oi1.getName().equals(oi2.getName())
                 && isSameMessageInfo(oi1.getInput(), oi2.getInput())
                 && isSameMessageInfo(oi1.getOutput(), oi2.getOutput())
                 && isSameFaultInfo(oi1.getFaults(), oi2.getFaults());

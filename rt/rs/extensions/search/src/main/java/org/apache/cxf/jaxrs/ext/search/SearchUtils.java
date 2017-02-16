@@ -208,7 +208,7 @@ public final class SearchUtils {
         return date;
     }
 
-    private  static Date timestampFromString(final SimpleDateFormat formatter, final String value) {
+    private static Date timestampFromString(final SimpleDateFormat formatter, final String value) {
         try {
             return formatter.parse(value);
         } catch (final ParseException ex) {

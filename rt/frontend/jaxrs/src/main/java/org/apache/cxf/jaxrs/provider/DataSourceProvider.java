@@ -80,7 +80,7 @@ public class DataSourceProvider<T> implements MessageBodyReader<T>, MessageBodyW
     }
 
     private boolean isSupported(Class<?> type, MediaType mt) {
-        return  DataSource.class.isAssignableFrom(type) || DataHandler.class.isAssignableFrom(type);
+        return DataSource.class.isAssignableFrom(type) || DataHandler.class.isAssignableFrom(type);
     }
 
     public void writeTo(T src, Class<?> cls, Type genericType, Annotation[] annotations,

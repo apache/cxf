@@ -434,7 +434,7 @@ public class CachedWriter extends Writer {
 
     }
 
-    private  void enforceLimits() throws IOException {
+    private void enforceLimits() throws IOException {
         if (maxSize > 0 && totalLength > maxSize) {
             throw new CacheSizeExceededException();
         }

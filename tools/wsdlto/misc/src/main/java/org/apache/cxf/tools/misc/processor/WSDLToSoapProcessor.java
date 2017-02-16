@@ -298,7 +298,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
         if (extReg == null) {
             extReg = wsdlFactory.newPopulatedExtensionRegistry();
         }
-        SoapFault  soapFault = null;
+        SoapFault soapFault = null;
         try {
             soapFault = SOAPBindingUtil.createSoapFault(extReg, isSOAP12());
         } catch (WSDLException wse) {

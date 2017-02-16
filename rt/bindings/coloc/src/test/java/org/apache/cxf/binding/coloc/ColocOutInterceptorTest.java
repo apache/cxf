@@ -243,7 +243,7 @@ public class ColocOutInterceptorTest extends Assert {
         EasyMock.expect(bus.getExtension(PhaseManager.class)).andReturn(pm).times(2);
 
         Endpoint ep = control.createMock(Endpoint.class);
-        Binding  bd = control.createMock(Binding.class);
+        Binding bd = control.createMock(Binding.class);
         Service srv = control.createMock(Service.class);
         ex.setInMessage(msg);
         ex.put(Bus.class, bus);

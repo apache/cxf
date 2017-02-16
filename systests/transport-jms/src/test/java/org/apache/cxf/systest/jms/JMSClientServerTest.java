@@ -441,7 +441,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 new GreeterImplQueueDecoupledOneWaysDeferredReply();
             replyEndpoint = Endpoint.publish("", replyServant);
 
-            BindingProvider  bp = (BindingProvider)greeter;
+            BindingProvider bp = (BindingProvider)greeter;
             Map<String, Object> requestContext = bp.getRequestContext();
             JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
             requestHeader.setJMSReplyTo("dynamicQueues/test.jmstransport.oneway.with.set.replyto.reply");
@@ -509,7 +509,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             GreeterImplQueueDecoupledOneWays requestServant = new GreeterImplQueueDecoupledOneWays(true);
             requestEndpoint = Endpoint.publish(null, requestServant);
 
-            BindingProvider  bp = (BindingProvider)greeter;
+            BindingProvider bp = (BindingProvider)greeter;
             Map<String, Object> requestContext = bp.getRequestContext();
             JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
             requestHeader.setJMSReplyTo("dynamicQueues/test.jmstransport.oneway.with.set.replyto.reply");

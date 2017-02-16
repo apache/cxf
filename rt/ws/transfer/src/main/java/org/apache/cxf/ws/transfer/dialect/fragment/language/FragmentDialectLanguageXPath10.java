@@ -75,7 +75,7 @@ public class FragmentDialectLanguageXPath10 implements FragmentDialectLanguage {
                 expressionStr, resource, XPathConstants.NODESET);
             if (checkResultConstraints(result)) {
                 if (result.getLength() == 0) {
-                    return  null;
+                    return null;
                 } else {
                     return result;
                 }

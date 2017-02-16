@@ -53,7 +53,7 @@ public final class PackageUtils {
         if (classes.isEmpty()) {
             return "";
         }
-        List<List<String>> lParts = new  ArrayList<List<String>>(classes.size());
+        List<List<String>> lParts = new ArrayList<List<String>>(classes.size());
         List<String> currentParts = new ArrayList<>();
         for (Class<?> cls : classes) {
             lParts.add(StringUtils.getParts(getPackageName(cls), "\\."));

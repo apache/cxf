@@ -809,7 +809,7 @@ public class WSDLGetUtils {
      * @param message
      * @param base the request URL
      * @param endpointInfo information for a web service 'port' inside of a service
-     * @return  String or NULL if none found
+     * @return String or NULL if none found
      */
     protected String getPublishedEndpointURL(Message message,
                                              String base,

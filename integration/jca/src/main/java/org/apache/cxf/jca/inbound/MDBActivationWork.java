@@ -149,7 +149,7 @@ public class MDBActivationWork implements Work {
             return;
         }
 
-        EndpointInfo  ei = server.getEndpoint().getEndpointInfo();
+        EndpointInfo ei = server.getEndpoint().getEndpointInfo();
         ei.setProperty(MESSAGE_ENDPOINT_FACTORY, endpointFactory);
         ei.setProperty(MDB_TRANSACTED_METHOD, method);
 

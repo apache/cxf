@@ -53,7 +53,7 @@ public class Java2WSMojo extends AbstractMojo {
     private String className;
 
     /**
-     * @parameter  expression="${project.build.outputDirectory}"
+     * @parameter expression="${project.build.outputDirectory}"
      * @required
      */
     private String classpath;
@@ -100,7 +100,7 @@ public class Java2WSMojo extends AbstractMojo {
     private String classifier;
 
     /**
-     * @parameter  expression="${project.compileClasspathElements}"
+     * @parameter expression="${project.compileClasspathElements}"
      * @required
      */
     private List<?> classpathElements;

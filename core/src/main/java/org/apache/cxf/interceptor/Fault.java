@@ -172,7 +172,7 @@ public class Fault extends UncheckedException {
     }
 
     /**
-     * Returns  http header status code.
+     * Returns http header status code.
      * @return status code.
      */
     public int getStatusCode() {

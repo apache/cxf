@@ -172,7 +172,7 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
                 String str = br.readLine();
                 if (str.contains("soap:address")
                         && str.contains("location=" + "\"" + address + "\"")) {
-                    return  true;
+                    return true;
                 }
             }
         }

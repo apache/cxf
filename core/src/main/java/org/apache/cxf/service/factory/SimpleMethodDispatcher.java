@@ -28,7 +28,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 public class SimpleMethodDispatcher
-    implements  org.apache.cxf.service.invoker.MethodDispatcher  {
+    implements org.apache.cxf.service.invoker.MethodDispatcher  {
 
     private Map<Method, Map<BindingInfo, BindingOperationInfo>> infoMap =
         new ConcurrentHashMap<Method, Map<BindingInfo, BindingOperationInfo>>(16, 0.75f, 2);

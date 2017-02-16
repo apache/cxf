@@ -77,7 +77,7 @@ public final class Client {
 
         InvocationHandler handler = Proxy.getInvocationHandler(greeter);
 
-        BindingProvider  bp = null;
+        BindingProvider bp = null;
 
         if (handler instanceof BindingProvider) {
             bp = (BindingProvider)handler;

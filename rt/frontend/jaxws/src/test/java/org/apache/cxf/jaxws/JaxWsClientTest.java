@@ -93,7 +93,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
             .create(url, serviceName);
         Greeter greeter = s.getPort(portName, Greeter.class);
         InvocationHandler handler = Proxy.getInvocationHandler(greeter);
-        BindingProvider  bp = null;
+        BindingProvider bp = null;
 
         if (handler instanceof BindingProvider) {
             bp = (BindingProvider)handler;

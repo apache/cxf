@@ -31,7 +31,7 @@ import org.junit.Test;
 
 public class ServiceUtilsTest extends Assert {
     private IMocksControl control;
-    private  Message msg;
+    private Message msg;
 
     @Before
     public void setUp() {

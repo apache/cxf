@@ -678,7 +678,7 @@ public class RMManager {
                 // and attachments
                 PersistenceUtils.decodeRMContent(m, message);
                 redeliveryQueue.addUndelivered(message);
-                // add  acknowledged undelivered message
+                // add acknowledged undelivered message
                 ds.addDeliveringMessageNumber(m.getMessageNumber());
             } catch (IOException e) {
                 LOG.log(Level.SEVERE, "Error reading persisted message data", e);

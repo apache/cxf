@@ -489,7 +489,7 @@ public class ClientProxyImpl extends AbstractClient implements
     @SuppressWarnings("unchecked")
     private static List<Parameter> getParameters(MultivaluedMap<ParameterType, Parameter> map,
                                            ParameterType key) {
-        return  map.get(key) == null ? Collections.EMPTY_LIST : map.get(key);
+        return map.get(key) == null ? Collections.EMPTY_LIST : map.get(key);
     }
 
     private void handleQueries(Method m,

@@ -173,7 +173,7 @@ public abstract class AbstractWSS4JStaxInterceptor implements SoapInterceptor,
         securityProperties.setDisableSchemaValidation(!validateSchemas);
     }
 
-    private  Collection<Pattern> convertCertConstraints(String certConstraints) {
+    private Collection<Pattern> convertCertConstraints(String certConstraints) {
         String[] certConstraintsList = certConstraints.split(",");
         if (certConstraintsList.length > 0) {
             Collection<Pattern> subjectCertConstraints = new ArrayList<>(certConstraintsList.length);

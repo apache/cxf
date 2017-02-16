@@ -487,7 +487,7 @@ public class ParameterProcessor extends AbstractProcessor {
                 }
             }
             if (!sameWrapperChild) {
-                JavaParameter  jp = getParameterFromQName(outputPart.getElementQName(), outElement,
+                JavaParameter jp = getParameterFromQName(outputPart.getElementQName(), outElement,
                                                           JavaType.Style.OUT, outputPart);
                 if (!qualified && !isRefElement(outputPart, outElement)) {
                     jp.setTargetNamespace("");

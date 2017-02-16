@@ -50,7 +50,7 @@ public class MessageReplayObserver implements MessageObserver {
 
             OutputStream out = message.getContent(OutputStream.class);
             Assert.assertNotNull(out);
-            InputStream  res = getClass().getResourceAsStream(responseMessage);
+            InputStream res = getClass().getResourceAsStream(responseMessage);
             IOUtils.copy(res, out, 2045);
 
             res.close();

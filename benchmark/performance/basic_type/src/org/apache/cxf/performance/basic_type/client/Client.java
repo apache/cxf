@@ -39,8 +39,8 @@ public final class Client extends TestCaseBase<BasicPortType> {
 
     private static int opid;
 
-    private  byte[] inputBase64;
-    private  String inputString = new String();
+    private byte[] inputBase64;
+    private String inputString = new String();
 
     private final int asciiCount = 1 * 1024;
 

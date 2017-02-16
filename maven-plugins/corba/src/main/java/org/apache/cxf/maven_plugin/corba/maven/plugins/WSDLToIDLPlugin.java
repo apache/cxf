@@ -46,7 +46,7 @@ import org.apache.maven.project.MavenProject;
 public class WSDLToIDLPlugin extends AbstractMojo {
 
     /**
-     * @parameter  expression="${project.build.directory}/generated/src/main/java"
+     * @parameter expression="${project.build.directory}/generated/src/main/java"
      * @required
      */
     File outputDir;

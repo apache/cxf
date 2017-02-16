@@ -91,7 +91,7 @@ public class SubscriptionTicket {
         if (nonExpiring) {
             return false;
         }
-        return  expires.toGregorianCalendar().before(new GregorianCalendar());
+        return expires.toGregorianCalendar().before(new GregorianCalendar());
     }
 
     public void setExpires(XMLGregorianCalendar expires) {

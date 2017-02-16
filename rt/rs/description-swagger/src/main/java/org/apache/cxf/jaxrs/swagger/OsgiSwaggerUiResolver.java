@@ -49,7 +49,7 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
                         if (location.equals(pattern + swaggerUiVersion)) {
                             return getSwaggerUiRoot(b, swaggerUiVersion);
                         }
-                    } else  if (location.startsWith(pattern)) {
+                    } else if (location.startsWith(pattern)) {
                         int dollarIndex = location.indexOf("$");
                         swaggerUiVersion = location.substring(pattern.length(),
                                 dollarIndex > pattern.length() ? dollarIndex : location.length());

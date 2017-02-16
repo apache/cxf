@@ -85,7 +85,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
             fail("should have failed");
         } catch (Exception t) {
             //expected
-            assertTrue(t.getCause().toString(), t.getCause() instanceof  java.net.SocketTimeoutException);
+            assertTrue(t.getCause().toString(), t.getCause() instanceof java.net.SocketTimeoutException);
         }
 
         AsyncHandler<AddNumbersResponse> handler = new AsyncHandler<AddNumbersResponse>() {
@@ -110,7 +110,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         } catch (Exception t) {
             //expected
             assertTrue(t.getCause().getCause().toString(),
-                       t.getCause().getCause() instanceof  java.net.ConnectException);
+                       t.getCause().getCause() instanceof java.net.ConnectException);
         }
         synchronized (handler) {
             port.addNumbersAsync(25,  25, handler);

@@ -70,7 +70,7 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
             } else if ("abstract".equals(name)) {
                 factoryBean.setAbstract(true);
                 bean.setAbstract(true);
-            } else  if ("depends-on".equals(name)) {
+            } else if ("depends-on".equals(name)) {
                 factoryBean.addDependsOn(val);
                 bean.addDependsOn(val);
             } else if (!"id".equals(name) && !"name".equals(name) && isAttribute(pre, name)) {

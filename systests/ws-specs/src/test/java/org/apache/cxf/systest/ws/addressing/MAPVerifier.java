@@ -94,7 +94,7 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
 
     private String getExpectedExposeAs(boolean remove) {
         int size = expectedExposedAs.size();
-        return  size == 0
+        return size == 0
                 ? null
                 : remove
                   ? expectedExposedAs.remove(size - 1)

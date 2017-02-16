@@ -32,7 +32,7 @@ public class NameSpaceTest extends Assert {
 
     @Test
     public void testNSStackOperations() throws Exception {
-        NSStack  nsStackObj = new NSStack();
+        NSStack nsStackObj = new NSStack();
 
         nsStackObj.push();
 

@@ -39,7 +39,7 @@ public class RMMessage {
      * @return the message number
      */
     public long getMessageNumber() {
-        return  messageNumber;
+        return messageNumber;
     }
 
     /**

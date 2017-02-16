@@ -579,7 +579,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertTrue("Expected string, " + expected, expected.equals(responseValue3));
 
         org.apache.hello_world_soap_http.types.TestDocLitFault fr =
-            new  org.apache.hello_world_soap_http.types.TestDocLitFault();
+            new org.apache.hello_world_soap_http.types.TestDocLitFault();
         fr.setFaultType(BadRecordLitFault.class.getSimpleName());
 
         tjbh = new TestJAXBHandler();

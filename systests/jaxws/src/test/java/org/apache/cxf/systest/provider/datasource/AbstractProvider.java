@@ -48,7 +48,7 @@ public abstract class AbstractProvider<T> implements WebProvider {
         return ret;
     }
 
-    protected  T get(T req) {
+    protected T get(T req) {
         return req;
     }
 

@@ -3564,7 +3564,7 @@ public IDLParser(ParserSharedInputState state) {
 		returnAST = null;
 		ASTPair currentAST = new ASTPair();
 		AST floating_pt_literal_AST = null;
-		Token  f = null;
+		Token f = null;
 		AST f_AST = null;
 
 		try {      // for error handling

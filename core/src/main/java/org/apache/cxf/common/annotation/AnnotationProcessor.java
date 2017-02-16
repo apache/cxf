@@ -37,7 +37,7 @@ import org.apache.cxf.common.util.ReflectionUtil;
  * by a member level annotation, only the visit method for the member
  * level annotation
  */
-public  class AnnotationProcessor {
+public class AnnotationProcessor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AnnotationProcessor.class);
 
