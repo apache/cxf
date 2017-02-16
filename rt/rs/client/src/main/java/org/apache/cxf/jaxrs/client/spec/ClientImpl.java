@@ -552,7 +552,9 @@ public class ClientImpl implements Client {
         }
     }
     private static Long getLongValue(Object o) {
-        return o instanceof Long ? (Long)o : o instanceof String ? Long.valueOf(o.toString()) : null;
+        return o instanceof Long ? (Long)o 
+            : o instanceof String ? Long.valueOf(o.toString()) 
+            : o instanceof Integer ? ((Integer)o).longValue() : null;
     }
     private static Integer getIntValue(Object o) {
         return o instanceof Integer ? (Integer)o : o instanceof String ? Integer.valueOf(o.toString()) : null;
