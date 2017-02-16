@@ -40,7 +40,6 @@ import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
 import javax.ws.rs.sse.SseEventSink;
 
-import org.apache.cxf.jaxrs.sse.SseImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,12 +47,14 @@ import org.slf4j.LoggerFactory;
 public class BookStore {
     private static final Logger LOG = LoggerFactory.getLogger(BookStore.class);
 
-    private final Sse sse = SseImpl.create();
     private final CountDownLatch latch = new CountDownLatch(2);
-    private final SseBroadcaster broadcaster;
+    private Sse sse;
+    private SseBroadcaster broadcaster;
 
-    public BookStore() {
-        broadcaster = sse.newBroadcaster();
+    @Context 
+    public void setSse(Sse sse) {
+        this.sse = sse;
+        this.broadcaster = sse.newBroadcaster();
     }
 
     @GET
