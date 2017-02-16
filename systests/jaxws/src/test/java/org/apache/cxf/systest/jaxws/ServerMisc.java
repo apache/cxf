@@ -89,10 +89,8 @@ public class ServerMisc extends AbstractBusTestServerBase {
         servers.add(factoryBean.create());
         
         factoryBean = new JaxWsServerFactoryBean();
-        factoryBean.setBus(b);
         factoryBean.setAddress(DOCLIT_CODEFIRST_URL_XMLBINDING);
         factoryBean.setServiceClass(DocLitWrappedCodeFirstServiceImpl.class);
-        factoryBean.setFeatures(Arrays.asList(new MetricsFeature()));
         factoryBean.setInvoker(invoker);
         factoryBean.setBindingId("http://cxf.apache.org/bindings/xformat");
         factoryBean.setWsdlURL("cxf6866.wsdl");
