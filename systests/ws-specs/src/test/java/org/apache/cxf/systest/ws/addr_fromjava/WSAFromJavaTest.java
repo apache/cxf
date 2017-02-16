@@ -131,8 +131,8 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
             assert false;
         }
 
-        assertTrue(output.toString().indexOf("http://cxf.apache.org/input") != -1);
-        assertTrue(input.toString().indexOf("http://cxf.apache.org/fault3") != -1);
+        assertTrue(output.toString(), output.toString().indexOf("http://cxf.apache.org/input") != -1);
+        assertTrue(input.toString(), input.toString().indexOf("http://cxf.apache.org/fault3") != -1);
     }
 
     @Test

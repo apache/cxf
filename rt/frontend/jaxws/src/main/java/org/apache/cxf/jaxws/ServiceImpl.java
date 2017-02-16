@@ -129,8 +129,7 @@ public class ServiceImpl extends ServiceDelegate {
             initialize(b, url, f);
         }
     }
-    
-    void initialize(Bus b, URL url, WebServiceFeature ... f) {
+    final void initialize(Bus b, URL url, WebServiceFeature ... f) {
         if (b == null) {
             b = BusFactory.getThreadDefaultBus(true);
         }
