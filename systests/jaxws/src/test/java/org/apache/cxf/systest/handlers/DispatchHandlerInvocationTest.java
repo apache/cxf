@@ -49,8 +49,8 @@ import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-import javax.xml.ws.http.HTTPException;
 import javax.xml.ws.soap.SOAPFaultException;
+
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
@@ -305,12 +305,8 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         URL is = getClass().getResource("/messages/XML_GreetMeDocLiteralReq.xml");
         DataSource ds = new URLDataSource(is);
 
-        try {
-            disp.invoke(ds);
-            fail("Did not get expected exception");
-        } catch (HTTPException e) {
-            //expected
-        }
+        DataSource resp = disp.invoke(ds);
+        assertNotNull(resp);
     }
 
     @Test
@@ -329,14 +325,8 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
 
         URL is = getClass().getResource("/messages/XML_GreetMeDocLiteralReq.xml");
         DataSource ds = new URLDataSource(is);
-
-        try {
-            disp.invoke(ds);
-            fail("Did not get expected exception");
-        } catch (HTTPException e) {
-            assertEquals(e.getCause().getMessage(),
-                         "DataSource is not valid in PAYLOAD mode with XML/HTTP binding.");
-        }
+        DataSource resp = disp.invoke(ds);
+        assertNotNull(resp);
     }
 
     @Test
