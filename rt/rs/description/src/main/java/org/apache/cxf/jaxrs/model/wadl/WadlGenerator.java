@@ -2219,17 +2219,10 @@ public class WadlGenerator implements ContainerRequestFilter {
         this.convertResourcesToDOM = convertResourcesToDOM;
     }
 
-<<<<<<< HEAD
-=======
-    public void setIncrementNamespacePrefix(boolean incrementNamespacePrefix) {
-        this.incrementNamespacePrefix = incrementNamespacePrefix;
-    }
     public void setJaxbContextProperties(Map<String, Object> jaxbContextProperties) {
         this.jaxbContextProperties = jaxbContextProperties;
     }
 
-
->>>>>>> 99f6606... Adding WadlGenerator jaxbContextProperties, patch from Vjacheslav Borisov applied with minor updates, This closes #238
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
         private static final String SCHEMA_LOCATION = "schemaLocation";
         private final Map<String, String> locsMap;
