@@ -19,10 +19,14 @@
 
 package org.apache.cxf.jaxrs.lifecycle;
 
+import java.lang.reflect.Constructor;
+import java.util.Collections;
+
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.service.factory.ServiceConstructionException;
 
 /**
  * The default singleton resource provider which returns 
@@ -32,10 +36,21 @@ public class SingletonResourceProvider implements ResourceProvider {
     private Object resourceInstance;
     
     public SingletonResourceProvider(Object o, boolean callPostConstruct) {
-        resourceInstance = o;
+        if (o instanceof Constructor) {
+            Constructor<?> c = (Constructor<?>)o;
+            Object[] values = 
+                ResourceUtils.createConstructorArguments(c, null, false, Collections.<Class<?>, Object>emptyMap());
+            try {
+                resourceInstance = values.length > 0 ? c.newInstance(values) : c.newInstance(new Object[]{});
+            } catch (Exception ex) {
+                throw new ServiceConstructionException(ex);
+            }
+        } else {
+            resourceInstance = o;
+        }   
         if (callPostConstruct) {
             InjectionUtils.invokeLifeCycleMethod(o, 
-                ResourceUtils.findPostConstructMethod(ClassHelper.getRealClass(o)));
+                ResourceUtils.findPostConstructMethod(ClassHelper.getRealClass(resourceInstance)));
         }
     }
     

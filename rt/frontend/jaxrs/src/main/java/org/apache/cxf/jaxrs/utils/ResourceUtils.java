@@ -100,6 +100,7 @@ import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -124,8 +125,7 @@ public final class ResourceUtils {
         SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.ContainerRequestFilter");
         SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.ContainerResponseFilter");
         SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.DynamicFeature");
-        SERVER_PROVIDER_CLASS_NAMES.add("org.apache.cxf.jaxrs.ext.ContextResolver");
-        
+        SERVER_PROVIDER_CLASS_NAMES.add("org.apache.cxf.jaxrs.ext.ContextProvider");
     }
     
     private ResourceUtils() {
@@ -779,12 +779,15 @@ public final class ResourceUtils {
                                                       Message m, 
                                                       boolean perRequest,
                                                       Map<Class<?>, Object> contextValues) {
+        if (m == null) {
+            m = new MessageImpl();
+        }
         Class<?>[] params = c.getParameterTypes();
         Annotation[][] anns = c.getParameterAnnotations();
         Type[] genericTypes = c.getGenericParameterTypes();
         @SuppressWarnings("unchecked")
-        MultivaluedMap<String, String> templateValues = m == null ? null
-            : (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS);
+        MultivaluedMap<String, String> templateValues = 
+            (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS);
         Object[] values = new Object[params.length];
         for (int i = 0; i < params.length; i++) {
             if (AnnotationUtils.getAnnotation(anns[i], Context.class) != null) {
@@ -808,19 +811,14 @@ public final class ResourceUtils {
         }
         return values;
     }
-    public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath) {
-        return createApplication(app, ignoreAppPath, false);
-    }
-    
-    public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath,
-            boolean staticSubresourceResolution) {
-        return createApplication(app, ignoreAppPath, staticSubresourceResolution, null);
-    }
     
     @SuppressWarnings("unchecked")
-    public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath,
-            boolean staticSubresourceResolution, Bus bus) {
-        
+    public static JAXRSServerFactoryBean createApplication(Application app, 
+                                                           boolean ignoreAppPath,
+                                                           boolean staticSubresourceResolution, 
+                                                           boolean useSingletonResourceProvider,
+                                                           Bus bus) {
+
         Set<Object> singletons = app.getSingletons();
         verifySingletons(singletons);
         
@@ -839,7 +837,11 @@ public final class ResourceUtils {
                     features.add(createFeatureInstance((Class<? extends Feature>) cls));
                 } else {
                     resourceClasses.add(cls);
-                    map.put(cls, new PerRequestResourceProvider(cls));
+                    if (useSingletonResourceProvider) {
+                        map.put(cls, new SingletonResourceProvider(createProviderInstance(cls)));
+                    } else {
+                        map.put(cls, new PerRequestResourceProvider(cls));
+                    }
                 }
             }
         }
