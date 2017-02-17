@@ -195,6 +195,7 @@ public class WadlGenerator implements ContainerRequestFilter {
     private Bus bus;
     private final List<DocumentationProvider> docProviders = new LinkedList<DocumentationProvider>();
     private ResourceIdGenerator idGenerator;
+    private Map<String, Object> jaxbContextProperties;
 
     public WadlGenerator() {
     }
@@ -301,7 +302,7 @@ public class WadlGenerator implements ContainerRequestFilter {
 
         JAXBContext jaxbContext = null;
         if (useJaxbContextForQnames && !allTypes.isEmpty()) {
-            jaxbContext = ResourceUtils.createJaxbContext(new HashSet<>(allTypes), null, null);
+            jaxbContext = ResourceUtils.createJaxbContext(new HashSet<>(allTypes), null, jaxbContextProperties);
             if (jaxbContext == null) {
                 LOG.warning("JAXB Context is null: possibly due to one of input classes being not accepted");
             }
@@ -2252,6 +2253,10 @@ public class WadlGenerator implements ContainerRequestFilter {
     public void setIncrementNamespacePrefix(boolean incrementNamespacePrefix) {
         this.incrementNamespacePrefix = incrementNamespacePrefix;
     }
+    public void setJaxbContextProperties(Map<String, Object> jaxbContextProperties) {
+        this.jaxbContextProperties = jaxbContextProperties;
+    }
+
 
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
         private static final String SCHEMA_LOCATION = "schemaLocation";
