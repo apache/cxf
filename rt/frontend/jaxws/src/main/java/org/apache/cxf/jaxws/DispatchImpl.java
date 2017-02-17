@@ -148,13 +148,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                                 "SOAPMessage",
                                 m,
                                 "SOAP/HTTP");
-        } else if (DataSource.class.isAssignableFrom(clazz)
-            && binding instanceof HTTPBinding) {
-            error = new Message("DISPATCH_OBJECT_NOT_SUPPORTED", LOG,
-                                "DataSource",
-                                m,
-                                "XML/HTTP");            
-        }
+        } 
     }
     
     DispatchImpl(Client cl, Service.Mode m, Class<T> clazz) {
