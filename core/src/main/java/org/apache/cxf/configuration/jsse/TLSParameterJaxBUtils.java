@@ -133,18 +133,12 @@ public final class TLSParameterJaxBUtils {
                 password = tmp.toCharArray();
             }
         }
-<<<<<<< HEAD
-        String provider = SSLUtils.getKeystoreProvider(kst.isSetProvider() 
-                                                       ? kst.getProvider() : null,
-                                                       LOG);
-=======
         String provider = null;
         if (trustStore) {
             provider = SSLUtils.getTruststoreProvider(kst.isSetProvider() ? kst.getProvider() : null, LOG);
         } else {
             provider = SSLUtils.getKeystoreProvider(kst.isSetProvider() ? kst.getProvider() : null, LOG);
         }
->>>>>>> 19a4d72... CXF-7252 - TLSParameterJaxBUtils.getTrustManagers getting password from wrong system property
         KeyStore keyStore = provider == null
                     ? KeyStore.getInstance(type)
                     : KeyStore.getInstance(type, provider);
