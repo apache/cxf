@@ -30,29 +30,29 @@ public final class IDLParser extends antlr.LLkParser       implements IDLTokenTy
  {
 
 protected IDLParser(TokenBuffer tokenBuf, int k) {
-  super(tokenBuf,k);
+  super(tokenBuf, k);
   tokenNames = _tokenNames;
   buildTokenTypeASTClassMap();
   astFactory = new ASTFactory(getTokenTypeToASTClassMap());
 }
 
 public IDLParser(TokenBuffer tokenBuf) {
-  this(tokenBuf,4);
+  this(tokenBuf, 4);
 }
 
 protected IDLParser(TokenStream lexer, int k) {
-  super(lexer,k);
+  super(lexer, k);
   tokenNames = _tokenNames;
   buildTokenTypeASTClassMap();
   astFactory = new ASTFactory(getTokenTypeToASTClassMap());
 }
 
 public IDLParser(TokenStream lexer) {
-  this(lexer,4);
+  this(lexer, 4);
 }
 
 public IDLParser(ParserSharedInputState state) {
-  super(state,4);
+  super(state, 4);
   tokenNames = _tokenNames;
   buildTokenTypeASTClassMap();
   astFactory = new ASTFactory(getTokenTypeToASTClassMap());

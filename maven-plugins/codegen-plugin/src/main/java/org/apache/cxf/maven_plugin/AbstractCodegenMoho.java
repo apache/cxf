@@ -566,7 +566,7 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             cript.update(doneFileName.getBytes("utf8"));
             doneFileName = new javax.xml.bind.annotation.adapters.HexBinaryAdapter().marshal(cript.digest());
         } catch (Exception e) {
-            //ignore,we'll try and fake it based on the wsdl
+            //ignore, we'll try and fake it based on the wsdl
 
             // Strip the basedir from the doneFileName
             if (doneFileName.startsWith(basedir.toString())) {

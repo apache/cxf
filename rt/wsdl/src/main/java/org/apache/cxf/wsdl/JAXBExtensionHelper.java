@@ -600,7 +600,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
             l3 = helper.createLabel();
             mv.visitJumpInsn(Opcodes.GOTO, l3);
             mv.visitLabel(l2);
-            mv.visitFrame(Opcodes.F_APPEND,1, new Object[] {"java/lang/String"}, 0, null);
+            mv.visitFrame(Opcodes.F_APPEND, 1, new Object[] {"java/lang/String"}, 0, null);
             mv.visitVarInsn(Opcodes.ALOAD, 1);
             mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Boolean", "valueOf", "(Ljava/lang/String;)Ljava/lang/Boolean;", false);
             mv.visitLabel(l3);

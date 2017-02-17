@@ -255,7 +255,7 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
 
         // 5.2.8 max-age lives in the output filter.
         if (effectiveMaxAge(ann) != null) {
-            m.getExchange().put(CorsHeaderConstants.HEADER_AC_MAX_AGE,effectiveMaxAge(ann).toString());
+            m.getExchange().put(CorsHeaderConstants.HEADER_AC_MAX_AGE, effectiveMaxAge(ann).toString());
         }
 
         // 5.2.7 is in here.

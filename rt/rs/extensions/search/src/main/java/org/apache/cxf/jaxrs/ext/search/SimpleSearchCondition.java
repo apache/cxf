@@ -242,7 +242,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * ssc.isMet(new Entity("ccc", 30, "other message"));
      * // true: is met, expression '"ccc"&gt;"bbb" and 30&gt;10' is true
      *
-     * Map&lt;String,ConditionType&gt; map;
+     * Map&lt;String, ConditionType&gt; map;
      * map.put("name", ConditionType.EQUALS);
      * map.put("level", ConditionType.GREATER_THAN);
      * ssc = new SimpleSearchCondition&lt;Entity&gt;(

@@ -438,7 +438,7 @@ public class WSDLToIDLAction {
                 // Before creating module, check to see if a Corba type
                 // represent this name aleady exists.
                 // For example if type is a.b.c and we are about to create
-                // module b,look to see if a.b
+                // module b, look to see if a.b
                 // is an interface that needs to be processed
                 QName qname = new QName(corbaTypeImpl.getType().getNamespaceURI(), dotScopedName.toString());
 
