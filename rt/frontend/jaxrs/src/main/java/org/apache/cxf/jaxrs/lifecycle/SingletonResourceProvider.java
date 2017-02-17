@@ -19,10 +19,17 @@
 
 package org.apache.cxf.jaxrs.lifecycle;
 
+import java.lang.reflect.Constructor;
+import java.util.Collections;
+
 import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.factory.ServiceConstructionException;
 
 /**
  * The default singleton resource provider which returns
@@ -30,19 +37,38 @@ import org.apache.cxf.message.Message;
  */
 public class SingletonResourceProvider implements ResourceProvider {
     private Object resourceInstance;
-
+    private boolean callPostConstruct;
+    
     public SingletonResourceProvider(Object o, boolean callPostConstruct) {
         resourceInstance = o;
-        if (callPostConstruct) {
-            InjectionUtils.invokeLifeCycleMethod(o,
-                ResourceUtils.findPostConstructMethod(ClassHelper.getRealClass(o)));
-        }
+        this.callPostConstruct = callPostConstruct;
     }
 
     public SingletonResourceProvider(Object o) {
         this(o, false);
     }
 
+    public void init(Endpoint ep) {
+        if (resourceInstance instanceof Constructor) {
+            Constructor<?> c = (Constructor<?>)resourceInstance;
+            Message m = new MessageImpl();
+            ExchangeImpl exchange = new ExchangeImpl();
+            exchange.put(Endpoint.class, ep);
+            m.setExchange(exchange);
+            Object[] values = 
+                ResourceUtils.createConstructorArguments(c, m, false, Collections.emptyMap());
+            try {
+                resourceInstance = values.length > 0 ? c.newInstance(values) : c.newInstance(new Object[]{});
+            } catch (Exception ex) {
+                throw new ServiceConstructionException(ex);
+            }
+        }
+        if (callPostConstruct) {
+            InjectionUtils.invokeLifeCycleMethod(resourceInstance,
+                ResourceUtils.findPostConstructMethod(ClassHelper.getRealClass(resourceInstance)));
+        }    
+    }
+    
     /**
      * {@inheritDoc}
      */

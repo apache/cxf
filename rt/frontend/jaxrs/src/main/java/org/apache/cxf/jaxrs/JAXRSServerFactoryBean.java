@@ -44,6 +44,7 @@ import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
@@ -159,7 +160,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             checkResources(true);
             if (serviceFactory.getService() == null) {
                 serviceFactory.create();
-                updateClassResourceProviders();
             }
 
             Endpoint ep = createEndpoint();
@@ -196,6 +196,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             applyBusFeatures(getBus());
             applyFeatures();
 
+            updateClassResourceProviders(ep);
             injectContexts(factory);
             factory.applyDynamicFeatures(getServiceFactory().getClassResourceInfo());
             
@@ -427,17 +428,18 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         }
     }
 
-    protected void updateClassResourceProviders() {
+    protected void updateClassResourceProviders(Endpoint ep) {
         for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
-            if (cri.getResourceProvider() != null) {
-                continue;
+            if (cri.getResourceProvider() == null) {
+                ResourceProvider rp = resourceProviders.get(cri.getResourceClass());
+                if (rp != null) {
+                    cri.setResourceProvider(rp);
+                } else {
+                    setDefaultResourceProvider(cri);
+                }
             }
-
-            ResourceProvider rp = resourceProviders.get(cri.getResourceClass());
-            if (rp != null) {
-                cri.setResourceProvider(rp);
-            } else {
-                setDefaultResourceProvider(cri);
+            if (cri.getResourceProvider() instanceof SingletonResourceProvider) {
+                ((SingletonResourceProvider)cri.getResourceProvider()).init(ep);
             }
         }
     }

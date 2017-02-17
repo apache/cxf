@@ -164,13 +164,15 @@ public class ResourceUtilsTest extends Assert {
 
     @Test
     public void shouldCreateApplicationWhichInheritsApplicationPath() throws Exception {
-        JAXRSServerFactoryBean application = ResourceUtils.createApplication(new SuperApplication(), false);
+        JAXRSServerFactoryBean application = ResourceUtils.createApplication(
+                                                 new SuperApplication(), false, false, false, null);
         assertEquals("/base", application.getAddress());
     }
 
     @Test
     public void shouldCreateApplicationWhichOverridesApplicationPath() throws Exception {
-        JAXRSServerFactoryBean application = ResourceUtils.createApplication(new CustomApplication(), false);
+        JAXRSServerFactoryBean application = ResourceUtils.createApplication(
+                                                 new CustomApplication(), false, false, false, null);
         assertEquals("/custom", application.getAddress());
     }
 

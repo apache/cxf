@@ -415,7 +415,11 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         return map;
     }
 
-
+    protected boolean isResourceLifecycleASingleton(ServletConfig servletConfig) {
+        String scope = servletConfig.getInitParameter(SERVICE_SCOPE_PARAM);
+        return SERVICE_SCOPE_SINGLETON.equals(scope);
+    }
+    
     protected Object createSingletonInstance(Class<?> cls, Map<String, List<String>> props, ServletConfig sc)
         throws ServletException {
         Constructor<?> c = ResourceUtils.findResourceConstructor(cls, false);
@@ -500,9 +504,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         for (String cName : classNames) {
             ApplicationInfo providerApp = createApplicationInfo(cName, servletConfig);
 
-            JAXRSServerFactoryBean bean = ResourceUtils.createApplication(providerApp.getProvider(),
+            JAXRSServerFactoryBean bean = ResourceUtils.createApplication(
+                                                providerApp.getProvider(),
                                                 ignoreApplicationPath,
-                                                getStaticSubResolutionValue(servletConfig));
+                                                getStaticSubResolutionValue(servletConfig),
+                                                isResourceLifecycleASingleton(servletConfig),
+                                                getBus());
             String splitChar = getParameterSplitChar(servletConfig);
             setAllInterceptors(bean, servletConfig, splitChar);
             setInvoker(bean, servletConfig);
@@ -523,9 +530,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     protected void createServerFromApplication(ServletConfig servletConfig)
         throws ServletException {
 
-        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(getApplication(),
-                                                                      isIgnoreApplicationPath(servletConfig),
-                                                                      getStaticSubResolutionValue(servletConfig));
+        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(
+                                          getApplication(),
+                                          isIgnoreApplicationPath(servletConfig),
+                                          getStaticSubResolutionValue(servletConfig),
+                                          isResourceLifecycleASingleton(servletConfig),
+                                          getBus());
         bean.setBus(getBus());
         bean.setApplication(getApplication());
         bean.create();

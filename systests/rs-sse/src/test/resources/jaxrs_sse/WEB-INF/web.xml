@@ -12,12 +12,12 @@
 			<param-value>http://cxf.apache.org/transports/http/sse</param-value>
 		</init-param>
 		<init-param>
-			<param-name>jaxrs.serviceClasses</param-name>
-			<param-value>org.apache.cxf.systest.jaxrs.sse.BookStore</param-value>
+			<param-name>javax.ws.rs.Application</param-name>
+			<param-value>org.apache.cxf.systest.jaxrs.sse.SseApplication</param-value>
 		</init-param>
 		<init-param>
-			<param-name>jaxrs.providers</param-name>
-			<param-value>com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider</param-value>
+			<param-name>jaxrs.scope</param-name>
+			<param-value>singleton</param-value>
 		</init-param>
 	</servlet>
 

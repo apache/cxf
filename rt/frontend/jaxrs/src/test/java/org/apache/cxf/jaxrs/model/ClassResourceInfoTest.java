@@ -249,7 +249,7 @@ public class ClassResourceInfoTest extends Assert {
     @Test
     public void testNameBindings() {
         Application app = new TestApplication();
-        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, true, true);
+        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, true, true, false, null);
         ClassResourceInfo cri = bean.getServiceFactory().getClassResourceInfo().get(0);
         Set<String> names = cri.getNameBindings();
         assertEquals(Collections.singleton(CustomNameBinding.class.getName()), names);

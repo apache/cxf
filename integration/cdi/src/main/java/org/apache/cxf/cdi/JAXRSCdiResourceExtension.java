@@ -187,7 +187,8 @@ public class JAXRSCdiResourceExtension implements Extension {
     private JAXRSServerFactoryBean createFactoryInstance(final Application application, final List< ? > services,
             final List< ? > providers, final List< ? extends Feature > features) {
 
-        final JAXRSServerFactoryBean instance = ResourceUtils.createApplication(application, false, false, bus);
+        final JAXRSServerFactoryBean instance = 
+            ResourceUtils.createApplication(application, false, false, false, bus);
         instance.setServiceBeans(new ArrayList<>(services));
         instance.setProviders(providers);
         instance.setProviders(loadExternalProviders());
@@ -203,7 +204,8 @@ public class JAXRSCdiResourceExtension implements Extension {
      */
     private JAXRSServerFactoryBean createFactoryInstance(final Application application, final BeanManager beanManager) {
 
-        final JAXRSServerFactoryBean instance = ResourceUtils.createApplication(application, false, false, bus);
+        final JAXRSServerFactoryBean instance = 
+            ResourceUtils.createApplication(application, false, false, false, bus);
         final ClassifiedClasses classified = classes2singletons(application, beanManager);
 
         instance.setProviders(classified.getProviders());
