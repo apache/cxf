@@ -569,13 +569,8 @@ public final class SSLUtils {
         } else {
             //Can default to JKS
             trustStoreType = SystemPropertyAction.getProperty("javax.net.ssl.trustStoreType");
-<<<<<<< HEAD
-            if (trustStoreType == null) {    
-                trustStoreType = DEFAULT_TRUST_STORE_TYPE;
-=======
             if (trustStoreType == null) {
                 trustStoreType = def;
->>>>>>> 19a4d72... CXF-7252 - TLSParameterJaxBUtils.getTrustManagers getting password from wrong system property
                 logMsg = "TRUST_STORE_TYPE_NOT_SET";
             } else {
                 logMsg = "TRUST_STORE_TYPE_SYSTEM_SET";
@@ -585,8 +580,6 @@ public final class SSLUtils {
         return trustStoreType;
     }
     
-<<<<<<< HEAD
-=======
     public static String getTruststorePassword(String trustStorePassword,
                                              Logger log) {
         String logMsg = null;
@@ -619,7 +612,6 @@ public final class SSLUtils {
         return trustStoreProvider;
     }
 
->>>>>>> 19a4d72... CXF-7252 - TLSParameterJaxBUtils.getTrustManagers getting password from wrong system property
     public static String getSecureSocketProtocol(String secureSocketProtocol,
                                                  Logger log) {
         if (secureSocketProtocol != null) {
