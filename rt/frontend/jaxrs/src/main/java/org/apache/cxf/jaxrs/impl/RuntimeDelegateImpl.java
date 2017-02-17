@@ -110,7 +110,7 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
             && !JAXRSServerFactoryBean.class.isAssignableFrom(endpointType))) {
             throw new IllegalArgumentException();
         }
-        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, false);
+        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, false, false, false, null);
         if (JAXRSServerFactoryBean.class.isAssignableFrom(endpointType)) {
             return endpointType.cast(bean);
         }
