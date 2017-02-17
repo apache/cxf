@@ -81,8 +81,8 @@ public interface ResourceManager {
 
     /**
      * Get all the currently registered resolvers.  This method should return
-     * a copy of the list of resolvers so that resolvers added after this method
-     * has been called will alter the list returned.
+     * an unmodifiable view of the list of resolvers so that resolvers added
+     * after this method has been called will alter the list returned.
      */
     List<ResourceResolver> getResourceResolvers();
 }
