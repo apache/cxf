@@ -73,8 +73,15 @@ public class DefaultResourceManager implements ResourceManager {
         }
     }
     public final void addResourceResolvers(Collection<? extends ResourceResolver> resolvers) {
+        int i = 0;
         for (ResourceResolver r : resolvers) {
-            addResourceResolver(r);
+            while (!registeredResolvers.contains(r)) {
+                try {
+                    registeredResolvers.add(i++, r);
+                } catch (IndexOutOfBoundsException e) {
+                    i = registeredResolvers.size();
+                }
+            }
         }
     }
 
