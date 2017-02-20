@@ -484,7 +484,10 @@ public class JMSConfiguration {
     }
 
     public Destination getReplyDestination(Session session, String replyToName) throws JMSException {
-        return destinationResolver.resolveDestinationName(session, replyToName, replyPubSubDomain);
+        if (replyToName != null) {
+            return destinationResolver.resolveDestinationName(session, replyToName, replyPubSubDomain);
+        }
+        return getReplyDestination(session);
     }
 
     public TransactionManager getTransactionManager() {
