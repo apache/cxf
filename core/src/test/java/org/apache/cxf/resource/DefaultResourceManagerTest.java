@@ -74,7 +74,7 @@ public class DefaultResourceManagerTest extends Assert {
 
     @Test
     public void testAddResolverList() {
-        List<ResourceResolver> addedResolvers = new ArrayList<>();
+        List<ResourceResolver> addedResolvers = new ArrayList<ResourceResolver>();
         for (int i = 0; i < 4; i++) {
             addedResolvers.add(new DummyResolver(resolvers[0].source));
         }
@@ -101,7 +101,7 @@ public class DefaultResourceManagerTest extends Assert {
 
     @Test
     public void testAddDuplicateResolverList() {
-        manager.addResourceResolvers(new ArrayList<>(manager.getResourceResolvers()));
+        manager.addResourceResolvers(new ArrayList<ResourceResolver>(manager.getResourceResolvers()));
 
         assertArrayEquals(resolvers, getResolvers(manager));
 
