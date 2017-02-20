@@ -338,7 +338,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     protected List<?> getProviders(ServletConfig servletConfig, String splitChar) throws ServletException {
         String providersList = servletConfig.getInitParameter(PROVIDERS_PARAM);
         if (providersList == null) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         String[] classNames = StringUtils.split(providersList, splitChar);
         List<Object> providers = new ArrayList<>();

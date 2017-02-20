@@ -486,10 +486,9 @@ public class ClientProxyImpl extends AbstractClient implements
         return m.getParameterAnnotations()[p.getIndex()];
     }
 
-    @SuppressWarnings("unchecked")
     private static List<Parameter> getParameters(MultivaluedMap<ParameterType, Parameter> map,
                                            ParameterType key) {
-        return map.get(key) == null ? Collections.EMPTY_LIST : map.get(key);
+        return map.get(key) == null ? Collections.emptyList() : map.get(key);
     }
 
     private void handleQueries(Method m,

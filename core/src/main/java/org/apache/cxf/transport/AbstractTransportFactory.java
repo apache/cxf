@@ -22,8 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.cxf.helpers.CastUtils;
-
 /**
  * Helper methods for {@link DestinationFactory}s and {@link ConduitInitiator}s.
  */
@@ -45,6 +43,6 @@ public abstract class AbstractTransportFactory {
     }
 
     public Set<String> getUriPrefixes() {
-        return CastUtils.cast(Collections.EMPTY_SET);
+        return Collections.emptySet();
     }
 }

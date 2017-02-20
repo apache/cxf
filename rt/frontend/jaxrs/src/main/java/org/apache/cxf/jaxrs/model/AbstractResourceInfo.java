@@ -257,10 +257,9 @@ public abstract class AbstractResourceInfo {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public Map<Class<?>, Method> getContextMethods() {
         Map<Class<?>, Method> methods = contextMethods == null ? null : contextMethods.get(getServiceClass());
-        return methods == null ? Collections.EMPTY_MAP
+        return methods == null ? Collections.emptyMap()
                                       : Collections.unmodifiableMap(methods);
     }
 
