@@ -43,6 +43,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -70,6 +71,7 @@ import org.apache.cxf.phase.Phase;
  * </pre>
  * or unless the <tt>defaultOptionsMethodsHandlePreflight</tt> property of this class is set to <tt>true</tt>.
  */
+@Provider
 @PreMatching
 @Priority(Priorities.AUTHENTICATION - 1)
 public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
@@ -165,10 +167,6 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
      * have additional headers based on what happens here.
      *
      * @param m the incoming message.
-     * @param opResInfo
-     * @param ann the annotation, if any, derived from a method that matched the OPTIONS request for the
-     *            preflight. probably completely useless.
-     * @param resourceClass the resource class passed into the filter.
      * @return
      */
     //CHECKSTYLE:OFF
@@ -486,8 +484,8 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
     /**
      * CORS uses one header containing space-separated values (Origin) and then
      * a raft of #field-name productions, which parse on commas and optional spaces.
-     * @param m
      * @param key
+     * @param spaceSeparated
      * @return
      */
     private List<String> getHeaderValues(String key, boolean spaceSeparated) {
