@@ -82,6 +82,11 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
                 data.setHost(beanConfig.getHost());
                 data.setInfo(beanConfig.getInfo());
             }
+            if (beanConfig.getSwagger() != null 
+                && beanConfig.getSwagger().getSecurityDefinitions() != null
+                && data.getSecurityDefinitions() == null) {
+                data.setSecurityDefinitions(beanConfig.getSwagger().getSecurityDefinitions());
+            }
         }
 
         if (replaceTags || javadocProvider != null) {
