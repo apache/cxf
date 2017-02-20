@@ -822,7 +822,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                     password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN);
                 }
 
-                if (!StringUtils.isEmpty(password)) {
+                if (password != null) {
                     // If the password is available then build the token
                     if (token.getPasswordType() == UsernameToken.PasswordType.HashPassword) {
                         utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);
