@@ -45,8 +45,7 @@ public class Swagger2NonAnnotatedServiceDescriptionTest extends AbstractSwagger2
             sf.setResourceProvider(BookStore.class,
                 new SingletonResourceProvider(new BookStore()));
             sf.setProvider(new JacksonJsonProvider());
-            final Swagger2Feature feature = new Swagger2Feature();
-            feature.setRunAsFilter(runAsFilter);
+            final Swagger2Feature feature = createSwagger2Feature();
             //FIXME swagger-jaxrs 1.5.3 can't handle a self-recursive subresource like Book
             // so we need to exclude "org.apache.cxf.systest.jaxrs" for now.
             feature.setResourcePackage("org.apache.cxf.systest.jaxrs.description.group1");

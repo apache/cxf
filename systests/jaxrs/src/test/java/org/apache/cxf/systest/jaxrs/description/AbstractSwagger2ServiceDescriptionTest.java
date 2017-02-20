@@ -49,12 +49,15 @@ import org.apache.cxf.jaxrs.swagger.SwaggerUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
+import org.hamcrest.CoreMatchers;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import org.yaml.snakeyaml.Yaml;
 
 public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBusClientServerTestBase {
+    private static final String CONTACT = "CXF unittest";
+    private static final String SECURITY_DEFINITION_NAME = "basicAuth";
 
     @Ignore
     public abstract static class Server extends AbstractBusTestServerBase {
@@ -73,13 +76,21 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             sf.setResourceProvider(BookStoreSwagger2.class,
                 new SingletonResourceProvider(new BookStoreSwagger2()));
             sf.setProvider(new JacksonJsonProvider());
-            final Swagger2Feature feature = new Swagger2Feature();
-            feature.setRunAsFilter(runAsFilter);
+            final Swagger2Feature feature = createSwagger2Feature();
             sf.setFeatures(Arrays.asList(feature));
             sf.setAddress("http://localhost:" + port + "/");
             sf.setExtensionMappings(
                  Collections.singletonMap("json", "application/json;charset=UTF-8"));
             sf.create();
+        }
+        
+        protected Swagger2Feature createSwagger2Feature() {
+            final Swagger2Feature feature = new Swagger2Feature();
+            feature.setRunAsFilter(runAsFilter);
+            feature.setContact(CONTACT);
+            feature.setSecurityDefinitions(Collections.singletonMap(SECURITY_DEFINITION_NAME,
+               new io.swagger.models.auth.BasicAuthDefinition()));
+            return feature;
         }
 
         protected static void start(final Server s) {
@@ -140,6 +151,8 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             assertEquals(1, delOpParams.size());
             assertEquals(ParameterType.PATH, delOpParams.get(0).getType());
 
+            assertThat(swaggerJson, CoreMatchers.containsString(CONTACT));
+            assertThat(swaggerJson, CoreMatchers.containsString(SECURITY_DEFINITION_NAME));
         } finally {
             client.close();
         }
