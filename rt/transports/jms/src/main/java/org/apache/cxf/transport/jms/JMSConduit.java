@@ -204,12 +204,13 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         
         // Synchronize on exchange early to make sure we do not miss the notify 
         synchronized (exchange) {
-            Destination replyToDestination = jmsConfig
-                .getReplyToDestination(session, headers.getJMSReplyTo());
-            String jmsMessageID = sendMessage(request, outMessage, replyToDestination, correlationId, closer,
-                                              session);
+            String replyTo = headers.getJMSReplyTo();
+            String jmsMessageID = sendMessage(request, outMessage,
+                                              jmsConfig.getReplyToDestination(session, replyTo),
+                                              correlationId, closer, session);
+            Destination replyDestination = jmsConfig.getReplyDestination(session, replyTo);
             boolean useSyncReceive = ((correlationId == null || userCID != null) && !jmsConfig.isPubSubDomain())
-                || (!replyToDestination.equals(staticReplyDestination) && headers.getJMSReplyTo() != null);
+                || !replyDestination.equals(staticReplyDestination);
             if (correlationId == null) {
                 correlationId = jmsMessageID;
                 correlationMap.put(correlationId, exchange);
@@ -217,8 +218,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
             if (exchange.isSynchronous()) {
                 if (useSyncReceive) {
-                    // TODO Not sure if replyToDestination is correct here
-                    javax.jms.Message replyMessage = JMSUtil.receive(session, replyToDestination,
+                    javax.jms.Message replyMessage = JMSUtil.receive(session, replyDestination,
                                                                      correlationId,
                                                                      jmsConfig.getReceiveTimeout(),
                                                                      jmsConfig.isPubSubNoLocal());
