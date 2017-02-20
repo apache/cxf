@@ -803,13 +803,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 if (StringUtils.isEmpty(password)) {
                     password = getPassword(userName, token, WSPasswordCallback.USERNAME_TOKEN);
                 }
-<<<<<<< HEAD
-            
-                if (!StringUtils.isEmpty(password)) {
-=======
-
                 if (password != null) {
->>>>>>> f91541b... CXF-7255 - Allow empty ("") passwords when calling a service
                     // If the password is available then build the token
                     if (token.getPasswordType() == UsernameToken.PasswordType.HashPassword) {
                         utBuilder.setPasswordType(WSConstants.PASSWORD_DIGEST);
