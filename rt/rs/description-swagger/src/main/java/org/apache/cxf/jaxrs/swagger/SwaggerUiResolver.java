@@ -69,6 +69,10 @@ public class SwaggerUiResolver {
     }
 
     public static String findSwaggerUiRoot(String swaggerUiVersion) {
-        return HELPER.findSwaggerUiRootInternal(swaggerUiVersion);
+        String root = HELPER.findSwaggerUiRootInternal(swaggerUiVersion);
+        if (root == null && HELPER.getClass() != SwaggerUiResolver.class) {
+            root = new SwaggerUiResolver().findSwaggerUiRootInternal(swaggerUiVersion);
+        }
+        return root;
     }
 }
