@@ -20,9 +20,11 @@ package org.apache.cxf.ext.logging;
 
 import java.util.UUID;
 
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -30,7 +32,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final int DEFAULT_LIMIT = 48 * 1024;
     public static final String CONTENT_SUPPRESSED = "--- Content suppressed ---";
-
+    private static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable"; 
     protected int limit = DEFAULT_LIMIT;
     protected long threshold = -1;
     protected boolean logBinary;
@@ -43,6 +45,11 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         this.sender = sender;
     }
 
+    protected static boolean isLoggingDisabledNow(Message message) throws Fault {
+        Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP);
+        return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
+    }
+    
     public void setLimit(int lim) {
         this.limit = lim;
     }

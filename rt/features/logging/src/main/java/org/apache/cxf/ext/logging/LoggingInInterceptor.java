@@ -75,6 +75,9 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     }
 
     public void handleMessage(Message message) throws Fault {
+        if (isLoggingDisabledNow(message)) {
+            return;
+        }
         createExchangeId(message);
         final LogEvent event = new DefaultLogEventMapper().map(message);
         if (shouldLogContent(event)) {

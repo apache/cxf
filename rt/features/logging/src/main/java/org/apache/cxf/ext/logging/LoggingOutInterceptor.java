@@ -58,6 +58,9 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
     }
 
     public void handleMessage(Message message) throws Fault {
+        if (isLoggingDisabledNow(message)) {
+            return;
+        }
         createExchangeId(message);
         final OutputStream os = message.getContent(OutputStream.class);
         if (os != null) {
