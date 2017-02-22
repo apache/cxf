@@ -73,6 +73,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected boolean prettyLogging;
     private boolean showBinaryContent;
     private boolean showMultipartContent = true;
+    private List<String> binaryContentMediaTypes = BINARY_CONTENT_MEDIA_TYPES;
 
     public AbstractLoggingInterceptor(String phase) {
         super(phase);
@@ -280,7 +281,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         return showBinaryContent;
     }
     protected boolean isBinaryContent(String contentType) {
-        return contentType != null && BINARY_CONTENT_MEDIA_TYPES.contains(contentType);
+        return contentType != null && binaryContentMediaTypes.contains(contentType);
     }
     public boolean isShowMultipartContent() {
         return showMultipartContent;
@@ -290,6 +291,12 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
     protected boolean isMultipartContent(String contentType) {
         return contentType != null && contentType.startsWith(MULTIPART_CONTENT_MEDIA_TYPE);
+    }
+    public List<String> getBinaryContentMediaTypes() {
+        return binaryContentMediaTypes;
+    }
+    public void setBinaryContentMediaTypes(List<String> binaryContentMediaTypes) {
+        this.binaryContentMediaTypes = binaryContentMediaTypes;
     }
 
 }
