@@ -90,7 +90,7 @@ public class JwsJsonConsumer {
     private Boolean validateB64Status() {
         return JwsJsonProducer.validateB64Status(signatures);
     }
-    protected JwsJsonSignatureEntry getSignatureObject(Map<String, Object> signatureEntry) {
+    protected final JwsJsonSignatureEntry getSignatureObject(Map<String, Object> signatureEntry) {
         String protectedHeader = (String)signatureEntry.get("protected");
         Map<String, Object> header = CastUtils.cast((Map<?, ?>)signatureEntry.get("header"));
         String signature = (String)signatureEntry.get("signature");

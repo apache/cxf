@@ -102,7 +102,7 @@ public class ServerImpl implements Server {
         }
     }
 
-    protected ManagedEndpoint createManagedEndpoint() {
+    private ManagedEndpoint createManagedEndpoint() {
         return new ManagedEndpoint(bus, endpoint, this);
     }
 

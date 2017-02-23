@@ -60,7 +60,7 @@ public class JwsHeaders extends JoseHeaders {
         setSignatureAlgorithm(sigAlgo);
     }
 
-    public void setSignatureAlgorithm(SignatureAlgorithm algo) {
+    public final void setSignatureAlgorithm(SignatureAlgorithm algo) {
         super.setAlgorithm(algo.getJwaName());
     }
 

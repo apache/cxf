@@ -227,11 +227,11 @@ public class JMSEndpoint {
      * @param key
      * @param value
      */
-    public void putJndiParameter(String key, String value) {
+    public final void putJndiParameter(String key, String value) {
         jndiParameters.put(key, value);
     }
 
-    public void putParameter(String key, String value) {
+    public final void putParameter(String key, String value) {
         parameters.put(key, value);
     }
 
@@ -270,7 +270,7 @@ public class JMSEndpoint {
     public String getJmsVariant() {
         return jmsVariant;
     }
-    public void setJmsVariant(String jmsVariant) {
+    public final void setJmsVariant(String jmsVariant) {
         if (jmsVariant == null) {
             this.jmsVariant = QUEUE;
         }

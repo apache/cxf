@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -78,7 +79,9 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
 
     public Jetty9WebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                      JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
-        super(bus, registry, ei, serverEngineFactory);
+        super(bus, registry, ei,
+              serverEngineFactory == null ? null : new URL(getNonWSAddress(ei)),
+              serverEngineFactory);
         try {
             webSocketFactory = (WebSocketServletFactory)ClassLoaderUtils
                 .loadClass("org.eclipse.jetty.websocket.server.WebSocketServerFactory",
@@ -115,13 +118,16 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         }
         super.invoke(config, context, request, response);
     }
-    @Override
-    protected String getAddress(EndpointInfo endpointInfo) {
+    private static String getNonWSAddress(EndpointInfo endpointInfo) {
         String address = endpointInfo.getAddress();
         if (address.startsWith("ws")) {
             address = "http" + address.substring(2);
         }
         return address;
+    }
+    @Override
+    protected String getAddress(EndpointInfo endpointInfo) {
+        return getNonWSAddress(endpointInfo);
     }
 
     @Override

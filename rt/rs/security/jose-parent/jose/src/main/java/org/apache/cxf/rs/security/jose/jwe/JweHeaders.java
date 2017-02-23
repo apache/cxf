@@ -100,10 +100,6 @@ public class JweHeaders extends JoseHeaders {
         return (String)getHeader(JoseConstants.JWE_HEADER_ZIP_ALGORITHM);
     }
 
-    @Override
-    public JoseHeaders setHeader(String name, Object value) {
-        return (JoseHeaders)super.setHeader(name, value);
-    }
     public byte[] toCipherAdditionalAuthData() {
         return toCipherAdditionalAuthData(new JsonMapObjectReaderWriter().toJson(this));
     }

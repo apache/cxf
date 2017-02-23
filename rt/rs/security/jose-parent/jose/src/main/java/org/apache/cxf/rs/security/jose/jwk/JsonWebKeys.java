@@ -59,10 +59,10 @@ public class JsonWebKeys extends JsonMapObject {
             return null;
         }
     }
-    public void setKey(JsonWebKey key) {
+    public final void setKey(JsonWebKey key) {
         setKeys(Collections.singletonList(key));
     }
-    public void setKeys(List<JsonWebKey> keys) {
+    public final void setKeys(List<JsonWebKey> keys) {
         super.setProperty(KEYS_PROPERTY, keys);
     }
 

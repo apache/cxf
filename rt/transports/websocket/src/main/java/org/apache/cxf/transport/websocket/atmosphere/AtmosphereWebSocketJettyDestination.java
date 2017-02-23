@@ -58,7 +58,9 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
 
     public AtmosphereWebSocketJettyDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                      JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
-        super(bus, registry, ei, serverEngineFactory);
+        super(bus, registry, ei, 
+              serverEngineFactory == null ? null : new URL(getNonWSAddress(ei)),
+              serverEngineFactory);
         framework = new AtmosphereFramework(false, true);
         framework.setUseNativeImplementation(false);
         framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
@@ -77,14 +79,18 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
                                HttpServletResponse resp) throws IOException {
         super.invoke(config, context, req, resp);
     }
-
-    @Override
-    protected String getAddress(EndpointInfo endpointInfo) {
+    
+    private static String getNonWSAddress(EndpointInfo endpointInfo) {
         String address = endpointInfo.getAddress();
         if (address.startsWith("ws")) {
             address = "http" + address.substring(2);
         }
         return address;
+    }
+
+    @Override
+    protected String getAddress(EndpointInfo endpointInfo) {
+        return getNonWSAddress(endpointInfo);
     }
 
 

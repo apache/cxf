@@ -132,7 +132,7 @@ public class JweJsonConsumer {
         iv = getDecodedBytes(jsonObjectMap, "iv");
         authTag = getDecodedBytes(jsonObjectMap, "tag");
     }
-    protected JweJsonEncryptionEntry getEncryptionObject(Map<String, Object> encryptionEntry) {
+    protected final JweJsonEncryptionEntry getEncryptionObject(Map<String, Object> encryptionEntry) {
         Map<String, Object> header = CastUtils.cast((Map<?, ?>)encryptionEntry.get("header"));
         JweHeaders recipientUnprotected = header == null ? null : new JweHeaders(header);
         String encodedKey = (String)encryptionEntry.get("encrypted_key");

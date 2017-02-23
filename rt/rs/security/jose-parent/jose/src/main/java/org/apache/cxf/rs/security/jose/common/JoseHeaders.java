@@ -46,7 +46,7 @@ public abstract class JoseHeaders extends JsonMapObject {
     private void init(JoseType type) {
         setType(type);
     }
-    public void setType(JoseType type) {
+    public final void setType(JoseType type) {
         setHeader(JoseConstants.HEADER_TYPE, type.toString());
     }
 
@@ -148,7 +148,7 @@ public abstract class JoseHeaders extends JsonMapObject {
         return new JsonWebKey(map);
     }
 
-    public JoseHeaders setHeader(String name, Object value) {
+    public final JoseHeaders setHeader(String name, Object value) {
         setProperty(name, value);
         return this;
     }

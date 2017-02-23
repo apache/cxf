@@ -90,15 +90,25 @@ public class JettyHTTPDestination extends ServletDestination {
             EndpointInfo ei,
             JettyHTTPServerEngineFactory serverEngineFactory
     ) throws IOException {
+        this(bus, registry, ei, 
+             serverEngineFactory == null ? null : new URL(getAddressValue(ei, true).getAddress()),
+             serverEngineFactory);
+    }
+
+    
+    protected JettyHTTPDestination(Bus bus,
+                                   DestinationRegistry registry,
+                                   EndpointInfo ei,
+                                   URL nurl,
+                                   JettyHTTPServerEngineFactory serverEngineFactory)
+        throws IOException {
         //Add the default port if the address is missing it
         super(bus, registry, ei, getAddressValue(ei, true).getAddress(), true);
         this.serverEngineFactory = serverEngineFactory;
-        if (serverEngineFactory != null) {
-            nurl = new URL(getAddress(endpointInfo));
-        }
+        this.nurl = nurl;
         loader = bus.getExtension(ClassLoader.class);
     }
-
+    
     protected Logger getLogger() {
         return LOG;
     }
