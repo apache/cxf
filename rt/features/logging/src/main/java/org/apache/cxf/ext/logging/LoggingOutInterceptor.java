@@ -31,7 +31,7 @@ import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
-import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
+import org.apache.cxf.ext.logging.slf4j.Slf4jNoMdcEventSender;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
@@ -47,7 +47,7 @@ import org.apache.cxf.phase.Phase;
 public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
 
     public LoggingOutInterceptor() {
-        this(new Slf4jEventSender());
+        this(new Slf4jNoMdcEventSender());
     }
     public LoggingOutInterceptor(PrintWriter w) {
         this(new PrintWriterEventSender(w));
