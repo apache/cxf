@@ -67,6 +67,7 @@ public class Activator implements BundleActivator {
             LOG.info("CXF message logging feature " + (enabled ? "enabled" : "disabled"));
             Integer limit = Integer.valueOf(getValue(config, "limit", "65536"));
             Boolean pretty = Boolean.valueOf(getValue(config, "pretty", "false"));
+            Boolean verbose = Boolean.valueOf(getValue(config, "verbose", "false"));
             Long inMemThreshold = Long.valueOf(getValue(config, "inMemThresHold", "-1"));
 
             if (limit != null) {
@@ -77,6 +78,10 @@ public class Activator implements BundleActivator {
             }
             if (pretty != null) {
                 logging.setPrettyLogging(pretty);
+            }
+            
+            if (verbose != null) {
+                logging.setVerbose(verbose);
             }
 
             if (intentReg == null) {
