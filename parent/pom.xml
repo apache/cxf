@@ -2242,6 +2242,27 @@
 	    <activation>
         	<jdk>9</jdk>
             </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
+                            <showWarnings>true</showWarnings>
+                            <compilerArgument>${cxf.compile.flags}</compilerArgument>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
 	</profile>
     </profiles>
 
