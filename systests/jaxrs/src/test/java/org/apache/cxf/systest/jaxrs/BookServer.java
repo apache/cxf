@@ -130,10 +130,10 @@ public class BookServer extends AbstractBusTestServerBase {
         List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
         inInts.add(new CustomInFaultyInterceptor());
         inInts.add(new LoggingInInterceptor());
-        inInts.add(new LoggingOutInterceptor());
         sf.setInInterceptors(inInts);
         List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
         outInts.add(new CustomOutInterceptor());
+        outInts.add(new LoggingOutInterceptor());
         sf.setOutInterceptors(outInts);
         List<Interceptor<? extends Message>> outFaultInts = new ArrayList<Interceptor<? extends Message>>();
         outFaultInts.add(new CustomOutFaultInterceptor());
