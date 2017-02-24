@@ -25,26 +25,19 @@ import java.util.Date;
 /**
  * 
  */
-public class PrintWriterEventSender extends AbstractPrintLogEventSender {
+public class PrintWriterEventSender implements LogEventSender {
     PrintWriter writer;
     
     public PrintWriterEventSender(PrintWriter writer) {
         this.writer = writer;
     }
     
-    void setPrintWriter(PrintWriter w) {
-        writer = w;
-    }
-    
-    
     /** {@inheritDoc}*/
     @Override
     public void send(LogEvent event) {
-        StringBuilder b = new StringBuilder();
-        b.append(new Date().toString()).append(" - PrintWriterEventSender");
-        prepareBuilder(b, event);
         synchronized (writer) {
-            writer.print(b.toString());
+            writer.println(Instant.now().toString() + " - PrintWriterEventSender");
+            writer.print(LogMessageFormatter.fomat(event));
         }
     }
     

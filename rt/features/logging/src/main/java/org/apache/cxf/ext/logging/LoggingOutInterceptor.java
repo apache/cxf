@@ -21,7 +21,6 @@ package org.apache.cxf.ext.logging;
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -30,8 +29,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
-import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
-import org.apache.cxf.ext.logging.slf4j.Slf4jNoMdcEventSender;
+import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
@@ -47,11 +45,9 @@ import org.apache.cxf.phase.Phase;
 public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
 
     public LoggingOutInterceptor() {
-        this(new Slf4jNoMdcEventSender());
+        this(new Slf4jVerboseEventSender());
     }
-    public LoggingOutInterceptor(PrintWriter w) {
-        this(new PrintWriterEventSender(w));
-    }
+
     public LoggingOutInterceptor(LogEventSender sender) {
         super(Phase.PRE_STREAM, sender);
         addBefore(StaxOutInterceptor.class.getName());
