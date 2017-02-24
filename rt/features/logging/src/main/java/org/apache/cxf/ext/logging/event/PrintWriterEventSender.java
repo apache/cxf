@@ -36,7 +36,7 @@ public class PrintWriterEventSender implements LogEventSender {
     @Override
     public void send(LogEvent event) {
         synchronized (writer) {
-            writer.println(Instant.now().toString() + " - PrintWriterEventSender");
+            writer.print(Instant.now().toString() + " - PrintWriterEventSender");
             writer.print(LogMessageFormatter.format(event));
         }
     }
