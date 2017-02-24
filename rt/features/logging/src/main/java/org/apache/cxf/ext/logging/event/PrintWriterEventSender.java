@@ -20,7 +20,7 @@
 package org.apache.cxf.ext.logging.event;
 
 import java.io.PrintWriter;
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * 
