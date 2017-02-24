@@ -53,7 +53,7 @@ public class LoggingFeature extends AbstractFeature {
     private PrettyLoggingFilter prettyFilter;
 
     public LoggingFeature() {
-        this.sender = new Slf4jEventSender();
+        this.sender = new Slf4jVerboseEventSender();
         prettyFilter = new PrettyLoggingFilter(sender);
         in = new LoggingInInterceptor(prettyFilter);
         out = new LoggingOutInterceptor(prettyFilter);
@@ -105,7 +105,7 @@ public class LoggingFeature extends AbstractFeature {
     }
     
     public void setVerbose(boolean verbose) {
-        sender = verbose ? new Slf4jVerboseEventSender() : new Slf4jEventSender();
+        this.sender = verbose ? new Slf4jVerboseEventSender() : new Slf4jEventSender();
         this.prettyFilter.setNext(sender);
     }
 }
