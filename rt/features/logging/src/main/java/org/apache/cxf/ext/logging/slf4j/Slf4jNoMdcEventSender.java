@@ -16,36 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.ext.logging.slf4j;
 
-package org.apache.cxf.ext.logging.event;
+import org.apache.cxf.ext.logging.event.AbstractPrintLogEventSender;
+import org.apache.cxf.ext.logging.event.LogEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.PrintWriter;
-import java.time.Instant;
+public class Slf4jNoMdcEventSender extends AbstractPrintLogEventSender {
+    private final String logCategory;
 
-/**
- *
- */
-public class PrintWriterEventSender extends AbstractPrintLogEventSender {
-    PrintWriter writer;
-
-    public PrintWriterEventSender(PrintWriter writer) {
-        this.writer = writer;
+    public Slf4jNoMdcEventSender(String logCategory) {
+        this.logCategory = logCategory;
     }
 
-    void setPrintWriter(PrintWriter w) {
-        writer = w;
+    public Slf4jNoMdcEventSender() {
+        this(null);
     }
 
-
-    /** {@inheritDoc}*/
     @Override
     public void send(LogEvent event) {
+        String cat = logCategory != null ? logCategory
+            : "org.apache.cxf.services." + event.getPortTypeName().getLocalPart() + "." + event.getType();
+        Logger log = LoggerFactory.getLogger(cat);
+        
         StringBuilder b = new StringBuilder();
-        b.append(Instant.now().toString()).append(" - PrintWriterEventSender");
         prepareBuilder(b, event);
-        synchronized (writer) {
-            writer.print(b.toString());
-        }
+        log.info(b.toString());
     }
+
     
 }

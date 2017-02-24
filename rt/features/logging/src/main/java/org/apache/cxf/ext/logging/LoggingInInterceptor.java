@@ -30,7 +30,7 @@ import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
-import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
+import org.apache.cxf.ext.logging.slf4j.Slf4jNoMdcEventSender;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedWriter;
@@ -59,7 +59,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     
     
     public LoggingInInterceptor() {
-        this(new Slf4jEventSender());
+        this(new Slf4jNoMdcEventSender());
     }
     public LoggingInInterceptor(LogEventSender sender) {
         super(Phase.PRE_INVOKE, sender);

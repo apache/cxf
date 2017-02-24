@@ -53,6 +53,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
@@ -129,7 +130,7 @@ public class BookServer extends AbstractBusTestServerBase {
         List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
         inInts.add(new CustomInFaultyInterceptor());
         inInts.add(new LoggingInInterceptor());
-
+        inInts.add(new LoggingOutInterceptor());
         sf.setInInterceptors(inInts);
         List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
         outInts.add(new CustomOutInterceptor());
