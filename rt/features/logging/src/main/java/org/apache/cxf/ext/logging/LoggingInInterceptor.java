@@ -19,6 +19,7 @@
 package org.apache.cxf.ext.logging;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +29,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
+import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
 import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
@@ -59,9 +61,15 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     public LoggingInInterceptor() {
         this(new Slf4jVerboseEventSender());
     }
+    
+    public LoggingInInterceptor(PrintWriter writer) {
+        this(new PrintWriterEventSender(writer));
+    }
+
     public LoggingInInterceptor(LogEventSender sender) {
         super(Phase.PRE_INVOKE, sender);
     }
+    
 
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         Collection<PhaseInterceptor<? extends Message>> ret = new ArrayList<>();
