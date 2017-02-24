@@ -18,32 +18,14 @@
  */
 package org.apache.cxf.ext.logging.slf4j;
 
-import org.apache.cxf.ext.logging.event.AbstractPrintLogEventSender;
 import org.apache.cxf.ext.logging.event.LogEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.cxf.ext.logging.event.LogMessageFormatter;
 
-public class Slf4jNoMdcEventSender extends AbstractPrintLogEventSender {
-    private final String logCategory;
-
-    public Slf4jNoMdcEventSender(String logCategory) {
-        this.logCategory = logCategory;
-    }
-
-    public Slf4jNoMdcEventSender() {
-        this(null);
-    }
+public class Slf4jVerboseEventSender extends Slf4jEventSender {
 
     @Override
-    public void send(LogEvent event) {
-        String cat = logCategory != null ? logCategory
-            : "org.apache.cxf.services." + event.getPortTypeName().getLocalPart() + "." + event.getType();
-        Logger log = LoggerFactory.getLogger(cat);
-        
-        StringBuilder b = new StringBuilder();
-        prepareBuilder(b, event);
-        log.info(b.toString());
+    protected String getLogMessage(LogEvent event) {
+        return LogMessageFormatter.fomat(event);
     }
 
-    
 }

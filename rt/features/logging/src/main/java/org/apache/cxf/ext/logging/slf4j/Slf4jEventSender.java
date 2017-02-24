@@ -30,20 +30,10 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 public class Slf4jEventSender implements LogEventSender {
-    private final String logCategory;
-
-    public Slf4jEventSender(String logCategory) {
-        this.logCategory = logCategory;
-    }
-
-    public Slf4jEventSender() {
-        this(null);
-    }
 
     @Override
     public void send(LogEvent event) {
-        String cat = logCategory != null ? logCategory
-            : "org.apache.cxf.services." + event.getPortTypeName().getLocalPart() + "." + event.getType();
+        String cat = "org.apache.cxf.services." + event.getPortTypeName().getLocalPart() + "." + event.getType();
         Logger log = LoggerFactory.getLogger(cat);
         Set<String> keys = new HashSet<>();
         try {
@@ -76,7 +66,7 @@ public class Slf4jEventSender implements LogEventSender {
         return name == null ? null : name.getLocalPart();
     }
 
-    private String getLogMessage(LogEvent event) {
+    protected String getLogMessage(LogEvent event) {
         return event.getPayload();
     }
 

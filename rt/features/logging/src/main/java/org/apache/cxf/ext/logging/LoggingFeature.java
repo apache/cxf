@@ -25,6 +25,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrettyLoggingFilter;
 import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
+import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
@@ -102,5 +103,10 @@ public class LoggingFeature extends AbstractFeature {
     public void setLogMultipart(boolean logMultipart) {
         in.setLogMultipart(logMultipart);
         out.setLogMultipart(logMultipart);
+    }
+    
+    public void setVerbose(boolean verbose) {
+        sender = verbose ? new Slf4jVerboseEventSender() : new Slf4jEventSender();
+        this.prettyFilter.setNext(sender);
     }
 }
