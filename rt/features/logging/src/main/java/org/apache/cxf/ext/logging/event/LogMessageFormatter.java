@@ -31,7 +31,7 @@ public final class LogMessageFormatter {
     private LogMessageFormatter() {
     }
     
-    public static String fomat(LogEvent event) {
+    public static String format(LogEvent event) {
         StringBuilder b = new StringBuilder();
         write(b, "Type", event.getType().toString());
         write(b, "Address", event.getAddress());

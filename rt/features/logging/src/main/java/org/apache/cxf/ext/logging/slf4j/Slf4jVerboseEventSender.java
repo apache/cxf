@@ -25,7 +25,7 @@ public class Slf4jVerboseEventSender extends Slf4jEventSender {
 
     @Override
     protected String getLogMessage(LogEvent event) {
-        return LogMessageFormatter.fomat(event);
+        return LogMessageFormatter.format(event);
     }
 
 }
