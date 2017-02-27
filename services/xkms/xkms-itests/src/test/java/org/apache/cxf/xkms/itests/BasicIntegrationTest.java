@@ -59,7 +59,7 @@ public class BasicIntegrationTest {
 
     @Configuration
     public Option[] getConfig() {
-        String karafVersion = System.getProperty("karaf.version", "3.0.4");
+        String karafVersion = System.getProperty("karaf.version", "4.0.8");
         String localRepository = System.getProperty("localRepository");
         MavenArtifactUrlReference karafUrl = maven() //
             .groupId("org.apache.karaf") //
