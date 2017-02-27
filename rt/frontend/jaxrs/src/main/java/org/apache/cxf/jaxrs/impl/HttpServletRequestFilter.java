@@ -65,7 +65,7 @@ public class HttpServletRequestFilter extends HttpServletRequestWrapper {
     @Override
     public String getParameter(String name) {
         String[] values = this.getParameterValues(name);
-        return values == null ? null : values[0];
+        return values == null || values.length == 0 ? null : values[0];
     }
     @Override
     public String[] getParameterValues(String name) {
