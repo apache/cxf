@@ -66,15 +66,17 @@ public class RESTLoggingTest {
         client.get(InputStream.class).close();
         server.destroy();
 
-        assertLogged(sender.getEvents().get(0));
-        assertLogged(sender.getEvents().get(1));
-        assertNotLogged(sender.getEvents().get(2));
-        assertNotLogged(sender.getEvents().get(3));
+        List<LogEvent> events = sender.getEvents();
+        Assert.assertEquals(8, events.size());
+        assertLogged(events.get(0));
+        assertLogged(events.get(1));
+        assertNotLogged(events.get(2));
+        assertNotLogged(events.get(3));
 
-        assertLogged(sender.getEvents().get(4));
-        assertLogged(sender.getEvents().get(5));
-        assertLogged(sender.getEvents().get(6));
-        assertLogged(sender.getEvents().get(7));
+        assertLogged(events.get(4));
+        assertLogged(events.get(5));
+        assertLogged(events.get(6));
+        assertLogged(events.get(7));
     }
 
     private void assertLogged(LogEvent event) {
