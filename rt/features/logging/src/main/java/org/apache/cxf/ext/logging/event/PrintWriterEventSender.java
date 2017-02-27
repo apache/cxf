@@ -38,6 +38,7 @@ public class PrintWriterEventSender implements LogEventSender {
         synchronized (writer) {
             writer.print(Instant.now().toString() + " - PrintWriterEventSender");
             writer.print(LogMessageFormatter.format(event));
+            writer.flush();
         }
     }
     
