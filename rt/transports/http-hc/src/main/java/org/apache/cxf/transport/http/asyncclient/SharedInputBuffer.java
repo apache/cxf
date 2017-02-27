@@ -25,7 +25,6 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.http.annotation.ThreadSafe;
 import org.apache.http.nio.ContentDecoder;
 import org.apache.http.nio.IOControl;
 import org.apache.http.nio.util.ByteBufferAllocator;
@@ -44,7 +43,6 @@ import org.apache.http.nio.util.ExpandableBuffer;
  * In case of an abnormal situation or when no longer needed the buffer must be shut down
  * using {@link #shutdown()} method.
  */
-@ThreadSafe
 public class SharedInputBuffer extends ExpandableBuffer {
 
     private final ReentrantLock lock;
