@@ -20,6 +20,9 @@
 package org.apache.cxf.tracing.htrace.ext;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,8 +44,22 @@ public class LoggingSpanReceiver extends SpanReceiver {
     public static final String LOG_LEVEL_INFO = Level.INFO.getName();
     public static final String LOG_LEVEL_WARN = Level.WARNING.getName();
 
+    private interface Stringifier<T> {
+        String toString(T value);
+    }
+    
     private static final Logger LOG = LogUtils.getL7dLogger(LoggingSpanReceiver.class);
     private final Level level;
+
+    private final Stringifier<TimelineAnnotation> timelineStringifier = new Stringifier<TimelineAnnotation>() {
+        @Override
+        public String toString(TimelineAnnotation annotation) {
+            final StringBuilder sb = new StringBuilder();
+            append(sb, "time", annotation.getTime());
+            append(sb, "message", annotation.getMessage(), true);
+            return "[" + sb.toString() + "]";
+        }
+    };
 
     public LoggingSpanReceiver(HTraceConfiguration conf) {
         level = Level.parse(conf.get(LOG_LEVEL_KEY, LOG_LEVEL_DEBUG));
@@ -57,6 +74,7 @@ public class LoggingSpanReceiver extends SpanReceiver {
     public void close() throws IOException {
     }
     
+    
     /**
      * Sample log statements:
      * 
@@ -70,12 +88,6 @@ public class LoggingSpanReceiver extends SpanReceiver {
      *   description="GET http://localhost:8282/rest/api/people" parents=[] kvs=[] timelines=[]
      */
     
-    private String toString(TimelineAnnotation annotation) {
-        final StringBuilder sb = new StringBuilder();
-        append(sb, "time", annotation.getTime());
-        append(sb, "message", annotation.getMessage(), true);
-        return sb.toString();
-    }
     
     private String toString(Span span) {
         final StringBuilder sb = new StringBuilder();
@@ -103,12 +115,12 @@ public class LoggingSpanReceiver extends SpanReceiver {
         
         append(sb, "parents", span.getParents());
         append(sb, "kvs", span.getKVAnnotations());
-        append(sb, "timelines", span.getTimelineAnnotations().toArray(), true);
+        append(sb, "timelines", span.getTimelineAnnotations(), timelineStringifier);
         
         return sb.toString();
     }
 
-    private<T> void append(StringBuilder sb, String key, Map<String, String> values) {
+    private void append(StringBuilder sb, String key, Map<String, String> values) {
         final StringBuilder inner = new StringBuilder();
         
         for (final Map.Entry<String, String> entry : values.entrySet()) {
@@ -117,22 +129,13 @@ public class LoggingSpanReceiver extends SpanReceiver {
 
         append(sb, key, inner.insert(0, "[").append("]").toString());
     }
-
-    private<T> void append(StringBuilder sb, String key, T[] values) {
-        append(sb, key, values, false);
+    
+    private<T> void append(StringBuilder sb, String key, Collection<T> values, Stringifier<T> stringifier) {
+        append(sb, key, toString(values, stringifier));
     }
-    private<T> void append(StringBuilder sb, String key, T[] values, boolean useBrackets) {
-        final StringBuilder inner = new StringBuilder();
-        
-        for (T value : values) {
-            String str = value.toString();
-            if (useBrackets) {
-                str = "[" + str + "]";
-            }
-            append(inner, quote(key), str, true);
-        }
-
-        append(sb, key, inner.insert(0, "[").append("]").toString());
+    
+    private<T> void append(StringBuilder sb, String key, T[] values) {
+        append(sb, key, toString(values));
     }
     
     private void append(StringBuilder sb, String key, long value) {
@@ -156,6 +159,26 @@ public class LoggingSpanReceiver extends SpanReceiver {
         final StringBuilder sb = new StringBuilder();
         quote(sb, value, true);
         return sb.toString();
+    }
+    
+    private<T> String toString(Collection<T> values, Stringifier<T> stringifier) {
+        final Collection<String> converted = new ArrayList<>();
+        
+        for (final T value: values) {
+            converted.add(stringifier.toString(value));
+        }
+        
+        return Arrays.toString(converted.toArray());
+    }
+    
+    private<T> String toString(T[] values) {
+        final Collection<String> converted = new ArrayList<>();
+        
+        for (final T value: values) {
+            converted.add(value.toString());
+        }
+        
+        return Arrays.toString(converted.toArray());
     }
     
     private void quote(StringBuilder sb, String value, boolean quoted) {
