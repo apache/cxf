@@ -49,7 +49,12 @@ public class OidcDynamicRegistrationService extends DynamicRegistrationService {
 
     @Override
     protected ClientRegistrationResponse fromClientToRegistrationResponse(Client client) {
-        ClientRegistrationResponse resp = super.fromClientToRegistrationResponse(client);
+        return super.fromClientToRegistrationResponse(client);
+    }
+
+    @Override
+    protected ClientRegistration fromClientToClientRegistration(Client client) {
+        ClientRegistration resp = super.fromClientToClientRegistration(client);
         String logoutUris = client.getProperties().get(RP_INITIATED_LOGOUT_URIS);
         if (logoutUris != null) {
             List<String> list = new LinkedList<String>();
@@ -59,12 +64,6 @@ public class OidcDynamicRegistrationService extends DynamicRegistrationService {
             resp.setProperty(RP_INITIATED_LOGOUT_URIS, list);
         }
         return resp;
-    }
-
-    @Override
-    protected ClientRegistration fromClientToClientRegistration(Client client) {
-        //TODO: check OIDC specific properties in Client extra properties
-        return super.fromClientToClientRegistration(client);
     }
 
     protected int getClientSecretSizeInBytes(ClientRegistration request) {
