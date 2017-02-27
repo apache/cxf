@@ -33,6 +33,10 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
     // Recommended - but optional
     private boolean userInfoEndpointNotAvailable;
     private String userInfoEndpointAddress;
+    
+    // Optional RP initiated logout
+    private boolean endSessionEndpointNotAvailable;
+    private String endSessionEndpointAddress;
 
     @Override
     protected void prepareConfigurationData(Map<String, Object> cfg, String baseUri) {
@@ -49,6 +53,13 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
             cfg.put("id_token_signing_alg_values_supported",
                     Collections.singletonList(sigProps.get(JoseConstants.RSSEC_SIGNATURE_ALGORITHM)));
         }
+        
+        // RP Initiated Logout Endpoint
+        if (!isEndSessionEndpointNotAvailable()) {
+            String theEndSessionEndpointAddress =
+                calculateEndpointAddress(endSessionEndpointAddress, baseUri, "/idp/logout");
+            cfg.put("end_session_endpoint", theEndSessionEndpointAddress);
+        }
     }
 
     public boolean isUserInfoEndpointNotAvailable() {
@@ -57,6 +68,22 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
 
     public void setUserInfoEndpointNotAvailable(boolean userInfoEndpointNotAvailable) {
         this.userInfoEndpointNotAvailable = userInfoEndpointNotAvailable;
+    }
+
+    public boolean isEndSessionEndpointNotAvailable() {
+        return endSessionEndpointNotAvailable;
+    }
+
+    public void setEndSessionEndpointNotAvailable(boolean endSessionEndpointNotAvailable) {
+        this.endSessionEndpointNotAvailable = endSessionEndpointNotAvailable;
+    }
+
+    public String getEndSessionEndpointAddress() {
+        return endSessionEndpointAddress;
+    }
+
+    public void setEndSessionEndpointAddress(String endSessionEndpointAddress) {
+        this.endSessionEndpointAddress = endSessionEndpointAddress;
     }
 
 }
