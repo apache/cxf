@@ -20,10 +20,7 @@
 package org.apache.cxf.tracing.htrace.ext;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -106,7 +103,7 @@ public class LoggingSpanReceiver extends SpanReceiver {
         
         append(sb, "parents", span.getParents());
         append(sb, "kvs", span.getKVAnnotations());
-        append(sb, "timelines", span.getTimelineAnnotations(), t -> "[" + toString(t) + "]");
+        append(sb, "timelines", span.getTimelineAnnotations().toArray(), true);
         
         return sb.toString();
     }
@@ -120,13 +117,22 @@ public class LoggingSpanReceiver extends SpanReceiver {
 
         append(sb, key, inner.insert(0, "[").append("]").toString());
     }
-    
-    private<T> void append(StringBuilder sb, String key, Collection<T> values, Function<T, String> stringifyer) {
-        append(sb, key, Arrays.toString(values.stream().map(stringifyer::apply).toArray(String[]::new)));
-    }
-    
+
     private<T> void append(StringBuilder sb, String key, T[] values) {
-        append(sb, key, Arrays.toString(Arrays.stream(values).map(T::toString).toArray(String[]::new)));
+        append(sb, key, values, false);
+    }
+    private<T> void append(StringBuilder sb, String key, T[] values, boolean useBrackets) {
+        final StringBuilder inner = new StringBuilder();
+        
+        for (T value : values) {
+            String str = value.toString();
+            if (useBrackets) {
+                str = "[" + str + "]";
+            }
+            append(inner, quote(key), str, true);
+        }
+
+        append(sb, key, inner.insert(0, "[").append("]").toString());
     }
     
     private void append(StringBuilder sb, String key, long value) {
