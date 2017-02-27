@@ -18,24 +18,47 @@
  */
 package org.apache.cxf.rs.security.oidc.idp;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.services.ClientRegistration;
 import org.apache.cxf.rs.security.oauth2.services.ClientRegistrationResponse;
 import org.apache.cxf.rs.security.oauth2.services.DynamicRegistrationService;
 
 public class OidcDynamicRegistrationService extends DynamicRegistrationService {
+    private static final String RP_INITIATED_LOGOUT_URIS = "post_logout_redirect_uris";
     private boolean protectIdTokenWithClientSecret;
 
     @Override
     protected Client createNewClient(ClientRegistration request) {
-        //TODO: set OIDC specific properties as Client extra properties
-        return super.createNewClient(request);
+        Client client = super.createNewClient(request);
+        List<String> logoutUris = request.getListStringProperty(RP_INITIATED_LOGOUT_URIS);
+        if (logoutUris != null) {
+            StringBuilder sb = new StringBuilder();
+            for (String uri : logoutUris) {
+                if (sb.length() > 0) {
+                    sb.append(" ");
+                }
+                sb.append(uri);
+            }
+            client.getProperties().put(RP_INITIATED_LOGOUT_URIS, sb.toString());
+        }
+        return client;
     }
 
     @Override
     protected ClientRegistrationResponse fromClientToRegistrationResponse(Client client) {
-        //TODO: check OIDC specific properties in Client extra properties
-        return super.fromClientToRegistrationResponse(client);
+        ClientRegistrationResponse resp = super.fromClientToRegistrationResponse(client);
+        String logoutUris = client.getProperties().get(RP_INITIATED_LOGOUT_URIS);
+        if (logoutUris != null) {
+            List<String> list = new LinkedList<String>();
+            for (String s : logoutUris.split(" ")) { 
+                list.add(s);
+            }
+            resp.setProperty(RP_INITIATED_LOGOUT_URIS, list);
+        }
+        return resp;
     }
 
     @Override
