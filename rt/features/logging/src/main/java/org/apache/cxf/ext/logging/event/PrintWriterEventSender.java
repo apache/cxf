@@ -20,7 +20,7 @@
 package org.apache.cxf.ext.logging.event;
 
 import java.io.PrintWriter;
-import java.time.Instant;
+import java.util.Date;
 
 /**
  * 
@@ -36,7 +36,7 @@ public class PrintWriterEventSender implements LogEventSender {
     @Override
     public void send(LogEvent event) {
         synchronized (writer) {
-            writer.print(Instant.now().toString() + " - PrintWriterEventSender");
+            writer.print(new Date().toString() + " - PrintWriterEventSender");
             writer.print(LogMessageFormatter.format(event));
         }
     }
