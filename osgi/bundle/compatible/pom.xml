@@ -178,7 +178,6 @@
                             org.eclipse.jetty*;resolution:=optional;version="${cxf.jetty.osgi.version}",
                             org.jaxen*;resolution:=optional,
                             org.jdom*;resolution:=optional,
-                            org.jibx*;resolution:=optional;version="[1.2.3,2)",
                             org.junit*;resolution:=optional,
                             org.mozilla.javascript*;resolution:=optional,
                             org.objectweb.asm*;version="[2.0,4)";resolution:=optional,

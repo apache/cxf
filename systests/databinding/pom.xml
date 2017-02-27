@@ -278,22 +278,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jibx</groupId>
-            <artifactId>jibx-bind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jibx</groupId>
-            <artifactId>jibx-run</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jibx</groupId>
-            <artifactId>jibx-schema</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jibx</groupId>
-            <artifactId>jibx-tools</artifactId>
-        </dependency>
-        <dependency>
             <groupId>net.java.dev.msv</groupId>
             <artifactId>msv-core</artifactId>
             <exclusions>
