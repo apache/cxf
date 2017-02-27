@@ -1259,7 +1259,7 @@ public abstract class HTTPConduit
 
             // If this is a GET method we must not touch the output
             // stream as this automagically turns the request into a POST.
-            if (getMethod().equals("GET")) {
+            if (getMethod().equals("GET") || cachedStream == null) {
                 handleNoOutput();
                 return;
             }
