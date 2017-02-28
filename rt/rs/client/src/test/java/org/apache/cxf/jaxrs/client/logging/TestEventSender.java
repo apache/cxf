@@ -18,15 +18,15 @@
  */
 package org.apache.cxf.jaxrs.client.logging;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
 
 final class TestEventSender implements LogEventSender {
-    private final List<LogEvent> events = new ArrayList<>();
-
+    private final List<LogEvent> events = new CopyOnWriteArrayList<>();
+    
     @Override
     public void send(LogEvent event) {
         events.add(event);
