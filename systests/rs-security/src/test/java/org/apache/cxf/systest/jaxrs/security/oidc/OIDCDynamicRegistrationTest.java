@@ -78,7 +78,8 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         reg.setClientName("dynamic_client");
         reg.setGrantTypes(Collections.singletonList("authorization_code"));
         reg.setRedirectUris(Collections.singletonList("https://a/b/c"));
-
+        reg.setProperty("post_logout_redirect_uris", 
+                        Collections.singletonList("https://rp/logout")); 
         ClientRegistrationResponse resp = null;
         Response r = wc.post(reg);
         if (initialAccessToken == null) {
@@ -109,6 +110,8 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
                      clientRegResp.getGrantTypes());
         assertEquals(Collections.singletonList("https://a/b/c"),
                      clientRegResp.getRedirectUris());
+        assertEquals(Collections.singletonList("https://rp/logout"),
+                     clientRegResp.getListStringProperty("post_logout_redirect_uris"));
 
         assertEquals(200, wc.delete().getStatus());
     }
