@@ -154,4 +154,8 @@ public class Jsr250BeanPostProcessor
         }
     }
 
+    public boolean requiresDestruction(Object bean) {
+        return isProcessing;
+    }
+
 }
