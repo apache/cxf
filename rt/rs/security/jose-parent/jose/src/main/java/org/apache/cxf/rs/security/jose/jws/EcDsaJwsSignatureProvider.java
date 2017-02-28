@@ -63,7 +63,7 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
     
     private static byte[] jcaOutputToJoseOutput(int jwsSignatureLen, byte jcaDer[]) {
         // Apache2 Licensed Jose4j code which adapts the Apache Santuario XMLSecurity
-        // code and aligns it with JWS/JWS requirements
+        // code and aligns it with JWS/JWA requirements
         if (jcaDer.length < 8 || jcaDer[0] != 48) {
             throw new JoseException("Invalid format of ECDSA signature");
         }

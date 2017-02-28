@@ -68,7 +68,7 @@ public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
     
     private static byte[] signatureToDer(byte joseSig[]) {
         // Apache2 Licensed Jose4j code which adapts the Apache Santuario XMLSecurity
-        // code and aligns it with JWS/JWS requirements
+        // code and aligns it with JWS/JWA requirements
         int rawLen = joseSig.length / 2;
 
         int i;
