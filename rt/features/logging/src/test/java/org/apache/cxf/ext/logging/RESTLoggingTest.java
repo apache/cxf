@@ -60,10 +60,11 @@ public class RESTLoggingTest {
         client.get(InputStream.class).close();
         loggingFeature.setLogBinary(true);
         client.get(InputStream.class).close();
+        client.close();
+        server.stop();
         server.destroy();
 
         List<LogEvent> events = sender.getEvents();
-        Assert.assertEquals(8, events.size());
         assertLogged(events.get(0));
         assertLogged(events.get(1));
         assertNotLogged(events.get(2));
@@ -72,6 +73,8 @@ public class RESTLoggingTest {
         assertLogged(events.get(4));
         assertLogged(events.get(5));
         assertLogged(events.get(6));
+
+        Assert.assertEquals(8, events.size());
         assertLogged(events.get(7));
     }
 
