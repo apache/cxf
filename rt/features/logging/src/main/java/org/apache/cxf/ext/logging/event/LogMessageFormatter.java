@@ -34,9 +34,8 @@ public final class LogMessageFormatter {
     public static String format(LogEvent event) {
         StringBuilder b = new StringBuilder();
         // Start from the next line to have the output well-aligned
-        b.append('\n');
+        b.append(event.getType()).append('\n');
         
-        write(b, "Type", event.getType().toString());
         write(b, "Address", event.getAddress());
         write(b, "HttpMethod", event.getHttpMethod());
         write(b, "Content-Type", event.getContentType());
