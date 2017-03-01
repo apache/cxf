@@ -41,7 +41,6 @@ public final class LogMessageFormatter {
         write(b, "Content-Type", event.getContentType());
         write(b, "ResponseCode", event.getResponseCode());
         write(b, "ExchangeId", event.getExchangeId());
-        write(b, "MessageId", event.getMessageId());
         if (event.getServiceName() != null) {
             write(b, "ServiceName", localPart(event.getServiceName()));
             write(b, "PortName", localPart(event.getPortName()));
