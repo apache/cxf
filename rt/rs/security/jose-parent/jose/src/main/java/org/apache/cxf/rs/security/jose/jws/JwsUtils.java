@@ -154,12 +154,15 @@ public final class JwsUtils {
         return theVerifier;
     }
     public static JwsSignatureVerifier getPublicKeySignatureVerifier(X509Certificate cert, SignatureAlgorithm algo) {
-        if (algo == null) {
-            LOG.warning("No signature algorithm was defined");
-            throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
-        }
-        
         if (cert != null) {
+            if (algo == null) {
+                algo = getDefaultPublicKeyAlgorithm(cert.getPublicKey());
+            }
+            if (algo == null) {
+                LOG.warning("No signature algorithm was defined");
+                throw new JwsException(JwsException.Error.ALGORITHM_NOT_SET);
+            }    
+            
             if (cert.getPublicKey() instanceof RSAPublicKey) {
                 return new PublicKeyJwsSignatureVerifier(cert, algo);
             } else if (cert.getPublicKey() instanceof ECPublicKey) {
@@ -376,6 +379,10 @@ public final class JwsUtils {
                 theSigProvider = new NoneJwsSignatureProvider();
             } else {
                 PrivateKey pk = KeyManagementUtils.loadPrivateKey(m, props, KeyOperation.SIGN);
+                if (signatureAlgo == null) {
+                    signatureAlgo = getDefaultPrivateKeyAlgorithm(pk);
+                }
+                
                 theSigProvider = getPrivateKeySignatureProvider(pk, signatureAlgo);
                 if (includeCert) {
                     headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
@@ -402,7 +409,7 @@ public final class JwsUtils {
         return loadSignatureVerifier(PhaseInterceptorChain.getCurrentMessage(),
                                      props, inHeaders, false);
     }
-    private static JwsSignatureVerifier loadSignatureVerifier(Message m, 
+    public static JwsSignatureVerifier loadSignatureVerifier(Message m,
                                                               Properties props,
                                                               JwsHeaders inHeaders, 
                                                               boolean ignoreNullVerifier) {
@@ -477,10 +484,6 @@ public final class JwsUtils {
                                                SignatureAlgorithm algo, 
                                                SignatureAlgorithm defaultAlgo) {
         if (algo == null) {
-            if (defaultAlgo == null) {
-                defaultAlgo = SignatureAlgorithm.RS256;
-            }
-            
             // Check for deprecated identifier first
             String sigAlgo = null;
             if (props != null) {
@@ -516,6 +519,24 @@ public final class JwsUtils {
             return SignatureAlgorithm.ES256;
         } else {
             return SignatureAlgorithm.RS256;
+        }
+    }
+    private static SignatureAlgorithm getDefaultPrivateKeyAlgorithm(PrivateKey key) {
+        if (key instanceof RSAPrivateKey) {
+            return SignatureAlgorithm.RS256;
+        } else if (key instanceof ECPrivateKey) {
+            return SignatureAlgorithm.ES256;
+        } else {
+            return null;
+        }
+    }
+    private static SignatureAlgorithm getDefaultPublicKeyAlgorithm(PublicKey key) {
+        if (key instanceof RSAPublicKey) {
+            return SignatureAlgorithm.RS256;
+        } else if (key instanceof ECPublicKey) {
+            return SignatureAlgorithm.ES256;
+        } else {
+            return null;
         }
     }
     public static JwsCompactConsumer verify(JwsSignatureVerifier v, String content) {
