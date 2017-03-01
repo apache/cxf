@@ -314,7 +314,6 @@ public final class JweUtils {
         return loadEncryptionProvider(props, headers, required);
     }
 
-    @SuppressWarnings("deprecation")
     public static JweEncryptionProvider loadEncryptionProvider(Properties props, JweHeaders headers, boolean required) {
         Message m = PhaseInterceptorChain.getCurrentMessage();
 
@@ -382,9 +381,6 @@ public final class JweUtils {
         }
 
         String compression = props.getProperty(JoseConstants.RSSEC_ENCRYPTION_ZIP_ALGORITHM);
-        if (compression == null) {
-            compression = props.getProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_ZIP_ALGORITHM);
-        }
         return createJweEncryptionProvider(keyEncryptionProvider,
                                     ctEncryptionProvider,
                                     contentAlgo.getJwaName(),
@@ -734,7 +730,6 @@ public final class JweUtils {
             return getDirectKeyJweDecryption(ctDecryptionKey, contentDecryptionAlgo);
         }
     }
-    @SuppressWarnings("deprecation")
     public static KeyAlgorithm getKeyEncryptionAlgorithm(Message m, Properties props,
                                                    KeyAlgorithm algo, KeyAlgorithm defaultAlgo) {
         if (algo == null) {
@@ -742,27 +737,15 @@ public final class JweUtils {
                 defaultAlgo = KeyAlgorithm.RSA_OAEP;
             }
 
-            // Check for deprecated identifier first
-            String encAlgo = null;
-            if (props != null) {
-                encAlgo = props.getProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_KEY_ALGORITHM);
-            }
-            if (encAlgo == null && m != null) {
-                encAlgo = (String)m.getContextualProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_KEY_ALGORITHM);
-            }
-            if (encAlgo != null) {
-                return KeyAlgorithm.getAlgorithm(encAlgo);
-            }
-
-            // Otherwise check newer identifier
-            if (props != null) {
-                return getKeyEncryptionAlgorithm(props, defaultAlgo);
-            }
+            algo = getKeyEncryptionAlgorithm(m, props, defaultAlgo);
         }
         return algo;
     }
     public static KeyAlgorithm getKeyEncryptionAlgorithm(Properties props, KeyAlgorithm defaultAlgo) {
-        String algo = KeyManagementUtils.getKeyAlgorithm(PhaseInterceptorChain.getCurrentMessage(),
+        return getKeyEncryptionAlgorithm(PhaseInterceptorChain.getCurrentMessage(), props, defaultAlgo);
+    }
+    public static KeyAlgorithm getKeyEncryptionAlgorithm(Message m, Properties props, KeyAlgorithm defaultAlgo) {    
+        String algo = KeyManagementUtils.getKeyAlgorithm(m,
                                                   props,
                                                   JoseConstants.RSSEC_ENCRYPTION_KEY_ALGORITHM,
                                                   defaultAlgo == null ? null : defaultAlgo.getJwaName());
@@ -776,29 +759,22 @@ public final class JweUtils {
             return KeyAlgorithm.RSA_OAEP;
         }
     }
-    @SuppressWarnings("deprecation")
     public static ContentAlgorithm getContentEncryptionAlgorithm(Message m,
                                                        Properties props,
                                                        ContentAlgorithm algo,
                                                        ContentAlgorithm defaultAlgo) {
         if (algo == null) {
-            // Check for deprecated identifier first
-            String encAlgo = props.getProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_CONTENT_ALGORITHM);
-            if (encAlgo == null && m != null) {
-                encAlgo = (String)m.getContextualProperty(JoseConstants.DEPR_RSSEC_ENCRYPTION_CONTENT_ALGORITHM);
-            }
-            if (encAlgo != null) {
-                return ContentAlgorithm.getAlgorithm(encAlgo);
-            }
-
-            return getContentEncryptionAlgorithm(props, defaultAlgo);
+            algo = getContentEncryptionAlgorithm(m, props, defaultAlgo);
         }
         return algo;
     }
-
     public static ContentAlgorithm getContentEncryptionAlgorithm(Properties props,
                                                                  ContentAlgorithm defaultAlgo) {
-        String algo = KeyManagementUtils.getKeyAlgorithm(PhaseInterceptorChain.getCurrentMessage(),
+        return getContentEncryptionAlgorithm(PhaseInterceptorChain.getCurrentMessage(), props, defaultAlgo);
+    }
+    public static ContentAlgorithm getContentEncryptionAlgorithm(Message m, Properties props,
+                                                                 ContentAlgorithm defaultAlgo) {
+        String algo = KeyManagementUtils.getKeyAlgorithm(m,
                                                   props,
                                                   JoseConstants.RSSEC_ENCRYPTION_CONTENT_ALGORITHM,
                                                   defaultAlgo == null ? null : defaultAlgo.getJwaName());
