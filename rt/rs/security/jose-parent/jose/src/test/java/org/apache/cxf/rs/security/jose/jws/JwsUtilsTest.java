@@ -52,6 +52,19 @@ public class JwsUtilsTest extends Assert {
         assertEquals("alice", headers.getKeyId());
     }
     @Test
+    public void testLoadSignatureVerifierFromJKS() throws Exception {
+        Properties p = new Properties();
+        p.put(JoseConstants.RSSEC_KEY_STORE_FILE,
+            "org/apache/cxf/rs/security/jose/jws/alice.jks");
+        p.put(JoseConstants.RSSEC_KEY_STORE_PSWD, "password");
+        p.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "alice");
+        JwsSignatureVerifier jws = JwsUtils.loadSignatureVerifier(createMessage(),
+                                                                  p,
+                                                                  new JwsHeaders(),
+                                                                  false);
+        assertNotNull(jws);
+    }
+    @Test
     public void testLoadVerificationKey() throws Exception {
         Properties p = new Properties();
         p.put(JoseConstants.RSSEC_KEY_STORE_FILE,
