@@ -138,13 +138,7 @@ public final class JoseConstants {
     public static final String RSSEC_EC_CURVE = "rs.security.elliptic.curve";
     
     /**
-     * The OLD signature algorithm identifier. Use RSSEC_SIGNATURE_ALGORITHM instead.
-     */
-    @Deprecated
-    public static final String DEPR_RSSEC_SIGNATURE_ALGORITHM = "rs.security.jws.content.signature.algorithm";
-    
-    /**
-     * The signature properties file for compact signature creation. If not specified then it falls back to 
+     * The signature properties file for compact signature creation. If not specified then it falls back to
      * RSSEC_SIGNATURE_PROPS.
      */
     public static final String RSSEC_SIGNATURE_OUT_PROPS = "rs.security.signature.out.properties";
