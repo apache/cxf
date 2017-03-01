@@ -478,36 +478,26 @@ public final class JwsUtils {
             throw new JwsException(JwsException.Error.NO_INIT_PROPERTIES);
         }
     }
-    
-    @SuppressWarnings("deprecation")
-    public static SignatureAlgorithm getSignatureAlgorithm(Message m, Properties props, 
-                                               SignatureAlgorithm algo, 
+
+    public static SignatureAlgorithm getSignatureAlgorithm(Message m, Properties props,
+                                               SignatureAlgorithm algo,
                                                SignatureAlgorithm defaultAlgo) {
         if (algo == null) {
-            // Check for deprecated identifier first
-            String sigAlgo = null;
-            if (props != null) {
-                sigAlgo = props.getProperty(JoseConstants.DEPR_RSSEC_SIGNATURE_ALGORITHM);
-            }
-            if (sigAlgo == null && m != null) {
-                sigAlgo = (String)m.getContextualProperty(JoseConstants.DEPR_RSSEC_SIGNATURE_ALGORITHM);
-            }
-            if (sigAlgo != null) {
-                return SignatureAlgorithm.getAlgorithm(sigAlgo);
-            }
-            
-            // Otherwise check newer identifier
-            if (props != null) {
-                return getSignatureAlgorithm(props, defaultAlgo);
-            }
+            algo = getSignatureAlgorithm(m, props, defaultAlgo);
         }
         return algo;
     }
-    public static SignatureAlgorithm getSignatureAlgorithm(Properties props, 
-                                               SignatureAlgorithm defaultAlgo) {
-        String algo = KeyManagementUtils.getKeyAlgorithm(PhaseInterceptorChain.getCurrentMessage(),
-                                                  props, 
-                                                  JoseConstants.RSSEC_SIGNATURE_ALGORITHM, 
+    public static SignatureAlgorithm getSignatureAlgorithm(Properties props,
+                                                           SignatureAlgorithm defaultAlgo) {
+        return getSignatureAlgorithm(PhaseInterceptorChain.getCurrentMessage(),
+                                     props, defaultAlgo);
+    }
+    public static SignatureAlgorithm getSignatureAlgorithm(Message m,
+                                                           Properties props,
+                                                           SignatureAlgorithm defaultAlgo) {
+        String algo = KeyManagementUtils.getKeyAlgorithm(m,
+                                                  props,
+                                                  JoseConstants.RSSEC_SIGNATURE_ALGORITHM,
                                                   defaultAlgo == null ? null : defaultAlgo.getJwaName());
         return SignatureAlgorithm.getAlgorithm(algo);
     }
