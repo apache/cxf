@@ -214,7 +214,7 @@ public class UserInfoTest extends AbstractBusClientServerTestBase {
         userInfoClient.header("Authorization", "Bearer " + accessToken.getTokenKey());
 
         Response serviceResponse = userInfoClient.get();
-        assertEquals(serviceResponse.getStatus(), 200);
+        assertEquals(200, serviceResponse.getStatus());
 
         String token = serviceResponse.readEntity(String.class);
         assertNotNull(token);
