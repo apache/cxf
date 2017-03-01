@@ -45,12 +45,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class SoapPreProtocolOutInterceptorTest extends Assert {
     private IMocksControl control;
     private SoapPreProtocolOutInterceptor interceptor;
-    
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
@@ -63,7 +63,7 @@ public class SoapPreProtocolOutInterceptorTest extends Assert {
         interceptor.handleMessage(message);
         control.verify();
 
-        Map<String, List<String>> reqHeaders 
+        Map<String, List<String>> reqHeaders
             = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         assertNotNull(reqHeaders);
         List<String> soapaction = reqHeaders.get("soapaction");
@@ -72,7 +72,7 @@ public class SoapPreProtocolOutInterceptorTest extends Assert {
     }
 
     private SoapMessage setUpMessage() throws Exception {
-        
+
         SoapMessage message = new SoapMessage(new MessageImpl());
         Exchange exchange = new ExchangeImpl();
         BindingOperationInfo bop = setUpBindingOperationInfo("http://foo/bar",
@@ -85,25 +85,25 @@ public class SoapPreProtocolOutInterceptorTest extends Assert {
         exchange.put(BindingOperationInfo.class, bop);
         message.setExchange(exchange);
         message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
-        
+
         control.replay();
         return message;
     }
-    
-    private BindingOperationInfo setUpBindingOperationInfo(String nsuri, 
+
+    private BindingOperationInfo setUpBindingOperationInfo(String nsuri,
                                                            String opreq,
                                                            String opresp,
                                                            Method method) {
         ServiceInfo si = new ServiceInfo();
-        InterfaceInfo iinf = new InterfaceInfo(si, 
+        InterfaceInfo iinf = new InterfaceInfo(si,
                                                new QName(nsuri, method.getDeclaringClass().getSimpleName()));
         OperationInfo opInfo = iinf.addOperation(new QName(nsuri, method.getName()));
         opInfo.setProperty(Method.class.getName(), method);
         opInfo.setInput(opreq, opInfo.createMessage(new QName(nsuri, opreq), Type.INPUT));
         opInfo.setOutput(opresp, opInfo.createMessage(new QName(nsuri, opresp), Type.INPUT));
-        
+
         BindingOperationInfo bindingOpInfo = new BindingOperationInfo(null, opInfo);
-        
+
         return bindingOpInfo;
     }
 

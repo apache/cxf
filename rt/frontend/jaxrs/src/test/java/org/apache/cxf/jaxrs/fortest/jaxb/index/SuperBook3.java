@@ -28,16 +28,16 @@ public class SuperBook3 extends Book {
     private long superId;
     public SuperBook3() {
     }
-    
+
     public SuperBook3(String name, long id, long superId) {
         super(name, id);
         this.superId = superId;
     }
-    
+
     public void setSuperId(long i) {
         superId = i;
     }
-    
+
     public long getSuperId() {
         return superId;
     }

@@ -38,7 +38,7 @@ public class LoadDistributorAddressOverrideTest  extends FailoverAddressOverride
     protected String getConfig() {
         return FAILOVER_CONFIG;
     }
-    
+
     private String responseFrom(String response) {
         if (response.endsWith(REPLICA_A)) {
             return REPLICA_A;
@@ -50,7 +50,7 @@ public class LoadDistributorAddressOverrideTest  extends FailoverAddressOverride
             return response;
         }
     }
-    
+
     private void incrementResponseCount(Map< String, Integer > responseCounts,
             String response) {
         String responder = responseFrom(response);
@@ -79,7 +79,7 @@ public class LoadDistributorAddressOverrideTest  extends FailoverAddressOverride
         stopTarget(REPLICA_B);
         stopTarget(REPLICA_C);
     }
-    
+
     @Test
     public void testDistributedSequentialStrategyWithFailover() throws Exception {
         startTarget(REPLICA_A);
@@ -102,7 +102,7 @@ public class LoadDistributorAddressOverrideTest  extends FailoverAddressOverride
         stopTarget(REPLICA_A);
         stopTarget(REPLICA_C);
     }
-    
+
     @Test
     public void testDistributedSequentialStrategyWithoutFailover() throws Exception {
         startTarget(REPLICA_A);
@@ -116,7 +116,7 @@ public class LoadDistributorAddressOverrideTest  extends FailoverAddressOverride
         } else {
             fail("unexpected conduit selector: " + conduitSelector);
         }
-        
+
         Map< String, Integer > responseCounts = new HashMap< String, Integer >();
         for (int i = 0; i < 12; ++i) {
             try {

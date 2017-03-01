@@ -46,12 +46,12 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
     public static final String PORT = allocatePort(Server.class);
 
     @Ignore
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
         org.apache.cxf.endpoint.Server server;
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setAddress("http://localhost:" + PORT + "/");
-            
+
             UserResource ur = new UserResource();
             ur.setName(BookStoreNoAnnotations.class.getName());
             ur.setPath("/bookstoreNoAnnotations");
@@ -60,18 +60,18 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             op.setName("getBook");
             op.setVerb("GET");
             op.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
-            
+
             UserOperation op2 = new UserOperation();
             op2.setPath("/books/{id}/chapter");
             op2.setName("getBookChapter");
             op2.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
-            
-            List<UserOperation> ops = new ArrayList<UserOperation>();
+
+            List<UserOperation> ops = new ArrayList<>();
             ops.add(op);
             ops.add(op2);
-            
+
             ur.setOperations(ops);
-            
+
             UserResource ur2 = new UserResource();
             ur2.setName(ChapterNoAnnotations.class.getName());
             UserOperation op3 = new UserOperation();
@@ -79,9 +79,9 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             op3.setName("getItself");
             op3.setVerb("GET");
             ur2.setOperations(Collections.singletonList(op3));
-            
+
             sf.setModelBeans(ur, ur2);
-            
+
             String modelRef = "classpath:/org/apache/cxf/systest/jaxrs/resources/resources2.xml";
             sf.setModelRefWithServiceClass(modelRef, BookStoreNoAnnotationsInterface.class);
             sf.setServiceBean(new BookStoreNoAnnotationsImpl());
@@ -106,7 +106,7 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             }
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -114,27 +114,27 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
                    launchServer(Server.class, true));
         createStaticBus();
     }
-    
+
     @Test
     public void testGetBook123() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstoreNoAnnotations/books/123",
                       "application/xml", 200);
     }
-    
+
     @Test
     public void testGetBookInterface123() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstore2/books/123",
                       "application/xml", 200);
     }
-    
+
     @Test
     public void testGetChapter() throws Exception {
-        
+
         getAndCompareChapter("http://localhost:" + PORT + "/bookstoreNoAnnotations/books/123/chapter",
                       "application/xml", 200);
     }
-    
-    private void getAndCompare(String address, 
+
+    private void getAndCompare(String address,
                                String acceptType,
                                int expectedStatus) throws Exception {
         GetMethod get = new GetMethod(address);
@@ -150,8 +150,8 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             get.releaseConnection();
         }
     }
-    
-    private void getAndCompareChapter(String address, 
+
+    private void getAndCompareChapter(String address,
                                String acceptType,
                                int expectedStatus) throws Exception {
         GetMethod get = new GetMethod(address);
@@ -167,15 +167,15 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             get.releaseConnection();
         }
     }
-    
-    
-    
+
+
+
     private Book readBook(InputStream is) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Unmarshaller u = c.createUnmarshaller();
         return (Book)u.unmarshal(is);
     }
-    
+
     private Chapter readChapter(InputStream is) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Chapter.class});
         Unmarshaller u = c.createUnmarshaller();

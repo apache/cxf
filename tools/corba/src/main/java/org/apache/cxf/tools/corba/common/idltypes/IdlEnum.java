@@ -25,11 +25,11 @@ import java.util.Iterator;
 
 
 public final class IdlEnum extends IdlScopeBase implements IdlType {
-    
+
     private IdlEnum(IdlScopeBase parent, String name) {
         super(parent, name);
     }
-    
+
     public static IdlEnum create(IdlScopeBase parent, String name) {
         return new IdlEnum(parent, name);
     }
@@ -61,5 +61,5 @@ public final class IdlEnum extends IdlScopeBase implements IdlType {
         indentLess();
         pw.println(indent() + "};");
     }
-    
+
 }

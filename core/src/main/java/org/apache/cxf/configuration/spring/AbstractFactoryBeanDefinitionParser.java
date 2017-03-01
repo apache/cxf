@@ -41,11 +41,11 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
     public static void setFactoriesAreAbstract(boolean b) {
         factoriesAreAbstract = b;
     }
-    
+
     protected String getDestroyMethod() {
         return null;
     }
-    
+
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         Class<?> factoryClass = getFactoryClass();
@@ -54,7 +54,7 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
             factoryBean = BeanDefinitionBuilder.rootBeanDefinition(getFactoryClass());
         }
 
-        NamedNodeMap atts = element.getAttributes();        
+        NamedNodeMap atts = element.getAttributes();
         boolean createdFromAPI = false;
         boolean setBus = false;
         for (int i = 0; i < atts.getLength(); i++) {
@@ -62,7 +62,7 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
             String val = node.getValue();
             String pre = node.getPrefix();
             String name = node.getLocalName();
-            
+
             if ("createdFromAPI".equals(name)) {
                 factoryBean.setAbstract(true);
                 bean.setAbstract(true);
@@ -70,7 +70,7 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
             } else if ("abstract".equals(name)) {
                 factoryBean.setAbstract(true);
                 bean.setAbstract(true);
-            } else  if ("depends-on".equals(name)) {
+            } else if ("depends-on".equals(name)) {
                 factoryBean.addDependsOn(val);
                 bean.addDependsOn(val);
             } else if (!"id".equals(name) && !"name".equals(name) && isAttribute(pre, name)) {
@@ -82,13 +82,13 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
                     }
                 }
                 mapAttribute(factoryBean, element, name, val);
-            } 
+            }
         }
-        
+
         if (!setBus) {
             addBusWiringAttribute(factoryBean, BusWiringType.PROPERTY);
         }
-        
+
         Node node = element.getFirstChild();
         while (node != null) {
             if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -97,7 +97,7 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
             }
             node = node.getNextSibling();
         }
-        
+
         String id = getIdOrName(element);
         BeanDefinition container = ctx.getContainingBeanDefinition();
         boolean noFactory = false;
@@ -117,7 +117,7 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
         if (createdFromAPI) {
             id = id + getSuffix();
         }
-        
+
         if (FactoryBean.class.isAssignableFrom(getFactoryClass())) {
             if (!noFactory) {
                 AbstractBeanDefinition def = factoryBean.getRawBeanDefinition().cloneBeanDefinition();

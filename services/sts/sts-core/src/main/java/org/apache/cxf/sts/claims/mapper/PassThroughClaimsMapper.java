@@ -33,9 +33,9 @@ public class PassThroughClaimsMapper implements ClaimsMapper {
     private static final Logger LOG = LoggerFactory.getLogger(PassThroughClaimsMapper.class);
 
     @Override
-    public ProcessedClaimCollection mapClaims(String sourceRealm, ProcessedClaimCollection sourceClaims, 
+    public ProcessedClaimCollection mapClaims(String sourceRealm, ProcessedClaimCollection sourceClaims,
         String targetRealm, ClaimsParameters parameters) {
-        LOG.debug("No mapping applied for sourceRealm ({}) to targetRealm ({}). All values have been copied.", 
+        LOG.debug("No mapping applied for sourceRealm ({}) to targetRealm ({}). All values have been copied.",
                   sourceRealm, targetRealm);
         return sourceClaims;
     }

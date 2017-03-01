@@ -43,8 +43,8 @@ import org.junit.Test;
 public class WSAFromWSDLTest extends AbstractWSATestBase {
     static final String PORT = allocatePort(Server.class);
     static final String INVALID_PORT = allocatePort(Server.class, 1);
-    
-    private static final String BASE_URI = "http://apache.org/cxf/systest/ws/addr_feature/" 
+
+    private static final String BASE_URI = "http://apache.org/cxf/systest/ws/addr_feature/"
         + "AddNumbersPortType/";
 
     private final QName serviceName = new QName("http://apache.org/cxf/systest/ws/addr_feature/",
@@ -71,7 +71,7 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
 
         String expectedOut = BASE_URI + "addNumbersRequest";
         String expectedIn = BASE_URI + "addNumbersResponse";
-        
+
         assertTrue(output.toString().indexOf(expectedOut) != -1);
         assertTrue(input.toString().indexOf(expectedIn) != -1);
     }
@@ -148,15 +148,15 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
                 e.printStackTrace();
                 assert false;
             }
-    
+
             String expectedOut = "3in";
             String expectedIn = "3fault";
-    
-            assertTrue(output.toString().indexOf(expectedOut) != -1);
-            assertTrue(input.toString().indexOf(expectedIn) != -1);
+
+            assertTrue(output.toString(), output.toString().indexOf(expectedOut) != -1);
+            assertTrue(input.toString(), input.toString().indexOf(expectedIn) != -1);
         }
     }
-    
+
     @Test
     public void testAnonToNonAnon() throws Exception {
         try (AddNumbersPortTypeProxy port = getPort()) {
@@ -169,14 +169,14 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
                 assertTrue(e.getFault().getFaultCode().contains("OnlyNonAnonymousAddressSupported"));
             }
         }
-    } 
+    }
     @Test
     public void testNonAnonToAnon() throws Exception {
         try (AddNumbersPortTypeProxy port = getPort()) {
             port.getRequestContext()
                 .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                      "http://localhost:" + PORT + "/jaxws/addAnon");
-            
+
             AddressingProperties maps = new AddressingProperties();
             EndpointReferenceType ref = new EndpointReferenceType();
             AttributedURIType add = new AttributedURIType();
@@ -184,10 +184,10 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
             ref.setAddress(add);
             maps.setReplyTo(ref);
             maps.setFaultTo(ref);
-    
+
             port.getRequestContext()
                 .put("javax.xml.ws.addressing.context", maps);
-    
+
             try {
                 port.addNumbers3(-1, 2);
             } catch (SOAPFaultException e) {

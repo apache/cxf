@@ -41,7 +41,7 @@ public class JweJwtCompactProducer  {
         headers = joseHeaders;
         claimsJson = JwtUtils.claimsToJson(claims);
     }
-    
+
     public String encryptWith(JsonWebKey key) {
         JweEncryptionProvider jwe = JweUtils.createJweEncryptionProvider(key, headers);
         return encryptWith(jwe);

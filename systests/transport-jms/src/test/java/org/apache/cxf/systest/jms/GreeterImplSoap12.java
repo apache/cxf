@@ -24,8 +24,8 @@ import javax.xml.ws.soap.Addressing;
 import org.apache.cxf.annotations.Logging;
 
 
-@WebService(serviceName = "SOAPService8", 
-            portName = "SoapPort8", 
+@WebService(serviceName = "SOAPService8",
+            portName = "SoapPort8",
             endpointInterface = "org.apache.hello_world_doc_lit.Greeter",
             targetNamespace = "http://apache.org/hello_world_doc_lit",
             wsdlLocation = "testutils/hello_world_doc_lit.wsdl")

@@ -50,14 +50,14 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
      * Get an AttributeStatementBean using the given parameters.
      */
     public AttributeStatementBean getStatement(TokenProviderParameters providerParameters) {
-        List<AttributeBean> attributeList = new ArrayList<AttributeBean>();
+        List<AttributeBean> attributeList = new ArrayList<>();
 
         TokenRequirements tokenRequirements = providerParameters.getTokenRequirements();
         String tokenType = tokenRequirements.getTokenType();
-        
+
         // Handle Claims
         ProcessedClaimCollection retrievedClaims = ClaimsUtils.processClaims(providerParameters);
-        
+
         AttributeStatementBean attrBean = new AttributeStatementBean();
         Iterator<ProcessedClaim> claimIterator = retrievedClaims.iterator();
         if (!claimIterator.hasNext()) {
@@ -65,25 +65,25 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
             AttributeBean attributeBean = createDefaultAttribute(tokenType);
             attributeList.add(attributeBean);
         }
-        
+
         while (claimIterator.hasNext()) {
             ProcessedClaim claim = claimIterator.next();
             AttributeBean attributeBean = createAttributeFromClaim(claim, tokenType);
             attributeList.add(attributeBean);
         }
-        
+
         ReceivedToken onBehalfOf = tokenRequirements.getOnBehalfOf();
         ReceivedToken actAs = tokenRequirements.getActAs();
         try {
             if (onBehalfOf != null) {
-                AttributeBean parameterBean = 
+                AttributeBean parameterBean =
                     handleAdditionalParameters(false, onBehalfOf.getToken(), tokenType);
                 if (!parameterBean.getAttributeValues().isEmpty()) {
                     attributeList.add(parameterBean);
                 }
             }
             if (actAs != null) {
-                AttributeBean parameterBean = 
+                AttributeBean parameterBean =
                     handleAdditionalParameters(true, actAs.getToken(), tokenType);
                 if (!parameterBean.getAttributeValues().isEmpty()) {
                     attributeList.add(parameterBean);
@@ -92,12 +92,12 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
         } catch (WSSecurityException ex) {
             throw new STSException(ex.getMessage(), ex);
         }
-        
+
         attrBean.setSamlAttributes(attributeList);
-        
+
         return attrBean;
     }
-    
+
     /**
      * Create a default attribute
      */
@@ -112,9 +112,9 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
             attributeBean.setSimpleName("token-requestor");
             attributeBean.setQualifiedName("http://cxf.apache.org/sts/custom");
         }
-        
+
         attributeBean.addAttributeValue("authenticated");
-        
+
         return attributeBean;
     }
 
@@ -122,8 +122,8 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
      * Handle ActAs or OnBehalfOf elements.
      */
     private AttributeBean handleAdditionalParameters(
-        boolean actAs, 
-        Object parameter, 
+        boolean actAs,
+        Object parameter,
         String tokenType
     ) throws WSSecurityException {
         AttributeBean parameterBean = new AttributeBean();
@@ -161,7 +161,7 @@ public class CustomAttributeProvider implements AttributeStatementProvider {
             attributeBean.setSimpleName(claim.getClaimType().toString());
         }
         attributeBean.setAttributeValues(claim.getValues());
-        
+
         return attributeBean;
     }
 

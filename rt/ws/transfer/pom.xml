@@ -56,6 +56,8 @@
                           <goal>xsdtojava</goal>
                       </goals>
                       <configuration>
+                          <fork>${cxf.xjcplugin.forkmode}</fork>
+                          <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                           <sourceRoot>${basedir}/target/generated-sources/xjc</sourceRoot>
                           <xsdOptions>
                               <xsdOption>
@@ -74,6 +76,8 @@
                           <goal>xsdtojava</goal>
                       </goals>
                       <configuration>
+                          <fork>${cxf.xjcplugin.forkmode}</fork>
+                          <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                           <sourceRoot>${basedir}/target/generated-sources/xjc</sourceRoot>
                           <xsdOptions>
                               <xsdOption>

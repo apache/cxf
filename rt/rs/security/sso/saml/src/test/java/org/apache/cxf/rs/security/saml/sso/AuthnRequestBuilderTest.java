@@ -42,7 +42,7 @@ import org.opensaml.saml.saml2.core.RequestedAuthnContext;
  * Some unit tests for the SamlpRequestComponentBuilder and AuthnRequestBuilder
  */
 public class AuthnRequestBuilderTest extends org.junit.Assert {
-    
+
     static {
         OpenSAMLUtil.initSamlEngine();
     }
@@ -53,48 +53,48 @@ public class AuthnRequestBuilderTest extends org.junit.Assert {
         docBuilderFactory.setNamespaceAware(true);
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         Document doc = docBuilder.newDocument();
-        
-        Issuer issuer = 
+
+        Issuer issuer =
             SamlpRequestComponentBuilder.createIssuer("http://localhost:9001/app");
-        NameIDPolicy nameIDPolicy = 
+        NameIDPolicy nameIDPolicy =
             SamlpRequestComponentBuilder.createNameIDPolicy(
                 true, "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent", "Issuer"
             );
-        
-        AuthnContextClassRef authnCtxClassRef = 
+
+        AuthnContextClassRef authnCtxClassRef =
             SamlpRequestComponentBuilder.createAuthnCtxClassRef(
                 "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
             );
-        RequestedAuthnContext authnCtx = 
+        RequestedAuthnContext authnCtx =
             SamlpRequestComponentBuilder.createRequestedAuthnCtxPolicy(
-                AuthnContextComparisonTypeEnumeration.EXACT, 
+                AuthnContextComparisonTypeEnumeration.EXACT,
                 Collections.singletonList(authnCtxClassRef), null
             );
-        
-        AuthnRequest authnRequest = 
+
+        AuthnRequest authnRequest =
             SamlpRequestComponentBuilder.createAuthnRequest(
-                "http://localhost:9001/sso", false, false, 
+                "http://localhost:9001/sso", false, false,
                 "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST", SAMLVersion.VERSION_20,
                 issuer, nameIDPolicy, authnCtx
             );
-        
+
         Element policyElement = OpenSAMLUtil.toDom(authnRequest, doc);
         doc.appendChild(policyElement);
         // String outputString = DOM2Writer.nodeToString(policyElement);
         assertNotNull(policyElement);
     }
-    
+
     @org.junit.Test
     public void testAuthnRequestBuilder() throws Exception {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         docBuilderFactory.setNamespaceAware(true);
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         Document doc = docBuilder.newDocument();
-        
+
         AuthnRequestBuilder authnRequestBuilder = new DefaultAuthnRequestBuilder();
         Message message = new MessageImpl();
-        
-        AuthnRequest authnRequest = 
+
+        AuthnRequest authnRequest =
             authnRequestBuilder.createAuthnRequest(
                 message, "http://localhost:9001/app", "http://localhost:9001/sso"
             );
@@ -103,16 +103,16 @@ public class AuthnRequestBuilderTest extends org.junit.Assert {
         // String outputString = DOM2Writer.nodeToString(policyElement);
         assertNotNull(policyElement);
     }
-    
+
     @org.junit.Test
     public void testAuthnRequestID() throws Exception {
         AuthnRequestBuilder authnRequestBuilder = new DefaultAuthnRequestBuilder();
-        AuthnRequest authnRequest = 
+        AuthnRequest authnRequest =
             authnRequestBuilder.createAuthnRequest(
                 new MessageImpl(), "http://localhost:9001/app", "http://localhost:9001/sso"
             );
         assertTrue("ID must start with a letter or underscore, and can only contain letters, digits, "
             + "underscores, hyphens, and periods.", authnRequest.getID().matches("^[_a-zA-Z][-_0-9a-zA-Z\\.]+$"));
     }
-    
+
 }

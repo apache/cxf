@@ -28,12 +28,12 @@ import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.HttpResponse;
 
 public class NettyHttpClientHandler extends ChannelDuplexHandler {
-    private final BlockingQueue<NettyHttpClientRequest> sendedQueue = 
+    private final BlockingQueue<NettyHttpClientRequest> sendedQueue =
         new LinkedBlockingDeque<NettyHttpClientRequest>();
-        
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        
+
         if (msg instanceof HttpResponse) {
             // just make sure we can combine the request and response together
             HttpResponse response = (HttpResponse)msg;
@@ -49,7 +49,7 @@ public class NettyHttpClientHandler extends ChannelDuplexHandler {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-        
+
         // need to deal with the request
         if (msg instanceof NettyHttpClientRequest) {
             NettyHttpClientRequest request = (NettyHttpClientRequest)msg;
@@ -59,7 +59,7 @@ public class NettyHttpClientHandler extends ChannelDuplexHandler {
             super.write(ctx, msg, promise);
         }
     }
-    
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
         throws Exception {
@@ -67,12 +67,12 @@ public class NettyHttpClientHandler extends ChannelDuplexHandler {
         cause.printStackTrace();
         ctx.close();
     }
-    
+
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         ctx.flush();
     }
-    
-    
+
+
 
 }

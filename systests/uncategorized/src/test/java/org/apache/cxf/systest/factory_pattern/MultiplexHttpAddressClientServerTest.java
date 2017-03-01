@@ -52,12 +52,12 @@ import org.junit.Test;
  */
 public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = TestUtil.getPortNumber(MultiplexHttpAddressClientServerTest.class);
-    public static final String FACTORY_ADDRESS = 
+    public static final String FACTORY_ADDRESS =
         "http://localhost:" + PORT + "/NumberFactoryService/NumberFactoryPort";
     public static final String NUMBER_SERVANT_ADDRESS_ROOT =
         "http://localhost:" + PORT + "/NumberService/NumberPort/";
-    
-    public static class Server extends AbstractBusTestServerBase {        
+
+    public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
         HttpNumberFactoryImpl implementor;
         protected void run() {
@@ -93,86 +93,86 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
         createStaticBus();
     }
 
-    
+
     @Test
     public void testWithGetPortExtensionHttp() throws Exception {
-        
+
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory factory = service.getNumberFactoryPort();
         updateAddressPort(factory, PORT);
-        
+
         NumberService numService = new NumberService();
         ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);
-        
+
         W3CEndpointReference numberTwoRef = factory.create("20");
         assertNotNull("reference", numberTwoRef);
-           
-        Number num =  serviceImpl.getPort(numberTwoRef, Number.class);
+
+        Number num = serviceImpl.getPort(numberTwoRef, Number.class);
         assertTrue("20 is even", num.isEven().isEven());
-        
+
         W3CEndpointReference numberTwentyThreeRef = factory.create("23");
-        num =  serviceImpl.getPort(numberTwentyThreeRef, Number.class);
+        num = serviceImpl.getPort(numberTwentyThreeRef, Number.class);
         assertTrue("23 is not even", !num.isEven().isEven());
     }
-    
+
     @Test
     public void testWithManualMultiplexEprCreation() throws Exception {
-    
+
         Service numService = Service.create(NumberFactoryImpl.NUMBER_SERVICE_QNAME);
-        Number num =  numService.getPort(Number.class);
-        
-        InvocationHandler handler  = Proxy.getInvocationHandler(num);
-        BindingProvider bp = (BindingProvider)handler;    
+        Number num = numService.getPort(Number.class);
+
+        InvocationHandler handler = Proxy.getInvocationHandler(num);
+        BindingProvider bp = (BindingProvider)handler;
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                                    NUMBER_SERVANT_ADDRESS_ROOT + "103");
-            
+
         IsEvenResponse numResp = num.isEven();
         assertTrue("103 is not even", Boolean.FALSE.equals(numResp.isEven()));
     }
-    
+
     @Test
     public void testWithGetWsdlOnServant() throws Exception {
-        
-        int firstChar = new URL(NUMBER_SERVANT_ADDRESS_ROOT 
-                + "?wsdl").openStream().read();        
+
+        int firstChar = new URL(NUMBER_SERVANT_ADDRESS_ROOT
+                + "?wsdl").openStream().read();
         assertTrue("firstChar :" + String.valueOf(firstChar), firstChar == '<');
-        
-        firstChar = new URL(NUMBER_SERVANT_ADDRESS_ROOT 
+
+        firstChar = new URL(NUMBER_SERVANT_ADDRESS_ROOT
                                 + "103?wsdl").openStream().read();
         assertTrue("firstChar :" + String.valueOf(firstChar), firstChar == '<');
     }
-    
+
     @Test
     public void testSoapAddressLocation() throws Exception {
-        
-        assertTrue("Should have received the soap:address location " 
-                   + NUMBER_SERVANT_ADDRESS_ROOT, 
+
+        assertTrue("Should have received the soap:address location "
+                   + NUMBER_SERVANT_ADDRESS_ROOT,
                    checkSoapAddressLocation(NUMBER_SERVANT_ADDRESS_ROOT));
-        assertTrue("Should have received the soap:address location " 
-                   + NUMBER_SERVANT_ADDRESS_ROOT + "20", 
+        assertTrue("Should have received the soap:address location "
+                   + NUMBER_SERVANT_ADDRESS_ROOT + "20",
                    checkSoapAddressLocation(NUMBER_SERVANT_ADDRESS_ROOT + "20"));
-        assertTrue("Should have received the soap:address location " 
-                   + NUMBER_SERVANT_ADDRESS_ROOT + "22", 
+        assertTrue("Should have received the soap:address location "
+                   + NUMBER_SERVANT_ADDRESS_ROOT + "22",
                    checkSoapAddressLocation(NUMBER_SERVANT_ADDRESS_ROOT + "22"));
-        assertTrue("Should have received the soap:address location " 
-                   + NUMBER_SERVANT_ADDRESS_ROOT + "20", 
+        assertTrue("Should have received the soap:address location "
+                   + NUMBER_SERVANT_ADDRESS_ROOT + "20",
                    checkSoapAddressLocation(NUMBER_SERVANT_ADDRESS_ROOT + "20"));
-        assertTrue("Should have received the soap:address location " 
-                   + NUMBER_SERVANT_ADDRESS_ROOT, 
+        assertTrue("Should have received the soap:address location "
+                   + NUMBER_SERVANT_ADDRESS_ROOT,
                    checkSoapAddressLocation(NUMBER_SERVANT_ADDRESS_ROOT));
     }
-    
-    private boolean checkSoapAddressLocation(String address) 
+
+    private boolean checkSoapAddressLocation(String address)
         throws Exception {
         URL url = new URL(address + "?wsdl");
-        
+
         URLConnection urlConn = url.openConnection();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(urlConn.getInputStream()))) {
             while (br.ready()) {
                 String str = br.readLine();
-                if (str.contains("soap:address") 
+                if (str.contains("soap:address")
                         && str.contains("location=" + "\"" + address + "\"")) {
-                    return  true;
+                    return true;
                 }
             }
         }

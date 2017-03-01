@@ -38,17 +38,17 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
     private final String resourcePath;
     private final String contextPath;
     private final int port;
-    
+
     protected AbstractTomcatServer(final String contextPath, int portNumber) {
         this(null, contextPath, portNumber);
     }
-    
+
     protected AbstractTomcatServer(final String resourcePath, final String contextPath, int portNumber) {
-        this.resourcePath = resourcePath; 
+        this.resourcePath = resourcePath;
         this.contextPath = contextPath;
         this.port = portNumber;
     }
-    
+
     protected void run() {
         server = new Tomcat();
         server.setPort(port);
@@ -60,7 +60,7 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
             if (resourcePath == null) {
                 final Context context = server.addContext("/", base.getAbsolutePath());
                 final Wrapper cxfServlet = Tomcat.addServlet(context, "cxfServlet", new CXFNonSpringJaxrsServlet());
-                cxfServlet.addInitParameter(CXFNonSpringJaxrsServlet.TRANSPORT_ID, 
+                cxfServlet.addInitParameter(CXFNonSpringJaxrsServlet.TRANSPORT_ID,
                     SseHttpTransportFactory.TRANSPORT_ID);
                 cxfServlet.addInitParameter("jaxrs.serviceClasses", BookStore.class.getName());
                 cxfServlet.addInitParameter("jaxrs.providers", JacksonJsonProvider.class.getName());
@@ -70,20 +70,20 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
                 server.getHost().setAppBase(base.getAbsolutePath());
                 server.getHost().setAutoDeploy(true);
                 server.getHost().setDeployOnStartup(true);
-                server.addWebapp(contextPath, getClass().getResource(resourcePath).toURI().getPath().toString());   
+                server.addWebapp(contextPath, getClass().getResource(resourcePath).toURI().getPath().toString());
             }
-            
+
             server.start();
         } catch (final Exception ex) {
             ex.printStackTrace();
             fail(ex.getMessage());
         }
     }
-    
+
     protected void configureServer(org.eclipse.jetty.server.Server theserver) throws Exception {
-        
+
     }
-    
+
     private static File createTemporaryDirectory() throws IOException {
         final File base = File.createTempFile("tmp-", "");
 
@@ -92,16 +92,16 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
         }
 
         if (!base.mkdir()) {
-            throw new IOException("Cannot create base folder: " + base.getAbsolutePath());           
+            throw new IOException("Cannot create base folder: " + base.getAbsolutePath());
         }
 
         base.deleteOnExit();
         return base;
     }
-        
+
     public void tearDown() throws Exception {
         super.tearDown();
-        
+
         if (server != null) {
             server.stop();
             server.destroy();

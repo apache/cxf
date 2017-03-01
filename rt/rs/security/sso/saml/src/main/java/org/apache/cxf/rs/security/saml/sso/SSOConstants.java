@@ -22,25 +22,25 @@ import org.apache.wss4j.common.WSS4JConstants;
 
 public final class SSOConstants {
     public static final String SAML_REQUEST = "SAMLRequest";
-    public static final String SAML_RESPONSE = "SAMLResponse"; 
+    public static final String SAML_RESPONSE = "SAMLResponse";
     public static final String RELAY_STATE = "RelayState";
     public static final String SIG_ALG = "SigAlg";
     public static final String SIGNATURE = "Signature";
     public static final long DEFAULT_STATE_TIME = 2L * 60L * 1000L;
-    
+
     public static final String RSA_SHA1 = WSS4JConstants.RSA_SHA1;
     public static final String DSA_SHA1 = WSS4JConstants.DSA;
-    
-    
+
+
     public static final String SECURITY_CONTEXT_TOKEN = "org.apache.cxf.websso.context";
     public static final String RACS_IS_COLLOCATED = "org.apache.cxf.racs.is.collocated";
-    
+
     public static final String SAML2_METADATA_NS = "urn:oasis:names:tc:SAML:2.0:metadata";
-    
+
     public static final String WS_ADDRESSING_NS = "http://www.w3.org/2005/08/addressing";
-    
+
     public static final String SCHEMA_INSTANCE_NS = "http://www.w3.org/2001/XMLSchema-instance";
-    
+
     private SSOConstants() {
     }
 }

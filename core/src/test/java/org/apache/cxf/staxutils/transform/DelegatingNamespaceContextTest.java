@@ -33,7 +33,7 @@ public class DelegatingNamespaceContextTest extends Assert {
     @Test
     public void testSomeAddsAndGets() throws Exception {
         DelegatingNamespaceContext dnc = getTestDelegatingNamespaceContext();
-        
+
         dnc.down(); //1
         dnc.addPrefix("p1", "urn:foo1");
         dnc.addPrefix("p2", "urn:foo2");
@@ -45,7 +45,7 @@ public class DelegatingNamespaceContextTest extends Assert {
         assertEquals("p2", dnc.getPrefix("urn:foo2"));
         verifyPrefixes(dnc.getPrefixes("urn:foo1"), new String[]{"p1"});
         verifyPrefixes(dnc.getPrefixes("urn:foo2"), new String[]{"p2"});
-        
+
         dnc.down(); //2
         dnc.addPrefix("p11", "urn:foo1");
         dnc.addPrefix("p2", "urn:foo22");
@@ -81,9 +81,9 @@ public class DelegatingNamespaceContextTest extends Assert {
         verifyPrefixes(dnc.getPrefixes("urn:foo1"), new String[]{"p1"});
         verifyPrefixes(dnc.getPrefixes("urn:foo2"), new String[]{"p2"});
         verifyPrefixes(dnc.getPrefixes("urn:foo3"), new String[]{});
-        
+
         dnc.up(); //0
-        
+
         try {
             dnc.up(); //-1
             fail("not allowed to go up");
@@ -95,7 +95,7 @@ public class DelegatingNamespaceContextTest extends Assert {
     @Test
     public void testSomeAddsWithDuplicatedPrefixName() throws Exception {
         DelegatingNamespaceContext dnc = getTestDelegatingNamespaceContext();
-        
+
         dnc.down(); // 1
         dnc.addPrefix("p00", "urn:foo0");
         dnc.addPrefix("p1", "urn:foo1");
@@ -130,7 +130,7 @@ public class DelegatingNamespaceContextTest extends Assert {
     }
 
     private void verifyPrefixes(Iterator<String> prefixes, String[] values) {
-        Set<String> tmp = new HashSet<String>();
+        Set<String> tmp = new HashSet<>();
         while (prefixes.hasNext()) {
             tmp.add(prefixes.next());
         }
@@ -143,6 +143,6 @@ public class DelegatingNamespaceContextTest extends Assert {
         }
         assertTrue(tmp.isEmpty());
     }
-    
-    
+
+
 }

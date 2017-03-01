@@ -48,7 +48,7 @@ public final class XPathAssert {
 
     /**
      * Assert that the following XPath query selects one or more nodes.
-     * 
+     *
      * @param xpath
      */
     public static NodeList assertValid(String xpath, Node node, Map<String, String> namespaces)
@@ -68,7 +68,7 @@ public final class XPathAssert {
     }
     /**
      * Assert that the following XPath query selects one or more nodes.
-     * 
+     *
      * @param xpath
      */
     public static void assertValidBoolean(String xpath, Node node, Map<String, String> namespaces)
@@ -83,7 +83,7 @@ public final class XPathAssert {
             throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpath
                                            + " from document:\n" + writeNodeToString(node));
         }
-        
+
         if (!b.booleanValue()) {
             throw new AssertionFailedError("Boolean XPath assertion evaluated to false:\n"
                                            + xpath
@@ -97,7 +97,7 @@ public final class XPathAssert {
 
     /**
      * Assert that the following XPath query selects no nodes.
-     * 
+     *
      * @param xpath
      */
     public static NodeList assertInvalid(String xpath, Node node, Map<String, String> namespaces)
@@ -120,14 +120,14 @@ public final class XPathAssert {
     /**
      * Asser that the text of the xpath node retrieved is equal to the value
      * specified.
-     * 
+     *
      * @param xpath
      * @param value
      * @param node
      */
-    public static void assertXPathEquals(String xpath, 
-                                         String value, 
-                                         Node node, 
+    public static void assertXPathEquals(String xpath,
+                                         String value,
+                                         Node node,
                                          Map<String, String> namespaces)
         throws Exception {
         Object o = createXPath(namespaces).compile(xpath)
@@ -145,23 +145,23 @@ public final class XPathAssert {
                 return;
             }
         }
-        throw new AssertionFailedError("No nodes were found for expression: " 
-            + xpath 
-            + " in document " 
+        throw new AssertionFailedError("No nodes were found for expression: "
+            + xpath
+            + " in document "
             + writeNodeToString(node));
     }
-    
+
     /**
      * Asser that the text of the xpath node retrieved is equal to the value
      * specified.
-     * 
+     *
      * @param xpath
      * @param value
      * @param node
      */
-    public static void assertXPathEquals(String xpath, 
-                                         QName value, 
-                                         Node node, 
+    public static void assertXPathEquals(String xpath,
+                                         QName value,
+                                         Node node,
                                          Map<String, String> namespaces)
         throws Exception {
         Object o = createXPath(namespaces).compile(xpath)
@@ -181,11 +181,11 @@ public final class XPathAssert {
                 return;
             }
         }
-        throw new AssertionFailedError("No nodes were found for expression: " 
-            + xpath 
-            + " in document " 
+        throw new AssertionFailedError("No nodes were found for expression: "
+            + xpath
+            + " in document "
             + writeNodeToString(node));
-    }    
+    }
 
     public static void assertNoFault(Node node) throws Exception {
         Map<String, String> namespaces = new HashMap<String, String>();

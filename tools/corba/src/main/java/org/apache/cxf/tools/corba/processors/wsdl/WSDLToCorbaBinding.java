@@ -92,7 +92,7 @@ public class WSDLToCorbaBinding {
     TypeMappingType typeMappingType;
     ExtensionRegistry extReg;
 
-    List<String> interfaceNames = new ArrayList<String>();
+    List<String> interfaceNames = new ArrayList<>();
     Map<Object, Object> bindingNameMap = new HashMap<Object, Object>();
     String bindingName;
     String address;
@@ -138,8 +138,8 @@ public class WSDLToCorbaBinding {
         helper.setXMLSchemaList(xmlSchemaList);
 
         List<PortType> intfs = null;
-        if (interfaceNames.size() > 0) {
-            intfs = new ArrayList<PortType>(interfaceNames.size());
+        if (!interfaceNames.isEmpty()) {
+            intfs = new ArrayList<>(interfaceNames.size());
 
             for (String interfaceName : interfaceNames) {
                 PortType portType = null;
@@ -186,7 +186,7 @@ public class WSDLToCorbaBinding {
             throw new Exception(msg.toString());
         } else {
             PortType portType = null;
-            intfs = new ArrayList<PortType>();
+            intfs = new ArrayList<>();
             if (portTypes.size() == 1) {
                 portType = portTypes.values().iterator().next();
                 interfaceNames.add(portType.getQName().getLocalPart());
@@ -226,7 +226,7 @@ public class WSDLToCorbaBinding {
             extReg = def.getExtensionRegistry();
         }
 
-        bindingNames = new ArrayList<String>();
+        bindingNames = new ArrayList<>();
         String interfaceName = portType.getQName().getLocalPart();
         String bname = getMappedBindingName(interfaceName);
 
@@ -419,8 +419,8 @@ public class WSDLToCorbaBinding {
         }
 
         operationType.setName(op.getName());
-        List<ParamType> params = new ArrayList<ParamType>();
-        List<ArgType> returns = new ArrayList<ArgType>();
+        List<ParamType> params = new ArrayList<>();
+        List<ArgType> returns = new ArrayList<>();
 
         wsdlParameter.processParameters(this, op, def, xmlSchemaList, params, returns, true);
 

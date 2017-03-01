@@ -29,7 +29,7 @@ import org.apache.cxf.rt.security.claims.Claim;
 public class ProcessedClaim extends Claim {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -336574019841442184L;
     private String issuer;
@@ -38,7 +38,7 @@ public class ProcessedClaim extends Claim {
 
     public ProcessedClaim() {
     }
-    
+
     public ProcessedClaim(ProcessedClaim processedClaim) {
         super(processedClaim);
         issuer = processedClaim.issuer;
@@ -126,7 +126,7 @@ public class ProcessedClaim extends Claim {
         }
         return true;
     }
-    
+
     @Override
     public ProcessedClaim clone() {
         super.clone(); // Checkstyle requires this call

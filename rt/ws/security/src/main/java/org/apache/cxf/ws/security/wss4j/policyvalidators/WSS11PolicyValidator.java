@@ -39,24 +39,24 @@ import org.apache.wss4j.policy.model.Wss11;
  * Validate a WSS11 policy.
  */
 public class WSS11PolicyValidator extends AbstractSecurityPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.WSS11.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.WSS11.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         List<WSSecurityEngineResult> scResults =
             parameters.getResults().getActionResults().get(WSConstants.SC);
-        
+
         for (AssertionInfo ai : ais) {
             Wss11 wss11 = (Wss11)ai.getAssertion();
             ai.setAsserted(true);
@@ -65,7 +65,7 @@ public class WSS11PolicyValidator extends AbstractSecurityPolicyValidator {
             if (!MessageUtils.isRequestor(parameters.getMessage())) {
                 continue;
             }
-            
+
             if ((wss11.isRequireSignatureConfirmation() && (scResults == null || scResults.isEmpty()))
                 || (!wss11.isRequireSignatureConfirmation() && !(scResults == null || scResults.isEmpty()))) {
                 ai.setNotAsserted(
@@ -75,10 +75,10 @@ public class WSS11PolicyValidator extends AbstractSecurityPolicyValidator {
             }
         }
     }
-    
+
     private void assertToken(Wss11 token, AssertionInfoMap aim) {
         String namespace = token.getName().getNamespaceURI();
-        
+
         if (token.isMustSupportRefEmbeddedToken()) {
             PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.MUST_SUPPORT_REF_EMBEDDED_TOKEN));
         }
@@ -100,8 +100,8 @@ public class WSS11PolicyValidator extends AbstractSecurityPolicyValidator {
         if (token.isRequireSignatureConfirmation()) {
             PolicyUtils.assertPolicy(aim, new QName(namespace, SPConstants.REQUIRE_SIGNATURE_CONFIRMATION));
         }
-        
+
     }
-    
-    
+
+
 }

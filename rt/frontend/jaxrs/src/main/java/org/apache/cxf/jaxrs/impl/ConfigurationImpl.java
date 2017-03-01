@@ -39,19 +39,19 @@ public class ConfigurationImpl implements Configuration {
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurationImpl.class);
     private Map<String, Object> props = new HashMap<String, Object>();
     private RuntimeType runtimeType;
-    private Map<Object, Map<Class<?>, Integer>> providers = 
-        new LinkedHashMap<Object, Map<Class<?>, Integer>>(); 
+    private Map<Object, Map<Class<?>, Integer>> providers =
+        new LinkedHashMap<Object, Map<Class<?>, Integer>>();
     private Map<Feature, Boolean> features = new LinkedHashMap<Feature, Boolean>();
-    
+
     public ConfigurationImpl(RuntimeType rt) {
         this.runtimeType = rt;
     }
-    
+
     public ConfigurationImpl(Configuration parent, Class<?>[] defaultContracts) {
         if (parent != null) {
             this.props.putAll(parent.getProperties());
             this.runtimeType = parent.getRuntimeType();
-            
+
             Set<Class<?>> providerClasses = new HashSet<Class<?>>(parent.getClasses());
             for (Object o : parent.getInstances()) {
                 if (!(o instanceof Feature)) {
@@ -65,10 +65,10 @@ public class ConfigurationImpl implements Configuration {
             for (Class<?> cls : providerClasses) {
                 registerParentProvider(createProvider(cls), parent, defaultContracts);
             }
-            
+
         }
     }
-    
+
     private void registerParentProvider(Object o, Configuration parent, Class<?>[] defaultContracts) {
         Map<Class<?>, Integer> contracts = parent.getContracts(o.getClass());
         if (contracts != null) {
@@ -77,7 +77,7 @@ public class ConfigurationImpl implements Configuration {
             register(o, AnnotationUtils.getBindingPriority(o.getClass()), defaultContracts);
         }
     }
-    
+
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
@@ -99,7 +99,7 @@ public class ConfigurationImpl implements Configuration {
 
     @Override
     public Set<Object> getInstances() {
-        Set<Object> allInstances = new HashSet<Object>();
+        Set<Object> allInstances = new HashSet<>();
         allInstances.addAll(providers.keySet());
         allInstances.addAll(features.keySet());
         return Collections.unmodifiableSet(allInstances);
@@ -167,17 +167,17 @@ public class ConfigurationImpl implements Configuration {
             props.put(name, value);
         }
     }
-    
+
     public void setFeature(Feature f, boolean enabled) {
         features.put(f, enabled);
     }
-    
-    
+
+
     private void register(Object provider, int bindingPriority, Class<?>... contracts) {
         register(provider, initContractsMap(bindingPriority, contracts));
     }
-    
-    public boolean register(Object provider, Map<Class<?>, Integer> contracts) {        
+
+    public boolean register(Object provider, Map<Class<?>, Integer> contracts) {
         if (provider.getClass() == Class.class) {
             if (isRegistered((Class<?>)provider)) {
                 LOG.warning("Provider class " + ((Class<?>)provider).getName() + " has already been registered");
@@ -189,7 +189,7 @@ public class ConfigurationImpl implements Configuration {
             LOG.warning("Provider " + provider.getClass().getName() + " has already been registered");
             return false;
         }
-        
+
         Map<Class<?>, Integer> metadata = providers.get(provider);
         if (metadata == null) {
             metadata = new HashMap<Class<?>, Integer>();
@@ -202,7 +202,7 @@ public class ConfigurationImpl implements Configuration {
         }
         return true;
     }
-    
+
     public static Map<Class<?>, Integer> initContractsMap(int bindingPriority, Class<?>... contracts) {
         Map<Class<?>, Integer> metadata = new HashMap<Class<?>, Integer>();
         for (Class<?> contract : contracts) {
@@ -210,12 +210,12 @@ public class ConfigurationImpl implements Configuration {
         }
         return metadata;
     }
-    
+
     public static Object createProvider(Class<?> cls) {
         try {
             return cls.newInstance();
         } catch (Throwable ex) {
-            throw new RuntimeException(ex); 
+            throw new RuntimeException(ex);
         }
     }
 }

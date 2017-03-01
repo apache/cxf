@@ -33,7 +33,7 @@ import javax.jws.soap.SOAPBinding;
              use = SOAPBinding.Use.LITERAL,
              parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
 public interface ArrayService {
-    
+
     @WebMethod
     String[] arrayOutput();
 

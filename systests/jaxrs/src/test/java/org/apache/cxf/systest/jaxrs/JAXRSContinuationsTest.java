@@ -32,13 +32,13 @@ public class JAXRSContinuationsTest extends AbstractJAXRSContinuationsTest {
         createStaticBus();
         assertTrue("server did not launch correctly",
                    launchServer(BookContinuationServer.class));
-                   
-                   
+
+
     }
-    
-    
+
+
     protected String getPort() {
         return PORT;
     }
-    
+
 }

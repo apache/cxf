@@ -133,7 +133,7 @@ public class JAXBExtensionHelperTest extends Assert {
             actual = reader.readLine();
         }
     }
-    
+
     @Test
     public void testMappedNamespace() throws Exception {
         JAXBExtensionHelper.addExtensions(registry, javax.wsdl.Port.class,
@@ -159,13 +159,13 @@ public class JAXBExtensionHelperTest extends Assert {
                                              new InputSource(new StringReader(out.toString())));
         checkTestExt();
     }
-    
+
     private void checkTestExt() throws Exception {
         Service s = wsdlDefinition.getService(new QName("http://cxf.apache.org/test/hello_world",
             "HelloWorldService"));
         Port p = s.getPort("HelloWorldPort");
         List<?> extPortList = p.getExtensibilityElements();
-    
+
         TestPolicyType tp = null;
         AnotherPolicyType ap = null;
         for (Object ext : extPortList) {
@@ -180,11 +180,11 @@ public class JAXBExtensionHelperTest extends Assert {
         }
         assertNotNull("Could not find extension element TestPolicyType", tp);
         assertNotNull("Could not find extension element AnotherPolicyType", ap);
-    
+
         assertEquals("Unexpected value for TestPolicyType intAttr", 30, tp.getIntAttr());
         assertEquals("Unexpected value for TestPolicyType stringAttr", "hello", tp.getStringAttr());
         assertTrue("Unexpected value for AnotherPolicyType floatAttr",
-                   Math.abs(0.1F - ap.getFloatAttr()) < 0.5E-5);        
+                   Math.abs(0.1F - ap.getFloatAttr()) < 0.5E-5);
     }
 
     private void checkSpaces(String actual, int spaces) {

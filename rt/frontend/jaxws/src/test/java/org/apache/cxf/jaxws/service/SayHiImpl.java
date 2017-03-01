@@ -23,7 +23,7 @@ import java.util.List;
 
 import javax.jws.WebService;
 
-@WebService(serviceName = "SayHiService", 
+@WebService(serviceName = "SayHiService",
             portName = "HelloPort",
             targetNamespace = "http://mynamespace.com/",
             endpointInterface = "org.apache.cxf.jaxws.service.SayHi")
@@ -32,7 +32,7 @@ public class SayHiImpl implements SayHi {
         return arg;
     }
     public void greetMe() {
-        
+
     }
     public String[] getStringArray(String[] strs) {
         String[] strings = new String[2];
@@ -41,10 +41,10 @@ public class SayHiImpl implements SayHi {
         return strings;
     }
     public List<String> getStringList(List<String> list) {
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
         ret.add("Hello" + list.get(0));
         ret.add("Bonjour" + list.get(1));
         return ret;
     }
-    
+
 }

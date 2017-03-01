@@ -70,12 +70,12 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
     public EndpointImpl(Bus bus, Service s, QName endpointName) throws EndpointException {
         this(bus, s, s.getEndpointInfo(endpointName));
     }
-    
+
     public EndpointImpl(Bus bus, Service s, EndpointInfo ei) throws EndpointException {
         if (ei == null) {
             throw new NullPointerException("EndpointInfo can not be null!");
         }
-        
+
         if (bus == null) {
             this.bus = BusFactory.getThreadDefaultBus();
         } else {
@@ -85,7 +85,7 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
         endpointInfo = ei;
 
         createBinding(endpointInfo.getBinding());
-        
+
         inFaultObserver = new InFaultChainInitiatorObserver(bus);
         outFaultObserver = new OutFaultChainInitiatorObserver(bus);
 
@@ -93,12 +93,12 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
         getOutInterceptors().add(new MessageSenderInterceptor());
         getOutFaultInterceptors().add(new MessageSenderInterceptor());
     }
-    
+
     public String getBeanName() {
         return endpointInfo.getName().toString() + ".endpoint";
     }
-    
-   
+
+
     public EndpointInfo getEndpointInfo() {
         return endpointInfo;
     }
@@ -141,9 +141,9 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
             } catch (BusException ex) {
                 throw new EndpointException(ex);
             }
-        }    
+        }
     }
-    
+
 
     public MessageObserver getInFaultObserver() {
         return inFaultObserver;
@@ -154,23 +154,23 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
     }
 
     public void setInFaultObserver(MessageObserver observer) {
-        inFaultObserver = observer;        
+        inFaultObserver = observer;
     }
 
     public void setOutFaultObserver(MessageObserver observer) {
         outFaultObserver = observer;
-        
+
     }
-    
+
     /**
      * Utility method to make it easy to set properties from Spring.
-     * 
+     *
      * @param properties
      */
     public void setProperties(Map<String, Object> properties) {
         this.putAll(properties);
     }
-    
+
     /**
      * @return the list of features <b>already</b> activated for this endpoint.
      */
@@ -193,10 +193,10 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
         if (!(obj instanceof EndpointImpl)) {
             return false;
         }
-        
+
         return super.equals(obj);
     }
-    
+
     /**
      * Returns the hashCode based on the EndpointInfo so that this object
      * can be used as a map key.
@@ -205,7 +205,7 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
     public int hashCode() {
         return endpointInfo.hashCode();
     }
-    
+
     public synchronized void addCleanupHook(Closeable c) {
         if (cleanupHooks == null) {
             cleanupHooks = new CopyOnWriteArrayList<Closeable>();

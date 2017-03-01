@@ -32,24 +32,24 @@ import org.apache.cxf.security.LoginSecurityContext;
  * SecurityContext which implements isUserInRole using the
  * following approach : skip the first Subject principal, and then checks
  * Groups the principal is a member of
- * 
+ *
  * TODO : consider moving this class into a rt-core-security module
  */
 public class DefaultSecurityContext implements LoginSecurityContext {
 
     private Principal p;
-    private Subject subject; 
-    
+    private Subject subject;
+
     public DefaultSecurityContext(Subject subject) {
         this.p = findPrincipal(null, subject);
         this.subject = subject;
     }
-    
+
     public DefaultSecurityContext(String principalName, Subject subject) {
         this.p = findPrincipal(principalName, subject);
         this.subject = subject;
     }
-    
+
     public DefaultSecurityContext(Principal p, Subject subject) {
         this.p = p;
         this.subject = subject;
@@ -57,35 +57,35 @@ public class DefaultSecurityContext implements LoginSecurityContext {
             this.p = findPrincipal(null, subject);
         }
     }
-    
+
     private static Principal findPrincipal(String principalName, Subject subject) {
         if (subject == null) {
             return null;
         }
-        
+
         for (Principal principal : subject.getPrincipals()) {
-            if (!(principal instanceof Group) 
+            if (!(principal instanceof Group)
                 && (principalName == null || principal.getName().equals(principalName))) {
                 return principal;
             }
         }
-        
+
         // No match for the principalName. Just return first non-Group Principal
         if (principalName != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if (!(principal instanceof Group)) { 
+                if (!(principal instanceof Group)) {
                     return principal;
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     public Principal getUserPrincipal() {
         return p;
     }
-    
+
     public boolean isUserInRole(String role) {
         if (subject != null) {
             for (Principal principal : subject.getPrincipals()) {
@@ -104,28 +104,28 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         if (group.getName().equals(role)) {
             return true;
         }
-            
+
         for (Enumeration<? extends Principal> members = group.members(); members.hasMoreElements();) {
             // this might be a plain role but could represent a group consisting of other groups/roles
             Principal member = members.nextElement();
-            if (member.getName().equals(role) 
+            if (member.getName().equals(role)
                 || member instanceof Group && checkGroup((Group)member, role)) {
                 return true;
             }
         }
-        return false;    
+        return false;
     }
 
-    
+
     public Subject getSubject() {
         return subject;
     }
 
     public Set<Principal> getUserRoles() {
-        Set<Principal> roles = new HashSet<Principal>();
+        Set<Principal> roles = new HashSet<>();
         if (subject != null) {
             for (Principal principal : subject.getPrincipals()) {
-                if (principal != p) { 
+                if (principal != p) {
                     roles.add(principal);
                 }
             }

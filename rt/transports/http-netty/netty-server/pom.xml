@@ -147,6 +147,8 @@
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
+                            <fork>${cxf.xjcplugin.forkmode}</fork>
+                            <additionalJvmArgs>${cxf.xjc.jvmArgs}</additionalJvmArgs>
                             <extensions>
                                 <extension>org.apache.cxf.xjcplugins:cxf-xjc-bug986:${cxf.xjc-utils.version}</extension>
                             </extensions>

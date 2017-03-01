@@ -41,7 +41,7 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.ADDRESSING_PROPERTIES
  */
 public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
     VerificationCache verificationCache;
-    List<String> expectedExposedAs = new ArrayList<String>();
+    List<String> expectedExposedAs = new ArrayList<>();
     private Map<String, Object> mapProperties;
 
     public MAPVerifier() {
@@ -50,7 +50,7 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
         mapProperties.put(MAPTest.INBOUND_KEY, ADDRESSING_PROPERTIES_INBOUND);
         mapProperties.put(MAPTest.OUTBOUND_KEY, ADDRESSING_PROPERTIES_OUTBOUND);
     }
-    
+
     public void handleMessage(Message message) {
         verify(message);
     }
@@ -61,11 +61,11 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
 
     private void verify(Message message) {
         boolean isOutbound = ContextUtils.isOutbound(message);
-        String mapProperty = 
-            (String)mapProperties.get(isOutbound 
+        String mapProperty =
+            (String)mapProperties.get(isOutbound
                                       ? MAPTest.OUTBOUND_KEY
                                       : MAPTest.INBOUND_KEY);
-        AddressingProperties maps = 
+        AddressingProperties maps =
             (AddressingProperties)message.get(mapProperty);
         if (maps == null) {
             return;
@@ -91,20 +91,20 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
         }
         verificationCache.put(MAPTest.verifyMAPs(maps, this));
     }
-    
+
     private String getExpectedExposeAs(boolean remove) {
         int size = expectedExposedAs.size();
-        return  size == 0 
+        return size == 0
                 ? null
                 : remove
                   ? expectedExposedAs.remove(size - 1)
                   : expectedExposedAs.get(size - 1);
     }
-    
+
     public void setVerificationCache(VerificationCache cache) {
         verificationCache = cache;
     }
-    
+
     public void addToExpectedExposedAs(String str) {
         expectedExposedAs.add(str);
     }

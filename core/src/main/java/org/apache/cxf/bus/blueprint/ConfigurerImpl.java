@@ -39,12 +39,12 @@ import org.osgi.service.blueprint.reflect.BeanMetadata;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 
 /**
- * 
+ *
  */
 public class ConfigurerImpl implements Configurer {
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurerImpl.class);
     BlueprintContainer container;
-    
+
     private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions
         = new TreeMap<String, List<MatcherHolder>>();
 
@@ -63,8 +63,8 @@ public class ConfigurerImpl implements Configurer {
             return literalCharsLen1.compareTo(literalCharsLen2) * -1;
         }
     }
-    
-    
+
+
     public ConfigurerImpl(BlueprintContainer con) {
         container = con;
         initializeWildcardMap();
@@ -83,12 +83,12 @@ public class ConfigurerImpl implements Configurer {
                     String orig = s;
                     if (s.charAt(0) == '*') {
                         //old wildcard
-                        s = "." + s.replaceAll("\\.", "\\."); 
+                        s = "." + s.replaceAll("\\.", "\\.");
                     }
                     Matcher matcher = Pattern.compile(s).matcher("");
                     List<MatcherHolder> m = wildCardBeanDefinitions.get(cls.getName());
                     if (m == null) {
-                        m = new ArrayList<MatcherHolder>();
+                        m = new ArrayList<>();
                         wildCardBeanDefinitions.put(cls.getName(), m);
                     }
                     MatcherHolder holder = new MatcherHolder(orig, matcher);
@@ -101,7 +101,7 @@ public class ConfigurerImpl implements Configurer {
     public void configureBean(Object beanInstance) {
         configureBean(null, beanInstance, true);
     }
-    
+
     public void configureBean(String bn, Object beanInstance) {
         configureBean(bn, beanInstance, true);
     }
@@ -109,14 +109,14 @@ public class ConfigurerImpl implements Configurer {
         if (null == bn) {
             bn = getBeanName(beanInstance);
         }
-        
+
         if (null == bn) {
             return;
         }
         if (checkWildcards) {
             configureWithWildCard(bn, beanInstance);
         }
-        
+
         if (container instanceof ExtendedBlueprintContainer) {
             ComponentMetadata cm = null;
             try {
@@ -129,10 +129,10 @@ public class ConfigurerImpl implements Configurer {
             }
         }
     }
-    
+
     private void configureWithWildCard(String bn, Object beanInstance) {
         if (!wildCardBeanDefinitions.isEmpty()) {
-            Class<?> clazz = beanInstance.getClass();            
+            Class<?> clazz = beanInstance.getClass();
             while (!Object.class.equals(clazz)) {
                 String className = clazz.getName();
                 List<MatcherHolder> matchers = wildCardBeanDefinitions.get(className);
@@ -174,13 +174,13 @@ public class ConfigurerImpl implements Configurer {
                 LogUtils.log(LOG, Level.WARNING, "ERROR_DETERMINING_BEAN_NAME_EXC", ex);
             }
         }
-        
+
         if (null == beanName) {
             LogUtils.log(LOG, Level.FINE, "COULD_NOT_DETERMINE_BEAN_NAME_MSG",
                          beanInstance.getClass().getName());
         }
-      
+
         return beanName;
     }
-    
+
 }

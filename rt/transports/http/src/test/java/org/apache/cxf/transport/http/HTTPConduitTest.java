@@ -61,7 +61,7 @@ public class HTTPConduitTest extends Assert {
     private Message getNewMessage() {
         Message message = new MessageImpl();
         Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
-        List<String> contentTypes = new ArrayList<String>();
+        List<String> contentTypes = new ArrayList<>();
         contentTypes.add("text/xml");
         contentTypes.add("charset=utf8");
         headers.put("content-type", contentTypes);
@@ -112,7 +112,7 @@ public class HTTPConduitTest extends Assert {
                      conduit.getURI().getPath(),
                      "/bar/foo");
     }
-    
+
 
 
     /**
@@ -208,7 +208,7 @@ public class HTTPConduitTest extends Assert {
         assertEquals("Wrong Authorization Token", "myauth", authorization.get(0));
 
         conduit.setAuthSupplier(null);
-        // Setting authorization policy on the message should override 
+        // Setting authorization policy on the message should override
         // conduit setting
         AuthorizationPolicy authPolicy = new AuthorizationPolicy();
         authPolicy.setUserName("Hello");

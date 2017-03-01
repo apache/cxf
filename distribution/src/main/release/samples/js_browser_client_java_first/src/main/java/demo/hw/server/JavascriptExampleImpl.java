@@ -30,11 +30,11 @@ import demo.hw.server.data.Ingredient;
 
 @WebService(endpointInterface = "demo.hw.server.JavascriptExample")
 public class JavascriptExampleImpl implements JavascriptExample {
-    
+
     private List<Beverage> beverages;
-    
+
     public JavascriptExampleImpl() {
-        beverages = new ArrayList<Beverage>();
+        beverages = new ArrayList<>();
         Ingredient calcium = new Ingredient();
         calcium.setName("calcium");
         calcium.setCategory(Category.Mineral);
@@ -47,7 +47,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
         Ingredient apple = new Ingredient();
         apple.setName("apple");
         apple.setCategory(Category.Fruit);
-        
+
         Beverage b = new Beverage();
         b.setName("zinc-fortified broccoli shake");
         b.setProof(20);
@@ -57,7 +57,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
         ingredients[1] = broccoli;
         b.setIngredients(ingredients);
         beverages.add(b);
-        
+
         b = new Beverage();
         b.setName("apple broccoli shake");
         b.setProof(50);
@@ -66,7 +66,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
         ingredients[1] = broccoli;
         b.setIngredients(ingredients);
         beverages.add(b);
-        
+
         b = new Beverage();
         b.setName("calcium-fortified apple juice");
         b.setProof(13);
@@ -75,12 +75,12 @@ public class JavascriptExampleImpl implements JavascriptExample {
         ingredients[1] = calcium;
         b.setIngredients(ingredients);
         beverages.add(b);
-        
+
 
     }
 
     public Beverage[] getBeverageWithIngredientCategories(List<Category> c) {
-        List<Beverage> matches = new ArrayList<Beverage>();
+        List<Beverage> matches = new ArrayList<>();
         for (Beverage b : beverages) {
             for (Ingredient i : b.getIngredients()) {
                 if (c.contains(i.getCategory())) {
@@ -93,7 +93,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
     }
 
     public Beverage[] getBeverageWithIngredientCategory(Category c) {
-        List<Beverage> matches = new ArrayList<Beverage>();
+        List<Beverage> matches = new ArrayList<>();
         for (Beverage b : beverages) {
             for (Ingredient i : b.getIngredients()) {
                 if (c == i.getCategory()) {
@@ -106,7 +106,7 @@ public class JavascriptExampleImpl implements JavascriptExample {
     }
 
     public Beverage[] getBeveragesWithIngredient(Ingredient i) {
-        List<Beverage> matches = new ArrayList<Beverage>();
+        List<Beverage> matches = new ArrayList<>();
         for (Beverage b : beverages) {
             for (Ingredient bi : b.getIngredients()) {
                 if (bi == i) {

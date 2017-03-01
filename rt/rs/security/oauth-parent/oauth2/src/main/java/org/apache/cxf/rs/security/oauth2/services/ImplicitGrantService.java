@@ -34,10 +34,10 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 /**
  * Redirection-based Implicit Grant Service
- * 
+ *
  * This resource handles the End User authorizing
  * or denying the Client embedded in the Web agent.
- * 
+ *
  */
 @Path("/authorize-implicit")
 public class ImplicitGrantService extends AbstractImplicitGrantService {
@@ -53,15 +53,15 @@ public class ImplicitGrantService extends AbstractImplicitGrantService {
         super(supportedResponseTypes, supportedGrantType);
     }
     @Override
-    protected OAuthAuthorizationData createAuthorizationData(Client client, 
+    protected OAuthAuthorizationData createAuthorizationData(Client client,
                                                              MultivaluedMap<String, String> params,
                                                              String redirectUri,
                                                              UserSubject subject,
                                                              List<OAuthPermission> requestedPerms,
                                                              List<OAuthPermission> alreadyAuthorizedPerms,
                                                              boolean authorizationCanBeSkipped) {
-        OAuthAuthorizationData data = 
-            super.createAuthorizationData(client, params, redirectUri, subject, 
+        OAuthAuthorizationData data =
+            super.createAuthorizationData(client, params, redirectUri, subject,
                                           requestedPerms, alreadyAuthorizedPerms, authorizationCanBeSkipped);
         data.setImplicitFlow(true);
         return data;

@@ -54,54 +54,54 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.BeanDefinitionParserDelegate;
 import org.springframework.beans.factory.xml.ParserContext;
 
-public abstract class AbstractBeanDefinitionParser 
+public abstract class AbstractBeanDefinitionParser
     extends org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser {
     public static final String WIRE_BUS_ATTRIBUTE = AbstractBeanDefinitionParser.class.getName() + ".wireBus";
     public static final String WIRE_BUS_NAME = AbstractBeanDefinitionParser.class.getName() + ".wireBusName";
-    public static final String WIRE_BUS_CREATE 
+    public static final String WIRE_BUS_CREATE
         = AbstractBeanDefinitionParser.class.getName() + ".wireBusCreate";
-    public static final String WIRE_BUS_HANDLER 
+    public static final String WIRE_BUS_HANDLER
         = "org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractBeanDefinitionParser.class);
-    
+
     private Class<?> beanClass;
     private JAXBContext context;
     private Set<Class<?>> classes;
 
     public AbstractBeanDefinitionParser() {
     }
-    
+
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
-        boolean setBus = parseAttributes(element, ctx, bean);        
+        boolean setBus = parseAttributes(element, ctx, bean);
         if (!setBus && hasBusProperty()) {
             addBusWiringAttribute(bean, BusWiringType.PROPERTY);
         }
         parseChildElements(element, ctx, bean);
     }
-    
+
     protected boolean parseAttributes(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         NamedNodeMap atts = element.getAttributes();
         boolean setBus = false;
         for (int i = 0; i < atts.getLength(); i++) {
             Attr node = (Attr) atts.item(i);
-            
+
             setBus |= parseAttribute(element, node, ctx, bean);
         }
         return setBus;
     }
-    protected boolean parseAttribute(Element element, Attr node, 
+    protected boolean parseAttribute(Element element, Attr node,
                                      ParserContext ctx, BeanDefinitionBuilder bean) {
         String val = node.getValue();
         String pre = node.getPrefix();
         String name = node.getLocalName();
         String prefix = node.getPrefix();
-        
+
         // Don't process namespaces
         if (isNamespace(name, prefix)) {
             return false;
         }
-        
+
         if ("createdFromAPI".equals(name)) {
             bean.setAbstract(true);
         } else if ("abstract".equals(name)) {
@@ -118,8 +118,8 @@ public abstract class AbstractBeanDefinitionParser
         return false;
     }
 
-    
-    protected boolean processBusAttribute(Element element, ParserContext ctx, 
+
+    protected boolean processBusAttribute(Element element, ParserContext ctx,
                                         BeanDefinitionBuilder bean,
                                         String val) {
         if (val != null && val.trim().length() > 0) {
@@ -129,7 +129,7 @@ public abstract class AbstractBeanDefinitionParser
                 addBusWiringAttribute(bean, BusWiringType.PROPERTY,
                                       val, ctx);
             }
-            return true;                         
+            return true;
         }
         return false;
     }
@@ -144,13 +144,13 @@ public abstract class AbstractBeanDefinitionParser
     private boolean isNamespace(String name, String prefix) {
         return "xmlns".equals(prefix) || prefix == null && "xmlns".equals(name);
     }
-    
+
     protected void parseChildElements(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         Element el = DOMUtils.getFirstElement(element);
         while (el != null) {
             String name = el.getLocalName();
             mapElement(ctx, bean, el, name);
-            el = DOMUtils.getNextElement(el);     
+            el = DOMUtils.getNextElement(el);
         }
     }
 
@@ -174,46 +174,46 @@ public abstract class AbstractBeanDefinitionParser
     protected void mapAttribute(BeanDefinitionBuilder bean, String name, String val) {
         mapToProperty(bean, name, val);
     }
-    
+
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element e, String name) {
     }
-    
+
     @Override
-    protected String resolveId(Element elem, AbstractBeanDefinition definition, 
+    protected String resolveId(Element elem, AbstractBeanDefinition definition,
                                ParserContext ctx) throws BeanDefinitionStoreException {
-        
+
         // REVISIT: use getAttributeNS instead
-        
+
         String id = getIdOrName(elem);
         String createdFromAPI = elem.getAttribute("createdFromAPI");
-        
+
         if (null == id || "".equals(id)) {
             return super.resolveId(elem, definition, ctx);
-        } 
-        
+        }
+
         if (createdFromAPI != null && "true".equals(createdFromAPI.toLowerCase())) {
             return id + getSuffix();
         }
-        return id;        
+        return id;
     }
 
     protected boolean hasBusProperty() {
         return false;
     }
-    
+
     protected String getSuffix() {
         return "";
     }
 
-    protected void setFirstChildAsProperty(Element element, ParserContext ctx, 
+    protected void setFirstChildAsProperty(Element element, ParserContext ctx,
                                          BeanDefinitionBuilder bean, String propertyName) {
 
         Element first = getFirstChild(element);
-        
+
         if (first == null) {
             throw new IllegalStateException(propertyName + " property must have child elements!");
         }
-        
+
         String id;
         BeanDefinition child;
         if (first.getNamespaceURI().equals(BeanDefinitionParserDelegate.BEANS_NAMESPACE_URI)) {
@@ -231,9 +231,9 @@ public abstract class AbstractBeanDefinitionParser
                 bean.addPropertyValue(propertyName, child);
                 return;
             } else {
-                throw new UnsupportedOperationException("Elements with the name " + name  
+                throw new UnsupportedOperationException("Elements with the name " + name
                                                         + " are not currently "
-                                                        + "supported as sub elements of " 
+                                                        + "supported as sub elements of "
                                                         + element.getLocalName());
             }
         }
@@ -245,12 +245,12 @@ public abstract class AbstractBeanDefinitionParser
         return DOMUtils.getFirstElement(element);
     }
 
-    protected void addBusWiringAttribute(BeanDefinitionBuilder bean, 
+    protected void addBusWiringAttribute(BeanDefinitionBuilder bean,
                                          BusWiringType type) {
         addBusWiringAttribute(bean, type, null, null);
     }
-                                         
-    protected void addBusWiringAttribute(BeanDefinitionBuilder bean, 
+
+    protected void addBusWiringAttribute(BeanDefinitionBuilder bean,
                                          BusWiringType type,
                                          String busName,
                                          ParserContext ctx) {
@@ -260,31 +260,31 @@ public abstract class AbstractBeanDefinitionParser
             if (busName.charAt(0) == '#') {
                 busName = busName.substring(1);
             }
-            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_NAME, busName); 
+            bean.getRawBeanDefinition().setAttribute(WIRE_BUS_NAME, busName);
         }
-        
-        if (ctx != null 
+
+        if (ctx != null
             && !ctx.getRegistry().containsBeanDefinition(WIRE_BUS_HANDLER)) {
-            BeanDefinitionBuilder b 
+            BeanDefinitionBuilder b
                 = BeanDefinitionBuilder.rootBeanDefinition(WIRE_BUS_HANDLER);
             ctx.getRegistry().registerBeanDefinition(WIRE_BUS_HANDLER, b.getBeanDefinition());
         }
     }
-    
-    protected void mapElementToJaxbProperty(Element parent, 
-                                            BeanDefinitionBuilder bean, 
+
+    protected void mapElementToJaxbProperty(Element parent,
+                                            BeanDefinitionBuilder bean,
                                             QName name,
                                             String propertyName) {
         mapElementToJaxbProperty(parent, bean, name, propertyName, null);
     }
-   
-    protected void mapElementToJaxbProperty(Element parent, 
-                                            BeanDefinitionBuilder bean, 
+
+    protected void mapElementToJaxbProperty(Element parent,
+                                            BeanDefinitionBuilder bean,
                                             QName name,
-                                            String propertyName, 
+                                            String propertyName,
                                             Class<?> c) {
         Element data = null;
-        
+
         Node node = parent.getFirstChild();
         while (node != null) {
             if (node.getNodeType() == Node.ELEMENT_NODE && name.getLocalPart().equals(node.getLocalName())
@@ -308,9 +308,9 @@ public abstract class AbstractBeanDefinitionParser
                 if (classes != null) {
                     tmp.addAll(classes);
                 }
-                JAXBContextCache.addPackage(tmp, getJaxbPackage(), 
-                                            cls == null 
-                                            ? getClass().getClassLoader() 
+                JAXBContextCache.addPackage(tmp, getJaxbPackage(),
+                                            cls == null
+                                            ? getClass().getClassLoader()
                                                 : cls.getClassLoader());
                 if (cls != null) {
                     boolean hasOf = false;
@@ -325,7 +325,7 @@ public abstract class AbstractBeanDefinitionParser
                     }
                 }
                 JAXBContextCache.scanPackages(tmp);
-                CachedContextAndSchemas ccs 
+                CachedContextAndSchemas ccs
                     = JAXBContextCache.getCachedContextAndSchemas(tmp, null, null, null, false);
                 classes = ccs.getClasses();
                 context = ccs.getContext();
@@ -336,9 +336,9 @@ public abstract class AbstractBeanDefinitionParser
         return context;
     }
 
-    protected void mapElementToJaxbProperty(Element data, 
-                                            BeanDefinitionBuilder bean, 
-                                            String propertyName, 
+    protected void mapElementToJaxbProperty(Element data,
+                                            BeanDefinitionBuilder bean,
+                                            String propertyName,
                                             Class<?> c) {
         try {
             XMLStreamWriter xmlWriter = null;
@@ -348,8 +348,8 @@ public abstract class AbstractBeanDefinitionParser
                 xmlWriter = StaxUtils.createXMLStreamWriter(writer);
                 StaxUtils.copy(data, xmlWriter);
                 xmlWriter.flush();
-    
-                BeanDefinitionBuilder jaxbbean 
+
+                BeanDefinitionBuilder jaxbbean
                     = BeanDefinitionBuilder.rootBeanDefinition(JAXBBeanFactory.class);
                 jaxbbean.getRawBeanDefinition().setFactoryMethodName("createJAXBBean");
                 jaxbbean.addConstructorArgValue(getContext(c));
@@ -382,26 +382,26 @@ public abstract class AbstractBeanDefinitionParser
     }
 
 
-    public void mapElementToJaxbPropertyFactory(Element data, 
-                                                BeanDefinitionBuilder bean, 
-                                                String propertyName, 
+    public void mapElementToJaxbPropertyFactory(Element data,
+                                                BeanDefinitionBuilder bean,
+                                                String propertyName,
                                                 Class<?> type,
                                                 Class<?> factory,
                                                 String method,
                                                 Object ... args) {
-        bean.addPropertyValue(propertyName, mapElementToJaxbBean(data, 
+        bean.addPropertyValue(propertyName, mapElementToJaxbBean(data,
                                                                  factory,
                                                                  null, type, method, args));
     }
-    public AbstractBeanDefinition mapElementToJaxbBean(Element data, 
+    public AbstractBeanDefinition mapElementToJaxbBean(Element data,
                                                        Class<?> cls,
                                                       Class<?> factory,
                                                       String method,
                                                       Object ... args) {
         return mapElementToJaxbBean(data, cls, factory, cls, method, args);
-    }    
+    }
 
-    public AbstractBeanDefinition mapElementToJaxbBean(Element data, 
+    public AbstractBeanDefinition mapElementToJaxbBean(Element data,
                                                        Class<?> cls,
                                                       Class<?> factory,
                                                       Class<?> jaxbClass,
@@ -418,7 +418,7 @@ public abstract class AbstractBeanDefinitionParser
             StaxUtils.close(xmlWriter);
         }
 
-        BeanDefinitionBuilder jaxbbean 
+        BeanDefinitionBuilder jaxbbean
             = BeanDefinitionBuilder.rootBeanDefinition(cls);
         if (factory != null) {
             jaxbbean.getRawBeanDefinition().setFactoryBeanName(factory.getName());
@@ -429,11 +429,11 @@ public abstract class AbstractBeanDefinitionParser
         if (args != null) {
             for (Object o : args) {
                 jaxbbean.addConstructorArgValue(o);
-            }                
+            }
         }
         return jaxbbean.getBeanDefinition();
     }
-    
+
     protected static <T> T unmarshalFactoryString(String s, JAXBContext ctx, Class<T> cls) {
         StringReader reader = new StringReader(s);
         XMLStreamReader data = StaxUtils.createXMLStreamReader(reader);
@@ -455,7 +455,7 @@ public abstract class AbstractBeanDefinitionParser
             JAXBUtils.closeUnmarshaller(u);
         }
     }
-    
+
     protected String getJaxbPackage() {
         return "";
     }
@@ -464,7 +464,7 @@ public abstract class AbstractBeanDefinitionParser
         if (ID_ATTRIBUTE.equals(propertyName)) {
             return;
         }
-        
+
         if (!StringUtils.isEmpty(val)) {
             if (val.startsWith("#") && !val.startsWith("#{")) {
                 bean.addPropertyReference(propertyName, val.substring(1));
@@ -473,9 +473,9 @@ public abstract class AbstractBeanDefinitionParser
             }
         }
     }
-    
+
     protected boolean isAttribute(String pre, String name) {
-        return !"xmlns".equals(name) && (pre == null || !pre.equals("xmlns"))
+        return !"xmlns".equals(name) && (pre == null || !"xmlns".equals(pre))
             && !"abstract".equals(name) && !"lazy-init".equals(name) && !"id".equals(name);
     }
 
@@ -498,12 +498,12 @@ public abstract class AbstractBeanDefinitionParser
         if (colIdx == -1) {
             local = t;
             pre = "";
-            
+
             ns = DOMUtils.getNamespace(element, "");
         } else {
             pre = t.substring(0, colIdx);
             local = t.substring(colIdx + 1);
-            
+
             ns = DOMUtils.getNamespace(element, pre);
         }
 
@@ -513,14 +513,14 @@ public abstract class AbstractBeanDefinitionParser
     /* This id-or-name resolution logic follows that in Spring's
      * org.springframework.beans.factory.xml.BeanDefinitionParserDelegate object
      * Intent is to have resolution of CXF custom beans follow that of Spring beans
-     */    
+     */
     protected String getIdOrName(Element elem) {
         String id = elem.getAttribute(BeanDefinitionParserDelegate.ID_ATTRIBUTE);
-        
+
         if (null == id || "".equals(id)) {
             String names = elem.getAttribute("name");
             if (null != names) {
-                StringTokenizer st = 
+                StringTokenizer st =
                     new StringTokenizer(names, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);
                 if (st.countTokens() > 0) {
                     id = st.nextToken();

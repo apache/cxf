@@ -41,24 +41,24 @@ import org.junit.Test;
 public class HBaseVisitorTest extends Assert {
     public static final byte[] BOOK_FAMILY = "book".getBytes();
     public static final byte[] NAME_QUALIFIER = "name".getBytes();
-    
+
     Table table;
     @Before
     public void setUp() throws Exception {
         try {
-            Configuration hBaseConfig =  HBaseConfiguration.create();
+            Configuration hBaseConfig = HBaseConfiguration.create();
             Connection connection = ConnectionFactory.createConnection(hBaseConfig);
             table = connection.getTable(TableName.valueOf("books"));
         } catch (Throwable t) {
             t.printStackTrace();
         }
     }
-    
+
     @Test
     @Ignore("Enable as soon as it is understood how to run HBase tests in process")
     public void testScanWithFilterVisitor() throws Exception {
         Scan scan = new Scan();
-        
+
         SearchCondition<SearchBean> sc = new FiqlParser<SearchBean>(SearchBean.class).parse("name==CXF");
         HBaseQueryVisitor<SearchBean> visitor = new HBaseQueryVisitor<SearchBean>("book");
         sc.accept(visitor);
@@ -74,10 +74,10 @@ public class HBaseVisitorTest extends Assert {
             }
             assertEquals(1, count);
         } finally {
-            rs.close();  
+            rs.close();
         }
     }
-    
+
     @After
     public void tearDown() throws Exception {
         if (table != null) {

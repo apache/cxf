@@ -35,7 +35,7 @@ public class JwsJsonOutputStream extends FilterOutputStream {
     private List<String> protectedHeaders;
     private List<JwsSignature> signatures;
     private ExecutorService executor;
-    public JwsJsonOutputStream(OutputStream out, 
+    public JwsJsonOutputStream(OutputStream out,
                                List<String> protectedHeaders,
                                List<JwsSignature> signatures) {
         super(out);
@@ -51,11 +51,11 @@ public class JwsJsonOutputStream extends FilterOutputStream {
         byte[] bytes = ByteBuffer.allocate(Integer.SIZE / 8).putInt(value).array();
         write(bytes, 0, bytes.length);
     }
-    
+
     @Override
     public void write(final byte b[], final int off, final int len) throws IOException {
         //TODO: Review if it is at least theoretically possible that a given b[] region
-        // can be modified in a subsequent write which might affect the signature calculation  
+        // can be modified in a subsequent write which might affect the signature calculation
         executor.execute(new Runnable() {
             public void run() {
                 for (JwsSignature signature : signatures) {
@@ -77,8 +77,8 @@ public class JwsJsonOutputStream extends FilterOutputStream {
             if (i > 0) {
                 out.write(new byte[]{','});
             }
-            out.write(StringUtils.toBytesUTF8("{\"protected\":\"" 
-                                             + protectedHeaders.get(i) 
+            out.write(StringUtils.toBytesUTF8("{\"protected\":\""
+                                             + protectedHeaders.get(i)
                                              + "\",\"signature\":\""));
             byte[] sign = signatures.get(i).sign();
             Base64UrlUtility.encodeAndStream(sign, 0, sign.length, out);

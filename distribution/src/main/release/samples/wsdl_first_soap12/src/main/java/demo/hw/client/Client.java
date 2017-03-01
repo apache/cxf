@@ -30,18 +30,18 @@ import org.apache.hello_world_soap12_http.types.FaultDetail;
 
 public final class Client {
 
-    private static final QName SERVICE_NAME 
+    private static final QName SERVICE_NAME
         = new QName("http://apache.org/hello_world_soap12_http", "SOAPService");
 
 
     private Client() {
-    } 
+    }
 
     public static void main(String args[]) throws Exception {
-        
-        if (args.length == 0) { 
+
+        if (args.length == 0) {
             System.out.println("please specify wsdl");
-            System.exit(1); 
+            System.exit(1);
         }
 
         URL wsdlURL;
@@ -51,11 +51,11 @@ public final class Client {
         } else {
             wsdlURL = new URL(args[0]);
         }
-        
+
         System.out.println(wsdlURL);
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         Greeter port = ss.getSoapPort();
-        String resp; 
+        String resp;
 
         System.out.println("Invoking sayHi...");
         resp = port.sayHi();
@@ -88,9 +88,9 @@ public final class Client {
             System.out.println("Expected exception: PingMeFault has occurred: " + ex.getMessage());
             FaultDetail detail = ex.getFaultInfo();
             System.out.println("FaultDetail major:" + detail.getMajor());
-            System.out.println("FaultDetail minor:" + detail.getMinor());            
-        }          
-        System.exit(0); 
+            System.out.println("FaultDetail minor:" + detail.getMinor());
+        }
+        System.exit(0);
     }
 
 }

@@ -30,7 +30,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthJoseJwtProducer;
 
 
 /**
- * Base Authorization Code Grant representation, captures the code 
+ * Base Authorization Code Grant representation, captures the code
  * and the redirect URI this code has been returned to, visible to the client
  */
 public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
@@ -40,16 +40,16 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
     private String issuer;
     public JwtRequestCodeGrant() {
     }
-    
+
     public JwtRequestCodeGrant(String issuer) {
         this.issuer = issuer;
     }
-    
+
     public JwtRequestCodeGrant(String code, String issuer) {
         super(code);
         this.issuer = issuer;
     }
-    
+
     public JwtRequestCodeGrant(String code, URI uri, String issuer) {
         super(code, uri);
         this.issuer = issuer;
@@ -59,7 +59,7 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
         MultivaluedMap<String, String> newMap = new MetadataMap<String, String>();
         newMap.putSingle("request", request);
         return newMap;
-        
+
     }
     public String getRequest() {
         MultivaluedMap<String, String> map = super.toMap();
@@ -72,10 +72,10 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
         }
         return joseProducer.processJwt(new JwtToken(claims), clientSecret);
     }
-    
+
     public void setIssuer(String issuer) {
         // Can it be a client id ?
-        
+
         this.issuer = issuer;
     }
 
@@ -90,5 +90,5 @@ public class JwtRequestCodeGrant extends AuthorizationCodeGrant {
     public void setJoseProducer(OAuthJoseJwtProducer joseProducer) {
         this.joseProducer = joseProducer;
     }
-    
+
 }

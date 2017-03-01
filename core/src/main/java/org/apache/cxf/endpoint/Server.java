@@ -24,14 +24,14 @@ import org.apache.cxf.transport.Destination;
 public interface Server  {
 
     void start();
-    
+
     void stop();
-    
+
     void destroy();
-    
+
     boolean isStarted();
-    
+
     Destination getDestination();
-    
+
     Endpoint getEndpoint();
 }

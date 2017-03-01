@@ -47,7 +47,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
 
     private static final String SCOPE = "%SCOPE%";
     private static final String ROLE = "%ROLE%";
-    
+
     private LdapTemplate ldap;
     private String userBaseDn;
     private String groupBaseDn;
@@ -63,16 +63,16 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
     private List<String> supportedRealms;
     private List<Filter> customFilters;
     private String realm;
-    
-    
+
+
     public void setSupportedRealms(List<String> supportedRealms) {
         this.supportedRealms = supportedRealms;
     }
 
     public void setRealm(String realm) {
         this.realm = realm;
-    }    
-    
+    }
+
     public boolean isUseFullGroupNameAsValue() {
         return useFullGroupNameAsValue;
     }
@@ -88,7 +88,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
     public void setUserObjectClass(String userObjectClass) {
         this.userObjectClass = userObjectClass;
     }
-    
+
     public String getGroupObjectClass() {
         return groupObjectClass;
     }
@@ -120,7 +120,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
     public String getUserBaseDN() {
         return userBaseDn;
     }
-    
+
     public String getGroupMemberAttribute() {
         return groupMemberAttribute;
     }
@@ -136,7 +136,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
     public void setGroupURI(String groupURI) {
         this.groupURI = groupURI;
     }
-    
+
     public void setAppliesToScopeMapping(Map<String, String> appliesToScopeMapping) {
         this.appliesToScopeMapping = appliesToScopeMapping;
     }
@@ -144,7 +144,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
     public Map<String, String> getAppliesToScopeMapping() {
         return appliesToScopeMapping;
     }
-    
+
     public String getGroupBaseDN() {
         return groupBaseDn;
     }
@@ -168,7 +168,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
     public void setGroupNameScopedFilter(String groupNameScopedFilter) {
         this.groupNameScopedFilter = groupNameScopedFilter;
     }
-    
+
     public List<URI> getSupportedClaimTypes() {
         List<URI> list = new ArrayList<>();
         try {
@@ -177,11 +177,11 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
             LOG.warning("Invalid groupURI '" + this.groupURI + "'");
         }
         return list;
-    }    
-    
+    }
+
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
-        
+
         boolean found = false;
         for (Claim claim: claims) {
             if (claim.getClaimType().toString().equals(this.groupURI)) {
@@ -192,9 +192,9 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
         if (!found) {
             return new ProcessedClaimCollection();
         }
-        
+
         String user = null;
-        
+
         Principal principal = parameters.getPrincipal();
         if (principal instanceof KerberosPrincipal) {
             KerberosPrincipal kp = (KerberosPrincipal)principal;
@@ -214,7 +214,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
         if (user == null) {
             return new ProcessedClaimCollection();
         }
-        
+
         if (!LdapUtils.isDN(user)) {
             Name dn = LdapUtils.getDnOfEntry(ldap, this.userBaseDn, this.getUserObjectClass(),
                                              this.getUserNameAttribute(), user);
@@ -228,32 +228,32 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
                 return new ProcessedClaimCollection();
             }
         }
-        
+
         if (LOG.isLoggable(Level.FINER)) {
             LOG.finer("Retrieve groups for user " + user);
         }
-        
+
         List<Filter> filters = new ArrayList<>();
         filters.add(new EqualsFilter(this.groupMemberAttribute, user));
         if (customFilters != null && !customFilters.isEmpty()) {
             filters.addAll(customFilters);
         }
-        
-        List<String> groups = 
+
+        List<String> groups =
             LdapUtils.getAttributeOfEntries(ldap, this.groupBaseDn, this.getGroupObjectClass(),
                                             filters, "cn");
-        
+
         if (groups == null || groups.size() == 0) {
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.info("No groups found for user '" + user + "'");
             }
             return new ProcessedClaimCollection();
         }
-        
+
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Groups for user '" + parameters.getPrincipal().getName() + "': " + groups);
         }
-        
+
         String scope = null;
         if (getAppliesToScopeMapping() != null && getAppliesToScopeMapping().size() > 0
             && parameters.getAppliesToAddress() != null) {
@@ -262,11 +262,11 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
                 LOG.fine("AppliesTo matches with scope: " + scope);
             }
         }
-        
+
         String regex = this.groupNameGlobalFilter;
         regex = regex.replaceAll(ROLE, ".*");
         Pattern globalPattern = Pattern.compile(regex);
-        
+
         //If AppliesTo value can be mapped to a Scope Name
         //ex. https://localhost/doubleit/services/doubleittransport  -> Demo
         Pattern scopePattern = null;
@@ -275,7 +275,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
             regex = regex.replaceAll(SCOPE, scope).replaceAll(ROLE, ".*");
             scopePattern = Pattern.compile(regex);
         }
-        
+
         List<String> filteredGroups = new ArrayList<>();
         for (String group: groups) {
             if (scopePattern != null && scopePattern.matcher(group).matches()) {
@@ -309,18 +309,18 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
                 }
             }
         }
-        
+
         LOG.info("Filtered groups: " + filteredGroups);
         if (filteredGroups.size() == 0) {
             LOG.info("No matching groups found for user '" + principal + "'");
             return new ProcessedClaimCollection();
         }
-        
+
         ProcessedClaimCollection claimsColl = new ProcessedClaimCollection();
         ProcessedClaim c = new ProcessedClaim();
         c.setClaimType(URI.create(this.groupURI));
         c.setPrincipal(principal);
-        c.setValues(new ArrayList<Object>(filteredGroups));
+        c.setValues(new ArrayList<>(filteredGroups));
         // c.setIssuer(issuer);
         // c.setOriginalIssuer(originalIssuer);
         // c.setNamespace(namespace);
@@ -328,7 +328,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
 
         return claimsColl;
     }
-    
+
     @Override
     public List<String> getSupportedRealms() {
         return supportedRealms;
@@ -337,7 +337,7 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
     @Override
     public String getHandlerRealm() {
         return realm;
-    }  
+    }
 
     private String parseRole(String group, String filter) {
         int roleStart = filter.indexOf(ROLE);
@@ -357,5 +357,5 @@ public class LdapGroupClaimsHandler implements ClaimsHandler, RealmSupport {
     public void setCustomFilters(List<Filter> customFilters) {
         this.customFilters = customFilters;
     }
-    
+
 }

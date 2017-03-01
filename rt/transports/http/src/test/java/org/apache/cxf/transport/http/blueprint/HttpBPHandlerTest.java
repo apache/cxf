@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class HttpBPHandlerTest extends Assert {
     @Test
     public void testGetSchemaLocation() {
         HttpBPHandler handler = new HttpBPHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/transports/http/configuration"));
     }
 

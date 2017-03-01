@@ -47,7 +47,7 @@ public class JaxbTypeTest extends AbstractAegisTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
- 
+
         Server s = createService(JaxbService.class);
         service = s.getEndpoint().getService();
         databinding = (AegisDatabinding) service.getDataBinding();

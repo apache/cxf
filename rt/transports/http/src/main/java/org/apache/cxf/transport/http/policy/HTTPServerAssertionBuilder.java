@@ -35,25 +35,25 @@ import org.apache.neethi.Constants;
 import org.apache.neethi.PolicyComponent;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
 public class HTTPServerAssertionBuilder extends JaxbAssertionBuilder<HTTPServerPolicy> {
-    public static final List<QName> KNOWN_ELEMENTS 
+    public static final List<QName> KNOWN_ELEMENTS
         = Collections.singletonList(new ServerPolicyCalculator().getDataClassName());
 
     public HTTPServerAssertionBuilder() throws JAXBException {
-        super(HTTPServerPolicy.class, new ServerPolicyCalculator().getDataClassName());        
+        super(HTTPServerPolicy.class, new ServerPolicyCalculator().getDataClassName());
     }
-    
+
     @Override
     protected JaxbAssertion<HTTPServerPolicy> buildAssertion() {
         return new HTTPServerPolicyAssertion();
     }
-    
+
     class HTTPServerPolicyAssertion extends JaxbAssertion<HTTPServerPolicy> {
         HTTPServerPolicyAssertion() {
-            super(new ServerPolicyCalculator().getDataClassName(), false);            
+            super(new ServerPolicyCalculator().getDataClassName(), false);
         }
 
         @Override
@@ -67,15 +67,15 @@ public class HTTPServerAssertionBuilder extends JaxbAssertionBuilder<HTTPServerP
                 return false;
             }
             JaxbAssertion<HTTPServerPolicy> other = JaxbAssertion.cast((Assertion)policyComponent);
-            return new ServerPolicyCalculator().equals(this.getData(), other.getData());  
+            return new ServerPolicyCalculator().equals(this.getData(), other.getData());
         }
-        
+
         @Override
         protected Assertion clone(boolean optional) {
             HTTPServerPolicyAssertion a = new HTTPServerPolicyAssertion();
             a.setData(getData());
-            return a;        
-        } 
+            return a;
+        }
     }
 }
 

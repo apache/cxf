@@ -38,7 +38,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Test;
 
 public class ExternalServicesServletTest extends AbstractServletTest {
-    static final String FORCED_BASE_ADDRESS 
+    static final String FORCED_BASE_ADDRESS
         = "http://localhost/somewhere";
     @Override
     protected Bus createBus() throws BusException {
@@ -49,46 +49,46 @@ public class ExternalServicesServletTest extends AbstractServletTest {
     protected String getConfiguration() {
         return "/org/apache/cxf/systest/servlet/web-external.xml";
     }
-    
+
     @Test
     public void testGetServiceList() throws Exception {
-        
+
         ServletUnitClient client = newClient();
         client.setExceptionsThrownOnErrorStatus(false);
 
         //test the '/' context get service list
-        WebResponse  res = client.getResponse(CONTEXT_URL + "/");
+        WebResponse res = client.getResponse(CONTEXT_URL + "/");
         WebLink[] links = res.getLinks();
         assertEquals("Wrong number of service links", 6, links.length);
-        
-        Set<String> links2 = new HashSet<String>();
+
+        Set<String> links2 = new HashSet<>();
         for (WebLink l : links) {
             links2.add(l.getURLString());
         }
-        assertTrue(links2.contains(FORCED_BASE_ADDRESS + "/greeter?wsdl"));       
-        assertTrue(links2.contains(FORCED_BASE_ADDRESS + "/greeter2?wsdl")); 
-        
+        assertTrue(links2.contains(FORCED_BASE_ADDRESS + "/greeter?wsdl"));
+        assertTrue(links2.contains(FORCED_BASE_ADDRESS + "/greeter2?wsdl"));
+
         assertEquals("text/html", res.getContentType());
-        
+
         //HTTPUnit do not support require url with ""
         /*
         res = client.getResponse(CONTEXT_URL);
         links = res.getLinks();
         assertEquals("There should get two links for the services", 1, links.length);
         assertEquals(CONTEXT_URL + "/greeter?wsdl", links[0].getURLString());
-        assertEquals(CONTEXT_URL + "/greeter2?wsdl", links[1].getURLString()); 
-        assertEquals("text/html", res.getContentType());*/        
-        
+        assertEquals(CONTEXT_URL + "/greeter2?wsdl", links[1].getURLString());
+        assertEquals("text/html", res.getContentType());*/
+
     }
 
     @Test
     public void testPostInvokeServices() throws Exception {
         newClient();
-        
+
         WebRequest req = new PostMethodWebRequest(CONTEXT_URL + "/greeter",
                 getClass().getResourceAsStream("GreeterMessage.xml"),
                 "text/xml; charset=UTF-8");
-        
+
         WebResponse response = newClient().getResponse(req);
 
         assertEquals("text/xml", response.getContentType());
@@ -96,9 +96,9 @@ public class ExternalServicesServletTest extends AbstractServletTest {
 
         Document doc = StaxUtils.read(response.getInputStream());
         assertNotNull(doc);
-        
+
         addNamespace("h", "http://apache.org/hello_world_soap_http/types");
-        
+
         assertValid("/s:Envelope/s:Body", doc);
         assertValid("//h:sayHiResponse", doc);
     }

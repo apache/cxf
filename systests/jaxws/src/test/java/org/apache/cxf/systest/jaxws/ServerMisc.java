@@ -52,21 +52,23 @@ import org.apache.cxf.wsdl.service.factory.AbstractServiceConfiguration;
 public class ServerMisc extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(ServerMisc.class);
 
-    
-    public static final String DOCLIT_CODEFIRST_URL = 
+
+    public static final String DOCLIT_CODEFIRST_URL =
         "http://localhost:" + PORT + "/DocLitWrappedCodeFirstService/";
-    public static final String RPCLIT_CODEFIRST_URL = 
+    public static final String RPCLIT_CODEFIRST_URL =
         "http://localhost:" + PORT + "/RpcLitCodeFirstService/";
     public static final String DOCLIT_CODEFIRST_BASE_URL =
         "http://localhost:" + PORT + "/DocLitWrappedCodeFirstServiceBaseService/";
-    public static final String DOCLITBARE_CODEFIRST_URL = 
+    public static final String DOCLITBARE_CODEFIRST_URL =
         "http://localhost:" + PORT + "/DocLitBareCodeFirstService/";
-    public static final String DOCLIT_CODEFIRST_SETTINGS_URL = 
+    public static final String DOCLIT_CODEFIRST_SETTINGS_URL =
         "http://localhost:" + PORT + "/DocLitWrappedCodeFirstServiceSettings/";
-    public static final String CXF_5064_URL = 
+    public static final String CXF_5064_URL =
         "http://localhost:" + PORT + "/CXF5064/";
-    
-    
+    public static final String DOCLIT_CODEFIRST_URL_XMLBINDING = 
+        "http://localhost:" + PORT + "/XMLBindingCodeFirstService/";
+
+
     List<org.apache.cxf.endpoint.Server> servers = new LinkedList<org.apache.cxf.endpoint.Server>();
     List<Endpoint> endpoints = new LinkedList<Endpoint>();
     public void tearDown() throws Exception {
@@ -75,20 +77,20 @@ public class ServerMisc extends AbstractBusTestServerBase {
             s.destroy();
         }
         servers.clear();
-        
+
         for (Endpoint ep : endpoints) {
             ep.stop();
         }
         endpoints.clear();
     }
-    
+
     protected void run() {
         Factory factory = new PerRequestFactory(DocLitWrappedCodeFirstServiceImpl.class);
         factory = new PooledFactory(factory, 4);
-        
+
         JAXWSMethodInvoker invoker = new JAXWSMethodInvoker(factory);
         JaxWsServerFactoryBean factoryBean;
-        
+
         Map<String, Object> properties = new HashMap<>();
         properties.put("bus.jmx.usePlatformMBeanServer", Boolean.TRUE);
         properties.put("bus.jmx.enabled", Boolean.TRUE);
@@ -97,8 +99,8 @@ public class ServerMisc extends AbstractBusTestServerBase {
         MetricRegistry registry = new MetricRegistry();
         CodahaleMetricsProvider.setupJMXReporter(b, registry);
         b.setExtension(registry, MetricRegistry.class);
-        
-        
+
+
         factoryBean = new JaxWsServerFactoryBean();
         factoryBean.setBus(b);
         factoryBean.setAddress(DOCLIT_CODEFIRST_URL);
@@ -107,6 +109,16 @@ public class ServerMisc extends AbstractBusTestServerBase {
         factoryBean.setInvoker(invoker);
         servers.add(factoryBean.create());
         
+        factoryBean = new JaxWsServerFactoryBean();
+        factoryBean.setBus(b);
+        factoryBean.setAddress(DOCLIT_CODEFIRST_URL_XMLBINDING);
+        factoryBean.setServiceClass(DocLitWrappedCodeFirstServiceImpl.class);
+        factoryBean.setFeatures(Arrays.asList(new MetricsFeature()));
+        factoryBean.setInvoker(invoker);
+        factoryBean.setBindingId("http://cxf.apache.org/bindings/xformat");
+        factoryBean.setWsdlURL("cxf6866.wsdl");
+        servers.add(factoryBean.create());
+
         factoryBean = new JaxWsServerFactoryBean();
         factoryBean.setAddress(DOCLIT_CODEFIRST_SETTINGS_URL);
         factoryBean.setServiceClass(DocLitWrappedCodeFirstServiceImpl.class);
@@ -121,19 +133,19 @@ public class ServerMisc extends AbstractBusTestServerBase {
             }
         });
         servers.add(factoryBean.create());
-         
+
         //Object implementor4 = new DocLitWrappedCodeFirstServiceImpl();
         //endpoints.add(Endpoint.publish(DOCLIT_CODEFIRST_URL, implementor4));
-        
+
         Object implementor7 = new DocLitBareCodeFirstServiceImpl();
         EndpointImpl ep = (EndpointImpl)Endpoint.publish(DOCLITBARE_CODEFIRST_URL, implementor7);
         ep.getServer().getEndpoint().getInInterceptors().add(new SAAJInInterceptor());
         endpoints.add(ep);
 
-        
+
         Object implementor6 = new InterfaceInheritTestImpl();
         endpoints.add(Endpoint.publish(DOCLIT_CODEFIRST_BASE_URL, implementor6));
-        
+
         Object implementor1 = new AnonymousComplexTypeImpl();
         String address = "http://localhost:" + PORT + "/anonymous_complex_typeSOAP";
         endpoints.add(Endpoint.publish(address, implementor1));
@@ -145,16 +157,16 @@ public class ServerMisc extends AbstractBusTestServerBase {
         Object implementor3 = new OrderedParamHolderImpl();
         address = "http://localhost:" + PORT + "/ordered_param_holder/";
         endpoints.add(Endpoint.publish(address, implementor3));
-        
+
         //Object implementor4 = new DocLitWrappedCodeFirstServiceImpl();
         //endpoints.add(Endpoint.publish(DOCLIT_CODEFIRST_URL, implementor4));
-        
+
         Object implementor5 = new RpcLitCodeFirstServiceImpl();
         endpoints.add(Endpoint.publish(RPCLIT_CODEFIRST_URL, implementor5));
-        
+
         endpoints.add(Endpoint.publish("http://localhost:" + PORT + "/InheritContext/InheritPort",
                          new InheritImpl()));
-        
+
         endpoints.add(Endpoint.publish(CXF_5064_URL, new SOAPHeaderServiceImpl()));
     }
 

@@ -32,13 +32,13 @@ import org.junit.Assert;
 
 @Path("/bookstore")
 public class BookStoreAuthn {
-    
-    @Context 
+
+    @Context
     MessageContext jaxrsContext;
-    
+
     public BookStoreAuthn() {
     }
-    
+
     @POST
     @Path("/books")
     @Produces("text/plain")
@@ -47,7 +47,7 @@ public class BookStoreAuthn {
         checkAuthentication();
         return text;
     }
-    
+
     @POST
     @Path("/books")
     @Produces("application/json")
@@ -56,7 +56,7 @@ public class BookStoreAuthn {
         checkAuthentication();
         return book;
     }
-    
+
     @POST
     @Path("/books")
     @Produces("application/xml")
@@ -65,7 +65,7 @@ public class BookStoreAuthn {
         checkAuthentication();
         return book;
     }
-    
+
     private void checkAuthentication() {
         // Check that we have an authenticated principal
         Assert.assertNotNull(jaxrsContext.getSecurityContext().getUserPrincipal());

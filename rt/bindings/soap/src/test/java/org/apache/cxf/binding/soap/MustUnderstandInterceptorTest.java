@@ -60,15 +60,15 @@ public class MustUnderstandInterceptorTest extends TestBase {
     public void setUp() throws Exception {
 
         super.setUp();
-        
+
         Bus bus = BusFactory.getDefaultBus();
 
         rhi = new ReadHeadersInterceptor(bus, "phase1");
         chain.add(rhi);
-        
+
         sbi = new StartBodyInterceptor("phase1.5");
         chain.add(sbi);
-        
+
         mui = new MustUnderstandInterceptor("phase2");
         chain.add(mui);
 
@@ -112,7 +112,7 @@ public class MustUnderstandInterceptorTest extends TestBase {
     public void testHandleMessageWithSoapHeader11Param() throws Exception {
         prepareSoapMessage("test-soap-header.xml");
         dsi.getUnderstoodHeaders().add(RESERVATION);
-        
+
         ServiceInfo serviceInfo = getMockedServiceModel(getClass().getResource("test-soap-header.wsdl")
             .toString());
 
@@ -146,7 +146,7 @@ public class MustUnderstandInterceptorTest extends TestBase {
         assertEquals("DummaySoapInterceptor getUnderstood has been called!", true, dsi
             .isCalledGetUnderstood());
     }
-    
+
     private void prepareSoapMessage(String payloadFileName) throws Exception {
 
         soapMessage = TestUtil.createEmptySoapMessage(Soap12.getInstance(), chain);
@@ -164,8 +164,8 @@ public class MustUnderstandInterceptorTest extends TestBase {
         private boolean calledGetRoles;
         private boolean calledGetUnderstood;
 
-        private Set<URI> roles = new HashSet<URI>();
-        private Set<QName> understood = new HashSet<QName>();
+        private Set<URI> roles = new HashSet<>();
+        private Set<QName> understood = new HashSet<>();
 
 
         DummySoapInterceptor(String phase) {

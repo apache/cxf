@@ -46,7 +46,7 @@ public class UriInfoImpl implements UriInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(UriInfoImpl.class);
     private static final String CASE_INSENSITIVE_QUERIES = "org.apache.cxf.http.case_insensitive_queries";
     private static final String PARSE_QUERY_VALUE_AS_COLLECTION = "parse.query.value.as.collection";
-    
+
     private MultivaluedMap<String, String> templateParams;
     private Message message;
     private OperationResourceInfoStack stack;
@@ -57,15 +57,15 @@ public class UriInfoImpl implements UriInfo {
     public UriInfoImpl(Message m) {
         this(m, (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS));
     }
-    
+
     public UriInfoImpl(Message m, MultivaluedMap<String, String> templateParams) {
         this.message = m;
         this.templateParams = templateParams;
         if (m != null) {
             this.stack = m.get(OperationResourceInfoStack.class);
-            this.caseInsensitiveQueries = 
+            this.caseInsensitiveQueries =
                 MessageUtils.isTrue(m.getContextualProperty(CASE_INSENSITIVE_QUERIES));
-            this.queryValueIsCollection = 
+            this.queryValueIsCollection =
                 MessageUtils.isTrue(m.getContextualProperty(PARSE_QUERY_VALUE_AS_COLLECTION));
         }
     }
@@ -94,7 +94,7 @@ public class UriInfoImpl implements UriInfo {
 
     public String getPath(boolean decode) {
         String value = doGetPath(decode, true);
-        if (value.length() > 1 && value.startsWith("/")) { 
+        if (value.length() > 1 && value.startsWith("/")) {
             return value.substring(1);
         } else {
             return value;
@@ -114,12 +114,12 @@ public class UriInfoImpl implements UriInfo {
     }
 
     public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
-        MultivaluedMap<String, String> queries = !caseInsensitiveQueries 
+        MultivaluedMap<String, String> queries = !caseInsensitiveQueries
             ? new MetadataMap<String, String>() : new MetadataMap<String, String>(false, true);
-        JAXRSUtils.getStructuredParams(queries, (String)message.get(Message.QUERY_STRING), 
+        JAXRSUtils.getStructuredParams(queries, (String)message.get(Message.QUERY_STRING),
                                       "&", decode, decode, queryValueIsCollection);
         return queries;
-        
+
     }
 
     public URI getRequestUri() {
@@ -172,11 +172,11 @@ public class UriInfoImpl implements UriInfo {
 
     public List<String> getMatchedURIs(boolean decode) {
         if (stack != null) {
-            List<String> objects = new ArrayList<String>();
+            List<String> objects = new ArrayList<>();
             List<String> uris = new LinkedList<String>();
             StringBuilder sumPath = new StringBuilder("");
             for (MethodInvocationInfo invocation : stack) {
-                List<String> templateObjects = invocation.getTemplateValues();                
+                List<String> templateObjects = invocation.getTemplateValues();
                 OperationResourceInfo ori = invocation.getMethodInfo();
                 URITemplate[] paths = {
                     ori.getClassResourceInfo().getURITemplate(),
@@ -184,9 +184,9 @@ public class UriInfoImpl implements UriInfo {
                 };
                 if (paths[0] != null) {
                     int count = paths[0].getVariables().size();
-                    List<String> rootObjects = new ArrayList<String>(count);
+                    List<String> rootObjects = new ArrayList<>(count);
                     for (int i = 0; i < count && i < templateObjects.size(); i++) {
-                        rootObjects.add(templateObjects.get(i));    
+                        rootObjects.add(templateObjects.get(i));
                     }
                     uris.add(0, createMatchedPath(paths[0].getValue(), rootObjects, decode));
                 }
@@ -233,10 +233,10 @@ public class UriInfoImpl implements UriInfo {
         URI resolved = HttpUtils.resolve(getBaseUriBuilder(), uri);
         return HttpUtils.relativize(getRequestUri(), resolved);
     }
-    
+
     @Override
     public URI resolve(URI uri) {
         return HttpUtils.resolve(getBaseUriBuilder(), uri);
     }
-    
+
 }

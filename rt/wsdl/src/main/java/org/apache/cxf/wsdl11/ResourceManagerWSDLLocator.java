@@ -30,7 +30,7 @@ import org.apache.cxf.resource.ResourceManager;
 
 public class ResourceManagerWSDLLocator extends AbstractWrapperWSDLLocator {
     Bus bus;
-    
+
     public ResourceManagerWSDLLocator(String wsdlUrl,
                                       WSDLLocator parent,
                                       Bus bus) {
@@ -63,5 +63,5 @@ public class ResourceManagerWSDLLocator extends AbstractWrapperWSDLLocator {
         }
         return is;
     }
-    
+
 }

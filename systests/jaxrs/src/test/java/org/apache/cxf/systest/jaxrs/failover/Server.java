@@ -36,10 +36,10 @@ public class Server extends AbstractBusTestServerBase {
     public static final String ADDRESS1 = "http://localhost:" + PORT1 + "/rest";
     public static final String ADDRESS2 = "http://localhost:" + PORT2 + "/rest";
     public static final String ADDRESS3 = "http://localhost:" + PORT3 + "/work/rest";
-    
+
 
     List<org.apache.cxf.endpoint.Server> servers = new ArrayList<org.apache.cxf.endpoint.Server>();
-    
+
     protected void run()  {
         createEndpoint(ADDRESS2);
         createEndpoint(ADDRESS3);
@@ -51,7 +51,7 @@ public class Server extends AbstractBusTestServerBase {
         }
         servers.clear();
     }
-        
+
     private void createEndpoint(String address) {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class);
@@ -61,13 +61,13 @@ public class Server extends AbstractBusTestServerBase {
     }
 
     public static void main(String[] args) {
-        try { 
-            Server s = new Server(); 
+        try {
+            Server s = new Server();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally { 
+        } finally {
             System.out.println("done!");
         }
     }

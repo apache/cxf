@@ -51,9 +51,9 @@ import org.apache.wss4j.dom.message.token.SecurityContextToken;
  * Some unit tests for validating a SecurityContextToken via the SCTValidator.
  */
 public class SCTValidatorTest extends org.junit.Assert {
-    
+
     private static TokenStore tokenStore = new DefaultInMemoryTokenStore();
-    
+
     /**
      * Test a valid SecurityContextToken
      */
@@ -62,16 +62,16 @@ public class SCTValidatorTest extends org.junit.Assert {
         TokenValidator sctValidator = new SCTValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a SecurityContextToken
         TokenProviderResponse providerResponse = getSecurityContextToken();
         ReceivedToken validateTarget = new ReceivedToken(providerResponse.getToken());
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(sctValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
             sctValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
@@ -80,7 +80,7 @@ public class SCTValidatorTest extends org.junit.Assert {
             validatorResponse.getAdditionalProperties().get(SCTValidator.SCT_VALIDATOR_SECRET) != null
         );
         assertTrue(validatorResponse.getPrincipal().getName().equals("alice"));
-        
+
         // Now remove the SCT from the cache
         tokenStore.remove(tokenStore.getToken(providerResponse.getTokenId()).getId());
         assertNull(tokenStore.getToken(providerResponse.getTokenId()));
@@ -89,7 +89,7 @@ public class SCTValidatorTest extends org.junit.Assert {
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
-    
+
     /**
      * Test an invalid SecurityContextToken
      */
@@ -98,49 +98,49 @@ public class SCTValidatorTest extends org.junit.Assert {
         TokenValidator sctValidator = new SCTValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
         TokenRequirements tokenRequirements = validatorParameters.getTokenRequirements();
-        
+
         // Create a ValidateTarget consisting of a SecurityContextToken
         Document doc = DOMUtils.createDocument();
         SecurityContextToken sct = new SecurityContextToken(doc);
         ReceivedToken validateTarget = new ReceivedToken(sct.getElement());
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(sctValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
             sctValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.INVALID);
     }
-    
+
     private TokenProviderResponse getSecurityContextToken() throws Exception {
         TokenProvider sctTokenProvider = new SCTProvider();
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(STSUtils.TOKEN_TYPE_SCT_05_12);
-        
+
         return sctTokenProvider.createToken(providerParameters);
     }
-    
+
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {
         TokenValidatorParameters parameters = new TokenValidatorParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(STSConstants.STATUS);
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
         parameters.setTokenStore(tokenStore);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         parameters.setMessageContext(msgCtx);
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -151,30 +151,30 @@ public class SCTValidatorTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         return parameters;
     }
-    
+
     private TokenProviderParameters createProviderParameters(String tokenType) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(tokenType);
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
 
         parameters.setTokenStore(tokenStore);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         parameters.setMessageContext(msgCtx);
-        
+
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -183,12 +183,12 @@ public class SCTValidatorTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         parameters.setEncryptionProperties(new EncryptionProperties());
-        
+
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -196,9 +196,9 @@ public class SCTValidatorTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
-    
+
+
 }

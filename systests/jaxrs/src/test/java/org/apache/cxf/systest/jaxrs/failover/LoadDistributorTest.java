@@ -45,7 +45,7 @@ import org.junit.Test;
  * Tests failover within a static cluster.
  */
 public class LoadDistributorTest extends AbstractBusClientServerTestBase {
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
@@ -62,7 +62,7 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
             if (activeReplica1Started && activeReplica2Started) {
                 break;
             }
-            Thread.sleep(1000);    
+            Thread.sleep(1000);
         }
     }
     private static boolean checkReplica(String address) {
@@ -73,67 +73,67 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
             return false;
         }
     }
-    
-    @Test    
+
+    @Test
     public void testMultipleAltAddresses() throws Exception {
-        FailoverFeature feature = getFeature(Server.ADDRESS2, Server.ADDRESS3); 
+        FailoverFeature feature = getFeature(Server.ADDRESS2, Server.ADDRESS3);
         strategyTest(Server.ADDRESS1, feature);
     }
-    
-    @Test    
+
+    @Test
     public void testSingleAltAddress() throws Exception {
         LoadDistributorFeature feature = new LoadDistributorFeature();
-        List<String> alternateAddresses = new ArrayList<String>();
+        List<String> alternateAddresses = new ArrayList<>();
         alternateAddresses.add(Server.ADDRESS2);
         SequentialStrategy strategy = new SequentialStrategy();
         strategy.setAlternateAddresses(alternateAddresses);
         feature.setStrategy(strategy);
-        
+
         BookStore bookStore = getBookStore(Server.ADDRESS1, feature);
         Book book = bookStore.getBook("123");
         assertEquals("unexpected id", 123L, book.getId());
-        
+
         book = bookStore.getBook("123");
         assertEquals("unexpected id", 123L, book.getId());
     }
-    
-    
+
+
     private FailoverFeature getFeature(String ...address) {
         FailoverFeature feature = new FailoverFeature();
-        List<String> alternateAddresses = new ArrayList<String>();
+        List<String> alternateAddresses = new ArrayList<>();
         for (String s : address) {
             alternateAddresses.add(s);
         }
         SequentialStrategy strategy = new SequentialStrategy();
         strategy.setAlternateAddresses(alternateAddresses);
         feature.setStrategy(strategy);
-        
-        LoadDistributorTargetSelector selector = new LoadDistributorTargetSelector(); 
+
+        LoadDistributorTargetSelector selector = new LoadDistributorTargetSelector();
         selector.setFailover(false);
-        
+
         feature.setTargetSelector(selector);
-        
+
         return feature;
     }
-    
-    protected BookStore getBookStore(String address, 
+
+    protected BookStore getBookStore(String address,
                                      FailoverFeature feature) throws Exception {
         JAXRSClientFactoryBean bean = createBean(address, feature);
         bean.setServiceClass(BookStore.class);
         return bean.create(BookStore.class);
     }
-    
-    protected JAXRSClientFactoryBean createBean(String address, 
+
+    protected JAXRSClientFactoryBean createBean(String address,
                                                 FailoverFeature feature) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
-        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        List<AbstractFeature> features = new ArrayList<>();
         features.add(feature);
         bean.setFeatures(features);
-        
+
         return bean;
     }
-    
+
     protected void strategyTest(String initialAddress,
                                 FailoverFeature feature) throws Exception {
         assertEquals(Server.ADDRESS1, initialAddress);
@@ -143,27 +143,27 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
             BookStore bookStore = getBookStore(initialAddress, feature);
             verifyStrategy(bookStore, SequentialStrategy.class);
             String bookId = "123";
-            
+
             Book book = bookStore.getBook(bookId);
             assertNotNull("expected non-null response", book);
             assertEquals("unexpected id", 123L, book.getId());
-            
+
             String address = getCurrentEndpointAddress(bookStore);
             if (Server.ADDRESS2.equals(address)) {
                 address2Count++;
             } else if (Server.ADDRESS3.equals(address)) {
                 address3Count++;
-            } 
+            }
         }
         assertEquals(10, address2Count);
         assertEquals(10, address3Count);
     }
-    
+
     protected String getCurrentEndpointAddress(Object client) {
         return WebClient.getConfig(client).getConduitSelector()
             .getEndpoint().getEndpointInfo().getAddress();
     }
-    
+
     protected void verifyStrategy(Object proxy, Class<?> clz) {
         ConduitSelector conduitSelector =
             WebClient.getConfig(proxy).getConduitSelector();
@@ -175,5 +175,5 @@ public class LoadDistributorTest extends AbstractBusClientServerTestBase {
             fail("unexpected conduit selector: " + conduitSelector);
         }
     }
-    
+
 }

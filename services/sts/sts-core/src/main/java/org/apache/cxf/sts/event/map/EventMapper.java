@@ -84,7 +84,7 @@ public class EventMapper implements STSEventListener {
     protected void handleEvent(TokenProviderParametersSupport event, Map<String, Object> map) {
         TokenProviderParameters params = event.getTokenParameters();
         try {
-            HttpServletRequest req = 
+            HttpServletRequest req =
                 (HttpServletRequest)params.getMessageContext().get(AbstractHTTPDestination.HTTP_REQUEST);
             map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
             map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
@@ -132,7 +132,7 @@ public class EventMapper implements STSEventListener {
 
     protected void handleEvent(TokenValidatorParametersSupport event, Map<String, Object> map) {
         TokenValidatorParameters params = event.getTokenParameters();
-        HttpServletRequest req = 
+        HttpServletRequest req =
             (HttpServletRequest)params.getMessageContext().get(AbstractHTTPDestination.HTTP_REQUEST);
         map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
         map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
@@ -153,7 +153,7 @@ public class EventMapper implements STSEventListener {
 
     protected void handleEvent(TokenCancellerParametersSupport event, Map<String, Object> map) {
         TokenCancellerParameters params = event.getTokenParameters();
-        HttpServletRequest req = 
+        HttpServletRequest req =
             (HttpServletRequest)params.getMessageContext().get(AbstractHTTPDestination.HTTP_REQUEST);
         map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
         map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));
@@ -173,7 +173,7 @@ public class EventMapper implements STSEventListener {
 
     protected void handleEvent(TokenRenewerParametersSupport event, Map<String, Object> map) {
         TokenRenewerParameters params = event.getTokenParameters();
-        HttpServletRequest req = 
+        HttpServletRequest req =
             (HttpServletRequest)params.getMessageContext().get(AbstractHTTPDestination.HTTP_REQUEST);
         map.put(KEYS.REMOTE_HOST.name(), req.getRemoteHost());
         map.put(KEYS.REMOTE_PORT.name(), String.valueOf(req.getRemotePort()));

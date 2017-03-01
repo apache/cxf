@@ -39,7 +39,7 @@ public class WSDLRefValidatorTest extends Assert {
         Bus b = BusFactory.getDefaultBus();
         return b.getExtension(WSDLManager.class).getDefinition(wsdl);
     }
-    
+
     @Test
     public void testNoService() throws Exception {
         String wsdl = getClass().getResource("resources/b.wsdl").toURI().toString();
@@ -58,7 +58,7 @@ public class WSDLRefValidatorTest extends Assert {
         assertEquals(2, results.getErrors().size());
         String t = results.getErrors().pop();
         String text = "{http://apache.org/hello_world/messages}[portType:GreeterA][operation:sayHi]";
-        Set<String> possibles = new HashSet<String>();
+        Set<String> possibles = new HashSet<>();
         //woodstox
         possibles.add(new Message("FAILED_AT_POINT",
                     WSDLRefValidator.LOG,
@@ -82,7 +82,7 @@ public class WSDLRefValidatorTest extends Assert {
                                   text).toString());
         assertTrue(possibles.contains(t));
     }
-    
+
 
     @Test
     public void testWSDLImport2() throws Exception {
@@ -92,7 +92,7 @@ public class WSDLRefValidatorTest extends Assert {
         String expected = "/wsdl:definitions[@targetNamespace='http://schemas.apache.org/yoko/idl/OptionsPT']"
             + "/wsdl:portType[@name='foo.bar']";
 
-        Set<String> xpath = new HashSet<String>();
+        Set<String> xpath = new HashSet<>();
 
         for (XNode node : validator.vNodes) {
             xpath.add(node.toString());
@@ -141,10 +141,10 @@ public class WSDLRefValidatorTest extends Assert {
         WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
         validator.isValid();
         ValidationResult results = validator.getValidationResults();
-        
+
         assertEquals(1, results.getErrors().size());
         String text = "{http://schemas.apache.org/yoko/idl/OptionsPT}[message:getEmployee]";
-        Set<String> possibles = new HashSet<String>();
+        Set<String> possibles = new HashSet<>();
         //woodstox
         possibles.add(new Message("FAILED_AT_POINT",
                     WSDLRefValidator.LOG,
@@ -171,7 +171,7 @@ public class WSDLRefValidatorTest extends Assert {
 
     @Test
     public void testNotAWsdl() throws Exception {
-        try {        
+        try {
             String wsdl = getClass().getResource("resources/c.xsd").toURI().toString();
             WSDLRefValidator validator = new WSDLRefValidator(getWSDL(wsdl), null);
             validator.isValid();

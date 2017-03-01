@@ -39,7 +39,7 @@ public abstract class AbstractBroadcasterSseTest extends AbstractSseBaseTest {
     @Test
     public void testBooksStreamIsBroadcasted() throws Exception {
         final Collection<Future<Response>> results = new ArrayList<>();
-        
+
         for (int i = 0; i < 2; ++i) {
             results.add(
                 createWebClient("/rest/api/bookstore/broadcast/sse").async().get()
@@ -49,32 +49,32 @@ public abstract class AbstractBroadcasterSseTest extends AbstractSseBaseTest {
         createWebClient("/rest/api/bookstore/broadcast/close")
             .async()
             .post(null)
-            .get(5, TimeUnit.SECONDS)
+            .get(10, TimeUnit.SECONDS)
             .close();
 
         for (final Future<Response> result: results) {
             final Response r = result.get(3, TimeUnit.SECONDS);
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
-    
+
             final String response = r.readEntity(String.class);
             assertThat(response, containsString("id: 1000"));
             assertThat(response, containsString("data: " + toJson("New Book #1000", 1000)));
-            
+
             assertThat(response, containsString("id: 2000"));
             assertThat(response, containsString("data: " + toJson("New Book #2000", 2000)));
-            
+
             r.close();
         }
     }
-    
+
     @Test
     public void testBooksAreReturned() throws JsonProcessingException {
         Response r = createWebClient("/rest/api/bookstore", MediaType.APPLICATION_JSON).get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        
+
         final Book[] books = r.readEntity(Book[].class);
         assertThat(Arrays.asList(books), hasItems(new Book("New Book #1", 1), new Book("New Book #2", 2)));
-        
+
         r.close();
     }
 }

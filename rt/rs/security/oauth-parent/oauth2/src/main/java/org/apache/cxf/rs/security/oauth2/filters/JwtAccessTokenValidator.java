@@ -43,17 +43,17 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTokenValidator {
 
     private static final String USERNAME_PROP = "username";
-    
+
     private Map<String, String> jwtAccessTokenClaimMap;
-    
+
     public List<String> getSupportedAuthorizationSchemes() {
         return Collections.singletonList(OAuthConstants.BEARER_AUTHORIZATION_SCHEME);
     }
 
     public AccessTokenValidation validateAccessToken(MessageContext mc,
-                                                     String authScheme, 
+                                                     String authScheme,
                                                      String authSchemeData,
-                                                     MultivaluedMap<String, String> extraProps) 
+                                                     MultivaluedMap<String, String> extraProps)
         throws OAuthServiceException {
         try {
             JwtToken token = super.getJwtToken(authSchemeData);
@@ -88,17 +88,17 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
         }
         Object scope = claims.getClaim(OAuthConstants.SCOPE);
         if (scope != null) {
-            String[] scopes = scope instanceof String 
+            String[] scopes = scope instanceof String
                 ? scope.toString().split(" ") : CastUtils.cast((List<?>)scope).toArray(new String[]{});
             List<OAuthPermission> perms = new LinkedList<OAuthPermission>();
-            for (String s : scopes) {    
+            for (String s : scopes) {
                 if (!StringUtils.isEmpty(s)) {
                     perms.add(new OAuthPermission(s.trim()));
                 }
             }
             atv.setTokenScopes(perms);
         }
-        String usernameClaimName = 
+        String usernameClaimName =
             JwtTokenUtils.getClaimName(USERNAME_PROP, USERNAME_PROP, jwtAccessTokenClaimMap);
         String username = claims.getStringProperty(usernameClaimName);
         if (username != null) {
@@ -110,6 +110,11 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
         } else if (claims.getSubject() != null) {
             atv.setTokenSubject(new UserSubject(claims.getSubject()));
         }
+        Map<String, String> extraProperties = CastUtils.cast((Map<?, ?>)claims.getClaim("extra_propertirs"));
+        if (extraProperties != null) {
+            atv.getExtraProps().putAll(extraProperties);
+        }
+
         return atv;
     }
 

@@ -41,31 +41,31 @@ public @interface WSDLDocumentation {
      * @return documentation string
      */
     String value();
-    
+
     /**
-     * The place to put the documentation.  The Default depends on the 
+     * The place to put the documentation.  The Default depends on the
      * location of the annotation.   On the method in the SEI, it would be
-     * the portType/operation, on the SEI, it would be the portType, on the 
+     * the portType/operation, on the SEI, it would be the portType, on the
      * service impl, the service element.
      * @return location
      */
     Placement placement() default Placement.DEFAULT;
-    
+
     /**
      * If Placement is FAULT_MESSAGE, PORT_FAULT, or BINDING_FAULT,
-     * return the fault class associated with this documentation 
+     * return the fault class associated with this documentation
      * @return the fault class
      */
     Class<?> faultClass() default DEFAULT.class;
-    
+
     enum Placement {
         DEFAULT,
         TOP,
-        
+
         INPUT_MESSAGE,
         OUTPUT_MESSAGE,
         FAULT_MESSAGE,
-        
+
         PORT_TYPE,
         PORT_TYPE_OPERATION,
         PORT_TYPE_OPERATION_INPUT,
@@ -80,9 +80,9 @@ public @interface WSDLDocumentation {
 
         SERVICE,
         SERVICE_PORT,
-        
+
     };
-    
+
 
     final class DEFAULT { }
 }

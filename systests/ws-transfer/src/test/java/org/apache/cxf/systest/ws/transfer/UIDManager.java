@@ -22,19 +22,19 @@ package org.apache.cxf.systest.ws.transfer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class UIDManager {
-    
+
     private static final AtomicInteger UID = new AtomicInteger(1);
-    
+
     private UIDManager() {
-        
+
     }
-    
+
     public static int getUID() {
         return UID.getAndIncrement();
     }
-    
+
     public static void reset() {
         UID.set(1);
     }
-    
+
 }

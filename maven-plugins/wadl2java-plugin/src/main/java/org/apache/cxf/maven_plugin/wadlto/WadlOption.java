@@ -39,7 +39,7 @@ public class WadlOption extends Option {
     String wadl;
 
     String wadlFileExtension = "wadl";
-    
+
     /**
      * Alternatively to the wadl string an artifact can be specified
      */
@@ -48,7 +48,7 @@ public class WadlOption extends Option {
     public WadlOption() {
         super();
     }
-    
+
     public String getWadl() {
         return wadl;
     }
@@ -64,11 +64,11 @@ public class WadlOption extends Option {
     public void setWadlArtifact(DocumentArtifact wadlArtifact) {
         this.wadlArtifact = wadlArtifact;
     }
-    
+
     /**
      * Try to find a file matching the wadl path (either absolutely, relatively to the current dir or to
      * the project base dir)
-     * 
+     *
      * @return wadl file
      */
     public File getDocumentFile(File baseDir) {
@@ -92,7 +92,7 @@ public class WadlOption extends Option {
         }
         return file;
     }
-    
+
     public List<URI> getWadlURIs(URI baseURI, ClassLoader resourceLoader) {
         String wadlLocation = getWadl();
         if (wadlLocation.contains(".") && !wadlLocation.contains("*")) {
@@ -108,10 +108,10 @@ public class WadlOption extends Option {
         }
         return uris;
     }
-    
+
     private URI getWadlURI(URI baseURI, String wadlLocation) {
         File wadlFile = new File(wadlLocation);
-        return wadlFile.exists() ? wadlFile.toURI() 
+        return wadlFile.exists() ? wadlFile.toURI()
             : baseURI.resolve(URIParserUtil.escapeChars(wadlLocation));
     }
 
@@ -141,7 +141,7 @@ public class WadlOption extends Option {
     }
 
     public List<String> generateCommandLine(File outputDirFile, URI basedir, URI wadlURI, boolean debug) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         addIfNotNull(list, outputDirFile, "-d");
         for (String binding : getBindingFiles()) {
             File bindingFile = new File(binding);
@@ -160,9 +160,9 @@ public class WadlOption extends Option {
         return list;
     }
 
-    
+
     // TODO: the following 3 helpers can go to a superclass or common utility class
-    //       to be used by WADL and WSDL Pptions 
+    //       to be used by WADL and WSDL Pptions
     private static void addIfNotNull(List<String> list, Object value, String key) {
         if (value != null) {
             list.add(key);
@@ -186,7 +186,7 @@ public class WadlOption extends Option {
             }
         }
     }
-    
+
     private static void addIfTrue(List<String> list, boolean expression, String key) {
         if (expression) {
             list.add(key);

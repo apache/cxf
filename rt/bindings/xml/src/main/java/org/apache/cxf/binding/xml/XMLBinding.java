@@ -27,9 +27,9 @@ import org.apache.cxf.message.XMLMessage;
 import org.apache.cxf.service.model.BindingInfo;
 
 public class XMLBinding extends AbstractBasicInterceptorProvider implements Binding {
-    
+
     private BindingInfo bindingInfo;
-    
+
     public XMLBinding(BindingInfo bindingInfo) {
         super();
         this.bindingInfo = bindingInfo;
@@ -45,10 +45,10 @@ public class XMLBinding extends AbstractBasicInterceptorProvider implements Bind
 
     public Message createMessage(Message m) {
         if (!m.containsKey(Message.CONTENT_TYPE)) {
-            
+
             String ct = null;
-            
-            // Should this be done in ServiceInvokerInterceptor to support a case where the 
+
+            // Should this be done in ServiceInvokerInterceptor to support a case where the
             // response content type is detected early on the inbound chain for all the bindings ?
             Exchange exchange = m.getExchange();
             if (exchange != null) {

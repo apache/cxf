@@ -76,7 +76,7 @@ public class WSDLSchemaManager {
         importedSchemas = new HashMap<File, XmlSchema>();
         defnSchemas = new HashMap<String, XmlSchema>();
 
-        deferredAttachments = new ArrayList<DeferredSchemaAttachment>();
+        deferredAttachments = new ArrayList<>();
     }
 
     public Definition createWSDLDefinition(String tns) throws WSDLException, JAXBException {

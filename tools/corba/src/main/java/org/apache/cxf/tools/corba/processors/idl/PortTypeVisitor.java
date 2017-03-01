@@ -44,7 +44,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
-public class PortTypeVisitor extends VisitorBase {   
+public class PortTypeVisitor extends VisitorBase {
 
     ExtensionRegistry extReg;
     PortType portType;
@@ -62,7 +62,7 @@ public class PortTypeVisitor extends VisitorBase {
     public static boolean accept(AST node) {
         return node.getType() == IDLTokenTypes.LITERAL_interface;
     }
-    
+
     public void visit(AST node) {
         // <interface> ::= <interface_dcl>
         //               | <forward_dcl>
@@ -78,24 +78,24 @@ public class PortTypeVisitor extends VisitorBase {
         //            | <op_dcl> ";"
         // <interface_inheritance_spec> ::= ":" <interface_name> { "," <interface_name> }*
         // <interface_name> ::= <scoped_name>
-        
-        
-        AST identifierNode = node.getFirstChild();   
+
+
+        AST identifierNode = node.getFirstChild();
         if (identifierNode.getText().equals("local")) {
             identifierNode = identifierNode.getNextSibling();
         }
         // Check if its a forward declaration
         if (identifierNode.getFirstChild() == null && identifierNode.getNextSibling() == null) {
-            visitForwardDeclaredInterface(identifierNode);        
+            visitForwardDeclaredInterface(identifierNode);
         } else {
-            visitInterface(identifierNode);                       
-        }       
+            visitInterface(identifierNode);
+        }
     }
 
     // Visits a fully declared interface
     private void visitInterface(AST identifierNode) {
         try {
-            String interfaceName = identifierNode.toString();        
+            String interfaceName = identifierNode.toString();
             Scope interfaceScope = new Scope(getScope(), interfaceName);
             portType = definition.createPortType();
 
@@ -115,25 +115,25 @@ public class PortTypeVisitor extends VisitorBase {
             portType.setUndefined(false);
 
             Binding binding = createBinding(interfaceScope.toString());
-        
-            AST specNode = identifierNode.getNextSibling();        
+
+            AST specNode = identifierNode.getNextSibling();
             if  (specNode.getType() == IDLTokenTypes.LCURLY) {
                 specNode = specNode.getNextSibling();
             }
-        
-            AST exportNode = null;        
+
+            AST exportNode = null;
             if (specNode.getType() == IDLTokenTypes.RCURLY) {
-                exportNode = specNode.getNextSibling();        
+                exportNode = specNode.getNextSibling();
             } else if (specNode.getType() == IDLTokenTypes.COLON) {
                 exportNode = visitInterfaceInheritanceSpec(specNode, binding, interfaceScope);
                 exportNode = exportNode.getNextSibling();
             } else {
                 exportNode = specNode;
             }
-           
-            while (exportNode != null  
+
+            while (exportNode != null
                    && exportNode.getType() != IDLTokenTypes.RCURLY) {
-            
+
                 if (TypeDclVisitor.accept(exportNode)) {
                     TypeDclVisitor visitor = new TypeDclVisitor(interfaceScope,
                                                                 definition,
@@ -162,7 +162,7 @@ public class PortTypeVisitor extends VisitorBase {
                     attributeVisitor.visit(exportNode);
                 } else if (OperationVisitor.accept(interfaceScope,
                                                    definition,
-                                                   newSchema, 
+                                                   newSchema,
                                                    exportNode,
                                                    wsdlVisitor)) {
                     OperationVisitor visitor = new OperationVisitor(interfaceScope,
@@ -176,16 +176,16 @@ public class PortTypeVisitor extends VisitorBase {
                     throw new RuntimeException("[InterfaceVisitor] Invalid IDL: unknown element "
                                                + exportNode.toString());
                 }
-            
+
                 exportNode = exportNode.getNextSibling();
             }
 
-            // Once we've finished declaring the interface, we should make sure it has been removed 
+            // Once we've finished declaring the interface, we should make sure it has been removed
             // from the list of scopedNames so that we indicate that is no longer simply forward
             // declared.
             Scope scopedName = new Scope(getScope(), identifierNode);
             scopedNames.remove(scopedName);
-        
+
             if (wsdlVisitor.getDeferredActions() != null) {
                 handleDeferredActions(wsdlVisitor.getDeferredActions(), scopedName, identifierNode);
             }
@@ -197,9 +197,9 @@ public class PortTypeVisitor extends VisitorBase {
 
         } catch (Exception ex) {
             throw new RuntimeException(ex);
-        }           
+        }
     }
-    
+
     private void handleDeferredActions(DeferredActionCollection deferredActions,
                                        Scope scopedName,
                                        AST identifierNode) {
@@ -207,7 +207,7 @@ public class PortTypeVisitor extends VisitorBase {
         if ((list != null) && !list.isEmpty()) {
             XmlSchemaType stype = null;
             CorbaTypeImpl ctype = null;
-            if (ObjectReferenceVisitor.accept(getScope(), schema, 
+            if (ObjectReferenceVisitor.accept(getScope(), schema,
                                               definition, identifierNode, wsdlVisitor)) {
                 ObjectReferenceVisitor visitor = new ObjectReferenceVisitor(getScope(),
                                                                             definition,
@@ -228,7 +228,7 @@ public class PortTypeVisitor extends VisitorBase {
         }
     }
 
-    
+
     public Binding createBinding(String scopedPortTypeName) {
         StringBuilder bname = new StringBuilder(scopedPortTypeName + "CORBABinding");
         QName bqname = new QName(rootDefinition.getTargetNamespace(),
@@ -245,9 +245,9 @@ public class PortTypeVisitor extends VisitorBase {
         try {
             BindingType bindingType = (BindingType)
                 extReg.createExtension(Binding.class, CorbaConstants.NE_CORBA_BINDING);
-            String pragmaPrefix = (this.getWsdlVisitor().getPragmaPrefix() != null 
-                                        && this.getWsdlVisitor().getPragmaPrefix().length() > 0) 
-                ? this.getWsdlVisitor().getPragmaPrefix() + "/" : ""; 
+            String pragmaPrefix = (this.getWsdlVisitor().getPragmaPrefix() != null
+                                        && this.getWsdlVisitor().getPragmaPrefix().length() > 0)
+                ? this.getWsdlVisitor().getPragmaPrefix() + "/" : "";
             bindingType.setRepositoryID(CorbaConstants.REPO_STRING
                                         + pragmaPrefix
                                         + scopedPortTypeName.replace('.', '/')
@@ -270,16 +270,16 @@ public class PortTypeVisitor extends VisitorBase {
         }
         return false;
     }
-    
+
     private AST visitInterfaceInheritanceSpec(AST interfaceInheritanceSpecNode, Binding binding,
                                               Scope childScope) {
         // <interface_inheritance_spec> ::= ":" <interface_name> { "," <interface_name> }*
-                
+
         AST interfaceNameNode = interfaceInheritanceSpecNode.getFirstChild();
         BindingType corbaBinding = findCorbaBinding(binding);
-        List<Scope> inheritedScopes = new ArrayList<Scope>();
-        
-        while (interfaceNameNode != null) {            
+        List<Scope> inheritedScopes = new ArrayList<>();
+
+        while (interfaceNameNode != null) {
             //check for porttypes in current & parent scopes
             Scope interfaceScope = null;
             PortType intf = null;
@@ -298,7 +298,7 @@ public class PortTypeVisitor extends VisitorBase {
                 intf = findPortType(interfaceScope);
                 currentScope = currentScope.getParent();
             }
-            
+
             if (intf == null) {
                 if (ScopedNameVisitor.isFullyScopedName(interfaceNameNode)) {
                     interfaceScope = ScopedNameVisitor.getFullyScopedName(new Scope(), interfaceNameNode);
@@ -316,7 +316,7 @@ public class PortTypeVisitor extends VisitorBase {
             Scope defnScope = interfaceScope.getParent();
             Definition defn = manager.getWSDLDefinition(mapper.map(defnScope));
             inheritedScopes.add(interfaceScope);
-            
+
             if (defn != null && !defn.getTargetNamespace().equals(definition.getTargetNamespace())) {
                 String key = defnScope.toString("_");
                 String fileName = getWsdlVisitor().getOutputDir()
@@ -326,13 +326,13 @@ public class PortTypeVisitor extends VisitorBase {
                                                 defn,
                                                 key,
                                                 fileName);
-            }                        
-            
+            }
+
             Binding inheritedBinding = findBinding(intf);
             BindingType inheritedCorbaBinding = findCorbaBinding(inheritedBinding);
             corbaBinding.getBases().add(inheritedCorbaBinding.getRepositoryID());
 
-            //add all the operations of the inherited port type.            
+            //add all the operations of the inherited port type.
             for (Operation op : CastUtils.cast(intf.getOperations(), Operation.class)) {
 
                 //check to see all the inherited namespaces are added.
@@ -342,9 +342,9 @@ public class PortTypeVisitor extends VisitorBase {
                 // Make sure we import the wsdl for the input namespace
                 if (definition.getImports().get(inputNS) == null && !mapper.isDefaultMapping()
                     && !definition.getTargetNamespace().equals(inputNS)) {
-                    manager.addWSDLDefinitionImport(definition, 
-                                                    manager.getWSDLDefinition(inputNS), 
-                                                    mapper.mapNSToPrefix(inputNS), 
+                    manager.addWSDLDefinitionImport(definition,
+                                                    manager.getWSDLDefinition(inputNS),
+                                                    mapper.mapNSToPrefix(inputNS),
                                                     manager.getImportedWSDLDefinitionFile(inputNS));
                 }
                 if (op.getOutput() != null) {
@@ -354,59 +354,59 @@ public class PortTypeVisitor extends VisitorBase {
                     // Make sure we import the wsdl for the output namespace
                     if (definition.getImports().get(outputNS) == null && !mapper.isDefaultMapping()
                         && !definition.getTargetNamespace().equals(outputNS)) {
-                        manager.addWSDLDefinitionImport(definition, 
-                                                        manager.getWSDLDefinition(outputNS), 
-                                                        mapper.mapNSToPrefix(outputNS), 
+                        manager.addWSDLDefinitionImport(definition,
+                                                        manager.getWSDLDefinition(outputNS),
+                                                        mapper.mapNSToPrefix(outputNS),
                                                         manager.getImportedWSDLDefinitionFile(outputNS));
                     }
                 }
 
-                
-                
+
+
                 for (Iterator<Fault> faults = CastUtils.cast(op.getFaults().values().iterator());
                     faults.hasNext();) {
-                    
+
                     String faultNS = faults.next().getMessage().getQName().getNamespaceURI();
                     manager.addWSDLDefinitionNamespace(definition, mapper.mapNSToPrefix(faultNS), faultNS);
                     // Make sure we import the wsdl for the fault namespace
                     if (definition.getImports().get(faultNS) == null && !mapper.isDefaultMapping()
                         && !definition.getTargetNamespace().equals(faultNS)) {
                         manager.addWSDLDefinitionImport(definition,
-                                                        manager.getWSDLDefinition(faultNS), 
-                                                        mapper.mapNSToPrefix(faultNS), 
+                                                        manager.getWSDLDefinition(faultNS),
+                                                        mapper.mapNSToPrefix(faultNS),
                                                         manager.getImportedWSDLDefinitionFile(faultNS));
                     }
                 }
-                
+
                 portType.addOperation(op);
             }
 
             //add all the binding extensions of the inherited corba binding
-            for (Iterator<BindingOperation> it = 
+            for (Iterator<BindingOperation> it =
                     CastUtils.cast(inheritedBinding.getBindingOperations().iterator());
                  it.hasNext();) {
                 binding.addBindingOperation(it.next());
             }
             interfaceNameNode = interfaceNameNode.getNextSibling();
         }
-        
-        if ((!inheritedScopes.isEmpty()) 
+
+        if ((!inheritedScopes.isEmpty())
             && (wsdlVisitor.getInheritedScopeMap() != null)) {
-            wsdlVisitor.getInheritedScopeMap().put(childScope, inheritedScopes);             
+            wsdlVisitor.getInheritedScopeMap().put(childScope, inheritedScopes);
         }
-        
+
         return interfaceInheritanceSpecNode.getNextSibling();
     }
-    
+
     private void visitForwardDeclaredInterface(AST identifierNode) {
-        String interfaceName = identifierNode.toString();        
+        String interfaceName = identifierNode.toString();
         Scope interfaceScope = new Scope(getScope(), interfaceName);
-        
+
         ScopeNameCollection scopedNames = wsdlVisitor.getScopedNames();
         if (scopedNames.getScope(interfaceScope) == null) {
             scopedNames.add(interfaceScope);
         }
-        
+
     }
 
 
@@ -414,7 +414,7 @@ public class PortTypeVisitor extends VisitorBase {
         String tns = mapper.map(intfScope.getParent());
         String intfName = intfScope.toString();
         Definition defn = definition;
-        if (tns != null) {           
+        if (tns != null) {
             defn = manager.getWSDLDefinition(tns);
             intfName = intfScope.tail();
         }
@@ -427,7 +427,7 @@ public class PortTypeVisitor extends VisitorBase {
     }
 
     private Binding findBinding(PortType intf) {
-        Object[] bindings = rootDefinition.getBindings().values().toArray();   
+        Object[] bindings = rootDefinition.getBindings().values().toArray();
         for (int i = 0; i < bindings.length; i++) {
             Binding binding = (Binding) bindings[i];
             if (binding.getPortType().getQName().equals(intf.getQName())) {

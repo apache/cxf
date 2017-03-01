@@ -25,22 +25,25 @@ import java.util.Set;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.cxf.helpers.BaseNamespaceHandler;
 import org.osgi.service.blueprint.container.BlueprintContainer;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 @Namespaces("http://cxf.apache.org/blueprint/simple")
-public class SimpleBPNamespaceHandler implements NamespaceHandler {
+public class SimpleBPNamespaceHandler extends BaseNamespaceHandler {
     private BlueprintContainer blueprintContainer;
-    
+
     public SimpleBPNamespaceHandler() {
     }
-    
+
     public URL getSchemaLocation(String namespace) {
-        return getClass().getClassLoader().getResource("schemas/blueprint/simple.xsd");
+        if ("http://cxf.apache.org/blueprint/simple".equals(namespace)) {
+            return getClass().getClassLoader().getResource("schemas/blueprint/simple.xsd");
+        }
+        return super.findCoreSchemaLocation(namespace);
     }
 
 
@@ -61,7 +64,7 @@ public class SimpleBPNamespaceHandler implements NamespaceHandler {
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;
     }
-    
+
 
     public BlueprintContainer getBlueprintContainer() {
         return blueprintContainer;
@@ -70,5 +73,5 @@ public class SimpleBPNamespaceHandler implements NamespaceHandler {
     public void setBlueprintContainer(BlueprintContainer blueprintContainer) {
         this.blueprintContainer = blueprintContainer;
     }
-    
+
 }

@@ -72,35 +72,35 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 
 public final class ServerProviderFactory extends ProviderFactory {
-    private static final Set<Class<?>> SERVER_FILTER_INTERCEPTOR_CLASSES = 
+    private static final Set<Class<?>> SERVER_FILTER_INTERCEPTOR_CLASSES =
         new HashSet<Class<?>>(Arrays.<Class<?>>asList(ContainerRequestFilter.class,
                                                       ContainerResponseFilter.class,
                                                       ReaderInterceptor.class,
                                                       WriterInterceptor.class));
-    
+
     private static final String WADL_PROVIDER_NAME = "org.apache.cxf.jaxrs.model.wadl.WadlGenerator";
     private static final String MAKE_DEFAULT_WAE_LEAST_SPECIFIC = "default.wae.mapper.least.specific";
-    private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers = 
+    private List<ProviderInfo<ExceptionMapper<?>>> exceptionMappers =
         new ArrayList<ProviderInfo<ExceptionMapper<?>>>(1);
-    
-    private List<ProviderInfo<ContainerRequestFilter>> preMatchContainerRequestFilters = 
+
+    private List<ProviderInfo<ContainerRequestFilter>> preMatchContainerRequestFilters =
         new ArrayList<ProviderInfo<ContainerRequestFilter>>(1);
-    private Map<NameKey, ProviderInfo<ContainerRequestFilter>> postMatchContainerRequestFilters = 
+    private Map<NameKey, ProviderInfo<ContainerRequestFilter>> postMatchContainerRequestFilters =
         new NameKeyMap<ProviderInfo<ContainerRequestFilter>>(true);
-    private Map<NameKey, ProviderInfo<ContainerResponseFilter>> containerResponseFilters = 
+    private Map<NameKey, ProviderInfo<ContainerResponseFilter>> containerResponseFilters =
         new NameKeyMap<ProviderInfo<ContainerResponseFilter>>(false);
     private RequestPreprocessor requestPreprocessor;
     private ApplicationInfo application;
     private Set<DynamicFeature> dynamicFeatures = new LinkedHashSet<DynamicFeature>();
-    
+
     private Map<Class<?>, BeanParamInfo> beanParams = new ConcurrentHashMap<Class<?>, BeanParamInfo>();
     private ProviderInfo<ContainerRequestFilter> wadlGenerator;
-        
+
     private ServerProviderFactory(Bus bus) {
         super(bus);
         wadlGenerator = createWadlGenerator(bus);
     }
-    
+
     private static ProviderInfo<ContainerRequestFilter> createWadlGenerator(Bus bus) {
         Object provider = createProvider(WADL_PROVIDER_NAME, bus);
         if (provider == null) {
@@ -109,42 +109,42 @@ public final class ServerProviderFactory extends ProviderFactory {
             return new ProviderInfo<ContainerRequestFilter>((ContainerRequestFilter)provider, bus, true);
         }
     }
-    
+
     public static ServerProviderFactory getInstance() {
         return createInstance(null);
     }
-    
+
     public static ServerProviderFactory createInstance(Bus bus) {
         if (bus == null) {
             bus = BusFactory.getThreadDefaultBus();
         }
         ServerProviderFactory factory = new ServerProviderFactory(bus);
         ProviderFactory.initFactory(factory);
-        factory.setProviders(false, false, 
+        factory.setProviders(false, false,
                              new WebApplicationExceptionMapper(),
                              new NioMessageBodyWriter());
         factory.setBusProviders();
         return factory;
     }
-    
+
     public static ServerProviderFactory getInstance(Message m) {
         Endpoint e = m.getExchange().getEndpoint();
         return (ServerProviderFactory)e.get(SERVER_FACTORY_NAME);
     }
-    
+
     public List<ProviderInfo<ContainerRequestFilter>> getPreMatchContainerRequestFilters() {
         return getContainerRequestFilters(preMatchContainerRequestFilters, true);
     }
-    
+
     public List<ProviderInfo<ContainerRequestFilter>> getPostMatchContainerRequestFilters(Set<String> names) {
         return getBoundFilters(postMatchContainerRequestFilters, names);
-        
+
     }
-    
+
     private List<ProviderInfo<ContainerRequestFilter>> getContainerRequestFilters(
         List<ProviderInfo<ContainerRequestFilter>> filters, boolean syncNeeded) {
-        
-        if (wadlGenerator == null) { 
+
+        if (wadlGenerator == null) {
             return filters;
         }
         if (filters.size() == 0) {
@@ -161,11 +161,11 @@ public final class ServerProviderFactory extends ProviderFactory {
             return filters;
         }
     }
-    
+
     public List<ProviderInfo<ContainerResponseFilter>> getContainerResponseFilters(Set<String> names) {
         return getBoundFilters(containerResponseFilters, names);
     }
-    
+
     public void addBeanParamInfo(BeanParamInfo bpi) {
         beanParams.put(bpi.getResourceClass(), bpi);
         for (Method m : bpi.getResourceClass().getMethods()) {
@@ -181,7 +181,7 @@ public final class ServerProviderFactory extends ProviderFactory {
             }
         }
     }
-    
+
     public BeanParamInfo getBeanParamInfo(Class<?> beanClass) {
         return beanParams.get(beanClass);
     }
@@ -198,14 +198,14 @@ public final class ServerProviderFactory extends ProviderFactory {
         if (candidates.size() == 0) {
             return null;
         }
-        boolean makeDefaultWaeLeastSpecific = 
+        boolean makeDefaultWaeLeastSpecific =
             MessageUtils.getContextualBoolean(m, MAKE_DEFAULT_WAE_LEAST_SPECIFIC, false);
         Collections.sort(candidates, new ExceptionProviderInfoComparator(exceptionType,
                                                                          makeDefaultWaeLeastSpecific));
         return (ExceptionMapper<T>) candidates.get(0).getProvider();
     }
-    
-    
+
+
     @SuppressWarnings("unchecked")
     @Override
     protected void setProviders(boolean custom, boolean busGlobal, Object... providers) {
@@ -215,11 +215,11 @@ public final class ServerProviderFactory extends ProviderFactory {
                 FeatureContext featureContext = createServerFeatureContext();
                 ((Feature)p).configure(featureContext);
                 Configuration cfg = featureContext.getConfiguration();
-                
+
                 for (Object featureProvider : cfg.getInstances()) {
                     Map<Class<?>, Integer> contracts = cfg.getContracts(featureProvider.getClass());
                     if (contracts != null && !contracts.isEmpty()) {
-                        allProviders.add(new FilterProviderInfo<Object>(featureProvider, 
+                        allProviders.add(new FilterProviderInfo<Object>(featureProvider,
                                                                         getBus(),
                                                                         contracts));
                     } else {
@@ -230,58 +230,58 @@ public final class ServerProviderFactory extends ProviderFactory {
                 allProviders.add(p);
             }
         }
-        
-        
-        List<ProviderInfo<ContainerRequestFilter>> postMatchRequestFilters = 
+
+
+        List<ProviderInfo<ContainerRequestFilter>> postMatchRequestFilters =
             new LinkedList<ProviderInfo<ContainerRequestFilter>>();
-        List<ProviderInfo<ContainerResponseFilter>> postMatchResponseFilters = 
+        List<ProviderInfo<ContainerResponseFilter>> postMatchResponseFilters =
             new LinkedList<ProviderInfo<ContainerResponseFilter>>();
-        
-        List<ProviderInfo<? extends Object>> theProviders = 
+
+        List<ProviderInfo<? extends Object>> theProviders =
             prepareProviders(custom, busGlobal, allProviders.toArray(), application);
         super.setCommonProviders(theProviders);
         for (ProviderInfo<? extends Object> provider : theProviders) {
             Class<?> providerCls = ClassHelper.getRealClass(getBus(), provider.getProvider());
-            
+
             if (filterContractSupported(provider, providerCls, ContainerRequestFilter.class)) {
-                addContainerRequestFilter(postMatchRequestFilters, 
+                addContainerRequestFilter(postMatchRequestFilters,
                                           (ProviderInfo<ContainerRequestFilter>)provider);
             }
-            
+
             if (filterContractSupported(provider, providerCls, ContainerResponseFilter.class)) {
-                postMatchResponseFilters.add((ProviderInfo<ContainerResponseFilter>)provider); 
+                postMatchResponseFilters.add((ProviderInfo<ContainerResponseFilter>)provider);
             }
-            
+
             if (DynamicFeature.class.isAssignableFrom(providerCls)) {
                 //TODO: review the possibility of DynamicFeatures needing to have Contexts injected
                 Object feature = provider.getProvider();
                 dynamicFeatures.add((DynamicFeature)feature);
             }
-            
-            
+
+
             if (ExceptionMapper.class.isAssignableFrom(providerCls)) {
-                addProviderToList(exceptionMappers, provider); 
+                addProviderToList(exceptionMappers, provider);
             }
-            
+
         }
-        
-        Collections.sort(preMatchContainerRequestFilters, 
+
+        Collections.sort(preMatchContainerRequestFilters,
             new BindingPriorityComparator(ContainerRequestFilter.class, true));
         mapInterceptorFilters(postMatchContainerRequestFilters, postMatchRequestFilters,
                               ContainerRequestFilter.class, true);
         mapInterceptorFilters(containerResponseFilters, postMatchResponseFilters,
                               ContainerResponseFilter.class, false);
-        
+
         injectContextProxies(exceptionMappers,
             postMatchContainerRequestFilters.values(), preMatchContainerRequestFilters,
             containerResponseFilters.values());
     }
-    
+
     @Override
     protected void injectContextProxiesIntoProvider(ProviderInfo<?> pi) {
         injectContextProxiesIntoProvider(pi, application == null ? null : application.getProvider());
     }
-    
+
     @Override
     protected void injectContextValues(ProviderInfo<?> pi, Message m) {
         if (m != null) {
@@ -291,13 +291,13 @@ public final class ServerProviderFactory extends ProviderFactory {
             }
         }
     }
-    
+
     private void addContainerRequestFilter(
         List<ProviderInfo<ContainerRequestFilter>> postMatchFilters,
         ProviderInfo<ContainerRequestFilter> p) {
         ContainerRequestFilter filter = p.getProvider();
         if (isWadlGenerator(filter.getClass())) {
-            wadlGenerator = p; 
+            wadlGenerator = p;
         } else {
             if (isPrematching(filter.getClass())) {
                 addProviderToList(preMatchContainerRequestFilters, p);
@@ -305,9 +305,9 @@ public final class ServerProviderFactory extends ProviderFactory {
                 postMatchFilters.add(p);
             }
         }
-        
+
     }
-    
+
     private static boolean isWadlGenerator(Class<?> filterCls) {
         if (filterCls == null || filterCls == Object.class) {
             return false;
@@ -318,27 +318,27 @@ public final class ServerProviderFactory extends ProviderFactory {
             return isWadlGenerator(filterCls.getSuperclass());
         }
     }
-    
+
     public RequestPreprocessor getRequestPreprocessor() {
         return requestPreprocessor;
     }
-    
+
     public void setApplicationProvider(ApplicationInfo app) {
         application = app;
     }
-    
+
     public ApplicationInfo getApplicationProvider() {
         return application;
     }
-    
+
     public void setRequestPreprocessor(RequestPreprocessor rp) {
         this.requestPreprocessor = rp;
     }
-    
+
     public void clearExceptionMapperProxies() {
         clearProxies(exceptionMappers);
     }
-    
+
     @Override
     public void clearProviders() {
         super.clearProviders();
@@ -347,7 +347,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         postMatchContainerRequestFilters.clear();
         containerResponseFilters.clear();
     }
-    
+
     @Override
     public void clearThreadLocalProxies() {
         if (application != null) {
@@ -355,23 +355,23 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         super.clearThreadLocalProxies();
     }
-    
+
     public void applyDynamicFeatures(List<ClassResourceInfo> list) {
-        if (dynamicFeatures.size() > 0) {
+        if (!dynamicFeatures.isEmpty()) {
             for (ClassResourceInfo cri : list) {
                 doApplyDynamicFeatures(cri);
             }
         }
     }
-    
+
     public Configuration getConfiguration(Message m) {
         return new ServerConfigurationImpl();
     }
-    
+
     private void doApplyDynamicFeatures(ClassResourceInfo cri) {
         Set<OperationResourceInfo> oris = cri.getMethodDispatcher().getOperationResourceInfos();
         for (OperationResourceInfo ori : oris) {
-            String nameBinding = DEFAULT_FILTER_NAME_BINDING 
+            String nameBinding = DEFAULT_FILTER_NAME_BINDING
                 + ori.getClassResourceInfo().getServiceClass().getName()
                 + "."
                 + ori.getMethodToInvoke().toString();
@@ -382,7 +382,7 @@ public final class ServerProviderFactory extends ProviderFactory {
                 for (Object provider : cfg.getInstances()) {
                     Map<Class<?>, Integer> contracts = cfg.getContracts(provider.getClass());
                     if (contracts != null && !contracts.isEmpty()) {
-                        registerUserProvider(new FilterProviderInfo<Object>(provider, 
+                        registerUserProvider(new FilterProviderInfo<Object>(provider,
                             getBus(),
                             nameBinding,
                             true,
@@ -395,16 +395,16 @@ public final class ServerProviderFactory extends ProviderFactory {
         Collection<ClassResourceInfo> subs = cri.getSubResources();
         for (ClassResourceInfo sub : subs) {
             if (sub != cri) {
-                doApplyDynamicFeatures(sub);    
+                doApplyDynamicFeatures(sub);
             }
         }
     }
-    
+
     private FeatureContext createServerFeatureContext() {
         FeatureContextImpl featureContext = new FeatureContextImpl();
         ServerFeatureContextConfigurable configImpl = new ServerFeatureContextConfigurable(featureContext);
         featureContext.setConfigurable(configImpl);
-        
+
         if (application != null) {
             Map<String, Object> appProps = application.getProvider().getProperties();
             for (Map.Entry<String, Object> entry : appProps.entrySet()) {
@@ -417,13 +417,13 @@ public final class ServerProviderFactory extends ProviderFactory {
     protected static boolean isPrematching(Class<?> filterCls) {
         return AnnotationUtils.getClassAnnotation(filterCls, PreMatching.class) != null;
     }
-        
+
     private static class ServerFeatureContextConfigurable extends ConfigurableImpl<FeatureContext> {
         protected ServerFeatureContextConfigurable(FeatureContext mc) {
             super(mc, RuntimeType.SERVER, SERVER_FILTER_INTERCEPTOR_CLASSES.toArray(new Class<?>[]{}));
         }
     }
-    
+
     public static void clearThreadLocalProxies(Message message) {
         clearThreadLocalProxies(ServerProviderFactory.getInstance(message), message);
     }
@@ -433,7 +433,7 @@ public final class ServerProviderFactory extends ProviderFactory {
             (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
         if (cri != null) {
             cri.clearThreadLocalProxies();
-        }    
+        }
     }
     public static void releaseRequestState(Message message) {
         releaseRequestState(ServerProviderFactory.getInstance(message), message);
@@ -450,25 +450,25 @@ public final class ServerProviderFactory extends ProviderFactory {
                 }
             }
         }
-        
+
         clearThreadLocalProxies(factory, message);
     }
-    
-    
+
+
     private class ServerConfigurationImpl implements Configuration {
         ServerConfigurationImpl() {
-            
+
         }
-        
+
         @Override
         public Set<Class<?>> getClasses() {
-            return application != null ? application.getProvider().getClasses() 
+            return application != null ? application.getProvider().getClasses()
                 : Collections.<Class<?>>emptySet();
         }
 
         @Override
         public Set<Object> getInstances() {
-            return application != null ? application.getProvider().getSingletons() 
+            return application != null ? application.getProvider().getSingletons()
                 : Collections.emptySet();
         }
 
@@ -480,7 +480,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         @Override
         public boolean isEnabled(Class<? extends Feature> featureCls) {
             for (DynamicFeature f : dynamicFeatures) {
-                if (featureCls.isAssignableFrom(f.getClass())) { 
+                if (featureCls.isAssignableFrom(f.getClass())) {
                     return true;
                 }
             }
@@ -511,29 +511,29 @@ public final class ServerProviderFactory extends ProviderFactory {
             if (isRegistered(cls)) {
                 if (ContainerRequestFilter.class.isAssignableFrom(cls)) {
                     boolean isPreMatch = cls.getAnnotation(PreMatching.class) != null;
-                    map.put(ContainerRequestFilter.class, 
+                    map.put(ContainerRequestFilter.class,
                             getPriority(isPreMatch ? preMatchContainerRequestFilters
-                                : postMatchContainerRequestFilters.values(), cls, ContainerRequestFilter.class));    
+                                : postMatchContainerRequestFilters.values(), cls, ContainerRequestFilter.class));
                 }
                 if (ContainerResponseFilter.class.isAssignableFrom(cls)) {
-                    map.put(ContainerResponseFilter.class, 
-                            getPriority(containerResponseFilters.values(), cls, ContainerResponseFilter.class));    
+                    map.put(ContainerResponseFilter.class,
+                            getPriority(containerResponseFilters.values(), cls, ContainerResponseFilter.class));
                 }
                 if (WriterInterceptor.class.isAssignableFrom(cls)) {
-                    map.put(WriterInterceptor.class, 
-                            getPriority(writerInterceptors.values(), cls, WriterInterceptor.class));    
+                    map.put(WriterInterceptor.class,
+                            getPriority(writerInterceptors.values(), cls, WriterInterceptor.class));
                 }
                 if (ReaderInterceptor.class.isAssignableFrom(cls)) {
-                    map.put(ReaderInterceptor.class, 
-                            getPriority(readerInterceptors.values(), cls, ReaderInterceptor.class));    
+                    map.put(ReaderInterceptor.class,
+                            getPriority(readerInterceptors.values(), cls, ReaderInterceptor.class));
                 }
             }
             return map;
         }
-        
+
         @Override
         public Map<String, Object> getProperties() {
-            return application != null ? application.getProperties() 
+            return application != null ? application.getProperties()
                 : Collections.<String, Object>emptyMap();
         }
 
@@ -551,7 +551,7 @@ public final class ServerProviderFactory extends ProviderFactory {
         public RuntimeType getRuntimeType() {
             return RuntimeType.SERVER;
         }
-        
+
         private boolean isRegistered(Collection<?> list, Object o) {
             Collection<ProviderInfo<?>> list2 = CastUtils.cast(list);
             for (ProviderInfo<?> pi : list2) {
@@ -563,8 +563,9 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         private boolean isRegistered(Collection<?> list, Class<?> cls) {
             Collection<ProviderInfo<?>> list2 = CastUtils.cast(list);
-            for (ProviderInfo<?> pi : list2) {
-                if (cls.isAssignableFrom(pi.getProvider().getClass())) {
+            for (ProviderInfo<?> p : list2) {
+                Class<?> pClass = ClassHelper.getRealClass(p.getBus(), p.getProvider());
+                if (cls.isAssignableFrom(pClass)) {
                     return true;
                 }
             }
@@ -572,9 +573,12 @@ public final class ServerProviderFactory extends ProviderFactory {
         }
         private Integer getPriority(Collection<?> list, Class<?> cls, Class<?> filterClass) {
             Collection<ProviderInfo<?>> list2 = CastUtils.cast(list);
-            for (ProviderInfo<?> pi : list2) {
-                if (pi instanceof FilterProviderInfo && pi.getProvider().getClass().isAssignableFrom(cls)) {
-                    return ((FilterProviderInfo<?>)pi).getPriority(filterClass);
+            for (ProviderInfo<?> p : list2) {
+                if (p instanceof FilterProviderInfo) {
+                    Class<?> pClass = ClassHelper.getRealClass(p.getBus(), p.getProvider());
+                    if (cls.isAssignableFrom(pClass)) {
+                        return ((FilterProviderInfo<?>)p).getPriority(filterClass);
+                    }
                 }
             }
             return Priorities.USER;
@@ -594,10 +598,10 @@ public final class ServerProviderFactory extends ProviderFactory {
                 } else if (p2.getProvider() instanceof WebApplicationExceptionMapper
                     && !p2.isCustom()) {
                     return -1;
-                } 
+                }
             }
             return super.compare(p1, p2);
         }
     }
-    
+
 }

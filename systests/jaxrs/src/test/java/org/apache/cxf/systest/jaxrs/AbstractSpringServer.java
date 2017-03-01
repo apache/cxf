@@ -33,7 +33,7 @@ public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
     private String resourcePath;
     private String contextPath;
     private int port;
-    
+
     protected AbstractSpringServer(String path, int portNumber) {
         this(path, "/", portNumber);
     }
@@ -43,7 +43,7 @@ public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
         contextPath = cPath;
         port = portNumber;
     }
-    
+
     protected void run() {
         server = new org.eclipse.jetty.server.Server(port);
 
@@ -56,26 +56,26 @@ public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
         } catch (URISyntaxException e1) {
             e1.printStackTrace();
         }
-        
+
         webappcontext.setWar(warPath);
 
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
 
         server.setHandler(handlers);
-        
+
         try {
             configureServer(server);
             server.start();
         } catch (Exception e) {
             e.printStackTrace();
-        }     
+        }
     }
-    
+
     protected void configureServer(org.eclipse.jetty.server.Server theserver) throws Exception {
-        
+
     }
-    
+
     public void tearDown() throws Exception {
         super.tearDown();
         if (server != null) {

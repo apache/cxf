@@ -27,7 +27,7 @@ public final class Server {
     }
 
     public static void main(String args[]) throws Exception {
-        ApplicationContext appctxt = 
+        ApplicationContext appctxt =
             new ClassPathXmlApplicationContext(Server.class.getResource("/context.xml").toString());
 
         System.out.println("Server ready...");

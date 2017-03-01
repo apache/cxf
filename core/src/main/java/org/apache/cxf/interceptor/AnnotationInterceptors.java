@@ -31,38 +31,38 @@ import org.apache.cxf.feature.Features;
 import org.apache.cxf.message.Message;
 
 public class AnnotationInterceptors {
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AnnotationInterceptors.class);
-    
+
     private Class<?> clazzes[];
-    
+
     public AnnotationInterceptors(Class<?> ... clz) {
         clazzes = clz;
     }
-        
+
     private <T> List<T> getAnnotationObject(Class<? extends Annotation> annotationClazz, Class<T> type) {
-        
+
         for (Class<?> cls : clazzes) {
-            Annotation  annotation = cls.getAnnotation(annotationClazz);
+            Annotation annotation = cls.getAnnotation(annotationClazz);
             if (annotation != null) {
                 return initializeAnnotationObjects(annotation, type);
             }
         }
         return null;
     }
-    
+
     private <T> List<T> initializeAnnotationObjects(Annotation annotation,
                                              Class<T> type) {
-        List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<>();
         for (String cn : getAnnotationObjectNames(annotation)) {
             list.add(initializeAnnotationObject(cn, type));
         }
         for (Class<? extends T> cn : getAnnotationObjectClasses(annotation, type)) {
             list.add(initializeAnnotationObject(cn));
         }
-        return list;   
+        return list;
     }
-    
+
     @SuppressWarnings("unchecked")
     private <T> Class<? extends T>[] getAnnotationObjectClasses(Annotation ann, Class<T> type) { //NOPMD
         if (ann instanceof InFaultInterceptors) {
@@ -91,10 +91,10 @@ public class AnnotationInterceptors {
         } else if (ann instanceof Features) {
             return ((Features)ann).features();
         }
-        
+
         throw new UnsupportedOperationException("Doesn't support the annotation: " + ann);
     }
-    
+
     private <T> T initializeAnnotationObject(String annObjectName, Class<T> type) {
         Object object = null;
         try {
@@ -102,7 +102,7 @@ public class AnnotationInterceptors {
             return type.cast(object);
         } catch (Throwable e) {
             throw new Fault(new org.apache.cxf.common.i18n.Message(
-                                            "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
+                                            "COULD_NOT_CREATE_ANNOTATION_OBJECT",
                                             BUNDLE, annObjectName), e);
         }
     }
@@ -113,11 +113,11 @@ public class AnnotationInterceptors {
             return type.cast(object);
         } catch (Throwable e) {
             throw new Fault(new org.apache.cxf.common.i18n.Message(
-                                            "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
+                                            "COULD_NOT_CREATE_ANNOTATION_OBJECT",
                                             BUNDLE, type.getName()), e);
         }
     }
-    
+
     private List<Interceptor<? extends Message>> getAnnotationInterceptorList(Class<? extends Annotation> t) {
         @SuppressWarnings("rawtypes")
         List<Interceptor> i = getAnnotationObject(t, Interceptor.class);
@@ -146,7 +146,7 @@ public class AnnotationInterceptors {
     public List<Interceptor<? extends Message>> getOutInterceptors() {
         return getAnnotationInterceptorList(OutInterceptors.class);
     }
-        
+
     public List<Feature> getFeatures() {
         return getAnnotationObject(Features.class, Feature.class);
     }

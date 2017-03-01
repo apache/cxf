@@ -27,7 +27,7 @@ public class StringListReceiver extends Receiver<String> {
 
     private static final long serialVersionUID = 1L;
     private List<String> inputStrings;
-    
+
     public StringListReceiver(List<String> inputStrings) {
         super(StorageLevel.MEMORY_ONLY());
         this.inputStrings = inputStrings;
@@ -40,5 +40,5 @@ public class StringListReceiver extends Receiver<String> {
     public void onStop() {
         // complete
     }
-    
+
 }

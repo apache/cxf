@@ -74,7 +74,7 @@ public class GreeterImplBase {
     public Response<PingMeResponse> pingMeAsync() {
         return null;
     }
-    
+
     public Future<?> pingMeAsync(AsyncHandler<PingMeResponse> asyncHandler) {
         return null;
     }

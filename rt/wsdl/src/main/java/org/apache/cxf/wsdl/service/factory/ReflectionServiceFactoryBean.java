@@ -158,12 +158,12 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     protected final Map<String, String> schemaLocationMapping = new HashMap<String, String>();
 
     private List<AbstractServiceConfiguration> serviceConfigurations =
-        new ArrayList<AbstractServiceConfiguration>();
+        new ArrayList<>();
     private QName serviceName;
     private Invoker invoker;
     private Executor executor;
-    private List<String> ignoredClasses = new ArrayList<String>();
-    private List<Method> ignoredMethods = new ArrayList<Method>();
+    private List<String> ignoredClasses = new ArrayList<>();
+    private List<Method> ignoredMethods = new ArrayList<>();
     private MethodDispatcher methodDispatcher = new SimpleMethodDispatcher();
     private Boolean wrappedStyle;
     private Map<String, Object> properties;
@@ -217,7 +217,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         }
         try {
             if (obj == null && cls == null) {
-                cls = getJAXBClass();            
+                cls = getJAXBClass();
             }
             if (obj instanceof String) {
                 cls = ClassLoaderUtils.loadClass(obj.toString(), getClass(), DataBinding.class);
@@ -229,7 +229,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                     .newInstance(this.isQualifyWrapperSchema(), this.getProperties());
             } catch (NoSuchMethodException nsme) {
                 //ignore, use the no-arg constructor
-            }            
+            }
             return cls.newInstance();
         } catch (Exception e) {
             throw new ServiceConstructionException(e);
@@ -239,7 +239,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         if (defaultDatabindingClass == null) {
             defaultDatabindingClass = ClassLoaderUtils.loadClass("org.apache.cxf.jaxb.JAXBDataBinding",
                                                                  ReflectionServiceFactoryBean.class,
-                                                                 DataBinding.class); 
+                                                                 DataBinding.class);
         }
         return defaultDatabindingClass;
     }
@@ -382,7 +382,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
             getService().putAll(properties);
         }
     }
-    
+
     protected void buildServiceFromWSDL(String url) {
         sendEvent(Event.CREATE_FROM_WSDL, url);
 
@@ -427,9 +427,9 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
     protected void buildServiceFromClass() {
         Object o = getBus().getProperty("requireExplicitContractLocation");
-        if (o != null 
+        if (o != null
             && ("true".equals(o) || Boolean.TRUE.equals(o))) {
-            throw new ServiceConstructionException(new Message("NO_WSDL_PROVIDED", LOG, 
+            throw new ServiceConstructionException(new Message("NO_WSDL_PROVIDED", LOG,
                                                                getServiceClass().getName()));
         }
         if (LOG.isLoggable(Level.INFO)) {
@@ -634,7 +634,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     }
 
     protected void initializeWSDLOperations() {
-        List<OperationInfo> removes = new ArrayList<OperationInfo>();
+        List<OperationInfo> removes = new ArrayList<>();
         Method[] methods = serviceClass.getMethods();
         Arrays.sort(methods, new MethodComparator());
 
@@ -675,7 +675,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         // Update the bindings.
         for (ServiceInfo service : getService().getServiceInfos()) {
             for (BindingInfo bi : service.getBindings()) {
-                List<BindingOperationInfo> biremoves = new ArrayList<BindingOperationInfo>();
+                List<BindingOperationInfo> biremoves = new ArrayList<>();
                 for (BindingOperationInfo binfo : bi.getOperations()) {
                     if (removes.contains(binfo.getOperationInfo())) {
                         biremoves.add(binfo);
@@ -861,7 +861,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
             QName inName = part.getConcreteName();
             part = o.getOutput().getMessagePart(name);
-            
+
             if (part == null) {
                 part = o.getOutput().getMessagePart(inName);
             }
@@ -897,7 +897,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                 mpiMap.put(fi, fi.getMessageParts());
             }
         }
-        
+
         for (int i = 0; i < types.length; i++) {
             Class<?> exClass = types[i];
             Class<?> beanClass = getBeanClass(exClass);
@@ -911,7 +911,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
                 FaultInfo fi = entry.getKey();
                 List<MessagePartInfo> mpis = entry.getValue();
                 if (mpis.size() != 1) {
-                    Message message = new Message("NO_FAULT_PART", LOG, fi.getFaultName()); 
+                    Message message = new Message("NO_FAULT_PART", LOG, fi.getFaultName());
                     LOG.log(Level.WARNING, message.toString());
                 }
                 for (MessagePartInfo mpi : mpis) {
@@ -1167,9 +1167,9 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
             QName qname = (QName)mpi.getProperty(ELEMENT_NAME);
             if (messageParts.size() == 1 && qname == null) {
-                qname = !isOut ? getInParameterName(opInfo, method, -1) 
+                qname = !isOut ? getInParameterName(opInfo, method, -1)
                         : getOutParameterName(opInfo, method, -1);
-                
+
                 if (qname.getLocalPart().startsWith("arg") || qname.getLocalPart().startsWith("return")) {
                     qname = isOut
                         ? new QName(qname.getNamespaceURI(), method.getName() + "Response") : new QName(qname
@@ -1506,14 +1506,14 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
             if (isInParam(method, j)) {
                 QName q = getInParameterName(op, method, j);
                 QName partName = getInPartName(op, method, j);
-                if (!isRPC(method) && !isWrapped(method) 
+                if (!isRPC(method) && !isWrapped(method)
                     && inMsg.getMessagePartsMap().containsKey(partName)) {
                     LOG.log(Level.WARNING, "INVALID_BARE_METHOD", getServiceClass() + "." + method.getName());
                     partName = new QName(partName.getNamespaceURI(), partName.getLocalPart() + j);
                     q = new QName(q.getNamespaceURI(), q.getLocalPart() + j);
                 }
                 MessagePartInfo part = inMsg.addMessagePart(partName);
-                
+
                 if (isHolder(paramClasses[j], genParTypes[j]) && !isInOutParam(method, j)) {
                     LOG.log(Level.WARNING, "INVALID_WEBPARAM_MODE", getServiceClass().getName() + "."
                                                                     + method.getName());
@@ -2011,7 +2011,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         }
         return true;
     }
-    
+
     protected boolean isInOutParam(Method method, int j) {
         for (AbstractServiceConfiguration c : serviceConfigurations) {
             Boolean b = c.isInOutParam(method, j);

@@ -24,12 +24,12 @@ import javax.jws.WebService;
 import org.apache.cxf.annotations.Policy;
 import org.apache.cxf.annotations.Policy.Placement;
 
-@WebService(name = "OperationSimpleService", 
-            endpointInterface = "org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleService", 
-            serviceName = "OperationSimpleService", 
+@WebService(name = "OperationSimpleService",
+            endpointInterface = "org.apache.cxf.systest.ws.policy.javafirst.OperationSimpleService",
+            serviceName = "OperationSimpleService",
             targetNamespace = "http://www.example.org/contract/OperationSimpleService")
 public class OperationSimpleServiceImpl implements OperationSimpleService {
-    @Policy(uri = "classpath:/java_first_policies/AlternativesPolicy.xml", 
+    @Policy(uri = "classpath:/java_first_policies/AlternativesPolicy.xml",
         placement = Placement.BINDING_OPERATION_INPUT)
 
     @Override

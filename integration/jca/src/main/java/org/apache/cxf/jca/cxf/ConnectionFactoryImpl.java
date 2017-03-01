@@ -36,8 +36,8 @@ import org.apache.cxf.connector.CXFConnectionFactory;
 import org.apache.cxf.connector.CXFConnectionParam;
 import org.apache.cxf.jca.core.resourceadapter.ResourceAdapterInternalException;
 
-public class ConnectionFactoryImpl implements CXFConnectionFactory, 
-                                              Referenceable, 
+public class ConnectionFactoryImpl implements CXFConnectionFactory,
+                                              Referenceable,
                                               Serializable {
     private static final long serialVersionUID = 3664687493256918163L;
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ConnectionFactoryImpl.class);
@@ -57,26 +57,26 @@ public class ConnectionFactoryImpl implements CXFConnectionFactory,
     public Reference getReference() throws NamingException {
         return reference;
     }
-    
-  
 
-    public Object getBus() { 
+
+
+    public Object getBus() {
         return ((ManagedConnectionFactoryImpl)managedConnectionFactory).getBus();
     }
 
     public Object getConnection(CXFConnectionParam param) throws ResourceException {
-        
+
         if (param.getInterface() == null) {
             throw new ResourceAdapterInternalException(new Message("INTERFACE_IS_NULL", BUNDLE).toString());
         }
-        
+
         if (!param.getInterface().isInterface()) {
-            throw new ResourceAdapterInternalException(new Message("IS_NOT_AN_INTERFACE", 
+            throw new ResourceAdapterInternalException(new Message("IS_NOT_AN_INTERFACE",
                                                                    BUNDLE, param.getInterface()).toString());
         }
-        
+
         CXFConnectionRequestInfo reqInfo = (CXFConnectionRequestInfo) param;
-        
+
         if (connectionManager == null) {
             // non-managed, null Subject
             ManagedConnection connection = managedConnectionFactory.createManagedConnection(null, reqInfo);

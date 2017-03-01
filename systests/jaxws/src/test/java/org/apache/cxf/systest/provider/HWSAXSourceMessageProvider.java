@@ -45,13 +45,13 @@ import org.xml.sax.InputSource;
                     wsdlLocation = "/wsdl/hello_world_rpc_lit.wsdl")
 @ServiceMode(value = Service.Mode.MESSAGE)
 public class HWSAXSourceMessageProvider implements Provider<SAXSource> {
-    
+
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
-    
-    @Resource 
+
+    @Resource
     WebServiceContext ctx;
-    
+
     private InputSource sayHiInputSource;
     private InputSource greetMeInputSource;
     private MessageFactory factory;
@@ -76,7 +76,7 @@ public class HWSAXSourceMessageProvider implements Provider<SAXSource> {
         if (qn == null) {
             throw new RuntimeException("No Operation Name");
         }
-        
+
         SAXSource response = new SAXSource();
         try {
             SOAPMessage msg = factory.createMessage();

@@ -21,8 +21,8 @@ package org.apache.cxf.cdi.extension;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 
 /**
- * Serves as an extension point in order to allow to customize JAX-RS server 
- * factory bean creation (f.e. add features, providers, assign transport, ...) 
+ * Serves as an extension point in order to allow to customize JAX-RS server
+ * factory bean creation (f.e. add features, providers, assign transport, ...)
  * during the CDI beans discovery and initialization.
  */
 public interface JAXRSServerFactoryCustomizationExtension {

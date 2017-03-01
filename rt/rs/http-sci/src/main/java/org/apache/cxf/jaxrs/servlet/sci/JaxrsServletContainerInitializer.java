@@ -43,21 +43,21 @@ import org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 @HandlesTypes({ Application.class, Provider.class, Path.class })
-public class JaxrsServletContainerInitializer implements ServletContainerInitializer {  
+public class JaxrsServletContainerInitializer implements ServletContainerInitializer {
     private static final Logger LOG = LogUtils.getL7dLogger(JaxrsServletContainerInitializer.class);
     private static final String IGNORE_PACKAGE = "org.apache.cxf";
-    
+
     private static final String JAXRS_APPLICATION_SERVLET_NAME = "javax.ws.rs.core.Application";
     private static final String JAXRS_APPLICATION_PARAM = "javax.ws.rs.Application";
     private static final String CXF_JAXRS_APPLICATION_PARAM = "jaxrs.application";
     private static final String CXF_JAXRS_CLASSES_PARAM = "jaxrs.classes";
-        
+
     @Override
-    public void onStartup(final Set< Class< ? > > classes, final ServletContext ctx) throws ServletException {        
+    public void onStartup(final Set< Class< ? > > classes, final ServletContext ctx) throws ServletException {
         Application app = null;
         String servletName = null;
         String servletMapping = null;
-        
+
         final Class< ? > appClass = findCandidate(classes);
         if (appClass != null) {
             // The best effort at detecting a CXFNonSpringJaxrsServlet handling this application.
@@ -73,14 +73,14 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
             // Servlet name is the application class name
             servletName = appClass.getName();
             ApplicationPath appPath = ResourceUtils.locateApplicationPath(appClass);
-            // If ApplicationPath is available - use its value as a mapping otherwise get it from 
-            // a servlet registration with an application implementation class name 
+            // If ApplicationPath is available - use its value as a mapping otherwise get it from
+            // a servlet registration with an application implementation class name
             if (appPath != null) {
                 servletMapping = appPath.value() + "/*";
             } else {
                 servletMapping = getServletMapping(ctx, servletName);
             }
-        } 
+        }
         // If application is null or empty then try to create a new application from available
         // resource and provider classes
         if (app == null
@@ -90,18 +90,18 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
             if (isCxfServletAvailable(ctx)) {
                 return;
             }
-            final Map< Class< ? extends Annotation >, Collection< Class< ? > > > providersAndResources = 
+            final Map< Class< ? extends Annotation >, Collection< Class< ? > > > providersAndResources =
                 groupByAnnotations(classes);
             if (!providersAndResources.get(Path.class).isEmpty()
                 || !providersAndResources.get(Provider.class).isEmpty()) {
                 if (app == null) {
                     // Servlet name is a JAX-RS Application class name
                     servletName = JAXRS_APPLICATION_SERVLET_NAME;
-                    // Servlet mapping is obtained from a servlet registration 
+                    // Servlet mapping is obtained from a servlet registration
                     // with a JAX-RS Application class name
                     servletMapping = getServletMapping(ctx, servletName);
-                } 
-                
+                }
+
                 app = new Application() {
                     @Override
                     public Set<Class<?>> getClasses() {
@@ -113,15 +113,15 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
                 };
             }
         }
-        
+
         if (app == null) {
             return;
         }
         CXFNonSpringJaxrsServlet cxfServlet = new CXFNonSpringJaxrsServlet(app);
-        final Dynamic servlet =  ctx.addServlet(servletName, cxfServlet);
+        final Dynamic servlet = ctx.addServlet(servletName, cxfServlet);
         servlet.addMapping(servletMapping);
     }
-    
+
     private boolean isCxfServletAvailable(ServletContext ctx) {
         for (Map.Entry<String, ? extends ServletRegistration> entry : ctx.getServletRegistrations().entrySet()) {
             if (entry.getValue().getInitParameter(CXF_JAXRS_CLASSES_PARAM) != null) {
@@ -137,7 +137,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
             return sr.getMappings().iterator().next();
         } else {
             final String error = "Servlet with a name " + name + " is not available";
-            throw new ServletException(error); 
+            throw new ServletException(error);
         }
     }
 
@@ -147,7 +147,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
             if (appParam == null) {
                 appParam = entry.getValue().getInitParameter(CXF_JAXRS_APPLICATION_PARAM);
             }
-            if (appParam != null && appParam.equals(appClass.getName())) { 
+            if (appParam != null && appParam.equals(appClass.getName())) {
                 return true;
             }
         }
@@ -156,13 +156,13 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
 
     private Map< Class< ? extends Annotation >, Collection< Class< ? > > > groupByAnnotations(
         final Set< Class< ? > > classes) {
-        
-        final Map< Class< ? extends Annotation >, Collection< Class< ? > > > grouped = 
+
+        final Map< Class< ? extends Annotation >, Collection< Class< ? > > > grouped =
             new HashMap< Class< ? extends Annotation >, Collection< Class< ? > > >();
-        
+
         grouped.put(Provider.class, new ArrayList< Class< ? > >());
         grouped.put(Path.class, new ArrayList< Class< ? > >());
-        
+
         if (classes != null) {
             for (final Class< ? > clazz: classes) {
                 if (!classShouldBeIgnored(clazz)) {
@@ -174,7 +174,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
                 }
             }
         }
-        
+
         return grouped;
     }
 
@@ -191,7 +191,7 @@ public class JaxrsServletContainerInitializer implements ServletContainerInitial
                 }
             }
         }
-        
+
         return null;
     }
 }

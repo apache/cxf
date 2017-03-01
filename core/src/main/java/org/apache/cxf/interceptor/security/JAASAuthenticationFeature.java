@@ -27,7 +27,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  */
 public class JAASAuthenticationFeature extends AbstractFeature {
     public static final String ID = "jaas";
-    
+
     private String contextName = "karaf";
     private boolean reportFault;
 
@@ -35,7 +35,7 @@ public class JAASAuthenticationFeature extends AbstractFeature {
     public String getID() {
         return ID;
     }
-    
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         JAASLoginInterceptor jaasLoginInterceptor = new JAASLoginInterceptor();
@@ -54,5 +54,5 @@ public class JAASAuthenticationFeature extends AbstractFeature {
     public void setReportFault(boolean reportFault) {
         this.reportFault = reportFault;
     }
-    
+
 }

@@ -42,10 +42,10 @@ public class PropertiesExpandingStreamReaderTest extends Assert {
         XMLStreamReader reader = new PropertiesExpandingStreamReader(
             StaxUtils.createXMLStreamReader(getTestStream("./resources/sysprops.xml")), map);
         Document doc = StaxUtils.read(reader);
-        Element abc = DOMUtils.getChildrenWithName(doc.getDocumentElement(), 
+        Element abc = DOMUtils.getChildrenWithName(doc.getDocumentElement(),
             "http://foo/bar", "abc").iterator().next();
         assertEquals("fooBAR-VALUEfoo", abc.getTextContent());
-        Element def = DOMUtils.getChildrenWithName(doc.getDocumentElement(),                     
+        Element def = DOMUtils.getChildrenWithName(doc.getDocumentElement(),
             "http://foo/bar", "def").iterator().next();
         assertEquals("ggggg", def.getTextContent());
         assertEquals("BLAH-VALUE2", def.getAttribute("myAttr"));

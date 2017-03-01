@@ -30,7 +30,7 @@ public class SimpleSecurityContext implements SecurityContext {
     public SimpleSecurityContext(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getUserPrincipal() {
         return principal;
     }

@@ -44,30 +44,30 @@ import org.apache.wss4j.policy.model.RequiredElements;
  * Validate either a SignedElements, EncryptedElements or ContentEncryptedElements policy
  */
 public class SecuredElementsPolicyValidator implements SecurityPolicyValidator {
-    
+
     private CoverageType coverageType = CoverageType.ENCRYPTED;
     private CoverageScope coverageScope = CoverageScope.ELEMENT;
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
         if (coverageType == CoverageType.SIGNED) {
-            return assertionInfo.getAssertion() != null 
+            return assertionInfo.getAssertion() != null
                 && (SP12Constants.SIGNED_ELEMENTS.equals(assertionInfo.getAssertion().getName())
                     || SP11Constants.SIGNED_ELEMENTS.equals(assertionInfo.getAssertion().getName()));
         } else if (coverageScope == CoverageScope.CONTENT) {
-            return assertionInfo.getAssertion() != null 
+            return assertionInfo.getAssertion() != null
                 && (SP12Constants.CONTENT_ENCRYPTED_ELEMENTS.equals(assertionInfo.getAssertion().getName())
                     || SP11Constants.CONTENT_ENCRYPTED_ELEMENTS.equals(assertionInfo.getAssertion().getName()));
         } else {
-            return assertionInfo.getAssertion() != null 
+            return assertionInfo.getAssertion() != null
                 && (SP12Constants.ENCRYPTED_ELEMENTS.equals(assertionInfo.getAssertion().getName())
                     || SP11Constants.ENCRYPTED_ELEMENTS.equals(assertionInfo.getAssertion().getName()));
         }
     }
-    
+
     /**
      * Validate policies.
      */
@@ -77,22 +77,22 @@ public class SecuredElementsPolicyValidator implements SecurityPolicyValidator {
         // each request.
         final XPathFactory factory = XPathFactory.newInstance();
         final XPath xpath = factory.newXPath();
-        
-        Element soapEnvelope = 
+
+        Element soapEnvelope =
             parameters.getSoapHeader().getOwnerDocument().getDocumentElement();
         Collection<WSDataRef> dataRefs = parameters.getEncrypted();
         if (coverageType == CoverageType.SIGNED) {
             dataRefs = parameters.getSigned();
         }
-        
+
         for (AssertionInfo ai : ais) {
             RequiredElements elements = (RequiredElements)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             if (elements != null && elements.getXPaths() != null && !elements.getXPaths().isEmpty()) {
                 List<String> expressions = new ArrayList<>();
                 MapNamespaceContext namespaceContext = new MapNamespaceContext();
-                
+
                 for (org.apache.wss4j.policy.model.XPath xPath : elements.getXPaths()) {
                     expressions.add(xPath.getXPath());
                     Map<String, String> namespaceMap = xPath.getPrefixNamespaceMap();
@@ -106,11 +106,11 @@ public class SecuredElementsPolicyValidator implements SecurityPolicyValidator {
                     CryptoCoverageUtil.checkCoverage(soapEnvelope, dataRefs,
                                                      xpath, expressions, coverageType, coverageScope);
                 } catch (WSSecurityException e) {
-                    ai.setNotAsserted("No " + coverageType 
-                                      + " element found matching one of the XPaths " 
+                    ai.setNotAsserted("No " + coverageType
+                                      + " element found matching one of the XPaths "
                                       + Arrays.toString(expressions.toArray()));
                 }
-            }            
+            }
         }
     }
 

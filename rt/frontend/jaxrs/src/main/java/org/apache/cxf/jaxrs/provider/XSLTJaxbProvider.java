@@ -83,9 +83,9 @@ import org.apache.cxf.staxutils.StaxUtils;
 @Consumes({"application/xml", "application/*+xml", "text/xml", "text/html" })
 @Provider
 public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(XSLTJaxbProvider.class);
-    
+
     private static final String ABSOLUTE_PATH_PARAMETER = "absolute.path";
     private static final String BASE_PATH_PARAMETER = "base.path";
     private static final String RELATIVE_PATH_PARAMETER = "relative.path";
@@ -106,34 +106,34 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     private Map<String, String> outProperties;
     private URIResolver uriResolver;
     private String systemId;
-    
+
     private boolean supportJaxbOnly;
     private boolean refreshTemplates;
     private boolean secureProcessing = true;
-    
+
     public void setSupportJaxbOnly(boolean support) {
         this.supportJaxbOnly = support;
     }
-    
+
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
         if (!super.isReadable(type, genericType, anns, mt)) {
             return false;
         }
-        
+
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             return supportJaxbOnly;
         }
-        
-        // if the user has set the list of in classes and a given class 
+
+        // if the user has set the list of in classes and a given class
         // is in that list then it can only be handled by the template
         if (inClassCanBeHandled(type.getName()) || inClassesToHandle == null && !supportJaxbOnly) {
-            return inTemplatesAvailable(type, anns, mt); 
+            return inTemplatesAvailable(type, anns, mt);
         } else {
             return supportJaxbOnly;
         }
     }
-    
+
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
         // JAXB support is required
@@ -143,32 +143,32 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             return supportJaxbOnly;
         }
-        
-        // if the user has set the list of out classes and a given class 
+
+        // if the user has set the list of out classes and a given class
         // is in that list then it can only be handled by the template
         if (outClassCanBeHandled(type.getName()) || outClassesToHandle == null && !supportJaxbOnly) {
-            return outTemplatesAvailable(type, anns, mt); 
+            return outTemplatesAvailable(type, anns, mt);
         } else {
             return supportJaxbOnly;
         }
     }
-    
+
     protected boolean inTemplatesAvailable(Class<?> cls, Annotation[] anns, MediaType mt) {
-        return inTemplates != null 
-            || inMediaTemplates != null && inMediaTemplates.containsKey(mt.getType() + "/" 
+        return inTemplates != null
+            || inMediaTemplates != null && inMediaTemplates.containsKey(mt.getType() + "/"
                                                                         + mt.getSubtype())
             || getTemplatesFromAnnotation(cls, anns, mt) != null;
     }
-    
+
     protected boolean outTemplatesAvailable(Class<?> cls, Annotation[] anns, MediaType mt) {
-        return outTemplates != null 
-            || outMediaTemplates != null && outMediaTemplates.containsKey(mt.getType() 
+        return outTemplates != null
+            || outMediaTemplates != null && outMediaTemplates.containsKey(mt.getType()
                                                                           + "/" + mt.getSubtype())
             || getTemplatesFromAnnotation(cls, anns, mt) != null;
     }
-    
+
     protected Templates getTemplatesFromAnnotation(Class<?> cls,
-                                                   Annotation[] anns, 
+                                                   Annotation[] anns,
                                                    MediaType mt) {
         Templates t = null;
         XSLTTransform ann = getXsltTransformAnn(anns, mt);
@@ -190,9 +190,9 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             }
         }
         return t;
-        
+
     }
-    
+
     protected Templates getAnnotationTemplates(Annotation[] anns) {
         Templates t = null;
         XSLTTransform ann = AnnotationUtils.getAnnotation(anns, XSLTTransform.class);
@@ -200,9 +200,9 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             t = annotationTemplates.get(ann.value());
         }
         return t;
-        
+
     }
-    
+
     protected XSLTTransform getXsltTransformAnn(Annotation[] anns, MediaType mt) {
         XSLTTransform ann = AnnotationUtils.getAnnotation(anns, XSLTTransform.class);
         if (ann != null && ann.type() != XSLTTransform.TransformType.CLIENT) {
@@ -218,38 +218,38 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         }
         return null;
     }
-    
-    
-    
+
+
+
     protected Templates getInTemplates(Annotation[] anns, MediaType mt) {
         Templates t = createTemplatesFromContext();
         if (t != null) {
             return t;
         }
-        t = inTemplates != null ? inTemplates 
+        t = inTemplates != null ? inTemplates
             : inMediaTemplates != null ? inMediaTemplates.get(mt.getType() + "/" + mt.getSubtype()) : null;
-        if (t == null) {    
+        if (t == null) {
             t = getAnnotationTemplates(anns);
         }
         return t;
     }
-    
+
     protected Templates getOutTemplates(Annotation[] anns, MediaType mt) {
         Templates t = createTemplatesFromContext();
         if (t != null) {
             return t;
         }
-        t = outTemplates != null ? outTemplates 
+        t = outTemplates != null ? outTemplates
             : outMediaTemplates != null ? outMediaTemplates.get(mt.getType() + "/" + mt.getSubtype()) : null;
-        if (t == null) {    
+        if (t == null) {
             t = getAnnotationTemplates(anns);
         }
-        return t;    
+        return t;
     }
-    
+
     @Override
-    protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, 
-                                              Annotation[] anns, MediaType mt) 
+    protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is,
+                                              Annotation[] anns, MediaType mt)
         throws JAXBException {
         try {
 
@@ -257,7 +257,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             if (t == null && supportJaxbOnly) {
                 return super.unmarshalFromInputStream(unmarshaller, is, anns, mt);
             }
-            
+
             if (unmarshaller.getClass().getName().contains("eclipse")) {
                 //eclipse MOXy doesn't work properly with the XMLFilter/Reader thing
                 //so we need to bounce through a DOM
@@ -284,13 +284,13 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             return unmarshaller.unmarshal(source);
         } catch (TransformerException ex) {
             LOG.warning("Transformation exception : " + ex.getMessage());
-            throw ExceptionUtils.toInternalServerErrorException(ex, null); 
+            throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
-    
+
     private void trySettingProperties(Object filter, TemplatesImpl ti) {
         try {
-            //Saxon doesn't allow creating a Filter or Handler from anything other than it's original 
+            //Saxon doesn't allow creating a Filter or Handler from anything other than it's original
             //Templates.  That then requires setting the parameters after the fact, but there
             //isn't a standard API for that, so we have to grab the Transformer via reflection to
             //set the parameters.
@@ -308,8 +308,8 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     }
 
     @Override
-    protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader, 
-                                         Annotation[] anns, MediaType mt) 
+    protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader,
+                                         Annotation[] anns, MediaType mt)
         throws JAXBException {
         CachedOutputStream out = new CachedOutputStream();
         try {
@@ -323,27 +323,27 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             throw ExceptionUtils.toBadRequestException(ex, null);
         }
     }
-    
+
     @Override
-    protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer, 
-                                   Annotation[] anns, MediaType mt) 
+    protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer,
+                                   Annotation[] anns, MediaType mt)
         throws Exception {
         CachedOutputStream out = new CachedOutputStream();
         marshalToOutputStream(ms, obj, out, anns, mt);
-        
+
         StaxUtils.copy(new StreamSource(out.getInputStream()), writer);
     }
-    
+
     @Override
     protected void addAttachmentMarshaller(Marshaller ms) {
         // complete
     }
-    
+
     @Override
-    protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os, 
+    protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os,
                                          Annotation[] anns, MediaType mt)
         throws Exception {
-        
+
         Templates t = createTemplates(getOutTemplates(anns, mt), outParamsMap, outProperties);
         if (t == null && supportJaxbOnly) {
             super.marshalToOutputStream(ms, obj, os, anns, mt);
@@ -362,7 +362,7 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             result.setSystemId(systemId);
         }
         th.setResult(result);
-        
+
         if (getContext() == null) {
             th.startDocument();
         }
@@ -371,73 +371,73 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             th.endDocument();
         }
     }
-    
+
     public void setOutTemplate(String loc) {
         outTemplates = createTemplates(loc);
     }
-    
+
     public void setInTemplate(String loc) {
         inTemplates = createTemplates(loc);
     }
-    
+
     public void setInMediaTemplates(Map<String, String> map) {
         inMediaTemplates = new HashMap<String, Templates>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             inMediaTemplates.put(entry.getKey(), createTemplates(entry.getValue()));
         }
     }
-    
+
     public void setOutMediaTemplates(Map<String, String> map) {
         outMediaTemplates = new HashMap<String, Templates>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             outMediaTemplates.put(entry.getKey(), createTemplates(entry.getValue()));
         }
     }
-    
+
     public void setResolver(URIResolver resolver) {
         uriResolver = resolver;
         if (factory != null) {
             factory.setURIResolver(uriResolver);
         }
     }
-    
+
     public void setSystemId(String system) {
         systemId = system;
     }
-    
+
     public void setInParameters(Map<String, Object> inParams) {
         this.inParamsMap = inParams;
     }
-    
+
     public void setOutParameters(Map<String, Object> outParams) {
         this.outParamsMap = outParams;
     }
-    
+
     public void setInProperties(Map<String, String> inProps) {
         this.inProperties = inProps;
     }
-    
+
     public void setOutProperties(Map<String, String> outProps) {
         this.outProperties = outProps;
     }
-    
+
     public void setInClassNames(List<String> classNames) {
         inClassesToHandle = classNames;
     }
-    
+
     public boolean inClassCanBeHandled(String className) {
-        return inClassesToHandle != null && inClassesToHandle.contains(className); 
+        return inClassesToHandle != null && inClassesToHandle.contains(className);
     }
-    
+
     public void setOutClassNames(List<String> classNames) {
         outClassesToHandle = classNames;
     }
-    
+
     public boolean outClassCanBeHandled(String className) {
-        return outClassesToHandle != null && outClassesToHandle.contains(className); 
+        return outClassesToHandle != null && outClassesToHandle.contains(className);
     }
-    
-    protected Templates createTemplates(Templates templates, 
+
+    protected Templates createTemplates(Templates templates,
                                       Map<String, Object> configuredParams,
                                       Map<String, String> outProps) {
         if (templates == null) {
@@ -448,8 +448,8 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
                 throw ExceptionUtils.toInternalServerErrorException(null, null);
             }
         }
-        
-        TemplatesImpl templ =  new TemplatesImpl(templates, uriResolver);
+
+        TemplatesImpl templ = new TemplatesImpl(templates, uriResolver);
         MessageContext mc = getContext();
         if (mc != null) {
             UriInfo ui = mc.getUriInfo();
@@ -462,9 +462,9 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
                 }
                 templ.setTransformerParameter(entry.getKey(), value);
             }
-            
+
             List<PathSegment> segments = ui.getPathSegments();
-            if (segments.size() > 0) {
+            if (!segments.isEmpty()) {
                 setTransformParameters(templ, segments.get(segments.size() - 1).getMatrixParameters());
             }
             setTransformParameters(templ, ui.getQueryParameters());
@@ -480,16 +480,16 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         if (outProps != null) {
             templ.setOutProperties(outProps);
         }
-        
+
         return templ;
     }
 
     private void setTransformParameters(TemplatesImpl templ, MultivaluedMap<String, String> params) {
         for (Map.Entry<String, List<String>> entry : params.entrySet()) {
             templ.setTransformerParameter(entry.getKey(), entry.getValue().get(0));
-        }    
+        }
     }
-    
+
     protected Templates createTemplates(String loc) {
         try {
             return createTemplates(ResourceUtils.getResourceURL(loc, this.getBus()));
@@ -498,8 +498,8 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         }
         return null;
     }
-    
-    protected Templates createTemplatesFromContext() { 
+
+    protected Templates createTemplatesFromContext() {
         MessageContext mc = getContext();
         if (mc != null) {
             String template = (String)mc.getContextualProperty(XSLT_TEMPLATE_PROPERTY);
@@ -509,13 +509,13 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         }
         return null;
     }
-    
+
     protected Templates createTemplates(URL urlStream) {
         try {
             if (urlStream == null) {
                 return null;
             }
-            
+
             Reader r = new BufferedReader(
                            new InputStreamReader(urlStream.openStream(), StandardCharsets.UTF_8));
             Source source = new StreamSource(r);
@@ -528,13 +528,13 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
                 }
             }
             return factory.newTemplates(source);
-            
+
         } catch (Exception ex) {
             LOG.warning("No template can be created : " + ex.getMessage());
         }
         return null;
     }
-    
+
     public void setRefreshTemplates(boolean refresh) {
         this.refreshTemplates = refresh;
     }
@@ -549,12 +549,12 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         private URIResolver resolver;
         private Map<String, Object> transformParameters = new HashMap<String, Object>();
         private Map<String, String> outProps = new HashMap<String, String>();
-        
+
         TemplatesImpl(Templates templates, URIResolver resolver) {
             this.templates = templates;
             this.resolver = resolver;
         }
-        
+
         public Templates getTemplates() {
             return templates;
         }
@@ -562,11 +562,11 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
         public void setTransformerParameter(String name, Object value) {
             transformParameters.put(name, value);
         }
-        
+
         public void setOutProperties(Map<String, String> props) {
             this.outProps = props;
         }
-        
+
         public Properties getOutputProperties() {
             return templates.getOutputProperties();
         }
@@ -582,6 +582,6 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
             }
             return tr;
         }
-        
+
     }
 }

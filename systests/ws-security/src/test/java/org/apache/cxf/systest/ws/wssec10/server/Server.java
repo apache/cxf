@@ -30,7 +30,7 @@ public class Server extends AbstractBusTestServerBase {
 
     private static boolean unrestrictedPoliciesInstalled;
     private static String configFileName;
-    
+
     static {
         unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
         if (unrestrictedPoliciesInstalled) {
@@ -38,12 +38,12 @@ public class Server extends AbstractBusTestServerBase {
         } else {
             configFileName = "org/apache/cxf/systest/ws/wssec10/server_restricted.xml";
         }
-    };    
+    };
 
     public Server() throws Exception {
-        
+
     }
-    
+
     protected void run()  {
         Bus busLocal = new SpringBusFactory().createBus(configFileName);
         BusFactory.setDefaultBus(busLocal);

@@ -24,9 +24,9 @@ import org.junit.Test;
 
 public class ObservableWriterTest extends Assert {
 
-    
+
     @Test
     public void testIsWriteable() {
     }
-       
+
 }

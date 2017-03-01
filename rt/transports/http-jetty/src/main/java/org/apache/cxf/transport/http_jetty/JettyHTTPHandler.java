@@ -77,7 +77,7 @@ public class JettyHTTPHandler extends AbstractHandler {
                 }
             }
         }
-        
+
     }
 
     public Bus getBus() {

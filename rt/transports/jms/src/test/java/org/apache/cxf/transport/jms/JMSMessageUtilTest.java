@@ -27,12 +27,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class JMSMessageUtilTest extends Assert {
-    
+
     @Test
-    public void testGetEncoding() throws IOException {                
-        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml; charset=utf-8"), 
+    public void testGetEncoding() throws IOException {
+        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml; charset=utf-8"),
                      StandardCharsets.UTF_8.name());
-        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml"), 
+        assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml"),
                      StandardCharsets.UTF_8.name());
         assertEquals("Get the wrong encoding", JMSMessageUtils.getEncoding("text/xml; charset=GBK"), "GBK");
         try {
@@ -43,5 +43,5 @@ public class JMSMessageUtilTest extends Assert {
                        ex instanceof UnsupportedEncodingException);
         }
     }
-    
+
 }

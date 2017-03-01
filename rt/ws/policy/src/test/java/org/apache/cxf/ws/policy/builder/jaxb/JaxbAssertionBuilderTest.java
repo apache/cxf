@@ -35,12 +35,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class JaxbAssertionBuilderTest extends Assert {
-    
+
     @Test
-    public void testConstructors() throws Exception {        
+    public void testConstructors() throws Exception {
         QName qn = new QName("http://cxf.apache.org/test/assertions/foo", "FooType");
         try {
             new JaxbAssertionBuilder<Object>("org.apache.cxf.test.assertions.foo.UnknownType", qn);
@@ -48,11 +48,11 @@ public class JaxbAssertionBuilderTest extends Assert {
         } catch (ClassNotFoundException ex) {
             // expected
         }
-        assertNotNull(new JaxbAssertionBuilder<Object>(qn)); 
-        assertNotNull(new JaxbAssertionBuilder<Object>(FooType.class.getName(), qn));   
+        assertNotNull(new JaxbAssertionBuilder<Object>(qn));
+        assertNotNull(new JaxbAssertionBuilder<Object>(FooType.class.getName(), qn));
         assertNotNull(new JaxbAssertionBuilder<FooType>(FooType.class, qn));
     }
-    
+
     @Test
     public void testGetKnownElements() throws Exception {
         QName qn = new QName("http://cxf.apache.org/test/assertions/foo", "FooType");
@@ -61,21 +61,21 @@ public class JaxbAssertionBuilderTest extends Assert {
         assertEquals(1, ab.getKnownElements().length);
         assertSame(qn, ab.getKnownElements()[0]);
     }
-    
+
     @Test
     public void testBuild() throws Exception {
         QName qn = new QName("http://cxf.apache.org/test/assertions/foo", "FooType");
         JaxbAssertionBuilder<FooType> ab = new JaxbAssertionBuilder<FooType>(FooType.class, qn);
         assertNotNull(ab);
         InputStream is = JaxbAssertionBuilderTest.class.getResourceAsStream("foo.xml");
-        Document doc = StaxUtils.read(is);        
-        Element elem =  DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(), 
-                                                          "http://cxf.apache.org/test/assertions/foo", 
+        Document doc = StaxUtils.read(is);
+        Element elem = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                          "http://cxf.apache.org/test/assertions/foo",
                                                           "foo").get(0);
         Assertion a = ab.build(elem, null);
         JaxbAssertion<FooType> jba = JaxbAssertion.cast(a, FooType.class);
         FooType foo = jba.getData();
         assertEquals("CXF", foo.getName());
-        assertEquals(2, foo.getNumber().intValue());         
+        assertEquals(2, foo.getNumber().intValue());
     }
 }

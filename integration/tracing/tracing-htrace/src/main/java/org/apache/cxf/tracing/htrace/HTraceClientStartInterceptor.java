@@ -40,13 +40,13 @@ public class HTraceClientStartInterceptor extends AbstractHTraceClientIntercepto
     @Override
     public void handleMessage(Message message) throws Fault {
         final Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(headers, 
-            (String)message.get(Message.ENDPOINT_ADDRESS), 
+        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(headers,
+            (String)message.get(Message.ENDPOINT_ADDRESS),
             (String)message.get(Message.HTTP_REQUEST_METHOD));
-        
+
         if (holder != null) {
             message.getExchange().put(TRACE_SPAN, holder);
         }
     }
-    
+
 }

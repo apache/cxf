@@ -28,17 +28,17 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 public abstract class AbstractJoseProducer {
     private JwsSignatureProvider sigProvider;
     private JweEncryptionProvider encryptionProvider;
-    
+
     protected JwsSignatureProvider getInitializedSignatureProvider(JwsHeaders jwsHeaders) {
         if (sigProvider != null) {
-            return sigProvider;    
-        } 
-        
+            return sigProvider;
+        }
+
         return JwsUtils.loadSignatureProvider(jwsHeaders, false);
     }
     protected JweEncryptionProvider getInitializedEncryptionProvider(JweHeaders jweHeaders) {
         if (encryptionProvider != null) {
-            return encryptionProvider;    
+            return encryptionProvider;
         }
         return JweUtils.loadEncryptionProvider(jweHeaders, false);
     }

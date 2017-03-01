@@ -56,56 +56,56 @@ import org.apache.cxf.jaxrs.model.wadl.jaxb.packageinfo.Book2;
 @Produces({"application/xml", "application/json" })
 public class BookStore extends AbstractStore<Book> implements BookDescription {
 
-    @Descriptions({ 
+    @Descriptions({
         @Description(value = "Attachments, max < 10", target = DocTarget.PARAM)
     })
-    @POST 
+    @POST
     @Consumes("multipart/form-data")
     public void formdata(MultipartBody body) {
-        
+
     }
-    
-    @GET 
+
+    @GET
     @Produces("application/xml")
     @XMLName("{http://superbooks}books")
-    @Descriptions({ 
+    @Descriptions({
         @Description(value = "Get Books", target = DocTarget.METHOD)
     })
     public List<Book> getBooks(@PathParam("id") Long id, @BeanParam TheBeanParam beanParam) {
         return Collections.emptyList();
     }
-    
+
     @GET
     @Path("thebooks2")
     @Produces("application/xml")
-    @Descriptions({ 
+    @Descriptions({
         @Description(value = "Get Books2", target = DocTarget.METHOD)
     })
     public List<Book2> getBooks2(@PathParam("id") Long id) {
         return Collections.emptyList();
     }
-    
-    @GET 
+
+    @GET
     @Produces("text/plain")
-    public String getName(@PathParam("id") Long id, @BeanParam TheBeanParam beanParam, 
+    public String getName(@PathParam("id") Long id, @BeanParam TheBeanParam beanParam,
                           @QueryParam("") QueryBean query) {
         return "store";
     }
-    
-    @PUT 
+
+    @PUT
     @Consumes("text/plain")
     public void setName(@PathParam("id") Long id, String name) {
     }
-    
+
     @Path("books/\"{bookid}\"")
     public Object addBook(@PathParam("id") int id,
                         @PathParam("bookid") int bookId,
                         @MatrixParam("mid") int matrixId) {
         return new Book(1);
     }
-    
-    
-    @Descriptions({ 
+
+
+    @Descriptions({
         @Description(value = "Update the books collection", target = DocTarget.METHOD),
         @Description(value = "Requested Book", target = DocTarget.RETURN),
         @Description(value = "Request", target = DocTarget.REQUEST),
@@ -127,12 +127,12 @@ public class BookStore extends AbstractStore<Book> implements BookDescription {
                         @QueryParam("bookstate") BookEnum state,
                         @QueryParam("a") List<String> queryList,
                         @Context HttpHeaders headers,
-                        @Description("InputBook")      
+                        @Description("InputBook")
                         @XMLName(value = "{http://books}thesuperbook2")
                         Book2 b) {
         return new Book(1);
     }
-    
+
     @PUT
     @Path("books/{bookid}")
     @Description("Update the book")
@@ -141,44 +141,44 @@ public class BookStore extends AbstractStore<Book> implements BookDescription {
                         @MatrixParam("mid") int matrixId,
                         Book b) {
     }
-    
+
     //CHECKSTYLE:ON
     @Path("booksubresource")
     public Book getBook(@PathParam("id") int id,
                         @MatrixParam("mid") int matrixId) {
         return new Book(1);
     }
-    
+
     @GET
     @Path("chapter")
     public Chapter getChapter() {
         return new Chapter(1);
     }
-    
+
     @GET
     @Path("chapter2")
     @ElementClass(response = Chapter.class)
     public void getChapterAsync(@Suspended AsyncResponse async) {
         async.resume(Response.ok().entity(new Chapter(1)).build());
     }
-    
+
     @Path("form")
     public FormInterface getForm() {
         return new Book(1);
     }
-    
+
     @Path("itself")
     public BookStore getItself() {
         return this;
     }
-    
+
     @Path("book2")
     @GET
     @XMLName(value = "{http://books}thesuperbook2", prefix = "p1")
     public Book2 getBook2() {
         return new Book2();
     }
-    
+
     public static class TheBeanParam {
         private int a;
         @QueryParam("b")
@@ -197,44 +197,44 @@ public class BookStore extends AbstractStore<Book> implements BookDescription {
             this.b = bb;
         }
     }
-    
+
     public static class QueryBean {
         private int a;
         private int b;
         private QueryBean2 bean;
-        
+
         public int getAProp() {
             return a;
         }
-        
+
         @IgnoreProperty
         public int getB() {
             return b;
         }
-        
+
         public QueryBean2 getC() {
             return bean;
         }
-        
+
         public TestEnum getE() {
             return TestEnum.A;
         }
-        
+
     }
-    
+
     public static class QueryBean2 {
         private int a;
         private int b;
         private QueryBean3 bean;
-        
+
         public int getA() {
             return a;
         }
-        
+
         public int getB() {
             return b;
         }
-        
+
         public QueryBean3 getD() {
             return bean;
         }
@@ -242,27 +242,27 @@ public class BookStore extends AbstractStore<Book> implements BookDescription {
         public QueryBean3 getD2() {
             return bean;
         }
-        
+
         public QueryBean2 getIt() {
             return this;
         }
     }
-    
+
     public static class QueryBean3 {
         private boolean a;
         private int b;
-        
+
         public boolean isA() {
             return a;
         }
-        
+
         @XmlTransient
         public int getB() {
             return b;
         }
     }
-    
+
     public enum TestEnum {
-        A;        
+        A;
     }
 }

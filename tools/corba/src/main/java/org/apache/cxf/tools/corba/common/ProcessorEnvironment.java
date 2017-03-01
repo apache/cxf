@@ -39,7 +39,7 @@ public class ProcessorEnvironment {
 
     public ProcessorEnvironment() {
     }
-    
+
     public void loadDefaultNS2Pck()  {
         try {
             PropertyUtil properties = new PropertyUtil();
@@ -49,7 +49,7 @@ public class ProcessorEnvironment {
             e.printStackTrace();
         }
     }
-    
+
     public void loadDefaultExcludes()  {
         try {
             PropertyUtil properties = new PropertyUtil();
@@ -63,11 +63,11 @@ public class ProcessorEnvironment {
     private InputStream getResourceAsStream(String file) throws IOException {
         return ProcessorEnvironment.class.getResourceAsStream(file);
     }
-    
+
     public void setParameters(Map<String, Object> map) {
         this.paramMap = map;
     }
-    
+
     public boolean containsKey(String key) {
         return (paramMap == null) ? false : paramMap.containsKey(key);
     }
@@ -137,7 +137,7 @@ public class ProcessorEnvironment {
     public void setPackageName(String pkgName) {
         this.packageName = pkgName;
     }
-    
+
     public String getPackageName() {
         return this.packageName;
     }
@@ -162,7 +162,7 @@ public class ProcessorEnvironment {
         return this.jaxbBindingFiles;
     }
 
-    public boolean isExcludeNamespaceEnabled() {        
-        return excludeNamespacePackageMap.size() > 0;
+    public boolean isExcludeNamespaceEnabled() {
+        return !excludeNamespacePackageMap.isEmpty();
     }
 }

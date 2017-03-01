@@ -31,13 +31,13 @@ import org.apache.cxf.bus.extension.ExtensionManagerBus;
 
 final class CdiBusBean extends AbstractCXFBean< ExtensionManagerBus > {
     static final String CXF = "cxf";
-    
+
     private final InjectionTarget<ExtensionManagerBus> injectionTarget;
-    
+
     CdiBusBean(final InjectionTarget<ExtensionManagerBus> injectionTarget) {
         this.injectionTarget = injectionTarget;
     }
-    
+
     @Override
     public Class< ? > getBeanClass() {
         return Bus.class;
@@ -59,20 +59,20 @@ final class CdiBusBean extends AbstractCXFBean< ExtensionManagerBus > {
         types.add(Bus.class);
         return types;
     }
-    
+
     @Override
     public ExtensionManagerBus create(final CreationalContext< ExtensionManagerBus > ctx) {
         final ExtensionManagerBus instance = injectionTarget.produce(ctx);
         CXFBusFactory.possiblySetDefaultBus(instance);
         instance.initialize();
-        
+
         injectionTarget.inject(instance, ctx);
         injectionTarget.postConstruct(instance);
         return instance;
     }
 
     @Override
-    public void destroy(final ExtensionManagerBus instance, 
+    public void destroy(final ExtensionManagerBus instance,
             final CreationalContext< ExtensionManagerBus > ctx) {
         injectionTarget.preDestroy(instance);
         injectionTarget.dispose(instance);

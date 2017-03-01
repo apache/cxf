@@ -47,8 +47,8 @@ import static org.atmosphere.cpr.FrameworkConfig.CONTAINER_RESPONSE;
  * Most of this class implementation is borrowed from SSEAtmosphereInterceptor. The original
  * implementation does two things which do not fit well into SSE support:
  *  - closes the response stream (overridden by SseAtmosphereInterceptorWriter)
- *  - wraps the whatever object is being written to SSE payload (overridden using 
- *    the complete SSE protocol) 
+ *  - wraps the whatever object is being written to SSE payload (overridden using
+ *    the complete SSE protocol)
  */
 public class SseAtmosphereInterceptor extends SSEAtmosphereInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(SseAtmosphereInterceptor.class);
@@ -56,7 +56,7 @@ public class SseAtmosphereInterceptor extends SSEAtmosphereInterceptor {
     private static final byte[] PADDING;
     private static final String PADDING_TEXT;
     private static final byte[] END = "\r\n\r\n".getBytes();
-    
+
     static {
         StringBuffer whitespace = new StringBuffer();
         for (int i = 0; i < 2000; i++) {
@@ -66,7 +66,7 @@ public class SseAtmosphereInterceptor extends SSEAtmosphereInterceptor {
         PADDING_TEXT = whitespace.toString();
         PADDING = PADDING_TEXT.getBytes();
     }
-    
+
     private boolean writePadding(AtmosphereResponse response) {
         if (response.request() != null && response.request().getAttribute("paddingWritten") != null) {
             return false;
@@ -99,7 +99,7 @@ public class SseAtmosphereInterceptor extends SSEAtmosphereInterceptor {
         response.resource().getRequest().setAttribute("paddingWritten", "true");
         return true;
     }
-    
+
     @Override
     public Action inspect(final AtmosphereResource r) {
         if (Utils.webSocketMessage(r)) {
@@ -114,7 +114,7 @@ public class SseAtmosphereInterceptor extends SSEAtmosphereInterceptor {
             if (response.getAsyncIOWriter() == null) {
                 response.asyncIOWriter(new SseAtmosphereInterceptorWriter());
             }
-            
+
             r.addEventListener(new P(response));
 
             AsyncIOWriter writer = response.getAsyncIOWriter();
@@ -157,14 +157,14 @@ public class SseAtmosphereInterceptor extends SSEAtmosphereInterceptor {
                     }
                 });
             } else {
-                LOG.warning(String.format("Unable to apply %s. Your AsyncIOWriter must implement %s", 
+                LOG.warning(String.format("Unable to apply %s. Your AsyncIOWriter must implement %s",
                     getClass().getName(), AtmosphereInterceptorWriter.class.getName()));
             }
         }
-        
+
         return Action.CONTINUE;
     }
-    
+
     private final class P extends OnPreSuspend implements AllowInterceptor {
 
         private final AtmosphereResponse response;
@@ -177,5 +177,5 @@ public class SseAtmosphereInterceptor extends SSEAtmosphereInterceptor {
         public void onPreSuspend(AtmosphereResourceEvent event) {
             writePadding(response);
         }
-    }    
+    }
 }

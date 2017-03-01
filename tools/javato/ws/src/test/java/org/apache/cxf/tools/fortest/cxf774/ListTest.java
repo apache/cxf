@@ -31,11 +31,11 @@ import javax.xml.ws.ResponseWrapper;
 public interface ListTest {
 
     @WebMethod(operationName = "sayHi", exclude = false)
-    @ResponseWrapper(className = "apache.cxf.SayHiResponse", 
-                     localName = "sayHiResponse", 
+    @ResponseWrapper(className = "apache.cxf.SayHiResponse",
+                     localName = "sayHiResponse",
                      targetNamespace = "http://cxf.apache/")
-    @RequestWrapper(className = "apache.cxf.SayHi", 
-                    localName = "sayHi", 
+    @RequestWrapper(className = "apache.cxf.SayHi",
+                    localName = "sayHi",
                     targetNamespace = "http://cxf.apache/")
     List<?> sayHi(String hi);
 

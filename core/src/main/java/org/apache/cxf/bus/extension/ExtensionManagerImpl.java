@@ -33,11 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.resource.ObjectTypeResolver;
@@ -46,14 +44,11 @@ import org.apache.cxf.resource.ResourceResolver;
 import org.apache.cxf.resource.SinglePropertyResolver;
 
 public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLocator {
-    public static final Logger LOG = LogUtils.getL7dLogger(ExtensionManagerImpl.class);
-    
-    
     public static final String EXTENSIONMANAGER_PROPERTY_NAME = "extensionManager";
     public static final String ACTIVATION_NAMESPACES_PROPERTY_NAME = "activationNamespaces";
     public static final String ACTIVATION_NAMESPACES_SETTER_METHOD_NAME = "setActivationNamespaces";
     public static final String BUS_EXTENSION_RESOURCE = "META-INF/cxf/bus-extensions.txt";
-    
+
     private final ClassLoader loader;
     private ResourceManager resourceManager;
     private Map<String, Extension> all = new ConcurrentHashMap<String, Extension>();
@@ -61,21 +56,21 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
     private final Map<Class<?>, Object> activated;
     private final Bus bus;
 
-    public ExtensionManagerImpl(ClassLoader cl, Map<Class<?>, Object> initialExtensions, 
+    public ExtensionManagerImpl(ClassLoader cl, Map<Class<?>, Object> initialExtensions,
                                 ResourceManager rm, Bus b) {
         this(new String[] {BUS_EXTENSION_RESOURCE},
                  cl, initialExtensions, rm, b);
     }
-    public ExtensionManagerImpl(String resource, 
-                                ClassLoader cl, 
-                                Map<Class<?>, Object> initialExtensions, 
+    public ExtensionManagerImpl(String resource,
+                                ClassLoader cl,
+                                Map<Class<?>, Object> initialExtensions,
                                 ResourceManager rm,
                                 Bus b) {
         this(new String[] {resource}, cl, initialExtensions, rm, b);
-    }    
-    public ExtensionManagerImpl(String resources[], 
-                                ClassLoader cl, 
-                                Map<Class<?>, Object> initialExtensions, 
+    }
+    public ExtensionManagerImpl(String resources[],
+                                ClassLoader cl,
+                                Map<Class<?>, Object> initialExtensions,
                                 ResourceManager rm,
                                 Bus b) {
 
@@ -97,7 +92,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             }
         }
     }
-    
+
     final void load(String resources[]) {
         if (resources == null) {
             return;
@@ -108,19 +103,19 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             }
         } catch (IOException ex) {
             throw new ExtensionException(ex);
-        }        
+        }
     }
     public void add(Extension ex) {
         all.put(ex.getName(), ex);
         ordered.add(ex);
     }
-    
+
     public void initialize() {
         for (Extension e : ordered) {
             if (!e.isDeferred() && e.getLoadedObject() == null) {
                 loadAndRegister(e);
             }
-        }        
+        }
     }
 
     public void removeBeansOfNames(List<String> names) {
@@ -136,7 +131,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
             if (e.getLoadedObject() == null) {
                 loadAndRegister(e);
             }
-        }        
+        }
     }
     public <T> void activateAllByType(Class<T> type) {
         for (Extension e : ordered) {
@@ -148,9 +143,9 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                     }
                 }
             }
-        }        
+        }
     }
-    
+
     public boolean hasBeanOfName(String name) {
         return all.containsKey(name);
     }
@@ -162,9 +157,9 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         load(resource, loader);
     }
     final synchronized void load(String resource, ClassLoader l) throws IOException {
-        
+
         Enumeration<URL> urls = l.getResources(resource);
-        
+
         while (urls.hasMoreElements()) {
             final URL url = urls.nextElement();
             InputStream is;
@@ -208,37 +203,37 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         if (null != activated && null != cls && null != activated.get(cls)) {
             return;
         }
-        
+
         synchronized (e) {
             Object obj = e.load(loader, bus);
             if (obj == null) {
                 return;
             }
-            
+
             if (null != activated) {
                 Configurer configurer = (Configurer)(activated.get(Configurer.class));
                 if (null != configurer) {
                     configurer.configureBean(obj);
                 }
             }
-            
+
             // let the object know for which namespaces it has been activated
             ResourceResolver namespacesResolver = null;
-            if (null != e.getNamespaces()) {            
-                namespacesResolver = new SinglePropertyResolver(ACTIVATION_NAMESPACES_PROPERTY_NAME, 
+            if (null != e.getNamespaces()) {
+                namespacesResolver = new SinglePropertyResolver(ACTIVATION_NAMESPACES_PROPERTY_NAME,
                                                                 e.getNamespaces());
                 resourceManager.addResourceResolver(namespacesResolver);
             }
-            
+
             // Since we need to support spring2.5 by removing @Resource("activationNamespaces")
             // Now we call the setActivationNamespaces method directly here
             if (e.getNamespaces() != null && !e.getNamespaces().isEmpty()) {
                 invokeSetterActivationNSMethod(obj, e.getNamespaces());
             }
-            
+
             ResourceInjector injector = new ResourceInjector(resourceManager);
-            
-            try {            
+
+            try {
                 injector.inject(obj);
                 injector.construct(obj);
             } finally {
@@ -246,11 +241,11 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                     resourceManager.removeResourceResolver(namespacesResolver);
                 }
             }
-            
+
             if (null != activated) {
                 if (cls == null) {
                     cls = obj.getClass();
-                }   
+                }
                 activated.put(cls, obj);
             }
         }
@@ -274,7 +269,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         }
         return null;
     }
-    
+
     private void invokeSetterActivationNSMethod(Object target, Object value) {
         Class<?> clazz = target.getClass();
         String methodName = ACTIVATION_NAMESPACES_SETTER_METHOD_NAME;
@@ -296,7 +291,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                 }
             }
             clazz = clazz.getSuperclass();
-        }        
+        }
     }
     public List<String> getBeanNamesOfType(Class<?> type) {
         List<String> ret = new LinkedList<String>();
@@ -306,7 +301,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                 synchronized (ex) {
                     ret.add(ex.getName());
                 }
-            }            
+            }
         }
         return ret;
     }
@@ -314,7 +309,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         if (name == null) {
             return null;
         }
-        Extension ex = all.get(name); 
+        Extension ex = all.get(name);
         if (ex != null) {
             if (ex.getLoadedObject() == null) {
                 loadAndRegister(ex);
@@ -336,7 +331,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                     if (ext.getLoadedObject() != null) {
                         ret.add(type.cast(ext.getLoadedObject()));
                     }
-                }                
+                }
             }
         }
         for (Extension ex : ordered) {
@@ -350,7 +345,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                         if (ex.getLoadedObject() != null) {
                             ret.add(type.cast(ex.getLoadedObject()));
                         }
-                    }                
+                    }
                 }
             }
         }
@@ -360,7 +355,7 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
         boolean loaded = false;
         for (Extension ex : ordered) {
             Class<?> cls = ex.getClassObject(loader);
-            if (cls != null 
+            if (cls != null
                 && type.isAssignableFrom(cls)) {
                 synchronized (ex) {
                     if (listener.loadBean(ex.getName(), cls.asSubclass(type))) {
@@ -391,6 +386,6 @@ public class ExtensionManagerImpl implements ExtensionManager, ConfiguredBeanLoc
                 ResourceInjector injector = new ResourceInjector(resourceManager);
                 injector.destroy(ex.getLoadedObject());
             }
-        }        
+        }
     }
 }

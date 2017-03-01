@@ -29,7 +29,7 @@ import org.junit.Test;
 
 public class ValidateWadlTest extends ProcessorTestBase {
 
-    @Test    
+    @Test
     public void testInvalidWadl() throws Exception {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
@@ -44,8 +44,8 @@ public class ValidateWadlTest extends ProcessorTestBase {
             // expected
         }
     }
-    
-    @Test    
+
+    @Test
     public void testInvalidParameterStyle() throws Exception {
         try {
             JAXRSContainer container = new JAXRSContainer(null);
@@ -54,13 +54,13 @@ public class ValidateWadlTest extends ProcessorTestBase {
             context.put(WadlToolConstants.CFG_WADLURL, getLocation("/wadl/invalidParamStyle.xml"));
             container.setContext(context);
             container.execute();
-            fail();            
+            fail();
         } catch (ValidationException e) {
             String message = e.getMessage();
             assertTrue(message.startsWith("Unsupported parameter style: plain"));
         }
     }
-        
+
     protected String getLocation(String wsdlFile) throws URISyntaxException {
         return getClass().getResource(wsdlFile).toString();
     }

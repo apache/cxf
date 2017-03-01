@@ -51,16 +51,16 @@ public class SoapMessage extends MessageImpl {
         super.put(SoapVersion.class, v);
         this.version = v;
     }
-    
+
     public List<Header> getHeaders() {
         List<Header> heads = CastUtils.cast((List<?>)get(Header.HEADER_LIST));
         if (heads == null) {
-            heads = new ArrayList<Header>();
+            heads = new ArrayList<>();
             put(Header.HEADER_LIST, heads);
         }
         return heads;
     }
-       
+
     public boolean hasHeader(QName qn) {
         for (Header head : getHeaders()) {
             if (head.getName().equals(qn)) {
@@ -77,18 +77,18 @@ public class SoapMessage extends MessageImpl {
         }
         return null;
     }
-    
+
     public boolean hasHeaders() {
         return containsKey(Header.HEADER_LIST) && getHeaders().size() > 0;
     }
-    
+
     public Map<String, String> getEnvelopeNs() {
         return CastUtils.cast((Map<?, ?>)getContextualProperty("soap.env.ns.map"));
     }
-    
+
     public boolean hasAdditionalEnvNs() {
         Map<String, String> ns = getEnvelopeNs();
         return ns != null && !ns.isEmpty();
-    } 
-    
+    }
+
 }

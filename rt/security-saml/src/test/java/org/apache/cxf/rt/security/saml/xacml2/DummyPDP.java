@@ -44,50 +44,50 @@ public class DummyPDP implements PolicyDecisionPoint {
 
     public ResponseType evaluate(RequestType request) {
         String role = getSubjectRole(request);
-        DECISION decision = "manager".equals(role) ? DecisionType.DECISION.Permit : DecisionType.DECISION.Deny;        
+        DECISION decision = "manager".equals(role) ? DecisionType.DECISION.Permit : DecisionType.DECISION.Deny;
         return createResponse(decision);
     }
-    
+
     private ResponseType createResponse(DECISION decision) {
         XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
-        
+
         @SuppressWarnings("unchecked")
-        XACMLObjectBuilder<ResponseType> responseTypeBuilder = 
+        XACMLObjectBuilder<ResponseType> responseTypeBuilder =
             (XACMLObjectBuilder<ResponseType>)
             builderFactory.getBuilder(ResponseType.DEFAULT_ELEMENT_NAME);
-        
+
         @SuppressWarnings("unchecked")
-        XACMLObjectBuilder<ResultType> resultTypeBuilder = 
+        XACMLObjectBuilder<ResultType> resultTypeBuilder =
             (XACMLObjectBuilder<ResultType>)
             builderFactory.getBuilder(ResultType.DEFAULT_ELEMENT_NAME);
-        
+
         @SuppressWarnings("unchecked")
         XACMLObjectBuilder<DecisionType> decisionTypeBuilder =
             (XACMLObjectBuilder<DecisionType>)
             builderFactory.getBuilder(DecisionType.DEFAULT_ELEMENT_NAME);
-        
+
         @SuppressWarnings("unchecked")
-        XACMLObjectBuilder<StatusType> statusTypeBuilder = 
+        XACMLObjectBuilder<StatusType> statusTypeBuilder =
             (XACMLObjectBuilder<StatusType>)
             builderFactory.getBuilder(StatusType.DEFAULT_ELEMENT_NAME);
-        
+
         @SuppressWarnings("unchecked")
         XACMLObjectBuilder<StatusCodeType> statusCodeTypeBuilder =
             (XACMLObjectBuilder<StatusCodeType>)
             builderFactory.getBuilder(StatusCodeType.DEFAULT_ELEMENT_NAME);
-            
+
         ResultType result = resultTypeBuilder.buildObject();
 
         DecisionType decisionType = decisionTypeBuilder.buildObject();
         decisionType.setDecision(decision);
         result.setDecision(decisionType);
-        
+
         StatusType status = statusTypeBuilder.buildObject();
         StatusCodeType statusCode = statusCodeTypeBuilder.buildObject();
         statusCode.setValue("urn:oasis:names:tc:xacml:1.0:status:ok");
         status.setStatusCode(statusCode);
         result.setStatus(status);
-        
+
         ResponseType response = responseTypeBuilder.buildObject();
         response.getResults().add(result);
         return response;

@@ -28,17 +28,17 @@ public class BinarySecret {
     public byte[] getBinarySecretValue() {
         return binarySecretValue;
     }
-    
+
     public void setBinarySecretValue(byte[] binarySecretValue) {
         this.binarySecretValue = binarySecretValue;
     }
-    
+
     public String getBinarySecretType() {
         return binarySecretType;
     }
-    
+
     public void setBinarySecretType(String binarySecretType) {
         this.binarySecretType = binarySecretType;
     }
-    
+
 }

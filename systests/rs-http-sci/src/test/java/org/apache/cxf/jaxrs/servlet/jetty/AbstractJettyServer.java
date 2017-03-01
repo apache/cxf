@@ -32,49 +32,49 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
     private final Resource[] resources;
     private final String contextPath;
     private final int port;
-    
+
     protected AbstractJettyServer(final String contextPath, final Resource[] resources, int portNumber) {
         this.contextPath = contextPath;
         this.resources = resources;
         this.port = portNumber;
     }
-    
+
     protected void run() {
         server = new Server(port);
-            
+
         try {
             final WebAppContext context = new WebAppContext();
             context.setContextPath(contextPath);
-            
+
             context.setConfigurations(new Configuration[] {
-                new WebXmlConfiguration(), 
-                new AnnotationConfiguration()  
-            });            
-            
+                new WebXmlConfiguration(),
+                new AnnotationConfiguration()
+            });
+
             for (final Resource resource: resources) {
-                context.getMetaData().addContainerResource(resource);    
+                context.getMetaData().addContainerResource(resource);
             }
-            
+
             configureContext(context);
             server.setHandler(context);
-            
+
             configureServer(server);
-            server.start();        
+            server.start();
         } catch (final Exception ex) {
             ex.printStackTrace();
             fail(ex.getMessage());
         }
     }
-    
-    protected void configureServer(final Server theserver) throws Exception {        
+
+    protected void configureServer(final Server theserver) throws Exception {
     }
-    
-    protected void configureContext(final WebAppContext context) throws Exception {        
+
+    protected void configureContext(final WebAppContext context) throws Exception {
     }
-        
+
     public void tearDown() throws Exception {
         super.tearDown();
-        
+
         if (server != null) {
             server.stop();
             server.destroy();

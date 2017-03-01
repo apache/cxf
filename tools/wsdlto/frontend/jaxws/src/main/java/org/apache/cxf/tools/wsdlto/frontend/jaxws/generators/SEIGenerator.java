@@ -71,9 +71,9 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
 
         Map<QName, JavaModel> map = CastUtils.cast((Map<?, ?>)penv.get(WSDLToJavaProcessor.MODEL_MAP));
         for (JavaModel javaModel : map.values()) {
-        
+
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
-    
+
             if (interfaces.size() == 0) {
                 ServiceInfo serviceInfo = env.get(ServiceInfo.class);
                 String wsdl = serviceInfo.getDescription().getBaseURI();
@@ -84,14 +84,14 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
                 continue;
             }
             for (JavaInterface intf : interfaces.values()) {
-    
+
                 if (hasHandlerConfig(intf)) {
                     HandlerConfigGenerator handlerGen = new HandlerConfigGenerator();
                     // REVISIT: find a better way to handle Handler gen, should not
                     // pass JavaInterface around.
                     handlerGen.setJavaInterface(intf);
                     handlerGen.generate(getEnvironment());
-    
+
                     JAnnotation annot = handlerGen.getHandlerAnnotation();
                     if (handlerGen.getHandlerAnnotation() != null) {
                         boolean existHandlerAnno = false;
@@ -108,7 +108,7 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
                 }
                 if (penv.containsKey(ToolConstants.RUNTIME_DATABINDING_CLASS)) {
                     JAnnotation ann = new JAnnotation(DataBinding.class);
-                    JAnnotationElement el 
+                    JAnnotationElement el
                         = new JAnnotationElement(null,
                                                  penv.get(ToolConstants.RUNTIME_DATABINDING_CLASS),
                                                  true);
@@ -129,15 +129,15 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
                 if (!StringUtils.isEmpty(seiSc)) {
                     seiSc += " ";
                 }
-                setAttributes("sei-superinterface-string", seiSc);                        
+                setAttributes("sei-superinterface-string", seiSc);
                 setCommonAttributes();
-    
+
                 doWrite(SEI_TEMPLATE, parseOutputName(intf.getPackageName(), intf.getName()));
-    
+
             }
         }
     }
-    
+
     public void register(final ClassCollector collector, String packageName, String fileName) {
         collector.addSeiClassName(packageName, fileName, packageName + "." + fileName);
     }

@@ -60,24 +60,24 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class TransportBindingTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
     static final String STAX_STSPORT2 = allocatePort(StaxSTSServer.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
     private static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     final TestParam test;
-    
+
     public TransportBindingTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -95,27 +95,27 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         STSServer stsServer = new STSServer();
         stsServer.setContext("cxf-transport.xml");
         assertTrue(launchServer(stsServer));
-        
+
         StaxSTSServer staxStsServer = new StaxSTSServer();
         staxStsServer.setContext("stax-cxf-transport.xml");
         assertTrue(launchServer(staxStsServer));
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT)},
                                                 {new TestParam(PORT, true, STSPORT)},
                                                 {new TestParam(STAX_PORT, false, STSPORT)},
                                                 {new TestParam(STAX_PORT, true, STSPORT)},
-                                                
+
                                                 {new TestParam(PORT, false, STAX_STSPORT)},
                                                 {new TestParam(PORT, true, STAX_STSPORT)},
                                                 {new TestParam(STAX_PORT, false, STAX_STSPORT)},
                                                 {new TestParam(STAX_PORT, true, STAX_STSPORT)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -135,22 +135,22 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, test.getStsPort());
 
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportSaml1Port);
         }
-        
+
         doubleIt(transportSaml1Port, 25);
-        
+
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSAML2() throws Exception {
 
@@ -164,22 +164,22 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
-        DoubleItPortType transportSaml2Port = 
+        DoubleItPortType transportSaml2Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml2Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)transportSaml2Port, test.getStsPort());
 
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportSaml2Port);
         }
-        
+
         doubleIt(transportSaml2Port, 25);
-        
+
         ((java.io.Closeable)transportSaml2Port).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * In this test-case, the client sends another cert to the STS for inclusion in the
      * SAML Assertion and connects via 2-way TLS as normal to the service provider. The
@@ -199,27 +199,27 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1Port");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, test.getPort());
 
         TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportSaml1Port);
         }
-        
+
         try {
             doubleIt(transportSaml1Port, 35);
             fail("Expected failure on an unknown client");
         } catch (javax.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSAML1Endorsing() throws Exception {
 
@@ -233,22 +233,22 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1EndorsingPort");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, test.getPort());
 
         TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportSaml1Port);
         }
-        
+
         doubleIt(transportSaml1Port, 25);
-        
+
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * In this test-case, the client sends a request for a Security Token with no
      * AppliesTo address (configured in Spring on the STSClient object). The STS fails as
@@ -267,31 +267,31 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1EndorsingPort");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, test.getPort());
 
         TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportSaml1Port);
         }
-        
+
         try {
             doubleIt(transportSaml1Port, 35);
             //fail("Expected failure on an unknown address");
         } catch (javax.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSAML2Dispatch() throws Exception {
-        
-        // Needed to prevent test failure using IBM JDK 
+
+        // Needed to prevent test failure using IBM JDK
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
             System.setProperty("https.protocols", "TLSv1");
         }
@@ -306,39 +306,39 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
-       
-        Dispatch<DOMSource> dispatch = 
+
+        Dispatch<DOMSource> dispatch =
             service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD);
         updateAddressPort(dispatch, test.getPort());
-        
+
         // Setup STSClient
         STSClient stsClient = createDispatchSTSClient(bus);
         String wsdlLocation = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
         stsClient.setWsdlLocation(wsdlLocation);
-        
+
         // Creating a DOMSource Object for the request
         DOMSource request = createDOMRequest();
-        
+
         // Make a successful request
         Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
         client.getRequestContext().put(SecurityConstants.USERNAME, "alice");
         client.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
-        
+
         if (test.isStreaming()) {
             client.getRequestContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
             client.getResponseContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
         }
-        
+
         DOMSource response = dispatch.invoke(request);
         assertNotNull(response);
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSAML2DispatchLocation() throws Exception {
-        
-        // Needed to prevent test failure using IBM JDK 
+
+        // Needed to prevent test failure using IBM JDK
         if ("IBM Corporation".equals(System.getProperty("java.vendor"))) {
             System.setProperty("https.protocols", "TLSv1");
         }
@@ -353,39 +353,39 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2Port");
-       
-        Dispatch<DOMSource> dispatch = 
+
+        Dispatch<DOMSource> dispatch =
             service.createDispatch(portQName, DOMSource.class, Service.Mode.PAYLOAD);
         updateAddressPort(dispatch, test.getPort());
-        
+
         // Setup STSClient
         STSClient stsClient = createDispatchSTSClient(bus);
         String location = "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport";
         stsClient.setLocation(location);
         stsClient.setPolicy("classpath:/org/apache/cxf/systest/sts/issuer/sts-transport-policy.xml");
-        
+
         // Creating a DOMSource Object for the request
         DOMSource request = createDOMRequest();
-        
+
         // Make a successful request
         Client client = ((DispatchImpl<DOMSource>) dispatch).getClient();
         client.getRequestContext().put(SecurityConstants.USERNAME, "alice");
         client.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
-        
+
         if (test.isStreaming()) {
             client.getRequestContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
             client.getResponseContext().put(SecurityConstants.ENABLE_STREAMING_SECURITY, "true");
         }
-        
+
         DOMSource response = dispatch.invoke(request);
         assertNotNull(response);
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSAML2EndorsingX509() throws Exception {
-        
+
         // Only works for DOM (clients)
         if (test.isStreaming()) {
             return;
@@ -401,22 +401,22 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = TransportBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2X509EndorsingPort");
-        DoubleItPortType transportSaml1Port = 
+        DoubleItPortType transportSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportSaml1Port, test.getPort());
 
         TokenTestUtils.updateSTSPort((BindingProvider)transportSaml1Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportSaml1Port);
         }
-        
+
         doubleIt(transportSaml1Port, 25);
-        
+
         ((java.io.Closeable)transportSaml1Port).close();
         bus.shutdown(true);
     }
-    
+
     private DOMSource createDOMRequest() throws ParserConfigurationException {
         // Creating a DOMSource Object for the request
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -430,12 +430,12 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         requestDoc.appendChild(root);
         return new DOMSource(requestDoc);
     }
-    
+
     private STSClient createDispatchSTSClient(Bus bus) {
         STSClient stsClient = new STSClient(bus);
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("security.username", "alice");
         properties.put("security.callback-handler",
@@ -444,11 +444,11 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         properties.put("ws-security.sts.token.properties", "clientKeystore.properties");
         properties.put("ws-security.sts.token.usecert", "true");
         stsClient.setProperties(properties);
-        
+
         return stsClient;
     }
-    
-    
+
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

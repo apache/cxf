@@ -24,7 +24,7 @@ import javax.jws.WebService;
 import org.apache.cxf.greeter_control.AbstractGreeterImpl;
 
 /**
- * 
+ *
  */
 
 @WebService(serviceName = "BasicGreeterService",

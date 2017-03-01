@@ -25,7 +25,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class StringUtilsTest extends Assert {
-    
+
     @Test
     public void testDiff() throws Exception {
         String str1 = "http://local/SoapContext/SoapPort/greetMe/me/CXF";
@@ -35,13 +35,13 @@ public class StringUtilsTest extends Assert {
         assertEquals("greetMe/me/CXF", StringUtils.diff(str1, str3));
         assertEquals("http://local/SoapContext/SoapPort/", StringUtils.diff(str3, str1));
     }
-    
+
     @Test
-    public void testGetFirstNotEmpty() throws Exception {        
+    public void testGetFirstNotEmpty() throws Exception {
         assertEquals("greetMe", StringUtils.getFirstNotEmpty("/greetMe/me/CXF", "/"));
         assertEquals("greetMe", StringUtils.getFirstNotEmpty("greetMe/me/CXF", "/"));
     }
-    
+
     @Test
     public void testGetParts() throws Exception {
         String str = "/greetMe/me/CXF";
@@ -51,7 +51,7 @@ public class StringUtilsTest extends Assert {
         assertEquals("me", parts.get(1));
         assertEquals("CXF", parts.get(2));
     }
-    
+
     @Test
     public void testGetPartsWithSingleSpace() throws Exception {
         String str = "a b";
@@ -60,7 +60,7 @@ public class StringUtilsTest extends Assert {
         assertEquals("a", parts.get(0));
         assertEquals("b", parts.get(1));
     }
-    
+
     @Test
     public void testGetPartsWithManySpaces() throws Exception {
         String str = "a  b";
@@ -69,7 +69,7 @@ public class StringUtilsTest extends Assert {
         assertEquals("a", parts.get(0));
         assertEquals("b", parts.get(1));
     }
-    
+
     @Test
     public void testSplitWithDot() throws Exception {
         String str = "a.b.c";
@@ -79,11 +79,11 @@ public class StringUtilsTest extends Assert {
         assertEquals("b", parts[1]);
         assertEquals("c", parts[2]);
     }
-    
+
     @Test
     public void testGetFound() throws Exception {
         String regex = "velocity-\\d+\\.\\d+\\.jar";
-        
+
         assertTrue(StringUtils.isEmpty(StringUtils.getFound("velocity-dep-1.4.jar", regex)));
         assertFalse(StringUtils.isEmpty(StringUtils.getFound("velocity-1.4.jar", regex)));
         assertTrue(StringUtils.isEmpty(StringUtils.getFound(null, regex)));
@@ -95,8 +95,8 @@ public class StringUtilsTest extends Assert {
         assertEquals("http://localhost:80/", StringUtils.addDefaultPortIfMissing("http://localhost/"));
         assertEquals("http://localhost:80/abc", StringUtils.addDefaultPortIfMissing("http://localhost/abc"));
         assertEquals("http://localhost:80", StringUtils.addDefaultPortIfMissing("http://localhost:80"));
-        
-        assertEquals("http://localhost:9090", 
+
+        assertEquals("http://localhost:9090",
                      StringUtils.addDefaultPortIfMissing("http://localhost", "9090"));
     }
 }

@@ -26,9 +26,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for addNumbers complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="addNumbers">
  *   &lt;complexContent>
@@ -41,8 +41,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 //CHECKSTYLE:OFF
 @XmlRootElement(name = "addNumbers",
@@ -59,7 +59,7 @@ public class AddNumbers {
 
     /**
      * Gets the value of the arg0 property.
-     * 
+     *
      */
     public int getArg0() {
         return arg0;
@@ -67,7 +67,7 @@ public class AddNumbers {
 
     /**
      * Sets the value of the arg0 property.
-     * 
+     *
      */
     public void setArg0(int value) {
         this.arg0 = value;
@@ -75,7 +75,7 @@ public class AddNumbers {
 
     /**
      * Gets the value of the arg1 property.
-     * 
+     *
      */
     public int getArg1() {
         return arg1;
@@ -83,7 +83,7 @@ public class AddNumbers {
 
     /**
      * Sets the value of the arg1 property.
-     * 
+     *
      */
     public void setArg1(int value) {
         this.arg1 = value;

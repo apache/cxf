@@ -35,13 +35,13 @@ public abstract class AbstractAegisIoImpl  {
     protected Schema schema;
     protected AegisContext aegisContext;
     protected Context context;
-    
+
     protected AbstractAegisIoImpl(AegisContext globalContext) {
         aegisContext = globalContext;
         context = new Context(globalContext);
         properties = new HashMap<String, Object>();
-    }  
-    
+    }
+
     /**
      * Due to the fact that the element data reader borrows this class, we need
      * a constructor that takes an existing context.
@@ -52,11 +52,11 @@ public abstract class AbstractAegisIoImpl  {
         aegisContext = globalContext;
         this.context = context;
         properties = new HashMap<String, Object>();
-    }  
-        
+    }
+
     /** {@inheritDoc}*/
     public void setProperty(String prop, Object value) {
-        if (DataReader.FAULT.equals(prop)) { 
+        if (DataReader.FAULT.equals(prop)) {
             context.setFault((Fault)value);
         }
     }
@@ -64,7 +64,7 @@ public abstract class AbstractAegisIoImpl  {
     /** {@inheritDoc}*/
     public void setSchema(Schema s) {
     }
-    
+
     public Context getContext() {
         return context;
     }

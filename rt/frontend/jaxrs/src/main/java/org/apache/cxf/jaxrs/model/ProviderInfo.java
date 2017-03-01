@@ -29,24 +29,24 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
     private T provider;
     private boolean custom;
     private boolean busGlobal;
-    
+
     public ProviderInfo(T provider, Bus bus, boolean custom) {
         this(provider, bus, true, custom);
     }
-    
+
     public ProviderInfo(T provider, Bus bus, boolean checkContexts, boolean custom) {
         this(provider, null, bus, checkContexts, custom);
     }
-    
-    public ProviderInfo(T provider, 
-                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
+
+    public ProviderInfo(T provider,
+                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
                         Bus bus,
                         boolean custom) {
         this(provider, constructorProxies, bus, true, custom);
     }
-    
-    public ProviderInfo(T provider, 
-                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
+
+    public ProviderInfo(T provider,
+                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
                         Bus bus,
                         boolean checkContexts,
                         boolean custom) {
@@ -54,7 +54,7 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
         this.provider = provider;
         this.custom = custom;
     }
-    
+
     @Override
     public boolean isSingleton() {
         return true;
@@ -63,7 +63,7 @@ public class ProviderInfo<T> extends AbstractResourceInfo {
     public T getProvider() {
         return provider;
     }
-    
+
     public boolean equals(Object obj) {
         if (!(obj instanceof ProviderInfo)) {
             return false;

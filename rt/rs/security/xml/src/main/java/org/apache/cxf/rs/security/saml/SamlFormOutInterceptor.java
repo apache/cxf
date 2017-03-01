@@ -39,31 +39,31 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.apache.wss4j.common.util.DOM2Writer;
 
 public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
-    private static final Logger LOG = 
+    private static final Logger LOG =
         LogUtils.getL7dLogger(SamlFormOutInterceptor.class);
     private static final String SAML_ELEMENT = "SAMLToken";
-    
+
     public SamlFormOutInterceptor() {
         this(Phase.WRITE);
     }
-    
+
     public SamlFormOutInterceptor(String phase) {
         super(phase);
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         Form form = getRequestForm(message);
         if (form == null) {
             return;
         }
-        
+
         try {
             SamlAssertionWrapper assertionWrapper = SAMLUtils.createAssertion(message);
-            
+
             Document doc = DOMUtils.newDocument();
             Element assertionElement = assertionWrapper.toDOM(doc);
             String encodedToken = encodeToken(DOM2Writer.nodeToString(assertionElement));
-                
+
             updateForm(form, encodedToken);
         } catch (Exception ex) {
             StringWriter sw = new StringWriter();
@@ -71,13 +71,13 @@ public class SamlFormOutInterceptor extends AbstractSamlOutInterceptor {
             LOG.warning(sw.toString());
             throw new Fault(new RuntimeException(ex.getMessage() + ", stacktrace: " + sw.toString()));
         }
-        
+
     }
-        
+
     protected void updateForm(Form form, String encodedToken) {
         form.param(SAML_ELEMENT, encodedToken);
     }
-    
+
     @SuppressWarnings("unchecked")
     protected Form getRequestForm(Message message) {
         Object ct = message.get(Message.CONTENT_TYPE);

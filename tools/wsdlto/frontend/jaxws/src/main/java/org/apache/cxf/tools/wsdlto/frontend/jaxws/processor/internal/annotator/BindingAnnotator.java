@@ -29,7 +29,7 @@ import org.apache.cxf.tools.common.model.JavaInterface;
 import org.apache.cxf.tools.common.model.JavaMethod;
 
 public final class BindingAnnotator implements Annotator {
-    
+
     public void annotate(JavaAnnotatable ja) {
         JavaInterface intf;
         if (ja instanceof JavaInterface) {
@@ -37,7 +37,7 @@ public final class BindingAnnotator implements Annotator {
         } else {
             throw new RuntimeException("BindingAnnotator can only annotate JavaInterface");
         }
-        
+
         if (processBinding(intf)) {
             JAnnotation bindingAnnotation = new JAnnotation(SOAPBinding.class);
             if (!SOAPBinding.Style.DOCUMENT.equals(intf.getSOAPStyle())) {
@@ -46,23 +46,23 @@ public final class BindingAnnotator implements Annotator {
             }
             if (!SOAPBinding.Use.LITERAL.equals(intf.getSOAPUse())) {
                 bindingAnnotation.addElement(new JAnnotationElement("use", intf.getSOAPUse()));
-            }            
+            }
             if (intf.getSOAPStyle() == SOAPBinding.Style.DOCUMENT
                 && intf.getSOAPParameterStyle() != SOAPBinding.ParameterStyle.WRAPPED) {
-                bindingAnnotation.addElement(new JAnnotationElement("parameterStyle", 
+                bindingAnnotation.addElement(new JAnnotationElement("parameterStyle",
                                                                      intf.getSOAPParameterStyle()));
             }
             intf.addAnnotation(bindingAnnotation);
         }
-        
-        
+
+
         for (JavaMethod method : intf.getMethods()) {
             if (!method.isAsync()) {
                 method.annotate(new SoapBindingAnnotator());
             }
         }
     }
-    
+
     private boolean processBinding(JavaInterface intf) {
         SOAPBinding.Style soapStyle = intf.getSOAPStyle();
         SOAPBinding.Use soapUse = intf.getSOAPUse();
@@ -92,7 +92,7 @@ public final class BindingAnnotator implements Annotator {
             } else {
                 allDOC = false;
             }
-          
+
             if (soapUse == null
                 && method.getSoapUse() != null) {
                 soapUse = method.getSoapUse();
@@ -101,7 +101,7 @@ public final class BindingAnnotator implements Annotator {
         if (allDOC) {
             soapStyle = SOAPBinding.Style.DOCUMENT;
         } else if (allRPC) {
-            soapStyle = SOAPBinding.Style.RPC;            
+            soapStyle = SOAPBinding.Style.RPC;
         }
 
         if (soapStyle == SOAPBinding.Style.DOCUMENT) {

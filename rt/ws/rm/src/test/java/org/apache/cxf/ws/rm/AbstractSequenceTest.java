@@ -29,18 +29,18 @@ public class AbstractSequenceTest extends Assert {
     @Test
     public void testIdentifierEquals() {
         Identifier id1 = null;
-        Identifier id2 = null;   
+        Identifier id2 = null;
         assertTrue(AbstractSequence.identifierEquals(id1, id2));
-        
+
         ObjectFactory factory = new ObjectFactory();
         id1 = factory.createIdentifier();
-        id1.setValue("seq1"); 
+        id1.setValue("seq1");
         assertTrue(!AbstractSequence.identifierEquals(id1, id2));
-        
+
         id2 = factory.createIdentifier();
-        id2.setValue("seq2"); 
+        id2.setValue("seq2");
         assertTrue(!AbstractSequence.identifierEquals(id1, id2));
-        
+
         id2.setValue("seq1");
         assertTrue(AbstractSequence.identifierEquals(id1, id2));
     }

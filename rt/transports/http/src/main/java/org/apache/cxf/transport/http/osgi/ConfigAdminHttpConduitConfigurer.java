@@ -32,44 +32,44 @@ import org.osgi.service.cm.ManagedServiceFactory;
 
 /**
  * Collects configuration information using a ManagedServiceFactory.
- * 
+ *
  * Registers a HTTPConduitConfigurer that can configure conduits based on the above
  * configuration data.
- * 
+ *
  * When used with felix config admin and fileinstall the configuration
  * is expected in files named org.apache.cxf.http.conduits-XYZ.cfg
  * that has a list of properties like:
- * 
+ *
  * url: Regex url to match the configuration
  * order: Integer order in which to apply the regex's when multiple regex's match.
  * client.*
  * tlsClientParameters.*
  * proxyAuthorization.*
  * authorization.*
- * 
- * Where each of those is a prefix for the attributes that would be on the elements 
+ *
+ * Where each of those is a prefix for the attributes that would be on the elements
  * of the http:conduit configuration defined at:
- * 
+ *
  * http://cxf.apache.org/schemas/configuration/http-conf.xsd
- * 
+ *
  * For example:
  * client.ReceiveTimeout: 1000
  * authorization.Username: Foo
  * tlsClientParameters.keyManagers.keyStore.file: mykeys.jks
  * etc....
- * 
+ *
  */
 class ConfigAdminHttpConduitConfigurer implements ManagedServiceFactory, HTTPConduitConfigurer {
-    public static final String FACTORY_PID = "org.apache.cxf.http.conduits"; 
+    public static final String FACTORY_PID = "org.apache.cxf.http.conduits";
 
     /**
-     * Stores the configuration data index by matcher and sorted by order 
+     * Stores the configuration data index by matcher and sorted by order
      */
     private static class PidInfo implements Comparable<PidInfo> {
         final Dictionary<String, String> props;
         final Matcher matcher;
         final int order;
-        
+
         PidInfo(Dictionary<String, String> p, Matcher m, int o) {
             matcher = m;
             props = p;
@@ -85,7 +85,7 @@ class ConfigAdminHttpConduitConfigurer implements ManagedServiceFactory, HTTPCon
         public int compareTo(PidInfo o) {
             if (order < o.order) {
                 return -1;
-            } else if (order > o.order) { 
+            } else if (order > o.order) {
                 return 1;
             }
             // priorities are equal
@@ -99,14 +99,14 @@ class ConfigAdminHttpConduitConfigurer implements ManagedServiceFactory, HTTPCon
         }
     }
 
-    Map<String, PidInfo> props 
+    Map<String, PidInfo> props
         = new ConcurrentHashMap<String, PidInfo>(4, 0.75f, 2);
     CopyOnWriteArrayList<PidInfo> sorted = new CopyOnWriteArrayList<PidInfo>();
 
     public String getName() {
         return FACTORY_PID;
     }
-    
+
     @SuppressWarnings("unchecked")
     public void updated(String pid, @SuppressWarnings("rawtypes") Dictionary properties)
         throws ConfigurationException {
@@ -119,13 +119,13 @@ class ConfigAdminHttpConduitConfigurer implements ManagedServiceFactory, HTTPCon
         String name = (String)properties.get("name");
         Matcher matcher = url == null ? null : Pattern.compile(url).matcher("");
         String p = (String)properties.get("order");
-        int order = 50; 
+        int order = 50;
         if (p != null) {
             order = Integer.parseInt(p);
         }
-        
+
         PidInfo info = new PidInfo(properties, matcher, order);
-        
+
         props.put(pid, info);
         if (url != null) {
             props.put(url, info);
@@ -182,7 +182,7 @@ class ConfigAdminHttpConduitConfigurer implements ManagedServiceFactory, HTTPCon
                 byAddress = null;
             }
         }
-        
+
         HttpConduitConfigApplier applier = new HttpConduitConfigApplier();
         for (PidInfo info : sorted) {
             if (info.getMatcher() != null
@@ -197,7 +197,7 @@ class ConfigAdminHttpConduitConfigurer implements ManagedServiceFactory, HTTPCon
                 }
             }
         }
-        
+
         if (byAddress != null) {
             applier.apply(byAddress.getProps(), c, address);
         }

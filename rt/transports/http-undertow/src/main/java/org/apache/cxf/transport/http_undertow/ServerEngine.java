@@ -23,7 +23,7 @@ import java.net.URL;
 
 
 public interface ServerEngine {
-    
+
     void addServant(URL url, UndertowHTTPHandler handler);
 
     /**

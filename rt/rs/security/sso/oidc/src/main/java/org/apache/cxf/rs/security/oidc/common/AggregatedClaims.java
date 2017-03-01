@@ -23,7 +23,7 @@ import java.util.Map;
 public class AggregatedClaims {
     private Map<String, String> claimNames;
     private Map<String, String> claimSources;
-    
+
     public Map<String, String> getClaimNames() {
         return claimNames;
     }

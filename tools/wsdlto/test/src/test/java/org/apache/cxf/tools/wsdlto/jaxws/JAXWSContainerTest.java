@@ -49,7 +49,7 @@ import org.junit.Test;
 
 public class JAXWSContainerTest extends ProcessorTestBase {
 
-    @Test    
+    @Test
     public void testCodeGen() {
         try {
             JAXWSContainer container = new JAXWSContainer(null);
@@ -58,10 +58,10 @@ public class JAXWSContainerTest extends ProcessorTestBase {
             // By default we only generate the SEI/Types/Exception classes/Service Class(client stub)
             // Uncomment to generate the impl class
             // context.put(ToolConstants.CFG_IMPL, "impl");
-        
+
             // Uncomment to compile the generated classes
             // context.put(ToolConstants.CFG_COMPILE, ToolConstants.CFG_COMPILE);
-            
+
             // Where to put the compiled classes
             // context.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");
 
@@ -132,8 +132,8 @@ public class JAXWSContainerTest extends ProcessorTestBase {
             e.printStackTrace();
         }
     }
-    
-    @Test    
+
+    @Test
     public void testSuppressCodeGen() {
         try {
             JAXWSContainer container = new JAXWSContainer(null);
@@ -189,13 +189,13 @@ public class JAXWSContainerTest extends ProcessorTestBase {
             }
             assertTrue(methodSame);
             assertNotNull(m1);
-            
+
             assertEquals(2, m1.getExceptions().size());
-            List<String> names = new ArrayList<String>();
+            List<String> names = new ArrayList<>();
             for (JavaException exc : m1.getExceptions()) {
                 names.add(exc.getName());
             }
-            
+
             assertTrue("BadRecordLitFault", names.contains("BadRecordLitFault"));
             assertTrue("NoSuchCodeLitFault", names.contains("NoSuchCodeLitFault"));
 
@@ -226,7 +226,7 @@ public class JAXWSContainerTest extends ProcessorTestBase {
         JAXWSContainer container = new JAXWSContainer(null);
         List<ServiceValidator> validators = container.getServiceValidators();
         assertNotNull(validators);
-        assertTrue(validators.size() > 0);
+        assertTrue(!validators.isEmpty());
     }
 
     protected String getLocation(String wsdlFile) throws URISyntaxException {

@@ -39,20 +39,20 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
     private final String resourcePath;
     private final String contextPath;
     private final int port;
-    
+
     protected AbstractJettyServer(final String contextPath, int portNumber) {
         this(null, contextPath, portNumber);
     }
-    
+
     protected AbstractJettyServer(final String resourcePath, final String contextPath, int portNumber) {
-        this.resourcePath = resourcePath; 
+        this.resourcePath = resourcePath;
         this.contextPath = contextPath;
         this.port = portNumber;
     }
-    
+
     protected void run() {
         server = new Server(port);
-            
+
         try {
             if (resourcePath == null) {
                 // Register and map the dispatcher servlet
@@ -64,31 +64,31 @@ public abstract class AbstractJettyServer extends AbstractBusTestServerBase {
                 context.setContextPath(contextPath);
                 context.addServlet(holder, "/rest/*");
                 server.setHandler(context);
-            } else {        
+            } else {
                 final WebAppContext context = new WebAppContext();
                 context.setContextPath(contextPath);
                 context.setWar(getClass().getResource(resourcePath).toURI().getPath());
-        
+
                 HandlerCollection handlers = new HandlerCollection();
                 handlers.setHandlers(new Handler[] {context, new DefaultHandler()});
                 server.setHandler(handlers);
-            }           
-        
+            }
+
             configureServer(server);
-            server.start();        
+            server.start();
         } catch (final Exception ex) {
             ex.printStackTrace();
             fail(ex.getMessage());
         }
     }
-    
+
     protected void configureServer(org.eclipse.jetty.server.Server theserver) throws Exception {
-        
+
     }
-        
+
     public void tearDown() throws Exception {
         super.tearDown();
-        
+
         if (server != null) {
             server.stop();
             server.destroy();

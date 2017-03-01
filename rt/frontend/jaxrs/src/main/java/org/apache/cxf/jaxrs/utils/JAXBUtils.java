@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 public final class JAXBUtils {
     private JAXBUtils() {
-        
+
     }
     public static void closeUnmarshaller(Unmarshaller u) {
         if (u instanceof Closeable) {
@@ -41,17 +41,17 @@ public final class JAXBUtils {
             } catch (IOException e) {
                 //ignore
             }
-        }        
+        }
     }
     public static Object convertWithAdapter(Object obj,
                                             Class<?> adapterClass,
                                             Annotation[] anns) {
-        return useAdapter(obj, 
+        return useAdapter(obj,
                           getAdapter(adapterClass, anns),
-                          false, 
+                          false,
                           obj);
     }
-    
+
     public static Class<?> getValueTypeFromAdapter(Class<?> expectedBoundType,
                                                    Class<?> defaultClass,
                                                    Annotation[] anns) {
@@ -66,7 +66,7 @@ public final class JAXBUtils {
         } catch (Throwable ex) {
             // ignore
         }
-        return defaultClass; 
+        return defaultClass;
     }
 
     public static XmlJavaTypeAdapter getAdapter(Class<?> objectClass, Annotation[] anns) {
@@ -76,13 +76,13 @@ public final class JAXBUtils {
             if (typeAdapter == null) {
                 // lets just try the 1st interface for now
                 Class<?>[] interfaces = objectClass.getInterfaces();
-                typeAdapter = interfaces.length > 0 
+                typeAdapter = interfaces.length > 0
                     ? interfaces[0].getAnnotation(XmlJavaTypeAdapter.class) : null;
             }
         }
         return typeAdapter;
     }
-    
+
     public static Class<?> getTypeFromAdapter(XmlJavaTypeAdapter adapter, Class<?> theType,
                                               boolean boundType) {
         if (adapter != null) {
@@ -98,16 +98,16 @@ public final class JAXBUtils {
         }
         return theType;
     }
-    
-    public static Object useAdapter(Object obj, 
-                                    XmlJavaTypeAdapter typeAdapter, 
+
+    public static Object useAdapter(Object obj,
+                                    XmlJavaTypeAdapter typeAdapter,
                                     boolean marshal) {
         return useAdapter(obj, typeAdapter, marshal, obj);
     }
-    
+
     @SuppressWarnings("unchecked")
-    public static Object useAdapter(Object obj, 
-                                    XmlJavaTypeAdapter typeAdapter, 
+    public static Object useAdapter(Object obj,
+                                    XmlJavaTypeAdapter typeAdapter,
                                     boolean marshal,
                                     Object defaultValue) {
         if (typeAdapter != null) {

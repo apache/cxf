@@ -35,20 +35,20 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
             .header(HttpHeaders.LAST_EVENT_ID_HEADER, 150)
             .get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        
+
         final String response = r.readEntity(String.class);
         assertThat(response, containsString("id: 151"));
         assertThat(response, containsString("data: " + toJson("New Book #151", 151)));
-        
+
         assertThat(response, containsString("id: 152"));
         assertThat(response, containsString("data: " + toJson("New Book #152", 152)));
-        
+
         assertThat(response, containsString("id: 152"));
         assertThat(response, containsString("data: " + toJson("New Book #153", 153)));
-        
+
         assertThat(response, containsString("id: 152"));
         assertThat(response, containsString("data: " + toJson("New Book #154", 154)));
-        
+
         r.close();
     }
 }

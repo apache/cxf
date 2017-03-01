@@ -84,7 +84,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         }
         WSDL_LOC = tmp;
     }
-    
+
     private static final QName GREETER_SERVICE_QNAME =
         new QName(
             "http://apache.org/hello_world_soap_http",
@@ -104,11 +104,11 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         );
 
     final TestParam test;
-    
+
     public WSSecurityClientTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -125,50 +125,50 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         );
         createStaticBus();
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(STAX_PORT, true)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-    
+
     @Test
     public void testUsernameToken() throws Exception {
-        final javax.xml.ws.Service svc 
+        final javax.xml.ws.Service svc
             = javax.xml.ws.Service.create(WSDL_LOC, GREETER_SERVICE_QNAME);
         final Greeter greeter = svc.getPort(USERNAME_TOKEN_PORT_QNAME, Greeter.class);
         updateAddressPort(greeter, test.getPort());
-        
+
         Client client = ClientProxy.getClient(greeter);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("action", "UsernameToken");
         props.put("user", "alice");
         props.put("passwordType", "PasswordText");
         WSS4JOutInterceptor wss4jOut = new WSS4JOutInterceptor(props);
-        
+
         client.getOutInterceptors().add(wss4jOut);
 
         ((BindingProvider)greeter).getRequestContext().put("password", "password");
-        
+
         try {
             greeter.greetMe("CXF");
             fail("should fail because of password text instead of digest");
         } catch (Exception ex) {
             //expected
         }
-        
+
         props.put("passwordType", "PasswordDigest");
         String s = greeter.greetMe("CXF");
         assertEquals("Hello CXF", s);
-        
+
         try {
             ((BindingProvider)greeter).getRequestContext().put("password", "foo");
             greeter.greetMe("CXF");
@@ -184,28 +184,28 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             //expected
         }
-        
+
         ((java.io.Closeable)greeter).close();
     }
-    
+
     @Test
     public void testUsernameTokenStreaming() throws Exception {
-        final javax.xml.ws.Service svc 
+        final javax.xml.ws.Service svc
             = javax.xml.ws.Service.create(WSDL_LOC, GREETER_SERVICE_QNAME);
         final Greeter greeter = svc.getPort(USERNAME_TOKEN_PORT_QNAME, Greeter.class);
         updateAddressPort(greeter, test.getPort());
-        
+
         Client client = ClientProxy.getClient(greeter);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("action", "UsernameToken");
         props.put("user", "alice");
         props.put("passwordType", "PasswordText");
         WSS4JStaxOutInterceptor wss4jOut = new WSS4JStaxOutInterceptor(props);
-        
+
         client.getOutInterceptors().add(wss4jOut);
 
         ((BindingProvider)greeter).getRequestContext().put("password", "password");
-        
+
         try {
             greeter.greetMe("CXF");
             fail("should fail because of password text instead of digest");
@@ -213,14 +213,14 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             //expected
         }
         client.getOutInterceptors().remove(wss4jOut);
-        
+
         props.put("passwordType", "PasswordDigest");
         wss4jOut = new WSS4JStaxOutInterceptor(props);
         client.getOutInterceptors().add(wss4jOut);
         String s = greeter.greetMe("CXF");
         assertEquals("Hello CXF", s);
         client.getOutInterceptors().remove(wss4jOut);
-        
+
         try {
             ((BindingProvider)greeter).getRequestContext().put("password", "foo");
             wss4jOut = new WSS4JStaxOutInterceptor(props);
@@ -242,7 +242,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             //expected
         }
         client.getOutInterceptors().remove(wss4jOut);
-        
+
         ((java.io.Closeable)greeter).close();
     }
 
@@ -266,7 +266,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         // with the explicitly configured SAAJOutInterceptor
         //
         @SuppressWarnings("rawtypes")
-        List<Handler> handlerChain = new ArrayList<Handler>();
+        List<Handler> handlerChain = new ArrayList<>();
         Binding binding = ((BindingProvider)greeter).getBinding();
         TestOutHandler handler = new TestOutHandler();
         handlerChain.add(handler);
@@ -274,9 +274,9 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
 
         greeter.sayHi();
 
-        assertTrue("expected Handler.handleMessage() to be called", 
+        assertTrue("expected Handler.handleMessage() to be called",
                    handler.handleMessageCalledOutbound);
-        assertFalse("expected Handler.handleFault() not to be called", 
+        assertFalse("expected Handler.handleFault() not to be called",
                     handler.handleFaultCalledOutbound);
         ((java.io.Closeable)greeter).close();
         b.shutdown(true);
@@ -297,7 +297,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         );
         result = source2String(dispatcher.invoke(new StreamSource(is)));
         assertTrue(result.indexOf("Fault") != -1);
-        
+
         //
         // Sending no security headers should result in a Fault
         //
@@ -326,12 +326,12 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         result = source2String(dispatcher.invoke(new StreamSource(is)));
         assertTrue(result.indexOf("Fault") != -1);
     }
-    
+
     @Test
     public void testDecoupledFaultFromSecurity() throws Exception {
         Dispatch<Source> dispatcher = null;
         java.io.InputStream is = null;
-        
+
         //
         // Sending no security headers should result in a Fault
         //
@@ -377,7 +377,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         );
         service.addPort(
             USERNAME_TOKEN_PORT_QNAME,
-            decoupled ? SOAPBinding.SOAP11HTTP_BINDING : HTTPBinding.HTTP_BINDING, 
+            decoupled ? SOAPBinding.SOAP11HTTP_BINDING : HTTPBinding.HTTP_BINDING,
             "http://localhost:" + port + "/GreeterService/UsernameTokenPort"
         );
         final Dispatch<Source> dispatcher = service.createDispatch(

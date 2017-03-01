@@ -70,7 +70,7 @@ public final class ClientNonSpring {
 
         System.out.println(wsdlURL);
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
-        Greeter port = ss.getPort(PORT_NAME, Greeter.class);        
+        Greeter port = ss.getPort(PORT_NAME, Greeter.class);
         if ("secure".equals(args[1])) {
             setupTLS(port);
         } else if ("insecure".equals(args[1])) {
@@ -79,7 +79,7 @@ public final class ClientNonSpring {
             System.out.println("arg1 needs to be either secure or insecure");
             System.exit(1);
         }
-        
+
         System.out.println("Invoking greetMe...");
         try {
             String resp = port.greetMe(System.getProperty("user.name"));
@@ -93,37 +93,37 @@ public final class ClientNonSpring {
 
         System.exit(0);
     }
-    
-    private static void setupTLS(Greeter port) 
+
+    private static void setupTLS(Greeter port)
         throws FileNotFoundException, IOException, GeneralSecurityException {
         String keyStoreLoc = "src/main/config/clientKeystore.jks";
         HTTPConduit httpConduit = (HTTPConduit) ClientProxy.getClient(port).getConduit();
- 
+
         TLSClientParameters tlsCP = new TLSClientParameters();
         String keyPassword = "ckpass";
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
         KeyManager[] myKeyManagers = getKeyManagers(keyStore, keyPassword);
         tlsCP.setKeyManagers(myKeyManagers);
- 
-        
+
+
         KeyStore trustStore = KeyStore.getInstance("JKS");
         trustStore.load(new FileInputStream(keyStoreLoc), "cspass".toCharArray());
         TrustManager[] myTrustStoreKeyManagers = getTrustManagers(trustStore);
         tlsCP.setTrustManagers(myTrustStoreKeyManagers);
-        
+
         httpConduit.setTlsClientParameters(tlsCP);
     }
 
-    private static TrustManager[] getTrustManagers(KeyStore trustStore) 
+    private static TrustManager[] getTrustManagers(KeyStore trustStore)
         throws NoSuchAlgorithmException, KeyStoreException {
         String alg = KeyManagerFactory.getDefaultAlgorithm();
         TrustManagerFactory fac = TrustManagerFactory.getInstance(alg);
         fac.init(trustStore);
         return fac.getTrustManagers();
     }
-    
-    private static KeyManager[] getKeyManagers(KeyStore keyStore, String keyPassword) 
+
+    private static KeyManager[] getKeyManagers(KeyStore keyStore, String keyPassword)
         throws GeneralSecurityException, IOException {
         String alg = KeyManagerFactory.getDefaultAlgorithm();
         char[] keyPass = keyPassword != null

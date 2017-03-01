@@ -83,7 +83,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     public void testCXF1969() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf1969/report_incident.wsdl"));
         //wsdl is invalid, but want to test some of the parsing of the invalid parts
-        env.remove(ToolConstants.CFG_VALIDATE_WSDL); 
+        env.remove(ToolConstants.CFG_VALIDATE_WSDL);
         processor.setContext(env);
 
         try {
@@ -225,11 +225,11 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/bug305772/hello_world.wsdl"));
         processor.setContext(env);
         processor.execute();
-        
+
         Path path = FileSystems.getDefault().getPath(output.getCanonicalPath(), "build.xml");
         assertTrue(Files.isReadable(path));
         String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-        
+
         assertTrue("wsdl location should be url style in build.xml", content.indexOf("param1=\"file:") > -1);
 
     }
@@ -498,7 +498,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         server.setHandler(reshandler);
         server.start();
         int port = ((NetworkConnector)server.getConnectors()[0]).getLocalPort();
-        env.put(ToolConstants.CFG_WSDLURL, "http://localhost:" 
+        env.put(ToolConstants.CFG_WSDLURL, "http://localhost:"
             + port + "/hello_world.wsdl");
         env.put(ToolConstants.CFG_BINDING, "http://localhost:"
             + port + "/remote-hello_world_binding.xsd");
@@ -811,7 +811,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     @Test
     public void testBindingForImportWSDL() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf1095/hello_world_services.wsdl"));
-        env.put(ToolConstants.CFG_BINDING, 
+        env.put(ToolConstants.CFG_BINDING,
                 new String[] {getLocation("/wsdl2java_wsdl/cxf1095/binding.xml"),
                               getLocation("/wsdl2java_wsdl/cxf1095/binding1.xml")});
         processor.setContext(env);
@@ -1168,7 +1168,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
             fail("shouldn't get exception");
         }
     }
-    
+
     @Test
     public void testCXF4128() throws Exception {
         try {
@@ -1183,7 +1183,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
             fail("shouldn't get exception");
         }
     }
-    
+
     @Test
     public void testCXF4452() throws Exception {
         try {

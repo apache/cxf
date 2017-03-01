@@ -27,20 +27,20 @@ import org.apache.cxf.ws.addressing.MessageIdCache;
 /**
  * An implementation that uses a simple set to store received message IDs.
  * Note that this implementation does not make any attempt to flush older
- * message IDs or to persist the message IDs outside of this instance. 
+ * message IDs or to persist the message IDs outside of this instance.
  */
 public class DefaultMessageIdCache implements MessageIdCache {
-    
+
     /**
      * The set of message IDs.
      */
-    private final Map<String, Boolean> messageIdSet = 
-        new ConcurrentHashMap<String, Boolean>();  
-    
+    private final Map<String, Boolean> messageIdSet =
+        new ConcurrentHashMap<String, Boolean>();
+
     public boolean checkUniquenessAndCacheId(String messageId) {
         return this.messageIdSet.put(messageId, Boolean.TRUE) == null;
     }
-    
+
     protected Set<String> getMessageIdSet() {
         return this.messageIdSet.keySet();
     }

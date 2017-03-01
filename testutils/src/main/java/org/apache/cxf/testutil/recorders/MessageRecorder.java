@@ -24,7 +24,7 @@ import java.util.List;
 import org.junit.Assert;
 
 public class MessageRecorder extends Assert {
-   
+
     private OutMessageRecorder outRecorder;
     private InMessageRecorder inRecorder;
 
@@ -32,12 +32,12 @@ public class MessageRecorder extends Assert {
         inRecorder = ir;
         outRecorder = or;
     }
- 
+
     public void awaitMessages(int nExpectedOut, int nExpectedIn, int timeout) {
         int waited = 0;
         int nOut = 0;
         int nIn = 0;
-        while (waited <= timeout) {                
+        while (waited <= timeout) {
             synchronized (outRecorder) {
                 nOut = outRecorder.getOutboundMessages().size();
             }
@@ -76,12 +76,12 @@ public class MessageRecorder extends Assert {
                 System.out.println("----------------\n");
             }
         }
-        
+
         if (nExpectedIn > nIn) {
             assertEquals("Did not receive expected number of inbound messages", nExpectedIn, nIn);
         }
         if (nExpectedOut > nOut) {
             assertEquals("Did not send expected number of outbound messages", nExpectedOut, nOut);
-        }        
-    }    
+        }
+    }
 }

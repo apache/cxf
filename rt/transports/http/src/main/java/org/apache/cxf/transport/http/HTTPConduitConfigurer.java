@@ -20,7 +20,7 @@
 package org.apache.cxf.transport.http;
 
 /**
- * 
+ *
  */
 public interface HTTPConduitConfigurer {
 

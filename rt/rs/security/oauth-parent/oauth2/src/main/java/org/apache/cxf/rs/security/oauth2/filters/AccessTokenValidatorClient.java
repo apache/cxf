@@ -38,15 +38,15 @@ public class AccessTokenValidatorClient implements AccessTokenValidator {
     private WebClient tokenValidatorClient;
     private List<String> supportedSchemes = new LinkedList<String>();
     public List<String> getSupportedAuthorizationSchemes() {
-        return supportedSchemes.isEmpty() 
-            ? Collections.singletonList(OAuthConstants.ALL_AUTH_SCHEMES) 
+        return supportedSchemes.isEmpty()
+            ? Collections.singletonList(OAuthConstants.ALL_AUTH_SCHEMES)
             : Collections.unmodifiableList(supportedSchemes);
     }
 
     public AccessTokenValidation validateAccessToken(MessageContext mc,
-                                                     String authScheme, 
+                                                     String authScheme,
                                                      String authSchemeData,
-                                                     MultivaluedMap<String, String> extraProps) 
+                                                     MultivaluedMap<String, String> extraProps)
         throws OAuthServiceException {
         WebClient client = WebClient.fromClient(tokenValidatorClient, true);
         MultivaluedMap<String, String> props = new MetadataMap<String, String>();

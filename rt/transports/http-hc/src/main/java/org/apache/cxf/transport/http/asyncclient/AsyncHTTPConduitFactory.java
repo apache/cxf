@@ -62,11 +62,11 @@ import org.apache.http.nio.reactor.IOSession;
 import org.apache.http.protocol.HttpContext;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
 public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
-    
+
     //TCP related properties
     public static final String TCP_NODELAY = "org.apache.cxf.transport.http.async.TCP_NODELAY";
     public static final String SO_KEEPALIVE = "org.apache.cxf.transport.http.async.SO_KEEPALIVE";
@@ -75,23 +75,23 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
     //ConnectionPool
     public static final String MAX_CONNECTIONS = "org.apache.cxf.transport.http.async.MAX_CONNECTIONS";
-    public static final String MAX_PER_HOST_CONNECTIONS 
+    public static final String MAX_PER_HOST_CONNECTIONS
         = "org.apache.cxf.transport.http.async.MAX_PER_HOST_CONNECTIONS";
     public static final String CONNECTION_TTL = "org.apache.cxf.transport.http.async.CONNECTION_TTL";
     public static final String CONNECTION_MAX_IDLE = "org.apache.cxf.transport.http.async.CONNECTION_MAX_IDLE";
-    
+
     //AsycClient specific props
     public static final String THREAD_COUNT = "org.apache.cxf.transport.http.async.ioThreadCount";
     public static final String INTEREST_OP_QUEUED = "org.apache.cxf.transport.http.async.interestOpQueued";
     public static final String SELECT_INTERVAL = "org.apache.cxf.transport.http.async.selectInterval";
-    
+
     //CXF specific
     public static final String USE_POLICY = "org.apache.cxf.transport.http.async.usePolicy";
-    
-    
+
+
     public enum UseAsyncPolicy {
         ALWAYS, ASYNC_ONLY, NEVER;
-        
+
         public static UseAsyncPolicy getPolicy(Object st) {
             if (st instanceof UseAsyncPolicy) {
                 return (UseAsyncPolicy)st;
@@ -113,7 +113,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
             return ASYNC_ONLY;
         }
     };
-        
+
     volatile PoolingNHttpClientConnectionManager connectionManager;
     volatile CloseableHttpAsyncClient client;
 
@@ -131,7 +131,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     int soTimeout = IOReactorConfig.DEFAULT.getSoTimeout();
     boolean soKeepalive = IOReactorConfig.DEFAULT.isSoKeepalive();
     boolean tcpNoDelay = true;
-   
+
 
     AsyncHTTPConduitFactory() {
         super();
@@ -141,20 +141,20 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         this();
         setProperties(conf);
     }
-    
+
     public AsyncHTTPConduitFactory(Bus b) {
         this();
         addListener(b);
         setProperties(b.getProperties());
     }
-    
+
     public UseAsyncPolicy getUseAsyncPolicy() {
         return policy;
     }
-    
+
     public void update(Map<String, Object> props) {
         if (setProperties(props) && client != null) {
-            restartReactor(); 
+            restartReactor();
         }
     }
 
@@ -167,7 +167,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         client = null;
         connectionManager = null;
     }
-    
+
 
     private boolean setProperties(Map<String, Object> s) {
         //properties that can be updated "live"
@@ -179,7 +179,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
             st = SystemPropertyAction.getPropertyOrNull(USE_POLICY);
         }
         policy = UseAsyncPolicy.getPolicy(st);
-        
+
         maxConnections = getInt(s.get(MAX_CONNECTIONS), maxConnections);
         connectionTTL = getInt(s.get(CONNECTION_TTL), connectionTTL);
         connectionMaxIdle = getInt(s.get(CONNECTION_MAX_IDLE), connectionMaxIdle);
@@ -189,14 +189,14 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
             connectionManager.setMaxTotal(maxConnections);
             connectionManager.setDefaultMaxPerRoute(maxPerRoute);
         }
-        
+
         //properties that need a restart of the reactor
         boolean changed = false;
-        
+
         int i = ioThreadCount;
         ioThreadCount = getInt(s.get(THREAD_COUNT), Runtime.getRuntime().availableProcessors());
         changed |= i != ioThreadCount;
-        
+
         long l = selectInterval;
         selectInterval = getInt(s.get(SELECT_INTERVAL), 1000);
         changed |= l != selectInterval;
@@ -212,7 +212,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         boolean b = interestOpQueued;
         interestOpQueued = getBoolean(s.get(INTEREST_OP_QUEUED), false);
         changed |= b != interestOpQueued;
-        
+
         b = tcpNoDelay;
         tcpNoDelay = getBoolean(s.get(TCP_NODELAY), true);
         changed |= b != tcpNoDelay;
@@ -220,7 +220,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         b = soKeepalive;
         soKeepalive = getBoolean(s.get(SO_KEEPALIVE), false);
         changed |= b != soKeepalive;
-                
+
         return changed;
     }
     private int getInt(Object s, int defaultv) {
@@ -235,7 +235,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
         }
         return i;
     }
-    
+
     private boolean getBoolean(Object s, boolean defaultv) {
         if (s instanceof String) {
             return Boolean.parseBoolean((String)s);
@@ -248,16 +248,16 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     public boolean isShutdown() {
         return isShutdown;
     }
-    
+
     @Override
     public HTTPConduit createConduit(HTTPTransportFactory f,
                                      Bus bus,
                                      EndpointInfo localInfo,
                                      EndpointReferenceType target) throws IOException {
-       
+
         return createConduit(bus, localInfo, target);
     }
-    
+
     public HTTPConduit createConduit(Bus bus,
                                      EndpointInfo localInfo,
                                      EndpointReferenceType target) throws IOException {
@@ -288,7 +288,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     private void addListener(Bus b) {
         BusLifeCycleManager manager = b.getExtension(BusLifeCycleManager.class);
         if (manager != null) {
-            
+
             manager.registerLifeCycleListener(new BusLifeCycleListener() {
                 public void initComplete() {
                 }
@@ -326,7 +326,7 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
 
             @Override
             public ManagedNHttpClientConnection create(final IOSession iosession, final ConnectionConfig config) {
-                ManagedNHttpClientConnection conn =  super.create(iosession, config);
+                ManagedNHttpClientConnection conn = super.create(iosession, config);
                 return conn;
             }
         };
@@ -369,9 +369,9 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
                 public void addCookie(Cookie cookie) {
                 }
             });
-        
+
         adaptClientBuilder(httpAsyncClientBuilder);
-        
+
         client = httpAsyncClientBuilder.build();
         // Start the client thread
         client.start();
@@ -383,9 +383,9 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
     }
 
     //provide a hook to customize the builder
-    protected void adaptClientBuilder(HttpAsyncClientBuilder httpAsyncClientBuilder) {    
+    protected void adaptClientBuilder(HttpAsyncClientBuilder httpAsyncClientBuilder) {
     }
-    
+
     public CloseableHttpAsyncClient createClient(final AsyncHTTPConduit c) throws IOException {
         if (client == null) {
             setupNIOClient(c.getClient());
@@ -421,6 +421,6 @@ public class AsyncHTTPConduitFactory implements HTTPConduitFactory {
                 // terminate
             }
         }
-        
+
     }
 }

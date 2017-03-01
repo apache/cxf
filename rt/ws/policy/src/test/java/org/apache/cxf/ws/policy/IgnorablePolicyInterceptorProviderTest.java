@@ -41,7 +41,7 @@ import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * 
+ *
  */
 public class IgnorablePolicyInterceptorProviderTest extends Assert {
     private static final QName ONEWAY_QNAME = new QName("http://tempuri.org/policy", "OneWay");

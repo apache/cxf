@@ -35,18 +35,18 @@ import org.apache.cxf.throttling.ThrottleResponse;
 import org.apache.cxf.throttling.ThrottlingFeature;
 import org.apache.cxf.throttling.ThrottlingManager;
 
-    
+
 public class BookServerThrottled extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookServerThrottled.class);
-     
+
     org.apache.cxf.endpoint.Server server;
     public BookServerThrottled() {
     }
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookStore.class);
-        List<Feature> features = new ArrayList<Feature>();
-        ThrottlingFeature tf = new ThrottlingFeature(new ThrottlingManagerImpl()); 
+        List<Feature> features = new ArrayList<>();
+        ThrottlingFeature tf = new ThrottlingFeature(new ThrottlingManagerImpl());
         features.add(tf);
         sf.setFeatures(features);
         sf.setResourceProvider(BookStore.class,
@@ -54,7 +54,7 @@ public class BookServerThrottled extends AbstractBusTestServerBase {
         sf.setAddress("http://localhost:" + PORT + "/");
         server = sf.create();
     }
-    
+
     public void tearDown() throws Exception {
         server.stop();
         server.destroy();
@@ -87,6 +87,6 @@ public class BookServerThrottled extends AbstractBusTestServerBase {
             }
             return new ThrottleResponse(503, 2000);
         }
-        
+
     }
 }

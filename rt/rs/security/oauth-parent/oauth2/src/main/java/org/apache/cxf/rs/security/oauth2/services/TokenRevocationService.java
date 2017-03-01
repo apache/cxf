@@ -35,17 +35,17 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  */
 @Path("/revoke")
 public class TokenRevocationService extends AbstractTokenService {
-    
+
     /**
      * Processes a token revocation request
-     * @param params the form parameters representing the access token grant 
-     * @return Access Token or the error 
+     * @param params the form parameters representing the access token grant
+     * @return Access Token or the error
      */
     @POST
     @Consumes("application/x-www-form-urlencoded")
     @Produces("application/json")
     public Response handleTokenRevocation(MultivaluedMap<String, String> params) {
-        
+
         // Make sure the client is authenticated
         Client client = authenticateClientIfNeeded(params);
         String token = params.getFirst(OAuthConstants.TOKEN_ID);
@@ -53,7 +53,7 @@ public class TokenRevocationService extends AbstractTokenService {
             return createErrorResponse(params, OAuthConstants.UNSUPPORTED_TOKEN_TYPE);
         }
         String tokenTypeHint = params.getFirst(OAuthConstants.TOKEN_TYPE_HINT);
-        if (tokenTypeHint != null 
+        if (tokenTypeHint != null
             && !OAuthConstants.ACCESS_TOKEN.equals(tokenTypeHint)
             && !OAuthConstants.REFRESH_TOKEN.equals(tokenTypeHint)) {
             return createErrorResponseFromErrorCode(OAuthConstants.UNSUPPORTED_TOKEN_TYPE);

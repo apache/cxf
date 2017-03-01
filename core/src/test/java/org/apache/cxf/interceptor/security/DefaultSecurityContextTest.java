@@ -41,7 +41,7 @@ public class DefaultSecurityContextTest extends Assert {
         s.getPrincipals().add(p);
         assertFalse(new DefaultSecurityContext(p, s).isUserInRole("friend"));
     }
-    
+
     @Test
     public void testUserInRole() {
         Subject s = new Subject();
@@ -50,33 +50,33 @@ public class DefaultSecurityContextTest extends Assert {
         s.getPrincipals().add(new SimpleGroup("friend", p));
         assertTrue(new DefaultSecurityContext(p, s).isUserInRole("friend"));
     }
-    
+
     @Test
     public void testMultipleRoles() {
         Subject s = new Subject();
         Principal p = new SimplePrincipal("Barry");
         s.getPrincipals().add(p);
-        
-        Set<Principal> roles = new HashSet<Principal>();
+
+        Set<Principal> roles = new HashSet<>();
         roles.add(new SimpleGroup("friend", p));
         roles.add(new SimpleGroup("admin", p));
         s.getPrincipals().addAll(roles);
-        
+
         LoginSecurityContext context = new DefaultSecurityContext(p, s);
         assertTrue(context.isUserInRole("friend"));
         assertTrue(context.isUserInRole("admin"));
         assertFalse(context.isUserInRole("bar"));
-        
-        Set<Principal> roles2 =  context.getUserRoles();
+
+        Set<Principal> roles2 = context.getUserRoles();
         assertEquals(roles2, roles);
     }
-    
+
     @Test
     public void testGetSubject() {
         Subject s = new Subject();
         assertSame(new DefaultSecurityContext(s).getSubject(), s);
     }
-    
+
     @Test
     public void testUserInRole2() {
         Subject s = new Subject();
@@ -87,7 +87,7 @@ public class DefaultSecurityContextTest extends Assert {
         s.getPrincipals().add(group);
         assertTrue(new DefaultSecurityContext(p, s).isUserInRole("friend"));
     }
-    
+
     @Test
     public void testUserInRole3() {
         Subject s = new Subject();
@@ -108,10 +108,10 @@ public class DefaultSecurityContextTest extends Assert {
         s.getPrincipals().add(p);
         Principal role = new SimplePrincipal("friend");
         s.getPrincipals().add(role);
-        LoginSecurityContext context = new DefaultSecurityContext(p, s); 
+        LoginSecurityContext context = new DefaultSecurityContext(p, s);
         assertTrue(context.isUserInRole("friend"));
         assertFalse(context.isUserInRole("family"));
         assertFalse(context.isUserInRole("Barry"));
     }
-    
+
 }

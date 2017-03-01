@@ -72,27 +72,27 @@ public class JPACodeDataProviderTest extends Assert {
     @Test
     public void testAddGetDeleteCodeGrants() {
         Client c = addClient("111", "bob");
-        
+
         AuthorizationCodeRegistration atr = new AuthorizationCodeRegistration();
         atr.setClient(c);
         atr.setApprovedScope(Collections.singletonList("a"));
         atr.setSubject(c.getResourceOwnerSubject());
-        
+
         ServerAuthorizationCodeGrant grant = getProvider().createCodeGrant(atr);
-        
+
         List<ServerAuthorizationCodeGrant> grants = getProvider().getCodeGrants(c, c.getResourceOwnerSubject());
         assertNotNull(grants);
         assertEquals(1, grants.size());
         assertEquals(grant.getCode(), grants.get(0).getCode());
-        
+
         grants = getProvider().getCodeGrants(c, null);
         assertNotNull(grants);
         assertEquals(1, grants.size());
         assertEquals(grant.getCode(), grants.get(0).getCode());
-        
+
         ServerAuthorizationCodeGrant grant2 = getProvider().removeCodeGrant(grant.getCode());
         assertEquals(grant.getCode(), grant2.getCode());
-        
+
         grants = getProvider().getCodeGrants(c, null);
         assertNotNull(grants);
         assertEquals(0, grants.size());
@@ -106,18 +106,18 @@ public class JPACodeDataProviderTest extends Assert {
         Client savedClient = getProvider().getClient(c.getClientId());
         assertEquals(c.getClientSecret(), savedClient.getClientSecret());
     }
-    
+
     @Test
     public void testAddGetDeleteCodeGrants2() {
         Client c = addClient("111", "bob");
-        
+
         AuthorizationCodeRegistration atr = new AuthorizationCodeRegistration();
         atr.setClient(c);
         atr.setApprovedScope(Collections.singletonList("a"));
         atr.setSubject(c.getResourceOwnerSubject());
-        
+
         getProvider().createCodeGrant(atr);
-        
+
         List<ServerAuthorizationCodeGrant> grants = getProvider().getCodeGrants(c, c.getResourceOwnerSubject());
         assertNotNull(grants);
         assertEquals(1, grants.size());
@@ -126,7 +126,7 @@ public class JPACodeDataProviderTest extends Assert {
         assertNotNull(grants);
         assertEquals(0, grants.size());
     }
-    
+
     private Client addClient(String clientId, String userLogin) {
         Client c = new Client();
         c.setRedirectUris(Collections.singletonList("http://client/redirect"));
@@ -146,8 +146,8 @@ public class JPACodeDataProviderTest extends Assert {
                 emFactory.close();
             }
         } catch (Throwable ex) {
-            ex.printStackTrace();    
-        } finally {    
+            ex.printStackTrace();
+        } finally {
             try {
                 connection.createStatement().execute("SHUTDOWN");
             } catch (Throwable ex) {
@@ -155,5 +155,5 @@ public class JPACodeDataProviderTest extends Assert {
             }
         }
     }
-    
+
 }

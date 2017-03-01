@@ -32,7 +32,7 @@ public class ColocOutFaultObserver extends OutFaultChainInitiatorObserver {
     public ColocOutFaultObserver(Bus bus) {
         super(bus);
         list = new TreeSet<Phase>(bus.getExtension(PhaseManager.class).getOutPhases());
-        ColocUtil.setPhases(list, Phase.SETUP, Phase.USER_LOGICAL);        
+        ColocUtil.setPhases(list, Phase.SETUP, Phase.USER_LOGICAL);
     }
 
     protected SortedSet<Phase> getPhases() {

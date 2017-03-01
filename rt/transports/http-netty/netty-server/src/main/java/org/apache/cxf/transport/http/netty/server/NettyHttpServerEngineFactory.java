@@ -49,27 +49,27 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
     private Bus bus;
 
     private BusLifeCycleManager lifeCycleManager;
-    
+
     /**
      * This map holds the threading parameters that are to be applied
      * to new Engines when bound to the reference id.
      */
     private Map<String, ThreadingParameters> threadingParametersMap =
         new TreeMap<String, ThreadingParameters>();
-    
-    private Map<String, TLSServerParameters> tlsServerParametersMap = 
+
+    private Map<String, TLSServerParameters> tlsServerParametersMap =
         new TreeMap<String, TLSServerParameters>();
 
     public NettyHttpServerEngineFactory() {
         // Empty
     }
-    
+
     public NettyHttpServerEngineFactory(Bus b) {
         setBus(b);
     }
-    
-    public NettyHttpServerEngineFactory(Bus b, 
-                                        Map<String, TLSServerParameters> tls, 
+
+    public NettyHttpServerEngineFactory(Bus b,
+                                        Map<String, TLSServerParameters> tls,
                                         Map<String, ThreadingParameters> threads) {
         setBus(b);
         tlsServerParametersMap = tls;
@@ -96,7 +96,7 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
             }
         }
     }
-    
+
     public Map<String, TLSServerParameters> getTlsServerParametersMap() {
         return tlsServerParametersMap;
     }
@@ -104,21 +104,21 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
     public void setTlsServerParameters(Map<String, TLSServerParameters> tlsParametersMap) {
         this.tlsServerParametersMap = tlsParametersMap;
     }
-    
+
     public Map<String, ThreadingParameters> getThreadingParametersMap() {
         return threadingParametersMap;
     }
-    
+
     public void setThreadingParametersMap(Map<String, ThreadingParameters> parameterMap) {
         this.threadingParametersMap = parameterMap;
     }
-    
+
     public void setEnginesList(List<NettyHttpServerEngine> enginesList) {
         for (NettyHttpServerEngine engine : enginesList) {
             portMap.putIfAbsent(engine.getPort(), engine);
-        }    
+        }
     }
-    
+
 
     public void initComplete() {
         // do nothing here
@@ -174,7 +174,7 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
                                                                           String protocol) throws IOException {
         LOG.log(Level.FINE, "CREATING_NETTY_SERVER_ENGINE",  port);
         TLSServerParameters tlsServerParameters = null;
-        if (protocol.equals("https") && tlsServerParametersMap != null) {
+        if ("https".equals(protocol) && tlsServerParametersMap != null) {
             tlsServerParameters = tlsServerParametersMap.get(Integer.toString(port));
         }
         NettyHttpServerEngine ref = getOrCreate(this, host, port, tlsServerParameters);
@@ -210,5 +210,5 @@ public class NettyHttpServerEngineFactory implements BusLifeCycleListener {
         }
     }
 
-   
+
 }

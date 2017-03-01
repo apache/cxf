@@ -37,18 +37,18 @@ public class RSPAssertionBuilder implements AssertionBuilder<Element> {
     public static final String CONFORMANT_NAME = "Conformant";
     public static final String RSP_NAMESPACE = "http://ws-i.org/profiles/rsp/1.0/";
     public static final QName CONFORMANT_QNAME = new QName(RSP_NAMESPACE, CONFORMANT_NAME);
-    
+
     public static final QName[] KNOWN_ELEMENTS = {
         CONFORMANT_QNAME
     };
-    
+
     /**
      * @see org.apache.neethi.builders.AssertionBuilder#getKnownElements()
      */
     public QName[] getKnownElements() {
         return KNOWN_ELEMENTS;
     }
-    
+
     /**
      * @see org.apache.neethi.builders.AssertionBuilder#build(org.w3c.dom.Element,
      *  org.apache.neethi.AssertionBuilderFactory)

@@ -40,25 +40,25 @@ import org.apache.cxf.service.model.ServiceInfo;
 
 import static org.apache.cxf.helpers.CastUtils.cast;
 
-public abstract class AbstractWSDLBindingFactory extends AbstractBindingFactory 
+public abstract class AbstractWSDLBindingFactory extends AbstractBindingFactory
                       implements WSDLBindingFactory {
 
     public AbstractWSDLBindingFactory() {
     }
-    
+
     public AbstractWSDLBindingFactory(Collection<String> ns) {
         super(ns);
     }
-    
+
     public AbstractWSDLBindingFactory(Bus b) {
         super(b);
     }
-    
+
     public AbstractWSDLBindingFactory(Bus b, Collection<String> ns) {
         super(b, ns);
     }
-    
-    
+
+
     /**
      * Copies extensors from the Binding to BindingInfo.
      * @param service

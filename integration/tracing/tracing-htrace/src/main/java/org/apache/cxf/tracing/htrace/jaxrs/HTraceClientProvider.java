@@ -31,29 +31,28 @@ import org.apache.htrace.core.TraceScope;
 import org.apache.htrace.core.Tracer;
 
 @Provider
-public class HTraceClientProvider extends AbstractHTraceClientProvider 
+public class HTraceClientProvider extends AbstractHTraceClientProvider
         implements ClientRequestFilter, ClientResponseFilter {
-    private static final String TRACE_SPAN = "org.apache.cxf.tracing.client.htrace.span";
-    
+
     public HTraceClientProvider(final Tracer tracer) {
         super(tracer);
     }
 
     @Override
     public void filter(final ClientRequestContext requestContext) throws IOException {
-        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(requestContext.getStringHeaders(), 
+        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(requestContext.getStringHeaders(),
             requestContext.getUri().toString(), requestContext.getMethod());
 
         if (holder != null) {
             requestContext.setProperty(TRACE_SPAN, holder);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public void filter(final ClientRequestContext requestContext,
             final ClientResponseContext responseContext) throws IOException {
-        final TraceScopeHolder<TraceScope> holder = 
+        final TraceScopeHolder<TraceScope> holder =
             (TraceScopeHolder<TraceScope>)requestContext.getProperty(TRACE_SPAN);
         super.stopTraceSpan(holder);
     }

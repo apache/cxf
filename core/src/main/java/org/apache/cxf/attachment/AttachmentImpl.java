@@ -37,7 +37,7 @@ public class AttachmentImpl implements Attachment {
     public AttachmentImpl(String idParam) {
         this.id = idParam;
     }
-    
+
     public AttachmentImpl(String idParam, DataHandler handlerParam) {
         this.id = idParam;
         this.dataHandler = handlerParam;
@@ -65,7 +65,7 @@ public class AttachmentImpl implements Attachment {
         String value = headers.get(name);
         return value == null ? headers.get(name.toLowerCase()) : value;
     }
-    
+
     public Iterator<String> getHeaderNames() {
         return headers.keySet().iterator();
     }

@@ -53,14 +53,14 @@ public class WebParamAnnotatorTest extends Assert {
         param.setQName(new QName("http://apache.org/cxf", "x"));
         param.setPartName("y");
     }
-    
+
     @Test
     public void testAnnotateDOCWrapped() throws Exception {
         init(method, parameter, SOAPBinding.Style.DOCUMENT, true);
         parameter.annotate(new WebParamAnnotator());
 
         JAnnotation annotation = parameter.getAnnotation("WebParam");
-        assertEquals("@WebParam(name = \"x\", targetNamespace = \"http://apache.org/cxf\")", 
+        assertEquals("@WebParam(name = \"x\", targetNamespace = \"http://apache.org/cxf\")",
                          annotation.toString());
         List<JAnnotationElement> elements = annotation.getElements();
         assertEquals(2, elements.size());
@@ -79,8 +79,8 @@ public class WebParamAnnotatorTest extends Assert {
         parameter.annotate(new WebParamAnnotator());
 
         JAnnotation annotation = parameter.getAnnotation("WebParam");
-        assertEquals("@WebParam(partName = \"y\", name = \"x\", " 
-                     + "targetNamespace = \"http://apache.org/cxf\")", 
+        assertEquals("@WebParam(partName = \"y\", name = \"x\", "
+                     + "targetNamespace = \"http://apache.org/cxf\")",
                          annotation.toString());
         List<JAnnotationElement> elements = annotation.getElements();
         assertEquals(3, elements.size());

@@ -51,7 +51,7 @@ public class OutboundSseEventBodyWriter implements MessageBodyWriter<OutboundSse
 
     private ServerProviderFactory factory;
     private Message message;
-    
+
     protected OutboundSseEventBodyWriter() {
     }
 
@@ -61,35 +61,35 @@ public class OutboundSseEventBodyWriter implements MessageBodyWriter<OutboundSse
         this.message.setExchange(exchange);
     }
 
-    
+
     @Override
     public boolean isWriteable(Class<?> cls, Type type, Annotation[] anns, MediaType mt) {
         return OutboundSseEvent.class.isAssignableFrom(cls) || SERVER_SENT_EVENTS_TYPE.isCompatible(mt);
     }
-    
+
     @Override
     public void writeTo(OutboundSseEvent p, Class<?> cls, Type t, Annotation[] anns,
-            MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
+            MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
                 throws IOException, WebApplicationException {
-        
+
         if (p.getName() != null) {
             os.write(EVENT);
             os.write(p.getName().getBytes(StandardCharsets.UTF_8));
             os.write(NEW_LINE);
         }
-        
+
         if (p.getId() != null) {
             os.write(ID);
             os.write(p.getId().getBytes(StandardCharsets.UTF_8));
             os.write(NEW_LINE);
         }
-        
+
         if (p.getComment() != null) {
             os.write(COMMENT);
             os.write(p.getComment().getBytes(StandardCharsets.UTF_8));
             os.write(NEW_LINE);
         }
-        
+
         if (p.getReconnectDelay() > 0) {
             os.write(RETRY);
             os.write(Long.toString(p.getReconnectDelay()).getBytes(StandardCharsets.UTF_8));
@@ -102,37 +102,37 @@ public class OutboundSseEventBodyWriter implements MessageBodyWriter<OutboundSse
             if (payloadType == null) {
                 payloadType = payloadClass;
             }
-            
+
             if (payloadType == null && payloadClass == null) {
                 payloadType = Object.class;
                 payloadClass = Object.class;
             }
-            
+
             os.write(DATA);
             writePayloadTo(payloadClass, payloadType, anns, p.getMediaType(), headers, p.getData(), os);
             os.write(NEW_LINE);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
-    private<T> void writePayloadTo(Class<T> cls, Type type, Annotation[] anns, MediaType mt, 
-            MultivaluedMap<String, Object> headers, Object data, OutputStream os) 
+    private<T> void writePayloadTo(Class<T> cls, Type type, Annotation[] anns, MediaType mt,
+            MultivaluedMap<String, Object> headers, Object data, OutputStream os)
                 throws IOException, WebApplicationException {
-        
+
         MessageBodyWriter<T> writer = null;
         if (message != null && factory != null) {
             writer = factory.createMessageBodyWriter(cls, type, anns, mt, message);
         }
-        
+
         if (writer == null) {
             throw new InternalServerErrorException("No suitable message body writer for class: " + cls.getName());
         }
-        
+
         writer.writeTo((T)data, cls, type, anns, mt, headers, os);
     }
-    
+
     @Override
-    public long getSize(OutboundSseEvent t, Class<?> type, Type genericType, Annotation[] annotations, 
+    public long getSize(OutboundSseEvent t, Class<?> type, Type genericType, Annotation[] annotations,
             MediaType mediaType) {
         return -1;
     }

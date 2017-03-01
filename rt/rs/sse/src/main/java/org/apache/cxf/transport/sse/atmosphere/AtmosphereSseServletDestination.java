@@ -20,6 +20,10 @@
 package org.apache.cxf.transport.sse.atmosphere;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,13 +32,17 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.sse.SseFeature;
 import org.apache.cxf.jaxrs.sse.atmosphere.SseAtmosphereInterceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
+import org.apache.cxf.transport.http.Headers;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.atmosphere.cache.UUIDBroadcasterCache;
 import org.atmosphere.cpr.ApplicationConfig;
@@ -49,10 +57,10 @@ public class AtmosphereSseServletDestination extends ServletDestination {
 
     private AtmosphereFramework framework;
 
-    public AtmosphereSseServletDestination(Bus bus, DestinationRegistry registry, 
+    public AtmosphereSseServletDestination(Bus bus, DestinationRegistry registry,
             EndpointInfo ei, String path) throws IOException {
         super(bus, registry, ei, path);
-        
+
         framework = new AtmosphereFramework(true, false);
         framework.interceptor(new SseAtmosphereInterceptor());
         framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
@@ -62,7 +70,7 @@ public class AtmosphereSseServletDestination extends ServletDestination {
         framework.setBroadcasterCacheClassName(UUIDBroadcasterCache.class.getName());
         framework.addAtmosphereHandler("/", new DestinationHandler());
         framework.init();
-        
+
         bus.getFeatures().add(new SseFeature());
     }
 
@@ -75,7 +83,7 @@ public class AtmosphereSseServletDestination extends ServletDestination {
             throw new IOException(e);
         }
     }
-    
+
     @Override
     public void shutdown() {
         try {
@@ -97,6 +105,34 @@ public class AtmosphereSseServletDestination extends ServletDestination {
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Failed to invoke service", e);
             }
+        }
+    }
+
+    @Override
+    protected OutputStream flushHeaders(Message outMessage, boolean getStream) throws IOException {
+        adjustContentLength(outMessage);
+        return super.flushHeaders(outMessage, getStream);
+    }
+
+    @Override
+    protected OutputStream flushHeaders(Message outMessage) throws IOException {
+        adjustContentLength(outMessage);
+        return super.flushHeaders(outMessage);
+    }
+
+    /**
+     * It has been noticed that Jetty checks the "Content-Length" header and completes the
+     * response if its value is 0 (or matches the number of bytes written). However, in case
+     * of SSE the content length is unknown so we are setting it to -1 before flushing the
+     * response. Otherwise, only the first event is going to be sent and response is going to
+     * be closed.
+     */
+    private void adjustContentLength(Message outMessage) {
+        final String contentType = (String)outMessage.get(Message.CONTENT_TYPE);
+
+        if (MediaType.SERVER_SENT_EVENTS.equalsIgnoreCase(contentType)) {
+            final Map<String, List<String>> headers = Headers.getSetProtocolHeaders(outMessage);
+            headers.put(HttpHeaders.CONTENT_LENGTH, Collections.singletonList("-1"));
         }
     }
 }

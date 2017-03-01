@@ -44,7 +44,7 @@ import org.junit.BeforeClass;
  */
 public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(BSTServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
@@ -57,13 +57,13 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
             launchServer(BSTServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-    
+
     @org.junit.Test
     public void testBinarySecurityToken() throws Exception {
 
@@ -76,29 +76,29 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = BinarySecurityTokenTest.class.getResource("DoubleItTokens.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-       
+
         // Successful invocation
         QName portQName = new QName(NAMESPACE, "DoubleItBinarySecurityTokenPort");
         DoubleItPortType port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         // Mock up a BinarySecurityToken to add
         SecurityToken securityToken = new SecurityToken();
         securityToken.setId("_" + UUID.randomUUID().toString());
-        
+
         Document doc = DOMUtils.newDocument();
         BinarySecurity binarySecurity = new BinarySecurity(doc);
         binarySecurity.setValueType("http://custom-value-type");
         binarySecurity.setToken("This is a token".getBytes());
-        
+
         securityToken.setToken(binarySecurity.getElement());
-        
+
         ((BindingProvider)port).getRequestContext().put(SecurityConstants.TOKEN, securityToken);
-        
+
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
 }

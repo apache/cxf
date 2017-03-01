@@ -54,32 +54,32 @@ import org.apache.maven.project.MavenProjectHelper;
  * @threadSafe
 */
 public class Java2WADLMojo extends AbstractMojo {
-    
+
     public static final String WADL_NS = "http://wadl.dev.java.net/2009/02";
-   
-    
-        
-    private List<ClassResourceInfo> classResourceInfos = new ArrayList<ClassResourceInfo>();
-    
-        
+
+
+
+    private List<ClassResourceInfo> classResourceInfos = new ArrayList<>();
+
+
     /**
      * @parameter
      */
     private String outputFile;
 
-   
-    
+
+
     /**
      * @parameter
      */
     private String address;
-    
+
     /**
      * @parameter
      */
     private String docProvider;
-    
-    
+
+
     /**
      * Attach the generated wadl file to the list of files to be deployed
      * on install. This means the wadl file will be copied to the repository
@@ -90,8 +90,8 @@ public class Java2WADLMojo extends AbstractMojo {
      * @parameter default-value="true"
      */
     private Boolean attachWadl;
-    
-    
+
+
     /**
      * @parameter
      */
@@ -102,19 +102,19 @@ public class Java2WADLMojo extends AbstractMojo {
      * @required
      */
     private List<String> classResourceNames;
-    
+
     /**
      * @parameter
      */
     private String basePackages;
-    
+
     /**
      * @parameter expression="${project}"
      * @required
      */
     private MavenProject project;
-    
-    
+
+
     /**
      * Maven ProjectHelper.
      *
@@ -133,42 +133,42 @@ public class Java2WADLMojo extends AbstractMojo {
      * @parameter default-value="true"
      */
     private boolean incrementNamespacePrefix;
-    
+
     /**
      * @parameter default-value="true"
      */
     private boolean singleResourceMultipleMethods;
-   
+
     /**
      * @parameter default-value="false"
      */
     private boolean useSingleSlashResource;
-    
+
     /**
      * @parameter default-value="false"
      */
     private boolean includeDefaultWadlSchemaLocation;
-    
+
     /**
      * @parameter default-value="false"
      */
     private boolean ignoreForwardSlash;
-    
+
     /**
      * @parameter default-value="false"
      */
     private boolean addResourceAndMethodIds;
-    
+
     /**
      * @parameter default-value="false"
      */
     private boolean linkAnyMediaTypeToXmlSchema;
-    
+
     /**
      * @parameter default-value="false"
      */
     private boolean checkAbsolutePathSlash;
-    
+
     /**
      * @parameter default-value="false"
      */
@@ -179,12 +179,12 @@ public class Java2WADLMojo extends AbstractMojo {
      */
     private boolean useJaxbContextForQnames;
 
-    
+
     /**
      * @parameter default-value="true"
      */
     private boolean usePathParamsToCompareOperations;
-    
+
     /**
      * @parameter default-value="true"
      */
@@ -199,34 +199,34 @@ public class Java2WADLMojo extends AbstractMojo {
      * @parameter default-value="true"
      */
     private boolean supportJaxbSubstitutions;
-    
+
     /**
      * @parameter
      */
     private String applicationTitle;
-    
+
     /**
      * @parameter
      */
     private String namespacePrefix;
-    
+
     /**
-     * @parameter 
+     * @parameter
      */
     private String outputFileName;
-    
+
     /**
      * @parameter default-value="wadl"
      */
     private String outputFileExtension;
-    
+
     /**
      * @parameter
      */
     private String stylesheetReference;
-    
+
     private ClassLoader resourceClassLoader;
-    
+
     public void execute() throws MojoExecutionException {
         List<Class<?>> resourceClasses = loadResourceClasses();
         initClassResourceInfoList(resourceClasses);
@@ -243,12 +243,12 @@ public class Java2WADLMojo extends AbstractMojo {
             }
         }
         setExtraProperties(wadlGenerator);
-        
+
         StringBuilder sbMain = wadlGenerator.generateWADL(getBaseURI(), classResourceInfos, useJson, null, null);
         getLog().debug("the wadl is =====> \n" + sbMain.toString());
         generateWadl(resourceClasses, sbMain.toString());
     }
-    
+
     private void setExtraProperties(WadlGenerator wg) {
         wg.setSingleResourceMultipleMethods(singleResourceMultipleMethods);
         wg.setIncrementNamespacePrefix(incrementNamespacePrefix);
@@ -266,18 +266,18 @@ public class Java2WADLMojo extends AbstractMojo {
         wg.setSupportJaxbSubstitutions(supportJaxbSubstitutions);
         if (applicationTitle != null) {
             wg.setApplicationTitle(applicationTitle);
-        } 
+        }
         if (namespacePrefix != null) {
             wg.setNamespacePrefix(namespacePrefix);
         }
         wg.setStylesheetReference(stylesheetReference);
     }
-    
+
     private void generateWadl(List<Class<?>> resourceClasses, String wadl) throws MojoExecutionException {
-     
+
         if (outputFile == null && project != null) {
             // Put the wadl in target/generated/wadl
-            
+
             String name = null;
             if (outputFileName != null) {
                 name = outputFileName;
@@ -286,10 +286,10 @@ public class Java2WADLMojo extends AbstractMojo {
             } else {
                 name = "application";
             }
-            outputFile = (project.getBuild().getDirectory() + "/generated/wadl/" + name + "." 
+            outputFile = (project.getBuild().getDirectory() + "/generated/wadl/" + name + "."
                 + outputFileExtension).replace("/", File.separator);
         }
-        
+
         BufferedWriter writer = null;
         try {
             FileUtils.mkDir(new File(outputFile).getParentFile());
@@ -321,7 +321,7 @@ public class Java2WADLMojo extends AbstractMojo {
                 } else {
                     projectHelper.attachArtifact(project, "wadl", wadlFile);
                 }
-                
+
             }
         }
     }
@@ -330,13 +330,13 @@ public class Java2WADLMojo extends AbstractMojo {
         if (address != null) {
             return address;
         } else {
-            // the consumer may use the original target URI to figure out absolute URI 
+            // the consumer may use the original target URI to figure out absolute URI
             return "/";
         }
     }
 
-    
-    
+
+
     private ClassLoader getClassLoader() throws MojoExecutionException {
         if (resourceClassLoader == null) {
             try {
@@ -361,14 +361,14 @@ public class Java2WADLMojo extends AbstractMojo {
                 resourceClasses.add(getClassLoader().loadClass(className));
             } catch (Exception e) {
                 throw new MojoExecutionException(e.getMessage(), e);
-            } 
+            }
         }
         if (resourceClasses.isEmpty() && basePackages != null) {
             try {
                 List<Class<? extends Annotation>> anns = new ArrayList<Class<? extends Annotation>>();
                 anns.add(Path.class);
-                final Map< Class< ? extends Annotation >, Collection< Class< ? > > > discoveredClasses = 
-                    ClasspathScanner.findClasses(ClasspathScanner.parsePackages(basePackages), 
+                final Map< Class< ? extends Annotation >, Collection< Class< ? > > > discoveredClasses =
+                    ClasspathScanner.findClasses(ClasspathScanner.parsePackages(basePackages),
                                                  anns,
                                                  getClassLoader());
                 if (discoveredClasses.containsKey(Path.class)) {
@@ -380,7 +380,7 @@ public class Java2WADLMojo extends AbstractMojo {
         }
         return resourceClasses;
     }
-    
+
     private void initClassResourceInfoList(List<Class<?>> resourceClasses) throws MojoExecutionException {
         for (Class<?> beanClass : resourceClasses) {
             ClassResourceInfo cri = getCreatedFromModel(beanClass);
@@ -392,7 +392,7 @@ public class Java2WADLMojo extends AbstractMojo {
                 cri.setResourceClass(beanClass);
                 continue;
             }
-            
+
             cri = ResourceUtils.createClassResourceInfo(beanClass, beanClass, true, true,
                                                         getBus());
             if (cri != null) {
@@ -400,15 +400,15 @@ public class Java2WADLMojo extends AbstractMojo {
             }
         }
     }
-    
+
     private Bus getBus() {
         return BusFactory.getDefaultBus();
     }
 
     private ClassResourceInfo getCreatedFromModel(Class<?> realClass) {
-        
+
         for (ClassResourceInfo cri : classResourceInfos) {
-            if (cri.isCreatedFromModel() 
+            if (cri.isCreatedFromModel()
                 && cri.isRoot() && cri.getServiceClass().isAssignableFrom(realClass)) {
                 return cri;
             }

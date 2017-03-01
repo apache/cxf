@@ -94,25 +94,25 @@ import org.apache.cxf.wsdl.WSDLManager;
 
 /**
  * A JAX-WS specific implementation of the CXF {@link org.apache.cxf.endpoint.Endpoint} interface.
- * Extends the interceptor provider functionality of its base class by adding 
+ * Extends the interceptor provider functionality of its base class by adding
  * interceptors in which to execute the JAX-WS handlers.
  * Creates and owns an implementation of {@link Binding} in addition to the
- * CXF {@link org.apache.cxf.binding.Binding}. 
+ * CXF {@link org.apache.cxf.binding.Binding}.
  *
  */
 public class JaxWsEndpointImpl extends EndpointImpl {
-    
+
     private static final long serialVersionUID = 4718088821386100282L;
     private static final String URI_POLICY_NS = "http://www.w3.org/ns/ws-policy";
-    private static final String URI_WSU_NS 
+    private static final String URI_WSU_NS
         = "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
     private static final Logger LOG = LogUtils.getL7dLogger(JaxWsEndpointImpl.class);
 
     private Binding jaxwsBinding;
-    private JaxWsImplementorInfo implInfo; 
+    private JaxWsImplementorInfo implInfo;
     private List<WebServiceFeature> wsFeatures;
     private List<Feature> features;
-    
+
     //interceptors added/removed to chains as needed
     private SOAPHandlerInterceptor soapHandlerInterceptor;
     private LogicalHandlerInInterceptor logicalInInterceptor;
@@ -122,26 +122,26 @@ public class JaxWsEndpointImpl extends EndpointImpl {
     private LogicalHandlerFaultInInterceptor logicalFaultInInterceptor;
     private SOAPHandlerFaultInInterceptor soapFaultInInterceptor;
     private boolean handlerInterceptorsAdded;
-        
+
     public JaxWsEndpointImpl(Bus bus, Service s, EndpointInfo ei) throws EndpointException {
         this(bus, s, ei, null, null, null, true);
     }
-    
-    public JaxWsEndpointImpl(Bus bus, Service s, EndpointInfo ei, 
-                             List<WebServiceFeature> wf) throws EndpointException {
-        this(bus, s, ei, null, wf, new ArrayList<Feature>(), true);
-    }    
 
-    public JaxWsEndpointImpl(Bus bus, Service s, EndpointInfo ei, JaxWsImplementorInfo implementorInfo, 
+    public JaxWsEndpointImpl(Bus bus, Service s, EndpointInfo ei,
+                             List<WebServiceFeature> wf) throws EndpointException {
+        this(bus, s, ei, null, wf, new ArrayList<>(), true);
+    }
+
+    public JaxWsEndpointImpl(Bus bus, Service s, EndpointInfo ei, JaxWsImplementorInfo implementorInfo,
                              List<WebServiceFeature> wf, List<? extends Feature> af, boolean isFromWsdl)
         throws EndpointException {
         super(bus, s, ei);
         this.implInfo = implementorInfo;
-        this.wsFeatures = new ArrayList<WebServiceFeature>();
+        this.wsFeatures = new ArrayList<>();
         if (af != null) {
             features = CastUtils.cast(af);
         } else {
-            features = new ArrayList<Feature>();
+            features = new ArrayList<>();
         }
         if (wf != null) {
             for (WebServiceFeature f : wf) {
@@ -153,14 +153,14 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             }
         }
         createJaxwsBinding();
-        
-        List<Interceptor<? extends Message>> in = super.getInInterceptors();       
+
+        List<Interceptor<? extends Message>> in = super.getInInterceptors();
         List<Interceptor<? extends Message>> out = super.getOutInterceptors();
 
         boolean isProvider = implInfo != null && implInfo.isWebServiceProvider();
         Class<?> clazz = implInfo != null && isProvider ? implInfo.getProviderParameterType() : null;
         Mode mode = implInfo != null && isProvider ? implInfo.getServiceMode() : null;
-        
+
         if (isProvider) {
             s.put(AbstractInDatabindingInterceptor.NO_VALIDATE_PARTS, Boolean.TRUE);
         }
@@ -180,7 +180,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             }
         }
         if (isProvider && mode == Mode.MESSAGE) {
-            in.add(new MessageModeInInterceptor(clazz, getBinding().getBindingInfo().getName()));            
+            in.add(new MessageModeInInterceptor(clazz, getBinding().getBindingInfo().getName()));
         }
 
         // Outbound chain
@@ -200,7 +200,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
 
         logicalFaultOutInterceptor = new LogicalHandlerFaultOutInterceptor(jaxwsBinding);
         logicalFaultInInterceptor = new LogicalHandlerFaultInInterceptor(jaxwsBinding);
-        
+
         if (getBinding() instanceof SoapBinding) {
             soapFaultOutInterceptor = new SOAPHandlerFaultOutInterceptor(jaxwsBinding);
             soapFaultInInterceptor = new SOAPHandlerFaultInInterceptor(jaxwsBinding);
@@ -214,14 +214,14 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         }
         resolveFeatures();
     }
-    
+
     private void extractWsdlExtensibilities(EndpointInfo endpoint) {
         List<ExtensibilityElement> portExtensors = getExtensors(endpoint);
-        List<ExtensibilityElement> bindingExtensors = getExtensors(endpoint.getBinding());        
-        
+        List<ExtensibilityElement> bindingExtensors = getExtensors(endpoint.getBinding());
+
         //check the extensions under <wsdl:binding>
         checkRespectBindingFeature(bindingExtensors);
-        
+
         Collection<BindingOperationInfo> bindingOperations = endpoint.getBinding().getOperations();
         if (null != bindingOperations) {
             Iterator<BindingOperationInfo> iterator = bindingOperations.iterator();
@@ -230,7 +230,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                 BindingMessageInfo inputInfo = operationInfo.getInput();
                 BindingMessageInfo outputnfo = operationInfo.getOutput();
                 Collection<BindingFaultInfo> faults = operationInfo.getFaults();
-                
+
                 //check the extensions under <wsdl:operation>
                 checkRespectBindingFeature(getExtensors(operationInfo));
                 //check the extensions under <wsdl:input>
@@ -241,16 +241,16 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                     Iterator<BindingFaultInfo> faultIterator = faults.iterator();
                     while (faultIterator.hasNext()) {
                         BindingFaultInfo faultInfo = faultIterator.next();
-                        
+
                         //check the extensions under <wsdl:fault>
                         checkRespectBindingFeature(getExtensors(faultInfo));
                     }
                 }
-                
+
             }
         }
 
-        
+
         if (hasUsingAddressing(bindingExtensors) || hasUsingAddressing(portExtensors)) {
             WSAddressingFeature feature = new WSAddressingFeature();
             if (addressingRequired(bindingExtensors)
@@ -261,11 +261,11 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         }
         extractWsdlEprs(endpoint);
     }
-    
+
     private List<ExtensibilityElement> getExtensors(Extensible extensibleInfo) {
         return (null != extensibleInfo) ? extensibleInfo.getExtensors(ExtensibilityElement.class) : null;
     }
-    
+
     private void checkRespectBindingFeature(List<ExtensibilityElement> bindingExtensors) {
         if (bindingExtensors != null) {
             Iterator<ExtensibilityElement> extensionElements = bindingExtensors.iterator();
@@ -275,8 +275,8 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                     && this.wsFeatures != null) {
                     for (WebServiceFeature feature : this.wsFeatures) {
                         if (feature instanceof RespectBindingFeature && feature.isEnabled()) {
-                            
-                            org.apache.cxf.common.i18n.Message message = 
+
+                            org.apache.cxf.common.i18n.Message message =
                                 new org.apache.cxf.common.i18n.Message("UNKONWN_REQUIRED_WSDL_BINDING", LOG);
                             LOG.severe(message.toString());
                             throw new WebServiceException(message.toString());
@@ -287,7 +287,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         }
 
     }
-        
+
     private void extractWsdlEprs(EndpointInfo endpoint) {
         //parse the EPR in wsdl
         List<ExtensibilityElement> portExtensors = endpoint.getExtensors(ExtensibilityElement.class);
@@ -308,25 +308,25 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             }
         }
     }
-    
+
     private boolean hasUsingAddressing(List<ExtensibilityElement> exts) {
         boolean found = false;
         if (exts != null) {
             Iterator<ExtensibilityElement> extensionElements = exts.iterator();
             while (extensionElements.hasNext() && !found) {
-                ExtensibilityElement ext = 
+                ExtensibilityElement ext =
                     extensionElements.next();
                 found = JAXWSAConstants.WSAW_USINGADDRESSING_QNAME.equals(ext.getElementType());
             }
         }
         return found;
-    }    
+    }
     private boolean addressingRequired(List<ExtensibilityElement> exts) {
         boolean found = false;
         if (exts != null) {
             Iterator<ExtensibilityElement> extensionElements = exts.iterator();
             while (extensionElements.hasNext() && !found) {
-                ExtensibilityElement ext = 
+                ExtensibilityElement ext =
                     extensionElements.next();
                 if (JAXWSAConstants.WSAW_USINGADDRESSING_QNAME.equals(ext.getElementType())
                     && ext.getRequired() != null) {
@@ -335,24 +335,24 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             }
         }
         return false;
-    }    
+    }
 
     private void buildWsdlExtensibilities(BindingInfo bindingInfo) {
         Addressing addressing = getAddressing();
-        if (addressing != null) {            
-            ExtensionRegistry extensionRegistry 
-                = getBus().getExtension(WSDLManager.class).getExtensionRegistry();            
+        if (addressing != null) {
+            ExtensionRegistry extensionRegistry
+                = getBus().getExtension(WSDLManager.class).getExtensionRegistry();
             try {
-                ExtensibilityElement el = extensionRegistry.createExtension(javax.wsdl.Binding.class, 
+                ExtensibilityElement el = extensionRegistry.createExtension(javax.wsdl.Binding.class,
                                                                             JAXWSAConstants.
                                                                             WSAW_USINGADDRESSING_QNAME);
                 el.setRequired(addressing.required());
                 bindingInfo.addExtensor(el);
-                
+
                 StringBuilder polRefId = new StringBuilder(bindingInfo.getName().getLocalPart());
                 polRefId.append("_WSAM_Addressing_Policy");
                 UnknownExtensibilityElement uel = new UnknownExtensibilityElement();
-                
+
                 W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
                 writer.writeStartElement("wsp", "PolicyReference", URI_POLICY_NS);
                 writer.writeAttribute("URI", "#" + polRefId.toString());
@@ -361,7 +361,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                 uel.setElement(pr);
                 uel.setElementType(DOMUtils.getElementQName(pr));
                 bindingInfo.addExtensor(uel);
-                
+
                 writer = new W3CDOMStreamWriter();
                 writer.writeStartElement("wsp", "Policy", URI_POLICY_NS);
                 writer.writeAttribute("wsu", URI_WSU_NS,
@@ -372,18 +372,18 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                                           "Optional", "true");
                 }
                 writer.writeStartElement("wsp", "Policy", URI_POLICY_NS);
-                
+
                 String s = getAddressingRequirement(addressing);
                 if (s != null) {
                     writer.writeEmptyElement("wsam", s, JAXWSAConstants.NS_WSAM);
                 }
-                
+
                 writer.writeEndElement();
                 writer.writeEndElement();
                 writer.writeEndElement();
-                
+
                 pr = writer.getDocument().getDocumentElement();
-                
+
                 uel = new UnknownExtensibilityElement();
                 uel.setElement(pr);
                 uel.setElementType(DOMUtils.getElementQName(pr));
@@ -393,12 +393,12 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                     bindingInfo.getService().setDescription(description);
                 }
                 bindingInfo.getService().getDescription().addExtensor(uel);
-                
+
             } catch (Exception e) {
                 //ignore
                 e.printStackTrace();
             }
-        }        
+        }
     }
 
     private String getAddressingRequirement(Addressing addressing) {
@@ -426,7 +426,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                 return ad;
             }
         }
-        
+
         serviceClass = implInfo.getSEIClass();
         if (serviceClass != null) {
             Addressing ad = serviceClass.getAnnotation(Addressing.class);
@@ -441,18 +441,18 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         return jaxwsBinding;
     }
 
-    private AddressingFeature getAddressingFeature() { 
+    private AddressingFeature getAddressingFeature() {
         if (wsFeatures == null) {
             return null;
         }
         for (WebServiceFeature feature : wsFeatures) {
             if (feature instanceof AddressingFeature) {
-                return (AddressingFeature)feature;                
+                return (AddressingFeature)feature;
             }
         }
         return null;
     }
-    
+
     public final void resolveFeatures() {
         AddressingFeature addressing = getAddressingFeature();
         if (addressing == null) {
@@ -472,7 +472,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                                           Boolean.TRUE);
         }
     }
-    
+
     public List<Feature> getFeatures() {
         return features;
     }
@@ -501,20 +501,20 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         if (f != null) {
             features.remove(f);
         }
-    }    
-    
+    }
+
     private MTOMFeature getMTOMFeature() {
         if (wsFeatures == null) {
             return null;
         }
         for (WebServiceFeature feature : wsFeatures) {
             if (feature instanceof MTOMFeature) {
-                return (MTOMFeature)feature;                
+                return (MTOMFeature)feature;
             }
         }
         return null;
     }
-    
+
     final void createJaxwsBinding() {
         if (getBinding() instanceof SoapBinding) {
             jaxwsBinding = new SOAPBindingImpl(getEndpointInfo().getBinding(), this);
@@ -534,15 +534,15 @@ public class JaxWsEndpointImpl extends EndpointImpl {
     public void addHandlerInterceptors() {
         if (handlerInterceptorsAdded) {
             return;
-        } 
+        }
 
         handlerInterceptorsAdded = true;
 
-        List<Interceptor<? extends Message>> in = super.getInInterceptors();       
+        List<Interceptor<? extends Message>> in = super.getInInterceptors();
         List<Interceptor<? extends Message>> out = super.getOutInterceptors();
-        List<Interceptor<? extends Message>> outFault = super.getOutFaultInterceptors();    
-        List<Interceptor<? extends Message>> inFault = super.getInFaultInterceptors(); 
-        
+        List<Interceptor<? extends Message>> outFault = super.getOutFaultInterceptors();
+        List<Interceptor<? extends Message>> inFault = super.getInFaultInterceptors();
+
         in.add(logicalInInterceptor);
         out.add(logicalOutInterceptor);
         inFault.add(logicalFaultInInterceptor);
@@ -565,11 +565,11 @@ public class JaxWsEndpointImpl extends EndpointImpl {
 
         handlerInterceptorsAdded = false;
 
-        List<Interceptor<? extends Message>> in = super.getInInterceptors();       
+        List<Interceptor<? extends Message>> in = super.getInInterceptors();
         List<Interceptor<? extends Message>> out = super.getOutInterceptors();
-        List<Interceptor<? extends Message>> outFault = super.getOutFaultInterceptors();    
-        List<Interceptor<? extends Message>> inFault = super.getInFaultInterceptors(); 
-        
+        List<Interceptor<? extends Message>> outFault = super.getOutFaultInterceptors();
+        List<Interceptor<? extends Message>> inFault = super.getInFaultInterceptors();
+
         in.remove(logicalInInterceptor);
         out.remove(logicalOutInterceptor);
         inFault.remove(logicalFaultInInterceptor);

@@ -51,10 +51,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ResourceUtilsTest extends Assert {
-    
+
     @Test
     public void testFindResourceConstructor() {
-        Constructor<?> c = ResourceUtils.findResourceConstructor(Customer.class, true); 
+        Constructor<?> c = ResourceUtils.findResourceConstructor(Customer.class, true);
         assertNotNull(c);
         assertEquals(2, c.getParameterTypes().length);
         assertEquals(UriInfo.class, c.getParameterTypes()[0]);
@@ -72,14 +72,14 @@ public class ResourceUtilsTest extends Assert {
         op.setVerb("POST");
         op.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
         ur.setOperations(Collections.singletonList(op));
-        
+
         Map<String, UserResource> resources = new HashMap<String, UserResource>();
         resources.put(ur.getName(), ur);
-        ClassResourceInfo cri = 
+        ClassResourceInfo cri =
             ResourceUtils.createClassResourceInfo(resources, ur, null, true, true, BusFactory.getDefaultBus());
         assertNotNull(cri);
         assertEquals("/hashmap", cri.getURITemplate().getValue());
-        Method method = 
+        Method method =
             HashMap.class.getMethod("get", new Class[]{Object.class});
         OperationResourceInfo ori = cri.getMethodDispatcher().getOperationResourceInfo(method);
         assertNotNull(ori);
@@ -89,10 +89,10 @@ public class ResourceUtilsTest extends Assert {
         Parameter p = params.get(0);
         assertEquals("id", p.getName());
     }
-    
+
     @Test
     public void testUserResourceFromFile() throws Exception {
-        List<UserResource> list = 
+        List<UserResource> list =
             ResourceUtils.getUserResources("classpath:/resources.xml");
         assertNotNull(list);
         assertEquals(1, list.size());
@@ -107,19 +107,19 @@ public class ResourceUtilsTest extends Assert {
         assertEquals("PUT", oper.getVerb());
         assertEquals("application/json", oper.getProduces());
         assertEquals("application/xml", oper.getConsumes());
-        
+
         Parameter p = oper.getParameters().get(0);
         assertEquals("map", p.getName());
         assertEquals("emptyMap", p.getDefaultValue());
         assertTrue(p.isEncoded());
         assertEquals("REQUEST_BODY", p.getType().toString());
     }
-    
+
     @Test
     public void testGetAllJaxbClasses() {
-        ClassResourceInfo cri1 = 
+        ClassResourceInfo cri1 =
             ResourceUtils.createClassResourceInfo(BookInterface.class, BookInterface.class, true, true);
-        Map<Class<?>, Type> types = 
+        Map<Class<?>, Type> types =
             ResourceUtils.getAllRequestResponseTypes(Collections.singletonList(cri1), true)
                 .getAllTypes();
         assertEquals(2, types.size());
@@ -128,32 +128,32 @@ public class ResourceUtilsTest extends Assert {
     }
     @Test
     public void testGetAllJaxbClasses2() {
-        ClassResourceInfo cri1 = 
+        ClassResourceInfo cri1 =
             ResourceUtils.createClassResourceInfo(IProductResource.class, IProductResource.class, true, true);
-        Map<Class<?>, Type> types = 
+        Map<Class<?>, Type> types =
             ResourceUtils.getAllRequestResponseTypes(Collections.singletonList(cri1), true)
                 .getAllTypes();
         assertEquals(2, types.size());
         assertTrue(types.containsKey(Book.class));
         assertTrue(types.containsKey(Chapter.class));
     }
-    
+
     @Test
     public void testGetAllJaxbClassesComplexGenericType() {
-        ClassResourceInfo cri1 = 
-            ResourceUtils.createClassResourceInfo(OrderResource.class, 
+        ClassResourceInfo cri1 =
+            ResourceUtils.createClassResourceInfo(OrderResource.class,
                                                   OrderResource.class, true, true);
-        Map<Class<?>, Type> types = 
+        Map<Class<?>, Type> types =
             ResourceUtils.getAllRequestResponseTypes(Collections.singletonList(cri1), true)
                 .getAllTypes();
         assertEquals(2, types.size());
         assertTrue(types.containsKey(OrderItemsDTO.class));
         assertTrue(types.containsKey(OrderItemDTO.class));
     }
-    
+
     @Test
     public void testClassResourceInfoWithOverride() throws Exception {
-        ClassResourceInfo cri = 
+        ClassResourceInfo cri =
             ResourceUtils.createClassResourceInfo(ExampleImpl.class, ExampleImpl.class, true, true);
         assertNotNull(cri);
         Method m = ExampleImpl.class.getMethod("get");
@@ -164,21 +164,23 @@ public class ResourceUtilsTest extends Assert {
 
     @Test
     public void shouldCreateApplicationWhichInheritsApplicationPath() throws Exception {
-        JAXRSServerFactoryBean application = ResourceUtils.createApplication(new SuperApplication(), false);
+        JAXRSServerFactoryBean application = ResourceUtils.createApplication(
+                                                 new SuperApplication(), false, false, false, null);
         assertEquals("/base", application.getAddress());
     }
 
     @Test
     public void shouldCreateApplicationWhichOverridesApplicationPath() throws Exception {
-        JAXRSServerFactoryBean application = ResourceUtils.createApplication(new CustomApplication(), false);
+        JAXRSServerFactoryBean application = ResourceUtils.createApplication(
+                                                 new CustomApplication(), false, false, false, null);
         assertEquals("/custom", application.getAddress());
     }
-    
+
     public interface IProductResource {
         @Path("/parts")
         IPartsResource getParts();
     }
-    
+
     public interface IPartsResource {
         @Path("/{i}/")
         IPartsResource2 elementAt(@PathParam("i") String i);
@@ -189,7 +191,7 @@ public class ResourceUtilsTest extends Assert {
         @Path("chapter")
         Chapter get();
     }
-    
+
     public interface IPartsResource2 {
         @Path("/{i}/")
         IPartsResource elementAt(@PathParam("i") String i);
@@ -198,10 +200,10 @@ public class ResourceUtilsTest extends Assert {
         @GET
         Book get();
     }
-    
+
     @Path("example")
     public interface Example {
-         
+
         @GET
         Book get();
     }
@@ -213,20 +215,20 @@ public class ResourceUtilsTest extends Assert {
             return null;
         }
     }
-    
+
     @XmlRootElement
     public static class OrderItem {
-        
+
     }
     @XmlRootElement
     public static class OrderItemDTO<T> {
-        
+
     }
     @XmlRootElement
     public static class OrderItemsDTO<E> {
-        
+
     }
-    
+
     public static class OrderResource {
         @GET
         public OrderItemsDTO<? extends OrderItemDTO<? extends OrderItem>> getOrders() {

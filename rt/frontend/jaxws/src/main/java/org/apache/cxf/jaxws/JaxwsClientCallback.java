@@ -32,7 +32,7 @@ import org.apache.cxf.endpoint.ClientCallback;
 class JaxwsClientCallback<T> extends ClientCallback {
     final AsyncHandler<T> handler;
     final Object proxy;
-    
+
     JaxwsClientCallback(final AsyncHandler<T> handler, Object p) {
         this.handler = handler;
         this.proxy = p;
@@ -70,7 +70,7 @@ class JaxwsClientCallback<T> extends ClientCallback {
                 public boolean isDone() {
                     return true;
                 }
-                
+
             });
         }
         done = true;
@@ -99,9 +99,9 @@ class JaxwsClientCallback<T> extends ClientCallback {
                     throw new ExecutionException(ex);
                 }
 
-                public T get(long timeout, TimeUnit unit) 
+                public T get(long timeout, TimeUnit unit)
                     throws InterruptedException, ExecutionException, TimeoutException {
-                    
+
                     throw new ExecutionException(ex);
                 }
 

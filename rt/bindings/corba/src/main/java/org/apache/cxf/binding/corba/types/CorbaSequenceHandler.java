@@ -27,32 +27,32 @@ import org.omg.CORBA.TypeCode;
 
 public class CorbaSequenceHandler extends CorbaObjectHandler {
 
-    private List<CorbaObjectHandler> elements = new ArrayList<CorbaObjectHandler>();
+    private List<CorbaObjectHandler> elements = new ArrayList<>();
     private CorbaObjectHandler templateElement;
     private boolean hasRecursiveTypeElement;
-    
+
     public CorbaSequenceHandler(QName seqName, QName seqIdlType, TypeCode seqTC, Object seqType) {
         super(seqName, seqIdlType, seqTC, seqType);
         hasRecursiveTypeElement = false;
     }
-    
+
     public void addElement(CorbaObjectHandler el) {
         elements.add(el);
     }
-    
+
     public int getNumberOfElements() {
         return elements.size();
     }
-    
+
     public List<CorbaObjectHandler> getElements() {
         return elements;
     }
-    
+
     public CorbaObjectHandler getElement(int index) {
         return elements.get(index);
     }
-    
-    // These handle the case where we have an unbounded sequence and we need to 
+
+    // These handle the case where we have an unbounded sequence and we need to
     // construct Corba objects during the reading of an object.
     public CorbaObjectHandler getTemplateElement() {
         return templateElement;

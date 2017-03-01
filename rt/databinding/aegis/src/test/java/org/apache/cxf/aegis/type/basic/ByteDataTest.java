@@ -51,7 +51,7 @@ public class ByteDataTest extends AbstractAegisTest {
         addNamespace("wsdl", WSDLConstants.NS_WSDL11);
         addNamespace("wsdlsoap", WSDLConstants.NS_SOAP11);
         addNamespace("xsd", WSDLConstants.NS_SCHEMA_XSD);
-   
+
         assertValid("//xsd:element[@name='data'][@type='xsd:base64Binary']", doc);
     }
 }

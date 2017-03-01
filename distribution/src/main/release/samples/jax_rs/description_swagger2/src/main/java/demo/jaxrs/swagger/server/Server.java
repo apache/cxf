@@ -34,18 +34,18 @@ public class Server {
         org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server(9000);
 
         final ServletHolder servletHolder = new ServletHolder(new CXFNonSpringJaxrsServlet());
-        final ServletContextHandler context = new ServletContextHandler();      
+        final ServletContextHandler context = new ServletContextHandler();
         context.setContextPath("/");
-        context.addServlet(servletHolder, "/*");  
+        context.addServlet(servletHolder, "/*");
         servletHolder.setInitParameter("jaxrs.serviceClasses", Sample.class.getName());
-        servletHolder.setInitParameter("jaxrs.features", 
+        servletHolder.setInitParameter("jaxrs.features",
             Swagger2Feature.class.getName());
         servletHolder.setInitParameter("jaxrs.providers", StringUtils.join(
             new String[] {
                 MultipartProvider.class.getName(),
                 JacksonJsonProvider.class.getName(),
                 ApiOriginFilter.class.getName()
-            }, ",") 
+            }, ",")
         );
 
         server.setHandler(context);

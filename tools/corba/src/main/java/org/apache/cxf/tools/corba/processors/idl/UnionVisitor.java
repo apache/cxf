@@ -141,8 +141,8 @@ public class UnionVisitor extends VisitorBase {
                                   XmlSchemaChoice choice,
                                   Union corbaUnion) {
         while (caseNode != null) {
-            AST typeNode  = null;
-            AST nameNode  = null;
+            AST typeNode = null;
+            AST nameNode = null;
             AST labelNode = null;
 
             // xmlschema:element

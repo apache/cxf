@@ -77,7 +77,7 @@ public class MessageContextImplTest extends Assert {
         Message m1 = new MessageImpl();
         Message m2 = new MessageImpl();
         m2.put("a", "b");
-        
+
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(m1);
         ex.setOutMessage(m2);
@@ -85,55 +85,55 @@ public class MessageContextImplTest extends Assert {
         assertEquals("b", mc.get("a"));
         assertNull(mc.get("b"));
     }
-    
+
     @Test
     public void testGetUriInfo() {
         MessageContext mc = new MessageContextImpl(new MessageImpl());
         assertSame(UriInfoImpl.class, mc.getUriInfo().getClass());
         assertSame(UriInfoImpl.class, mc.getContext(UriInfo.class).getClass());
     }
-    
+
     @Test
     public void testGetRequest() {
         MessageContext mc = new MessageContextImpl(new MessageImpl());
         assertSame(RequestImpl.class, mc.getRequest().getClass());
         assertSame(RequestImpl.class, mc.getContext(Request.class).getClass());
     }
-    
+
     @Test
     public void testGetHttpHeaders() {
         MessageContext mc = new MessageContextImpl(new MessageImpl());
         assertSame(HttpHeadersImpl.class, mc.getHttpHeaders().getClass());
         assertSame(HttpHeadersImpl.class, mc.getContext(HttpHeaders.class).getClass());
     }
-    
+
     @Test
     public void testGetSecurityContext() {
         MessageContext mc = new MessageContextImpl(new MessageImpl());
         assertSame(SecurityContextImpl.class, mc.getSecurityContext().getClass());
         assertSame(SecurityContextImpl.class, mc.getContext(SecurityContext.class).getClass());
     }
-    
+
     @Test
     public void testProviders() {
         MessageContext mc = new MessageContextImpl(new MessageImpl());
         assertSame(ProvidersImpl.class, mc.getProviders().getClass());
         assertSame(ProvidersImpl.class, mc.getContext(Providers.class).getClass());
     }
-    
+
     @Test
     public void testHttpRequest() {
         Message m = createMessage();
         MessageContext mc = new MessageContextImpl(m);
         HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, request);
-        
-        assertSame(request.getClass(), 
+
+        assertSame(request.getClass(),
                    ((HttpServletRequestFilter)mc.getHttpServletRequest()).getRequest().getClass());
-        assertSame(request.getClass(), 
+        assertSame(request.getClass(),
                    ((HttpServletRequestFilter)mc.getContext(HttpServletRequest.class)).getRequest().getClass());
     }
-    
+
     @Test
     public void testHttpResponse() {
         Message m = createMessage();
@@ -145,7 +145,7 @@ public class MessageContextImplTest extends Assert {
         filter = (HttpServletResponseFilter)mc.getContext(HttpServletResponse.class);
         assertSame(request.getClass(), filter.getResponse().getClass());
     }
-    
+
     @Test
     public void testServletContext() {
         Message m = createMessage();
@@ -155,7 +155,7 @@ public class MessageContextImplTest extends Assert {
         assertSame(request.getClass(), mc.getServletContext().getClass());
         assertSame(request.getClass(), mc.getContext(ServletContext.class).getClass());
     }
-    
+
     @Test
     public void testServletConfig() {
         Message m = createMessage();
@@ -165,14 +165,14 @@ public class MessageContextImplTest extends Assert {
         assertSame(request.getClass(), mc.getServletConfig().getClass());
         assertSame(request.getClass(), mc.getContext(ServletConfig.class).getClass());
     }
-    
+
     @SuppressWarnings("unchecked")
     @Test
     public void testContextResolver() {
         ContextResolver<JAXBContext> resolver = new CustomContextResolver();
         ProviderFactory factory = ServerProviderFactory.getInstance();
         factory.registerUserProvider(resolver);
-        
+
         Message m = new MessageImpl();
         Exchange ex = new ExchangeImpl();
         m.setExchange(ex);
@@ -183,18 +183,18 @@ public class MessageContextImplTest extends Assert {
         EasyMock.replay(e);
         ex.put(Endpoint.class, e);
         MessageContext mc = new MessageContextImpl(m);
-        ContextResolver<JAXBContext> resolver2 = 
+        ContextResolver<JAXBContext> resolver2 =
             mc.getResolver(ContextResolver.class, JAXBContext.class);
         assertNotNull(resolver2);
         assertSame(resolver2, resolver);
     }
-    
+
     @Test
     public void testNoContext() {
         MessageContext mc = new MessageContextImpl(createMessage());
         assertNull(mc.getContext(Message.class));
     }
-    
+
     private Message createMessage() {
         ProviderFactory factory = ServerProviderFactory.getInstance();
         Message m = new MessageImpl();
@@ -217,13 +217,13 @@ public class MessageContextImplTest extends Assert {
         e.put(Endpoint.class, endpoint);
         return m;
     }
-    
+
     public static class CustomContextResolver implements ContextResolver<JAXBContext> {
 
         public JAXBContext getContext(Class<?> type) {
             // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
 }

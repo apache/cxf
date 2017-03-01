@@ -96,7 +96,7 @@ public class TemporaryCredentialsController {
             oAuthParams.setOauthTokenSecret(accessor.tokenSecret);
             Cookie cId = new Cookie("clientID", oAuthParams.getClientID());
             Cookie cSec = new Cookie("clientSecret", oAuthParams.getClientSecret());
-            Cookie tokenSec = new Cookie("tokenSec", accessor.tokenSecret); 
+            Cookie tokenSec = new Cookie("tokenSec", accessor.tokenSecret);
             response.addCookie(cId);
             response.addCookie(cSec);
             response.addCookie(tokenSec);

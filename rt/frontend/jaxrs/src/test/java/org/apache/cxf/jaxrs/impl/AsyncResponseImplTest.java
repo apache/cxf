@@ -40,12 +40,12 @@ import org.junit.Test;
 public class AsyncResponseImplTest extends Assert {
 
     private IMocksControl control;
-    
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
     }
-    
+
     /**
      * According to the spec, subsequent calls to cancel the same AsyncResponse should
      * have the same behavior as the first call.
@@ -58,32 +58,32 @@ public class AsyncResponseImplTest extends Assert {
         Message msg = new MessageImpl();
         msg.setExchange(new ExchangeImpl());
         msg.put(ContinuationProvider.class.getName(), new Servlet3ContinuationProvider(req, resp, msg));
-        
+
         req.startAsync();
         EasyMock.expectLastCall().andReturn(asyncCtx);
         control.replay();
-        
+
         AsyncResponse impl = new AsyncResponseImpl(msg);
-        
+
         // cancel the AsyncResponse for the first time
         assertTrue("Unexpectedly returned false when canceling the first time", impl.cancel());
-        
+
         // check the state of the AsyncResponse
         assertTrue("AsyncResponse was canceled but is reporting that it was not canceled", impl.isCancelled());
         boolean isDone = impl.isDone();
         boolean isSuspended = impl.isSuspended();
-        
+
         // cancel the AsyncResponse a second time
         assertTrue("Unexpectedly returned false when canceling the second time", impl.cancel());
-        
+
         // verify that the state is the same as before the second cancel
         assertTrue("AsyncResponse was canceled (twice) but is reporting that it was not canceled", impl.isCancelled());
-        assertEquals("AsynchResponse.isDone() returned a different response after canceling a second time", 
+        assertEquals("AsynchResponse.isDone() returned a different response after canceling a second time",
                      isDone, impl.isDone());
-        assertEquals("AsynchResponse.isSuspended() returned a different response after canceling a second time", 
+        assertEquals("AsynchResponse.isSuspended() returned a different response after canceling a second time",
                      isSuspended, impl.isSuspended());
     }
-    
+
     /**
      * Similar to testCancelBehavesTheSameWhenInvokedMultipleTimes, but using the cancel(int) signature.
      */
@@ -95,32 +95,32 @@ public class AsyncResponseImplTest extends Assert {
         Message msg = new MessageImpl();
         msg.setExchange(new ExchangeImpl());
         msg.put(ContinuationProvider.class.getName(), new Servlet3ContinuationProvider(req, resp, msg));
-        
+
         req.startAsync();
         EasyMock.expectLastCall().andReturn(asyncCtx);
         control.replay();
-        
+
         AsyncResponse impl = new AsyncResponseImpl(msg);
-        
+
         // cancel the AsyncResponse for the first time
         assertTrue("Unexpectedly returned false when canceling the first time", impl.cancel(10));
-        
+
         // check the state of the AsyncResponse
         assertTrue("AsyncResponse was canceled but is reporting that it was not canceled", impl.isCancelled());
         boolean isDone = impl.isDone();
         boolean isSuspended = impl.isSuspended();
-        
+
         // cancel the AsyncResponse a second time
         assertTrue("Unexpectedly returned false when canceling the second time", impl.cancel(25));
-        
+
         // verify that the state is the same as before the second cancel
         assertTrue("AsyncResponse was canceled (twice) but is reporting that it was not canceled", impl.isCancelled());
-        assertEquals("AsynchResponse.isDone() returned a different response after canceling a second time", 
+        assertEquals("AsynchResponse.isDone() returned a different response after canceling a second time",
                      isDone, impl.isDone());
-        assertEquals("AsynchResponse.isSuspended() returned a different response after canceling a second time", 
+        assertEquals("AsynchResponse.isSuspended() returned a different response after canceling a second time",
                      isSuspended, impl.isSuspended());
     }
-    
+
     /**
      * Similar to testCancelBehavesTheSameWhenInvokedMultipleTimes, but using the cancel(Date) signature.
      */
@@ -132,31 +132,31 @@ public class AsyncResponseImplTest extends Assert {
         Message msg = new MessageImpl();
         msg.setExchange(new ExchangeImpl());
         msg.put(ContinuationProvider.class.getName(), new Servlet3ContinuationProvider(req, resp, msg));
-        
+
         req.startAsync();
         EasyMock.expectLastCall().andReturn(asyncCtx);
         control.replay();
-        
+
         AsyncResponse impl = new AsyncResponseImpl(msg);
-        
+
         // cancel the AsyncResponse for the first time
         Date d = new Date(System.currentTimeMillis() + 60000);
         assertTrue("Unexpectedly returned false when canceling the first time", impl.cancel(d));
-        
+
         // check the state of the AsyncResponse
         assertTrue("AsyncResponse was canceled but is reporting that it was not canceled", impl.isCancelled());
         boolean isDone = impl.isDone();
         boolean isSuspended = impl.isSuspended();
-        
+
         // cancel the AsyncResponse a second time
         d = new Date(System.currentTimeMillis() + 120000);
         assertTrue("Unexpectedly returned false when canceling the second time", impl.cancel(d));
-        
+
         // verify that the state is the same as before the second cancel
         assertTrue("AsyncResponse was canceled (twice) but is reporting that it was not canceled", impl.isCancelled());
-        assertEquals("AsynchResponse.isDone() returned a different response after canceling a second time", 
+        assertEquals("AsynchResponse.isDone() returned a different response after canceling a second time",
                      isDone, impl.isDone());
-        assertEquals("AsynchResponse.isSuspended() returned a different response after canceling a second time", 
+        assertEquals("AsynchResponse.isSuspended() returned a different response after canceling a second time",
                      isSuspended, impl.isSuspended());
     }
 }

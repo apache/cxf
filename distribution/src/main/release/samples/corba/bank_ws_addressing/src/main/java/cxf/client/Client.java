@@ -34,12 +34,12 @@ public final class Client {
     private static final Logger LOG =
         Logger.getLogger(Client.class.getPackage().getName());
 
-    
+
     private Client() {
     }
 
     public static void main(String args[]) throws Exception {
-        
+
         LOG.log(Level.INFO, "Resolving the bank object");
         BankCORBAService service = new BankCORBAService();
         Bank port = service.getBankCORBAPort();
@@ -53,8 +53,8 @@ public final class Client {
         System.out.println("Current balance of account \"Account1\" is " + account1.getBalance());
         System.out.println();
 
-        /* Re-enable when we have a utility to manipulate the meta data stored 
-           within the EPR. 
+        /* Re-enable when we have a utility to manipulate the meta data stored
+           within the EPR.
         // Test the method Bank.createEprAccount()
         System.out.println("Creating account called \"Account2\"");
         W3CEndpointReference epr2 = port.createEprAccount("Account2");
@@ -70,7 +70,7 @@ public final class Client {
         acc3.deposit(200.00f);
         Account acc4 = getAccountFromEPR(port.createAccount("Account4"));
         acc4.deposit(400.00f);
-        
+
         // Test the method Bank.getAccount()
         System.out.println("Retrieving account called \"Account3\"");
         W3CEndpointReference epr3 = port.getAccount("Account3");
@@ -81,8 +81,8 @@ public final class Client {
         System.out.println("New balance for account \"Account3\" is " + account3.getBalance());
         System.out.println();
 
-        /* Re-enable when we have a utility to manipulate the meta data stored 
-           within the EPR. 
+        /* Re-enable when we have a utility to manipulate the meta data stored
+           within the EPR.
         // Test the method Bank.getEprAccount()
         System.out.println("Retrieving account called \"Account4\"");
         EndpointReferenceType epr4 = port.getEprAccount("Account4");

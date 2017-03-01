@@ -36,21 +36,21 @@ public abstract class AbstractSseBaseTest extends AbstractBusClientServerTestBas
     protected String toJson(final String name, final Integer id) throws JsonProcessingException {
         return mapper.writeValueAsString(new Book(name, id));
     }
-    
+
     protected WebClient createWebClient(final String url, final String media) {
         final List< ? > providers = Arrays.asList(new JacksonJsonProvider());
-        
+
         final WebClient wc = WebClient
             .create("http://localhost:" + getPort() + url, providers)
             .accept(media);
-        
+
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(8000L);
         return wc;
     }
-    
+
     protected WebClient createWebClient(final String url) {
         return createWebClient(url, MediaType.SERVER_SENT_EVENTS);
     }
-    
+
     protected abstract int getPort();
 }

@@ -77,8 +77,8 @@ public class Consumer implements NotificationConsumer, Referencable {
     }
 
     public void notify(
-        @WebParam(partName = "Notify", 
-                  name = "Notify", 
+        @WebParam(partName = "Notify",
+                  name = "Notify",
                   targetNamespace = "http://docs.oasis-open.org/wsn/b-2") Notify notify) {
         for (NotificationMessageHolderType message : notify.getNotificationMessage()) {
             if (context != null) {

@@ -54,7 +54,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         ServerImpl server = (ServerImpl)svrBean.create();
         assertTrue(server.getDestination() instanceof CustomDestination);
     }
-    
+
     public interface TestService<P> {
         int open(P args);
         void close(int handle);
@@ -64,11 +64,11 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         public void close(int handle) {
         }
 
-        public int open(P args) { 
+        public int open(P args) {
             return 0;
         }
     }
-    
+
     @Test
     public void testCXF1758() throws Exception {
         ServerFactoryBean svrBean = new ServerFactoryBean();
@@ -92,7 +92,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         if (props == null) {
             props = new HashMap<String, Object>();
         }
-        props.put("jaxb.additionalContextClasses", 
+        props.put("jaxb.additionalContextClasses",
                   new Class[] {GreetMe.class, GreetMeOneWay.class});
         svrBean.setProperties(props);
         Server serv = svrBean.create();
@@ -127,12 +127,12 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
 
         public void shutdown() {
             // TODO Auto-generated method stub
-            
+
         }
 
         public void setMessageObserver(MessageObserver observer) {
             // TODO Auto-generated method stub
-            
+
         }
 
         public MessageObserver getMessageObserver() {

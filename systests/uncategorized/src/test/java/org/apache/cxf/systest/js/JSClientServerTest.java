@@ -33,12 +33,12 @@ import org.junit.Test;
 
 
 public class JSClientServerTest extends AbstractBusClientServerTestBase {
-    
+
     public static final String JS_PORT = Server.JS_PORT;
     public static final String JSX_PORT = Server.JSX_PORT;
-    
+
     private static final String NS = "http://apache.org/hello_world_soap_http";
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));

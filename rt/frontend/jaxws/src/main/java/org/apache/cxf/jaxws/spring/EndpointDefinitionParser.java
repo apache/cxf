@@ -51,7 +51,7 @@ import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 
 public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
     private static final Class<?> EP_CLASS = SpringEndpointImpl.class;
-    
+
     private static final String IMPLEMENTOR = "implementor";
 
     public EndpointDefinitionParser() {
@@ -102,7 +102,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
                 publish = "true".equals(val);
             }
         }
-        
+
         Element elem = DOMUtils.getFirstElement(element);
         while (elem != null) {
             String name = elem.getLocalName();
@@ -147,18 +147,18 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         }
     }
     @Override
-    protected String resolveId(Element elem, 
-                               AbstractBeanDefinition definition, 
-                               ParserContext ctx) 
+    protected String resolveId(Element elem,
+                               AbstractBeanDefinition definition,
+                               ParserContext ctx)
         throws BeanDefinitionStoreException {
         String id = super.resolveId(elem, definition, ctx);
         if (StringUtils.isEmpty(id)) {
             id = EndpointImpl.class.getName() + "--" + definition.hashCode();
         }
-        
+
         return id;
     }
-    
+
     public static final void setBlocking(ApplicationContext ctx, EndpointImpl impl) {
         AutowireCapableBeanFactory fact = ctx.getAutowireCapableBeanFactory();
         if (fact instanceof DefaultListableBeanFactory) {
@@ -175,13 +175,13 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
             }
         }
     }
-    
+
     @NoJSR250Annotations
     public static class SpringEndpointImpl extends EndpointImpl
         implements ApplicationContextAware {
-    
+
         boolean checkBlockConstruct;
-        
+
         public SpringEndpointImpl(Object o) {
             super(o instanceof Bus ? (Bus)o : null,
                 o instanceof Bus ? null : o);
@@ -190,11 +190,11 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         public SpringEndpointImpl(Bus bus, Object implementor) {
             super(bus, implementor);
         }
-        
+
         public void setCheckBlockConstruct(Boolean b) {
             checkBlockConstruct = b;
         }
-        
+
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (checkBlockConstruct) {
                 setBlocking(ctx, this);

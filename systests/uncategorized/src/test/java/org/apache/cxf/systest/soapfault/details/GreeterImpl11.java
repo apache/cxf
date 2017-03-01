@@ -81,7 +81,7 @@ public class GreeterImpl11 {
         faultDetail.setMinor((short)1);
         LOG.info("Executing operation pingMe, throwing PingMeFault exception");
         //System.out.println("Executing operation pingMe, throwing PingMeFault exception\n");
-        throw new PingMeFault("PingMeFault raised by server", faultDetail);        
+        throw new PingMeFault("PingMeFault raised by server", faultDetail);
     }
 
     public Future<?> greetMeAsync(String requestType, AsyncHandler<GreetMeResponse> asyncHandler) {
@@ -107,7 +107,7 @@ public class GreeterImpl11 {
     public Response<PingMeResponse> pingMeAsync() {
         return null;
     }
-    
+
     public Future<?> pingMeAsync(AsyncHandler<PingMeResponse> asyncHandler) {
         return null;
     }

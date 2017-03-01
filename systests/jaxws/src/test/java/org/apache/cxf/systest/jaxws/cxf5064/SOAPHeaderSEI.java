@@ -28,6 +28,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @WebService(targetNamespace = "http://cxf.apache.org/cxf5064")
 public interface SOAPHeaderSEI {
     @WebMethod(operationName = "test")
-    String test(@WebParam(header = true, mode = Mode.IN, name = "SESSIONID") 
+    String test(@WebParam(header = true, mode = Mode.IN, name = "SESSIONID")
         @XmlJavaTypeAdapter(HeaderObjTypeAdapter.class) HeaderObj headerObj);
 }

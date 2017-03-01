@@ -76,7 +76,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
 
     JAXBContextInitializer(ServiceInfo serviceInfo,
                                   Set<Class<?>> classes,
-                                  Collection<Object> typeReferences, 
+                                  Collection<Object> typeReferences,
                                   Map<String, Object> unmarshallerProperties) {
         super(serviceInfo);
         this.classes = classes;
@@ -97,7 +97,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                              Boolean.TRUE);
         }
         boolean isFromWrapper = part.getMessageInfo().getOperation().isUnwrapped();
-        if (isFromWrapper 
+        if (isFromWrapper
             && !Boolean.TRUE.equals(part.getProperty("messagepart.isheader"))) {
             UnwrappedOperationInfo uop = (UnwrappedOperationInfo)part.getMessageInfo().getOperation();
             OperationInfo op = uop.getWrappedOperation();
@@ -120,7 +120,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             && !Byte.TYPE.equals(clazz.getComponentType())) {
             clazz = clazz.getComponentType();
         }
-        
+
         Annotation[] a = (Annotation[])part.getProperty("parameter.annotations");
         checkForAdapter(clazz, a);
 
@@ -174,7 +174,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             }
         }
         if (clazz != null) {
-            if (!isFromWrapper 
+            if (!isFromWrapper
                 && clazz.getAnnotation(XmlRootElement.class) == null
                 && clazz.getAnnotation(XmlType.class) != null
                 && StringUtils.isEmpty(clazz.getAnnotation(XmlType.class).name())) {
@@ -183,7 +183,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     typeReferences.add(ref);
                 }
             }
-            
+
             addClass(clazz);
         }
     }
@@ -309,7 +309,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
         return true;
     }
-    
+
     void addClass(Class<?> claz) {
         if (Throwable.class.isAssignableFrom(claz)) {
             if (!Throwable.class.equals(claz)
@@ -322,8 +322,8 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             return;
         } else {
             Class<?> cls = JAXBUtils.getValidClass(claz);
-            if (cls == null 
-                && ReflectionUtil.getDeclaredConstructors(claz).length > 0 
+            if (cls == null
+                && ReflectionUtil.getDeclaredConstructors(claz).length > 0
                 && !Modifier.isAbstract(claz.getModifiers())) {
                 if (LOG.isLoggable(Level.INFO)) {
                     LOG.info("Class " + claz.getName() + " does not have a default constructor which JAXB requires.");
@@ -359,7 +359,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                     }
                     return;
                 }
-                
+
                 if (cls.getSuperclass() != null) {
                     //JAXB should do this, but it doesn't always.
                     //in particular, older versions of jaxb don't
@@ -369,10 +369,10 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 if (!cls.isInterface()) {
                     walkReferences(cls);
                 }
-            } 
+            }
         }
     }
-    
+
     private void walkReferences(Class<?> cls) {
         if (cls == null) {
             return;
@@ -392,7 +392,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (accessType != XmlAccessType.PROPERTY) {   // only look for fields if we are instructed to
             //fields are accessible even if not public, must look at the declared fields
             //then walk to parents declared fields, etc...
-            Field fields[] = ReflectionUtil.getDeclaredFields(cls); 
+            Field fields[] = ReflectionUtil.getDeclaredFields(cls);
             for (Field f : fields) {
                 if (isFieldAccepted(f, accessType)) {
                     XmlJavaTypeAdapter xjta = Utils.getFieldXJTA(f);
@@ -410,7 +410,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
 
         if (accessType != XmlAccessType.FIELD) {   // only look for methods if we are instructed to
-            Method methods[] = ReflectionUtil.getDeclaredMethods(cls); 
+            Method methods[] = ReflectionUtil.getDeclaredMethods(cls);
             for (Method m : methods) {
                 if (isMethodAccepted(m, accessType)) {
                     XmlJavaTypeAdapter xjta = Utils.getMethodXJTA(m);
@@ -442,7 +442,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (Modifier.isStatic(field.getModifiers())) {
             return field.isAnnotationPresent(XmlAttribute.class);
         }
-        if (accessType == XmlAccessType.PUBLIC_MEMBER 
+        if (accessType == XmlAccessType.PUBLIC_MEMBER
             && !Modifier.isPublic(field.getModifiers())) {
             return false;
         }
@@ -459,7 +459,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
      */
     static boolean isMethodAccepted(Method method, XmlAccessType accessType) {
         // We only accept non static property getters which are not marked @XmlTransient
-        if (Modifier.isStatic(method.getModifiers()) 
+        if (Modifier.isStatic(method.getModifiers())
                 || method.isAnnotationPresent(XmlTransient.class)
                 || !Modifier.isPublic(method.getModifiers())
                 || "getClass".equals(method.getName())) {
@@ -479,7 +479,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         if (method.getName().startsWith("is")) {
             beginIndex = 2;
         }
-        
+
         Method setter = null;
         try {
             setter = method.getDeclaringClass()
@@ -496,7 +496,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         } else if (!Collection.class.isAssignableFrom(method.getReturnType())
             && !Throwable.class.isAssignableFrom(method.getDeclaringClass())) {
             //no setter, it's not a collection (thus getter().add(...)), and
-            //not an Exception, 
+            //not an Exception,
             return false;
         }
 
@@ -522,12 +522,12 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
         return false;
     }
-    
+
     /**
      * The TypeReference class is a sun specific class that is found in two different
      * locations depending on environment. In IBM JDK the class is not available at all.
      * So we have to load it at runtime.
-     * 
+     *
      * @param n
      * @param cls
      * @return initiated TypeReference
@@ -535,7 +535,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
     private static Object createTypeReference(QName n, Class<?> cls) {
         Class<?> refClass = null;
         try {
-            refClass = ClassLoaderUtils.loadClass("com.sun.xml.bind.api.TypeReference", 
+            refClass = ClassLoaderUtils.loadClass("com.sun.xml.bind.api.TypeReference",
                                                   JAXBContextInitializer.class);
         } catch (Throwable ex) {
             try {
@@ -555,9 +555,9 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         }
         return null;
     }
-    
-    @SuppressWarnings("unused") 
-    private Object createFactory(Class<?> cls, Constructor<?> contructor) {       
+
+    @SuppressWarnings("unused")
+    private Object createFactory(Class<?> cls, Constructor<?> contructor) {
         String newClassName = cls.getName() + "Factory";
         ASMHelper helper = new ASMHelper();
         ClassWriter cw = helper.createClassWriter();
@@ -583,10 +583,10 @@ class JAXBContextInitializer extends ServiceModelVisitor {
         mv.visitTypeInsn(Opcodes.NEW, name);
         mv.visitInsn(Opcodes.DUP);
         StringBuilder paraString = new StringBuilder("(");
-       
+
         for (Class<?> paraClass : contructor.getParameterTypes()) {
             mv.visitInsn(Opcodes.ACONST_NULL);
-            paraString.append("Ljava/lang/Object;");      
+            paraString.append("Ljava/lang/Object;");
         }
         paraString.append(")V");
 
@@ -602,9 +602,9 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             return factoryClass.newInstance();
         } catch (Exception e) {
            //ignore
-        } 
+        }
         return null;
     }
-    
-    
+
+
 }

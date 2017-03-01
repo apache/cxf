@@ -67,7 +67,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
 
     public W3CDOMStreamWriter(Element e) {
         this.document = e.getOwnerDocument();
-        
+
         currentNode = e;
         ((W3CNamespaceContext)context).setElement(e);
     }
@@ -76,7 +76,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         currentNode = e;
         ((W3CNamespaceContext)context).setElement(e);
     }
-    
+
     public Element getCurrentNode() {
         if (currentNode instanceof Element) {
             return (Element)currentNode;
@@ -89,7 +89,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         }
         return null;
     }
-    
+
     public void setNsRepairing(boolean b) {
         nsRepairing = b;
     }
@@ -147,14 +147,14 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
             }
         }
     }
-    
+
     protected Element createElementNS(String ns, String pfx, String local) {
         if (pfx != null) {
             local = pfx + ":" + local;
         }
         return document.createElementNS(ns, local);
     }
-    
+
     protected void createAndAddElement(String prefix, String local, String namespace) {
         if (prefix == null) {
             if (namespace == null) {
@@ -183,7 +183,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeEndElement() throws XMLStreamException {
-        if (stack.size() > 0) {
+        if (!stack.isEmpty()) {
             currentNode = stack.pop();
         } else {
             currentNode = null;
@@ -214,7 +214,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         if (prefix.length() > 0) {
             local = prefix + ":" + local;
         }
-        
+
         Attr a = document.createAttributeNS(namespace, local);
         a.setValue(value);
         ((Element)currentNode).setAttributeNodeNS(a);
@@ -340,7 +340,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
 
     public void flush() throws XMLStreamException {
     }
-    
+
     public String toString() {
         if (document == null) {
             return "<null>";

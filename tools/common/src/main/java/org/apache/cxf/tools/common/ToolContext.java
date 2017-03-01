@@ -43,9 +43,9 @@ public class ToolContext {
     private ToolErrorListener errors;
     private Map<String, String> namespacePackageMap = new HashMap<String, String>();
     private Map<String, String> excludeNamespacePackageMap = new HashMap<String, String>();
-    private List<InputSource> jaxbBindingFiles = new ArrayList<InputSource>();
-    private List<String> excludePkgList = new ArrayList<String>();
-    private List<String> excludeFileList = new ArrayList<String>();
+    private List<InputSource> jaxbBindingFiles = new ArrayList<>();
+    private List<String> excludePkgList = new ArrayList<>();
+    private List<String> excludeFileList = new ArrayList<>();
 
     public ToolContext() {
     }
@@ -105,7 +105,7 @@ public class ToolContext {
         }
         return (String[])o;
     }
-    
+
     public Object get(String key, Object defaultValue) {
         if (!optionSet(key)) {
             return defaultValue;
@@ -113,7 +113,7 @@ public class ToolContext {
             return get(key);
         }
     }
-    
+
     /**
      * avoid need to suppress warnings on string->object cases.
      * @param <T>
@@ -229,7 +229,7 @@ public class ToolContext {
                 return getPackageName();
             }
             return URIParserUtil.parsePackageName(ns, null);
-            
+
         }
     }
 
@@ -246,7 +246,7 @@ public class ToolContext {
     }
 
     public boolean isExcludeNamespaceEnabled() {
-        return excludeNamespacePackageMap.size() > 0;
+        return !excludeNamespacePackageMap.isEmpty();
     }
 
     public List<String> getExcludePkgList() {
@@ -256,7 +256,7 @@ public class ToolContext {
     public List<String> getExcludeFileList() {
         return this.excludeFileList;
     }
-    
+
     public QName getQName(String key) {
         return getQName(key, null);
     }
@@ -276,7 +276,7 @@ public class ToolContext {
         }
         return null;
     }
-    
+
     public ToolErrorListener getErrorListener() {
         if (errors == null) {
             errors = new ToolErrorListener();
@@ -286,36 +286,36 @@ public class ToolContext {
     public void setErrorListener(ToolErrorListener e) {
         errors = e;
     }
-    
+
     public Map<String, String> getNamespacePackageMap() {
         return namespacePackageMap;
     }
-    
+
     public boolean isPackageNameChanged() {
         return packageNameChanged;
     }
-    
+
     /**
      * This method attempts to do a deep copy of items which may change in this ToolContext.
      * The intent of this is to be able to take a snapshot of the state of the ToolContext
      * after it's initialised so we can run a tool multiple times with the same setup
-     * while not having the state preserved between multiple runs. I didn't want 
+     * while not having the state preserved between multiple runs. I didn't want
      * to call this clone() as it neither does a deep nor shallow copy. It does a mix
      * based on my best guess at what changes and what doesn't.
      */
     public ToolContext makeCopy() {
         ToolContext newCopy = new ToolContext();
-        
+
         newCopy.javaModel = javaModel;
         newCopy.paramMap = new HashMap<String, Object>(paramMap);
         newCopy.packageName = packageName;
         newCopy.packageNameChanged = packageNameChanged;
         newCopy.namespacePackageMap = new HashMap<String, String>(namespacePackageMap);
         newCopy.excludeNamespacePackageMap = new HashMap<String, String>(excludeNamespacePackageMap);
-        newCopy.jaxbBindingFiles = new ArrayList<InputSource>(jaxbBindingFiles);
-        newCopy.excludePkgList = new ArrayList<String>(excludePkgList);
-        newCopy.excludeFileList = new ArrayList<String>(excludeFileList);
+        newCopy.jaxbBindingFiles = new ArrayList<>(jaxbBindingFiles);
+        newCopy.excludePkgList = new ArrayList<>(excludePkgList);
+        newCopy.excludeFileList = new ArrayList<>(excludeFileList);
         newCopy.errors = errors;
         return newCopy;
-    }    
+    }
 }

@@ -21,15 +21,15 @@ package org.apache.cxf.wsn;
 import java.util.List;
 
 public interface NotificationBrokerMBean extends EndpointMBean {
-    
+
     List<String> getPublisher();
-    
+
     List<String> getSubscriptions();
-    
+
     EndpointMBean getPublisher(String name);
-    
+
     EndpointMBean getSubscription(String name);
-    
+
     EndpointMBean getAnonymousPublisher();
 
 }

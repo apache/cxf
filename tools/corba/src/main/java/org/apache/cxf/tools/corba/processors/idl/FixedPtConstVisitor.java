@@ -32,13 +32,13 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.constants.Constants;
 
 public class FixedPtConstVisitor implements Visitor {
-        
+
     private XmlSchemaType schemaType;
     private CorbaType corbaType;
     private Scope scope;
     private XmlSchemaCollection schemas;
-    
-    
+
+
     public FixedPtConstVisitor(Scope scopeRef,
                                Definition defn,
                                XmlSchema schemaRef,
@@ -47,22 +47,22 @@ public class FixedPtConstVisitor implements Visitor {
         schemas = xmlSchemas;
     }
 
-    
+
     public static boolean accept(AST node) {
         return node.getType() == IDLTokenTypes.LITERAL_fixed;
     }
-    
+
     public void visit(AST fixedNode) {
         //      <fixed_pt_const_type> ::= "fixed"
-                
-        XmlSchemaType stype = null; 
+
+        XmlSchemaType stype = null;
         CorbaType ctype = null;
-        
-        QName corbaTypeQName =  CorbaConstants.NE_CORBA_FIXED; 
-        
+
+        QName corbaTypeQName = CorbaConstants.NE_CORBA_FIXED;
+
         if (corbaTypeQName != null) {
             QName schemaTypeQName = Constants.XSD_DECIMAL;
-            if (schemaTypeQName != null) {        
+            if (schemaTypeQName != null) {
                 stype = schemas.getTypeByQName(schemaTypeQName);
                 if (stype != null) {
                     ctype = new CorbaType();
@@ -72,25 +72,25 @@ public class FixedPtConstVisitor implements Visitor {
                 }
             }
         }
-        
+
         schemaType = stype;
-        corbaType = ctype;        
+        corbaType = ctype;
     }
-    
+
     public XmlSchemaType getSchemaType() {
         return schemaType;
     }
-    
+
     public CorbaType getCorbaType() {
         return corbaType;
     }
-    
+
     public Scope getScope() {
         return scope;
     }
-    
+
     public Scope getFullyQualifiedName() {
         return scope;
     }
-        
+
 }

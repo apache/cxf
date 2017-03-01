@@ -39,7 +39,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
     }
 
 
-    public FileOutputStreamFactory(String dir) {        
+    public FileOutputStreamFactory(String dir) {
         this(dir, null);
         fileNames = new LinkedList<String>();
     }
@@ -52,7 +52,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
             dirName = "";
         }
 
-        if ((!"".equals(dirName)) 
+        if ((!"".equals(dirName))
             && (!".".equals(dirName))) {
             if (!dirName.endsWith(File.separator)) {
                 dirName += File.separator;
@@ -83,7 +83,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
 
     private String getClassDirectory(String packageName) {
         String result = convertPackageNameToDirectory(packageName);
-        
+
         if (!".".equals(dirName)) {
             result = dirName + result;
         }
@@ -144,7 +144,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
         if (!".".equals(dirName)) {
             dname = dirName + packageDirName;
         }
-        
+
         if ((!"".equals(dname)) && (!".".equals(dname))) {
             File file = new File(dname);
             file.mkdirs();

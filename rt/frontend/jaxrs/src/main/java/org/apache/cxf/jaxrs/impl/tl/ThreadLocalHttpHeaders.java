@@ -30,7 +30,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
-public class ThreadLocalHttpHeaders extends AbstractThreadLocalProxy<HttpHeaders> 
+public class ThreadLocalHttpHeaders extends AbstractThreadLocalProxy<HttpHeaders>
     implements HttpHeaders {
 
     public List<MediaType> getAcceptableMediaTypes() {

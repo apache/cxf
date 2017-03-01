@@ -53,7 +53,7 @@ public class Java2WSMojo extends AbstractMojo {
     private String className;
 
     /**
-     * @parameter  expression="${project.build.outputDirectory}"
+     * @parameter expression="${project.build.outputDirectory}"
      * @required
      */
     private String classpath;
@@ -92,15 +92,15 @@ public class Java2WSMojo extends AbstractMojo {
      * @parameter
      */
     private String address;
-    
-    
+
+
     /**
      * @parameter
      */
     private String classifier;
 
     /**
-     * @parameter  expression="${project.compileClasspathElements}"
+     * @parameter expression="${project.compileClasspathElements}"
      * @required
      */
     private List<?> classpathElements;
@@ -220,7 +220,7 @@ public class Java2WSMojo extends AbstractMojo {
             String cp = classLoaderSwitcher.switchClassLoader(project, false,
                                                               classpath, classpathElements);
             if (fork) {
-                List<String> artifactsPath = new ArrayList<String>(pluginArtifacts.size());
+                List<String> artifactsPath = new ArrayList<>(pluginArtifacts.size());
                 for (Artifact a : pluginArtifacts) {
                     File file = a.getFile();
                     if (file == null) {
@@ -243,10 +243,13 @@ public class Java2WSMojo extends AbstractMojo {
     }
 
     private List<String> initArgs(String cp) {
-        List<String> args = new ArrayList<String>();
+        List<String> args = new ArrayList<>();
 
         if (fork) {
-            args.add(additionalJvmArgs);
+            String[] split = additionalJvmArgs.split("\\s+");
+            for (String each : split) {
+                args.add(each);
+            }
             // @see JavaToWS#isExitOnFinish()
             args.add("-DexitOnFinish=true");
         }

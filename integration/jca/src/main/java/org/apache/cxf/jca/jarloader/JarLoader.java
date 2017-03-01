@@ -54,7 +54,7 @@ public final class JarLoader {
         return getBytesFromInputStream(is, -1);
     }
 
-    public static synchronized Map<?, ?> getJarContents(String path) 
+    public static synchronized Map<?, ?> getJarContents(String path)
         throws MalformedURLException, IOException {
         if (!archives.containsKey(path)) {
             loadArchive(path);
@@ -76,9 +76,9 @@ public final class JarLoader {
                     // This byte array has now been exploded into a Map so the raw bytes are
                     // no longer needed, replace the entry with the exploded Map
                     //
-                    Map<String, Object> parentMap = 
+                    Map<String, Object> parentMap =
                         CastUtils.cast((Map<?, ?>)archives.get(buildPartialName(nameComponents, i)));
-                    Map<?, ?> archiveMap = 
+                    Map<?, ?> archiveMap =
                         (Map<?, ?>)archives.get(buildPartialName(nameComponents, i + 1));
 
                     parentMap.put(nameComponents.get(i), archiveMap);
@@ -133,13 +133,13 @@ public final class JarLoader {
         List<String> nameComponents = tokenizePathComponents(name);
         Map<String, Object> map = null;
 
-        if (nameComponents.size() == 1) {            
+        if (nameComponents.size() == 1) {
             map = readZipStream((new URL(getRootArchiveName(name))).openStream());
         } else {
-            Map<?, ?> parentMap 
+            Map<?, ?> parentMap
                 = (Map<?, ?>)archives.get(buildPartialName(nameComponents, nameComponents.size() - 1));
             byte bytes[] = (byte[])(parentMap.get(nameComponents.get(nameComponents.size() - 1)));
-            
+
             if (null == bytes) {
                 // unexpected, classpath entry in error, referenced jar is not in the archive
                 throw new IOException(
@@ -160,8 +160,8 @@ public final class JarLoader {
 
         for (ZipEntry ze = zis.getNextEntry(); ze != null; ze = zis.getNextEntry()) {
             if (ze.isDirectory()) {
-                map.put(ze.getName(), ze.getName());               
-            } else {                
+                map.put(ze.getName(), ze.getName());
+            } else {
                 byte bytes[] = getBytesFromInputStream(zis, ze.getSize());
                 map.put(ze.getName(), bytes);
             }
@@ -171,15 +171,15 @@ public final class JarLoader {
     }
 
     private static byte[] getBytesFromInputStream(InputStream is, long size) throws IOException {
-               
+
         byte chunk[] = new byte[((size > CHUNK_SIZE) && (size < MAX_CHUNK_SIZE)) ? (int)size : CHUNK_SIZE];
-        
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         for (int i = is.read(chunk, 0, chunk.length); i != -1; i = is.read(chunk, 0, chunk.length)) {
-            baos.write(chunk, 0, i);           
+            baos.write(chunk, 0, i);
         }
-         
+
         return baos.toByteArray();
     }
 }

@@ -81,7 +81,7 @@ public class WSDLToJava {
         }
         return "YES".equalsIgnoreCase(exit) || "TRUE".equalsIgnoreCase(exit);
     }
-    
+
     public void run(ToolContext context) throws Exception {
         run(context, null);
     }

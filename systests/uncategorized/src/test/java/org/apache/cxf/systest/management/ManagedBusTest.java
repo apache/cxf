@@ -58,7 +58,7 @@ public class ManagedBusTest extends Assert {
             imi.setEnabled(true);
             imi.init();
 
-            
+
             Greeter greeter1 = new GreeterImpl();
             JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
             svrFactory.setAddress("http://localhost:" + SERVICE_PORT + "/Hello");
@@ -72,52 +72,52 @@ public class ManagedBusTest extends Assert {
             svrFactory.setServiceBean(greeter2);
             svrFactory.getProperties(true).put("managed.endpoint.name", "greeter2");
             svrFactory.create();
-            
-            MBeanServer mbs = im.getMBeanServer(); 
-            
-            ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
+
+            MBeanServer mbs = im.getMBeanServer();
+
+            ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME
                                              + ":type=Bus.Service.Endpoint,*");
             Set<?> s = mbs.queryMBeans(name, null);
             assertEquals(2, s.size());
         } finally {
             bus.shutdown(true);
         }
-        
+
     }
-    
+
     @Test
     public void testManagedSpringBus() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
-        Bus bus = factory.createBus();        
+        Bus bus = factory.createBus();
         InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
         assertNotNull(im);
-                
+
         InstrumentationManagerImpl imi = (InstrumentationManagerImpl)im;
-        assertEquals("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi", 
+        assertEquals("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi",
                      imi.getJMXServiceURL());
         assertTrue(!imi.isEnabled());
         assertNull(imi.getMBeanServer());
-        
+
         //Test that registering without an MBeanServer is a no-op
-        im.register(imi, new ObjectName("org.apache.cxf:foo=bar"));                        
-        
+        im.register(imi, new ObjectName("org.apache.cxf:foo=bar"));
+
         bus.shutdown(true);
     }
-        
+
     @Test
     public void testManagedBusWithTransientId() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/systest/management/managed-bus.xml", true);
         doManagedBusTest(bus, bus.getId(), "cxf_managed_bus_test", Integer.parseInt(JMX_PORT1));
     }
-    
+
     @Test
     public void testManagedBusWithPersistentId() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/systest/management/persistent-id.xml", true);
         doManagedBusTest(bus, "cxf_managed_bus_test", bus.getId(), Integer.parseInt(JMX_PORT2));
     }
-    
+
     private void doManagedBusTest(Bus bus, String expect, String reject, int port) throws Exception {
         InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
         assertNotNull(im);
@@ -128,9 +128,9 @@ public class ManagedBusTest extends Assert {
         assertNotNull(imi.getMBeanServer());
 
         WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
-                
-        MBeanServer mbs = im.getMBeanServer();      
-        ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
+
+        MBeanServer mbs = im.getMBeanServer();
+        ObjectName name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME
                                          + ":type=WorkQueueManager,*");
         Set<?> s = mbs.queryNames(name, null);
         StringBuilder b = new StringBuilder();
@@ -143,11 +143,11 @@ public class ManagedBusTest extends Assert {
             b.append("\n");
         }
         assertEquals("Size is wrong: " + b.toString(), 1, s.size());
-        
+
         assertNotNull(manager.getNamedWorkQueue("testQueue"));
         manager.getAutomaticWorkQueue();
 
-        name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
+        name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME
                              + ":type=WorkQueues,*");
         s = mbs.queryNames(name, null);
         b = new StringBuilder();
@@ -160,15 +160,15 @@ public class ManagedBusTest extends Assert {
             b.append("\n");
         }
         assertEquals("Size is wrong: " + b.toString(), 2, s.size());
-        
+
         Iterator<?> it = s.iterator();
         while (it.hasNext()) {
-            ObjectName n = (ObjectName)it.next();            
-            Long result = 
+            ObjectName n = (ObjectName)it.next();
+            Long result =
                 (Long)mbs.invoke(n, "getWorkQueueMaxSize", new Object[0], new String[0]);
-            assertEquals(result, Long.valueOf(256));                
+            assertEquals(result, Long.valueOf(256));
 
-            Integer hwm = 
+            Integer hwm =
                 (Integer)mbs.invoke(n, "getHighWaterMark", new Object[0], new String[0]);
 
             if (n.toString().contains("testQueue")) {
@@ -178,7 +178,7 @@ public class ManagedBusTest extends Assert {
             }
         }
 
-        name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME 
+        name = new ObjectName(ManagementConstants.DEFAULT_DOMAIN_NAME
                                          + ":type=Bus,*");
         s = mbs.queryNames(name, null);
         assertTrue(s.size() == 1);
@@ -187,9 +187,9 @@ public class ManagedBusTest extends Assert {
             ObjectName n = (ObjectName)it.next();
             Object[] params = {Boolean.FALSE};
             String[] sig = {"boolean"};
-            mbs.invoke(n, "shutdown", params, sig);            
-        }        
-        
+            mbs.invoke(n, "shutdown", params, sig);
+        }
+
         bus.shutdown(true);
     }
 }

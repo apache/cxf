@@ -32,7 +32,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 public class ThrottlingResponseInterceptor extends AbstractPhaseInterceptor<Message> {
     public ThrottlingResponseInterceptor() {
@@ -50,7 +50,7 @@ public class ThrottlingResponseInterceptor extends AbstractPhaseInterceptor<Mess
                 }
             }
             Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-            
+
             if (headers == null) {
                 headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
                 message.put(Message.PROTOCOL_HEADERS, headers);
@@ -58,12 +58,12 @@ public class ThrottlingResponseInterceptor extends AbstractPhaseInterceptor<Mess
             for (Map.Entry<String, String> e : rsp.getResponseHeaders().entrySet()) {
                 List<String> r = headers.get(e.getKey());
                 if (r == null) {
-                    r = new ArrayList<String>();
+                    r = new ArrayList<>();
                     headers.put(e.getKey(), r);
                 }
                 r.add(e.getValue());
             }
-            if (rsp.getResponseCode() == 503 && rsp.getDelay() > 0 
+            if (rsp.getResponseCode() == 503 && rsp.getDelay() > 0
                 && !rsp.getResponseHeaders().containsKey("Retry-After")) {
                 String retryAfter = Long.toString(rsp.getDelay() / 1000);
                 headers.put("Retry-After", Collections.singletonList(retryAfter));

@@ -26,18 +26,18 @@ import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyRegistry;
 
 /**
- * 
+ *
  */
 public class PolicyRegistryImpl implements PolicyRegistry {
 
     private Map<String, Policy> reg = new ConcurrentHashMap<String, Policy>(16, 0.75f, 4);
-    
+
     public Policy lookup(String key) {
         return reg.get(key);
     }
 
     public void register(String key, Policy policy) {
-        reg.put(key, policy);        
+        reg.put(key, policy);
     }
 
     public void remove(String key) {

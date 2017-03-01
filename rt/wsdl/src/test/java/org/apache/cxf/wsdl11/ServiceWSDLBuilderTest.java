@@ -81,17 +81,17 @@ public class ServiceWSDLBuilderTest extends Assert {
 
     private WSDLServiceBuilder wsdlServiceBuilder;
     private ServiceInfo serviceInfo;
-    
+
     private IMocksControl control;
     private Bus bus;
     private BindingFactoryManager bindingFactoryManager;
     private DestinationFactoryManager destinationFactoryManager;
     private DestinationFactory destinationFactory;
-    
+
     private void setupWSDL(String wsdlPath) throws Exception {
         setupWSDL(wsdlPath, false);
     }
-    
+
     private void setupWSDL(String wsdlPath, boolean doXsdImports) throws Exception {
         String wsdlUrl = getClass().getResource(wsdlPath).toString();
         LOG.info("the path of wsdl file is " + wsdlUrl);
@@ -99,7 +99,7 @@ public class ServiceWSDLBuilderTest extends Assert {
         WSDLReader wsdlReader = wsdlFactory.newWSDLReader();
         wsdlReader.setFeature("javax.wsdl.verbose", false);
         def = wsdlReader.readWSDL(wsdlUrl);
-        
+
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
         bindingFactoryManager = control.createMock(BindingFactoryManager.class);
@@ -114,30 +114,30 @@ public class ServiceWSDLBuilderTest extends Assert {
             }
         }
         EasyMock.expect(bus.getExtension(WSDLManager.class)).andReturn(new WSDLManagerImpl()).anyTimes();
-        
+
         EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bindingFactoryManager);
         EasyMock.expect(bus.getExtension(DestinationFactoryManager.class))
             .andReturn(destinationFactoryManager);
-        
+
         EasyMock.expect(destinationFactoryManager
                         .getDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/"))
             .andReturn(destinationFactory);
 
         control.replay();
-        
+
         serviceInfo = wsdlServiceBuilder.buildServices(def, service).get(0);
         ServiceWSDLBuilder builder = new ServiceWSDLBuilder(bus, serviceInfo);
         builder.setUseSchemaImports(doXsdImports);
         builder.setBaseFileName("HelloWorld");
         newDef = builder.build(new HashMap<String, SchemaInfo>());
     }
-    
+
     @After
-    public void tearDown() throws Exception {        
+    public void tearDown() throws Exception {
         control.verify();
         newDef = null;
     }
-    
+
     @Test
     public void testNoBodyParts() throws Exception {
         setupWSDL(NO_BODY_PARTS_WSDL_PATH);
@@ -147,8 +147,8 @@ public class ServiceWSDLBuilderTest extends Assert {
         Part part = message.getPart("mimeAttachment");
         assertNotNull(part.getTypeName());
     }
-    
-    @Test    
+
+    @Test
     public void testDefinition() throws Exception {
         setupWSDL(WSDL_PATH);
         assertEquals(newDef.getTargetNamespace(), "http://apache.org/hello_world_soap_http");
@@ -157,7 +157,7 @@ public class ServiceWSDLBuilderTest extends Assert {
         assertNotNull(serv);
         assertNotNull(serv.getPort("SoapPort"));
     }
-    
+
     @Test
     public void testPortType() throws Exception {
         setupWSDL(WSDL_PATH);
@@ -165,18 +165,18 @@ public class ServiceWSDLBuilderTest extends Assert {
         PortType portType = (PortType)newDef.getPortTypes().values().iterator().next();
         assertNotNull(portType);
         assertTrue(portType.getQName().equals(new QName(newDef.getTargetNamespace(), "Greeter")));
-        
+
     }
-    
+
     @Test
     public void testSayHiOperation() throws Exception {
         setupWSDL(WSDL_PATH);
-        PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(), 
+        PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(),
             "Greeter"));
-        Collection<Operation> operations =  
+        Collection<Operation> operations =
             CastUtils.cast(
                 portType.getOperations(), Operation.class);
-        
+
         assertEquals(4, operations.size());
         Operation sayHi = portType.getOperation("sayHi", "sayHiRequest", "sayHiResponse");
         assertNotNull(sayHi);
@@ -200,13 +200,13 @@ public class ServiceWSDLBuilderTest extends Assert {
         assertEquals(1, message.getParts().size());
         assertEquals("out", message.getPart("out").getName());
         assertEquals(0, sayHi.getFaults().size());
-              
+
     }
-    
+
     @Test
     public void testGreetMeOperation() throws Exception {
         setupWSDL(WSDL_PATH);
-        PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(), 
+        PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(),
             "Greeter"));
         Operation greetMe = portType.getOperation("greetMe", "greetMeRequest", "greetMeResponse");
         assertNotNull(greetMe);
@@ -230,13 +230,13 @@ public class ServiceWSDLBuilderTest extends Assert {
         assertEquals(1, message.getParts().size());
         assertEquals("out", message.getPart("out").getName());
         assertEquals(0, greetMe.getFaults().size());
-        
+
     }
-    
+
     @Test
     public void testGreetMeOneWayOperation() throws Exception {
         setupWSDL(WSDL_PATH);
-        PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(), 
+        PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(),
             "Greeter"));
         Operation greetMeOneWay = portType.getOperation("greetMeOneWay", "greetMeOneWayRequest", null);
         assertNotNull(greetMeOneWay);
@@ -254,11 +254,11 @@ public class ServiceWSDLBuilderTest extends Assert {
         assertNull(output);
         assertEquals(0, greetMeOneWay.getFaults().size());
     }
-    
+
     @Test
     public void testPingMeOperation() throws Exception {
         setupWSDL(WSDL_PATH);
-        PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(), 
+        PortType portType = newDef.getPortType(new QName(newDef.getTargetNamespace(),
             "Greeter"));
         Operation pingMe = portType.getOperation("pingMe", "pingMeRequest", "pingMeResponse");
         assertNotNull(pingMe);
@@ -293,7 +293,7 @@ public class ServiceWSDLBuilderTest extends Assert {
         assertEquals("faultDetail", message.getPart("faultDetail").getName());
         assertNull(message.getPart("faultDetail").getTypeName());
     }
-    
+
     @Test
     public void testBinding() throws Exception {
         setupWSDL(WSDL_PATH);
@@ -309,23 +309,23 @@ public class ServiceWSDLBuilderTest extends Assert {
         assertEquals(newDef.getBindings().size(), 1);
         assertTrue(newDef.getNamespace("ns3").equals("http://cxf.apache.org/samples/wsdl-first"));
     }
-    
+
     @Test
     public void testSchemas() throws Exception {
         setupWSDL(WSDL_PATH);
         Types types = newDef.getTypes();
         assertNotNull(types);
-        Collection<ExtensibilityElement> schemas = 
+        Collection<ExtensibilityElement> schemas =
             CastUtils.cast(types.getExtensibilityElements(), ExtensibilityElement.class);
         assertEquals(1, schemas.size());
         XmlSchemaCollection schemaCollection = new XmlSchemaCollection();
         Element schemaElem = ((Schema)schemas.iterator().next()).getElement();
-        XmlSchema newSchema = schemaCollection.read(schemaElem); 
+        XmlSchema newSchema = schemaCollection.read(schemaElem);
         assertEquals("http://apache.org/hello_world_soap_http/types",
-                     newSchema.getTargetNamespace() 
+                     newSchema.getTargetNamespace()
                      );
     }
-    
+
     @Test
     public void testXsdImportMultipleSchemas() throws Exception {
         setupWSDL(WSDL_XSD_IMPORT_PATH, true);
@@ -351,9 +351,9 @@ public class ServiceWSDLBuilderTest extends Assert {
                 "http://apache.org/hello_world_soap_http/types");
 
         Schema typesSchema = typesSchemaImport.getReferencedSchema();
-        
+
         Document doc = typesSchema.getElement().getOwnerDocument();
-        
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(outputStream, "utf-8");
         StaxUtils.writeNode(doc, writer, true);
@@ -362,17 +362,17 @@ public class ServiceWSDLBuilderTest extends Assert {
         // this is a test to make sure any embedded namespaces are properly included
         String savedSchema = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
         assertTrue(savedSchema.contains("http://www.w3.org/2005/05/xmlmime"));
-        
+
         SchemaImport types2SchemaImport = getImport(typesSchema.getImports(),
                 "http://apache.org/hello_world_soap_http/types2");
-        
+
         Schema types2Schema = types2SchemaImport.getReferencedSchema();
         assertNotNull(types2Schema);
     }
-    
+
     private SchemaImport getImport(Map<?, ?> imps, String key) {
         List<SchemaImport> s1 = CastUtils.cast((List<?>)imps.get(key));
         return s1.get(0);
     }
-    
+
 }

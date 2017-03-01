@@ -38,26 +38,26 @@ import org.apache.cxf.transport.http.DestinationRegistryImpl;
 import org.apache.cxf.transport.http.HttpDestinationFactory;
 
 public class NettyHttpTransportFactory extends AbstractTransportFactory implements DestinationFactory {
-    
+
     public static final List<String> DEFAULT_NAMESPACES = Arrays
         .asList("http://cxf.apache.org/transports/http/netty/server");
-   
+
     /**
      * This constant holds the prefixes served by this factory.
      */
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
     static {
         URI_PREFIXES.add("netty://");
     }
-    
+
     protected final DestinationRegistry registry;
-    
+
     protected final HttpDestinationFactory factory = new NettyHttpDestinationFactory();
-    
+
     public NettyHttpTransportFactory() {
         this(new DestinationRegistryImpl());
     }
-    
+
     public NettyHttpTransportFactory(DestinationRegistry registry) {
         super(DEFAULT_NAMESPACES);
         if (registry == null) {
@@ -65,33 +65,33 @@ public class NettyHttpTransportFactory extends AbstractTransportFactory implemen
         }
         this.registry = registry;
     }
-    
+
     public DestinationRegistry getRegistry() {
         return registry;
     }
-    
+
     /**
      * This call is used by CXF ExtensionManager to inject the activationNamespaces
      * @param ans The transport ids.
      */
     public void setActivationNamespaces(Collection<String> ans) {
-        setTransportIds(new ArrayList<String>(ans));
+        setTransportIds(new ArrayList<>(ans));
     }
-    
+
     public Set<String> getUriPrefixes() {
         return URI_PREFIXES;
     }
-    
+
     /**
      * This call uses the Configurer from the bus to configure
      * a bean.
-     * 
+     *
      * @param bean
      */
     protected void configure(Bus b, Object bean) {
         configure(b, bean, null, null);
     }
-    
+
     protected void configure(Bus bus, Object bean, String name, String extraName) {
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
@@ -101,7 +101,7 @@ public class NettyHttpTransportFactory extends AbstractTransportFactory implemen
             }
         }
     }
-    
+
     protected String getAddress(EndpointInfo endpointInfo) {
         String address = endpointInfo.getAddress();
         if (address.startsWith("netty://")) {
@@ -109,7 +109,7 @@ public class NettyHttpTransportFactory extends AbstractTransportFactory implemen
         }
         return address;
     }
-    
+
     public Destination getDestination(EndpointInfo endpointInfo, Bus bus) throws IOException {
         if (endpointInfo == null) {
             throw new IllegalArgumentException("EndpointInfo cannot be null");

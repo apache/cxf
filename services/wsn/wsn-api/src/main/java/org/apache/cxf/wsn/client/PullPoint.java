@@ -53,7 +53,7 @@ public class PullPoint implements Referencable {
         return this.epr;
     }
 
-    public List<NotificationMessageHolderType> getMessages(long max) 
+    public List<NotificationMessageHolderType> getMessages(long max)
         throws UnableToGetMessagesFault, ResourceUnknownFault {
         GetMessages getMessages = new GetMessages();
         getMessages.setMaximumNumber(BigInteger.valueOf(max));

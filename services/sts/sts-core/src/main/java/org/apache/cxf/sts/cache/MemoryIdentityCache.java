@@ -42,22 +42,22 @@ import org.apache.cxf.sts.IdentityMapper;
  */
 @ManagedResource()
 public class MemoryIdentityCache extends AbstractIdentityCache {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(MemoryIdentityCache.class);
-    
+
     private final Map<String, Map<String, String>> cache =
             Collections.synchronizedMap(new HashMap<String, Map<String, String>>());
-    
+
     private long maxCacheItems = 10000L;
-    
+
     protected MemoryIdentityCache() {
         super(null, null);
     }
-    
+
     public MemoryIdentityCache(IdentityMapper identityMapper) {
         super(null, identityMapper);
     }
-    
+
     public MemoryIdentityCache(Bus bus, IdentityMapper identityMapper) {
         super(bus, identityMapper);
         if (bus != null) {
@@ -71,7 +71,7 @@ public class MemoryIdentityCache extends AbstractIdentityCache {
             }
         }
     }
-    
+
     public long getMaxCacheItems() {
         return maxCacheItems;
     }
@@ -96,21 +96,21 @@ public class MemoryIdentityCache extends AbstractIdentityCache {
 
     @Override
     public void remove(String user, String realm) {
-        cache.remove(user + "@" + realm);       
+        cache.remove(user + "@" + realm);
     }
-    
+
     @ManagedOperation()
     @Override
     public void clear() {
-        cache.clear();  
+        cache.clear();
     }
-    
+
     @ManagedOperation()
     @Override
     public int size() {
         return cache.size();
     }
-    
+
     @ManagedOperation()
     public String getContent() {
         return this.cache.toString();
@@ -127,6 +127,6 @@ public class MemoryIdentityCache extends AbstractIdentityCache {
         buffer.append(ManagementConstants.NAME_PROP).append('=')
             .append("MemoryIdentityCache-" + System.identityHashCode(this));
         return new ObjectName(buffer.toString());
-    }    
+    }
 }
 

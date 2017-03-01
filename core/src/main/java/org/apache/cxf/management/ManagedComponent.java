@@ -23,10 +23,10 @@ import javax.management.JMException;
 import javax.management.ObjectName;
 /**
  * Basic interface for representing a Instrumented object.
- * 
+ *
  */
 public interface ManagedComponent {
-    
+
     ObjectName getObjectName() throws JMException;
-    
+
 }

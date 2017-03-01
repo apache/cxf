@@ -84,7 +84,7 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
     protected SoapMessage getSoapMessageForDom(Document doc) throws Exception {
         return getSoapMessageForDom(doc, SOAPConstants.SOAP_1_1_PROTOCOL);
     }
-    
+
     protected SoapMessage getSoapMessageForDom(Document doc, String protocol) throws Exception {
         SOAPMessage saajMsg = MessageFactory.newInstance(protocol).createMessage();
         SOAPPart part = saajMsg.getSOAPPart();
@@ -97,10 +97,10 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
         Exchange ex = new ExchangeImpl();
         ex.setInMessage(msg);
         msg.setContent(SOAPMessage.class, saajMsg);
-        
+
         return msg;
     }
-    
+
     protected byte[] getMessageBytes(Document doc) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         XMLStreamWriter byteArrayWriter = StaxUtils.createXMLStreamWriter(outputStream);
@@ -108,7 +108,7 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
         byteArrayWriter.flush();
         return outputStream.toByteArray();
     }
-   
+
     protected SoapMessage makeInvocation(
         Map<String, Object> outProperties,
         List<String> xpaths,
@@ -155,12 +155,12 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
         ex.setInMessage(inmsg);
         inmsg.setContent(SOAPMessage.class, saajMsg);
 
-        
+
         inHandler.handleMessage(inmsg);
 
         return inmsg;
     }
-    
+
     protected static boolean checkUnrestrictedPoliciesInstalled() {
         try {
             byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
@@ -179,7 +179,7 @@ public abstract class AbstractSecurityTest extends AbstractCXFTest {
         }
         return false;
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() {
         String tmpDir = System.getProperty("java.io.tmpdir");

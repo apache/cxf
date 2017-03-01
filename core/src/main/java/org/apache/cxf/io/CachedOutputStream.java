@@ -53,7 +53,7 @@ public class CachedOutputStream extends OutputStream {
     private static long defaultMaxSize;
     private static String defaultCipherTransformation;
     static {
-        
+
         String s = SystemPropertyAction.getPropertyOrNull("org.apache.cxf.io.CachedOutputStream.OutputDirectory");
         if (s != null) {
             File f = new File(s);
@@ -89,15 +89,15 @@ public class CachedOutputStream extends OutputStream {
     private CipherPair ciphers;
 
     private List<CachedOutputStreamCallback> callbacks;
-    
-    private List<Object> streamList = new ArrayList<Object>();
+
+    private List<Object> streamList = new ArrayList<>();
 
     public CachedOutputStream() {
         this(defaultThreshold);
     }
 
     public CachedOutputStream(long threshold) {
-        this.threshold = threshold; 
+        this.threshold = threshold;
         currentStream = new LoadingByteArrayOutputStream(2048);
         inmem = true;
         readBusProperties();
@@ -132,14 +132,14 @@ public class CachedOutputStream extends OutputStream {
     public void releaseTempFileHold() {
         allowDeleteOfFile = true;
     }
-    
+
     public void registerCallback(CachedOutputStreamCallback cb) {
         if (null == callbacks) {
-            callbacks = new ArrayList<CachedOutputStreamCallback>();
+            callbacks = new ArrayList<>();
         }
         callbacks.add(cb);
     }
-    
+
     public void deregisterCallback(CachedOutputStreamCallback cb) {
         if (null != callbacks) {
             callbacks.remove(cb);
@@ -155,7 +155,7 @@ public class CachedOutputStream extends OutputStream {
      * output stream ... etc.)
      */
     protected void doFlush() throws IOException {
-        
+
     }
 
     public void flush() throws IOException {
@@ -172,14 +172,14 @@ public class CachedOutputStream extends OutputStream {
      * Perform any actions required on stream closure (handle response etc.)
      */
     protected void doClose() throws IOException {
-        
+
     }
-    
+
     /**
      * Perform any actions required after stream closure (close the other related stream etc.)
      */
     protected void postClose() throws IOException {
-        
+
     }
 
     /**
@@ -201,7 +201,7 @@ public class CachedOutputStream extends OutputStream {
         doClose();
         streamList.remove(currentStream);
     }
-    
+
     public void close() throws IOException {
         currentStream.flush();
         outputLocked = true;
@@ -233,7 +233,7 @@ public class CachedOutputStream extends OutputStream {
      * When with Attachment, needs to replace the xml writer stream with the stream used by
      * AttachmentSerializer or copy the cached output stream to the "real"
      * output stream, i.e. onto the wire.
-     * 
+     *
      * @param out the new output stream
      * @param copyOldContent flag indicating if the old content should be copied
      * @throws IOException
@@ -314,11 +314,11 @@ public class CachedOutputStream extends OutputStream {
             IOUtils.copyAndCloseInput(fin, out);
         }
     }
-    
+
     public void writeCacheTo(StringBuilder out, long limit) throws IOException {
         writeCacheTo(out, StandardCharsets.UTF_8.name(), limit);
     }
-    
+
     public void writeCacheTo(StringBuilder out, String charsetName, long limit) throws IOException {
         flush();
         if (totalLength < limit
@@ -360,11 +360,11 @@ public class CachedOutputStream extends OutputStream {
             }
         }
     }
-    
+
     public void writeCacheTo(StringBuilder out) throws IOException {
         writeCacheTo(out, StandardCharsets.UTF_8.name());
     }
-    
+
     public void writeCacheTo(StringBuilder out, String charsetName) throws IOException {
         flush();
         if (inmem) {
@@ -419,13 +419,13 @@ public class CachedOutputStream extends OutputStream {
 
     }
 
-    private  void enforceLimits() throws IOException {
+    private void enforceLimits() throws IOException {
         if (maxSize > 0 && totalLength > maxSize) {
             throw new CacheSizeExceededException();
         }
         if (inmem && totalLength > threshold && currentStream instanceof ByteArrayOutputStream) {
             createFileOutputStream();
-        }       
+        }
     }
 
     public void write(byte[] b, int off, int len) throws IOException {
@@ -466,7 +466,7 @@ public class CachedOutputStream extends OutputStream {
             } else {
                 tempFile = FileUtils.createTempFile("cos", "tmp", outputDir, false);
             }
-            
+
             currentStream = createOutputStream(tempFile);
             bout.writeTo(currentStream);
             inmem = false;
@@ -513,14 +513,14 @@ public class CachedOutputStream extends OutputStream {
                         }
                     };
                 }
-                
+
                 return fileInputStream;
             } catch (FileNotFoundException e) {
                 throw new IOException("Cached file was deleted, " + e.toString());
             }
         }
     }
-    
+
     private synchronized void deleteTempFile() {
         if (tempFile != null) {
             File file = tempFile;
@@ -551,7 +551,7 @@ public class CachedOutputStream extends OutputStream {
     public void setOutputDir(File outputDir) throws IOException {
         this.outputDir = outputDir;
     }
-    
+
     public long getThreshold() {
         return threshold;
     }
@@ -566,7 +566,7 @@ public class CachedOutputStream extends OutputStream {
     public void setCipherTransformation(String cipherTransformation) {
         this.cipherTransformation = cipherTransformation;
     }
-    
+
     public static void setDefaultMaxSize(long l) {
         if (l == -1) {
             String s = System.getProperty("org.apache.cxf.io.CachedOutputStream.MaxSize",
@@ -585,7 +585,7 @@ public class CachedOutputStream extends OutputStream {
             }
         }
         defaultThreshold = i;
-        
+
     }
     public static void setDefaultCipherTransformation(String n) {
         if (n == null) {
@@ -636,12 +636,12 @@ public class CachedOutputStream extends OutputStream {
     private class TransferableFileInputStream extends FileInputStream implements Transferable {
         private boolean closed;
         private File sourceFile;
-        
+
         TransferableFileInputStream(File sourceFile) throws FileNotFoundException {
             super(sourceFile);
             this.sourceFile = sourceFile;
         }
-        
+
         public void close() throws IOException {
             if (!closed) {
                 super.close();

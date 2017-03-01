@@ -43,7 +43,7 @@ public class ServerPolicyCalculatorTest extends Assert {
         p2.setSuppressClientSendErrors(true);
         assertTrue("Policies are compatible.", spc.compatible(p1, p2));
     }
-        
+
     @Test
     public void testIntersectServerPolicies() {
         ServerPolicyCalculator spc = new ServerPolicyCalculator();
@@ -64,13 +64,13 @@ public class ServerPolicyCalculatorTest extends Assert {
         assertTrue(p.isSuppressClientSendErrors());
     }
 
-    
+
     @Test
     public void testEqualServerPolicies() {
         ServerPolicyCalculator spc = new ServerPolicyCalculator();
         HTTPServerPolicy p1 = new HTTPServerPolicy();
         assertTrue(spc.equals(p1, p1));
-        HTTPServerPolicy p2 = new HTTPServerPolicy();        
+        HTTPServerPolicy p2 = new HTTPServerPolicy();
         assertTrue(spc.equals(p1, p2));
         p1.setContentEncoding("encoding");
         assertTrue(!spc.equals(p1, p2));

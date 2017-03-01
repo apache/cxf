@@ -31,16 +31,16 @@ import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.service.model.BindingInfo;
 
 public class HTTPBindingImpl extends AbstractBindingImpl implements HTTPBinding {
-        
+
     public HTTPBindingImpl(BindingInfo sb, JaxWsEndpointImpl ep) {
         super(ep);
     }
-    
+
     public String getBindingID() {
         //REVISIT: JIRA CXF-613
         return "http://cxf.apache.org/bindings/xformat";
     }
-    
+
     @SuppressWarnings("rawtypes")
     @Override
     public void setHandlerChain(List<Handler> hc) {
@@ -54,6 +54,6 @@ public class HTTPBindingImpl extends AbstractBindingImpl implements HTTPBinding 
                 throw new WebServiceException("Adding an incompatible handler in HTTPBinding: "
                                               + handler.getClass());
             }
-        }        
-    }    
+        }
+    }
 }

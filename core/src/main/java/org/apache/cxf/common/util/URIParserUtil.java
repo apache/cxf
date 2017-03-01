@@ -90,7 +90,7 @@ public final class URIParserUtil {
 
         List<String> tokens = tokenize(nameSpaceURI, "/: ");
         if (tokens.size() == 0) {
-            return "cxf"; 
+            return "cxf";
         }
 
         if (tokens.size() > 1) {
@@ -165,7 +165,7 @@ public final class URIParserUtil {
 
     private static List<String> tokenize(String str, String sep) {
         StringTokenizer tokens = new StringTokenizer(str, sep);
-        List<String> r = new ArrayList<String>();
+        List<String> r = new ArrayList<>();
 
         while (tokens.hasMoreTokens()) {
             r.add(tokens.nextToken());
@@ -204,7 +204,7 @@ public final class URIParserUtil {
     }
 
     private static <T> List<T> reverse(List<T> a) {
-        List<T> r = new ArrayList<T>();
+        List<T> r = new ArrayList<>();
 
         for (int i = a.size() - 1; i >= 0; i--) {
             r.add(a.get(i));
@@ -218,7 +218,7 @@ public final class URIParserUtil {
 
     public static String escapeChars(String s) {
         StringBuilder b = new StringBuilder(s.length());
-        
+
         for (int x = 0; x < s.length(); x++) {
             char ch = s.charAt(x);
             if (isExcluded(ch)) {
@@ -242,7 +242,7 @@ public final class URIParserUtil {
             result = escapeChars(url.toURI().normalize().toString().replace("\\", "/"));
         } catch (MalformedURLException e1) {
             try {
-                if (uri.startsWith("classpath:")) {                  
+                if (uri.startsWith("classpath:")) {
                     url = ClassLoaderUtils.getResource(uri.substring(10), URIParserUtil.class);
                     return url != null ? url.toExternalForm() : uri;
                 }
@@ -286,7 +286,7 @@ public final class URIParserUtil {
             return normalize(arg);
         }
     }
-    
+
     public static String relativize(String base, String toBeRelativized) throws URISyntaxException {
         if (base == null || toBeRelativized == null) {
             return null;
@@ -298,7 +298,7 @@ public final class URIParserUtil {
      * This is a custom implementation for doing what URI.relativize(URI uri) should be
      * doing but is not actually doing when URI roots do not fully match.
      * See http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6226081
-     * 
+     *
      * @param base              The base URI
      * @param toBeRelativized   The URI to be realivized
      * @return                  The string value of the URI you'd expect to get as result

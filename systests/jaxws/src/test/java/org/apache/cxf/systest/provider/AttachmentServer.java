@@ -25,8 +25,8 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
 
 public class AttachmentServer extends AbstractBusTestServerBase {
-    public static final String ADDRESS 
-        = "http://localhost:" + TestUtil.getPortNumber(AttachmentServer.class) 
+    public static final String ADDRESS
+        = "http://localhost:" + TestUtil.getPortNumber(AttachmentServer.class)
             + "/XMLServiceAttachment";
     protected void run() {
         Object implementor = new AttachmentStreamSourceXMLProvider();

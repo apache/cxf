@@ -38,7 +38,7 @@ public class Tag {
 
     public List<String> getIgnoreAttr() {
         if (ignoreAttr == null) {
-            ignoreAttr = new ArrayList<String>();
+            ignoreAttr = new ArrayList<>();
         }
         return ignoreAttr;
     }
@@ -53,7 +53,7 @@ public class Tag {
 
     public List<Tag> getTags() {
         if (tags == null) {
-            tags = new ArrayList<Tag>();
+            tags = new ArrayList<>();
         }
         return tags;
     }
@@ -80,7 +80,7 @@ public class Tag {
         }
         return attributes;
     }
-    
+
     private String createIndent(int size) {
         String indent = "    ";
         StringBuilder sb = new StringBuilder();
@@ -114,7 +114,7 @@ public class Tag {
             sb.append(" (" + tag.getParent().getName().getLocalPart() + ")");
         }
         if (text != null) {
-            sb.append(text); 
+            sb.append(text);
         }
         sb.append("\n");
 

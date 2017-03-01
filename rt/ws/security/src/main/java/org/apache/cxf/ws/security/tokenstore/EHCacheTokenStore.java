@@ -45,12 +45,12 @@ import org.apache.wss4j.common.cache.EHCacheManagerHolder;
 public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleListener {
     public static final long DEFAULT_TTL = 3600L;
     public static final long MAX_TTL = DEFAULT_TTL * 12L;
-    
+
     private Ehcache cache;
     private Bus bus;
     private CacheManager cacheManager;
     private long ttl = DEFAULT_TTL;
-    
+
     public EHCacheTokenStore(String key, Bus b, URL configFileURL) {
         bus = b;
         if (bus != null) {
@@ -61,7 +61,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         @SuppressWarnings("deprecation")
         CacheConfiguration cc = EHCacheManagerHolder.getCacheConfiguration(key, cacheManager)
             .overflowToDisk(false); //tokens not writable
-        
+
         Cache newCache = new RefCountCache(cc);
         cache = cacheManager.addCacheIfAbsent(newCache);
         synchronized (cache) {
@@ -72,11 +72,11 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
                 ((RefCountCache)cache).incrementAndGet();
             }
         }
-        
+
         // Set the TimeToLive value from the CacheConfiguration
         ttl = cc.getTimeToLiveSeconds();
     }
-    
+
     private static class RefCountCache extends Cache {
         AtomicInteger count = new AtomicInteger();
         RefCountCache(CacheConfiguration cc) {
@@ -89,7 +89,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
             return count.decrementAndGet();
         }
     }
-    
+
     /**
      * Set a new (default) TTL value in seconds
      * @param newTtl a new (default) TTL value in seconds
@@ -97,7 +97,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
     public void setTTL(long newTtl) {
         ttl = newTtl;
     }
-    
+
     public void add(SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(token.getId())) {
             Element element = new Element(token.getId(), token, getTTL(), getTTL());
@@ -105,7 +105,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
             cache.put(element);
         }
     }
-    
+
     public void add(String identifier, SecurityToken token) {
         if (token != null && !StringUtils.isEmpty(identifier)) {
             Element element = new Element(identifier, token, getTTL(), getTTL());
@@ -113,7 +113,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
             cache.put(element);
         }
     }
-    
+
     public void remove(String identifier) {
         if (cache != null && !StringUtils.isEmpty(identifier) && cache.isKeyInCache(identifier)) {
             cache.remove(identifier);
@@ -127,7 +127,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         }
         return cache.getKeysWithExpiryCheck();
     }
-    
+
     public SecurityToken getToken(String identifier) {
         if (cache == null) {
             return null;
@@ -138,7 +138,7 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
         }
         return null;
     }
-    
+
     private int getTTL() {
         int parsedTTL = (int)ttl;
         if (ttl != (long)parsedTTL) {
@@ -157,9 +157,9 @@ public class EHCacheTokenStore implements TokenStore, Closeable, BusLifeCycleLis
                         && ((RefCountCache)cache).decrementAndGet() == 0) {
                         cacheManager.removeCache(cache.getName());
                     }
-                }                
+                }
             }
-            
+
             EHCacheManagerHolder.releaseCacheManger(cacheManager);
             cacheManager = null;
             cache = null;

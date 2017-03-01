@@ -19,35 +19,69 @@
 package org.apache.cxf.ext.logging;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
-import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
+import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
+import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedWriter;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.phase.PhaseInterceptor;
 
 /**
  * 
  */
 @NoJSR250Annotations
 public class LoggingInInterceptor extends AbstractLoggingInterceptor {
-
-    public LoggingInInterceptor() {
-        this(new Slf4jEventSender());
+    class LoggingInFaultInterceptor extends AbstractPhaseInterceptor<Message> {
+        LoggingInFaultInterceptor() {
+            super(Phase.RECEIVE);
+        }
+        @Override
+        public void handleMessage(Message message) throws Fault {
+        }
+        @Override
+        public void handleFault(Message message) throws Fault {
+            LoggingInInterceptor.this.handleMessage(message);
+        }
     }
     
+    
+    public LoggingInInterceptor() {
+        this(new Slf4jVerboseEventSender());
+    }
+    
+    public LoggingInInterceptor(PrintWriter writer) {
+        this(new PrintWriterEventSender(writer));
+    }
+
     public LoggingInInterceptor(LogEventSender sender) {
         super(Phase.PRE_INVOKE, sender);
     }
+    
+
+    public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
+        Collection<PhaseInterceptor<? extends Message>> ret = new ArrayList<>();
+        ret.add(new WireTapIn(limit, threshold));
+        ret.add(new LoggingInFaultInterceptor());
+        return ret;
+    }
 
     public void handleMessage(Message message) throws Fault {
+        if (isLoggingDisabledNow(message)) {
+            return;
+        }
         createExchangeId(message);
         final LogEvent event = new DefaultLogEventMapper().map(message);
         if (shouldLogContent(event)) {

@@ -60,54 +60,54 @@ import org.apache.olingo.odata2.core.uri.expression.FilterParserImpl;
 
 public class ODataParser<T> extends AbstractSearchConditionParser<T> {
     private final FilterParser parser;
-    
+
     private static class TypedProperty {
         private final TypeInfo typeInfo;
         private final String propertyName;
-        
+
         TypedProperty(final TypeInfo typeInfo, final String propertyName) {
             this.typeInfo = typeInfo;
             this.propertyName = propertyName;
         }
     }
-    
+
     private static class TypedValue {
         private final Object value;
-        private final String literal;    
+        private final String literal;
         private final Class< ? > typeClass;
-        
+
         TypedValue(final Class< ? > typeClass, final String literal, final Object value) {
             this.literal = literal;
             this.value = value;
             this.typeClass = typeClass;
         }
     }
-    
+
     private class FilterExpressionVisitor implements ExpressionVisitor {
         private final T condition;
-        
+
         FilterExpressionVisitor(final T condition) {
             this.condition = condition;
         }
 
         @Override
-        public Object visitFilterExpression(FilterExpression filterExpression, String expressionString, 
+        public Object visitFilterExpression(FilterExpression filterExpression, String expressionString,
                 Object expression) {
             return expression;
         }
 
         @Override
         @SuppressWarnings("unchecked")
-        public Object visitBinary(BinaryExpression binaryExpression, BinaryOperator operator, 
+        public Object visitBinary(BinaryExpression binaryExpression, BinaryOperator operator,
                 Object leftSide, Object rightSide) {
-            
+
             // AND / OR operate on search conditions
             if (operator == BinaryOperator.AND || operator == BinaryOperator.OR) {
                 if (leftSide instanceof SearchCondition && rightSide instanceof SearchCondition) {
                     final List< SearchCondition< T > > conditions = new ArrayList< SearchCondition< T > >(2);
                     conditions.add((SearchCondition< T >)leftSide);
                     conditions.add((SearchCondition< T >)rightSide);
-                    
+
                     if (operator == BinaryOperator.AND) {
                         return new AndSearchCondition< T >(conditions);
                     } else if (operator == BinaryOperator.OR) {
@@ -115,16 +115,16 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
                     }
                 } else {
                     throw new SearchParseException(
-                        "Unsupported binary operation arguments (SearchCondition expected): " 
+                        "Unsupported binary operation arguments (SearchCondition expected): "
                             + leftSide + ", " + rightSide);
                 }
             }
 
-            // Property could be either on left side (Name eq 'Tom') or 
+            // Property could be either on left side (Name eq 'Tom') or
             // right side ('Tom' eq Name)
             TypedValue value = null;
             TypedProperty property = null;
-            
+
             if (leftSide instanceof TypedProperty && rightSide instanceof TypedValue) {
                 property = (TypedProperty)leftSide;
                 value = (TypedValue)rightSide;
@@ -133,13 +133,13 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
                 value = (TypedValue)leftSide;
             } else {
                 throw new SearchParseException(
-                    "Unsupported binary operation arguments (TypedValue or TypedProperty expected): " 
+                    "Unsupported binary operation arguments (TypedValue or TypedProperty expected): "
                         + leftSide + ", " + rightSide);
             }
-                       
+
             ConditionType conditionType = null;
             switch (operator) {
-            case EQ:    
+            case EQ:
                 conditionType = ConditionType.EQUALS;
                 break;
             case NE:
@@ -153,14 +153,14 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
                 break;
             case GT:
                 conditionType = ConditionType.GREATER_THAN;
-                break;                
+                break;
             case GE:
                 conditionType = ConditionType.GREATER_OR_EQUALS;
-                break;                
+                break;
             default:
                 throw new SearchParseException("Unsupported binary operation: " + operator);
             }
-            
+
             Object typedValue = null;
             // If property type and value type are compatible, just use them
             if (property.typeInfo.getWrappedTypeClass().isAssignableFrom(value.typeClass)) {
@@ -170,34 +170,34 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
                 if (isDecodeQueryValues()) {
                     valueStr = UrlUtils.urlDecode(valueStr);
                 }
-                typedValue = parseType(property.propertyName, null, null, property.propertyName, 
+                typedValue = parseType(property.propertyName, null, null, property.propertyName,
                     property.typeInfo, valueStr);
             }
-            
+
             final CollectionCheckInfo checkInfo = property.typeInfo.getCollectionCheckInfo();
             if (checkInfo != null) {
-                return new CollectionCheckCondition< T >(property.propertyName, typedValue, 
+                return new CollectionCheckCondition< T >(property.propertyName, typedValue,
                     property.typeInfo.getGenericType(), conditionType, condition, checkInfo);
             }
-                        
-            return new PrimitiveSearchCondition< T >(property.propertyName, typedValue,  
+
+            return new PrimitiveSearchCondition< T >(property.propertyName, typedValue,
                 property.typeInfo.getGenericType(), conditionType, condition);
         }
 
         @Override
-        public Object visitLiteral(LiteralExpression literal, EdmLiteral edmLiteral) {            
+        public Object visitLiteral(LiteralExpression literal, EdmLiteral edmLiteral) {
             try {
-                final EdmSimpleType type = edmLiteral.getType();  
-                
-                final Object value = type.valueOfString(edmLiteral.getLiteral(), 
+                final EdmSimpleType type = edmLiteral.getType();
+
+                final Object value = type.valueOfString(edmLiteral.getLiteral(),
                     EdmLiteralKind.DEFAULT, null, type.getDefaultType());
-                
-                return new TypedValue(type.getDefaultType(), edmLiteral.getLiteral(), value); 
+
+                return new TypedValue(type.getDefaultType(), edmLiteral.getLiteral(), value);
             } catch (EdmSimpleTypeException ex) {
                 throw new SearchParseException("Failed to convert literal to a typed form: " + literal, ex);
             }
         }
-        
+
         @Override
         public Object visitProperty(PropertyExpression propertyExpression, String uriLiteral, EdmTyped edmProperty) {
             String setter = getActualSetterName(uriLiteral);
@@ -207,83 +207,83 @@ public class ODataParser<T> extends AbstractSearchConditionParser<T> {
 
         @Override
         public Object visitMethod(MethodExpression methodExpression, MethodOperator method, List<Object> parameters) {
-            throw new SearchParseException("Unsupported operation visitMethod: " + methodExpression 
+            throw new SearchParseException("Unsupported operation visitMethod: " + methodExpression
                 + "," + method + "," + parameters);
         }
 
         @Override
         public Object visitMember(MemberExpression memberExpression, Object path, Object property) {
-            throw new SearchParseException("Unsupported operation visitMember: " 
-                + memberExpression + "," + path + "," + property);            
+            throw new SearchParseException("Unsupported operation visitMember: "
+                + memberExpression + "," + path + "," + property);
         }
 
         @Override
         public Object visitUnary(UnaryExpression unaryExpression, UnaryOperator operator, Object operand) {
-            throw new SearchParseException("Unsupported operation visitUnary: " + unaryExpression 
+            throw new SearchParseException("Unsupported operation visitUnary: " + unaryExpression
                 + "," + operator + "," + operand);
         }
-        
+
         @Override
         public Object visitOrderByExpression(OrderByExpression orderByExpression, String expressionString,
                 List<Object> orders) {
-            throw new SearchParseException("Unsupported operation visitOrderByExpression: " 
+            throw new SearchParseException("Unsupported operation visitOrderByExpression: "
                 + orderByExpression + "," + expressionString + "," + orders);
         }
 
         @Override
         public Object visitOrder(OrderExpression orderExpression, Object filterResult, SortOrder sortOrder) {
-            throw new SearchParseException("Unsupported operation visitOrder: " + orderExpression 
+            throw new SearchParseException("Unsupported operation visitOrder: " + orderExpression
                 + "," + filterResult + "," + sortOrder);
-        }        
+        }
     }
-    
+
     /**
      * Creates OData parser.
-     * 
+     *
      * @param conditionClass - class of T used to create condition objects. Class T must have
-     *            accessible no-arguments constructor and complementary setters to these used in 
+     *            accessible no-arguments constructor and complementary setters to these used in
      *            OData $filter expressions.
      */
-    public ODataParser(final Class< T > conditionClass) {    
+    public ODataParser(final Class< T > conditionClass) {
         this(conditionClass, Collections.<String, String>emptyMap());
     }
-    
+
     /**
      * Creates OData parser.
-     * 
+     *
      * @param tclass - class of T used to create condition objects in built syntax tree. Class T must have
-     *            accessible no-arg constructor and complementary setters to these used in 
+     *            accessible no-arg constructor and complementary setters to these used in
      *            OData $filter expressions.
-     * @param contextProperties            
+     * @param contextProperties
      */
     public ODataParser(Class<T> tclass, Map<String, String> contextProperties) {
         this(tclass, contextProperties, null);
     }
-    
+
     /**
      * Creates OData parser.
-     * 
+     *
      * @param tclass - class of T used to create condition objects in built syntax tree. Class T must have
      *            accessible no-arg constructor and complementary setters to these used in
      *            OData $filter expressions.
-     * @param contextProperties            
+     * @param contextProperties
      */
-    public ODataParser(Class<T> tclass, 
+    public ODataParser(Class<T> tclass,
                       Map<String, String> contextProperties,
                       Map<String, String> beanProperties) {
         super(tclass, contextProperties, beanProperties);
-        
+
         this.parser = new FilterParserImpl(null);
     }
-    
+
     @Override
     @SuppressWarnings("unchecked")
     public SearchCondition<T> parse(String searchExpression) throws SearchParseException {
         try {
             final T condition = conditionClass.newInstance();
             final FilterExpression expression = parser.parseFilterString(searchExpression);
-            final FilterExpressionVisitor visitor = new FilterExpressionVisitor(condition);            
-            return (SearchCondition< T >)expression.accept(visitor);            
+            final FilterExpressionVisitor visitor = new FilterExpressionVisitor(condition);
+            return (SearchCondition< T >)expression.accept(visitor);
         } catch (ODataMessageException ex) {
             throw new SearchParseException(ex);
         } catch (ODataApplicationException ex) {

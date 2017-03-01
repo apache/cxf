@@ -41,12 +41,14 @@
         <cxf.compile.show.deprecation>true</cxf.compile.show.deprecation>
         <cxf.codegenplugin.forkmode>once</cxf.codegenplugin.forkmode>
         <cxf.codegen.jvmArgs>-Djavax.xml.accessExternalSchema=file</cxf.codegen.jvmArgs>
+        <cxf.xjc.jvmArgs/>
+        <cxf.xjcplugin.forkmode>false</cxf.xjcplugin.forkmode>
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
         <!-- stuff related to ASM -->
         <cxf.asm.groupId>org.ow2.asm</cxf.asm.groupId>
         <cxf.asm.artifactId>asm</cxf.asm.artifactId>
-        <cxf.asm.version>5.0.4</cxf.asm.version>
-        <cxf.osgi.asm.version>[3.0,6)</cxf.osgi.asm.version>
+        <cxf.asm.version>5.2</cxf.asm.version>
+        <cxf.osgi.asm.version>[3.0,6.1)</cxf.osgi.asm.version>
         <!-- OSGi related properties -->
         <cxf.fragment.host />
         <cxf.bundle.activator />
@@ -65,10 +67,11 @@
         <cxf.osgi.javax.xml.ws.version>[0.0,3)</cxf.osgi.javax.xml.ws.version>
         <!-- please maintain alphabetical order here -->
         <cxf.abdera.version>1.1.3</cxf.abdera.version>
-        <cxf.activemq.version>5.14.2</cxf.activemq.version>
+        <cxf.abdera.osgi.version>1.1.3_2</cxf.abdera.osgi.version>
+        <cxf.activemq.version>5.14.3</cxf.activemq.version>
         <cxf.ahc.version>1.9.8</cxf.ahc.version>
         <cxf.apacheds.version>2.0.0-M23</cxf.apacheds.version>
-        <cxf.atmosphere.version>2.4.7</cxf.atmosphere.version>
+        <cxf.atmosphere.version>2.4.9</cxf.atmosphere.version>
         <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
         <cxf.axiom.version>1.2.14</cxf.axiom.version>
         <cxf.bcprov.version>1.55</cxf.bcprov.version>
@@ -84,13 +87,13 @@
         <cxf.ehcache3.version>3.0.3</cxf.ehcache3.version>
         <cxf.fastinfoset.bundle.version>1.2.13_1</cxf.fastinfoset.bundle.version>
         <cxf.guava.version>18.0</cxf.guava.version>
-        <cxf.hazelcast.version>1.9.4</cxf.hazelcast.version>
-        <cxf.httpcomponents.asyncclient.version>4.1.2</cxf.httpcomponents.asyncclient.version>
+        <cxf.hazelcast.version>3.7.4</cxf.hazelcast.version>
+        <cxf.httpcomponents.asyncclient.version>4.1.3</cxf.httpcomponents.asyncclient.version>
         <cxf.httpcomponents.asyncclient.version.range>[4.0,4.2)</cxf.httpcomponents.asyncclient.version.range>
-        <cxf.httpcomponents.client.version>4.5.2</cxf.httpcomponents.client.version>
-        <cxf.httpcomponents.core.version>4.4.4</cxf.httpcomponents.core.version>
+        <cxf.httpcomponents.client.version>4.5.3</cxf.httpcomponents.client.version>
+        <cxf.httpcomponents.core.version>4.4.6</cxf.httpcomponents.core.version>
         <cxf.httpcomponents.core.version.range>[4.3,4.5.0)</cxf.httpcomponents.core.version.range>
-        <cxf.jackson.version>2.6.6</cxf.jackson.version>
+        <cxf.jackson.version>2.8.7</cxf.jackson.version>
         <cxf.james.mim4j.version>0.7.2</cxf.james.mim4j.version>
         <cxf.logback.classic.version>1.0.13</cxf.logback.classic.version>
         <cxf.log4j.version>1.2.17</cxf.log4j.version>
@@ -100,13 +103,14 @@
         <cxf.javax.annotation-api.version>1.2</cxf.javax.annotation-api.version>
         <cxf.jcache.version>1.0.0</cxf.jcache.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
+        <cxf.geronimo.jta.version>1.1.1</cxf.geronimo.jta.version>
         <cxf.geronimo.j2ee.management.version>1.0.1</cxf.geronimo.j2ee.management.version>
         <cxf.geronimo.jpa.version>1.0</cxf.geronimo.jpa.version>
-        <cxf.openjpa.version>2.4.1</cxf.openjpa.version>
+        <cxf.openjpa.version>2.4.2</cxf.openjpa.version>
         <cxf.geronimo.transaction.version>1.1.1</cxf.geronimo.transaction.version>
         <cxf.jasypt.bundle.version>1.9.0_1</cxf.jasypt.bundle.version>
         <cxf.javassist.version>3.19.0-GA</cxf.javassist.version>
-        <cxf.javax.ws.rs.version>2.1-m01</cxf.javax.ws.rs.version>
+        <cxf.javax.ws.rs.version>2.1-m04</cxf.javax.ws.rs.version>
         <cxf.jaxb.version>2.2.11</cxf.jaxb.version>
         <cxf.jaxb.impl.version>${cxf.jaxb.version}</cxf.jaxb.impl.version>
         <cxf.jaxb.core.version>${cxf.jaxb.version}</cxf.jaxb.core.version>
@@ -114,19 +118,17 @@
         <cxf.joda.time.version>2.9.4</cxf.joda.time.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jettison.version>1.3.8</cxf.jettison.version>
-        <cxf.jetty8.version>8.1.19.v20160209</cxf.jetty8.version>
         <cxf.jetty9.version>9.3.5.v20151012</cxf.jetty9.version>
         <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
         <cxf.jetty.osgi.version>[8.1,10)</cxf.jetty.osgi.version>
         <cxf.undertow.version>1.3.7.Final</cxf.undertow.version>
         <cxf.undertow.osgi.version>[1.3, 1.4)</cxf.undertow.osgi.version>
-        <cxf.jibx.version>1.2.6</cxf.jibx.version>
         <cxf.junit.version>4.12</cxf.junit.version>
         <cxf.hamcrest.version>1.3</cxf.hamcrest.version>
         <cxf.maven.core.version>3.0.5</cxf.maven.core.version>
         <cxf.msv.version>2013.6.1</cxf.msv.version>
         <cxf.neethi.version>3.0.3</cxf.neethi.version>
-        <cxf.netty.version>4.0.19.Final</cxf.netty.version>
+        <cxf.netty.version>4.0.43.Final</cxf.netty.version>
         <cxf.netty3.version>3.9.2.Final</cxf.netty3.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
         <cxf.oauth.bundle.version>20100527_1</cxf.oauth.bundle.version>
@@ -142,16 +144,16 @@
         <cxf.geronimo.servlet25.version>1.2</cxf.geronimo.servlet25.version>
         <cxf.servlet-api-2.5.artifact>geronimo-servlet_2.5_spec</cxf.servlet-api-2.5.artifact>
         <cxf.servlet-api-2.5.version>1.1.2</cxf.servlet-api-2.5.version>
-        <cxf.slf4j.version>1.7.21</cxf.slf4j.version>
+        <cxf.slf4j.version>1.7.24</cxf.slf4j.version>
         <cxf.specs.jaxws.api.version>1.2</cxf.specs.jaxws.api.version>
-        <cxf.spring.version>4.2.8.RELEASE</cxf.spring.version>
-        <cxf.spring.boot.version>1.3.6.RELEASE</cxf.spring.boot.version>
-        <cxf.spring.security.version>4.2.0.RELEASE</cxf.spring.security.version>
+        <cxf.spring.version>4.3.6.RELEASE</cxf.spring.version>
+        <cxf.spring.boot.version>1.5.1.RELEASE</cxf.spring.boot.version>
+        <cxf.spring.security.version>4.2.1.RELEASE</cxf.spring.security.version>
         <cxf.spring.osgi.version>1.2.1</cxf.spring.osgi.version>
-        <cxf.spring.ldap.version>2.1.0.RELEASE</cxf.spring.ldap.version>
+        <cxf.spring.ldap.version>2.2.1.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.swagger.version>1.3.13</cxf.swagger.version>
-        <cxf.swagger2.version>1.5.10</cxf.swagger2.version>
+        <cxf.swagger2.version>1.5.12</cxf.swagger2.version>
         <cxf.velocity.version>1.7</cxf.velocity.version>
         <cxf.woodstox.core.version>5.0.3</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>3.1.4</cxf.woodstox.stax2-api.version>
@@ -171,15 +173,16 @@
         <cxf.jboss.weld.version>2.4.0.Final</cxf.jboss.weld.version>
         <cxf.jboss.logging.version>3.3.0.Final</cxf.jboss.logging.version>
         <cxf.osgi.validation.api.version>1.1.0</cxf.osgi.validation.api.version>
-        <cxf.hibernate.validator.version>5.2.2.Final</cxf.hibernate.validator.version>
+        <cxf.hibernate.validator.version>5.2.3.Final</cxf.hibernate.validator.version>
         <cxf.glassfish.json.version>1.0.4</cxf.glassfish.json.version>
+        <cxf.johnzon.version>1.0.0</cxf.johnzon.version>
         <cxf.javax.el.version>3.0.0</cxf.javax.el.version>
         <!-- various OSGi related versions -->
         <cxf.aries.version>1.0.0</cxf.aries.version>
         <cxf.aries.parser.version>1.3.1</cxf.aries.parser.version> 
         <cxf.aries.version.range>[1.0,2)</cxf.aries.version.range>
         <cxf.osgi.version>4.2.0</cxf.osgi.version>
-        <cxf.karaf.version>4.0.6</cxf.karaf.version>
+        <cxf.karaf.version>4.0.8</cxf.karaf.version>
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
         <cxf.pax.exam.version>4.7.0</cxf.pax.exam.version>
         <cxf.felix.framework.version>2.0.5</cxf.felix.framework.version>
@@ -210,6 +213,7 @@
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.htrace.version>4.0.1-incubating</cxf.htrace.version>
         <cxf.zest.version>2.1</cxf.zest.version>
+        <cxf.brave.version>3.16.0</cxf.brave.version>
         <cxf.checkstyle.extension />
         <cxf.jaxb.context.class />
         <cxf.jaxb.context.class.property>none</cxf.jaxb.context.class.property>
@@ -272,7 +276,7 @@
                 <plugin>
                     <groupId>org.apache.servicemix.tooling</groupId>
                     <artifactId>depends-maven-plugin</artifactId>
-                    <version>1.2</version>
+                    <version>1.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -355,7 +359,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.5</version>
+                    <version>3.7</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.cxf.build-utils</groupId>
@@ -948,6 +952,12 @@
                 <optional>true</optional>
             </dependency>
             <dependency>
+                <groupId>org.apache.johnzon</groupId>
+                <artifactId>johnzon-core</artifactId>
+                <version>${cxf.johnzon.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-jdk14</artifactId>
                 <version>${cxf.slf4j.version}</version>
@@ -1446,7 +1456,7 @@
             <dependency>
                 <groupId>org.easymock</groupId>
                 <artifactId>easymock</artifactId>
-                <version>3.3.1</version>
+                <version>3.4</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -1576,6 +1586,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
+                <artifactId>geronimo-jta_1.1_spec</artifactId>
+                <version>${cxf.geronimo.jta.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
                 <version>2.0.0</version>
             </dependency>
@@ -1619,26 +1634,6 @@
                         <artifactId>stax-api</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.jibx</groupId>
-                <artifactId>jibx-bind</artifactId>
-                <version>${cxf.jibx.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jibx</groupId>
-                <artifactId>jibx-run</artifactId>
-                <version>${cxf.jibx.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jibx</groupId>
-                <artifactId>jibx-schema</artifactId>
-                <version>${cxf.jibx.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.jibx</groupId>
-                <artifactId>jibx-tools</artifactId>
-                <version>${cxf.jibx.version}</version>
             </dependency>
             <dependency>
                 <groupId>xml-resolver</groupId>
@@ -1919,6 +1914,11 @@
                 <version>${cxf.htrace.version}</version>
             </dependency>
             <dependency>
+                 <groupId>io.zipkin.brave</groupId>
+                 <artifactId>brave-http</artifactId>
+                 <version>${cxf.brave.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.qi4j.library</groupId>
                 <artifactId>org.qi4j.library.circuitbreaker</artifactId>
                 <version>${cxf.zest.version}</version>
@@ -1964,12 +1964,6 @@
             <id>jetty9</id>
             <properties>
                 <cxf.jetty.version>${cxf.jetty9.version}</cxf.jetty.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>jetty8</id>
-            <properties>
-                <cxf.jetty.version>${cxf.jetty8.version}</cxf.jetty.version>
             </properties>
         </profile>
         <profile>
@@ -2182,7 +2176,7 @@
                     <plugin>
                         <groupId>org.ekstazi</groupId>
                         <artifactId>ekstazi-maven-plugin</artifactId>
-                        <version>4.3.0</version>
+                        <version>4.6.2</version>
                         <configuration>
                             <!-- always run tests that failed in prevoius run -->
                             <forcefailing>true</forcefailing>
@@ -2212,6 +2206,43 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+	    <id>java9</id>
+	    <properties>
+                <cxf.karaf.version>4.1.0</cxf.karaf.version>
+                <cxf.pax.exam.version>4.10.0</cxf.pax.exam.version>
+                <cxf.server.launcher.vmargs>-ea --patch-module java.annotations.common=${project.basedir}/target/java9/javax.annotation-api-1.2.jar --patch-module java.transaction=${project.basedir}/target/java9 --add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED --add-exports=java.xml.bind/com.sun.xml.internal.bind.v2=ALL-UNNAMED --add-exports=java.xml.bind/com.sun.xml.internal.bind.v2.runtime=ALL-UNNAMED --add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED --add-exports=java.base/java.io=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.rmi/sun.rmi.transport=ALL-UNNAMED --add-opens java.xml.bind/com.sun.xml.internal.bind.api=ALL-UNNAMED --add-opens jdk.xml.bind/com.sun.tools.internal.xjc.reader.internalizer=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.xml.ws/javax.xml.ws=ALL-UNNAMED --add-opens jdk.xml.bind/com.sun.codemodel.internal=ALL-UNNAMED --add-opens jdk.xml.bind/com.sun.tools.internal.xjc.api.impl.s2j=ALL-UNNAMED --add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED --add-opens java.base/java.security=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED --add-exports=java.xml.bind/com.sun.xml.internal.bind.marshaller=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver.tools=ALL-UNNAMED --add-exports=java.xml.ws/com.sun.xml.internal.messaging.saaj.soap=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.tools.internal.xjc.api.impl.s2j=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.tools.internal.xjc=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.tools.internal.xjc.api=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.codemodel.internal=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.codemodel.internal.writer=ALL-UNNAMED --add-exports=java.corba/com.sun.corba.se.impl.corba=ALL-UNNAMED --add-modules java.corba,java.activation,java.xml.bind,java.xml.ws,jdk.xml.bind</cxf.server.launcher.vmargs>
+                <cxf.surefire.fork.vmargs>-ea --patch-module java.annotations.common=${project.basedir}/target/java9/javax.annotation-api-1.2.jar --patch-module java.transaction=${project.basedir}/target/java9 --add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED --add-exports=java.xml.bind/com.sun.xml.internal.bind.v2=ALL-UNNAMED --add-exports=java.xml.bind/com.sun.xml.internal.bind.v2.runtime=ALL-UNNAMED --add-exports=java.base/java.io=ALL-UNNAMED --add-opens java.rmi/sun.rmi.transport=ALL-UNNAMED --add-opens java.xml.bind/com.sun.xml.internal.bind.api=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens jdk.xml.bind/com.sun.tools.internal.xjc.reader.internalizer=ALL-UNNAMED --add-opens jdk.xml.bind/com.sun.tools.internal.xjc.api.impl.s2j=ALL-UNNAMED --add-opens java.xml.ws/javax.xml.ws=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED --add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED --add-opens jdk.xml.bind/com.sun.codemodel.internal=ALL-UNNAMED --add-opens java.base/java.security=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED --add-exports=java.base/sun.security.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED --add-exports=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs.util=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.jaxp=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.dom=ALL-UNNAMED --add-exports=java.xml.bind/com.sun.xml.internal.bind.marshaller=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xml.internal.resolver.tools=ALL-UNNAMED --add-exports=java.xml.ws/com.sun.xml.internal.messaging.saaj.soap=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.tools.internal.xjc.api.impl.s2j=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.tools.internal.xjc=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.tools.internal.xjc.api=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.codemodel.internal=ALL-UNNAMED --add-exports=jdk.xml.bind/com.sun.codemodel.internal.writer=ALL-UNNAMED --add-exports=java.corba/com.sun.corba.se.impl.corba=ALL-UNNAMED --add-modules java.corba,java.activation,java.xml.bind,java.xml.ws,jdk.xml.bind</cxf.surefire.fork.vmargs>
+                <cxf.xjc.jvmArgs>--add-modules java.activation,java.xml.bind,java.xml.ws --add-exports=java.xml.bind/com.sun.xml.internal.bind.v2.runtime=ALL-UNNAMED --add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED --add-exports=java.xml.bind/com.sun.xml.internal.bind.marshaller=ALL-UNNAMED --add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED --add-opens java.base/java.security=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED</cxf.xjc.jvmArgs>
+                <cxf.codegen.jvmArgs>--add-modules java.activation,java.xml.bind,java.xml.ws --add-exports=java.xml.bind/com.sun.xml.internal.bind.v2.runtime=ALL-UNNAMED --add-exports=jdk.xml.dom/org.w3c.dom.html=ALL-UNNAMED --add-exports=java.xml/com.sun.org.apache.xerces.internal.impl.xs=ALL-UNNAMED --add-exports=java.xml.bind/com.sun.xml.internal.bind.marshaller=ALL-UNNAMED --add-opens java.xml.ws/javax.xml.ws.wsaddressing=ALL-UNNAMED --add-opens java.base/java.security=ALL-UNNAMED --add-opens java.base/java.net=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED</cxf.codegen.jvmArgs>
+                <cxf.codegenplugin.forkmode>true</cxf.codegenplugin.forkmode>
+                <cxf.xjcplugin.forkmode>true</cxf.xjcplugin.forkmode>
+	    </properties>
+	    <activation>
+        	<jdk>9</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
+                            <showWarnings>true</showWarnings>
+                            <compilerArgument>${cxf.compile.flags}</compilerArgument>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+	</profile>
     </profiles>
 
     <!-- Temporarily only till JAX-RS 2.1 artifacts become available -->

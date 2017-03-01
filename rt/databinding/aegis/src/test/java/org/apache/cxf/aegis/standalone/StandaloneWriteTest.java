@@ -48,18 +48,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * 
+ *
  */
 public class StandaloneWriteTest {
     private AegisContext context;
     private TestUtilities testUtilities;
     private XMLOutputFactory xmlOutputFactory;
     private XMLInputFactory xmlInputFactory;
-    
+
     private interface ListStringInterface {
         List<String> method();
     }
-    
+
     @Before
     public void before() {
         testUtilities = new TestUtilities(getClass());
@@ -67,17 +67,17 @@ public class StandaloneWriteTest {
         xmlOutputFactory = XMLOutputFactory.newInstance();
         xmlInputFactory = XMLInputFactory.newInstance();
     }
-    
+
     @Test
     public void testTypeLookup() throws Exception {
         context = new AegisContext();
         context.initialize();
-        AegisType st = context.getTypeMapping().getType(new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, 
+        AegisType st = context.getTypeMapping().getType(new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI,
                                                              "string"));
         assertNotNull(st);
         assertEquals(st.getClass(), StringType.class);
     }
-    
+
     @Test
     public void testBasicTypeWrite() throws Exception {
         context = new AegisContext();
@@ -98,20 +98,20 @@ public class StandaloneWriteTest {
         String text = reader.getText();
         assertEquals("ball-of-yarn", text);
     }
-    
+
     @Test
     public void testWriteCollection() throws Exception {
         context = new AegisContext();
         context.setWriteXsiTypes(true);
         context.initialize();
-        List<String> strings = new ArrayList<String>();
+        List<String> strings = new ArrayList<>();
         strings.add("cat");
         strings.add("dog");
         strings.add("hailstorm");
         AegisWriter<XMLStreamWriter> writer = context.createXMLStreamWriter();
         StringWriter stringWriter = new StringWriter();
         XMLStreamWriter xmlWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);
-        java.lang.reflect.Type listStringType 
+        java.lang.reflect.Type listStringType
             = ListStringInterface.class.getMethods()[0].getGenericReturnType();
         writer.write(strings, new QName("urn:borghes", "items"),
                       false, xmlWriter, listStringType);
@@ -137,7 +137,7 @@ public class StandaloneWriteTest {
         text = reader.getElementText();
         assertEquals("hailstorm", text);
     }
-    
+
     @Test
     public void testBean() throws Exception {
         context = new AegisContext();
@@ -157,6 +157,6 @@ public class StandaloneWriteTest {
         xmlWriter.close();
         String xml = stringWriter.toString();
         assertTrue(xml.contains("doody"));
-        
+
     }
 }

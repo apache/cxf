@@ -52,13 +52,13 @@ public class SOAPHandlerFaultInInterceptor extends
     }
 
     public Set<URI> getRoles() {
-        Set<URI> roles = new HashSet<URI>();
+        Set<URI> roles = new HashSet<>();
         // TODO
         return roles;
     }
 
     public Set<QName> getUnderstoodHeaders() {
-        Set<QName> understood = new HashSet<QName>();
+        Set<QName> understood = new HashSet<>();
         for (Handler<?> h : getBinding().getHandlerChain()) {
             if (h instanceof SOAPHandler) {
                 Set<QName> headers = CastUtils.cast(((SOAPHandler<?>) h).getHeaders());
@@ -100,8 +100,8 @@ public class SOAPHandlerFaultInInterceptor extends
         if (soapMessage.getHeaders().isEmpty() && paramHeaders.isEmpty()) {
             //the TCK expects the getHeaders method to always be
             //called.   If there aren't any headers in the message,
-            //THe MustUnderstandInterceptor quickly returns without 
-            //trying to calculate the understood headers.   Thus, 
+            //THe MustUnderstandInterceptor quickly returns without
+            //trying to calculate the understood headers.   Thus,
             //we need to call it here.
             getUnderstoodHeaders();
         }

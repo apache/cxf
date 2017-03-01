@@ -47,7 +47,7 @@ import org.apache.cxf.helpers.IOUtils;
 public class TestProvider extends AbstractProvider<DataSource> implements Provider<DataSource> {
 
     static final Logger LOG = LogUtils.getLogger(TestProvider.class);
-    
+
     @javax.annotation.Resource
     public void setWebServiceContext(WebServiceContext wsc) {
         super.setWebServiceContext(wsc);
@@ -55,9 +55,9 @@ public class TestProvider extends AbstractProvider<DataSource> implements Provid
 
     @Override
     public DataSource invoke(DataSource req) {
-        return super.invoke(req); 
+        return super.invoke(req);
     }
-    
+
     protected DataSource post(DataSource req) {
         String msg;
         try {
@@ -80,12 +80,12 @@ public class TestProvider extends AbstractProvider<DataSource> implements Provid
         return new ByteArrayDataSource(msg.getBytes(), "text/xml");
     }
 
-    
+
     @Override
     protected DataSource get(DataSource req) {
         String msg = "<doc><response>Hello</response></doc>";
         return new ByteArrayDataSource(msg.getBytes(), "application/octet-stream");
     }
-    
-    
+
+
 }

@@ -40,10 +40,10 @@ import org.apache.xml.security.stax.securityEvent.SecurityEventConstants.Event;
 
 /**
  * This interceptor handles parsing the StaX WS-Security results (events) + checks that the
- * specified crypto coverage events actually occurred. The default functionality is to enforce 
+ * specified crypto coverage events actually occurred. The default functionality is to enforce
  * that the SOAP Body, Timestamp, and WS-Addressing ReplyTo and FaultTo headers must be signed,
  * and the UsernameToken must be encrypted (if they exist in the message payload).
- * 
+ *
  * Note that this interceptor must be explicitly added to the InInterceptor chain.
  */
 public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMessage> {
@@ -52,37 +52,37 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
     public static final String WSU_NS = WSConstants.WSU_NS;
     public static final String WSSE_NS = WSConstants.WSSE_NS;
     public static final String WSA_NS = Names.WSA_NAMESPACE_NAME;
-    
+
     private boolean signBody;
     private boolean signTimestamp;
     private boolean encryptBody;
     private boolean signAddressingHeaders;
     private boolean signUsernameToken;
     private boolean encryptUsernameToken;
-    
+
     public StaxCryptoCoverageChecker() {
         super(Phase.PRE_PROTOCOL);
-        
+
         // Sign SOAP Body
         setSignBody(true);
-        
+
         // Sign Timestamp
         setSignTimestamp(true);
-        
+
         // Sign Addressing Headers
         setSignAddressingHeaders(true);
-        
+
         // Encrypt UsernameToken
         setEncryptUsernameToken(true);
     }
 
     @Override
     public void handleMessage(SoapMessage soapMessage) throws Fault {
-        
+
         @SuppressWarnings("unchecked")
-        final List<SecurityEvent> incomingSecurityEventList = 
+        final List<SecurityEvent> incomingSecurityEventList =
             (List<SecurityEvent>)soapMessage.get(SecurityEvent.class.getName() + ".in");
-        
+
         List<SecurityEvent> results = new ArrayList<>();
         if (incomingSecurityEventList != null) {
             // Get all Signed/Encrypted Results
@@ -90,7 +90,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
                 getEventFromResults(WSSecurityEventConstants.SIGNED_PART, incomingSecurityEventList));
             results.addAll(
                 getEventFromResults(WSSecurityEventConstants.SignedElement, incomingSecurityEventList));
-            
+
             if (encryptBody || encryptUsernameToken) {
                 results.addAll(
                     getEventFromResults(WSSecurityEventConstants.ENCRYPTED_PART, incomingSecurityEventList));
@@ -98,11 +98,11 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
                     getEventFromResults(WSSecurityEventConstants.EncryptedElement, incomingSecurityEventList));
             }
         }
-        
+
         try {
             checkSignedBody(results);
             checkEncryptedBody(results);
-            
+
             if (signTimestamp) {
                 // We only insist on the Timestamp being signed if it is actually present in the message
                 List<SecurityEvent> timestampResults =
@@ -111,15 +111,15 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
                     checkSignedTimestamp(results);
                 }
             }
-            
+
             if (signAddressingHeaders) {
-                AddressingProperties addressingProperties = 
+                AddressingProperties addressingProperties =
                     (AddressingProperties)soapMessage.get("javax.xml.ws.addressing.context.inbound");
                 checkSignedAddressing(results, addressingProperties);
             }
-            
+
             if (signUsernameToken || encryptUsernameToken) {
-                // We only insist on the UsernameToken being signed/encrypted if it is actually 
+                // We only insist on the UsernameToken being signed/encrypted if it is actually
                 // present in the message
                 List<SecurityEvent> usernameTokenResults =
                     getEventFromResults(WSSecurityEventConstants.USERNAME_TOKEN, incomingSecurityEventList);
@@ -127,7 +127,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
                     if (signUsernameToken) {
                         checkSignedUsernameToken(results);
                     }
-                    
+
                     if (encryptUsernameToken) {
                         checkEncryptedUsernameToken(results);
                     }
@@ -137,7 +137,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
             throw createSoapFault(soapMessage.getVersion(), e);
         }
     }
-    
+
     private List<SecurityEvent> getEventFromResults(Event event, List<SecurityEvent> incomingSecurityEventList) {
         List<SecurityEvent> results = new ArrayList<>();
         for (SecurityEvent incomingEvent : incomingSecurityEventList) {
@@ -147,85 +147,85 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
         }
         return results;
     }
-    
+
     private void checkSignedBody(List<SecurityEvent> results) throws WSSecurityException {
         if (!signBody) {
             return;
         }
-        
+
         boolean isBodySigned = false;
         for (SecurityEvent signedEvent : results) {
-            AbstractSecuredElementSecurityEvent securedEvent = 
+            AbstractSecuredElementSecurityEvent securedEvent =
                 (AbstractSecuredElementSecurityEvent)signedEvent;
             if (!securedEvent.isSigned()) {
                 continue;
             }
-            
+
             List<QName> signedPath = securedEvent.getElementPath();
             if (isBody(signedPath)) {
                 isBodySigned = true;
                 break;
             }
         }
-        
+
         if (!isBodySigned) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           new Exception("The SOAP Body is not signed"));
         }
     }
-    
+
     private void checkEncryptedBody(List<SecurityEvent> results) throws WSSecurityException {
         if (!encryptBody) {
             return;
         }
-        
+
         boolean isBodyEncrypted = false;
         for (SecurityEvent signedEvent : results) {
-            AbstractSecuredElementSecurityEvent securedEvent = 
+            AbstractSecuredElementSecurityEvent securedEvent =
                 (AbstractSecuredElementSecurityEvent)signedEvent;
             if (!securedEvent.isEncrypted()) {
                 continue;
             }
-            
+
             List<QName> encryptedPath = securedEvent.getElementPath();
             if (isBody(encryptedPath)) {
                 isBodyEncrypted = true;
                 break;
             }
         }
-        
+
         if (!isBodyEncrypted) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           new Exception("The SOAP Body is not encrypted"));
         }
     }
-    
+
     private void checkSignedTimestamp(List<SecurityEvent> results) throws WSSecurityException {
         if (!signTimestamp) {
             return;
         }
-        
+
         boolean isTimestampSigned = false;
         for (SecurityEvent signedEvent : results) {
-            AbstractSecuredElementSecurityEvent securedEvent = 
+            AbstractSecuredElementSecurityEvent securedEvent =
                 (AbstractSecuredElementSecurityEvent)signedEvent;
             if (!securedEvent.isSigned()) {
                 continue;
             }
-            
+
             List<QName> signedPath = securedEvent.getElementPath();
             if (isTimestamp(signedPath)) {
                 isTimestampSigned = true;
                 break;
             }
         }
-        
+
         if (!isTimestampSigned) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           new Exception("The Timestamp is not signed"));
         }
     }
-    
+
     private void checkSignedAddressing(
         List<SecurityEvent> results,
         AddressingProperties addressingProperties
@@ -234,110 +234,110 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
             || (addressingProperties.getReplyTo() == null && addressingProperties.getFaultTo() == null)) {
             return;
         }
-        
+
         boolean isReplyToSigned = false;
         boolean isFaultToSigned = false;
         for (SecurityEvent signedEvent : results) {
-            AbstractSecuredElementSecurityEvent securedEvent = 
+            AbstractSecuredElementSecurityEvent securedEvent =
                 (AbstractSecuredElementSecurityEvent)signedEvent;
             if (!securedEvent.isSigned()) {
                 continue;
             }
-            
+
             List<QName> signedPath = securedEvent.getElementPath();
             if (isReplyTo(signedPath)) {
                 isReplyToSigned = true;
-            } 
+            }
             if (isFaultTo(signedPath)) {
                 isFaultToSigned = true;
             }
-            
+
             if (isReplyToSigned && isFaultToSigned) {
                 break;
             }
         }
-        
+
         if (!isReplyToSigned && (addressingProperties.getReplyTo() != null)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           new Exception("The Addressing headers are not signed"));
         }
-        
+
         if (!isFaultToSigned && (addressingProperties.getFaultTo() != null)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           new Exception("The Addressing headers are not signed"));
         }
     }
-    
+
     private void checkSignedUsernameToken(List<SecurityEvent> results) throws WSSecurityException {
         if (!signUsernameToken) {
             return;
         }
-        
+
         boolean isUsernameTokenSigned = false;
         for (SecurityEvent signedEvent : results) {
-            AbstractSecuredElementSecurityEvent securedEvent = 
+            AbstractSecuredElementSecurityEvent securedEvent =
                 (AbstractSecuredElementSecurityEvent)signedEvent;
             if (!securedEvent.isSigned()) {
                 continue;
             }
-            
+
             List<QName> signedPath = securedEvent.getElementPath();
             if (isUsernameToken(signedPath)) {
                 isUsernameTokenSigned = true;
                 break;
             }
         }
-        
+
         if (!isUsernameTokenSigned) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           new Exception("The UsernameToken is not signed"));
         }
     }
-    
+
     private void checkEncryptedUsernameToken(List<SecurityEvent> results) throws WSSecurityException {
         if (!encryptUsernameToken) {
             return;
         }
-        
+
         boolean isUsernameTokenEncrypted = false;
         for (SecurityEvent encryptedEvent : results) {
-            AbstractSecuredElementSecurityEvent securedEvent = 
+            AbstractSecuredElementSecurityEvent securedEvent =
                 (AbstractSecuredElementSecurityEvent)encryptedEvent;
             if (!securedEvent.isEncrypted()) {
                 continue;
             }
-            
+
             List<QName> encryptedPath = securedEvent.getElementPath();
             if (isUsernameToken(encryptedPath)) {
                 isUsernameTokenEncrypted = true;
                 break;
             }
         }
-        
+
         if (!isUsernameTokenEncrypted) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           new Exception("The UsernameToken is not encrypted"));
         }
     }
-    
+
     private boolean isEnvelope(QName qname) {
         return "Envelope".equals(qname.getLocalPart())
-            && (SOAP_NS.equals(qname.getNamespaceURI()) 
+            && (SOAP_NS.equals(qname.getNamespaceURI())
                 || SOAP12_NS.equals(qname.getNamespaceURI()));
     }
-    
+
     private boolean isSoapHeader(QName qname) {
         return "Header".equals(qname.getLocalPart())
-            && (SOAP_NS.equals(qname.getNamespaceURI()) 
+            && (SOAP_NS.equals(qname.getNamespaceURI())
                 || SOAP12_NS.equals(qname.getNamespaceURI()));
     }
-    
+
     private boolean isSecurityHeader(QName qname) {
         return "Security".equals(qname.getLocalPart()) && WSSE_NS.equals(qname.getNamespaceURI());
     }
-    
+
     private boolean isTimestamp(List<QName> qnames) {
-        return qnames != null 
+        return qnames != null
             && qnames.size() == 4
             && isEnvelope(qnames.get(0))
             && isSoapHeader(qnames.get(1))
@@ -345,7 +345,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
             && "Timestamp".equals(qnames.get(3).getLocalPart())
             && WSU_NS.equals(qnames.get(3).getNamespaceURI());
     }
-    
+
     private boolean isReplyTo(List<QName> qnames) {
         return qnames != null && qnames.size() == 3
             && isEnvelope(qnames.get(0))
@@ -353,7 +353,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
             && "ReplyTo".equals(qnames.get(2).getLocalPart())
             && WSA_NS.equals(qnames.get(2).getNamespaceURI());
     }
-    
+
     private boolean isFaultTo(List<QName> qnames) {
         return qnames != null && qnames.size() == 3
             && isEnvelope(qnames.get(0))
@@ -361,15 +361,15 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
             && "FaultTo".equals(qnames.get(2).getLocalPart())
             && WSA_NS.equals(qnames.get(2).getNamespaceURI());
     }
-    
+
     private boolean isBody(List<QName> qnames) {
         return qnames != null && qnames.size() == 2
             && isEnvelope(qnames.get(0))
             && "Body".equals(qnames.get(1).getLocalPart())
-            && (SOAP_NS.equals(qnames.get(1).getNamespaceURI()) 
+            && (SOAP_NS.equals(qnames.get(1).getNamespaceURI())
                 || SOAP12_NS.equals(qnames.get(1).getNamespaceURI()));
     }
-    
+
     private boolean isUsernameToken(List<QName> qnames) {
         return qnames != null && qnames.size() == 4
             && isEnvelope(qnames.get(0))
@@ -378,7 +378,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
             && "UsernameToken".equals(qnames.get(3).getLocalPart())
             && WSSE_NS.equals(qnames.get(3).getNamespaceURI());
     }
-    
+
     public boolean isSignBody() {
         return signBody;
     }
@@ -410,14 +410,14 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
     public final void setSignAddressingHeaders(boolean signAddressingHeaders) {
         this.signAddressingHeaders = signAddressingHeaders;
     }
-    
+
     /**
      * Create a SoapFault from a WSSecurityException, following the SOAP Message Security
      * 1.1 specification, chapter 12 "Error Handling".
-     * 
+     *
      * When the Soap version is 1.1 then set the Fault/Code/Value from the fault code
      * specified in the WSSecurityException (if it exists).
-     * 
+     *
      * Otherwise set the Fault/Code/Value to env:Sender and the Fault/Code/Subcode/Value
      * as the fault code from the WSSecurityException.
      */
@@ -447,7 +447,7 @@ public class StaxCryptoCoverageChecker extends AbstractPhaseInterceptor<SoapMess
         return encryptUsernameToken;
     }
 
-    public void setEncryptUsernameToken(boolean encryptUsernameToken) {
+    public final void setEncryptUsernameToken(boolean encryptUsernameToken) {
         this.encryptUsernameToken = encryptUsernameToken;
     }
 }

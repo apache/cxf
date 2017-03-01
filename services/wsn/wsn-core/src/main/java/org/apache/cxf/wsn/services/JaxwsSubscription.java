@@ -66,7 +66,7 @@ public class JaxwsSubscription extends JmsSubscription {
             throw new SubscribeCreationFailedFault("Raw notifications are not supported", fault);
         }
         try {
-            consumer = WSNHelper.getInstance().getPort(subscribeRequest.getConsumerReference(), 
+            consumer = WSNHelper.getInstance().getPort(subscribeRequest.getConsumerReference(),
                                                        NotificationConsumer.class);
         } catch (Exception e) {
             SubscribeCreationFailedFaultType fault = new SubscribeCreationFailedFaultType();

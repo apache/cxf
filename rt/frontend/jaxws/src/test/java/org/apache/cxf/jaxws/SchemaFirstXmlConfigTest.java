@@ -35,10 +35,10 @@ public class SchemaFirstXmlConfigTest extends AbstractJaxWsTest {
 
     @Override
     protected Bus createBus() throws BusException {
-        
+
         ctx = new ClassPathXmlApplicationContext(new String[] {
             "classpath:org/apache/cxf/jaxws/schemaFirst.xml"});
-        
+
         return (Bus) ctx.getBean("cxf");
     }
 
@@ -51,10 +51,10 @@ public class SchemaFirstXmlConfigTest extends AbstractJaxWsTest {
         Document d = getWSDLDocument(serverFB.getServer());
 
         //XMLUtils.printDOM(d);
-        
+
         // XmlSchema still isn't preserving all the extra info...
         assertValid("//xsd:complexType[@name='foo']/xsd:sequence", d);
-        
+
         EndpointImpl ep = (EndpointImpl) ctx.getBean("helloEndpoint");
 
         d = getWSDLDocument(ep.getServer());

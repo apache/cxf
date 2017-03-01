@@ -31,8 +31,8 @@ import javax.xml.ws.Response;
 import org.apache.hello_world_soap_http.types.BareDocumentResponse;
 
 
-@WebService(serviceName = "SOAPService_DocLitBare", 
-            portName = "SoapPort2", 
+@WebService(serviceName = "SOAPService_DocLitBare",
+            portName = "SoapPort2",
             endpointInterface = "org.apache.hello_world_soap_http.DocLitBare",
             targetNamespace = "http://apache.org/hello_world_soap_http",
             wsdlLocation = "testutils/hello_world.wsdl")
@@ -40,7 +40,7 @@ import org.apache.hello_world_soap_http.types.BareDocumentResponse;
 public class DocLitBareGreeterImpl implements DocLitBare {
 
     private int invocationCount;
-    
+
     public BareDocumentResponse testDocLitBare(String in) {
         invocationCount++;
         BareDocumentResponse res = new BareDocumentResponse();
@@ -58,7 +58,7 @@ public class DocLitBareGreeterImpl implements DocLitBare {
 
         return null;
     }
-    
+
     public int getInvocationCount() {
         return invocationCount;
     }

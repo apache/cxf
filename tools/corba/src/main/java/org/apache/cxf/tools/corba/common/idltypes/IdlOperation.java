@@ -35,7 +35,7 @@ public final class IdlOperation extends IdlScopeBase {
         exceptions = new Vector<IdlException>();
         oneway = isOneway;
     }
-    
+
     public static IdlOperation create(IdlScopeBase parent, String name, boolean isOneway) {
         return new IdlOperation(parent, name, isOneway);
     }
@@ -115,5 +115,5 @@ public final class IdlOperation extends IdlScopeBase {
             pw.println(indent() + ");");
         }
     }
-    
+
 }

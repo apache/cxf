@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class BaseUrlHelperTest {
-    private String testGetBaseURL(String requestUrl, String contextPath, 
+    private String testGetBaseURL(String requestUrl, String contextPath,
                                   String servletPath, String pathInfo) {
         HttpServletRequest req = EasyMock.createMock(HttpServletRequest.class);
         req.getRequestURL();
@@ -55,7 +55,7 @@ public class BaseUrlHelperTest {
         String url = testGetBaseURL("http://services.com/services/bar", "/services", "", "/bar");
         Assert.assertEquals("http://services.com/services", url);
     }
-    
+
     @Test
     public void testGetRequestURL() throws Exception {
         String url = testGetBaseURL("http://localhost:8080/services/bar", "", "/services", "/bar");
@@ -82,7 +82,7 @@ public class BaseUrlHelperTest {
 
     @Test
     public void testGetRequestURLMultipleMatrixParam() throws Exception {
-        String url = testGetBaseURL("http://localhost:8080/services/bar;a=b;c=d;e=f", 
+        String url = testGetBaseURL("http://localhost:8080/services/bar;a=b;c=d;e=f",
                                     "", "/services", "/bar");
         Assert.assertEquals("http://localhost:8080/services", url);
 

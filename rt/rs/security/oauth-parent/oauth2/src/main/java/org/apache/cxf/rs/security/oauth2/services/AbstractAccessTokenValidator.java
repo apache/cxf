@@ -41,41 +41,41 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public abstract class AbstractAccessTokenValidator {
-    
-    private static final String DEFAULT_AUTH_SCHEME = OAuthConstants.BEARER_AUTHORIZATION_SCHEME;
-    
 
-    protected Set<String> supportedSchemes = new HashSet<String>();
+    private static final String DEFAULT_AUTH_SCHEME = OAuthConstants.BEARER_AUTHORIZATION_SCHEME;
+
+
+    protected Set<String> supportedSchemes = new HashSet<>();
     protected String realm;
-    
+
     private MessageContext mc;
     private List<AccessTokenValidator> tokenHandlers = Collections.emptyList();
     private OAuthDataProvider dataProvider;
-    
+
     private int maxValidationDataCacheSize;
     private ConcurrentHashMap<String, AccessTokenValidation> accessTokenValidations =
         new ConcurrentHashMap<String, AccessTokenValidation>();
-    
+
     public void setTokenValidator(AccessTokenValidator validator) {
         setTokenValidators(Collections.singletonList(validator));
     }
-    
+
     public void setTokenValidators(List<AccessTokenValidator> validators) {
         tokenHandlers = validators;
         for (AccessTokenValidator handler : validators) {
             supportedSchemes.addAll(handler.getSupportedAuthorizationSchemes());
         }
     }
-    
+
     public void setDataProvider(OAuthDataProvider provider) {
         dataProvider = provider;
     }
-    
+
     @Context
     public void setMessageContext(MessageContext context) {
         this.mc = context;
     }
-    
+
     public MessageContext getMessageContext() {
         return mc != null ? mc : new MessageContextImpl(PhaseInterceptorChain.getCurrentMessage());
     }
@@ -88,9 +88,9 @@ public abstract class AbstractAccessTokenValidator {
                 return handler;
             }
         }
-        return null;        
+        return null;
     }
-    
+
     /**
      * Get the access token
      */
@@ -100,10 +100,10 @@ public abstract class AbstractAccessTokenValidator {
         if (dataProvider == null && tokenHandlers.isEmpty()) {
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
-        
+
         if (maxValidationDataCacheSize > 0) {
             accessTokenV = accessTokenValidations.get(authSchemeData);
-        } 
+        }
         ServerAccessToken localAccessToken = null;
         if (accessTokenV == null) {
             // Get the registered handler capable of processing the token
@@ -111,7 +111,7 @@ public abstract class AbstractAccessTokenValidator {
             if (handler != null) {
                 try {
                     // Convert the HTTP Authorization scheme data into a token
-                    accessTokenV = handler.validateAccessToken(getMessageContext(), authScheme, authSchemeData, 
+                    accessTokenV = handler.validateAccessToken(getMessageContext(), authScheme, authSchemeData,
                                                                extraProps);
                 } catch (OAuthServiceException ex) {
                     AuthorizationUtils.throwAuthorizationFailure(Collections.singleton(authScheme), realm);
@@ -156,8 +156,8 @@ public abstract class AbstractAccessTokenValidator {
     }
 
     protected void removeAccessToken(ServerAccessToken at) {
-        dataProvider.revokeToken(at.getClient(), 
-                                 at.getTokenKey(), 
+        dataProvider.revokeToken(at.getClient(),
+                                 at.getTokenKey(),
                                  OAuthConstants.ACCESS_TOKEN);
     }
 
@@ -169,5 +169,5 @@ public abstract class AbstractAccessTokenValidator {
         this.maxValidationDataCacheSize = maxValidationDataCacheSize;
     }
 
-    
+
 }

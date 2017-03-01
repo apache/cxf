@@ -28,18 +28,18 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.neethi.Policy;
 
 /**
- * 
+ *
  */
 public interface PolicyProvider {
 
     Policy getEffectivePolicy(ServiceInfo si, Message m);
-    
+
     Policy getEffectivePolicy(EndpointInfo ei, Message m);
-    
+
     Policy getEffectivePolicy(BindingOperationInfo bi, Message m);
-    
+
     Policy getEffectivePolicy(BindingMessageInfo bmi, Message m);
-    
+
     Policy getEffectivePolicy(BindingFaultInfo bfi, Message m);
-    
+
 }

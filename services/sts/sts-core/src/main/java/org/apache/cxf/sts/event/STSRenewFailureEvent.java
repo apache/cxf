@@ -22,14 +22,14 @@ package org.apache.cxf.sts.event;
 import org.apache.cxf.sts.token.renewer.TokenRenewerParameters;
 
 public class STSRenewFailureEvent extends AbstractSTSFailureEvent implements TokenRenewerParametersSupport {
-    
+
     private static final String OPERATION = "Renew";
-    
-    
+
+
     public STSRenewFailureEvent(TokenRenewerParameters parameters, long duration, Exception exception) {
         super(parameters, duration, exception);
     }
-    
+
     @Override
     public String getOperation() {
         return OPERATION;
@@ -38,6 +38,6 @@ public class STSRenewFailureEvent extends AbstractSTSFailureEvent implements Tok
     @Override
     public TokenRenewerParameters getTokenParameters() {
         return (TokenRenewerParameters)this.getSource();
-    } 
+    }
 
 }

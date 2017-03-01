@@ -42,23 +42,23 @@ import demo.colocated.server.Server;
 public final class DispatchSourceClient {
     private static final String ADDRESS = "http://localhost:9000/SoapContext/GreeterPort";
 
-    private static final String SERVICE_NS = "http://apache.org/hello_world_soap_http"; 
+    private static final String SERVICE_NS = "http://apache.org/hello_world_soap_http";
     private static final QName SERVICE_NAME = new QName(SERVICE_NS, "SOAPService");
     private static final QName PORT_NAME = new QName(SERVICE_NS, "SoapPort");
     private static final String PAYLOAD_NAMESPACE_URI = "http://apache.org/hello_world_soap_http/types";
 
-    private static final String SAYHI_REQUEST_TEMPLATE 
+    private static final String SAYHI_REQUEST_TEMPLATE
         = "<ns1:sayHi xmlns:ns1=\"http://apache.org/hello_world_soap_http/types\" />";
-    private static final String GREETME_REQUEST_TEMPLATE 
+    private static final String GREETME_REQUEST_TEMPLATE
         = "<ns1:greetMe xmlns:ns1=\"http://apache.org/hello_world_soap_http/types\">"
             + "<ns1:requestType>%s</ns1:requestType></ns1:greetMe>";
-    private static final String PINGME_REQUEST_TEMPLATE 
+    private static final String PINGME_REQUEST_TEMPLATE
         = "<ns1:pingMe xmlns:ns1=\"http://apache.org/hello_world_soap_http/types\" />";
 
     private static final QName SAYHI_OPERATION_NAME = new QName(SERVICE_NS, "sayHi");
     private static final QName GREETME_OPERATION_NAME = new QName(SERVICE_NS, "greetMe");
     private static final QName PINGME_OPERATION_NAME = new QName(SERVICE_NS, "pingMe");
-        
+
 
 
     private DispatchSourceClient() {
@@ -67,15 +67,15 @@ public final class DispatchSourceClient {
     public static void main(String args[]) throws Exception {
 
         Server.main(new String[]{"inProcess"});
-        
+
         Service service = Service.create(SERVICE_NAME);
         service.addPort(PORT_NAME, SOAPBinding.SOAP11HTTP_BINDING, ADDRESS);
-        
+
         Dispatch<Source> dispatch = service.createDispatch(PORT_NAME, Source.class, Service.Mode.PAYLOAD);
-        
+
         String resp;
         Source response;
-        
+
         System.out.println("Invoking sayHi...");
         setOperation(dispatch, SAYHI_OPERATION_NAME);
         response = dispatch.invoke(encodeSource(SAYHI_REQUEST_TEMPLATE, null));
@@ -99,9 +99,9 @@ public final class DispatchSourceClient {
         }
         System.exit(0);
     }
-    
+
     private static void setOperation(Dispatch<Source> dispatch, QName operationName) {
-        dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION, operationName);        
+        dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION, operationName);
     }
 
     private static Source encodeSource(String template, String value) throws IOException {
@@ -118,20 +118,20 @@ public final class DispatchSourceClient {
         transformer.transform(source, new SAXResult(handler));
         return handler.getValue();
     }
-    
+
     static class ContentHandler extends DefaultHandler {
         StringBuffer buffer;
         String namespaceURI;
         String elementName;
         boolean recording;
-        
+
         ContentHandler(String namespaceURI, String elementName) {
             this.namespaceURI = namespaceURI;
             this.elementName = elementName;
         }
-        
+
         /* (non-Javadoc)
-         * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, 
+         * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String,
          *             java.lang.String, java.lang.String, org.xml.sax.Attributes)
          */
         @Override
@@ -144,7 +144,7 @@ public final class DispatchSourceClient {
 
 
         /* (non-Javadoc)
-         * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, 
+         * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String,
          *                            java.lang.String, java.lang.String)
          */
         @Override
@@ -173,5 +173,5 @@ public final class DispatchSourceClient {
         public String getValue() {
             return buffer == null ? null : buffer.toString();
         }
-    }    
+    }
 }

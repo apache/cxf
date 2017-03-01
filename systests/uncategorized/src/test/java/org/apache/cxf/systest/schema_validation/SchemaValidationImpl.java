@@ -35,7 +35,7 @@ import org.apache.schema_validation.types.SomeRequestWithHeader;
 import org.apache.schema_validation.types.SomeResponse;
 import org.apache.schema_validation.types.SomeResponseWithHeader;
 
-@WebService(serviceName = "SchemaValidationService", 
+@WebService(serviceName = "SchemaValidationService",
             portName = "SoapPort",
             endpointInterface = "org.apache.schema_validation.SchemaValidation",
             targetNamespace = "http://apache.org/schema_validation",
@@ -49,7 +49,7 @@ public class SchemaValidationImpl implements SchemaValidation {
     public boolean setOccuringStruct(OccuringStruct in) {
         return true;
     }
-    
+
     public ComplexStruct getComplexStruct(String in) {
         ComplexStruct complexStruct = new ComplexStruct();
         complexStruct.setElem1(in + "-one");
@@ -87,7 +87,7 @@ public class SchemaValidationImpl implements SchemaValidation {
         } else {
             response.setTransactionId("aaaaaaaaaa");
         }
-        
+
         return response;
     }
 

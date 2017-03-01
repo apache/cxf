@@ -30,7 +30,7 @@ import org.apache.htrace.core.Tracer;
 @Provider
 public class HTraceContextProvider implements ContextProvider< TracerContext > {
     private final Tracer tracer;
-    
+
     public HTraceContextProvider(final Tracer tracer) {
         this.tracer = tracer;
     }
@@ -39,13 +39,13 @@ public class HTraceContextProvider implements ContextProvider< TracerContext > {
     public TracerContext createContext(final Message message) {
         // Check if there is a trace scope passed along with the message
         final TraceScope continuationScope = message.get(TraceScope.class);
-        
-        // If trace scope is already present, let us check if it is detached 
+
+        // If trace scope is already present, let us check if it is detached
         // (asynchronous invocation)
         if (continuationScope != null) {
             return new HTraceTracerContext(tracer, continuationScope);
         }
-        
+
         return new HTraceTracerContext(tracer);
     }
 }

@@ -20,13 +20,13 @@
 package org.apache.cxf.tools.corba.common.idltypes;
 
 public final class IdlException extends IdlStructBase {
-    
+
     private IdlException(IdlScopeBase parent, String name) {
         super(parent, name, "exception");
     }
-    
+
     public static IdlException create(IdlScopeBase parent, String name) {
         return new IdlException(parent, name);
     }
-    
+
 }

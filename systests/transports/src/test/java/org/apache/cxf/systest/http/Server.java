@@ -34,16 +34,16 @@ public class Server extends AbstractBusTestServerBase {
     private String address;
     private URL configFileURL;
     private EndpointImpl ep;
-    
+
     public Server(String[] args) throws Exception {
         this(args[0], args[1], args[2]);
     }
-    
+
     public Server(String n, String addr, String conf) throws Exception {
-        name    = n;
+        name = n;
         address = addr;
         configFileURL = new URL(conf);
-        //System.out.println("Starting " + name 
+        //System.out.println("Starting " + name
         //                     + " Server at " + address
         //                     + " with config " + configFileURL);
 
@@ -71,15 +71,15 @@ public class Server extends AbstractBusTestServerBase {
         // This impl class must have the appropriate annotations
         // to match the WSDL file that we are using.
         Object implementor = new GreeterImpl(name);
-        
+
         // I don't know why this works.
-        ep = 
+        ep =
             new EndpointImpl(
-                    getBus(), 
+                    getBus(),
                     implementor,
                     nullBindingID,
                     this.getClass().getResource("greeting.wsdl").toString());
-        // How the hell do I know what the name of the 
+        // How the hell do I know what the name of the
         // http-destination is from using this call?
         ep.setEndpointName(new QName("http://apache.org/hello_world", name));
         ep.publish(address);

@@ -37,11 +37,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 public class IDLToWSDLPlugin extends AbstractMojo {
 
     /**
-     * @parameter  expression="${project.build.directory}/generated/src/main/java"
+     * @parameter expression="${project.build.directory}/generated/src/main/java"
      * @required
      */
     String outputDir;
-    
+
     /**
      * @parameter
      */
@@ -51,7 +51,7 @@ public class IDLToWSDLPlugin extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         File outputDirFile = new File(outputDir);
         outputDirFile.mkdirs();
-        
+
         if (idltowsdlOptions == null) {
             throw new MojoExecutionException("Please specify the idl2wsdl options");
         }
@@ -68,11 +68,11 @@ public class IDLToWSDLPlugin extends AbstractMojo {
             }
 
             if (doWork) {
-                List<Object> list = new ArrayList<Object>();
+                List<Object> list = new ArrayList<>();
                 list.add("-o");
                 list.add(outputDir);
                 list.addAll(idltowsdlOptions[x].getExtraargs());
-                list.add(idltowsdlOptions[x].getIDL());            
+                list.add(idltowsdlOptions[x].getIDL());
                 try {
                     IDLToWSDL.run(list.toArray(new String[list.size()]));
                     doneFile.delete();

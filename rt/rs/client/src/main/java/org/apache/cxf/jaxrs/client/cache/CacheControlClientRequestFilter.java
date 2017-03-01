@@ -41,7 +41,7 @@ public class CacheControlClientRequestFilter implements ClientRequestFilter {
     private Cache<Key, Entry> cache;
 
     public CacheControlClientRequestFilter(final Cache<Key, Entry> cache) {
-        setCache(cache);
+        this.cache = cache;
     }
 
     public CacheControlClientRequestFilter() {

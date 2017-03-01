@@ -63,7 +63,7 @@ public final class Client {
         client.await(5);
         responses = client.getReceivedResponses();
         System.out.println(responses.get(0));
-        
+
         // Sent POST request to add customer
         client.reset(1);
         System.out.println("Sent POST request to add customer");
@@ -85,7 +85,7 @@ public final class Client {
         client2.await(5);
         responses = client2.getReceivedResponses();
         System.out.println(responses.get(0));
-        
+
         // one retrieval, one delete
         client2.reset(2);
         client.reset(2);
@@ -95,9 +95,9 @@ public final class Client {
         client2.await(5);
         responses = client2.getReceivedResponses();
         for (Object o : responses) {
-            System.out.println(o);    
+            System.out.println(o);
         }
-        
+
         client.close();
         client2.close();
         System.exit(0);

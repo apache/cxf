@@ -44,24 +44,24 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
  * asymmetric signature, but populates the roles from a SAML Token.
  */
 public class CustomWSS4JSecurityContextCreator extends DefaultWSS4JSecurityContextCreator {
-    
+
     /**
      * Create a SecurityContext and store it on the SoapMessage parameter
      */
     public void createSecurityContext(SoapMessage msg, WSHandlerResult handlerResult) {
         Map<Integer, List<WSSecurityEngineResult>> actionResults = handlerResult.getActionResults();
-        
+
         Principal asymmetricPrincipal = null;
-        
+
         // Get Asymmetric Signature action
         List<WSSecurityEngineResult> foundResults = actionResults.get(WSConstants.SIGN);
         if (foundResults != null && !foundResults.isEmpty()) {
             for (WSSecurityEngineResult result : foundResults) {
-                PublicKey publickey = 
+                PublicKey publickey =
                     (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
-                X509Certificate cert = 
+                X509Certificate cert =
                     (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                
+
                 if (publickey == null && cert == null) {
                     continue;
                 }
@@ -72,12 +72,12 @@ public class CustomWSS4JSecurityContextCreator extends DefaultWSS4JSecurityConte
                 }
             }
         }
-        
+
         // We must have an asymmetric principal
         if (asymmetricPrincipal == null) {
             return;
         }
-        
+
         // Get signed SAML action
         SAMLSecurityContext context = null;
         foundResults = actionResults.get(WSConstants.ST_SIGNED);
@@ -89,16 +89,16 @@ public class CustomWSS4JSecurityContextCreator extends DefaultWSS4JSecurityConte
                 }
 
                 if (receivedAssertion instanceof SamlAssertionWrapper) {
-                    String roleAttributeName = 
-                        (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SAML_ROLE_ATTRIBUTENAME, 
+                    String roleAttributeName =
+                        (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SAML_ROLE_ATTRIBUTENAME,
                                                                        msg);
                     if (roleAttributeName == null || roleAttributeName.length() == 0) {
                         roleAttributeName = WSS4JInInterceptor.SAML_ROLE_ATTRIBUTENAME_DEFAULT;
                     }
 
-                    ClaimCollection claims = 
+                    ClaimCollection claims =
                         SAMLUtils.getClaims((SamlAssertionWrapper)receivedAssertion);
-                    Set<Principal> roles = 
+                    Set<Principal> roles =
                         SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
 
                     context = new SAMLSecurityContext(asymmetricPrincipal, roles, claims);
@@ -108,11 +108,11 @@ public class CustomWSS4JSecurityContextCreator extends DefaultWSS4JSecurityConte
                 }
             }
         }
-        
+
         if (context != null) {
             msg.put(SecurityContext.class, context);
         }
-        
+
     }
-    
+
 }

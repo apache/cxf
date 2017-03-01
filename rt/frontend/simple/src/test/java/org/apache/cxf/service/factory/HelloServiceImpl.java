@@ -31,7 +31,7 @@ public class HelloServiceImpl implements HelloService {
     }
 
     public void ping() {
-        
+
     }
 
     public String sayHello() {

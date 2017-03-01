@@ -27,12 +27,12 @@ import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.types.XopStringType;
 
 
-@WebService(serviceName = "TestMtomJMSService", 
-        portName = "TestMtomJMSPort", 
-        targetNamespace = "http://cxf.apache.org/mime", 
+@WebService(serviceName = "TestMtomJMSService",
+        portName = "TestMtomJMSPort",
+        targetNamespace = "http://cxf.apache.org/mime",
         endpointInterface = "org.apache.cxf.mime.TestMtom",
         wsdlLocation = "testutils/mtom_xop.wsdl")
-        
+
 public class TestMtomJMSImpl implements TestMtom {
 
     public void testXop(Holder<String> name, Holder<DataHandler> attachinfo) {

@@ -25,10 +25,10 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
 /**
- * 
+ *
  */
 public class ServiceModelSchemaValidator extends ServiceModelVisitor {
-    
+
     private SchemaCollection schemaCollection;
     private StringBuilder complaints;
 
@@ -37,7 +37,7 @@ public class ServiceModelSchemaValidator extends ServiceModelVisitor {
         schemaCollection = serviceInfo.getXmlSchemaCollection();
         complaints = new StringBuilder();
     }
-    
+
     public String getComplaints() {
         return complaints.toString();
     }
@@ -53,8 +53,8 @@ public class ServiceModelSchemaValidator extends ServiceModelVisitor {
             }
         } else if (!part.getMessageInfo().getOperation().isUnwrapped()) {
             if (part.getTypeQName() == null) {
-                complaints.append(part.getName() + " of message " 
-                                  + part.getMessageInfo().getName() 
+                complaints.append(part.getName() + " of message "
+                                  + part.getMessageInfo().getName()
                                   + " part type QName null.\n");
             } else {
                 try {

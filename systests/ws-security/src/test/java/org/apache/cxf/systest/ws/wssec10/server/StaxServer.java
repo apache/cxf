@@ -30,7 +30,7 @@ public class StaxServer extends AbstractBusTestServerBase {
 
     private static boolean unrestrictedPoliciesInstalled;
     private static String configFileName;
-    
+
     static {
         unrestrictedPoliciesInstalled = SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
         if (unrestrictedPoliciesInstalled) {
@@ -38,12 +38,12 @@ public class StaxServer extends AbstractBusTestServerBase {
         } else {
             configFileName = "org/apache/cxf/systest/ws/wssec10/stax-server_restricted.xml";
         }
-    };    
+    };
 
     public StaxServer() throws Exception {
-        
+
     }
-    
+
     protected void run()  {
         Bus busLocal = new SpringBusFactory().createBus(configFileName);
         BusFactory.setDefaultBus(busLocal);

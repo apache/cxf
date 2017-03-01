@@ -28,7 +28,7 @@ public class WsdltoidlOption {
     boolean idl;
 
     List<String> extraargs;
-    
+
     public String getWSDL() {
         return wsdl;
     }

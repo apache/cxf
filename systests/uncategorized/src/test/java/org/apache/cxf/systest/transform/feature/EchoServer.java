@@ -27,7 +27,7 @@ public class EchoServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(EchoServer.class);
 
 
-    protected void run()  {    
+    protected void run()  {
         Object implementor = new EchoImpl();
         String address = "http://localhost:" + PORT + "/EchoContext/EchoPort";
         Endpoint.publish(address, implementor);

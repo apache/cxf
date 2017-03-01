@@ -24,16 +24,16 @@ import java.util.List;
 import java.util.Map;
 
 public class StudentServiceDocLiteralImpl implements StudentServiceDocLiteral {
-    
+
     private Map<Long, Student> studentMap;
-    
+
     public StudentServiceDocLiteralImpl() {
         studentMap = new HashMap<Long, Student>();
         studentMap.put(Long.valueOf(1), new Student("Student1", 1));
         studentMap.put(Long.valueOf(100), new Student("Student100", 100));
         studentMap.put(Long.valueOf(-1), new Student("StudentNegative", -1));
     }
-    
+
     public Student findStudent(Long id) {
         return studentMap.get(id);
     }
@@ -44,7 +44,7 @@ public class StudentServiceDocLiteralImpl implements StudentServiceDocLiteral {
             if (filters.containsKey(e.getValue())) {
                 returnValue.add(e.getValue());
             }
-            
+
         }
         return returnValue;
     }

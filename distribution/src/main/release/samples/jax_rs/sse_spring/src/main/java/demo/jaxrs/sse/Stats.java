@@ -29,7 +29,7 @@ public class Stats implements Serializable {
 
     private long timestamp;
     private int load;
-    
+
     public Stats() {
     }
 
@@ -41,7 +41,7 @@ public class Stats implements Serializable {
     public long getTimestamp() {
         return timestamp;
     }
-    
+
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }

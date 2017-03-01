@@ -32,17 +32,17 @@ import org.apache.ws.security.WSPasswordCallback;
  */
 
 public class KeystorePasswordCallback implements CallbackHandler {
-    
-    private Map<String, String> passwords = 
+
+    private Map<String, String> passwords =
         new HashMap<String, String>();
-    
+
     public KeystorePasswordCallback() {
         passwords.put("myclientkey", "ckpass");
         passwords.put("myservicekey", "skpass");
     }
 
     /**
-     * It attempts to get the password from the private 
+     * It attempts to get the password from the private
      * alias/passwords map.
      */
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {

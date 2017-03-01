@@ -30,16 +30,16 @@ import java.io.OutputStream;
 public class WriteOnCloseOutputStream extends CachedOutputStream {
 
     OutputStream flowThroughStream;
-    
+
     public WriteOnCloseOutputStream(OutputStream stream) {
         super();
         flowThroughStream = stream;
     }
 
-    
+
     protected void doClose() throws IOException {
         resetOut(flowThroughStream, true);
         flowThroughStream.flush();
-    }    
-    
+    }
+
 }

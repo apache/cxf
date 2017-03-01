@@ -25,12 +25,12 @@ import java.util.List;
 import org.apache.cxf.common.util.StringUtils;
 
 public class JavaClass extends JavaInterface {
-    
-    private final List<JavaField> jfield = new ArrayList<JavaField>();
+
+    private final List<JavaField> jfield = new ArrayList<>();
 
     public JavaClass() {
     }
-    
+
     public JavaClass(JavaModel model) {
         super(model);
     }
@@ -57,7 +57,7 @@ public class JavaClass extends JavaInterface {
         block.getExpressions().add(exp);
 
         jMethod.setJavaCodeBlock(block);
-        
+
         addMethod(jMethod);
         return jMethod;
     }
@@ -76,7 +76,7 @@ public class JavaClass extends JavaInterface {
         block.getExpressions().add(exp);
 
         jMethod.setJavaCodeBlock(block);
-        
+
         jMethod.setName(setterName);
         addMethod(jMethod);
         return jMethod;
@@ -85,5 +85,5 @@ public class JavaClass extends JavaInterface {
     private String getSetterParamName(String fieldName) {
         return "new" + StringUtils.capitalize(fieldName);
     }
-    
+
 }

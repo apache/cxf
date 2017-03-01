@@ -32,12 +32,12 @@ import org.apache.cxf.headers.Header;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 
 /**
- * 
+ *
  */
 @WebService(endpointInterface = "org.apache.cxf.javascript.fortest.SimpleDocLitWrapped",
             targetNamespace = "uri:org.apache.cxf.javascript.fortest")
 public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
-    
+
     @Resource
     private WebServiceContext context;
     private String lastString;
@@ -50,9 +50,9 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
     private SpecificGenericClass lastSpecificGeneric;
     private GenericGenericClass<Double> lastGenericGeneric;
     private InheritanceTestDerived lastInheritanceTestDerived;
-    
+
     public String echoWithHeader(String what) {
-        List<Header> headers = new ArrayList<Header>();
+        List<Header> headers = new ArrayList<>();
         Header dummyHeader;
         try {
             dummyHeader = new Header(new QName("uri:org.apache.cxf", "dummy"), "decapitated",
@@ -82,7 +82,7 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
         lastLong = l;
         lastFloat = f;
         lastDouble = d;
-        return "eels"; 
+        return "eels";
     }
 
     /** {@inheritDoc}*/
@@ -92,7 +92,7 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
         lastLong = l;
         lastFloat = f;
         lastDouble = d;
-        return "cetaceans"; 
+        return "cetaceans";
     }
 
     /** {@inheritDoc}*/
@@ -146,7 +146,7 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
         lastSpecificGeneric = sgc;
         lastGenericGeneric = ggc;
     }
-    
+
     public void inheritanceTestFunction(InheritanceTestDerived d) {
         lastInheritanceTestDerived = d;
     }

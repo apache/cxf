@@ -27,14 +27,14 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 
 public class Server implements Runnable {
 
-    
+
     public Server(String address) throws Exception {
         System.out.println("Starting Server");
         Object implementor = new ServerImpl();
         Endpoint.publish(address, implementor);
         System.out.println("Server published " + address);
     }
-    
+
     public static void main(String args[]) throws Exception {
         String host = "localhost";
         String protocol = "http";
@@ -59,23 +59,23 @@ public class Server implements Runnable {
         } else {
             BusFactory.setDefaultBus(new SpringBusFactory().createBus(cfg));
         }
-    
-        Server server = new Server(protocol + "://" + host 
+
+        Server server = new Server(protocol + "://" + host
                                    + ":8080/cxf-benchmark-soapdoclit/services/SoapHttpDocLitPort");
         server.run();
         if (wait) {
             Thread.sleep(10000000);
         }
     }
-    
+
     public void run() {
         System.out.println("running server");
         System.out.println("READY");
     }
-    
+
     void shutdown(boolean wait) {
         System.out.println("shutting down server");
     }
 
-    
+
 }

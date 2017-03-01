@@ -36,7 +36,7 @@ import org.junit.After;
 
 
 public class ProviderImplTest extends org.junit.Assert {
-    
+
     @org.junit.Test
     public void testCreateW3CEpr() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org", "ServiceName");
@@ -45,13 +45,13 @@ public class ProviderImplTest extends org.junit.Assert {
         W3CEndpointReference w3Epr = impl.createW3CEndpointReference("http://myaddress", serviceName,
                                                                       portName, null, "wsdlLoc",
                                                                       null);
-        
+
         java.io.StringWriter sw = new java.io.StringWriter();
         StreamResult result = new StreamResult(sw);
         w3Epr.writeTo(result);
-        String expected = "<wsdl:definitions"; 
+        String expected = "<wsdl:definitions";
         assertTrue("Embeded wsdl element is not generated", sw.toString().indexOf(expected) > -1);
-        assertTrue("wsdlLocation attribute has the wrong value", 
+        assertTrue("wsdlLocation attribute has the wrong value",
                    sw.toString().contains(":wsdlLocation=\"http://cxf.apache.org wsdlLoc\""));
     }
 
@@ -60,34 +60,34 @@ public class ProviderImplTest extends org.junit.Assert {
         ProviderImpl impl = new ProviderImpl();
         W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
                          "http://myaddress", null, null, null, null, null, null, null, null);
-        
+
         java.io.StringWriter sw = new java.io.StringWriter();
         StreamResult result = new StreamResult(sw);
         w3Epr.writeTo(result);
         assertTrue("Address is expected", sw.toString().contains("Address"));
         assertFalse("empty Metadata element should be dropped", sw.toString().contains("Metadata"));
     }
-    
+
     @org.junit.Test
     public void testCreateW3CEprNoMetadataEmptyCustomMetadata() throws Exception {
         ProviderImpl impl = new ProviderImpl();
         W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
-            "http://myaddress", null, null, new ArrayList<Element>(), null, null);
-        
+            "http://myaddress", null, null, new ArrayList<>(), null, null);
+
         java.io.StringWriter sw = new java.io.StringWriter();
         StreamResult result = new StreamResult(sw);
         w3Epr.writeTo(result);
         assertTrue("Address is expected", sw.toString().contains("Address"));
         assertFalse("empty Metadata element should be dropped", sw.toString().contains("Metadata"));
     }
-    
+
     @org.junit.Test
     public void testCreateW3CEprMetadataInterfaceNameOnly() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org", "IntfName");
         ProviderImpl impl = new ProviderImpl();
         W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
                          "http://myaddress", serviceName, null, null, null, null, null, null, null);
-        
+
         java.io.StringWriter sw = new java.io.StringWriter();
         StreamResult result = new StreamResult(sw);
         w3Epr.writeTo(result);
@@ -96,14 +96,14 @@ public class ProviderImplTest extends org.junit.Assert {
         assertTrue("Interface element expected", sw.toString().contains("Interface"));
         assertFalse("ServiceName is unexpected", sw.toString().contains("ServiceName"));
     }
-    
+
     @org.junit.Test
     public void testCreateW3CEprMetadataServiceNameOnly() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org", "ServiceName");
         ProviderImpl impl = new ProviderImpl();
         W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
                          "http://myaddress", null, serviceName, null, null, null, null, null, null);
-        
+
         java.io.StringWriter sw = new java.io.StringWriter();
         StreamResult result = new StreamResult(sw);
         w3Epr.writeTo(result);
@@ -112,18 +112,18 @@ public class ProviderImplTest extends org.junit.Assert {
         assertFalse("Interface element unexpected", sw.toString().contains("Interface"));
         assertTrue("ServiceName is expected", sw.toString().contains("ServiceName"));
     }
-    
+
     @org.junit.Test
     public void testCreateW3CEprMetadataMetadataOnly() throws Exception {
         ProviderImpl impl = new ProviderImpl();
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Element element = builder.newDocument().createElement("customMetadata");
-        List<Element> metadata = new ArrayList<Element>();
+        List<Element> metadata = new ArrayList<>();
         metadata.add(element);
         W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
-                         "http://myaddress", null, null, 
+                         "http://myaddress", null, null,
                          metadata, null, null);
-        
+
         java.io.StringWriter sw = new java.io.StringWriter();
         StreamResult result = new StreamResult(sw);
         w3Epr.writeTo(result);
@@ -133,12 +133,12 @@ public class ProviderImplTest extends org.junit.Assert {
         assertFalse("Interface element unexpected", sw.toString().contains("Interface"));
         assertFalse("ServiceName unexpected", sw.toString().contains("ServiceName"));
     }
-    
+
     @After
     public void tearDown() {
         BusFactory.setDefaultBus(null);
     }
-    
-    
+
+
 
 }

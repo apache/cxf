@@ -37,8 +37,8 @@ import org.apache.cxf.common.util.Base64Utility;
 
 /**
  * Converts back and forth to byte[] objects.
- * There is a co-routine between this class and the MTOM ByteArrayType. This class can accept either 
- * inline base64 or an MTOM attachment. It passes the problem over the ByteArrayType for the later. 
+ * There is a co-routine between this class and the MTOM ByteArrayType. This class can accept either
+ * inline base64 or an MTOM attachment. It passes the problem over the ByteArrayType for the later.
  */
 public class Base64Type extends AegisType {
     private AbstractXOPType optimizedType;
@@ -48,12 +48,12 @@ public class Base64Type extends AegisType {
         // no MTOM for this type.
         optimizedType = new ByteArrayType(false, null);
     }
-    
+
     public Base64Type(AbstractXOPType xopType) {
         super();
         optimizedType = xopType;
     }
-    
+
     @Override
     public Object readObject(MessageReader mreader, Context context) throws DatabindingException {
         XMLStreamReader reader = mreader.getXMLStreamReader();
@@ -65,7 +65,7 @@ public class Base64Type extends AegisType {
             while (!reader.isCharacters() && !reader.isEndElement() && !reader.isStartElement()) {
                 reader.next();
             }
-            
+
             if (reader.isStartElement() && reader.getName().equals(AbstractXOPType.XOP_INCLUDE)) {
                 return optimizedType.readMtoM(mreader, context);
             }
@@ -108,7 +108,7 @@ public class Base64Type extends AegisType {
             optimizedType.writeObject(object, writer, context);
             return;
         }
-        
+
         byte[] data = (byte[])object;
 
         if (data != null && data.length > 0) {

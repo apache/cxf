@@ -25,21 +25,21 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
 import org.apache.cxf.jaxrs.rx.provider.ObservableWriter;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
-    
+
 public class ReactiveServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(ReactiveServer.class);
-     
+
     org.apache.cxf.endpoint.Server server;
     public ReactiveServer() {
     }
-    
+
     protected void run() {
         Bus bus = BusFactory.getDefaultBus();
         // Make sure default JSONProvider is not loaded
@@ -57,7 +57,7 @@ public class ReactiveServer extends AbstractBusTestServerBase {
         sf.setAddress("http://localhost:" + PORT + "/");
         server = sf.create();
     }
-    
+
     public void tearDown() throws Exception {
         server.stop();
         server.destroy();
@@ -75,5 +75,5 @@ public class ReactiveServer extends AbstractBusTestServerBase {
             System.out.println("done!");
         }
     }
-    
+
 }

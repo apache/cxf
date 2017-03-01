@@ -25,7 +25,7 @@ public class DTOService {
     public CollectionDTO getDTO() {
         CollectionDTO dto = new CollectionDTO();
 
-        List<String> strings = new ArrayList<String>();
+        List<String> strings = new ArrayList<>();
         strings.add("hi");
         dto.setStrings(strings);
 

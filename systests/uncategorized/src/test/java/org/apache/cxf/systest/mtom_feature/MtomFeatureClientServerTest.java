@@ -31,7 +31,8 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.MTOMFeature;
 
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.local.LocalConduit;
 
@@ -49,7 +50,7 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Before
     public void setUp() throws Exception {
         this.createBus();
@@ -63,7 +64,7 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         assertEquals("CXF", new String(photo.value));
         assertNotNull(image.value);
     }
-    
+
     @Test
     public void testEcho() throws Exception {
         byte[] bytes = ImageHelper.getImageBytes(getImage("/java.jpg"), "image/jpeg");
@@ -71,7 +72,7 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         port.echoData(image);
         assertNotNull(image);
     }
-    
+
     @Test
     public void testWithLocalTransport() throws Exception {
         Object implementor = new HelloImpl();
@@ -79,20 +80,20 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         Endpoint.publish(address, implementor);
         QName portName = new QName("http://apache.org/cxf/systest/mtom_feature",
                                    "HelloPort");
-        
+
         Service service = Service.create(serviceName);
-        service.addPort(portName, 
-                        "http://schemas.xmlsoap.org/soap/", 
+        service.addPort(portName,
+                        "http://schemas.xmlsoap.org/soap/",
                         "local://Hello");
         port = service.getPort(portName,
                                Hello.class,
                                new MTOMFeature());
 
-        
+
 
         ((BindingProvider)port).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
-        
+
         ((BindingProvider)port).getRequestContext()
             .put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
         Holder<byte[]> photo = new Holder<byte[]>("CXF".getBytes());
@@ -100,8 +101,8 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         port.detail(photo, image);
         assertEquals("CXF", new String(photo.value));
         assertNotNull(image.value);
-        
-        
+
+
         ((BindingProvider)port).getRequestContext()
             .put(LocalConduit.DIRECT_DISPATCH, Boolean.FALSE);
         photo = new Holder<byte[]>("CXF".getBytes());
@@ -110,9 +111,9 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         assertEquals("CXF", new String(photo.value));
         assertNotNull(image.value);
     }
-    
+
     @Test
-    public void testEchoWithLowThreshold() throws Exception { 
+    public void testEchoWithLowThreshold() throws Exception {
         ByteArrayOutputStream bout = this.setupOutLogging();
         byte[] bytes = ImageHelper.getImageBytes(getImage("/java.jpg"), "image/jpeg");
         Holder<byte[]> image = new Holder<byte[]>(bytes);
@@ -120,9 +121,9 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         hello.echoData(image);
         assertTrue("MTOM should be enabled", bout.toString().indexOf("<xop:Include") > -1);
     }
-    
+
     @Test
-    public void testEchoWithHighThreshold() throws Exception { 
+    public void testEchoWithHighThreshold() throws Exception {
         ByteArrayOutputStream bout = this.setupOutLogging();
         byte[] bytes = ImageHelper.getImageBytes(getImage("/java.jpg"), "image/jpeg");
         Holder<byte[]> image = new Holder<byte[]>(bytes);
@@ -130,12 +131,12 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         hello.echoData(image);
         assertTrue("MTOM should not be enabled", bout.toString().indexOf("<xop:Include") == -1);
     }
-    
+
     private ByteArrayOutputStream setupOutLogging() {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         PrintWriter writer = new PrintWriter(bos, true);
 
-        LoggingOutInterceptor out = new LoggingOutInterceptor(writer);
+        LoggingOutInterceptor out = new LoggingOutInterceptor(new PrintWriterEventSender(writer));
         this.bus.getOutInterceptors().add(out);
 
         return bos;
@@ -160,7 +161,7 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
             mtomFeature = new MTOMFeature(true, threshold);
         }
         Hello hello = service.getHelloPort(mtomFeature);
-        
+
         try {
             updateAddressPort(hello, PORT);
         } catch (Exception e) {

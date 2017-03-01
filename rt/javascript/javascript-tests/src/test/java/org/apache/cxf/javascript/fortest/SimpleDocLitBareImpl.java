@@ -24,19 +24,19 @@ import java.util.concurrent.CountDownLatch;
 import javax.jws.WebService;
 
 /**
- * 
+ *
  */
 @WebService(endpointInterface = "org.apache.cxf.javascript.fortest.SimpleDocLitBare",
             targetNamespace = "uri:org.apache.cxf.javascript.fortest")
 public class SimpleDocLitBareImpl implements SimpleDocLitBare {
-    
+
     private String lastString;
     private int lastInt;
     private double lastDouble;
     private TestBean1 lastBean1;
     private TestBean1[] lastBean1Array;
     private CountDownLatch oneWayLatch;
-    
+
     public void resetLastValues() {
         lastString = null;
         lastInt = -1;
@@ -44,7 +44,7 @@ public class SimpleDocLitBareImpl implements SimpleDocLitBare {
         lastBean1 = null;
         lastBean1Array = null;
     }
-    
+
 
     public int basicTypeFunctionReturnInt(String s, double d) {
         lastString = s;
@@ -69,16 +69,16 @@ public class SimpleDocLitBareImpl implements SimpleDocLitBare {
         bean1.intItem = 42;
         return bean1;
     }
-    
+
     public String compliant(TestBean1 green) {
         lastBean1 = green;
         return green.stringItem;
     }
-    
+
 
     public TestBean2 compliantNoArgs() {
         return new TestBean2("horsefeathers");
-    } 
+    }
 
     public String getLastString() {
         return lastString;
@@ -114,17 +114,17 @@ public class SimpleDocLitBareImpl implements SimpleDocLitBare {
             oneWayLatch.countDown();
         }
     }
-    
+
     public void prepareToWaitForOneWay() {
         oneWayLatch = new CountDownLatch(1);
     }
-    
+
     public void waitForOneWay() {
         if (oneWayLatch != null) {
             try {
                 oneWayLatch.await();
             } catch (InterruptedException e) {
-                // 
+                //
             }
             oneWayLatch = null;
         }

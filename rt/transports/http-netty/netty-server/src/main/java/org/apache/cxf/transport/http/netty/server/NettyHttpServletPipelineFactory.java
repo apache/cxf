@@ -51,25 +51,25 @@ import io.netty.util.concurrent.ImmediateEventExecutor;
 public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel> {
     private static final Logger LOG =
         LogUtils.getL7dLogger(NettyHttpServletPipelineFactory.class);
-    
+
     //Holds the child channel
     private final ChannelGroup allChannels = new DefaultChannelGroup(ImmediateEventExecutor.INSTANCE);;
 
     private final HttpSessionWatchdog watchdog;
-    
+
     private final TLSServerParameters tlsServerParameters;
-    
+
     private final boolean supportSession;
-    
+
     private final Map<String, NettyHttpContextHandler> handlerMap;
-    
+
     private final int maxChunkContentSize;
-    
+
     private final EventExecutorGroup applicationExecutor;
 
     private final NettyHttpServerEngine nettyHttpServerEngine;
 
-    public NettyHttpServletPipelineFactory(TLSServerParameters tlsServerParameters, 
+    public NettyHttpServletPipelineFactory(TLSServerParameters tlsServerParameters,
                                            boolean supportSession, int threadPoolSize, int maxChunkContentSize,
                                            Map<String, NettyHttpContextHandler> handlerMap,
                                            NettyHttpServerEngine engine) {
@@ -101,13 +101,13 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
         }
         return null;
     }
-    
+
     public void start() {
         if (supportSession) {
             new Thread(watchdog).start();
         }
     }
-    
+
     public void shutdown() {
         allChannels.close().awaitUninterruptibly();
         watchdog.stopWatching();
@@ -132,10 +132,10 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
 
         // Create a default pipeline implementation.
         ChannelPipeline pipeline = channel.pipeline();
-        
+
         SslHandler sslHandler = configureServerSSLOnDemand();
         if (sslHandler != null) {
-            LOG.log(Level.FINE, 
+            LOG.log(Level.FINE,
                     "Server SSL handler configured and added as an interceptor against the ChannelPipeline: {}",
                     sslHandler);
             pipeline.addLast("ssl", sslHandler);
@@ -197,7 +197,7 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
     @Override
     protected void initChannel(Channel ch) throws Exception {
         ChannelPipeline pipeline = getDefaulHttpChannelPipeline(ch);
-        
+
         pipeline.addLast(applicationExecutor, "handler", this.getServletHandler());
     }
 

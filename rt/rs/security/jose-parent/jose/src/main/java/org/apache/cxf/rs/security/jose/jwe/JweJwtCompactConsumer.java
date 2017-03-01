@@ -36,16 +36,16 @@ public class JweJwtCompactConsumer  {
         headers = jweConsumer.getJweHeaders();
     }
     public JwtToken decryptWith(JsonWebKey key) {
-        return decryptWith(JweUtils.createJweDecryptionProvider(key, 
+        return decryptWith(JweUtils.createJweDecryptionProvider(key,
                                headers.getContentEncryptionAlgorithm()));
     }
     public JwtToken decryptWith(PrivateKey key) {
-        return decryptWith(JweUtils.createJweDecryptionProvider(key, 
+        return decryptWith(JweUtils.createJweDecryptionProvider(key,
                                headers.getKeyEncryptionAlgorithm(),
                                headers.getContentEncryptionAlgorithm()));
     }
     public JwtToken decryptWith(SecretKey key) {
-        return decryptWith(JweUtils.createJweDecryptionProvider(key, 
+        return decryptWith(JweUtils.createJweDecryptionProvider(key,
                                headers.getKeyEncryptionAlgorithm(),
                                headers.getContentEncryptionAlgorithm()));
     }
@@ -54,7 +54,7 @@ public class JweJwtCompactConsumer  {
         JwtClaims claims = JwtUtils.jsonToClaims(toString(bytes));
         return new JwtToken(headers, claims);
     }
-    
+
     public JweHeaders getHeaders() {
         return headers;
     }

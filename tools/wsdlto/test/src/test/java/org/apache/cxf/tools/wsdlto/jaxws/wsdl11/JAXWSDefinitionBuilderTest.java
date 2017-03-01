@@ -94,7 +94,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         if (obj instanceof JAXBExtensibilityElement) {
             obj = ((JAXBExtensibilityElement)obj).getValue();
         }
-        assertTrue(obj.getClass().getName() + " is not an XMLBindingMessageFormat", 
+        assertTrue(obj.getClass().getName() + " is not an XMLBindingMessageFormat",
                    obj instanceof XMLBindingMessageFormat);
     }
 

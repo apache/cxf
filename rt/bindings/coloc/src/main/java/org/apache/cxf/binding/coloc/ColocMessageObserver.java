@@ -71,14 +71,14 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             }
             Exchange ex = new ExchangeImpl();
             setExchangeProperties(ex, m);
-            
+
             Message inMsg = endpoint.getBinding().createMessage();
             MessageImpl.copyContent(m, inMsg);
-            
+
             //Copy Request Context to Server inBound Message
-            //TODO a Context Filter Strategy required. 
+            //TODO a Context Filter Strategy required.
             inMsg.putAll(m);
-    
+
             inMsg.put(COLOCATED, Boolean.TRUE);
             inMsg.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
             inMsg.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
@@ -89,27 +89,27 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             }
             ex.setInMessage(inMsg);
             inMsg.setExchange(ex);
-            
+
             if (LOG.isLoggable(Level.FINEST)) {
                 LOG.finest("Build inbound interceptor chain.");
             }
-    
+
             //Add all interceptors between USER_LOGICAL and INVOKE.
             SortedSet<Phase> phases = new TreeSet<Phase>(bus.getExtension(PhaseManager.class).getInPhases());
             ColocUtil.setPhases(phases, Phase.USER_LOGICAL, Phase.INVOKE);
             InterceptorChain chain = ColocUtil.getInInterceptorChain(ex, phases);
             chain.add(addColocInterceptors());
             inMsg.setInterceptorChain(chain);
-    
+
             //Convert the coloc object type if necessary
             BindingOperationInfo bop = m.getExchange().getBindingOperationInfo();
             OperationInfo soi = bop != null ? bop.getOperationInfo() : null;
             if (soi != null && oi != null) {
-                if (ColocUtil.isAssignableOperationInfo(soi, Source.class) 
+                if (ColocUtil.isAssignableOperationInfo(soi, Source.class)
                     && !ColocUtil.isAssignableOperationInfo(oi, Source.class)) {
                     // converting source -> pojo
                     ColocUtil.convertSourceToObject(inMsg);
-                } else if (ColocUtil.isAssignableOperationInfo(oi, Source.class) 
+                } else if (ColocUtil.isAssignableOperationInfo(oi, Source.class)
                     && !ColocUtil.isAssignableOperationInfo(soi, Source.class)) {
                     // converting pojo -> source
                     ColocUtil.convertObjectToSource(inMsg);
@@ -117,12 +117,12 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             }
             chain.doIntercept(inMsg);
             if (soi != null && oi != null) {
-                if (ColocUtil.isAssignableOperationInfo(soi, Source.class) 
+                if (ColocUtil.isAssignableOperationInfo(soi, Source.class)
                     && !ColocUtil.isAssignableOperationInfo(oi, Source.class)
                     && ex.getOutMessage() != null) {
-                    // converting pojo -> source                
+                    // converting pojo -> source
                     ColocUtil.convertObjectToSource(ex.getOutMessage());
-                } else if (ColocUtil.isAssignableOperationInfo(oi, Source.class) 
+                } else if (ColocUtil.isAssignableOperationInfo(oi, Source.class)
                     && !ColocUtil.isAssignableOperationInfo(soi, Source.class)
                     && ex.getOutMessage() != null) {
                     // converting pojo -> source
@@ -140,7 +140,7 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             }
         }
     }
-    
+
     protected void setOutBoundMessage(Exchange from, Exchange to) {
         if (from.getOutFaultMessage() != null) {
             to.setInFaultMessage(from.getOutFaultMessage());
@@ -148,7 +148,7 @@ public class ColocMessageObserver extends ChainInitiationObserver {
             to.setInMessage(from.getOutMessage());
         }
     }
-    
+
     protected void setExchangeProperties(Exchange exchange, Message m) {
         exchange.put(Bus.class, bus);
         exchange.put(Endpoint.class, endpoint);
@@ -162,10 +162,10 @@ public class ColocMessageObserver extends ChainInitiationObserver {
         if (boi != null && boi.isUnwrapped()) {
             boi = boi.getWrappedOperation();
         }
-        
+
         exchange.put(BindingOperationInfo.class, boi);
     }
-    
+
     protected List<Interceptor<? extends Message>> addColocInterceptors() {
         List<Interceptor<? extends Message>> list = new ArrayList<Interceptor<? extends Message>>();
         list.add(new ColocInInterceptor());

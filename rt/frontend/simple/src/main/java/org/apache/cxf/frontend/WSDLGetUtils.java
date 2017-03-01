@@ -565,12 +565,12 @@ public class WSDLGetUtils {
      * 1) get a valid relative location to use for recursion into the imported schema
      * 2) add an entry to the doneSchemas map using such a valid relative location, as that's
      *    what will be used later for import links
-     * 
+     *
      * The valid relative location for the imported schema is computed by first obtaining the
      * relative uri that maps the importing schema resolved location into the imported schema
      * resolved location, then such value is resolved on top of the valid relative location
      * that's saved in the doneSchemas map for the importing schema.
-     * 
+     *
      * @param doneSchemas
      * @param resolvedSchemaLocation
      * @param currentSchema
@@ -809,7 +809,7 @@ public class WSDLGetUtils {
      * @param message
      * @param base the request URL
      * @param endpointInfo information for a web service 'port' inside of a service
-     * @return  String or NULL if none found
+     * @return String or NULL if none found
      */
     protected String getPublishedEndpointURL(Message message,
                                              String base,

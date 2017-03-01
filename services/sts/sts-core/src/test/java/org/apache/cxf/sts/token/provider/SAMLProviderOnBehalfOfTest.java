@@ -51,73 +51,73 @@ import org.apache.wss4j.dom.WSConstants;
  * Some unit tests for creating SAML Tokens with an OnBehalfOf element.
  */
 public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
-    
+
     /**
      * Create a default Saml1 Bearer Assertion with OnBehalfOf from a UsernameToken
      */
     @org.junit.Test
     public void testDefaultSaml1OnBehalfOfUsernameToken() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
-        
+
         UsernameTokenType usernameToken = new UsernameTokenType();
         AttributedString username = new AttributedString();
         username.setValue("bob");
         usernameToken.setUsername(username);
-        JAXBElement<UsernameTokenType> usernameTokenType = 
+        JAXBElement<UsernameTokenType> usernameTokenType =
             new JAXBElement<UsernameTokenType>(
                 QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                 WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
             );
         //Principal must be set in ReceivedToken/OnBehalfOf
         providerParameters.getTokenRequirements().getOnBehalfOf().setPrincipal(
                 new CustomTokenPrincipal(username.getValue()));
-        
+
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("bob"));
     }
-    
+
     /**
      * Create a default Saml2 Bearer Assertion with OnBehalfOf from a SAML Assertion
      */
     @org.junit.Test
     public void testDefaultSaml2OnBehalfOfAssertion() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
-        
+
         String user = "alice";
         Element saml1Assertion = getSAMLAssertion(user);
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                 WSConstants.WSS_SAML2_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, saml1Assertion
             );
         //Principal must be set in ReceivedToken/OnBehalfOf
         providerParameters.getTokenRequirements().getOnBehalfOf().setPrincipal(
                 new CustomTokenPrincipal(user));
-        
+
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains(user));
     }
-    
+
     /**
      * Create a Saml1 Bearer Assertion with OnBehalfOf from a UsernameToken. The SAMLTokenProvider is
      * configured with a custom Attribute Provider that instead creates a "CustomOnBehalfOf" attribute.
@@ -125,59 +125,59 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
     @org.junit.Test
     public void testCustomHandlingUsernameToken() throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
-        
+
         UsernameTokenType usernameToken = new UsernameTokenType();
         AttributedString username = new AttributedString();
         username.setValue("bob");
         usernameToken.setUsername(username);
-        JAXBElement<UsernameTokenType> usernameTokenType = 
+        JAXBElement<UsernameTokenType> usernameTokenType =
             new JAXBElement<UsernameTokenType>(
                 QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                 WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, usernameTokenType
             );
         //Principal must be set in ReceivedToken/OnBehalfOf
         providerParameters.getTokenRequirements().getOnBehalfOf().setPrincipal(
                 new CustomTokenPrincipal(username.getValue()));
-        
+
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
         TokenProviderResponse providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         Element token = (Element)providerResponse.getToken();
         String tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains(providerResponse.getTokenId()));
         assertTrue(tokenString.contains("AttributeStatement"));
         assertTrue(tokenString.contains("bob"));
-        
+
         try {
             assertTrue(tokenString.contains("CustomOnBehalfOf"));
             fail("Failure expected as the default AttributeProvider does not create this attribute");
         } catch (AssertionError ex) {
             // expected on the wrong attribute provider
         }
-        
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
+
+        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
         customProviderList.add(new CustomAttributeProvider());
         ((SAMLTokenProvider)samlTokenProvider).setAttributeStatementProviders(customProviderList);
-        
+
         providerResponse = samlTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         token = (Element)providerResponse.getToken();
         tokenString = DOM2Writer.nodeToString(token);
         assertTrue(tokenString.contains("CustomOnBehalfOf"));
     }
-    
-    
+
+
     private Element getSAMLAssertion(String user) throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, STSConstants.BEARER_KEY_KEYTYPE, null);
         providerParameters.setPrincipal(new CustomTokenPrincipal(user));
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML_TOKEN_TYPE));
@@ -187,36 +187,36 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
 
         return (Element)providerResponse.getToken();
     }
-    
+
 
     private TokenProviderParameters createProviderParameters(
         String tokenType, String keyType, Object onBehalfOf
     ) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(tokenType);
-        
+
         if (onBehalfOf != null) {
             ReceivedToken onBehalfOfToken = new ReceivedToken(onBehalfOf);
             onBehalfOfToken.setState(STATE.VALID);
             tokenRequirements.setOnBehalfOf(onBehalfOfToken);
-            
+
         }
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         keyRequirements.setKeyType(keyType);
         parameters.setKeyRequirements(keyRequirements);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         parameters.setMessageContext(msgCtx);
-        
+
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -225,12 +225,12 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         parameters.setEncryptionProperties(new EncryptionProperties());
-        
+
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -238,10 +238,10 @@ public class SAMLProviderOnBehalfOfTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
-  
-    
+
+
+
 }

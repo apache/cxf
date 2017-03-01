@@ -28,7 +28,7 @@ import java.util.logging.Logger;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = 42L;
-    
+
     transient String code;
     transient Object[] parameters;
     transient ResourceBundle bundle;
@@ -56,24 +56,24 @@ public class Message implements Serializable {
         bundle = catalog;
         parameters = params;
     }
-    
+
     public String toString() {
         String fmt = null;
         try {
             if (null == bundle) {
                 return code;
             }
-            fmt = bundle.getString(code);  
+            fmt = bundle.getString(code);
         } catch (MissingResourceException ex) {
             return code;
         }
         return MessageFormat.format(fmt, parameters);
     }
-    
+
     public String getCode() {
-        return code;      
+        return code;
     }
-    
+
     public Object[] getParameters() {
         return parameters;
     }

@@ -21,6 +21,7 @@ package org.apache.cxf.ext.logging;
 import java.io.FilterWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -29,7 +30,8 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.ext.logging.event.DefaultLogEventMapper;
 import org.apache.cxf.ext.logging.event.LogEvent;
 import org.apache.cxf.ext.logging.event.LogEventSender;
-import org.apache.cxf.ext.logging.slf4j.Slf4jEventSender;
+import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
+import org.apache.cxf.ext.logging.slf4j.Slf4jVerboseEventSender;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
@@ -39,21 +41,28 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
 public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
 
     public LoggingOutInterceptor() {
-        this(new Slf4jEventSender());
+        this(new Slf4jVerboseEventSender());
     }
     
+    public LoggingOutInterceptor(PrintWriter writer) {
+        this(new PrintWriterEventSender(writer));
+    }
+
     public LoggingOutInterceptor(LogEventSender sender) {
         super(Phase.PRE_STREAM, sender);
         addBefore(StaxOutInterceptor.class.getName());
     }
 
     public void handleMessage(Message message) throws Fault {
+        if (isLoggingDisabledNow(message)) {
+            return;
+        }
         createExchangeId(message);
         final OutputStream os = message.getContent(OutputStream.class);
         if (os != null) {
@@ -61,7 +70,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             message.setContent(OutputStream.class, createCachingOut(message, os, callback));
         } else {
             final Writer iowriter = message.getContent(Writer.class);
-            if (iowriter != null) { 
+            if (iowriter != null) {
                 message.setContent(Writer.class, new LogEventSendingWriter(sender, message, iowriter, limit));
             }
         }
@@ -126,7 +135,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             if (w2 == null) {
                 w2 = (StringWriter)out;
             }
-            
+
             String payload = shouldLogContent(event) ? getPayload(event, w2) : CONTENT_SUPPRESSED;
             event.setPayload(payload);
             sender.send(event);
@@ -144,7 +153,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             }
             return payload.toString();
         }
-        
+
         protected void writePayload(StringBuilder builder, StringWriter stringWriter, String contentType)
             throws Exception {
             StringBuffer buffer = stringWriter.getBuffer();
@@ -203,7 +212,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 // ignore
             }
         }
-        
+
         protected void writePayload(StringBuilder builder, CachedOutputStream cos, String encoding,
                                     String contentType) throws Exception {
             if (StringUtils.isEmpty(encoding)) {

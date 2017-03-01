@@ -37,11 +37,11 @@ import org.junit.Test;
 
 
 public class NettyHttpServerEngineTest extends Assert {
-    private static final int PORT1 
+    private static final int PORT1
         = Integer.valueOf(TestUtil.getPortNumber(NettyHttpServerEngineTest.class, 1));
-    private static final int PORT3 
+    private static final int PORT3
         = Integer.valueOf(TestUtil.getPortNumber(NettyHttpServerEngineTest.class, 3));
-    
+
 
     private Bus bus;
     private IMocksControl control;
@@ -51,11 +51,11 @@ public class NettyHttpServerEngineTest extends Assert {
     public void setUp() throws Exception {
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
-        
+
         Configurer configurer = control.createMock(Configurer.class);
         bus.getExtension(Configurer.class);
         EasyMock.expectLastCall().andReturn(configurer).anyTimes();
-        
+
         control.replay();
 
         factory = new NettyHttpServerEngineFactory();
@@ -86,7 +86,7 @@ public class NettyHttpServerEngineTest extends Assert {
         NettyHttpTestHandler handler2 = new NettyHttpTestHandler("string2", true);
         engine.addServant(new URL(urlStr), handler1);
         //assertEquals("Get the wrong maxIdleTime.", 30000, engine.getConnector().getMaxIdleTime());
-        
+
         String response = null;
         response = getResponse(urlStr);
         assertEquals("The netty http handler did not take effect", response, "string1");

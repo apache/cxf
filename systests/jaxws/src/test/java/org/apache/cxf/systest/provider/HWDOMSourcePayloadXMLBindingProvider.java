@@ -46,9 +46,9 @@ import org.w3c.dom.Document;
 @javax.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
 public class HWDOMSourcePayloadXMLBindingProvider implements
         Provider<DOMSource> {
-    @Resource 
+    @Resource
     WebServiceContext ctx;
-    
+
     public HWDOMSourcePayloadXMLBindingProvider() {
     }
 
@@ -59,7 +59,7 @@ public class HWDOMSourcePayloadXMLBindingProvider implements
                 throw new RuntimeException("No Operation Name");
             }
         }
-        
+
         DocumentBuilderFactory factory;
         DocumentBuilder builder;
         Document document = null;

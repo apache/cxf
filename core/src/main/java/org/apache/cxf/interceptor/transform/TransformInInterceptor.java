@@ -38,50 +38,50 @@ import org.apache.cxf.staxutils.transform.TransformUtils;
  * Creates an XMLStreamReader from the InputStream on the Message.
  */
 public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+
     private List<String> inDropElements;
     private Map<String, String> inElementsMap;
     private Map<String, String> inAppendMap;
     private Map<String, String> inAttributesMap;
     private boolean blockOriginalReader = true;
     private String contextPropertyName;
-    
+
     public TransformInInterceptor() {
         this(Phase.POST_STREAM);
         addBefore(StaxInInterceptor.class.getName());
     }
-    
+
     public TransformInInterceptor(String phase) {
         super(phase);
     }
-    
+
     public TransformInInterceptor(String phase, List<String> after) {
         super(phase);
         if (after != null) {
             addAfter(after);
         }
     }
-    
+
     public TransformInInterceptor(String phase, List<String> before, List<String> after) {
         this(phase, after);
         if (before != null) {
             addBefore(before);
         }
     }
-    
+
     public void handleMessage(Message message) {
-        if (contextPropertyName != null 
+        if (contextPropertyName != null
             && !MessageUtils.getContextualBoolean(message, contextPropertyName, false)) {
             return;
         }
         XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         InputStream is = message.getContent(InputStream.class);
-        
+
         XMLStreamReader transformReader = createTransformReaderIfNeeded(reader, is);
         if (transformReader != null) {
             message.setContent(XMLStreamReader.class, transformReader);
         }
-         
+
     }
 
     protected XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, InputStream is) {
@@ -96,11 +96,11 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
     public void setInAppendElements(Map<String, String> inElements) {
         this.inAppendMap = inElements;
     }
-    
+
     public void setInDropElements(List<String> dropElementsSet) {
         this.inDropElements = dropElementsSet;
     }
-    
+
     public void setInTransformElements(Map<String, String> inElements) {
         this.inElementsMap = inElements;
     }
@@ -112,7 +112,7 @@ public class TransformInInterceptor extends AbstractPhaseInterceptor<Message> {
     public void setBlockOriginalReader(boolean blockOriginalReader) {
         this.blockOriginalReader = blockOriginalReader;
     }
-    
+
     public void setContextPropertyName(String propertyName) {
         contextPropertyName = propertyName;
     }

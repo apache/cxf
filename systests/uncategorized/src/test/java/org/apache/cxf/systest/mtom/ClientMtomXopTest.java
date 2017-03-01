@@ -38,10 +38,10 @@ import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsClientProxy;
 import org.apache.cxf.jaxws.binding.soap.SOAPBindingImpl;
@@ -65,7 +65,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     public static final QName MTOM_PORT = new QName("http://cxf.apache.org/mime", "TestMtomPort");
     public static final QName MTOM_SERVICE = new QName("http://cxf.apache.org/mime", "TestMtomService");
 
-    
+
     public static class Server extends AbstractBusTestServerBase {
         EndpointImpl jaxep;
         protected void run() {
@@ -76,7 +76,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 Endpoint ep = jaxep.getServer().getEndpoint();
                 ep.getInInterceptors().add(new TestMultipartMessageInterceptor());
                 ep.getOutInterceptors().add(new TestAttachmentOutInterceptor());
-                
+
                 SOAPBinding jaxWsSoapBinding = (SOAPBinding) jaxep.getBinding();
                 jaxWsSoapBinding.setMTOMEnabled(true);
 
@@ -89,7 +89,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             jaxep = null;
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         createStaticBus();
@@ -101,86 +101,86 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
         try {
             Holder<DataHandler> param = new Holder<DataHandler>();
-            Holder<String> name; 
+            Holder<String> name;
             byte bytes[];
             InputStream in;
-            
+
             InputStream pre = this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl");
             int fileSize = 0;
             for (int i = pre.read(); i != -1; i = pre.read()) {
                 fileSize++;
             }
-            
+
             int count = 50;
             byte[] data = new byte[fileSize *  count];
             for (int x = 0; x < count; x++) {
-                this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl").read(data, 
+                this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl").read(data,
                                                                                 fileSize * x,
                                                                                 fileSize);
             }
-            
+
             Object[] validationTypes = new Object[]{Boolean.TRUE, SchemaValidationType.IN, SchemaValidationType.BOTH};
-            
+
             for (Object validationType : validationTypes) {
                 ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
                                                                     validationType);
-                
+
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
                 name = new Holder<String>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
-                
+
                 in = param.value.getInputStream();
                 bytes = IOUtils.readBytesFromStream(in);
                 assertEquals(data.length, bytes.length);
                 in.close();
-           
+
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
                 name = new Holder<String>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
-                
+
                 in = param.value.getInputStream();
                 bytes = IOUtils.readBytesFromStream(in);
                 assertEquals(data.length, bytes.length);
                 in.close();
             }
-            
+
             validationTypes = new Object[]{Boolean.FALSE, SchemaValidationType.OUT, SchemaValidationType.NONE};
             for (Object validationType : validationTypes) {
                 ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
                                                                 validationType);
                 SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
                 SAAJInInterceptor saajIn = new SAAJInInterceptor();
-                
+
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
                 name = new Holder<String>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
-                
+
                 in = param.value.getInputStream();
                 bytes = IOUtils.readBytesFromStream(in);
                 assertEquals(data.length, bytes.length);
                 in.close();
-                
-                ClientProxy.getClient(mtomPort).getInInterceptors().add(saajIn); 
-                ClientProxy.getClient(mtomPort).getInInterceptors().add(saajOut); 
+
+                ClientProxy.getClient(mtomPort).getInInterceptors().add(saajIn);
+                ClientProxy.getClient(mtomPort).getInInterceptors().add(saajOut);
                 param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
                 name = new Holder<String>("call detail");
                 mtomPort.testXop(name, param);
                 assertEquals("name unchanged", "return detail + call detail", name.value);
                 assertNotNull(param.value);
-                
+
                 in = param.value.getInputStream();
                 bytes = IOUtils.readBytesFromStream(in);
                 assertEquals(data.length, bytes.length);
                 in.close();
-                    
-                ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajIn); 
-                ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajOut); 
+
+                ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajIn);
+                ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajOut);
             }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
@@ -188,7 +188,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             if (ex.getMessage().contains("Connection reset")
                 && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
                 //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being 
+                //Jetty will occasionally send back a RST prior to all the data being
                 //sent back to the client when using localhost (which is what we do)
                 //we'll ignore for now
                 return;
@@ -203,10 +203,10 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class, true, true);
         try {
             Holder<DataHandler> param = new Holder<DataHandler>();
-            Holder<String> name; 
-                        
+            Holder<String> name;
+
             URL fileURL = getClass().getClassLoader().getResource("me.bmp");
-            
+
             Object[] validationTypes = new Object[]{Boolean.TRUE, SchemaValidationType.IN, SchemaValidationType.BOTH};
             for (Object validationType : validationTypes) {
                 ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
@@ -223,7 +223,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             if (ex.getMessage().contains("Connection reset")
                 && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
                 //There seems to be a bug/interaction with Java 1.6 and Jetty where
-                //Jetty will occasionally send back a RST prior to all the data being 
+                //Jetty will occasionally send back a RST prior to all the data being
                 //sent back to the client when using localhost (which is what we do)
                 //we'll ignore for now
                 return;
@@ -270,7 +270,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             //jaxwsEndpoint.getBinding().getInInterceptors().add(new TestMultipartMessageInterceptor());
             jaxwsEndpoint.getBinding().getOutInterceptors().add(new TestAttachmentOutInterceptor());
         }
-        
+
         jaxwsEndpoint.getBinding().getInInterceptors().add(new LoggingInInterceptor());
         jaxwsEndpoint.getBinding().getOutInterceptors().add(new LoggingOutInterceptor());
 

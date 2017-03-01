@@ -29,8 +29,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.sse.OutboundSseEvent;
-import javax.ws.rs.sse.SseContext;
-import javax.ws.rs.sse.SseEventOutput;
+import javax.ws.rs.sse.OutboundSseEvent.Builder;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 
 import org.springframework.stereotype.Component;
 
@@ -38,6 +39,43 @@ import org.springframework.stereotype.Component;
 @Component
 public class StatsRestServiceImpl {
     private static final Random RANDOM = new Random();
+    private Sse sse;
+    
+    @Context 
+    public void setSse(Sse sse) {
+        this.sse = sse;
+    }
+
+    @GET
+    @Path("sse/{id}")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void stats(@Context SseEventSink sink, @PathParam("id") final String id) {
+        new Thread() {
+            public void run() {
+                try {
+                    final Builder builder = sse.newEventBuilder();
+                    sink.onNext(createStatsEvent(builder.name("stats"), 1));
+                    Thread.sleep(1000);
+                    sink.onNext(createStatsEvent(builder.name("stats"), 2));
+                    Thread.sleep(1000);
+                    sink.onNext(createStatsEvent(builder.name("stats"), 3));
+                    Thread.sleep(1000);
+                    sink.onNext(createStatsEvent(builder.name("stats"), 4));
+                    Thread.sleep(1000);
+                    sink.onNext(createStatsEvent(builder.name("stats"), 5));
+                    Thread.sleep(1000);
+                    sink.onNext(createStatsEvent(builder.name("stats"), 6));
+                    Thread.sleep(1000);
+                    sink.onNext(createStatsEvent(builder.name("stats"), 7));
+                    Thread.sleep(1000);
+                    sink.onNext(createStatsEvent(builder.name("stats"), 8));
+                    sink.close();
+                } catch (final InterruptedException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+    }
 
     private static OutboundSseEvent createStatsEvent(final OutboundSseEvent.Builder builder, final int eventId) {
         return builder
@@ -45,39 +83,5 @@ public class StatsRestServiceImpl {
             .data(Stats.class, new Stats(new Date().getTime(), RANDOM.nextInt(100)))
             .mediaType(MediaType.APPLICATION_JSON_TYPE)
             .build();
-    }
-    
-    @GET
-    @Path("sse/{id}")
-    @Produces("text/event-stream")
-    public SseEventOutput stats(@Context SseContext sseContext, @PathParam("id") final String id) {
-        final SseEventOutput output = sseContext.newOutput();
-        
-        new Thread() {
-            public void run() {
-                try {
-                    output.write(createStatsEvent(sseContext.newEvent().name("stats"), 1));
-                    Thread.sleep(1000);
-                    output.write(createStatsEvent(sseContext.newEvent().name("stats"), 2));
-                    Thread.sleep(1000);
-                    output.write(createStatsEvent(sseContext.newEvent().name("stats"), 3));
-                    Thread.sleep(1000);
-                    output.write(createStatsEvent(sseContext.newEvent().name("stats"), 4));
-                    Thread.sleep(1000);
-                    output.write(createStatsEvent(sseContext.newEvent().name("stats"), 5));
-                    Thread.sleep(1000);
-                    output.write(createStatsEvent(sseContext.newEvent().name("stats"), 6));
-                    Thread.sleep(1000);
-                    output.write(createStatsEvent(sseContext.newEvent().name("stats"), 7));
-                    Thread.sleep(1000);
-                    output.write(createStatsEvent(sseContext.newEvent().name("stats"), 8));
-                    output.close();
-                } catch (final InterruptedException | IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-
-        return output;
     }
 }

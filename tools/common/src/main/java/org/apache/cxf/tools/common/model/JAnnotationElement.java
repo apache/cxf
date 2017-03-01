@@ -29,7 +29,7 @@ public final class JAnnotationElement {
     private Object value;
     private boolean isPrimitive;
 
-    private Set<String> imports = new HashSet<String>();
+    private Set<String> imports = new HashSet<>();
 
     public JAnnotationElement() {
     }
@@ -90,7 +90,7 @@ public final class JAnnotationElement {
                     if (i < Array.getLength(value) - 1) {
                         sb.append(", ");
                     }
-                }                
+                }
                 sb.append("}");
             } else {
                 appendValue(sb, value);

@@ -24,7 +24,7 @@ import java.io.Reader;
 import org.w3c.dom.ls.LSInput;
 
 /**
- * LSInput implementation that can be used in 
+ * LSInput implementation that can be used in
  * custom LSResourceResolver implementations for getting
  * schema import and include references resolved.
  */

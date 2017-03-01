@@ -33,21 +33,29 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class WireTapIn extends AbstractPhaseInterceptor<Message> {
+    private static final String WIRE_TAP_STARTED = WireTapIn.class.getName() + ".Started";
+    
     private long threshold = -1;
     private int limit = AbstractLoggingInterceptor.DEFAULT_LIMIT;
 
     /**
      * Instantiates a new WireTapIn
-     * @param limit 
+     * @param limit
      *
      * @param logMessageContent the log message content
      */
-    public WireTapIn() {
+    public WireTapIn(int limit, long threshold) {
         super(Phase.RECEIVE);
+        this.limit = limit;
+        this.threshold = threshold;
     }
 
     @Override
     public void handleMessage(final Message message) throws Fault {
+        if (message.containsKey(WIRE_TAP_STARTED)) {
+            return;
+        }
+        message.put(WIRE_TAP_STARTED, Boolean.TRUE);
         try {
             InputStream is = message.getContent(InputStream.class);
             if (is != null) {
@@ -94,13 +102,13 @@ public class WireTapIn extends AbstractPhaseInterceptor<Message> {
         message.setContent(CachedOutputStream.class, bos);
 
     }
-    
+
     public void setLimit(int limit) {
         this.limit = limit;
     }
-    
+
     public void setThreshold(long threshold) {
         this.threshold = threshold;
     }
-    
+
 }

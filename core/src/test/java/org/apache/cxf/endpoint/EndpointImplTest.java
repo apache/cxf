@@ -29,10 +29,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class EndpointImplTest extends Assert {
-    
+
     @Test
     public void testEqualsAndHashCode() throws Exception {
         Bus bus = new ExtensionManagerBus();
@@ -41,26 +41,26 @@ public class EndpointImplTest extends Assert {
         ei.setAddress("http://nowhere.com/bar/foo");
         EndpointInfo ei2 = new EndpointInfo();
         ei2.setAddress("http://nowhere.com/foo/bar");
-        
+
         Endpoint ep = new EndpointImpl(bus, svc, ei);
         Endpoint ep1 = new EndpointImpl(bus, svc, ei);
         Endpoint ep2 = new EndpointImpl(bus, svc, ei2);
-        
+
         int hashcode = ep.hashCode();
         int hashcode1 = ep1.hashCode();
         int hashcode2 = ep2.hashCode();
-        
+
         assertTrue("hashcodes must be equal", hashcode == hashcode1);
         assertTrue("hashcodes must not be equal", hashcode != hashcode2);
 
         assertTrue("reflexivity violated", ep.equals(ep));
         assertFalse("two objects must not be equal", ep.equals(ep1));
         assertFalse("two objects must not be equal", ep.equals(ep2));
-        
+
         ep.put("custom", Boolean.TRUE);
-        
+
         assertTrue("hashcode must remain equal", hashcode == ep.hashCode());
     }
-    
+
     //TODO add other tests
 }

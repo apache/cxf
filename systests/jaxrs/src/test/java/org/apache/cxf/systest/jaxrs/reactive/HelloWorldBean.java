@@ -27,7 +27,7 @@ public class HelloWorldBean {
     public HelloWorldBean(String greeting) {
         this.greeting = greeting;
     }
-    
+
     public String getGreeting() {
         return greeting;
     }

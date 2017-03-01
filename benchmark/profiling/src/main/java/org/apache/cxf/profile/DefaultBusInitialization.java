@@ -26,10 +26,10 @@ import java.io.File;
 import org.apache.cxf.BusFactory;
 
 /**
- * 
+ *
  */
 public class DefaultBusInitialization {
-    
+
     public static void main(String[] args) {
         Controller.stopAllocRecording();
         Controller.stopCPURecording();

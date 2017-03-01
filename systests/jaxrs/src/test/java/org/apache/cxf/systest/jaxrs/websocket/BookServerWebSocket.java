@@ -27,7 +27,7 @@ import org.apache.cxf.jaxrs.provider.StreamingResponseProvider;
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookStorePerRequest;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-    
+
 public class BookServerWebSocket extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookServerWebSocket.class, 1);
     public static final String PORT_SPRING = allocatePort(BookServerWebSocket.class, 2);
@@ -35,9 +35,9 @@ public class BookServerWebSocket extends AbstractBusTestServerBase {
     public static final String PORT2 = allocatePort(BookServerWebSocket.class, 4);
     public static final String PORT2_SPRING = allocatePort(BookServerWebSocket.class, 5);
     public static final String PORT2_WAR = allocatePort(BookServerWebSocket.class, 6);
-     
+
     org.apache.cxf.endpoint.Server server;
-    
+
     private String port;
 
     public BookServerWebSocket() {
@@ -47,7 +47,7 @@ public class BookServerWebSocket extends AbstractBusTestServerBase {
     public BookServerWebSocket(String port) {
         this.port = port;
     }
-    
+
     protected void run() {
         Bus bus = BusFactory.getDefaultBus();
         setBus(bus);
@@ -63,7 +63,7 @@ public class BookServerWebSocket extends AbstractBusTestServerBase {
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
     }
-    
+
     public void tearDown() throws Exception {
         server.stop();
         server.destroy();
@@ -81,5 +81,5 @@ public class BookServerWebSocket extends AbstractBusTestServerBase {
             System.out.println("done!");
         }
     }
-    
+
 }

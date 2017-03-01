@@ -59,8 +59,8 @@ import org.oasis_open.docs.wsn.b_2.TopicExpressionType;
 
 public abstract class WsnBrokerTest extends Assert {
     private boolean useExternal;
-    
-    
+
+
     private ActiveMQConnectionFactory activemq;
     private JaxwsNotificationBroker notificationBrokerServer;
     private JaxwsCreatePullPoint createPullPointServer;
@@ -70,9 +70,9 @@ public abstract class WsnBrokerTest extends Assert {
 
     private int port1 = 8182;
     private int port2;
-    
+
     protected abstract String getProviderImpl();
-    
+
 
     @Before
     public void setUp() throws Exception {
@@ -81,14 +81,14 @@ public abstract class WsnBrokerTest extends Assert {
         Thread.currentThread()
             .setContextClassLoader(new FakeClassLoader(impl));
         WSNHelper.getInstance().setClassLoader(false);
-    
+
         System.setProperty("javax.xml.ws.spi.Provider", impl);
 
         port2 = getFreePort();
         if (!useExternal) {
             port1 = getFreePort();
             int brokerPort = getFreePort();
-            activemq = new ActiveMQConnectionFactory("vm:(broker:(tcp://localhost:" + brokerPort 
+            activemq = new ActiveMQConnectionFactory("vm:(broker:(tcp://localhost:" + brokerPort
                                                      + ")?persistent=false)");
 
             notificationBrokerServer = new JaxwsNotificationBroker("WSNotificationBroker", activemq);
@@ -130,34 +130,34 @@ public abstract class WsnBrokerTest extends Assert {
         Consumer consumer = new Consumer(callback, "http://localhost:" + port2 + "/test/consumer");
 
         Subscription subscription = notificationBroker.subscribe(consumer, "myTopic");
-        
+
 
         synchronized (callback.notifications) {
-            notificationBroker.notify("myTopic", 
+            notificationBroker.notify("myTopic",
                                       new JAXBElement<String>(new QName("urn:test:org", "foo"),
                                           String.class, "bar"));
             callback.notifications.wait(1000000);
         }
         assertEquals(1, callback.notifications.size());
         NotificationMessageHolderType message = callback.notifications.get(0);
-        assertEquals(WSNHelper.getInstance().getWSAAddress(subscription.getEpr()), 
+        assertEquals(WSNHelper.getInstance().getWSAAddress(subscription.getEpr()),
                      WSNHelper.getInstance().getWSAAddress(message.getSubscriptionReference()));
 
         subscription.unsubscribe();
         consumer.stop();
     }
-    
+
     @Test
     public void testRenew() throws Exception {
         TestConsumer callback = new TestConsumer();
         Consumer consumer = new Consumer(callback, "http://localhost:" + port2 + "/test/consumer");
 
-        //create subscription with InitialTerminationTime 20 sec, so that the 
+        //create subscription with InitialTerminationTime 20 sec, so that the
         //subscription would be expired after 20 sec
         Subscription subscription = notificationBroker.subscribe(consumer, "myTopic", null, false, "PT20S");
         Thread.sleep(30000);
         synchronized (callback.notifications) {
-            notificationBroker.notify("myTopic", 
+            notificationBroker.notify("myTopic",
                                       new JAXBElement<String>(new QName("urn:test:org", "foo"),
                                           String.class, "bar"));
             callback.notifications.wait(10000);
@@ -165,14 +165,14 @@ public abstract class WsnBrokerTest extends Assert {
         assertEquals(0, callback.notifications.size()); //the subscription is expired so can't get the notification
         subscription.renew("PT60S"); //renew another 60 sec to resend the notification
         synchronized (callback.notifications) {
-            notificationBroker.notify("myTopic", 
+            notificationBroker.notify("myTopic",
                                       new JAXBElement<String>(new QName("urn:test:org", "foo"),
                                           String.class, "bar"));
             callback.notifications.wait(10000);
         }
         assertEquals(1, callback.notifications.size()); //the subscription is expired so can't get the notification
         NotificationMessageHolderType message = callback.notifications.get(0);
-        assertEquals(WSNHelper.getInstance().getWSAAddress(subscription.getEpr()), 
+        assertEquals(WSNHelper.getInstance().getWSAAddress(subscription.getEpr()),
                      WSNHelper.getInstance().getWSAAddress(message.getSubscriptionReference()));
 
         subscription.unsubscribe();
@@ -184,7 +184,7 @@ public abstract class WsnBrokerTest extends Assert {
         PullPoint pullPoint = createPullPoint.create();
         Subscription subscription = notificationBroker.subscribe(pullPoint, "myTopic");
         notificationBroker.notify("myTopic",
-                                  new JAXBElement<String>(new QName("urn:test:org", "foo"), 
+                                  new JAXBElement<String>(new QName("urn:test:org", "foo"),
                                                   String.class, "bar"));
 
         boolean received = false;
@@ -201,13 +201,13 @@ public abstract class WsnBrokerTest extends Assert {
         subscription.unsubscribe();
         pullPoint.destroy();
     }
-    
+
     @Test
     public void testPullPointWithQueueName() throws Exception {
         PullPoint pullPoint = createPullPoint.create("testQueue");
         Subscription subscription = notificationBroker.subscribe(pullPoint, "myTopic");
         notificationBroker.notify("myTopic",
-                                  new JAXBElement<String>(new QName("urn:test:org", "foo"), 
+                                  new JAXBElement<String>(new QName("urn:test:org", "foo"),
                                                   String.class, "bar"));
 
         boolean received = false;
@@ -233,7 +233,7 @@ public abstract class WsnBrokerTest extends Assert {
         Subscription subscription = notificationBroker.subscribe(consumer, "myTopic");
 
         PublisherCallback publisherCallback = new PublisherCallback();
-        Publisher publisher = new Publisher(publisherCallback, "http://localhost:" + port2 
+        Publisher publisher = new Publisher(publisherCallback, "http://localhost:" + port2
                                             + "/test/publisher");
         Registration registration = notificationBroker.registerPublisher(publisher, "myTopic");
 
@@ -287,10 +287,10 @@ public abstract class WsnBrokerTest extends Assert {
         Consumer consumer = new Consumer(consumerCallback, "http://localhost:" + port2 + "/test/consumer");
 
         PublisherCallback publisherCallback = new PublisherCallback();
-        Publisher publisher = new Publisher(publisherCallback, "http://localhost:" 
+        Publisher publisher = new Publisher(publisherCallback, "http://localhost:"
             + port2 + "/test/publisher");
-        Registration registration = notificationBroker.registerPublisher(publisher, 
-                                                                         Arrays.asList("myTopic1", 
+        Registration registration = notificationBroker.registerPublisher(publisher,
+                                                                         Arrays.asList("myTopic1",
                                                                                        "myTopic2"), true);
 
         Subscription subscription = notificationBroker.subscribe(consumer, "myTopic1");
@@ -311,20 +311,20 @@ public abstract class WsnBrokerTest extends Assert {
         publisher.stop();
         consumer.stop();
     }
-    
+
     @Test
     public void testPublisherCustomType() throws Exception {
         notificationBroker.setExtraClasses(CustomType.class);
-        
+
         TestConsumer consumerCallback = new TestConsumer();
         Consumer consumer = new Consumer(consumerCallback,
                                          "http://localhost:" + port2 + "/test/consumer",
                                          CustomType.class);
-        
+
         Subscription subscription = notificationBroker.subscribe(consumer, "myTopic");
 
         PublisherCallback publisherCallback = new PublisherCallback();
-        Publisher publisher = new Publisher(publisherCallback, "http://localhost:" + port2 
+        Publisher publisher = new Publisher(publisherCallback, "http://localhost:" + port2
                                             + "/test/publisher");
         Registration registration = notificationBroker.registerPublisher(publisher, "myTopic");
 
@@ -350,8 +350,8 @@ public abstract class WsnBrokerTest extends Assert {
 
     public static class TestConsumer implements Consumer.Callback {
 
-        final List<NotificationMessageHolderType> notifications 
-            = new ArrayList<NotificationMessageHolderType>();
+        final List<NotificationMessageHolderType> notifications
+            = new ArrayList<>();
 
         public void notify(NotificationMessageHolderType message) {
             synchronized (notifications) {
@@ -396,7 +396,7 @@ public abstract class WsnBrokerTest extends Assert {
                         return false;
                     }
                     public URL nextElement() {
-                        throw new NoSuchElementException(); 
+                        throw new NoSuchElementException();
                     }
                 };
             }

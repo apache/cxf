@@ -38,7 +38,7 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 public final class JavaFirstUtil {
     private JavaFirstUtil() {
-        
+
     }
     public static JavaInterface serviceInfo2JavaInf(ServiceInfo service) {
         JavaInterface javaInf = new JavaInterface();

@@ -28,18 +28,18 @@ public class CircuitBreakerFailoverFeature extends FailoverFeature {
     private int threshold;
     private long timeout;
     private FailoverTargetSelector targetSelector;
-    
+
     public CircuitBreakerFailoverFeature() {
-        this(CircuitBreakerTargetSelector.DEFAULT_THESHOLD, 
+        this(CircuitBreakerTargetSelector.DEFAULT_THESHOLD,
              CircuitBreakerTargetSelector.DEFAULT_TIMEOUT);
     }
-    
+
     public CircuitBreakerFailoverFeature(String clientBootstrapAddress) {
-        this(CircuitBreakerTargetSelector.DEFAULT_THESHOLD, 
+        this(CircuitBreakerTargetSelector.DEFAULT_THESHOLD,
              CircuitBreakerTargetSelector.DEFAULT_TIMEOUT,
              clientBootstrapAddress);
     }
-    
+
     public CircuitBreakerFailoverFeature(int threshold, long timeout) {
         this.threshold = threshold;
         this.timeout = timeout;
@@ -50,28 +50,28 @@ public class CircuitBreakerFailoverFeature extends FailoverFeature {
         this.threshold = threshold;
         this.timeout = timeout;
     }
-    
+
     @Override
     public FailoverTargetSelector getTargetSelector() {
         if (this.targetSelector == null) {
-            this.targetSelector = new CircuitBreakerTargetSelector(threshold, timeout, 
+            this.targetSelector = new CircuitBreakerTargetSelector(threshold, timeout,
                                                                    super.getClientBootstrapAddress());
         }
         return this.targetSelector;
     }
-    
+
     public int getThreshold() {
         return threshold;
     }
-    
+
     public long getTimeout() {
         return timeout;
     }
-    
+
     public void setThreshold(int threshold) {
         this.threshold = threshold;
     }
-    
+
     public void setTimeout(long timeout) {
         this.timeout = timeout;
     }

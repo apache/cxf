@@ -34,21 +34,21 @@ import org.apache.karaf.shell.api.action.Completion;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 
 /**
- * 
+ *
  */
 @Command(scope = "cxf", name = "start-endpoint",
     description = "Starts a CXF Endpoint on a Bus.")
 @Service
 public class StartEndpointCommand extends CXFController implements Action {
-    
-    @Argument(index = 0, name = "bus", 
-        description = "The CXF bus name where to look for the Endpoint", 
+
+    @Argument(index = 0, name = "bus",
+        description = "The CXF bus name where to look for the Endpoint",
         required = true, multiValued = false)
     @Completion(BusCompleter.class)
     String busName;
-    
+
     @Argument(index = 1, name = "endpoint",
-        description = "The Endpoint name to start", 
+        description = "The Endpoint name to start",
         required = true, multiValued = false)
     @Completion(StoppedEndpointCompleter.class)
     String endpoint;
@@ -64,5 +64,5 @@ public class StartEndpointCommand extends CXFController implements Action {
             }
         }
         return null;
-    } 
+    }
 }

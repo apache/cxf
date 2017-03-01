@@ -22,16 +22,16 @@ package org.apache.cxf.pat.internal;
 public class TestResult {
     public static final String AVG_UNIT = " (ms)";
     public static final String THROUGHPUT_UNIT = " (invocations/sec)";
-    
+
     private String name;
     private TestCaseBase testCase;
-  
+
     private double duration;
     private double numOfInvocations;
-    
+
     private double avgResponseTime;
     private double throughput;
-  
+
     public TestResult() {
         this("Default Result");
     }
@@ -48,9 +48,9 @@ public class TestResult {
     public void compute(long startTime, long endTime, int numberOfInvocations) {
         numOfInvocations = (double)numberOfInvocations;
         duration = convertToSeconds(endTime - startTime);
-      
+
         throughput = numOfInvocations / duration;
-        avgResponseTime  = duration / numOfInvocations;
+        avgResponseTime = duration / numOfInvocations;
         System.out.println();
         System.out.println("--------------Test Result of " +  this.getName() + "-------------");
         System.out.println("Throughput: " + testCase.getOperationName() + " " + throughput + THROUGHPUT_UNIT);
@@ -75,11 +75,11 @@ public class TestResult {
     public double getThroughput() {
         return throughput;
     }
-    
+
     public double getDuration() {
         return duration;
     }
-    
+
     public double getNumOfInvocations() {
         return numOfInvocations;
     }

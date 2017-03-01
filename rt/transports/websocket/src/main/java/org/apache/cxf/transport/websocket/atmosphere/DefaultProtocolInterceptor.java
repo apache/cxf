@@ -57,8 +57,8 @@ import org.atmosphere.cpr.FrameworkConfig;
 
 /**
  * DefaultProtocolInterceptor provides the default CXF's WebSocket protocol that uses.
- * 
- * This interceptor is automatically engaged when no atmosphere interceptor is configured.  
+ *
+ * This interceptor is automatically engaged when no atmosphere interceptor is configured.
  */
 public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultProtocolInterceptor.class);
@@ -111,7 +111,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
     @Override
     public Action inspect(final AtmosphereResource r) {
         LOG.log(Level.FINE, "inspect");
-        if (AtmosphereResource.TRANSPORT.WEBSOCKET != r.transport() 
+        if (AtmosphereResource.TRANSPORT.WEBSOCKET != r.transport()
             && AtmosphereResource.TRANSPORT.SSE != r.transport()
             && AtmosphereResource.TRANSPORT.POLLING != r.transport()) {
             LOG.fine("Skipping ignorable request");
@@ -138,7 +138,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
                 }
 
                 @Override
-                public AsyncIOWriter write(AtmosphereResponse r, byte[] data, int offset, int length) 
+                public AsyncIOWriter write(AtmosphereResponse r, byte[] data, int offset, int length)
                     throws IOException {
                     suspendedResponse.write(data, offset, length);
                     suspendedResponse.flushBuffer();
@@ -149,8 +149,8 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
                 public void close(AtmosphereResponse response) throws IOException {
                 }
             });
-            // REVISIT we need to keep this response's asyncwriter alive so that data can be written to the 
-            //   suspended response, but investigate if there is a better alternative. 
+            // REVISIT we need to keep this response's asyncwriter alive so that data can be written to the
+            //   suspended response, but investigate if there is a better alternative.
             r.getResponse().destroyable(false);
             return Action.CONTINUE;
         }
@@ -188,14 +188,14 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
             try {
                 byte[] data = WebSocketUtils.readBody(request.getInputStream());
                 if (data.length == 0) {
-                    if (AtmosphereResource.TRANSPORT.WEBSOCKET == r.transport() 
+                    if (AtmosphereResource.TRANSPORT.WEBSOCKET == r.transport()
                         || AtmosphereResource.TRANSPORT.SSE == r.transport()) {
                         r.suspend();
                         return Action.SUSPEND;
                     }
                     return Action.CANCELLED;
                 }
-                
+
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.log(Level.FINE, "inspecting data {0}", new String(data));
                 }
@@ -234,7 +234,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
                 return Action.CANCELLED;
             } catch (IOException e) {
                 LOG.log(Level.WARNING, "Error during protocol processing", e);
-            }           
+            }
         } else {
             request.destroyable(false);
         }
@@ -252,7 +252,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
 
     /**
      * Creates a virtual request using the specified parent request and the actual data.
-     * 
+     *
      * @param r
      * @param data
      * @return
@@ -272,7 +272,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         String requestURI = path;
         String requestURL = r.getRequestURL() + requestURI.substring(r.getRequestURI().length());
         String contentType = hdrs.get("Content-Type");
-        
+
         String method = hdrs.get(WebSocketUtils.METHOD_KEY);
         b.pathInfo(path)
                 .contentType(contentType)
@@ -291,7 +291,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
 
     /**
      * Creates a response data based on the specified payload.
-     * 
+     *
      * @param response
      * @param payload
      * @param parent
@@ -302,7 +302,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         String refid = (String)request.getAttribute(WebSocketConstants.DEFAULT_REQUEST_ID_KEY);
 
         if (AtmosphereResource.TRANSPORT.WEBSOCKET != response.resource().transport()) {
-            return payload; 
+            return payload;
         }
         Map<String, String> headers = new HashMap<String, String>();
         if (refid != null) {
@@ -311,16 +311,16 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         }
         if (parent) {
             // include the status code and content-type and those matched headers
-            String sc = response.getHeader(WebSocketUtils.SC_KEY); 
+            String sc = response.getHeader(WebSocketUtils.SC_KEY);
             if (sc == null) {
                 sc = Integer.toString(response.getStatus());
             }
-            headers.put(WebSocketUtils.SC_KEY, sc);            
+            headers.put(WebSocketUtils.SC_KEY, sc);
             if (payload != null && payload.length > 0) {
                 headers.put("Content-Type",  response.getContentType());
             }
             for (Map.Entry<String, String> hv : response.headers().entrySet()) {
-                if (!"Content-Type".equalsIgnoreCase(hv.getKey()) 
+                if (!"Content-Type".equalsIgnoreCase(hv.getKey())
                     && includedheaders != null && includedheaders.matcher(hv.getKey()).matches()
                     && !(excludedheaders != null && excludedheaders.matcher(hv.getKey()).matches())) {
                     headers.put(hv.getKey(), hv.getValue());
@@ -334,7 +334,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
 
         @Override
         @SuppressWarnings("deprecation")
-        public byte[] transformPayload(AtmosphereResponse response, byte[] responseDraft, byte[] data) 
+        public byte[] transformPayload(AtmosphereResponse response, byte[] responseDraft, byte[] data)
             throws IOException {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "transformPayload with draft={0}", new String(responseDraft));
@@ -358,7 +358,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         }
     }
 
-    // a workaround to flush the header data upon close when no write operation occurs  
+    // a workaround to flush the header data upon close when no write operation occurs
     private static class WrappedAtmosphereResponse extends AtmosphereResponseImpl {
         final AtmosphereResponse response;
         ServletOutputStream sout;
@@ -375,11 +375,11 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
             }
             return sout;
         }
-        
+
         private final class BufferedServletOutputStream extends ServletOutputStream {
             final ServletOutputStream delegate;
             CachedOutputStream out = new CachedOutputStream();
-            
+
             BufferedServletOutputStream(ServletOutputStream d) {
                 delegate = d;
             }
@@ -440,6 +440,6 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
             }
         }
 
-        
+
     }
 }

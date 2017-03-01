@@ -32,21 +32,21 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class LocalDestinationTest extends Assert {
 
     /**
-     * Tests if the status code is available after closing the destination so that it can be logged. 
+     * Tests if the status code is available after closing the destination so that it can be logged.
      * Note that this test verifies the current approach of setting the status code if it is not set earlier.
-     * 
+     *
      * @throws Exception
      */
     @Test
     public void testStatusCodeSetAfterClose() throws Exception {
         Bus bus = BusFactory.getDefaultBus();
         LocalTransportFactory factory = new LocalTransportFactory();
-        
+
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
         ei.setAddress("http://localhost/test");
 
@@ -65,7 +65,7 @@ public class LocalDestinationTest extends Assert {
         Conduit backChannel = d.getBackChannel(m);
 
         backChannel.close(m);
-        
+
         code = (Integer)m.get(Message.RESPONSE_CODE);
         assertNotNull(code);
         assertEquals(200, code.intValue());

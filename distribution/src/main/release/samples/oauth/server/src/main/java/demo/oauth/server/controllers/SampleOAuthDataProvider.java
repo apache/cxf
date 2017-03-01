@@ -38,7 +38,7 @@ public class SampleOAuthDataProvider extends MemoryOAuthDataProvider
     }
 
     public Set<Client> listRegisteredClients() {
-        Set<Client> apps = new HashSet<Client>();
+        Set<Client> apps = new HashSet<>();
         Set<String> appList = userRegisteredClients.keySet();
         if (appList != null) {
             for (String s : appList) {
@@ -49,7 +49,7 @@ public class SampleOAuthDataProvider extends MemoryOAuthDataProvider
     }
 
     public Set<Client> listAuthorizedClients() {
-        Set<Client> apps = new HashSet<Client>();
+        Set<Client> apps = new HashSet<>();
         Set<String> appList = userAuthorizedClients.keySet();
         if (appList != null) {
             for (String s : appList) {
@@ -58,7 +58,7 @@ public class SampleOAuthDataProvider extends MemoryOAuthDataProvider
         }
         return apps;
     }
- 
+
     public synchronized void removeRegisteredClient(String consumerKey) {
         List<String> registeredApps = this.userRegisteredClients.get(consumerKey);
         this.clientAuthInfo.remove(consumerKey);
@@ -81,5 +81,5 @@ public class SampleOAuthDataProvider extends MemoryOAuthDataProvider
                 oauthTokens.remove(token.getTokenKey());
             }
         }
-    }   
+    }
 }

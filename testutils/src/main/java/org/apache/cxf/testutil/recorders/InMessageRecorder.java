@@ -57,7 +57,7 @@ public class InMessageRecorder extends AbstractPhaseInterceptor<Message> {
             bos.close();
             byte bytes[] = bos.toByteArray();
             synchronized (inbound) {
-                inbound.add(bytes);    
+                inbound.add(bytes);
             }
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("inbound: " + bos.toString());
@@ -71,5 +71,5 @@ public class InMessageRecorder extends AbstractPhaseInterceptor<Message> {
 
     public List<byte[]> getInboundMessages() {
         return inbound;
-    } 
+    }
 }

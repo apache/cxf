@@ -26,5 +26,5 @@ public class CorbaFixedListener extends AbstractCorbaTypeListener {
 
     public void processCharacters(String text) {
         ((CorbaFixedHandler) handler).setValueFromData(text);
-    }    
+    }
 }

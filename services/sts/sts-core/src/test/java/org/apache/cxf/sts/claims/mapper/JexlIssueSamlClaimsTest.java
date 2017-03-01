@@ -101,7 +101,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
      */
     private List<RequestSecurityTokenResponseType> issueToken(TokenIssueOperation issueOperation,
         RequestSecurityTokenType request, Principal principal, Map<String, Object> messageContext) {
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, principal, messageContext);
         List<RequestSecurityTokenResponseType> securityTokenResponse = response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
@@ -128,10 +128,10 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         Map<String, RealmProperties> realms = createSamlRealms();
 
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
+        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
         providerList.add(samlTokenProvider);
@@ -141,7 +141,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         issueOperation.setDelegationHandlers(Collections.singletonList(delegationHandler));
 
         // Add Token Validator
-        List<TokenValidator> validatorList = new ArrayList<TokenValidator>();
+        List<TokenValidator> validatorList = new ArrayList<>();
         SAMLTokenValidator samlTokenValidator = new SAMLTokenValidator();
         samlTokenValidator.setSamlRealmCodec(new IssuerSAMLRealmCodec());
         validatorList.add(samlTokenValidator);
@@ -150,7 +150,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
         addService(issueOperation);
 
         // Add Relationship list
-        List<Relationship> relationshipList = new ArrayList<Relationship>();
+        List<Relationship> relationshipList = new ArrayList<>();
         Relationship rs = createRelationship();
         relationshipList.add(rs);
 
@@ -319,7 +319,7 @@ public class JexlIssueSamlClaimsTest extends org.junit.Assert {
 
         SAMLTokenProvider samlTokenProvider = new SAMLTokenProvider();
         samlTokenProvider.setRealmMap(realms);
-        List<AttributeStatementProvider> customProviderList = new ArrayList<AttributeStatementProvider>();
+        List<AttributeStatementProvider> customProviderList = new ArrayList<>();
         customProviderList.add(new ClaimsAttributeStatementProvider());
         samlTokenProvider.setAttributeStatementProviders(customProviderList);
 

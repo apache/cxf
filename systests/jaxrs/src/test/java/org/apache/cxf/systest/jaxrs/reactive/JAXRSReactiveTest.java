@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.GenericType;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -31,6 +33,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.rx.client.ObservableRxInvoker;
+import org.apache.cxf.jaxrs.rx.client.ObservableRxInvokerProvider;
 import org.apache.cxf.jaxrs.rx.provider.ObservableReader;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -62,19 +65,19 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         String text = wc.accept("text/plain").get(String.class);
         assertEquals("Hello, world!", text);
     }
-    
+
     @Test
     public void testGetHelloWorldTextObservableSync() throws Exception {
         String address = "http://localhost:" + PORT + "/reactive/text";
         WebClient wc = WebClient.create(address, Collections.singletonList(
             new ObservableReader<Object>()));
-        GenericType<Observable<String>> genericResponseType = 
-            new GenericType<Observable<String>>() {        
+        GenericType<Observable<String>> genericResponseType =
+            new GenericType<Observable<String>>() {
             };
         Observable<String> obs = wc.accept("text/plain").get(genericResponseType);
         obs.subscribe(s -> assertResponse(s));
     }
-    
+
     private void assertResponse(String s) {
         assertEquals("Hello, world!", s);
     }
@@ -111,9 +114,9 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(address,
                                         Collections.singletonList(new JacksonJsonProvider()));
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
-        GenericType<List<HelloWorldBean>> genericResponseType = new GenericType<List<HelloWorldBean>>() {        
+        GenericType<List<HelloWorldBean>> genericResponseType = new GenericType<List<HelloWorldBean>>() {
         };
-        
+
         List<HelloWorldBean> beans = wc.accept("application/json").get(genericResponseType);
         assertEquals(2, beans.size());
         assertEquals("Hello", beans.get(0).getGreeting());
@@ -121,33 +124,35 @@ public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
         assertEquals("Ciao", beans.get(1).getGreeting());
         assertEquals("World", beans.get(1).getAudience());
     }
-    
+
     @Test
     public void testGetHelloWorldAsyncObservable() throws Exception {
         String address = "http://localhost:" + PORT + "/reactive/textAsync";
-        WebClient wc = WebClient.create(address);
+        WebClient wc = WebClient.create(address,
+                                        Collections.singletonList(new ObservableRxInvokerProvider()));
         Observable<String> obs = wc.accept("text/plain")
             .rx(ObservableRxInvoker.class)
             .get(String.class);
-        obs.map(s -> { 
-            return s + s; 
+        obs.map(s -> {
+            return s + s;
         });
-        
+
         Thread.sleep(3000);
-        
+
         obs.subscribe(s -> assertDuplicateResponse(s));
     }
     @Test
     public void testGetHelloWorldAsyncObservable404() throws Exception {
         String address = "http://localhost:" + PORT + "/reactive/textAsync404";
-        WebClient wc = WebClient.create(address);
-        wc.rx(ObservableRxInvoker.class).get(String.class).subscribe(
+        Invocation.Builder b = ClientBuilder.newClient().register(new ObservableRxInvokerProvider())
+            .target(address).request();
+        b.rx(ObservableRxInvoker.class).get(String.class).subscribe(
             s -> {
                 fail("Exception expected");
             },
             t -> validateT((ExecutionException)t));
     }
-    
+
     private void validateT(ExecutionException t) {
         assertTrue(t.getCause() instanceof NotFoundException);
     }

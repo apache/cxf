@@ -67,7 +67,7 @@ public class JavaClassTest extends Assert {
                      setter.getParameters().get(0).getClassName());
         assertEquals("this.array = newArray;", setter.getJavaCodeBlock().getExpressions().get(0).toString());
 
-        
+
         field = new JavaField("return",
                               "String[]",
                               "http://doc.withannotation.fortest.tools.cxf.apache.org/");

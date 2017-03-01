@@ -47,47 +47,47 @@ public class AuthorizationMetadataService {
     // Optional
     private boolean dynamicRegistrationEndpointNotAvailable;
     private String dynamicRegistrationEndpointAddress;
-    
+
     @GET
     @Produces("application/json")
     public String getConfiguration(@Context UriInfo ui) {
         Map<String, Object> cfg = new LinkedHashMap<String, Object>();
         String baseUri = getBaseUri(ui);
         prepareConfigurationData(cfg, baseUri);
-        
+
         JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
         writer.setFormat(true);
         return writer.toJson(cfg);
     }
-    
+
     protected void prepareConfigurationData(Map<String, Object> cfg, String baseUri) {
         // Issuer
         cfg.put("issuer", issuer == null ? baseUri : issuer);
         // Authorization Endpoint
-        String theAuthorizationEndpointAddress = 
+        String theAuthorizationEndpointAddress =
             calculateEndpointAddress(authorizationEndpointAddress, baseUri, "/idp/authorize");
         cfg.put("authorization_endpoint", theAuthorizationEndpointAddress);
         // Token Endpoint
         if (!isTokenEndpointNotAvailable()) {
-            String theTokenEndpointAddress = 
+            String theTokenEndpointAddress =
                 calculateEndpointAddress(tokenEndpointAddress, baseUri, "/oauth2/token");
             cfg.put("token_endpoint", theTokenEndpointAddress);
         }
         // Token Revocation Endpoint
         if (!isTokenRevocationEndpointNotAvailable()) {
-            String theTokenRevocationEndpointAddress = 
+            String theTokenRevocationEndpointAddress =
                 calculateEndpointAddress(tokenRevocationEndpointAddress, baseUri, "/oauth2/revoke");
             cfg.put("revocation_endpoint", theTokenRevocationEndpointAddress);
         }
         // Jwks Uri Endpoint
         if (!isJwkEndpointNotAvailable()) {
-            String theJwkEndpointAddress = 
+            String theJwkEndpointAddress =
                 calculateEndpointAddress(jwkEndpointAddress, baseUri, "/jwk/keys");
             cfg.put("jwks_uri", theJwkEndpointAddress);
         }
         // Dynamic Registration Endpoint
         if (!isDynamicRegistrationEndpointNotAvailable()) {
-            String theDynamicRegistrationEndpointAddress = 
+            String theDynamicRegistrationEndpointAddress =
                 calculateEndpointAddress(dynamicRegistrationEndpointAddress, baseUri, "/dynamic/register");
             cfg.put("registration_endpoint", theDynamicRegistrationEndpointAddress);
         }
@@ -98,7 +98,7 @@ public class AuthorizationMetadataService {
         if (endpointAddress.startsWith("https")) {
             return endpointAddress;
         } else {
-            return UriBuilder.fromUri(baseUri).path(endpointAddress).build().toString(); 
+            return UriBuilder.fromUri(baseUri).path(endpointAddress).build().toString();
         }
     }
 
@@ -141,7 +141,7 @@ public class AuthorizationMetadataService {
     public void setJwkEndpointNotAvailable(boolean jwkEndpointNotAvailable) {
         this.jwkEndpointNotAvailable = jwkEndpointNotAvailable;
     }
-    
+
     public boolean isJwkEndpointNotAvailable() {
         return jwkEndpointNotAvailable;
     }
@@ -169,5 +169,5 @@ public class AuthorizationMetadataService {
     public void setDynamicRegistrationEndpointAddress(String dynamicRegistrationEndpointAddress) {
         this.dynamicRegistrationEndpointAddress = dynamicRegistrationEndpointAddress;
     }
-    
+
 }

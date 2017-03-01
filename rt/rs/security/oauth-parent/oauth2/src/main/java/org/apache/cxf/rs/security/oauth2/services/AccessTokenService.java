@@ -51,7 +51,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class AccessTokenService extends AbstractTokenService {
     private List<AccessTokenGrantHandler> grantHandlers = new LinkedList<AccessTokenGrantHandler>();
     private List<AccessTokenResponseFilter> responseHandlers = new LinkedList<AccessTokenResponseFilter>();
-    
+
     /**
      * Sets the list of optional grant handlers
      * @param handlers the grant handlers
@@ -59,7 +59,7 @@ public class AccessTokenService extends AbstractTokenService {
     public void setGrantHandlers(List<AccessTokenGrantHandler> handlers) {
         grantHandlers = handlers;
     }
-    
+
     /**
      * Sets a grant handler
      * @param handler the grant handler
@@ -71,44 +71,44 @@ public class AccessTokenService extends AbstractTokenService {
     public void setResponseFilters(List<AccessTokenResponseFilter> handlers) {
         this.responseHandlers = handlers;
     }
-    
+
     public void setResponseFilter(AccessTokenResponseFilter responseHandler) {
         responseHandlers.add(responseHandler);
     }
     /**
      * Processes an access token request
-     * @param params the form parameters representing the access token grant 
-     * @return Access Token or the error 
+     * @param params the form parameters representing the access token grant
+     * @return Access Token or the error
      */
     @POST
     @Consumes("application/x-www-form-urlencoded")
     @Produces("application/json")
     public Response handleTokenRequest(MultivaluedMap<String, String> params) {
-        
+
         // Make sure the client is authenticated
         Client client = authenticateClientIfNeeded(params);
-        
-        if (!OAuthUtils.isGrantSupportedForClient(client, 
+
+        if (!OAuthUtils.isGrantSupportedForClient(client,
                                                   isCanSupportPublicClients(),
                                                   params.getFirst(OAuthConstants.GRANT_TYPE))) {
             LOG.log(Level.FINE, "The grant type {} is not supported for the client",
                      params.getFirst(OAuthConstants.GRANT_TYPE));
-            return createErrorResponse(params, OAuthConstants.UNAUTHORIZED_CLIENT);    
+            return createErrorResponse(params, OAuthConstants.UNAUTHORIZED_CLIENT);
         }
-        
+
         try {
             checkAudience(client, params);
         } catch (OAuthServiceException ex) {
             return super.createErrorResponseFromBean(ex.getError());
-        } 
-                
+        }
+
         // Find the grant handler
         AccessTokenGrantHandler handler = findGrantHandler(params);
         if (handler == null) {
             LOG.fine("No Grant Handler found");
             return createErrorResponse(params, OAuthConstants.UNSUPPORTED_GRANT_TYPE);
         }
-        
+
         // Create the access token
         ServerAccessToken serverToken = null;
         try {
@@ -116,9 +116,9 @@ public class AccessTokenService extends AbstractTokenService {
         } catch (WebApplicationException ex) {
             throw ex;
         } catch (RuntimeException ex) {
-            // This is done to bypass a Check-Style 
-            // restriction on a number of return statements 
-            OAuthServiceException oauthEx = ex instanceof OAuthServiceException 
+            // This is done to bypass a Check-Style
+            // restriction on a number of return statements
+            OAuthServiceException oauthEx = ex instanceof OAuthServiceException
                 ? (OAuthServiceException)ex : new OAuthServiceException(ex);
             return handleException(oauthEx, OAuthConstants.INVALID_GRANT);
         }
@@ -126,10 +126,10 @@ public class AccessTokenService extends AbstractTokenService {
             LOG.fine("No access token was created");
             return createErrorResponse(params, OAuthConstants.INVALID_GRANT);
         }
-        
+
         // Extract the information to be of use for the client
         ClientAccessToken clientToken = OAuthUtils.toClientAccessToken(serverToken, isWriteOptionalParameters());
-        processClientAccessToken(clientToken, serverToken);    
+        processClientAccessToken(clientToken, serverToken);
         // Return it to the client
         return Response.ok(clientToken)
                        .header(HttpHeaders.CACHE_CONTROL, "no-store")
@@ -138,24 +138,24 @@ public class AccessTokenService extends AbstractTokenService {
     }
     protected void processClientAccessToken(ClientAccessToken clientToken, ServerAccessToken serverToken) {
         for (AccessTokenResponseFilter filter : responseHandlers) {
-            filter.process(clientToken, serverToken); 
+            filter.process(clientToken, serverToken);
         }
     }
-    protected void checkAudience(Client c, MultivaluedMap<String, String> params) { 
+    protected void checkAudience(Client c, MultivaluedMap<String, String> params) {
         String audienceParam = params.getFirst(OAuthConstants.CLIENT_AUDIENCE);
         if (!OAuthUtils.validateAudience(audienceParam, c.getRegisteredAudiences())) {
             LOG.fine("Error validating the audience parameter");
             throw new OAuthServiceException(new OAuthError(OAuthConstants.ACCESS_DENIED));
         }
-        
+
     }
-    
+
     /**
      * Find the matching grant handler
      */
-    protected AccessTokenGrantHandler findGrantHandler(MultivaluedMap<String, String> params) {    
+    protected AccessTokenGrantHandler findGrantHandler(MultivaluedMap<String, String> params) {
         String grantType = params.getFirst(OAuthConstants.GRANT_TYPE);
-                
+
         if (grantType != null) {
             for (AccessTokenGrantHandler handler : grantHandlers) {
                 if (handler.getSupportedGrantTypes().contains(grantType)) {
@@ -171,7 +171,7 @@ public class AccessTokenService extends AbstractTokenService {
                 }
             }
         }
-        
+
         return null;
     }
 }

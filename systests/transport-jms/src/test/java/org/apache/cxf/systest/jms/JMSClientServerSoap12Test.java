@@ -32,16 +32,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSClientServerSoap12Test extends AbstractVmJMSTest {
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         startBusAndJMS(JMSClientServerSoap12Test.class);
         publish("jms:queue:routertest.SOAPService2Q.text", new GreeterImplSoap12());
     }
-    
+
     @Test
     public void testGzipEncodingWithJms() throws Exception {
-        QName serviceName = new QName("http://apache.org/hello_world_doc_lit", 
+        QName serviceName = new QName("http://apache.org/hello_world_doc_lit",
                                  "SOAPService8");
         QName portName = new QName("http://apache.org/hello_world_doc_lit", "SoapPort8");
         URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
@@ -69,12 +69,12 @@ public class JMSClientServerSoap12Test extends AbstractVmJMSTest {
     }
     @Test
     public void testWSAddressingWithJms() throws Exception {
-        QName serviceName = new QName("http://apache.org/hello_world_doc_lit", 
+        QName serviceName = new QName("http://apache.org/hello_world_doc_lit",
                                  "SOAPService8");
         QName portName = new QName("http://apache.org/hello_world_doc_lit", "SoapPort8");
         URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
-        Greeter greeter = markForClose(service.getPort(portName, Greeter.class, 
+        Greeter greeter = markForClose(service.getPort(portName, Greeter.class,
                                                        cff, new AddressingFeature()));
 
         for (int idx = 0; idx < 5; idx++) {

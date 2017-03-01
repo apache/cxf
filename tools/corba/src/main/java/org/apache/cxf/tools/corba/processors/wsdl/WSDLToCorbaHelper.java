@@ -167,7 +167,7 @@ public class WSDLToCorbaHelper {
                                              QName defaultName,
                                              QName schemaTypeName)
         throws Exception {
-        List<MemberType> members = new ArrayList<MemberType>();
+        List<MemberType> members = new ArrayList<>();
 
         Iterator<? extends XmlSchemaObjectBase> iterL = null;
         if (particle instanceof XmlSchemaSequence) {
@@ -526,7 +526,7 @@ public class WSDLToCorbaHelper {
     protected List<MemberType> processAttributesAsMembers(List<XmlSchemaAttributeOrGroupRef> list,
                                                           String uri) throws Exception {
         QName memName = null;
-        List <MemberType>members = new ArrayList<MemberType>();
+        List <MemberType>members = new ArrayList<>();
 
         for (XmlSchemaAttributeOrGroupRef aog : list) {
             if (!(aog instanceof XmlSchemaAttribute)) {
@@ -555,7 +555,7 @@ public class WSDLToCorbaHelper {
                         if (!isDuplicate(attType)) {
                             typeMappingType.getStructOrExceptionOrUnion().add(attType);
                         }
-                        QName name =  createQNameTargetNamespace(typeName.getLocalPart() + "_nil");
+                        QName name = createQNameTargetNamespace(typeName.getLocalPart() + "_nil");
                         membertype = createNillableUnion(name,
                                                          checkPrefix(attrName),
                                                          createQNameCorbaNamespace(typeName.getLocalPart()),
@@ -566,7 +566,7 @@ public class WSDLToCorbaHelper {
                     //REVISIT, bravi, attType is null for the wsaddr type
                     //{http://www.w3.org/2005/08/addressing}RelationshipTypeOpenEnum
                     if (attType != null) {
-                        QName name =  createQNameTargetNamespace(attType.getQName().getLocalPart() + "_nil");
+                        QName name = createQNameTargetNamespace(attType.getQName().getLocalPart() + "_nil");
                         //REVISIT, Edell - bug in Xmlschema 1.2
                         // https://issues.apache.org/jira/browse/WSCOMMONS-208
                         membertype = createNillableUnion(name,
@@ -1068,7 +1068,7 @@ public class WSDLToCorbaHelper {
             if (basetype == null) {
                 return null;
             }
-            // process  ext types ????
+            // process ext types ????
             MemberType basemember = new MemberType();
             basemember.setName("_simpleTypeValue");
             QName baseTypeName = checkPrefix(basetype.getQName());
@@ -1409,7 +1409,7 @@ public class WSDLToCorbaHelper {
 
         List<MemberType> fields = processContainerAsMembers(choice, defaultName, schematypeName);
 
-        List<String> caselist = new ArrayList<String>();
+        List<String> caselist = new ArrayList<>();
 
         if (disctype instanceof Enum) {
             Enum corbaenum = (Enum)disctype;
@@ -1496,7 +1496,7 @@ public class WSDLToCorbaHelper {
         List<MemberType> fields = processContainerAsMembers(choice, defaultName, schematypeName);
 
         //Choose an Integer as a Discriminator
-        List<String> caselist = new ArrayList<String>();
+        List<String> caselist = new ArrayList<>();
 
         for (int i = 0; i < fields.size(); i++) {
             caselist.add(Integer.toString(i));

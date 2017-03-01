@@ -19,13 +19,13 @@
 
 package org.apache.cxf.cxf1226;
 
-import javax.jws.WebService; 
+import javax.jws.WebService;
 
 @WebService(endpointInterface = "org.apache.cxf.cxf1226.HelloWorld",
-            targetNamespace = "http://nstest.helloworld") 
-public class HelloWorldImpl implements HelloWorld { 
-    public String sayHi(String text) { 
-        return "Hello " + text; 
-    } 
-} 
+            targetNamespace = "http://nstest.helloworld")
+public class HelloWorldImpl implements HelloWorld {
+    public String sayHi(String text) {
+        return "Hello " + text;
+    }
+}
 

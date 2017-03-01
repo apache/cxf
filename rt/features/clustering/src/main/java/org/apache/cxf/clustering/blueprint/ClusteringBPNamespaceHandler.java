@@ -24,17 +24,17 @@ import java.util.Set;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.Namespaces;
 import org.apache.aries.blueprint.ParserContext;
 import org.apache.cxf.clustering.FailoverFeature;
 import org.apache.cxf.clustering.LoadDistributorFeature;
 import org.apache.cxf.clustering.circuitbreaker.CircuitBreakerFailoverFeature;
+import org.apache.cxf.helpers.BaseNamespaceHandler;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
 @Namespaces("http://cxf.apache.org/clustering")
-public class ClusteringBPNamespaceHandler implements NamespaceHandler {
+public class ClusteringBPNamespaceHandler extends BaseNamespaceHandler {
     public ComponentMetadata decorate(Node node, ComponentMetadata component, ParserContext context) {
         return null;
     }
@@ -57,7 +57,11 @@ public class ClusteringBPNamespaceHandler implements NamespaceHandler {
     }
 
     public URL getSchemaLocation(String namespace) {
-        return getClass().getClassLoader().getResource("schemas/clustering.xsd");
+        if ("http://cxf.apache.org/clustering".equals(namespace)) {
+            return getClass().getClassLoader().getResource("schemas/clustering.xsd");
+        }
+        // delegate to cxf-core
+        return super.findCoreSchemaLocation(namespace);
     }
 
 }

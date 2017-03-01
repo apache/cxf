@@ -59,19 +59,19 @@ import org.apache.mina.transport.socket.DatagramSessionConfig;
 import org.apache.mina.transport.socket.nio.NioDatagramAcceptor;
 
 /**
- * 
+ *
  */
 public class UDPDestination extends AbstractDestination {
     public static final String NETWORK_INTERFACE = UDPDestination.class.getName() + ".NETWORK_INTERFACE";
-    
-    private static final Logger LOG = LogUtils.getL7dLogger(UDPDestination.class); 
+
+    private static final Logger LOG = LogUtils.getL7dLogger(UDPDestination.class);
     private static final AttributeKey KEY_IN = new AttributeKey(StreamIoHandler.class, "in");
     private static final AttributeKey KEY_OUT = new AttributeKey(StreamIoHandler.class, "out");
-    
+
     NioDatagramAcceptor acceptor;
     AutomaticWorkQueue queue;
     volatile MulticastSocket mcast;
-    
+
     public UDPDestination(Bus b, EndpointReferenceType ref, EndpointInfo ei) {
         super(b, ref, ei);
     }
@@ -86,7 +86,7 @@ public class UDPDestination extends AbstractDestination {
                     byte bytes[] = new byte[64 * 1024];
                     final DatagramPacket p = new DatagramPacket(bytes, bytes.length);
                     mcast.receive(p);
-                    
+
                     LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream() {
                         public void close() throws IOException {
                             super.close();
@@ -97,11 +97,11 @@ public class UDPDestination extends AbstractDestination {
                             mcast.send(p2);
                         }
                     };
-                    
+
                     UDPConnectionInfo info = new UDPConnectionInfo(null,
                                                                    out,
                                                                    new ByteArrayInputStream(bytes, 0, p.getLength()));
-                    
+
                     final MessageImpl m = new MessageImpl();
                     final Exchange exchange = new ExchangeImpl();
                     exchange.setDestination(UDPDestination.this);
@@ -117,11 +117,11 @@ public class UDPDestination extends AbstractDestination {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-            }            
+            }
         }
     }
-    
-    
+
+
     /** {@inheritDoc}*/
     @Override
     protected Conduit getInbuiltBackChannel(Message inMessage) {
@@ -148,7 +148,7 @@ public class UDPDestination extends AbstractDestination {
         if (queue == null) {
             queue = queuem.getAutomaticWorkQueue();
         }
-        
+
         try {
             URI uri = new URI(this.getAddress().getAddress().getValue());
             InetSocketAddress isa = null;
@@ -179,10 +179,10 @@ public class UDPDestination extends AbstractDestination {
                 mcast = socket;
                 queue.execute(new MCastListener());
             } else {
-                
+
                 acceptor = new NioDatagramAcceptor();
                 acceptor.setHandler(new UDPIOHandler());
-                
+
                 acceptor.setDefaultLocalAddress(isa);
                 DatagramSessionConfig dcfg = acceptor.getSessionConfig();
                 dcfg.setReadBufferSize(64 * 1024);
@@ -203,7 +203,7 @@ public class UDPDestination extends AbstractDestination {
         }
         if (ret == null) {
             Enumeration<NetworkInterface> ifcs = NetworkInterface.getNetworkInterfaces();
-            List<NetworkInterface> possibles = new ArrayList<NetworkInterface>();
+            List<NetworkInterface> possibles = new ArrayList<>();
             while (ifcs.hasMoreElements()) {
                 NetworkInterface ni = ifcs.nextElement();
                 if (ni.supportsMulticast()
@@ -234,23 +234,23 @@ public class UDPDestination extends AbstractDestination {
             mcast = null;
         }
     }
-    
+
     static class UDPConnectionInfo {
         final IoSession session;
         final OutputStream out;
         final InputStream in;
-        
+
         UDPConnectionInfo(IoSession io, OutputStream o, InputStream i) {
             session = io;
             out = o;
             in = i;
         }
     }
-    
-    
+
+
     class UDPIOHandler extends StreamIoHandler {
-        
-        
+
+
         @Override
         public void sessionOpened(IoSession session) {
             // Set timeouts
@@ -264,7 +264,7 @@ public class UDPDestination extends AbstractDestination {
             session.setAttribute(KEY_OUT, out);
             processStreamIo(session, in, out);
         }
-        
+
         protected void processStreamIo(IoSession session, InputStream in, OutputStream out) {
             final MessageImpl m = new MessageImpl();
             final Exchange exchange = new ExchangeImpl();
@@ -280,7 +280,7 @@ public class UDPDestination extends AbstractDestination {
                 }
             });
         }
-        
+
         public void sessionClosed(IoSession session) throws Exception {
             final InputStream in = (InputStream) session.getAttribute(KEY_IN);
             final OutputStream out = (OutputStream) session.getAttribute(KEY_OUT);
@@ -311,7 +311,7 @@ public class UDPDestination extends AbstractDestination {
             if (e != null && in != null) {
                 in.throwException(e);
             } else {
-                session.close(true);
+                session.closeOnFlush().awaitUninterruptibly();
             }
         }
         public void sessionIdle(IoSession session, IdleStatus status) {
@@ -328,12 +328,12 @@ public class UDPDestination extends AbstractDestination {
             super(cause);
         }
     }
-    
+
     public class UDPDestinationOutputStream extends OutputStream {
         final OutputStream out;
         IoBuffer buffer = IoBuffer.allocate(64 * 1024 - 42); //max size
         boolean closed;
-        
+
         public UDPDestinationOutputStream(OutputStream out) {
             this.out = out;
         }
@@ -365,5 +365,5 @@ public class UDPDestination extends AbstractDestination {
             out.close();
         }
     }
-    
+
 }

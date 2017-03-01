@@ -30,9 +30,9 @@ public class Server extends AbstractBusTestServerBase {
         Object implementor = new GreeterImpl();
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
-        
+
     }
-    
+
     public static void main(String[] args) {
         try {
             Server s = new Server();

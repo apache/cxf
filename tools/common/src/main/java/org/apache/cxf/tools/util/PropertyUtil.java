@@ -41,7 +41,7 @@ public class PropertyUtil {
                 String key = null;
                 String value = null;
                 if (st.hasMoreTokens()) {
-                    key  = st.nextToken().trim();
+                    key = st.nextToken().trim();
                 }
                 if (st.hasMoreTokens()) {
                     value = st.nextToken().trim();
@@ -53,11 +53,11 @@ public class PropertyUtil {
             }
         }
     }
-    
+
     public void load(InputStream is) throws IOException {
         load(is, DEFAULT_DELIM);
     }
-    
+
     public String getProperty(String key) {
         return this.maps.get(key);
     }

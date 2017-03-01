@@ -28,7 +28,7 @@ public final class Version {
     private static String name;
     private static String fullVersion;
     private static String buildNumber;
-    
+
     private static final String VERSION_BASE = "/org/apache/cxf/version/";
 
     private Version() {
@@ -43,7 +43,7 @@ public final class Version {
         }
         return ins;
     }
-    
+
     private static synchronized void loadProperties() {
         if (version == null) {
             Properties p = new Properties();
@@ -59,7 +59,7 @@ public final class Version {
             version = p.getProperty("product.version", "<unknown>");
             name = p.getProperty("product.name", "Apache CXF");
             buildNumber = p.getProperty("build.number", "<unknown>");
-            if (version.contains("SNAPSHOT") 
+            if (version.contains("SNAPSHOT")
                 || version.contains("<unknown>")) {
                 fullVersion = name + " " + version + "-" + buildNumber;
             } else {

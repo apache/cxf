@@ -23,7 +23,7 @@ import org.apache.cxf.service.model.OperationInfo;
 
 /**
  * Returning null from the getSchemaValidationType will be ignored.  This generally
- * will mean, it falls back to the service endpoint default, whether configured 
+ * will mean, it falls back to the service endpoint default, whether configured
  * by @SchemaValidation or a endpoint property.
  */
 public interface SchemaValidationTypeProvider {

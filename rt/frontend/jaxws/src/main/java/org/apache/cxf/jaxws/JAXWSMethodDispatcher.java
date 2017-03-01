@@ -43,7 +43,7 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXWSMethodDispatcher.class);
 
     private JaxWsImplementorInfo implInfo;
-    
+
     public JAXWSMethodDispatcher(JaxWsImplementorInfo implInfo) {
         this.implInfo = implInfo;
     }
@@ -64,7 +64,7 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
                     continue;
                 }
                 Class<?> endpointClass = implInfo.getImplementorClass();
-                Message msg = new Message("SEI_METHOD_NOT_FOUND", LOG, 
+                Message msg = new Message("SEI_METHOD_NOT_FOUND", LOG,
                                           m.getName(), endpointClass.getName());
                 throw new ServiceConstructionException(msg, e);
             }
@@ -80,13 +80,13 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
         }
         return super.getBindingOperation(method, endpoint);
     }
-    
+
     public Method getImplementationMethod(Method method) throws NoSuchMethodException {
         Class<?> endpointClass = implInfo.getImplementorClass();
-        
+
         if (!endpointClass.isAssignableFrom(method.getDeclaringClass())) {
             try {
-                Method m2 = endpointClass.getMethod(method.getName(), 
+                Method m2 = endpointClass.getMethod(method.getName(),
                                                  method.getParameterTypes());
                 if (Modifier.isVolatile(m2.getModifiers())) {
                     //bridge method, need to map the generics
@@ -111,12 +111,12 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
                     ReflectionUtil.setAccessible(method);
                 } catch (Throwable t) {
                     //ignore
-                }                
+                }
             } catch (SecurityException e) {
                 throw new ServiceConstructionException(e);
             }
         }
         return method;
     }
-    
+
 }

@@ -36,16 +36,16 @@ import org.apache.cxf.common.logging.LogUtils;
  */
 public class StaticService implements ServiceMBean {
     private static final Logger LOG = LogUtils.getL7dLogger(StaticService.class);
-    
+
     private String tokenType;
     private String keyType;
     private EncryptionProperties encryptionProperties;
-    
+
     /**
      * a collection of compiled regular expression patterns
      */
     private final Collection<Pattern> endpointPatterns = new ArrayList<>();
-    
+
     /**
      * Return true if the supplied address corresponds to a known address for this service
      */
@@ -65,14 +65,14 @@ public class StaticService implements ServiceMBean {
         }
         return false;
     }
-    
+
     /**
      * Get the default Token Type to be issued for this Service
      */
     public String getTokenType() {
         return tokenType;
     }
-    
+
     /**
      * Set the default Token Type to be issued for this Service
      */
@@ -82,14 +82,14 @@ public class StaticService implements ServiceMBean {
             LOG.fine("Setting Token Type: " + tokenType);
         }
     }
-    
+
     /**
      * Get the default Key Type to be issued for this Service
      */
     public String getKeyType() {
         return keyType;
     }
-    
+
     /**
      * Set the default Key Type to be issued for this Service
      */
@@ -99,7 +99,7 @@ public class StaticService implements ServiceMBean {
             LOG.fine("Setting Key Type: " + keyType);
         }
     }
-    
+
     /**
      * Set the list of endpoint addresses that correspond to this service
      */
@@ -116,14 +116,14 @@ public class StaticService implements ServiceMBean {
             }
         }
     }
-    
+
     /**
      * Get the EncryptionProperties to be used to encrypt tokens issued for this service
      */
     public EncryptionProperties getEncryptionProperties() {
         return encryptionProperties;
     }
-    
+
     /**
      * Set the EncryptionProperties to be used to encrypt tokens issued for this service
      */
@@ -131,5 +131,5 @@ public class StaticService implements ServiceMBean {
         this.encryptionProperties = encryptionProperties;
         LOG.fine("Setting encryption properties");
     }
-    
+
 }

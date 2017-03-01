@@ -52,7 +52,7 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
     private RenewOperation renewOperation;
     private RequestCollectionOperation requestCollectionOperation;
     private ValidateOperation validateOperation;
-    
+
     @Resource
     private WebServiceContext context;
 
@@ -63,7 +63,7 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
     public void setIssueOperation(IssueOperation issueOperation) {
         this.issueOperation = issueOperation;
     }
-    
+
     public void setIssueSingleOperation(IssueSingleOperation issueSingleOperation) {
         this.issueSingleOperation = issueSingleOperation;
     }
@@ -118,7 +118,7 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         }
         return issueOperation.issue(request, getPrincipal(), getMessageContext());
     }
-    
+
     public RequestSecurityTokenResponseType issueSingle(
             RequestSecurityTokenType request) {
         if (issueSingleOperation == null) {
@@ -142,15 +142,15 @@ public class SecurityTokenServiceImpl implements SecurityTokenService {
         }
         return renewOperation.renew(request, getPrincipal(), getMessageContext());
     }
-    
+
     protected Principal getPrincipal() {
         return context.getUserPrincipal();
     }
-    
+
     protected Map<String, Object> getMessageContext() {
         return context.getMessageContext();
     }
-    
+
     private void throwUnsupportedOperation(String string) {
         try {
             SOAPFault fault = SAAJFactoryResolver.createSOAPFactory(null).createFault();

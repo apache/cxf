@@ -41,29 +41,29 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Test the Symmetric binding. The CXF client gets a token from the STS by authenticating via an
- * X.509 Cert over the asymmetric binding, and then sends it to the CXF endpoint using 
+ * X.509 Cert over the asymmetric binding, and then sends it to the CXF endpoint using
  * the symmetric binding.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
     static final String STAX_STSPORT2 = allocatePort(StaxSTSServer.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static final String PORT = allocatePort(Server.class);
     private static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     final TestParam test;
-    
+
     public X509SymmetricBindingTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -81,27 +81,27 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         STSServer stsServer = new STSServer();
         stsServer.setContext("cxf-x509.xml");
         assertTrue(launchServer(stsServer));
-        
+
         StaxSTSServer staxStsServer = new StaxSTSServer();
         staxStsServer.setContext("stax-cxf-x509.xml");
         assertTrue(launchServer(staxStsServer));
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, STSPORT2)},
                                                 {new TestParam(PORT, true, STSPORT2)},
                                                 {new TestParam(STAX_PORT, false, STSPORT2)},
                                                 {new TestParam(STAX_PORT, true, STSPORT2)},
-                                                
+
                                                 {new TestParam(PORT, false, STAX_STSPORT2)},
                                                 {new TestParam(PORT, true, STAX_STSPORT2)},
                                                 {new TestParam(STAX_PORT, false, STAX_STSPORT2)},
                                                 {new TestParam(STAX_PORT, true, STAX_STSPORT2)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -117,22 +117,22 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML1Port");
-        DoubleItPortType symmetricSaml1Port = 
+        DoubleItPortType symmetricSaml1Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml1Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml1Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(symmetricSaml1Port);
         }
 
         doubleIt(symmetricSaml1Port, 25);
-        
+
         ((java.io.Closeable)symmetricSaml1Port).close();
         bus.shutdown(true);
     }
@@ -150,23 +150,23 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2Port");
-        DoubleItPortType symmetricSaml2Port = 
+        DoubleItPortType symmetricSaml2Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml2Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(symmetricSaml2Port);
         }
-        
+
         doubleIt(symmetricSaml2Port, 30);
         TokenTestUtils.verifyToken(symmetricSaml2Port);
-        
+
         ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testX509SAML2Endorsing() throws Exception {
 
@@ -180,25 +180,25 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2EndorsingPort");
-        DoubleItPortType symmetricSaml2Port = 
+        DoubleItPortType symmetricSaml2Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml2Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(symmetricSaml2Port);
         }
-        
+
         // TODO Streaming client is not including a separate main Signature
         if (!test.isStreaming()) {
             doubleIt(symmetricSaml2Port, 30);
         }
-        
+
         ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testX509SAML2Supporting() throws Exception {
 
@@ -212,18 +212,18 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2SupportingPort");
-        DoubleItPortType symmetricSaml2Port = 
+        DoubleItPortType symmetricSaml2Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml2Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(symmetricSaml2Port);
         }
-        
+
         doubleIt(symmetricSaml2Port, 30);
-        
+
         ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
     }
@@ -232,7 +232,7 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
     // STR Transform
     @org.junit.Test
     public void testX509SAML2SupportingDirectReferenceToAssertion() throws Exception {
-        
+
         // TODO Not yet supported for the client streaming code
         if (test.isStreaming()) {
             return;
@@ -248,24 +248,24 @@ public class X509SymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = X509SymmetricBindingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSAML2SupportingPort");
-        DoubleItPortType symmetricSaml2Port = 
+        DoubleItPortType symmetricSaml2Port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricSaml2Port, test.getPort());
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)symmetricSaml2Port, test.getStsPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(symmetricSaml2Port);
         }
-        
+
         ((BindingProvider)symmetricSaml2Port).getRequestContext().put("ws-security.use.str.transform", "false");
-        
+
         doubleIt(symmetricSaml2Port, 30);
-        
+
         ((java.io.Closeable)symmetricSaml2Port).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

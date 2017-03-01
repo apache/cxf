@@ -117,7 +117,7 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
         for (Iterator<ParamType> iter = paramTypes.iterator(); iter.hasNext();) {
             ParamType param = iter.next();
             QName idlType = param.getIdltype();
-            
+
             QName paramName;
             CorbaObjectHandler obj = null;
             if (param.getMode().equals(ModeType.OUT)) {
@@ -207,7 +207,7 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
             }
             message.addStreamableArgument(streamable);
         }
-        
+
     }
 
     protected QName getMessageParamQName(MessageInfo msgInfo,
@@ -223,7 +223,7 @@ public class CorbaStreamOutEndingInterceptor extends AbstractPhaseInterceptor<Me
         return paramQName;
     }
 
-    protected String getWrappedParamNamespace(MessageInfo msgInfo) {    
+    protected String getWrappedParamNamespace(MessageInfo msgInfo) {
         MessagePartInfo part = msgInfo.getMessageParts().get(0);
         if (part.isElement()) {
             return part.getElementQName().getNamespaceURI();

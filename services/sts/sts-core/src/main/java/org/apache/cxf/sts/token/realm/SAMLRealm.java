@@ -24,5 +24,5 @@ package org.apache.cxf.sts.token.realm;
  */
 @Deprecated
 public class SAMLRealm extends RealmProperties {
-    
+
 }

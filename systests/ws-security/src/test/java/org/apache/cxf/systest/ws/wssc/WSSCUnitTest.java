@@ -71,13 +71,13 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     final TestParam test;
-    
+
     public WSSCUnitTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -87,15 +87,15 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
             launchServer(UnitServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(PORT, true)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -104,74 +104,74 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testEndorsingSecureConveration() throws Exception {
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = WSSCUnitTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = WSSCUnitTest.class.getResource("DoubleItWSSC.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
     }
-    
+
     @Test
     public void testEndorsingSecureConverationSP12() throws Exception {
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = WSSCUnitTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = WSSCUnitTest.class.getResource("DoubleItWSSC.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSP12Port");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
     }
-    
+
     @Test
     public void testIssueUnitTest() throws Exception {
-        
+
         if (test.isStreaming()) {
             return;
         }
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = WSSCUnitTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         STSClient stsClient = new STSClient(bus);
         stsClient.setSecureConv(true);
         stsClient.setLocation("https://localhost:" + PORT + "/" + "DoubleItTransport");
-        
+
         // Add Addressing policy
         Policy p = new Policy();
         ExactlyOne ea = new ExactlyOne();
@@ -180,31 +180,31 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         all.addPolicyComponent(new PrimitiveAssertion(MetadataConstants.USING_ADDRESSING_2006_QNAME,
                                                       false));
         ea.addPolicyComponent(all);
-        
+
         stsClient.setPolicy(p);
-        
+
         stsClient.requestSecurityToken("http://localhost:" + PORT + "/" + "DoubleItTransport");
     }
-    
+
     @Test
     public void testIssueAndCancelUnitTest() throws Exception {
         if (test.isStreaming()) {
             return;
         }
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = WSSCUnitTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         STSClient stsClient = new STSClient(bus);
         stsClient.setSecureConv(true);
         stsClient.setLocation("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
-        
+
         stsClient.setPolicy(createSymmetricBindingPolicy());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("security.encryption.username", "bob");
         TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
@@ -212,34 +212,34 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         properties.put("security.signature.properties", "alice.properties");
         properties.put("security.encryption.properties", "bob.properties");
         stsClient.setProperties(properties);
-        
-        SecurityToken securityToken = 
+
+        SecurityToken securityToken =
             stsClient.requestSecurityToken("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
         assertNotNull(securityToken);
         callbackHandler.setSecurityToken(securityToken);
-        
+
         assertTrue(stsClient.cancelSecurityToken(securityToken));
     }
-    
+
     @Test
     public void testIssueAndRenewUnitTest() throws Exception {
         if (test.isStreaming()) {
             return;
         }
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = WSSCUnitTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         STSClient stsClient = new STSClient(bus);
         stsClient.setSecureConv(true);
         stsClient.setLocation("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
-        
+
         stsClient.setPolicy(createSymmetricBindingPolicy());
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("security.encryption.username", "bob");
         TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
@@ -247,12 +247,12 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         properties.put("security.signature.properties", "alice.properties");
         properties.put("security.encryption.properties", "bob.properties");
         stsClient.setProperties(properties);
-        
-        SecurityToken securityToken = 
+
+        SecurityToken securityToken =
             stsClient.requestSecurityToken("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
         assertNotNull(securityToken);
         callbackHandler.setSecurityToken(securityToken);
-        
+
         assertNotNull(stsClient.renewSecurityToken(securityToken));
     }
 
@@ -266,9 +266,9 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         all.addPolicyComponent(new PrimitiveAssertion(MetadataConstants.USING_ADDRESSING_2006_QNAME,
                                                       false));
         ea.addPolicyComponent(all);
-        
+
         // X509 Token
-        final X509Token x509Token = 
+        final X509Token x509Token =
             new X509Token(
                 SPConstants.SPVersion.SP12,
                 SPConstants.IncludeTokenType.INCLUDE_TOKEN_NEVER,
@@ -277,14 +277,14 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
                 null,
                 new Policy()
             );
-        
+
         Policy x509Policy = new Policy();
         ExactlyOne x509PolicyEa = new ExactlyOne();
         x509Policy.addPolicyComponent(x509PolicyEa);
         All x509PolicyAll = new All();
         x509PolicyAll.addPolicyComponent(x509Token);
         x509PolicyEa.addPolicyComponent(x509PolicyAll);
-        
+
         // AlgorithmSuite
         Policy algSuitePolicy = new Policy();
         ExactlyOne algSuitePolicyEa = new ExactlyOne();
@@ -294,13 +294,13 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
             new PrimitiveAssertion(new QName(SP12Constants.SP_NS, SP12Constants.ALGO_SUITE_BASIC128)));
         algSuitePolicyEa.addPolicyComponent(algSuitePolicyAll);
         AlgorithmSuite algorithmSuite = new AlgorithmSuite(SPConstants.SPVersion.SP12, algSuitePolicy);
-        
+
         // Symmetric Binding
         Policy bindingPolicy = new Policy();
         ExactlyOne bindingPolicyEa = new ExactlyOne();
         bindingPolicy.addPolicyComponent(bindingPolicyEa);
         All bindingPolicyAll = new All();
-        
+
         bindingPolicyAll.addPolicyComponent(new ProtectionToken(SPConstants.SPVersion.SP12, x509Policy));
         bindingPolicyAll.addPolicyComponent(algorithmSuite);
         bindingPolicyAll.addAssertion(
@@ -308,25 +308,25 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         bindingPolicyAll.addAssertion(
             new PrimitiveAssertion(SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY));
         bindingPolicyEa.addPolicyComponent(bindingPolicyAll);
-        
-        DefaultSymmetricBinding binding = 
+
+        DefaultSymmetricBinding binding =
             new DefaultSymmetricBinding(SPConstants.SPVersion.SP12, bindingPolicy);
         binding.setOnlySignEntireHeadersAndBody(true);
         binding.setProtectTokens(false);
         all.addPolicyComponent(binding);
-        
-        List<Header> headers = new ArrayList<Header>();
-        SignedParts signedParts = 
+
+        List<Header> headers = new ArrayList<>();
+        SignedParts signedParts =
             new SignedParts(SPConstants.SPVersion.SP12, true, null, headers, false);
         all.addPolicyComponent(signedParts);
-        
+
         return p;
     }
-    
+
     private static class TokenCallbackHandler implements CallbackHandler {
-        
+
         private SecurityToken securityToken;
-        
+
         @Override
         public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
             for (int i = 0; i < callbacks.length; i++) {
@@ -336,13 +336,13 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
                 } else {
                     new org.apache.cxf.systest.ws.common.KeystorePasswordCallback().handle(callbacks);
                 }
-                    
+
             }
         }
 
         public void setSecurityToken(SecurityToken securityToken) {
             this.securityToken = securityToken;
         }
-        
+
     };
 }

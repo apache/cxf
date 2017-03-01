@@ -16,6 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://apache.org/handlers/types", 
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://apache.org/handlers/types",
                                      elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.apache.cxf.systest.handlers.types;

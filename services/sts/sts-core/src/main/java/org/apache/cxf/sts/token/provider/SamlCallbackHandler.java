@@ -49,21 +49,21 @@ public class SamlCallbackHandler implements CallbackHandler {
     private ConditionsBean conditionsBean;
     private SubjectBean subjectBean;
     private String issuer;
-    
+
     /**
      * Set the list of AttributeStatementBeans.
      */
     public void setAttributeBeans(List<AttributeStatementBean> attributeBeanList) {
         this.attributeBeans = attributeBeanList;
     }
-    
+
     /**
      * Set the list of AuthenticationStatementBeans.
      */
     public void setAuthenticationBeans(List<AuthenticationStatementBean> authBeanList) {
         this.authBeans = authBeanList;
     }
-    
+
     /**
      * Set the list of AuthDecisionStatementBeans.
      */
@@ -77,28 +77,28 @@ public class SamlCallbackHandler implements CallbackHandler {
     public void setSubjectBean(SubjectBean subjectBean) {
         this.subjectBean = subjectBean;
     }
-    
+
     /**
      * Set the ConditionsBean
      */
     public void setConditionsBean(ConditionsBean conditionsBean) {
         this.conditionsBean = conditionsBean;
     }
-    
+
     /**
      * Set the TokenProviderParameters.
      */
     public void setTokenProviderParameters(TokenProviderParameters tokenProviderParameters) {
         this.tokenParameters = tokenProviderParameters;
     }
-    
+
     /**
      * Set the issuer name
      */
     public void setIssuer(String issuerName) {
         this.issuer = issuerName;
     }
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (Callback callback : callbacks) {
             if (callback instanceof SAMLCallback) {
@@ -108,7 +108,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 if (subjectBean != null) {
                     samlCallback.setSubject(subjectBean);
                 }
-                
+
                 // Set the token Type.
                 TokenRequirements tokenRequirements = tokenParameters.getTokenRequirements();
                 String tokenType = tokenRequirements.getTokenType();
@@ -121,7 +121,7 @@ public class SamlCallbackHandler implements CallbackHandler {
                 } else {
                     samlCallback.setSamlVersion(Version.SAML_20);
                 }
-                
+
                 // Set the issuer
                 if (issuer == null) {
                     STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
@@ -144,21 +144,21 @@ public class SamlCallbackHandler implements CallbackHandler {
                     samlCallback.setAuthDecisionStatementData(authDecisionBeans);
                     statementAdded = true;
                 }
-                
+
                 // If SAML 1.1 we *must* add a Statement
                 if (saml1 && !statementAdded) {
-                    AttributeStatementBean defaultStatement = 
+                    AttributeStatementBean defaultStatement =
                         new DefaultAttributeStatementProvider().getStatement(tokenParameters);
                     defaultStatement.setSubject(subjectBean);
                     samlCallback.setAttributeStatementData(Collections.singletonList(defaultStatement));
                 }
-                
+
                 // Set the conditions
                 samlCallback.setConditions(conditionsBean);
             }
         }
     }
-    
+
     /**
      * For SAML 1.1 default to setting the SubjectBean on the statements if they
      * don't already have a Subject defined.
@@ -187,6 +187,6 @@ public class SamlCallbackHandler implements CallbackHandler {
         }
 
     }
-    
-    
+
+
 }

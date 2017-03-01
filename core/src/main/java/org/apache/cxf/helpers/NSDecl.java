@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package  org.apache.cxf.helpers;
+package org.apache.cxf.helpers;
 
 public final class NSDecl {
     private final String prefix;

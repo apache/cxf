@@ -56,7 +56,7 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
                 if (operation != null && operation.getInput() != null) {
                     Message inMessage = operation.getInput().getMessage();
                     BindingInput bin = op.getBindingInput();
-                    Set<String> headers = new HashSet<String>();
+                    Set<String> headers = new HashSet<>();
                     if (bin != null) {
                         List<ExtensibilityElement> lst = CastUtils.cast(bin.getExtensibilityElements());
                         for (ExtensibilityElement ext : lst) {
@@ -70,10 +70,10 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
                             headers.add(header.getPart());
                         }
                     }
-                    
+
                     //find the headers as they don't contribute to the body
-                    
-                    if (inMessage != null && !isUniqueBodyPart(operation.getName(), 
+
+                    if (inMessage != null && !isUniqueBodyPart(operation.getName(),
                                                                inMessage,
                                                                headers,
                                                                binding.getQName())) {
@@ -98,7 +98,7 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
             String opName = getOperationNameWithSamePart(operationName, part);
             if (opName != null) {
                 addErrorMessage("Non unique body parts, operation " + "[ " + opName + " ] "
-                                + "and  operation [ " + operationName + " ] in binding "
+                                + "and operation [ " + operationName + " ] in binding "
                                 + bindingName.toString()
                                 + " have the same body block: "
                                 + part.getElementName());

@@ -27,7 +27,7 @@ import org.apache.wss4j.dom.WSConstants;
 /**
  */
 public class SVSubjectProvider extends DefaultSubjectProvider {
-    
+
     /**
      * Get the SubjectConfirmation method given a tokenType and keyType
      */
@@ -35,14 +35,14 @@ public class SVSubjectProvider extends DefaultSubjectProvider {
     protected String getSubjectConfirmationMethod(String tokenType, String keyType) {
         if (WSConstants.WSS_SAML2_TOKEN_TYPE.equals(tokenType)
             || WSConstants.SAML2_NS.equals(tokenType)) {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
+            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
                 || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
                 return SAML2Constants.CONF_SENDER_VOUCHES;
             } else {
                 return SAML2Constants.CONF_BEARER;
             }
         } else {
-            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType) 
+            if (STSConstants.SYMMETRIC_KEY_KEYTYPE.equals(keyType)
                 || STSConstants.PUBLIC_KEY_KEYTYPE.equals(keyType)) {
                 return SAML1Constants.CONF_SENDER_VOUCHES;
             } else {

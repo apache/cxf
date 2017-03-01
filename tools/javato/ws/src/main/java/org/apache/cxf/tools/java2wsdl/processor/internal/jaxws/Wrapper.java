@@ -81,7 +81,7 @@ public class Wrapper {
     public WrapperBeanClass getWrapperBeanClass(final Method m) {
         return new WrapperBeanClass();
     }
-    
+
     protected WrapperBeanClass getWrapperBeanClass(final QName wrapperBeanName) {
         WrapperBeanClass jClass = new WrapperBeanClass();
         if (wrapperBeanName == null) {
@@ -113,10 +113,10 @@ public class Wrapper {
 
         if (StringUtils.isEmpty(c1.getName())) {
             c1.setName(c2.getName());
-        }       
+        }
         return c1;
     }
-    
+
     public WrapperBeanClass getJavaClass() {
         if (javaClass == null) {
             WrapperBeanClass jClass1 = getWrapperBeanClass(this.name);
@@ -185,9 +185,9 @@ public class Wrapper {
         }
         return "java.lang".equals(clz.getPackage().getName());
     }
-    
+
     protected List<JavaField> buildFields() {
-        return new ArrayList<JavaField>();
+        return new ArrayList<>();
     }
 
     public Method getMethod() {
@@ -197,7 +197,7 @@ public class Wrapper {
     public OperationInfo getOperationInfo() {
         return this.operationInfo;
     }
-    
+
     protected String getTypeString(Type t) {
         String type = "Object";
         if (t instanceof Class) {
@@ -228,7 +228,7 @@ public class Wrapper {
         type = type.replace('$', '.');
         return type;
     }
-    
+
     protected WebParam getWebParamAnnotation(final Annotation[] annotations) {
         for (Annotation annotation : annotations) {
             if (annotation instanceof WebParam) {

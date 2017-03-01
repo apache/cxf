@@ -77,20 +77,20 @@ public abstract class IdlDefnImplBase implements IdlDefn {
         pw.print(definitionName);
     }
 
-    
+
     public void writeFwd(PrintWriter pw) {
         // COMPLETE;
     }
 
-    
+
     public boolean isEmptyDef() {
         return false;
     }
 
-    public boolean isCircular() {       
+    public boolean isCircular() {
         return getCircularScope(null, new Vector<Object>()) != null;
     }
-    
+
     public IdlScopeBase getCircularScope(IdlScopeBase startScope, List<Object> doneDefn) {
         return null;
     }

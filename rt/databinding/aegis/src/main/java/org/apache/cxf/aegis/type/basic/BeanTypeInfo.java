@@ -45,8 +45,8 @@ public class BeanTypeInfo {
     private Map<QName, String> mappedName2pdName = new HashMap<QName, String>();
     private Map<QName, AegisType> mappedName2type = new HashMap<QName, AegisType>();
     private Class<?> beanClass;
-    private List<QName> attributes = new ArrayList<QName>();
-    private List<QName> elements = new ArrayList<QName>();
+    private List<QName> attributes = new ArrayList<>();
+    private List<QName> elements = new ArrayList<>();
     private PropertyDescriptor[] descriptors;
     private TypeMapping typeMapping;
     private volatile boolean initialized;
@@ -77,7 +77,7 @@ public class BeanTypeInfo {
 
     /**
      * Create a BeanTypeInfo class.
-     * 
+     *
      * @param typeClass
      * @param defaultNamespace
      * @param initiallize If true attempt default property/xml mappings.
@@ -230,7 +230,7 @@ public class BeanTypeInfo {
     /**
      * Specifies the name of the property as it shows up in the xml schema. This
      * method just returns <code>propertyDescriptor.getName();</code>
-     * 
+     *
      * @param desc
      * @return
      */
@@ -254,7 +254,7 @@ public class BeanTypeInfo {
 
     /**
      * Specifies the SchemaType for a particular class.
-     * 
+     *
      * @param mappedName
      * @param type
      */
@@ -288,9 +288,9 @@ public class BeanTypeInfo {
             PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
             if (propertyDescriptors != null) {
                 // see comments on this function.
-                descriptors = ReflectionUtil.getPropertyDescriptorsAvoidSunBug(getClass(), 
-                                                                               beanInfo, 
-                                                                               beanClass, 
+                descriptors = ReflectionUtil.getPropertyDescriptorsAvoidSunBug(getClass(),
+                                                                               beanInfo,
+                                                                               beanClass,
                                                                                propertyDescriptors);
             }
         }
@@ -306,7 +306,7 @@ public class BeanTypeInfo {
     }
 
     private PropertyDescriptor[] getInterfacePropertyDescriptors(Class<?> clazz) {
-        List<PropertyDescriptor> pds = new ArrayList<PropertyDescriptor>();
+        List<PropertyDescriptor> pds = new ArrayList<>();
 
         getInterfacePropertyDescriptors(clazz, pds, new HashSet<Class<?>>());
 
@@ -378,7 +378,7 @@ public class BeanTypeInfo {
 
     /**
      * Nillable is only allowed if the actual property is Nullable
-     * 
+     *
      * @param name
      * @return
      */
@@ -392,7 +392,7 @@ public class BeanTypeInfo {
 
     /**
      * Return the minOccurs value. When there is no XML file or annotation (the situation
-     * if we are running from the base class here), there is no source for the 
+     * if we are running from the base class here), there is no source for the
      * minOccurs parameter except the default, which is supplied from the overall Aegis options.
      * @param name Element QName
      * @return
@@ -400,7 +400,7 @@ public class BeanTypeInfo {
     public int getMinOccurs(QName name) {
         return minOccurs;
     }
-    
+
     /**
      * Return the maxOccurs value. When there is no XML file or annotation (the situation
      * if we are in the base class here), there is no per-element source for this item,
@@ -411,7 +411,7 @@ public class BeanTypeInfo {
     public int getMaxOccurs(QName name) {
         return 1;
     }
-    
+
     public long getMinOccurs() {
         return minOccurs;
     }

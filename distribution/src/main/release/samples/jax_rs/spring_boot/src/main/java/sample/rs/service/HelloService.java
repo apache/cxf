@@ -24,14 +24,14 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.springframework.stereotype.Service;
- 
+
 @Path("/sayHello")
 @Service
 public interface HelloService {
- 
+
     @GET
     @Path("/{a}")
     @Produces(MediaType.TEXT_PLAIN)
     String sayHello(@PathParam("a") String a);
-    
+
 }

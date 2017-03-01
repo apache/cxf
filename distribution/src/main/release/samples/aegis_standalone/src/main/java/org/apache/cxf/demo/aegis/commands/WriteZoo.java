@@ -39,7 +39,7 @@ import org.apache.cxf.demo.aegis.types.Zoo;
 import javanet.staxutils.IndentingXMLStreamWriter;
 
 /**
- * 
+ *
  */
 public final class WriteZoo {
     private XMLOutputFactory outputFactory;

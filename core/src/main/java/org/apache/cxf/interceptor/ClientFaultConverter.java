@@ -75,7 +75,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
     public void handleMessage(Message msg) {
         Fault fault = (Fault) msg.getContent(Exception.class);
 
-        if (fault.getDetail() != null 
+        if (fault.getDetail() != null
             && !MessageUtils.getContextualBoolean(msg,
                                                  DISABLE_FAULT_MAPPING,
                                                  false)) {
@@ -96,7 +96,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                 }
             }
         }
-        
+
         msg.getExchange().put(FaultMode.class, faultMode);
     }
 
@@ -164,19 +164,19 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
             reader.setProperty(DataReader.FAULT, fault);
             e = reader.read(part, xsr);
         }
-        
+
         if (!(e instanceof Exception)) {
-            
+
             try {
                 Class<?> exClass = faultWanted.getProperty(Class.class.getName(), Class.class);
                 if (exClass == null) {
                     return;
                 }
-                if (e == null) { 
+                if (e == null) {
                     Constructor<?> constructor = exClass.getConstructor(new Class[]{String.class});
                     e = constructor.newInstance(new Object[]{fault.getMessage()});
                 } else {
-                
+
                     try {
                         Constructor<?> constructor = getConstructor(exClass, e);
                         e = constructor.newInstance(new Object[]{fault.getMessage(), e});
@@ -203,7 +203,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
             msg.setContent(Exception.class, e);
         }
     }
-    
+
     private Constructor<?> getConstructor(Class<?> faultClass, Object e) throws NoSuchMethodException {
         Class<?> beanClass = e.getClass();
         Constructor<?> cons[] = faultClass.getConstructors();
@@ -236,7 +236,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         }
         return supportsDOM;
     }
-    
+
     private void setStackTrace(Fault fault, Message msg) {
         Throwable cause = null;
         Map<String, String> ns = new HashMap<String, String>();
@@ -244,7 +244,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         ns.put("s", Fault.STACKTRACE_NAMESPACE);
         String ss = (String) xu.getValue("//s:" + Fault.STACKTRACE + "/text()", fault.getDetail(),
                 XPathConstants.STRING);
-        List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
+        List<StackTraceElement> stackTraceList = new ArrayList<>();
         if (!StringUtils.isEmpty(ss)) {
             Iterator<String> linesIterator = Arrays.asList(CAUSE_SUFFIX_SPLITTER.split(ss)).iterator();
             while (linesIterator.hasNext()) {
@@ -255,7 +255,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                 }
                 stackTraceList.add(parseStackTrackLine(oneLine));
             }
-            if (stackTraceList.size() > 0 || cause != null) {
+            if (!stackTraceList.isEmpty() || cause != null) {
                 Exception e = msg.getContent(Exception.class);
                 if (!stackTraceList.isEmpty()) {
                     StackTraceElement[] stackTraceElement = new StackTraceElement[stackTraceList.size()];
@@ -295,7 +295,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         if (res == null) {
             res = new Throwable(firstLine);
         }
-        List<StackTraceElement> stackTraceList = new ArrayList<StackTraceElement>();
+        List<StackTraceElement> stackTraceList = new ArrayList<>();
         while (linesIterator.hasNext()) {
             String oneLine = linesIterator.next();
             if (oneLine.startsWith("Caused by:")) {
@@ -309,13 +309,13 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         res.setStackTrace(stackTraceList.toArray(stackTraceElement));
         return res;
     }
-    
+
     private static StackTraceElement parseStackTrackLine(String oneLine) {
         StringTokenizer stInner = new StringTokenizer(oneLine, "!");
         return new StackTraceElement(stInner.nextToken(), stInner.nextToken(),
                 stInner.nextToken(), Integer.parseInt(stInner.nextToken()));
     }
-    
+
     private Class<?> getPrimitiveClass(Class<?> cls) {
         if (cls.isPrimitive()) {
             return cls;
@@ -332,13 +332,13 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
         }
         return null;
     }
-    
+
     private Exception convertFaultBean(Class<?> exClass, Object faultBean, Fault fault) throws Exception {
         Constructor<?> constructor = exClass.getConstructor(new Class[]{String.class});
         Exception e = (Exception)constructor.newInstance(new Object[]{fault.getMessage()});
 
         //Copy fault bean fields to exception
-        for (Class<?> obj = exClass; !obj.equals(Object.class);  obj = obj.getSuperclass()) {   
+        for (Class<?> obj = exClass; !obj.equals(Object.class);  obj = obj.getSuperclass()) {
             Field[] fields = obj.getDeclaredFields();
             for (Field f : fields) {
                 try {
@@ -349,7 +349,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                 } catch (NoSuchFieldException e1) {
                     //do nothing
                 }
-            }            
+            }
         }
         //also use/try public getter/setter methods
         Method meth[] = faultBean.getClass().getMethods();

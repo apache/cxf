@@ -50,11 +50,11 @@ public class NettyHttpServerEngineFactoryBeanDefinitionParser
         extends AbstractBeanDefinitionParser {
     static final String HTTP_NETTY_SERVER_NS = "http://cxf.apache.org/transports/http-netty-server/configuration";
 
-    protected String resolveId(Element elem, AbstractBeanDefinition definition, 
+    protected String resolveId(Element elem, AbstractBeanDefinition definition,
                                ParserContext ctx) throws BeanDefinitionStoreException {
         String id = this.getIdOrName(elem);
         if (StringUtils.isEmpty(id)) {
-            return NettyHttpServerEngineFactory.class.getName();            
+            return NettyHttpServerEngineFactory.class.getName();
         }
         id = super.resolveId(elem, definition, ctx);
         if (!ctx.getRegistry().containsBeanDefinition(NettyHttpServerEngineFactory.class.getName())) {
@@ -62,14 +62,14 @@ public class NettyHttpServerEngineFactoryBeanDefinitionParser
         }
         return id;
     }
-    
+
 
     @Override
     public void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
-        //bean.setAbstract(true);        
+        //bean.setAbstract(true);
         String bus = element.getAttribute("bus");
-        
-        BeanDefinitionBuilder factbean 
+
+        BeanDefinitionBuilder factbean
             = BeanDefinitionBuilder
                 .rootBeanDefinition(NettySpringTypesFactory.class);
 
@@ -87,43 +87,43 @@ public class NettyHttpServerEngineFactoryBeanDefinitionParser
                                                         TLSServerParametersIdentifiedType.class,
                                                         NettySpringTypesFactory.class,
                                                         "createTLSServerParametersMap"));
-            
+
             bean.addConstructorArgValue(mapElementToJaxbBean(element,
                                                              ThreadingParametersIdentifiedType.class,
                                                              NettySpringTypesFactory.class,
                                                              "createThreadingParametersMap"));
-            
+
             // parser the engine list
-            List<Object> list = 
+            List<Object> list =
                 getRequiredElementsList(element, ctx, new QName(HTTP_NETTY_SERVER_NS, "engine"), bean);
-            if (list.size() > 0) {
+            if (!list.isEmpty()) {
                 bean.addPropertyValue("enginesList", list);
             }
         } catch (Exception e) {
             throw new RuntimeException("Could not process configuration.", e);
         }
-    }    
-    
+    }
+
     private List<Object> getRequiredElementsList(Element parent, ParserContext ctx, QName name,
                                          BeanDefinitionBuilder bean) {
-       
-        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(parent, 
-                                                                     name.getNamespaceURI(), 
+
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(parent,
+                                                                     name.getNamespaceURI(),
                                                                      name.getLocalPart());
         ManagedList<Object> list = new ManagedList<Object>(elemList.size());
         list.setSource(ctx.extractSource(parent));
-        
+
         for (Element elem : elemList) {
             list.add(ctx.getDelegate().parsePropertySubElement(elem, bean.getBeanDefinition()));
         }
         return list;
     }
-    
-    
-          
+
+
+
     /*
      * We do not require an id from the configuration.
-     * 
+     *
      * (non-Javadoc)
      * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#shouldGenerateId()
      */
@@ -136,9 +136,9 @@ public class NettyHttpServerEngineFactoryBeanDefinitionParser
     protected Class<?> getBeanClass(Element arg0) {
         return SpringNettyHttpServerEngineFactory.class;
     }
-    
+
     @NoJSR250Annotations(unlessNull = "bus")
-    public static class SpringNettyHttpServerEngineFactory extends NettyHttpServerEngineFactory 
+    public static class SpringNettyHttpServerEngineFactory extends NettyHttpServerEngineFactory
         implements ApplicationContextAware {
 
         public SpringNettyHttpServerEngineFactory() {
@@ -148,8 +148,8 @@ public class NettyHttpServerEngineFactoryBeanDefinitionParser
                                                   Map<String, TLSServerParameters> tls,
                                                   Map<String, ThreadingParameters> threads) {
             super(bus, tls, threads);
-        }   
-        
+        }
+
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (getBus() == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));

@@ -45,12 +45,12 @@ import org.opensaml.xacml.ctx.SubjectType;
  * Some unit tests to create a XACML Request using the RequestComponentBuilder.
  */
 public class RequestComponentBuilderTest extends org.junit.Assert {
-    
+
     private DocumentBuilder docBuilder;
     static {
         OpenSAMLUtil.initSamlEngine();
     }
-    
+
     public RequestComponentBuilderTest() throws ParserConfigurationException {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         docBuilderFactory.setNamespaceAware(true);
@@ -60,42 +60,42 @@ public class RequestComponentBuilderTest extends org.junit.Assert {
     @org.junit.Test
     public void testCreateXACMLRequest() throws Exception {
         Document doc = docBuilder.newDocument();
-        
+
         // Subject
-        AttributeValueType subjectIdAttributeValue = 
+        AttributeValueType subjectIdAttributeValue =
             RequestComponentBuilder.createAttributeValueType(
                     "alice-user@apache.org"
             );
-        AttributeType subjectIdAttribute = 
+        AttributeType subjectIdAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.SUBJECT_ID,
                     XACMLConstants.RFC_822_NAME,
                     null,
                     Collections.singletonList(subjectIdAttributeValue)
             );
-        
-        AttributeValueType subjectGroupAttributeValue = 
+
+        AttributeValueType subjectGroupAttributeValue =
             RequestComponentBuilder.createAttributeValueType(
                     "manager"
             );
-        AttributeType subjectGroupAttribute = 
+        AttributeType subjectGroupAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.SUBJECT_ROLE,
                     XACMLConstants.XS_ANY_URI,
                     "admin-user@apache.org",
                     Collections.singletonList(subjectGroupAttributeValue)
             );
-        List<AttributeType> attributes = new ArrayList<AttributeType>();
+        List<AttributeType> attributes = new ArrayList<>();
         attributes.add(subjectIdAttribute);
         attributes.add(subjectGroupAttribute);
         SubjectType subject = RequestComponentBuilder.createSubjectType(attributes, null);
-        
+
         // Resource
-        AttributeValueType resourceAttributeValue = 
+        AttributeValueType resourceAttributeValue =
             RequestComponentBuilder.createAttributeValueType(
                     "{http://www.example.org/contract/DoubleIt}DoubleIt"
             );
-        AttributeType resourceAttribute = 
+        AttributeType resourceAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.RESOURCE_ID,
                     XACMLConstants.XS_STRING,
@@ -105,13 +105,13 @@ public class RequestComponentBuilderTest extends org.junit.Assert {
         attributes.clear();
         attributes.add(resourceAttribute);
         ResourceType resource = RequestComponentBuilder.createResourceType(attributes, null);
-        
+
         // Action
-        AttributeValueType actionAttributeValue = 
+        AttributeValueType actionAttributeValue =
             RequestComponentBuilder.createAttributeValueType(
                     "execute"
             );
-        AttributeType actionAttribute = 
+        AttributeType actionAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.ACTION_ID,
                     XACMLConstants.XS_STRING,
@@ -121,48 +121,48 @@ public class RequestComponentBuilderTest extends org.junit.Assert {
         attributes.clear();
         attributes.add(actionAttribute);
         ActionType action = RequestComponentBuilder.createActionType(attributes);
-        
+
         // Request
-        RequestType request = 
+        RequestType request =
             RequestComponentBuilder.createRequestType(
-                    Collections.singletonList(subject), 
-                    Collections.singletonList(resource), 
-                    action, 
+                    Collections.singletonList(subject),
+                    Collections.singletonList(resource),
+                    action,
                     null
             );
-        
+
         Element policyElement = OpenSAMLUtil.toDom(request, doc);
         // String outputString = DOM2Writer.nodeToString(policyElement);
         assertNotNull(policyElement);
     }
-    
+
     @org.junit.Test
     public void testEnvironment() throws Exception {
         Document doc = docBuilder.newDocument();
-        
+
         // Subject
-        AttributeValueType subjectIdAttributeValue = 
+        AttributeValueType subjectIdAttributeValue =
             RequestComponentBuilder.createAttributeValueType(
                     "alice-user@apache.org"
             );
-        AttributeType subjectIdAttribute = 
+        AttributeType subjectIdAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.SUBJECT_ID,
                     XACMLConstants.RFC_822_NAME,
                     null,
                     Collections.singletonList(subjectIdAttributeValue)
             );
-        
-        List<AttributeType> attributes = new ArrayList<AttributeType>();
+
+        List<AttributeType> attributes = new ArrayList<>();
         attributes.add(subjectIdAttribute);
         SubjectType subject = RequestComponentBuilder.createSubjectType(attributes, null);
-        
+
         // Resource
-        AttributeValueType resourceAttributeValue = 
+        AttributeValueType resourceAttributeValue =
             RequestComponentBuilder.createAttributeValueType(
                     "{http://www.example.org/contract/DoubleIt}DoubleIt"
             );
-        AttributeType resourceAttribute = 
+        AttributeType resourceAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.RESOURCE_ID,
                     XACMLConstants.XS_STRING,
@@ -172,13 +172,13 @@ public class RequestComponentBuilderTest extends org.junit.Assert {
         attributes.clear();
         attributes.add(resourceAttribute);
         ResourceType resource = RequestComponentBuilder.createResourceType(attributes, null);
-        
+
         // Action
-        AttributeValueType actionAttributeValue = 
+        AttributeValueType actionAttributeValue =
             RequestComponentBuilder.createAttributeValueType(
                     "execute"
             );
-        AttributeType actionAttribute = 
+        AttributeType actionAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.ACTION_ID,
                     XACMLConstants.XS_STRING,
@@ -188,12 +188,12 @@ public class RequestComponentBuilderTest extends org.junit.Assert {
         attributes.clear();
         attributes.add(actionAttribute);
         ActionType action = RequestComponentBuilder.createActionType(attributes);
-        
+
         // Environment
         DateTime dateTime = new DateTime();
-        AttributeValueType environmentAttributeValue = 
+        AttributeValueType environmentAttributeValue =
             RequestComponentBuilder.createAttributeValueType(dateTime.toString());
-        AttributeType environmentAttribute = 
+        AttributeType environmentAttribute =
             RequestComponentBuilder.createAttributeType(
                     XACMLConstants.CURRENT_DATETIME,
                     XACMLConstants.XS_DATETIME,
@@ -202,21 +202,21 @@ public class RequestComponentBuilderTest extends org.junit.Assert {
             );
         attributes.clear();
         attributes.add(environmentAttribute);
-        EnvironmentType environmentType = 
+        EnvironmentType environmentType =
              RequestComponentBuilder.createEnvironmentType(attributes);
-        
+
         // Request
-        RequestType request = 
+        RequestType request =
             RequestComponentBuilder.createRequestType(
-                    Collections.singletonList(subject), 
-                    Collections.singletonList(resource), 
-                    action, 
+                    Collections.singletonList(subject),
+                    Collections.singletonList(resource),
+                    action,
                     environmentType
             );
-        
+
         Element policyElement = OpenSAMLUtil.toDom(request, doc);
         // String outputString = DOM2Writer.nodeToString(policyElement);
         assertNotNull(policyElement);
     }
-    
+
 }

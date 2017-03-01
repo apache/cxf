@@ -39,10 +39,10 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
 
 public class ColocInInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(ColocInInterceptor.class);
 
-    
+
     public ColocInInterceptor() {
         super(Phase.INVOKE);
         addAfter(ServiceInvokerInterceptor.class.getName());
@@ -69,7 +69,7 @@ public class ColocInInterceptor extends AbstractPhaseInterceptor<Message> {
         BindingOperationInfo boi = ex.getBindingOperationInfo();
         Message outBound = ex.getOutMessage();
         if (boi != null) {
-            outBound.put(MessageInfo.class, 
+            outBound.put(MessageInfo.class,
                          boi.getOperationInfo().getOutput());
         }
 

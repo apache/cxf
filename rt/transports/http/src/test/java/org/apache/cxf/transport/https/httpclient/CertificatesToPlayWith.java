@@ -508,7 +508,7 @@ public final class CertificatesToPlayWith {
         + "I1mQmUs44cg2HZAqnFBpDyJQhNYy8M7yGVaRkbfuVaMqiPa+xDPR5v7NFB3kxRq2\n"
         + "Za2Snopi52eUxDEhJ0MNqFi3Jfj/ZSmJ+XHra5lU4R8lijCAq8SVLZCmIQ==\n"
         + "-----END CERTIFICATE-----").getBytes();
-    
+
     private CertificatesToPlayWith() {
         //
     }

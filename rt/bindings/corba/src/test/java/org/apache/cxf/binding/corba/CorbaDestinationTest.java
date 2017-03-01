@@ -31,38 +31,38 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CorbaDestinationTest extends Assert {    
-    
+public class CorbaDestinationTest extends Assert {
+
     protected static TestUtils testUtils;
     EndpointInfo endpointInfo;
     OrbConfig orbConfig;
-    
-    
+
+
     @Before
     public void setUp() throws Exception {
         testUtils = new TestUtils();
         orbConfig = new OrbConfig();
     }
-    
+
     @Test
-    public void testDestination() throws Exception {       
+    public void testDestination() throws Exception {
         endpointInfo = testUtils.setupServiceInfo("http://cxf.apache.org/bindings/corba/simple",
                         "/wsdl_corbabinding/simpleIdl.wsdl", "SimpleCORBAService",
                         "SimpleCORBAPort");
         CorbaDestination destination = new CorbaDestination(endpointInfo, orbConfig);
-   
-        EndpointReferenceType  rtype = destination.getAddress();
-        assertTrue("EndpointReferenceType should not be null", rtype != null);       
+
+        EndpointReferenceType rtype = destination.getAddress();
+        assertTrue("EndpointReferenceType should not be null", rtype != null);
         BindingInfo bindingInfo = destination.getBindingInfo();
-        assertTrue("BindingInfo should not be null", bindingInfo != null);       
+        assertTrue("BindingInfo should not be null", bindingInfo != null);
         EndpointInfo e2 = destination.getEndPointInfo();
         assertTrue("EndpointInfo should not be null", e2 != null);
-   
+
         Message m = new MessageImpl();
         CorbaServerConduit serverConduit = (CorbaServerConduit)destination.getBackChannel(m);
-        assertNotNull("CorbaServerConduit should not be null", serverConduit);             
+        assertNotNull("CorbaServerConduit should not be null", serverConduit);
     }
-   
+
    /*
     @Test
     public void testSetMessageObserverActivate() throws Exception {
@@ -71,26 +71,26 @@ public class CorbaDestinationTest extends Assert {
                         "SimpleCORBAPort");
        CorbaDestination destination = new CorbaDestination(endpointInfo);
        String addr = destination.getAddressType().getLocation();
-       assertEquals(addr, "corbaloc::localhost:40000/Simple");  
-       
+       assertEquals(addr, "corbaloc::localhost:40000/Simple");
+
        Bus bus = BusFactory.newInstance().getDefaultBus();
        Service service = new ServiceImpl();
-       Endpoint endpoint = new EndpointImpl(bus, service, endpointInfo);       
-       MessageObserver observer = new ChainInitiationObserver(endpoint, bus);       
-       destination.setMessageObserver(observer);               
+       Endpoint endpoint = new EndpointImpl(bus, service, endpointInfo);
+       MessageObserver observer = new ChainInitiationObserver(endpoint, bus);
+       destination.setMessageObserver(observer);
        assertTrue("orb should not be null",  destination.getOrb() != null);
-       
-       try { 
-           File file = new File("endpoint.ior");   
+
+       try {
+           File file = new File("endpoint.ior");
            assertEquals(true,file.exists());
        } finally {
            new File("endpoint.ior").deleteOnExit();
        }
-       
+
        addr = destination.getAddressType().getLocation();
        addr = addr.substring(0,4);
-       assertEquals(addr, "IOR:");    
+       assertEquals(addr, "IOR:");
        destination.shutdown();
-   }*/     
+   }*/
 
 }

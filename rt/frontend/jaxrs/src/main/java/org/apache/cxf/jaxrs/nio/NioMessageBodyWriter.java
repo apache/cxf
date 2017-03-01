@@ -37,7 +37,7 @@ import org.apache.cxf.message.Message;
 
 @Provider
 public class NioMessageBodyWriter implements MessageBodyWriter<NioWriteEntity> {
-    
+
     public NioMessageBodyWriter() {
     }
 
@@ -45,10 +45,10 @@ public class NioMessageBodyWriter implements MessageBodyWriter<NioWriteEntity> {
     public boolean isWriteable(Class<?> cls, Type type, Annotation[] anns, MediaType mt) {
         return NioWriteEntity.class.isAssignableFrom(cls) && getContinuationProvider() != null;
     }
-    
+
     @Override
     public void writeTo(NioWriteEntity entity, Class<?> cls, Type t, Annotation[] anns,
-            MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
+            MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
                 throws IOException, WebApplicationException {
         Continuation cont = getContinuationProvider().getContinuation();
         NioWriteListenerImpl listener = new NioWriteListenerImpl(cont, entity, os);
@@ -57,7 +57,7 @@ public class NioMessageBodyWriter implements MessageBodyWriter<NioWriteEntity> {
         // return the current thread to the pool
         cont.suspend(0);
     }
-    
+
     @Override
     public long getSize(NioWriteEntity t, Class<?> type, Type genericType, Annotation[] annotations,
             MediaType mediaType) {

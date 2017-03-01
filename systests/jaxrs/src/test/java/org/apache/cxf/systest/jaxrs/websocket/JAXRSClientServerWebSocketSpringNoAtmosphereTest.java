@@ -35,7 +35,7 @@ public class JAXRSClientServerWebSocketSpringNoAtmosphereTest extends JAXRSClien
     public static void startServers() throws Exception {
         System.setProperty("org.apache.cxf.transport.websocket.atmosphere.disabled", "true");
         @SuppressWarnings({ "unused", "resource" })
-        ApplicationContext appctxt = 
+        ApplicationContext appctxt =
             new ClassPathXmlApplicationContext(
                 JAXRSClientServerWebSocketSpringTest.class.getResource(
                     "/jaxrs_websocket/beans-embedded2.xml").toString());

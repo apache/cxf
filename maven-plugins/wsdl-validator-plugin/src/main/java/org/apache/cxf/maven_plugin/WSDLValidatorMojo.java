@@ -53,28 +53,28 @@ public class WSDLValidatorMojo extends AbstractMojo {
      * @parameter expression="${cxf.wsdlRoot}" default-value="${basedir}/src/main/resources/wsdl"
      */
     private File wsdlRoot;
-    
+
     /**
      * @parameter expression="${cxf.testWsdlRoot}" default-value="${basedir}/src/test/resources/wsdl"
      */
     private File testWsdlRoot;
-    
+
     /**
-     * Directory in which the "DONE" markers are saved that 
-     * @parameter expression="${cxf.markerDirectory}" 
+     * Directory in which the "DONE" markers are saved that
+     * @parameter expression="${cxf.markerDirectory}"
      *            default-value="${project.build.directory}/cxf-wsdl-validator-markers"
      */
     private File markerDirectory;
     /**
      * A list of wsdl files to include. Can contain ant-style wildcards and double wildcards. Defaults to
      * *.wsdl
-     * 
+     *
      * @parameter
      */
     private String includes[];
     /**
      * A list of wsdl files to exclude. Can contain ant-style wildcards and double wildcards.
-     * 
+     *
      * @parameter
      */
     private String excludes[];
@@ -93,11 +93,11 @@ public class WSDLValidatorMojo extends AbstractMojo {
         }
         return str.toString();
     }
-    
+
     private List<File> getWsdlFiles(File dir)
         throws MojoExecutionException {
 
-        List<String> exList = new ArrayList<String>();
+        List<String> exList = new ArrayList<>();
         if (excludes != null) {
             exList.addAll(Arrays.asList(excludes));
         }
@@ -113,9 +113,9 @@ public class WSDLValidatorMojo extends AbstractMojo {
             throw new MojoExecutionException(exc.getMessage(), exc);
         }
     }
-    
+
     private void processWsdl(File file) throws MojoExecutionException {
-        
+
         // If URL to WSDL, replace ? and & since they're invalid chars for file names
         File doneFile =
             new File(markerDirectory, "." + file.getName().replace('?', '_').replace('&', '_') + ".DONE");
@@ -124,12 +124,12 @@ public class WSDLValidatorMojo extends AbstractMojo {
             doWork = true;
         } else if (file.lastModified() > doneFile.lastModified()) {
             doWork = true;
-        } 
+        }
 
         if (doWork) {
             doneFile.delete();
-            
-            List<String> list = new ArrayList<String>();
+
+            List<String> list = new ArrayList<>();
 
             // verbose arg
             if (verbose != null && verbose.booleanValue()) {
@@ -145,7 +145,7 @@ public class WSDLValidatorMojo extends AbstractMojo {
             try {
                 list.add(file.getCanonicalPath());
                 String[] pargs = list.toArray(new String[list.size()]);
-                
+
                 ToolSpec spec = null;
                 try (InputStream toolspecStream = WSDLValidator.class .getResourceAsStream("wsdlvalidator.xml")) {
                     spec = new ToolSpec(toolspecStream, false);
@@ -159,7 +159,7 @@ public class WSDLValidatorMojo extends AbstractMojo {
 
                 doneFile.createNewFile();
             } catch (Throwable e) {
-                throw new MojoExecutionException(file.getName() + ": " 
+                throw new MojoExecutionException(file.getName() + ": "
                                                  + e.getMessage(), e);
             }
         }
@@ -171,10 +171,10 @@ public class WSDLValidatorMojo extends AbstractMojo {
                 "*.wsdl"
             };
         }
-        
+
         markerDirectory.mkdirs();
-        
-        List<File> wsdls = new ArrayList<File>();
+
+        List<File> wsdls = new ArrayList<>();
         if (wsdlRoot != null && wsdlRoot.exists()) {
             wsdls.addAll(getWsdlFiles(wsdlRoot));
         }

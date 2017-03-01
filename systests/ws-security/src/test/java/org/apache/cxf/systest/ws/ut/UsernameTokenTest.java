@@ -42,22 +42,22 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * A set of tests for Username Tokens over the Transport Binding. 
+ * A set of tests for Username Tokens over the Transport Binding.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     final TestParam test;
-    
+
     public UsernameTokenTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -73,17 +73,17 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(PORT, true)},
                                                 {new TestParam(STAX_PORT, false)},
                                                 {new TestParam(STAX_PORT, true)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -103,20 +103,20 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         utPort.doubleIt(25);
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testPlaintextCreated() throws Exception {
 
@@ -130,20 +130,20 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextCreatedPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         utPort.doubleIt(25);
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testPlaintextSupporting() throws Exception {
 
@@ -157,20 +157,20 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextSupportingPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         utPort.doubleIt(25);
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testPlaintextSupportingSP11() throws Exception {
 
@@ -184,20 +184,20 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextSupportingSP11Port");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         utPort.doubleIt(25);
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testPasswordHashed() throws Exception {
 
@@ -211,20 +211,20 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItHashedPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         utPort.doubleIt(25);
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testNoPassword() throws Exception {
 
@@ -238,20 +238,20 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItNoPasswordPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         utPort.doubleIt(25);
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedEndorsing() throws Exception {
 
@@ -265,20 +265,20 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSignedEndorsingPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         utPort.doubleIt(25);
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedEncrypted() throws Exception {
 
@@ -292,20 +292,20 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSignedEncryptedPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         utPort.doubleIt(25);
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testEncrypted() throws Exception {
 
@@ -319,20 +319,20 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         utPort.doubleIt(25);
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testNoUsernameToken() throws Exception {
 
@@ -346,14 +346,14 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItInlinePolicyPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         try {
             utPort.doubleIt(25);
             fail("Failure expected on no UsernameToken");
@@ -366,7 +366,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testPasswordHashedReplay() throws Exception {
 
@@ -379,18 +379,18 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        
+
         QName portQName = new QName(NAMESPACE, "DoubleItHashedPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (!test.isStreaming()) {
             Client cxfClient = ClientProxy.getClient(utPort);
             SecurityHeaderCacheInterceptor cacheInterceptor =
                 new SecurityHeaderCacheInterceptor();
             cxfClient.getOutInterceptors().add(cacheInterceptor);
-            
+
             // Make two invocations with the same UsernameToken
             utPort.doubleIt(25);
             try {
@@ -400,11 +400,11 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 assertTrue(ex.getMessage().contains(WSSecurityException.UNIFIED_SECURITY_ERR));
             }
         }
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     // In this test, the service is using the UsernameTokenInterceptor, but the
     // client is using the WSS4JOutInterceptor
     @org.junit.Test
@@ -419,18 +419,18 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
 
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        
+
         QName portQName = new QName(NAMESPACE, "DoubleItDigestNoBindingPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (!test.isStreaming() && PORT.equals(test.getPort())) {
             Client cxfClient = ClientProxy.getClient(utPort);
             SecurityHeaderCacheInterceptor cacheInterceptor =
                 new SecurityHeaderCacheInterceptor();
             cxfClient.getOutInterceptors().add(cacheInterceptor);
-            
+
             // Make two invocations with the same UsernameToken
             utPort.doubleIt(25);
             try {
@@ -440,11 +440,11 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                 assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
             }
         }
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testPlaintextPrincipal() throws Exception {
 
@@ -458,17 +458,17 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleItUt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPrincipalPort");
-        DoubleItPortType utPort = 
+        DoubleItPortType utPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(utPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(utPort);
         }
-        
+
         ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Alice");
         utPort.doubleIt(25);
-        
+
         try {
             ((BindingProvider)utPort).getRequestContext().put(SecurityConstants.USERNAME, "Frank");
             utPort.doubleIt(30);
@@ -477,7 +477,7 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
             String error = "Unauthorized";
             assertTrue(ex.getMessage().contains(error));
         }
-        
+
         ((java.io.Closeable)utPort).close();
         bus.shutdown(true);
     }

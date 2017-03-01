@@ -54,7 +54,7 @@ public final class WrapperUtil {
     }
 
     public static List<Annotation> getJaxbAnnotations(Method method) {
-        List<Annotation> jaxbAnnotation = new ArrayList<Annotation>();
+        List<Annotation> jaxbAnnotation = new ArrayList<>();
         Annotation ann = method.getAnnotation(XmlAttachmentRef.class);
         if (ann != null) {
             jaxbAnnotation.add(ann);
@@ -75,9 +75,9 @@ public final class WrapperUtil {
     }
 
     public static List<Annotation> getJaxbAnnotations(Method method, int idx) {
-        List<Annotation> jaxbAnnotation = new ArrayList<Annotation>();
+        List<Annotation> jaxbAnnotation = new ArrayList<>();
         Annotation[][] anns = method.getParameterAnnotations();
-        for (int i = 0; i < method.getParameterTypes().length; i++) {            
+        for (int i = 0; i < method.getParameterTypes().length; i++) {
             if (i == idx) {
                 for (Annotation ann : anns[i]) {
                     if (ann.annotationType() == XmlAttachmentRef.class
@@ -86,7 +86,7 @@ public final class WrapperUtil {
                         || ann.annotationType() == XmlList.class
                         || ann.annotationType() == XmlElement.class) {
                         jaxbAnnotation.add(ann);
-                    }                   
+                    }
                 }
             }
         }

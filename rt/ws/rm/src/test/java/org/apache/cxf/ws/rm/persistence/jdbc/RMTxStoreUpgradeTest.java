@@ -35,22 +35,22 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Tests the automatic table updating of RMTxStore that allows compatible changes 
- * in the database tables. 
+ * Tests the automatic table updating of RMTxStore that allows compatible changes
+ * in the database tables.
  */
 public class RMTxStoreUpgradeTest extends Assert {
-    private static final String CREATE_OLD_SRC_SEQ_TABLE_STMT = 
-        "CREATE TABLE CXF_RM_SRC_SEQUENCES " 
+    private static final String CREATE_OLD_SRC_SEQ_TABLE_STMT =
+        "CREATE TABLE CXF_RM_SRC_SEQUENCES "
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
         + "CUR_MSG_NO DECIMAL(19, 0) DEFAULT 1 NOT NULL, "
         + "LAST_MSG CHAR(1), "
         + "EXPIRY DECIMAL(19, 0), "
         + "OFFERING_SEQ_ID VARCHAR(256), "
-        + "ENDPOINT_ID VARCHAR(1024), "            
+        + "ENDPOINT_ID VARCHAR(1024), "
         + "PRIMARY KEY (SEQ_ID))";
 
-    private static final String CREATE_OLD_DEST_SEQ_TABLE_STMT = 
-        "CREATE TABLE CXF_RM_DEST_SEQUENCES " 
+    private static final String CREATE_OLD_DEST_SEQ_TABLE_STMT =
+        "CREATE TABLE CXF_RM_DEST_SEQUENCES "
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
         + "ACKS_TO VARCHAR(1024) NOT NULL, "
         + "LAST_MSG_NO DECIMAL(19, 0), "
@@ -59,7 +59,7 @@ public class RMTxStoreUpgradeTest extends Assert {
         + "PRIMARY KEY (SEQ_ID))";
 
     private static final String CREATE_OLD_MSGS_TABLE_STMT =
-        "CREATE TABLE {0} " 
+        "CREATE TABLE {0} "
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
         + "MSG_NO DECIMAL(19, 0) NOT NULL, "
         + "SEND_TO VARCHAR(256), "
@@ -67,74 +67,74 @@ public class RMTxStoreUpgradeTest extends Assert {
         + "PRIMARY KEY (SEQ_ID, MSG_NO))";
 
     private static final String INBOUND_MSGS_TABLE_NAME = "CXF_RM_INBOUND_MESSAGES";
-    private static final String OUTBOUND_MSGS_TABLE_NAME = "CXF_RM_OUTBOUND_MESSAGES";    
-    
+    private static final String OUTBOUND_MSGS_TABLE_NAME = "CXF_RM_OUTBOUND_MESSAGES";
+
     private static final String TEST_DB_NAME = "rmdbu";
 
-    @BeforeClass 
+    @BeforeClass
     public static void setUpOnce() {
         RMTxStore.deleteDatabaseFiles(TEST_DB_NAME, true);
     }
-     
+
     @AfterClass
     public static void tearDownOnce() {
         RMTxStore.deleteDatabaseFiles(TEST_DB_NAME, false);
     }
-    
+
     @Test
     public void testUpgradeTables() throws Exception {
         TestRMTxStore store = new TestRMTxStore();
         store.setDriverClassName("org.apache.derby.jdbc.EmbeddedDriver");
-        
+
         // workaround for the db file deletion problem during the tests
         store.setUrl(MessageFormat.format("jdbc:derby:{0};create=true", TEST_DB_NAME));
-        
+
         // use the old db definitions to create the tables
         store.init();
-        
+
         // verify the absence of the new columns in the tables
         verifyColumns(store, "CXF_RM_SRC_SEQUENCES", new String[]{"PROTOCOL_VERSION"}, true);
         verifyColumns(store, "CXF_RM_DEST_SEQUENCES", new String[]{"PROTOCOL_VERSION"}, true);
         verifyColumns(store, INBOUND_MSGS_TABLE_NAME, new String[]{}, true);
         verifyColumns(store, OUTBOUND_MSGS_TABLE_NAME, new String[]{}, true);
-        
+
         // upgrade the tables and add new columns to the old tables
         store.upgrade();
         store.init();
-        
+
         // verify the presence of the new columns in the upgraded tables
         verifyColumns(store, "CXF_RM_SRC_SEQUENCES", new String[]{"PROTOCOL_VERSION"}, false);
         verifyColumns(store, "CXF_RM_DEST_SEQUENCES", new String[]{"PROTOCOL_VERSION"}, false);
         verifyColumns(store, INBOUND_MSGS_TABLE_NAME, new String[]{}, false);
         verifyColumns(store, OUTBOUND_MSGS_TABLE_NAME, new String[]{}, false);
     }
-    
-    private static void verifyColumns(RMTxStore store, String tableName, 
+
+    private static void verifyColumns(RMTxStore store, String tableName,
                                       String[] cols, boolean absent) throws Exception {
         // verify the presence of the new fields
         DatabaseMetaData metadata = store.getConnection().getMetaData();
         ResultSet rs = metadata.getColumns(null, null, tableName, "%");
-        Set<String> colNames = new HashSet<String>();
+        Set<String> colNames = new HashSet<>();
         Collections.addAll(colNames, cols);
         while (rs.next()) {
             colNames.remove(rs.getString(4));
         }
-        
+
         if (absent) {
-            assertEquals("Some new columns are already present", cols.length, colNames.size());            
+            assertEquals("Some new columns are already present", cols.length, colNames.size());
         } else {
             assertEquals("Some new columns are still absent", 0, colNames.size());
         }
     }
-    
-    
+
+
     static class TestRMTxStore extends RMTxStore {
         private boolean upgraded;
-    
+
         public void upgrade() {
             upgraded = true;
         }
-        
+
         @Override
         public synchronized void init() {
             if (upgraded) {
@@ -147,7 +147,7 @@ public class RMTxStoreUpgradeTest extends Assert {
                 } catch (SQLException e) {
                     // ignore this error
                 }
-                
+
             }
         }
 
@@ -167,10 +167,10 @@ public class RMTxStoreUpgradeTest extends Assert {
             } catch (SQLException ex) {
                 if (!isTableExistsError(ex)) {
                     throw ex;
-                } 
+                }
             }
             stmt.close();
-        
+
             stmt = getConnection().createStatement();
             try {
                 stmt.executeUpdate(CREATE_OLD_DEST_SEQ_TABLE_STMT);

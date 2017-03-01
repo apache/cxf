@@ -34,21 +34,21 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * The CXF client gets a token from the STS by authenticating via an X.509 Cert over the asymmetric binding, 
+ * The CXF client gets a token from the STS by authenticating via an X.509 Cert over the asymmetric binding,
  * and then sends it to the CXF endpoint using the asymmetric binding. The SAML Token contains a role, that is
  * required by the endpoint to access the service correctly. Therefore, client authentication is done by the
  * asymmetric signature, authorization is done by extracting roles from the SAML Token.
  */
 public class X509AsymmetricBindingTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STSPORT2 = allocatePort(STSServer.class, 2);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static final String PORT = allocatePort(AsymmetricServer.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -61,7 +61,7 @@ public class X509AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         stsServer.setContext("cxf-x509.xml");
         assertTrue(launchServer(stsServer));
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -81,18 +81,18 @@ public class X509AsymmetricBindingTest extends AbstractBusClientServerTestBase {
         URL wsdl = X509AsymmetricBindingTest.class.getResource("DoubleItAsymmetric.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSAML2Port");
-        DoubleItPortType port = 
+        DoubleItPortType port =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         TokenTestUtils.updateSTSPort((BindingProvider)port, STSPORT2);
-        
+
         doubleIt(port, 30);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

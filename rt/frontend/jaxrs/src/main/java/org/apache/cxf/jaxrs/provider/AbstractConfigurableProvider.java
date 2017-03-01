@@ -37,13 +37,13 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 public abstract class AbstractConfigurableProvider {
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
-    
+
     private List<String> consumeMediaTypes;
     private List<String> produceMediaTypes;
     private boolean enableBuffering;
     private boolean enableStreaming;
     private Bus bus;
-    
+
     /**
      * Sets the Bus
      * @param b
@@ -53,19 +53,19 @@ public abstract class AbstractConfigurableProvider {
             bus = b;
         }
     }
-    
+
     /**
-     * Gets the Bus. 
+     * Gets the Bus.
      * Providers may use the bus to resolve resource references.
      * Example:
      * ResourceUtils.getResourceStream(reference, this.getBus())
-     * 
+     *
      * @return
      */
     public Bus getBus() {
         return bus != null ? bus : BusFactory.getThreadDefaultBus();
     }
-    
+
     /**
      * Sets custom Consumes media types; can be used to override static
      * {@link Consumes} annotation value set on the provider.
@@ -74,15 +74,15 @@ public abstract class AbstractConfigurableProvider {
     public void setConsumeMediaTypes(List<String> types) {
         consumeMediaTypes = types;
     }
-    
+
     /**
      * Gets the custom Consumes media types
      * @return media types
      */
     public List<String> getConsumeMediaTypes() {
-        return consumeMediaTypes;    
+        return consumeMediaTypes;
     }
-    
+
     /**
      * Sets custom Produces media types; can be used to override static
      * {@link Produces} annotation value set on the provider.
@@ -91,31 +91,31 @@ public abstract class AbstractConfigurableProvider {
     public void setProduceMediaTypes(List<String> types) {
         produceMediaTypes = types;
     }
-    
+
     /**
      * Gets the custom Produces media types
      * @return media types
      */
     public List<String> getProduceMediaTypes() {
-        return produceMediaTypes;    
+        return produceMediaTypes;
     }
-    
+
     /**
      * Enables the buffering mode. If set to true then the runtime will ensure
      * that the provider writes to a cached stream.
-     *  
+     *
      * For example, the JAXB marshalling process may fail after the initial XML
      * tags have already been written out to the HTTP output stream. Enabling
      * the buffering ensures no incomplete payloads are sent back to clients
      * in case of marshalling errors at the cost of the initial buffering - which
      * might be negligible for small payloads.
-     * 
+     *
      * @param enableBuf the value of the buffering mode, false is default.
      */
     public void setEnableBuffering(boolean enableBuf) {
         enableBuffering = enableBuf;
     }
-    
+
     /**
      * Gets the value of the buffering mode
      * @return true if the buffering is enabled
@@ -123,18 +123,18 @@ public abstract class AbstractConfigurableProvider {
     public boolean getEnableBuffering() {
         return enableBuffering;
     }
-    
+
     /**
-     * Enables the support for streaming. XML-aware providers which prefer 
+     * Enables the support for streaming. XML-aware providers which prefer
      * writing to Stax XMLStreamWriter can set this value to true. Additionally,
      * if the streaming and the buffering modes are enabled, the runtime will
-     * ensure the XMLStreamWriter events are cached properly. 
+     * ensure the XMLStreamWriter events are cached properly.
      * @param enableStream the value of the streaming mode, false is default.
      */
     public void setEnableStreaming(boolean enableStream) {
-        enableStreaming = enableStream; 
+        enableStreaming = enableStream;
     }
-    
+
     /**
      * Gets the value of the streaming mode
      * @return true if the streaming is enabled
@@ -142,19 +142,19 @@ public abstract class AbstractConfigurableProvider {
     public boolean getEnableStreaming() {
         return enableStreaming;
     }
-    
+
     /**
      * Gives providers a chance to introspect the JAX-RS model classes.
      * For example, the JAXB provider may use the model classes to create
-     * a single composite JAXBContext supporting all the JAXB-annotated 
+     * a single composite JAXBContext supporting all the JAXB-annotated
      * root resource classes/types.
-     * 
+     *
      * @param resources
      */
     public void init(List<ClassResourceInfo> resources) {
         // complete
     }
-    
+
     protected boolean isPayloadEmpty(HttpHeaders headers) {
         if (headers != null) {
             return isPayloadEmpty(headers.getRequestHeaders());
@@ -162,7 +162,7 @@ public abstract class AbstractConfigurableProvider {
             return false;
         }
     }
-    
+
     protected boolean isPayloadEmpty(MultivaluedMap<String, String> headers) {
         return HttpUtils.isPayloadEmpty(headers);
     }

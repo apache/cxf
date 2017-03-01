@@ -48,7 +48,7 @@ public class WSDLHelper {
         Iterator<Binding> ite = CastUtils.cast(def.getBindings().values().iterator());
         while (ite.hasNext()) {
             Binding binding = ite.next();
-            Iterator<BindingOperation> ite1 
+            Iterator<BindingOperation> ite1
                 = CastUtils.cast(binding.getBindingOperations().iterator());
             while (ite1.hasNext()) {
                 BindingOperation bop = ite1.next();
@@ -59,7 +59,7 @@ public class WSDLHelper {
         }
         return null;
     }
-    
+
     public static String writeQName(Definition def, QName qname) {
         return def.getPrefix(qname.getNamespaceURI()) + ":" + qname.getLocalPart();
     }
@@ -78,7 +78,7 @@ public class WSDLHelper {
     }
 
     public List<PortType> getPortTypes(Definition def) {
-        List<PortType> portTypes = new ArrayList<PortType>();
+        List<PortType> portTypes = new ArrayList<>();
         Collection<PortType> ite = CastUtils.cast(def.getPortTypes().values());
         for (PortType portType : ite) {
             portTypes.add(portType);
@@ -88,7 +88,7 @@ public class WSDLHelper {
 
     public List<Part> getInMessageParts(Operation operation) {
         Input input = operation.getInput();
-        List<Part> partsList = new ArrayList<Part>();
+        List<Part> partsList = new ArrayList<>();
         if (input != null && input.getMessage() != null) {
             Collection<Part> parts = CastUtils.cast(input.getMessage().getParts().values());
             for (Part p : parts) {
@@ -100,7 +100,7 @@ public class WSDLHelper {
 
     public List<Part> getOutMessageParts(Operation operation) {
         Output output = operation.getOutput();
-        List<Part> partsList = new ArrayList<Part>();
+        List<Part> partsList = new ArrayList<>();
         if (output != null && output.getMessage() != null) {
             Collection<Part> parts = CastUtils.cast(output.getMessage().getParts().values());
             for (Part p : parts) {

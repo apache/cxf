@@ -34,22 +34,22 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class AssertionBuilderRegistryImplTest extends Assert {
 
     private IMocksControl control;
-    
-    @Before 
+
+    @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();       
+        control = EasyMock.createNiceControl();
     }
-    
+
     @After
     public void tearDown() {
         control.verify();
     }
-    
+
     @Test
     public void testBuildUnknownAssertion() {
         Bus bus = control.createMock(Bus.class);
@@ -71,10 +71,10 @@ public class AssertionBuilderRegistryImplTest extends Assert {
             EasyMock.expect(elems[i].getNamespaceURI()).andReturn(qnames[i].getNamespaceURI()).anyTimes();
             EasyMock.expect(elems[i].getLocalName()).andReturn(qnames[i].getLocalPart()).anyTimes();
         }
-        
+
         control.replay();
         reg.setBus(bus);
-        
+
         assertTrue(!reg.isIgnoreUnknownAssertions());
         try {
             reg.build(elems[0]);
@@ -86,7 +86,7 @@ public class AssertionBuilderRegistryImplTest extends Assert {
         assertTrue(reg.isIgnoreUnknownAssertions());
         for (int i = 0; i < 10; i++) {
             Assertion assertion = reg.build(elems[i]);
-            assertTrue("Not a PrimitiveAsertion: " + assertion.getClass().getName(), 
+            assertTrue("Not a PrimitiveAsertion: " + assertion.getClass().getName(),
                        assertion instanceof PrimitiveAssertion);
         }
         for (int i = 9; i >= 0; i--) {

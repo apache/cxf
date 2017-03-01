@@ -42,19 +42,19 @@ public class SamlCallbackHandler implements CallbackHandler {
     private boolean saml2 = true;
     private String confirmationMethod = SAML2Constants.CONF_BEARER;
     private List<AttributeBean> attributes;
-    
+
     public SamlCallbackHandler() {
         //
     }
-    
+
     public SamlCallbackHandler(boolean saml2) {
         this.saml2 = saml2;
     }
-    
+
     public void setConfirmationMethod(String confirmationMethod) {
         this.confirmationMethod = confirmationMethod;
     }
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
@@ -71,19 +71,19 @@ public class SamlCallbackHandler implements CallbackHandler {
                 if (!saml2 && SAML2Constants.CONF_SENDER_VOUCHES.equals(confirmationMethod)) {
                     confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
                 }
-                SubjectBean subjectBean = 
+                SubjectBean subjectBean =
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod
                     );
                 callback.setSubject(subjectBean);
-                
+
                 if (attributes != null) {
                     AttributeStatementBean attrBean = new AttributeStatementBean();
                     attrBean.setSubject(subjectBean);
                     attrBean.setSamlAttributes(attributes);
                     callback.setAttributeStatementData(Collections.singletonList(attrBean));
                 }
-                
+
             }
         }
     }
@@ -95,5 +95,5 @@ public class SamlCallbackHandler implements CallbackHandler {
     public void setAttributes(List<AttributeBean> attributes) {
         this.attributes = attributes;
     }
-    
+
 }

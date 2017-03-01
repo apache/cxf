@@ -24,16 +24,16 @@ import javax.ws.rs.core.NioWriterHandler;
 public final class NioWriteEntity {
     private final NioWriterHandler writer;
     private final NioErrorHandler error;
-    
+
     public NioWriteEntity(final NioWriterHandler writer, final NioErrorHandler error) {
         this.writer = writer;
         this.error = error;
     }
-    
+
     public NioWriterHandler getWriter() {
         return writer;
     }
-    
+
     public NioErrorHandler getError() {
         return error;
     }

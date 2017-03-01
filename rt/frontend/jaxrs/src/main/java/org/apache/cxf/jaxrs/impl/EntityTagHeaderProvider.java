@@ -25,20 +25,20 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 public class EntityTagHeaderProvider implements HeaderDelegate<EntityTag> {
 
     private static final String WEAK_PREFIX = "W/";
-    
+
     public EntityTag fromString(String header) {
-        
-        
+
+
         if (header == null) {
             throw new IllegalArgumentException("ETag value can not be null");
         }
-        
+
         if ("*".equals(header)) {
             return new EntityTag("*");
         }
-        
+
         String tag = null;
-        boolean weak =  false;
+        boolean weak = false;
         int i = header.indexOf(WEAK_PREFIX);
         if (i != -1) {
             weak = true;
@@ -56,7 +56,7 @@ public class EntityTagHeaderProvider implements HeaderDelegate<EntityTag> {
         if (tag.length() < 2 || !tag.startsWith("\"") || !tag.endsWith("\"")) {
             throw new IllegalArgumentException("Misformatted ETag : " + header);
         }
-        tag = tag.length() == 2 ? "" : tag.substring(1, tag.length() - 1); 
+        tag = tag.length() == 2 ? "" : tag.substring(1, tag.length() - 1);
         return new EntityTag(tag, weak);
     }
 

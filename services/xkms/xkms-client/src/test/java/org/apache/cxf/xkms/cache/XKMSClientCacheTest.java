@@ -29,76 +29,76 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
  * A test for the XKMSClientCache
  */
 public class XKMSClientCacheTest extends org.junit.Assert {
-    
+
     private final XKMSClientCache cache;
     private final X509Certificate alice;
     private final X509Certificate bob;
 
     public XKMSClientCacheTest() throws Exception {
         cache = new EHCacheXKMSClientCache();
-        
+
         KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks", 
-                                                           XKMSClientCacheTest.class), 
+        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/alice.jks",
+                                                           XKMSClientCacheTest.class),
                                                            "password".toCharArray());
         alice = (X509Certificate)keystore.getCertificate("alice");
-        
+
         keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/bob.jks", 
-                                                           XKMSClientCacheTest.class), 
+        keystore.load(ClassLoaderUtils.getResourceAsStream("keys/bob.jks",
+                                                           XKMSClientCacheTest.class),
                                                            "password".toCharArray());
         bob = (X509Certificate)keystore.getCertificate("bob");
     }
-    
+
     @org.junit.Test
     public void testCache() {
         assertNotNull(alice);
         assertNotNull(bob);
-        
+
         XKMSCacheToken aliceToken = new XKMSCacheToken();
         aliceToken.setX509Certificate(alice);
-        
+
         // Put
         storeCertificateInCache(alice, false);
         storeCertificateInCache(bob, false);
-        
+
         // Get
         XKMSCacheToken cachedToken = cache.get(alice.getSubjectX500Principal().getName());
         assertEquals(alice, cachedToken.getX509Certificate());
         assertFalse(cachedToken.isXkmsValidated());
-        
-        cache.get(getKeyForIssuerSerial(alice.getIssuerX500Principal().getName(), 
+
+        cache.get(getKeyForIssuerSerial(alice.getIssuerX500Principal().getName(),
                                         alice.getSerialNumber()));
         assertEquals(alice, cachedToken.getX509Certificate());
         assertFalse(cachedToken.isXkmsValidated());
-        
+
         cachedToken = cache.get(bob.getSubjectX500Principal().getName());
         assertEquals(bob, cachedToken.getX509Certificate());
         assertFalse(cachedToken.isXkmsValidated());
-        
-        cache.get(getKeyForIssuerSerial(bob.getIssuerX500Principal().getName(), 
+
+        cache.get(getKeyForIssuerSerial(bob.getIssuerX500Principal().getName(),
                                         bob.getSerialNumber()));
         assertEquals(bob, cachedToken.getX509Certificate());
         assertFalse(cachedToken.isXkmsValidated());
-        
+
         // Validate
         cachedToken = cache.get(alice.getSubjectX500Principal().getName());
         cachedToken.setXkmsValidated(true);
-        
+
         cachedToken = cache.get(alice.getSubjectX500Principal().getName());
         assertTrue(cachedToken.isXkmsValidated());
-        cache.get(getKeyForIssuerSerial(alice.getIssuerX500Principal().getName(), 
+        cache.get(getKeyForIssuerSerial(alice.getIssuerX500Principal().getName(),
                                         alice.getSerialNumber()));
         assertTrue(cachedToken.isXkmsValidated());
     }
-    
+
     private void storeCertificateInCache(X509Certificate certificate, boolean validated) {
         XKMSCacheToken cacheToken = new XKMSCacheToken(certificate);
         cacheToken.setXkmsValidated(validated);
-        
+
         // Store it using IssuerSerial
-        String issuerSerialKey = 
-            getKeyForIssuerSerial(certificate.getIssuerX500Principal().getName(), 
+        String issuerSerialKey =
+            getKeyForIssuerSerial(certificate.getIssuerX500Principal().getName(),
                                   certificate.getSerialNumber());
         cache.put(issuerSerialKey, cacheToken);
 
@@ -106,7 +106,7 @@ public class XKMSClientCacheTest extends org.junit.Assert {
         String subjectDNKey = certificate.getSubjectX500Principal().getName();
         cache.put(subjectDNKey, cacheToken);
     }
-    
+
     private String getKeyForIssuerSerial(String issuer, BigInteger serial) {
         return issuer + "-" + serial.toString(16);
     }

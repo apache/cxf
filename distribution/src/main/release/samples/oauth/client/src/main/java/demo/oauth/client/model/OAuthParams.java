@@ -44,7 +44,7 @@ public class OAuthParams implements Serializable {
     private String header;
     private Integer responseCode;
 
-    private List<SignatureMethod> methods = new ArrayList<SignatureMethod>();
+    private List<SignatureMethod> methods = new ArrayList<>();
 
     public OAuthParams() {
         methods.add(new SignatureMethod("HMAC-SHA1"));

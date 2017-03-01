@@ -41,21 +41,21 @@ import org.apache.handlers.types.ObjectFactory;
  */
 public class SmallNumberHandler extends TestHandlerBase implements LogicalHandler<LogicalMessageContext> {
     @Resource(name = "handlerResource")
-    String injectedString; 
-    
-    
+    String injectedString;
+
+
     public SmallNumberHandler() {
-        this(true); 
-    } 
-    
+        this(true);
+    }
+
     public SmallNumberHandler(boolean serverSide) {
         super(serverSide);
     }
-    
-    public String getHandlerId() { 
+
+    public String getHandlerId() {
         return "SmallNumberHandler" + getId();
-    }  
-    
+    }
+
     public final boolean handleMessage(LogicalMessageContext messageContext) {
         //System.out.println("LogicalMessageHandler handleMessage called");
 
@@ -86,20 +86,20 @@ public class SmallNumberHandler extends TestHandlerBase implements LogicalHandle
                         //System.out.printf("SmallNumberHandler addNumbers(%d, %d) == %d\n", a, b, answer);
                         // ok, we've done the calculation, so build the
                         // response and set it as the payload of the message
-                        
+
                         AddNumbersResponse resp = new AddNumbersResponse();
                         resp.setReturn(answer);
                         msg.setPayload(new ObjectFactory().createAddNumbersResponse(resp),
                                        jaxbContext);
-                        
-                        Source src = msg.getPayload();                                             
+
+                        Source src = msg.getPayload();
                         msg.setPayload(src);
-                        
+
                         payload = msg.getPayload(jaxbContext);
                         if (payload instanceof JAXBElement) {
                             payload = ((JAXBElement<?>)payload).getValue();
                         }
-                        
+
                         AddNumbersResponse resp2 = (AddNumbersResponse)payload;
                         if (resp2 == resp) {
                             throw new WebServiceException("Shouldn't be the same object");
@@ -139,11 +139,11 @@ public class SmallNumberHandler extends TestHandlerBase implements LogicalHandle
     public void doPostConstruct() {
         methodCalled("doPostConstruct");
     }
-    
+
     public String getInjectedString() {
-        return injectedString;        
+        return injectedString;
     }
-        
+
     private boolean isSmall(int i) {
         return i > 0 && i <= 10;
     }

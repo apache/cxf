@@ -35,46 +35,46 @@ public class AuthPolicyValidatingInterceptorTest extends Assert {
         AuthPolicyValidatingInterceptor in = new AuthPolicyValidatingInterceptor();
         TestSTSTokenValidator validator = new TestSTSTokenValidator();
         in.setValidator(validator);
-        
+
         AuthorizationPolicy policy = new AuthorizationPolicy();
         policy.setUserName("bob");
         policy.setPassword("pswd");
         Message message = new MessageImpl();
         message.put(AuthorizationPolicy.class, policy);
-        
+
         in.handleMessage(message);
-        
+
         assertTrue(validator.isValidated());
     }
-    
+
     @Test
     public void testInvalidUsernamePassword() throws Exception {
         AuthPolicyValidatingInterceptor in = new AuthPolicyValidatingInterceptor();
         TestSTSTokenValidator validator = new TestSTSTokenValidator();
         in.setValidator(validator);
-        
+
         AuthorizationPolicy policy = new AuthorizationPolicy();
         policy.setUserName("bob");
         policy.setPassword("pswd2");
         Message message = new MessageImpl();
         message.put(AuthorizationPolicy.class, policy);
-        
+
         in.handleMessage(message);
-        
+
         assertFalse(validator.isValidated());
     }
-    
+
     @Test
     public void testNoUsername() throws Exception {
         AuthPolicyValidatingInterceptor in = new AuthPolicyValidatingInterceptor();
         TestSTSTokenValidator validator = new TestSTSTokenValidator();
         in.setValidator(validator);
-        
+
         AuthorizationPolicy policy = new AuthorizationPolicy();
         policy.setPassword("pswd");
         Message message = new MessageImpl();
         message.put(AuthorizationPolicy.class, policy);
-        
+
         try {
             in.handleMessage(message);
             fail("Failure expected with no username");
@@ -82,17 +82,17 @@ public class AuthPolicyValidatingInterceptorTest extends Assert {
             // expected
         }
     }
-    
+
     private static class TestSTSTokenValidator extends STSTokenValidator {
-        
-        private boolean validated; 
-        
+
+        private boolean validated;
+
         TestSTSTokenValidator() {
             super(true);
         }
-        
+
         @Override
-        public Credential validateWithSTS(Credential credential, Message message) 
+        public Credential validateWithSTS(Credential credential, Message message)
             throws WSSecurityException {
             UsernameToken token = credential.getUsernametoken();
             if ("bob".equals(token.getName()) && "pswd".equals(token.getPassword())) {
@@ -101,7 +101,7 @@ public class AuthPolicyValidatingInterceptorTest extends Assert {
             }
             return credential;
         }
-        
+
         public boolean isValidated() {
             return validated;
         }

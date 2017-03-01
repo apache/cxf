@@ -33,13 +33,13 @@ import java.util.logging.Logger;
  * when moving to Spring 2.0.
  *
  */
-    
+
 public final class PropertiesLoaderUtils {
-    
+
     /**
      * Prevents instantiation.
      */
-    private PropertiesLoaderUtils() {        
+    private PropertiesLoaderUtils() {
     }
 
     /**
@@ -48,7 +48,7 @@ public final class PropertiesLoaderUtils {
      * <p>
      * Merges properties if more than one resource of the same name found in the
      * class path.
-     * 
+     *
      * @param resourceName the name of the class path resource
      * @param classLoader the ClassLoader to use for loading (or
      *            <code>null</code> to use the default class loader)
@@ -58,7 +58,7 @@ public final class PropertiesLoaderUtils {
     public static Properties loadAllProperties(String resourceName, ClassLoader classLoader)
         throws IOException {
         return loadAllProperties(resourceName, classLoader, null, null, null);
-    }        
+    }
     public static Properties loadAllProperties(String resourceName, ClassLoader classLoader,
                                                Logger logger, Level level, String msg)
         throws IOException {
@@ -74,7 +74,7 @@ public final class PropertiesLoaderUtils {
             if (logger != null) {
                 logger.log(level, msg, url.toString());
             }
-            
+
             try (InputStream is = url.openStream()) {
                 properties.loadFromXML(new BufferedInputStream(is));
             }

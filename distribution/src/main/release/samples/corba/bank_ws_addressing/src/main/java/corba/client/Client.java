@@ -36,9 +36,9 @@ public final class Client {
         //not constructed
     }
     static int run(ORB orb, String[] args) throws UserException {
-        
+
         // Get the Bank object
-        org.omg.CORBA.Object obj = 
+        org.omg.CORBA.Object obj =
             orb.string_to_object("corbaname::localhost:1050#Bank");
         if (obj == null) {
             System.err.println("bank.Client: cannot read IOR from corbaname::localhost:1050#Bank");
@@ -63,7 +63,7 @@ public final class Client {
         account2.deposit(5.00f);
         System.out.println("Current balance of \"Account2\" is " + account2.get_balance());
         System.out.println();
-        
+
         // Create two more accounts to use with the getAccount calls
         Account acc3 = bank.create_account("Account3");
         acc3.deposit(200.00f);

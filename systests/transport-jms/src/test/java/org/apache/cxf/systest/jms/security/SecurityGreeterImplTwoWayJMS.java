@@ -20,11 +20,11 @@ package org.apache.cxf.systest.jms.security;
 
 import javax.jws.WebService;
 
-@WebService(serviceName = "HelloWorldService", 
+@WebService(serviceName = "HelloWorldService",
             portName = "HelloWorldPort",
             endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPortType",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")
-public class SecurityGreeterImplTwoWayJMS extends TwoWayJMSImplBase {    
-    
+public class SecurityGreeterImplTwoWayJMS extends TwoWayJMSImplBase {
+
 }

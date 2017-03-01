@@ -169,7 +169,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
 
             assertNotNull("no response received from service", reply);
             assertEquals(response1 + username, reply);
-            
+
             SayHi request = new SayHi();
 
             SayHiResponse response = greeter.sayHi1(request);
@@ -186,7 +186,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAddPort() throws Exception {
         URL url = getClass().getResource("/wsdl/hello_world_xml_wrapped.wsdl");
-        
+
         Service service = Service.create(url, wrapServiceName);
         assertNotNull(service);
 
@@ -210,7 +210,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
             reply = greeter.sayHi();
             assertNotNull("no response received from service", reply);
             assertEquals(response2, reply);
-            
+
             BindingProvider bp = (BindingProvider) greeter;
             Map<String, Object> responseContext = bp.getResponseContext();
             Integer responseCode = (Integer) responseContext.get(Message.RESPONSE_CODE);
@@ -221,7 +221,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception) ex.getCause();
         }
-       
+
     }
     String stripSpaces(String s) {
         String s2 = s.replace(" ", "");
@@ -307,19 +307,19 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         assertEquals("check return value",
                      "requestType=InoutHeaderRequest",
                      resp.getResponseType());
-        
+
         assertEquals("check inout value",
                      "message=inoutMessage",
                      holder.value.getMessage());
         assertEquals("check inout value",
                      "orginator=inoutOriginator",
-                     holder.value.getOriginator());        
+                     holder.value.getOriginator());
     }
 
     public void verifyOutHeader(HeaderTester proxy) throws Exception {
         OutHeader me = new OutHeader();
         me.setRequestType("OutHeaderRequest");
-        
+
         Holder<OutHeaderResponse> outHeaderHolder = new Holder<OutHeaderResponse>();
         Holder<SOAPHeaderData> soapHeaderHolder = new Holder<SOAPHeaderData>();
         proxy.outHeader(me, outHeaderHolder, soapHeaderHolder);
@@ -328,7 +328,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         assertEquals("check out value",
                      "requestType=OutHeaderRequest",
                      outHeaderHolder.value.getResponseType());
-        
+
         assertEquals("check out value",
                      "message=outMessage",
                      soapHeaderHolder.value.getMessage());
@@ -336,7 +336,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         assertEquals("check out value",
                      "orginator=outOriginator",
                      soapHeaderHolder.value.getOriginator());
-        
+
     }
 
 }

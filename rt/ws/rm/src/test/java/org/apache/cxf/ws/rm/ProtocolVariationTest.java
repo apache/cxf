@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class ProtocolVariationTest extends Assert {
 
@@ -39,8 +39,8 @@ public class ProtocolVariationTest extends Assert {
                           RM10Constants.NAMESPACE_URI, Names.WSA_NAMESPACE_NAME));
         assertNotNull(ProtocolVariation.findVariant(
                           RM11Constants.NAMESPACE_URI, Names.WSA_NAMESPACE_NAME));
-        
-        // invalid combinations 
+
+        // invalid combinations
         assertNull(ProtocolVariation.findVariant(
                           RM11Constants.NAMESPACE_URI, Names200408.WSA_NAMESPACE_NAME));
     }

@@ -28,11 +28,11 @@ public class OAuthPermission extends Permission {
     private List<String> roles = Collections.emptyList();
     private List<String> httpVerbs = Collections.emptyList();
     private List<String> uris = Collections.emptyList();
-    
+
     public OAuthPermission(String permission, String description) {
         super(permission, description);
     }
-    
+
     public OAuthPermission(String permission, String description, List<String> roles) {
         super(permission, description);
         this.roles = roles;
@@ -61,5 +61,5 @@ public class OAuthPermission extends Permission {
     public List<String> getUris() {
         return uris;
     }
-    
+
 }

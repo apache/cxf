@@ -29,22 +29,22 @@ import org.apache.cxf.message.Message;
 public class CdiResourceProvider implements ResourceProvider {
     private Object instance;
     private CreationalContext< ? > context;
-    
+
     private final BeanManager beanManager;
     private final Bean< ? > bean;
-    
+
     CdiResourceProvider(final BeanManager beanManager, final Bean< ? > bean) {
         this.beanManager = beanManager;
         this.bean = bean;
     }
-    
+
     @Override
     public Object getInstance(Message m) {
         if (instance == null) {
             context = beanManager.createCreationalContext(bean);
             instance = beanManager.getReference(bean, bean.getBeanClass(), context);
         }
-        
+
         return instance;
     }
 

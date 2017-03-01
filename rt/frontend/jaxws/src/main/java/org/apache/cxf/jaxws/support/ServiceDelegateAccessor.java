@@ -42,14 +42,14 @@ public final class ServiceDelegateAccessor {
     private static final String DELEGATE_FIELD_NAME = "delegate";
     private static final String DELEGATE_FIELD_NAME2 = "_delegate";
 
-    private ServiceDelegateAccessor() {        
+    private ServiceDelegateAccessor() {
     }
-    
+
     /**
      * Get the delegate reference from the Service private field. This method
      * uses Field.setAccessible() which, in the presence of a SecurityManager,
      * requires the suppressAccessChecks permission
-     * 
+     *
      * @param service the taraget service
      * @return the implementation delegate
      * @throws WebServiceException if access to the field fails for any reason
@@ -67,11 +67,11 @@ public final class ServiceDelegateAccessor {
                 delegate = (ServiceImpl)delegateField.get(service);
             } catch (Exception e2) {
                 WebServiceException wse = new WebServiceException("Failed to access Field named "
-                                                                  + DELEGATE_FIELD_NAME 
+                                                                  + DELEGATE_FIELD_NAME
                                                                   + " of Service instance "
                                                                   + service, e);
                 LOG.log(Level.SEVERE, e.getMessage(), e);
-                throw wse;                
+                throw wse;
             }
         }
         return delegate;

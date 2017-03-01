@@ -48,7 +48,7 @@ public class ChainInitiationObserver implements MessageObserver {
     protected Endpoint endpoint;
     protected Bus bus;
     protected ClassLoader loader;
-    
+
     private PhaseChainCache chainCache = new PhaseChainCache();
 
     public ChainInitiationObserver(Endpoint endpoint, Bus bus) {
@@ -68,19 +68,19 @@ public class ChainInitiationObserver implements MessageObserver {
                 origLoader = ClassLoaderUtils.setThreadContextClassloader(loader);
             }
             InterceptorChain phaseChain = null;
-            
+
             if (m.getInterceptorChain() != null) {
                 phaseChain = m.getInterceptorChain();
                 // To make sure the phase chain is run by one thread once
                 synchronized (phaseChain) {
-                    if (phaseChain.getState() == InterceptorChain.State.PAUSED 
+                    if (phaseChain.getState() == InterceptorChain.State.PAUSED
                         || phaseChain.getState() == InterceptorChain.State.SUSPENDED) {
                         phaseChain.resume();
                         return;
                     }
                 }
             }
-            
+
             Message message = getBinding().createMessage(m);
             Exchange exchange = message.getExchange();
             if (exchange == null) {
@@ -89,7 +89,7 @@ public class ChainInitiationObserver implements MessageObserver {
             }
             exchange.setInMessage(message);
             setExchangeProperties(exchange, message);
-    
+
             InterceptorProvider dbp = null;
             if (endpoint.getService().getDataBinding() instanceof InterceptorProvider) {
                 dbp = (InterceptorProvider)endpoint.getService().getDataBinding();
@@ -109,17 +109,17 @@ public class ChainInitiationObserver implements MessageObserver {
                                             getBinding().getInInterceptors(),
                                             dbp.getInInterceptors());
             }
-        
-            
-            
+
+
+
             message.setInterceptorChain(phaseChain);
-            
+
             phaseChain.setFaultObserver(endpoint.getOutFaultObserver());
-           
+
             addToChain(phaseChain, message);
-            
+
             phaseChain.doIntercept(message);
-            
+
         } finally {
             if (origBus != bus) {
                 BusFactory.setThreadDefaultBus(origBus);
@@ -130,14 +130,14 @@ public class ChainInitiationObserver implements MessageObserver {
         }
     }
     private void addToChain(InterceptorChain chain, Message m) {
-        Collection<InterceptorProvider> providers 
+        Collection<InterceptorProvider> providers
             = CastUtils.cast((Collection<?>)m.get(Message.INTERCEPTOR_PROVIDERS));
         if (providers != null) {
             for (InterceptorProvider p : providers) {
                 chain.add(p.getInInterceptors());
             }
         }
-        Collection<Interceptor<? extends Message>> is 
+        Collection<Interceptor<? extends Message>> is
             = CastUtils.cast((Collection<?>)m.get(Message.IN_INTERCEPTORS));
         if (is != null) {
             chain.add(is);
@@ -150,7 +150,7 @@ public class ChainInitiationObserver implements MessageObserver {
     protected Binding getBinding() {
         return endpoint.getBinding();
     }
-    
+
     protected void setExchangeProperties(Exchange exchange, Message m) {
         exchange.put(Endpoint.class, endpoint);
         exchange.put(Binding.class, getBinding());
@@ -193,5 +193,5 @@ public class ChainInitiationObserver implements MessageObserver {
     public Endpoint getEndpoint() {
         return endpoint;
     }
-    
+
 }

@@ -32,8 +32,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
-import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -75,21 +75,21 @@ public class CxfAutoConfiguration {
     protected static class SpringBusConfiguration {
 
     }
-    
+
     @Configuration
     @ConditionalOnClass(JAXRSServerFactoryBean.class)
     @ConditionalOnExpression("'${cxf.jaxrs.component-scan}'=='true' && '${cxf.jaxrs.classes-scan}'!='true'")
     @Import(SpringComponentScanServer.class)
     protected static class JaxRsComponentConfiguration {
-     
+
     }
-    
+
     @Configuration
     @ConditionalOnClass(JAXRSServerFactoryBean.class)
     @ConditionalOnExpression("'${cxf.jaxrs.classes-scan}'=='true' && '${cxf.jaxrs.component-scan}'!='true'")
     @Import(SpringJaxrsClassesScanServer.class)
     protected static class JaxRsClassesConfiguration {
-     
+
     }
 
 }

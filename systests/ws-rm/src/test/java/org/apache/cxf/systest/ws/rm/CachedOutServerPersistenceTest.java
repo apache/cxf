@@ -32,7 +32,7 @@ import org.junit.Test;
 public class CachedOutServerPersistenceTest extends AbstractServerPersistenceTest {
     public static final String PORT = allocatePort(CachedOutServerPersistenceTest.class);
     public static final String DECOUPLED_PORT = allocatePort(CachedOutServerPersistenceTest.class, 1);
-   
+
     @BeforeClass
     public static void setProperties() throws Exception {
         RMTxStore.deleteDatabaseFiles("cospt-recovery", true);
@@ -40,7 +40,7 @@ public class CachedOutServerPersistenceTest extends AbstractServerPersistenceTes
         startServers(PORT, "cospt");
         CachedOutputStream.setDefaultThreshold(16);
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         CachedOutputStream.setDefaultThreshold(-1);
@@ -48,7 +48,7 @@ public class CachedOutServerPersistenceTest extends AbstractServerPersistenceTes
         RMTxStore.deleteDatabaseFiles("cospt-server", false);
     }
 
-    @Test 
+    @Test
     public void testRecovery() throws Exception {
         super.testRecovery();
     }

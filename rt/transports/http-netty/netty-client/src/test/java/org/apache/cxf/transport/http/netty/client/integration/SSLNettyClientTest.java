@@ -52,17 +52,17 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
-    
+
     public static final String PORT = allocatePort(SSLNettyClientTest.class);
-    
+
     static {
         System.setProperty("SSLNettyClientTest.port", PORT);
     }
-    
+
     static Endpoint ep;
 
     static Greeter g;
-    
+
     static String address;
 
     @BeforeClass
@@ -72,7 +72,7 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         address = "https://localhost:" + PORT + "/SoapContext/SoapPort";
         ep = Endpoint.publish(address,
                 new org.apache.hello_world_soap_http.GreeterImpl());
-        
+
         URL wsdl = SSLNettyClientTest.class.getResource("/wsdl/hello_world.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
@@ -93,14 +93,14 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         }
         ep = null;
     }
-    
+
     @Test
     public void testInvocation() throws Exception {
         setupTLS(g);
         setAddress(g, address);
         String response = g.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
-        
+
         GreetMeResponse resp = (GreetMeResponse)g.greetMeAsync("asyncTest", new AsyncHandler<GreetMeResponse>() {
             public void handleResponse(Response<GreetMeResponse> res) {
                 try {
@@ -120,10 +120,10 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello, finally!", handler.getResponse().getResponseType());
 
     }
-    
+
     private static void setupTLS(Greeter port)
         throws FileNotFoundException, IOException, GeneralSecurityException {
-        String keyStoreLoc = 
+        String keyStoreLoc =
             "src/test/resources/org/apache/cxf/transport/http/netty/client/integration/clientKeystore.jks";
         NettyHttpConduit httpConduit = (NettyHttpConduit) ClientProxy.getClient(port).getConduit();
 
@@ -150,7 +150,7 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         fac.init(trustStore);
         return fac.getTrustManagers();
     }
-    
+
     private static KeyManager[] getKeyManagers(KeyStore keyStore, String keyPassword)
         throws GeneralSecurityException, IOException {
         String alg = KeyManagerFactory.getDefaultAlgorithm();
@@ -161,7 +161,7 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         fac.init(keyStore, keyPass);
         return fac.getKeyManagers();
     }
-    
+
     private class MyLaterResponseHandler implements AsyncHandler<GreetMeLaterResponse> {
         GreetMeLaterResponse response;
         @Override
@@ -180,6 +180,6 @@ public class SSLNettyClientTest extends AbstractBusClientServerTestBase {
         }
 
     }
-    
+
 
 }

@@ -21,14 +21,14 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 public final class Priorities {
     public static final int JWE_SERVER_READ_PRIORITY = 1001;
     public static final int JWS_SERVER_READ_PRIORITY = 1002;
-    
+
     public static final int JWE_WRITE_PRIORITY = 1001;
     public static final int JWS_WRITE_PRIORITY = 1002;
-    
+
     public static final int JWE_CLIENT_READ_PRIORITY = 1002;
     public static final int JWS_CLIENT_READ_PRIORITY = 1001;
-    
+
     private Priorities() {
-        
+
     }
 }

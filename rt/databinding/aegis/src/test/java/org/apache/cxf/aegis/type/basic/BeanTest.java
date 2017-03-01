@@ -757,23 +757,23 @@ public class BeanTest extends AbstractAegisTest {
             this.howdy = howdy;
         }
     }
-    
+
     public interface SerializableBean extends Serializable {
         String getString();
     }
-    
+
     public interface CloneableBean extends Cloneable {
         String getString();
     }
-    
+
     public interface SimpleInterface {
         String getString();
     }
-    
+
     public interface ExtendingInterface extends SimpleInterface {
         String getAnotherString();
     }
-    
+
     public enum EnumBean {
         VALUE1, VALUE2;
     }

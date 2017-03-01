@@ -48,7 +48,7 @@ public class ArrayTypeInfo {
     private AegisType type;
     private QName typeName;
     private int ranks;
-    private final List<Integer> dimensions = new ArrayList<Integer>();
+    private final List<Integer> dimensions = new ArrayList<>();
     private int offset;
 
     public ArrayTypeInfo(QName typeName, int ranks, Integer... dimensions) {
@@ -70,7 +70,7 @@ public class ArrayTypeInfo {
                 typeName = new QName(namespace, typeName.getLocalPart(), typeName.getPrefix());
             }
         }
-        
+
         if (tm != null) {
             type = tm.getType(typeName);
 
@@ -98,10 +98,10 @@ public class ArrayTypeInfo {
         }
 
         // arrayTypeValue = atype , asize ;
-        // atype          = QName , [ rank ] ;
-        // rank           = "[" , { "," } , "]" ;
-        // asize          = "[" , length , { ","  length} , "]" ;
-        // length         = DIGIT , { DIGIT } ;
+        // atype = QName , [ rank ] ;
+        // rank = "[" , { "," } , "]" ;
+        // asize = "[" , length , { ","  length} , "]" ;
+        // length = DIGIT , { DIGIT } ;
         //
         // x:foo[,,,][1,2,3,4]
 
@@ -113,7 +113,7 @@ public class ArrayTypeInfo {
             throw new DatabindingException("Invalid ArrayType value " + arrayTypeValue);
         }
         if (tokens.get(1).equals(":")) {
-            typeName = 
+            typeName =
                 new QName(namespaceContext.getNamespaceURI(tokens.get(0)), tokens.get(2), tokens.get(0));
             tokens = tokens.subList(3, tokens.size());
         } else {
@@ -222,7 +222,7 @@ public class ArrayTypeInfo {
 
     public String toString() {
         StringBuilder string = new StringBuilder();
-        
+
         // no prefix handed to us by someone else ...
         if ("".equals(typeName.getPrefix()) && !"".equals(typeName.getNamespaceURI())) {
             throw new RuntimeException("No prefix provided in QName for " + typeName.getNamespaceURI());

@@ -25,7 +25,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class JMSServer extends AbstractBusTestServerBase {
 
     ClassPathXmlApplicationContext context;
-    
+
     protected void run()  {
         context = new ClassPathXmlApplicationContext("org/apache/cxf/systest/jaxrs/jms/jms_server_config.xml");
         context.start();
@@ -34,7 +34,7 @@ public class JMSServer extends AbstractBusTestServerBase {
     public void tearDown() {
         context.close();
     }
-    
+
     public static void main(String[] args) {
         try {
             BrokerService broker = new BrokerService();

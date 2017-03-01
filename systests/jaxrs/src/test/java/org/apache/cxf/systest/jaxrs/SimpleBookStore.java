@@ -27,20 +27,20 @@ import javax.ws.rs.Produces;
 
 @Path("/simplebooks")
 public class SimpleBookStore {
-    
+
     @GET
     @Path("simple")
     @Produces("application/xml")
     public Book getSimpleBook() {
         return new Book("444", 444L);
     }
-    
+
     @GET
     @Path("{id}")
     @Produces("application/xml")
     public Book getSimpleBookById(@PathParam("id") Long id) {
         return new Book(id.toString(), id);
     }
-}   
+}
 
 

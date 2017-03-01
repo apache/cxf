@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import java.security.MessageDigest;
 import java.security.spec.AlgorithmParameterSpec;
-import java.util.Arrays;
 
 import javax.crypto.spec.IvParameterSpec;
 
@@ -47,20 +47,20 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
     }
     protected void validateAuthenticationTag(JweDecryptionInput jweDecryptionInput, byte[] theCek) {
         byte[] actualAuthTag = jweDecryptionInput.getAuthTag();
-        
-        final AesCbcHmacJweEncryption.MacState macState = 
-            AesCbcHmacJweEncryption.getInitializedMacState(theCek, 
+
+        final AesCbcHmacJweEncryption.MacState macState =
+            AesCbcHmacJweEncryption.getInitializedMacState(theCek,
                                                            jweDecryptionInput.getInitVector(),
                                                            jweDecryptionInput.getAad(),
                                                            jweDecryptionInput.getJweHeaders(),
                                                            jweDecryptionInput.getDecodedJsonHeaders());
         macState.mac.update(jweDecryptionInput.getEncryptedContent());
         byte[] expectedAuthTag = AesCbcHmacJweEncryption.signAndGetTag(macState);
-        if (!Arrays.equals(actualAuthTag, expectedAuthTag)) {
+        if (!MessageDigest.isEqual(actualAuthTag, expectedAuthTag)) {
             LOG.warning("Invalid authentication tag");
             throw new JweException(JweException.Error.CONTENT_DECRYPTION_FAILURE);
         }
-        
+
     }
     private static class AesCbcContentDecryptionAlgorithm extends AbstractContentEncryptionCipherProperties
         implements ContentDecryptionProvider {
@@ -81,7 +81,7 @@ public class AesCbcHmacJweDecryption extends JweDecryption {
         }
     }
     private String validateCekAlgorithm(String cekAlgo) {
-        if (!AlgorithmUtils.isAesCbcHmac(cekAlgo) 
+        if (!AlgorithmUtils.isAesCbcHmac(cekAlgo)
             || supportedAlgo != null && !supportedAlgo.equals(cekAlgo)) {
             LOG.warning("Invalid content encryption algorithm");
             throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);

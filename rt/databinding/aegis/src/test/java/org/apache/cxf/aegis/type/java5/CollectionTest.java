@@ -174,7 +174,7 @@ public class CollectionTest extends AbstractAegisTest {
 
     @Test
     public void testCollectionServiceWSDL() throws Exception {
-        
+
         createService(CollectionServiceInterface.class, new CollectionService(), null);
 
         Document wsdl = getWSDLDocument("CollectionServiceInterface");
@@ -182,7 +182,7 @@ public class CollectionTest extends AbstractAegisTest {
     }
 
     @Test
-    public void testUnannotatedStrings() throws Exception {        
+    public void testUnannotatedStrings() throws Exception {
         createService(CollectionServiceInterface.class, new CollectionService(), null);
 
         Document doc = getWSDLDocument("CollectionServiceInterface");
@@ -192,7 +192,7 @@ public class CollectionTest extends AbstractAegisTest {
                     + "/xsd:sequence/xsd:element[@type='tns:ArrayOfString']",
                     doc);
     }
-    
+
     @Test
     public void testDoubleList() throws Exception {
         createService(CollectionServiceInterface.class, new CollectionService(), null);
@@ -201,9 +201,9 @@ public class CollectionTest extends AbstractAegisTest {
                     "//xsd:complexType[@name='ArrayOfDouble']"
                     + "/xsd:sequence/xsd:element[@type='xsd:double']",
                     doc);
-        
+
     }
-    
+
     /**
      * CXF-1833 complained of a bizarre schema when @@WebParaming a parameter of List<String>. This regression
      * test captures the fact that we don't, in fact, have this problem with correct use of JAX-WS.
@@ -217,12 +217,12 @@ public class CollectionTest extends AbstractAegisTest {
         assertInvalid("//xsd:schema[@targetNamespace='http://util.java']",
                       doc);
     }
-    
 
-    
+
+
     @Test
     public void testNestedMapType() throws Exception {
-        Method m = CollectionService.class.getMethod("mapOfMapWithStringAndPojo", 
+        Method m = CollectionService.class.getMethod("mapOfMapWithStringAndPojo",
                                                      new Class[] {Map.class});
         AegisType type = creator.createType(m, 0);
         tm.register(type);

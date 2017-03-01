@@ -39,22 +39,22 @@ import org.junit.Test;
 public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
     public static final String CB_PORT = allocatePort(CallbackClientServerTest.class);
-    
-    private static final QName SERVICE_NAME 
+
+    private static final QName SERVICE_NAME
         = new QName("http://apache.org/nested_callback", "SOAPService");
-    private static final QName SERVICE_NAME_CALLBACK 
+    private static final QName SERVICE_NAME_CALLBACK
         = new QName("http://apache.org/nested_callback", "CallbackService");
 
-    private static final QName PORT_NAME 
+    private static final QName PORT_NAME
         = new QName("http://apache.org/nested_callback", "SOAPPort");
 
-    private static final QName PORT_NAME_CALLBACK 
+    private static final QName PORT_NAME_CALLBACK
         = new QName("http://apache.org/nested_callback", "CallbackPort");
-    
+
     private static final QName PORT_TYPE_CALLBACK
         = new QName("http://apache.org/nested_callback", "CallbackPortType");
-    
-    
+
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
@@ -63,40 +63,40 @@ public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testCallback() throws Exception {
 
-                    
+
         Object implementor = new CallbackImpl();
         String address = "http://localhost:" + CB_PORT + "/CallbackContext/NestedCallbackPort";
         Endpoint.publish(address, implementor);
-    
+
         URL wsdlURL = getClass().getResource("/wsdl/nested_callback.wsdl");
-    
+
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         ServerPortType port = ss.getPort(PORT_NAME, ServerPortType.class);
         updateAddressPort(port, PORT);
-   
+
         EndpointReferenceType ref = null;
         try {
-            ref = EndpointReferenceUtils.getEndpointReference(wsdlURL, 
-                                                              SERVICE_NAME_CALLBACK, 
+            ref = EndpointReferenceUtils.getEndpointReference(wsdlURL,
+                                                              SERVICE_NAME_CALLBACK,
                                                               PORT_NAME_CALLBACK.getLocalPart());
             EndpointReferenceUtils.setInterfaceName(ref, PORT_TYPE_CALLBACK);
             EndpointReferenceUtils.setAddress(ref, address);
         } catch (Exception e) {
             e.printStackTrace();
         }
-    
+
         NestedCallback callbackObject = new NestedCallback();
 
         Source source = EndpointReferenceUtils.convertToXML(ref);
-        W3CEndpointReference  w3cEpr = new W3CEndpointReference(source);
-        
-        
+        W3CEndpointReference w3cEpr = new W3CEndpointReference(source);
+
+
         callbackObject.setCallback(w3cEpr);
         String resp = port.registerCallback(callbackObject);
 
         assertEquals("registerCallback called", resp);
-            
+
     }
-    
-    
+
+
 }

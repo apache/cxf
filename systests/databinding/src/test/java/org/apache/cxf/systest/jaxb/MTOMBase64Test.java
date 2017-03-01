@@ -31,9 +31,9 @@ import javax.xml.ws.soap.MTOM;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.annotations.Logging;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -43,7 +43,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class MTOMBase64Test extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(MTOMTest.class);
@@ -55,12 +55,12 @@ public class MTOMBase64Test extends AbstractBusClientServerTestBase {
 
         public ObjectWithHashMapData() {
         }
-        
+
         @XmlJavaTypeAdapter(HashMapAdapter.class)
         public Map<String, byte[]> getKeyData() {
             return keyData;
         }
-        
+
         public void setKeyData(Map<String, byte[]> d) {
             keyData = d;
         }
@@ -73,7 +73,7 @@ public class MTOMBase64Test extends AbstractBusClientServerTestBase {
             this.name = name;
         }
     }
-    
+
     @Logging(pretty = true)
     @WebService
     @MTOM(threshold = 1)
@@ -101,9 +101,9 @@ public class MTOMBase64Test extends AbstractBusClientServerTestBase {
                 bytes[y] = (byte)z;
             }
             return bytes;
-        }        
+        }
     }
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
             EndpointImpl endpointImpl = (EndpointImpl)Endpoint.publish(ADDRESS, new MTOMServer());
@@ -125,12 +125,12 @@ public class MTOMBase64Test extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
-       
+
+
     @Test
     public void testMTOMInHashMapWithBase64() throws Exception {
         Service service = Service.create(new QName("http://foo", "bar"));
-        service.addPort(new QName("http://foo", "bar"), SOAPBinding.SOAP11HTTP_BINDING, 
+        service.addPort(new QName("http://foo", "bar"), SOAPBinding.SOAP11HTTP_BINDING,
                         ADDRESS);
         MTOMService port = service.getPort(new QName("http://foo", "bar"),
                                            MTOMService.class);

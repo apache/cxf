@@ -36,13 +36,13 @@ public class JAXRSServletFilterTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServerServletFilter.class, true));
         createStaticBus();
     }
-    
-    
+
+
     @Test
     public void testServletConfigInitParam() throws Exception {
-        
+
         String endpointAddress =
-            "http://localhost:" + PORT + "/webapp/filter/resources/servlet/config/query?name=a"; 
+            "http://localhost:" + PORT + "/webapp/filter/resources/servlet/config/query?name=a";
         WebClient wc = WebClient.create(endpointAddress);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(1000000L);
         wc.accept("text/plain");

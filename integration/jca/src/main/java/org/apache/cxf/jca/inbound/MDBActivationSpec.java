@@ -25,7 +25,7 @@ import javax.resource.spi.ResourceAdapter;
 
 /**
  * MDBActivationSpec is an {@link javax.resource.spi.ActivationSpec} that
- * activates a CXF service endpoint facade.  All resource locations are 
+ * activates a CXF service endpoint facade.  All resource locations are
  * relative to the message driven bean jar.
  *
  */
@@ -40,18 +40,18 @@ public class MDBActivationSpec implements ActivationSpec {
     private String endpointName;
     private String serviceName;
     private String displayName;
-    
+
     /**
-     * Gets the transport address used by 
+     * Gets the transport address used by
      * {@link org.apache.cxf.frontend.ServerFactoryBean}.
-     * 
+     *
      * @return the address
      */
     public String getAddress() {
         return address;
     }
 
-    /**      
+    /**
      * @return the busConfigLocation
      */
     public String getBusConfigLocation() {
@@ -66,7 +66,7 @@ public class MDBActivationSpec implements ActivationSpec {
     }
 
     /**
-     *  
+     *
      * @return the endpointName
      */
     public String getEndpointName() {
@@ -79,7 +79,7 @@ public class MDBActivationSpec implements ActivationSpec {
 
     /**
      * Comma separated schema locations
-     * 
+     *
      * @return the schemaLocations
      */
     public String getSchemaLocations() {
@@ -88,10 +88,10 @@ public class MDBActivationSpec implements ActivationSpec {
 
 
     /**
-     * Gets the service endpoint interface classname.  
-     * 
+     * Gets the service endpoint interface classname.
+     *
      * The class should be available in the Message Driven Bean jar.
-     * 
+     *
      * @return the serviceInterfaceClass
      */
     public String getServiceInterfaceClass() {
@@ -107,7 +107,7 @@ public class MDBActivationSpec implements ActivationSpec {
 
 
     /**
-     * 
+     *
      * @return the wsdlLocation
      */
     public String getWsdlLocation() {
@@ -116,9 +116,9 @@ public class MDBActivationSpec implements ActivationSpec {
 
 
     /**
-     * Sets the transport address used by 
+     * Sets the transport address used by
      * {@link org.apache.cxf.frontend.ServerFactoryBean}.
-     * 
+     *
      * @param address the address to set
      */
     public void setAddress(String address) {
@@ -127,7 +127,7 @@ public class MDBActivationSpec implements ActivationSpec {
 
 
     /**
-     *      
+     *
      * @param busConfigLocation the busConfigLocation to set
      */
     public void setBusConfigLocation(String busConfigLocation) {
@@ -138,7 +138,7 @@ public class MDBActivationSpec implements ActivationSpec {
     /**
      * A unique name that is readable to human and it is to
      * identify an inbound endpoint within a application server.
-     * 
+     *
      * @param displayName the displayName to set
      */
     public void setDisplayName(String displayName) {
@@ -158,7 +158,7 @@ public class MDBActivationSpec implements ActivationSpec {
 
     /**
      * Comma separated schema locations
-     * 
+     *
      * @param schemaLocations the schemaLocations to set
      */
     public void setSchemaLocations(String schemaLocations) {
@@ -181,7 +181,7 @@ public class MDBActivationSpec implements ActivationSpec {
 
 
     /**
-     * 
+     *
      * @param wsdlLocation the wsdlLocation to set
      */
     public void setWsdlLocation(String wsdlLocation) {

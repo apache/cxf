@@ -38,5 +38,5 @@ public class DistributedClaims {
     public void setClaimSources(Map<String, DistributedClaimSource> claimSources) {
         this.claimSources = claimSources;
     }
-       
+
 }

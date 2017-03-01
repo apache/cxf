@@ -27,7 +27,7 @@ public interface ReferenceConstants {
     String WSADDRESSING_PREFIX = "wsa";
     String WSADDRESSING_LOCATION = "http://www.w3.org/2005/08/addressing/ws-addr.xsd";
     String WSADDRESSING_LOCAL_NAME = "EndpointReferenceType";
-    QName  WSADDRESSING_TYPE = new QName(WSADDRESSING_NAMESPACE, WSADDRESSING_LOCAL_NAME);
+    QName WSADDRESSING_TYPE = new QName(WSADDRESSING_NAMESPACE, WSADDRESSING_LOCAL_NAME);
 
     String getValue(String value);
 }

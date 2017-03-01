@@ -31,7 +31,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 public final class StatsServer {
     private StatsServer() {
     }
-    
+
     public static void main(final String[] args) throws Exception {
         final Server server = new Server(8686);
 
@@ -54,7 +54,7 @@ public final class StatsServer {
         HandlerList handlers = new HandlerList();
         handlers.addHandler(staticContext);
         handlers.addHandler(context);
-        
+
         server.setHandler(handlers);
         server.start();
         server.join();

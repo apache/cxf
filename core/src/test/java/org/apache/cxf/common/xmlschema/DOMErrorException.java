@@ -22,12 +22,12 @@ package org.apache.cxf.common.xmlschema;
 import org.w3c.dom.DOMError;
 
 /**
- * 
+ *
  */
 public class DOMErrorException extends RuntimeException {
     private static final long serialVersionUID = -4350285749042450625L;
     private DOMError error;
-    
+
     public DOMErrorException(DOMError error) {
         this.error = error;
     }

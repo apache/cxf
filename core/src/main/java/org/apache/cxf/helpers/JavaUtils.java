@@ -35,7 +35,7 @@ public final class JavaUtils {
      * literal values, but for the purposes of this array, they can be treated
      * as literals.
      */
-    private static final Set<String> KEYWORDS = new HashSet<String>(Arrays.asList(
+    private static final Set<String> KEYWORDS = new HashSet<>(Arrays.asList(
         "abstract", "assert", "boolean", "break", "byte", "case", "catch",
         "char", "class", "const", "continue", "default", "do", "double",
         "else", "enum", "extends", "false", "final", "finally", "float", "for", "goto",
@@ -48,14 +48,14 @@ public final class JavaUtils {
 
     private JavaUtils() {
     }
-    
+
     /**
      * checks if the input string is a valid java keyword.
-     * 
+     *
      * @return boolean true/false
      */
     public static boolean isJavaKeyword(String keyword) {
-        return KEYWORDS.contains(keyword); 
+        return KEYWORDS.contains(keyword);
     }
 
     /**

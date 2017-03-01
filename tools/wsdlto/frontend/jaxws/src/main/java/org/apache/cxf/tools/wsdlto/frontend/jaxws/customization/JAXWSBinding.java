@@ -45,11 +45,11 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
     private String packageName;
 
     private String methodName;
-    
+
     private String methodJavaDoc;
-    
+
     private String packageJavaDoc;
-    
+
     private String classJavaDoc;
 
     private List<JAXWSParameter> jaxwsPara;
@@ -128,13 +128,13 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
 
     public void addJaxwsPara(JAXWSParameter para) {
         if (jaxwsPara == null) {
-            jaxwsPara = new ArrayList<JAXWSParameter>();
+            jaxwsPara = new ArrayList<>();
         }
         jaxwsPara.add(para);
     }
 
     public void setJaxwsParas(List<JAXWSParameter> p) {
-        jaxwsPara = new ArrayList<JAXWSParameter>(p);
+        jaxwsPara = new ArrayList<>(p);
     }
     public List<JAXWSParameter> getJaxwsParas() {
         return jaxwsPara;
@@ -156,28 +156,28 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
     public String getMethodName() {
         return this.methodName;
     }
-    
+
     public void setMethodJavaDoc(String doc) {
         methodJavaDoc = doc;
     }
-    
-    public String getMethodJavaDoc() {   
+
+    public String getMethodJavaDoc() {
         return (methodJavaDoc != null) ? methodJavaDoc : "";
     }
-    
+
     public void setPackageJavaDoc(String doc) {
         packageJavaDoc = doc;
     }
-    
-    public String getPackageJavaDoc() {   
+
+    public String getPackageJavaDoc() {
         return (packageJavaDoc != null) ? packageJavaDoc : "";
     }
-    
+
     public void setClassJavaDoc(String doc) {
         classJavaDoc = doc;
     }
-    
-    public String getClassJavaDoc() {   
+
+    public String getClassJavaDoc() {
         return (classJavaDoc != null) ? classJavaDoc : "";
     }
 }

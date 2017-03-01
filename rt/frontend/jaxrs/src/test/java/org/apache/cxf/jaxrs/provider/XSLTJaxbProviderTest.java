@@ -51,49 +51,49 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class XSLTJaxbProviderTest extends Assert {
-    
+
     private static final String TEMPLATE_LOCATION = "classpath:/org/apache/cxf/jaxrs/provider/template.xsl";
     private static final String BOOK_XML = "<Book><id>123</id><name>TheBook</name></Book>";
-    
-    
+
+
     @Test
     public void testIsWriteable() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
         provider.setOutTemplate(TEMPLATE_LOCATION);
         provider.isWriteable(Book.class, Book.class, null, MediaType.APPLICATION_XML_TYPE);
     }
-    
+
     @Test
     public void testIsWriteableWithSetClasses() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
         provider.setOutTemplate(TEMPLATE_LOCATION);
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         names.add(Book.class.getName());
         provider.setOutClassNames(names);
         provider.isWriteable(Book.class, Book.class, null, MediaType.APPLICATION_XML_TYPE);
     }
-    
+
     @Test
     public void testNotWriteableWithSetClasses() throws Exception {
         XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<SuperBook>();
         provider.setOutTemplate(TEMPLATE_LOCATION);
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         names.add(Book.class.getName());
         provider.setOutClassNames(names);
         provider.isWriteable(SuperBook.class, SuperBook.class, null, MediaType.APPLICATION_XML_TYPE);
     }
-    
+
     @Test
     public void testIsWriteableWithSetClassesAndJaxbOnly() throws Exception {
         XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<SuperBook>();
         provider.setSupportJaxbOnly(true);
         provider.setOutTemplate(TEMPLATE_LOCATION);
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         names.add(Book.class.getName());
         provider.setOutClassNames(names);
         provider.isWriteable(SuperBook.class, SuperBook.class, null, MediaType.APPLICATION_XML_TYPE);
     }
-    
+
     @Test
     public void testWrite() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
@@ -110,7 +110,7 @@ public class XSLTJaxbProviderTest extends Assert {
         b.setName("TheBook2");
         assertEquals("Transformation is bad", b, b2);
     }
-    
+
     @Test
     public void testWriteWithAnnotation() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
@@ -119,7 +119,7 @@ public class XSLTJaxbProviderTest extends Assert {
         b.setId(123L);
         b.setName("TheBook");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        
+
         Annotation[] anns = Root.class.getMethod("getBook").getAnnotations();
         assertTrue(provider.isWriteable(Book.class, Book.class, anns, MediaType.TEXT_XML_TYPE));
         provider.writeTo(b, Book.class, Book.class, anns,
@@ -129,7 +129,7 @@ public class XSLTJaxbProviderTest extends Assert {
         b.setName("TheBook2");
         assertEquals("Transformation is bad", b, b2);
     }
-    
+
     @Test
     public void testWriteToStreamWriter() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>() {
@@ -151,12 +151,12 @@ public class XSLTJaxbProviderTest extends Assert {
         b.setName("TheBook2");
         assertEquals("Transformation is bad", b, b2);
     }
-    
+
     @Test
     public void testWriteWithoutTemplate() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
         provider.setSupportJaxbOnly(true);
-        
+
         Book b = new Book();
         b.setId(123L);
         b.setName("TheBook");
@@ -167,50 +167,50 @@ public class XSLTJaxbProviderTest extends Assert {
         Book b2 = (Book)um.unmarshal(new StringReader(bos.toString()));
         assertEquals(b, b2);
     }
-    
+
     @Test
     public void testIsReadable() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
         provider.setInTemplate(TEMPLATE_LOCATION);
         provider.isReadable(Book.class, Book.class, null, MediaType.APPLICATION_XML_TYPE);
     }
-    
+
     @Test
     public void testIsReadableWithSetClasses() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
         provider.setInTemplate(TEMPLATE_LOCATION);
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         names.add(Book.class.getName());
         provider.setInClassNames(names);
         provider.isReadable(Book.class, Book.class, null, MediaType.APPLICATION_XML_TYPE);
     }
-    
+
     @Test
     public void testNotReadableWithSetClasses() throws Exception {
         XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<SuperBook>();
         provider.setInTemplate(TEMPLATE_LOCATION);
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         names.add(Book.class.getName());
         provider.setInClassNames(names);
         provider.isReadable(SuperBook.class, SuperBook.class, null, MediaType.APPLICATION_XML_TYPE);
     }
-    
+
     @Test
     public void testIsReadableWithSetClassesAndJaxbOnly() throws Exception {
         XSLTJaxbProvider<SuperBook> provider = new XSLTJaxbProvider<SuperBook>();
         provider.setSupportJaxbOnly(true);
         provider.setInTemplate(TEMPLATE_LOCATION);
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         names.add(Book.class.getName());
         provider.setInClassNames(names);
         provider.isReadable(SuperBook.class, SuperBook.class, null, MediaType.APPLICATION_XML_TYPE);
     }
-    
+
     @Test
     public void testRead() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
         provider.setInTemplate(TEMPLATE_LOCATION);
-        
+
         Book b = new Book();
         b.setId(123L);
         b.setName("TheBook");
@@ -220,7 +220,7 @@ public class XSLTJaxbProviderTest extends Assert {
         b.setName("TheBook2");
         assertEquals("Transformation is bad", b, b2);
     }
-    
+
     @Test
     public void testReadFromStreamReader() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>() {
@@ -230,7 +230,7 @@ public class XSLTJaxbProviderTest extends Assert {
             }
         };
         provider.setInTemplate(TEMPLATE_LOCATION);
-        
+
         Book b = new Book();
         b.setId(123L);
         b.setName("TheBook");
@@ -240,12 +240,12 @@ public class XSLTJaxbProviderTest extends Assert {
         b.setName("TheBook2");
         assertEquals("Transformation is bad", b, b2);
     }
-    
+
     @Test
     public void testReadWithoutTemplate() throws Exception {
         XSLTJaxbProvider<Book> provider = new XSLTJaxbProvider<Book>();
         provider.setSupportJaxbOnly(true);
-        
+
         Book b = new Book();
         b.setId(123L);
         b.setName("TheBook");
@@ -254,7 +254,7 @@ public class XSLTJaxbProviderTest extends Assert {
                           new ByteArrayInputStream(BOOK_XML.getBytes()));
         assertEquals("Transformation is bad", b, b2);
     }
-    
+
     private Message createMessage() {
         ProviderFactory factory = ServerProviderFactory.getInstance();
         Message m = new MessageImpl();
@@ -278,7 +278,7 @@ public class XSLTJaxbProviderTest extends Assert {
         e.put(Endpoint.class, endpoint);
         return m;
     }
-    
+
     public static class Root {
         @GET
         @XSLTTransform(TEMPLATE_LOCATION)

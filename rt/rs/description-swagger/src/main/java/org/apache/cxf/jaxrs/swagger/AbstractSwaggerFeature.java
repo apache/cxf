@@ -32,7 +32,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 public abstract class AbstractSwaggerFeature extends AbstractFeature {
 
     private static final boolean SWAGGER_JAXRS_AVAILABLE;
-    
+
     static {
         SWAGGER_JAXRS_AVAILABLE = isSwaggerJaxRsAvailable();
     }
@@ -51,16 +51,16 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
     private String licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.html";
     private String termsOfServiceUrl;
     private String filterClass;
-    
+
     private static boolean isSwaggerJaxRsAvailable() {
         try {
             Class.forName("io.swagger.jaxrs.DefaultParameterExtension");
             return true;
         } catch (Throwable ex) {
             return false;
-        }    
+        }
     }
-    
+
     @Override
     public void initialize(Server server, Bus bus) {
         if (!activateOnlyIfJaxrsSupported || SWAGGER_JAXRS_AVAILABLE) {
@@ -81,10 +81,10 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
         if (!StringUtils.isEmpty(getResourcePackage())) {
             return;
         }
-        JAXRSServiceFactoryBean serviceFactoryBean = 
+        JAXRSServiceFactoryBean serviceFactoryBean =
             (JAXRSServiceFactoryBean)server.getEndpoint().get(JAXRSServiceFactoryBean.class.getName());
         List<ClassResourceInfo> resourceInfos = serviceFactoryBean.getClassResourceInfo();
-        
+
         if (resourceInfos.size() == 1) {
             setResourcePackage(resourceInfos.get(0).getServiceClass().getPackage().getName());
         } else {
@@ -98,7 +98,7 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
             }
         }
     }
-    
+
     protected void calculateDefaultBasePath(Server server) {
         if (getBasePath() == null || getBasePath().length() == 0) {
             String address = server.getEndpoint().getEndpointInfo().getAddress();
@@ -187,5 +187,5 @@ public abstract class AbstractSwaggerFeature extends AbstractFeature {
     public void setActivateOnlyIfJaxrsSupported(boolean activateOnlyIfJaxrsSupported) {
         this.activateOnlyIfJaxrsSupported = activateOnlyIfJaxrsSupported;
     }
-    
+
 }

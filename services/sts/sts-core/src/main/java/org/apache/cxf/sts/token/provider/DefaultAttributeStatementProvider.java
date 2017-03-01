@@ -28,7 +28,7 @@ import org.apache.wss4j.dom.WSConstants;
 
 /**
  * A default AttributeStatementProvider implementation. It simply creates a default attribute with
- * value "authenticated". 
+ * value "authenticated".
  */
 public class DefaultAttributeStatementProvider implements AttributeStatementProvider {
 
@@ -43,12 +43,12 @@ public class DefaultAttributeStatementProvider implements AttributeStatementProv
         String tokenType = tokenRequirements.getTokenType();
         AttributeBean attributeBean = createDefaultAttribute(tokenType);
         attributeList.add(attributeBean);
-        
+
         attrBean.setSamlAttributes(attributeList);
-        
+
         return attrBean;
     }
-    
+
     /**
      * Create a default attribute
      */
@@ -63,9 +63,9 @@ public class DefaultAttributeStatementProvider implements AttributeStatementProv
             attributeBean.setQualifiedName("token-requestor");
             attributeBean.setNameFormat("http://cxf.apache.org/sts");
         }
-        
+
         attributeBean.addAttributeValue("authenticated");
-        
+
         return attributeBean;
     }
 

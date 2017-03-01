@@ -76,13 +76,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
     static EmbeddedJMSBrokerLauncher broker;
-    
+
     java.io.Closeable closeable;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         broker = new EmbeddedJMSBrokerLauncher();
@@ -99,7 +99,7 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
             closeable = null;
         }
     }
-    
+
     private void oneWayTest(TestCaseType testcase, JMSSimplePortType port) throws Exception {
         closeable = (java.io.Closeable)port;
         InvocationHandler handler = Proxy.getInvocationHandler(port);
@@ -259,7 +259,7 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         requestHeader.setJMSDeliveryMode(DeliveryMode.NON_PERSISTENT);
         requestHeader.setTimeToLive(10800000);
         requestHeader.setJMSPriority(3);
-        
+
         // FIXME had to change this
         requestHeader.setJMSReplyTo("dynamicQueues/replyqueue00091");
 
@@ -330,46 +330,46 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
             assertTrue(e.getMessage().contains("Unrecognized BindingVersion"));
         }
     }
-    
+
     @Test
     public void test1002() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1002");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
-    
+
     @Test
     public void test1003() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1003");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
-    
+
     @Test
     public void test1004() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1004");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
-    
+
     @Test
     public void test1006() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1006");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
-    
+
     @Test
     public void test1007() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1007");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
-    
+
     @Test
     public void test1008() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1008");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
 
@@ -404,33 +404,33 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
             assertTrue(e.getMessage().contains("Unrecognized BindingVersion"));
         }
     }
-    
+
     @Test
     public void test1102() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1102");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
-    
+
     @Test
     public void test1103() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1103");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
-    
+
     @Test
     public void test1104() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1104");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
-    
+
     @Test
     public void test1105() throws Exception {
- 
+
         TestCaseType testcase = JMSTestUtil.getTestCase("test1105");
-         
+
         final JMSSimplePortType simplePort = getPort("JMSSimpleService1105", "SimplePort",
                                                      JMSSimpleService1105.class,
                                                      JMSSimplePortType.class);
@@ -443,28 +443,28 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
             assertTrue(e.getMessage().contains("Mismatched SoapAction"));
         }
     }
-    
+
     @Test
     public void test1106() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1106");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
-    
+
     @Test
     public void test1107() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1107");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
-    
+
     @Test
     public void test1108() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1108");
-        
+
         twoWayTestWithCreateMessage(testcase);
     }
-    
+
     @Test
     public void test1109() throws Exception {
         TestCaseType testcase = JMSTestUtil.getTestCase("test1109");
@@ -480,10 +480,10 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    
-    
-    
-    
+
+
+
+
     public <T1, T2> T2 getPort(String serviceName, String portName, Class<T1> serviceClass,
                                Class<T2> portTypeClass) throws Exception {
         String namespace = "http://cxf.apache.org/jms_simple";
@@ -630,14 +630,14 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
         }
         // todo messagebody
     }
-    
+
     public void twoWayTestWithCreateMessage(final TestCaseType testcase) throws Exception {
         String address = testcase.getAddress();
-        
+
         EndpointInfo endpointInfo = new EndpointInfo();
         endpointInfo.setAddress(JMSTestUtil.getFullAddress(address, broker.getBrokerURL()));
         JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(staticBus, endpointInfo, null);
-        
+
         ResourceCloser closer = new ResourceCloser();
         try {
             Connection connection = closer.register(JMSFactory.createConnection(jmsConfig));
@@ -648,7 +648,7 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
             JMSSender sender = JMSFactory.createJmsSender(jmsConfig, null);
             Message jmsMessage = JMSTestUtil.buildJMSMessageFromTestCase(testcase, session, replyToDestination);
             sender.sendMessage(session, targetDest, jmsMessage);
-            Message replyMessage = JMSUtil.receive(session, replyToDestination, 
+            Message replyMessage = JMSUtil.receive(session, replyToDestination,
                                                    jmsMessage.getJMSMessageID(), 10000, true);
             checkReplyMessage(replyMessage, testcase);
         } catch (JMSException e) {
@@ -660,5 +660,5 @@ public class SOAPJMSTestSuiteTest extends AbstractBusClientServerTestBase {
 
     private void checkReplyMessage(Message replyMessage, TestCaseType testcase) throws JMSException {
         checkJMSProperties(replyMessage, testcase.getResponseMessage());
-    }    
+    }
 }

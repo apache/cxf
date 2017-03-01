@@ -21,7 +21,7 @@ package org.apache.cxf.transport.http;
 import java.util.regex.Pattern;
 
 /**
- * Convert a "nonProxyHosts" formatted String into a usable regular expression usable in {@code Pattern}. 
+ * Convert a "nonProxyHosts" formatted String into a usable regular expression usable in {@code Pattern}.
  */
 public final class PatternBuilder {
 

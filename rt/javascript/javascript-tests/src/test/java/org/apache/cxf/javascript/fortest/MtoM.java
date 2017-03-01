@@ -24,7 +24,7 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
 /**
- * 
+ *
  */
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 @WebService(targetNamespace = "uri:org.apache.cxf.javascript.fortest")

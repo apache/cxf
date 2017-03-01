@@ -37,12 +37,12 @@ public class Base64OutputStream extends FilterOutputStream {
         byte[] bytes = ByteBuffer.allocate(Integer.SIZE / 8).putInt(value).array();
         write(bytes, 0, bytes.length);
     }
-    
+
     @Override
     public void write(byte b[], int off, int len) throws IOException {
         encodeAndWrite(b, off, len, false);
     }
-    
+
     private void encodeAndWrite(byte[] b, int off, int len, boolean finalWrite) throws IOException {
         byte[] theChunk = lastChunk;
         int lenToEncode = len;
@@ -53,16 +53,16 @@ public class Base64OutputStream extends FilterOutputStream {
         } else {
             theChunk = b;
         }
-        int rem = finalWrite ? 0 : lenToEncode % 3; 
+        int rem = finalWrite ? 0 : lenToEncode % 3;
         Base64Utility.encodeAndStream(theChunk, off, lenToEncode - rem, urlSafe, out);
-        
+
         if (rem > 0) {
             lastChunk = newArray(theChunk, lenToEncode - rem, rem);
         } else {
             lastChunk = null;
         }
     }
-    
+
     @Override
     public void flush() throws IOException {
         if (flushed || lastChunk == null) {

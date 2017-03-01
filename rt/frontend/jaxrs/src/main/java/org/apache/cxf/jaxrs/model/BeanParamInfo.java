@@ -30,5 +30,5 @@ public class BeanParamInfo extends BeanResourceInfo {
     public boolean isSingleton() {
         return false;
     }
-    
+
 }

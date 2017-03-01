@@ -31,7 +31,7 @@ import org.apache.cxf.message.Message;
 
 public class StaxDataBindingFeature extends AbstractFeature {
 
-    
+
     @Override
     public void initialize(Client client, Bus bus) {
         removeDatabindingInterceptor(client.getEndpoint().getBinding().getInInterceptors());

@@ -40,15 +40,15 @@ import org.junit.Test;
 
 public class CXF4130Test extends AbstractBusClientServerTestBase {
 
-    public static final String ADDRESS 
+    public static final String ADDRESS
         = "http://localhost:" + TestUtil.getPortNumber(Server.class)
             + "/InBand33MessageServiceProvider/InBandSoapHeaderSoapHttpPort";
-    
+
     public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
             Object implementor = new CXF4130Provider();
-            Endpoint.publish(ADDRESS, implementor);                                 
+            Endpoint.publish(ADDRESS, implementor);
         }
 
         public static void main(String[] args) {
@@ -68,19 +68,19 @@ public class CXF4130Test extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testCxf4130() throws Exception {
         InputStream body = getClass().getResourceAsStream("cxf4130data.txt");
         HttpClient client = new HttpClient();
         PostMethod post = new PostMethod(ADDRESS);
         post.setRequestEntity(new InputStreamRequestEntity(body, "text/xml"));
-        client.executeMethod(post); 
+        client.executeMethod(post);
 
         Document doc = StaxUtils.read(post.getResponseBodyAsStream());
         Element root = doc.getDocumentElement();
         Node child = root.getFirstChild();
-        
+
         boolean foundBody = false;
         while (child != null) {
             if ("Body".equals(child.getLocalName())) {

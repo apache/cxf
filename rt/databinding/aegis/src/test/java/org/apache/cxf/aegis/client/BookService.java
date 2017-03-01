@@ -20,10 +20,10 @@ package org.apache.cxf.aegis.client;
 
 public interface BookService {
     Book[] getBooks();
-    
+
     Book findBook(String isbn);
-    
+
     void addBook(Book book);
-    
+
     void addBooks(Book[] books);
 }

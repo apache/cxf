@@ -59,7 +59,7 @@ public class SoapJmsSpecTest extends AbstractVmJMSTest {
         ep.getFeatures().add(cff);
         ep.publish("jms:queue:test.cxf.jmstransport.queue6");
     }
-    
+
     @Test
     public void testSpecJMS() throws Exception {
         QName serviceName = new QName(SERVICE_NS, "JMSGreeterService");
@@ -152,7 +152,7 @@ public class SoapJmsSpecTest extends AbstractVmJMSTest {
             Assert.assertTrue(responseHdr.isSOAPJMSIsFault());
         }
     }
-    
+
     @Test
     public void testGzip() throws Exception {
         URL wsdl = getWSDLURL(WSDL);
@@ -163,8 +163,8 @@ public class SoapJmsSpecTest extends AbstractVmJMSTest {
         factory.getFeatures().add(cff);
         factory.getFeatures().add(new GZIPFeature());
         factory.setAddress("jms:queue:test.cxf.jmstransport.queue6");
-        JMSGreeterPortType greeter = (JMSGreeterPortType)markForClose(factory.create()); 
-        
+        JMSGreeterPortType greeter = (JMSGreeterPortType)markForClose(factory.create());
+
         for (int idx = 0; idx < 5; idx++) {
 
             greeter.greetMeOneWay("test String");

@@ -33,7 +33,7 @@ import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
 @NoJSR250Annotations
 public final class WSRMP12PolicyLoader implements PolicyInterceptorProviderLoader, AssertionBuilderLoader {
     Bus bus;
-    
+
     public WSRMP12PolicyLoader(Bus b) {
         bus = b;
         registerBuilders();
@@ -44,7 +44,7 @@ public final class WSRMP12PolicyLoader implements PolicyInterceptorProviderLoade
             // that point. If nothing uses WS-RMP 1.2 no warnings/errors will display
         }
     }
-    
+
     public void registerBuilders() {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg == null) {
@@ -52,7 +52,7 @@ public final class WSRMP12PolicyLoader implements PolicyInterceptorProviderLoade
         }
         reg.registerBuilder(new RM12AssertionBuilder());
     }
-    
+
     public void registerProviders() {
         //interceptor provider for the policy
         PolicyInterceptorProviderRegistry reg = bus.getExtension(PolicyInterceptorProviderRegistry.class);

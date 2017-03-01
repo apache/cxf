@@ -45,7 +45,7 @@ public class CommandDocument {
         if (d == null) {
             throw new NullPointerException("CommandDocument cannot be created with a null document");
         }
-        values = new ArrayList<Element>();
+        values = new ArrayList<>();
         this.doc = d;
         NodeList nl = doc.getDocumentElement().getElementsByTagName("option");
 
@@ -82,7 +82,7 @@ public class CommandDocument {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Getting parameters for " + name);
         }
-        List<Object> result = new ArrayList<Object>();
+        List<Object> result = new ArrayList<>();
 
         if (values != null) {
             for (Element el : values) {
@@ -106,7 +106,7 @@ public class CommandDocument {
     }
 
     public String[] getParameterNames() {
-        List<Object> result = new ArrayList<Object>();
+        List<Object> result = new ArrayList<>();
 
         if (values != null) {
             for (Element el : values) {

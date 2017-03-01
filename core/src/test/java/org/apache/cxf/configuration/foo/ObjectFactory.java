@@ -26,18 +26,18 @@ import javax.xml.namespace.QName;
 
 
 /**
- * This object contains factory methods for each 
- * Java content interface and Java element interface 
- * generated in the org.apache.cxf.configuration.foo package. 
- * <p>An ObjectFactory allows you to programatically 
- * construct new instances of the Java representation 
- * for XML content. The Java representation of XML 
- * content can consist of schema derived interfaces 
- * and classes representing the binding of schema 
- * type definitions, element declarations and model 
- * groups.  Factory methods for each of these are 
+ * This object contains factory methods for each
+ * Java content interface and Java element interface
+ * generated in the org.apache.cxf.configuration.foo package.
+ * <p>An ObjectFactory allows you to programatically
+ * construct new instances of the Java representation
+ * for XML content. The Java representation of XML
+ * content can consist of schema derived interfaces
+ * and classes representing the binding of schema
+ * type definitions, element declarations and model
+ * groups.  Factory methods for each of these are
  * provided in this class.
- * 
+ *
  */
 @XmlRegistry
 public class ObjectFactory {
@@ -52,14 +52,14 @@ public class ObjectFactory {
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived
      * classes for package: org.apache.cxf.configuration.foo
-     * 
+     *
      */
     public ObjectFactory() {
     }
 
     /**
      * Create an instance of {@link Address }
-     * 
+     *
      */
     public Address createAddress() {
         return new Address();
@@ -67,7 +67,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Foo }
-     * 
+     *
      */
     public Foo createFoo() {
         return new Foo();
@@ -75,7 +75,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link Point }
-     * 
+     *
      */
     public Point createPoint() {
         return new Point();
@@ -83,7 +83,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Point }{@code >}}
-     * 
+     *
      */
     @XmlElementDecl(namespace = "http://cxf.apache.org/configuration/foo", name = "point")
     public JAXBElement<Point> createPoint(Point value) {
@@ -92,7 +92,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Address }{@code >}}
-     * 
+     *
      */
     @XmlElementDecl(namespace = "http://cxf.apache.org/configuration/foo", name = "address")
     public JAXBElement<Address> createAddress(Address value) {
@@ -101,7 +101,7 @@ public class ObjectFactory {
 
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link Foo }{@code >}}
-     * 
+     *
      */
     @XmlElementDecl(namespace = "http://cxf.apache.org/configuration/foo", name = "foo")
     public JAXBElement<Foo> createFoo(Foo value) {

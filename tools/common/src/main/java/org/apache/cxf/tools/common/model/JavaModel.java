@@ -26,7 +26,7 @@ public class JavaModel {
     private final Map<String, JavaInterface> interfaces;
     private final Map<String, JavaExceptionClass> exceptionClasses;
     private final Map<String, JavaServiceClass> serviceClasses;
-    
+
     private String location;
 
     public JavaModel() {
@@ -47,7 +47,7 @@ public class JavaModel {
     public void addExceptionClass(String name, JavaExceptionClass ex) {
         this.exceptionClasses.put(name, ex);
     }
-    
+
     public Map<String, JavaExceptionClass> getExceptionClasses() {
         return this.exceptionClasses;
     }
@@ -55,7 +55,7 @@ public class JavaModel {
     public void addServiceClass(String name, JavaServiceClass service) {
         this.serviceClasses.put(name, service);
     }
-    
+
     public Map<String, JavaServiceClass> getServiceClasses() {
         return this.serviceClasses;
     }

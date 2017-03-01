@@ -34,7 +34,8 @@ import org.apache.cxf.rt.security.saml.interceptor.ClaimsAuthorizingInterceptor;
 public class ClaimsAuthorizingFilter implements ContainerRequestFilter {
 
     private ClaimsAuthorizingInterceptor interceptor = new ClaimsAuthorizingInterceptor();
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
         try {
@@ -47,10 +48,10 @@ public class ClaimsAuthorizingFilter implements ContainerRequestFilter {
     public void setClaims(Map<String, List<ClaimBean>> claimsMap) {
         interceptor.setClaims(claimsMap);
     }
-    
+
     public void setSecuredObject(Object securedObject) {
         interceptor.setSecuredObject(securedObject);
     }
-    
-    
+
+
 }

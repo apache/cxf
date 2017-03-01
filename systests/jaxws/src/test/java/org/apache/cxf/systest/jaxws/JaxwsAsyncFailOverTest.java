@@ -42,26 +42,26 @@ public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
     static final String PORT2 = allocatePort(ServerNoBodyParts.class, 2);
 
     public static class Server extends AbstractBusTestServerBase {
-        
-        protected void run()  {            
+
+        protected void run()  {
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             javax.xml.ws.Endpoint.publish(address, implementor);
         }
-        
+
 
         public static void main(String[] args) {
-            try { 
-                Server s = new Server(); 
+            try {
+                Server s = new Server();
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.exit(-1);
-            } finally { 
+            } finally {
                 System.out.println("done!");
             }
         }
-        
+
         @WebService(serviceName = "BasicGreeterService",
                     portName = "GreeterPort",
                     endpointInterface = "org.apache.cxf.greeter_control.Greeter",
@@ -69,17 +69,17 @@ public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
                     wsdlLocation = "testutils/greeter_control.wsdl")
         public class GreeterImpl extends AbstractGreeterImpl {
         }
-    }  
- 
+    }
+
 
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-         
+
     @Test
     public void testUseFailOverOnClient() throws Exception {
-        List<String> serviceList = new ArrayList<String>();
+        List<String> serviceList = new ArrayList<>();
         serviceList.add("http://localhost:" + PORT + "/SoapContext/GreeterPort");
 
         RandomStrategy strategy = new RandomStrategy();
@@ -87,7 +87,7 @@ public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
 
         FailoverFeature ff = new FailoverFeature();
         ff.setStrategy(strategy);
-        
+
         // setup the feature by using JAXWS front-end API
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         // set a fake address to kick off the failover feature
@@ -95,7 +95,7 @@ public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
         factory.getFeatures().add(ff);
         factory.setServiceClass(Greeter.class);
         Greeter proxy = factory.create(Greeter.class);
-        
+
         Response<GreetMeResponse>  response = proxy.greetMeAsync("cxf");
         int waitCount = 0;
         while (!response.isDone() && waitCount < 15) {
@@ -103,7 +103,7 @@ public class JaxwsAsyncFailOverTest  extends AbstractBusClientServerTestBase {
             waitCount++;
         }
         assertTrue("Response still not received.", response.isDone());
-        
+
     }
-   
+
 }

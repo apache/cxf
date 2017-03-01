@@ -49,7 +49,7 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WrapperClassInInterceptor.class);
-    
+
     public WrapperClassInInterceptor() {
         super(Phase.POST_LOGICAL);
     }
@@ -57,27 +57,27 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
     public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
         BindingOperationInfo boi = ex.getBindingOperationInfo();
-        if (Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE)) 
+        if (Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE))
             || boi == null) {
             return;
         }
-               
+
         Method method = ex.get(Method.class);
 
         if (method != null && method.getName().endsWith("Async")) {
             Class<?> retType = method.getReturnType();
-            if (retType.getName().equals("java.util.concurrent.Future") 
+            if (retType.getName().equals("java.util.concurrent.Future")
                 || retType.getName().equals("javax.xml.ws.Response")) {
                 return;
             }
-        }        
+        }
 
-        
+
         if (boi.isUnwrappedCapable()) {
             BindingOperationInfo boi2 = boi.getUnwrappedOperation();
             OperationInfo op = boi2.getOperationInfo();
             BindingMessageInfo bmi;
-            
+
             MessageInfo wrappedMessageInfo = message.get(MessageInfo.class);
             MessageInfo messageInfo;
             if (wrappedMessageInfo == boi.getOperationInfo().getInput()) {
@@ -87,7 +87,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                 messageInfo = op.getOutput();
                 bmi = boi2.getOutput();
             }
-            
+
             // Sometimes, an operation can be unwrapped according to WSDLServiceFactory,
             // but not according to JAX-WS. We should unify these at some point, but
             // for now check for the wrapper class.
@@ -98,12 +98,12 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
             message.put(MessageInfo.class, messageInfo);
             message.put(BindingMessageInfo.class, bmi);
             ex.put(BindingOperationInfo.class, boi2);
-            
+
             if (isGET(message)) {
                 LOG.fine("WrapperClassInInterceptor skipped in HTTP GET method");
                 return;
             }
-            
+
             MessagePartInfo wrapperPart = wrappedMessageInfo.getFirstMessagePart();
             Class<?> wrapperClass = wrapperPart.getTypeClass();
             Object wrappedObject = lst.get(wrapperPart.getIndex());
@@ -111,7 +111,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                 || (wrapperClass != null && !wrapperClass.isInstance(wrappedObject))) {
                 return;
             }
-            
+
             WrapperHelper helper = wrapperPart.getProperty("WRAPPER_CLASS", WrapperHelper.class);
             if (helper == null) {
                 Service service = ServiceModelUtil.getService(message.getExchange());
@@ -122,13 +122,13 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                     wrapperPart.setProperty("WRAPPER_CLASS", helper);
                 } else {
                     return;
-                }                
-            }            
-            
+                }
+            }
+
             MessageContentsList newParams;
             try {
                 newParams = new MessageContentsList(helper.getWrapperParts(wrappedObject));
-                
+
                 List<Integer> removes = null;
                 int count = 0;
                 for (MessagePartInfo part : messageInfo.getMessageParts()) {
@@ -140,7 +140,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                         } else if (mpi == null || mpi.getTypeClass() == null) {
                             //header, but not mapped to a param on the method
                             if (removes == null) {
-                                removes = new ArrayList<Integer>();
+                                removes = new ArrayList<>();
                             }
                             removes.add(part.getIndex());
                         }
@@ -158,21 +158,21 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                         }
                     }
                 }
-                
+
             } catch (Exception e) {
                 throw new Fault(e);
             }
-            
+
             message.setContent(List.class, newParams);
         }
     }
-    
-    private WrapperHelper createWrapperHelper(WrapperCapableDatabinding dataBinding, 
+
+    private WrapperHelper createWrapperHelper(WrapperCapableDatabinding dataBinding,
                                               MessageInfo messageInfo,
                                               MessageInfo wrappedMessageInfo,
                                               Class<?> wrapperClass) {
-        List<String> partNames = new ArrayList<String>();
-        List<String> elTypeNames = new ArrayList<String>();
+        List<String> partNames = new ArrayList<>();
+        List<String> elTypeNames = new ArrayList<>();
         List<Class<?>> partClasses = new ArrayList<Class<?>>();
         QName wrapperName = null;
         for (MessagePartInfo p : wrappedMessageInfo.getMessageParts()) {
@@ -180,7 +180,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                 wrapperName = p.getElementQName();
             }
         }
-        
+
         for (MessagePartInfo p : messageInfo.getMessageParts()) {
             if (Boolean.TRUE.equals(p.getProperty(ReflectionServiceFactoryBean.HEADER))) {
                 if (p.getTypeClass() != null) {
@@ -204,7 +204,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                 ensureSize(elTypeNames, idx);
                 ensureSize(partClasses, idx);
                 ensureSize(partNames, idx);
-                
+
                 elTypeNames.set(idx, elementType);
                 partClasses.set(idx, p.getTypeClass());
                 partNames.set(idx, p.getName().getLocalPart());

@@ -48,16 +48,16 @@ public class SourceSequenceTest extends Assert {
     private SourcePolicyType sp;
     private SequenceTerminationPolicyType stp;
     private RetransmissionQueue rq;
-  
+
     @Before
-    public void setUp() {        
+    public void setUp() {
         factory = new ObjectFactory();
         id = factory.createIdentifier();
         id.setValue("seq");
-        
+
         control = EasyMock.createNiceControl();
     }
-    
+
     @After
     public void tearDown() {
         source = null;
@@ -66,33 +66,33 @@ public class SourceSequenceTest extends Assert {
         stp = null;
         rq = null;
     }
-    
+
     void setUpSource() {
-        source = control.createMock(Source.class); 
+        source = control.createMock(Source.class);
         manager = control.createMock(RMManager.class);
         EasyMock.expect(source.getManager()).andReturn(manager).anyTimes();
         rq = control.createMock(RetransmissionQueue.class);
         EasyMock.expect(manager.getRetransmissionQueue()).andReturn(rq).anyTimes();
-        
+
         // default termination policy
-        
-        org.apache.cxf.ws.rm.manager.ObjectFactory cfgFactory = 
+
+        org.apache.cxf.ws.rm.manager.ObjectFactory cfgFactory =
             new org.apache.cxf.ws.rm.manager.ObjectFactory();
         sp = cfgFactory.createSourcePolicyType();
         stp = cfgFactory
-            .createSequenceTerminationPolicyType(); 
+            .createSequenceTerminationPolicyType();
         sp.setSequenceTerminationPolicy(stp);
         EasyMock.expect(manager.getSourcePolicy()).andReturn(sp).anyTimes();
     }
-    
+
     @Test
     public void testConstructors() {
 
         Identifier otherId = factory.createIdentifier();
         otherId.setValue("otherSeq");
-       
+
         SourceSequence seq = null;
-        
+
         seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         assertEquals(id, seq.getIdentifier());
         assertTrue(!seq.isLastMessage());
@@ -102,9 +102,9 @@ public class SourceSequenceTest extends Assert {
         assertEquals(0, seq.getAcknowledgement().getAcknowledgementRange().size());
         assertTrue(!seq.allAcknowledged());
         assertFalse(seq.offeredBy(otherId));
-        
+
         Date expiry = new Date(System.currentTimeMillis() + 3600 * 1000);
-        
+
         seq = new SourceSequence(id, expiry, null, ProtocolVariation.RM10WSA200408);
         assertEquals(id, seq.getIdentifier());
         assertTrue(!seq.isLastMessage());
@@ -114,39 +114,39 @@ public class SourceSequenceTest extends Assert {
         assertEquals(0, seq.getAcknowledgement().getAcknowledgementRange().size());
         assertTrue(!seq.allAcknowledged());
         assertFalse(seq.offeredBy(otherId));
-        
+
         seq = new SourceSequence(id, expiry, otherId, ProtocolVariation.RM10WSA200408);
         assertTrue(seq.offeredBy(otherId));
         assertFalse(seq.offeredBy(id));
     }
-    
+
     @Test
     public void testSetExpires() {
         SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
-        
+
         Expires expires = factory.createExpires();
         seq.setExpires(expires);
-            
+
         assertTrue(!seq.isExpired());
-        
-        Duration d = DatatypeFactory.PT0S;          
-        expires.setValue(d); 
+
+        Duration d = DatatypeFactory.PT0S;
+        expires.setValue(d);
         seq.setExpires(expires);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
             assertTrue(!seq.isExpired());
         }
-        
-        d = DatatypeFactory.createDuration("PT1S");        
+
+        d = DatatypeFactory.createDuration("PT1S");
         expires.setValue(d);
         seq.setExpires(expires);
         assertTrue(!seq.isExpired());
-        
-        d = DatatypeFactory.createDuration("-PT1S");  
+
+        d = DatatypeFactory.createDuration("-PT1S");
         expires.setValue(d);
         seq.setExpires(expires);
-        assertTrue(seq.isExpired());   
+        assertTrue(seq.isExpired());
     }
 
     @Test
@@ -161,19 +161,19 @@ public class SourceSequenceTest extends Assert {
         otherId.setValue("otherSeq");
         otherSeq = new SourceSequence(otherId, ProtocolVariation.RM10WSA200408);
         assertTrue(!seq.equals(otherSeq));
-        assertTrue(seq.hashCode() != otherSeq.hashCode()); 
+        assertTrue(seq.hashCode() != otherSeq.hashCode());
         assertTrue(!seq.equals(this));
     }
-    
+
     @Test
     public void testSetAcknowledged() throws RMException {
         SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         setUpSource();
         seq.setSource(source);
-        
+
         SequenceAcknowledgement ack = seq.getAcknowledgement();
         ack = factory.createSequenceAcknowledgement();
-        SequenceAcknowledgement.AcknowledgementRange r = 
+        SequenceAcknowledgement.AcknowledgementRange r =
             factory.createSequenceAcknowledgementAcknowledgementRange();
         r.setLower(new Long(1));
         r.setUpper(new Long(2));
@@ -188,36 +188,36 @@ public class SourceSequenceTest extends Assert {
         ack.getAcknowledgementRange().add(r);
         rq.purgeAcknowledged(seq);
         EasyMock.expectLastCall();
-        
+
         control.replay();
         seq.setAcknowledged(ack);
         assertSame(ack, seq.getAcknowledgement());
         assertEquals(3, ack.getAcknowledgementRange().size());
-        assertTrue(!seq.isAcknowledged(3));  
+        assertTrue(!seq.isAcknowledged(3));
         assertTrue(seq.isAcknowledged(5));
         control.verify();
-    } 
+    }
 
     @Test
     public void testAllAcknowledged() throws RMException {
-        
+
         SourceSequence seq = new SourceSequence(id, null, null, 4, false,
-                                                ProtocolVariation.RM10WSA200408);        
+                                                ProtocolVariation.RM10WSA200408);
         setUpSource();
         seq.setSource(source);
-        
+
         assertTrue(!seq.allAcknowledged());
         seq.setLastMessage(true);
         assertTrue(!seq.allAcknowledged());
         SequenceAcknowledgement ack = factory.createSequenceAcknowledgement();
-        SequenceAcknowledgement.AcknowledgementRange r = 
+        SequenceAcknowledgement.AcknowledgementRange r =
             factory.createSequenceAcknowledgementAcknowledgementRange();
         r.setLower(new Long(1));
         r.setUpper(new Long(2));
         ack.getAcknowledgementRange().add(r);
         rq.purgeAcknowledged(seq);
         EasyMock.expectLastCall();
-        
+
         control.replay();
         seq.setAcknowledged(ack);
         assertTrue(!seq.allAcknowledged());
@@ -225,41 +225,41 @@ public class SourceSequenceTest extends Assert {
         assertTrue(seq.allAcknowledged());
         control.verify();
     }
-    
+
     @Test
-    public void testNextMessageNumber() throws RMException {     
-        SourceSequence seq = null;        
+    public void testNextMessageNumber() throws RMException {
+        SourceSequence seq = null;
         setUpSource();
         rq.purgeAcknowledged(EasyMock.isA(SourceSequence.class));
         EasyMock.expectLastCall().anyTimes();
         control.replay();
-        
+
         // default termination policy
 
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);  
+        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         assertTrue(!nextMessages(seq, 10));
         control.verify();
-        
+
         // termination policy max length = 1
-        
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408); 
+
+        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         stp.setMaxLength(1);
         assertTrue(nextMessages(seq, 10));
         assertEquals(1, seq.getCurrentMessageNr());
         control.verify();
-        
+
         // termination policy max length = 5
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408); 
+        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         stp.setMaxLength(5);
         assertTrue(!nextMessages(seq, 2));
         control.verify();
-        
+
         // termination policy max range exceeded
-        
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408); 
+
+        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         stp.setMaxLength(0);
         stp.setMaxRanges(3);
@@ -267,79 +267,79 @@ public class SourceSequenceTest extends Assert {
         assertTrue(nextMessages(seq, 10));
         assertEquals(1, seq.getCurrentMessageNr());
         control.verify();
-        
+
         // termination policy max range not exceeded
-        
-        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408); 
+
+        seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         stp.setMaxLength(0);
         stp.setMaxRanges(4);
         acknowledge(seq, 1, 2, 4, 5, 6, 8, 9, 10);
         assertTrue(!nextMessages(seq, 10));
         control.verify();
-        
-        // termination policy max unacknowledged 
+
+        // termination policy max unacknowledged
     }
-    
+
     @Test
     public void testGetEndpointIdentfier() {
         setUpSource();
         String name = "abc";
         EasyMock.expect(source.getName()).andReturn(name);
         control.replay();
-        
+
         SourceSequence seq = new SourceSequence(id, ProtocolVariation.RM10WSA200408);
         seq.setSource(source);
         assertEquals("Unexpected endpoint identifier", name, seq.getEndpointIdentifier());
         control.verify();
     }
-    
+
     @Test
     public void testCheckOfferingSequenceClosed() {
         SourceSequence seq = null;
-        
+
         setUpSource();
- 
+
         RMEndpoint rme = control.createMock(RMEndpoint.class);
         EasyMock.expect(source.getReliableEndpoint()).andReturn(rme).anyTimes();
         Destination destination = control.createMock(Destination.class);
         EasyMock.expect(rme.getDestination()).andReturn(destination).anyTimes();
-        DestinationSequence dseq = control.createMock(DestinationSequence.class); 
+        DestinationSequence dseq = control.createMock(DestinationSequence.class);
         Identifier did = control.createMock(Identifier.class);
         EasyMock.expect(destination.getSequence(did)).andReturn(dseq).anyTimes();
         EasyMock.expect(dseq.getLastMessageNumber()).andReturn(new Long(1)).anyTimes();
         EasyMock.expect(did.getValue()).andReturn("dseq").anyTimes();
-        
+
         control.replay();
-        
-        seq = new SourceSequence(id, null, did, ProtocolVariation.RM10WSA200408);  
-        seq.setSource(source);        
+
+        seq = new SourceSequence(id, null, did, ProtocolVariation.RM10WSA200408);
+        seq.setSource(source);
         seq.nextMessageNumber(did, 1, false);
         assertTrue(seq.isLastMessage());
-        
+
         control.verify();
     }
-   
-    private boolean nextMessages(SourceSequence seq, 
+
+    private boolean nextMessages(SourceSequence seq,
                                  int n) {
         int i = 0;
-        while ((i < n) && !seq.isLastMessage()) {            
+        while ((i < n) && !seq.isLastMessage()) {
             seq.nextMessageNumber();
             i++;
         }
         return seq.isLastMessage();
     }
-    
+
     protected void acknowledge(SourceSequence seq, int... messageNumbers) throws RMException {
         SequenceAcknowledgement ack = factory.createSequenceAcknowledgement();
         int i = 0;
         while (i < messageNumbers.length) {
-            SequenceAcknowledgement.AcknowledgementRange r = 
+            SequenceAcknowledgement.AcknowledgementRange r =
                 factory.createSequenceAcknowledgementAcknowledgementRange();
             Long l = new Long(messageNumbers[i]);
             r.setLower(l);
             i++;
-            
+
             while (i < messageNumbers.length && (messageNumbers[i] - messageNumbers[i - 1]) == 1) {
                 i++;
             }

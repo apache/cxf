@@ -24,10 +24,10 @@ import org.apache.cxf.common.i18n.UncheckedException;
 
 /**
  * RMStoreException is the type of RuntimeException thrown by the RMStore
- * when  encountering problems.
+ * when encountering problems.
  */
 public class RMStoreException extends UncheckedException {
-    
+
     private static final long serialVersionUID = -3463443325216082887L;
 
     public RMStoreException(Message msg, Throwable t) {

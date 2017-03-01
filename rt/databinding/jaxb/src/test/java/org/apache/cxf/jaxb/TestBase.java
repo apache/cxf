@@ -86,7 +86,7 @@ public class TestBase extends Assert {
             .andStubReturn(new ArrayList<Interceptor<? extends Message>>());
         expect(binding.getOutFaultInterceptors())
             .andStubReturn(new ArrayList<Interceptor<? extends Message>>());
-        
+
         bfm.registerBindingFactory("http://schemas.xmlsoap.org/wsdl/soap/", bf);
 
         String ns = "http://apache.org/hello_world_soap_http";

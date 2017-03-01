@@ -31,7 +31,7 @@ public class CatastrophicEventSinkImpl implements CatastrophicEventSink {
 
     private Server server;
 
-    private List<Object> receivedEvents = new ArrayList<Object>();
+    private List<Object> receivedEvents = new ArrayList<>();
 
     public CatastrophicEventSinkImpl(String url) {
         JaxWsServerFactoryBean bean = new JaxWsServerFactoryBean();

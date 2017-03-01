@@ -39,7 +39,7 @@ public class OOBAuthorizationResponse extends AbstractAuthorizationResponse {
         this.userId = userId;
     }
 
-    
+
     public String getClientDescription() {
         return clientDescription;
     }
@@ -48,5 +48,5 @@ public class OOBAuthorizationResponse extends AbstractAuthorizationResponse {
         this.clientDescription = clientDescription;
     }
 
-    
+
 }

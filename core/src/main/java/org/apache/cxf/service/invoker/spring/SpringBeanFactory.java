@@ -26,25 +26,25 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * Factory that will query the Spring ApplicationContext for the 
+ * Factory that will query the Spring ApplicationContext for the
  * appropriate bean for each request.
- * 
- * This can be expensive.  If the bean is "prototype" or similar such that a 
- * new instance is created each time, this could slow things down.  In that 
+ *
+ * This can be expensive.  If the bean is "prototype" or similar such that a
+ * new instance is created each time, this could slow things down.  In that
  * case, it's recommended to use this in conjunction with the PooledFactory
  * to pool the beans or the SessionFactory or similar.
  */
 public class SpringBeanFactory implements Factory, ApplicationContextAware {
     volatile ApplicationContext ctx;
     final String beanName;
-    
+
     public SpringBeanFactory(String name) {
         beanName = name;
     }
     public SpringBeanFactory(Class<?> c, String[] args) {       //NOPMD
         beanName = args[0];
     }
-    
+
     /** {@inheritDoc}*/
     public Object create(Exchange e) throws Throwable {
         if (ctx == null) {

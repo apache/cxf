@@ -37,9 +37,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.jaxws.MessageReplayObserver;
@@ -96,7 +96,7 @@ public class DispatchTest extends AbstractJaxWsTest {
 
     @Test
     public void testDOMSource() throws Exception {
-        ServiceImpl service = 
+        ServiceImpl service =
             new ServiceImpl(getBus(), getClass().getResource("/wsdl/hello_world.wsdl"), serviceName, null);
 
         Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
@@ -146,10 +146,10 @@ public class DispatchTest extends AbstractJaxWsTest {
             //Passed
             return;
         }
-        
+
         fail("SOAPFaultException was not thrown");
     }
-    
+
     @Test
     // CXF-2822
     public void testInterceptorsConfiguration() throws Exception {
@@ -172,13 +172,13 @@ public class DispatchTest extends AbstractJaxWsTest {
 
     @Test
     public void testFindOperationWithSource() throws Exception {
-        ServiceImpl service = 
+        ServiceImpl service =
             new ServiceImpl(getBus(), getClass().getResource("/wsdl/hello_world.wsdl"), serviceName, null);
 
         Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
         disp.getRequestContext().put(Dispatch.ENDPOINT_ADDRESS_PROPERTY, address);
         disp.getRequestContext().put("find.dispatch.operation", Boolean.TRUE);
-        
+
         d.setMessageObserver(new MessageReplayObserver("/org/apache/cxf/jaxws/sayHiResponse.xml"));
 
         BindingOperationVerifier bov = new BindingOperationVerifier();
@@ -194,17 +194,17 @@ public class DispatchTest extends AbstractJaxWsTest {
 
         assertEquals(new QName("http://apache.org/hello_world_soap_http", "sayHi"), boi.getName());
     }
-    
+
     private static class BindingOperationVerifier extends AbstractSoapInterceptor {
         BindingOperationInfo boi;
         BindingOperationVerifier() {
             super(Phase.POST_LOGICAL);
         }
-        
+
         public void handleMessage(SoapMessage message) throws Fault {
             boi = message.getExchange().getBindingOperationInfo();
         }
-        
+
         public BindingOperationInfo getBindingOperationInfo() {
             return boi;
         }

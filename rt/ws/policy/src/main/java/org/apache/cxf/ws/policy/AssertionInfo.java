@@ -23,14 +23,14 @@ import org.apache.neethi.Assertion;
 
 
 /**
- * 
+ *
  */
 public class AssertionInfo {
-    
+
     private boolean asserted;
     private final Assertion assertion;
     private String errorMessage;
-    
+
     public AssertionInfo(Assertion a) {
         assertion = a;
     }
@@ -47,7 +47,7 @@ public class AssertionInfo {
     public String getErrorMessage() {
         return errorMessage;
     }
-    
+
     public Assertion getAssertion() {
         return assertion;
     }

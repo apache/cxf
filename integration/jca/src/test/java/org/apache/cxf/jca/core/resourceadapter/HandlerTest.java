@@ -28,16 +28,16 @@ import org.junit.Test;
 
 
 public class HandlerTest extends Assert {
-    Handler h; 
-    
-    
+    Handler h;
+
+
     @Before
-    public void setUp() throws ClassNotFoundException { 
+    public void setUp() throws ClassNotFoundException {
         h = new Handler();
-    } 
-    
+    }
+
     @Test
-    public void testGetStreamToThisResource() throws Exception { 
+    public void testGetStreamToThisResource() throws Exception {
         String urlpath = HandlerTest.class.getName().replace('.', '/') + ".class";
         String urls = "resourceadapter:" + urlpath;
         URL res = new URL(null, urls, h);
@@ -47,7 +47,7 @@ public class HandlerTest extends Assert {
 
 
     @Test
-    public void testGetStreamToNonExistantResourceThrows() throws Exception { 
+    public void testGetStreamToNonExistantResourceThrows() throws Exception {
         String path = "some gobbledy rubbish/that/does/not/exist";
         String urls = "resourceadapter:" + path;
         URL res = new URL(null, urls, h);
@@ -60,7 +60,7 @@ public class HandlerTest extends Assert {
         }
     }
 
-       
-    
+
+
 }
 

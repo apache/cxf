@@ -34,24 +34,24 @@ import org.apache.wss4j.dom.WSConstants;
  * A Dummy TokenProvider for use in the unit tests. It mocks up a dummy BinarySecurityToken.
  */
 public class DummyTokenProvider implements TokenProvider {
-    
-    public static final String TOKEN_TYPE = 
+
+    public static final String TOKEN_TYPE =
         "http://dummy-token-type.com/dummy";
-    public static final String BASE64_NS = 
+    public static final String BASE64_NS =
         WSConstants.SOAPMESSAGE_NS + "#Base64Binary";
-    
+
     public boolean canHandleToken(String tokenType) {
         return TOKEN_TYPE.equals(tokenType);
     }
-    
+
     public boolean canHandleToken(String tokenType, String realm) {
         return canHandleToken(tokenType);
     }
-    
+
     public TokenProviderResponse createToken(TokenProviderParameters tokenParameters) {
         try {
             Document doc = DOMUtils.createDocument();
-            
+
             // Mock up a dummy BinarySecurityToken
             String id = "BST-1234";
             BinarySecurity bst = new BinarySecurity(doc);
@@ -61,22 +61,22 @@ public class DummyTokenProvider implements TokenProvider {
             bst.setValueType(TOKEN_TYPE);
             bst.setEncodingType(BASE64_NS);
             bst.setToken("12345678".getBytes());
-            
+
             TokenProviderResponse response = new TokenProviderResponse();
             response.setToken(bst.getElement());
             response.setTokenId(id);
-            
+
             if (tokenParameters.isEncryptToken()) {
-                Element el = TokenProviderUtils.encryptToken(bst.getElement(), response.getTokenId(), 
-                                                        tokenParameters.getStsProperties(), 
-                                                        tokenParameters.getEncryptionProperties(), 
+                Element el = TokenProviderUtils.encryptToken(bst.getElement(), response.getTokenId(),
+                                                        tokenParameters.getStsProperties(),
+                                                        tokenParameters.getEncryptionProperties(),
                                                         tokenParameters.getKeyRequirements(),
                                                         tokenParameters.getMessageContext());
                 response.setToken(el);
             } else {
                 response.setToken(bst.getElement());
             }
-            
+
             return response;
         } catch (Exception e) {
             throw new STSException("Can't serialize SAML assertion", e, STSException.REQUEST_FAILED);

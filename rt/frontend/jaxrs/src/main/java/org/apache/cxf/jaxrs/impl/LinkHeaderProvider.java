@@ -34,14 +34,14 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
     private static final String REL = "rel";
     private static final String TYPE = "type";
     private static final String TITLE = "title";
-    
+
     private static final Set<String> KNOWN_PARAMETERS;
     static {
-        KNOWN_PARAMETERS = new HashSet<String>(Arrays.asList(REL, TYPE, TITLE));
+        KNOWN_PARAMETERS = new HashSet<>(Arrays.asList(REL, TYPE, TITLE));
     }
-    
+
     public Link fromString(String value) {
-        
+
         if (value == null) {
             throw new IllegalArgumentException("Link value can not be null");
         }
@@ -53,7 +53,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
         Link.Builder builder = new LinkBuilderImpl();
         builder.uri(value.substring(1, closeIndex).trim());
         if (closeIndex < value.length() - 1) {
-            
+
             String[] tokens = StringUtils.split(value.substring(closeIndex + 1), ";");
             for (String token : tokens) {
                 String theToken = token.trim();
@@ -82,7 +82,7 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
             }
         }
         return builder.build();
-        
+
     }
 
     private String removeQuotesIfNeeded(String value) {
@@ -92,14 +92,14 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
             return value;
         }
     }
-    
+
     public String toString(Link link) {
         StringBuilder sb = new StringBuilder();
-        
+
         sb.append('<');
         sb.append(link.getUri());
         sb.append('>');
-        
+
         String rels = link.getRel();
         if (!rels.isEmpty()) {
             sb.append(";").append(REL).append('=');
@@ -118,9 +118,9 @@ public class LinkHeaderProvider implements HeaderDelegate<Link> {
             sb.append(";").append(entry.getKey()).append('=');
             writeListParamValues(sb, entry.getValue());
         }
-        
+
         return sb.toString();
-        
+
     }
 
     private void writeListParamValues(StringBuilder sb, String value) {

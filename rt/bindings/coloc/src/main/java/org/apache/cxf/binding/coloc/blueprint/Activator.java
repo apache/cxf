@@ -30,7 +30,7 @@ public class Activator  implements BundleActivator {
     public void start(BundleContext context) throws Exception {
         try {
             BlueprintNameSpaceHandlerFactory factory = new BlueprintNameSpaceHandlerFactory() {
-                
+
                 @Override
                 public Object createNamespaceHandler() {
                     return new ColocBPNamespaceHandler();

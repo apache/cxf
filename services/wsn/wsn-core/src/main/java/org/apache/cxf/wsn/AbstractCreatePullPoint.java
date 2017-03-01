@@ -40,7 +40,7 @@ import org.oasis_open.docs.wsn.bw_2.UnableToCreatePullPointFault;
 import org.oasis_open.docs.wsn.bw_2.UnableToDestroyPullPointFault;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.bw_2.CreatePullPoint")
-public abstract class AbstractCreatePullPoint extends AbstractEndpoint 
+public abstract class AbstractCreatePullPoint extends AbstractEndpoint
     implements CreatePullPoint, CreatePullPointMBean {
 
     private static final Logger LOGGER = LogUtils.getL7dLogger(AbstractCreatePullPoint.class);
@@ -70,9 +70,9 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint
     public void destroy() throws Exception {
         unregister();
     }
-    
+
     public List<String> getPullEndpoints() {
-        return new ArrayList<String>(pullPoints.keySet());
+        return new ArrayList<>(pullPoints.keySet());
     }
 
     public EndpointMBean getPullEndpoint(String name) {
@@ -80,12 +80,12 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint
     }
 
     @WebMethod(operationName = "CreatePullPoint")
-    @WebResult(name = "CreatePullPointResponse", 
-               targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+    @WebResult(name = "CreatePullPointResponse",
+               targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                partName = "CreatePullPointResponse")
     public CreatePullPointResponse createPullPoint(
-            @WebParam(name = "CreatePullPoint", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2", 
+            @WebParam(name = "CreatePullPoint",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-2",
                       partName = "CreatePullPointRequest")
             org.oasis_open.docs.wsn.b_2.CreatePullPoint createPullPointRequest)
         throws UnableToCreatePullPointFault {
@@ -95,7 +95,7 @@ public abstract class AbstractCreatePullPoint extends AbstractEndpoint
     }
 
     public CreatePullPointResponse handleCreatePullPoint(
-            org.oasis_open.docs.wsn.b_2.CreatePullPoint createPullPointRequest, 
+            org.oasis_open.docs.wsn.b_2.CreatePullPoint createPullPointRequest,
             EndpointManager manager) throws UnableToCreatePullPointFault {
         AbstractPullPoint pullPoint = null;
         boolean success = false;

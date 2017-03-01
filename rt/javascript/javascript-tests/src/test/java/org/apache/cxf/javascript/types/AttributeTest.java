@@ -90,7 +90,7 @@ public class AttributeTest extends AbstractCXFSpringTest {
         testUtilities.rhinoCallInContext("deserializeAttributeTestBean", serialized);
     }
 
-    private String serializeObject(DataBinding dataBinding, 
+    private String serializeObject(DataBinding dataBinding,
                                    AttributeTestBean bean) throws XMLStreamException {
         DataWriter<XMLStreamWriter> writer = dataBinding.createWriter(XMLStreamWriter.class);
         StringWriter stringWriter = new StringWriter();
@@ -180,7 +180,7 @@ public class AttributeTest extends AbstractCXFSpringTest {
         ServiceInfo serviceInfo = serviceInfos.get(0);
         schemata = serviceInfo.getSchemas();
         nameManager = BasicNameManager.newNameManager(serviceInfo);
-        NamespacePrefixAccumulator prefixAccumulator = 
+        NamespacePrefixAccumulator prefixAccumulator =
             new NamespacePrefixAccumulator(serviceInfo.getXmlSchemaCollection());
         for (SchemaInfo schema : schemata) {
             SchemaJavascriptBuilder builder = new SchemaJavascriptBuilder(serviceInfo

@@ -44,6 +44,7 @@ import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ApplicationInfo;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ServerProviderFactory;
@@ -64,18 +65,18 @@ import org.apache.cxf.service.invoker.Invoker;
  * sf.setAddress("http://localhost:9080/");
  * Server myServer = sf.create();
  * </pre>
- * This will start a server for you and register it with the ServerManager.  Note 
+ * This will start a server for you and register it with the ServerManager.  Note
  * you should explicitly close the {@link org.apache.cxf.endpoint.Server} created
  * when finished with it:
  * <pre>
  * myServer.close();
  * myServer.destroy(); // closes first if close() not previously called
- * </pre> 
+ * </pre>
  */
 public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
-    
+
     protected Map<Class<?>, ResourceProvider> resourceProviders = new HashMap<Class<?>, ResourceProvider>();
-    
+
     private Server server;
     private boolean start = true;
     private Map<Object, Object> languageMappings;
@@ -83,7 +84,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     private ResourceComparator rc;
     private ApplicationInfo appProvider;
     private String documentLocation;
-    
+
     public JAXRSServerFactoryBean() {
         this(new JAXRSServiceFactoryBean());
     }
@@ -91,7 +92,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     public JAXRSServerFactoryBean(JAXRSServiceFactoryBean sf) {
         super(sf);
     }
-    
+
     /**
      * Saves the reference to the JAX-RS {@link Application}
      * @param app
@@ -99,7 +100,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     public void setApplication(Application app) {
         setApplicationInfo(new ApplicationInfo(app, getBus()));
     }
-    
+
     public void setApplicationInfo(ApplicationInfo provider) {
         appProvider = provider;
         Set<String> appNameBindings = AnnotationUtils.getNameBindings(provider.getProvider()
@@ -110,29 +111,29 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             cri.setNameBindings(clsNameBindings);
         }
     }
-    
+
     /**
-     * Resource comparator which may be used to customize the way 
-     * a root resource or resource method is selected 
+     * Resource comparator which may be used to customize the way
+     * a root resource or resource method is selected
      * @param rcomp comparator
      */
     public void setResourceComparator(ResourceComparator rcomp) {
         rc = rcomp;
     }
-    
+
     /**
      * By default the subresources are resolved dynamically, mainly due to
      * the JAX-RS specification allowing Objects being returned from the subresource
-     * locators. Setting this property to true enables the runtime to do the 
+     * locators. Setting this property to true enables the runtime to do the
      * early resolution.
-     * 
+     *
      * @param enableStatic enabling the static resolution if set to true
      */
     public void setStaticSubresourceResolution(boolean enableStatic) {
         serviceFactory.setEnableStaticResolution(enableStatic);
     }
 
-    
+
     /**
      * Creates the JAX-RS Server instance
      * @return the server
@@ -142,7 +143,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             create();
         }
     }
-    
+
     /**
      * Creates the JAX-RS Server instance
      * @return the server
@@ -159,27 +160,27 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             checkResources(true);
             if (serviceFactory.getService() == null) {
                 serviceFactory.create();
-                updateClassResourceProviders();
             }
-            
+
             Endpoint ep = createEndpoint();
 
             getServiceFactory().sendEvent(FactoryBeanListener.Event.PRE_SERVER_CREATE,
                                           server);
-            
-            server = new ServerImpl(getBus(), 
-                                    ep, 
-                                    getDestinationFactory(), 
+
+            server = new ServerImpl(getBus(),
+                                    ep,
+                                    getDestinationFactory(),
                                     getBindingFactory());
 
-            Invoker invoker = serviceFactory.getInvoker(); 
+            Invoker invoker = serviceFactory.getInvoker();
             if (invoker == null) {
                 ep.getService().setInvoker(createInvoker());
             } else {
                 ep.getService().setInvoker(invoker);
             }
-            
+
             ServerProviderFactory factory = setupFactory(ep);
+            
             ep.put(Application.class.getName(), appProvider);
             factory.setRequestPreprocessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
@@ -191,17 +192,21 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                 ep.put("org.apache.cxf.jaxrs.comparator", rc);
             }
             checkPrivateEndpoint(ep);
-            
-            factory.applyDynamicFeatures(getServiceFactory().getClassResourceInfo());
+
             applyBusFeatures(getBus());
             applyFeatures();
 
+            updateClassResourceProviders(ep);
+            injectContexts(factory);
+            factory.applyDynamicFeatures(getServiceFactory().getClassResourceInfo());
+            
+            
             getServiceFactory().sendEvent(FactoryBeanListener.Event.SERVER_CREATED,
-                                          server, 
+                                          server,
                                           null,
                                           null);
-            
-            
+
+
             if (start) {
                 try {
                     server.start();
@@ -230,9 +235,9 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     public Server getServer() {
         return server;
     }
-    
-    protected ServerProviderFactory setupFactory(Endpoint ep) { 
-        ServerProviderFactory factory = ServerProviderFactory.createInstance(getBus()); 
+
+    protected ServerProviderFactory setupFactory(Endpoint ep) {
+        ServerProviderFactory factory = ServerProviderFactory.createInstance(getBus());
         setBeanInfo(factory);
         factory.setApplicationProvider(appProvider);
         super.setupFactory(factory, ep);
@@ -244,9 +249,9 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         for (ClassResourceInfo cri : cris) {
             cri.initBeanParamInfo(factory);
         }
-        
+
     }
-    
+
     protected void applyBusFeatures(final Bus bus) {
         if (bus.getFeatures() != null) {
             for (Feature feature : bus.getFeatures()) {
@@ -254,7 +259,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             }
         }
     }
-    
+
     protected void applyFeatures() {
         if (getFeatures() != null) {
             for (Feature feature : getFeatures()) {
@@ -268,29 +273,29 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     }
 
     /**
-     * Sets the language mappings, 
+     * Sets the language mappings,
      * example, 'en' is the key and 'en-gb' is the value.
-     * 
+     *
      * @param lMaps the language mappings
      */
     public void setLanguageMappings(Map<Object, Object> lMaps) {
         languageMappings = lMaps;
     }
-    
+
     /**
-     * Sets the extension mappings, 
+     * Sets the extension mappings,
      * example, 'xml' is the key and 'text/xml' is the value.
-     * 
+     *
      * @param lMaps the extension mappings
      */
     public void setExtensionMappings(Map<Object, Object> extMaps) {
         extensionMappings = extMaps;
     }
-    
+
     public List<Class<?>> getResourceClasses() {
         return serviceFactory.getResourceClasses();
     }
-    
+
     /**
      * This method is used primarily by Spring handler processing
      * the jaxrs:server/@serviceClass attribute. It delegates to
@@ -302,7 +307,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     }
 
     /**
-     * Sets one or more root resource classes 
+     * Sets one or more root resource classes
      * @param classes the list of resource classes
      */
     public void setResourceClasses(List<Class<?>> classes) {
@@ -310,47 +315,47 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     }
 
     /**
-     * Sets one or more root resource classes 
+     * Sets one or more root resource classes
      * @param classes the array of resource classes
      */
     public void setResourceClasses(Class<?>... classes) {
         serviceFactory.setResourceClasses(classes);
     }
-    
+
     /**
-     * Sets the resource beans. If this is set then the JAX-RS runtime 
+     * Sets the resource beans. If this is set then the JAX-RS runtime
      * will not be responsible for the life-cycle of resource classes.
-     * 
+     *
      * @param beans the array of resource instances
      */
     public void setServiceBeanObjects(Object... beans) {
         setServiceBeans(Arrays.asList(beans));
     }
-    
+
     /**
-     * Sets the single resource bean. If this is set then the JAX-RS runtime 
+     * Sets the single resource bean. If this is set then the JAX-RS runtime
      * will not be responsible for the life-cycle of resource classes.
      * Please avoid setting the resource class of this bean explicitly,
-     * the runtime will determine it itself.  
-     * 
+     * the runtime will determine it itself.
+     *
      * @param bean resource instance
      */
     public void setServiceBean(Object bean) {
         setServiceBeans(Arrays.asList(bean));
     }
-    
+
     /**
-     * Sets the resource beans. If this is set then the JAX-RS runtime 
+     * Sets the resource beans. If this is set then the JAX-RS runtime
      * will not be responsible for the life-cycle of resource classes.
-     * 
+     *
      * @param beans the list of resource instances
      */
     public void setServiceBeans(List<Object> beans) {
-        List<Object> newBeans = new ArrayList<Object>();
+        List<Object> newBeans = new ArrayList<>();
         addToBeans(newBeans, beans);
         serviceFactory.setResourceClassesFromBeans(newBeans);
-    }    
-    
+    }
+
     /**
      * Sets the provider managing the life-cycle of the given resource class
      * <pre>
@@ -363,7 +368,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     public void setResourceProvider(Class<?> c, ResourceProvider rp) {
         resourceProviders.put(c, rp);
     }
-    
+
     /**
      * Sets the provider managing the life-cycle of the resource class
      * <pre>
@@ -375,10 +380,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     public void setResourceProvider(ResourceProvider rp) {
         setResourceProviders(CastUtils.cast(Collections.singletonList(rp), ResourceProvider.class));
     }
-    
+
     /**
      * Sets the list of providers managing the life-cycle of the resource classes
-     * 
+     *
      * @param rps resource providers
      */
     public void setResourceProviders(List<ResourceProvider> rps) {
@@ -390,7 +395,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     }
 
     /**
-     * Sets the custom Invoker which can be used to customize the way 
+     * Sets the custom Invoker which can be used to customize the way
      * the default JAX-RS invoker calls on the service bean
      * @param invoker
      */
@@ -407,41 +412,42 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         this.start = start;
     }
 
-    protected void injectContexts() {
+    protected void injectContexts(ServerProviderFactory factory) {
         Application application = appProvider == null ? null : appProvider.getProvider();
         for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
             if (cri.isSingleton()) {
-                InjectionUtils.injectContextProxiesAndApplication(cri, 
+                InjectionUtils.injectContextProxiesAndApplication(cri,
                                                     cri.getResourceProvider().getInstance(null),
-                                                    application);
+                                                    application,
+                                                    factory);
             }
         }
         if (application != null) {
-            InjectionUtils.injectContextProxiesAndApplication(appProvider, 
-                                                              application, null);
+            InjectionUtils.injectContextProxiesAndApplication(appProvider,
+                                                              application, null, null);
         }
     }
-    
-    protected void updateClassResourceProviders() {
+
+    protected void updateClassResourceProviders(Endpoint ep) {
         for (ClassResourceInfo cri : serviceFactory.getClassResourceInfo()) {
-            if (cri.getResourceProvider() != null) {
-                continue;
+            if (cri.getResourceProvider() == null) {
+                ResourceProvider rp = resourceProviders.get(cri.getResourceClass());
+                if (rp != null) {
+                    cri.setResourceProvider(rp);
+                } else {
+                    setDefaultResourceProvider(cri);
+                }
             }
-            
-            ResourceProvider rp = resourceProviders.get(cri.getResourceClass());
-            if (rp != null) {
-                cri.setResourceProvider(rp);
-            } else {
-                setDefaultResourceProvider(cri);  
+            if (cri.getResourceProvider() instanceof SingletonResourceProvider) {
+                ((SingletonResourceProvider)cri.getResourceProvider()).init(ep);
             }
         }
-        injectContexts();
     }
 
     protected void setDefaultResourceProvider(ClassResourceInfo cri) {
         cri.setResourceProvider(new PerRequestResourceProvider(cri.getResourceClass()));
     }
-    
+
     /**
      * Set the reference to the document (WADL, etc) describing the endpoint
      * @param documentLocation document location

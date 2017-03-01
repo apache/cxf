@@ -53,9 +53,9 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 @Produces({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Consumes({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Provider
-public class FormEncodingProvider<T> extends AbstractConfigurableProvider 
+public class FormEncodingProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyReader<T>, MessageBodyWriter<T> {
-        
+
     private FormValidator validator;
     @Context private MessageContext mc;
     private String attachmentDir;
@@ -63,27 +63,27 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
     private String attachmentMaxSize;
 
     private boolean expectEncoded;
-    
+
     public FormEncodingProvider() {
-        
+
     }
-    
+
     public FormEncodingProvider(boolean expectEncoded) {
         this.expectEncoded = expectEncoded;
     }
-    
+
     public void setExpectedEncoded(boolean expect) {
         this.expectEncoded = expect;
     }
-    
+
     public void setAttachmentDirectory(String dir) {
         attachmentDir = dir;
     }
-    
+
     public void setAttachmentThreshold(String threshold) {
         attachmentThreshold = threshold;
     }
-    
+
     public void setAttachmentMaxSize(String maxSize) {
         attachmentMaxSize = maxSize;
     }
@@ -91,15 +91,15 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
     public void setValidator(FormValidator formValidator) {
         validator = formValidator;
     }
-    
-    public boolean isReadable(Class<?> type, Type genericType, 
+
+    public boolean isReadable(Class<?> type, Type genericType,
                               Annotation[] annotations, MediaType mt) {
         return isSupported(type, genericType, annotations, mt);
     }
 
     public T readFrom(
-        Class<T> clazz, Type genericType, Annotation[] annotations, MediaType mt, 
-        MultivaluedMap<String, String> headers, InputStream is) 
+        Class<T> clazz, Type genericType, Annotation[] annotations, MediaType mt,
+        MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
         if (is == null) {
             return null;
@@ -111,15 +111,15 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
                     return clazz.cast(body);
                 } else if (Attachment.class.isAssignableFrom(clazz)) {
                     return clazz.cast(body.getRootAttachment());
-                }  
+                }
             }
-            
+
             MultivaluedMap<String, String> params = createMap(clazz);
             populateMap(params, annotations, is, mt, !keepEncoded(annotations));
             validateMap(params);
-            
+
             persistParamsOnMessage(params);
-            
+
             return getFormObject(clazz, params);
         } catch (WebApplicationException e) {
             throw e;
@@ -129,17 +129,17 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
     }
 
     protected boolean keepEncoded(Annotation[] anns) {
-        return AnnotationUtils.getAnnotation(anns, Encoded.class) != null 
+        return AnnotationUtils.getAnnotation(anns, Encoded.class) != null
                || expectEncoded;
     }
-    
+
     protected void persistParamsOnMessage(MultivaluedMap<String, String> params) {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         if (message != null) {
             message.put(FormUtils.FORM_PARAM_MAP, params);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     protected MultivaluedMap<String, String> createMap(Class<?> clazz) throws Exception {
         if (clazz == MultivaluedMap.class || clazz == Form.class) {
@@ -147,30 +147,30 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
         }
         return (MultivaluedMap<String, String>)clazz.newInstance();
     }
-    
+
     private T getFormObject(Class<T> clazz, MultivaluedMap<String, String> params) {
         return clazz.cast(Form.class.isAssignableFrom(clazz) ? new Form(params) : params);
     }
-    
+
     /**
      * Retrieve map of parameters from the passed in message
      *
      * @param message
      * @return a Map of parameters.
      */
-    protected void populateMap(MultivaluedMap<String, String> params, 
+    protected void populateMap(MultivaluedMap<String, String> params,
                                Annotation[] anns,
-                               InputStream is, 
-                               MediaType mt, 
+                               InputStream is,
+                               MediaType mt,
                                boolean decode) {
         if (mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
-            MultipartBody body = 
+            MultipartBody body =
                 AttachmentUtils.getMultipartBody(mc, attachmentDir, attachmentThreshold, attachmentMaxSize);
-            FormUtils.populateMapFromMultipart(params, body, PhaseInterceptorChain.getCurrentMessage(), 
+            FormUtils.populateMapFromMultipart(params, body, PhaseInterceptorChain.getCurrentMessage(),
                                                decode);
         } else {
             String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
-            
+
             Object servletRequest = mc != null ? mc.getHttpServletRequest() : null;
             if (servletRequest == null) {
                 FormUtils.populateMapFromString(params,
@@ -188,45 +188,45 @@ public class FormEncodingProvider<T> extends AbstractConfigurableProvider
             }
         }
     }
-    
+
     protected void validateMap(MultivaluedMap<String, String> params) {
         if (validator != null) {
             validator.validate(params);
         }
     }
 
-    public long getSize(T t, Class<?> type, 
-                        Type genericType, Annotation[] annotations, 
+    public long getSize(T t, Class<?> type,
+                        Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, 
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
                                MediaType mt) {
         return isSupported(type, genericType, annotations, mt);
     }
 
-    private boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations, 
+    private boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations,
                                 MediaType mt) {
-        return (MultivaluedMap.class.isAssignableFrom(type) || Form.class.isAssignableFrom(type)) 
-            || (mt.getType().equalsIgnoreCase("multipart") 
+        return (MultivaluedMap.class.isAssignableFrom(type) || Form.class.isAssignableFrom(type))
+            || (mt.getType().equalsIgnoreCase("multipart")
             && mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
             && (MultivaluedMap.class.isAssignableFrom(type) || Form.class.isAssignableFrom(type)));
     }
-    
+
     @SuppressWarnings("unchecked")
-    public void writeTo(T obj, Class<?> c, Type t, Annotation[] anns, 
-                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
+    public void writeTo(T obj, Class<?> c, Type t, Annotation[] anns,
+                        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException, WebApplicationException {
-        
-        MultivaluedMap<String, String> map = 
+
+        MultivaluedMap<String, String> map =
             (MultivaluedMap<String, String>)(obj instanceof Form ? ((Form)obj).asMap() : obj);
         boolean encoded = keepEncoded(anns);
-        
+
         String enc = HttpUtils.getSetEncoding(mt, headers, StandardCharsets.UTF_8.name());
-        
+
         FormUtils.writeMapToOutputStream(map, os, enc, encoded);
-        
+
     }
 
 }

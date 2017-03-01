@@ -32,7 +32,7 @@ public class JavaDocProviderTest extends Assert {
     public void testJava6Docs() throws Exception {
         doTestJavaDocs("classpath:/javadocs/pet-store-javadoc16.jar", "1.6");
     }
-    
+
     @Test
     public void testJava7Docs() throws Exception {
         doTestJavaDocs("classpath:/javadocs/pet-store-javadoc17.jar", "1.7");
@@ -41,15 +41,15 @@ public class JavaDocProviderTest extends Assert {
     public void testJava8Docs() throws Exception {
         doTestJavaDocs("classpath:/javadocs/pet-store-javadoc18.jar", "1.8");
     }
-    
+
     private void doTestJavaDocs(String path, String version) throws Exception {
         JavaDocProvider p = new JavaDocProvider(path);
         p.setJavaDocsBuiltByVersion(version);
-        ClassResourceInfo cri = 
+        ClassResourceInfo cri =
             ResourceUtils.createClassResourceInfo(PetStore.class, PetStore.class, true, true);
         String classDoc = p.getClassDoc(cri);
         assertEquals("The Pet Store", classDoc);
-        
+
         boolean getStatus1Tested = false;
         boolean getStatus2Tested = false;
         boolean getStatus3Tested = false;
@@ -81,7 +81,7 @@ public class JavaDocProviderTest extends Assert {
         assertEquals("Return Pet Status with no params", p.getMethodDoc(ori));
         assertEquals("status", p.getMethodResponseDoc(ori));
     }
-    
+
     private void testGetStatus1JavaDocs(JavaDocProvider p, OperationResourceInfo ori) {
         assertEquals("Return Pet Status With 1 Param", p.getMethodDoc(ori));
         assertEquals(1, ori.getParameters().size());
@@ -103,5 +103,5 @@ public class JavaDocProviderTest extends Assert {
         assertEquals("the query", p.getMethodParameterDoc(ori, 1));
         assertEquals("the query2", p.getMethodParameterDoc(ori, 2));
     }
-    
+
 }

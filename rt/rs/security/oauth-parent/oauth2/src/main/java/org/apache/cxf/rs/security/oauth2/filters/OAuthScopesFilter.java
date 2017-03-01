@@ -50,9 +50,9 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     private static final Logger LOG = LogUtils.getL7dLogger(OAuthScopesFilter.class);
     private static final Set<String> SKIP_METHODS;
     static {
-        SKIP_METHODS = new HashSet<String>();
+        SKIP_METHODS = new HashSet<>();
         SKIP_METHODS.addAll(Arrays.asList(
-            new String[] {"wait", "notify", "notifyAll", 
+            new String[] {"wait", "notify", "notifyAll",
                           "equals", "toString", "hashCode"}));
     }
 
@@ -60,8 +60,8 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     private MessageContext mc;
     private Map<String, List<String>> scopesMap = new HashMap<String, List<String>>();
     private Map<String, Boolean> scopesMatchAllMap = new HashMap<String, Boolean>();
-    private Set<String> confidentialClientMethods = new HashSet<String>();
-   
+    private Set<String> confidentialClientMethods = new HashSet<>();
+
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);
         checkSecureClass(cls);
@@ -90,7 +90,7 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
                 scopesMap.put(m.getName(), Arrays.asList(theScopes.value()));
                 scopesMatchAllMap.put(m.getName(), theScopes.matchAll());
             }
-            
+
             ConfidentialClient mConfClient = m.getAnnotation(ConfidentialClient.class);
             if (classConfClient != null || mConfClient != null) {
                 confidentialClientMethods.add(m.getName());
@@ -133,12 +133,12 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
                 return;
             }
         }
-        
+
         if (!requestScopes.containsAll(methodScopes)) {
             LOG.warning("Scopes do not match");
             throw ExceptionUtils.toForbiddenException(null, null);
         }
-        
+
     }
     protected Method getTargetMethod() {
         Method method = (Method)mc.get("org.apache.cxf.resource.method");
@@ -157,7 +157,7 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
             scopesMap.put(entry.getKey(), Arrays.asList(entry.getValue().split(" ")));
         }
     }
-    
+
     public void setScopesMatchAllMap(Map<String, Boolean> scopesMatchAllMap) {
         this.scopesMatchAllMap = scopesMatchAllMap;
     }
@@ -165,6 +165,6 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
     public void setConfidentialClientMethods(Set<String> confidentialClientMethods) {
         this.confidentialClientMethods = confidentialClientMethods;
     }
-    
-    
+
+
 }

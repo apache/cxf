@@ -53,7 +53,7 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /**
- * 
+ *
  */
 public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     private static final Logger LOG = LogUtils.getL7dLogger(AhcWebSocketConduit.class);
@@ -64,7 +64,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     //REVISIT make these keys configurable
     private String requestIdKey = WebSocketConstants.DEFAULT_REQUEST_ID_KEY;
     private String responseIdKey = WebSocketConstants.DEFAULT_RESPONSE_ID_KEY;
-    
+
     private Map<String, RequestResponse> uncorrelatedRequests = new ConcurrentHashMap<String, RequestResponse>();
 
     public AhcWebSocketConduit(Bus b, EndpointInfo ei, EndpointReferenceType t) throws IOException {
@@ -81,7 +81,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         if (!"ws".equals(s) && !"wss".equals(s)) {
             throw new MalformedURLException("unknown protocol: " + s);
         }
-        
+
         message.put("http.scheme", currentURL.getScheme());
         String httpRequestMethod =
                 (String)message.get(Message.HTTP_REQUEST_METHOD);

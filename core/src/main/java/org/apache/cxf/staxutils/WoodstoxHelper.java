@@ -28,17 +28,17 @@ import com.ctc.wstx.stax.WstxInputFactory;
 import org.codehaus.stax2.XMLStreamReader2;
 
 /**
- * 
+ *
  */
 final class WoodstoxHelper {
 
     private WoodstoxHelper() {
     }
-    
+
     public static XMLInputFactory createInputFactory() {
         return new WstxInputFactory();
     }
-    
+
     public static XMLEventFactory createEventFactory() {
         return new WstxEventFactory();
     }

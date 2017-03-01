@@ -68,12 +68,12 @@ public class NotificationBroker implements Referencable {
     public static final QName QNAME_TOPIC_EXPRESSION = new QName(WSN_URI, "TopicExpression");
 
     public static final QName QNAME_MESSAGE_CONTENT = new QName(WSN_URI, "MessageContent");
-    
+
     public static final QName QNAME_INITIAL_TERMINATION_TIME = new QName(WSN_URI, "InitialTerminationTime");
-    
+
     public static final QName QNAME_PULLPOINT_QUEUE_NAME = new QName(WSN_URI, "pullPointQueueName");
 
-    
+
     private org.oasis_open.docs.wsn.brw_2.NotificationBroker broker;
     private final W3CEndpointReference epr;
     private Class<?> extraClasses[];
@@ -90,18 +90,18 @@ public class NotificationBroker implements Referencable {
     public void setExtraClasses(Class<?> ... c) {
         extraClasses = c;
     }
-    
+
     public synchronized org.oasis_open.docs.wsn.brw_2.NotificationBroker getBroker() {
         if (broker == null) {
             WSNHelper helper = WSNHelper.getInstance();
             if (helper.supportsExtraClasses()) {
                 this.broker = WSNHelper.getInstance()
-                    .getPort(epr, 
+                    .getPort(epr,
                          org.oasis_open.docs.wsn.brw_2.NotificationBroker.class,
                          extraClasses);
             } else {
                 this.broker = WSNHelper.getInstance()
-                    .getPort(epr, 
+                    .getPort(epr,
                          org.oasis_open.docs.wsn.brw_2.NotificationBroker.class);
                 if (extraClasses != null && extraClasses.length > 0) {
                     try {
@@ -132,12 +132,12 @@ public class NotificationBroker implements Referencable {
                 msg = result.getNode();
                 if (msg instanceof Document) {
                     msg = ((Document)msg).getDocumentElement();
-                } 
+                }
             } catch (JAXBException e) {
                 //ignore, we'll try and let the runtime handle it as is
             }
         }
-        
+
         Notify notify = new Notify();
         NotificationMessageHolderType holder = new NotificationMessageHolderType();
         if (publisher != null) {
@@ -154,26 +154,26 @@ public class NotificationBroker implements Referencable {
         getBroker().notify(notify);
     }
 
-    public Subscription subscribe(Referencable consumer, String topic) 
+    public Subscription subscribe(Referencable consumer, String topic)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
         throws TopicExpressionDialectUnknownFault, InvalidFilterFault, TopicNotSupportedFault,
-        UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault, 
-        InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, ResourceUnknownFault, 
-        UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault, 
+        UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault,
+        InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, ResourceUnknownFault,
+        UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault,
         NotifyMessageNotSupportedFault, InvalidProducerPropertiesExpressionFault {
         //CHECKSTYLE:ON
-        
+
         return subscribe(consumer, topic, null, false, null);
     }
-    
 
 
-    public Subscription subscribe(Referencable consumer, String topic, String xpath) 
+
+    public Subscription subscribe(Referencable consumer, String topic, String xpath)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
-        throws TopicExpressionDialectUnknownFault, InvalidFilterFault, TopicNotSupportedFault, 
-        UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault, 
-        InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, ResourceUnknownFault, 
-        UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault, NotifyMessageNotSupportedFault, 
+        throws TopicExpressionDialectUnknownFault, InvalidFilterFault, TopicNotSupportedFault,
+        UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault,
+        InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, ResourceUnknownFault,
+        UnsupportedPolicyRequestFault, UnrecognizedPolicyRequestFault, NotifyMessageNotSupportedFault,
         InvalidProducerPropertiesExpressionFault {
         //CHECKSTYLE:ON
         return subscribe(consumer, topic, xpath, false, null);
@@ -182,10 +182,10 @@ public class NotificationBroker implements Referencable {
     public Subscription subscribe(Referencable consumer, String topic,
                                   String xpath, boolean raw, String initialTerminationTime)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
-        throws TopicNotSupportedFault, InvalidFilterFault, TopicExpressionDialectUnknownFault, 
-        UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault, 
-        InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, UnrecognizedPolicyRequestFault, 
-        UnsupportedPolicyRequestFault, ResourceUnknownFault, NotifyMessageNotSupportedFault, 
+        throws TopicNotSupportedFault, InvalidFilterFault, TopicExpressionDialectUnknownFault,
+        UnacceptableInitialTerminationTimeFault, SubscribeCreationFailedFault,
+        InvalidMessageContentExpressionFault, InvalidTopicExpressionFault, UnrecognizedPolicyRequestFault,
+        UnsupportedPolicyRequestFault, ResourceUnknownFault, NotifyMessageNotSupportedFault,
         InvalidProducerPropertiesExpressionFault {
         //CHECKSTYLE:ON
 
@@ -220,9 +220,9 @@ public class NotificationBroker implements Referencable {
         return new Subscription(response.getSubscriptionReference());
     }
 
-    public List<Object> getCurrentMessage(String topic) 
+    public List<Object> getCurrentMessage(String topic)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
-        throws TopicNotSupportedFault, TopicExpressionDialectUnknownFault, MultipleTopicsSpecifiedFault, 
+        throws TopicNotSupportedFault, TopicExpressionDialectUnknownFault, MultipleTopicsSpecifiedFault,
         InvalidTopicExpressionFault, ResourceUnknownFault, NoCurrentMessageOnTopicFault {
         //CHECKSTYLE:ON
         GetCurrentMessage getCurrentMessageRequest = new GetCurrentMessage();
@@ -237,17 +237,17 @@ public class NotificationBroker implements Referencable {
 
     public Registration registerPublisher(Referencable publisher, String topic)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
-        throws TopicNotSupportedFault, PublisherRegistrationFailedFault, 
-        UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault, 
+        throws TopicNotSupportedFault, PublisherRegistrationFailedFault,
+        UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault,
         ResourceUnknownFault, PublisherRegistrationRejectedFault {
         //CHECKSTYLE:ON
         return registerPublisher(publisher, topic, false);
     }
 
-    public Registration registerPublisher(Referencable publisher, String topic, boolean demand) 
+    public Registration registerPublisher(Referencable publisher, String topic, boolean demand)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
-        throws TopicNotSupportedFault, PublisherRegistrationFailedFault, 
-        UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault, ResourceUnknownFault, 
+        throws TopicNotSupportedFault, PublisherRegistrationFailedFault,
+        UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault, ResourceUnknownFault,
         PublisherRegistrationRejectedFault {
         //CHECKSTYLE:ON
         return registerPublisher(publisher, Collections.singletonList(topic), demand);
@@ -255,8 +255,8 @@ public class NotificationBroker implements Referencable {
 
     public Registration registerPublisher(Referencable publisher, List<String> topics, boolean demand)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
-        throws TopicNotSupportedFault, PublisherRegistrationFailedFault, 
-        UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault, ResourceUnknownFault, 
+        throws TopicNotSupportedFault, PublisherRegistrationFailedFault,
+        UnacceptableInitialTerminationTimeFault, InvalidTopicExpressionFault, ResourceUnknownFault,
         PublisherRegistrationRejectedFault {
         //CHECKSTYLE:ON
 

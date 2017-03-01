@@ -40,17 +40,17 @@ import org.apache.cxf.interceptor.transform.TransformOutInterceptor;
  */
 @NoJSR250Annotations
 public class StaxTransformFeature extends AbstractFeature {
-    
+
     private TransformInInterceptor in = new TransformInInterceptor();
     private TransformOutInterceptor out = new TransformOutInterceptor();
-    
+
     public StaxTransformFeature() {
         //
     }
-    
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        
+
         provider.getInInterceptors().add(in);
         provider.getOutInterceptors().add(out);
         provider.getOutFaultInterceptors().add(out);
@@ -71,7 +71,7 @@ public class StaxTransformFeature extends AbstractFeature {
     public void setSkipOnFault(boolean value) {
         out.setSkipOnFault(value);
     }
-    
+
     public void setOutAppendElements(Map<String, String> map) {
         out.setOutAppendElements(map);
     }
@@ -83,23 +83,23 @@ public class StaxTransformFeature extends AbstractFeature {
     public void setInAppendElements(Map<String, String> inElements) {
         in.setInAppendElements(inElements);
     }
-    
+
     public void setInDropElements(List<String> dropElementsSet) {
         in.setInDropElements(dropElementsSet);
     }
-    
+
     public void setInTransformElements(Map<String, String> inElements) {
         in.setInTransformElements(inElements);
     }
-    
+
     public void setInTransformAttributes(Map<String, String> inAttributes) {
         in.setInTransformAttributes(inAttributes);
     }
-    
+
     public void setOutDefaultNamespace(String ns) {
         out.setDefaultNamespace(ns);
     }
-    
+
     public void setContextPropertyName(String propertyName) {
         in.setContextPropertyName(propertyName);
         out.setContextPropertyName(propertyName);

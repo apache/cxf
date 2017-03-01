@@ -83,16 +83,6 @@
                             </defaultOptions>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/xmlbeans/hello_world.wsdl</wsdl>
-                                    <frontEnd>cxf</frontEnd>
-                                    <dataBinding>xmlbeans</dataBinding>
-                                </wsdlOption>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/xmlbeans/doc_lit_bare.wsdl</wsdl>
-                                    <frontEnd>cxf</frontEnd>
-                                    <dataBinding>xmlbeans</dataBinding>
-                                </wsdlOption>
-                                <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/source/hello_world.wsdl</wsdl>
                                     <frontEnd>cxf</frontEnd>
                                     <dataBinding>domsource</dataBinding>
@@ -176,14 +166,15 @@
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-databinding-jibx</artifactId>
+            <artifactId>cxf-rt-transports-http</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-transports-http</artifactId>
+            <artifactId>cxf-rt-features-logging</artifactId>
             <version>${project.version}</version>
-        </dependency>
+            <scope>test</scope>
+        </dependency>        
         <dependency>
             <groupId>${cxf.servlet-api.group}</groupId>
             <artifactId>${cxf.servlet-api.artifact}</artifactId>
@@ -271,11 +262,6 @@
             <artifactId>FastInfoset</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>rhino</groupId>
             <artifactId>js</artifactId>
             <scope>test</scope>
@@ -290,22 +276,6 @@
             <artifactId>commons-io</artifactId>
             <version>2.0</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jibx</groupId>
-            <artifactId>jibx-bind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jibx</groupId>
-            <artifactId>jibx-run</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jibx</groupId>
-            <artifactId>jibx-schema</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jibx</groupId>
-            <artifactId>jibx-tools</artifactId>
         </dependency>
         <dependency>
             <groupId>net.java.dev.msv</groupId>

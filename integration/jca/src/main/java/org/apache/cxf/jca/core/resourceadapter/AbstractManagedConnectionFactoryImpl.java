@@ -36,8 +36,8 @@ import javax.security.auth.Subject;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jca.core.logging.LoggerHelper;
 
- 
-public abstract class AbstractManagedConnectionFactoryImpl extends ResourceBean 
+
+public abstract class AbstractManagedConnectionFactoryImpl extends ResourceBean
     implements ManagedConnectionFactory {
 
     private static final long serialVersionUID = 1886331424891906960L;
@@ -67,18 +67,18 @@ public abstract class AbstractManagedConnectionFactoryImpl extends ResourceBean
     protected abstract void validateReference(AbstractManagedConnectionImpl conn, Subject subject)
         throws ResourceAdapterInternalException;
 
-    @SuppressWarnings("rawtypes") 
+    @SuppressWarnings("rawtypes")
     public ManagedConnection matchManagedConnections(
         Set aMCSet, Subject subject, ConnectionRequestInfo crInfo)
         throws ResourceException {
-        
+
         LOG.log(Level.FINE, "MATCHING_CONNECTIONS",
             new Object[] {Integer.valueOf(aMCSet.size()), crInfo, subject});
 
         for (Iterator iterator = aMCSet.iterator(); iterator.hasNext();) {
             AbstractManagedConnectionImpl conn = (AbstractManagedConnectionImpl)iterator.next();
 
-            LOG.log(Level.FINE, "MATCH_CONNECTION_AGAINST", 
+            LOG.log(Level.FINE, "MATCH_CONNECTION_AGAINST",
                        new Object[] {conn.getConnectionRequestInfo(),
                                      crInfo});
 
@@ -106,7 +106,7 @@ public abstract class AbstractManagedConnectionFactoryImpl extends ResourceBean
         if (candidate.equals(crInfo) && (subject == null || subject.equals(candidateConn.getSubject()))) {
             try {
                 validateReference(candidateConn, subject);
-                result = true; 
+                result = true;
             } catch (Exception thrown) {
                 result = false;
             }

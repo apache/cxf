@@ -22,9 +22,9 @@ import javax.xml.stream.XMLStreamReader;
 
 /**
  * Interface for XMLStreamReader wrappers
- * 
+ *
  */
 public interface XMLStreamReaderWrapper {
-    
+
     XMLStreamReader wrap(XMLStreamReader reader);
 }

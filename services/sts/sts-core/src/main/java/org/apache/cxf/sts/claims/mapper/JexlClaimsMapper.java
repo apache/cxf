@@ -86,11 +86,11 @@ public class JexlClaimsMapper implements ClaimsMapper {
         return script;
     }
 
-    public void setScript(Script script) {
+    public final void setScript(Script script) {
         this.script = script;
     }
 
-    public void setScript(String scriptLocation) throws IOException {
+    public final void setScript(String scriptLocation) throws IOException {
         URL resource = ClassLoaderUtils.getResource(scriptLocation, this.getClass());
         if (resource != null) {
             scriptLocation = resource.getPath();

@@ -30,23 +30,23 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 
 /**
- * 
+ *
  */
 public final class ClientEndpointCreationLoop {
-    
+
     private final QName portName = new QName("http://apache.org/hello_world_soap_http",
                                              "SoapPort");
 
     private ClientEndpointCreationLoop() {
     }
-    
-    private void iteration() throws URISyntaxException {    
+
+    private void iteration() throws URISyntaxException {
         SOAPService service = new SOAPService();
         service.getPort(portName, Greeter.class);
     }
     /**
      * @param args
-     * @throws URISyntaxException 
+     * @throws URISyntaxException
      */
     public static void main(String[] args) throws URISyntaxException {
         Controller.stopAllocRecording();

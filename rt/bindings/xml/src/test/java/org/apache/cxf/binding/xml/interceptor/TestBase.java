@@ -62,13 +62,13 @@ public class TestBase extends Assert {
     protected PhaseInterceptorChain chain;
 
     protected Message xmlMessage;
-    
+
     protected Bus bus;
 
     protected IMocksControl control;
-    
+
     protected ServiceInfo serviceInfo;
-    
+
     @Before
     public void setUp() throws Exception {
         SortedSet<Phase> phases = new TreeSet<Phase>();
@@ -112,26 +112,26 @@ public class TestBase extends Assert {
         }
         return null;
     }
-    
+
     protected void common(String wsdl, QName portName, Class<?>... jaxbClasses) throws Exception {
         control = EasyMock.createNiceControl();
-        
+
         bus = control.createMock(Bus.class);
-        
+
         WSDLManagerImpl manager = new WSDLManagerImpl();
         XMLWSDLExtensionLoader.registerExtensors(manager);
         EasyMock.expect(bus.getExtension(WSDLManager.class)).andStubReturn(manager);
-        
+
         BindingFactoryManager bindingFactoryManager = control.createMock(BindingFactoryManager.class);
         EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andStubReturn(bindingFactoryManager);
         DestinationFactoryManager dfm = control.createMock(DestinationFactoryManager.class);
         EasyMock.expect(bus.getExtension(DestinationFactoryManager.class)).andStubReturn(dfm);
-        
-        control.replay();        
-        
+
+        control.replay();
+
         assertNotNull(bus.getExtension(WSDLManager.class));
-        
-        WSDLServiceFactory factory = 
+
+        WSDLServiceFactory factory =
             new WSDLServiceFactory(bus, getClass().getResource(wsdl).toString(),
                                    new QName(portName.getNamespaceURI(), "XMLService"));
 
@@ -153,13 +153,13 @@ public class TestBase extends Assert {
         EasyMock.expect(endpoint.getBinding()).andStubReturn(xmlBinding);
         EasyMock.expect(endpoint.getService()).andStubReturn(service);
         EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
-        
+
 
         control.replay();
 
         xmlMessage.getExchange().put(Endpoint.class, endpoint);
         xmlMessage.getExchange().put(org.apache.cxf.service.Service.class, service);
-        
+
 
     }
 }

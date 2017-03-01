@@ -31,13 +31,13 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
     private final String resourcePath;
     private final String contextPath;
     private final int port;
-    
+
     protected AbstractTomcatServer(final String resourcePath, final String contextPath, int portNumber) {
-        this.resourcePath = resourcePath; 
+        this.resourcePath = resourcePath;
         this.contextPath = contextPath;
         this.port = portNumber;
     }
-    
+
     protected void run() {
         System.setProperty("java.naming.factory.url", "org.eclipse.jetty.jndi");
         System.setProperty("java.naming.factory.initial", "org.eclipse.jetty.jndi.InitialContextFactory");
@@ -47,20 +47,20 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
 
         try {
             final File base = createTemporaryDirectory();
-            server.setBaseDir(base.getAbsolutePath());    
-    
+            server.setBaseDir(base.getAbsolutePath());
+
             server.getHost().setAppBase(base.getAbsolutePath());
             server.getHost().setAutoDeploy(true);
             server.getHost().setDeployOnStartup(true);
-            
-            server.addWebapp(contextPath, getClass().getResource(resourcePath).toURI().getPath().toString());   
+
+            server.addWebapp(contextPath, getClass().getResource(resourcePath).toURI().getPath().toString());
             server.start();
         } catch (final Exception ex) {
             ex.printStackTrace();
             fail(ex.getMessage());
         }
     }
-    
+
     private static File createTemporaryDirectory() throws IOException {
         final File base = File.createTempFile("tmp-", "");
 
@@ -69,16 +69,16 @@ public abstract class AbstractTomcatServer extends AbstractBusTestServerBase {
         }
 
         if (!base.mkdir()) {
-            throw new IOException("Cannot create base folder: " + base.getAbsolutePath());           
+            throw new IOException("Cannot create base folder: " + base.getAbsolutePath());
         }
 
         base.deleteOnExit();
         return base;
     }
-        
+
     public void tearDown() throws Exception {
         super.tearDown();
-        
+
         if (server != null) {
             server.stop();
             server.destroy();

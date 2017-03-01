@@ -66,11 +66,11 @@ import org.apache.wss4j.stax.securityEvent.WSSecurityEventConstants;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 
 /**
- * This is a collection of utility methods for use in negotiation exchanges such as WS-SecureConversation 
+ * This is a collection of utility methods for use in negotiation exchanges such as WS-SecureConversation
  * and WS-Trust for SPNEGO.
  */
 final class NegotiationUtils {
-    
+
     private NegotiationUtils() {
         // complete
     }
@@ -82,7 +82,7 @@ final class NegotiationUtils {
         }
         return (Trust10)ai.getAssertion();
     }
-    
+
     static Trust13 getTrust13(AssertionInfoMap aim) {
         AssertionInfo ai = PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.TRUST_13);
         if (ai == null) {
@@ -90,7 +90,7 @@ final class NegotiationUtils {
         }
         return (Trust13)ai.getAssertion();
     }
-    
+
     static Assertion getAddressingPolicy(AssertionInfoMap aim, boolean optional) {
         Collection<AssertionInfo> lst = aim.get(MetadataConstants.USING_ADDRESSING_2004_QNAME);
         Assertion assertion = null;
@@ -114,7 +114,7 @@ final class NegotiationUtils {
                                           optional);
         } else if (optional) {
             return new PrimitiveAssertion(assertion.getName(),
-                                          optional);            
+                                          optional);
         }
         return assertion;
     }
@@ -126,7 +126,7 @@ final class NegotiationUtils {
         }
         return null;
     }
-    
+
     static int getWSCVersion(String tokenTypeValue) throws WSSecurityException {
         if (tokenTypeValue == null) {
             return ConversationConstants.DEFAULT_VERSION;
@@ -137,14 +137,14 @@ final class NegotiationUtils {
         } else if (tokenTypeValue.startsWith(ConversationConstants.WSC_NS_05_12)) {
             return ConversationConstants.getWSTVersion(ConversationConstants.WSC_NS_05_12);
         } else {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                           "unsupportedSecConvVersion");
         }
     }
-    
+
     static void recalcEffectivePolicy(
-        SoapMessage message, 
-        String namespace, 
+        SoapMessage message,
+        String namespace,
         Policy policy,
         Invoker invoker,
         boolean secConv
@@ -161,21 +161,21 @@ final class NegotiationUtils {
 
             TokenStore store = TokenStoreUtils.getTokenStore(message);
             if (secConv) {
-                endpoint = STSUtils.createSCEndpoint(bus, 
+                endpoint = STSUtils.createSCEndpoint(bus,
                                                      namespace,
                                                      endpoint.getEndpointInfo().getTransportId(),
                                                      destination.getAddress().getAddress().getValue(),
-                                                     message.getVersion().getBindingId(), 
+                                                     message.getVersion().getBindingId(),
                                                      policy);
             } else {
-                endpoint = STSUtils.createSTSEndpoint(bus, 
+                endpoint = STSUtils.createSTSEndpoint(bus,
                                                       namespace,
                                                       endpoint.getEndpointInfo().getTransportId(),
                                                       destination.getAddress().getAddress().getValue(),
-                                                      message.getVersion().getBindingId(), 
+                                                      message.getVersion().getBindingId(),
                                                       policy,
                                                       null);
-            } 
+            }
             endpoint.getEndpointInfo().setProperty(TokenStore.class.getName(), store);
             message.getExchange().put(TokenStore.class.getName(), store);
 
@@ -202,16 +202,16 @@ final class NegotiationUtils {
      * Return true on successfully parsing a SecurityContextToken result
      */
     static boolean parseSCTResult(SoapMessage message) {
-        List<WSHandlerResult> results = 
+        List<WSHandlerResult> results =
             CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
         if (results == null) {
             // Try Streaming results
             @SuppressWarnings("unchecked")
-            final List<SecurityEvent> incomingEventList = 
+            final List<SecurityEvent> incomingEventList =
                 (List<SecurityEvent>) message.getExchange().get(SecurityEvent.class.getName() + ".in");
             if (incomingEventList != null) {
                 for (SecurityEvent incomingEvent : incomingEventList) {
-                    if (WSSecurityEventConstants.SECURITY_CONTEXT_TOKEN 
+                    if (WSSecurityEventConstants.SECURITY_CONTEXT_TOKEN
                         == incomingEvent.getSecurityEventType()) {
                         return true;
                     }
@@ -219,14 +219,14 @@ final class NegotiationUtils {
             }
             return false;
         }
-        
+
         for (WSHandlerResult rResult : results) {
-            
-            List<WSSecurityEngineResult> sctResults = 
+
+            List<WSSecurityEngineResult> sctResults =
                 rResult.getActionResults().get(WSConstants.SCT);
             if (sctResults != null) {
                 for (WSSecurityEngineResult wser : sctResults) {
-                    SecurityContextToken tok = 
+                    SecurityContextToken tok =
                         (SecurityContextToken)wser.get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
                     message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
 
@@ -253,5 +253,5 @@ final class NegotiationUtils {
         }
         return false;
     }
-    
+
 }

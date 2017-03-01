@@ -114,7 +114,7 @@ public final class WSDLASTVisitor implements ASTVisitor {
         throws WSDLException, JAXBException {
         this(tns, schemans, corbatypemaptns, null);
     }
-    
+
     public void visit(AST node) {
         // <specification> ::= <definition>+
 
@@ -249,10 +249,10 @@ public final class WSDLASTVisitor implements ASTVisitor {
     }
 
     public Binding[] getCorbaBindings() {
-        List<Binding> result = new ArrayList<Binding>();
+        List<Binding> result = new ArrayList<>();
         Map<QName, Binding> bindings = CastUtils.cast(definition.getBindings());
         for (Binding binding : bindings.values()) {
-            List<ExtensibilityElement> extElements 
+            List<ExtensibilityElement> extElements
                 = CastUtils.cast(binding.getExtensibilityElements());
             for (int i = 0; i < extElements.size(); i++) {
                 ExtensibilityElement el = extElements.get(i);

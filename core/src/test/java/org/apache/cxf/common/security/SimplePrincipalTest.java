@@ -28,11 +28,11 @@ public class SimplePrincipalTest extends Assert {
     public void testNullName() {
         new SimplePrincipal(null);
     }
-    
+
     public void testEquals() {
         assertEquals(new SimplePrincipal("barry"), new SimplePrincipal("barry"));
     }
-    
+
     public void testNotEquals() {
         assertFalse(new SimplePrincipal("barry").equals(new SimplePrincipal("john")));
     }

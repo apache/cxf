@@ -23,13 +23,13 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 
 /**
  * ClientIdProvider is responsible for providing a mapping between
- * the authenticated client and its id  
+ * the authenticated client and its id
  */
 public interface ClientIdProvider {
 
     /**
      * Get a client id
-     * 
+     *
      * @param mc the {@link MessageContext} of this request
      * @return the client id
      */

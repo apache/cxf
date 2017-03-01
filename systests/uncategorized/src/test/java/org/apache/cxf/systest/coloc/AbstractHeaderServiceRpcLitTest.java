@@ -54,12 +54,12 @@ import org.junit.Test;
 public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest {
     static final QName SERVICE_NAME = new QName("http://apache.org/headers/rpc_lit",
                                                 "SOAPHeaderService");
-    static final QName PORT_NAME = new QName("http://apache.org/headers/rpc_lit", 
-                                             "SoapPort");    
+    static final QName PORT_NAME = new QName("http://apache.org/headers/rpc_lit",
+                                             "SoapPort");
     static final String WSDL_LOCATION = "/wsdl/header_rpc_lit.wsdl";
 
     private HeaderTester port;
-    
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
@@ -76,7 +76,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
             verifyTwoWay(port);
         }
     }
-    
+
     @Test
     public void testInHeaderParts() {
         for (int idx = 0; idx < 2; idx++) {
@@ -104,7 +104,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
             verifyFaults(port);
         }
     }
-    
+
     @Test
     public void testAll() {
         for (int idx = 0; idx < 2; idx++) {
@@ -150,7 +150,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
         headerInfo.setMessage(HeaderTesterUtil.INOUT_MESSAGE_IN);
         headerInfo.setOriginator(HeaderTesterUtil.INOUT_ORIGINATOR_IN);
 
-        Holder<HeaderInfo> holder  = new Holder<HeaderInfo>();
+        Holder<HeaderInfo> holder = new Holder<HeaderInfo>();
         holder.value = headerInfo;
         InoutHeaderResponseT inoutHeaderResponse = ht.inoutHeader(inoutHeader, holder);
 
@@ -173,7 +173,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
         Holder<OutHeaderResponseT> respHolder = new Holder<OutHeaderResponseT>();
         respHolder.value = theResponse;
 
-        Holder<HeaderInfo> holder  = new Holder<HeaderInfo>();
+        Holder<HeaderInfo> holder = new Holder<HeaderInfo>();
         HeaderInfo headerInfo = new HeaderInfo();
         headerInfo.setMessage(HeaderTesterUtil.OUT_MESSAGE_IN);
         headerInfo.setOriginator(HeaderTesterUtil.OUT_ORIGINATOR_IN);
@@ -188,7 +188,7 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
     public void verifyFaults(HeaderTester ht) {
         getLogger().debug("Client: calling pingMe user fault");
         PingMeT in = new PingMeT();
-        
+
         try {
             in.setFaultType("USER");
             ht.pingMe(in);
@@ -249,11 +249,11 @@ public abstract class AbstractHeaderServiceRpcLitTest extends AbstractColocTest 
     protected QName getServiceQname() {
         return SERVICE_NAME;
     }
-    
+
     protected QName getPortQName() {
         return PORT_NAME;
     }
-    
+
     protected boolean isFaultCodeCheckEnabled() {
         return false;
     }

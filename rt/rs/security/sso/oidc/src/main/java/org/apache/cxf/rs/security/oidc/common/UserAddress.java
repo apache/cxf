@@ -30,14 +30,14 @@ public class UserAddress extends JsonMapObject {
     public static final String REGION = "region";
     public static final String FORMATTED = "formatted";
     private static final long serialVersionUID = -6065703167243134105L;
-    
+
     public UserAddress() {
     }
-    
+
     public UserAddress(Map<String, Object> claims) {
         super(claims);
     }
-    
+
     public void setStreet(String name) {
         setProperty(STREET, name);
     }

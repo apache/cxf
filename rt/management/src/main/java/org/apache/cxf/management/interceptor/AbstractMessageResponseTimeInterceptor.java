@@ -109,7 +109,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
             cr.increaseCounter(operationCounter, mhtr);
         }
     }
-    
+
     protected ObjectName getServiceCounterName(Exchange ex) {
         Bus bus = ex.getBus();
         StringBuilder buffer = new StringBuilder();
@@ -128,7 +128,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
             if (serviceCounterName == null) {
                 String serviceName = "\"" + escapePatternChars(service.getName().toString()) + "\"";
                 String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
-    
+
                 buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
                 buffer.append(ManagementConstants.BUS_ID_PROP + "=" + bus.getId() + ",");
                 Message message = ex.getOutMessage();
@@ -140,9 +140,9 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
                                   + ".Server,");
                 }
                 buffer.append(ManagementConstants.SERVICE_NAME_PROP + "=" + serviceName + ",");
-    
+
                 buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + portName);
-                
+
                 try {
                     serviceCounterName = new ObjectName(buffer.toString());
                     endpoint.put("javax.management.ObjectName", serviceCounterName);
@@ -152,9 +152,9 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
             }
         }
         return serviceCounterName;
-        
+
     }
-  
+
     protected boolean isServiceCounterEnabled(Exchange ex) {
         Bus bus = ex.getBus();
         CounterRepository counterRepo = bus.getExtension(CounterRepository.class);
@@ -166,7 +166,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         //If serviceCounter is null, we need to wait ResponseTimeOutInterceptor to create it , hence set to true
         return serviceCounter == null || serviceCounter.isEnabled();
     }
-    
+
     protected ObjectName getOperationCounterName(Exchange ex, ObjectName sericeCounterName) {
         BindingOperationInfo bop = ex.getBindingOperationInfo();
         OperationInfo opInfo = bop == null ? null : bop.getOperationInfo();
@@ -199,7 +199,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
             LOG.log(Level.WARNING, "CREATE_COUNTER_OBJECTNAME_FAILED", e);
         }
         return operationCounter;
-        
+
     }
     protected String escapePatternChars(String value) {
         // This can be replaced if really needed with pattern-based matching

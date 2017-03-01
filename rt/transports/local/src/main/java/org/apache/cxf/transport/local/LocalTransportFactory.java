@@ -49,41 +49,41 @@ import org.apache.cxf.wsdl.http.AddressType;
 @NoJSR250Annotations
 public class LocalTransportFactory extends AbstractTransportFactory
     implements DestinationFactory, ConduitInitiator {
-   
+
     public static final String TRANSPORT_ID = "http://cxf.apache.org/transports/local";
-    public static final List<String> DEFAULT_NAMESPACES 
+    public static final List<String> DEFAULT_NAMESPACES
         = Arrays.asList(TRANSPORT_ID);
 
-    
-    public static final String MESSAGE_FILTER_PROPERTIES 
+
+    public static final String MESSAGE_FILTER_PROPERTIES
         = LocalTransportFactory.class.getName() + ".filterProperties";
-    public static final String MESSAGE_INCLUDE_PROPERTIES 
+    public static final String MESSAGE_INCLUDE_PROPERTIES
         = LocalTransportFactory.class.getName() + ".includeProperties";
 
     private static final Logger LOG = LogUtils.getL7dLogger(LocalTransportFactory.class);
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
-    private static final String NULL_ADDRESS 
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
+    private static final String NULL_ADDRESS
         = LocalTransportFactory.class.getName() + ".nulladdress";
 
     static {
         URI_PREFIXES.add("local://");
     }
-    
-    private ConcurrentMap<String, Destination> destinations 
+
+    private ConcurrentMap<String, Destination> destinations
         = new ConcurrentHashMap<String, Destination>();
 
     private Set<String> messageFilterProperties;
     private Set<String> messageIncludeProperties;
-    private Set<String> uriPrefixes = new HashSet<String>(URI_PREFIXES);
+    private Set<String> uriPrefixes = new HashSet<>(URI_PREFIXES);
     private volatile Executor executor;
 
     public LocalTransportFactory() {
         super(DEFAULT_NAMESPACES);
-        
-        messageFilterProperties = new HashSet<String>();
-        messageIncludeProperties = new HashSet<String>();
-        messageFilterProperties.add(Message.REQUESTOR_ROLE); 
-        
+
+        messageFilterProperties = new HashSet<>();
+        messageIncludeProperties = new HashSet<>();
+        messageFilterProperties.add(Message.REQUESTOR_ROLE);
+
         messageIncludeProperties.add(Message.PROTOCOL_HEADERS);
         messageIncludeProperties.add(Message.ENCODING);
         messageIncludeProperties.add(Message.CONTENT_TYPE);
@@ -136,12 +136,12 @@ public class LocalTransportFactory extends AbstractTransportFactory
             }
         }
     }
-    
+
     public Executor getExecutor(Bus bus) {
         if (executor == null && bus != null) {
             WorkQueueManager manager = bus.getExtension(WorkQueueManager.class);
             if (manager != null) {
-                Executor ex =  manager.getNamedWorkQueue("local-transport");
+                Executor ex = manager.getNamedWorkQueue("local-transport");
                 if (ex == null) {
                     ex = manager.getAutomaticWorkQueue();
                 }
@@ -150,7 +150,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
         }
         return executor;
     }
-    
+
     public void setExecutor(Executor executor) {
         this.executor = executor;
     }
@@ -193,14 +193,14 @@ public class LocalTransportFactory extends AbstractTransportFactory
         this.messageIncludeProperties = props;
     }
 
-    
+
     public void copy(Message message, Message copy) {
         Set<String> filter = CastUtils.cast((Set<?>)message.get(MESSAGE_FILTER_PROPERTIES));
         if (filter == null) {
             filter = messageFilterProperties;
         }
-        
-        Set<String> includes =  CastUtils.cast((Set<?>)message.get(MESSAGE_INCLUDE_PROPERTIES));
+
+        Set<String> includes = CastUtils.cast((Set<?>)message.get(MESSAGE_INCLUDE_PROPERTIES));
         if (includes == null) {
             includes = messageIncludeProperties;
         }
@@ -213,5 +213,5 @@ public class LocalTransportFactory extends AbstractTransportFactory
                 copy.put(e.getKey(), e.getValue());
             }
         }
-    }    
+    }
 }

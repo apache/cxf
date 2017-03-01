@@ -82,14 +82,14 @@ public class XNode {
     public void setAttributeValue(final String newAttributeValue) {
         this.attributeValue = newAttributeValue;
     }
-    
+
     public void setDefaultAttributeValue(boolean b) {
         this.isDefaultAttributeValue = b;
     }
     public boolean isDefaultAttributeValue() {
         return this.isDefaultAttributeValue;
     }
-    
+
     public XNode getParentNode() {
         return parentNode;
     }
@@ -170,8 +170,8 @@ public class XNode {
         return sb.toString();
     }
 
-    
-    private boolean matches(Element el) { 
+
+    private boolean matches(Element el) {
         if (el.getLocalName().equals(name.getLocalPart())
             && el.getNamespaceURI().equals(name.getNamespaceURI())) {
             if (!StringUtils.isEmpty(attributeName) && !StringUtils.isEmpty(attributeValue)) {
@@ -205,7 +205,7 @@ public class XNode {
         }
         return false;
     }
-    
+
     public boolean matches(Document doc) {
         Stack<XNode> nodes = new Stack<XNode>();
         nodes.push(this);
@@ -216,6 +216,6 @@ public class XNode {
         }
         pNode = nodes.pop();
         return pNode.matches(doc.getDocumentElement(), nodes);
-        
+
     }
 }

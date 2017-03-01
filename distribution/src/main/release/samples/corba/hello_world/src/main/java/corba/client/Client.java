@@ -31,7 +31,7 @@ public final class Client {
     private Client() {
         //not consructed
     }
-    
+
     static int run(ORB orb, String[] args) throws UserException {
 
         // Get "hello" object

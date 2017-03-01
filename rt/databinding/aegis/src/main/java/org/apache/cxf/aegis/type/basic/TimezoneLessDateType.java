@@ -34,7 +34,7 @@ import org.apache.cxf.aegis.xml.MessageWriter;
  */
 public class TimezoneLessDateType extends DateType {
     private static TimezoneLessXsDateFormat format = new TimezoneLessXsDateFormat();
-    
+
     @Override
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
         String value = reader.getValue();

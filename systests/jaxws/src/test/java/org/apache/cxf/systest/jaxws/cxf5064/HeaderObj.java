@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.jaxws.cxf5064;
 
 /**
- * 
+ *
  */
 public class HeaderObj {
     String field1;

@@ -42,7 +42,7 @@ public @interface SchemaValidation {
      * @return validation type
      */
     SchemaValidationType type() default SchemaValidationType.BOTH;
-    
+
     /**
      * Optional list of schema locations
      * @return schema locations

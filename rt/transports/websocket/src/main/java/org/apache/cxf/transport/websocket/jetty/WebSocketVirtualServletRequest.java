@@ -56,7 +56,7 @@ import org.apache.cxf.transport.websocket.InvalidPathException;
 import org.apache.cxf.transport.websocket.WebSocketUtils;
 
 /**
- * 
+ *
  */
 public class WebSocketVirtualServletRequest implements HttpServletRequest {
     private static final Logger LOG = LogUtils.getL7dLogger(WebSocketVirtualServletRequest.class);
@@ -65,8 +65,8 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     private InputStream in;
     private Map<String, String> requestHeaders;
     private Map<String, Object> attributes;
-    
-    public WebSocketVirtualServletRequest(WebSocketServletHolder websocket, InputStream in) 
+
+    public WebSocketVirtualServletRequest(WebSocketServletHolder websocket, InputStream in)
         throws IOException {
         this.webSocketHolder = websocket;
         this.in = in;
@@ -417,7 +417,7 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     @Override
     public String getPathInfo() {
         String uri = requestHeaders.get(WebSocketUtils.URI_KEY);
-        String servletpath = webSocketHolder.getServletPath(); 
+        String servletpath = webSocketHolder.getServletPath();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.log(Level.FINE, "getPathInfo " + servletpath + " " + uri);
         }
@@ -534,7 +534,7 @@ public class WebSocketVirtualServletRequest implements HttpServletRequest {
     @Override
     public void login(String username, String password) throws ServletException {
         LOG.log(Level.FINE, "login");
-        
+
     }
 
     @Override

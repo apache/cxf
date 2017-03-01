@@ -22,17 +22,17 @@ package org.apache.cxf.systest.callback;
 import org.apache.callback.CallbackPortType;
 
 
-@javax.jws.WebService(serviceName = "CallbackService", 
+@javax.jws.WebService(serviceName = "CallbackService",
                       portName = "CallbackPort",
                       endpointInterface = "org.apache.callback.CallbackPortType",
-                      targetNamespace = "http://apache.org/callback", 
+                      targetNamespace = "http://apache.org/callback",
                       wsdlLocation = "testutils/basic_callback_test.wsdl")
-                  
+
 public class CallbackImpl implements CallbackPortType  {
 
-    //private static final Logger LOG = 
+    //private static final Logger LOG =
     //    Logger.getLogger(CallbackImpl.class.getPackage().getName());
-    
+
     /**
      * serverSayHi
      * @param: return_message (String)
@@ -41,5 +41,5 @@ public class CallbackImpl implements CallbackPortType  {
     public String serverSayHi(String message) {
         return new String("Hi " + message);
     }
-    
+
 }

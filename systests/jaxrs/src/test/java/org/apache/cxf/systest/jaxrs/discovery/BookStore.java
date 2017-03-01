@@ -34,14 +34,14 @@ public class BookStore implements BookStoreInterface {
     @Path("/books")
     @Valid
     public BookWithValidation addBook(@NotNull @FormParam("id") String id,
-            @FormParam("name") String name) {        
+            @FormParam("name") String name) {
         return new BookWithValidation(name, id);
     }
-    
+
     @GET
     @Path("/book/{id}")
     @Valid
-    public BookWithValidation getBook(@NotNull @PathParam("id") String id) {        
+    public BookWithValidation getBook(@NotNull @PathParam("id") String id) {
         return new BookWithValidation("", id);
     }
 }

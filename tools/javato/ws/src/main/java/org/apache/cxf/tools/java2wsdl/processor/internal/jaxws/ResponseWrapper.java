@@ -68,7 +68,7 @@ public final class ResponseWrapper extends Wrapper {
     }
 
     protected List<JavaField> buildFields(final Method method, final MessageInfo message) {
-        List<JavaField> fields = new ArrayList<JavaField>();
+        List<JavaField> fields = new ArrayList<>();
 
         final Class<?> returnType = method.getReturnType();
         JavaField field = new JavaField();
@@ -76,17 +76,17 @@ public final class ResponseWrapper extends Wrapper {
             return fields;
         }
         MessagePartInfo part = message.getMessageParts().get(0);
-        
+
         field.setName(part.getName().getLocalPart());
         field.setTargetNamespace(part.getName().getNamespaceURI());
-               
-        if (method.getAnnotation(WebResult.class) == null 
+
+        if (method.getAnnotation(WebResult.class) == null
             && method.getAnnotation(javax.xml.ws.ResponseWrapper.class) == null
-            || method.getAnnotation(WebResult.class) != null 
+            || method.getAnnotation(WebResult.class) != null
             && method.getAnnotation(WebResult.class).targetNamespace().equals("")) {
-            field.setTargetNamespace("");   
+            field.setTargetNamespace("");
         }
-        
+
         boolean hasReturnType = false;
 
         if (!returnType.isAssignableFrom(void.class)) {
@@ -117,7 +117,7 @@ public final class ResponseWrapper extends Wrapper {
                         if (wParam != null && !StringUtils.isEmpty(wParam.targetNamespace())) {
                             jf.setTargetNamespace(wParam.targetNamespace());
                         }
-                    }                   
+                    }
                 }
                 fields.add(jf);
             }
@@ -125,7 +125,7 @@ public final class ResponseWrapper extends Wrapper {
 
         return fields;
     }
-    
+
     @Override
     public WrapperBeanClass getWrapperBeanClass(final Method method) {
         javax.xml.ws.ResponseWrapper resWrapper = method.getAnnotation(javax.xml.ws.ResponseWrapper.class);

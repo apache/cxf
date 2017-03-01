@@ -56,11 +56,11 @@ public class StaxServer {
         URL busFile = Server.class.getResource("wssec.xml");
         Bus bus = bf.createBus(busFile.toString());
 
-        Properties decCryptoProperties = 
+        Properties decCryptoProperties =
             CryptoFactory.getProperties("etc/Server_Decrypt.properties", StaxServer.class.getClassLoader());
-        Properties sigVerCryptoProperties = 
+        Properties sigVerCryptoProperties =
             CryptoFactory.getProperties("etc/Server_SignVerf.properties", StaxServer.class.getClassLoader());
-        
+
         WSSSecurityProperties properties = new WSSSecurityProperties();
         properties.addAction(WSSConstants.USERNAMETOKEN);
         properties.addAction(WSSConstants.TIMESTAMP);
@@ -71,7 +71,7 @@ public class StaxServer {
         properties.setTokenUser("Alice");
         properties.setSignatureUser("serverx509v1");
         properties.setEncryptionUser("clientx509v1");
-        
+
         properties.setEncryptionCryptoProperties(sigVerCryptoProperties);
         properties.setEncryptionKeyIdentifier(
             WSSecurityTokenConstants.KeyIdentifier_IssuerSerial
@@ -85,7 +85,7 @@ public class StaxServer {
         properties.addEncryptionPart(
             new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Content)
         );
-        
+
         properties.setSignatureCryptoProperties(decCryptoProperties);
         properties.setSignatureKeyIdentifier(
             WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
@@ -98,10 +98,10 @@ public class StaxServer {
             new SecurePart(new QName(WSSConstants.NS_SOAP11, "Body"), SecurePart.Modifier.Content)
         );
         properties.setCallbackHandler(new UTPasswordCallback());
-        
+
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(properties);
         bus.getOutInterceptors().add(ohandler);
-        
+
         WSSSecurityProperties inProperties = new WSSSecurityProperties();
         inProperties.addAction(WSSConstants.USERNAMETOKEN);
         inProperties.addAction(WSSConstants.TIMESTAMP);
@@ -111,7 +111,7 @@ public class StaxServer {
         inProperties.setCallbackHandler(new UTPasswordCallback());
         inProperties.setDecryptionCryptoProperties(decCryptoProperties);
         inProperties.setSignatureVerificationCryptoProperties(sigVerCryptoProperties);
-        
+
         WSS4JStaxInInterceptor inhandler = new WSS4JStaxInInterceptor(inProperties);
         bus.getInInterceptors().add(inhandler);
 

@@ -21,16 +21,16 @@ package org.apache.cxf.configuration;
 
 /**
  * The configurer's interface
- * 
- * A class that implements this interface will perform a 
+ *
+ * A class that implements this interface will perform a
  * bean's configuration work
  */
-public interface Configurer {    
-    
+public interface Configurer {
+
     String DEFAULT_USER_CFG_FILE = "cxf.xml";
 
     String USER_CFG_FILE_PROPERTY_NAME = "cxf.config.file";
-    
+
     String USER_CFG_FILE_PROPERTY_URL = "cxf.config.file.url";
 
     /**
@@ -38,7 +38,7 @@ public interface Configurer {
      * @param beanInstance the instance of the bean which needs to be configured
      */
     void configureBean(Object beanInstance);
-    
+
     /**
      * set up the Bean's value by using Dependency Injection from the application context
      * with a proper name. You can use * as the prefix of wildcard name.

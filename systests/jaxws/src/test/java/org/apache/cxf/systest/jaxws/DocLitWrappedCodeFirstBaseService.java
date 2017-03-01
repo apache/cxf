@@ -23,10 +23,10 @@ import javax.jws.WebService;
 
 @WebService(name = "DocLitWrappedCodeFirstBaseService",
             targetNamespace = "http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstBaseService")
-public interface DocLitWrappedCodeFirstBaseService 
+public interface DocLitWrappedCodeFirstBaseService
     extends DocLitWrappedCodeFirstSubService1,
-    DocLitWrappedCodeFirstSubService2 { 
-    
+    DocLitWrappedCodeFirstSubService2 {
+
     int operationInBase(int i);
 
 }

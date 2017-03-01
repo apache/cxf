@@ -64,21 +64,21 @@ import org.apache.cxf.jca.core.logging.LoggerHelper;
  */
 public class ManagedConnectionImpl implements ManagedConnection {
     private static final Logger LOG = LogUtils.getL7dLogger(ManagedConnectionImpl.class);
-    
-    private Set<ConnectionEventListener> listeners = 
-        Collections.synchronizedSet(new HashSet<ConnectionEventListener>());
-    
-    private Map<Object, Subject> handles = 
+
+    private Set<ConnectionEventListener> listeners =
+        Collections.synchronizedSet(new HashSet<>());
+
+    private Map<Object, Subject> handles =
         Collections.synchronizedMap(new HashMap<Object, Subject>());
     private PrintWriter printWriter;
-    
+
     private ManagedConnectionFactoryImpl mcf;
     private ConnectionRequestInfo connReqInfo;
     private boolean isClosed;
     private Bus bus;
     private Object associatedHandle;
     private Object clientProxy;
-    
+
     public ManagedConnectionImpl(ManagedConnectionFactoryImpl mcf,
             ConnectionRequestInfo connReqInfo, Subject subject) {
         this.mcf = mcf;
@@ -88,7 +88,7 @@ public class ManagedConnectionImpl implements ManagedConnection {
     /* -------------------------------------------------------------------
      * ManagedConnection Methods
      */
-    
+
     public void addConnectionEventListener(ConnectionEventListener listener) {
         if (LOG.isLoggable(Level.FINER)) {
             LOG.finer("add listener : " + listener);
@@ -116,7 +116,7 @@ public class ManagedConnectionImpl implements ManagedConnection {
         if (LOG.isLoggable(Level.FINER)) {
             LOG.finer("destroy");
         }
-        
+
         Client client = ClientProxy.getClient(clientProxy);
         client.destroy();
 
@@ -132,24 +132,24 @@ public class ManagedConnectionImpl implements ManagedConnection {
             LOG.finer("get handle for subject=" + subject + " cxRequestInfo="
                     + cxRequestInfo);
         }
-        
+
         if (isClosed) {
             throw new ResourceException("connection has been closed");
         }
-        
+
         // check request info
         if (!connReqInfo.equals(cxRequestInfo)) {
             throw new ResourceException("connection request info: " + cxRequestInfo
                     + " does not match " + connReqInfo);
         }
-        
+
         CXFConnectionSpec spec = (CXFConnectionSpec)cxRequestInfo;
 
         Object handle = createConnectionHandle(spec);
         handles.put(handle, subject);
         associatedHandle = handle;
         return handle;
-        
+
     }
 
     public LocalTransaction getLocalTransaction() throws ResourceException {
@@ -179,7 +179,7 @@ public class ManagedConnectionImpl implements ManagedConnection {
             LoggerHelper.initializeLoggingOnWriter(printWriter);
         }
     }
-    
+
     /* -------------------------------------------------------------------
      * Public Methods
      */
@@ -187,15 +187,15 @@ public class ManagedConnectionImpl implements ManagedConnection {
     public ConnectionRequestInfo getRequestInfo() {
         return connReqInfo;
     }
-    
+
     public ManagedConnectionFactoryImpl getManagedConnectionFactoryImpl() {
         return mcf;
     }
-    
+
     /* -------------------------------------------------------------------
      * Private Methods
      */
-    
+
     private void sendEvent(final ConnectionEvent coEvent) {
         synchronized (listeners) {
             Iterator<ConnectionEventListener> iterator = listeners.iterator();
@@ -205,7 +205,7 @@ public class ManagedConnectionImpl implements ManagedConnection {
         }
     }
 
-    private void sendEventToListener(ConnectionEventListener listener, 
+    private void sendEventToListener(ConnectionEventListener listener,
             ConnectionEvent coEvent) {
         if (coEvent.getId() == ConnectionEvent.CONNECTION_CLOSED) {
             listener.connectionClosed(coEvent);
@@ -226,53 +226,53 @@ public class ManagedConnectionImpl implements ManagedConnection {
         if (coEvent.getId() == ConnectionEvent.CONNECTION_ERROR_OCCURRED) {
             listener.connectionErrorOccurred(coEvent);
         }
-        
+
     }
-    
+
     private String getUserName() {
         if (associatedHandle != null) {
             Subject subject = handles.get(associatedHandle);
             if (subject != null) {
                 return subject.toString();
             }
-        } 
+        }
         return null;
-        
+
     }
 
     private Object createConnectionHandle(final CXFConnectionSpec spec) {
-                                
-        Class<?> interfaces[] = {CXFConnection.class, BindingProvider.class, 
+
+        Class<?> interfaces[] = {CXFConnection.class, BindingProvider.class,
                 spec.getServiceClass()};
 
-        return Proxy.newProxyInstance(spec.getServiceClass().getClassLoader(), 
+        return Proxy.newProxyInstance(spec.getServiceClass().getClassLoader(),
                 interfaces, new ConnectionInvocationHandler(
                         createClientProxy(spec), spec));
     }
-    
+
     private synchronized Object createClientProxy(final CXFConnectionSpec spec) {
         if (clientProxy == null) {
             validateConnectionSpec(spec);
             ClientProxyFactoryBean factory = null;
-            
+
             if (EndpointUtils.hasWebServiceAnnotation(spec.getServiceClass())) {
                 factory = new JaxWsProxyFactoryBean();
             } else {
                 factory = new ClientProxyFactoryBean();
             }
-            
+
             factory.setBus(getBus(spec.getBusConfigURL()));
             factory.setServiceClass(spec.getServiceClass());
             factory.getServiceFactory().setEndpointName(spec.getEndpointName());
             factory.getServiceFactory().setServiceName(spec.getServiceName());
             factory.getServiceFactory().setWsdlURL(spec.getWsdlURL());
-            
+
             if (spec.getAddress() != null) {
                 factory.setAddress(spec.getAddress());
             }
-            
+
             configureObject(spec.getEndpointName().toString() + ".jaxws-client.proxyFactory", factory);
-            
+
             clientProxy = factory.create();
         }
 
@@ -283,15 +283,15 @@ public class ManagedConnectionImpl implements ManagedConnection {
         if (spec.getServiceClass() == null) {
             throw new IllegalArgumentException("no serviceClass in connection spec");
         }
-        
+
         if (spec.getEndpointName() == null) {
             throw new IllegalArgumentException("no endpointName in connection spec");
         }
-        
+
         if (spec.getServiceName() == null) {
             throw new IllegalArgumentException("no serviceName in connection spec");
         }
-        
+
         if (spec.getWsdlURL() == null) {
             throw new IllegalArgumentException("no wsdlURL in connection spec");
         }
@@ -303,7 +303,7 @@ public class ManagedConnectionImpl implements ManagedConnection {
             configurer.configureBean(name, instance);
         }
     }
-    
+
     private synchronized Bus getBus(URL busConfigLocation) {
         if (bus == null) {
             if (busConfigLocation != null) {
@@ -312,11 +312,11 @@ public class ManagedConnectionImpl implements ManagedConnection {
                 }
                 bus = new SpringBusFactory().createBus(busConfigLocation);
             } else if (mcf.getBusConfigURL() != null) {
-                
+
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Create bus from URL " + mcf.getBusConfigURL());
                 }
-                
+
                 URL url = null;
                 try {
                     url = new URL(mcf.getBusConfigURL());
@@ -327,8 +327,8 @@ public class ManagedConnectionImpl implements ManagedConnection {
                 if (url != null) {
                     bus = new SpringBusFactory().createBus(url);
                 }
-            } 
-            
+            }
+
             if (bus == null) {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("Create default bus");
@@ -342,7 +342,7 @@ public class ManagedConnectionImpl implements ManagedConnection {
     private class ConnectionInvocationHandler implements InvocationHandler {
         private Object target;
         private CXFConnectionSpec spec;
-        
+
         ConnectionInvocationHandler(Object target, CXFConnectionSpec spec) {
             this.target = target;
             this.spec = spec;
@@ -350,37 +350,37 @@ public class ManagedConnectionImpl implements ManagedConnection {
 
         public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable {
-            
+
             if (LOG.isLoggable(Level.FINEST)) {
                 LOG.finest("invoke connection spec:" + spec + " method=" + method);
             }
-            
+
             if ("hashCode".equals(method.getName())) {
                 return method.invoke(Proxy.getInvocationHandler(proxy), args);
             }
-            
+
             if ("equals".equals(method.getName())) {
                 // These are proxies.  We don't really care if their targets are equal.
-                // We do care if these are the same proxy instances that we created.  
-                // Therefore, if their proxy and invocation handler are consistent, 
+                // We do care if these are the same proxy instances that we created.
+                // Therefore, if their proxy and invocation handler are consistent,
                 // we believe they are equal.
                 boolean result = false;
                 try {
                     result = proxy == args[0] && this == Proxy.getInvocationHandler(args[0]);
                 } catch (Exception e) {
                     // ignore and assume not equal
-                }      
+                }
                 return result;
             }
-            
+
             if ("toString".equals(method.getName())) {
                 return "ManagedConnection: " + spec;
             }
-            
+
             if (!handles.containsKey(proxy)) {
                 throw new IllegalArgumentException("Stale connection");
             }
-            
+
             if ("getService".equals(method.getName())) {
                 return handleGetServiceMethod(proxy, method, args);
             } else if ("close".equals(method.getName())) {
@@ -395,25 +395,25 @@ public class ManagedConnectionImpl implements ManagedConnection {
                 Object[] args) {
 
             if (!spec.getServiceClass().equals(args[0])) {
-                throw new IllegalArgumentException("serviceClass " 
+                throw new IllegalArgumentException("serviceClass "
                         + args[0] + " does not match " + spec.getServiceClass());
-            }                                      
-                                                                          
+            }
+
             return target;
         }
-        
+
         private Object handleCloseMethod(Object proxy, Method method,
-                Object[] args) { 
-            
+                Object[] args) {
+
             handles.remove(proxy);
             associatedHandle = null;
             ConnectionEvent event = new ConnectionEvent(ManagedConnectionImpl.this,
                     ConnectionEvent.CONNECTION_CLOSED);
             event.setConnectionHandle(proxy);
             sendEvent(event);
-            
+
             return null;
         }
     }
-   
+
 }

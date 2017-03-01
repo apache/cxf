@@ -26,7 +26,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerLifeCycleListener;
 
 /**
- * 
+ *
  */
 public class MEXServerListener implements ServerLifeCycleListener {
 

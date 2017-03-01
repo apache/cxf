@@ -26,7 +26,7 @@ import org.apache.hello_world_async_soap_http.types.GreetMeSometimeResponse;
 
 
 public class TestAsyncHandler implements AsyncHandler<GreetMeSometimeResponse> {
-    
+
     private GreetMeSometimeResponse reply;
 
     public void handleResponse(Response<GreetMeSometimeResponse> response) {
@@ -37,9 +37,9 @@ public class TestAsyncHandler implements AsyncHandler<GreetMeSometimeResponse> {
             ex.printStackTrace();
         }
     }
-    
+
     public String getResponse() {
         return reply.getResponseType();
     }
-    
+
 }

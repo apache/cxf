@@ -94,9 +94,9 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
         }
         return new ServiceImpl(null, wsdlDocumentLocation,
                                serviceName, serviceClass, features);
-        
+
     }
-    
+
     protected EndpointImpl createEndpointImpl(Bus bus,
                                               String bindingId,
                                               Object implementor,
@@ -143,7 +143,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
         ep.publish(address);
         return ep;
     }
-    
+
     //new in 2.2
     public Endpoint createEndpoint(String bindingId, Class<?> implementorClass,
                                    Invoker invoker, WebServiceFeature ... features) {
@@ -169,10 +169,10 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
         }
     }
-    
 
-    public W3CEndpointReference createW3CEndpointReference(String address, 
-                                                           QName serviceName, 
+
+    public W3CEndpointReference createW3CEndpointReference(String address,
+                                                           QName serviceName,
                                                            QName portName,
                                                            List<Element> metadata,
                                                            String wsdlDocumentLocation,
@@ -181,23 +181,23 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                                           metadata, wsdlDocumentLocation, referenceParameters,
                                           null, null);
     }
-    
+
     /**
      * Convert from EndpointReference to CXF internal 2005/08 EndpointReferenceType
-     * 
+     *
      * @param external the javax.xml.ws.EndpointReference
      * @return CXF internal 2005/08 EndpointReferenceType
      */
     public static EndpointReferenceType convertToInternal(EndpointReference external) {
         if (external instanceof W3CEndpointReference) {
-            
+
             Unmarshaller um = null;
             try {
                 Document doc = DOMUtils.newDocument();
                 DOMResult result = new DOMResult(doc);
                 external.writeTo(result);
                 W3CDOMStreamReader reader = new W3CDOMStreamReader(doc.getDocumentElement());
-                
+
                 // CXF internal 2005/08 EndpointReferenceType should be
                 // compatible with W3CEndpointReference
                 //jaxContext = ContextUtils.getJAXBContext();
@@ -221,14 +221,14 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
         return null;
     }
 
-    
-    
-    
-    
+
+
+
+
     //CHECKSTYLE:OFF - spec requires a bunch of params
     public W3CEndpointReference createW3CEndpointReference(String address,
-                                                           QName interfaceName, 
-                                                           QName serviceName, 
+                                                           QName interfaceName,
+                                                           QName serviceName,
                                                            QName portName,
                                                            List<Element> metadata,
                                                            String wsdlDocumentLocation,
@@ -236,10 +236,10 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                                                            List<Element> elements,
                                                            Map<QName, String> attributes) {
         //CHECKSTYLE:ON
-        if (serviceName != null && portName != null 
+        if (serviceName != null && portName != null
             && wsdlDocumentLocation != null && interfaceName == null) {
             Bus bus = BusFactory.getThreadDefaultBus();
-            WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);          
+            WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
             try {
                 Definition def = wsdlManager.getDefinition(wsdlDocumentLocation);
                 interfaceName = def.getService(serviceName).getPort(portName.getLocalPart()).getBinding()
@@ -278,14 +278,14 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             if (wsdlDocumentLocation != null
                 || interfaceName != null
                 || serviceName != null
-                || (metadata != null && metadata.size() > 0)) {
-                
-                        
+                || (metadata != null && !metadata.isEmpty())) {
+
+
                 writer.writeStartElement(JAXWSAConstants.WSA_PREFIX, JAXWSAConstants.WSA_METADATA_NAME,
                                          JAXWSAConstants.NS_WSA);
                 writer.writeNamespace(JAXWSAConstants.WSAW_PREFIX, JAXWSAConstants.NS_WSAW);
                 writer.writeNamespace(JAXWSAConstants.WSAM_PREFIX, JAXWSAConstants.NS_WSAM);
-                
+
                 if (wsdlDocumentLocation != null) {
                     boolean includeLocationOnly = false;
                     org.apache.cxf.message.Message message = PhaseInterceptorChain.getCurrentMessage();
@@ -293,7 +293,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                         includeLocationOnly = MessageUtils.isTrue(
                             message.getContextualProperty("org.apache.cxf.wsa.metadata.wsdlLocationOnly"));
                     }
-                    String attrubuteValue = serviceName != null && !includeLocationOnly 
+                    String attrubuteValue = serviceName != null && !includeLocationOnly
                             ? serviceName.getNamespaceURI() + " " + wsdlDocumentLocation
                             : wsdlDocumentLocation;
                     writer.writeNamespace(JAXWSAConstants.WSDLI_PFX,
@@ -315,30 +315,30 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                     writer.writeCharacters(portTypePrefix + ":" + interfaceName.getLocalPart());
                     writer.writeEndElement();
                 }
-    
-                
+
+
                 String serviceNamePrefix = null;
-    
+
                 if (serviceName != null) {
-                    serviceNamePrefix = 
+                    serviceNamePrefix =
                         (serviceName.getPrefix() == null || serviceName.getPrefix().length() == 0)
                         ? "ns2" : serviceName.getPrefix();
-    
+
                     writer.writeStartElement(JAXWSAConstants.WSAM_PREFIX,
                                              JAXWSAConstants.WSAM_SERVICENAME_NAME,
                                              JAXWSAConstants.NS_WSAM);
-    
+
                     if (portName != null) {
                         writer.writeAttribute(JAXWSAConstants.WSAM_ENDPOINT_NAME, portName.getLocalPart());
                     }
                     writer.writeNamespace(serviceNamePrefix, serviceName.getNamespaceURI());
                     writer.writeCharacters(serviceNamePrefix + ":" + serviceName.getLocalPart());
-    
+
                     writer.writeEndElement();
                 }
-    
+
                 if (wsdlDocumentLocation != null) {
-    
+
                     writer.writeStartElement(WSDLConstants.WSDL_PREFIX, WSDLConstants.QNAME_DEFINITIONS
                         .getLocalPart(), WSDLConstants.NS_WSDL11);
                     writer.writeNamespace(WSDLConstants.WSDL_PREFIX, WSDLConstants.NS_WSDL11);
@@ -352,16 +352,16 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                     writer.writeEndElement();
                     writer.writeEndElement();
                 }
-    
+
                 if (metadata != null) {
                     for (Element e : metadata) {
                         StaxUtils.writeElement(e, writer, true);
                     }
                 }
-    
+
                 writer.writeEndElement();
             }
-            
+
             if (elements != null) {
                 for (Element e : elements) {
                     StaxUtils.writeElement(e, writer, true);

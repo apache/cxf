@@ -38,20 +38,20 @@ import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
 
 /**
- * Validate a SignedEndorsingSupportingToken policy. 
+ * Validate a SignedEndorsingSupportingToken policy.
  */
 public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
      * Validate policies.
      */
@@ -59,7 +59,7 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             setSignedParts(binding.getSignedParts());
             setEncryptedParts(binding.getEncryptedParts());
             setSignedElements(binding.getSignedElements());
@@ -71,7 +71,7 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
                     assertSecurePartsIfTokenNotRequired(binding, parameters.getAssertionInfoMap());
                     continue;
                 }
-                
+
                 DerivedKeys derivedKeys = token.getDerivedKeys();
                 boolean derived = derivedKeys == DerivedKeys.RequireDerivedKeys;
                 boolean processingFailed = false;
@@ -95,7 +95,7 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
                     if (!processUsernameTokens(parameters, derived)) {
                         processingFailed = true;
                     }
-                } else if (token instanceof SecurityContextToken 
+                } else if (token instanceof SecurityContextToken
                     || token instanceof SpnegoContextToken) {
                     if (!processSCTokens(parameters, derived)) {
                         processingFailed = true;
@@ -103,7 +103,7 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
                 } else if (!(token instanceof IssuedToken)) {
                     processingFailed = true;
                 }
-                
+
                 if (processingFailed) {
                     ai.setNotAsserted(
                         "The received token does not match the signed endorsing supporting token requirement"
@@ -113,15 +113,15 @@ public class SignedEndorsingTokenPolicyValidator extends AbstractSupportingToken
             }
         }
     }
-    
+
     protected boolean isSigned() {
         return true;
     }
-    
+
     protected boolean isEncrypted() {
         return false;
     }
-    
+
     protected boolean isEndorsing() {
         return true;
     }

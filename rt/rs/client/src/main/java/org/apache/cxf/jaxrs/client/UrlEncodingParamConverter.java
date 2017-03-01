@@ -28,21 +28,21 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 public class UrlEncodingParamConverter implements ParamConverter<String> {
 
     private Set<Character> encodeClientParametersList;
-    
+
     public UrlEncodingParamConverter() {
-        this(null);    
+        this(null);
     }
     public UrlEncodingParamConverter(String encodeClientParametersListStr) {
         if (encodeClientParametersListStr != null) {
             String[] chars = encodeClientParametersListStr.trim().split(" ");
-            encodeClientParametersList = new HashSet<Character>();
+            encodeClientParametersList = new HashSet<>();
             for (String ch : chars) {
                 // this may need to be tuned though this should cover URI reserved chars
                 encodeClientParametersList.add(Character.valueOf(ch.charAt(0)));
             }
         }
     }
-    
+
     @Override
     public String fromString(String s) {
         return HttpUtils.urlDecode(s);
@@ -51,7 +51,7 @@ public class UrlEncodingParamConverter implements ParamConverter<String> {
     @Override
     public String toString(String s) {
         if (encodeClientParametersList == null || encodeClientParametersList.isEmpty()) {
-            return HttpUtils.urlEncode(s);    
+            return HttpUtils.urlEncode(s);
         } else {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < s.length(); i++) {
@@ -64,7 +64,7 @@ public class UrlEncodingParamConverter implements ParamConverter<String> {
             }
             return sb.toString();
         }
-        
+
     }
 
 }

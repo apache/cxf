@@ -42,31 +42,31 @@ public class DecoupledFaultHandlerTest extends Assert {
             protected Destination createDecoupledDestination(Exchange exchange, EndpointReferenceType epr) {
                 assertEquals("http://bar", epr.getAddress().getValue());
                 return EasyMock.createMock(Destination.class);
-            }    
+            }
         };
-        
+
         SoapMessage message = new SoapMessage(new MessageImpl());
         QName qname = new QName("http://cxf.apache.org/mustunderstand", "TestMU");
         message.getHeaders().add(new Header(qname, new Object()));
         AddressingProperties maps = new AddressingProperties();
-        
+
         EndpointReferenceType faultTo = new EndpointReferenceType();
         faultTo.setAddress(new AttributedURIType());
         faultTo.getAddress().setValue("http://bar");
         maps.setFaultTo(faultTo);
-        message.put(ContextUtils.getMAPProperty(false, false, false), 
+        message.put(ContextUtils.getMAPProperty(false, false, false),
                     maps);
-        
+
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
         exchange.setInMessage(message);
         exchange.setOneWay(true);
-        
+
         handler.handleFault(message);
         assertTrue(message.getHeaders().isEmpty());
         assertFalse(exchange.isOneWay());
         assertSame(message, exchange.getOutMessage());
         assertNotNull(exchange.getDestination());
     }
-    
+
 }

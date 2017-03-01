@@ -38,7 +38,7 @@ public class ChainInitiationObserverTest extends Assert {
     private TestChain chain;
     private Message message;
     private ChainInitiationObserver observer;
-    
+
     @Before
     public void setUp() {
 
@@ -56,35 +56,35 @@ public class ChainInitiationObserverTest extends Assert {
     public void tearDown() {
         control.verify();
     }
-    
+
     @Test
     public void testPausedChain() {
         message.getInterceptorChain();
         EasyMock.expectLastCall().andReturn(chain).times(2);
         control.replay();
-        
+
         observer.onMessage(message);
         assertTrue(chain.isInvoked());
     }
-    
+
     private static class TestChain extends PhaseInterceptorChain {
-        
+
         private boolean invoked;
-        
+
         TestChain(SortedSet<Phase> ps) {
             super(ps);
         }
-        
+
         @Override
         public void resume() {
             invoked = true;
         }
-        
+
         @Override
         public State getState() {
             return State.PAUSED;
         }
-        
+
         public boolean isInvoked() {
             return invoked;
         }

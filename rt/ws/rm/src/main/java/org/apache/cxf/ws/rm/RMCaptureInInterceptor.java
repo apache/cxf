@@ -48,7 +48,7 @@ import org.apache.cxf.staxutils.transform.OutTransformWriter;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 
 /**
- * 
+ *
  */
 public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
 
@@ -61,7 +61,7 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
 
     @Override
     protected void handle(Message message) throws SequenceFault, RMException {
-       
+
         // all messages are initially captured as they cannot be distinguished at this phase
         // Non application messages temp files are released (cos.releaseTempFileHold()) in RMInInterceptor
         if (!isGET(message) && !MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))
@@ -70,7 +70,7 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
 
             message.getInterceptorChain().add(new RMCaptureInEnd());
             XMLStreamReader reader = message.getContent(XMLStreamReader.class);
-            
+
             if (null != reader) {
                 CachedOutputStream saved = new CachedOutputStream();
                 // REVISIT check factory for READER

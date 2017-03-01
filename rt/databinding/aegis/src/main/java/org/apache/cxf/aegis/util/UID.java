@@ -27,7 +27,7 @@ public final class UID {
     private UID() {
         //utility
     }
-    
+
     public static String generate() {
         return String.valueOf(System.currentTimeMillis()) + counter++ + random.nextInt();
     }

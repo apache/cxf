@@ -30,18 +30,18 @@ import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
 @WebService(serviceName = "NumberService",
-            endpointInterface = "org.apache.cxf.factory_pattern.Number", 
+            endpointInterface = "org.apache.cxf.factory_pattern.Number",
             targetNamespace = "http://cxf.apache.org/factory_pattern")
-            
+
 public class NumberImpl implements org.apache.cxf.factory_pattern.Number {
 
     @Resource
     protected WebServiceContext wsContext;
-    
+
     public IsEvenResponse isEven() {
 
         String id = idFromWebServiceContext(getWebSercviceContext());
-        
+
         int num = stateFromId(id);
         boolean ret = evalIsEeven(num);
         return genResponse(ret);
@@ -50,21 +50,21 @@ public class NumberImpl implements org.apache.cxf.factory_pattern.Number {
     protected WebServiceContext getWebSercviceContext() {
         return wsContext;
     }
-    
+
     protected String idFromWebServiceContext(WebServiceContext wsC) {
         MessageContext mc = wsC.getMessageContext();
         return idFromMessageContext(mc);
     }
 
-    protected String idFromMessageContext(MessageContext mc) {        
+    protected String idFromMessageContext(MessageContext mc) {
         String id = EndpointReferenceUtils.getEndpointReferenceId(mc);
-        
+
         boolean jmsInvoke = null != mc.get(JMSConstants.JMS_REQUEST_MESSAGE);
         if ("999".equals(id) && jmsInvoke) {
             // verification that this is indeed JMS
             throw new RuntimeException("This is indeed JMS, id=" + id);
         }
-        
+
         return id;
     }
 

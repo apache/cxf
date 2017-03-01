@@ -47,7 +47,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     //
     // data
     //
-    
+
     /**
      * the package path used to locate resources specific to this test
      */
@@ -62,12 +62,12 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
             e.printStackTrace();
         }
     }
-    
+
     @BeforeClass
     public static void setupPorts() {
         BusServer.resetPortMap();
     }
-          
+
     public void startServers() throws Exception {
         assertTrue(
             "Server failed to launch",
@@ -76,16 +76,16 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
             launchServer(BusServer.class, true)
         );
     }
-    
-    
+
+
     public void stopServers() throws Exception {
         stopAllServers();
         System.clearProperty(Configurer.USER_CFG_FILE_PROPERTY_URL);
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
-    }    
-    
-    
+    }
+
+
     //
     // tests
     //
@@ -100,14 +100,14 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     }
     public final void testSuccessfulCall(String configuration,
                                          String address,
-                                         URL url, 
+                                         URL url,
                                          boolean dynamicClient) throws Exception {
         setTheConfiguration(configuration);
         startServers();
         if (url == null) {
             url = SOAPService.WSDL_LOCATION;
         }
-        
+
         //CXF-4037 - dynamic client isn't using the conduit settings to resolve schemas
         if (dynamicClient) {
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -116,36 +116,36 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
             Thread.currentThread().setContextClassLoader(loader);
         }
 
-        
-        
+
+
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         BindingProvider provider = (BindingProvider)port;
         provider.getRequestContext().put(
               BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
               address);
-        
+
         //for (int x = 0; x < 100000; x++) {
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
         //}
-        
-        
+
+
         stopServers();
     }
-    
+
     @Test
     public final void testJaxwsServer() throws Exception {
-        testSuccessfulCall("jaxws-server.xml", 
-                           "https://localhost:" + BusServer.getPort(2) + "/SoapContext/HttpsPort");        
+        testSuccessfulCall("jaxws-server.xml",
+                           "https://localhost:" + BusServer.getPort(2) + "/SoapContext/HttpsPort");
     }
     @Test
     public final void testJaxwsServerChangeHttpsToHttp() throws Exception {
-        testSuccessfulCall("jaxws-server.xml", 
-                            "http://localhost:" + BusServer.getPort(3) + "/SoapContext/HttpPort");    
-    }    
+        testSuccessfulCall("jaxws-server.xml",
+                            "http://localhost:" + BusServer.getPort(3) + "/SoapContext/HttpPort");
+    }
     @Test
     public final void testJaxwsEndpoint() throws Exception {
         testSuccessfulCall("jaxws-publish.xml",
@@ -166,7 +166,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
         testSuccessfulCall("pkcs12.xml",
                            "https://localhost:" + BusServer.getPort(6) + "/SoapContext/HttpsPort");
     }
-    
+
     @Test
     public final void testResourceKeySpecEndpoint() throws Exception {
         testSuccessfulCall("resource-key-spec.xml",
@@ -178,9 +178,9 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
                            "https://localhost:" + BusServer.getPort(5) + "/SoapContext/HttpsPort",
                            new URL("https://localhost:" + BusServer.getPort(5) + "/SoapContext/HttpsPort?wsdl"),
                            true);
-        
+
     }
-    
+
     public static class ServerManagersFactory {
         public static KeyManager[] getKeyManagers() {
             KeyManagersType kmt = new KeyManagersType();
@@ -188,7 +188,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
             kst.setResource("keys/Bethal.jks");
             kst.setPassword("password");
             kst.setType("JKS");
-        
+
             kmt.setKeyStore(kst);
             kmt.setKeyPassword("password");
             try {
@@ -197,14 +197,14 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
                 throw new RuntimeException("failed to retrieve key managers", e);
             }
         }
-    
+
         public static TrustManager[] getTrustManagers() {
             TrustManagersType tmt = new TrustManagersType();
             KeyStoreType kst = new KeyStoreType();
             kst.setResource("keys/Truststore.jks");
             kst.setPassword("password");
             kst.setType("JKS");
-        
+
             tmt.setKeyStore(kst);
             try {
                 return TLSParameterJaxBUtils.getTrustManagers(tmt);
@@ -221,7 +221,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
             kst.setResource("keys/Morpit.jks");
             kst.setPassword("password");
             kst.setType("JKS");
-        
+
             kmt.setKeyStore(kst);
             kmt.setKeyPassword("password");
             try {
@@ -230,14 +230,14 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
                 throw new RuntimeException("failed to retrieve key managers", e);
             }
         }
-    
+
         public static TrustManager[] getTrustManagers() {
             TrustManagersType tmt = new TrustManagersType();
             KeyStoreType kst = new KeyStoreType();
             kst.setResource("keys/Truststore.jks");
             kst.setPassword("password");
             kst.setType("JKS");
-        
+
             tmt.setKeyStore(kst);
             try {
                 return TLSParameterJaxBUtils.getTrustManagers(tmt);

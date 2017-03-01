@@ -40,7 +40,7 @@ import static org.junit.Assert.assertNotNull;
  * as the SEB. The simple front end, due to type erasure, turns all the <T> items
  * into xsd:anyType. That exposed a bad assumption in the Javascript code generator,
  * and this test regresses it by not exploding on contact. However, this will
- * be obsolete if the Simple front end is made to cope correctly with Generic 
+ * be obsolete if the Simple front end is made to cope correctly with Generic
  * SEBs.
  */
 public class GenericAegisTest  {

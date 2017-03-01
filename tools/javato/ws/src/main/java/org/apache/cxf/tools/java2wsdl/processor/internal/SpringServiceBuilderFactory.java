@@ -56,12 +56,12 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
 
     public SpringServiceBuilderFactory() {
         super();
-        this.beanDefinitions = new ArrayList<String>(0);
+        this.beanDefinitions = new ArrayList<>(0);
     }
 
     /**
      * Convert a parameter value to the name of a bean we'd use for a data binding.
-     * 
+     *
      * @param databindingName
      * @return
      */
@@ -100,7 +100,7 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
     /**
      * Return the name of a prototype bean from Spring that can provide the service. The use of a bean allows
      * for the possibility of an override.
-     * 
+     *
      * @param s Style of service
      * @return name of bean.
      */
@@ -110,7 +110,7 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
 
     /**
      * This is factored out to permit use in a unit test.
-     * 
+     *
      * @param bus
      * @return
      */
@@ -119,12 +119,12 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
             .getExtension(BusApplicationContext.class);
         GenericApplicationContext appContext = new GenericApplicationContext(busApplicationContext);
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
-        List<URL> urls = ClassLoaderUtils.getResources("META-INF/cxf/java2wsbeans.xml", 
+        List<URL> urls = ClassLoaderUtils.getResources("META-INF/cxf/java2wsbeans.xml",
                                                        SpringServiceBuilderFactory.class);
         for (URL url : urls) {
             reader.loadBeanDefinitions(new UrlResource(url));
         }
-        
+
         for (String pathname : additionalFilePathnames) {
             try {
                 reader.loadBeanDefinitions(new FileSystemResource(pathname));

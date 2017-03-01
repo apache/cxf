@@ -33,11 +33,11 @@ public abstract class AbstractBeanValidationInterceptor extends AbstractValidati
     protected Object getServiceObject(Message message) {
         return checkNotNull(super.getServiceObject(message), "SERVICE_OBJECT_NULL");
     }
-    
+
     protected Method getServiceMethod(Message message) {
         return (Method)checkNotNull(super.getServiceMethod(message), "SERVICE_METHOD_NULL");
     }
-    
+
     private Object checkNotNull(Object object, String name) {
         if (object == null) {
             String message = new org.apache.cxf.common.i18n.Message(name, BUNDLE).toString();
@@ -46,17 +46,17 @@ public abstract class AbstractBeanValidationInterceptor extends AbstractValidati
         }
         return object;
     }
-    
+
     @Override
     protected void handleValidation(final Message message, final Object resourceInstance,
                                     final Method method, final List<Object> arguments) {
-        if (arguments.size() > 0) {
+        if (!arguments.isEmpty()) {
             BeanValidationProvider provider = getProvider(message);
             provider.validateParameters(resourceInstance, method, unwrapArgs(arguments).toArray());
             message.getExchange().put(BeanValidationProvider.class, provider);
         }
     }
-    
+
     protected List<Object> unwrapArgs(List<Object> arguments) {
         return arguments;
     }

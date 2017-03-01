@@ -32,13 +32,13 @@ import org.apache.cxf.wsdl.interceptors.AbstractEndpointSelectionInterceptor;
 
 /**
  * Selects the most appropriate endpoint based on the SOAP version used.
- * 
+ *
  * @param message
  * @param eps
  * @return
  */
 public class EndpointSelectionInterceptor extends AbstractEndpointSelectionInterceptor {
-    
+
     public EndpointSelectionInterceptor() {
         super(Phase.READ);
         getAfter().add(ReadHeadersInterceptor.class.getName());
@@ -51,7 +51,7 @@ public class EndpointSelectionInterceptor extends AbstractEndpointSelectionInter
             EndpointInfo ei = e.getEndpointInfo();
             BindingInfo binding = ei.getBinding();
 
-            if (binding instanceof SoapBindingInfo 
+            if (binding instanceof SoapBindingInfo
                 && ((SoapBindingInfo)binding).getSoapVersion().equals(sv)) {
                 return e;
             }

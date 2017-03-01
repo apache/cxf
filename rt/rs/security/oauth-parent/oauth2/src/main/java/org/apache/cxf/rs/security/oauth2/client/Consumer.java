@@ -22,7 +22,7 @@ public class Consumer {
 
     private String clientId;
     private String clientSecret;
-    
+
     public Consumer() {
 
     }
@@ -41,7 +41,7 @@ public class Consumer {
     public void setKey(String key) {
         setClientId(key);
     }
-    
+
     public String getClientId() {
         return clientId;
     }
@@ -76,5 +76,5 @@ public class Consumer {
     public boolean equals(Object o) {
         return o instanceof Consumer && clientId.equals(((Consumer)o).clientId);
     }
-    
+
 }

@@ -50,37 +50,37 @@ import org.junit.Test;
 
 
 public class CorbaBindingFactoryTest extends Assert {
-    
+
     protected Bus bus;
     protected EndpointInfo endpointInfo;
-    protected EndpointReferenceType target;    
+    protected EndpointReferenceType target;
     protected MessageObserver observer;
     protected Message inMessage;
     CorbaBindingFactory factory;
-    
+
     @Before
     public void setUp() throws Exception {
-        bus = BusFactory.getDefaultBus();       
-        BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);        
+        bus = BusFactory.getDefaultBus();
+        BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
         factory = (CorbaBindingFactory)bfm.getBindingFactory("http://cxf.apache.org/bindings/corba");
-        bfm.registerBindingFactory(CorbaConstants.NU_WSDL_CORBA, factory);               
+        bfm.registerBindingFactory(CorbaConstants.NU_WSDL_CORBA, factory);
     }
-    
+
     @After
     public void tearDown() {
-        bus.shutdown(true);     
+        bus.shutdown(true);
     }
-    
-    protected void setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {        
+
+    protected void setupServiceInfo(String ns, String wsdl, String serviceName, String portName) {
         URL wsdlUrl = getClass().getResource(wsdl);
         assertNotNull(wsdlUrl);
         WSDLServiceFactory f = new WSDLServiceFactory(bus, wsdlUrl.toString(), new QName(ns, serviceName));
 
-        Service service = f.create();        
+        Service service = f.create();
         endpointInfo = service.getEndpointInfo(new QName(ns, portName));
-   
+
     }
-    
+
     @Test
     public void testCreateBinding() throws Exception {
         IMocksControl control = EasyMock.createNiceControl();
@@ -88,55 +88,55 @@ public class CorbaBindingFactoryTest extends Assert {
 
         CorbaBinding binding = (CorbaBinding)factory.createBinding(bindingInfo);
         assertNotNull(binding);
-        assertTrue(CorbaBinding.class.isInstance(binding));        
+        assertTrue(CorbaBinding.class.isInstance(binding));
         List<Interceptor<? extends Message>> inInterceptors = binding.getInInterceptors();
         assertNotNull(inInterceptors);
         List<Interceptor<? extends Message>> outInterceptors = binding.getOutInterceptors();
         assertNotNull(outInterceptors);
         assertEquals(2, inInterceptors.size());
-        assertEquals(2, outInterceptors.size());        
+        assertEquals(2, outInterceptors.size());
     }
 
     @Test
     public void testGetCorbaConduit() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/bindings/corba/simple", 
-                         "/wsdl_corbabinding/simpleIdl.wsdl", 
-                         "SimpleCORBAService", 
+        setupServiceInfo("http://cxf.apache.org/bindings/corba/simple",
+                         "/wsdl_corbabinding/simpleIdl.wsdl",
+                         "SimpleCORBAService",
                          "SimpleCORBAPort");
-        
+
         Conduit conduit = factory.getConduit(endpointInfo, bus);
-        assertNotNull(conduit);   
+        assertNotNull(conduit);
         conduit = factory.getConduit(endpointInfo, null, bus);
         assertNotNull(conduit);
         target = EasyMock.createMock(EndpointReferenceType.class);
         conduit = factory.getConduit(endpointInfo, target, bus);
         assertNotNull(conduit);
     }
-            
+
     @Test
-    public void testGetDestination() throws Exception {                
-        setupServiceInfo("http://cxf.apache.org/bindings/corba/simple", 
-                         "/wsdl_corbabinding/simpleIdl.wsdl", 
-                         "SimpleCORBAService", 
+    public void testGetDestination() throws Exception {
+        setupServiceInfo("http://cxf.apache.org/bindings/corba/simple",
+                         "/wsdl_corbabinding/simpleIdl.wsdl",
+                         "SimpleCORBAService",
                          "SimpleCORBAPort");
-        
+
         Destination destination = factory.getDestination(endpointInfo, bus);
         assertNotNull(destination);
         target = destination.getAddress();
         assertNotNull(target);
     }
-    
+
     @Test
     public void testTransportIds() throws Exception {
-        setupServiceInfo("http://cxf.apache.org/bindings/corba/simple", 
-                         "/wsdl_corbabinding/simpleIdl.wsdl", 
-                         "SimpleCORBAService", 
+        setupServiceInfo("http://cxf.apache.org/bindings/corba/simple",
+                         "/wsdl_corbabinding/simpleIdl.wsdl",
+                         "SimpleCORBAService",
                          "SimpleCORBAPort");
-        
-        List<String> strs = new ArrayList<String>();
+
+        List<String> strs = new ArrayList<>();
         strs.add("one");
         strs.add("two");
-        factory.setTransportIds(strs);        
+        factory.setTransportIds(strs);
         List<String> retStrs = factory.getTransportIds();
         assertNotNull(retStrs);
         String str = retStrs.get(0);
@@ -144,17 +144,17 @@ public class CorbaBindingFactoryTest extends Assert {
         str = retStrs.get(1);
         assertEquals("two", str.toString());
     }
-    
+
     @Test
     public void testGetUriPrefixes() throws Exception {
         Set<String> prefixes = factory.getUriPrefixes();
         assertNotNull("Prefixes should not be null", prefixes != null);
     }
-    
+
     // check this
     @Test
     public void testSetBus() throws Exception {
-        factory.setBus(bus);    
+        factory.setBus(bus);
     }
 
 }

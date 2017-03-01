@@ -38,19 +38,19 @@ import org.apache.cxf.tools.misc.processor.WSDLToSoapProcessor;
 
 public class WSDLToSoap extends AbstractCXFToolContainer {
 
-    static final String TOOL_NAME = "wsdl2soap";    
+    static final String TOOL_NAME = "wsdl2soap";
     static final String BINDING_NAME_POSTFIX = "_Binding";
     static final String STYLE_DEF_VALUE = "document";
     static final String USE_DEF_VALUE = "literal";
-    
+
     public WSDLToSoap(ToolSpec toolspec) throws Exception {
         super(TOOL_NAME, toolspec);
     }
-    
+
     private Set<String> getArrayKeys() {
-        return new HashSet<String>();
+        return new HashSet<>();
     }
-    
+
     public void execute(boolean exitOnFinish) {
         WSDLToSoapProcessor processor = new WSDLToSoapProcessor();
         try {
@@ -63,9 +63,9 @@ public class WSDLToSoap extends AbstractCXFToolContainer {
                 }
                 env.put(ToolConstants.CFG_CMD_ARG, getArgument());
 
-                validate(env);       
+                validate(env);
                 setEnvParamDefValues(env);
-                
+
                 processor.setEnvironment(env);
                 processor.process();
             }
@@ -99,7 +99,7 @@ public class WSDLToSoap extends AbstractCXFToolContainer {
         }
         if (!env.optionSet(ToolConstants.CFG_USE)) {
             env.put(ToolConstants.CFG_USE, USE_DEF_VALUE);
-        }        
+        }
     }
 
     private void validate(ToolContext env) throws ToolException {

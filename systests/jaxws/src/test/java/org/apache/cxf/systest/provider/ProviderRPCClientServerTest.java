@@ -40,19 +40,19 @@ import org.junit.Test;
 
 public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase {
     private static final String PORT = Server.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testSWA() throws Exception {
         SOAPFactory soapFac = SOAPFactory.newInstance();
         MessageFactory msgFac = MessageFactory.newInstance();
         SOAPConnectionFactory conFac = SOAPConnectionFactory.newInstance();
         SOAPMessage msg = msgFac.createMessage();
-        
+
         QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHiWAttach");
         msg.getSOAPBody().addChildElement(soapFac.createElement(sayHi));
         AttachmentPart ap1 = msg.createAttachmentPart();
@@ -62,11 +62,11 @@ public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase
         ap2.setContent("Attachment content - Part 2", "text/plain");
         msg.addAttachmentPart(ap2);
         msg.saveChanges();
-        
+
         SOAPConnection con = conFac.createConnection();
-        URL endpoint = new URL("http://localhost:" + PORT 
+        URL endpoint = new URL("http://localhost:" + PORT
                                + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit1");
-        SOAPMessage response = con.call(msg, endpoint); 
+        SOAPMessage response = con.call(msg, endpoint);
         QName sayHiResp = new QName("http://apache.org/hello_world_rpclit", "sayHiResponse");
         assertNotNull(response.getSOAPBody().getChildElements(sayHiResp));
         assertEquals(2, response.countAttachments());
@@ -89,7 +89,7 @@ public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase
                 String reply = greeter.sayHi();
                 assertNotNull("no response received from service", reply);
                 assertEquals(response2, reply);
-                
+
                 if (doFault) {
                     try {
                         greeter.greetMe("throwFault");
@@ -116,7 +116,7 @@ public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase
         SOAPServiceRPCLit service = new SOAPServiceRPCLit(wsdl, serviceName);
         assertNotNull(service);
 
-        
+
         String response1 = new String("TestGreetMeResponseServerLogicalHandlerServerSOAPHandler");
         String response2 = new String("TestSayHiResponse");
         GreeterRPCLit greeter = service.getPort(portName, GreeterRPCLit.class);
@@ -158,7 +158,7 @@ public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase
 
         doGreeterRPCLit(service, portName, 1, true);
     }
-    
+
     @Test
     public void testPayloadModeWithSourceData() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world_rpc_lit.wsdl");
@@ -171,18 +171,18 @@ public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase
         assertNotNull(service);
 
         String addresses[] = {
-            "http://localhost:" + PORT 
+            "http://localhost:" + PORT
                 + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8",
-            "http://localhost:" + PORT 
+            "http://localhost:" + PORT
                 + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-dom",
-            "http://localhost:" + PORT 
+            "http://localhost:" + PORT
                 + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-sax",
-            "http://localhost:" + PORT 
+            "http://localhost:" + PORT
                 + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-cxfstax",
-            "http://localhost:" + PORT 
+            "http://localhost:" + PORT
                 + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-stax",
-            "http://localhost:" + PORT 
-                + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-stream"               
+            "http://localhost:" + PORT
+                + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-stream"
         };
         String response1 = new String("TestGreetMeResponseServerLogicalHandlerServerSOAPHandler");
         GreeterRPCLit greeter = service.getPort(portName, GreeterRPCLit.class);
@@ -194,7 +194,7 @@ public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase
             assertEquals("wrong response received from service " + ad, response1, greeting);
         }
     }
-    
+
     @Test
     public void testMessageModeWithSAXSourceData() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world_rpc_lit.wsdl");

@@ -43,8 +43,8 @@ public class ActionTest extends AbstractBusClientServerTestBase {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
-    private static boolean unrestrictedPoliciesInstalled = 
+
+    private static boolean unrestrictedPoliciesInstalled =
         SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
 
     @BeforeClass
@@ -56,7 +56,7 @@ public class ActionTest extends AbstractBusClientServerTestBase {
                 launchServer(Server.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -72,19 +72,19 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleIt3DESEncryptionPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUsernameToken() throws Exception {
 
@@ -94,34 +94,34 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         // Successful call
         port.doubleIt(25);
-        
+
         // This should fail, as the client is not sending a UsernameToken
         portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernameToken element");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
-        
-        
+
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUsernameTokenReplay() throws Exception {
 
@@ -131,19 +131,19 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItUsernameTokenPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         Client cxfClient = ClientProxy.getClient(port);
         SecurityHeaderCacheInterceptor cacheInterceptor =
             new SecurityHeaderCacheInterceptor();
         cxfClient.getOutInterceptors().add(cacheInterceptor);
-        
+
         // Make two invocations with the same UsernameToken
         port.doubleIt(25);
         try {
@@ -152,14 +152,14 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testEncryptedPassword() throws Exception {
-        
+
         if (!unrestrictedPoliciesInstalled) {
             return;
         }
@@ -170,19 +170,19 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptedPasswordPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSignedTimestampReplay() throws Exception {
 
@@ -192,19 +192,19 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSignedTimestampPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         Client cxfClient = ClientProxy.getClient(port);
         SecurityHeaderCacheInterceptor cacheInterceptor =
             new SecurityHeaderCacheInterceptor();
         cxfClient.getOutInterceptors().add(cacheInterceptor);
-        
+
         // Make two invocations with the same SecurityHeader
         port.doubleIt(25);
         try {
@@ -213,11 +213,11 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             assertTrue(ex.getMessage().equals(WSSecurityException.UNIFIED_SECURITY_ERR));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Here the client is using "Actions", where the server is using an AsymmetricBinding policy
     @org.junit.Test
     public void testAsymmetricActionToPolicy() throws Exception {
@@ -228,21 +228,21 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         // Successful call
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Here the client is using "Actions", where the server is using an AsymmetricBinding policy
     @org.junit.Test
     public void testAsymmetricEncryptBeforeSigningActionToPolicy() throws Exception {
@@ -253,21 +253,21 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricEncryptBeforeSigningPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         // Successful call
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testEncryption() throws Exception {
 
@@ -277,17 +277,17 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItEncryptionPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         // Successful call
         port.doubleIt(25);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }

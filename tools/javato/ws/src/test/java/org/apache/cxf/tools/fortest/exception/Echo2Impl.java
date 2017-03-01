@@ -20,15 +20,15 @@ package org.apache.cxf.tools.fortest.exception;
 
 import javax.jws.WebService;
 
-@WebService(serviceName = "ListService", portName = "ListPort", 
-            endpointInterface = "org.apache.cxf.tools.fortest.exception.Echo2", 
+@WebService(serviceName = "ListService", portName = "ListPort",
+            endpointInterface = "org.apache.cxf.tools.fortest.exception.Echo2",
             targetNamespace = "http://cxf.apache.org/test/ListService")
 public class Echo2Impl implements Echo2 {
     public String echo(String request) throws ListException {
         return "Response";
 
     }
-    
+
     public String echo2(String request) throws ListException2 {
         return "Response";
 

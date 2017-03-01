@@ -38,19 +38,19 @@ public class QualificationTest extends AbstractAegisTest {
 
     public void setUp() throws Exception {
         super.setUp();
-    
+
         addNamespace("b", "urn:Bean");
         addNamespace("xyzzy", "urn:xyzzy");
         addNamespace("pkg", "http://services.aegis.cxf.apache.org");
         addNamespace("xsi", Constants.URI_2001_SCHEMA_XSI);
     }
-    
+
     @Test
     public void testAnnotatedDefaultUnqualifiedAttribute() throws Exception {
         AegisContext context = new AegisContext();
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
-        
+
         AegisType type = mapping.getTypeCreator().createType(AttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
@@ -62,17 +62,17 @@ public class QualificationTest extends AbstractAegisTest {
         assertValid("/b:root[@attrPlainString]", element);
         assertXPathEquals("/b:root/@attrPlainString", "attrPlain", element);
     }
-    
+
     @Test
     public void testAnnotatedDefaultQualifiedAttribute() throws Exception {
         AegisContext context = new AegisContext();
-        TypeCreationOptions typeCreationOptions = 
+        TypeCreationOptions typeCreationOptions =
             new TypeCreationOptions();
         typeCreationOptions.setQualifyAttributes(true);
         context.setTypeCreationOptions(typeCreationOptions);
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
-        
+
         AegisType type = mapping.getTypeCreator().createType(AttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
@@ -89,28 +89,28 @@ public class QualificationTest extends AbstractAegisTest {
         AegisContext context = new AegisContext();
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
-        
+
         AegisType type = mapping.getTypeCreator().createType(XmlMappedAttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         Context messageContext = new Context(context);
         XmlMappedAttributeBean bean = new XmlMappedAttributeBean();
-        
+
         Element element = writeObjectToElement(type, bean, messageContext);
         assertValid("/b:root[@attrXmlString]", element);
         assertXPathEquals("/b:root/@attrXmlString", "attrXml", element);
     }
-    
+
     @Test
     public void testXmlDefaultQualifiedAttribute() throws Exception {
         AegisContext context = new AegisContext();
-        TypeCreationOptions typeCreationOptions = 
+        TypeCreationOptions typeCreationOptions =
             new TypeCreationOptions();
         typeCreationOptions.setQualifyAttributes(true);
         context.setTypeCreationOptions(typeCreationOptions);
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
-        
+
         AegisType type = mapping.getTypeCreator().createType(XmlMappedAttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 

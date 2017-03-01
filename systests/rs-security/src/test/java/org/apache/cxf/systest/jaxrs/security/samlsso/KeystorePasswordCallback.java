@@ -31,12 +31,12 @@ import org.apache.wss4j.common.ext.WSPasswordCallback;
  */
 
 public class KeystorePasswordCallback implements CallbackHandler {
-    
+
     public KeystorePasswordCallback() {
     }
 
     /**
-     * It attempts to get the password from the private 
+     * It attempts to get the password from the private
      * alias/passwords map.
      */
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
@@ -51,6 +51,6 @@ public class KeystorePasswordCallback implements CallbackHandler {
             }
         }
     }
-    
+
 
 }

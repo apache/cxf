@@ -20,7 +20,7 @@ package org.apache.cxf.systest.jaxws;
 import javax.jws.WebService;
 
 
-@WebService(name = "Hello", serviceName = "HelloService", portName = "HelloPort", 
+@WebService(name = "Hello", serviceName = "HelloService", portName = "HelloPort",
             targetNamespace = "http://cxf.apache.org/systest/wsa/responses",
             endpointInterface = "org.apache.cxf.systest.jaxws.Hello")
 public class HelloImpl implements Hello {

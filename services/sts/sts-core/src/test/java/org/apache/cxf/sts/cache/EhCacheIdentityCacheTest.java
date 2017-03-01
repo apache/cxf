@@ -27,34 +27,34 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.junit.BeforeClass;
 
 public class EhCacheIdentityCacheTest extends org.junit.Assert {
-  
+
     @BeforeClass
     public static void init() throws Exception {
-        
+
     }
-    
+
     // tests TokenStore apis for storing in the cache.
     @org.junit.Test
     public void testOneMapping() throws Exception {
         IdentityMapper mapper = new CacheIdentityMapper();
         Bus bus = BusFactory.getDefaultBus();
         EHCacheIdentityCache cache = new EHCacheIdentityCache(mapper, bus);
-        
+
         cache.mapPrincipal("REALM_A", new CustomTokenPrincipal("user_aaa"), "REALM_B");
         assertEquals(2, cache.size());
         assertNotNull(cache.get("user_aaa", "REALM_A"));
         assertNotNull(cache.get("user_bbb", "REALM_B"));
-        
+
         cache.close();
     }
-    
-    
+
+
     @org.junit.Test
     public void testTwoDistinctMappings() {
         IdentityMapper mapper = new CacheIdentityMapper();
         Bus bus = BusFactory.getDefaultBus();
         EHCacheIdentityCache cache = new EHCacheIdentityCache(mapper, bus);
-        
+
         cache.mapPrincipal("REALM_A", new CustomTokenPrincipal("user_aaa"), "REALM_B");
         cache.mapPrincipal("REALM_C", new CustomTokenPrincipal("user_ccc"), "REALM_D");
         assertEquals(4, cache.size());
@@ -62,16 +62,16 @@ public class EhCacheIdentityCacheTest extends org.junit.Assert {
         assertNotNull(cache.get("user_bbb", "REALM_B"));
         assertNotNull(cache.get("user_ccc", "REALM_C"));
         assertNotNull(cache.get("user_ddd", "REALM_D"));
-        
+
         cache.close();
     }
-    
+
     @org.junit.Test
     public void testTwoDistinctAndOneRelatedMapping() {
         IdentityMapper mapper = new CacheIdentityMapper();
         Bus bus = BusFactory.getDefaultBus();
         EHCacheIdentityCache cache = new EHCacheIdentityCache(mapper, bus);
-        
+
         cache.mapPrincipal("REALM_A", new CustomTokenPrincipal("user_aaa"), "REALM_B");
         cache.mapPrincipal("REALM_C", new CustomTokenPrincipal("user_ccc"), "REALM_D");
         cache.mapPrincipal("REALM_A", new CustomTokenPrincipal("user_aaa"), "REALM_D");
@@ -85,16 +85,16 @@ public class EhCacheIdentityCacheTest extends org.junit.Assert {
         assertEquals(4, cache.get("user_bbb", "REALM_B").size());
         assertEquals(4, cache.get("user_ccc", "REALM_C").size());
         assertEquals(4, cache.get("user_ddd", "REALM_D").size());
-        
+
         cache.close();
     }
-    
+
     @org.junit.Test
     public void testTwoDistinctAndTwoRelatedMapping() {
         IdentityMapper mapper = new CacheIdentityMapper();
         Bus bus = BusFactory.getDefaultBus();
         EHCacheIdentityCache cache = new EHCacheIdentityCache(mapper, bus);
-        
+
         cache.mapPrincipal("REALM_A", new CustomTokenPrincipal("user_aaa"), "REALM_B");
         cache.mapPrincipal("REALM_D", new CustomTokenPrincipal("user_ddd"), "REALM_E");
         assertEquals(4, cache.size());
@@ -103,7 +103,7 @@ public class EhCacheIdentityCacheTest extends org.junit.Assert {
         assertEquals(2, cache.get("user_bbb", "REALM_B").size());
         assertEquals(2, cache.get("user_ddd", "REALM_D").size());
         assertEquals(2, cache.get("user_eee", "REALM_E").size());
-        
+
         cache.mapPrincipal("REALM_B", new CustomTokenPrincipal("user_bbb"), "REALM_C");
         assertEquals(5, cache.size());
         assertNotNull(cache.get("user_aaa", "REALM_A"));
@@ -117,7 +117,7 @@ public class EhCacheIdentityCacheTest extends org.junit.Assert {
         //No mapping occurred between A,B,C and D,E -> distinct
         assertEquals(2, cache.get("user_ddd", "REALM_D").size());
         assertEquals(2, cache.get("user_eee", "REALM_E").size());
-        
+
         cache.mapPrincipal("REALM_C", new CustomTokenPrincipal("user_ccc"), "REALM_E");
         //All mappings are known now
         assertEquals(5, cache.size());
@@ -131,8 +131,8 @@ public class EhCacheIdentityCacheTest extends org.junit.Assert {
         assertEquals(5, cache.get("user_ccc", "REALM_C").size());
         assertEquals(5, cache.get("user_ddd", "REALM_D").size());
         assertEquals(5, cache.get("user_eee", "REALM_E").size());
-        
+
         cache.close();
-    }      
-    
+    }
+
 }

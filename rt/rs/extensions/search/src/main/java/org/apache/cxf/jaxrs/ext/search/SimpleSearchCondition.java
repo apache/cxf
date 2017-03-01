@@ -35,9 +35,9 @@ import org.apache.cxf.jaxrs.ext.search.collections.CollectionCheckInfo;
 /**
  * Simple search condition comparing primitive objects or complex object by its getters. For details see
  * {@link #isMet(Object)} description.
- * 
+ *
  * @param <T> type of search condition.
- * 
+ *
  */
 public class SimpleSearchCondition<T> implements SearchCondition<T> {
 
@@ -52,13 +52,13 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
     }
     private final ConditionType joiningType = ConditionType.AND;
     private T condition;
-    
+
     private List<SearchCondition<T>> scts;
-    
+
     /**
      * Creates search condition with same operator (equality, inequality) applied in all comparison; see
      * {@link #isMet(Object)} for details of comparison.
-     * 
+     *
      * @param cType shared condition type
      * @param condition template object
      */
@@ -74,20 +74,20 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
         this.condition = condition;
         scts = createConditions(null, null, null, cType);
-                
+
     }
 
     /**
      * Creates search condition with different operators (equality, inequality etc) specified for each getter;
      * see {@link #isMet(Object)} for details of comparison. Cannot be used for primitive T type due to
      * per-getter comparison strategy.
-     * 
+     *
      * @param getters2operators getters names and operators to be used with them during comparison
-     * @param realGetters 
-     * @param propertyTypeInfo 
+     * @param realGetters
+     * @param propertyTypeInfo
      * @param condition template object
      */
-    public SimpleSearchCondition(Map<String, ConditionType> getters2operators, 
+    public SimpleSearchCondition(Map<String, ConditionType> getters2operators,
                                  Map<String, String> realGetters,
                                  Map<String, TypeInfo> propertyTypeInfo,
                                  T condition) {
@@ -111,11 +111,11 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         scts = createConditions(getters2operators, realGetters, propertyTypeInfo, null);
     }
 
-    public SimpleSearchCondition(Map<String, ConditionType> getters2operators, 
+    public SimpleSearchCondition(Map<String, ConditionType> getters2operators,
                                  T condition) {
         this(getters2operators, null, null, condition);
     }
-    
+
     @Override
     public T getCondition() {
         return condition;
@@ -154,34 +154,34 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         } else {
             List<SearchCondition<T>> list = new ArrayList<>();
             Map<String, Object> get2val = getGettersAndValues();
-            
+
             Set<String> keySet = get2val != null ? get2val.keySet()
                 : ((SearchBean)condition).getKeySet();
-            
+
             for (String getter : keySet) {
-                ConditionType ct = getters2operators == null ? sharedType 
+                ConditionType ct = getters2operators == null ? sharedType
                     : getters2operators.get(getter.toLowerCase());
                 if (ct == null) {
                     continue;
                 }
-                Object rval = get2val != null 
+                Object rval = get2val != null
                     ? get2val.get(getter) : ((SearchBean)condition).get(getter);
                 if (rval == null) {
                     continue;
                 }
-                String realGetter = realGetters != null && realGetters.containsKey(getter) 
+                String realGetter = realGetters != null && realGetters.containsKey(getter)
                     ? realGetters.get(getter) : getter;
-                
+
                 TypeInfo tInfo = propertyTypeInfo != null ? propertyTypeInfo.get(getter) : null;
                 Type genType = tInfo != null ? tInfo.getGenericType() : rval.getClass();
                 CollectionCheckInfo checkInfo = tInfo != null ? tInfo.getCollectionCheckInfo() : null;
-                
-                PrimitiveSearchCondition<T> pc = checkInfo == null 
+
+                PrimitiveSearchCondition<T> pc = checkInfo == null
                     ? new PrimitiveSearchCondition<>(realGetter, rval, genType, ct, condition)
-                    : new CollectionCheckCondition<>(realGetter, rval, genType, ct, condition, checkInfo);    
-                
+                    : new CollectionCheckCondition<>(realGetter, rval, genType, ct, condition, checkInfo);
+
                 list.add(pc);
-                
+
             }
             if (list.isEmpty()) {
                 throw new IllegalStateException("This search condition is empty and can not be used");
@@ -189,7 +189,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
             return list;
         }
     }
-    
+
     /**
      * Compares given object against template condition object.
      * <p>
@@ -218,41 +218,41 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * cards.
      * <p>
      * <b>Example:</b>
-     * 
+     *
      * <pre>
      * SimpleSearchCondition&lt;Integer&gt; ssc = new SimpleSearchCondition&lt;Integer&gt;(
-     *   ConditionType.GREATER_THAN, 10);    
+     *   ConditionType.GREATER_THAN, 10);
      * ssc.isMet(20);
-     * // true since 20&gt;10 
-     * 
+     * // true since 20&gt;10
+     *
      * class Entity {
      *   public String getName() {...
      *   public int getLevel() {...
      *   public String getMessage() {...
      * }
-     * 
+     *
      * Entity template = new Entity("bbb", 10, null);
      * ssc = new SimpleSearchCondition&lt;Entity&gt;(
-     *   ConditionType.GREATER_THAN, template);    
-     * 
-     * ssc.isMet(new Entity("aaa", 20, "some mesage")); 
-     * // false: is not met, expression '"aaa"&gt;"bbb" and 20&gt;10' is not true  
+     *   ConditionType.GREATER_THAN, template);
+     *
+     * ssc.isMet(new Entity("aaa", 20, "some mesage"));
+     * // false: is not met, expression '"aaa"&gt;"bbb" and 20&gt;10' is not true
      * // since "aaa" is not greater than "bbb"; not that message is null in template hence ingored
-     * 
+     *
      * ssc.isMet(new Entity("ccc", 30, "other message"));
      * // true: is met, expression '"ccc"&gt;"bbb" and 30&gt;10' is true
-     * 
-     * Map&lt;String,ConditionType&gt; map;
+     *
+     * Map&lt;String, ConditionType&gt; map;
      * map.put("name", ConditionType.EQUALS);
      * map.put("level", ConditionType.GREATER_THAN);
      * ssc = new SimpleSearchCondition&lt;Entity&gt;(
      *   ConditionType.GREATER_THAN, template);
-     *   
+     *
      * ssc.isMet(new Entity("ccc", 30, "other message"));
      * // false due to expression '"aaa"=="ccc" and 30&gt;10"' (note different operators)
-     * 
+     *
      * </pre>
-     * 
+     *
      * @throws IllegalAccessException when security manager disallows reflective call of getters.
      */
     @Override
@@ -269,7 +269,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * Creates cache of getters from template (condition) object and its values returned during one-pass
      * invocation. Method isMet() will use its keys to introspect getters of passed pojo object, and values
      * from map in comparison.
-     * 
+     *
      * @return template (condition) object getters mapped to their non-null values
      */
     private Map<String, Object> getGettersAndValues() {
@@ -282,7 +282,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
             }
             //we do not need compare class objects
             getters2values.keySet().remove("class");
-            return getters2values; 
+            return getters2values;
         } else {
             return null;
         }
@@ -315,7 +315,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
     public String toSQL(String table, String... columns) {
         return SearchUtils.toSQL(this, table, columns);
     }
-    
+
     @Override
     public PrimitiveStatement getStatement() {
         if (scts.size() == 1) {
@@ -329,5 +329,5 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
     public void accept(SearchConditionVisitor<T, ?> visitor) {
         visitor.visit(this);
     }
-    
+
 }

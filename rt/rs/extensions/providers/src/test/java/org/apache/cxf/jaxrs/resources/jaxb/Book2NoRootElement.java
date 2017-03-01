@@ -24,18 +24,18 @@ import javax.xml.bind.annotation.XmlType;
 public class Book2NoRootElement {
 
     private int id;
-    
+
     public Book2NoRootElement() {
     }
-    
+
     public Book2NoRootElement(int id) {
         this.id = id;
     }
-    
+
     public int getId() {
         return id;
     }
-    
+
     public void setId(int ident) {
         id = ident;
     }

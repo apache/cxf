@@ -54,11 +54,11 @@ public class ProxyFactory {
      * if there is no appropriate System properties)
      */
     private HTTPClientPolicy systemProxyConfiguration;
-    
+
     public ProxyFactory() {
         this.systemProxyConfiguration = createSystemProxyConfiguration();
     }
-    
+
     private static HTTPClientPolicy createSystemProxyConfiguration() {
         // Retrieve system properties (if any)
         HTTPClientPolicy systemProxyConfiguration = null;
@@ -78,7 +78,7 @@ public class ProxyFactory {
             if (StringUtils.isEmpty(proxyPort)) {
                 proxyPort = "8080";
             }
-            
+
             systemProxyConfiguration.setProxyServerPort(Integer.parseInt(proxyPort));
 
             // Load non proxy hosts
@@ -89,11 +89,11 @@ public class ProxyFactory {
         }
         return systemProxyConfiguration;
     }
-    
+
     /**
-     * This method returns the Proxy server should it be set on the 
+     * This method returns the Proxy server should it be set on the
      * Client Side Policy.
-     * 
+     *
      * @return The proxy server or null, if not set.
      */
     public Proxy createProxy(HTTPClientPolicy policy, URI currentUrl) {

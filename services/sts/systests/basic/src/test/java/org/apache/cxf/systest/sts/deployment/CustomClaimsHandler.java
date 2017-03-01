@@ -34,17 +34,17 @@ import org.apache.cxf.sts.claims.ProcessedClaimCollection;
  */
 public class CustomClaimsHandler implements ClaimsHandler {
 
-    public static final URI ROLE = 
-            URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");  
-    public static final URI GIVEN_NAME = 
-        URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");  
-    public static final URI LANGUAGE = 
+    public static final URI ROLE =
+            URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
+    public static final URI GIVEN_NAME =
+        URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname");
+    public static final URI LANGUAGE =
         URI.create("http://schemas.mycompany.com/claims/language");
-    
+
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
-      
-        if (claims != null && claims.size() > 0) {
+
+        if (claims != null && !claims.isEmpty()) {
             ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
             for (Claim requestClaim : claims) {
                 ProcessedClaim claim = new ProcessedClaim();
@@ -70,7 +70,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
     }
 
     public List<URI> getSupportedClaimTypes() {
-        List<URI> list = new ArrayList<URI>();
+        List<URI> list = new ArrayList<>();
         list.add(ROLE);
         list.add(GIVEN_NAME);
         list.add(LANGUAGE);

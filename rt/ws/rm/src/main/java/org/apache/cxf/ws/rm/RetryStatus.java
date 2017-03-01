@@ -35,32 +35,32 @@ public interface RetryStatus {
      * @return the previous retry time
      */
     Date getPrevious();
-    
+
     /**
      * @return the number of retries
      */
     int getRetries();
-    
+
     /**
      * @return the max number of retries permitted
      */
     int getMaxRetries();
-    
+
     /**
      * @return the nextInterval
      */
     long getNextInterval();
-    
+
     /**
      * @return the backoff
      */
     long getBackoff();
-    
+
     /**
      * @return the pending
      */
     boolean isPending();
-    
+
     /**
      * @return the suspended
      */

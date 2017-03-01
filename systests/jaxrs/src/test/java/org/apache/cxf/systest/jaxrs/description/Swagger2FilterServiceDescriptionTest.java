@@ -23,22 +23,22 @@ import org.junit.Test;
 
 public class Swagger2FilterServiceDescriptionTest extends AbstractSwagger2ServiceDescriptionTest {
     private static final String PORT = allocatePort(Swagger2FilterServiceDescriptionTest.class);
-    
+
     public static class SwaggerFilter extends Server {
         public SwaggerFilter() {
             super(PORT, true);
         }
-        
+
         public static void main(String[] args) {
             start(new SwaggerFilter());
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         startServers(SwaggerFilter.class);
     }
-    
+
     @Override
     protected String getPort() {
         return PORT;
@@ -48,7 +48,7 @@ public class Swagger2FilterServiceDescriptionTest extends AbstractSwagger2Servic
     protected String getExpectedFileYaml() {
         return "swagger2-yaml.txt";
     }
-    
+
     @Test
     public void testApiListingIsProperlyReturnedJSON() throws Exception {
         doTestApiListingIsProperlyReturnedJSON();

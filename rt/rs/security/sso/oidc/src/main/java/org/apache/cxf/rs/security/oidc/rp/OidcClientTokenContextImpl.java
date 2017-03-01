@@ -27,7 +27,7 @@ public class OidcClientTokenContextImpl extends ClientTokenContextImpl implement
     private IdToken idToken;
     private UserInfo userInfo;
     public OidcClientTokenContextImpl() {
-        
+
     }
     public OidcClientTokenContextImpl(IdToken idToken) {
         this.idToken = idToken;

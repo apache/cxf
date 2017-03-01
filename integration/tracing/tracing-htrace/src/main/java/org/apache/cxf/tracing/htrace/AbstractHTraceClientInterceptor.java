@@ -26,16 +26,16 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.htrace.core.Tracer;
 
-public abstract class AbstractHTraceClientInterceptor extends AbstractHTraceClientProvider 
+public abstract class AbstractHTraceClientInterceptor extends AbstractHTraceClientProvider
         implements PhaseInterceptor<Message> {
-    
+
     private String phase;
 
     protected AbstractHTraceClientInterceptor(final String phase, final Tracer tracer) {
         super(tracer);
         this.phase = phase;
     }
-    
+
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         return null;
     }
@@ -55,7 +55,7 @@ public abstract class AbstractHTraceClientInterceptor extends AbstractHTraceClie
     public String getPhase() {
         return phase;
     }
-    
+
     public void handleFault(Message message) {
     }
 

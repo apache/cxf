@@ -25,7 +25,7 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class BeanInCreationExceptionTest extends AbstractCXFSpringTest {
     static String port = TestUtil.getPortNumber("springport");
@@ -38,6 +38,6 @@ public class BeanInCreationExceptionTest extends AbstractCXFSpringTest {
     @Test
     public void testBeanInCreationExceptionTest() throws Exception {
         //CXF-3805
-        //if it gets in here, creation of the context worked.   
+        //if it gets in here, creation of the context worked.
     }
 }

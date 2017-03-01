@@ -40,17 +40,17 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 
 public class JsrJsonpProviderTest extends Assert {
     private JsrJsonpProvider provider;
-    
+
     @Before
     public void setUp() {
         provider = new JsrJsonpProvider();
     }
-    
+
     @Test(expected = IOException.class)
     public void testReadWithNullStream() throws Exception {
         provider.readFrom(JsonStructure.class, null, null, null, null, null);
     }
-    
+
     @Test
     public void testGetSizeReturnsMinusOne() throws Exception {
         assertThat(provider.getSize(null, JsonStructure.class, null, null, null),
@@ -59,112 +59,112 @@ public class JsrJsonpProviderTest extends Assert {
 
     @Test
     public void testReadableTypes() throws Exception {
-        assertThat(provider.isReadable(JsonArray.class, null, null, null), 
+        assertThat(provider.isReadable(JsonArray.class, null, null, null),
             equalTo(true));
-        assertThat(provider.isReadable(JsonStructure.class, null, null, null), 
+        assertThat(provider.isReadable(JsonStructure.class, null, null, null),
             equalTo(true));
-        assertThat(provider.isReadable(JsonObject.class, null, null, null), 
+        assertThat(provider.isReadable(JsonObject.class, null, null, null),
             equalTo(true));
-        assertThat(provider.isReadable(JsonValue.class, null, null, null), 
-            equalTo(false));        
+        assertThat(provider.isReadable(JsonValue.class, null, null, null),
+            equalTo(false));
     }
 
     @Test
     public void testWritableTypes() throws Exception {
-        assertThat(provider.isWriteable(JsonArray.class, null, null, null), 
+        assertThat(provider.isWriteable(JsonArray.class, null, null, null),
             equalTo(true));
-        assertThat(provider.isWriteable(JsonStructure.class, null, null, null), 
+        assertThat(provider.isWriteable(JsonStructure.class, null, null, null),
             equalTo(true));
-        assertThat(provider.isWriteable(JsonObject.class, null, null, null), 
+        assertThat(provider.isWriteable(JsonObject.class, null, null, null),
             equalTo(true));
-        assertThat(provider.isWriteable(JsonValue.class, null, null, null), 
-            equalTo(false));        
+        assertThat(provider.isWriteable(JsonValue.class, null, null, null),
+            equalTo(false));
     }
-    
+
     @Test(expected = IOException.class)
     public void testWriteWithNullStream() throws Exception {
         final JsonObject obj = Json.createObjectBuilder()
             .add("firstName", "Tom")
             .add("lastName", "Tommyknocker")
             .build();
-        
+
         provider.writeTo(obj, JsonObject.class, null, null, null, null, null);
     }
-    
+
     @Test
     public void testReadMalformedJson() throws Exception {
         byte[] bytes = "junk".getBytes();
-         
+
         try {
-            provider.readFrom(JsonStructure.class, null, null, null, null, 
+            provider.readFrom(JsonStructure.class, null, null, null, null,
                 new ByteArrayInputStream(bytes));
             fail("400 BAD REQUEST is expected");
         } catch (WebApplicationException ex) {
-            assertThat(ex.getResponse().getStatus(), 
+            assertThat(ex.getResponse().getStatus(),
                 equalTo(Response.Status.BAD_REQUEST.getStatusCode()));
         }
     }
-    
+
     @Test
     public void testReadJsonObject() throws Exception {
         final StringWriter writer = new StringWriter();
-        
+
         Json.createGenerator(writer)
             .writeStartObject()
             .write("firstName", "Tom")
             .write("lastName", "Tommyknocker")
             .writeEnd()
             .close();
-        
+
         final String str = writer.toString();
         writer.close();
-        
-        final JsonStructure obj = provider.readFrom(JsonStructure.class, null, null, null, null, 
+
+        final JsonStructure obj = provider.readFrom(JsonStructure.class, null, null, null, null,
             new ByteArrayInputStream(str.getBytes()));
-        
+
         assertThat(obj, instanceOf(JsonObject.class));
         assertThat(((JsonObject)obj).getString("firstName"), equalTo("Tom"));
         assertThat(((JsonObject)obj).getString("lastName"), equalTo("Tommyknocker"));
     }
-    
+
     @Test
     public void testReadJsonArray() throws Exception {
         final StringWriter writer = new StringWriter();
-        
+
         Json.createGenerator(writer)
             .writeStartArray()
             .write("Tom")
             .write("Tommyknocker")
             .writeEnd()
             .close();
-        
-        final JsonStructure obj = provider.readFrom(JsonStructure.class, null, null, null, null, 
+
+        final JsonStructure obj = provider.readFrom(JsonStructure.class, null, null, null, null,
             new ByteArrayInputStream(writer.toString().getBytes()));
-        
+
         assertThat(obj, instanceOf(JsonArray.class));
         assertThat(((JsonArray)obj).getString(0), equalTo("Tom"));
         assertThat(((JsonArray)obj).getString(1), equalTo("Tommyknocker"));
         assertThat(((JsonArray)obj).size(), equalTo(2));
     }
-    
+
     @Test
-    public void testWriteJsonObject() throws Exception {        
+    public void testWriteJsonObject() throws Exception {
         final JsonObject obj = Json.createObjectBuilder()
             .add("firstName", "Tom")
             .add("lastName", "Tommyknocker")
-            .build();              
-        
+            .build();
+
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         provider.writeTo(obj, JsonStructure.class, null, null, null, null, out);
         out.close();
-        
-        assertThat(new String(out.toByteArray()), 
+
+        assertThat(new String(out.toByteArray()),
             equalTo("{\"firstName\":\"Tom\",\"lastName\":\"Tommyknocker\"}"));
     }
 
     @Test
     public void testWriteJsonArray() throws Exception {
-        final JsonArray obj = Json.createArrayBuilder()             
+        final JsonArray obj = Json.createArrayBuilder()
             .add(
                 Json.createObjectBuilder()
                     .add("firstName", "Tom")
@@ -175,12 +175,12 @@ public class JsrJsonpProviderTest extends Assert {
                     .add("firstName", "Bob")
                     .add("lastName", "Bobbyknocker")
             )
-            .build();              
+            .build();
 
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         provider.writeTo(obj, JsonStructure.class, null, null, null, null, out);
         out.close();
-        
+
         assertThat(new String(out.toByteArray()),
             equalTo("[{\"firstName\":\"Tom\",\"lastName\":\"Tommyknocker\"},"
                     + "{\"firstName\":\"Bob\",\"lastName\":\"Bobbyknocker\"}]"));

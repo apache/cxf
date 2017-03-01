@@ -24,24 +24,24 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class CachedOutputStreamTest extends CachedStreamTestBase {
-    
+
     @Override
     protected void reloadDefaultProperties() {
         CachedOutputStream.setDefaultThreshold(-1);
         CachedOutputStream.setDefaultMaxSize(-1);
         CachedOutputStream.setDefaultCipherTransformation(null);
     }
-    
+
     @Override
     protected Object createCache() {
         return new CachedOutputStream();
     }
-    
+
     @Override
     protected Object createCache(long threshold) {
         return createCache(threshold, null);
     }
-    
+
     @Override
     protected Object createCache(long threshold, String transformation) {
         CachedOutputStream cos = new CachedOutputStream();
@@ -49,16 +49,16 @@ public class CachedOutputStreamTest extends CachedStreamTestBase {
         cos.setCipherTransformation(transformation);
         return cos;
     }
-    
+
     @Override
     protected String getResetOutValue(String result, Object cache) throws IOException {
         CachedOutputStream cos = (CachedOutputStream)cache;
         cos.write(result.getBytes());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         cos.resetOut(out, true);
-        return out.toString();        
+        return out.toString();
     }
-    
+
     @Override
     protected File getTmpFile(String result, Object cache) throws IOException {
         CachedOutputStream cos = (CachedOutputStream)cache;
@@ -72,7 +72,7 @@ public class CachedOutputStreamTest extends CachedStreamTestBase {
     protected Object getInputStreamObject(Object cache) throws IOException {
         return ((CachedOutputStream)cache).getInputStream();
     }
-    
+
     @Override
     protected String readFromStreamObject(Object obj) throws IOException {
         return readFromStream((InputStream)obj);
@@ -83,5 +83,5 @@ public class CachedOutputStreamTest extends CachedStreamTestBase {
         return readPartiallyFromStream((InputStream)cache, len);
     }
 }
-    
-   
+
+

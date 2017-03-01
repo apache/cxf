@@ -35,7 +35,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.validation.BeanValidationInInterceptor;
 
 @Provider
-public class JAXRSBeanValidationInInterceptor extends BeanValidationInInterceptor 
+public class JAXRSBeanValidationInInterceptor extends BeanValidationInInterceptor
     implements ContainerRequestFilter {
     public JAXRSBeanValidationInInterceptor() {
     }
@@ -47,7 +47,7 @@ public class JAXRSBeanValidationInInterceptor extends BeanValidationInIntercepto
     protected Object getServiceObject(Message message) {
         return ValidationUtils.getResourceInstance(message);
     }
-    
+
     @Override
     protected void handleValidation(final Message message, final Object resourceInstance,
                                     final Method method, final List<Object> arguments) {
@@ -58,10 +58,10 @@ public class JAXRSBeanValidationInInterceptor extends BeanValidationInIntercepto
             throw ex;
         }
     }
-    
+
     @Override
     public void filter(ContainerRequestContext context) throws IOException {
         InterceptorChain chain = PhaseInterceptorChain.getCurrentMessage().getInterceptorChain();
-        chain.add(this);    
+        chain.add(this);
     }
 }

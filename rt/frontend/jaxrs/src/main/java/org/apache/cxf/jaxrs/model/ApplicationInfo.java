@@ -32,12 +32,12 @@ public class ApplicationInfo extends ProviderInfo<Application> {
     public ApplicationInfo(Application provider, Bus bus) {
         this(provider, null, bus);
     }
-    public ApplicationInfo(Application provider, 
-                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies, 
+    public ApplicationInfo(Application provider,
+                        Map<Class<?>, ThreadLocalProxy<?>> constructorProxies,
                         Bus bus) {
         super(provider, constructorProxies, bus, true);
     }
-    
+
     public Map<String, Object> getProperties() {
         Map<String, Object> appProps = super.getProvider().getProperties();
         if (overridingProps.isEmpty()) {

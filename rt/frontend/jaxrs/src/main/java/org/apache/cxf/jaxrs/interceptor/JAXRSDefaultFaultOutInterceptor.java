@@ -57,7 +57,7 @@ public class JAXRSDefaultFaultOutInterceptor extends AbstractOutDatabindingInter
             return;
         }
         final Fault f = (Fault) message.getContent(Exception.class);
-        
+
         Response r = JAXRSUtils.convertFaultToResponse(f.getCause(), message);
         if (r != null) {
             JAXRSUtils.setMessageContentType(message, r);
@@ -68,12 +68,12 @@ public class JAXRSDefaultFaultOutInterceptor extends AbstractOutDatabindingInter
             new JAXRSOutInterceptor().handleMessage(message);
             return;
         }
-        
+
         ServerProviderFactory.releaseRequestState(message);
         if (mustPropogateException(message)) {
             throw f;
         }
-        
+
         new StaxOutInterceptor().handleMessage(message);
         message.put(org.apache.cxf.message.Message.RESPONSE_CODE, f.getStatusCode());
         NSStack nsStack = new NSStack();
@@ -83,19 +83,19 @@ public class JAXRSDefaultFaultOutInterceptor extends AbstractOutDatabindingInter
         try {
             nsStack.add("http://cxf.apache.org/bindings/xformat");
             String prefix = nsStack.getPrefix("http://cxf.apache.org/bindings/xformat");
-            StaxUtils.writeStartElement(writer, prefix, "XMLFault", 
+            StaxUtils.writeStartElement(writer, prefix, "XMLFault",
                                         "http://cxf.apache.org/bindings/xformat");
-            StaxUtils.writeStartElement(writer, prefix, "faultstring", 
+            StaxUtils.writeStartElement(writer, prefix, "faultstring",
                                         "http://cxf.apache.org/bindings/xformat");
             Throwable t = f.getCause();
             writer.writeCharacters(t == null ? f.getMessage() : t.toString());
             // fault string
             writer.writeEndElement();
             // call StaxUtils to write Fault detail.
-            
+
             if (f.getDetail() != null) {
                 StaxUtils.writeStartElement(writer, prefix, "detail", "http://cxf.apache.org/bindings/xformat");
-                StaxUtils.writeNode(DOMUtils.getChild(f.getDetail(), Node.ELEMENT_NODE), 
+                StaxUtils.writeNode(DOMUtils.getChild(f.getDetail(), Node.ELEMENT_NODE),
                                     writer, false);
                 writer.writeEndElement();
             }
@@ -106,17 +106,17 @@ public class JAXRSDefaultFaultOutInterceptor extends AbstractOutDatabindingInter
             throw new Fault(new org.apache.cxf.common.i18n.Message("XML_WRITE_EXC", BUNDLE), xe);
         }
     }
-    
+
     @Override
     public void handleFault(Message message) throws Fault {
         if (mustPropogateException(message)) {
             throw (Fault) message.getContent(Exception.class);
         }
     }
-    
+
     protected boolean mustPropogateException(Message m) {
         return Boolean.TRUE.equals(m.getExchange().get(Message.PROPOGATE_EXCEPTION));
     }
-    
-    
+
+
 }

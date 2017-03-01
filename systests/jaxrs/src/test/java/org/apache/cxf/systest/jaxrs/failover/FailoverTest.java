@@ -37,26 +37,26 @@ import org.junit.Test;
  * Tests failover within a static cluster.
  */
 public class FailoverTest extends AbstractFailoverTest {
-    @Test    
+    @Test
     public void testSequentialStrategyWithCustomTargetSelector() throws Exception {
-        FailoverFeature feature = getCustomFeature(true, false, Server.ADDRESS2, Server.ADDRESS3); 
+        FailoverFeature feature = getCustomFeature(true, false, Server.ADDRESS2, Server.ADDRESS3);
         strategyTest("resolver://info", feature, Server.ADDRESS3, null, false, false, false);
     }
-    
-    @Test    
+
+    @Test
     public void testSequentialStrategyWithCustomTargetSelector2() throws Exception {
-        FailoverFeature feature = getCustomFeature(true, false, Server.ADDRESS2, Server.ADDRESS3); 
+        FailoverFeature feature = getCustomFeature(true, false, Server.ADDRESS2, Server.ADDRESS3);
         strategyTest("resolver://info", feature, Server.ADDRESS3, null, false, false, true);
     }
-    
+
     @Override
     protected FailoverFeature getFeature(boolean random, String... address) {
         return getCustomFeature(false, random, address);
     }
-    
+
     private FailoverFeature getCustomFeature(boolean custom, boolean random, String ...address) {
         FailoverFeature feature = new FailoverFeature();
-        List<String> alternateAddresses = new ArrayList<String>();
+        List<String> alternateAddresses = new ArrayList<>();
         for (String s : address) {
             alternateAddresses.add(s);
         }
@@ -70,10 +70,10 @@ public class FailoverTest extends AbstractFailoverTest {
             feature.setStrategy(strategy);
         }
         if (custom) {
-            FailoverTargetSelector selector = new ReplaceInitialAddressSelector(); 
+            FailoverTargetSelector selector = new ReplaceInitialAddressSelector();
             feature.setTargetSelector(selector);
         }
-        
+
         return feature;
     }
 
@@ -81,11 +81,11 @@ public class FailoverTest extends AbstractFailoverTest {
         @Override
         public synchronized void prepare(Message message) {
             EndpointInfo ei = getEndpoint().getEndpointInfo();
-            ei.setAddress(Server.ADDRESS3); 
+            ei.setAddress(Server.ADDRESS3);
             message.put(Message.ENDPOINT_ADDRESS, Server.ADDRESS3);
             super.prepare(message);
         }
-        
+
         @Override
         protected boolean requiresFailover(Exchange exchange, Exception ex) {
             return false;

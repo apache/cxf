@@ -27,27 +27,27 @@ public class SearchUtilsTest extends Assert {
     public void testSqlWildcardString() {
         assertEquals("abc", SearchUtils.toSqlWildcardString("abc", false));
     }
-    
+
     @Test
     public void testSqlWildcardStringAlways() {
         assertEquals("%abc%", SearchUtils.toSqlWildcardString("abc", true));
     }
-    
+
     @Test
     public void testSqlWildcardString2() {
         assertEquals("%abc", SearchUtils.toSqlWildcardString("*abc", false));
     }
-    
+
     @Test
     public void testSqlWildcardString3() {
         assertEquals("abc%", SearchUtils.toSqlWildcardString("abc*", false));
     }
-    
+
     @Test
     public void testSqlWildcardString4() {
         assertEquals("%abc%", SearchUtils.toSqlWildcardString("*abc*", false));
     }
-    
+
     @Test
     public void testSqlWildcardString5() {
         assertEquals("%", SearchUtils.toSqlWildcardString("*", false));

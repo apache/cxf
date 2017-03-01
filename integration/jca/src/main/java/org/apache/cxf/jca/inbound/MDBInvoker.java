@@ -29,12 +29,12 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.invoker.AbstractInvoker;
 
 /**
- * An invoker that supports direct Message Driven Bean invocation.  
- * It get invoked in the context of the Message Driven Bean that 
- * activates the CXF service endpoint facade.  Applications that put 
- * service implementation inside the Message Driven Bean that activates 
- * the inbound endpoint facade should choose this invoker.  It is 
- * more straightforward and faster than {@link DispatchMBDInvoker} but 
+ * An invoker that supports direct Message Driven Bean invocation.
+ * It get invoked in the context of the Message Driven Bean that
+ * activates the CXF service endpoint facade.  Applications that put
+ * service implementation inside the Message Driven Bean that activates
+ * the inbound endpoint facade should choose this invoker.  It is
+ * more straightforward and faster than {@link DispatchMBDInvoker} but
  * it requires to modify resource adapter's deployment descriptor (ra.xml)
  * as the <messaging-type> needs to be set to the Service Endpoint Interface
  * (SEI) class.
@@ -43,7 +43,7 @@ public class MDBInvoker extends AbstractInvoker {
     private static final Logger LOG = LogUtils.getL7dLogger(MDBInvoker.class);
     private static final int MAX_ATTEMPTS = 5;
     private static final long RETRY_SLEEP = 2000;
-    
+
     private final MessageEndpointFactory endpointFactory;
 
     /**
@@ -68,7 +68,7 @@ public class MDBInvoker extends AbstractInvoker {
     public Object getServiceObject(Exchange context) {
         return getMessageEndpoint();
     }
-    
+
     public void releaseServiceObject(final Exchange context, Object obj) {
         if (obj instanceof MessageEndpoint) {
             MessageEndpoint mep = (MessageEndpoint)obj;
@@ -95,7 +95,7 @@ public class MDBInvoker extends AbstractInvoker {
                 }
             }
         }
-        
+
         return ep;
     }
 }

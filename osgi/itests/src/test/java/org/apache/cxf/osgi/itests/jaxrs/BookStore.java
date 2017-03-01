@@ -55,12 +55,12 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 public class BookStore {
     private Map<Long, Book> books = new HashMap<Long, Book>();
 
-    @Context 
+    @Context
     private UriInfo ui;
 
-    @Context 
+    @Context
     private ResourceInfo rcInfo;
-    
+
     @Context
     private ResourceContext resourceContext;
 
@@ -70,7 +70,7 @@ public class BookStore {
     public BookStore() {
         init();
     }
-    
+
     @GET
     @Path("/books/{id}")
     public Response getBookRoot(@PathParam("id") Long id) {
@@ -85,7 +85,7 @@ public class BookStore {
     @PUT
     @Path("/books/{id}")
     public Response updateBook(@PathParam("id") Long id, Book book) {
-        assertInjections();        
+        assertInjections();
         Book b = books.get(id);
         if (b == null) {
             return Response.status(Status.NOT_FOUND).build();
@@ -124,7 +124,7 @@ public class BookStore {
         return createBook(book);
     }
 
-    
+
     @POST
     @Path("/books")
     public Response createBook(Book book) {
@@ -154,13 +154,13 @@ public class BookStore {
 
     private void init() {
         books.clear();
-        
+
         Book book = new Book();
         book.setId(123);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
-    
+
     private void assertInjections() {
         if (ui.getAbsolutePath() == null) {
             throw new IllegalArgumentException("UriInfo absolute path is null");

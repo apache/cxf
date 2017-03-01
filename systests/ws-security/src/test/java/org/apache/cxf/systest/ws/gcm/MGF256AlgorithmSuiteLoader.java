@@ -43,11 +43,11 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
  * MGF SHA-1 256 specified.
  */
 public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
-    
+
     public MGF256AlgorithmSuiteLoader(Bus bus) {
         bus.setExtension(this, AlgorithmSuiteLoader.class);
     }
-    
+
     public AlgorithmSuite getAlgorithmSuite(Bus bus, SPConstants.SPVersion version, Policy nestedPolicy) {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg != null) {
@@ -55,7 +55,7 @@ public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
             final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
             QName qName = new QName(ns, "Basic256GCMMGFSHA256");
             assertions.put(qName, new PrimitiveAssertion(qName));
-            
+
             reg.registerBuilder(new PrimitiveAssertionBuilder(assertions.keySet()) {
                 public Assertion build(Element element, AssertionBuilderFactory fact) {
                     if (XMLPrimitiveAssertionBuilder.isOptional(element)
@@ -64,17 +64,17 @@ public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     }
                     QName q = new QName(element.getNamespaceURI(), element.getLocalName());
                     return assertions.get(q);
-                }            
+                }
             });
         }
         return new GCMAlgorithmSuite(version, nestedPolicy);
     }
-    
+
     public static class GCMAlgorithmSuite extends AlgorithmSuite {
-        
+
         static {
             ALGORITHM_SUITE_TYPES.put(
-                "Basic256GCMMGFSHA256", 
+                "Basic256GCMMGFSHA256",
                 new AlgorithmSuiteType(
                     "Basic256GCMMGFSHA256",
                     SPConstants.SHA1,
@@ -87,7 +87,7 @@ public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                 )
             );
             ALGORITHM_SUITE_TYPES.put(
-                 "Basic256GCMMGFSHA256Digest", 
+                 "Basic256GCMMGFSHA256Digest",
                  new AlgorithmSuiteType(
                      "Basic256GCMMGFSHA256Digest",
                      SPConstants.SHA256,

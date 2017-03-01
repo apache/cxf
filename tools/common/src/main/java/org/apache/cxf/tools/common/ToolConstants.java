@@ -29,7 +29,7 @@ public final class ToolConstants {
     public static final String XML_NAMESPACE_URI = "http://www.w3.org/XML/1998/namespace";
     public static final String WSDL_NAMESPACE_URI = "http://schemas.xmlsoap.org/wsdl/";
     public static final String WSA_NAMESPACE_URI = "http://www.w3.org/2005/08/addressing";
-    
+
     /**
      * Tools permit caller to pass in additional bean definitions.
      */
@@ -72,7 +72,7 @@ public final class ToolConstants {
     public static final String CFG_ASYNCMETHODS = "asyncMethods";
     public static final String CFG_MIMEMETHODS = "mimeMethods";
     public static final String CFG_DEFAULT_VALUES = "defaultValues";
-    public static final String CFG_JAVASCRIPT_UTILS =  "javascriptUtils";
+    public static final String CFG_JAVASCRIPT_UTILS = "javascriptUtils";
 
 
     public static final String CFG_VALIDATE_WSDL = "validate";
@@ -83,7 +83,7 @@ public final class ToolConstants {
     public static final String CFG_FRONTEND = "frontend";
 
     public static final String CFG_DATABINDING = "databinding";
-    
+
     public static final String DEFAULT_ADDRESS = "http://localhost:9090";
 
     // WSDL2Java Constants
@@ -218,7 +218,7 @@ public final class ToolConstants {
     public static final String IMPORTED_PORTTYPE = "importedPortType";
     public static final String IMPORTED_SERVICE = "importedService";
     public static final String BINDING_GENERATOR = "BindingGenerator";
-   
+
 
     // Tools framework
     public static final String FRONTEND_PLUGIN = "frontend";
@@ -231,7 +231,7 @@ public final class ToolConstants {
     // Suppress the code generation, in this case you can just get the generated code model
     public static final String CFG_SUPPRESS_GEN = "suppress";
     public static final String DEFAULT_PACKAGE_NAME = "defaultnamespace";
-    
+
     //For java2ws tool
     public static final String SERVICE_LIST = "serviceList";
     public static final String GEN_FROM_SEI = "genFromSEI";
@@ -251,7 +251,7 @@ public final class ToolConstants {
     public static final String CLIENT_CLASS = "clientClass";
     public static final String SERVER_CLASS = "serverClass";
     public static final String CFG_JSPREFIXMAP = "javascriptPrefixMap";
-    
+
     private ToolConstants() {
         //utility class
     }

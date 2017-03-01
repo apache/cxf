@@ -38,7 +38,7 @@ import javax.xml.ws.Holder;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-  
+
 import org.apache.cxf.pat.internal.TestCaseBase;
 import org.apache.cxf.pat.internal.TestResult;
 import org.apache.cxf.cxf.performance.DocPortType;
@@ -56,7 +56,7 @@ import org.apache.cxf.performance.complex_type.server.Server;
 public final class Client extends TestCaseBase<DocPortType> {
     private static final QName SERVICE_NAME = new QName(
                                                        "http://cxf.apache.org/cxf/performance",
-                                                       "PerfService");          
+                                                       "PerfService");
     private static final QName PORT_NAME = new QName(
                                                     "http://cxf.apache.org/cxf/performance",
                                                     "DocPortType");
@@ -99,7 +99,7 @@ public final class Client extends TestCaseBase<DocPortType> {
     public static void main(String args[]) throws Exception {
         //workaround issue of xmlsec logging too much
         Logger.getLogger("org.apache.xml.security.signature.Reference").setLevel(Level.WARNING);
-        
+
         int threadIdx = -1;
         int servIdx = -1;
         for (int x = 0; x < args.length; x++) {
@@ -114,12 +114,12 @@ public final class Client extends TestCaseBase<DocPortType> {
             String tmp[] = new String[args.length - servIdx];
             System.arraycopy(args, servIdx, tmp, 0, args.length - servIdx);
             Server.main(tmp);
-            
+
             tmp = new String[servIdx];
             System.arraycopy(args, 0, tmp, 0, servIdx);
             args = tmp;
         }
-        List<String> threadList = new ArrayList<String>();
+        List<String> threadList = new ArrayList<>();
         if (threadIdx != -1) {
             String threads[] = args[threadIdx].split(",");
             for (String s : threads) {
@@ -130,10 +130,10 @@ public final class Client extends TestCaseBase<DocPortType> {
                     int i2 = Integer.parseInt(s2);
                     for (int x = i1; x <= i2; x++) {
                         threadList.add(Integer.toString(x));
-                    }                
+                    }
                 } else {
                     threadList.add(s);
-                } 
+                }
             }
         } else {
             threadList.add("1");
@@ -147,7 +147,7 @@ public final class Client extends TestCaseBase<DocPortType> {
             System.out.println(Arrays.asList(args));
             Client client = new Client(args, first);
             first = false;
-            client.initialize(); 
+            client.initialize();
 
 
             client.run();
@@ -218,7 +218,7 @@ public final class Client extends TestCaseBase<DocPortType> {
         NestedComplexType ct = createComplexType();
         for (int i = 0; i < packetSize; i++) {
             complexTypeSeq.getItem().add(ct);
-        }            
+        }
         // init String and Binary
         String temp = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+?><[]/0123456789";
         inputBase64 = new byte[1024];
@@ -264,7 +264,7 @@ public final class Client extends TestCaseBase<DocPortType> {
     public synchronized DocPortType getPort() {
         try {
             URL wsdl = null;
-            if (wsdlPath.startsWith("file:") 
+            if (wsdlPath.startsWith("file:")
                 || wsdlPath.startsWith("http://")
                 || wsdlPath.startsWith("https://")) {
                 wsdl = new URL(wsdlPath);
@@ -282,7 +282,7 @@ public final class Client extends TestCaseBase<DocPortType> {
 
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
         //httpClientPolicy.setAllowChunking(false);
-  
+
         http.setClient(httpClientPolicy);
         */
         return port;

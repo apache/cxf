@@ -26,9 +26,9 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -80,7 +80,7 @@ public class CXF6655Test extends AbstractClientServerTestBase {
                                            new HashMap<String, HttpFilter>());
         proxy.start();
     }
-    
+
     @Test
     public void testConnection() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws/", "HelloService");

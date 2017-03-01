@@ -42,7 +42,7 @@ import org.apache.cxf.common.logging.LogUtils;
 /**
  * Test client to do websocket calls.
  * @see JAXRSClientServerWebSocketTest
- * 
+ *
  * we may put this in test-tools so that other systests can use this code.
  * for now keep it here to experiment jaxrs websocket scenarios.
  */
@@ -55,15 +55,15 @@ class WebSocketTestClient {
     private AsyncHttpClient client;
     private WebSocket websocket;
     private String url;
-    
+
     WebSocketTestClient(String url) {
-        this.received = new ArrayList<Object>();
-        this.fragments = new ArrayList<Object>();
+        this.received = new ArrayList<>();
+        this.fragments = new ArrayList<>();
         this.latch = new CountDownLatch(1);
         this.client = new AsyncHttpClient();
         this.url = url;
     }
-    
+
     public void connect() throws InterruptedException, ExecutionException, IOException {
         websocket = client.prepareGet(url).execute(
             new WebSocketUpgradeHandler.Builder().addWebSocketListener(new WsSocketListener()).build()).get();
@@ -76,11 +76,11 @@ class WebSocketTestClient {
     public void sendMessage(byte[] message) {
         websocket.sendMessage(message);
     }
-    
+
     public boolean await(int secs) throws InterruptedException {
         return latch.await(secs, TimeUnit.SECONDS);
     }
-    
+
     public void reset(int count) {
         latch = new CountDownLatch(count);
         received.clear();
@@ -92,13 +92,13 @@ class WebSocketTestClient {
 
     public List<Response> getReceivedResponses() {
         Object[] objs = received.toArray();
-        List<Response> responses = new ArrayList<Response>(objs.length);
+        List<Response> responses = new ArrayList<>(objs.length);
         for (Object o : objs) {
             responses.add(new Response(o));
         }
         return responses;
     }
-    
+
     public void close() {
         websocket.close();
         client.close();
@@ -107,15 +107,15 @@ class WebSocketTestClient {
     class WsSocketListener implements WebSocketTextListener, WebSocketByteListener {
 
         public void onOpen(WebSocket ws) {
-            LOG.info("[ws] opened");            
+            LOG.info("[ws] opened");
         }
 
         public void onClose(WebSocket ws) {
-            LOG.info("[ws] closed");            
+            LOG.info("[ws] closed");
         }
 
         public void onError(Throwable t) {
-            LOG.info("[ws] error: " + t);                        
+            LOG.info("[ws] error: " + t);
         }
 
         public void onMessage(byte[] message) {
@@ -137,7 +137,7 @@ class WebSocketTestClient {
         public void onFragment(String fragment, boolean last) {
             processFragments(fragment, last);
         }
-        
+
         private void processFragments(Object f, boolean last) {
             synchronized (fragments) {
                 fragments.add(f);
@@ -169,7 +169,7 @@ class WebSocketTestClient {
             }
         }
     }
-    
+
     private static String makeString(byte[] data) {
         return data == null ? null : makeString(data, 0, data.length).toString();
     }
@@ -186,11 +186,11 @@ class WebSocketTestClient {
         }
         return xbuf.append(cbuf);
     }
-    
+
     private static void writeHex(StringBuilder buf, int b) {
         buf.append(Integer.toHexString(0x100 | (0xff & b)).substring(1)).append(' ');
     }
-    
+
     private static void writePrintable(StringBuilder buf, int b) {
         if (b == 0x0d) {
             buf.append("\\r");
@@ -205,15 +205,15 @@ class WebSocketTestClient {
         }
         buf.append(' ');
     }
-    
+
     //TODO this is a temporary way to verify the response; we should come up with something better.
     public static class Response {
         private Object data;
-        private int pos; 
+        private int pos;
         private int statusCode;
         private String contentType;
         private Object entity;
-        
+
         Response(Object data) {
             this.data = data;
             String line;
@@ -240,25 +240,25 @@ class WebSocketTestClient {
                 System.arraycopy((byte[])data, pos, (byte[])entity, 0, ((byte[])entity).length);
             }
         }
-        
+
         private static boolean isStatusCode(String line) {
             char c = line.charAt(0);
             return '0' <= c && c <= '9';
         }
-        
+
         public int getStatusCode() {
             return statusCode;
         }
-        
+
         public String getContentType() {
             return contentType;
         }
-        
+
         @SuppressWarnings("unused")
         public Object getEntity() {
             return entity;
         }
-        
+
         public String getTextEntity() {
             return gettext(entity);
         }
@@ -270,7 +270,7 @@ class WebSocketTestClient {
             sb.append("Entity: ").append(gettext(entity)).append("\r\n");
             return sb.toString();
         }
-        
+
         private String readLine() {
             StringBuilder sb = new StringBuilder();
             while (pos < length(data)) {

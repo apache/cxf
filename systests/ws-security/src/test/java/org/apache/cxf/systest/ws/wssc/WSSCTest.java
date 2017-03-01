@@ -60,19 +60,19 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
     private static final String OUT = "CXF : ping";
     private static wssec.wssc.PingService svc;
     private static Bus bus;
-    
+
     final TestParam test;
-    
+
     public WSSCTest(TestParam type) {
         this.test = type;
     }
-    
+
     static class TestParam {
         final String prefix;
         final boolean streaming;
         final String port;
         final boolean clearAction;
-        
+
         TestParam(String p, String port, boolean b) {
             prefix = p;
             this.port = port;
@@ -86,11 +86,11 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             clearAction = a;
         }
         public String toString() {
-            return prefix + ":" + port + ":" + (streaming ? "streaming" : "dom") 
+            return prefix + ":" + port + ":" + (streaming ? "streaming" : "dom")
                 + (clearAction ? "/no SOAPAction" : "");
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -105,14 +105,14 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
                    // set this to false to fork
                    launchServer(StaxServer.class, true)
         );
-        
+
         bus = new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssc/client.xml");
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
-        
+
         svc = new wssec.wssc.PingService();
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
         return Arrays.asList(new TestParam[][] {
@@ -140,7 +140,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             {new TestParam("_XD_IPingService", PORT, false)},
             {new TestParam("_XD-SEES_IPingService", PORT, false)},
             {new TestParam("_XD-ES_IPingService", PORT, false)},
-            
+
             {new TestParam("SecureConversation_UserNameOverTransport_IPingService", PORT2, true)},
             // TODO Endorsing streaming not supported
             // {new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService", PORT, true)},
@@ -168,10 +168,10 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             // {new TestParam("_XD_IPingService", PORT, true)},
             // {new TestParam("_XD-SEES_IPingService", PORT, true)},
             // {new TestParam("_XD-ES_IPingService", PORT, true)},
-            
+
             {new TestParam("SecureConversation_UserNameOverTransport_IPingService", STAX_PORT2, false)},
             // TODO StAX Policy Validation error caused by incorrect DOM message
-            // {new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService", 
+            // {new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService",
             //               STAX_PORT, false)},
             {new TestParam("AC_IPingService", STAX_PORT, false)},
             {new TestParam("ADC_IPingService", STAX_PORT, false)},
@@ -195,10 +195,10 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             {new TestParam("_XD_IPingService", STAX_PORT, false)},
             {new TestParam("_XD-SEES_IPingService", STAX_PORT, false)},
             {new TestParam("_XD-ES_IPingService", STAX_PORT, false)},
-            
+
             {new TestParam("SecureConversation_UserNameOverTransport_IPingService", STAX_PORT2, true)},
             // TODO Endorsing derived keys not supported.
-            // {new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService", 
+            // {new TestParam("SecureConversation_MutualCertificate10SignEncrypt_IPingService",
             //               STAX_PORT, true)},
             {new TestParam("AC_IPingService", STAX_PORT, true)},
             {new TestParam("ADC_IPingService", STAX_PORT, true)},
@@ -212,7 +212,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             {new TestParam("_UX_IPingService", STAX_PORT, true)},
             {new TestParam("_UXD_IPingService", STAX_PORT, true)},
             {new TestParam("_UXD-SEES_IPingService", STAX_PORT, true)},
-            // TODO Streaming endorsing not working 
+            // TODO Streaming endorsing not working
             // {new TestParam("XC_IPingService", STAX_PORT, true)},
             // {new TestParam("XDC_IPingService", STAX_PORT, true)},
             // {new TestParam("XDC_IPingService1", STAX_PORT, true)},
@@ -220,28 +220,28 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             // {new TestParam("XDC-SEES_IPingService", STAX_PORT, true)},
             // {new TestParam("_X_IPingService", STAX_PORT, true)},
             {new TestParam("_X10_IPingService", STAX_PORT, true)},
-            // TODO Streaming endorsing not working 
+            // TODO Streaming endorsing not working
             // {new TestParam("_XD_IPingService", STAX_PORT, true)},
             // {new TestParam("_XD-SEES_IPingService", STAX_PORT, true)},
             // {new TestParam("_XD-ES_IPingService", STAX_PORT, true)},
-            
+
             {new TestParam("AC_IPingService", PORT, false, true)},
             {new TestParam("AC_IPingService", PORT, true, true)},
             {new TestParam("AC_IPingService", STAX_PORT, false, true)},
             {new TestParam("AC_IPingService", STAX_PORT, true, true)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         bus.shutdown(true);
         stopAllServers();
     }
-  
+
     @Test
     public void testSecureConversation() throws Exception {
-        final wssec.wssc.IPingService port = 
+        final wssec.wssc.IPingService port =
             svc.getPort(
                 new QName("http://WSSec/wssc", test.prefix),
                 wssec.wssc.IPingService.class
@@ -254,7 +254,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                     "http://localhost:" + test.port + "/" + test.prefix);
         }
-        
+
         if (test.prefix.charAt(0) == '_') {
             //MS would like the _ versions to send a cancel
             ((BindingProvider)port).getRequestContext()
@@ -270,7 +270,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             );
         }
         if (test.clearAction) {
-            AbstractPhaseInterceptor<Message> clearActionInterceptor 
+            AbstractPhaseInterceptor<Message> clearActionInterceptor
                 = new AbstractPhaseInterceptor<Message>(Phase.POST_LOGICAL) {
                     public void handleMessage(Message message) throws Fault {
                         STSClient client = STSUtils.getClient(message, "sct");
@@ -304,5 +304,5 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
     }
 
-    
+
 }

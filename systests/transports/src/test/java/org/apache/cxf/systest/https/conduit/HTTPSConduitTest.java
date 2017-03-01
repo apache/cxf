@@ -66,22 +66,22 @@ import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 
 /**
- * This class tests several issues and Conduit policies based 
+ * This class tests several issues and Conduit policies based
  * on a set up of redirecting servers.
  * <pre>
- * 
+ *
  * Http Redirection:
- * 
+ *
  * Poltim(https:9005)  ----> Mortimer (http:9000)
- * 
+ *
  * HttpS redirection/Trust:
- * 
+ *
  * Tarpin(https:9003) ----> Gordy(https:9001) ----> Bethal(https:9002)
- * 
+ *
  * Hostname Verifier Test
- * 
+ *
  * Morpit (https:9008)
- * 
+ *
  * </pre>HTTPConduitTest
  * The Bethal server issues 401 with differing realms depending on the
  * User name given in the authorization header.
@@ -91,21 +91,21 @@ import org.springframework.context.ApplicationContext;
  */
 public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
     private static final boolean IN_PROCESS = true;
-    
+
     private static TLSClientParameters tlsClientParameters = new TLSClientParameters();
-    private static List<String> servers = new ArrayList<String>();
+    private static List<String> servers = new ArrayList<>();
 
     private static Map<String, String> addrMap = new TreeMap<String, String>();
-    
+
     static {
         try (InputStream key = ClassLoaderUtils.getResourceAsStream("keys/Morpit.jks", HTTPSConduitTest.class);
-            InputStream truststore = 
+            InputStream truststore =
                 ClassLoaderUtils.getResourceAsStream("keys/Truststore.jks", HTTPSConduitTest.class);) {
             //System.setProperty("javax.net.debug", "all");
             KeyManager[] kmgrs = getKeyManagers(getKeyStore("JKS", key, "password"), "password");
-            
+
             TrustManager[] tmgrs = getTrustManagers(getKeyStore("JKS", truststore, "password"));
-            
+
             tlsClientParameters.setKeyManagers(kmgrs);
             tlsClientParameters.setTrustManagers(tmgrs);
         } catch (Exception e) {
@@ -113,25 +113,25 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private final QName serviceName = 
+    private final QName serviceName =
         new QName("http://apache.org/hello_world", "SOAPService");
-    private final QName bethalQ = 
+    private final QName bethalQ =
         new QName("http://apache.org/hello_world", "Bethal");
-    private final QName gordyQ = 
+    private final QName gordyQ =
         new QName("http://apache.org/hello_world", "Gordy");
-    private final QName tarpinQ = 
+    private final QName tarpinQ =
         new QName("http://apache.org/hello_world", "Tarpin");
-    private final QName poltimQ = 
+    private final QName poltimQ =
         new QName("http://apache.org/hello_world", "Poltim");
 
     public HTTPSConduitTest() {
     }
-    
-    
+
+
     public static String getPort(String s) {
         return BusServer.PORTMAP.get(s);
     }
-    
+
     @BeforeClass
     public static void allocatePorts() {
         BusServer.resetPortMap();
@@ -167,9 +167,9 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(null);
         boolean server = launchServer(Server.class, null,
                 new String[] {
-                    name, 
+                    name,
                     addrMap.get(name),
-                    serverC.toString() }, 
+                    serverC.toString() },
                 IN_PROCESS);
         if (server) {
             servers.add(name);
@@ -178,7 +178,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         BusFactory.setThreadDefaultBus(bus);
         return server;
     }
-    
+
     @AfterClass
     public static void cleanUp() {
         Bus b = BusFactory.getDefaultBus(false);
@@ -194,52 +194,52 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
     public static KeyStore getKeyStore(String ksType, InputStream inputStream, String ksPassword)
         throws GeneralSecurityException,
                IOException {
-        
+
         String type = ksType != null
                     ? ksType
                     : KeyStore.getDefaultType();
-                    
+
         char[] password = ksPassword != null
                     ? ksPassword.toCharArray()
                     : null;
 
         // We just use the default Keystore provider
         KeyStore keyStore = KeyStore.getInstance(type);
-        
+
         keyStore.load(inputStream, password);
-        
+
         return keyStore;
     }
 
-    public static KeyManager[] getKeyManagers(KeyStore keyStore, String keyPassword) 
+    public static KeyManager[] getKeyManagers(KeyStore keyStore, String keyPassword)
         throws GeneralSecurityException,
                IOException {
         // For tests, we just use the default algorithm
         String alg = KeyManagerFactory.getDefaultAlgorithm();
-        
+
         char[] keyPass = keyPassword != null
                      ? keyPassword.toCharArray()
                      : null;
-        
+
         // For tests, we just use the default provider.
         KeyManagerFactory fac = KeyManagerFactory.getInstance(alg);
-                     
+
         fac.init(keyStore, keyPass);
-        
+
         return fac.getKeyManagers();
     }
 
-    public static TrustManager[] getTrustManagers(KeyStore keyStore) 
+    public static TrustManager[] getTrustManagers(KeyStore keyStore)
         throws GeneralSecurityException,
                IOException {
         // For tests, we just use the default algorithm
         String alg = TrustManagerFactory.getDefaultAlgorithm();
-        
+
         // For tests, we just use the default provider.
         TrustManagerFactory fac = TrustManagerFactory.getInstance(alg);
-                     
+
         fac.init(keyStore);
-        
+
         return fac.getTrustManagers();
     }
 
@@ -255,7 +255,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
     /**
      * We use this class to reset the default bus.
      * Note: This may not always work in the future.
-     * I was lucky in that "defaultBus" is actually a 
+     * I was lucky in that "defaultBus" is actually a
      * protected static.
      */
     class DefaultBusFactory extends SpringBusFactory {
@@ -266,7 +266,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
             return bus;
         }
     }
-    
+
     /**
      * This methods tests a basic https connection to Bethal.
      * It supplies an authorization policy with preemptive user/pass
@@ -277,7 +277,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         startServer("Bethal");
 
         URL config = getClass().getResource("BethalClientConfig.cxf");
-        
+
         // We go through the back door, setting the default bus.
         new DefaultBusFactory().createBus(config);
         URL wsdl = getClass().getResource("greeting.wsdl");
@@ -290,40 +290,40 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
 
         assertNotNull("Port is null", bethal);
         updateAddressPort(bethal, getPort("PORT4"));
-        verifyBethalClient(bethal);        
+        verifyBethalClient(bethal);
     }
-    
+
     @Test
     public void testGetClientFromSpringContext() throws Exception {
-        startServer("Bethal");        
-        
+        startServer("Bethal");
+
         BusFactory.setDefaultBus(null);
         // The client bean configuration file
         URL beans = getClass().getResource("BethalClientBeans.xml");
         // We go through the back door, setting the default bus.
         Bus bus = new DefaultBusFactory().createBus(beans);
-        
+
         ApplicationContext context = bus.getExtension(BusApplicationContext.class);
-        Greeter bethal = (Greeter)context.getBean("Bethal");        
+        Greeter bethal = (Greeter)context.getBean("Bethal");
         updateAddressPort(bethal, getPort("PORT4"));
         // verify the client side's setting
-        verifyBethalClient(bethal);         
+        verifyBethalClient(bethal);
     }
-    
+
     // we just verify the configurations are loaded successfully
     private void verifyBethalClient(Greeter bethal) {
         Client client = ClientProxy.getClient(bethal);
 
-        HTTPConduit http = 
+        HTTPConduit http =
             (HTTPConduit) client.getConduit();
-        
+
         HTTPClientPolicy httpClientPolicy = http.getClient();
         assertEquals("the httpClientPolicy's autoRedirect should be true",
                      true, httpClientPolicy.isAutoRedirect());
         TLSClientParameters tlsParameters = http.getTlsClientParameters();
         assertNotNull("the http conduit's tlsParameters should not be null", tlsParameters);
-        
-        
+
+
         // If we set any name, but Edward, Mary, or George,
         // and a password of "password" we will get through
         // Bethal.
@@ -334,20 +334,20 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
                      "password", authPolicy.getPassword());
 
         configureProxy(ClientProxy.getClient(bethal));
-        
+
         String answer = bethal.sayHi();
         answer = bethal.sayHi();
         answer = bethal.sayHi();
         answer = bethal.sayHi();
         answer = bethal.sayHi();
-        assertTrue("Unexpected answer: " + answer, 
+        assertTrue("Unexpected answer: " + answer,
                 "Bonjour from Bethal".equals(answer));
-        
-        //With HTTPS, it will just be a CONNECT to the proxy and all the 
+
+        //With HTTPS, it will just be a CONNECT to the proxy and all the
         //data is encrypted.  Thus, the proxy cannot distinquish the requests
         assertProxyRequestCount(0);
     }
-    
+
     /**
      * This methods tests a basic https connection to Bethal.
      * It supplies an authorization policy with premetive user/pass
@@ -366,15 +366,15 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         Greeter bethal = service.getPort(bethalQ, Greeter.class);
         assertNotNull("Port is null", bethal);
         updateAddressPort(bethal, getPort("PORT4"));
-        
+
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(bethal);
-        HTTPConduit http = 
+        HTTPConduit http =
             (HTTPConduit) client.getConduit();
-        
+
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-        
+
         httpClientPolicy.setAutoRedirect(false);
         // If we set any name, but Edward, Mary, or George,
         // and a password of "password" we will get through
@@ -382,18 +382,18 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         AuthorizationPolicy authPolicy = new AuthorizationPolicy();
         authPolicy.setUserName("Betty");
         authPolicy.setPassword("password");
-        
+
         http.setClient(httpClientPolicy);
         http.setTlsClientParameters(tlsClientParameters);
         http.setAuthorization(authPolicy);
-        
+
         configureProxy(client);
         String answer = bethal.sayHi();
-        assertTrue("Unexpected answer: " + answer, 
+        assertTrue("Unexpected answer: " + answer,
                 "Bonjour from Bethal".equals(answer));
         assertProxyRequestCount(0);
     }
-    
+
 
     @Test
     public void testHttpsRedirectToHttpFail() throws Exception {
@@ -413,13 +413,13 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(poltim);
-        HTTPConduit http = 
+        HTTPConduit http =
             (HTTPConduit) client.getConduit();
-        
+
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-        
+
         httpClientPolicy.setAutoRedirect(true);
-        
+
         http.setClient(httpClientPolicy);
         http.setTlsClientParameters(tlsClientParameters);
         configureProxy(client);
@@ -428,48 +428,48 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         //client -> mortimer is http and recoreded
         assertProxyRequestCount(1);
     }
-    
+
     class MyHttpsTrustDecider extends MessageTrustDecider {
-        
+
         private String[] trustName;
         private int      called;
-        
+
         MyHttpsTrustDecider(String name) {
             trustName = new String[] {name};
         }
-        
+
         MyHttpsTrustDecider(String[] name) {
             trustName = name;
         }
-        
+
         public int wasCalled() {
             return called;
         }
-        
+
         public void establishTrust(
             String            conduitName,
             URLConnectionInfo cinfo,
             Message           message
         ) throws UntrustedURLConnectionIOException {
-        
+
             called++;
 
             HttpsURLConnectionInfo ci = (HttpsURLConnectionInfo) cinfo;
             boolean trusted = false;
             for (int i = 0; i < trustName.length; i++) {
-                trusted = trusted 
+                trusted = trusted
                          || ci.getPeerPrincipal()
                                  .toString().contains("OU=" + trustName[i]);
             }
             if (!trusted) {
                 throw new UntrustedURLConnectionIOException(
-                        "Peer Principal \"" 
-                        + ci.getPeerPrincipal() 
-                        + "\" does not contain " 
+                        "Peer Principal \""
+                        + ci.getPeerPrincipal()
+                        + "\" does not contain "
                         + getTrustNames());
             }
         }
-        
+
         private String getTrustNames() {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < trustName.length; i++) {
@@ -483,7 +483,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
             return sb.toString();
         }
     }
-    
+
     @Test
     public void testHttpsTrust() throws Exception {
         startServer("Bethal");
@@ -497,15 +497,15 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         Greeter bethal = service.getPort(bethalQ, Greeter.class);
         assertNotNull("Port is null", bethal);
         updateAddressPort(bethal, getPort("PORT4"));
-        
+
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(bethal);
-        HTTPConduit http = 
+        HTTPConduit http =
             (HTTPConduit) client.getConduit();
-        
+
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-        
+
         httpClientPolicy.setAutoRedirect(false);
         // If we set any name, but Edward, Mary, or George,
         // and a password of "password" we will get through
@@ -513,21 +513,21 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         AuthorizationPolicy authPolicy = new AuthorizationPolicy();
         authPolicy.setUserName("Betty");
         authPolicy.setPassword("password");
-        
+
         http.setClient(httpClientPolicy);
         http.setTlsClientParameters(tlsClientParameters);
         http.setAuthorization(authPolicy);
-        
+
         // Our expected server should be OU=Bethal
         http.setTrustDecider(new MyHttpsTrustDecider("Bethal"));
-        
+
         configureProxy(client);
         String answer = bethal.sayHi();
-        assertTrue("Unexpected answer: " + answer, 
+        assertTrue("Unexpected answer: " + answer,
                 "Bonjour from Bethal".equals(answer));
         assertProxyRequestCount(0);
-        
-        
+
+
         // Nobody will not equal OU=Bethal
         MyHttpsTrustDecider trustDecider =
                                  new MyHttpsTrustDecider("Nobody");
@@ -537,7 +537,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
             fail("Unexpected answer from Bethal: " + answer);
         } catch (Exception e) {
             //e.printStackTrace();
-            //assertTrue("Trust Decider was not called", 
+            //assertTrue("Trust Decider was not called",
             //              0 > trustDecider.wasCalled());
         }
         assertProxyRequestCount(0);
@@ -558,15 +558,15 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         Greeter tarpin = service.getPort(tarpinQ, Greeter.class);
         assertNotNull("Port is null", tarpin);
         updateAddressPort(tarpin, getPort("PORT1"));
-        
+
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(tarpin);
-        HTTPConduit http = 
+        HTTPConduit http =
             (HTTPConduit) client.getConduit();
-        
+
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-        
+
         httpClientPolicy.setAutoRedirect(true);
         // If we set any name, but Edward, Mary, or George,
         // and a password of "password" we will get through
@@ -574,28 +574,28 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         AuthorizationPolicy authPolicy = new AuthorizationPolicy();
         authPolicy.setUserName("Betty");
         authPolicy.setPassword("password");
-        
+
         http.setClient(httpClientPolicy);
         http.setTlsClientParameters(tlsClientParameters);
         http.setAuthorization(authPolicy);
-        
+
         // We get redirected from Tarpin, to Gordy, to Bethal.
         MyHttpsTrustDecider trustDecider =
             new MyHttpsTrustDecider(
                     new String[] {"Tarpin", "Gordy", "Bethal"});
         http.setTrustDecider(trustDecider);
-        
+
         // We actually get our answer from Bethal at the end of the
         // redirects.
         configureProxy(ClientProxy.getClient(tarpin));
         String answer = tarpin.sayHi();
         assertProxyRequestCount(0);
-        
-        assertTrue("Trust Decider wasn't called correctly", 
+
+        assertTrue("Trust Decider wasn't called correctly",
                        3 == trustDecider.wasCalled());
-        assertTrue("Unexpected answer: " + answer, 
+        assertTrue("Unexpected answer: " + answer,
                 "Bonjour from Bethal".equals(answer));
-        
+
         // Limit the redirects to 1, since there are two, this should fail.
         http.getClient().setMaxRetransmits(1);
 
@@ -606,16 +606,16 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
             //e.printStackTrace();
         }
         assertProxyRequestCount(0);
-        
+
         // Set back to unlimited.
         http.getClient().setMaxRetransmits(-1);
-        
+
         // Effectively we will not trust Gordy in the middle.
-        trustDecider = 
+        trustDecider =
                 new MyHttpsTrustDecider(
                     new String[] {"Tarpin", "Bethal"});
         http.setTrustDecider(trustDecider);
-        
+
         try {
             answer = tarpin.sayHi();
             fail("Unexpected answer from Tarpin: " + answer);
@@ -632,17 +632,17 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         String realm;
         String user;
         String pass;
-        
+
         /**
          * This will loop from Cronus, to Andromeda, to Zorantius
          */
         MyBasicAuthSupplier() {
         }
-        
+
         MyBasicAuthSupplier(String r, String u, String p) {
             realm = r;
-            user  = u;
-            pass  = p;
+            user = u;
+            pass = p;
         }
 
         /**
@@ -690,7 +690,7 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
      * This tests redirects through Gordy to Bethal. Bethal will
      * supply a series of 401s. See PushBack401.
      */
-    @Test    
+    @Test
     public void testHttpsRedirect401Response() throws Exception {
         startServer("Gordy");
         startServer("Bethal");
@@ -704,42 +704,42 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
         Greeter gordy = service.getPort(gordyQ, Greeter.class);
         assertNotNull("Port is null", gordy);
         updateAddressPort(gordy, getPort("PORT3"));
-        
+
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(gordy);
-        
-        HTTPConduit http = 
+
+        HTTPConduit http =
             (HTTPConduit) client.getConduit();
-        
+
         HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
-        
+
         httpClientPolicy.setAutoRedirect(true);
         http.setClient(httpClientPolicy);
         http.setTlsClientParameters(tlsClientParameters);
-        
+
         // We get redirected from Gordy, to Bethal.
         http.setTrustDecider(
                 new MyHttpsTrustDecider(
                         new String[] {"Gordy", "Bethal"}));
-        
+
         // Without preemptive user/pass Bethal returns a
         // 401 for realm Cronus. If we supply any name other
         // than Edward, George, or Mary, with the pass of "password"
         // we should succeed.
         http.setAuthSupplier(
                 new MyBasicAuthSupplier("Cronus", "Betty", "password"));
-        
+
         // We actually get our answer from Bethal at the end of the
         // redirects.
         String answer = gordy.sayHi();
-        assertTrue("Unexpected answer: " + answer, 
+        assertTrue("Unexpected answer: " + answer,
                 "Bonjour from Bethal".equals(answer));
-        
-        // The loop auth supplier, 
+
+        // The loop auth supplier,
         // We should die with looping realms.
         http.setAuthSupplier(new MyBasicAuthSupplier());
-        
+
         try {
             answer = gordy.sayHi();
             fail("Unexpected answer from Gordy: " + answer);
@@ -747,6 +747,6 @@ public class HTTPSConduitTest extends AbstractBusClientServerTestBase {
             //e.printStackTrace();
         }
     }
-    
+
 }
 

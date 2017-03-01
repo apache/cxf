@@ -47,12 +47,12 @@ public class JAXRSServerFactoryBeanTest extends Assert {
             BusFactory.getDefaultBus(false).shutdown(true);
         }
     }
-    
+
     @Test
     public void testServers() throws Exception {
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxrs/spring/servers.xml"});
-        
+
         JAXRSServerFactoryBean sfb = (JAXRSServerFactoryBean)ctx.getBean("simple");
         assertEquals("Get a wrong address", "http://localhost:9090/rs", sfb.getAddress());
         assertNotNull("The resource classes should not be null", sfb.getResourceClasses());
@@ -60,13 +60,13 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         QName serviceQName = new QName("http://books.com", "BookService");
         assertEquals(serviceQName, sfb.getServiceName());
         assertEquals(serviceQName, sfb.getServiceFactory().getServiceName());
-        
+
         sfb = (JAXRSServerFactoryBean)ctx.getBean("inlineServiceBeans");
         assertNotNull("The resource classes should not be null", sfb.getResourceClasses());
         assertEquals("Get a wrong resource class", BookStore.class, sfb.getResourceClasses().get(0));
-        assertEquals("Get a wrong resource class", 
+        assertEquals("Get a wrong resource class",
                      BookStoreSubresourcesOnly.class, sfb.getResourceClasses().get(1));
-        
+
         sfb = (JAXRSServerFactoryBean)ctx.getBean("inlineProvider");
         assertNotNull("The provider should not be null", sfb.getProviders());
         assertEquals("Get a wrong provider size", 2, sfb.getProviders().size());
@@ -74,17 +74,17 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         sfb = (JAXRSServerFactoryBean)ctx.getBean("moduleServer");
         assertNotNull("The resource classes should not be null", sfb.getResourceClasses());
         assertEquals("Get a wrong ResourceClasses size", 1, sfb.getResourceClasses().size());
-        assertEquals("Get a wrong resource class", BookStoreNoAnnotations.class, 
+        assertEquals("Get a wrong resource class", BookStoreNoAnnotations.class,
                      sfb.getResourceClasses().get(0));
         ctx.close();
     }
-    
+
     private void verifyJaxbProvider(List<?> providers) throws Exception {
         JAXBElementProvider<?> provider = null;
         for (Object o : providers) {
             if (o instanceof JAXBElementProvider) {
                 provider = (JAXBElementProvider<?>)o;
-                
+
             }
         }
         assertNotNull(provider);

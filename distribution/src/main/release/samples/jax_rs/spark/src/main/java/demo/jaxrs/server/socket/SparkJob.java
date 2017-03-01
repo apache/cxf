@@ -45,7 +45,7 @@ public class SparkJob implements Runnable {
         String jobId = SparkUtils.getRandomId();
         BlockingQueue<String> queue = new LinkedBlockingQueue<String>();
         sparkResponses.put(jobId, queue);
-        
+
         for (String s : inputStrings) {
             sparkOutputStream.println(jobId + ":" + s);
         }

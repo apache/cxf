@@ -40,23 +40,23 @@ import org.apache.cxf.service.model.OperationInfo;
 public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
 
     public DefaultServiceConfiguration() {
-        
+
     }
-    
+
     @Override
     public QName getOperationName(InterfaceInfo service, Method method) {
         boolean fromWsdl = this.getServiceFactory().isFromWsdl();
         String ns = service.getName().getNamespaceURI();
         String local = method.getName();
-        
+
         QName name = new QName(ns, local);
-        
+
         if (fromWsdl && service.getOperation(name) != null) {
             //just matching the ops in the class to the ops on the wsdl
             //probably should check the params and such
             return name;
         }
-        
+
         if (service.getOperation(name) == null) {
             return name;
         }
@@ -90,7 +90,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
 
     @Override
     public QName getInParameterName(OperationInfo op, Method method, int paramNumber) {
-        return new QName(op.getName().getNamespaceURI(), 
+        return new QName(op.getName().getNamespaceURI(),
                          getDefaultLocalName(op, method, paramNumber, "arg"));
     }
 
@@ -101,7 +101,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
 
     @Override
     public QName getOutParameterName(OperationInfo op, Method method, int paramNumber) {
-        return new QName(op.getName().getNamespaceURI(), 
+        return new QName(op.getName().getNamespaceURI(),
                          getDefaultLocalName(op, method, paramNumber, "return"));
     }
 
@@ -115,7 +115,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
                 throw new ServiceConstructionException(e);
             }
         }
-        
+
         return DefaultServiceConfiguration.createName(method, paramNumber, op.getInput()
             .getMessagePartsNumber(), false, prefix);
     }
@@ -166,7 +166,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
     @Override
     public String getServiceNamespace() {
         String ret = super.getServiceNamespace();
-        if (ret == null 
+        if (ret == null
             && getServiceFactory() != null
             && getServiceFactory().getServiceClass() != null) {
             ret = ServiceUtils.makeNamespaceFromClassName(getServiceFactory().getServiceClass().getName(),
@@ -210,13 +210,13 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
 
         // Don't do m.equals(method)
         for (Method m : getServiceFactory().getIgnoredMethods()) {
-            if (m.getName().equals(method.getName()) 
+            if (m.getName().equals(method.getName())
                 && Arrays.equals(method.getParameterTypes(), m.getParameterTypes())
                 && m.getReturnType() == method.getReturnType()) {
                 return Boolean.FALSE;
             }
         }
-        
+
         final int modifiers = method.getModifiers();
         if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers) && !method.isSynthetic()) {
             return Boolean.TRUE;
@@ -231,7 +231,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
         }
         Class<?> cls = method.getParameterTypes()[j];
         Type tp = method.getGenericParameterTypes()[j];
-        
+
         return isHolder(cls, tp);
     }
 
@@ -239,12 +239,12 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
     public Boolean isWrapped(Method m) {
         return getServiceFactory().isWrapped();
     }
-    
+
     @Override
     public Boolean isHolder(Class<?> cls, Type type) {
         if (cls.getSimpleName().equals("Holder")) {
             for (Field f : cls.getDeclaredFields()) {
-                if (Modifier.isStatic(f.getModifiers())) { 
+                if (Modifier.isStatic(f.getModifiers())) {
                     continue;
                 }
                 if (Modifier.isPublic(f.getModifiers())
@@ -256,13 +256,13 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
         }
         return Boolean.FALSE;
     }
-    
+
     @Override
     public Class<?> getHolderType(Class<?> cls, Type type) {
-        
+
         if (isHolder(cls, type)) {
             if (type instanceof ParameterizedType) {
-                //JAX-WS style using generics       
+                //JAX-WS style using generics
                 ParameterizedType paramType = (ParameterizedType)type;
                 cls = getHolderClass(paramType);
             } else {
@@ -272,8 +272,8 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
         }
 
         return null;
-    }   
-    
+    }
+
     private static Class<?> getHolderClass(ParameterizedType paramType) {
         Object rawType = paramType.getActualTypeArguments()[0];
         Class<?> rawClass;
@@ -292,7 +292,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
     public Boolean isWrapperPartNillable(MessagePartInfo mpi) {
         return (Boolean)mpi.getProperty("nillable");
     }
-    
+
     public Long getWrapperPartMaxOccurs(MessagePartInfo mpi) {
         String miString = (String)mpi.getProperty("maxOccurs");
         if (miString != null) {
@@ -309,7 +309,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
         }
         return null;
     }
-    
+
     public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
         String miString = (String)mpi.getProperty("minOccurs");
         if (miString != null) {

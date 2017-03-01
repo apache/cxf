@@ -35,11 +35,11 @@ import org.junit.Test;
 
 public class WADLToJavaTest extends ProcessorTestBase {
 
-    @Test    
+    @Test
     public void testCodeGenInterfaces() {
         try {
             String[] args = new String[] {
-                "-d", 
+                "-d",
                 output.getCanonicalPath(),
                 "-p",
                 "custom.service",
@@ -53,10 +53,10 @@ public class WADLToJavaTest extends ProcessorTestBase {
             WADLToJava tool = new WADLToJava(args);
             tool.run(new ToolContext());
             assertNotNull(output.list());
-            
+
             verifyFiles("java", true, false, "superbooks", "custom.service");
             verifyFiles("class", true, false, "superbooks", "custom.service");
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -97,11 +97,11 @@ public class WADLToJavaTest extends ProcessorTestBase {
             fail();
         }
     }
-    
+
     private List<Class<?>> getSchemaClassFiles() throws Exception {
         URLClassLoader cl = new URLClassLoader(new URL[] {output.toURI().toURL()},
                                             Thread.currentThread().getContextClassLoader());
-           
+
         List<Class<?>> files = new ArrayList<Class<?>>(4);
         files.add(cl.loadClass("superbooks.EnumType"));
         files.add(cl.loadClass("superbooks.Book"));
@@ -142,7 +142,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
                 c.getMethod("hashCode");
                 c.getMethod("equals", Object.class);
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             fail();
@@ -150,9 +150,9 @@ public class WADLToJavaTest extends ProcessorTestBase {
     }
 
 
-    
-    private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl, 
-                             String schemaPackage, String resourcePackage) {    
+
+    private void verifyFiles(String ext, boolean subresourceExpected, boolean interfacesAndImpl,
+                             String schemaPackage, String resourcePackage) {
         List<File> files = FileUtils.getFilesRecurse(output, ".+\\." + ext + "$");
         int size = interfacesAndImpl ? 11 : 10;
         if (!subresourceExpected) {
@@ -171,7 +171,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
             assertTrue(checkContains(files, resourcePackage + ".BookStoreImpl." + ext));
         }
     }
-    
+
     private void doVerifyTypes(List<File> files, String schemaPackage, String ext) {
         assertTrue(checkContains(files, schemaPackage + ".EnumType." + ext));
         assertTrue(checkContains(files, schemaPackage + ".Book." + ext));
@@ -180,7 +180,7 @@ public class WADLToJavaTest extends ProcessorTestBase {
         assertTrue(checkContains(files, schemaPackage + ".ObjectFactory." + ext));
         assertTrue(checkContains(files, schemaPackage + ".package-info." + ext));
     }
-    
+
     private boolean checkContains(List<File> clsFiles, String name) {
         for (File f : clsFiles) {
             if (checkFileContains(f, name)) {
@@ -189,11 +189,11 @@ public class WADLToJavaTest extends ProcessorTestBase {
         }
         return false;
     }
-    
+
     private boolean checkFileContains(File f, String name) {
         return f.getAbsolutePath().replace(File.separatorChar, '.').endsWith(name);
     }
-    
+
     protected String getLocation(String wsdlFile) throws URISyntaxException {
         return getClass().getResource(wsdlFile).toString();
     }

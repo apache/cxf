@@ -38,11 +38,11 @@ public class PolicyEngineBeanDefinitionParser extends AbstractBeanDefinitionPars
         super.addBusWiringAttribute(bean, BusWiringType.CONSTRUCTOR);
         super.doParse(element, ctx, bean);
     }
-    
-    
+
+
     @Override
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element e, String name) {
-        if ("alternativeSelector".equals(name)) {            
+        if ("alternativeSelector".equals(name)) {
             setFirstChildAsProperty(e, ctx, bean, name);
         }
     }
@@ -53,20 +53,20 @@ public class PolicyEngineBeanDefinitionParser extends AbstractBeanDefinitionPars
     }
 
     @Override
-    protected String resolveId(Element e, AbstractBeanDefinition abd, ParserContext ctx) 
+    protected String resolveId(Element e, AbstractBeanDefinition abd, ParserContext ctx)
         throws BeanDefinitionStoreException {
         return PolicyEngineConfig.class.getName();
     }
 
-    
+
     public static class PolicyEngineConfig {
-        
+
         private PolicyEngineImpl engine;
-        
+
         public PolicyEngineConfig(Bus bus) {
             engine = (PolicyEngineImpl)bus.getExtension(PolicyEngine.class);
         }
-        
+
         public boolean getEnabled() {
             return engine.isEnabled();
         }

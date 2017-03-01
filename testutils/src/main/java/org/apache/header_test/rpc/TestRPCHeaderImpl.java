@@ -24,19 +24,19 @@ import javax.xml.ws.Holder;
 import org.apache.header_test.rpc.types.HeaderMessage;
 
 
-@WebService(serviceName = "SOAPRPCHeaderService", 
-            portName = "SoapRPCHeaderPort", 
+@WebService(serviceName = "SOAPRPCHeaderService",
+            portName = "SoapRPCHeaderPort",
             endpointInterface = "org.apache.header_test.rpc.TestRPCHeader",
             targetNamespace = "http://apache.org/header_test/rpc",
             wsdlLocation = "testutils/soapheader_rpc.wsdl")
-            
+
 public class TestRPCHeaderImpl implements TestRPCHeader {
 
     public String testHeader1(HeaderMessage inHeader, String in) {
         if (in == null || inHeader == null) {
             throw new IllegalArgumentException("TestHeader1 part not found.");
         }
-        
+
         return in + "/" + inHeader.getHeaderVal();
     }
 

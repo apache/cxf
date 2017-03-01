@@ -51,7 +51,7 @@ public class TokenProviderParameters {
     private TokenStore tokenStore;
     private String realm;
     private boolean encryptToken;
-    
+
     public TokenStore getTokenStore() {
         return tokenStore;
     }
@@ -67,7 +67,7 @@ public class TokenProviderParameters {
     public void setClaimsManager(ClaimsManager claimsManager) {
         this.claimsManager = claimsManager;
     }
-        
+
     public String getAppliesToAddress() {
         return appliesToAddress;
     }
@@ -83,7 +83,7 @@ public class TokenProviderParameters {
     public void setTokenRequirements(TokenRequirements tokenRequirements) {
         this.tokenRequirements = tokenRequirements;
     }
-    
+
     public KeyRequirements getKeyRequirements() {
         return keyRequirements;
     }
@@ -99,7 +99,7 @@ public class TokenProviderParameters {
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
+
     public EncryptionProperties getEncryptionProperties() {
         return encryptionProperties;
     }
@@ -107,27 +107,27 @@ public class TokenProviderParameters {
     public void setEncryptionProperties(EncryptionProperties encryptionProperties) {
         this.encryptionProperties = encryptionProperties;
     }
-    
+
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getPrincipal() {
         return principal;
     }
-    
+
     public void setAdditionalProperties(Map<String, Object> additionalProperties) {
         this.additionalProperties = additionalProperties;
     }
-    
+
     public Map<String, Object> getAdditionalProperties() {
         return additionalProperties;
     }
-    
+
     public void setRealm(String realm) {
         this.realm = realm;
     }
-    
+
     public String getRealm() {
         return realm;
     }
@@ -163,5 +163,5 @@ public class TokenProviderParameters {
     public void setMessageContext(Map<String, Object> messageContext) {
         this.messageContext = messageContext;
     }
-    
+
 }

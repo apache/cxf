@@ -23,6 +23,7 @@ import java.security.Signature;
 import java.security.interfaces.ECPrivateKey;
 import java.security.spec.AlgorithmParameterSpec;
 
+import org.apache.cxf.rs.security.jose.common.JoseException;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 
@@ -33,7 +34,7 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
     public EcDsaJwsSignatureProvider(ECPrivateKey key, AlgorithmParameterSpec spec, SignatureAlgorithm algo) {
         this(key, null, spec, algo);
     }
-    public EcDsaJwsSignatureProvider(ECPrivateKey key, SecureRandom random, AlgorithmParameterSpec spec, 
+    public EcDsaJwsSignatureProvider(ECPrivateKey key, SecureRandom random, AlgorithmParameterSpec spec,
                                      SignatureAlgorithm algo) {
         super(key, random, spec, algo);
     }
@@ -43,10 +44,10 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
     }
     @Override
     protected JwsSignature doCreateJwsSignature(Signature s) {
-        return new EcDsaPrivateKeyJwsSignature(s, 
+        return new EcDsaPrivateKeyJwsSignature(s,
             EcDsaJwsSignatureVerifier.SIGNATURE_LENGTH_MAP.get(super.getAlgorithm().getJwaName()));
     }
-    
+
     protected static class EcDsaPrivateKeyJwsSignature extends PrivateKeyJwsSignature {
         private int outLen;
         public EcDsaPrivateKeyJwsSignature(Signature s, int outLen) {
@@ -59,52 +60,55 @@ public class EcDsaJwsSignatureProvider extends PrivateKeyJwsSignatureProvider {
             return jcaOutputToJoseOutput(outLen, jcaDer);
         }
     }
-    
+
     private static byte[] jcaOutputToJoseOutput(int jwsSignatureLen, byte jcaDer[]) {
-        // DER uses a pattern of type-length-value triplets
-        // http://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One#Example_encoded_in_DER
-        
-        // The algorithm implementation guarantees the correct DER format so no extra validation
-        
-        // ECDSA signature production: 
-        // 48 (SEQUENCE) + Total Length (1 or 2 bytes, the 1st byte is -127 if 2 bytes) 
-        // + R & S triples, where both triples are represented as 
-        // 2(INTEGER TYPE) + length + the actual sequence of a given length;
-        // The sequence might have the extra leading zeroes which need to be skipped
-        int requiredPartLen = jwsSignatureLen / 2;
-        
-        int rsDataBlockStart = jcaDer[1] == -127 ? 4 : 3;
-        int rPartLen = jcaDer[rsDataBlockStart];
-        int rDataBlockStart = rsDataBlockStart + 1;
-        int rPartLenDiff = rPartLen - requiredPartLen; 
-        int rValueStart = rDataBlockStart + getDataBlockOffset(jcaDer, rDataBlockStart, rPartLenDiff);
-        
-        int sPartStart = rDataBlockStart + rPartLen;
-        int sPartLen = jcaDer[sPartStart + 1];
-        int sPartLenDiff = sPartLen - requiredPartLen; 
-        int sDataBlockStart = sPartStart + 2;
-        int sValueStart = sDataBlockStart + getDataBlockOffset(jcaDer, sDataBlockStart, sPartLenDiff);
-                
-        byte[] result = new byte[jwsSignatureLen]; 
-        System.arraycopy(jcaDer, rValueStart, result, 
-            rPartLenDiff < 0 ? rPartLenDiff * -1 : 0, 
-            rPartLenDiff < 0 ? requiredPartLen + rPartLenDiff : requiredPartLen);
-        System.arraycopy(jcaDer, sValueStart, result, 
-            sPartLenDiff < 0 ? requiredPartLen + sPartLenDiff * -1 : requiredPartLen, 
-            sPartLenDiff < 0 ? requiredPartLen + sPartLenDiff : requiredPartLen);
-        return result;
-    }
-    private static int getDataBlockOffset(byte[] jcaDer, int blockStart, int partLenDiff) {
-        // ECDSA productions have 64, 96 or 132 output lengths. The R and S parts would be 32, 48 or 66 bytes each.
-        // If it is 32 or 48 bytes then we may have occasional extra zeroes in the JCA DER output
-        int i = 0;
-        if (partLenDiff > 0) {
-            while (i < partLenDiff && jcaDer[blockStart + i] == 0) {
-                i++;
-            }
+        // Apache2 Licensed Jose4j code which adapts the Apache Santuario XMLSecurity
+        // code and aligns it with JWS/JWA requirements
+        if (jcaDer.length < 8 || jcaDer[0] != 48) {
+            throw new JoseException("Invalid format of ECDSA signature");
         }
-        return i;
+
+        int offset;
+        if (jcaDer[1] > 0) {
+            offset = 2;
+        } else if (jcaDer[1] == (byte) 0x81) {
+            offset = 3;
+        } else {
+            throw new JoseException("Invalid format of ECDSA signature");
+        }
+
+        byte rLength = jcaDer[offset + 1];
+
+        int i;
+        for (i = rLength; i > 0 && jcaDer[(offset + 2 + rLength) - i] == 0; i--) {
+            // complete
+        }
+
+        byte sLength = jcaDer[offset + 2 + rLength + 1];
+
+        int j;
+        for (j = sLength; j > 0 && jcaDer[(offset + 2 + rLength + 2 + sLength) - j] == 0; j--) {
+            // complete
+        }
+
+        int rawLen = Math.max(i, j);
+        rawLen = Math.max(rawLen, jwsSignatureLen / 2);
+
+        if ((jcaDer[offset - 1] & 0xff) != jcaDer.length - offset
+            || (jcaDer[offset - 1] & 0xff) != 2 + rLength + 2 + sLength
+            || jcaDer[offset] != 2
+            || jcaDer[offset + 2 + rLength] != 2) {
+            throw new JoseException("Invalid format of ECDSA signature");
+        }
+        
+        byte concatenatedSignatureBytes[] = new byte[2 * rawLen];
+
+        System.arraycopy(jcaDer, (offset + 2 + rLength) - i, concatenatedSignatureBytes, rawLen - i, i);
+        System.arraycopy(jcaDer, (offset + 2 + rLength + 2 + sLength) - j, 
+                         concatenatedSignatureBytes, 2 * rawLen - j, j);
+
+        return concatenatedSignatureBytes;
     }
     
-    
+
 }

@@ -45,7 +45,7 @@ import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 
 
 
-@javax.jws.WebService(serviceName = "SOAPService", 
+@javax.jws.WebService(serviceName = "SOAPService",
                       portName = "SoapPort",
                       endpointInterface = "org.apache.hello_world_doc_lit_bare.PutLastTradedPricePortType",
                       targetNamespace = "http://apache.org/hello_world_doc_lit_bare",
@@ -53,7 +53,7 @@ import org.apache.hello_world_doc_lit_bare.types.TradePriceData;
 public class OOBHdrServiceImpl implements PutLastTradedPricePortType {
     @Resource
     private WebServiceContext context;
-    
+
     public void sayHi(Holder<TradePriceData> inout) {
         inout.value.setTickerPrice(4.5f);
         inout.value.setTickerSymbol("APACHE");
@@ -61,8 +61,8 @@ public class OOBHdrServiceImpl implements PutLastTradedPricePortType {
             //System.out.println("Received out-of-band header as expected..");
             sendReturnOOBHeader();
         }
-    }   
-    
+    }
+
     private void sendReturnOOBHeader() {
         if (context != null) {
             MessageContext ctx = context.getMessageContext();
@@ -76,11 +76,11 @@ public class OOBHdrServiceImpl implements PutLastTradedPricePortType {
                     // Add Out-of-band header object to HeaderHolder.
 
                     JAXBElement<OutofBandHeader> job = new JAXBElement<OutofBandHeader>(
-                            new QName(OOBHeaderTest.TEST_HDR_NS, OOBHeaderTest.TEST_HDR_RESPONSE_ELEM), 
+                            new QName(OOBHeaderTest.TEST_HDR_NS, OOBHeaderTest.TEST_HDR_RESPONSE_ELEM),
                             OutofBandHeader.class, null, ob);
                     Header hdr = new Header(
-                            new QName(OOBHeaderTest.TEST_HDR_NS, OOBHeaderTest.TEST_HDR_RESPONSE_ELEM), 
-                            job, 
+                            new QName(OOBHeaderTest.TEST_HDR_NS, OOBHeaderTest.TEST_HDR_RESPONSE_ELEM),
+                            job,
                             new JAXBDataBinding(ob.getClass()));
                     List<Header> hdrList = CastUtils.cast((List<?>) ctx.get(Header.HEADER_LIST));
                     hdrList.add(hdr);
@@ -93,12 +93,12 @@ public class OOBHdrServiceImpl implements PutLastTradedPricePortType {
             }
         }
     }
-    
+
     public void putLastTradedPrice(TradePriceData body) {
         //System.out.println("-----TradePriceData TickerPrice : ----- " + body.getTickerPrice());
         //System.out.println("-----TradePriceData TickerSymbol : ----- " + body.getTickerSymbol());
     }
-    
+
     private boolean checkContext() {
         boolean success = false;
         MessageContext ctx = context == null ? null : context.getMessageContext();
@@ -116,13 +116,13 @@ public class OOBHdrServiceImpl implements PutLastTradedPricePortType {
                             .unmarshal((Node) hdr1.getObject());
                         OutofBandHeader ob = (OutofBandHeader) job.getValue();
                         if ("testOobHeader".equals(ob.getName())
-                            && "testOobHeaderValue".equals(ob.getValue())) { 
+                            && "testOobHeaderValue".equals(ob.getValue())) {
                             if ("testHdrAttribute".equals(ob.getHdrAttribute())) {
                                 success = true;
                                 iter.remove(); //mark it processed
                             } else if ("dontProcess".equals(ob.getHdrAttribute())) {
                                 //we won't remove it so we won't let the runtime know
-                                //it's processed.   It SHOULD throw an exception 
+                                //it's processed.   It SHOULD throw an exception
                                 //saying the mustunderstand wasn't processed
                                 success = true;
                             }
@@ -138,10 +138,10 @@ public class OOBHdrServiceImpl implements PutLastTradedPricePortType {
         } else {
             throw new RuntimeException("MessageContext is null or doesnot contain OOBHeaders");
         }
-        
+
         return success;
     }
-    
+
     public String bareNoParam() {
         return "testResponse";
     }
@@ -149,6 +149,6 @@ public class OOBHdrServiceImpl implements PutLastTradedPricePortType {
     public String nillableParameter(BigDecimal theRequest) {
         return null;
     }
-   
+
 
 }

@@ -44,12 +44,12 @@ import org.junit.runners.Parameterized.Parameters;
 public class X509TokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     final TestParam test;
-    
+
     public X509TokenTest(TestParam type) {
         this.test = type;
     }
@@ -69,17 +69,17 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(PORT, true)},
                                                 {new TestParam(STAX_PORT, false)},
                                                 {new TestParam(STAX_PORT, true)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -102,20 +102,20 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignEncryptPort");
-        DoubleItPortType x509Port = 
+        DoubleItPortType x509Port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(x509Port);
         }
-        
+
         x509Port.doubleIt(25);
-        
+
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * 2.2.2 (WSS1.0) Mutual Authentication with X.509 Certificates, Sign, Encrypt
      */
@@ -132,20 +132,20 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricProtectTokensPort");
-        DoubleItPortType x509Port = 
+        DoubleItPortType x509Port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(x509Port);
         }
-        
+
         x509Port.doubleIt(25);
-        
+
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * 2.2.3 (WSS1.1) Anonymous with X.509 Certificate, Sign, Encrypt
      */
@@ -162,20 +162,20 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSignEncryptPort");
-        DoubleItPortType x509Port = 
+        DoubleItPortType x509Port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(x509Port);
         }
-        
+
         x509Port.doubleIt(25);
-        
+
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * 2.2.4 (WSS1.1) Mutual Authentication with X.509 Certificates, Sign, Encrypt
      */
@@ -192,23 +192,23 @@ public class X509TokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricEndorsingPort");
-        DoubleItPortType x509Port = 
+        DoubleItPortType x509Port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(x509Port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(x509Port);
         }
-        
+
         // TODO - support endorsing Streaming
         if (!test.isStreaming()) {
             x509Port.doubleIt(25);
         }
-        
+
         ((java.io.Closeable)x509Port).close();
         bus.shutdown(true);
     }
-    
-    
-    
+
+
+
 }

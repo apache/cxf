@@ -32,7 +32,7 @@ public class RequestType {
 
     /**
      * Gets the value of the request property.
-     * 
+     *
      * @return possible object is {@link SomeFeatureType }
      */
     public SomeFeatureType getRequest() {
@@ -41,7 +41,7 @@ public class RequestType {
 
     /**
      * Sets the value of the request property.
-     * 
+     *
      * @param value allowed object is {@link SomeFeatureType }
      */
     public void setRequest(SomeFeatureType value) {

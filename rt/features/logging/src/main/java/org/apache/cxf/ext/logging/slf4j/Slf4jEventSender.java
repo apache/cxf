@@ -30,55 +30,46 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 public class Slf4jEventSender implements LogEventSender {
-    private final String logCategory;
-
-    public Slf4jEventSender(String logCategory) {
-        this.logCategory = logCategory;
-    }
-
-    public Slf4jEventSender() {
-        this(null);
-    }
 
     @Override
     public void send(LogEvent event) {
-        String cat = logCategory != null ? logCategory
-            : "org.apache.cxf.services." + event.getPortTypeName().getLocalPart() + "." + event.getType();
+        String cat = "org.apache.cxf.services." + event.getPortTypeName().getLocalPart() + "." + event.getType();
         Logger log = LoggerFactory.getLogger(cat);
-        Set<String> keys = new HashSet<String>(); 
+        Set<String> keys = new HashSet<>();
         try {
-            put(keys, "type", event.getType().toString());
-            put(keys, "address", event.getAddress());
-            put(keys, "content-type", event.getContentType());
-            put(keys, "encoding", event.getEncoding());
-            put(keys, "exchangeId", event.getExchangeId());
-            put(keys, "httpMethod", event.getHttpMethod());
-            put(keys, "messageId", event.getMessageId());
-            put(keys, "responseCode", event.getResponseCode());
-            put(keys, "serviceName", localPart(event.getServiceName()));
-            put(keys, "portName", localPart(event.getPortName()));
-            put(keys, "portTypeName", localPart(event.getPortTypeName()));
-            if (event.getFullContentFile() != null) {
-                put(keys, "fullContentFile", event.getFullContentFile().getAbsolutePath());
+            put(keys, "Type", event.getType().toString());
+            put(keys, "Address", event.getAddress());
+            put(keys, "HttpMethod", event.getHttpMethod());
+            put(keys, "Content-Type", event.getContentType());
+            put(keys, "ResponseCode", event.getResponseCode());
+            put(keys, "ExchangeId", event.getExchangeId());
+            put(keys, "MessageId", event.getMessageId());
+            if (event.getServiceName() != null) {
+                put(keys, "ServiceName", localPart(event.getServiceName()));
+                put(keys, "PortName", localPart(event.getPortName()));
+                put(keys, "PortTypeName", localPart(event.getPortTypeName()));
             }
-            put(keys, "headers", event.getHeaders().toString());
+            if (event.getFullContentFile() != null) {
+                put(keys, "FullContentFile", event.getFullContentFile().getAbsolutePath());
+            }
+            put(keys, "Headers", event.getHeaders().toString());
             log.info(getLogMessage(event));
         } finally {
             for (String key : keys) {
                 MDC.remove(key);
             }
         }
-        
+
     }
-    
+
     private String localPart(QName name) {
         return name == null ? null : name.getLocalPart();
     }
 
-    private String getLogMessage(LogEvent event) {
+    protected String getLogMessage(LogEvent event) {
         return event.getPayload();
     }
-    
+
     private void put(Set<String> keys, String key, String value) {
         if (value != null) {
             MDC.put(key, value);

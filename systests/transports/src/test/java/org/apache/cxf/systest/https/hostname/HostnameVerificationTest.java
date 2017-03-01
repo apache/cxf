@@ -33,9 +33,9 @@ import org.junit.BeforeClass;
 
 /**
  * A set of tests for hostname verification, where the hostname in question is "localhost".
- * 
+ *
  * Keys created via something like:
- * keytool -genkey -validity 3650 -alias subjalt -keyalg RSA -keystore subjalt.jks 
+ * keytool -genkey -validity 3650 -alias subjalt -keyalg RSA -keystore subjalt.jks
  * -dname "CN=Colm,OU=WSS4J,O=Apache,L=Dublin,ST=Leinster,C=IE" -ext SAN=DNS:localhost
  */
 public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
@@ -44,7 +44,7 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
     static final String PORT3 = allocatePort(HostnameVerificationServer.class, 3);
     static final String PORT4 = allocatePort(HostnameVerificationServer.class, 4);
     static final String PORT5 = allocatePort(HostnameVerificationServer.class, 5);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -54,7 +54,7 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
             launchServer(HostnameVerificationServer.class, true)
         );
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         stopAllServers();
@@ -69,26 +69,26 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT);
-        
+
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-        
+
         // Enable Async
         ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        
+
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Subject Alternative Name does not match (but the CN does - still an error)
     @org.junit.Test
     public void testSubjectAlternativeNameNoMatch() throws Exception {
@@ -98,36 +98,36 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT2);
-        
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected on a non-matching subject alternative name");
         } catch (Exception ex) {
             // expected
         }
-        
+
         // Enable Async
         ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected on a non-matching subject alternative name");
         } catch (Exception ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // No Subject Alternative Name, but the CN matches
     @org.junit.Test
     public void testNoSubjectAlternativeNameCNMatch() throws Exception {
@@ -137,26 +137,26 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT3);
-        
+
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
-        
+
         // Enable Async
         ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        
+
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // No Subject Alternative Name, no matching CN
     @org.junit.Test
     public void testNoSubjectAlternativeNameNoCNMatch() throws Exception {
@@ -166,25 +166,25 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         updateAddressPort(port, PORT4);
-        
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected with no matching Subject Alt Name or CN");
         } catch (Exception ex) {
             // expected
         }
-        
+
         // Enable Async
         ((BindingProvider)port).getRequestContext().put("use.async.http.conduit", true);
-        
+
         try {
             port.greetMe("Kitty");
             fail("Failure expected with no matching Subject Alt Name or CN");
@@ -195,5 +195,5 @@ public class HostnameVerificationTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
 }

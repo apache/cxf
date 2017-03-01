@@ -128,7 +128,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
-    public void logrb(Level level, String sourceClass, String sourceMethod, 
+    public void logrb(Level level, String sourceClass, String sourceMethod,
                       String bundleName, String msg, Object param1) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -140,7 +140,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
-    public void logrb(Level level, String sourceClass, String sourceMethod, 
+    public void logrb(Level level, String sourceClass, String sourceMethod,
                       String bundleName, String msg, Object params[]) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -151,7 +151,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
         }
     }
 
-    public void logrb(Level level, String sourceClass, String sourceMethod, 
+    public void logrb(Level level, String sourceClass, String sourceMethod,
                       String bundleName, String msg, Throwable thrown) {
         if (isLoggable(level)) {
             LogRecord lr = new LogRecord(level, msg);
@@ -278,7 +278,7 @@ public abstract class AbstractDelegatingLogger extends Logger {
     protected boolean supportsHandlers() {
         return false;
     }
-    
+
     public synchronized void addHandler(Handler handler) throws SecurityException {
         if (supportsHandlers()) {
             super.addHandler(handler);

@@ -31,10 +31,10 @@ import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 public class WebServiceProviderConfiguration extends JaxWsServiceConfiguration {
 
     private JaxWsImplementorInfo implInfo;
-    
+
     @Override
     public Boolean isOperation(Method method) {
-        return method.getName().equals("invoke") 
+        return method.getName().equals("invoke")
             && method.getParameterTypes().length == 1
             && (Source.class.isAssignableFrom(method.getParameterTypes()[0])
                 || SOAPMessage.class.isAssignableFrom(method.getParameterTypes()[0])
@@ -74,7 +74,7 @@ public class WebServiceProviderConfiguration extends JaxWsServiceConfiguration {
         }
         return null;
     }
-    
+
     @Override
     public Boolean isWrapped(Method m) {
         return Boolean.FALSE;

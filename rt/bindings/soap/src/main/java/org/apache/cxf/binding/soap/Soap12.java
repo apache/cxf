@@ -23,11 +23,11 @@ import javax.xml.namespace.QName;
 
 /**
  * Represents the SOAP 1.2 version
- * 
+ *
  */
 public final class Soap12 implements SoapVersion {
     public static final String SOAP_NAMESPACE = "http://www.w3.org/2003/05/soap-envelope";
-    
+
     private static final Soap12 INSTANCE = new Soap12();
 
     private static final double VERSION = 1.2;
@@ -49,9 +49,9 @@ public final class Soap12 implements SoapVersion {
     private final QName fault = new QName(SOAP_NAMESPACE, "Fault");
 
     private Soap12() {
-       // Singleton 
+       // Singleton
     }
-    
+
     public static Soap12 getInstance() {
         return INSTANCE;
     }
@@ -82,7 +82,7 @@ public final class Soap12 implements SoapVersion {
     public QName getFault() {
         return fault;
     }
-    
+
     public String getSoapEncodingStyle() {
         return SOAP_ENCODING_STYLE;
     }
@@ -100,7 +100,7 @@ public final class Soap12 implements SoapVersion {
     public String getNextRole() {
         return NEXT_ROLE;
     }
-    
+
     public String getAttrNameRole() {
         return "role";
     }

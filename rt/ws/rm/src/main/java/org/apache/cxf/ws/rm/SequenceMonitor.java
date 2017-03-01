@@ -31,7 +31,7 @@ public class SequenceMonitor {
     private static final Logger LOG = LogUtils.getL7dLogger(SequenceMonitor.class);
     private long monitorInterval = DEFAULT_MONITOR_INTERVAL;
     private long firstCheck;
-    private List<Long> receiveTimes = new ArrayList<Long>();
+    private List<Long> receiveTimes = new ArrayList<>();
 
     public void acknowledgeMessage() {
         long now = System.currentTimeMillis();
@@ -54,18 +54,18 @@ public class SequenceMonitor {
                 }
             }
             mpm = receiveTimes.size();
-        } 
-        
+        }
+
         return mpm;
     }
-        
+
     public synchronized long getLastArrivalTime() {
-        if (receiveTimes.size() > 0) {
+        if (!receiveTimes.isEmpty()) {
             return receiveTimes.get(receiveTimes.size() - 1).longValue();
         }
         return 0;
     }
-    
+
     protected void setMonitorInterval(long i) {
         if (receiveTimes.size() == 0) {
             firstCheck = 0;

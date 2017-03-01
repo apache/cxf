@@ -55,8 +55,8 @@ public class TestBase extends Assert {
     protected PhaseInterceptorChain chain;
     protected SoapMessage soapMessage;
 
-    
-    
+
+
 
     @Before
     public void setUp() throws Exception {

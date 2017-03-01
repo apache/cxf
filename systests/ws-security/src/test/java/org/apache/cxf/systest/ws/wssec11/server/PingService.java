@@ -21,7 +21,7 @@ package org.apache.cxf.systest.ws.wssec11.server;
 import wssec.wssec11.IPingService;
 
 /**
- * 
+ *
  */
 public class PingService implements IPingService {
 
@@ -31,6 +31,6 @@ public class PingService implements IPingService {
         return request;
     }
 
-   
+
 
 }

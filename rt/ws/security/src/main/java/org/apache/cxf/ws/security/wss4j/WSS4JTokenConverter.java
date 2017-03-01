@@ -28,9 +28,9 @@ import org.apache.wss4j.common.principal.UsernameTokenPrincipal;
 public final class WSS4JTokenConverter {
 
     private WSS4JTokenConverter() {
-        
+
     }
-    
+
     public static void convertToken(Message msg, Principal p) {
         if (p instanceof UsernameTokenPrincipal) {
             UsernameTokenPrincipal utp = (UsernameTokenPrincipal)p;
@@ -38,14 +38,14 @@ public final class WSS4JTokenConverter {
             if (utp.getNonce() != null) {
                 nonce = Base64Utility.encode(utp.getNonce());
             }
-            msg.put(org.apache.cxf.common.security.SecurityToken.class, 
+            msg.put(org.apache.cxf.common.security.SecurityToken.class,
                     new UsernameToken(utp.getName(),
                                       utp.getPassword(),
                                       utp.getPasswordType(),
                                       utp.isPasswordDigest(),
                                       nonce,
                                       utp.getCreatedTime()));
-            
+
         }
     }
 }

@@ -19,13 +19,12 @@
 package org.apache.cxf.systest.ws.wssec10.server;
 
 @javax.jws.WebService(
-    targetNamespace = "http://WSSec/wssec10", 
-    serviceName = "PingService", 
-    portName = "UserNameOverTransportLocal_IPingService", 
+    targetNamespace = "http://WSSec/wssec10",
+    serviceName = "PingService",
+    portName = "UserNameOverTransportLocal_IPingService",
     endpointInterface = "wssec.wssec10.IPingService",
     wsdlLocation = "target/test-classes/wsdl_systest_wssec/wssec10/WsSecurity10.wsdl"
-)                  
+)
 public class UserNameOverTransport extends PingServiceBase {
     // complete
 }
- 

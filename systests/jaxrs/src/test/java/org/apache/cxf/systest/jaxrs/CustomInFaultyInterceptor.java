@@ -32,12 +32,12 @@ public class CustomInFaultyInterceptor extends AbstractPhaseInterceptor<Message>
     }
 
     public void handleMessage(Message message) throws Fault {
-        
+
         String requestUri = (String)message.get(Message.REQUEST_URI);
         if (requestUri.endsWith("/infault")) {
             throw new WebApplicationException(401);
         }
-        
+
     }
 
 }

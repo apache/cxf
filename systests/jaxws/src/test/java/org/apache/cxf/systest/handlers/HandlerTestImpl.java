@@ -71,7 +71,7 @@ public class HandlerTestImpl implements HandlerTest {
 
     public final List<String> pingWithArgs(String handlerCommand) throws PingException {
 
-        List<String> ret = new ArrayList<String>();
+        List<String> ret = new ArrayList<>();
         ret.add(handlerCommand);
         ret.addAll(getHandlersInfo(context.getMessageContext()));
 
@@ -111,7 +111,7 @@ public class HandlerTestImpl implements HandlerTest {
     private List<String> getHandlersInfo(MessageContext ctx) {
         List<String> ret = CastUtils.cast((List<?>)ctx.get("handler.info"));
         if (ret == null) {
-            ret = new ArrayList<String>();
+            ret = new ArrayList<>();
         }
         return ret;
     }

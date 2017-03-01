@@ -32,22 +32,21 @@ import org.junit.Test;
 
 public class Swagger2NonAnnotatedServiceDescriptionTest extends AbstractSwagger2ServiceDescriptionTest {
     private static final String PORT = allocatePort(Swagger2NonAnnotatedServiceDescriptionTest.class);
-    
+
     public static class SwaggerRegularNonAnnotated extends Server {
         public SwaggerRegularNonAnnotated() {
             super(PORT, false);
         }
-        
+
         @Override
         protected void run() {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
-            sf.setResourceProvider(BookStore.class, 
+            sf.setResourceProvider(BookStore.class,
                 new SingletonResourceProvider(new BookStore()));
             sf.setProvider(new JacksonJsonProvider());
-            final Swagger2Feature feature = new Swagger2Feature();
-            feature.setRunAsFilter(runAsFilter);
-            //FIXME swagger-jaxrs 1.5.3 can't handle a self-recursive subresource like Book 
+            final Swagger2Feature feature = createSwagger2Feature();
+            //FIXME swagger-jaxrs 1.5.3 can't handle a self-recursive subresource like Book
             // so we need to exclude "org.apache.cxf.systest.jaxrs" for now.
             feature.setResourcePackage("org.apache.cxf.systest.jaxrs.description.group1");
             feature.setScanAllResources(true);
@@ -60,12 +59,12 @@ public class Swagger2NonAnnotatedServiceDescriptionTest extends AbstractSwagger2
             start(new SwaggerRegularNonAnnotated());
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         startServers(SwaggerRegularNonAnnotated.class);
     }
-    
+
     @Override
     protected String getPort() {
         return PORT;
@@ -75,7 +74,7 @@ public class Swagger2NonAnnotatedServiceDescriptionTest extends AbstractSwagger2
     public void testApiListingIsProperlyReturnedJSON() throws Exception {
         doTestApiListingIsProperlyReturnedJSON();
     }
-    
+
     @Override
     protected String getExpectedFileYaml() {
         return "swagger2-noano-yaml.txt";

@@ -40,7 +40,7 @@ public class JwsJsonSignatureEntry implements JsonObject {
     private JwsHeaders unprotectedHeader;
     private JwsHeaders unionHeaders;
     private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
-      
+
     public JwsJsonSignatureEntry(String jwsPayload,
                                  String encodedProtectedHeader,
                                  String encodedSignature,
@@ -49,7 +49,7 @@ public class JwsJsonSignatureEntry implements JsonObject {
             LOG.warning("Invalid Signature entry");
             throw new JwsException(JwsException.Error.INVALID_JSON_JWS);
         }
-        
+
         this.jwsPayload = jwsPayload;
         this.encodedProtectedHeader = encodedProtectedHeader;
         this.encodedSignature = encodedSignature;
@@ -61,12 +61,12 @@ public class JwsJsonSignatureEntry implements JsonObject {
     }
     private void prepare() {
         unionHeaders = new JwsHeaders();
-        
+
         if (protectedHeader != null) {
             unionHeaders.asMap().putAll(protectedHeader.asMap());
         }
         if (unprotectedHeader != null) {
-            if (!Collections.disjoint(unionHeaders.asMap().keySet(), 
+            if (!Collections.disjoint(unionHeaders.asMap().keySet(),
                                      unprotectedHeader.asMap().keySet())) {
                 LOG.warning("Protected and unprotected headers have duplicate values");
                 throw new JwsException(JwsException.Error.INVALID_JSON_JWS);

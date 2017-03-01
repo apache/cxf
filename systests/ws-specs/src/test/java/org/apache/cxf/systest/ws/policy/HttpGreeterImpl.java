@@ -24,7 +24,7 @@ import javax.jws.WebService;
 import org.apache.cxf.greeter_control.AbstractGreeterImpl;
 
 /**
- * 
+ *
  */
 
 @WebService(serviceName = "BasicGreeterService",
@@ -35,16 +35,16 @@ import org.apache.cxf.greeter_control.AbstractGreeterImpl;
 public class HttpGreeterImpl extends AbstractGreeterImpl {
 
     private int greetMeCount;
-    
+
     @Override
     public String greetMe(String arg0) {
         if (0 == greetMeCount % 2) {
             setDelay(0);
         } else {
             setDelay(2000);
-        }   
+        }
         greetMeCount++;
         return super.greetMe(arg0);
     }
-    
+
 }

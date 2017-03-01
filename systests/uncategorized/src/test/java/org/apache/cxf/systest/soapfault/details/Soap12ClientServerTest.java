@@ -36,7 +36,7 @@ import org.apache.hello_world_soap12_http.types.FaultDetail;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {    
+public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server12.PORT;
 
     private final QName serviceName = new QName("http://apache.org/hello_world_soap12_http",
@@ -76,7 +76,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
             assertEquals("org.apache.cxf.systest.soapfault.details.GreeterImpl12", element[0].getClassName());
         }
     }
-    
+
 
     private Greeter getGreeter() throws NumberFormatException, MalformedURLException {
         URL wsdl = getClass().getResource("/wsdl/hello_world_soap12.wsdl");
@@ -84,7 +84,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
 
         SOAPService service = new SOAPService(wsdl, serviceName);
         assertNotNull("Service is ull ", service);
-        
+
         Greeter g = service.getPort(portName, Greeter.class);
         updateAddressPort(g, PORT);
         return g;

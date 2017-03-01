@@ -59,20 +59,20 @@ import org.apache.xml.security.stax.ext.XMLSecurityUtils;
 import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 
 /**
- * A Streaming SAML Token Validator implementation to validate a received Token to a 
+ * A Streaming SAML Token Validator implementation to validate a received Token to a
  * SecurityTokenService (STS).
- * 
+ *
  * TODO Refactor this class a bit better...
  */
-public class STSStaxTokenValidator 
+public class STSStaxTokenValidator
     extends SamlTokenValidatorImpl implements BinarySecurityTokenValidator, UsernameTokenValidator {
-    
+
     private boolean alwaysValidateToSts;
-    
+
     public STSStaxTokenValidator() {
-        // 
+        //
     }
-    
+
     /**
      * Construct a new instance.
      * @param alwaysValidateToSts whether to always validate the token to the STS
@@ -80,7 +80,7 @@ public class STSStaxTokenValidator
     public STSStaxTokenValidator(boolean alwaysValidateToSts) {
         this.alwaysValidateToSts = alwaysValidateToSts;
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public <T extends SamlSecurityToken & InboundSecurityToken> T validate(
@@ -89,11 +89,11 @@ public class STSStaxTokenValidator
                                                  final TokenContext tokenContext) throws WSSecurityException {
         // Check conditions
         checkConditions(samlAssertionWrapper);
-        
+
         // Check OneTimeUse Condition
-        checkOneTimeUse(samlAssertionWrapper, 
+        checkOneTimeUse(samlAssertionWrapper,
                         tokenContext.getWssSecurityProperties().getSamlOneTimeUseReplayCache());
-        
+
         // Validate the assertion against schemas/profiles
         validateAssertion(samlAssertionWrapper);
 
@@ -101,10 +101,10 @@ public class STSStaxTokenValidator
         if (samlAssertionWrapper.isSigned()) {
             sigVerCrypto = tokenContext.getWssSecurityProperties().getSignatureVerificationCrypto();
         }
-        
-        final SoapMessage message = 
+
+        final SoapMessage message =
             (SoapMessage)tokenContext.getWssSecurityProperties().getMsgContext();
-        
+
         // Validate to STS if required
         boolean valid = false;
         if (alwaysValidateToSts) {
@@ -113,14 +113,14 @@ public class STSStaxTokenValidator
             valid = true;
         }
         final boolean stsValidated = valid;
-        
+
         SamlSecurityTokenImpl securityToken = new SamlSecurityTokenImpl(
                 samlAssertionWrapper, subjectSecurityToken,
                 tokenContext.getWsSecurityContext(),
                 sigVerCrypto,
                 WSSecurityTokenConstants.KeyIdentifier_NoKeyInfo,
                 tokenContext.getWssSecurityProperties()) {
-            
+
             @Override
             public void verify() throws XMLSecurityException {
                 if (stsValidated) {
@@ -135,7 +135,7 @@ public class STSStaxTokenValidator
                     validateTokenToSTS(tokenElement, message);
                 }
             }
-            
+
         };
 
         securityToken.setElementPath(tokenContext.getElementPath());
@@ -143,7 +143,7 @@ public class STSStaxTokenValidator
 
         return (T)securityToken;
     }
-    
+
     @Override
     public InboundSecurityToken validate(final BinarySecurityTokenType binarySecurityTokenType,
                                          final TokenContext tokenContext)
@@ -151,7 +151,7 @@ public class STSStaxTokenValidator
         STSStaxBSTValidator validator = new STSStaxBSTValidator(alwaysValidateToSts);
         return validator.validate(binarySecurityTokenType, tokenContext);
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public <T extends UsernameSecurityToken & InboundSecurityToken> T validate(UsernameTokenType usernameTokenType,
@@ -161,23 +161,23 @@ public class STSStaxTokenValidator
         // spec says that it cannot contain a password, and it must contain
         // an Iteration element
         final byte[] salt = XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE11_SALT);
-        PasswordString passwordType = 
+        PasswordString passwordType =
             XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE_PASSWORD);
-        final Long iteration = 
+        final Long iteration =
             XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), WSSConstants.TAG_WSSE11_ITERATION);
         if (salt != null && (passwordType != null || iteration == null)) {
             throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, "badTokenType01");
         }
 
-        boolean handleCustomPasswordTypes = 
+        boolean handleCustomPasswordTypes =
             tokenContext.getWssSecurityProperties().getHandleCustomPasswordTypes();
-        boolean allowUsernameTokenNoPassword = 
-            tokenContext.getWssSecurityProperties().isAllowUsernameTokenNoPassword() 
+        boolean allowUsernameTokenNoPassword =
+            tokenContext.getWssSecurityProperties().isAllowUsernameTokenNoPassword()
                 || Boolean.parseBoolean((String)tokenContext.getWsSecurityContext().get(
                     WSSConstants.PROP_ALLOW_USERNAMETOKEN_NOPASSWORD));
 
         // Check received password type against required type
-        WSSConstants.UsernameTokenPasswordType requiredPasswordType = 
+        WSSConstants.UsernameTokenPasswordType requiredPasswordType =
             tokenContext.getWssSecurityProperties().getUsernameTokenPasswordType();
         if (requiredPasswordType != null) {
             if (passwordType == null || passwordType.getType() == null) {
@@ -189,23 +189,23 @@ public class STSStaxTokenValidator
                 throw new WSSecurityException(WSSecurityException.ErrorCode.FAILED_AUTHENTICATION);
             }
         }
-        
-        WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType = 
+
+        WSSConstants.UsernameTokenPasswordType usernameTokenPasswordType =
             WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE;
         if (passwordType != null && passwordType.getType() != null) {
-            usernameTokenPasswordType = 
+            usernameTokenPasswordType =
                 WSSConstants.UsernameTokenPasswordType.getUsernameTokenPasswordType(
                     passwordType.getType());
         }
 
         final AttributedString username = usernameTokenType.getUsername();
         if (username == null) {
-            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
+            throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                                           "badTokenType01");
         }
 
         final EncodedString encodedNonce =
-                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(), 
+                XMLSecurityUtils.getQNameType(usernameTokenType.getAny(),
                                               WSSConstants.TAG_WSSE_NONCE);
         byte[] nonceVal = null;
         if (encodedNonce != null && encodedNonce.getValue() != null) {
@@ -220,14 +220,14 @@ public class STSStaxTokenValidator
         if (attributedDateTimeCreated != null) {
             created = attributedDateTimeCreated.getValue();
         }
-        
+
         // Validate to STS if required
         boolean valid = false;
-        final SoapMessage message = 
+        final SoapMessage message =
             (SoapMessage)tokenContext.getWssSecurityProperties().getMsgContext();
         if (alwaysValidateToSts) {
-            Element tokenElement = 
-                convertToDOM(username.getValue(), passwordType.getValue(), 
+            Element tokenElement =
+                convertToDOM(username.getValue(), passwordType.getValue(),
                              passwordType.getType(), usernameTokenType.getId());
             validateTokenToSTS(tokenElement, message);
             valid = true;
@@ -237,20 +237,20 @@ public class STSStaxTokenValidator
             try {
                 if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST) {
                     if (encodedNonce == null || attributedDateTimeCreated == null) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, 
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN,
                                                       "badTokenType01");
                     }
-    
+
                     if (!WSSConstants.SOAPMESSAGE_NS10_BASE64_ENCODING.equals(encodedNonce.getEncodingType())) {
-                        throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN, 
+                        throw new WSSecurityException(WSSecurityException.ErrorCode.UNSUPPORTED_SECURITY_TOKEN,
                                                       "badTokenType01");
                     }
-    
+
                     verifyDigestPassword(username.getValue(), passwordType, nonceVal, created, tokenContext);
                 } else if (usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT
                         || passwordType != null && passwordType.getValue() != null
                         && usernameTokenPasswordType == WSSConstants.UsernameTokenPasswordType.PASSWORD_NONE) {
-                    
+
                     verifyPlaintextPassword(username.getValue(), passwordType, tokenContext);
                 } else if (passwordType != null && passwordType.getValue() != null) {
                     if (!handleCustomPasswordTypes) {
@@ -263,8 +263,8 @@ public class STSStaxTokenValidator
                     }
                 }
             } catch (WSSecurityException ex) {
-                Element tokenElement = 
-                    convertToDOM(username.getValue(), passwordType.getValue(), 
+                Element tokenElement =
+                    convertToDOM(username.getValue(), passwordType.getValue(),
                                  passwordType.getType(), usernameTokenType.getId());
                 validateTokenToSTS(tokenElement, message);
             }
@@ -296,7 +296,7 @@ public class STSStaxTokenValidator
 
         return (T)usernameSecurityToken;
     }
-    
+
     /**
      * Verify a UsernameToken containing a password digest.
      */
@@ -327,7 +327,7 @@ public class STSStaxTokenValidator
         }
         passwordType.setValue(pwCb.getPassword());
     }
-    
+
     /**
      * Verify a UsernameToken containing a plaintext password.
      */
@@ -355,30 +355,30 @@ public class STSStaxTokenValidator
         }
         passwordType.setValue(pwCb.getPassword());
     }
-    
-    // Convert to DOM to send the token to the STS - it does not copy Nonce/Created/Iteration 
+
+    // Convert to DOM to send the token to the STS - it does not copy Nonce/Created/Iteration
     // values
     private Element convertToDOM(
         String username, String password, String passwordType, String id
     ) {
         Document doc = DOMUtils.newDocument();
-        
+
         UsernameToken usernameToken = new UsernameToken(true, doc, passwordType);
         usernameToken.setName(username);
         usernameToken.setPassword(password);
         usernameToken.setID(id);
-        
+
         usernameToken.addWSSENamespace();
         usernameToken.addWSUNamespace();
-        
+
         return usernameToken.getElement();
     }
-    
-    private static void validateTokenToSTS(Element tokenElement, SoapMessage message) 
+
+    private static void validateTokenToSTS(Element tokenElement, SoapMessage message)
         throws WSSecurityException {
         SecurityToken token = new SecurityToken();
         token.setToken(tokenElement);
-        
+
         STSClient c = STSUtils.getClient(message, "sts");
         synchronized (c) {
             System.setProperty("noprint", "true");
@@ -389,15 +389,15 @@ public class STSStaxTokenValidator
             }
         }
     }
-    
+
     /**
-     * A Streaming SAML Token Validator implementation to validate a BinarySecurityToken to a 
+     * A Streaming SAML Token Validator implementation to validate a BinarySecurityToken to a
      * SecurityTokenService (STS).
      */
     private static class STSStaxBSTValidator extends BinarySecurityTokenValidatorImpl {
-        
+
         private boolean alwaysValidateToSts;
-        
+
         /**
          * Construct a new instance.
          * @param alwaysValidateToSts whether to always validate the token to the STS
@@ -421,19 +421,19 @@ public class STSStaxTokenValidator
             }
 
             final byte[] securityTokenData = Base64.decodeBase64(binarySecurityTokenType.getValue());
-            final SoapMessage message = 
+            final SoapMessage message =
                 (SoapMessage)tokenContext.getWssSecurityProperties().getMsgContext();
-            
+
             // Validate to STS if required
             boolean valid = false;
             if (alwaysValidateToSts) {
-                Element tokenElement = 
+                Element tokenElement =
                     convertToDOM(binarySecurityTokenType, securityTokenData);
                 validateTokenToSTS(tokenElement, message);
                 valid = true;
             }
             final boolean stsValidated = valid;
-            
+
             try {
                 if (WSSConstants.NS_X509_V3_TYPE.equals(binarySecurityTokenType.getValueType())) {
                     Crypto crypto = getCrypto(tokenContext.getWssSecurityProperties());
@@ -444,7 +444,7 @@ public class STSStaxTokenValidator
                             securityTokenData, binarySecurityTokenType.getId(),
                             tokenContext.getWssSecurityProperties()
                     ) {
-                        
+
                         @Override
                         public void verify() throws XMLSecurityException {
                             if (stsValidated) {
@@ -454,7 +454,7 @@ public class STSStaxTokenValidator
                             try {
                                 super.verify();
                             } catch (XMLSecurityException ex) {
-                                Element tokenElement = 
+                                Element tokenElement =
                                     convertToDOM(binarySecurityTokenType, securityTokenData);
                                 validateTokenToSTS(tokenElement, message);
                             }
@@ -465,7 +465,7 @@ public class STSStaxTokenValidator
                     return x509V3SecurityToken;
                 } else if (WSSConstants.NS_X509_PKIPATH_V1.equals(binarySecurityTokenType.getValueType())) {
                     Crypto crypto = getCrypto(tokenContext.getWssSecurityProperties());
-                    X509PKIPathv1SecurityTokenImpl x509PKIPathv1SecurityToken = 
+                    X509PKIPathv1SecurityTokenImpl x509PKIPathv1SecurityToken =
                         new X509PKIPathv1SecurityTokenImpl(
                             tokenContext.getWsSecurityContext(),
                             crypto,
@@ -483,7 +483,7 @@ public class STSStaxTokenValidator
                                 try {
                                     super.verify();
                                 } catch (XMLSecurityException ex) {
-                                    Element tokenElement = 
+                                    Element tokenElement =
                                         convertToDOM(binarySecurityTokenType, securityTokenData);
                                     validateTokenToSTS(tokenElement, message);
                                 }
@@ -493,7 +493,7 @@ public class STSStaxTokenValidator
                     x509PKIPathv1SecurityToken.setXMLSecEvent(tokenContext.getFirstXMLSecEvent());
                     return x509PKIPathv1SecurityToken;
                 } else if (WSSConstants.NS_GSS_KERBEROS5_AP_REQ.equals(binarySecurityTokenType.getValueType())) {
-                    KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken = 
+                    KerberosServiceSecurityTokenImpl kerberosServiceSecurityToken =
                         new KerberosServiceSecurityTokenImpl(
                             tokenContext.getWsSecurityContext(),
                             tokenContext.getWssSecurityProperties().getCallbackHandler(),
@@ -510,7 +510,7 @@ public class STSStaxTokenValidator
                                 try {
                                     super.verify();
                                 } catch (XMLSecurityException ex) {
-                                    Element tokenElement = 
+                                    Element tokenElement =
                                         convertToDOM(binarySecurityTokenType, securityTokenData);
                                     validateTokenToSTS(tokenElement, message);
                                 }
@@ -528,7 +528,7 @@ public class STSStaxTokenValidator
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN, e);
             }
         }
-        
+
         // Convert to DOM to send the token to the STS
         private Element convertToDOM(
             BinarySecurityTokenType binarySecurityTokenType,
@@ -545,14 +545,14 @@ public class STSStaxTokenValidator
             } else {
                 throw new WSSecurityException(WSSecurityException.ErrorCode.INVALID_SECURITY_TOKEN);
             }
-            
+
             binarySecurity.addWSSENamespace();
             binarySecurity.addWSUNamespace();
             binarySecurity.setEncodingType(binarySecurityTokenType.getEncodingType());
             binarySecurity.setValueType(binarySecurityTokenType.getValueType());
             binarySecurity.setID(binarySecurityTokenType.getId());
             binarySecurity.setToken(securityTokenData);
-            
+
             return binarySecurity.getElement();
         }
     }

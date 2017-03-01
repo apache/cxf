@@ -65,51 +65,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-rt-databinding-jibx</artifactId>
-            <version>${project.version}</version>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.jibx</groupId>
-                    <artifactId>jibx-bind</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jibx</groupId>
-                    <artifactId>jibx-run</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jibx</groupId>
-                    <artifactId>jibx-schema</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jibx</groupId>
-                    <artifactId>jibx-tools</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-rt-databinding-sdo</artifactId>
-            <version>${project.version}</version>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.tuscany.sdo</groupId>
-                    <artifactId>tuscany-sdo-tools</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.tuscany.sdo</groupId>
-                    <artifactId>tuscany-sdo-impl</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-tools-wsdlto-frontend-jaxws</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -223,7 +178,6 @@
                             org.eclipse.jetty*;resolution:=optional;version="${cxf.jetty.osgi.version}",
                             org.jaxen*;resolution:=optional,
                             org.jdom*;resolution:=optional,
-                            org.jibx*;resolution:=optional;version="[1.2.3,2)",
                             org.junit*;resolution:=optional,
                             org.mozilla.javascript*;resolution:=optional,
                             org.objectweb.asm*;version="[2.0,4)";resolution:=optional,

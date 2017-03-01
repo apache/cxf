@@ -48,7 +48,7 @@ import org.apache.wss4j.policy.model.AbstractToken;
 
 /**
  * An interceptor to add a BinarySecurityToken token to the security header of an outbound request, and to
- * process a BinarySecurityToken on an inbound request. It takes the BinarySecurityToken from the message 
+ * process a BinarySecurityToken on an inbound request. It takes the BinarySecurityToken from the message
  * context on the outbound side.
  */
 public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
@@ -56,7 +56,7 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
     public BinarySecurityTokenInterceptor() {
         super();
     }
-    
+
     protected void processToken(SoapMessage message) {
         Header h = findSecurityHeader(message, false);
         if (h == null) {
@@ -76,16 +76,16 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
                             results = new ArrayList<>();
                             message.put(WSHandlerConstants.RECV_RESULTS, results);
                         }
-                        WSHandlerResult rResult = 
+                        WSHandlerResult rResult =
                             new WSHandlerResult(null, bstResults,
                                                 Collections.singletonMap(WSConstants.BST, bstResults));
                         results.add(0, rResult);
 
                         assertTokens(message);
-                        
-                        Principal principal = 
+
+                        Principal principal =
                             (Principal)bstResults.get(0).get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                        
+
                         SecurityContext sc = message.get(SecurityContext.class);
                         if (sc == null || sc.getUserPrincipal() == null) {
                             message.put(SecurityContext.class, new DefaultSecurityContext(principal, null));
@@ -99,10 +99,9 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
             child = DOMUtils.getNextElement(child);
         }
     }
-    
+
     private List<WSSecurityEngineResult> processToken(Element tokenElement, final SoapMessage message)
         throws WSSecurityException {
-        WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
         RequestData data = new CXFRequestData();
         Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.CALLBACK_HANDLER, message);
         try {
@@ -112,13 +111,14 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
         }
         data.setMsgContext(message);
         data.setWssConfig(WSSConfig.getNewInstance());
-        
+
+        WSDocInfo wsDocInfo = new WSDocInfo(tokenElement.getOwnerDocument());
+        data.setWsDocInfo(wsDocInfo);
+
         BinarySecurityTokenProcessor p = new BinarySecurityTokenProcessor();
-        List<WSSecurityEngineResult> results = 
-            p.handleToken(tokenElement, data, wsDocInfo);
-        return results;
+        return p.handleToken(tokenElement, data);
     }
-    
+
     protected AbstractToken assertTokens(SoapMessage message) {
         // Assert tokens here if required
         return null;
@@ -130,7 +130,7 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
             // No SecurityToken so just return
             return;
         }
-        
+
         assertTokens(message);
         Header h = findSecurityHeader(message, true);
         Element el = (Element)h.getObject();
@@ -141,18 +141,18 @@ public class BinarySecurityTokenInterceptor extends AbstractTokenInterceptor {
         if (message.getContextualProperty(SecurityConstants.TOKEN) instanceof SecurityToken) {
             return (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
         }
-        
+
         // Get the TokenStore
         TokenStore tokenStore = getTokenStore(message);
         if (tokenStore == null) {
             return null;
         }
-        
+
         String id = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
         if (id != null) {
             return tokenStore.getToken(id);
         }
         return null;
     }
-    
+
 }

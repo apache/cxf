@@ -46,16 +46,16 @@ import org.opensaml.saml.common.xml.SAMLConstants;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
-    
+
     final TestParam test;
-    
+
     public SAMLBatchUnitTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -71,15 +71,15 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxSTSServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam("", false, STSPORT)},
                                                 {new TestParam("", false, STAX_STSPORT)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -94,37 +94,37 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
-        String wsdlLocation = 
+
+        String wsdlLocation =
             "https://localhost:" + test.getStsPort() + "/SecurityTokenService/Transport?wsdl";
-        
-        List<BatchRequest> requestList = new ArrayList<BatchRequest>();
+
+        List<BatchRequest> requestList = new ArrayList<>();
         BatchRequest request = new BatchRequest();
         request.setAppliesTo("https://localhost:8081/doubleit/services/doubleittransportsaml1");
         request.setTokenType("http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1");
         request.setKeyType("http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer");
         requestList.add(request);
-        
+
         request = new BatchRequest();
         request.setAppliesTo("https://localhost:8081/doubleit/services/doubleittransportsaml2");
         request.setTokenType("http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0");
         request.setKeyType("http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer");
         requestList.add(request);
-        
+
         String action = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchIssue";
         String requestType = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchIssue";
         String port = "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port";
-        
+
         // Request the token
-        List<SecurityToken> tokens = 
+        List<SecurityToken> tokens =
             requestSecurityTokens(bus, wsdlLocation, requestList, action, requestType, port);
         assertTrue(tokens != null && tokens.size() == 2);
-        
+
         assertTrue(tokens.get(0).getToken().getLocalName().equals("Assertion"));
         assertTrue(tokens.get(0).getToken().getNamespaceURI().equals(SAMLConstants.SAML1_NS));
         assertTrue(tokens.get(1).getToken().getLocalName().equals("Assertion"));
         assertTrue(tokens.get(1).getToken().getNamespaceURI().equals(SAMLConstants.SAML20_NS));
-        
+
         // Now validate the tokens
         requestList.get(0).setValidateTarget(tokens.get(0).getToken());
         requestList.get(0).setTokenType(STSUtils.WST_NS_05_12 + "/RSTR/Status");
@@ -133,13 +133,13 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
         action = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchValidate";
         requestType = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/BatchValidate";
         port = "{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port2";
-        
+
         validateSecurityTokens(bus, wsdlLocation, requestList, action, requestType, port);
-        
+
         bus.shutdown(true);
     }
-    
-    
+
+
     private List<SecurityToken> requestSecurityTokens(
         Bus bus, String wsdlLocation, List<BatchRequest> requestList, String action, String requestType,
         String port
@@ -152,11 +152,11 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            SecurityConstants.CALLBACK_HANDLER, 
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
         properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "serviceKeystore.properties");
-        
+
         stsClient.setEnableLifetime(true);
 
         stsClient.setProperties(properties);
@@ -164,7 +164,7 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
 
         return stsClient.requestBatchSecurityTokens(requestList, action, requestType);
     }
-    
+
     private List<SecurityToken> validateSecurityTokens(
         Bus bus, String wsdlLocation, List<BatchRequest> requestList, String action, String requestType,
         String port
@@ -177,7 +177,7 @@ public class SAMLBatchUnitTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            SecurityConstants.CALLBACK_HANDLER, 
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
         properties.put(SecurityConstants.STS_TOKEN_PROPERTIES, "serviceKeystore.properties");

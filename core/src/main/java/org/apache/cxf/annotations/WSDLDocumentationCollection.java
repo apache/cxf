@@ -29,9 +29,9 @@ import java.lang.annotation.Target;
 
 
 /**
- * Used to attach multiple WSDLDocumentation annotations 
+ * Used to attach multiple WSDLDocumentation annotations
  * to a method or type if documentation needs to be added
- * to more than one place in the wsdl. 
+ * to more than one place in the wsdl.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
@@ -39,5 +39,5 @@ import java.lang.annotation.Target;
 @Inherited
 public @interface WSDLDocumentationCollection {
     WSDLDocumentation[] value();
-    
+
 }

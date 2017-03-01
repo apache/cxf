@@ -51,19 +51,19 @@ import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 /**
  * Describe class TestSOAPHandler here.
  */
-public class  TestSOAPHandler extends TestHandlerBase 
+public class  TestSOAPHandler extends TestHandlerBase
     implements SOAPHandler<SOAPMessageContext> {
 
-    
-    
+
+
     @Resource
     Bus bus;
     @Resource(name = "org.apache.cxf.wsdl.WSDLManager")
     org.apache.cxf.wsdl.WSDLManager manager;
-    
+
     public TestSOAPHandler() {
-        this(true); 
-    } 
+        this(true);
+    }
 
     public TestSOAPHandler(boolean serverSide) {
         super(serverSide);
@@ -79,58 +79,58 @@ public class  TestSOAPHandler extends TestHandlerBase
             throw new RuntimeException("No WSDL Manager");
         }
     }
-    
+
     // Implementation of javax.xml.ws.handler.soap.SOAPHandler
 
     public final Set<QName> getHeaders() {
         return null;
     }
-  
-    public String getHandlerId() { 
+
+    public String getHandlerId() {
         return "soapHandler" + getId();
     }
-    
+
     public boolean handleMessage(SOAPMessageContext ctx) {
 
-        boolean continueProcessing = true; 
+        boolean continueProcessing = true;
 
         if (!isValidWsdlDescription(ctx.get(MessageContext.WSDL_DESCRIPTION))) {
             throw new RuntimeException("can't find WsdlDescription throws RuntimeException");
         }
-        
+
         try {
-            methodCalled("handleMessage"); 
+            methodCalled("handleMessage");
             printHandlerInfo("handleMessage", isOutbound(ctx));
 
-            Object b  = ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
+            Object b = ctx.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
             boolean outbound = (Boolean)b;
             SOAPMessage msg = ctx.getMessage();
-            
+
             if (isServerSideHandler()) {
                 if (outbound) {
-                    continueProcessing = getReturnValue(outbound, ctx); 
+                    continueProcessing = getReturnValue(outbound, ctx);
                 } else {
-                    continueProcessing = getReturnValue(outbound, ctx); 
+                    continueProcessing = getReturnValue(outbound, ctx);
                     if (!continueProcessing) {
                         outbound = true;
                     }
                 }
-                
+
                 if (outbound) {
                     try {
-                        // append handler id to SOAP response message 
-                        SOAPBody body = msg.getSOAPPart().getEnvelope().getBody(); 
+                        // append handler id to SOAP response message
+                        SOAPBody body = msg.getSOAPPart().getEnvelope().getBody();
                         Node resp = body.getFirstChild();
-                        
-                        if (resp.getNodeName().contains("pingResponse")) { 
+
+                        if (resp.getNodeName().contains("pingResponse")) {
                             Node child = resp.getFirstChild();
                             Document doc = resp.getOwnerDocument();
                             Node info = doc.createElementNS(child.getNamespaceURI(), child.getLocalName());
                             info.setPrefix("ns4");
                             info.appendChild(doc.createTextNode(getHandlerId()));
-                            resp.appendChild(info); 
+                            resp.appendChild(info);
                             msg.saveChanges();
-                        } 
+                        }
                     } catch (DOMException e) {
                         e.printStackTrace();
                     }
@@ -145,7 +145,7 @@ public class  TestSOAPHandler extends TestHandlerBase
     }
 
     public boolean handleFault(SOAPMessageContext ctx) {
-        methodCalled("handleFault"); 
+        methodCalled("handleFault");
         printHandlerInfo("handleFault", isOutbound(ctx));
 
         if (isServerSideHandler()) {
@@ -166,22 +166,22 @@ public class  TestSOAPHandler extends TestHandlerBase
                 // do nothing
             }
         }
-        
+
         return true;
     }
 
     public final void destroy() {
-        methodCalled("destroy"); 
+        methodCalled("destroy");
     }
 
     public final void close(MessageContext messageContext) {
-        methodCalled("close"); 
+        methodCalled("close");
     }
 
-    private boolean getReturnValue(boolean outbound, SOAPMessageContext ctx) { 
+    private boolean getReturnValue(boolean outbound, SOAPMessageContext ctx) {
         boolean ret = true;
         try {
-            SOAPMessage msg  = ctx.getMessage(); 
+            SOAPMessage msg = ctx.getMessage();
             SOAPBody body = msg.getSOAPPart().getEnvelope().getBody();
 
             if (body.getFirstChild().getFirstChild() == null) {
@@ -189,9 +189,9 @@ public class  TestSOAPHandler extends TestHandlerBase
             }
 
             Node commandNode = body.getFirstChild().getFirstChild().getFirstChild();
-            String arg = commandNode.getNodeValue(); 
-            String namespace = body.getFirstChild().getFirstChild().getNamespaceURI(); 
-            
+            String arg = commandNode.getNodeValue();
+            String namespace = body.getFirstChild().getFirstChild().getNamespaceURI();
+
             StringTokenizer strtok = new StringTokenizer(arg, " ");
             String hid = "";
             String direction = "";
@@ -201,31 +201,31 @@ public class  TestSOAPHandler extends TestHandlerBase
                 direction = strtok.nextToken();
                 command = strtok.nextToken();
             }
-            
+
             if (!getHandlerId().equals(hid)) {
                 return true;
-            } 
-            
+            }
+
             if ("stop".equals(command)) {
                 if (!outbound && "inbound".equals(direction)) {
                      // remove the incoming request body.
-                    Document doc = body.getOwnerDocument(); 
-                    // build the SOAP response for this message 
+                    Document doc = body.getOwnerDocument();
+                    // build the SOAP response for this message
                     //
                     Node wrapper = doc.createElementNS(namespace, "pingResponse");
                     wrapper.setPrefix("ns4");
                     body.removeChild(body.getFirstChild());
-                    body.appendChild(wrapper); 
+                    body.appendChild(wrapper);
 
                     for (String info : getHandlerInfoList(ctx)) {
-                        // copy the previously invoked handler list into the response.  
+                        // copy the previously invoked handler list into the response.
                         // Ignore this handler's information as it will be added again later.
                         //
                         if (!info.contains(getHandlerId())) {
                             Node newEl = doc.createElementNS(namespace, "HandlersInfo");
                             newEl.setPrefix("ns4");
                             newEl.appendChild(doc.createTextNode(info));
-                            wrapper.appendChild(newEl); 
+                            wrapper.appendChild(newEl);
                         }
                     }
                     ret = false;
@@ -262,15 +262,15 @@ public class  TestSOAPHandler extends TestHandlerBase
                         throw createSOAPFaultExceptionWithDetail(exceptionText);
                     }
                 }
-             
+
             }
 
         } catch (SOAPException e) {
             e.printStackTrace();
         }
-            
+
         return ret;
-    } 
+    }
 
     private SOAPFaultException createSOAPFaultException(String faultString) throws SOAPException {
         SOAPFault fault = SOAPFactory.newInstance().createFault();
@@ -278,36 +278,36 @@ public class  TestSOAPHandler extends TestHandlerBase
         SAAJUtils.setFaultCode(fault, new QName("http://cxf.apache.org/faultcode", "Server"));
         return new SOAPFaultException(fault);
     }
-    private SOAPFaultException createSOAPFaultExceptionWithDetail(String faultString) 
+    private SOAPFaultException createSOAPFaultExceptionWithDetail(String faultString)
         throws SOAPException {
 
         SOAPFault fault = SOAPFactory.newInstance().createFault();
 
-        QName faultName = new QName(SOAPConstants.URI_NS_SOAP_ENVELOPE, 
-                        "Server"); 
-        SAAJUtils.setFaultCode(fault, faultName); 
-        fault.setFaultActor("http://gizmos.com/orders"); 
-        fault.setFaultString(faultString); 
+        QName faultName = new QName(SOAPConstants.URI_NS_SOAP_ENVELOPE,
+                        "Server");
+        SAAJUtils.setFaultCode(fault, faultName);
+        fault.setFaultActor("http://gizmos.com/orders");
+        fault.setFaultString(faultString);
 
-        Detail detail = fault.addDetail(); 
+        Detail detail = fault.addDetail();
 
-        QName entryName = new QName("http://gizmos.com/orders/", 
-                        "order", "PO"); 
-        DetailEntry entry = detail.addDetailEntry(entryName); 
-        entry.addTextNode("Quantity element does not have a value"); 
+        QName entryName = new QName("http://gizmos.com/orders/",
+                        "order", "PO");
+        DetailEntry entry = detail.addDetailEntry(entryName);
+        entry.addTextNode("Quantity element does not have a value");
 
-        QName entryName2 = new QName("http://gizmos.com/orders/", 
-                        "order", "PO"); 
-        DetailEntry entry2 = detail.addDetailEntry(entryName2); 
-        entry2.addTextNode("Incomplete address: no zip code"); 
+        QName entryName2 = new QName("http://gizmos.com/orders/",
+                        "order", "PO");
+        DetailEntry entry2 = detail.addDetailEntry(entryName2);
+        entry2.addTextNode("Incomplete address: no zip code");
 
         return new SOAPFaultException(fault);
     }
 
-    public String toString() { 
+    public String toString() {
         return getHandlerId();
     }
-    
+
     private boolean isValidWsdlDescription(Object wsdlDescription) {
         return (wsdlDescription != null)
                && ((wsdlDescription instanceof java.net.URI) || (wsdlDescription instanceof java.net.URL));

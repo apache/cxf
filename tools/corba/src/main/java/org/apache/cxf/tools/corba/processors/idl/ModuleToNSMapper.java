@@ -48,7 +48,7 @@ public class ModuleToNSMapper {
     public void setUserMapping(Map<String, String> map) {
         userMap = map;
     }
-    
+
     public Map<String, String> getUserMapping() {
         return userMap;
     }
@@ -56,7 +56,7 @@ public class ModuleToNSMapper {
     public void setExcludedModuleMap(Map<String, List<String>> map) {
         exModules = map;
     }
-    
+
     public Map<String, List<String>> getExcludedModuleMap() {
         return exModules;
     }
@@ -72,12 +72,12 @@ public class ModuleToNSMapper {
     public boolean containsExcludedModule(String module) {
         return exModules.containsKey(module);
     }
-    
+
     public String map(String scopeStr, String separator) {
         Scope scope = new Scope(scopeStr, separator);
         return map(scope);
     }
-    
+
     public String map(Scope scope) {
         return map(scope, ToolCorbaConstants.MODULE_SEPARATOR);
     }
@@ -115,7 +115,7 @@ public class ModuleToNSMapper {
             return uri;
         }
     }
-    
+
     public String mapToQName(Scope scope) {
         if (defaultMapping) {
             return scope.toString();
@@ -129,7 +129,7 @@ public class ModuleToNSMapper {
         if (pos != -1) {
             nsURI = nsURI.substring(pos + 1);
         }
-        return nsURI.replaceAll("/", "_");      
+        return nsURI.replaceAll("/", "_");
     }
 
 }

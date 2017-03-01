@@ -25,18 +25,18 @@ public class Book2 {
 
     private String name;
     private int id;
-    
+
     public Book2() {
     }
-    
+
     public Book2(int id) {
         this.id = id;
     }
-    
+
     public int getId() {
         return id;
     }
-    
+
     public void setId(int ident) {
         id = ident;
     }

@@ -58,7 +58,7 @@ public class ContentDisposition {
         while (m.find()) {
             String paramName = null;
             String paramValue = "";
-            
+
             String groupValue = m.group().trim();
             int eqIndex = groupValue.indexOf('=');
             if (eqIndex > 0) {

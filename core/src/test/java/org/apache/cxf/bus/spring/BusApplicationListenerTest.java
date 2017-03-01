@@ -30,7 +30,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 public class BusApplicationListenerTest extends Assert {
-    
+
     @Test
     public void testParentApplicationEvent() {
         AbstractRefreshableApplicationContext parent = new ClassPathXmlApplicationContext();

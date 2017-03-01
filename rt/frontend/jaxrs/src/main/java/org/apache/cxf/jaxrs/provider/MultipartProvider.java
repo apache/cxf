@@ -76,7 +76,7 @@ import org.apache.cxf.message.MessageUtils;
 @Produces({"multipart/related", "multipart/mixed", "multipart/alternative", "multipart/form-data" })
 public class MultipartProvider extends AbstractConfigurableProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
-    
+
     private static final String SUPPORT_TYPE_AS_MULTIPART = "support.type.as.multipart";
     private static final String SINGLE_PART_IS_COLLECTION = "single.multipart.is.collection";
     private static final Logger LOG = LogUtils.getL7dLogger(MultipartProvider.class);
@@ -87,14 +87,14 @@ public class MultipartProvider extends AbstractConfigurableProvider
         WELL_KNOWN_MULTIPART_CLASSES = new HashSet<Class<?>>();
         WELL_KNOWN_MULTIPART_CLASSES.add(MultipartBody.class);
         WELL_KNOWN_MULTIPART_CLASSES.add(Attachment.class);
-        
-        MULTIPART_SUBTYPES = new HashSet<String>();
+
+        MULTIPART_SUBTYPES = new HashSet<>();
         MULTIPART_SUBTYPES.add("form-data");
         MULTIPART_SUBTYPES.add("mixed");
         MULTIPART_SUBTYPES.add("related");
         MULTIPART_SUBTYPES.add("alternative");
     }
-    
+
     @Context
     private MessageContext mc;
     private String attachmentDir;
@@ -104,28 +104,28 @@ public class MultipartProvider extends AbstractConfigurableProvider
     public void setMessageContext(MessageContext context) {
         this.mc = context;
     }
-    
+
     public void setAttachmentDirectory(String dir) {
         attachmentDir = dir;
     }
-    
+
     public void setAttachmentThreshold(String threshold) {
         attachmentThreshold = threshold;
     }
-    
+
     public void setAttachmentMaxSize(String maxSize) {
         attachmentMaxSize = maxSize;
     }
 
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                               MediaType mt) {
-        return isSupported(type, genericType, annotations, mt); 
-            
+        return isSupported(type, genericType, annotations, mt);
+
     }
-    
-    private boolean isSupported(Class<?> type, Type genericType, Annotation[] anns, 
+
+    private boolean isSupported(Class<?> type, Type genericType, Annotation[] anns,
                                 MediaType mt) {
-        return mediaTypeSupported(mt) 
+        return mediaTypeSupported(mt)
             && (WELL_KNOWN_MULTIPART_CLASSES.contains(type)
                 || Collection.class.isAssignableFrom(type)
                 || Map.class.isAssignableFrom(type) && type != MultivaluedMap.class
@@ -140,14 +140,14 @@ public class MultipartProvider extends AbstractConfigurableProvider
             throw new WebApplicationException(400);
         }
     }
-    
-    public Object readFrom(Class<Object> c, Type t, Annotation[] anns, MediaType mt, 
-                           MultivaluedMap<String, String> headers, InputStream is) 
+
+    public Object readFrom(Class<Object> c, Type t, Annotation[] anns, MediaType mt,
+                           MultivaluedMap<String, String> headers, InputStream is)
         throws IOException, WebApplicationException {
         checkContentLength();
         List<Attachment> infos = AttachmentUtils.getAttachments(
                 mc, attachmentDir, attachmentThreshold, attachmentMaxSize);
-        
+
         boolean collectionExpected = Collection.class.isAssignableFrom(c);
         if (collectionExpected
             && AnnotationUtils.getAnnotation(anns, Multipart.class) == null) {
@@ -164,11 +164,11 @@ public class MultipartProvider extends AbstractConfigurableProvider
         if (MultipartBody.class.isAssignableFrom(c)) {
             return new MultipartBody(infos);
         }
-        
+
         Multipart id = AnnotationUtils.getAnnotation(anns, Multipart.class);
         Attachment multipart = AttachmentUtils.getMultipart(id, mt, infos);
         if (multipart != null) {
-            if (collectionExpected 
+            if (collectionExpected
                 && !mediaTypeSupported(multipart.getContentType())
                 && !MessageUtils.isTrue(mc.getContextualProperty(SINGLE_PART_IS_COLLECTION))) {
                 List<Attachment> allMultiparts = AttachmentUtils.getMatchingAttachments(id, infos);
@@ -176,11 +176,11 @@ public class MultipartProvider extends AbstractConfigurableProvider
             } else {
                 return fromAttachment(multipart, c, t, anns);
             }
-        } 
-        
+        }
+
         if (id != null && !id.required()) {
             /*
-             * Return default value for a missing optional part 
+             * Return default value for a missing optional part
              */
             Object defaultValue = null;
             if (c.isPrimitive()) {
@@ -188,23 +188,23 @@ public class MultipartProvider extends AbstractConfigurableProvider
             }
             return defaultValue;
         }
-        
+
         throw ExceptionUtils.toBadRequestException(null, null);
-        
+
     }
-    
+
     private Object getAttachmentCollection(Type t, List<Attachment> infos, Annotation[] anns) throws IOException {
         Class<?> actual = getActualType(t, 0);
         if (Attachment.class.isAssignableFrom(actual)) {
             return infos;
         }
-        Collection<Object> objects = new ArrayList<Object>();
+        Collection<Object> objects = new ArrayList<>();
         for (Attachment a : infos) {
             objects.add(fromAttachment(a, actual, actual, anns));
         }
         return objects;
     }
-    
+
     private Class<?> getActualType(Type type, int pos) {
         Class<?> actual = null;
         try {
@@ -214,8 +214,8 @@ public class MultipartProvider extends AbstractConfigurableProvider
         }
         return actual != null && actual != Object.class ? actual : Attachment.class;
     }
-    
-    private <T> Object fromAttachment(Attachment multipart, Class<T> c, Type t, Annotation anns[]) 
+
+    private <T> Object fromAttachment(Attachment multipart, Class<T> c, Type t, Annotation anns[])
         throws IOException {
         if (DataHandler.class.isAssignableFrom(c)) {
             return multipart.getDataHandler();
@@ -227,26 +227,26 @@ public class MultipartProvider extends AbstractConfigurableProvider
             if (mediaTypeSupported(multipart.getContentType())) {
                 mc.put("org.apache.cxf.multipart.embedded", true);
                 mc.put("org.apache.cxf.multipart.embedded.ctype", multipart.getContentType());
-                mc.put("org.apache.cxf.multipart.embedded.input", 
+                mc.put("org.apache.cxf.multipart.embedded.input",
                        multipart.getDataHandler().getInputStream());
                 anns = new Annotation[]{};
             }
-            MessageBodyReader<T> r = 
+            MessageBodyReader<T> r =
                 mc.getProviders().getMessageBodyReader(c, t, anns, multipart.getContentType());
             if (r != null) {
                 InputStream is = multipart.getDataHandler().getInputStream();
-                return r.readFrom(c, t, anns, multipart.getContentType(), multipart.getHeaders(), 
+                return r.readFrom(c, t, anns, multipart.getContentType(), multipart.getHeaders(),
                                   is);
             }
         }
         return null;
     }
-    
+
     private boolean mediaTypeSupported(MediaType mt) {
         return mt.getType().equals("multipart") && MULTIPART_SUBTYPES.contains(mt.getSubtype());
     }
 
-    public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, 
+    public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mediaType) {
         return -1;
     }
@@ -256,28 +256,28 @@ public class MultipartProvider extends AbstractConfigurableProvider
         return isSupported(type, genericType, annotations, mt);
     }
 
-    
+
     public void writeTo(Object obj, Class<?> type, Type genericType, Annotation[] anns, MediaType mt,
-                        MultivaluedMap<String, Object> headers, OutputStream os) 
+                        MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException, WebApplicationException {
-        
+
         List<Attachment> handlers = convertToDataHandlers(obj, type, genericType, anns, mt);
         mc.put(MultipartBody.OUTBOUND_MESSAGE_ATTACHMENTS, handlers);
         handlers.get(0).getDataHandler().writeTo(os);
     }
-    
+
     private List<Attachment> convertToDataHandlers(Object obj,
-                                                   Class<?> type, Type genericType,                          
+                                                   Class<?> type, Type genericType,
                                                    Annotation[] anns, MediaType mt)  throws IOException {
         if (Map.class.isAssignableFrom(obj.getClass())) {
             Map<Object, Object> objects = CastUtils.cast((Map<?, ?>)obj);
-            List<Attachment> handlers = new ArrayList<Attachment>(objects.size());
+            List<Attachment> handlers = new ArrayList<>(objects.size());
             int i = 0;
-            for (Iterator<Map.Entry<Object, Object>> iter = objects.entrySet().iterator(); 
+            for (Iterator<Map.Entry<Object, Object>> iter = objects.entrySet().iterator();
                 iter.hasNext();) {
                 Map.Entry<Object, Object> entry = iter.next();
                 Object value = entry.getValue();
-                Attachment handler = createDataHandler(value, value.getClass(), 
+                Attachment handler = createDataHandler(value, value.getClass(),
                                                        new Annotation[]{},
                                                        entry.getKey().toString(),
                                                        mt.toString(),
@@ -286,7 +286,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             }
             return handlers;
         } else {
-            String rootMediaType = getRootMediaType(anns, mt); 
+            String rootMediaType = getRootMediaType(anns, mt);
             if (List.class.isAssignableFrom(obj.getClass())) {
                 return getAttachments((List<?>)obj, rootMediaType);
             } else {
@@ -302,9 +302,9 @@ public class MultipartProvider extends AbstractConfigurableProvider
             }
         }
     }
-    
+
     private List<Attachment> getAttachments(List<?> objects, String rootMediaType) throws IOException {
-        List<Attachment> handlers = new ArrayList<Attachment>(objects.size());
+        List<Attachment> handlers = new ArrayList<>(objects.size());
         for (int i = 0; i < objects.size(); i++) {
             Object value = objects.get(i);
             Attachment handler = createDataHandler(value,
@@ -314,8 +314,8 @@ public class MultipartProvider extends AbstractConfigurableProvider
         }
         return handlers;
     }
-    
-    private <T> Attachment createDataHandler(T obj, 
+
+    private <T> Attachment createDataHandler(T obj,
                                              Type genericType,
                                              Annotation[] anns,
                                              String mimeType,
@@ -325,8 +325,8 @@ public class MultipartProvider extends AbstractConfigurableProvider
         Class<T> cls = (Class<T>)obj.getClass();
         return createDataHandler(obj, cls, genericType, anns, mimeType, mainMediaType, id);
     }
-    private <T> Attachment createDataHandler(T obj, 
-                                         Class<T> cls, 
+    private <T> Attachment createDataHandler(T obj,
+                                         Class<T> cls,
                                          Type genericType,
                                          Annotation[] anns,
                                          String mimeType,
@@ -341,7 +341,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             dh = new DataHandler((DataSource)obj);
         } else if (File.class.isAssignableFrom(obj.getClass())) {
             File f = (File)obj;
-            ContentDisposition cd = mainMediaType.startsWith(MediaType.MULTIPART_FORM_DATA) 
+            ContentDisposition cd = mainMediaType.startsWith(MediaType.MULTIPART_FORM_DATA)
                 ? new ContentDisposition("form-data;name=file;filename=" + f.getName()) :  null;
             return new Attachment(AttachmentUtil.BODY_ATTACHMENT_ID, new FileInputStream(f), cd);
         } else if (Attachment.class.isAssignableFrom(obj.getClass())) {
@@ -349,8 +349,8 @@ public class MultipartProvider extends AbstractConfigurableProvider
             if (att.getObject() == null) {
                 return att;
             }
-            dh = getHandlerForObject(att.getObject(), 
-                                     att.getObject().getClass(), new Annotation[]{}, 
+            dh = getHandlerForObject(att.getObject(),
+                                     att.getObject().getClass(), new Annotation[]{},
                                      att.getContentType().toString(), id);
             return new Attachment(att.getContentId(), dh, att.getHeaders());
         } else if (byte[].class.isAssignableFrom(obj.getClass())) {
@@ -361,7 +361,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             dh = getHandlerForObject(obj, cls, genericType, anns, mimeType, id);
         }
         String contentId = getContentId(anns, id);
-        
+
         return new Attachment(contentId, dh, new MetadataMap<String, String>());
     }
 
@@ -372,32 +372,32 @@ public class MultipartProvider extends AbstractConfigurableProvider
         }
         return id == 0 ? AttachmentUtil.BODY_ATTACHMENT_ID : Integer.toString(id);
     }
-    
-    private <T> DataHandler getHandlerForObject(T obj, 
+
+    private <T> DataHandler getHandlerForObject(T obj,
                                             Class<T> cls, Type genericType,
                                             Annotation[] anns,
                                             String mimeType, int id) {
         MediaType mt = JAXRSUtils.toMediaType(mimeType);
         mc.put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, this);
-        
+
         MessageBodyWriter<T> r = null;
         try {
             r = mc.getProviders().getMessageBodyWriter(cls, genericType, anns, mt);
         } finally {
-            mc.put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, null); 
+            mc.put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, null);
         }
         if (r == null) {
-            org.apache.cxf.common.i18n.Message message = 
+            org.apache.cxf.common.i18n.Message message =
                 new org.apache.cxf.common.i18n.Message("NO_MSG_WRITER",
                                                    BUNDLE,
                                                    cls);
             LOG.severe(message.toString());
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
-        
+
         return new MessageBodyWriterDataHandler<T>(r, obj, cls, genericType, anns, mt);
     }
-    private <T> DataHandler getHandlerForObject(T obj, 
+    private <T> DataHandler getHandlerForObject(T obj,
                                             Type genericType,
                                             Annotation[] anns,
                                             String mimeType, int id) {
@@ -405,11 +405,11 @@ public class MultipartProvider extends AbstractConfigurableProvider
         Class<T> cls = (Class<T>)obj.getClass();
         return getHandlerForObject(obj, cls, genericType, anns, mimeType, id);
     }
-    
+
     private DataHandler createInputStreamDH(InputStream is, String mimeType) {
         return new DataHandler(new InputStreamDataSource(is, mimeType));
     }
-    
+
     private String getRootMediaType(Annotation[] anns, MediaType mt) {
         String mimeType = mt.getParameters().get("type");
         if (mimeType != null) {
@@ -428,7 +428,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         }
         return mimeType;
     }
-    
+
     private static class MessageBodyWriterDataHandler<T> extends DataHandler {
         private MessageBodyWriter<T> writer;
         private T obj;
@@ -450,22 +450,22 @@ public class MultipartProvider extends AbstractConfigurableProvider
             this.anns = anns;
             this.contentType = contentType;
         }
-        
+
         @Override
         public void writeTo(OutputStream os) {
             try {
-                writer.writeTo(obj, cls, genericType, anns, contentType, 
+                writer.writeTo(obj, cls, genericType, anns, contentType,
                                new MetadataMap<String, Object>(), os);
             } catch (IOException ex) {
-                throw ExceptionUtils.toInternalServerErrorException(ex, null); 
+                throw ExceptionUtils.toInternalServerErrorException(ex, null);
             }
         }
-        
+
         @Override
         public String getContentType() {
             return contentType.toString();
         }
-        
+
         // TODO : throw UnsupportedOperationException for all other DataHandler methods
     }
 }

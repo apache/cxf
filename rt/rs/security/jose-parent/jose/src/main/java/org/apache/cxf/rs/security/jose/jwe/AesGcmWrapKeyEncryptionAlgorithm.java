@@ -31,11 +31,11 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class AesGcmWrapKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionAlgorithm {
-    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<String>(
+    private static final Set<String> SUPPORTED_ALGORITHMS = new HashSet<>(
         Arrays.asList(KeyAlgorithm.A128GCMKW.getJwaName(),
                       KeyAlgorithm.A192GCMKW.getJwaName(),
                       KeyAlgorithm.A256GCMKW.getJwaName()));
-    public AesGcmWrapKeyEncryptionAlgorithm(String encodedKey, KeyAlgorithm keyAlgoJwt) {    
+    public AesGcmWrapKeyEncryptionAlgorithm(String encodedKey, KeyAlgorithm keyAlgoJwt) {
         this(CryptoUtils.decodeSequence(encodedKey), keyAlgoJwt);
     }
     public AesGcmWrapKeyEncryptionAlgorithm(byte[] keyBytes, KeyAlgorithm keyAlgoJwt) {
@@ -45,13 +45,13 @@ public class AesGcmWrapKeyEncryptionAlgorithm extends AbstractWrapKeyEncryptionA
     public AesGcmWrapKeyEncryptionAlgorithm(SecretKey key, KeyAlgorithm keyAlgoJwt) {
         super(key, keyAlgoJwt, true, SUPPORTED_ALGORITHMS);
     }
-    
+
     @Override
     public byte[] getEncryptedContentEncryptionKey(JweHeaders headers, byte[] cek) {
         byte[] wrappedKeyAndTag = super.getEncryptedContentEncryptionKey(headers, cek);
-        byte[] wrappedKey = new byte[wrappedKeyAndTag.length - 128 / 8]; 
+        byte[] wrappedKey = new byte[wrappedKeyAndTag.length - 128 / 8];
         System.arraycopy(wrappedKeyAndTag, 0, wrappedKey, 0, wrappedKeyAndTag.length - 128 / 8);
-        String encodedTag = Base64UrlUtility.encodeChunk(wrappedKeyAndTag, 
+        String encodedTag = Base64UrlUtility.encodeChunk(wrappedKeyAndTag,
                                                          wrappedKeyAndTag.length - 128 / 8, 128 / 8);
         headers.setHeader("tag", encodedTag);
         return wrappedKey;

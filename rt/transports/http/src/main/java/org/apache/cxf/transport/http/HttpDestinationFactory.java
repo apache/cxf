@@ -24,7 +24,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 
 public interface HttpDestinationFactory {
-    AbstractHTTPDestination createDestination(EndpointInfo endpointInfo, 
-                                              Bus bus, 
+    AbstractHTTPDestination createDestination(EndpointInfo endpointInfo,
+                                              Bus bus,
                                               DestinationRegistry registry) throws IOException;
 }

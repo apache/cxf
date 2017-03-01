@@ -28,11 +28,11 @@ public class JPALanguageVisitorTest extends Assert {
 
     @Test
     public void testSimpleQuery() throws Exception {
-        
+
         SearchCondition<Book> filter = new FiqlParser<Book>(Book.class).parse("id=lt=10");
         JPALanguageVisitor<Book> jpa = new JPALanguageVisitor<Book>(Book.class);
         filter.accept(jpa);
         assertEquals("SELECT t FROM Book t WHERE t.id < '10'", jpa.getQuery());
-        
+
     }
 }

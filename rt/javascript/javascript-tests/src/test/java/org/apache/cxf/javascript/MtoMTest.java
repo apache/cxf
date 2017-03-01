@@ -35,7 +35,7 @@ import org.mozilla.javascript.Context;
 import org.springframework.context.support.GenericApplicationContext;
 
 /*
- * We end up here with a part with isElement == true, a non-array element, 
+ * We end up here with a part with isElement == true, a non-array element,
  * but a complex type for an array of the element.
  */
 
@@ -50,25 +50,25 @@ public class MtoMTest extends JavascriptRhinoTest {
     @Override
     protected void additionalSpringConfiguration(GenericApplicationContext context) throws Exception {
     }
-    
+
     @Override
     protected String[] getConfigLocations() {
         TestUtil.getNewPortNumber("TestPort");
         return new String[] {"classpath:MtoMBeans.xml"};
     }
-    
+
     @Before
     public void before() throws Exception {
-        setupRhino("mtom-service-endpoint", 
+        setupRhino("mtom-service-endpoint",
                    "/org/apache/cxf/javascript/MtoMTests.js",
                    SchemaValidationType.NONE);
         implementor = (MtoMImpl)rawImplementor;
         implementor.reset();
     }
-    
+
     private Void acceptMtoMString(Context context) throws IOException {
-        Notifier notifier = 
-            testUtilities.rhinoCallConvert("testMtoMString", Notifier.class, 
+        Notifier notifier =
+            testUtilities.rhinoCallConvert("testMtoMString", Notifier.class,
                                            testUtilities.javaToJS(getAddress()));
         boolean notified = notifier.waitForJavascript(1000 * 10);
         assertTrue(notified);
@@ -86,8 +86,8 @@ public class MtoMTest extends JavascriptRhinoTest {
     }
 
     private Void sendMtoMString(Context context) throws IOException {
-        Notifier notifier = 
-            testUtilities.rhinoCallConvert("testMtoMReply", Notifier.class, 
+        Notifier notifier =
+            testUtilities.rhinoCallConvert("testMtoMReply", Notifier.class,
                                            testUtilities.javaToJS(getAddress()));
         boolean notified = notifier.waitForJavascript(1000 * 30);
         assertTrue(notified);
@@ -99,7 +99,7 @@ public class MtoMTest extends JavascriptRhinoTest {
         assertNotNull(unpacked);
         return null;
     }
-    
+
     @Test
     public void sendMtoMStringTest() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
@@ -112,7 +112,7 @@ public class MtoMTest extends JavascriptRhinoTest {
             }
         });
     }
-    
+
     @Test
     public void acceptMtoMStringTest() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {

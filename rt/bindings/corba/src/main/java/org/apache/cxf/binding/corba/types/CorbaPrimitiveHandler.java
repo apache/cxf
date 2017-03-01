@@ -27,23 +27,23 @@ import org.omg.CORBA.TypeCode;
 
 public class CorbaPrimitiveHandler extends CorbaObjectHandler {
 
-    private static final int UNSIGNED_MAX = 256; 
+    private static final int UNSIGNED_MAX = 256;
     private Object value;
     private String valueAsString;
     private boolean objectSet;
     private Any any;
-    
+
     public CorbaPrimitiveHandler(QName primName, QName primIdlType, TypeCode primTC, Object primType) {
         super(primName, primIdlType, primTC, primType);
     }
-    
+
     public Object getValue() {
         return value;
     }
     public Any getAny() {
         return any;
     }
-    
+
     public void setIntoAny(Any val, CorbaStreamable stream, boolean output) {
         any = val;
         if (stream != null) {
@@ -94,7 +94,7 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
                 any.insert_wstring((String)value);
                 break;
             default:
-                // Default: assume that whatever stored the data will also know how to convert it into what 
+                // Default: assume that whatever stored the data will also know how to convert it into what
                 // it needs.
             }
         }
@@ -125,8 +125,8 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
         case TCKind._tk_char:
             char charValue = ((Character)value).charValue();
             // outside the normal range it will -256
-            data = Byte.toString((byte)(charValue > Byte.MAX_VALUE 
-                                                    ? charValue - UNSIGNED_MAX 
+            data = Byte.toString((byte)(charValue > Byte.MAX_VALUE
+                                                    ? charValue - UNSIGNED_MAX
                                                     : charValue));
             break;
         case TCKind._tk_wchar:
@@ -176,14 +176,14 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
             data = (String)value;
             break;
         default:
-            // Default: assume that whatever stored the data will also know how to convert it into what 
+            // Default: assume that whatever stored the data will also know how to convert it into what
             // it needs.
             data = value.toString();
         }
         valueAsString = data;
         return data;
     }
-    
+
     public void setValueFromData(String data) {
         Object obj = null;
         switch (typeCode.kind().value()) {
@@ -193,10 +193,10 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
         case TCKind._tk_char:
             // A char is mapped to a byte, we need it as a character
             Byte byteValue = Byte.valueOf(data);
-            // for values < 0 + 256 
+            // for values < 0 + 256
             // This means that we can directly write out the chars in the normal
             // range 0-127 even when using UTF-8
-            obj = Character.valueOf((char)(byteValue.byteValue() < 0 
+            obj = Character.valueOf((char)(byteValue.byteValue() < 0
                                          ? byteValue.byteValue() + UNSIGNED_MAX
                                          : byteValue.byteValue()));
             break;
@@ -267,8 +267,8 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
         case TCKind._tk_char:
             char charValue = any.extract_char();
             // outside the normal range it will -256
-            data = Byte.toString((byte)(charValue > Byte.MAX_VALUE 
-                                                    ? charValue - UNSIGNED_MAX 
+            data = Byte.toString((byte)(charValue > Byte.MAX_VALUE
+                                                    ? charValue - UNSIGNED_MAX
                                                     : charValue));
             break;
         case TCKind._tk_wchar:
@@ -330,7 +330,7 @@ public class CorbaPrimitiveHandler extends CorbaObjectHandler {
         valueAsString = data;
         return data;
     }
-    
+
     public void clear() {
         value = null;
         objectSet = false;

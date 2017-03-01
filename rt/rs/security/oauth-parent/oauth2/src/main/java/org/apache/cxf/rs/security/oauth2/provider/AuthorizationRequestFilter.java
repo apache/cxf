@@ -24,7 +24,7 @@ import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 public interface AuthorizationRequestFilter {
-    MultivaluedMap<String, String> process(MultivaluedMap<String, String> params, 
+    MultivaluedMap<String, String> process(MultivaluedMap<String, String> params,
                                            UserSubject endUser,
                                            Client client);
 }

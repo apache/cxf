@@ -52,82 +52,82 @@ import org.junit.Assert;
  * Some unit tests for creating JWT Tokens with an ActAs element.
  */
 public class JWTProviderActAsTest extends org.junit.Assert {
-    
+
     /**
      * Create a JWT Token with ActAs from a UsernameToken
      */
     @org.junit.Test
     public void testJWTActAsUsernameToken() throws Exception {
         TokenProvider tokenProvider = new JWTTokenProvider();
-        
+
         UsernameTokenType usernameToken = new UsernameTokenType();
         AttributedString username = new AttributedString();
         username.setValue("bob");
         usernameToken.setUsername(username);
-        JAXBElement<UsernameTokenType> usernameTokenType = 
+        JAXBElement<UsernameTokenType> usernameTokenType =
             new JAXBElement<UsernameTokenType>(
                 QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                 JWTTokenProvider.JWT_TOKEN_TYPE, usernameTokenType
             );
         //Principal must be set in ReceivedToken/ActAs
         providerParameters.getTokenRequirements().getActAs().setPrincipal(
                 new CustomTokenPrincipal(username.getValue()));
-        
+
         assertTrue(tokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         // Validate the token
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("technical-user", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         Assert.assertEquals("bob", jwt.getClaim("ActAs"));
     }
-    
+
     /**
      * Create a JWT Token with ActAs from a SAML Assertion
      */
     @org.junit.Test
     public void testJWTActAsAssertion() throws Exception {
         TokenProvider tokenProvider = new JWTTokenProvider();
-        
+
         String user = "bob";
         Element saml1Assertion = getSAMLAssertion(user);
-        
-        TokenProviderParameters providerParameters = 
+
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                 JWTTokenProvider.JWT_TOKEN_TYPE, saml1Assertion
             );
         //Principal must be set in ReceivedToken/ActAs
         providerParameters.getTokenRequirements().getActAs().setPrincipal(
                 new CustomTokenPrincipal(user));
-        
+
         assertTrue(tokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE));
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
-        
+
         // Validate the token
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("technical-user", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         Assert.assertEquals("bob", jwt.getClaim("ActAs"));
     }
-    
+
     private Element getSAMLAssertion(String user) throws Exception {
         TokenProvider samlTokenProvider = new SAMLTokenProvider();
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(WSConstants.WSS_SAML_TOKEN_TYPE, null);
         providerParameters.getKeyRequirements().setKeyType(STSConstants.BEARER_KEY_KEYTYPE);
         providerParameters.setPrincipal(new CustomTokenPrincipal(user));
@@ -143,29 +143,29 @@ public class JWTProviderActAsTest extends org.junit.Assert {
         String tokenType, Object actAs
     ) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         tokenRequirements.setTokenType(tokenType);
-        
+
         if (actAs != null) {
             ReceivedToken actAsToken = new ReceivedToken(actAs);
             actAsToken.setState(STATE.VALID);
             tokenRequirements.setActAs(actAsToken);
-            
+
         }
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("technical-user"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         parameters.setMessageContext(msgCtx);
-        
+
         parameters.setAppliesToAddress("http://dummy-service.com/dummy");
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -174,12 +174,12 @@ public class JWTProviderActAsTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         parameters.setEncryptionProperties(new EncryptionProperties());
-        
+
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -187,10 +187,10 @@ public class JWTProviderActAsTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
-  
-    
+
+
+
 }

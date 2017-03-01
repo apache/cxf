@@ -36,5 +36,5 @@ public class MetricsMessageInOneWayInterceptor extends AbstractMetricsIntercepto
         if (ex.isOneWay() && !isRequestor(message)) {
             stop(message);
         }
-    }               
+    }
 }

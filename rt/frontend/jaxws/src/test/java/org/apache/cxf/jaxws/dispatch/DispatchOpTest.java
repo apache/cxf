@@ -69,14 +69,14 @@ public class DispatchOpTest extends AbstractJaxWsTest {
 
     @Test
     public void testResolveOperationWithSource() throws Exception {
-        ServiceImpl service = 
+        ServiceImpl service =
             new ServiceImpl(getBus(), getClass().getResource(wsdlResource), serviceName, null);
 
         Dispatch<Source> disp = service.createDispatch(
                 portName, Source.class, Service.Mode.PAYLOAD);
         disp.getRequestContext().put(MessageContext.WSDL_OPERATION, operationName);
         disp.getRequestContext().put(Dispatch.ENDPOINT_ADDRESS_PROPERTY, address);
-        
+
         d.setMessageObserver(new MessageReplayObserver(responseResource));
 
         BindingOperationVerifier bov = new BindingOperationVerifier();
@@ -92,10 +92,10 @@ public class DispatchOpTest extends AbstractJaxWsTest {
 
         assertEquals(operationName, boi.getName());
     }
-    
+
     @Test
     public void testResolveOperationWithSourceAndWSA() throws Exception {
-        ServiceImpl service = 
+        ServiceImpl service =
             new ServiceImpl(getBus(), getClass().getResource(wsdlResource),
                     serviceName, null, new AddressingFeature());
 
@@ -103,7 +103,7 @@ public class DispatchOpTest extends AbstractJaxWsTest {
                 portName, Source.class, Service.Mode.PAYLOAD);
         disp.getRequestContext().put(MessageContext.WSDL_OPERATION, operationName);
         disp.getRequestContext().put(Dispatch.ENDPOINT_ADDRESS_PROPERTY, address);
-        
+
         d.setMessageObserver(new MessageReplayObserver(responseResource));
 
         BindingOperationVerifier bov = new BindingOperationVerifier();
@@ -119,17 +119,17 @@ public class DispatchOpTest extends AbstractJaxWsTest {
 
         assertEquals(operationName, boi.getName());
     }
-    
+
     private static class BindingOperationVerifier extends AbstractSoapInterceptor {
         BindingOperationInfo boi;
         BindingOperationVerifier() {
             super(Phase.POST_LOGICAL);
         }
-        
+
         public void handleMessage(SoapMessage message) throws Fault {
             boi = message.getExchange().getBindingOperationInfo();
         }
-        
+
         public BindingOperationInfo getBindingOperationInfo() {
             return boi;
         }

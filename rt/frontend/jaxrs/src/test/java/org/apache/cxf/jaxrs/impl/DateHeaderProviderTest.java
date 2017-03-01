@@ -29,7 +29,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class DateHeaderProviderTest extends Assert {
-    
+
     @Test
     public void testToFromSimpleString() {
         Date retry = new Date();
@@ -37,7 +37,7 @@ public class DateHeaderProviderTest extends Assert {
         Date retry2 = ex.getRetryTime(new Date());
         assertEquals(HttpUtils.toHttpDate(retry), HttpUtils.toHttpDate(retry2));
     }
-    
-    
-        
+
+
+
 }

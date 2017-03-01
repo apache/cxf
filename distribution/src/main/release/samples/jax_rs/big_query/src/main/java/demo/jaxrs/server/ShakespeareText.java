@@ -22,7 +22,7 @@ public class ShakespeareText {
     private String text;
     private String date;
     public ShakespeareText() {
-        
+
     }
     public ShakespeareText(String text, String date) {
         this.text = text;

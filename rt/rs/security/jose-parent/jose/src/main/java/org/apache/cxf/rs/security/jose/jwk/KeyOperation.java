@@ -28,7 +28,7 @@ public enum KeyOperation {
     UNWRAPKEY(JsonWebKey.KEY_OPER_UNWRAP_KEY),
     DERIVEKEY(JsonWebKey.KEY_OPER_DERIVE_KEY),
     DERIVEBITS(JsonWebKey.KEY_OPER_DERIVE_BITS);
-    
+
     private final String oper;
     KeyOperation(String oper) {
         this.oper = oper;
@@ -42,5 +42,5 @@ public enum KeyOperation {
     public String toString() {
         return oper;
     }
-    
+
 }

@@ -30,7 +30,7 @@ import org.apache.cxf.management.annotation.ManagedAttribute;
 import org.apache.cxf.management.annotation.ManagedOperation;
 import org.apache.cxf.management.annotation.ManagedResource;
 
-@ManagedResource(componentName = "Endpoint", 
+@ManagedResource(componentName = "Endpoint",
                  description = "Responsible for managing server instances.")
 
 public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListener {
@@ -41,17 +41,17 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
     protected final Bus bus;
     protected final Endpoint endpoint;
     protected final Server server;
-    
+
     private enum State { CREATED, STARTED, STOPPED };
     private State state = State.CREATED;
-    
+
     public ManagedEndpoint(Bus b, Endpoint ep, Server s) {
         bus = b;
         endpoint = ep;
         server = s;
     }
 
-    @ManagedOperation        
+    @ManagedOperation
     public void start() {
         if (state == State.STARTED) {
             return;
@@ -62,12 +62,12 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
         }
         server.start();
     }
-    
+
     @ManagedOperation
     public void stop() {
         server.stop();
     }
-    
+
     @ManagedOperation
     public void destroy() {
         server.destroy();
@@ -77,24 +77,24 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
     public String getAddress() {
         return endpoint.getEndpointInfo().getAddress();
     }
-    
+
     @ManagedAttribute(description = "TransportId Attribute", currencyTimeLimit = 60)
     public String getTransportId() {
         return endpoint.getEndpointInfo().getTransportId();
     }
-    
+
     @ManagedAttribute(description = "Server State")
     public String getState() {
         return state.toString();
     }
-        
+
     public ObjectName getObjectName() throws JMException {
         String busId = bus.getId();
         StringBuilder buffer = new StringBuilder();
         buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
         buffer.append(ManagementConstants.BUS_ID_PROP).append('=').append(busId).append(',');
         buffer.append(ManagementConstants.TYPE_PROP).append('=').append("Bus.Service.Endpoint,");
-       
+
 
         String serviceName = (String)endpoint.get(SERVICE_NAME);
         if (StringUtils.isEmpty(serviceName)) {
@@ -102,8 +102,8 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
         }
         serviceName = ObjectName.quote(serviceName);
         buffer.append(ManagementConstants.SERVICE_NAME_PROP).append('=').append(serviceName).append(',');
-        
-        
+
+
         String endpointName = (String)endpoint.get(ENDPOINT_NAME);
         if (StringUtils.isEmpty(endpointName)) {
             endpointName = endpoint.getEndpointInfo().getName().getLocalPart();
@@ -116,14 +116,14 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
         }
         // Added the instance id to make the ObjectName unique
         buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(instanceId);
-        
+
         //Use default domain name of server
         return new ObjectName(buffer.toString());
     }
 
     public void startServer(Server s) {
         if (server.equals(s)) {
-            state = State.STARTED;            
+            state = State.STARTED;
         }
     }
 
@@ -133,7 +133,7 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
             // unregister server to avoid the memory leak
             ServerLifeCycleManager mgr = bus.getExtension(ServerLifeCycleManager.class);
             if (mgr != null) {
-                mgr.unRegisterListener(this);                
+                mgr.unRegisterListener(this);
             }
         }
     }

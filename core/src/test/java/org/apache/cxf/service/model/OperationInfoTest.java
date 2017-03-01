@@ -28,12 +28,12 @@ import org.junit.Test;
 public class OperationInfoTest extends Assert {
 
     private OperationInfo operationInfo;
-    
+
     @Before
     public void setUp() throws Exception {
         operationInfo = new OperationInfo(null, new QName("urn:test:ns", "operationTest"));
     }
-    
+
     @Test
     public void testName() throws Exception {
         assertNull(operationInfo.getInterface());
@@ -47,7 +47,7 @@ public class OperationInfoTest extends Assert {
             assertEquals(e.getMessage(), "Operation Name cannot be null.");
         }
     }
-    
+
     @Test
     public void testInput() throws Exception {
         assertFalse(operationInfo.hasInput());
@@ -62,7 +62,7 @@ public class OperationInfoTest extends Assert {
                      inputMessage.getName().getNamespaceURI());
         assertEquals(operationInfo.getInputName(), "input");
     }
-    
+
     @Test
     public void testOutput() throws Exception {
         assertFalse(operationInfo.hasOutput());
@@ -77,7 +77,7 @@ public class OperationInfoTest extends Assert {
                      outputMessage.getName().getNamespaceURI());
         assertEquals(operationInfo.getOutputName(), "output");
     }
-    
+
     @Test
     public void testOneWay() throws Exception {
         assertFalse(operationInfo.isOneWay());
@@ -87,7 +87,7 @@ public class OperationInfoTest extends Assert {
         operationInfo.setInput("input", inputMessage);
         assertTrue(operationInfo.isOneWay());
     }
-    
+
     @Test
     public void testFault() throws Exception {
         assertEquals(operationInfo.getFaults().size(), 0);
@@ -99,7 +99,7 @@ public class OperationInfoTest extends Assert {
         assertNotNull(fault);
         assertEquals(fault.getFaultName().getLocalPart(), "fault");
         assertEquals(fault.getName().getLocalPart(), "faultMessage");
-        assertEquals(fault.getName().getNamespaceURI(), 
+        assertEquals(fault.getName().getNamespaceURI(),
                      "http://apache.org/hello_world_soap_http");
         operationInfo.removeFault(faultName);
         assertEquals(operationInfo.getFaults().size(), 0);
@@ -114,10 +114,10 @@ public class OperationInfoTest extends Assert {
             operationInfo.addFault(faultName, null);
             fail("should get IllegalArgumentException");
         } catch (IllegalArgumentException e) {
-            assertEquals(e.getMessage(), 
+            assertEquals(e.getMessage(),
                 "A fault with name [{urn:test:ns}fault] already exists in this operation");
         }
     }
-    
-    
+
+
 }

@@ -34,15 +34,15 @@ import org.apache.wss4j.dom.validate.SamlAssertionValidator;
  * for SAML SSO. A Bearer Assertion does not have to be signed by default if the outer Response is signed.
  */
 public class SamlSSOAssertionValidator extends SamlAssertionValidator {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(SamlSSOAssertionValidator.class);
-    
+
     private final boolean signedResponse;
-    
+
     public SamlSSOAssertionValidator(boolean signedResponse) {
         this.signedResponse = signedResponse;
     }
-    
+
     /**
      * Check the Subject Confirmation method requirements
      */
@@ -111,5 +111,5 @@ public class SamlSSOAssertionValidator extends SamlAssertionValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE,
                                       "invalidSAMLsecurity");
         }
-    }    
+    }
 }

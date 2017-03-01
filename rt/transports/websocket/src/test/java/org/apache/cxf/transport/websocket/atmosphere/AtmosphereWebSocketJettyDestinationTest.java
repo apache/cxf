@@ -35,7 +35,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class AtmosphereWebSocketJettyDestinationTest extends Assert {
     private static final String ENDPOINT_ADDRESS = "ws://localhost:8080/websocket/nada";
@@ -43,13 +43,13 @@ public class AtmosphereWebSocketJettyDestinationTest extends Assert {
 
     @Test
     public void testUseCXFDefaultAtmoosphereInterceptor() throws Exception {
-        Bus bus = new ExtensionManagerBus();        
+        Bus bus = new ExtensionManagerBus();
         DestinationRegistry registry = new HTTPTransportFactory().getRegistry();
         EndpointInfo endpoint = new EndpointInfo();
         endpoint.setAddress(ENDPOINT_ADDRESS);
         endpoint.setName(ENDPOINT_NAME);
 
-        AtmosphereWebSocketServletDestination dest = 
+        AtmosphereWebSocketServletDestination dest =
             new AtmosphereWebSocketServletDestination(bus, registry, endpoint, ENDPOINT_ADDRESS);
 
         List<AtmosphereInterceptor> ais = dest.getAtmosphereFramework().interceptors();
@@ -72,7 +72,7 @@ public class AtmosphereWebSocketJettyDestinationTest extends Assert {
         endpoint.setAddress(ENDPOINT_ADDRESS);
         endpoint.setName(ENDPOINT_NAME);
 
-        AtmosphereWebSocketServletDestination dest = 
+        AtmosphereWebSocketServletDestination dest =
             new AtmosphereWebSocketServletDestination(bus, registry, endpoint, ENDPOINT_ADDRESS);
 
         List<AtmosphereInterceptor> ais = dest.getAtmosphereFramework().interceptors();
@@ -81,7 +81,7 @@ public class AtmosphereWebSocketJettyDestinationTest extends Assert {
             if (CustomInterceptor1.class.equals(a.getClass())) {
                 added++;
                 break;
-            } 
+            }
         }
         assertEquals(1, added);
     }
@@ -95,7 +95,7 @@ public class AtmosphereWebSocketJettyDestinationTest extends Assert {
         endpoint.setAddress(ENDPOINT_ADDRESS);
         endpoint.setName(ENDPOINT_NAME);
 
-        AtmosphereWebSocketServletDestination dest = 
+        AtmosphereWebSocketServletDestination dest =
             new AtmosphereWebSocketServletDestination(bus, registry, endpoint, ENDPOINT_ADDRESS);
 
         List<AtmosphereInterceptor> ais = dest.getAtmosphereFramework().interceptors();
@@ -106,11 +106,11 @@ public class AtmosphereWebSocketJettyDestinationTest extends Assert {
             } else if (CustomInterceptor2.class.equals(a.getClass())) {
                 added++;
                 break;
-            } 
+            }
         }
         assertEquals(2, added);
     }
-    
+
     private static class CustomInterceptor1 extends DefaultProtocolInterceptor {
     }
     private static class CustomInterceptor2 extends DefaultProtocolInterceptor {

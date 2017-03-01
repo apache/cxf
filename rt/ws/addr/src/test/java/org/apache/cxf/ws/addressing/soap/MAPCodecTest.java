@@ -75,7 +75,7 @@ public class MAPCodecTest extends Assert {
     private boolean expectRelatesTo;
     private String nonReplyRelationship;
     private boolean expectFaultTo;
-    
+
     @Before
     public void setUp() {
         codec = new MAPCodec();
@@ -288,13 +288,13 @@ public class MAPCodecTest extends Assert {
                                      boolean preExistingSOAPAction, String exposeAs) throws Exception {
         return setUpMessage(requestor, outbound, invalidMAP, preExistingSOAPAction, null, exposeAs);
     }
-    
+
     private SoapMessage setUpMessage(boolean requestor, boolean outbound, boolean invalidMAP,
-                                     boolean preExistingSOAPAction, Boolean generateRelatesTo, 
+                                     boolean preExistingSOAPAction, Boolean generateRelatesTo,
                                      String exposeAs) throws Exception {
         SoapMessage message = new SoapMessage(new MessageImpl());
         setUpOutbound(message, outbound);
-        expectRelatesTo = generateRelatesTo != null ? generateRelatesTo 
+        expectRelatesTo = generateRelatesTo != null ? generateRelatesTo
             : (requestor && !outbound) || (!requestor && outbound);
         message.put(REQUESTOR_ROLE, Boolean.valueOf(requestor));
         String mapProperty = getMAPProperty(requestor, outbound);
@@ -328,7 +328,7 @@ public class MAPCodecTest extends Assert {
         mimeHeaders = new HashMap<String, List<String>>();
         message.put(MIME_HEADERS, mimeHeaders);
         if (preExistingSOAPAction) {
-            List<String> soapAction = new ArrayList<String>();
+            List<String> soapAction = new ArrayList<>();
             soapAction.add("\"foobar\"");
             mimeHeaders.put(SoapBindingConstants.SOAP_ACTION, soapAction);
         }
@@ -480,7 +480,7 @@ public class MAPCodecTest extends Assert {
                 VersionTransformer.convertTo200403(id),
                 VersionTransformer.convertTo200403(to),
                 VersionTransformer.convertTo200403(replyTo),
-                VersionTransformer.convertTo200403(relatesTo), 
+                VersionTransformer.convertTo200403(relatesTo),
                 VersionTransformer.convertTo200403(from),
                 VersionTransformer.convertTo200403(faultTo),
             };
@@ -563,16 +563,16 @@ public class MAPCodecTest extends Assert {
             if (outbound) {
                 String id = expectedValues[1] instanceof AttributedURIType
                     ? ((AttributedURIType)expectedValues[1]).getValue()
-                    : expectedValues[0] instanceof AttributedURI 
-                      ? ((AttributedURI)expectedValues[1]).getValue() 
+                    : expectedValues[0] instanceof AttributedURI
+                      ? ((AttributedURI)expectedValues[1]).getValue()
                       : ((org.apache.cxf.ws.addressing.v200403.AttributedURI)expectedValues[1]).getValue();
-                assertSame("unexpected correlated exchange", 
-                           codec.uncorrelatedExchanges.get(id), 
+                assertSame("unexpected correlated exchange",
+                           codec.uncorrelatedExchanges.get(id),
                            message.getExchange());
             } else {
                 if (isReply(exposedAsNative)) {
-                    assertSame("unexpected correlated exchange", 
-                               correlatedExchange, 
+                    assertSame("unexpected correlated exchange",
+                               correlatedExchange,
                                message.getExchange());
                 } else {
                     assertNotSame("unexpected correlated exchange",
@@ -580,7 +580,7 @@ public class MAPCodecTest extends Assert {
                                   message.getExchange());
                 }
                 assertEquals("expected empty uncorrelated exchange cache",
-                             0, 
+                             0,
                              codec.uncorrelatedExchanges.size());
             }
         }
@@ -605,18 +605,18 @@ public class MAPCodecTest extends Assert {
     private boolean isReply(boolean exposedAsNative) {
         boolean isReply = false;
         if (exposedAsNative) {
-            isReply = 
+            isReply =
                 Names.WSA_RELATIONSHIP_REPLY.equals(
                     ((RelatesToType)expectedValues[4]).getRelationshipType());
         } else {
-            QName relationship = 
+            QName relationship =
                 expectedValues[4] instanceof Relationship
                 ? ((Relationship)expectedValues[4]).getRelationshipType()
                 : ((org.apache.cxf.ws.addressing.v200403.Relationship)expectedValues[4])
                       .getRelationshipType();
-            isReply = relationship == null 
+            isReply = relationship == null
                       || Names.WSA_REPLY_NAME.equalsIgnoreCase(relationship.getLocalPart());
-        } 
+        }
 
         return isReply;
     }

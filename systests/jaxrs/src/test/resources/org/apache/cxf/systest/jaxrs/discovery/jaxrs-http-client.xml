@@ -21,7 +21,7 @@ under the License.
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:http="http://cxf.apache.org/transports/http/configuration"
 	xmlns:jaxrs="http://cxf.apache.org/jaxrs-client" 
 	xmlns:cxf="http://cxf.apache.org/core"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-4.3.xsd         
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans-4.2.xsd         
 	   http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd  
 	   http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd">	
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>

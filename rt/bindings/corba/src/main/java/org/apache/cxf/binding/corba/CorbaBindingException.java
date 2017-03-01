@@ -21,8 +21,8 @@ package org.apache.cxf.binding.corba;
 import javax.xml.ws.ProtocolException;
 
 // NOTE: This exception provides basic functionality for throwing exceptions within the binding.
-// At the momemnt, we just want to support the ability to throw a message (and accompanying 
-// exception) but it may be necessary to break up this functionality into separate exceptions 
+// At the momemnt, we just want to support the ability to throw a message (and accompanying
+// exception) but it may be necessary to break up this functionality into separate exceptions
 // or make this exception a bit more complex.
 public class CorbaBindingException extends ProtocolException {
 

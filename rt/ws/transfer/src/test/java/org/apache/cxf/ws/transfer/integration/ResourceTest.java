@@ -42,15 +42,15 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ResourceTest extends IntegrationBaseTest {
-    
+
     private static final String UUID_VALUE = "123456";
-    
+
     private static final String REPRESENTATION_NAME = "name1";
-    
+
     private static final String REPRESENTATION_NAMESPACE = "test";
-    
+
     private static final String REPRESENTATION_VALUE = "value1";
-    
+
     protected Resource createClient(ReferenceParametersType refParams) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setBus(bus);
@@ -68,14 +68,14 @@ public class ResourceTest extends IntegrationBaseTest {
 
         return proxy;
     }
-    
+
     @Test
     public void getRequestTest() {
         Element representationEl = document.createElementNS(REPRESENTATION_NAMESPACE, REPRESENTATION_NAME);
         representationEl.setTextContent(REPRESENTATION_VALUE);
         Representation representation = new Representation();
         representation.setAny(representationEl);
-        
+
         ResourceManager manager = EasyMock.createMock(ResourceManager.class);
         EasyMock.expect(manager.get(EasyMock.isA(ReferenceParametersType.class))).andReturn(representation);
         EasyMock.expectLastCall().once();
@@ -86,13 +86,13 @@ public class ResourceTest extends IntegrationBaseTest {
                 MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent(UUID_VALUE);
         refParams.getAny().add(uuid);
-        
+
         Server server = createLocalResource(manager);
         Resource client = createClient(refParams);
-        
+
         GetResponse response = client.get(new Get());
         EasyMock.verify(manager);
-        
+
         representationEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("Namespace is other than expected.",
                 REPRESENTATION_NAMESPACE, representationEl.getNamespaceURI());
@@ -100,10 +100,10 @@ public class ResourceTest extends IntegrationBaseTest {
                 REPRESENTATION_NAME, representationEl.getLocalName());
         Assert.assertEquals("Value is other than expected.",
                 REPRESENTATION_VALUE, representationEl.getTextContent());
-        
+
         server.destroy();
     }
-    
+
     @Test
     public void putRequestTest() {
         ResourceManager manager = EasyMock.createMock(ResourceManager.class);
@@ -118,21 +118,21 @@ public class ResourceTest extends IntegrationBaseTest {
                 MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent(UUID_VALUE);
         refParams.getAny().add(uuid);
-        
+
         Element representationEl = document.createElementNS(REPRESENTATION_NAMESPACE, REPRESENTATION_NAME);
         representationEl.setTextContent(REPRESENTATION_VALUE);
         Representation representation = new Representation();
         representation.setAny(representationEl);
-        
+
         Server server = createLocalResource(manager);
         Resource client = createClient(refParams);
-        
+
         Put putRequest = new Put();
         putRequest.setRepresentation(representation);
-        
+
         PutResponse response = client.put(putRequest);
         EasyMock.verify(manager);
-        
+
         representationEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("Namespace is other than expected.",
                 REPRESENTATION_NAMESPACE, representationEl.getNamespaceURI());
@@ -140,10 +140,10 @@ public class ResourceTest extends IntegrationBaseTest {
                 REPRESENTATION_NAME, representationEl.getLocalName());
         Assert.assertEquals("Value is other than expected.",
                 REPRESENTATION_VALUE, representationEl.getTextContent());
-        
+
         server.destroy();
     }
-    
+
     @Test
     public void deleteRequestTest() {
         ResourceManager manager = EasyMock.createMock(ResourceManager.class);
@@ -156,13 +156,13 @@ public class ResourceTest extends IntegrationBaseTest {
                 MemoryResourceManager.REF_NAMESPACE, MemoryResourceManager.REF_LOCAL_NAME);
         uuid.setTextContent(UUID_VALUE);
         refParams.getAny().add(uuid);
-        
+
         Server server = createLocalResource(manager);
         Resource client = createClient(refParams);
-        
+
         client.delete(new Delete());
         EasyMock.verify(manager);
-        
+
         server.destroy();
     }
 }

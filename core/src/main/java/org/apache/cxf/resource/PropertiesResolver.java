@@ -23,9 +23,9 @@ import java.io.InputStream;
 import java.util.Map;
 
 public class PropertiesResolver implements ResourceResolver {
-    
-    private final Map<String, Object> properties; 
-    
+
+    private final Map<String, Object> properties;
+
     public PropertiesResolver(Map<String, Object> p) {
         properties = p;
     }
@@ -43,7 +43,7 @@ public class PropertiesResolver implements ResourceResolver {
             return resourceType.cast(properties.get(resourceName));
         }
         return null;
-        
-        
-    }    
+
+
+    }
 }

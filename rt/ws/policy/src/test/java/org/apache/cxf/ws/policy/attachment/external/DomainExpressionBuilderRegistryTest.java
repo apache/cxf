@@ -34,27 +34,27 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class DomainExpressionBuilderRegistryTest extends Assert {
 
     private IMocksControl control;
-    
-    
+
+
     @Before
     public void setUp() {
-        control = EasyMock.createNiceControl();        
-    } 
-    
+        control = EasyMock.createNiceControl();
+    }
+
     @Test
     public void testNoBuilder() {
         DomainExpressionBuilderRegistry reg = new DomainExpressionBuilderRegistry();
         assertEquals(DomainExpressionBuilderRegistry.class, reg.getRegistrationType());
-        
-        Element e = control.createMock(Element.class); 
+
+        Element e = control.createMock(Element.class);
         EasyMock.expect(e.getNamespaceURI()).andReturn("http://a.b.c");
         EasyMock.expect(e.getLocalName()).andReturn("x");
-        
+
         control.replay();
         try {
             reg.build(e);
@@ -63,9 +63,9 @@ public class DomainExpressionBuilderRegistryTest extends Assert {
             // expected
         }
         control.verify();
-        
+
     }
-    
+
     @Test
     public void testBuild() {
         DomainExpressionBuilder builder = control.createMock(DomainExpressionBuilder.class);
@@ -73,15 +73,15 @@ public class DomainExpressionBuilderRegistryTest extends Assert {
         QName qn = new QName("http://a.b.c", "x");
         builders.put(qn, builder);
         DomainExpressionBuilderRegistry reg = new DomainExpressionBuilderRegistry(builders);
-        
-        Element e = control.createMock(Element.class); 
+
+        Element e = control.createMock(Element.class);
         EasyMock.expect(e.getNamespaceURI()).andReturn("http://a.b.c");
         EasyMock.expect(e.getLocalName()).andReturn("x");
-        DomainExpression de = control.createMock(DomainExpression.class); 
+        DomainExpression de = control.createMock(DomainExpression.class);
         EasyMock.expect(builder.build(e)).andReturn(de);
-        
+
         control.replay();
         assertSame(de, reg.build(e));
-        control.verify();     
+        control.verify();
     }
 }

@@ -37,7 +37,7 @@ public class StreamInterceptor extends AbstractPhaseInterceptor<Message> {
         super(Phase.PRE_STREAM);
         addBefore(SoapPreProtocolOutInterceptor.class.getName());
     }
-    
+
     public void handleMessage(Message message) {
         //TODO
 
@@ -49,7 +49,7 @@ public class StreamInterceptor extends AbstractPhaseInterceptor<Message> {
             OutputStream os = message.getContent(OutputStream.class);
             CachedStream cs = new CachedStream();
             message.setContent(OutputStream.class, cs);
-            
+
             message.getInterceptorChain().doIntercept(message);
 
             try {
@@ -80,20 +80,20 @@ public class StreamInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void handleFault(Message message) {
     }
-    
+
 
     private class CachedStream extends CachedOutputStream {
         CachedStream() {
             super();
         }
-        
+
         protected void doFlush() throws IOException {
             currentStream.flush();
         }
 
         protected void doClose() throws IOException {
         }
-        
+
         protected void onWrite() throws IOException {
         }
     }

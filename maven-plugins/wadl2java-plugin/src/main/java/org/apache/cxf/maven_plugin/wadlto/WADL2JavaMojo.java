@@ -50,11 +50,11 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
 
     @Parameter(property = "cxf.testWadlRoot", defaultValue = "${basedir}/src/test/resources/wadl")
     File testWadlRoot;
-    
-    
+
+
     @Component
     BuildContext buildContext;
-    
+
     private void mergeOptions(List<WadlOption> effectiveOptions) {
         if (wadlOptions == null) {
             return;
@@ -76,7 +76,7 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
         File classesDir = new File(classesDirectory);
         classesDir.mkdirs();
         markerDirectory.mkdirs();
-        
+
         // add the generated source into compile source
         // do this step first to ensure the source folder will be added to the Eclipse classpath
         if (project != null && sourceRoot != null) {
@@ -85,7 +85,7 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
         if (project != null && testSourceRoot != null) {
             project.addTestCompileSourceRoot(testSourceRoot.getAbsolutePath());
         }
-        
+
         // if this is an m2e configuration build then return immediately without doing any work
         if (project != null && buildContext.isIncremental() && !buildContext.hasDelta(project.getBasedir())) {
             return;
@@ -110,7 +110,7 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
             } else {
                 for (WadlOption o : effectiveWsdlOptions) {
                     bus = callCodeGenerator(o, bus, cp);
-    
+
                     File dirs[] = o.getDeleteDirs();
                     if (dirs != null) {
                         for (int idx = 0; idx < dirs.length; ++idx) {
@@ -129,14 +129,14 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
 
         System.gc();
     }
-    
+
     /**
      * @return effective WsdlOptions
      * @throws MojoExecutionException
      */
-    private List<WadlOption> createWadlOptionsFromScansAndExplicitWadlOptions(File classesDir) 
+    private List<WadlOption> createWadlOptionsFromScansAndExplicitWadlOptions(File classesDir)
         throws MojoExecutionException {
-        List<WadlOption> effectiveOptions = new ArrayList<WadlOption>();
+        List<WadlOption> effectiveOptions = new ArrayList<>();
         mergeOptions(effectiveOptions);
         downloadRemoteDocs(effectiveOptions);
         if (effectiveOptions.isEmpty()) {
@@ -147,13 +147,13 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
             }
             File defaultRoot = wadlRoot != null && wadlRoot.exists() ? wadlRoot : testWadlRoot;
             effectiveOptions.addAll(
-                OptionLoader.loadWadlOptionsFromFile(defaultRoot, 
-                                                     includes, 
-                                                     excludes, 
-                                                     defaultOptions, 
+                OptionLoader.loadWadlOptionsFromFile(defaultRoot,
+                                                     includes,
+                                                     excludes,
+                                                     defaultOptions,
                                                      classesDir));
         }
         return effectiveOptions;
     }
-    
+
 }

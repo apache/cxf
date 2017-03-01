@@ -27,7 +27,7 @@ import javax.ws.rs.core.UriInfo;
 
 @Path("/atom")
 public class AtomBookStore3 extends AtomBookStore {
-    
+
     @Context
     public void setUriInfo(UriInfo ui) {
         super.uField = ui;

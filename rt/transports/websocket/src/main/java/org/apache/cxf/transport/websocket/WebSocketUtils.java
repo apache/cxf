@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
- * 
+ *
  */
 public final class WebSocketUtils {
     public static final String URI_KEY = "$uri";
@@ -40,15 +40,15 @@ public final class WebSocketUtils {
 
     private WebSocketUtils() {
     }
-    
+
     /**
      * Read header properties from the specified input stream.
-     *  
+     *
      * Only a restricted syntax is allowed as the syntax is in our control.
      * Not allowed are:
      * - multiline or line-wrapped headers are not not
      * - charset other than utf-8. (although i would have preferred iso-8859-1 ;-)
-     * 
+     *
      * @param in the input stream
      * @param req true if the input stream includes the request line
      * @return a map of name value pairs.
@@ -68,7 +68,7 @@ public final class WebSocketUtils {
             headers.put(METHOD_KEY, line.substring(0, del).trim());
             headers.put(URI_KEY, line.substring(del + 1).trim());
         }
-        
+
         // read headers
         while ((line = readLine(in)) != null) {
             if (line.length() > 0) {
@@ -90,7 +90,7 @@ public final class WebSocketUtils {
 
 
     /**
-     * Read a line terminated by '\n' optionally preceded by '\r' from the 
+     * Read a line terminated by '\n' optionally preceded by '\r' from the
      * specified input stream.
      * @param in the input stream
      * @return
@@ -149,7 +149,7 @@ public final class WebSocketUtils {
             sb.append(v).append(CRLF);
         }
         sb.append(headers);
-        
+
         if (data != null && length > 0) {
             sb.append(CRLF).append(data, offset, length);
         }
@@ -204,7 +204,7 @@ public final class WebSocketUtils {
 
     /**
      * Build request bytes with the specified method, url, headers, and content entity.
-     * 
+     *
      * @param method
      * @param url
      * @param headers

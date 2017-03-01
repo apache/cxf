@@ -40,38 +40,38 @@ public class AsyncHttpTransportFactory extends AbstractTransportFactory implemen
 
     public static final List<String> DEFAULT_NAMESPACES = Arrays
         .asList("http://cxf.apache.org/transports/http/http-client");
-   
+
     /**
      * This constant holds the prefixes served by this factory.
      */
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
-    
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
+
     static {
         URI_PREFIXES.add("hc://");
     }
-    
+
     private final AsyncHTTPConduitFactory factory = new AsyncHTTPConduitFactory();
-    
+
     public AsyncHttpTransportFactory() {
         super(DEFAULT_NAMESPACES);
     }
-    
+
     /**
      * This call is used by CXF ExtensionManager to inject the activationNamespaces
      * @param ans The transport ids.
      */
     public void setActivationNamespaces(Collection<String> ans) {
-        setTransportIds(new ArrayList<String>(ans));
+        setTransportIds(new ArrayList<>(ans));
     }
-    
+
     public Set<String> getUriPrefixes() {
         return URI_PREFIXES;
     }
-    
+
     protected void configure(Bus b, Object bean) {
         configure(b, bean, null, null);
     }
-    
+
     protected void configure(Bus bus, Object bean, String name, String extraName) {
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
@@ -81,7 +81,7 @@ public class AsyncHttpTransportFactory extends AbstractTransportFactory implemen
             }
         }
     }
-    
+
     protected String getAddress(EndpointInfo endpointInfo) {
         String address = endpointInfo.getAddress();
         if (address.startsWith("hc://")) {
@@ -89,7 +89,7 @@ public class AsyncHttpTransportFactory extends AbstractTransportFactory implemen
         }
         return address;
     }
-    
+
     @Override
     public Conduit getConduit(EndpointInfo endpointInfo, Bus bus) throws IOException {
         return getConduit(endpointInfo, endpointInfo.getTarget(), bus);
@@ -98,14 +98,14 @@ public class AsyncHttpTransportFactory extends AbstractTransportFactory implemen
     @Override
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target, Bus bus)
         throws IOException {
-        
+
         HTTPConduit conduit = null;
         // need to updated the endpointInfo
         endpointInfo.setAddress(getAddress(endpointInfo));
-        
+
         conduit = factory.createConduit(bus, endpointInfo, target);
 
-        // Spring configure the conduit.  
+        // Spring configure the conduit.
         String address = conduit.getAddress();
         if (address != null && address.indexOf('?') != -1) {
             address = address.substring(0, address.indexOf('?'));

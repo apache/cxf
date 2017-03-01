@@ -44,9 +44,9 @@ import org.ietf.jgss.GSSCredential;
  */
 public class KerberosClient implements Configurable {
     private static final Logger LOG = LogUtils.getL7dLogger(KerberosClient.class);
-    
+
     String name = "default.kerberos-client";
-    
+
     private String serviceName;
     private CallbackHandler callbackHandler;
     private String contextName;
@@ -58,14 +58,14 @@ public class KerberosClient implements Configurable {
     @Deprecated
     public KerberosClient(Bus b) {
     }
-    
+
     public KerberosClient() {
     }
 
     public String getBeanName() {
         return name;
     }
-    
+
     /**
      * Get the JAAS Login context name to use.
      * @return the JAAS Login context name to use
@@ -81,7 +81,7 @@ public class KerberosClient implements Configurable {
     public void setContextName(String contextName) {
         this.contextName = contextName;
     }
-    
+
     /**
      * @deprecated
      * Get the JAAS Login module name to use.
@@ -123,7 +123,7 @@ public class KerberosClient implements Configurable {
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
-    
+
     /**
      * Get the name of the service to use when contacting the KDC.
      * @return the name of the service to use when contacting the KDC
@@ -142,9 +142,9 @@ public class KerberosClient implements Configurable {
                 delegatedCredential = (GSSCredential)obj;
             }
         }
-        
+
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Requesting Kerberos ticket for " + serviceName 
+            LOG.fine("Requesting Kerberos ticket for " + serviceName
                     + " using JAAS Login Module: " + getContextName());
         }
         KerberosSecurity bst = new KerberosSecurity(DOMUtils.createDocument());
@@ -153,7 +153,7 @@ public class KerberosClient implements Configurable {
                                   delegatedCredential);
         bst.addWSUNamespace();
         bst.setID(wssConfig.getIdAllocator().createSecureId("BST-", bst));
-        
+
         SecurityToken token = new SecurityToken(bst.getID());
         token.setToken(bst.getElement());
         token.setWsuId(bst.getID());

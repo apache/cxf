@@ -31,5 +31,5 @@ public interface IssueOperation {
             RequestSecurityTokenType request,
             Principal principal,
             Map<String, Object> messageContext);
-    
+
 }

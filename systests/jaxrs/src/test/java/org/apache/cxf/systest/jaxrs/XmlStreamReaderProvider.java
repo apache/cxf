@@ -36,19 +36,19 @@ public class XmlStreamReaderProvider implements ContainerRequestFilter {
 
     @Context
     private MessageContext context;
-    
+
     public void filter(ContainerRequestContext c) throws IOException {
         String method = context.get(Message.HTTP_REQUEST_METHOD).toString();
-        
+
         if ("PUT".equals(method)) {
             MultivaluedMap<String, String> map = context.getUriInfo().getPathParameters();
             if (!"123".equals(map.getFirst("id"))) {
                 throw new RuntimeException();
             }
             Message m = JAXRSUtils.getCurrentMessage();
-            XMLStreamReader reader = 
+            XMLStreamReader reader =
                 StaxUtils.createXMLStreamReader(m.getContent(InputStream.class));
-            m.setContent(XMLStreamReader.class, 
+            m.setContent(XMLStreamReader.class,
                                                       new CustomXmlStreamReader(reader));
         }
     }

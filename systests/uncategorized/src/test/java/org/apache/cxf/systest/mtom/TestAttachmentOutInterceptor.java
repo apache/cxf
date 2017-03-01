@@ -29,7 +29,7 @@ import org.junit.Assert;
 
 public class TestAttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    
+
     public TestAttachmentOutInterceptor() {
         super(Phase.SEND);
     }

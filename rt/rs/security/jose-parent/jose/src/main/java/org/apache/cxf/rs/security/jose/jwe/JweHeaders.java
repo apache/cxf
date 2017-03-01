@@ -45,7 +45,7 @@ public class JweHeaders extends JoseHeaders {
     public JweHeaders(JoseHeaders headers) {
         super(headers.asMap());
     }
-    
+
     public JweHeaders(Map<String, Object> values) {
         super(values);
     }
@@ -66,48 +66,44 @@ public class JweHeaders extends JoseHeaders {
     }
     private void init(KeyAlgorithm keyEncAlgo, ContentAlgorithm ctEncAlgo, boolean deflate) {
         if (keyEncAlgo != null) {
-            setKeyEncryptionAlgorithm(keyEncAlgo);    
+            setKeyEncryptionAlgorithm(keyEncAlgo);
         }
         setContentEncryptionAlgorithm(ctEncAlgo);
         if (deflate) {
             setZipAlgorithm(JoseConstants.JWE_DEFLATE_ZIP_ALGORITHM);
         }
     }
-    
+
     public void setKeyEncryptionAlgorithm(KeyAlgorithm algo) {
         super.setAlgorithm(algo.getJwaName());
     }
-    
+
     public KeyAlgorithm getKeyEncryptionAlgorithm() {
         String algo = super.getAlgorithm();
         return algo == null ? null : KeyAlgorithm.getAlgorithm(algo);
     }
-    
+
     public void setContentEncryptionAlgorithm(ContentAlgorithm algo) {
         setHeader(JoseConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM, algo.getJwaName());
     }
-    
+
     public ContentAlgorithm getContentEncryptionAlgorithm() {
         Object prop = getHeader(JoseConstants.JWE_HEADER_CONTENT_ENC_ALGORITHM);
         return prop == null ? null : ContentAlgorithm.getAlgorithm(prop.toString());
     }
-    
+
     public void setZipAlgorithm(String type) {
         setHeader(JoseConstants.JWE_HEADER_ZIP_ALGORITHM, type);
     }
-    
+
     public String getZipAlgorithm() {
         return (String)getHeader(JoseConstants.JWE_HEADER_ZIP_ALGORITHM);
     }
-    
-    @Override
-    public JoseHeaders setHeader(String name, Object value) {
-        return (JoseHeaders)super.setHeader(name, value);
-    }
-    public byte[] toCipherAdditionalAuthData() { 
+
+    public byte[] toCipherAdditionalAuthData() {
         return toCipherAdditionalAuthData(new JsonMapObjectReaderWriter().toJson(this));
     }
-    public static byte[] toCipherAdditionalAuthData(String headersJson) { 
+    public static byte[] toCipherAdditionalAuthData(String headersJson) {
         byte[] headerBytes = StringUtils.toBytesUTF8(headersJson);
         String base64UrlHeadersInJson = Base64UrlUtility.encode(headerBytes);
         return StringUtils.toBytesASCII(base64UrlHeadersInJson);

@@ -37,7 +37,7 @@ public class CorbaPrimitiveTypeEventProducer implements CorbaTypeEventProducer {
         name = handler.getName();
     }
 
-    public String getLocalName() {        
+    public String getLocalName() {
         return handler.getSimpleName();
     }
 

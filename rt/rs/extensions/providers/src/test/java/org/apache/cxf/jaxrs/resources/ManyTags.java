@@ -23,17 +23,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "ManyTags")
 public class ManyTags {
     private Tags tags;
-    
+
     public ManyTags() {
-        
+
     }
-    
+
     public void setTags(Tags t) {
         tags = t;
     }
-    
+
     public Tags getTags() {
         return tags;
     }
-    
+
 }

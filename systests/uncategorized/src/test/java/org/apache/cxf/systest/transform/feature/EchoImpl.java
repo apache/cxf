@@ -20,12 +20,12 @@
 package org.apache.cxf.systest.transform.feature;
 
 
-@javax.jws.WebService(portName = "EchoPort", serviceName = "EchoService", 
-                      targetNamespace = "http://apache.org/echo", 
-                      endpointInterface = "org.apache.cxf.systest.transform.feature.Echo")                  
+@javax.jws.WebService(portName = "EchoPort", serviceName = "EchoService",
+                      targetNamespace = "http://apache.org/echo",
+                      endpointInterface = "org.apache.cxf.systest.transform.feature.Echo")
 public class EchoImpl implements Echo {
 
-    
+
     /* (non-Javadoc)
      * @see org.apache.hello_world_soap12_http.Greeter#sayHi()
      */

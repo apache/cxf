@@ -32,13 +32,13 @@ public class JsonMapObject implements Serializable {
     Map<String, Integer> updateCount;
     Map<String, Object> values = new LinkedHashMap<String, Object>();
     public JsonMapObject() {
-        
+
     }
-    
+
     public JsonMapObject(Map<String, Object> values) {
         this.values = values;
     }
-    
+
     public void setProperty(String name, Object value) {
         if (values.containsKey(name)) {
             if (updateCount == null) {
@@ -50,11 +50,11 @@ public class JsonMapObject implements Serializable {
         }
         values.put(name, value);
     }
-    
+
     public boolean containsProperty(String name) {
         return values.containsKey(name);
     }
-    
+
     public Object getProperty(String name) {
         return values.get(name);
     }
@@ -102,10 +102,10 @@ public class JsonMapObject implements Serializable {
             return null;
         }
     }
-    public int hashCode() { 
+    public int hashCode() {
         return values.hashCode();
     }
-    
+
     public boolean equals(Object obj) {
         return obj instanceof JsonMapObject && ((JsonMapObject)obj).values.equals(this.values);
     }

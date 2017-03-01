@@ -28,10 +28,10 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 /**
  * Captures the information associated with the code grant registration request.
- * @see ServerAuthorizationCodeGrant  
+ * @see ServerAuthorizationCodeGrant
  */
 public class AuthorizationCodeRegistration {
-    private Client client; 
+    private Client client;
     private List<String> requestedScope = Collections.emptyList();
     private List<String> approvedScope = Collections.emptyList();
     private String redirectUri;
@@ -70,7 +70,7 @@ public class AuthorizationCodeRegistration {
     public String getRedirectUri() {
         return redirectUri;
     }
-    
+
     /**
      * Sets the scopes request by the client
      * @param requestedScope the requested scopes
@@ -78,7 +78,7 @@ public class AuthorizationCodeRegistration {
     public void setRequestedScope(List<String> requestedScope) {
         this.requestedScope = requestedScope;
     }
-    
+
     /**
      * Gets the scopes request by the client
      * @return the requested scopes
@@ -86,16 +86,16 @@ public class AuthorizationCodeRegistration {
     public List<String> getRequestedScope() {
         return requestedScope;
     }
-    
+
     /**
      * Sets the scopes explicitly approved by the end user.
-     * If this list is empty then the end user had no way to down-scope. 
+     * If this list is empty then the end user had no way to down-scope.
      * @param approvedScope the approved scopes
      */
     public void setApprovedScope(List<String> approvedScope) {
         this.approvedScope = approvedScope;
     }
-    
+
     /**
      * Gets the scopes explicitly approved by the end user
      * @return the approved scopes
@@ -103,7 +103,7 @@ public class AuthorizationCodeRegistration {
     public List<String> getApprovedScope() {
         return approvedScope;
     }
-    
+
     /**
      * Sets the user subject representing the end user
      * @param subject the subject
@@ -111,7 +111,7 @@ public class AuthorizationCodeRegistration {
     public void setSubject(UserSubject subject) {
         this.subject = subject;
     }
-    
+
     /**
      * Gets the user subject representing the end user
      * @return the subject

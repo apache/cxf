@@ -31,40 +31,40 @@ import org.apache.cxf.annotations.GZIP;
 @Path("/bookstore")
 @GZIP(threshold = 1)
 public interface BookStore {
-    
+
     @GET
     @Path("/")
     Book getBookRoot();
-    
+
     @Path("/default")
     @Produces("application/xml")
     Book getDefaultBook();
-    
+
     @GET
     @Path("/books/{bookId}/")
     @Produces("application/xml")
     Book getBook(@PathParam("bookId") String id) throws BookNotFoundFault;
-    
+
     @GET
     @Path("/books/query/default")
     @Produces("application/xml")
     Book getBook(@QueryParam("bookId") long id) throws BookNotFoundFault;
-    
+
     @GET
     @Path("/the books/{bookId}/")
     @Produces("application/xml")
     Book getBookWithSpace(@PathParam("bookId") String id) throws BookNotFoundFault;
-    
+
     @PathParam("bookId")
     void setBookId(String id);
-    
+
     void setDefaultNameAndId(String name, long id);
-    
+
     @GET
     @Path("/books/{bookId}/")
     @Produces("application/json;qs=0.9")
     Book getBookAsJSON() throws BookNotFoundFault;
-    
+
     class BookNotReturnedException extends RuntimeException {
 
         private static final long serialVersionUID = 4935423670510083220L;
@@ -73,7 +73,7 @@ public interface BookStore {
             super(errorMessage);
         }
     }
-    
+
 }
 
 

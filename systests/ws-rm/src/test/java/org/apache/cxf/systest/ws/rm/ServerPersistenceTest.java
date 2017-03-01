@@ -32,7 +32,7 @@ import org.junit.BeforeClass;
 public class ServerPersistenceTest extends AbstractServerPersistenceTest {
     public static final String PORT = allocatePort(ServerPersistenceTest.class);
     public static final String DECOUPLED_PORT = allocatePort(ServerPersistenceTest.class, 1);
-    
+
     public String getPort() {
         return PORT;
     }
@@ -42,13 +42,13 @@ public class ServerPersistenceTest extends AbstractServerPersistenceTest {
         RMTxStore.deleteDatabaseFiles("spt-rmdb", true);
         startServers(PORT, "spt");
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         RMTxStore.deleteDatabaseFiles("spt-recovery", false);
         RMTxStore.deleteDatabaseFiles("spt-rmdb", false);
     }
-    
+
     public String getPrefix() {
         return "spt";
     }

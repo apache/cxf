@@ -49,47 +49,47 @@ public abstract class ManagedConnectionTestBase extends Assert {
     protected ManagedConnectionFactoryImpl factory = EasyMock.createMock(ManagedConnectionFactoryImpl.class);
 
     protected Bus bus;
-    
+
     protected ConnectionEventListener mockListener = EasyMock.createMock(ConnectionEventListener.class);
-    
+
     public ManagedConnectionTestBase() {
-        
+
     }
-    
+
     @Before
     public void setUp() throws ResourceException, MalformedURLException, BusException {
-               
+
         subj = new Subject();
-        
+
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
-        
+
         QName serviceName = new QName("http://apache.org/hello_world_soap_http", "SOAPService");
-        
+
         QName serviceName2 = new QName("http://apache.org/hello_world_soap_http", "SOAPService2");
-        
+
         QName portName = new QName("http://apache.org/hello_world_soap_http", "SoapPort");
-        
+
         QName portName2 = new QName("http://apache.org/hello_world_soap_http", "SoapPort2");
 
         cri = new CXFConnectionRequestInfo(Greeter.class, wsdl, serviceName, portName);
 
         cri2 = new CXFConnectionRequestInfo(Greeter.class, wsdl, serviceName2, portName2);
-        
+
         BusFactory bf = BusFactory.newInstance();
         bus = bf.createBus();
         BusFactory.setDefaultBus(bus);
-        
-        
-        EasyMock.reset(factory); 
-        
+
+
+        EasyMock.reset(factory);
+
         factory.getBus();
-        
+
         EasyMock.expectLastCall().andReturn(bus).anyTimes();
         EasyMock.replay(factory);
-                
-        mci = new ManagedConnectionImpl(factory, cri, subj);        
-              
+
+        mci = new ManagedConnectionImpl(factory, cri, subj);
+
         mci.addConnectionEventListener(mockListener);
     }
-    
+
 }

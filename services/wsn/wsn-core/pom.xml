@@ -32,8 +32,6 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <properties>
-        <!-- bug in jaxb is causing an assertion error if -ea is turned on -->
-        <cxf.surefire.fork.vmargs />
         <cxf.server.launcher.vmargs />
         <cxf.surefire.enable.assertions>false</cxf.surefire.enable.assertions>
     </properties>

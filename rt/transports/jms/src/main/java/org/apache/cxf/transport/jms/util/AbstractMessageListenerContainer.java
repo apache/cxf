@@ -89,18 +89,18 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
     public void setExecutor(Executor executor) {
         this.executor = executor;
     }
-    
+
     public void setJndiEnvironment(Properties jndiEnvironment) {
         this.jndiEnvironment = jndiEnvironment;
     }
 
-    /** 
-     * Creates a InitialContext if a JNDI environment has been provided. 
+    /**
+     * Creates a InitialContext if a JNDI environment has been provided.
      * This is usefull in e.g. weblogic, where interaction with JNDI JMS resources is secured.
-     * 
+     *
      * Be careful not to cache the return value in a non thread local scope.
-     * 
-     * @return an initial context, with the endpoint's JNDI properties, 
+     *
+     * @return an initial context, with the endpoint's JNDI properties,
      * or null if none is provided or if an errur occurs
      **/
     public InitialContext createInitialContext() {
@@ -113,14 +113,14 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
         }
         return null;
     }
-    
+
     @Override
     public void stop() {
         // In case of using external executor, don't shutdown it
         if ((executor == null) || !internalExecutor) {
             return;
         }
-        
+
         ExecutorService executorService = (ExecutorService)executor;
         executorService.shutdown();
         try {
@@ -132,7 +132,7 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
         executor = null;
         internalExecutor = false;
     }
-    
+
     public void setDurableSubscriptionName(String durableSubscriptionName) {
         this.durableSubscriptionName = durableSubscriptionName;
     }
@@ -145,7 +145,7 @@ public abstract class AbstractMessageListenerContainer implements JMSListenerCon
     public boolean isRunning() {
         return running;
     }
-    
+
     public void setTransactionManager(TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
     }

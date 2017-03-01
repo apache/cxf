@@ -59,8 +59,8 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
         List<JwsSignatureProvider> sigProviders = getInitializedSigProviders();
         OutputStream actualOs = ctx.getOutputStream();
         if (useJwsOutputStream) {
-            List<String> protectedHeaders = new ArrayList<String>(sigProviders.size());
-            List<JwsSignature> signatures = new ArrayList<JwsSignature>(sigProviders.size());
+            List<String> protectedHeaders = new ArrayList<>(sigProviders.size());
+            List<JwsSignature> signatures = new ArrayList<>(sigProviders.size());
             for (JwsSignatureProvider signer : sigProviders) {
                 JwsHeaders protectedHeader = prepareProtectedHeader(ctx, signer);
                 String encoded = Base64UrlUtility.encode(writer.toJson(protectedHeader));
@@ -69,11 +69,11 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
                 byte[] start = StringUtils.toBytesUTF8(encoded + ".");
                 signature.update(start, 0, start.length);
                 signatures.add(signature);
-            }    
+            }
             ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE_JSON));
             actualOs.write(StringUtils.toBytesUTF8("{\"payload\":\""));
             JwsJsonOutputStream jwsStream = new JwsJsonOutputStream(actualOs, protectedHeaders, signatures);
-            
+
             Base64UrlOutputStream base64Stream = null;
             if (encodePayload) {
                 base64Stream = new Base64UrlOutputStream(jwsStream);
@@ -87,21 +87,21 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
             }
             jwsStream.flush();
         } else {
-            CachedOutputStream cos = new CachedOutputStream(); 
+            CachedOutputStream cos = new CachedOutputStream();
             ctx.setOutputStream(cos);
             ctx.proceed();
             JwsJsonProducer p = new JwsJsonProducer(new String(cos.getBytes(), StandardCharsets.UTF_8));
             for (JwsSignatureProvider signer : sigProviders) {
                 JwsHeaders protectedHeader = prepareProtectedHeader(ctx, signer);
-                p.signWith(signer, protectedHeader, null);    
+                p.signWith(signer, protectedHeader, null);
             }
             ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE_JSON));
             writeJws(p, actualOs);
         }
-        
+
     }
-    
-    private JwsHeaders prepareProtectedHeader(WriterInterceptorContext ctx, 
+
+    private JwsHeaders prepareProtectedHeader(WriterInterceptorContext ctx,
                                               JwsSignatureProvider signer) {
         JwsHeaders headers = new JwsHeaders();
         headers.setSignatureAlgorithm(signer.getAlgorithm());
@@ -111,17 +111,17 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
         }
         return headers;
     }
-    
+
     public void setContentTypeRequired(boolean contentTypeRequired) {
         this.contentTypeRequired = contentTypeRequired;
     }
     public void setUseJwsJsonOutputStream(boolean useJwsJsonOutputStream) {
         this.useJwsOutputStream = useJwsJsonOutputStream;
     }
-    private void setContentTypeIfNeeded(JoseHeaders headers, WriterInterceptorContext ctx) {    
+    private void setContentTypeIfNeeded(JoseHeaders headers, WriterInterceptorContext ctx) {
         if (contentTypeRequired) {
             MediaType mt = ctx.getMediaType();
-            if (mt != null 
+            if (mt != null
                 && !JAXRSUtils.mediaTypeToString(mt).equals(JoseConstants.MEDIA_TYPE_JOSE_JSON)) {
                 if ("application".equals(mt.getType())) {
                     headers.setContentType(mt.getSubtype());
@@ -135,5 +135,5 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
     public void setEncodePayload(boolean encodePayload) {
         this.encodePayload = encodePayload;
     }
-    
+
 }

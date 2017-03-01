@@ -24,11 +24,11 @@ import java.security.NoSuchAlgorithmException;
 
 public class MessageDigestInputStream extends java.security.DigestInputStream {
     public static final String ALGO_SHA_256 = "SHA-256";
-    
+
     public MessageDigestInputStream(InputStream is) {
         super(is, getDigestInstance(ALGO_SHA_256));
     }
-    
+
     private static MessageDigest getDigestInstance(String algo)  {
         try {
             return MessageDigest.getInstance(algo);

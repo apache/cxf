@@ -30,17 +30,17 @@ import org.apache.cxf.maven_plugin.WsdlArtifact;
  * An option for javascript generation.
  */
 public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.GenericWsdlOption {
-    
+
     private String wsdl;
     private WsdlArtifact artifact;
-    
+
     /**
      * @return Pathname or URI to wsdl.
      */
     public String getWsdl() {
         return wsdl;
     }
-    
+
     /**
      * Set pathname or URI to WSDL.
      * @param wsdl path.
@@ -48,9 +48,9 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
     public void setWsdl(String wsdl) {
         this.wsdl = wsdl;
     }
-    
+
     /**
-     * Maven coordinates 
+     * Maven coordinates
      * @return
      */
     public WsdlArtifact getArtifact() {
@@ -76,7 +76,7 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
     }
 
     public List<String> generateCommandLine(File outputDirFile, URI basedir, URI wsdlURI, boolean debug) {
-        List<String> options = new ArrayList<String>();
+        List<String> options = new ArrayList<>();
         if (wsdlVersion != null && !"".equals(wsdlVersion)) {
             options.add("-wv");
             options.add(wsdlVersion);
@@ -91,7 +91,7 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
             options.add("-catalog");
             options.add(catalog.getAbsolutePath());
         }
-        
+
         options.add("-d");
         if (output != null) {
             options.add(output.getAbsolutePath());
@@ -117,5 +117,5 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
     public String toString() {
         return String.format("WsdlOption [wsdl=%s, artifact=%s, %s]", wsdl, artifact,
                              super.toString());
-    } 
+    }
 }

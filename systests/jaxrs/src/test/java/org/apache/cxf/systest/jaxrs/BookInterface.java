@@ -31,18 +31,18 @@ public interface BookInterface {
     @Path("/thosebooks/{bookId}/")
     @Produces("application/xml")
     Book getThatBook(@PathParam("bookId") Long id) throws BookNotFoundFault;
-    
-    
+
+
     @GET
     @Path("/thosebooks/{bookId}/{id}")
     @Produces("application/xml")
     Book getThatBook(@PathParam("bookId") Long id, @PathParam("id") String s) throws BookNotFoundFault;
-    
+
     @GET
     @Path("/thosebooks")
     @Produces("application/xml")
     Book getThatBook() throws BookNotFoundFault;
-    
+
     @POST
     @Path("/thosebooks")
     Book echoBook(Book b);

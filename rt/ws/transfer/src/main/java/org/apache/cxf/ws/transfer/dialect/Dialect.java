@@ -29,7 +29,7 @@ import org.apache.cxf.ws.transfer.Representation;
  * The interface for a Dialect objects.
  */
 public interface Dialect {
-    
+
     /**
      * Method for processing incoming Get message by Dialect extension.
      * @param body Get body
@@ -37,7 +37,7 @@ public interface Dialect {
      * @return Representation, which will be returned in response.
      */
     Object processGet(Get body, Representation representation);
-    
+
     /**
      * Method for processing incoming Put message by Dialect extension.
      * @param body Put body
@@ -45,7 +45,7 @@ public interface Dialect {
      * @return Representation, which will be stored in ResourceManager.
      */
     Representation processPut(Put body, Representation representation);
-    
+
     /**
      * Method for processing incoming Delete message by Dialect extension.
      * @param body Delete body
@@ -53,12 +53,12 @@ public interface Dialect {
      * @return Representation, which will be stored in ResourceManager.
      */
     boolean processDelete(Delete body, Representation representation);
-    
+
     /**
      * Method for processing incoming Create message by Dialect extension.
      * @param body Create body
      * @return Representation, which will be stored in ResourceManager.
      */
     Representation processCreate(Create body);
-    
+
 }

@@ -41,7 +41,7 @@ public final class SoapAddressPlugin extends AbstractWSDLPlugin {
         SoapAddress soapAddress = null;
 
         soapAddress = SOAPBindingUtil.createSoapAddress(registry, isSOAP12);
-        
+
         soapAddress.setLocationURI(address);
 
         return soapAddress;

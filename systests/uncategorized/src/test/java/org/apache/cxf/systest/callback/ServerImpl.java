@@ -36,66 +36,66 @@ import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 
-@javax.jws.WebService(serviceName = "SOAPService", 
+@javax.jws.WebService(serviceName = "SOAPService",
                       portName = "SOAPPort",
                       targetNamespace = "http://apache.org/callback",
                       endpointInterface = "org.apache.callback.ServerPortType",
-                      wsdlLocation = "testutils/basic_callback_test.wsdl") 
-                      
-                  
+                      wsdlLocation = "testutils/basic_callback_test.wsdl")
+
+
 public class ServerImpl implements ServerPortType  {
 
     @Resource
     Bus bus;
-    
+
     public String foo(String s) {
         return s;
     }
-    
+
     public String registerCallback(W3CEndpointReference w3cRef) {
         try {
 
             WSDLManager manager = new WSDLManagerImpl();
 
-        
+
             EndpointReferenceType callback = ProviderImpl.convertToInternal(w3cRef);
-        
+
             QName interfaceName = EndpointReferenceUtils.getInterfaceName(callback, bus);
             QName serviceName = EndpointReferenceUtils.getServiceName(callback, bus);
             String address = EndpointReferenceUtils.getAddress(callback);
-            
+
             String portString = EndpointReferenceUtils.getPortName(callback);
-            
+
             QName portName = new QName(serviceName.getNamespaceURI(), portString);
-            
+
             StringBuilder seiName = new StringBuilder();
             seiName.append(JAXBUtils.namespaceURIToPackage(interfaceName.getNamespaceURI()));
             seiName.append(".");
             seiName.append(JAXBUtils.nameToIdentifier(interfaceName.getLocalPart(),
-                                                      JAXBUtils.IdentifierType.INTERFACE));           
-            Class<?> sei = null; 
+                                                      JAXBUtils.IdentifierType.INTERFACE));
+            Class<?> sei = null;
             try {
-                sei = Class.forName(seiName.toString(), 
+                sei = Class.forName(seiName.toString(),
                                     true, manager.getClass().getClassLoader());
             } catch (ClassNotFoundException ex) {
                 ex.printStackTrace();
             }
-            
+
             Service service = Service.create(null, serviceName);
             service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, address);
-            CallbackPortType port =  (CallbackPortType)service.getPort(portName, sei);
+            CallbackPortType port = (CallbackPortType)service.getPort(portName, sei);
 
             port.serverSayHi("Sean");
 
-            
+
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
-        
-        return "registerCallback called";     
+
+        return "registerCallback called";
     }
 
-    
-        
-}    
+
+
+}

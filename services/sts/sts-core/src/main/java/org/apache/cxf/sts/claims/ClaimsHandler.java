@@ -34,4 +34,3 @@ public interface ClaimsHandler {
     ProcessedClaimCollection retrieveClaimValues(ClaimCollection claims, ClaimsParameters parameters);
 
 }
- 

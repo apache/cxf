@@ -23,22 +23,22 @@ import java.io.IOException;
 
 /**
  * SSO Service Provider State Manager.
- * 
+ *
  * TODO: review the possibility of working with the Servlet HTTPSession
- * instead; in that case it can be tricky to configure various containers 
- * (Tomcat, Jetty) to make sure the cookies are shared across multiple 
+ * instead; in that case it can be tricky to configure various containers
+ * (Tomcat, Jetty) to make sure the cookies are shared across multiple
  * war contexts which will be needed if RequestAssertionConsumerService
- * needs to be run in its own war file instead of having every application 
- * war on the SP side have a dedicated RequestAssertionConsumerService endpoint   
+ * needs to be run in its own war file instead of having every application
+ * war on the SP side have a dedicated RequestAssertionConsumerService endpoint
  */
 public interface SPStateManager extends Closeable {
-    
+
     void setRequestState(String relayState, RequestState state);
     RequestState removeRequestState(String relayState);
-    
+
     void setResponseState(String contextKey, ResponseState state);
     ResponseState getResponseState(String contextKey);
     ResponseState removeResponseState(String contextKey);
-    
+
     void close() throws IOException;
 }

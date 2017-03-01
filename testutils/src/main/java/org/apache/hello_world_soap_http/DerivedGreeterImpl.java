@@ -195,11 +195,11 @@ public class DerivedGreeterImpl implements Greeter {
                                                             int intElem) {
         return null;
     }
-    
-    public Future<?> testNillableAsync(String nillElem, 
+
+    public Future<?> testNillableAsync(String nillElem,
                                        int intElem,
                                        AsyncHandler<TestNillableResponse> asyncHandler) {
         return null;
     }
-    
+
 }

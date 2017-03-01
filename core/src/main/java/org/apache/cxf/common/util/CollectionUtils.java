@@ -25,14 +25,14 @@ import java.util.Iterator;
 
 public final class CollectionUtils {
     private CollectionUtils() {
-        
+
     }
-    
+
     public static <T> Collection<T> diff(Collection<T> c1, Collection<T> c2) {
         if (c1 == null || c1.size() == 0 || c2 == null || c2.size() == 0) {
             return c1;
         }
-        Collection<T> difference = new ArrayList<T>();
+        Collection<T> difference = new ArrayList<>();
         for (T item : c1) {
             if (!c2.contains(item)) {
                 difference.add(item);
@@ -40,7 +40,7 @@ public final class CollectionUtils {
         }
         return difference;
     }
-    
+
     public static <T> boolean isEmpty(Collection<T> c) {
         if (c == null || c.size() == 0) {
             return true;
@@ -52,5 +52,5 @@ public final class CollectionUtils {
         }
         return true;
     }
-    
+
 }

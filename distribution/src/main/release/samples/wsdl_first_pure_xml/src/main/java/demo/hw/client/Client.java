@@ -34,7 +34,7 @@ public final class Client {
     private static final QName SERVICE_NAME = new QName("http://apache.org/hello_world_xml_http/bare",
             "XMLService");
 
-    private static final QName PORT_NAME = 
+    private static final QName PORT_NAME =
         new QName("http://apache.org/hello_world_xml_http/bare", "XMLPort");
 
     private Client() {

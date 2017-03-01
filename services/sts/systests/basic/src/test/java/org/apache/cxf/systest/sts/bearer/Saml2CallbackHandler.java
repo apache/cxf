@@ -36,22 +36,22 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
  * Create a SAML2 Bearer Assertion.
  */
 public class Saml2CallbackHandler implements CallbackHandler {
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
-                
+
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 callback.setSamlVersion(Version.SAML_20);
-                
+
                 callback.setIssuer("sts");
                 String subjectName = "uid=alice";
                 String confirmationMethod = SAML2Constants.CONF_BEARER;
 
-                SubjectBean subjectBean = 
+                SubjectBean subjectBean =
                     new SubjectBean(subjectName, null, confirmationMethod);
                 callback.setSubject(subjectBean);
-                
+
                 AttributeStatementBean attrBean = new AttributeStatementBean();
                 if (subjectBean != null) {
                     attrBean.setSubject(subjectBean);
@@ -64,5 +64,5 @@ public class Saml2CallbackHandler implements CallbackHandler {
             }
         }
     }
-    
+
 }

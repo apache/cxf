@@ -41,18 +41,18 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * A set of tests for the validation rules associated with various Subject Confirmation
- * methods. 
+ * methods.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     final TestParam test;
-    
+
     public SamlSubjectConfTest(TestParam type) {
         this.test = type;
     }
@@ -72,15 +72,15 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(STAX_PORT, false)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -104,32 +104,32 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         // Successful call
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        
+
         callbackHandler.setCryptoAlias("morpit");
         callbackHandler.setCryptoPassword("password");
         callbackHandler.setCryptoPropertiesFile("morpit.properties");
-        
+
         ((BindingProvider)port).getRequestContext().put(
             "security.saml-callback-handler", callbackHandler
         );
         int result = port.doubleIt(25);
         assertTrue(result == 50);
-        
+
         // Don't sign the Assertion
         callbackHandler = new SamlCallbackHandler(true, false);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        
+
         callbackHandler.setCryptoAlias("morpit");
         callbackHandler.setCryptoPassword("password");
         callbackHandler.setCryptoPropertiesFile("morpit.properties");
-        
+
         ((BindingProvider)port).getRequestContext().put(
             "security.saml-callback-handler", callbackHandler
         );
@@ -139,11 +139,11 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Sign using "alice"
     @org.junit.Test
     public void testHOKNonMatchingCert() throws Exception {
@@ -158,27 +158,27 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)port).getRequestContext().put(
             "security.saml-callback-handler", callbackHandler
         );
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a non matching cert (SAML -> TLS)");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testHOKNoClientAuthentication() throws Exception {
 
@@ -192,18 +192,18 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         // Successful call
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
-        
+
         callbackHandler.setCryptoAlias("morpit");
         callbackHandler.setCryptoPassword("password");
         callbackHandler.setCryptoPropertiesFile("morpit.properties");
-        
+
         ((BindingProvider)port).getRequestContext().put(
             "security.saml-callback-handler", callbackHandler
         );
@@ -213,13 +213,13 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     //
-    // SV requires client auth. The server is set up not to require client auth to 
+    // SV requires client auth. The server is set up not to require client auth to
     // test this. SV does not require an internal signature unlike HOK.
     //
     @org.junit.Test
@@ -235,14 +235,14 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         // Successful call
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, false);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-        
+
         ((BindingProvider)port).getRequestContext().put(
             "security.saml-callback-handler", callbackHandler
         );
@@ -252,7 +252,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSVNoClientAuthentication() throws Exception {
 
@@ -266,14 +266,14 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         // Successful call
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, false);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
-        
+
         ((BindingProvider)port).getRequestContext().put(
             "security.saml-callback-handler", callbackHandler
         );
@@ -283,15 +283,15 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     //
     // Bearer does not require client auth, but it does require an internal signature
     //
-    
+
     @org.junit.Test
     public void testBearer() throws Exception {
 
@@ -305,18 +305,18 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         // Successful call
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
-        
+
         callbackHandler.setCryptoAlias("morpit");
         callbackHandler.setCryptoPassword("password");
         callbackHandler.setCryptoPropertiesFile("morpit.properties");
-        
+
         ((BindingProvider)port).getRequestContext().put(
             "security.saml-callback-handler", callbackHandler
         );
@@ -326,7 +326,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUnsignedBearer() throws Exception {
 
@@ -334,24 +334,24 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlSubjectConfTest.class.getResource("client-auth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);    
+        SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         // Successful call
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, false);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
-        
+
         ((BindingProvider)port).getRequestContext().put(
             "security.saml-callback-handler", callbackHandler
         );
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on an unsigned bearer token");
@@ -362,7 +362,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUnknownCustomMethod() throws Exception {
 
@@ -370,24 +370,24 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         URL busFile = SamlSubjectConfTest.class.getResource("client-auth.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);    
+        SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SamlSubjectConfTest.class.getResource("DoubleItSamlSubjectConf.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         // Successful call
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, false);
         callbackHandler.setConfirmationMethod("urn:oasis:names:tc:SAML:2.0:cm:custom");
-        
+
         ((BindingProvider)port).getRequestContext().put(
             "security.saml-callback-handler", callbackHandler
         );
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on an unknown custom subject confirmation method");
@@ -398,7 +398,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
-    
-   
+
+
+
 }

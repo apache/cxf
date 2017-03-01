@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class ClusteringBPNamespaceHandlerTest extends Assert {
     @Test
     public void testGetSchemaLocation() {
         ClusteringBPNamespaceHandler handler = new ClusteringBPNamespaceHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/clustering"));
     }
 

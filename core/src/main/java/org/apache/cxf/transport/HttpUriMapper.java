@@ -20,20 +20,20 @@
 package org.apache.cxf.transport;
 
 public final class HttpUriMapper {
-    
+
     private HttpUriMapper() {
         // Util class doesn't need public constructor
     }
-    
+
     public static String getContextName(String path) {
-        String contextName = "";        
+        String contextName = "";
         int idx = path.lastIndexOf('/');
         if (idx >= 0) {
-            contextName = path.substring(0, idx);          
+            contextName = path.substring(0, idx);
         }
         return contextName;
     }
-    
+
     public static String getResourceBase(String path) {
         String servletMap = "";
         int idx = path.lastIndexOf('/');
@@ -42,7 +42,7 @@ public final class HttpUriMapper {
         }
         if ("".equals(servletMap) || "".equals(path)) {
             servletMap = "/";
-        } 
+        }
         return servletMap;
     }
 }

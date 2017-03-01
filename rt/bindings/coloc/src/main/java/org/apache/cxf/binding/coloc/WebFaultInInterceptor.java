@@ -42,12 +42,12 @@ public class WebFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (ex != null) {
             message.put(Message.RESPONSE_CODE, Integer.valueOf(500));
         }
-        
+
         if (ex instanceof Fault) {
             Fault f = (Fault) ex;
             ex = (Exception) f.getCause();
         }
-        if (ex == null) { 
+        if (ex == null) {
             return;
         }
 
@@ -71,15 +71,15 @@ public class WebFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (wf != null) {
             faultName = new QName(wf.targetNamespace(), wf.name());
         }
-            
+
         return faultName;
     }
-    
+
     private MessagePartInfo getFaultMessagePart(QName qname, OperationInfo op) {
         if (op.isUnwrapped() && (op instanceof UnwrappedOperationInfo)) {
             op = ((UnwrappedOperationInfo)op).getWrappedOperation();
         }
-        
+
         for (FaultInfo faultInfo : op.getFaults()) {
             for (MessagePartInfo mpi : faultInfo.getMessageParts()) {
                 String ns = null;
@@ -88,13 +88,13 @@ public class WebFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
                 } else {
                     ns = mpi.getTypeQName().getNamespaceURI();
                 }
-                if (qname.getLocalPart().equals(mpi.getConcreteName().getLocalPart()) 
+                if (qname.getLocalPart().equals(mpi.getConcreteName().getLocalPart())
                         && qname.getNamespaceURI().equals(ns)) {
                     return mpi;
                 }
             }
-            
+
         }
         return null;
-    }    
+    }
 }

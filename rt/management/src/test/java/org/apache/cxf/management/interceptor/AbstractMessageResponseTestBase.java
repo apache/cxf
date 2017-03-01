@@ -44,25 +44,25 @@ public class AbstractMessageResponseTestBase extends Assert {
     protected static final QName SERVICE_NAME = new QName("http://org.apache.cxf", "hello");
     protected static final QName OPERATION_NAME = new QName("http://org.apache.cxf", "world");
     protected static final QName PORT_NAME = new QName("http://org.apache.cxf", "port");
-    
+
     protected static final String CLIENT_SERVICE_ONAME =
-        "org.apache.cxf:type=Performance.Counter.Client,bus.id=cxf,service=\"" 
-        + SERVICE_NAME.toString() + "\",port=\"" 
+        "org.apache.cxf:type=Performance.Counter.Client,bus.id=cxf,service=\""
+        + SERVICE_NAME.toString() + "\",port=\""
         + PORT_NAME.getLocalPart() + "\"";
-    protected static final String SERVER_SERVICE_ONAME = 
-        "org.apache.cxf:type=Performance.Counter.Server,bus.id=cxf,service=\"" 
-        + SERVICE_NAME.toString() + "\",port=\"" 
+    protected static final String SERVER_SERVICE_ONAME =
+        "org.apache.cxf:type=Performance.Counter.Server,bus.id=cxf,service=\""
+        + SERVICE_NAME.toString() + "\",port=\""
         + PORT_NAME.getLocalPart() + "\"";
     protected ObjectName clientServiceCounterOName;
     protected ObjectName serverServiceCounterOName;
     protected ObjectName clientOperationCounterOName;
     protected ObjectName serverOperationCounterOName;
-    
+
     protected Bus bus;
     protected Message message;
     protected Exchange exchange;
     protected CounterRepository cRepository;
-    
+
     @Before
     public void setUp() throws Exception {
         message = EasyMock.createMock(Message.class);
@@ -71,23 +71,23 @@ public class AbstractMessageResponseTestBase extends Assert {
         cRepository = EasyMock.createMock(CounterRepository.class);
         clientServiceCounterOName = new ObjectName(CLIENT_SERVICE_ONAME);
         serverServiceCounterOName = new ObjectName(SERVER_SERVICE_ONAME);
-        clientOperationCounterOName = new ObjectName(CLIENT_SERVICE_ONAME 
+        clientOperationCounterOName = new ObjectName(CLIENT_SERVICE_ONAME
             + ",operation=\"" + OPERATION_NAME.getLocalPart() + "\"");
-        serverOperationCounterOName = new ObjectName(SERVER_SERVICE_ONAME 
+        serverOperationCounterOName = new ObjectName(SERVER_SERVICE_ONAME
             + ",operation=\"" + OPERATION_NAME.getLocalPart() + "\"");
     }
-    
+
     protected void setupCounterRepository(boolean increase, boolean isClient) {
         ObjectName serviceCounterOName;
         ObjectName operationCounterOName;
         if (isClient) {
             serviceCounterOName = clientServiceCounterOName;
-            operationCounterOName = clientOperationCounterOName;            
+            operationCounterOName = clientOperationCounterOName;
         } else {
             serviceCounterOName = serverServiceCounterOName;
             operationCounterOName = serverOperationCounterOName;
         }
-        BusFactory.setDefaultBus(bus);      
+        BusFactory.setDefaultBus(bus);
         bus.getExtension(CounterRepository.class);
         EasyMock.expectLastCall().andReturn(cRepository).anyTimes();
         if (increase) {
@@ -95,25 +95,25 @@ public class AbstractMessageResponseTestBase extends Assert {
             cRepository.increaseCounter(EasyMock.eq(serviceCounterOName),
                 EasyMock.isA(MessageHandlingTimeRecorder.class));
             EasyMock.expectLastCall();
-            cRepository.increaseCounter(EasyMock.eq(operationCounterOName), 
+            cRepository.increaseCounter(EasyMock.eq(operationCounterOName),
                 EasyMock.isA(MessageHandlingTimeRecorder.class));
             EasyMock.expectLastCall();
             EasyMock.expect(cRepository.getCounter(EasyMock.isA(ObjectName.class))).andReturn(null);
             EasyMock.replay(cRepository);
         }
-        
+
         EasyMock.replay(bus);
         // increase the number
     }
-    
+
     protected void setupExchangeForMessage() {
         EasyMock.expect(exchange.getBus()).andReturn(bus).anyTimes();
-       
+
         Service service = EasyMock.createMock(Service.class);
-        EasyMock.expect(service.getName()).andReturn(SERVICE_NAME).anyTimes();        
+        EasyMock.expect(service.getName()).andReturn(SERVICE_NAME).anyTimes();
         EasyMock.expect(exchange.getService()).andReturn(service).anyTimes();
         EasyMock.replay(service);
-        
+
         Endpoint endpoint = EasyMock.createMock(Endpoint.class);
         EndpointInfo endpointInfo = EasyMock.createMock(EndpointInfo.class);
         EasyMock.expect(endpointInfo.getName()).andReturn(PORT_NAME).anyTimes();
@@ -124,12 +124,12 @@ public class AbstractMessageResponseTestBase extends Assert {
         EasyMock.expect(exchange.getEndpoint()).andReturn(endpoint).anyTimes();
         EasyMock.replay(endpointInfo);
         EasyMock.replay(endpoint);
-        
-        
+
+
         //EasyMock.expect(exchange.getBus()).andReturn(bus);
         EasyMock.expect(exchange.get("org.apache.cxf.management.service.counter.name")).andReturn(null).anyTimes();
     }
-      
+
     protected void setupOperationForMessage() {
         OperationInfo op = EasyMock.createMock(OperationInfo.class);
         BindingOperationInfo bop = EasyMock.createMock(BindingOperationInfo.class);

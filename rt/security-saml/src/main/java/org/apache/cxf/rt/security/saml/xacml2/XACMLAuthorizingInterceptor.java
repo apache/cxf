@@ -27,20 +27,20 @@ import org.opensaml.xacml.ctx.ResponseType;
  * An interceptor to perform an XACML 2.0 authorization request to a remote PDP using OpenSAML,
  * and make an authorization decision based on the response. It takes the principal and roles
  * from the SecurityContext, and uses the XACMLRequestBuilder to construct an XACML Request
- * statement. 
+ * statement.
  */
 public class XACMLAuthorizingInterceptor extends AbstractXACMLAuthorizingInterceptor {
-    
+
     private PolicyDecisionPoint pdp;
-    
+
     public XACMLAuthorizingInterceptor(PolicyDecisionPoint pdp) {
         super();
         this.pdp = pdp;
     }
-    
+
     @Override
     protected ResponseType performRequest(RequestType request, Message message) throws Exception {
         return this.pdp.evaluate(request);
     }
-    
+
 }

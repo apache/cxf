@@ -28,23 +28,23 @@ import org.apache.cxf.wsdl.WSDLExtensionLoader;
 import org.apache.cxf.wsdl.WSDLManager;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
-public final class AddressingWSDLExtensionLoader implements WSDLExtensionLoader { 
-    
+public final class AddressingWSDLExtensionLoader implements WSDLExtensionLoader {
+
     public AddressingWSDLExtensionLoader(Bus b) {
         WSDLManager manager = b.getExtension(WSDLManager.class);
-        
+
         createExtensor(manager, javax.wsdl.Binding.class,
-                       org.apache.cxf.ws.addressing.wsdl.UsingAddressing.class);        
+                       org.apache.cxf.ws.addressing.wsdl.UsingAddressing.class);
     }
     public void createExtensor(WSDLManager manager,
                                 Class<?> parentType,
                                 Class<?> elementType) {
         try {
             JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
-                                              parentType, 
+                                              parentType,
                                               elementType, null,
                                               this.getClass().getClassLoader());
         } catch (JAXBException e) {

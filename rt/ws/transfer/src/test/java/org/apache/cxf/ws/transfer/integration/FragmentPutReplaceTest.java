@@ -39,7 +39,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class FragmentPutReplaceTest extends IntegrationBaseTest {
-    
+
     @Test
     public void replaceElementTest() throws XMLStreamException {
         String content = "<root><a>Text</a></root>";
@@ -47,7 +47,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -61,15 +61,15 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("b", rootEl.getChildNodes().item(0).getNodeName());
         Assert.assertEquals("Better text", rootEl.getChildNodes().item(0).getTextContent());
-        
+
         resource.destroy();
     }
-    
+
     @Test
     public void replaceElement2Test() throws XMLStreamException {
         String content = "<a/>";
@@ -77,7 +77,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -90,14 +90,14 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("b", rootEl.getNodeName());
-        
+
         resource.destroy();
     }
-    
+
     @Test
     public void replaceTextContentTest() throws XMLStreamException {
         String content = "<root><a>Text</a></root>";
@@ -105,9 +105,9 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         //ObjectFactory objectFactory = new ObjectFactory();
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -119,15 +119,15 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("a", rootEl.getChildNodes().item(0).getNodeName());
         Assert.assertEquals("Better text", rootEl.getChildNodes().item(0).getTextContent());
-        
+
         resource.destroy();
     }
-    
+
     @Test
     public void replaceAttributeTest() throws XMLStreamException {
         String content = "<root><a foo=\"1\">Text</a></root>";
@@ -135,7 +135,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -157,24 +157,24 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Element aEl = (Element) rootEl.getChildNodes().item(0);
         Assert.assertNotNull(aEl);
         String attribute = aEl.getAttribute("bar");
         Assert.assertEquals("2", attribute);
-        
+
         resource.destroy();
     }
-    
+
     @Test
     public void replaceEmptyDocumentTest() {
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(new Representation());
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -187,14 +187,14 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("a", rootEl.getNodeName());
-        
+
         resource.destroy();
     }
-    
+
     @Test
     public void replaceDocumentTest() throws XMLStreamException {
         String content = "<a/>";
@@ -202,7 +202,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -215,14 +215,14 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("b", rootEl.getNodeName());
-        
+
         resource.destroy();
     }
-    
+
     @Test
     public void replaceDocument2Test() throws XMLStreamException {
         String content = "<a/>";
@@ -230,7 +230,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -243,14 +243,14 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("b", rootEl.getNodeName());
-        
+
         resource.destroy();
     }
-    
+
     @Test
     public void replaceOneElementTest() throws XMLStreamException {
         String content = "<a><b/><b/></a>";
@@ -258,7 +258,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -271,15 +271,15 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals("c", ((Element)rootEl.getChildNodes().item(0)).getLocalName());
         Assert.assertEquals("b", ((Element)rootEl.getChildNodes().item(1)).getLocalName());
-        
+
         resource.destroy();
     }
-    
+
     @Test
     public void replaceAllElementsTest() throws XMLStreamException {
         String content = "<a><b/><b/></a>";
@@ -287,7 +287,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -300,17 +300,17 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
         fragment.setExpression(expression);
         fragment.setValue(value);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals(1, rootEl.getChildNodes().getLength());
         Assert.assertEquals("c", ((Element)rootEl.getChildNodes().item(0)).getLocalName());
-        
+
         resource.destroy();
     }
 
     @Test
-    public  void replaceNonExistingElementTest() throws XMLStreamException {
+    public void replaceNonExistingElementTest() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -339,7 +339,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
 
     @Test
-    public  void replaceNonExistingRootTest() {
+    public void replaceNonExistingRootTest() {
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(new Representation());
         Server resource = createLocalResource(resourceManager);
@@ -366,7 +366,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
 
     @Test(expected = SOAPFaultException.class)
-    public  void replaceNonExistingElementFailTest() throws XMLStreamException {
+    public void replaceNonExistingElementFailTest() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
@@ -392,7 +392,7 @@ public class FragmentPutReplaceTest extends IntegrationBaseTest {
     }
 
     @Test(expected = SOAPFaultException.class)
-    public  void replaceNonExistingElementFail2Test() throws XMLStreamException {
+    public void replaceNonExistingElementFail2Test() throws XMLStreamException {
         String content = "<a/>";
         ResourceManager resourceManager = new MemoryResourceManager();
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));

@@ -37,11 +37,11 @@ public class CircuitBreakerFailoverTest extends FailoverTest {
     protected String getConfig() {
         return FAILOVER_CONFIG;
     }
-    
+
     @Test
     public void testWithNoAlternativeEndpoints() throws Exception {
         final Greeter g = getGreeter(REPLICA_E);
-        
+
         try {
             g.greetMe("fred");
             fail("Expecting communication exception");
@@ -56,19 +56,19 @@ public class CircuitBreakerFailoverTest extends FailoverTest {
             assertThat(ex.getMessage(), equalTo("None of alternative addresses are available at the moment"));
         }
     }
-    
+
     @Test
     public void testWithAlternativeEnpdpoints() throws Exception {
         final Greeter g = getGreeter(REPLICA_A);
         startTarget(REPLICA_E);
-        
+
         try {
             final String response = g.greetMe("fred");
             assertNotNull("expected non-null response", response);
         } finally {
             stopTarget(REPLICA_E);
         }
-        
+
         try {
             g.greetMe("fred");
             fail("Expecting no alternative endpoints exception");

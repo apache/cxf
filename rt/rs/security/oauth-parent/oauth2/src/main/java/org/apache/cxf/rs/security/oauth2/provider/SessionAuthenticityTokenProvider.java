@@ -26,29 +26,29 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthRedirectionState;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 
 /**
- * SessionAuthenticityTokenProvider responsible for storing and retrieving tokens 
+ * SessionAuthenticityTokenProvider responsible for storing and retrieving tokens
  * to validate the authenticity of request sessions
  */
 public interface SessionAuthenticityTokenProvider {
 
     /**
      * Create a new session token and stores it
-     * 
+     *
      * @param mc the {@link MessageContext} of this request
      * @param params redirection-based grant request parameters
      * @param subject authenticated end user
-     * @param secData 
+     * @param secData
      * @return the created session token
      */
     String createSessionToken(MessageContext mc,
                               MultivaluedMap<String, String> params,
-                              UserSubject subject, 
+                              UserSubject subject,
                               OAuthRedirectionState secData);
 
     /**
      * Retrieve the stored session token
-     * 
-     * @param mc the {@link MessageContext} of this request   
+     *
+     * @param mc the {@link MessageContext} of this request
      * @param params grant authorization parameters
      * @param subject authenticated end user
      * @return the stored token
@@ -59,7 +59,7 @@ public interface SessionAuthenticityTokenProvider {
 
     /**
      * Remove the stored session token
-     * 
+     *
      * @param mc the {@link MessageContext} of this request
      * @param params grant authorization parameters
      * @param subject authenticated end user
@@ -70,7 +70,7 @@ public interface SessionAuthenticityTokenProvider {
 
     /**
      * Expand the session token
-     * 
+     *
      * @param mc the {@link MessageContext} of this request
      * @param sessionToken the token
      * @param subject authenticated end user

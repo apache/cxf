@@ -33,13 +33,13 @@ import org.apache.abdera.model.Entry;
 @Consumes({"application/atom+xml", "application/atom+xml;type=entry" })
 @Provider
 public class AtomEntryProvider extends AbstractAtomProvider<Entry> {
-    
+
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return Entry.class.isAssignableFrom(type);
     }
-    
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return Entry.class.isAssignableFrom(type);
     }
-    
+
 }

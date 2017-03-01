@@ -32,16 +32,16 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBElement;
 
 @SuppressWarnings("rawtypes")
-public class JAXBElementTypedProvider extends JAXBElementProvider<JAXBElement>  
+public class JAXBElementTypedProvider extends JAXBElementProvider<JAXBElement>
     implements MessageBodyWriter<JAXBElement>, MessageBodyReader<JAXBElement> {
-    
-    public JAXBElement readFrom(Class<JAXBElement> type, Type genericType, Annotation[] anns, MediaType mt, 
-        MultivaluedMap<String, String> headers, InputStream is) 
+
+    public JAXBElement readFrom(Class<JAXBElement> type, Type genericType, Annotation[] anns, MediaType mt,
+        MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
         return super.readFrom(type, genericType, anns, mt, headers, is);
     }
-    public void writeTo(JAXBElement<?> obj, Class<?> cls, Type genericType, Annotation[] anns,  
-        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
+    public void writeTo(JAXBElement<?> obj, Class<?> cls, Type genericType, Annotation[] anns,
+        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         super.writeTo(obj, cls, genericType, anns, m, headers, os);
     }

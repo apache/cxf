@@ -27,7 +27,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 /**
  * Instructs the runtime to copy the input stream to the output stream using NIO.
- * This annotation will have no effect if continuations are not available  
+ * This annotation will have no effect if continuations are not available
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

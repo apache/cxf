@@ -44,7 +44,7 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
  * A CallbackHandler instance that is used by the STS to mock up a SAML Attribute Assertion.
  */
 public class SamlRoleCallbackHandler implements CallbackHandler {
-    private static final String ROLE_URI = 
+    private static final String ROLE_URI =
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
     private boolean saml2 = true;
     private String confirmationMethod = SAML2Constants.CONF_BEARER;
@@ -54,23 +54,23 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
     private String cryptoAlias = "alice";
     private String cryptoPassword = "password";
     private String cryptoPropertiesFile = "alice.properties";
-    
+
     public SamlRoleCallbackHandler() {
         //
     }
-    
+
     public SamlRoleCallbackHandler(boolean saml2) {
         this.saml2 = saml2;
     }
-    
+
     public void setConfirmationMethod(String confirmationMethod) {
         this.confirmationMethod = confirmationMethod;
     }
-    
+
     public void setKeyInfoIdentifier(CERT_IDENTIFIER keyInfoIdentifier) {
         this.keyInfoIdentifier = keyInfoIdentifier;
     }
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
@@ -86,7 +86,7 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
                 if (!saml2 && SAML2Constants.CONF_SENDER_VOUCHES.equals(confirmationMethod)) {
                     confirmationMethod = SAML1Constants.CONF_SENDER_VOUCHES;
                 }
-                SubjectBean subjectBean = 
+                SubjectBean subjectBean =
                     new SubjectBean(
                         subjectName, subjectQualifier, confirmationMethod
                     );
@@ -100,10 +100,10 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
                     }
                 }
                 callback.setSubject(subjectBean);
-                
+
                 AttributeStatementBean attrBean = new AttributeStatementBean();
                 attrBean.setSubject(subjectBean);
-                
+
                 AttributeBean attributeBean = new AttributeBean();
                 attributeBean.setNameFormat(SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED);
                 if (saml2) {
@@ -119,14 +119,14 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
 
                     String namespace = uri.substring(0, lastSlash);
                     String name = uri.substring(lastSlash + 1, uri.length());
-                    
+
                     attributeBean.setSimpleName(name);
                     attributeBean.setQualifiedName(namespace);
                 }
                 attributeBean.addAttributeValue(roleName);
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
-                
+
                 try {
                     Crypto crypto = CryptoFactory.getInstance(cryptoPropertiesFile);
                     callback.setIssuerCrypto(crypto);
@@ -139,14 +139,14 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
             }
         }
     }
-    
+
     protected KeyInfoBean createKeyInfo() throws Exception {
-        Crypto crypto = 
+        Crypto crypto =
             CryptoFactory.getInstance("alice.properties");
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("alice");
         X509Certificate[] certs = crypto.getX509Certificates(cryptoType);
-        
+
         KeyInfoBean keyInfo = new KeyInfoBean();
         keyInfo.setCertIdentifer(keyInfoIdentifier);
         if (keyInfoIdentifier == CERT_IDENTIFIER.X509_CERT) {
@@ -154,7 +154,7 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
         } else if (keyInfoIdentifier == CERT_IDENTIFIER.KEY_VALUE) {
             keyInfo.setPublicKey(certs[0].getPublicKey());
         }
-        
+
         return keyInfo;
     }
 
@@ -165,7 +165,7 @@ public class SamlRoleCallbackHandler implements CallbackHandler {
     public void setRoleName(String roleName) {
         this.roleName = roleName;
     }
-    
+
     public void setSignAssertion(boolean signAssertion) {
         this.signAssertion = signAssertion;
     }

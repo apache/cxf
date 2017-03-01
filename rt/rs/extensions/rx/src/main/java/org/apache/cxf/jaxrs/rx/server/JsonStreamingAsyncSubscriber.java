@@ -30,5 +30,5 @@ public class JsonStreamingAsyncSubscriber<T> extends StreamingAsyncSubscriber<T>
     public JsonStreamingAsyncSubscriber(AsyncResponse ar, long pollTimeout, long asyncTimeout) {
         super(ar, "[", "]", ",", pollTimeout, asyncTimeout);
     }
-    
+
 }

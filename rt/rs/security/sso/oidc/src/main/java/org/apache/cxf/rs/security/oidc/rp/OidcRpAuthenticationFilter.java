@@ -55,7 +55,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     private String redirectUri;
     private String roleClaim;
     private boolean addRequestUriAsRedirectQuery;
-    
+
     public void filter(ContainerRequestContext rc) {
         if (checkSecurityContext(rc)) {
             return;
@@ -75,7 +75,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
             URI redirectAddress = redirectBuilder.build();
             rc.abortWith(Response.seeOther(redirectAddress)
                            .header(HttpHeaders.CACHE_CONTROL, "no-cache, no-store")
-                           .header("Pragma", "no-cache") 
+                           .header("Pragma", "no-cache")
                            .build());
         } else {
             rc.abortWith(Response.status(401).build());
@@ -100,7 +100,7 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         newTokenContext.setUserInfo(tokenContext.getUserInfo());
         newTokenContext.setState(toRequestState(rc));
         JAXRSUtils.getCurrentMessage().setContent(ClientTokenContext.class, newTokenContext);
-        
+
         OidcSecurityContext oidcSecCtx = new OidcSecurityContext(newTokenContext);
         oidcSecCtx.setRoleClaim(roleClaim);
         rc.setSecurityContext(oidcSecCtx);
@@ -111,10 +111,10 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
         requestState.putAll(rc.getUriInfo().getQueryParameters(true));
         if (MediaType.APPLICATION_FORM_URLENCODED_TYPE.isCompatible(rc.getMediaType())) {
             String body = FormUtils.readBody(rc.getEntityStream(), StandardCharsets.UTF_8.name());
-            FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body, 
+            FormUtils.populateMapFromString(requestState, JAXRSUtils.getCurrentMessage(), body,
                                             StandardCharsets.UTF_8.name(), true);
             rc.setEntityStream(new ByteArrayInputStream(StringUtils.toBytesUTF8(body)));
-            
+
         }
         return requestState;
     }
@@ -124,11 +124,11 @@ public class OidcRpAuthenticationFilter implements ContainerRequestFilter {
     public void setClientTokenContextManager(ClientTokenContextManager manager) {
         this.stateManager = manager;
     }
-    
+
     public void setRoleClaim(String roleClaim) {
         this.roleClaim = roleClaim;
     }
-    
+
     public void setAddRequestUriAsRedirectQuery(boolean addRequestUriAsRedirectQuery) {
         this.addRequestUriAsRedirectQuery = addRequestUriAsRedirectQuery;
     }

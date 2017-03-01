@@ -21,9 +21,9 @@ package org.apache.cxf.systest.dispatch;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -51,7 +51,7 @@ public class MalformedResponseInterceptor extends AbstractPhaseInterceptor<Messa
                 message.setContent(InputStream.class, bos.getInputStream());
                 bos.close();
                 message.setContent(InputStream.class, bos.getInputStream());
-                
+
             } catch (IOException e) {
                 throw new Fault(e);
             }

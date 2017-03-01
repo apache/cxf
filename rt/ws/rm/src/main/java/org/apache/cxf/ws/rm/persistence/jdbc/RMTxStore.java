@@ -67,9 +67,9 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
 @NoJSR250Annotations
 public class RMTxStore implements RMStore {
-    
+
     public static final String DEFAULT_DATABASE_NAME = "rmdb";
-    private static final String[][] DEST_SEQUENCES_TABLE_COLS 
+    private static final String[][] DEST_SEQUENCES_TABLE_COLS
         = {{"SEQ_ID", "VARCHAR(256) NOT NULL"},
            {"ACKS_TO", "VARCHAR(1024) NOT NULL"},
            {"LAST_MSG_NO", "DECIMAL(19, 0)"},
@@ -95,22 +95,22 @@ public class RMTxStore implements RMStore {
            {"CONTENT", "BLOB"},
            {"CONTENT_TYPE", "VARCHAR(1024)"}};
     private static final String[] MESSAGES_TABLE_KEYS = {"SEQ_ID", "MSG_NO"};
-    private static final String DEST_SEQUENCES_TABLE_NAME = "CXF_RM_DEST_SEQUENCES"; 
+    private static final String DEST_SEQUENCES_TABLE_NAME = "CXF_RM_DEST_SEQUENCES";
     private static final String SRC_SEQUENCES_TABLE_NAME = "CXF_RM_SRC_SEQUENCES";
     private static final String INBOUND_MSGS_TABLE_NAME = "CXF_RM_INBOUND_MESSAGES";
-    private static final String OUTBOUND_MSGS_TABLE_NAME = "CXF_RM_OUTBOUND_MESSAGES";    
-    private static final String CREATE_DEST_SEQUENCES_TABLE_STMT = 
-        buildCreateTableStatement(DEST_SEQUENCES_TABLE_NAME, 
+    private static final String OUTBOUND_MSGS_TABLE_NAME = "CXF_RM_OUTBOUND_MESSAGES";
+    private static final String CREATE_DEST_SEQUENCES_TABLE_STMT =
+        buildCreateTableStatement(DEST_SEQUENCES_TABLE_NAME,
                                   DEST_SEQUENCES_TABLE_COLS, DEST_SEQUENCES_TABLE_KEYS);
 
     private static final String CREATE_SRC_SEQUENCES_TABLE_STMT =
-        buildCreateTableStatement(SRC_SEQUENCES_TABLE_NAME, 
+        buildCreateTableStatement(SRC_SEQUENCES_TABLE_NAME,
                                   SRC_SEQUENCES_TABLE_COLS, SRC_SEQUENCES_TABLE_KEYS);
     private static final String CREATE_MESSAGES_TABLE_STMT =
         buildCreateTableStatement("{0}", MESSAGES_TABLE_COLS, MESSAGES_TABLE_KEYS);
-    private static final String CREATE_DEST_SEQUENCE_STMT_STR 
+    private static final String CREATE_DEST_SEQUENCE_STMT_STR
         = "INSERT INTO CXF_RM_DEST_SEQUENCES "
-            + "(SEQ_ID, ACKS_TO, ENDPOINT_ID, PROTOCOL_VERSION) " 
+            + "(SEQ_ID, ACKS_TO, ENDPOINT_ID, PROTOCOL_VERSION) "
             + "VALUES(?, ?, ?, ?)";
     private static final String CREATE_SRC_SEQUENCE_STMT_STR
         = "INSERT INTO CXF_RM_SRC_SEQUENCES "
@@ -124,7 +124,7 @@ public class RMTxStore implements RMStore {
         "UPDATE CXF_RM_DEST_SEQUENCES SET LAST_MSG_NO = ?, TERMINATED = ?, ACKNOWLEDGED = ? WHERE SEQ_ID = ?";
     private static final String UPDATE_SRC_SEQUENCE_STMT_STR =
         "UPDATE CXF_RM_SRC_SEQUENCES SET CUR_MSG_NO = ?, LAST_MSG = ? WHERE SEQ_ID = ?";
-    private static final String CREATE_MESSAGE_STMT_STR 
+    private static final String CREATE_MESSAGE_STMT_STR
         = "INSERT INTO {0} (SEQ_ID, MSG_NO, SEND_TO, CREATED_TIME, CONTENT, CONTENT_TYPE) VALUES(?, ?, ?, ?, ?, ?)";
     private static final String DELETE_MESSAGE_STMT_STR =
         "DELETE FROM {0} WHERE SEQ_ID = ? AND MSG_NO = ?";
@@ -144,9 +144,9 @@ public class RMTxStore implements RMStore {
         "SELECT MSG_NO, SEND_TO, CREATED_TIME, CONTENT, CONTENT_TYPE FROM {0} WHERE SEQ_ID = ?";
     private static final String ALTER_TABLE_STMT_STR =
         "ALTER TABLE {0} ADD {1} {2}";
-    private static final String CREATE_INBOUND_MESSAGE_STMT_STR = 
+    private static final String CREATE_INBOUND_MESSAGE_STMT_STR =
         MessageFormat.format(CREATE_MESSAGE_STMT_STR, INBOUND_MSGS_TABLE_NAME);
-    private static final String CREATE_OUTBOUND_MESSAGE_STMT_STR = 
+    private static final String CREATE_OUTBOUND_MESSAGE_STMT_STR =
         MessageFormat.format(CREATE_MESSAGE_STMT_STR, OUTBOUND_MSGS_TABLE_NAME);
     private static final String DELETE_INBOUND_MESSAGE_STMT_STR =
         MessageFormat.format(DELETE_MESSAGE_STMT_STR, INBOUND_MSGS_TABLE_NAME);
@@ -162,13 +162,13 @@ public class RMTxStore implements RMStore {
     private static final String[] SET_SCHEMA_STMT_STRS = {"SET SCHEMA {0}",
                                                           "SET CURRENT_SCHEMA = {0}",
                                                           "ALTER SESSION SET CURRENT_SCHEMA = {0}"};
-    
+
     private static final String DERBY_TABLE_EXISTS_STATE = "X0Y32";
     private static final int ORACLE_TABLE_EXISTS_CODE = 955;
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(RMTxStore.class);
-    
-    // the connection and statements are cached only if 
+
+    // the connection and statements are cached only if
     private boolean keepConnection = true;
     private Connection connection;
     private boolean createdConnection = true;
@@ -190,13 +190,13 @@ public class RMTxStore implements RMStore {
     private long reconnectDelay;
     private int reconnectAttempts;
     private long nextReconnectAttempt;
-    
+
     private String tableExistsState = DERBY_TABLE_EXISTS_STATE;
     private int tableExistsCode = ORACLE_TABLE_EXISTS_CODE;
-    
+
     public RMTxStore() {
     }
-    
+
     public void destroy() {
         if (connection != null && createdConnection) {
             try {
@@ -207,41 +207,41 @@ public class RMTxStore implements RMStore {
             connection = null;
         }
     }
-    
+
     // configuration
-    
+
     public void setDriverClassName(String dcn) {
         driverClassName = dcn;
     }
-    
+
     public String getDriverClassName() {
         return driverClassName;
     }
-    
+
     public void setPassword(String p) {
         password = p;
     }
-    
+
     public String getPassword() {
         return password;
     }
-    
+
     public void setUrl(String u) {
         url = u;
     }
-    
+
     public String getUrl() {
         return url;
     }
-    
+
     public void setUserName(String un) {
         userName = un;
     }
-    
+
     public String getUserName() {
         return userName;
     }
-    
+
     public String getSchemaName() {
         return schemaName;
     }
@@ -278,7 +278,7 @@ public class RMTxStore implements RMStore {
         this.tableExistsCode = tableExistsCode;
     }
 
-    
+
     public boolean isKeepConnection() {
         return keepConnection;
     }
@@ -307,9 +307,9 @@ public class RMTxStore implements RMStore {
         connection = c;
         createdConnection = false;
     }
-    
-    // RMStore interface  
-    
+
+    // RMStore interface
+
     public void createDestinationSequence(DestinationSequence seq) {
         String sequenceIdentifier = seq.getIdentifier().getValue();
         String endpointIdentifier = seq.getEndpointIdentifier();
@@ -323,15 +323,15 @@ public class RMTxStore implements RMStore {
         SQLException conex = null;
         try {
             beginTransaction();
-            stmt = getStatement(con, CREATE_DEST_SEQUENCE_STMT_STR); 
-            
+            stmt = getStatement(con, CREATE_DEST_SEQUENCE_STMT_STR);
+
             stmt.setString(1, sequenceIdentifier);
             String addr = seq.getAcksTo().getAddress().getValue();
             stmt.setString(2, addr);
             stmt.setString(3, endpointIdentifier);
             stmt.setString(4, protocolVersion);
             stmt.execute();
-            
+
             commit(con);
         } catch (SQLException ex) {
             abort(con);
@@ -342,23 +342,23 @@ public class RMTxStore implements RMStore {
             updateConnectionState(con, conex);
         }
     }
-    
+
     public void createSourceSequence(SourceSequence seq) {
         String sequenceIdentifier = seq.getIdentifier().getValue();
         String endpointIdentifier = seq.getEndpointIdentifier();
         String protocolVersion = encodeProtocolVersion(seq.getProtocol());
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Creating source sequence: " + sequenceIdentifier + ", (endpoint: "
-                     + endpointIdentifier + ")"); 
+                     + endpointIdentifier + ")");
         }
         Connection con = verifyConnection();
         PreparedStatement stmt = null;
         SQLException conex = null;
         try {
             beginTransaction();
-            
+
             stmt = getStatement(con, CREATE_SRC_SEQUENCE_STMT_STR);
-            
+
             stmt.setString(1, sequenceIdentifier);
             Date expiry = seq.getExpires();
             stmt.setLong(2, expiry == null ? 0 : expiry.getTime());
@@ -366,8 +366,8 @@ public class RMTxStore implements RMStore {
             stmt.setString(3, osid == null ? null : osid.getValue());
             stmt.setString(4, endpointIdentifier);
             stmt.setString(5, protocolVersion);
-            stmt.execute();    
-            
+            stmt.execute();
+
             commit(con);
         } catch (SQLException ex) {
             conex = ex;
@@ -392,9 +392,9 @@ public class RMTxStore implements RMStore {
 
             stmt.setString(1, sid.getValue());
             res = stmt.executeQuery();
-            
+
             if (res.next()) {
-                EndpointReferenceType acksTo = RMUtils.createReference(res.getString(1));  
+                EndpointReferenceType acksTo = RMUtils.createReference(res.getString(1));
                 long lm = res.getLong(2);
                 ProtocolVariation pv = decodeProtocolVersion(res.getString(3));
                 boolean t = res.getBoolean(4);
@@ -402,7 +402,7 @@ public class RMTxStore implements RMStore {
                 SequenceAcknowledgement ack = null;
                 if (null != is) {
                     ack = PersistenceUtils.getInstance()
-                        .deserialiseAcknowledgment(is); 
+                        .deserialiseAcknowledgment(is);
                 }
                 return new DestinationSequence(sid, acksTo, lm, t, ack, pv);
             }
@@ -429,7 +429,7 @@ public class RMTxStore implements RMStore {
 
             stmt.setString(1, sid.getValue());
             res = stmt.executeQuery();
-            
+
             if (res.next()) {
                 long cmn = res.getLong(1);
                 boolean lm = res.getBoolean(2);
@@ -451,7 +451,7 @@ public class RMTxStore implements RMStore {
         } finally {
             releaseResources(stmt, res);
             updateConnectionState(con, conex);
-        } 
+        }
         return null;
     }
 
@@ -461,14 +461,14 @@ public class RMTxStore implements RMStore {
         SQLException conex = null;
         try {
             beginTransaction();
-            
+
             stmt = getStatement(con, DELETE_DEST_SEQUENCE_STMT_STR);
 
             stmt.setString(1, sid.getValue());
             stmt.execute();
-            
+
             commit(con);
-            
+
         } catch (SQLException ex) {
             conex = ex;
             abort(con);
@@ -478,22 +478,22 @@ public class RMTxStore implements RMStore {
             updateConnectionState(con, conex);
         }
     }
-    
-    
+
+
     public void removeSourceSequence(Identifier sid) {
         Connection con = verifyConnection();
         PreparedStatement stmt = null;
         SQLException conex = null;
         try {
             beginTransaction();
-            
+
             stmt = getStatement(con, DELETE_SRC_SEQUENCE_STMT_STR);
 
             stmt.setString(1, sid.getValue());
             stmt.execute();
-            
+
             commit(con);
-            
+
         } catch (SQLException ex) {
             conex = ex;
             abort(con);
@@ -501,9 +501,9 @@ public class RMTxStore implements RMStore {
         } finally {
             releaseResources(stmt, null);
             updateConnectionState(con, conex);
-        }        
+        }
     }
-    
+
     public Collection<DestinationSequence> getDestinationSequences(String endpointIdentifier) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting destination sequences for endpoint: " + endpointIdentifier);
@@ -511,17 +511,17 @@ public class RMTxStore implements RMStore {
         Connection con = verifyConnection();
         PreparedStatement stmt = null;
         SQLException conex = null;
-        Collection<DestinationSequence> seqs = new ArrayList<DestinationSequence>();
+        Collection<DestinationSequence> seqs = new ArrayList<>();
         ResultSet res = null;
         try {
             stmt = getStatement(con, SELECT_DEST_SEQUENCES_STMT_STR);
 
             stmt.setString(1, endpointIdentifier);
-            res = stmt.executeQuery(); 
+            res = stmt.executeQuery();
             while (res.next()) {
-                Identifier sid = new Identifier();                
+                Identifier sid = new Identifier();
                 sid.setValue(res.getString(1));
-                EndpointReferenceType acksTo = RMUtils.createReference(res.getString(2));  
+                EndpointReferenceType acksTo = RMUtils.createReference(res.getString(2));
                 long lm = res.getLong(3);
                 ProtocolVariation pv = decodeProtocolVersion(res.getString(4));
                 boolean t = res.getBoolean(5);
@@ -529,10 +529,10 @@ public class RMTxStore implements RMStore {
                 SequenceAcknowledgement ack = null;
                 if (null != is) {
                     ack = PersistenceUtils.getInstance()
-                        .deserialiseAcknowledgment(is); 
+                        .deserialiseAcknowledgment(is);
                 }
                 DestinationSequence seq = new DestinationSequence(sid, acksTo, lm, t, ack, pv);
-                seqs.add(seq);                                                 
+                seqs.add(seq);
             }
         } catch (SQLException ex) {
             conex = ex;
@@ -540,10 +540,10 @@ public class RMTxStore implements RMStore {
         } finally {
             releaseResources(stmt, res);
             updateConnectionState(con, conex);
-        } 
+        }
         return seqs;
     }
-    
+
     public Collection<SourceSequence> getSourceSequences(String endpointIdentifier) {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.info("Getting source sequences for endpoint: " + endpointIdentifier);
@@ -551,11 +551,11 @@ public class RMTxStore implements RMStore {
         Connection con = verifyConnection();
         PreparedStatement stmt = null;
         SQLException conex = null;
-        Collection<SourceSequence> seqs = new ArrayList<SourceSequence>();
+        Collection<SourceSequence> seqs = new ArrayList<>();
         ResultSet res = null;
         try {
             stmt = getStatement(con, SELECT_SRC_SEQUENCES_STMT_STR);
-            
+
             stmt.setString(1, endpointIdentifier);
             res = stmt.executeQuery();
             while (res.next()) {
@@ -573,7 +573,7 @@ public class RMTxStore implements RMStore {
                 }
                 ProtocolVariation pv = decodeProtocolVersion(res.getString(6));
                 SourceSequence seq = new SourceSequence(sid, expiry, oi, cmn, lm, pv);
-                seqs.add(seq);                          
+                seqs.add(seq);
             }
         } catch (SQLException ex) {
             conex = ex;
@@ -582,15 +582,15 @@ public class RMTxStore implements RMStore {
         } finally {
             releaseResources(stmt, res);
             updateConnectionState(con, conex);
-        } 
+        }
         return seqs;
     }
-    
+
     public Collection<RMMessage> getMessages(Identifier sid, boolean outbound) {
         Connection con = verifyConnection();
         PreparedStatement stmt = null;
         SQLException conex = null;
-        Collection<RMMessage> msgs = new ArrayList<RMMessage>();
+        Collection<RMMessage> msgs = new ArrayList<>();
         ResultSet res = null;
         try {
             stmt = getStatement(con, outbound ? SELECT_OUTBOUND_MESSAGES_STMT_STR : SELECT_INBOUND_MESSAGES_STMT_STR);
@@ -627,28 +627,28 @@ public class RMTxStore implements RMStore {
         }
         return msgs;
     }
-    
-    public void persistIncoming(DestinationSequence seq, RMMessage msg) {        
+
+    public void persistIncoming(DestinationSequence seq, RMMessage msg) {
         Connection con = verifyConnection();
         SQLException conex = null;
         try {
             beginTransaction();
-            
+
             updateDestinationSequence(con, seq);
-            
+
             if (msg != null && msg.getContent() != null) {
                 storeMessage(con, seq.getIdentifier(), msg, false);
             }
-            
+
             commit(con);
-            
+
         } catch (SQLException ex) {
             conex = ex;
             abort(con);
             throw new RMStoreException(ex);
         } catch (IOException ex) {
             abort(con);
-            throw new RMStoreException(ex);        
+            throw new RMStoreException(ex);
         } finally {
             updateConnectionState(con, conex);
         }
@@ -658,27 +658,27 @@ public class RMTxStore implements RMStore {
         SQLException conex = null;
         try {
             beginTransaction();
-            
+
             updateSourceSequence(con, seq);
-            
+
             if (msg != null && msg.getContent() != null) {
                 storeMessage(con, seq.getIdentifier(), msg, true);
             }
-            
+
             commit(con);
-            
+
         } catch (SQLException ex) {
             conex = ex;
             abort(con);
             throw new RMStoreException(ex);
         } catch (IOException ex) {
             abort(con);
-            throw new RMStoreException(ex);        
+            throw new RMStoreException(ex);
         } finally {
             updateConnectionState(con, conex);
-        }        
+        }
     }
-    
+
     public void removeMessages(Identifier sid, Collection<Long> messageNrs, boolean outbound) {
         Connection con = verifyConnection();
         PreparedStatement stmt = null;
@@ -693,9 +693,9 @@ public class RMTxStore implements RMStore {
                 stmt.setLong(2, messageNr);
                 stmt.execute();
             }
-            
+
             commit(con);
-            
+
         } catch (SQLException ex) {
             conex = ex;
             abort(con);
@@ -705,13 +705,13 @@ public class RMTxStore implements RMStore {
             updateConnectionState(con, conex);
         }
     }
-    
+
     // transaction demarcation
-    // 
+    //
 
     protected void beginTransaction() {
     }
-    
+
     protected void commit(Connection con) throws SQLException {
         con.commit();
     }
@@ -723,10 +723,10 @@ public class RMTxStore implements RMStore {
     protected void commit() throws SQLException {
         commit(connection);
     }
-    
+
     protected void abort(Connection con) {
         try {
-            con.rollback(); 
+            con.rollback();
         } catch (SQLException ex) {
             LogUtils.log(LOG, Level.SEVERE, "ABORT_FAILED_MSG", ex);
         }
@@ -735,10 +735,10 @@ public class RMTxStore implements RMStore {
     protected void abort() {
         abort(connection);
     }
-    
+
     // helpers
-    
-    protected void storeMessage(Connection con, Identifier sid, RMMessage msg, boolean outbound)         
+
+    protected void storeMessage(Connection con, Identifier sid, RMMessage msg, boolean outbound)
         throws IOException, SQLException {
         String id = sid.getValue();
         long nr = msg.getMessageNumber();
@@ -774,7 +774,7 @@ public class RMTxStore implements RMStore {
             cos.close(); // needed to clean-up tmp file folder
         }
     }
-    
+
     /**
      * this method is only useful when keepConnection is set to true
      */
@@ -782,30 +782,30 @@ public class RMTxStore implements RMStore {
         throws IOException, SQLException {
         storeMessage(connection, sid, msg, outbound);
     }
-    
-    protected void updateSourceSequence(Connection con, SourceSequence seq) 
+
+    protected void updateSourceSequence(Connection con, SourceSequence seq)
         throws SQLException {
         PreparedStatement stmt = null;
         try {
             stmt = getStatement(con, UPDATE_SRC_SEQUENCE_STMT_STR);
-            
-            stmt.setLong(1, seq.getCurrentMessageNr()); 
-            stmt.setString(2, seq.isLastMessage() ? "1" : "0"); 
+
+            stmt.setLong(1, seq.getCurrentMessageNr());
+            stmt.setString(2, seq.isLastMessage() ? "1" : "0");
             stmt.setString(3, seq.getIdentifier().getValue());
             stmt.execute();
         } finally {
             releaseResources(stmt, null);
         }
     }
-    
+
     /**
-     * @throws SQLException 
+     * @throws SQLException
      */
     protected void updateSourceSequence(SourceSequence seq) throws SQLException  {
         updateSourceSequence(connection, seq);
     }
-    
-    protected void updateDestinationSequence(Connection con, DestinationSequence seq) 
+
+    protected void updateDestinationSequence(Connection con, DestinationSequence seq)
         throws SQLException, IOException {
         PreparedStatement stmt = null;
         try {
@@ -815,7 +815,7 @@ public class RMTxStore implements RMStore {
             stmt.setLong(1, lastMessageNr);
             stmt.setString(2, seq.isTerminated() ? "1" : "0");
             InputStream is = PersistenceUtils.getInstance().serialiseAcknowledgment(seq.getAcknowledgment());
-            stmt.setBinaryStream(3, is, is.available()); 
+            stmt.setBinaryStream(3, is, is.available());
             stmt.setString(4, seq.getIdentifier().getValue());
             stmt.execute();
         } finally {
@@ -824,18 +824,18 @@ public class RMTxStore implements RMStore {
     }
 
     /**
-     * @throws IOException 
+     * @throws IOException
      * @throws SQLException
      */
-    protected void updateDestinationSequence(DestinationSequence seq) 
+    protected void updateDestinationSequence(DestinationSequence seq)
         throws SQLException, IOException {
         updateDestinationSequence(connection, seq);
     }
-    
+
     protected void createTables() throws SQLException {
         Connection con = verifyConnection();
         Statement stmt = null;
-        
+
         try {
             con.setAutoCommit(true);
             stmt = con.createStatement();
@@ -860,7 +860,7 @@ public class RMTxStore implements RMStore {
                     throw ex;
                 } else {
                     LOG.fine("Table CXF_RM_DEST_SEQUENCES already exists.");
-                    verifyTable(con, DEST_SEQUENCES_TABLE_NAME, DEST_SEQUENCES_TABLE_COLS);        
+                    verifyTable(con, DEST_SEQUENCES_TABLE_NAME, DEST_SEQUENCES_TABLE_COLS);
                 }
             } finally {
                 stmt.close();
@@ -890,12 +890,12 @@ public class RMTxStore implements RMStore {
             }
         }
     }
-    
+
     protected void verifyTable(Connection con, String tableName, String[][] tableCols) {
         try {
             DatabaseMetaData metadata = con.getMetaData();
             ResultSet rs = metadata.getColumns(null, null, tableName, "%");
-            Set<String> dbCols = new HashSet<String>();
+            Set<String> dbCols = new HashSet<>();
             List<String[]> newCols = new ArrayList<String[]>();
             while (rs.next()) {
                 dbCols.add(rs.getString(4));
@@ -905,7 +905,7 @@ public class RMTxStore implements RMStore {
                     newCols.add(col);
                 }
             }
-            if (newCols.size() > 0) {
+            if (!newCols.isEmpty()) {
                 // need to add the new columns
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.log(Level.FINE, "Table " + tableName + " needs additional columns");
@@ -914,7 +914,7 @@ public class RMTxStore implements RMStore {
                 for (String[] newCol : newCols) {
                     Statement st = con.createStatement();
                     try {
-                        st.executeUpdate(MessageFormat.format(ALTER_TABLE_STMT_STR, 
+                        st.executeUpdate(MessageFormat.format(ALTER_TABLE_STMT_STR,
                                                               tableName, newCol[0], newCol[1]));
                         if (LOG.isLoggable(Level.FINE)) {
                             LOG.log(Level.FINE, "Successfully added column {0} to table {1}",
@@ -942,11 +942,11 @@ public class RMTxStore implements RMStore {
         if (schemaName == null || connection == null) {
             return;
         }
-        
+
         Statement stmt = connection.createStatement();
         // schemaName has been verified at setSchemaName(String)
         try {
-            stmt.executeUpdate(MessageFormat.format(CREATE_SCHEMA_STMT_STR, 
+            stmt.executeUpdate(MessageFormat.format(CREATE_SCHEMA_STMT_STR,
                                                     schemaName));
         } catch (SQLException ex) {
             // assume it is already created or no authorization is provided (create one manually)
@@ -974,13 +974,13 @@ public class RMTxStore implements RMStore {
             }
         }
     }
-    
+
     /**
-     * Returns either the locally cached statement or the one from the specified connection 
+     * Returns either the locally cached statement or the one from the specified connection
      * depending on whether the connection is held by this store. If the statement retrieved from
-     * the local cache, it is locked until it is released. The retrieved statement must be 
+     * the local cache, it is locked until it is released. The retrieved statement must be
      * released using releaseResources(PreparedStatement stmt, ResultSet rs).
-     * 
+     *
      * @param con
      * @param sql
      * @return
@@ -997,8 +997,8 @@ public class RMTxStore implements RMStore {
     }
 
     /**
-     * Releases the statement and any result set. 
-     *  
+     * Releases the statement and any result set.
+     *
      * @param stmt
      * @param rs
      */
@@ -1023,13 +1023,13 @@ public class RMTxStore implements RMStore {
         }
     }
 
-    
+
     protected void cacheStatement(Connection con, String sql) throws SQLException {
         PreparedStatement stmt = con.prepareStatement(sql);
         cachedStatements.put(sql, stmt);
         statementLocks.put(stmt, new ReentrantLock());
     }
-    
+
     protected void cacheStatements() throws SQLException {
         if (connection == null) {
             // if the connection is not held, no statement is cached.
@@ -1038,8 +1038,8 @@ public class RMTxStore implements RMStore {
         // create a statement specific lock table
         statementLocks = new HashMap<Statement, Lock>();
         cachedStatements = new HashMap<String, PreparedStatement>();
-        
-        // create the statements in advance if the connection is to be kept 
+
+        // create the statements in advance if the connection is to be kept
         cacheStatement(connection, CREATE_DEST_SEQUENCE_STMT_STR);
         cacheStatement(connection, CREATE_SRC_SEQUENCE_STMT_STR);
         cacheStatement(connection, DELETE_DEST_SEQUENCE_STMT_STR);
@@ -1062,7 +1062,7 @@ public class RMTxStore implements RMStore {
         if (keepConnection && connection == null) {
             connection = createConnection();
         }
-        
+
         try {
             if (connection != null && schemaName != null) {
                 setCurrentSchema();
@@ -1082,14 +1082,14 @@ public class RMTxStore implements RMStore {
         } catch (Throwable ex) {
             LogUtils.log(LOG, Level.SEVERE, "INITIALIZATION_FAILED_MSG", ex);
         }
-    }   
-    
+    }
+
     Connection getConnection() {
         return connection;
     }
-    
+
     protected Connection createConnection() {
-        LOG.log(Level.FINE, "Using derby.system.home: {0}", 
+        LOG.log(Level.FINE, "Using derby.system.home: {0}",
                 SystemPropertyAction.getProperty("derby.system.home"));
         Connection con = null;
         if (null != dataSource) {
@@ -1097,7 +1097,7 @@ public class RMTxStore implements RMStore {
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.log(Level.FINE, "Using dataSource: " + dataSource);
                 }
-                con = dataSource.getConnection();    
+                con = dataSource.getConnection();
             } catch (SQLException ex) {
                 LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
             }
@@ -1125,7 +1125,7 @@ public class RMTxStore implements RMStore {
             // return a new connection
             con = createConnection();
         } else {
-            // return the cached connection or create and cache a new one if the old one is dead  
+            // return the cached connection or create and cache a new one if the old one is dead
             synchronized (this) {
                 if (createdConnection && nextReconnectAttempt > 0
                     && (maxReconnectAttempts < 0 || maxReconnectAttempts > reconnectAttempts)) {
@@ -1142,9 +1142,9 @@ public class RMTxStore implements RMStore {
                     }
                 }
             }
-            con =  connection;
+            con = connection;
         }
-        
+
         return con;
     }
 
@@ -1165,7 +1165,7 @@ public class RMTxStore implements RMStore {
                     reconnectAttempts = 0;
                     nextReconnectAttempt = 0;
                 } else if (createdConnection && isRecoverableError(e)) {
-                    // update the next reconnect schedule 
+                    // update the next reconnect schedule
                     if (reconnectDelay == 0) {
                         reconnectDelay = initialReconnectDelay;
                     }
@@ -1181,20 +1181,20 @@ public class RMTxStore implements RMStore {
     public static void deleteDatabaseFiles() {
         deleteDatabaseFiles(DEFAULT_DATABASE_NAME, true);
     }
-    
+
     public static void deleteDatabaseFiles(String dbName, boolean now) {
         String dsh = SystemPropertyAction.getPropertyOrNull("derby.system.home");
-       
-        File root = null;  
+
+        File root = null;
         File log = null;
         if (null == dsh) {
             log = new File("derby.log");
-            root = new File(dbName);            
+            root = new File(dbName);
         } else {
-            log = new File(dsh, "derby.log"); 
+            log = new File(dsh, "derby.log");
             root = new File(dsh, dbName);
         }
-        if (log.exists()) {            
+        if (log.exists()) {
             if (now) {
                 boolean deleted = log.delete();
                 LOG.log(Level.FINE, "Deleted log file {0}: {1}", new Object[] {log, deleted});
@@ -1206,11 +1206,11 @@ public class RMTxStore implements RMStore {
             LOG.log(Level.FINE, "Trying to delete directory {0}", root);
             recursiveDelete(root, now);
         }
-    
+
     }
-    
+
     protected static String encodeProtocolVersion(ProtocolVariation pv) {
-        return pv.getCodec().getWSRMNamespace() + ' ' + pv.getCodec().getWSANamespace(); 
+        return pv.getCodec().getWSRMNamespace() + ' ' + pv.getCodec().getWSANamespace();
     }
 
     protected static ProtocolVariation decodeProtocolVersion(String pv) {
@@ -1222,8 +1222,8 @@ public class RMTxStore implements RMStore {
         }
         return ProtocolVariation.RM10WSA200408;
     }
-    
-    
+
+
     private static void recursiveDelete(File dir, boolean now) {
         for (File f : dir.listFiles()) {
             if (f.isDirectory()) {
@@ -1242,7 +1242,7 @@ public class RMTxStore implements RMStore {
             dir.deleteOnExit();
         }
     }
-     
+
     private static String buildCreateTableStatement(String name, String[][] cols, String[] keys) {
         StringBuilder buf = new StringBuilder();
         buf.append("CREATE TABLE ").append(name).append(" (");
@@ -1265,7 +1265,7 @@ public class RMTxStore implements RMStore {
         return (null != tableExistsState && tableExistsState.equals(ex.getSQLState()))
                 || tableExistsCode == ex.getErrorCode();
     }
-    
+
     protected boolean isRecoverableError(SQLException ex) {
         // check for a transient or non-transient connection exception
         return ex.getSQLState() != null && ex.getSQLState().startsWith("08");

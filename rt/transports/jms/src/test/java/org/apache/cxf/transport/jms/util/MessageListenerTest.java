@@ -168,7 +168,7 @@ public class MessageListenerTest {
         int actualNum;
         do {
             actualNum = JMSUtil.getNumMessages(connection, queue);
-            
+
             //System.out.println("Messages in queue " + queue.getQueueName() + ": " + actualNum
             //                   + ", expecting: " + expectedNum);
             Thread.sleep(100);

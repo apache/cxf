@@ -20,7 +20,7 @@ package org.apache.cxf.aegis.inheritance.intf;
 
 public interface IGrandChild extends IChild {
     String getGrandChildName();
-    
+
     // make sure we don't get two getChildName props
     String getChildName();
 }

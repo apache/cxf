@@ -42,13 +42,13 @@ import org.apache.cxf.performance.complex_type.types.SimpleStruct;
 public final class Client extends TestCaseBase<ComplexPortType> {
     private static final QName SERVICE_NAME = new QName(
                                              "http://cxf.apache.org/performance/complex_type",
-                                             "ComplexService");          
+                                             "ComplexService");
     private static final QName PORT_NAME = new QName(
                                           "http://cxf.apache.org/performance/complex_type",
                                           "ComplexPortType");
     private ComplexService cs;
     private final NestedComplexTypeSeq complexTypeSeq = new NestedComplexTypeSeq();
-       
+
     public Client(String[] args) {
         super("Complex Type TestCase", args);
         serviceName = "ComplexService";
@@ -60,13 +60,13 @@ public final class Client extends TestCaseBase<ComplexPortType> {
     }
 
     public static void main(String args[]) throws Exception {
-                       
+
         Client client = new Client(args);
-        
-        client.initialize(); 
-        
+
+        client.initialize();
+
         client.run();
-        
+
         List results = client.getTestResults();
         TestResult testResult = null;
         for (Iterator iter = results.iterator(); iter.hasNext();) {
@@ -77,7 +77,7 @@ public final class Client extends TestCaseBase<ComplexPortType> {
         System.out.println("cxf client is going to shutdown!");
         System.exit(0);
     }
-    
+
     private SimpleStruct getSimpleStruct() throws DatatypeConfigurationException {
         SimpleStruct ss = new SimpleStruct();
         ss.setVarFloat(Float.MAX_VALUE);
@@ -91,9 +91,9 @@ public final class Client extends TestCaseBase<ComplexPortType> {
         return ss;
     }
 
-    
+
     public void initTestData() {
-        NestedComplexType  complexType  = new NestedComplexType();
+        NestedComplexType complexType = new NestedComplexType();
         complexType.setVarString("#12345ABc");
         complexType.setVarUByte(Short.MAX_VALUE);
         complexType.setVarUnsignedLong(new BigInteger("13691056728"));
@@ -104,7 +104,7 @@ public final class Client extends TestCaseBase<ComplexPortType> {
         } catch (DatatypeConfigurationException e) {
             e.printStackTrace();
         }
-         
+
         complexType.setVarEnum(ColourEnum.RED);
         byte[] binary = new byte[1024];
         for (int idx = 0; idx < 4; idx++) {
@@ -117,15 +117,15 @@ public final class Client extends TestCaseBase<ComplexPortType> {
 
         for (int i = 0; i < packetSize; i++) {
             complexTypeSeq.getItem().add(complexType);
-        }            
+        }
     }
-    
+
     public void doJob(ComplexPortType port) {
         port.sendReceiveData(complexTypeSeq);
     }
 
-    public ComplexPortType getPort() {        
-        try{ 
+    public ComplexPortType getPort() {
+        try{
             URL wsdl = null;
             if ((wsdlPath.startsWith("file://")) || (wsdlPath.startsWith("http://"))) {
                  wsdl = new URL(wsdlPath);
@@ -136,7 +136,7 @@ public final class Client extends TestCaseBase<ComplexPortType> {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        return cs.getSoapPort();        
+        return cs.getSoapPort();
     }
 
     public void printUsage() {

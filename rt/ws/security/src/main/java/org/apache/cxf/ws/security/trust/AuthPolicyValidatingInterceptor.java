@@ -33,22 +33,22 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.rt.security.saml.interceptor.WSS4JBasicAuthValidator;
 
-public class AuthPolicyValidatingInterceptor 
+public class AuthPolicyValidatingInterceptor
     extends WSS4JBasicAuthValidator implements PhaseInterceptor<Message> {
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AuthPolicyValidatingInterceptor.class);
     private static final Logger LOG = LogUtils.getL7dLogger(AuthPolicyValidatingInterceptor.class);
-    
+
     private String phase;
-    
+
     public AuthPolicyValidatingInterceptor() {
         this(Phase.UNMARSHAL);
     }
-    
+
     public AuthPolicyValidatingInterceptor(String phase) {
         this.phase = phase;
     }
-    
+
     public void handleMessage(Message message) throws Fault {
 
         AuthorizationPolicy policy = message.get(AuthorizationPolicy.class);
@@ -57,9 +57,9 @@ public class AuthPolicyValidatingInterceptor
             if (policy != null) {
                 name = policy.getUserName();
             }
-            org.apache.cxf.common.i18n.Message errorMsg = 
-                new org.apache.cxf.common.i18n.Message("NO_USER_PASSWORD", 
-                                                       BUNDLE, 
+            org.apache.cxf.common.i18n.Message errorMsg =
+                new org.apache.cxf.common.i18n.Message("NO_USER_PASSWORD",
+                                                       BUNDLE,
                                                        name);
             LOG.warning(errorMsg.toString());
             throw new SecurityException(errorMsg.toString());

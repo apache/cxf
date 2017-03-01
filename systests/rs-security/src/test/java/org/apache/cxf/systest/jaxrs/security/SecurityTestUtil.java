@@ -26,7 +26,7 @@ import javax.crypto.spec.SecretKeySpec;
  * A utility class for security tests
  */
 public final class SecurityTestUtil {
-    
+
     private static final boolean UNRESTRICTED_POLICIES_INSTALLED;
     static {
         boolean ok = false;
@@ -47,13 +47,13 @@ public final class SecurityTestUtil {
         }
         UNRESTRICTED_POLICIES_INSTALLED = ok;
     }
-    
+
     private SecurityTestUtil() {
         // complete
     }
-    
+
     public static boolean checkUnrestrictedPoliciesInstalled() {
         return UNRESTRICTED_POLICIES_INSTALLED;
     }
-    
+
 }

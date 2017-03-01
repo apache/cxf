@@ -31,19 +31,19 @@ import org.apache.cxf.pat.internal.TestResult;
 import org.apache.cxf.performance.basic_type.BasicPortType;
 import org.apache.cxf.performance.basic_type.BasicService;
 import org.apache.cxf.performance.basic_type.server.Server;
- 
+
 public final class Client extends TestCaseBase<BasicPortType> {
-    
-    private static final QName SERVICE_NAME 
+
+    private static final QName SERVICE_NAME
         = new QName("http://cxf.apache.org/performance/basic_type", "BasicService");
 
     private static int opid;
-    
-    private  byte[] inputBase64;
-    private  String inputString = new String();
+
+    private byte[] inputBase64;
+    private String inputString = new String();
 
     private final int asciiCount = 1 * 1024;
-    
+
     private BasicService ss;
 
     public Client(String[] args) {
@@ -113,7 +113,7 @@ public final class Client extends TestCaseBase<BasicPortType> {
     }
 
     public BasicPortType getPort() {
-       
+
         try {
             URL wsdl = null;
             if ((wsdlPath.startsWith("file://")) || (wsdlPath.startsWith("http://"))) {
@@ -127,7 +127,7 @@ public final class Client extends TestCaseBase<BasicPortType> {
         }
         return ss.getSoapHttpPort();
     }
-} 
- 
+}
+
 
 

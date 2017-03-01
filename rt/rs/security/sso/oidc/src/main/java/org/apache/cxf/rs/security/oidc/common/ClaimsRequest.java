@@ -28,20 +28,20 @@ public class ClaimsRequest extends JsonMapObject {
     public static final String ID_TOKEN_CLAIMS = "id_token";
     public static final String USER_INFO_CLAIMS = "userinfo";
     private static final long serialVersionUID = -1356735897518391517L;
-    
+
 
     public void setIdTokenClaims(Map<String, ClaimRequirement> claims) {
         setProperty(ID_TOKEN_CLAIMS, claims);
     }
-    
+
     public Map<String, ClaimRequirement> getIdTokenClaims() {
         return getClaims(ID_TOKEN_CLAIMS);
     }
-    
+
     public void setUserInfoClaims(Map<String, ClaimRequirement> claims) {
         setProperty(USER_INFO_CLAIMS, claims);
     }
-    
+
     private Map<String, ClaimRequirement> getClaims(String propertyName) {
         Object claimsProp = getProperty(propertyName);
         if (claimsProp instanceof Map) {
@@ -53,7 +53,7 @@ public class ClaimsRequest extends JsonMapObject {
                 Map<String, ClaimRequirement> claims = new LinkedHashMap<String, ClaimRequirement>();
                 Map<String, Map<String, ?>> parsedMap = CastUtils.cast((Map<?, ?>)claimsProp);
                 for (Map.Entry<String, Map<String, ?>> entry : parsedMap.entrySet()) {
-                    
+
                     ClaimRequirement pref = new ClaimRequirement();
                     Object essentialProp = entry.getValue().get(ClaimRequirement.ESSENTIAL_PROPERTY);
                     if (essentialProp != null) {
@@ -70,8 +70,8 @@ public class ClaimsRequest extends JsonMapObject {
                 }
                 return claims;
             }
-        } 
+        }
         return null;
-        
+
     }
 }

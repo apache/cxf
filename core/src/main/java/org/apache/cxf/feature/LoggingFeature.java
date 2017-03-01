@@ -29,11 +29,11 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 
 /**
- * This class is used to control message-on-the-wire logging. 
+ * This class is used to control message-on-the-wire logging.
  * By attaching this feature to an endpoint, you
  * can specify logging. If this feature is present, an endpoint will log input
  * and output of ordinary and log messages.
- * 
+ *
  * <pre>
  * <![CDATA[
     <jaxws:endpoint ...>
@@ -43,8 +43,8 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
     </jaxws:endpoint>
   ]]>
   </pre>
- * 
- * @deprecated use the logging module rt/features/logging instead 
+ *
+ * @deprecated use the logging module rt/features/logging instead
  */
 @NoJSR250Annotations
 @Deprecated
@@ -53,17 +53,17 @@ public class LoggingFeature extends AbstractFeature {
     private static final int DEFAULT_LIMIT = AbstractLoggingInterceptor.DEFAULT_LIMIT;
     private static final LoggingInInterceptor IN = new LoggingInInterceptor(DEFAULT_LIMIT);
     private static final LoggingOutInterceptor OUT = new LoggingOutInterceptor(DEFAULT_LIMIT);
-    
-    
+
+
     String inLocation;
     String outLocation;
     boolean prettyLogging;
     boolean showBinary;
-    
+
     int limit = DEFAULT_LIMIT;
 
     public LoggingFeature() {
-        
+
     }
     public LoggingFeature(int lim) {
         limit = lim;
@@ -84,7 +84,7 @@ public class LoggingFeature extends AbstractFeature {
         limit = lim;
         prettyLogging = p;
     }
-    
+
     public LoggingFeature(String in, String out, int lim, boolean p, boolean showBinary) {
         this(in, out, lim, p);
         this.showBinary = showBinary;
@@ -100,7 +100,7 @@ public class LoggingFeature extends AbstractFeature {
 
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        if (limit == DEFAULT_LIMIT && inLocation == null 
+        if (limit == DEFAULT_LIMIT && inLocation == null
             && outLocation == null && !prettyLogging) {
             provider.getInInterceptors().add(IN);
             provider.getInFaultInterceptors().add(IN);
@@ -115,7 +115,7 @@ public class LoggingFeature extends AbstractFeature {
             out.setOutputLocation(outLocation);
             out.setPrettyLogging(prettyLogging);
             out.setShowBinaryContent(showBinary);
-            
+
             provider.getInInterceptors().add(in);
             provider.getInFaultInterceptors().add(in);
             provider.getOutInterceptors().add(out);
@@ -130,14 +130,14 @@ public class LoggingFeature extends AbstractFeature {
     public void setLimit(int lim) {
         limit = lim;
     }
-    
+
     /**
      * Retrieve the value set with {@link #setLimit(int)}.
      */
     public int getLimit() {
         return limit;
     }
-    
+
     /**
      */
     public boolean isPrettyLogging() {
@@ -149,5 +149,5 @@ public class LoggingFeature extends AbstractFeature {
      */
     public void setPrettyLogging(boolean prettyLogging) {
         this.prettyLogging = prettyLogging;
-    }    
+    }
 }

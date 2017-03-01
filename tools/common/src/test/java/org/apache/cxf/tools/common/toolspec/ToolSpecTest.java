@@ -32,7 +32,7 @@ public class ToolSpecTest extends Assert {
         toolSpec = new ToolSpec();
         assertTrue(toolSpec != null);
     }
-    
+
     @Test
     public void testConstructFromInputStream() {
         String tsSource = "parser/resources/testtool.xml";
@@ -54,7 +54,7 @@ public class ToolSpecTest extends Assert {
         assertTrue(toolSpec.getParameterDefault("namespace") == null);
         assertTrue(toolSpec.getParameterDefault("wsdlurl") == null);
     }
-    
+
     @Test
     public void testGetStreamRefName1() throws Exception {
         String tsSource = "parser/resources/testtool1.xml";

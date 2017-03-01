@@ -46,27 +46,27 @@ public abstract class AbstractOAuthService {
     private boolean blockUnsecureRequests;
     private boolean writeOptionalParameters = true;
     private Method dataProviderContextMethod;
-    
+
     public void setWriteOptionalParameters(boolean write) {
         writeOptionalParameters = write;
     }
-    
-    public boolean isWriteOptionalParameters() { 
+
+    public boolean isWriteOptionalParameters() {
         return writeOptionalParameters;
     }
-    
-    @Context 
+
+    @Context
     public void setMessageContext(MessageContext context) {
-        this.mc = context;    
+        this.mc = context;
         if (dataProviderContextMethod != null) {
             try {
                 dataProviderContextMethod.invoke(dataProvider, new Object[]{mc});
             } catch (Throwable t) {
-                throw new RuntimeException(t); 
+                throw new RuntimeException(t);
             }
         }
     }
-    
+
     public MessageContext getMessageContext() {
         return mc;
     }
@@ -74,26 +74,26 @@ public abstract class AbstractOAuthService {
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
         try {
-            dataProviderContextMethod = dataProvider.getClass().getMethod("setMessageContext", 
+            dataProviderContextMethod = dataProvider.getClass().getMethod("setMessageContext",
                                                                           new Class[]{MessageContext.class});
         } catch (Throwable t) {
             // ignore
         }
-        
+
     }
 
     public OAuthDataProvider getDataProvider() {
         return dataProvider;
     }
-    
+
     protected MultivaluedMap<String, String> getQueryParameters() {
         return getMessageContext().getUriInfo().getQueryParameters();
     }
-    
+
     /**
      * Get the {@link Client} reference
      * @param clientId the provided client id
-     * @return Client the client reference 
+     * @return Client the client reference
      * @throws {@link OAuthServiceExcepption} if no matching Client is found
      */
     protected Client getValidClient(String clientId, MultivaluedMap<String, String> params)
@@ -106,35 +106,35 @@ public abstract class AbstractOAuthService {
         LOG.fine("No valid client found as the given clientId is null");
         return null;
     }
-    
+
     /**
      * HTTPS is the default transport for OAuth 2.0 services.
-     * By default this method will issue a warning for open 
+     * By default this method will issue a warning for open
      * endpoints
      */
-    protected void checkTransportSecurity() {  
+    protected void checkTransportSecurity() {
         if (!mc.getSecurityContext().isSecure()) {
-            LOG.warning("Unsecure HTTP, Transport Layer Security is recommended");
+            LOG.warning("Unsecure HTTP, HTTPS is recommended");
             if (blockUnsecureRequests) {
-                throw ExceptionUtils.toBadRequestException(null, null);    
+                throw ExceptionUtils.toBadRequestException(null, null);
             }
         }
     }
-    
+
     protected void reportInvalidRequestError(String errorDescription) {
         reportInvalidRequestError(errorDescription, MediaType.APPLICATION_JSON_TYPE);
     }
-    
+
     protected void reportInvalidRequestError(String errorDescription, MediaType mt) {
-        OAuthError error = 
+        OAuthError error =
             new OAuthError(OAuthConstants.INVALID_REQUEST, errorDescription);
         reportInvalidRequestError(error, mt);
     }
-    
+
     protected void reportInvalidRequestError(OAuthError entity) {
         reportInvalidRequestError(entity, MediaType.APPLICATION_JSON_TYPE);
     }
-    
+
     protected void reportInvalidRequestError(OAuthError entity, MediaType mt) {
         ResponseBuilder rb = JAXRSUtils.toResponseBuilder(400);
         if (mt != null) {
@@ -144,9 +144,9 @@ public abstract class AbstractOAuthService {
     }
 
     /**
-     * HTTPS is the default transport for OAuth 2.0 services, this property 
+     * HTTPS is the default transport for OAuth 2.0 services, this property
      * can be used to block all the requests issued over HTTP
-     * 
+     *
      * @param blockUnsecureRequests if set to true then HTTP requests will be blocked
      */
     public void setBlockUnsecureRequests(boolean blockUnsecureRequests) {

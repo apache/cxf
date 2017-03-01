@@ -35,17 +35,17 @@ import org.apache.neethi.Assertion;
  * InterceptorProviderRegistry is used to manage InterceptorProviders that provide
  * assertion domain specific interceptors.
  */
-public interface PolicyInterceptorProviderRegistry 
+public interface PolicyInterceptorProviderRegistry
     extends Registry<QName, Set<PolicyInterceptorProvider>> {
-    
+
     /**
      * Register the builder for all qnames from the provider
      * getAssertionTypes call.
-     * @param provider the provider to register 
+     * @param provider the provider to register
      */
     void register(PolicyInterceptorProvider provider);
-    
-    List<Interceptor<? extends Message>> 
+
+    List<Interceptor<? extends Message>>
     getInterceptorsForAlternative(Collection<? extends Assertion> alterative,
                                   boolean out, boolean fault);
 

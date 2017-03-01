@@ -239,7 +239,7 @@ public class MapType extends AegisType {
 
     @Override
     public Set<AegisType> getDependencies() {
-        Set<AegisType> deps = new HashSet<AegisType>();
+        Set<AegisType> deps = new HashSet<>();
         deps.add(getKeyType());
         deps.add(getValueType());
         return deps;

@@ -45,5 +45,5 @@ public class ResourceRemote extends ResourceLocal implements ResourceFactory {
         response.setRepresentation(body.getRepresentation());
         return response;
     }
-    
+
 }

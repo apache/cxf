@@ -49,7 +49,7 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         super(phase);
         providers = p;
     }
-    
+
     protected Collection<? extends MetricsProvider> getMetricProviders(Bus bus) {
         if (providers != null) {
             return Arrays.asList(providers);
@@ -60,13 +60,13 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         }
         return b.getBeansOfType(MetricsProvider.class);
     }
-    
+
     protected ExchangeMetrics getExchangeMetrics(Message m, boolean create) {
         ExchangeMetrics ctx = m.getExchange().get(ExchangeMetrics.class);
         if (ctx == null && create) {
             ctx = new ExchangeMetrics(m.getExchange());
             m.getExchange().put(ExchangeMetrics.class, ctx);
-            
+
             addEndpointMetrics(ctx, m);
         }
         return ctx;
@@ -94,7 +94,7 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         final Endpoint ep = m.getExchange().getEndpoint();
         Object o = ep.get(MetricsContext.class.getName());
         if (o == null) {
-            List<MetricsContext> contexts = new ArrayList<MetricsContext>();
+            List<MetricsContext> contexts = new ArrayList<>();
             for (MetricsProvider p : getMetricProviders(m.getExchange().getBus())) {
                 MetricsContext c = p.createEndpointContext(ep, MessageUtils.isRequestor(m),
                                                            (String)m.getContextualProperty(MetricsProvider.CLIENT_ID));
@@ -157,14 +157,14 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
             ctx.addContext((MetricsContext)metrics);
         }
     }
-    
+
     private synchronized Object createMetricsContextForRestResource(Message message, String resource) {
         Map<String, Object> restMap = getRestMetricsMap(message.getExchange().getEndpoint());
         Object o = restMap.get(resource);
         if (o != null) {
             return o;
         }
-        List<MetricsContext> contexts = new ArrayList<MetricsContext>();
+        List<MetricsContext> contexts = new ArrayList<>();
         for (MetricsProvider p : getMetricProviders(message.getExchange().getBus())) {
             MetricsContext c = p.createResourceContext(message.getExchange().getEndpoint(),
                                      resource, MessageUtils.isRequestor(message),
@@ -187,7 +187,7 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
     private Object createMetricsContextForOperation(Message message, BindingOperationInfo boi) {
         Object o = boi.getProperty(MetricsContext.class.getName());
         if (o == null) {
-            List<MetricsContext> contexts = new ArrayList<MetricsContext>();
+            List<MetricsContext> contexts = new ArrayList<>();
             for (MetricsProvider p : getMetricProviders(message.getExchange().getBus())) {
                 MetricsContext c = p.createOperationContext(message.getExchange().getEndpoint(),
                                          boi, MessageUtils.isRequestor(message),
@@ -208,7 +208,7 @@ public abstract class AbstractMetricsInterceptor extends AbstractPhaseIntercepto
         }
         return o;
     }
-   
+
     public void stop(Message m) {
         ExchangeMetrics ctx = getExchangeMetrics(m, false);
         if (ctx != null) {

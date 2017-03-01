@@ -21,19 +21,19 @@ package org.apache.cxf.jaxrs.ext.search;
 import java.util.List;
 
 /**
- * Composite 'and' search condition   
+ * Composite 'and' search condition
  */
 public class AndSearchCondition<T> extends AbstractComplexCondition<T> {
 
     public AndSearchCondition() {
         super(ConditionType.AND);
     }
-    
+
     public AndSearchCondition(List<SearchCondition<T>> conditions) {
-        super(conditions, ConditionType.AND);    
+        super(conditions, ConditionType.AND);
     }
-    
-    
+
+
     public boolean isMet(T pojo) {
         for (SearchCondition<T> sc : conditions) {
             if (!sc.isMet(pojo)) {
@@ -42,5 +42,5 @@ public class AndSearchCondition<T> extends AbstractComplexCondition<T> {
         }
         return true;
     }
-    
+
 }

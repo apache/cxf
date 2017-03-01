@@ -130,7 +130,7 @@ public final class ServiceModelUtil {
     }
 
     public static List<String> getOperationInputPartNames(OperationInfo operation) {
-        List<String> names = new ArrayList<String>();
+        List<String> names = new ArrayList<>();
         List<MessagePartInfo> parts = operation.getInput().getMessageParts();
         if (parts == null || parts.size() == 0) {
             return names;
@@ -183,7 +183,7 @@ public final class ServiceModelUtil {
 
         return best;
     }
-    
+
     public static QName getServiceQName(EndpointInfo ei) {
         InterfaceInfo ii = ei.getInterface();
         if (ii != null) {
@@ -193,6 +193,6 @@ public final class ServiceModelUtil {
         } else {
             return ei.getName();
         }
-        
+
     }
 }

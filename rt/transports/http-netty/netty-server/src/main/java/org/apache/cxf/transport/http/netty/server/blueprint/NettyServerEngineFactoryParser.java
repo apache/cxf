@@ -58,7 +58,7 @@ public class NettyServerEngineFactoryParser extends AbstractBPBeanDefinitionPars
             ef.setId("netty.engine.factory-holder-" + UUID.randomUUID().toString());
         }
         ef.setRuntimeClass(NettyHttpServerEngineFactoryHolder.class);
-        
+
         try {
             // Print the DOM node
             String xmlString = StaxUtils.toString(element);

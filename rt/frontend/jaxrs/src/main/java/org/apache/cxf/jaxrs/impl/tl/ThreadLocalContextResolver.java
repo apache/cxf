@@ -21,8 +21,8 @@ package org.apache.cxf.jaxrs.impl.tl;
 
 import javax.ws.rs.ext.ContextResolver;
 
-public class ThreadLocalContextResolver<T> 
-    extends AbstractThreadLocalProxy<ContextResolver<T>> 
+public class ThreadLocalContextResolver<T>
+    extends AbstractThreadLocalProxy<ContextResolver<T>>
     implements ContextResolver<T> {
 
     public T getContext(Class<?> type) {

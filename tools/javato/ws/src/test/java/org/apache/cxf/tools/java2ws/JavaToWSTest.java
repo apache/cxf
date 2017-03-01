@@ -92,8 +92,8 @@ public class JavaToWSTest extends ToolTestBase {
     public void testCXF2941() throws Exception {
         String[] args = new String[] {
             "-wsdl", "-wrapperbean",
-            "-s", output.getPath(), 
-            "-o", output.getPath() + "/cxf2941.wsdl", 
+            "-s", output.getPath(),
+            "-o", output.getPath() + "/cxf2941.wsdl",
             org.apache.cxf.tools.fortest.cxf2941.WebResultService.class.getName()
         };
         JavaToWS.main(args);
@@ -104,14 +104,14 @@ public class JavaToWSTest extends ToolTestBase {
         assertTrue("name value in annoataion @XmlElement is not correct",
                    str.indexOf("\"name\"") > -1);
     }
-    
-    
+
+
     @Test
     public void testCXF2934() throws Exception {
         String[] args = new String[] {
             "-wsdl", "-wrapperbean",
-            "-s", output.getPath(), 
-            "-o", output.getPath() + "/tmp.wsdl", 
+            "-s", output.getPath(),
+            "-o", output.getPath() + "/tmp.wsdl",
             "org.apache.cxf.tools.fortest.cxf2934.WebParamService"
         };
         JavaToWS.main(args);
@@ -124,8 +124,8 @@ public class JavaToWSTest extends ToolTestBase {
     public void testCXF1450() throws Exception {
         String[] args = new String[] {
             "-wsdl", "-wrapperbean",
-            "-s", output.getPath(), 
-            "-o", output.getPath() + "/tmp.wsdl", 
+            "-s", output.getPath(),
+            "-o", output.getPath() + "/tmp.wsdl",
             "org.apache.cxf.tools.fortest.cxf1450.WebParamService"
         };
         JavaToWS.main(args);
@@ -260,12 +260,12 @@ public class JavaToWSTest extends ToolTestBase {
         assertTrue("Greeter_GreeterPort_Server.java was not generated", server.exists());
         assertTrue("Impl was not generated", impl.exists());
         String implContent = FileUtils.getStringFromFile(impl);
-        
+
         int idx = implContent.indexOf("serviceName");
         assertFalse("serviceName annotation was not generated", idx == -1);
         implContent = implContent.substring(idx + 11).trim();
         implContent = implContent.substring(1).trim();
-        assertTrue("serviceName annotation was not generated\n" + implContent, 
+        assertTrue("serviceName annotation was not generated\n" + implContent,
                     implContent.startsWith("\"GreeterService\""));
     }
 
@@ -287,7 +287,7 @@ public class JavaToWSTest extends ToolTestBase {
         String[] args = new String[] {"-s", output.getPath(), "-wrapperbean", "-server",
                                       "org.apache.cxf.tools.java2ws.fortest.Calculator"};
         JavaToWS.main(args);
-        checkStdErr();
+        //checkStdErr(); will see java9 warning message here
     }
 
     @Test
@@ -345,7 +345,7 @@ public class JavaToWSTest extends ToolTestBase {
         JavaToWS.main(args);
 
         File file = new File(output.getPath() + "/xml-list.wsdl");
-        
+
         Document doc = StaxUtils.read(file);
         Map<String, String> map = new HashMap<String, String>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
@@ -371,16 +371,16 @@ public class JavaToWSTest extends ToolTestBase {
                    str.indexOf(":swaRef") > -1 && str.indexOf(swaImport) > -1 && str.indexOf(schemaLoc) > -1);
 
     }
-    
-    
+
+
     @Test
     public void testXmlJavaTypeAdapter() throws Exception {
         String[] args = new String[] {"-o", output.getPath() + "/xmladapter.wsdl", "-verbose",
                                       "-wsdl", "org.apache.xmladapter.GreeterImpl"};
-       
+
         JavaToWS.main(args);
         File file = new File(output.getPath() + "/xmladapter.wsdl");
-        
+
         Document doc = StaxUtils.read(file);
         Map<String, String> map = new HashMap<String, String>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");

@@ -60,7 +60,7 @@ import org.opensaml.xmlsec.signature.support.SignatureConstants;
  * Some unit tests for the SAMLSSOResponseValidator.
  */
 public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
-    
+
     static {
         OpenSAMLUtil.initSamlEngine();
     }
@@ -72,9 +72,9 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setInResponseTo("12345");
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
-        
+
         Response response = createResponse(subjectConfirmationData);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -85,7 +85,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         validator.setSpIdentifier("http://service.apache.org");
         validator.validateSamlResponse(response, false);
     }
-    
+
     @org.junit.Test
     public void testInvalidAddress() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -93,9 +93,9 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setInResponseTo("12345");
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
-        
+
         Response response = createResponse(subjectConfirmationData);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -111,7 +111,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testInvalidRequestId() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -119,9 +119,9 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setInResponseTo("12345-bad");
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
-        
+
         Response response = createResponse(subjectConfirmationData);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -137,7 +137,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testInvalidRecipient() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -145,9 +145,9 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setInResponseTo("12345");
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://bad.recipient.apache.org");
-        
+
         Response response = createResponse(subjectConfirmationData);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -163,7 +163,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testInvalidNotOnOrAfter() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -171,9 +171,9 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setInResponseTo("12345");
         subjectConfirmationData.setNotAfter(new DateTime().minusSeconds(1));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
-        
+
         Response response = createResponse(subjectConfirmationData);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -189,7 +189,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testInvalidNotBefore() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -198,9 +198,9 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setNotBefore(new DateTime());
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
-        
+
         Response response = createResponse(subjectConfirmationData);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -216,29 +216,29 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testSignedResponseInvalidDestination() throws Exception {
         DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
         docBuilderFactory.setNamespaceAware(true);
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         Document doc = docBuilder.newDocument();
-        
-        Status status = 
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
-        Response response = 
+        Response response =
             SAML2PResponseComponentBuilder.createSAMLResponse(
                 "http://cxf.apache.org/saml", "http://cxf.apache.org/issuer", status
             );
-        
+
         // Create an AuthenticationAssertion
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setNotBefore(new DateTime());
         conditions.setNotAfter(new DateTime().plusMinutes(5));
@@ -246,36 +246,36 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         audienceRestriction.setAudienceURIs(Collections.singletonList("http://service.apache.org"));
         conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
         callbackHandler.setConditions(conditions);
-        
+
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
-        
+
         response.getAssertions().add(assertion.getSaml2());
         response.setDestination("xyz");
-        
+
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(SAMLResponseValidatorTest.class);
         InputStream input = Merlin.loadInputStream(loader, "alice.jks");
         keyStore.load(input, "password".toCharArray());
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
-        
+
         signResponse(response, "alice", "password", issuerCrypto, true);
-        
+
         Element policyElement = OpenSAMLUtil.toDom(response, doc);
         doc.appendChild(policyElement);
         assertNotNull(policyElement);
-        
+
         Response marshalledResponse = (Response)OpenSAMLUtil.fromDom(policyElement);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setIssuerIDP("http://cxf.apache.org/issuer");
@@ -290,7 +290,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testResponseInvalidIssuer() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -298,10 +298,10 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setInResponseTo("12345");
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
-        
+
         Response response = createResponse(subjectConfirmationData);
         response.setIssuer(SAML2PResponseComponentBuilder.createIssuer("xyz"));
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -317,7 +317,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testMissingAuthnStatement() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -325,10 +325,10 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setInResponseTo("12345");
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
-        
+
         Response response = createResponse(subjectConfirmationData);
         response.getAssertions().get(0).getAuthnStatements().clear();
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -344,11 +344,11 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testNoSubjectConfirmationData() throws Exception {
         Response response = createResponse(null);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -364,7 +364,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testEmptyAudienceRestriction() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -374,11 +374,11 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
-        Response response = 
-            createResponse(subjectConfirmationData, 
-                           Collections.singletonList(audienceRestriction), 
+        Response response =
+            createResponse(subjectConfirmationData,
+                           Collections.singletonList(audienceRestriction),
                            null);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -394,7 +394,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testBadAudienceRestriction() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -406,11 +406,11 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(
             Collections.singletonList("http://unknown-service.apache.org"));
-        Response response = 
-            createResponse(subjectConfirmationData, 
-                           Collections.singletonList(audienceRestriction), 
+        Response response =
+            createResponse(subjectConfirmationData,
+                           Collections.singletonList(audienceRestriction),
                            null);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -426,7 +426,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testAudienceRestrictionMultipleValues() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -435,17 +435,17 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         values.add("http://unknown-service.apache.org");
         values.add("http://service.apache.org");
-        
+
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(values);
-        Response response = 
-            createResponse(subjectConfirmationData, 
-                           Collections.singletonList(audienceRestriction), 
+        Response response =
+            createResponse(subjectConfirmationData,
+                           Collections.singletonList(audienceRestriction),
                            null);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -454,10 +454,10 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         validator.setClientAddress("http://apache.org");
         validator.setRequestId("12345");
         validator.setSpIdentifier("http://service.apache.org");
-        
+
         validator.validateSamlResponse(response, false);
     }
-    
+
     @org.junit.Test
     public void testMultipleAudienceRestrictions() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -466,22 +466,22 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
 
-        List<AudienceRestrictionBean> audienceRestrictions = 
-            new ArrayList<AudienceRestrictionBean>();
-        
+        List<AudienceRestrictionBean> audienceRestrictions =
+            new ArrayList<>();
+
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(
             Collections.singletonList("http://unknown-service.apache.org"));
         audienceRestrictions.add(audienceRestriction);
-        
+
         audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(
             Collections.singletonList("http://service.apache.org"));
         audienceRestrictions.add(audienceRestriction);
-        
-        Response response = 
+
+        Response response =
             createResponse(subjectConfirmationData, audienceRestrictions, null);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -490,7 +490,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         validator.setClientAddress("http://apache.org");
         validator.setRequestId("12345");
         validator.setSpIdentifier("http://service.apache.org");
-        
+
         try {
             validator.validateSamlResponse(response, false);
             fail("Expected failure on bad response");
@@ -498,7 +498,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testAssertionBadIssuer() throws Exception {
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
@@ -506,26 +506,26 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         subjectConfirmationData.setInResponseTo("12345");
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
-        
+
         // Create a AuthenticationAssertion
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("http://cxf.apache.org/bad-issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
-        
+
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setNotBefore(new DateTime());
         conditions.setNotAfter(new DateTime().plusMinutes(5));
-        
+
         AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
         audienceRestriction.setAudienceURIs(Collections.singletonList("http://service.apache.org"));
         conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
         callbackHandler.setConditions(conditions);
-        
+
         Response response = createResponse(subjectConfirmationData, callbackHandler);
-        
+
         // Validate the Response
         SAMLSSOResponseValidator validator = new SAMLSSOResponseValidator();
         validator.setEnforceAssertionsSigned(false);
@@ -534,7 +534,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         validator.setClientAddress("http://apache.org");
         validator.setRequestId("12345");
         validator.setSpIdentifier("http://service.apache.org");
-        
+
         try {
             validator.validateSamlResponse(response, false);
             fail("Expected failure on bad response");
@@ -542,25 +542,25 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     @org.junit.Test
     public void testEnforceAssertionsSigned() throws Exception {
-        
+
         SubjectConfirmationDataBean subjectConfirmationData = new SubjectConfirmationDataBean();
         subjectConfirmationData.setAddress("http://apache.org");
         subjectConfirmationData.setInResponseTo("12345");
         subjectConfirmationData.setNotAfter(new DateTime().plusMinutes(5));
         subjectConfirmationData.setRecipient("http://recipient.apache.org");
-        
+
         Response response = createResponse(subjectConfirmationData);
-        
+
         Crypto issuerCrypto = new Merlin();
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         ClassLoader loader = Loader.getClassLoader(CombinedValidatorTest.class);
         InputStream input = Merlin.loadInputStream(loader, "alice.jks");
         keyStore.load(input, "password".toCharArray());
         ((Merlin)issuerCrypto).setKeyStore(keyStore);
-        
+
         // Test SSO validation
         SAMLSSOResponseValidator ssoValidator = new SAMLSSOResponseValidator();
         ssoValidator.setIssuerIDP("http://cxf.apache.org/issuer");
@@ -568,7 +568,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         ssoValidator.setClientAddress("http://apache.org");
         ssoValidator.setRequestId("12345");
         ssoValidator.setSpIdentifier("http://service.apache.org");
-        
+
         // Parse the response
         try {
             ssoValidator.validateSamlResponse(response, false);
@@ -577,13 +577,13 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             // expected
         }
     }
-    
+
     private Response createResponse(
         SubjectConfirmationDataBean subjectConfirmationData
     ) throws Exception {
         return createResponse(subjectConfirmationData, null, null);
     }
-    
+
     private Response createResponse(
         SubjectConfirmationDataBean subjectConfirmationData,
         List<AudienceRestrictionBean> audienceRestrictions,
@@ -593,28 +593,28 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         docBuilderFactory.setNamespaceAware(true);
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         Document doc = docBuilder.newDocument();
-        
-        Status status = 
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
-        Response response = 
+        Response response =
             SAML2PResponseComponentBuilder.createSAMLResponse(
                 "http://cxf.apache.org/saml", "http://cxf.apache.org/issuer", status
             );
-        
+
         // Create an AuthenticationAssertion
         SAML2CallbackHandler callbackHandler = new SAML2CallbackHandler();
         callbackHandler.setStatement(SAML2CallbackHandler.Statement.AUTHN);
         callbackHandler.setIssuer("http://cxf.apache.org/issuer");
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
-        
+
         callbackHandler.setSubjectConfirmationData(subjectConfirmationData);
-        
+
         ConditionsBean conditions = new ConditionsBean();
         conditions.setNotBefore(new DateTime());
         conditions.setNotAfter(new DateTime().plusMinutes(5));
-        
+
         if (audienceRestrictions == null) {
             AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
             audienceRestriction.setAudienceURIs(Collections.singletonList("http://service.apache.org"));
@@ -623,27 +623,27 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
             conditions.setAudienceRestrictions(audienceRestrictions);
         }
         callbackHandler.setConditions(conditions);
-        
+
         SAMLCallback samlCallback = new SAMLCallback();
         SAMLUtil.doSAMLCallback(callbackHandler, samlCallback);
         SamlAssertionWrapper assertion = new SamlAssertionWrapper(samlCallback);
-        
+
         response.getAssertions().add(assertion.getSaml2());
-        
+
         if (authnClassRef != null) {
-            AuthnStatement authnStatement = 
+            AuthnStatement authnStatement =
                 response.getAssertions().get(0).getAuthnStatements().get(0);
             authnStatement.getAuthnContext().setAuthnContextClassRef(
                 SAML2PResponseComponentBuilder.createAuthnContextClassRef(authnClassRef));
         }
-        
+
         Element policyElement = OpenSAMLUtil.toDom(response, doc);
         doc.appendChild(policyElement);
         assertNotNull(policyElement);
-        
+
         return (Response)OpenSAMLUtil.fromDom(policyElement);
     }
- 
+
     private Response createResponse(
         SubjectConfirmationDataBean subjectConfirmationData,
         SAML2CallbackHandler callbackHandler
@@ -653,11 +653,11 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
         Document doc = docBuilder.newDocument();
 
-        Status status = 
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
-        Response response = 
+        Response response =
             SAML2PResponseComponentBuilder.createSAMLResponse(
                 "http://cxf.apache.org/saml", "http://cxf.apache.org/issuer", status
             );
@@ -675,10 +675,10 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
 
         return (Response)OpenSAMLUtil.fromDom(policyElement);
     }
-    
+
     /**
      * Sign a SAML Response
-     * @throws Exception 
+     * @throws Exception
      */
     private void signResponse(
         Response response,
@@ -692,7 +692,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         //
         Signature signature = OpenSAMLUtil.buildSignature();
         signature.setCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
-        
+
         // prepare to sign the SAML token
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(issuerKeyName);
@@ -709,7 +709,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         if (pubKeyAlgo.equalsIgnoreCase("DSA")) {
             sigAlgo = SignatureConstants.ALGO_ID_SIGNATURE_DSA;
         }
-        
+
         PrivateKey privateKey = issuerCrypto.getPrivateKey(issuerKeyName, issuerKeyPassword);
 
         signature.setSignatureAlgorithm(sigAlgo);
@@ -721,7 +721,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         if (useKeyInfo) {
             X509KeyInfoGeneratorFactory kiFactory = new X509KeyInfoGeneratorFactory();
             kiFactory.setEmitEntityCertificate(true);
-            
+
             try {
                 KeyInfo keyInfo = kiFactory.newInstance().generate(signingCredential);
                 signature.setKeyInfo(keyInfo);

@@ -37,7 +37,7 @@ public class DocLitBareCodeFirstServiceImpl implements DocLitBareCodeFirstServic
 
     public GreetMeResponse greetMe(GreetMeRequest gmr) {
         if ("fault".equals(gmr.getName())) {
-            try { 
+            try {
                 SOAPFactory factory = SOAPFactory.newInstance();
                 SOAPFault fault = factory.createFault("this is a fault string!",
                                                       new QName("http://foo", "FooCode"));
@@ -50,7 +50,7 @@ public class DocLitBareCodeFirstServiceImpl implements DocLitBareCodeFirstServic
         } else if ("emptyfault".equals(gmr.getName())) {
             throw new RuntimeException("Empty!");
         }
-        
+
         GreetMeResponse resp = new GreetMeResponse();
         resp.setName(gmr.getName());
         return resp;

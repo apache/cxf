@@ -27,7 +27,7 @@ import io.undertow.server.HttpServerExchange;
 public class TestDummyHandler implements CXFUndertowHttpHandler {
 
     private HttpHandler handler;
-    
+
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
         handler.handleRequest(exchange);

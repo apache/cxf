@@ -26,21 +26,21 @@ import java.util.List;
 public class Participants {
     private Object primaryParticipant;
     private List<Object> participants;
-    
+
     public Object getPrimaryParticipant() {
         return primaryParticipant;
     }
-    
+
     public void setPrimaryParticipant(Object primaryParticipant) {
         this.primaryParticipant = primaryParticipant;
     }
-    
+
     public List<Object> getParticipants() {
         return participants;
     }
-    
+
     public void setParticipants(List<Object> participants) {
         this.participants = participants;
     }
-    
+
 }

@@ -29,13 +29,13 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 public class Server extends AbstractBusTestServerBase {
     public static final String JS_PORT = allocatePort(Server.class);
     public static final String JSX_PORT = allocatePort(Server.class, 1);
-    
-    ProviderFactory pf = new ProviderFactory();            
+
+    ProviderFactory pf = new ProviderFactory();
     protected void run()  {
-        try {            
+        try {
             String f = getClass().getResource("resources/hello_world.js").toURI().getPath();
             f = URLDecoder.decode(f, StandardCharsets.UTF_8.name());
-            pf.createAndPublish(new File(f), "http://localhost:" + JS_PORT 
+            pf.createAndPublish(new File(f), "http://localhost:" + JS_PORT
                                 + "/SoapContext/SoapPort", false);
             f = getClass().getResource("resources/hello_world.jsx").toURI().getPath();
             f = URLDecoder.decode(f, StandardCharsets.UTF_8.name());

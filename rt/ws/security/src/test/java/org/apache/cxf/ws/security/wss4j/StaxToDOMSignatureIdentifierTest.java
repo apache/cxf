@@ -26,9 +26,9 @@ import java.util.Properties;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
@@ -46,26 +46,26 @@ import org.junit.Test;
  * for different Signature Key Identifier methods.
  */
 public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
-    
+
     @Test
     public void testSignatureDirectReference() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
         actions.add(WSSConstants.SIGNATURE);
@@ -74,8 +74,8 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
             WSSecurityTokenConstants.KEYIDENTIFIER_SECURITY_TOKEN_DIRECT_REFERENCE
         );
         properties.setSignatureUser("myalias");
-        
-        Properties cryptoProperties = 
+
+        Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
         properties.setSignatureCryptoProperties(cryptoProperties);
         properties.setCallbackHandler(new TestPwdCallback());
@@ -84,26 +84,26 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testSignatureIssuerSerial() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
         actions.add(WSSConstants.SIGNATURE);
@@ -112,8 +112,8 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
             WSSecurityTokenConstants.KeyIdentifier_IssuerSerial
         );
         properties.setSignatureUser("myalias");
-        
-        Properties cryptoProperties = 
+
+        Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
         properties.setSignatureCryptoProperties(cryptoProperties);
         properties.setCallbackHandler(new TestPwdCallback());
@@ -122,26 +122,26 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testSignatureThumbprint() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
         actions.add(WSSConstants.SIGNATURE);
@@ -150,8 +150,8 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
             WSSecurityTokenConstants.KEYIDENTIFIER_THUMBPRINT_IDENTIFIER
         );
         properties.setSignatureUser("myalias");
-        
-        Properties cryptoProperties = 
+
+        Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
         properties.setSignatureCryptoProperties(cryptoProperties);
         properties.setCallbackHandler(new TestPwdCallback());
@@ -160,12 +160,12 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testSignatureX509() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -173,14 +173,14 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
         actions.add(WSSConstants.SIGNATURE);
@@ -189,8 +189,8 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
             WSSecurityTokenConstants.KeyIdentifier_X509KeyIdentifier
         );
         properties.setSignatureUser("myalias");
-        
-        Properties cryptoProperties = 
+
+        Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
         properties.setSignatureCryptoProperties(cryptoProperties);
         properties.setCallbackHandler(new TestPwdCallback());
@@ -199,12 +199,12 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
 
         assertEquals("test", echo.echo("test"));
     }
-    
+
     @Test
     public void testSignatureKeyValue() throws Exception {
         // Create + configure service
         Service service = createService();
-        
+
         Map<String, Object> inProperties = new HashMap<String, Object>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -212,14 +212,14 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         inProperties.put(WSHandlerConstants.IS_BSP_COMPLIANT, "false");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
-        
+
         // Create + configure client
         Echo echo = createClientProxy();
-        
+
         Client client = ClientProxy.getClient(echo);
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         WSSSecurityProperties properties = new WSSSecurityProperties();
         List<WSSConstants.Action> actions = new ArrayList<WSSConstants.Action>();
         actions.add(WSSConstants.SIGNATURE);
@@ -228,8 +228,8 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
             WSSecurityTokenConstants.KeyIdentifier_KeyValue
         );
         properties.setSignatureUser("myalias");
-        
-        Properties cryptoProperties = 
+
+        Properties cryptoProperties =
             CryptoFactory.getProperties("outsecurity.properties", this.getClass().getClassLoader());
         properties.setSignatureCryptoProperties(cryptoProperties);
         properties.setCallbackHandler(new TestPwdCallback());
@@ -246,20 +246,20 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         factory.setAddress("local://Echo");
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         Server server = factory.create();
-        
+
         Service service = server.getEndpoint().getService();
         service.getInInterceptors().add(new LoggingInInterceptor());
         service.getOutInterceptors().add(new LoggingOutInterceptor());
-        
+
         return service;
     }
-    
+
     private Echo createClientProxy() {
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
         proxyFac.setServiceClass(Echo.class);
         proxyFac.setAddress("local://Echo");
         proxyFac.getClientFactoryBean().setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        
+
         return (Echo)proxyFac.create();
     }
 }

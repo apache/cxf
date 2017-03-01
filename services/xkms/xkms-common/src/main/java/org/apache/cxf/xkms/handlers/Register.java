@@ -38,7 +38,7 @@ public interface Register {
     ReissueResultType reissue(ReissueRequestType request, ReissueResultType response);
 
     RevokeResultType revoke(RevokeRequestType request, RevokeResultType response);
-    
+
     RecoverResultType recover(RecoverRequestType request, RecoverResultType response);
 
 }

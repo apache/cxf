@@ -39,7 +39,7 @@ public class SampleRestApplication {
     public static void main(String[] args) {
         SpringApplication.run(SampleRestApplication.class, args);
     }
- 
+
     @Bean
     public Server rsServer() {
         JAXRSServerFactoryBean endpoint = new JAXRSServerFactoryBean();

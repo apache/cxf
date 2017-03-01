@@ -26,7 +26,7 @@ public class PrivateKeyPasswordProviderImpl implements PrivateKeyPasswordProvide
 
     private String password = "password";
     public PrivateKeyPasswordProviderImpl() {
-        
+
     }
     public PrivateKeyPasswordProviderImpl(String password) {
         this.password = password;
@@ -35,6 +35,6 @@ public class PrivateKeyPasswordProviderImpl implements PrivateKeyPasswordProvide
     public char[] getPassword(Properties storeProperties) {
         return password.toCharArray();
     }
-    
+
 }
 

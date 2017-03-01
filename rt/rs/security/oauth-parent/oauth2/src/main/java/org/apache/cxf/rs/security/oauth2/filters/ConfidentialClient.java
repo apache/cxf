@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
 /**
  * Indicates that only OAuth2 confidential clients can invoke a given resource method.
  * Confidential clients are less likely to have their access tokens lost or stolen due
- * to them being generally more secure than public clients which can not keep their client 
+ * to them being generally more secure than public clients which can not keep their client
  * secrets.
  */
 public @interface ConfidentialClient {

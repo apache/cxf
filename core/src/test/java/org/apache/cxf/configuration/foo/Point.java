@@ -26,9 +26,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for point complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="point">
  *   &lt;complexContent>
@@ -41,8 +41,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "point",
@@ -57,7 +57,7 @@ public class Point {
 
     /**
      * Gets the value of the x property.
-     * 
+     *
      */
     public int getX() {
         return x;
@@ -65,7 +65,7 @@ public class Point {
 
     /**
      * Sets the value of the x property.
-     * 
+     *
      */
     public void setX(int value) {
         this.x = value;
@@ -73,7 +73,7 @@ public class Point {
 
     /**
      * Gets the value of the y property.
-     * 
+     *
      */
     public int getY() {
         return y;
@@ -81,7 +81,7 @@ public class Point {
 
     /**
      * Sets the value of the y property.
-     * 
+     *
      */
     public void setY(int value) {
         this.y = value;

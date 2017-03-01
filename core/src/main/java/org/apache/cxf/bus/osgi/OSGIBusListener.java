@@ -47,7 +47,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
     public static final String CONTEXT_SYMBOLIC_NAME_PROPERTY = "cxf.context.symbolicname";
     public static final String CONTEXT_VERSION_PROPERTY = "cxf.context.version";
     public static final String CONTEXT_NAME_PROPERTY = "cxf.bus.id";
-    
+
     private static final String SERVICE_PROPERTY_PRIVATE = "org.apache.cxf.bus.private.extension";
     private static final String SERVICE_PROPERTY_RESTRICTED = "org.apache.cxf.bus.restricted.extension";
     private static final String BUS_EXTENSION_BUNDLES_EXCLUDES = "bus.extension.bundles.excludes";
@@ -61,7 +61,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
     }
     public OSGIBusListener(Bus b, Object args[]) {
         bus = b;
-        if (args != null && args.length > 0 
+        if (args != null && args.length > 0
             && args[0] instanceof BundleContext) {
             defaultContext = (BundleContext)args[0];
         }
@@ -86,11 +86,11 @@ public class OSGIBusListener implements BusLifeCycleListener {
         final ConfiguredBeanLocator cbl = bus.getExtension(ConfiguredBeanLocator.class);
         if (cbl instanceof ExtensionManagerImpl) {
             // wire in the OSGi things
-            bus.setExtension(new OSGiBeanLocator(cbl, defaultContext), 
+            bus.setExtension(new OSGiBeanLocator(cbl, defaultContext),
                              ConfiguredBeanLocator.class);
         }
     }
-    
+
     public void initComplete() {
         ManagedWorkQueueList wqList = bus.getExtension(ManagedWorkQueueList.class);
         if (wqList != null) {
@@ -99,7 +99,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
         }
         registerBusAsService();
     }
-    
+
 
     public void preShutdown() {
     }
@@ -110,7 +110,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
             service = null;
         }
     }
-    
+
     private static ServiceReference[] getServiceReferences(BundleContext context, Class<?> serviceClass) {
         ServiceReference[] refs = null;
         try {
@@ -154,7 +154,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
             }
         }
     }
-    
+
     private void registerBusFeatures() {
         ServiceReference refs[] = getServiceReferences(defaultContext, Feature.class);
         for (ServiceReference ref : refs) {
@@ -192,7 +192,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
             }
         }
         // if the excludes-regex is set, the service is excluded when matching that regex.
-        return extensionBundlesExcludesPattern != null 
+        return extensionBundlesExcludesPattern != null
             && extensionBundlesExcludesPattern.matcher(ref.getBundle().getSymbolicName()).matches();
     }
 

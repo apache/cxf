@@ -25,12 +25,12 @@ import org.opensaml.xacml.ctx.ResponseType;
  * An interface that describes a PolicyDecisionPoint (PDP) that supports XACML 2.0 using OpenSAML
  */
 public interface PolicyDecisionPoint {
-    
+
     /**
      * Evaluate an XACML Request and return a Response
      * @param request an XACML Request as a RequestType
      * @return the XACML Response as a ResponseType
      */
     ResponseType evaluate(RequestType request) throws Exception;
-    
+
 }

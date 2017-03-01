@@ -63,7 +63,7 @@ public class JavaFirstNoWsdlTest extends AbstractVmJMSTest {
         factory.getFeatures().add(cff);
         factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
         factory.setServiceClass(Hello.class);
-        factory.setAddress(address); 
+        factory.setAddress(address);
         Hello client = (Hello)markForClose(factory.create());
         String reply = client.sayHi(" HI");
         Assert.assertEquals("get HI", reply);

@@ -27,7 +27,7 @@ import javax.jws.soap.SOAPBinding;
             targetNamespace = "http://cxf.apache.org/echotest")
 @SOAPBinding(style = javax.jws.soap.SOAPBinding.Style.RPC)
 public class EchoImpl {
-    
+
     @WebMethod
     public String echoString(String str) {
         return str;

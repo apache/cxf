@@ -27,10 +27,10 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-public class ThreadLocalUriInfo extends AbstractThreadLocalProxy<UriInfo> 
+public class ThreadLocalUriInfo extends AbstractThreadLocalProxy<UriInfo>
                                     implements UriInfo {
 
-    
+
     public URI getAbsolutePath() {
         return get().getAbsolutePath();
     }
@@ -39,7 +39,7 @@ public class ThreadLocalUriInfo extends AbstractThreadLocalProxy<UriInfo>
         return get().getAbsolutePathBuilder();
     }
 
-    
+
     public URI getBaseUri() {
         return get().getBaseUri();
     }

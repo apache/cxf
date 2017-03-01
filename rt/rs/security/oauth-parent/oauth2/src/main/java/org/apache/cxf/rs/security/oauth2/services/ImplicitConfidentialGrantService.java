@@ -27,7 +27,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 /**
  * Redirection-based Implicit Grant Service which returns tokens for the confidential clients
- * directly to a human user. 
+ * directly to a human user.
  */
 @Path("/implicit-confidential")
 public class ImplicitConfidentialGrantService extends AbstractImplicitGrantService {
@@ -35,7 +35,7 @@ public class ImplicitConfidentialGrantService extends AbstractImplicitGrantServi
     public ImplicitConfidentialGrantService() {
         super(OAuthConstants.TOKEN_RESPONSE_TYPE, OAuthConstants.IMPLICIT_CONFIDENTIAL_GRANT);
     }
-    
+
     @Override
     protected void processRefreshToken(StringBuilder sb, String refreshToken) {
         sb.append("&").append(OAuthConstants.REFRESH_TOKEN).append("=").append(refreshToken);
@@ -44,8 +44,8 @@ public class ImplicitConfidentialGrantService extends AbstractImplicitGrantServi
     protected boolean canSupportPublicClient(Client c) {
         return false;
     }
-    
-    
+
+
 }
 
 

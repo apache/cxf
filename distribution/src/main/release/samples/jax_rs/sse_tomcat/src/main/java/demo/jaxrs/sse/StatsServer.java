@@ -35,15 +35,15 @@ import org.springframework.web.context.ContextLoaderListener;
 public final class StatsServer {
     private StatsServer() {
     }
-    
+
     public static void main(final String[] args) throws Exception {
         // Register and map the dispatcher servlet
         final File base = new File(System.getProperty("java.io.tmpdir"));
-        
+
         final Tomcat server = new Tomcat();
         server.setPort(8686);
         server.setBaseDir(base.getAbsolutePath());
-        
+
         final StandardContext context = (StandardContext)server.addWebapp("/", base.getAbsolutePath());
         context.setConfigFile(StatsServer.class.getResource("/META-INF/context.xml"));
         context.addApplicationListener(ContextLoaderListener.class.getName());
@@ -58,8 +58,8 @@ public final class StatsServer {
         Tomcat.addServlet(staticContext, "cxfStaticServlet", new DefaultServlet());
         staticContext.addServletMapping("/static/*", "cxfStaticServlet");
         staticContext.setResources(resourcesFrom(staticContext, "target/classes/web-ui"));
-        staticContext.setParentClassLoader(Thread.currentThread().getContextClassLoader());       
-        
+        staticContext.setParentClassLoader(Thread.currentThread().getContextClassLoader());
+
         server.start();
         server.getServer().await();
     }

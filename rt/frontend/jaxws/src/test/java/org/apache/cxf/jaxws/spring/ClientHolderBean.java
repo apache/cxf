@@ -24,21 +24,21 @@ import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * 
+ *
  */
 public class ClientHolderBean {
 
     @Autowired
     Collection<org.apache.hello_world_soap_http.Greeter> greeters;
-    
+
     org.apache.hello_world_soap_http.Greeter greet1;
     org.apache.hello_world_soap_http.Greeter greet2;
-    
-    
+
+
     public int greeterCount() {
         return greeters.size();
     }
-    
+
     public void setGreet1(org.apache.hello_world_soap_http.Greeter g1) {
         greet1 = g1;
     }

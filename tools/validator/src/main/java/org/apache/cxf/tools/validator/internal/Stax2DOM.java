@@ -82,7 +82,7 @@ public class Stax2DOM {
             try {
                 if (reader != null) {
                     try {
-                        //on woodstox, calling closeCompletely will allow any 
+                        //on woodstox, calling closeCompletely will allow any
                         //cached things like dtds and such to be completely
                         //closed and cleaned up.
                         reader.getClass().getMethod("closeCompletely").invoke(reader);

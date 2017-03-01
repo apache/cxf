@@ -30,7 +30,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class AuthorizationUtilsTest extends Assert {
-    
+
     @Test
     public void testThrowAuthorizationFailureSingleChallenge() {
         try {
@@ -44,7 +44,7 @@ public class AuthorizationUtilsTest extends Assert {
             assertEquals("Basic", value.toString());
         }
     }
-    
+
     @Test
     public void testThrowAuthorizationFailureManyChallenges() {
         Set<String> challenges = new LinkedHashSet<String>();
@@ -74,11 +74,11 @@ public class AuthorizationUtilsTest extends Assert {
             assertNull(value);
         }
     }
-    
+
     @Test
     public void testThrowAuthorizationFailureWithCause() {
         try {
-            AuthorizationUtils.throwAuthorizationFailure(Collections.singleton("Basic"), 
+            AuthorizationUtils.throwAuthorizationFailure(Collections.singleton("Basic"),
                                                          null, new RuntimeException("expired token"));
             fail("WebApplicationException expected");
         } catch (WebApplicationException ex) {

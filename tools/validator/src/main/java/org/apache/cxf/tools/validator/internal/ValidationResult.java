@@ -38,7 +38,7 @@ public final class ValidationResult {
     public void addError(final Message msg) {
         addError(msg.toString());
     }
-    
+
     public void addError(final String error) {
         this.errors.push(error);
     }
@@ -52,9 +52,9 @@ public final class ValidationResult {
     }
 
     public boolean hasWarnings() {
-        return warnings.size() > 0;
+        return !warnings.isEmpty();
     }
-    
+
     public boolean isSuccessful() {
         return errors.size() == 0 && warnings.size() == 0;
     }
@@ -66,20 +66,20 @@ public final class ValidationResult {
         sb.append(errors.size());
         sb.append(", Warnings: ");
         sb.append(warnings.size());
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             sb.append("\n\n <<< ERROR! \n");
             while (!errors.empty()) {
                 sb.append(errors.pop());
                 sb.append("\n");
             }
         }
-        if (warnings.size() > 0) {
+        if (!warnings.isEmpty()) {
             sb.append("\n <<< WARNING! \n");
             while (!warnings.empty()) {
                 sb.append(warnings.pop());
-                sb.append("\n");                    
+                sb.append("\n");
             }
         }
         return sb.toString();
-    }    
+    }
 }

@@ -29,19 +29,19 @@ import org.apache.cxf.phase.PhaseInterceptor;
 
 
 public class OAuthRequestInterceptor extends OAuthRequestFilter implements PhaseInterceptor<Message> {
-    
+
     public void handleMessage(Message message) throws Fault {
         validateRequest(message);
     }
 
     protected String[] getAuthorizationParts(Message message) {
         return super.getAuthorizationParts(message);
-        
-//        You can customise it, extract the token from the message, example, get 
+
+//        You can customise it, extract the token from the message, example, get
 //        WS-Security Binary token put on the message by WSS4JInInterceptor
-//    
-//        String token = getTokenFromCurrentMessage(mc);       
-//        return new String[] {"Bearer", token};    
+//
+//        String token = getTokenFromCurrentMessage(mc);
+//        return new String[] {"Bearer", token};
     }
 
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
@@ -63,7 +63,7 @@ public class OAuthRequestInterceptor extends OAuthRequestFilter implements Phase
     public String getPhase() {
         return Phase.PRE_INVOKE;
     }
-    
+
     public void handleFault(Message message) {
     }
 

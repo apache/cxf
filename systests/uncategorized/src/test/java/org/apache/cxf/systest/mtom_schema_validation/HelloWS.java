@@ -30,8 +30,8 @@ public interface HelloWS {
 
     @WebResult(name = "helloResponse", targetNamespace = "http://cxf.apache.org/", partName = "parameters")
     @WebMethod
-    HelloResponse hello(@WebParam(partName = "parameters", 
-                                         name = "helloRequest", 
+    HelloResponse hello(@WebParam(partName = "parameters",
+                                         name = "helloRequest",
                                          targetNamespace = "http://cxf.apache.org/") Hello parameters)
         throws ExceptionTypeException;
 }

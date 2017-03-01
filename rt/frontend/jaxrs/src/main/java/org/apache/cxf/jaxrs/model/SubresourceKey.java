@@ -22,20 +22,20 @@ package org.apache.cxf.jaxrs.model;
 public class SubresourceKey {
     private Class<?> typedClass;
     private Class<?> instanceClass;
-    
+
     public SubresourceKey(Class<?> tClass, Class<?> iClass) {
         typedClass = tClass;
         instanceClass = iClass;
     }
-    
+
     public Class<?> getTypedClass() {
         return typedClass;
     }
-    
+
     public Class<?> getInstanceClass() {
         return instanceClass;
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof SubresourceKey)) {
@@ -44,7 +44,7 @@ public class SubresourceKey {
         SubresourceKey other = (SubresourceKey)o;
         return typedClass == other.typedClass && instanceClass == other.instanceClass;
     }
-    
+
     @Override
     public int hashCode() {
         return typedClass.hashCode() + 37 * instanceClass.hashCode();

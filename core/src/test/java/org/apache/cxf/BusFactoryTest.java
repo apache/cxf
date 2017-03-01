@@ -26,19 +26,19 @@ import org.junit.Test;
 
 
 public class BusFactoryTest extends Assert {
-    
+
     @After
     public void tearDown() {
-        System.clearProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME);        
+        System.clearProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME);
     }
-    
+
     @Test
     public void testGetInstance() {
         System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, TestBusFactory.class.getName());
         BusFactory factory = BusFactory.newInstance();
         assertTrue(factory instanceof TestBusFactory);
     }
-    
+
     public static class TestBusFactory extends BusFactory {
 
         public Bus createBus() {

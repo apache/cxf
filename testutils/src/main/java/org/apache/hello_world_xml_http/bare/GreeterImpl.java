@@ -21,7 +21,7 @@ package org.apache.hello_world_xml_http.bare;
 
 import org.apache.hello_world_xml_http.bare.types.MyComplexStructType;
 
-@javax.jws.WebService(serviceName = "XMLService", 
+@javax.jws.WebService(serviceName = "XMLService",
                 portName = "XMLPort",
                 endpointInterface = "org.apache.hello_world_xml_http.bare.Greeter",
                 targetNamespace = "http://apache.org/hello_world_xml_http/bare")
@@ -32,7 +32,7 @@ public class GreeterImpl implements Greeter {
 
     public String greetMe(String me) {
         // TODO Auto-generated method stub
-        return "Hello " + me;        
+        return "Hello " + me;
     }
 
     public String sayHi() {
@@ -41,7 +41,7 @@ public class GreeterImpl implements Greeter {
     }
 
     public MyComplexStructType sendReceiveData(MyComplexStructType in) {
-        // TODO Auto-generated method stub        
+        // TODO Auto-generated method stub
         return in;
     }
 

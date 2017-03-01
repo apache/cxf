@@ -28,13 +28,13 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 public class OAuthJoseJwtProducer extends JoseJwtProducer {
     private boolean encryptWithClientSecret;
     private boolean signWithClientSecret;
-    
+
     public String processJwt(JwtToken jwt, String clientSecret) {
-        return processJwt(jwt, 
+        return processJwt(jwt,
                          getInitializedEncryptionProvider(clientSecret),
                          getInitializedSignatureProvider(clientSecret));
     }
-    
+
     protected JwsSignatureProvider getInitializedSignatureProvider(String clientSecret) {
         if (signWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
             return OAuthUtils.getClientSecretSignatureProvider(clientSecret);

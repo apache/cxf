@@ -79,7 +79,7 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
     public Definition build(String wsdlURL) {
         WSDLManager mgr = bus.getExtension(WSDLManager.class);
         registerJaxwsExtension(mgr.getExtensionRegistry());
-        
+
         WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(this.bus);
         wsdlDefinition = builder.build(wsdlURL);
         context.put(Bus.class, bus);
@@ -120,9 +120,9 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
 
         context.setJaxbBindingFiles(jaxbBindings);
         context.put(ToolConstants.HANDLER_CHAIN, handlerChain);
-        
-        
-        
+
+
+
         try {
             this.wsdlDefinition = buildCustomizedDefinition();
         } catch (Exception e) {
@@ -173,16 +173,16 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
         return false;
     }
 
-    private Definition buildCustomizedDefinition() throws Exception {      
-        Map<String, Element> eleMap = cusParser.getCustomizedWSDLElements();        
+    private Definition buildCustomizedDefinition() throws Exception {
+        Map<String, Element> eleMap = cusParser.getCustomizedWSDLElements();
         String wsdlUrl = URIParserUtil.getAbsoluteURI((String)context.get(ToolConstants.CFG_WSDLURL));
         CustomizedWSDLLocator wsdlLocator = new CustomizedWSDLLocator(wsdlUrl, eleMap);
         wsdlLocator.setCatalogResolver(OASISCatalogManager.getCatalogManager(bus));
-        
+
         WSDLManager mgr = bus.getExtension(WSDLManager.class);
         WSDLReader reader = mgr.getWSDLFactory().newWSDLReader();
         reader.setFeature("javax.wsdl.verbose", false);
-        reader.setExtensionRegistry(mgr.getExtensionRegistry());       
+        reader.setExtensionRegistry(mgr.getExtensionRegistry());
 
         Element el = eleMap.get(wsdlLocator.getBaseURI());
         if (el == null) {
@@ -206,5 +206,5 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder {
     public boolean validate(final Definition def) throws ToolException {
         return new WSDL11Validator(def, context, bus).isValid();
     }
-    
+
 }

@@ -35,13 +35,13 @@ import org.apache.wss4j.policy.SPUtils;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 
 public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
-    
+
     private Bus bus;
 
     public AlgorithmSuiteBuilder(Bus bus) {
         this.bus = bus;
     }
-    
+
     @Override
     public Assertion build(Element element, AssertionBuilderFactory factory) throws IllegalArgumentException {
 
@@ -51,7 +51,7 @@ public class AlgorithmSuiteBuilder implements AssertionBuilder<Element> {
             throw new IllegalArgumentException("sp:AlgorithmSuite must have an inner wsp:Policy element");
         }
         final Policy nestedPolicy = factory.getPolicyEngine().getPolicy(nestedPolicyElement);
-        
+
         AlgorithmSuiteLoader loader = bus.getExtension(AlgorithmSuiteLoader.class);
         if (loader == null) {
             loader = new DefaultAlgorithmSuiteLoader();

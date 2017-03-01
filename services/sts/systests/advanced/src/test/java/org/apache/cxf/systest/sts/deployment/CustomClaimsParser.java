@@ -34,8 +34,8 @@ import org.apache.cxf.sts.claims.ClaimsParser;
  * A Custom ClaimsParser implementation.
  */
 public class CustomClaimsParser implements ClaimsParser {
-    
-    public static final String DIALECT = 
+
+    public static final String DIALECT =
         "http://schemas.mycompany.com/claims";
 
     private static final Logger LOG = LogUtils.getL7dLogger(CustomClaimsParser.class);
@@ -55,7 +55,7 @@ public class CustomClaimsParser implements ClaimsParser {
                 requestClaim.setClaimType(new URI(claimTypeUri));
             } catch (URISyntaxException e) {
                 LOG.log(
-                    Level.WARNING, 
+                    Level.WARNING,
                     "Cannot create URI from the given ClaimType attribute value " + claimTypeUri,
                     e
                 );
@@ -70,12 +70,12 @@ public class CustomClaimsParser implements ClaimsParser {
                 requestClaim.setClaimType(new URI(claimTypeUri));
             } catch (URISyntaxException e) {
                 LOG.log(
-                    Level.WARNING, 
+                    Level.WARNING,
                     "Cannot create URI from the given ClaimTye attribute value " + claimTypeUri,
                     e
                 );
             }
-            
+
             Node valueNode = claimType.getFirstChild();
             if (valueNode != null) {
                 if ("Value".equals(valueNode.getLocalName())) {
@@ -89,12 +89,12 @@ public class CustomClaimsParser implements ClaimsParser {
                 LOG.warning("No child element of ClaimValue element available");
                 return null;
             }
-             
+
             requestClaim.setOptional(Boolean.parseBoolean(claimTypeOptional));
-            
+
             return requestClaim;
         }
-        
+
         LOG.fine("Found unknown element: " + claimLocalName + " " + claimNS);
         return null;
     }

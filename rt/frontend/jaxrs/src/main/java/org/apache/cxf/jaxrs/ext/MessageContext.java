@@ -34,24 +34,24 @@ import javax.ws.rs.ext.Providers;
  *
  */
 public interface MessageContext {
-    
+
     Object get(Object key);
     Object getContextualProperty(Object key);
     <T> T getContent(Class<T> format);
-    
+
     void put(Object key, Object value);
-    
+
     UriInfo getUriInfo();
     Request getRequest();
     HttpHeaders getHttpHeaders();
     SecurityContext getSecurityContext();
     Providers getProviders();
-    
-    HttpServletRequest getHttpServletRequest(); 
+
+    HttpServletRequest getHttpServletRequest();
     HttpServletResponse getHttpServletResponse();
     ServletContext getServletContext();
     ServletConfig getServletConfig();
-    
+
     <T> T getContext(Class<T> contextClass);
     <T, E> T getResolver(Class<T> resolverClass, Class<E> resolveClazz);
 }

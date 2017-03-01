@@ -44,58 +44,58 @@ import org.junit.Test;
 public class DirectDispatchClientTest extends AbstractBusClientServerTestBase {
     private static Bus staticBus;
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
-                                            "SOAPService");    
+                                            "SOAPService");
     private final QName localPortName = new QName("http://apache.org/hello_world_soap_http",
                                             "localPortName");
-    
-    
+
+
     @BeforeClass
     public static void startServers() throws Exception {
-        staticBus = BusFactory.getDefaultBus(); 
+        staticBus = BusFactory.getDefaultBus();
         BusFactory.setThreadDefaultBus(staticBus);
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testDirectDispatch() {
         invokeService(true);
     }
-    
+
     @Test
     public void testPipeLineDispatch() {
         invokeService(false);
     }
-    
+
 
     private void invokeService(boolean isDirectDispatch) {
         BusFactory.setThreadDefaultBus(staticBus);
         Service service = Service.create(serviceName);
-        service.addPort(localPortName, "http://schemas.xmlsoap.org/soap/", 
+        service.addPort(localPortName, "http://schemas.xmlsoap.org/soap/",
                         "local://Greeter");
         Greeter greeter = service.getPort(localPortName, Greeter.class);
-        
+
         if (isDirectDispatch) {
             Client client = ClientProxy.getClient(greeter);
             client.getOutInterceptors().add(new GZIPOutInterceptor(50));
             client.getInInterceptors().add(new GZIPInInterceptor());
-            InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
-            BindingProvider  bp = null;
+            InvocationHandler handler = Proxy.getInvocationHandler(greeter);
+            BindingProvider bp = null;
             if (handler instanceof BindingProvider) {
                 bp = (BindingProvider)handler;
                 Map<String, Object> requestContext = bp.getRequestContext();
-                requestContext.put(LocalConduit.DIRECT_DISPATCH, true);            
-                
+                requestContext.put(LocalConduit.DIRECT_DISPATCH, true);
+
             }
-        }    
-        
+        }
+
         String reply = greeter.greetMe("test");
         assertEquals("Hello test", reply);
         reply = greeter.sayHi();
         assertNotNull("no response received from service", reply);
         assertEquals("Bonjour", reply);
-        
+
     }
-    
-    
+
+
 
 }

@@ -61,7 +61,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
     public WebFaultOutInterceptor() {
         super();
     }
-    
+
     private QName getFaultName(WebFault wf, Class<?> cls, OperationInfo op) {
         String ns = wf.targetNamespace();
         if (StringUtils.isEmpty(ns)) {
@@ -73,7 +73,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
         }
         return new QName(ns, name);
     }
-    
+
 
     private WebFault getWebFaultAnnotation(Class<?> t) {
         WebFault fault = t.getAnnotation(WebFault.class);
@@ -84,7 +84,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
         }
         return fault;
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         Fault f = (Fault)message.getContent(Exception.class);
         if (f == null) {
@@ -101,7 +101,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
             if (sf != null) {
                 if (f instanceof SoapFault) {
                     for (Iterator<QName> it = CastUtils.cast(sf.getFault().getFaultSubcodes()); it.hasNext();) {
-                        ((SoapFault) f).addSubCode(it.next());    
+                        ((SoapFault) f).addSubCode(it.next());
                     }
                 }
                 if (sf.getFault().getFaultReasonLocales().hasNext()) {
@@ -132,7 +132,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 faultInfo = method.invoke(cause, new Object[0]);
             } catch (NoSuchMethodException e) {
                 faultInfo = createFaultInfoBean(fault, cause);
-                
+
             } catch (InvocationTargetException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("INVOCATION_TARGET_EXC", BUNDLE), e);
             } catch (IllegalAccessException e) {
@@ -143,9 +143,9 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
             Service service = message.getExchange().getService();
 
             try {
-                DataWriter<XMLStreamWriter> writer 
+                DataWriter<XMLStreamWriter> writer
                     = service.getDataBinding().createWriter(XMLStreamWriter.class);
-                
+
                 if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)) {
                     Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0),
                                                                      message.getExchange().getBus());
@@ -163,7 +163,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                         f.setDetail(null);
                     }
                 }
-    
+
                 f.setMessage(ex.getMessage());
             } catch (Exception nex) {
                 if (nex instanceof Fault) {
@@ -224,7 +224,7 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
         }
 
         LOG.fine("Using @WebFault annotated class "
-                 + cause.getClass().getName() 
+                 + cause.getClass().getName()
                  + " as faultInfo since getFaultInfo() was not found");
         return cause;
     }
@@ -238,12 +238,12 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 } else {
                     ns = mpi.getTypeQName().getNamespaceURI();
                 }
-                if (qname.getLocalPart().equals(mpi.getConcreteName().getLocalPart()) 
+                if (qname.getLocalPart().equals(mpi.getConcreteName().getLocalPart())
                         && qname.getNamespaceURI().equals(ns)) {
                     return mpi;
                 }
             }
-            
+
         }
         return null;
     }

@@ -37,21 +37,21 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 public class SpringResourceFactoryTest extends Assert {
-    
+
     @After
     public void tearDown() throws Exception {
         if (BusFactory.getDefaultBus(false) != null) {
             BusFactory.getDefaultBus(false).shutdown(true);
         }
     }
-    
+
     @Test
     public void testFactory() throws Exception {
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxrs/spring/servers2.xml"});
         verifyFactory(ctx, "sfactory1", true);
         verifyFactory(ctx, "sfactory2", false);
-        
+
         Object serverBean = ctx.getBean("server1");
         assertNotNull(serverBean);
         JAXRSServerFactoryBean factoryBean = (JAXRSServerFactoryBean)serverBean;
@@ -63,8 +63,8 @@ public class SpringResourceFactoryTest extends Assert {
         assertSame(BookStore.class, list.get(1).getServiceClass());
         assertSame(BookStore.class, list.get(1).getResourceClass());
     }
-    
-    private void verifyFactory(ApplicationContext ctx, String factoryName, boolean isSingleton) 
+
+    private void verifyFactory(ApplicationContext ctx, String factoryName, boolean isSingleton)
         throws Exception {
         Object bean = ctx.getBean(factoryName);
         assertNotNull(bean);
@@ -74,9 +74,9 @@ public class SpringResourceFactoryTest extends Assert {
         if (!isSingleton) {
             Constructor<?> c = sf.getBeanConstructor();
             Constructor<BookStore> c2 = BookStore.class.getConstructor(new Class[]{});
-                    
+
             assertEquals(c.getParameterTypes().length, c2.getParameterTypes().length);
         }
-        
+
     }
 }

@@ -47,14 +47,15 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
     private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
     private SamlOAuthValidator samlOAuthValidator = new SamlOAuthValidator();
-    
+
     public Saml2BearerAuthHandler() {
     }
-    
+
     public void setSamlOAuthValidator(SamlOAuthValidator validator) {
         samlOAuthValidator = validator;
     }
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
         Form form = readFormData(message);
@@ -65,16 +66,16 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         String assertion = formData.getFirst(Constants.CLIENT_AUTH_ASSERTION_PARAM);
-        
-        Element token = readToken(message, assertion);         
+
+        Element token = readToken(message, assertion);
         String clientId = formData.getFirst(OAuthConstants.CLIENT_ID);
         validateToken(message, token, clientId);
-        
-        
+
+
         formData.remove(OAuthConstants.CLIENT_ID);
         formData.remove(Constants.CLIENT_AUTH_ASSERTION_PARAM);
         formData.remove(Constants.CLIENT_AUTH_ASSERTION_TYPE);
-        
+
         // restore input stream
         try {
             FormUtils.restoreForm(provider, form, message);
@@ -82,42 +83,42 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
-    
+
     private Form readFormData(Message message) {
         try {
             return FormUtils.readForm(provider, message);
         } catch (Exception ex) {
-            throw ExceptionUtils.toNotAuthorizedException(null, null);    
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
-    
+
     protected Element readToken(Message message, String assertion) {
         if (assertion == null) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
         try {
             byte[] deflatedToken = Base64UrlUtility.decode(assertion);
-            InputStream is = new ByteArrayInputStream(deflatedToken); 
-            return readToken(message, is); 
+            InputStream is = new ByteArrayInputStream(deflatedToken);
+            return readToken(message, is);
         } catch (Base64Exception ex) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
-        }         
+        }
     }
-    
+
     protected void validateToken(Message message, Element element, String clientId) {
-        
+
         SamlAssertionWrapper wrapper = toWrapper(element);
         // The common SAML assertion validation:
         // signature, subject confirmation, etc
         super.validateToken(message, wrapper);
-        
+
         // This is specific to OAuth2 path
         // Introduce SAMLOAuth2Validator to be reused between auth and grant handlers
         Subject subject = SAMLUtils.getSubject(message, wrapper);
         if (subject.getName() == null) {
-            throw ExceptionUtils.toNotAuthorizedException(null, null);  
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
-        
+
         if (clientId != null && !clientId.equals(subject.getName())) {
             //TODO:  Attempt to map client_id to subject.getName()
             throw ExceptionUtils.toNotAuthorizedException(null, null);
@@ -125,5 +126,5 @@ public class Saml2BearerAuthHandler extends AbstractSamlInHandler {
         samlOAuthValidator.validate(message, wrapper);
         message.put(OAuthConstants.CLIENT_ID, subject.getName());
     }
-    
+
 }

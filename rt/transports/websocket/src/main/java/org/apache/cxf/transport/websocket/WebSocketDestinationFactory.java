@@ -38,8 +38,6 @@ import org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketServletD
 @NoJSR250Annotations()
 public class WebSocketDestinationFactory implements HttpDestinationFactory {
     private static final boolean ATMOSPHERE_AVAILABLE = probeClass("org.atmosphere.cpr.ApplicationConfig");
-    private static final Constructor<?> JETTY_WEBSOCKET_DESTINATION_CTR =
-        probeConstructor("org.apache.cxf.transport.websocket.jetty.JettyWebSocketDestination");
     private static final Constructor<?> JETTY9_WEBSOCKET_DESTINATION_CTR =
         probeConstructor("org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination");
     private static final Constructor<?> ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR =
@@ -56,17 +54,17 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
             return false;
         }
     }
-    
+
     private static Constructor<?> probeConstructor(String name) {
         try {
             Class<?> clz = Class.forName(name, true, WebSocketDestinationFactory.class.getClassLoader());
-            return clz.getConstructor(Bus.class, DestinationRegistry.class, 
+            return clz.getConstructor(Bus.class, DestinationRegistry.class,
                                       EndpointInfo.class, JettyHTTPServerEngineFactory.class);
         } catch (Throwable t) {
             return null;
         }
     }
-    
+
     public AbstractHTTPDestination createDestination(EndpointInfo endpointInfo, Bus bus,
                                                      DestinationRegistry registry) throws IOException {
         if (endpointInfo.getAddress().startsWith("ws")) {
@@ -78,34 +76,22 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
                 return createJettyHTTPDestination(ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR,
                                                   bus, registry, endpointInfo, serverEngineFactory);
             } else {
-                if (serverEngineFactory.isJetty8()) {
-                    return createJettyHTTPDestination(JETTY_WEBSOCKET_DESTINATION_CTR,
+                return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
                                                       bus, registry, endpointInfo, serverEngineFactory);
-                } else {
-                    return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
-                                                      bus, registry, endpointInfo, serverEngineFactory);
-                }
             }
         } else {
             //REVISIT other way of getting the registry of http so that the plain cxf servlet finds the destination?
             registry = getDestinationRegistry(bus);
-            
+
             // choose atmosphere if available, otherwise assume jetty is available
             if (ATMOSPHERE_AVAILABLE && !atmosphereDisabled) {
                 // use atmosphere if available
                 return new AtmosphereWebSocketServletDestination(bus, registry,
                                                                  endpointInfo, endpointInfo.getAddress());
             } else {
-                JettyHTTPServerEngineFactory serverEngineFactory = bus
-                    .getExtension(JettyHTTPServerEngineFactory.class);
                 // use jetty-websocket
-                if (serverEngineFactory.isJetty8()) { 
-                    return createJettyHTTPDestination(JETTY_WEBSOCKET_DESTINATION_CTR,
+                return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
                                                       bus, registry, endpointInfo, null);
-                } else {
-                    return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR,
-                                                      bus, registry, endpointInfo, null);
-                }
             }
         }
     }
@@ -124,8 +110,8 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
         }
         return null;
     }
-    
-    private AbstractHTTPDestination createJettyHTTPDestination(Constructor<?> ctr, Bus bus, 
+
+    private AbstractHTTPDestination createJettyHTTPDestination(Constructor<?> ctr, Bus bus,
                                                                DestinationRegistry registry, EndpointInfo ei,
                                                                JettyHTTPServerEngineFactory jhsef) throws IOException {
         if (ctr != null) {

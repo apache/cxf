@@ -31,6 +31,6 @@ public class ResourceBeanTest extends Assert {
         ResourceBean rb = new ResourceBean();
         rb.setDisableConsoleLogging(true);
     }
-    
+
 
 }

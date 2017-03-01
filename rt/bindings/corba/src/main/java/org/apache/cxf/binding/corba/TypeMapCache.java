@@ -31,7 +31,7 @@ public final class TypeMapCache {
     private TypeMapCache() {
         //utility class
     }
-    
+
     public static CorbaTypeMap get(ServiceInfo service) {
         if (service != null) {
             synchronized (service) {
@@ -44,7 +44,7 @@ public final class TypeMapCache {
                         service.setProperty(KEY, map);
                     }
                 }
-                return map; 
+                return map;
             }
         }
         return null;

@@ -26,9 +26,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class BindingFaultInfoTest extends Assert {
-    
+
     private BindingFaultInfo bindingFaultInfo;
-    
+
     @Before
     public void setUp() throws Exception {
         FaultInfo faultInfo = new FaultInfo(new QName("http://faultns/", "fault"), new QName(

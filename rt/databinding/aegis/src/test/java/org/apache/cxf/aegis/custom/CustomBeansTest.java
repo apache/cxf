@@ -31,7 +31,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertNotSame;
 
 /**
- * 
+ *
  */
 public class CustomBeansTest {
 
@@ -45,12 +45,12 @@ public class CustomBeansTest {
 
         AegisDatabinding dataBinding = new AegisDatabinding();
 
-        NoDefaultConstructorBeanTypeRegistrar beanRegistrar 
+        NoDefaultConstructorBeanTypeRegistrar beanRegistrar
             = new NoDefaultConstructorBeanTypeRegistrar();
         beanRegistrar.setDataBinding(dataBinding);
         beanRegistrar.register();
 
-        NoDefaultConstructorBeanKeyTypeRegistrar beanKeyRegistrar 
+        NoDefaultConstructorBeanKeyTypeRegistrar beanKeyRegistrar
             = new NoDefaultConstructorBeanKeyTypeRegistrar();
         beanKeyRegistrar.setDataBinding(dataBinding);
         beanKeyRegistrar.register();

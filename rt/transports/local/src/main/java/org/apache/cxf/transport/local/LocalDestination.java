@@ -107,7 +107,7 @@ public class LocalDestination extends AbstractDestination {
                 }
 
                 final Runnable receiver = new Runnable() {
-                    public void run() {                                    
+                    public void run() {
                         if (exchange != null) {
                             exchange.setInMessage(m);
                         }
@@ -141,15 +141,15 @@ public class LocalDestination extends AbstractDestination {
             this.conduit = conduit;
         }
 
-        public void prepare(final Message message) throws IOException {            
+        public void prepare(final Message message) throws IOException {
             if (!Boolean.TRUE.equals(message.getExchange().get(LocalConduit.DIRECT_DISPATCH))) {
                 final Exchange exchange = (Exchange)message.getExchange().get(LocalConduit.IN_EXCHANGE);
 
-                AbstractWrappedOutputStream cout 
+                AbstractWrappedOutputStream cout
                     = new LocalDestinationOutputStream(exchange, message);
-                
-                message.setContent(OutputStream.class, cout);    
-                
+
+                message.setContent(OutputStream.class, cout);
+
             } else {
                 CachedOutputStream stream = new CachedOutputStream();
                 message.setContent(OutputStream.class, stream);
@@ -163,13 +163,13 @@ public class LocalDestination extends AbstractDestination {
             // set the pseudo status code if not set (REVISIT add this method in MessageUtils to be reused elsewhere?)
             Integer i = (Integer)message.get(Message.RESPONSE_CODE);
             if (i == null) {
-                int code = ((message.getExchange().isOneWay() && !MessageUtils.isPartialResponse(message)) 
+                int code = ((message.getExchange().isOneWay() && !MessageUtils.isPartialResponse(message))
                     || MessageUtils.isEmptyPartialResponse(message)) ? 202 : 200;
                 message.put(Message.RESPONSE_CODE, code);
             }
             if (Boolean.TRUE.equals(message.getExchange().get(LocalConduit.DIRECT_DISPATCH))) {
                 final Exchange exchange = (Exchange)message.getExchange().get(LocalConduit.IN_EXCHANGE);
-                
+
                 MessageImpl copy = new MessageImpl();
                 copy.putAll(message);
                 message.getContent(OutputStream.class).close();
@@ -180,11 +180,11 @@ public class LocalDestination extends AbstractDestination {
                 stream.releaseTempFileHold();
                 if (exchange != null && exchange.getInMessage() == null) {
                     exchange.setInMessage(copy);
-                }                
+                }
                 conduit.getMessageObserver().onMessage(copy);
                 return;
             }
-            
+
             super.close(message);
         }
 
@@ -192,5 +192,5 @@ public class LocalDestination extends AbstractDestination {
             return LOG;
         }
     }
-    
+
 }

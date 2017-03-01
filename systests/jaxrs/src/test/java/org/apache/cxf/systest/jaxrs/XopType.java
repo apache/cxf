@@ -52,26 +52,26 @@ public class XopType {
         this.name = value;
     }
 
-    
+
     @XmlElement(required = true)
     @XmlMimeType("application/octet-stream")
     public byte[] getAttachinfo2() {
         return attachinfo2;
     }
 
-    
+
     public void setAttachinfo2(byte[] value) {
         this.attachinfo2 = value;
     }
-    
-    
+
+
     @XmlElement(required = true)
     @XmlMimeType("application/octet-stream")
     public DataHandler getAttachinfo() {
         return attachinfo;
     }
 
-    
+
     public void setAttachinfo(DataHandler value) {
         this.attachinfo = value;
     }

@@ -47,9 +47,9 @@ public class OrbConfig {
 
     protected String orbClass;
     protected String orbSingletonClass;
-    protected List<String> orbArgs = new ArrayList<String>();
+    protected List<String> orbArgs = new ArrayList<>();
     protected Properties orbProperties = new Properties();
-    
+
     public OrbConfig() {
         //nothing
     }
@@ -57,56 +57,56 @@ public class OrbConfig {
     public void setOrbClass(String cls) {
         orbClass = cls;
     }
-    
+
     public String getOrbClass() {
         return orbClass;
     }
-    
+
     public void setOrbSingletonClass(String cls) {
         orbSingletonClass = cls;
     }
-    
+
     public String getOrbSingletonClass() {
         return orbSingletonClass;
     }
-    
+
     public void setOrbArgs(List<String> args) {
         orbArgs = args;
     }
-    
+
     public List<String> getOrbArgs() {
         return orbArgs;
     }
-    
+
     public void setOrbProperties(Properties props) {
         orbProperties = props;
     }
-    
+
     public Properties getOrbProperties() {
         return orbProperties;
     }
-    
-    public void addPOAPolicies(ORB orb, 
+
+    public void addPOAPolicies(ORB orb,
                                String poaName,
                                POA parentPOA,
                                POAManager poaManager,
                                List<Policy> policies) {
         //nothing
     }
-    
-    
+
+
     public Any createSystemExceptionAny(ORB orb, SystemException sysEx) {
         Any exAny = orb.create_any();
         SystemExceptionHelper.insert(exAny, sysEx);
         return exAny;
     }
-    
+
     public void exportObjectReference(ORB orb,
                                        org.omg.CORBA.Object ref,
                                        String url,
-                                       AddressType address) 
+                                       AddressType address)
         throws URISyntaxException, IOException {
-        
+
         if ((url.startsWith("ior:")) || (url.startsWith("IOR:"))) {
             // make use of Thread cache of last exported IOR
             String ior = CorbaUtils.exportObjectReference(ref, orb);
@@ -135,7 +135,7 @@ public class OrbConfig {
                                                      String location) {
         int idx = location.indexOf("#");
         String name = location.substring(idx + 1);
-        
+
         //Register in NameService
         try {
             org.omg.CORBA.Object nsObj = orb.resolve_initial_references("NameService");
@@ -158,7 +158,7 @@ public class OrbConfig {
                 bootMgrHelperClass.getMethod("narrow", org.omg.CORBA.Object.class);
             java.lang.Object bootMgr = narrowMethod.invoke(null,
                                                            orb.resolve_initial_references("BootManager"));
-            Method addBindingMethod = 
+            Method addBindingMethod =
                 bootMgrClass.getMethod("add_binding", byte[].class, org.omg.CORBA.Object.class);
             addBindingMethod.invoke(bootMgr, key.getBytes(), object);
         } catch (ClassNotFoundException ex) {
@@ -173,7 +173,7 @@ public class OrbConfig {
 
     public void exportObjectReferenceToFile(ORB orb,
                                               org.omg.CORBA.Object obj,
-                                              URI iorFile) 
+                                              URI iorFile)
         throws IOException {
         String ref = orb.object_to_string(obj);
         File f = null;

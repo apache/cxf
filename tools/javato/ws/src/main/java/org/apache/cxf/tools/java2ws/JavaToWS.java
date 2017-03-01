@@ -75,14 +75,14 @@ public class JavaToWS {
 
     public void run() throws Exception {
         ToolRunner.runTool(JavaToWSContainer.class, JavaToWSContainer.class
-                           .getResourceAsStream("java2ws.xml"), false, args);      
+                           .getResourceAsStream("java2ws.xml"), false, args);
     }
-    
+
     public void run(OutputStream os) throws Exception {
         ToolRunner.runTool(JavaToWSContainer.class, JavaToWSContainer.class
-                           .getResourceAsStream("java2ws.xml"), false, args, os);      
+                           .getResourceAsStream("java2ws.xml"), false, args, os);
     }
-    
+
 
     private boolean isExitOnFinish() {
         String exit = System.getProperty("exitOnFinish");
@@ -91,7 +91,7 @@ public class JavaToWS {
         }
         return "YES".equalsIgnoreCase(exit) || "TRUE".equalsIgnoreCase(exit);
     }
-    
-    
+
+
 
 }

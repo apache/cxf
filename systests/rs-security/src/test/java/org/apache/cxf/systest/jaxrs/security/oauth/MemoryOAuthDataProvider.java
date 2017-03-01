@@ -42,7 +42,7 @@ import org.apache.cxf.rs.security.oauth.provider.OAuthServiceException;
 
 public class MemoryOAuthDataProvider implements OAuthDataProvider {
 
-    private static final ConcurrentHashMap<String, OAuthPermission> AVAILABLE_PERMISSIONS = 
+    private static final ConcurrentHashMap<String, OAuthPermission> AVAILABLE_PERMISSIONS =
         new ConcurrentHashMap<String, OAuthPermission>();
 
     static {
@@ -50,7 +50,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
                 .put("read_info", new OAuthPermission("read_info", "Read your personal information",
                         Collections.singletonList("ROLE_USER")));
         AVAILABLE_PERMISSIONS.put("modify_info",
-                new OAuthPermission("modify_info", "Modify your personal information", 
+                new OAuthPermission("modify_info", "Modify your personal information",
                                     Collections.singletonList("ROLE_ADMIN")));
     }
 
@@ -62,27 +62,27 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
 
     protected ConcurrentHashMap<String, Token> oauthTokens = new ConcurrentHashMap<String, Token>();
 
-    protected MD5SequenceGenerator tokenGenerator = 
+    protected MD5SequenceGenerator tokenGenerator =
         new MD5SequenceGenerator();
 
     public MemoryOAuthDataProvider() {
-        Client client = new Client(OAuthTestUtils.CLIENT_ID, 
+        Client client = new Client(OAuthTestUtils.CLIENT_ID,
             OAuthTestUtils.CLIENT_SECRET,
             OAuthTestUtils.APPLICATION_NAME,
             OAuthTestUtils.CALLBACK);
         clientAuthInfo.put(OAuthTestUtils.CLIENT_ID, client);
     }
-    
+
     private List<OAuthPermission> getPermissionsInfo(List<String> requestPermissions) {
-        List<OAuthPermission> permissions = new ArrayList<OAuthPermission>();
+        List<OAuthPermission> permissions = new ArrayList<>();
         for (String requestScope : requestPermissions) {
             OAuthPermission oAuthPermission = AVAILABLE_PERMISSIONS.get(requestScope);
             permissions.add(oAuthPermission);
         }
-    
+
         return permissions;
     }
-    
+
     public Client getClient(String consumerKey) {
         return clientAuthInfo.get(consumerKey);
     }
@@ -91,10 +91,10 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         String token = generateToken();
         String tokenSecret = generateToken();
 
-        RequestToken reqToken = new RequestToken(reg.getClient(), token, tokenSecret, 
+        RequestToken reqToken = new RequestToken(reg.getClient(), token, tokenSecret,
                                                  reg.getLifetime(), reg.getIssuedAt());
         reqToken.setScopes(getPermissionsInfo(reg.getScopes()));
-        
+
         oauthTokens.put(token, reqToken);
         return reqToken;
     }
@@ -115,7 +115,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
             OAuthServiceException {
 
         RequestToken requestToken = reg.getRequestToken();
-        
+
         Client client = requestToken.getClient();
         requestToken = getRequestToken(requestToken.getTokenKey());
 
@@ -126,7 +126,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
                                                   3600, System.currentTimeMillis() / 1000);
 
         accessToken.setScopes(requestToken.getScopes());
-        
+
         synchronized (oauthTokens) {
             oauthTokens.remove(requestToken.getTokenKey());
             oauthTokens.put(accessTokenString, accessToken);
@@ -143,7 +143,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     }
 
     public void removeToken(Token t) {
-        
+
         for (Token token : oauthTokens.values()) {
             Client authNInfo = token.getClient();
             if (t.getClient().getConsumerKey().equals(authNInfo.getConsumerKey())) {
@@ -151,7 +151,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
                 break;
             }
         }
-        
+
     }
 
     protected String generateToken() throws OAuthServiceException {

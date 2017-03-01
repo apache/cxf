@@ -28,7 +28,7 @@ import org.apache.cxf.tools.common.model.JavaInterface;
 import org.apache.cxf.tools.common.model.JavaModel;
 
 /**
- * 
+ *
  */
 public class JaxwsServerGenerator extends AbstractJaxwsGenerator {
 
@@ -46,7 +46,7 @@ public class JaxwsServerGenerator extends AbstractJaxwsGenerator {
 
         this.env = penv;
         JavaModel javaModel = env.get(JavaModel.class);
-        
+
         if (passthrough()) {
             return;
         }

@@ -38,7 +38,7 @@ public class SchemaFirstTest extends AbstractJaxWsTest {
         svr.setBus(bus);
         svr.setServiceBean(new EchoFoo());
         svr.setAddress("http://localhost:9000/hello");
-        List<String> schemas = new ArrayList<String>();
+        List<String> schemas = new ArrayList<>();
         schemas.add("/org/apache/cxf/jaxws/service/echoFoo.xsd");
         svr.setSchemaLocations(schemas);
         Server server = svr.create();

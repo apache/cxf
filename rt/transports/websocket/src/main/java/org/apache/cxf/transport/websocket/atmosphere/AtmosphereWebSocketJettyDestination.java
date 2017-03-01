@@ -49,16 +49,18 @@ import org.eclipse.jetty.server.Request;
 
 
 /**
- * 
+ *
  */
-public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination implements 
+public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination implements
     WebSocketDestinationService {
     private static final Logger LOG = LogUtils.getL7dLogger(AtmosphereWebSocketJettyDestination.class);
     private AtmosphereFramework framework;
-    
+
     public AtmosphereWebSocketJettyDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                      JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
-        super(bus, registry, ei, serverEngineFactory);
+        super(bus, registry, ei, 
+              serverEngineFactory == null ? null : new URL(getNonWSAddress(ei)),
+              serverEngineFactory);
         framework = new AtmosphereFramework(false, true);
         framework.setUseNativeImplementation(false);
         framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
@@ -71,20 +73,24 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
         framework.addAtmosphereHandler("/", new DestinationHandler());
         framework.init();
     }
-    
+
     @Override
     public void invokeInternal(ServletConfig config, ServletContext context, HttpServletRequest req,
                                HttpServletResponse resp) throws IOException {
         super.invoke(config, context, req, resp);
     }
-
-    @Override
-    protected String getAddress(EndpointInfo endpointInfo) {
+    
+    private static String getNonWSAddress(EndpointInfo endpointInfo) {
         String address = endpointInfo.getAddress();
         if (address.startsWith("ws")) {
             address = "http" + address.substring(2);
         }
         return address;
+    }
+
+    @Override
+    protected String getAddress(EndpointInfo endpointInfo) {
+        return getNonWSAddress(endpointInfo);
     }
 
 
@@ -95,7 +101,7 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
         }
         return new URL(getAddress(endpointInfo)).getPath();
     }
-    
+
     @Override
     protected JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd, boolean cmExact) {
         return new AtmosphereJettyWebSocketHandler(jhd, cmExact);
@@ -116,13 +122,13 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
         AtmosphereJettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact) {
             super(jhd, cmExact);
         }
-        
+
         @Override
         public void handle(String target, Request baseRequest, HttpServletRequest request,
                            HttpServletResponse response) throws IOException, ServletException {
             if (AtmosphereUtils.useAtmosphere(request)) {
                 try {
-                    framework.doCometSupport(AtmosphereRequestImpl.wrap(request), 
+                    framework.doCometSupport(AtmosphereRequestImpl.wrap(request),
                                              AtmosphereResponseImpl.wrap(response));
                     baseRequest.setHandled(true);
                 } catch (ServletException e) {
@@ -141,14 +147,14 @@ public class AtmosphereWebSocketJettyDestination extends JettyHTTPDestination im
         public void onRequest(final AtmosphereResource resource) throws IOException {
             LOG.fine("onRequest");
             try {
-                invokeInternal(null, 
+                invokeInternal(null,
                     resource.getRequest().getServletContext(), resource.getRequest(), resource.getResponse());
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "Failed to invoke service", e);
             }
         }
     }
-    
+
     // used for internal tests
     AtmosphereFramework getAtmosphereFramework() {
         return framework;

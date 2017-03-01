@@ -37,5 +37,5 @@ public class JwsJwtCompactConsumer extends JwsCompactConsumer {
         }
         return token;
     }
-    
+
 }

@@ -46,47 +46,47 @@ public class PolicyValidatorParameters {
     private boolean utWithCallbacks;
     private Collection<WSDataRef> signed;
     private Collection<WSDataRef> encrypted;
- 
+
     public Message getMessage() {
         return message;
     }
-    
+
     public void setMessage(Message message) {
         this.message = message;
     }
-    
+
     public Element getSoapBody() {
         return soapBody;
     }
-    
+
     public void setSoapBody(Element soapBody) {
         this.soapBody = soapBody;
     }
-    
+
     public WSHandlerResult getResults() {
         return results;
     }
-    
+
     public void setResults(WSHandlerResult results) {
         this.results = results;
     }
-    
+
     public List<WSSecurityEngineResult> getSignedResults() {
         return signedResults;
     }
-    
+
     public void setSignedResults(List<WSSecurityEngineResult> signedResults) {
         this.signedResults = signedResults;
     }
-    
+
     public List<WSSecurityEngineResult> getEncryptedResults() {
         return encryptedResults;
     }
-    
+
     public void setEncryptedResults(List<WSSecurityEngineResult> encryptedResults) {
         this.encryptedResults = encryptedResults;
     }
-    
+
     public AssertionInfoMap getAssertionInfoMap() {
         return assertionInfoMap;
     }
@@ -94,7 +94,7 @@ public class PolicyValidatorParameters {
     public void setAssertionInfoMap(AssertionInfoMap assertionInfoMap) {
         this.assertionInfoMap = assertionInfoMap;
     }
-    
+
     public List<WSSecurityEngineResult> getUsernameTokenResults() {
         return usernameTokenResults;
     }

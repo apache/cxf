@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class ColocBPNamespaceHandlerTest extends Assert {
     @Test
     public void testGetSchemaLocation() {
         ColocBPNamespaceHandler handler = new ColocBPNamespaceHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/binding/coloc"));
     }
 

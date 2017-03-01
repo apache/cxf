@@ -41,36 +41,36 @@ import org.apache.wss4j.policy.model.UsernameToken;
 import org.apache.wss4j.policy.model.X509Token;
 
 /**
- * Validate a SignedEndorsingEncryptedSupportingToken policy. 
+ * Validate a SignedEndorsingEncryptedSupportingToken policy.
  */
 public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
         QName suppTokens12 = SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS;
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && suppTokens12.equals(assertionInfo.getAssertion().getName());
     }
-    
+
     /**
      * Validate policies.
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         // Tokens must be encrypted even if TLS is used unless we have a TransportBinding policy available
         if (isTLSInUse(parameters.getMessage())) {
-            AssertionInfo transportAi = 
-                PolicyUtils.getFirstAssertionByLocalname(parameters.getAssertionInfoMap(), 
+            AssertionInfo transportAi =
+                PolicyUtils.getFirstAssertionByLocalname(parameters.getAssertionInfoMap(),
                                                          SPConstants.TRANSPORT_BINDING);
             super.setEnforceEncryptedTokens(transportAi == null);
         }
-        
+
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             setSignedParts(binding.getSignedParts());
             setEncryptedParts(binding.getEncryptedParts());
             setSignedElements(binding.getSignedElements());
@@ -82,7 +82,7 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
                     assertSecurePartsIfTokenNotRequired(binding, parameters.getAssertionInfoMap());
                     continue;
                 }
-                
+
                 DerivedKeys derivedKeys = token.getDerivedKeys();
                 boolean derived = derivedKeys == DerivedKeys.RequireDerivedKeys;
                 boolean processingFailed = false;
@@ -114,7 +114,7 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
                 } else if (!(token instanceof IssuedToken)) {
                     processingFailed = true;
                 }
-                
+
                 if (processingFailed) {
                     ai.setNotAsserted(
                         "The received token does not match the signed endorsing encrypted "
@@ -125,15 +125,15 @@ public class SignedEndorsingEncryptedTokenPolicyValidator extends AbstractSuppor
             }
         }
     }
-    
+
     protected boolean isSigned() {
         return true;
     }
-    
+
     protected boolean isEncrypted() {
         return true;
     }
-    
+
     protected boolean isEndorsing() {
         return true;
     }

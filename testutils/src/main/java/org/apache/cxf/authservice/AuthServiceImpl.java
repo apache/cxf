@@ -39,13 +39,13 @@ public class AuthServiceImpl implements AuthService {
     public boolean authenticate(Authenticate au) {
         return au.getUid().equals(au.getSid());
     }
-    
+
     public String getAuthentication(String sid) {
         return "get " + sid;
     }
 
     public List<String> getRoles(String sid) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add(sid);
         list.add(sid + "-1");
         list.add(sid + "-2");

@@ -30,18 +30,18 @@ import rx.schedulers.Schedulers;
 
 public class JaxrsClientObservableCallback<T> extends JaxrsClientCallback<T> {
     private Observable<T> observable;
-    
-    public JaxrsClientObservableCallback(Class<?> responseClass, 
+
+    public JaxrsClientObservableCallback(Class<?> responseClass,
                                   Type outGenericType,
                                   Executor ex) {
         super(null, responseClass, outGenericType);
         Future<T> f = super.createFuture();
-        observable = ex == null ? Observable.from(f) 
+        observable = ex == null ? Observable.from(f)
             : Observable.from(f, Schedulers.from(ex));
     }
-    
+
     public Observable<T> getObservable() {
         return observable;
     }
-    
+
 }

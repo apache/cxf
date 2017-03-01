@@ -27,27 +27,27 @@ public class TagVO {
     private String name;
     private String group;
     private Integer attrInt;
-    public TagVO() { 
-        
+    public TagVO() {
+
     }
-    
+
     public TagVO(String name, String group) {
         this.name = name;
         this.group = group;
     }
-    
+
     public void setName(String n) {
         this.name = n;
     }
-    
+
     public void setGroup(String g) {
         this.group = g;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public String getGroup() {
         return group;
     }
@@ -60,5 +60,5 @@ public class TagVO {
     public void setAttrInt(Integer attrInt) {
         this.attrInt = attrInt;
     }
-    
+
 }

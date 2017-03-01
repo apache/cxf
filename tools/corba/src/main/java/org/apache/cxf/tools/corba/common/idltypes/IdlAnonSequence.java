@@ -22,11 +22,11 @@ package org.apache.cxf.tools.corba.common.idltypes;
 import java.io.PrintWriter;
 
 public final class IdlAnonSequence extends IdlSequenceBase {
-    
+
     private IdlAnonSequence(IdlScopeBase parent, IdlType elem, int bound) {
         super(parent, "", elem, bound);
     }
-    
+
     public static IdlAnonSequence create(IdlScopeBase parent, IdlType elem) {
         return new IdlAnonSequence(parent, elem, 0);
     }
@@ -49,7 +49,7 @@ public final class IdlAnonSequence extends IdlSequenceBase {
 
     public void write(PrintWriter pw) {
         // intentionally empty
-    }    
+    }
 
     private String seqName(String name) {
         StringBuilder str = new StringBuilder();

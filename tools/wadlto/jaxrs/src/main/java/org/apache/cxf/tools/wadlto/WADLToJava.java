@@ -36,7 +36,7 @@ public class WADLToJava {
 
 
     private String[] args;
-    
+
     public WADLToJava() {
         args = new String[0];
     }
@@ -52,7 +52,7 @@ public class WADLToJava {
         }
         return "YES".equalsIgnoreCase(exit) || "TRUE".equalsIgnoreCase(exit);
     }
-    
+
     public void run(ToolContext context) throws Exception {
         run(context, null);
     }
@@ -89,7 +89,7 @@ public class WADLToJava {
         return false;
     }
 
-    
+
     public static void main(String[] pargs) {
 
         CommandInterfaceUtils.commandCommonMain();

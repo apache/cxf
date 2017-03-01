@@ -31,7 +31,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
 
-public class Jsr250BeanPostProcessor 
+public class Jsr250BeanPostProcessor
     implements DestructionAwareBeanPostProcessor, Ordered, ApplicationContextAware {
 
     private ResourceManager resourceManager;
@@ -43,9 +43,9 @@ public class Jsr250BeanPostProcessor
 
     Jsr250BeanPostProcessor() {
     }
-    
+
     public void setApplicationContext(ApplicationContext arg0) throws BeansException {
-        context = arg0;  
+        context = arg0;
         try {
             Class<?> cls = Class
                 .forName("org.springframework.context.annotation.CommonAnnotationBeanPostProcessor");
@@ -54,11 +54,11 @@ public class Jsr250BeanPostProcessor
             isProcessing = true;
         }
     }
-    
+
     public int getOrder() {
         return 1010;
     }
-        
+
     private boolean injectable(Object bean, String beanId) {
         return !"cxf".equals(beanId) && ResourceInjector.processable(bean.getClass(), bean);
     }
@@ -111,7 +111,7 @@ public class Jsr250BeanPostProcessor
             }
             return bean;
         }
-        if (bean != null 
+        if (bean != null
             && injectable(bean, beanId)) {
             new ResourceInjector(getResourceManager(bean)).construct(bean);
         }
@@ -130,14 +130,14 @@ public class Jsr250BeanPostProcessor
             Thread.dumpStack();
         }
         */
-        
-        if (bean != null 
+
+        if (bean != null
             && injectable(bean, beanId)) {
             new ResourceInjector(getResourceManager(bean)).inject(bean);
             /*
             System.out.println("p :" + (++count) + ": " + bean.getClass().getName() + " " + beanId);
         } else if (bean != null) {
-            System.out.println("np: " + (++count2) 
+            System.out.println("np: " + (++count2)
                                + ": " + bean.getClass().getName() + " " + beanId);
                                */
         }
@@ -148,10 +148,14 @@ public class Jsr250BeanPostProcessor
         if (!isProcessing) {
             return;
         }
-        if (bean != null 
+        if (bean != null
             && injectable(bean, beanId)) {
             new ResourceInjector(getResourceManager(bean)).destroy(bean);
         }
+    }
+
+    public boolean requiresDestruction(Object bean) {
+        return isProcessing;
     }
 
 }

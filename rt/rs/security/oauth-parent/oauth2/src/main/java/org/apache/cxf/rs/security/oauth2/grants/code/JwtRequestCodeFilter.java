@@ -48,7 +48,7 @@ public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements Author
     private String issuer;
     private JsonMapObjectReaderWriter jsonHandler = new JsonMapObjectReaderWriter();
     @Override
-    public MultivaluedMap<String, String> process(MultivaluedMap<String, String> params, 
+    public MultivaluedMap<String, String> process(MultivaluedMap<String, String> params,
                                                   UserSubject endUser,
                                                   Client client) {
         String requestToken = params.getFirst(REQUEST_PARAM);
@@ -63,26 +63,26 @@ public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements Author
             JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(client);
             JwtToken jwt = getJwtToken(requestToken, theDecryptor, theSigVerifier);
             JwtClaims claims = jwt.getClaims();
-            
+
             // Check issuer
-            String iss = issuer != null ? issuer : client.getClientId();  
+            String iss = issuer != null ? issuer : client.getClientId();
             if (!iss.equals(claims.getIssuer())) {
                 throw new SecurityException();
             }
-            
+
             // Check client_id - if present it must match the client_id specified in the request
-            if (claims.getClaim(OAuthConstants.CLIENT_ID) != null 
+            if (claims.getClaim(OAuthConstants.CLIENT_ID) != null
                 && !claims.getStringProperty(OAuthConstants.CLIENT_ID).equals(client.getClientId())) {
                 throw new SecurityException();
             }
-            
+
             // Check response_type - if present it must match the response_type specified in the request
             String tokenResponseType = (String)claims.getClaim(OAuthConstants.RESPONSE_TYPE);
-            if (tokenResponseType != null 
+            if (tokenResponseType != null
                 && !tokenResponseType.equals(params.getFirst(OAuthConstants.RESPONSE_TYPE))) {
                 throw new SecurityException();
             }
-            
+
             MultivaluedMap<String, String> newParams = new MetadataMap<String, String>(params);
             Map<String, Object> claimsMap = claims.asMap();
             for (Map.Entry<String, Object> entry : claimsMap.entrySet()) {
@@ -94,7 +94,7 @@ public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements Author
                 } else if (value instanceof List) {
                     List<Object> list = CastUtils.cast((List<?>)value);
                     value = jsonHandler.toJson(list);
-                } 
+                }
                 newParams.putSingle(key, value.toString());
             }
             return newParams;
@@ -108,10 +108,10 @@ public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements Author
     }
     protected JwsSignatureVerifier getInitializedSigVerifier(Client c) {
         if (verifyWithClientCertificates) {
-            X509Certificate cert = 
+            X509Certificate cert =
                 (X509Certificate)CryptoUtils.decodeCertificate(c.getApplicationCertificates().get(0));
             return JwsUtils.getPublicKeySignatureVerifier(cert, SignatureAlgorithm.RS256);
-        } 
+        }
         return super.getInitializedSignatureVerifier(c.getClientSecret());
     }
     public void setIssuer(String issuer) {
@@ -120,5 +120,5 @@ public class JwtRequestCodeFilter extends OAuthJoseJwtConsumer implements Author
     public void setVerifyWithClientCertificates(boolean verifyWithClientCertificates) {
         this.verifyWithClientCertificates = verifyWithClientCertificates;
     }
-    
+
 }

@@ -59,7 +59,7 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
     private HttpSession session;
     private Principal principal;
     private Enumeration<String> requestHeaderNames;
-    private Map<String, Enumeration<String>> headersMap = 
+    private Map<String, Enumeration<String>> headersMap =
         new java.util.concurrent.ConcurrentHashMap<String, Enumeration<String>>();
     private String requestedSessionId;
 

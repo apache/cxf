@@ -54,7 +54,7 @@ public class ServiceListJAASAuthenticator {
     private static final String AUTHENTICATION_SCHEME_BASIC = "Basic";
 
     private String realm;
-        
+
     public String getRealm() {
         return realm;
     }
@@ -63,7 +63,7 @@ public class ServiceListJAASAuthenticator {
         this.realm = realm;
     }
 
-    
+
     public Object authenticate(final String username, final String password) {
         return doAuthenticate(username, password);
     }
@@ -111,7 +111,7 @@ public class ServiceListJAASAuthenticator {
                 String authType = authHeader.substring(0, blank);
                 String authInfo = authHeader.substring(blank).trim();
 
-                
+
                 if (authType.equalsIgnoreCase(AUTHENTICATION_SCHEME_BASIC)) {
                     try {
                         String srcString = base64Decode(authInfo);
@@ -125,7 +125,7 @@ public class ServiceListJAASAuthenticator {
                         if (subject != null) {
                             return true;
                         }
-                       
+
                     } catch (Exception e) {
                         // Ignore
                     }
@@ -147,7 +147,7 @@ public class ServiceListJAASAuthenticator {
         // inform HttpService that authentication failed
         return false;
     }
-    
+
     private static String base64Decode(String srcString) {
         byte[] transformed = null;
         try {

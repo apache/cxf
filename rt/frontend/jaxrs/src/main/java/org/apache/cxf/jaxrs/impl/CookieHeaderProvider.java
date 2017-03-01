@@ -28,19 +28,19 @@ public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
     private static final String VERSION = "$Version";
     private static final String PATH = "$Path";
     private static final String DOMAIN = "$Domain";
-    
+
     public Cookie fromString(String c) {
-        
+
         if (c == null) {
             throw new IllegalArgumentException("Cookie value can not be null");
         }
-        
+
         int version = 0;
         String name = null;
         String value = null;
         String path = null;
         String domain = null;
-        
+
         // ignore the fact the possible version may be seperated by ','
         String[] tokens = StringUtils.split(c, ";");
         for (String token : tokens) {
@@ -56,22 +56,22 @@ public class CookieHeaderProvider implements HeaderDelegate<Cookie> {
                 int i = theToken.indexOf('=');
                 if (i != -1) {
                     name = theToken.substring(0, i);
-                    value = i == theToken.length()  + 1 ? "" 
+                    value = i == theToken.length()  + 1 ? ""
                         : NewCookieHeaderProvider.stripQuotes(theToken.substring(i + 1));
                 }
             }
         }
-        
+
         if (name == null || value == null) {
             throw new IllegalArgumentException("Cookie is malformed : " + c);
         }
-        
+
         return new Cookie(name, value, path, domain, version);
     }
 
     public String toString(Cookie c) {
         StringBuilder sb = new StringBuilder();
-        
+
         if (c.getVersion() != 0) {
             sb.append(VERSION).append('=').append(c.getVersion()).append(';');
         }

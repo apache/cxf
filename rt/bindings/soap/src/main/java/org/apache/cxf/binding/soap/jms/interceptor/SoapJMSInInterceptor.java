@@ -33,7 +33,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
 
@@ -62,12 +62,12 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
     private void checkContentEncoding(SoapMessage message, Map<String, List<String>> headers) {
         List<String> contentEncodingList = headers.get(SoapJMSConstants.CONTENTENCODING_FIELD);
         JMSFault jmsFault = null;
-        if (contentEncodingList != null && contentEncodingList.size() > 0) {
+        if (contentEncodingList != null && !contentEncodingList.isEmpty()) {
             String contentEncoding = contentEncodingList.get(0);
             if (!"gzip".equals(contentEncoding)) {
                 jmsFault = JMSFaultFactory.createContentEncodingNotSupported(contentEncoding);
             }
-        } 
+        }
         if (jmsFault != null) {
             Fault f = createFault(message, jmsFault);
             if (f != null) {
@@ -83,7 +83,7 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
      */
     private void checkJMSMessageFormat(SoapMessage message, Map<String, List<String>> headers) {
         List<String> mt = headers.get(SoapJMSConstants.JMS_MESSAGE_TYPE);
-        if (mt != null && mt.size() > 0) {
+        if (mt != null && !mt.isEmpty()) {
             String messageType = mt.get(0);
             if (!"text".equals(messageType) && !"byte".equals(messageType)) {
                 JMSFault jmsFault = JMSFaultFactory.createUnsupportedJMSMessageFormatFault(messageType);
@@ -106,13 +106,13 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         String contentTypeAction = null;
         List<String> ct = headers.get(SoapJMSConstants.CONTENTTYPE_FIELD);
         List<String> sa = headers.get(SoapJMSConstants.SOAPACTION_FIELD);
-        if (sa != null && sa.size() > 0) {
+        if (sa != null && !sa.isEmpty()) {
             soapAction = sa.get(0);
             if (soapAction != null && soapAction.startsWith("\"")) {
                 soapAction = soapAction.substring(1, soapAction.lastIndexOf("\""));
             }
         }
-        if (ct != null && ct.size() > 0) {
+        if (ct != null && !ct.isEmpty()) {
             contentType = ct.get(0);
         }
         if (contentType != null && contentType.indexOf("action=") != -1) {
@@ -148,15 +148,15 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
     private void checkRequestURI(SoapMessage message, Map<String, List<String>> headers) {
         List<String> ru = headers.get(SoapJMSConstants.REQUESTURI_FIELD);
         JMSFault jmsFault = null;
-        if (ru != null && ru.size() > 0) {
+        if (ru != null && !ru.isEmpty()) {
             String requestURI = ru.get(0);
             List<String> mr = headers.get(SoapJMSConstants.MALFORMED_REQUESTURI);
-            if (mr != null && mr.size() > 0 && mr.get(0).equals("true")) {
+            if (mr != null && !mr.isEmpty() && mr.get(0).equals("true")) {
                 jmsFault = JMSFaultFactory.createMalformedRequestURIFault(requestURI);
             }
 
             List<String> trn = headers.get(SoapJMSConstants.TARGET_SERVICE_IN_REQUESTURI);
-            if (trn != null && trn.size() > 0 && trn.get(0).equals("true")) {
+            if (trn != null && !trn.isEmpty() && trn.get(0).equals("true")) {
                 jmsFault = JMSFaultFactory.createTargetServiceNotAllowedInRequestURIFault();
             }
         } else {
@@ -177,7 +177,7 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
     private void checkContentType(SoapMessage message, Map<String, List<String>> headers) {
         List<String> ct = headers.get(SoapJMSConstants.CONTENTTYPE_FIELD);
         JMSFault jmsFault = null;
-        if (ct != null && ct.size() > 0) {
+        if (ct != null && !ct.isEmpty()) {
             String contentType = ct.get(0);
             if (!contentType.startsWith("text/xml")
                 && !contentType.startsWith("application/soap+xml")
@@ -203,7 +203,7 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
      */
     private void checkBindingVersion(SoapMessage message, Map<String, List<String>> headers) {
         List<String> bv = headers.get(SoapJMSConstants.BINDINGVERSION_FIELD);
-        if (bv != null && bv.size() > 0) {
+        if (bv != null && !bv.isEmpty()) {
             String bindingVersion = bv.get(0);
             if (!"1.0".equals(bindingVersion)) {
                 JMSFault jmsFault = JMSFaultFactory

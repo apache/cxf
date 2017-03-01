@@ -28,17 +28,17 @@ public class Entropy {
     public BinarySecret getBinarySecret() {
         return binarySecret;
     }
-    
+
     public void setBinarySecret(BinarySecret binarySecret) {
         this.binarySecret = binarySecret;
     }
-    
+
     public void setDecryptedKey(byte[] decryptedKey) {
         this.decryptedKey = decryptedKey;
     }
-    
+
     public byte[] getDecryptedKey() {
         return decryptedKey;
     }
-    
+
 }

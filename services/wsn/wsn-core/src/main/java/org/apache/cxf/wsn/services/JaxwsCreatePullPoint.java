@@ -42,7 +42,7 @@ public class JaxwsCreatePullPoint extends JmsCreatePullPoint
         this(name, connectionFactory, null);
     }
 
-    public JaxwsCreatePullPoint(String name, 
+    public JaxwsCreatePullPoint(String name,
                                 ConnectionFactory connectionFactory,
                                 EndpointManager epManager) {
         super(name, connectionFactory);

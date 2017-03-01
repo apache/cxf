@@ -50,49 +50,49 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ClaimsAuthorizingInterceptor.class);
-    
+
     private static final Set<String> SKIP_METHODS;
     static {
         SKIP_METHODS = new HashSet<>();
         SKIP_METHODS.addAll(Arrays.asList(
-            new String[] {"wait", "notify", "notifyAll", 
+            new String[] {"wait", "notify", "notifyAll",
                           "equals", "toString", "hashCode"}));
     }
-    
+
     private Map<String, List<ClaimBean>> claims = new HashMap<>();
     private Map<String, String> nameAliases = Collections.emptyMap();
     private Map<String, String> formatAliases = Collections.emptyMap();
-    
+
     public ClaimsAuthorizingInterceptor() {
         super(Phase.PRE_INVOKE);
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         SecurityContext sc = message.get(SecurityContext.class);
         if (!(sc instanceof SAMLSecurityContext)) {
             throw new AccessDeniedException("Security Context is unavailable or unrecognized");
         }
-        
+
         Method method = getTargetMethod(message);
-        
+
         if (authorize((SAMLSecurityContext)sc, method)) {
             return;
         }
-        
+
         throw new AccessDeniedException("Unauthorized");
     }
-    
+
     public void setClaims(Map<String, List<ClaimBean>> claimsMap) {
         claims.putAll(claimsMap);
     }
-    
+
     protected Method getTargetMethod(Message m) {
         BindingOperationInfo bop = m.getExchange().getBindingOperationInfo();
         if (bop != null) {
-            MethodDispatcher md = (MethodDispatcher) 
+            MethodDispatcher md = (MethodDispatcher)
                 m.getExchange().getService().get(MethodDispatcher.class.getName());
             return md.getMethod(bop);
-        } 
+        }
         Method method = (Method)m.get("org.apache.cxf.resource.method");
         if (method != null) {
             return method;
@@ -103,7 +103,7 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
     protected boolean authorize(SAMLSecurityContext sc, Method method) {
         List<ClaimBean> list = claims.get(method.getName());
         org.apache.cxf.rt.security.claims.ClaimCollection actualClaims = sc.getClaims();
-        
+
         for (ClaimBean claimBean : list) {
             org.apache.cxf.rt.security.claims.Claim claim = claimBean.getClaim();
             org.apache.cxf.rt.security.claims.Claim matchingClaim = null;
@@ -124,14 +124,14 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             }
             List<Object> claimValues = claim.getValues();
             List<Object> matchingClaimValues = matchingClaim.getValues();
-            if (claimBean.isMatchAll() 
-                && !matchingClaimValues.containsAll(claimValues)) {    
+            if (claimBean.isMatchAll()
+                && !matchingClaimValues.containsAll(claimValues)) {
                 return false;
             } else {
                 boolean matched = false;
                 for (Object value : matchingClaimValues) {
                     if (claimValues.contains(value)) {
-                        matched = true;    
+                        matched = true;
                         break;
                     }
                 }
@@ -142,7 +142,7 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         }
         return true;
     }
-    
+
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);
         findClaims(cls);
@@ -155,15 +155,15 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         if (cls == null || cls == Object.class) {
             return;
         }
-        List<ClaimBean> clsClaims = 
+        List<ClaimBean> clsClaims =
             getClaims(cls.getAnnotation(Claims.class), cls.getAnnotation(Claim.class));
         for (Method m : cls.getMethods()) {
             if (SKIP_METHODS.contains(m.getName())) {
                 continue;
             }
-            List<ClaimBean> methodClaims = 
+            List<ClaimBean> methodClaims =
                 getClaims(m.getAnnotation(Claims.class), m.getAnnotation(Claim.class));
-            
+
             List<ClaimBean> allClaims = new ArrayList<>(methodClaims);
             for (ClaimBean bean : clsClaims) {
                 if (isClaimOverridden(bean, methodClaims)) {
@@ -171,26 +171,26 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
                 }
                 allClaims.add(bean);
             }
-            
+
             claims.put(m.getName(), allClaims);
         }
         if (!claims.isEmpty()) {
             return;
         }
-        
+
         findClaims(cls.getSuperclass());
-        
+
         if (!claims.isEmpty()) {
             return;
         }
-        
+
         for (Class<?> interfaceCls : cls.getInterfaces()) {
             findClaims(interfaceCls);
         }
     }
-    
+
     private static boolean isClaimOverridden(ClaimBean bean, List<ClaimBean> mClaims) {
-        for (ClaimBean methodBean : mClaims) {    
+        for (ClaimBean methodBean : mClaims) {
             if (bean.getClaim().getName().equals(methodBean.getClaim().getName())
                 && bean.getClaim().getNameFormat().equals(methodBean.getClaim().getNameFormat())) {
                 return true;
@@ -198,11 +198,11 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         }
         return false;
     }
-    
+
     private List<ClaimBean> getClaims(
             Claims claimsAnn, Claim claimAnn) {
         List<ClaimBean> claimsList = new ArrayList<>();
-        
+
         List<Claim> annClaims = new ArrayList<>();
         if (claimsAnn != null) {
             annClaims.addAll(Arrays.asList(claimsAnn.value()));
@@ -211,7 +211,7 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
         }
         for (Claim ann : annClaims) {
             SAMLClaim claim = new SAMLClaim();
-            
+
             String claimName = ann.name();
             if (nameAliases.containsKey(claimName)) {
                 claimName = nameAliases.get(claimName);
@@ -220,13 +220,13 @@ public class ClaimsAuthorizingInterceptor extends AbstractPhaseInterceptor<Messa
             if (formatAliases.containsKey(claimFormat)) {
                 claimFormat = formatAliases.get(claimFormat);
             }
-            
+
             claim.setName(claimName);
             claim.setNameFormat(claimFormat);
             for (String value : ann.value()) {
                 claim.addValue(value);
             }
-            
+
             claimsList.add(new ClaimBean(claim, ann.mode(), ann.matchAll()));
         }
         return claimsList;

@@ -58,7 +58,7 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
                 .add("allowMultiple", false)
             )
         ).build();
-    
+
     private static final JsonObject GET_BY_ID_METHOD_SPEC = Json.createObjectBuilder()
         .add("method", "GET")
         .add("summary", "Get book by Id")
@@ -77,7 +77,7 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
                 .add("allowMultiple", false)
             )
         ).build();
-    
+
     private static final JsonObject GET_METHOD_SPEC = Json.createObjectBuilder()
         .add("method", "GET")
         .add("summary", "Get books")
@@ -98,7 +98,7 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
                 .add("allowMultiple", false)
             )
         ).build();
-    
+
     private static final JsonObject BOOK_MODEL_SPEC = Json.createObjectBuilder()
         .add("Book", Json.createObjectBuilder()
             .add("id", "Book")
@@ -111,21 +111,21 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
                 )
             )
         ).build();
-    
+
     @Ignore
     public abstract static class Server extends AbstractBusTestServerBase {
         private final String port;
         private final boolean runAsFilter;
-        
+
         Server(final String port, final boolean runAsFilter) {
             this.port = port;
             this.runAsFilter = runAsFilter;
         }
-        
+
         protected void run() {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStoreSwagger.class);
-            sf.setResourceProvider(BookStoreSwagger.class, 
+            sf.setResourceProvider(BookStoreSwagger.class,
                 new SingletonResourceProvider(new BookStoreSwagger()));
             sf.setProvider(new JacksonJsonProvider());
             final SwaggerFeature feature = new SwaggerFeature();
@@ -134,7 +134,7 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
             sf.setAddress("http://localhost:" + port + "/");
             sf.create();
         }
-        
+
         protected static void start(final Server s) {
             try {
                 s.start();
@@ -146,7 +146,7 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
             }
         }
     }
-    
+
     protected static void startServers(final Class< ? extends Server> serverClass) throws Exception {
         AbstractResourceInfo.clearAllMaps();
         //keep out of process due to stack traces testing failures
@@ -155,11 +155,11 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
     }
 
     protected abstract String getPort();
-    
+
     @Test
     public void testApiListingIsProperlyReturned() throws Exception {
         final WebClient client = createWebClient("/api-docs");
-        
+
         try {
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
@@ -180,17 +180,17 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
                         .add("contact", "users@cxf.apache.org")
                         .add("license", "Apache 2.0 License")
                         .add("licenseUrl", "http://www.apache.org/licenses/LICENSE-2.0.html")
-                    ).build().toString(), 
+                    ).build().toString(),
                     IOUtils.readStringFromStream((InputStream)r.getEntity()), false);
         } finally {
             client.close();
         }
     }
-    
+
     @Test
     public void testApiResourcesAreProperlyReturned() throws Exception {
         final WebClient client = createWebClient("/api-docs/bookstore");
-        
+
         try {
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
@@ -210,22 +210,22 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
                         .add(Json.createObjectBuilder()
                             .add("path", "/bookstore")
                             .add("operations", Json.createArrayBuilder().add(GET_METHOD_SPEC))))
-                    .add("models", BOOK_MODEL_SPEC).build().toString(), 
+                    .add("models", BOOK_MODEL_SPEC).build().toString(),
                     IOUtils.readStringFromStream((InputStream)r.getEntity()), false);
         } finally {
             client.close();
         }
     }
-    
+
     @Test
     public void testNonRegisteredApiResourcesAreNotReturned() throws Exception {
         final Response r = createWebClient("/api-docs/books").get();
         assertEquals(Status.NOT_FOUND.getStatusCode(), r.getStatus());
     }
-    
+
     private WebClient createWebClient(final String url) {
         return WebClient
-            .create("http://localhost:" + getPort() + url, 
+            .create("http://localhost:" + getPort() + url,
                 Arrays.< Object >asList(new JacksonJsonProvider()))
             .accept(MediaType.APPLICATION_JSON);
     }

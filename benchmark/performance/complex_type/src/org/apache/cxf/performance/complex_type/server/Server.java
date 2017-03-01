@@ -24,7 +24,7 @@ import javax.xml.ws.Endpoint;
 
 public class Server implements Runnable {
 
-    
+
     public Server(String address) throws Exception {
         System.out.println("Starting Server");
         Object implementor = new ServerImpl();
@@ -35,20 +35,20 @@ public class Server implements Runnable {
     public Server(String[] args) throws Exception {
         this("http://localhost:20003/performance/complex_type/SoapPort");
     }
-    
+
     public static void main(String args[]) throws Exception {
         Server server = new Server(args);
         server.run();
     }
-    
+
     public void run() {
         System.out.println("running server");
         System.out.println("READY");
     }
-    
+
     void shutdown(boolean wait) {
         System.out.println("shutting down server");
     }
 
-    
+
 }

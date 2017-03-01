@@ -37,7 +37,7 @@ public interface BookService {
     Book getAnotherBook(@WebParam(name = "GetAnotherBook")
                          GetAnotherBook getAnotherBook) throws BookNotFoundFault;
 
-    
+
     void updateBook(@WebParam(name = "Book")
                         Book c);
 

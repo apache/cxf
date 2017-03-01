@@ -28,13 +28,13 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 public class DirectKeyDecryptionAlgorithm implements KeyDecryptionProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(DirectKeyDecryptionAlgorithm.class);
     private byte[] contentDecryptionKey;
-    public DirectKeyDecryptionAlgorithm(Key contentDecryptionKey) {    
+    public DirectKeyDecryptionAlgorithm(Key contentDecryptionKey) {
         this(contentDecryptionKey.getEncoded());
     }
-    public DirectKeyDecryptionAlgorithm(String encodedContentDecryptionKey) {    
+    public DirectKeyDecryptionAlgorithm(String encodedContentDecryptionKey) {
         this(CryptoUtils.decodeSequence(encodedContentDecryptionKey));
     }
-    public DirectKeyDecryptionAlgorithm(byte[] contentDecryptionKey) {    
+    public DirectKeyDecryptionAlgorithm(byte[] contentDecryptionKey) {
         this.contentDecryptionKey = contentDecryptionKey;
     }
     @Override

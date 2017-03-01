@@ -40,11 +40,11 @@ import org.apache.cxf.message.Message;
 import org.apache.neethi.Assertion;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations(unlessNull = "bus")
-public class PolicyInterceptorProviderRegistryImpl 
-    extends RegistryImpl<QName, Set<PolicyInterceptorProvider>> 
+public class PolicyInterceptorProviderRegistryImpl
+    extends RegistryImpl<QName, Set<PolicyInterceptorProvider>>
     implements PolicyInterceptorProviderRegistry, BusExtension {
 
     private Bus bus;
@@ -60,7 +60,7 @@ public class PolicyInterceptorProviderRegistryImpl
 
     public PolicyInterceptorProviderRegistryImpl(Map<QName, Set<PolicyInterceptorProvider>> interceptors) {
         super(interceptors);
-    }    
+    }
 
     @Resource
     public final void setBus(Bus b) {
@@ -107,10 +107,10 @@ public class PolicyInterceptorProviderRegistryImpl
         return pps;
     }
 
-    public List<Interceptor<? extends Message>> 
+    public List<Interceptor<? extends Message>>
     getInterceptorsForAlternative(Collection<? extends Assertion> alternative,
                                   boolean out, boolean fault) {
-        
+
         List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
         for (Assertion a : alternative) {
             if (a.isOptional()) {
@@ -144,8 +144,8 @@ public class PolicyInterceptorProviderRegistryImpl
         List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
         Set<PolicyInterceptorProvider> pps = get(qn);
         for (PolicyInterceptorProvider pp : pps) {
-            interceptors.addAll(out 
-                                ? (fault ? pp.getOutFaultInterceptors() : pp.getOutInterceptors()) 
+            interceptors.addAll(out
+                                ? (fault ? pp.getOutFaultInterceptors() : pp.getOutInterceptors())
                                     : (fault ? pp.getInFaultInterceptors() : pp.getInInterceptors()));
         }
         return interceptors;

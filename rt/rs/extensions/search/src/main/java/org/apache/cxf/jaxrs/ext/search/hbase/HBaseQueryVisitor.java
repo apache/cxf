@@ -48,7 +48,7 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
     public HBaseQueryVisitor(String family, Map<String, String> fieldsMap) {
         super(fieldsMap);
         this.family = family;
-        queryStack.push(new ArrayList<Filter>());
+        queryStack.push(new ArrayList<>());
     }
     public HBaseQueryVisitor(Map<String, String> familyMap) {
         this(familyMap, Collections.<String, String>emptyMap());
@@ -57,33 +57,33 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
                              Map<String, String> fieldsMap) {
         super(fieldsMap);
         this.familyMap = familyMap;
-        queryStack.push(new ArrayList<Filter>());
+        queryStack.push(new ArrayList<>());
     }
-    
+
     public void visit(SearchCondition<T> sc) {
         PrimitiveStatement statement = sc.getStatement();
         if (statement != null) {
             if (statement.getProperty() != null) {
-                queryStack.peek().add(buildSimpleQuery(sc.getConditionType(), 
-                                         statement.getProperty(), 
+                queryStack.peek().add(buildSimpleQuery(sc.getConditionType(),
+                                         statement.getProperty(),
                                          statement.getValue()));
             }
         } else {
-            queryStack.push(new ArrayList<Filter>());
+            queryStack.push(new ArrayList<>());
             for (SearchCondition<T> condition : sc.getSearchConditions()) {
                 condition.accept(this);
             }
             boolean orCondition = sc.getConditionType() == ConditionType.OR;
             List<Filter> queries = queryStack.pop();
             queryStack.peek().add(createCompositeQuery(queries, orCondition));
-        }    
+        }
     }
 
     public Filter getQuery() {
         List<Filter> queries = queryStack.peek();
         return queries.isEmpty() ? null : queries.get(0);
     }
-    
+
     private Filter buildSimpleQuery(ConditionType ct, String name, Object value) {
         name = super.getRealPropertyName(name);
         validatePropertyValue(name, value);
@@ -111,24 +111,24 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
         case LESS_OR_EQUALS:
             compareOp = CompareOp.LESS_OR_EQUAL;
             break;
-        default: 
+        default:
             break;
         }
         String qualifier = name;
         String theFamily = family != null ? family : familyMap.get(qualifier);
-        ByteArrayComparable byteArrayComparable = regexCompRequired 
+        ByteArrayComparable byteArrayComparable = regexCompRequired
             ? new RegexStringComparator(value.toString().replace("*", "."))
             : new BinaryComparator(value.toString().getBytes(StandardCharsets.UTF_8));
-        
+
         Filter query = new SingleColumnValueFilter(theFamily.getBytes(StandardCharsets.UTF_8),
                                                    qualifier.getBytes(StandardCharsets.UTF_8),
                                                    compareOp,
                                                    byteArrayComparable);
         return query;
     }
-    
+
     private Filter createCompositeQuery(List<Filter> queries, boolean orCondition) {
-        
+
         FilterList.Operator oper = orCondition ? FilterList.Operator.MUST_PASS_ONE
             : FilterList.Operator.MUST_PASS_ALL;
         FilterList list = new FilterList(oper);
@@ -137,5 +137,5 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
         }
         return list;
     }
-    
+
 }

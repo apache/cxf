@@ -47,36 +47,36 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
     public void setDelayBetweenRetries(long delay) {
         this.delayBetweenRetries = delay;
     }
-    
+
     public long getDelayBetweenRetries() {
         return this.delayBetweenRetries;
     }
-    
+
     public void setAlternateAddresses(List<String> alternateAddresses) {
         this.alternateAddresses = alternateAddresses;
     }
-   
+
     /**
      * Get the alternate addresses for this invocation.
-     * 
+     *
      * @param exchange the current Exchange
      * @return a List of alternate addresses if available
      */
     public List<String> getAlternateAddresses(Exchange exchange) {
         return alternateAddresses != null
-               ? new ArrayList<String>(alternateAddresses)
+               ? new ArrayList<>(alternateAddresses)
                : null;
     }
 
     /**
      * Select one of the alternate addresses for a retried invocation.
-     * 
+     *
      * @param a List of alternate addresses if available
      * @return the selected address
      */
     public String selectAlternateAddress(List<String> alternates) {
         String selected = null;
-        if (alternates != null && alternates.size() > 0) {
+        if (alternates != null && !alternates.isEmpty()) {
             selected = getNextAlternate(alternates);
             Level level = getLogLevel();
             if (LOG.isLoggable(level)) {
@@ -92,23 +92,23 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
 
     /**
      * Get the alternate endpoints for this invocation.
-     * 
+     *
      * @param exchange the current Exchange
      * @return a List of alternate endpoints if available
      */
     public List<Endpoint> getAlternateEndpoints(Exchange exchange) {
         return getEndpoints(exchange, false);
     }
-    
+
     /**
      * Select one of the alternate endpoints for a retried invocation.
-     * 
+     *
      * @param a List of alternate endpoints if available
      * @return the selected endpoint
      */
     public Endpoint selectAlternateEndpoint(List<Endpoint> alternates) {
         Endpoint selected = null;
-        if (alternates != null && alternates.size() > 0) {
+        if (alternates != null && !alternates.isEmpty()) {
             selected = getNextAlternate(alternates);
             Level level = getLogLevel();
             if (LOG.isLoggable(level)) {
@@ -122,10 +122,10 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
         }
         return selected;
     }
-    
+
     /**
      * Get the endpoints for this invocation.
-     * 
+     *
      * @param exchange the current Exchange
      * @param acceptCandidatesWithSameAddress true to accept candidates with the same address
      * @return a List of alternate endpoints if available
@@ -134,7 +134,7 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
         Endpoint endpoint = exchange.getEndpoint();
         Collection<ServiceInfo> services = endpoint.getService().getServiceInfos();
         QName currentBinding = endpoint.getBinding().getBindingInfo().getName();
-        List<Endpoint> alternates = new ArrayList<Endpoint>();
+        List<Endpoint> alternates = new ArrayList<>();
         for (ServiceInfo service : services) {
             Collection<EndpointInfo> candidates = service.getEndpoints();
             for (EndpointInfo candidate : candidates) {
@@ -165,17 +165,17 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
 
     /**
      * Get next alternate endpoint.
-     * 
-     * @param alternates non-empty List of alternate endpoints 
+     *
+     * @param alternates non-empty List of alternate endpoints
      * @return
      */
     protected abstract <T> T getNextAlternate(List<T> alternates);
-    
+
     /**
-     * Get the log level for reporting the selection of the new alternative address or endpoint 
+     * Get the log level for reporting the selection of the new alternative address or endpoint
      * @return the log level
      */
     protected Level getLogLevel() {
-        return Level.WARNING;    
+        return Level.WARNING;
     }
 }

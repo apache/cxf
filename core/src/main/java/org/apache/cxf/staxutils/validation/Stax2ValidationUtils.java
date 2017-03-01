@@ -65,7 +65,7 @@ class Stax2ValidationUtils {
         }
         HAS_WOODSTOX = hasw;
     }
-    
+
     Stax2ValidationUtils() {
         if (!HAS_WOODSTOX) {
             throw new RuntimeException("Could not load woodstox");
@@ -74,12 +74,12 @@ class Stax2ValidationUtils {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @throws XMLStreamException
      */
-    public boolean setupValidation(XMLStreamReader reader, Endpoint endpoint, ServiceInfo serviceInfo) 
+    public boolean setupValidation(XMLStreamReader reader, Endpoint endpoint, ServiceInfo serviceInfo)
         throws XMLStreamException {
-        
+
         // Gosh, this is bad, but I don't know a better solution, unless we're willing
         // to require the stax2 API no matter what.
         XMLStreamReader effectiveReader = reader;
@@ -102,9 +102,9 @@ class Stax2ValidationUtils {
         return true;
     }
 
-    public boolean setupValidation(XMLStreamWriter writer, Endpoint endpoint, ServiceInfo serviceInfo) 
+    public boolean setupValidation(XMLStreamWriter writer, Endpoint endpoint, ServiceInfo serviceInfo)
         throws XMLStreamException {
-        
+
         XMLStreamWriter2 writer2 = (XMLStreamWriter2)writer;
         XMLValidationSchema vs = getValidator(endpoint, serviceInfo);
         if (vs == null) {
@@ -122,7 +122,7 @@ class Stax2ValidationUtils {
 
     /**
      * Create woodstox validator for a schema set.
-     * 
+     *
      * @param schemas
      * @return
      * @throws XMLStreamException
@@ -135,24 +135,24 @@ class Stax2ValidationUtils {
                     return null;
                 }
                 Map<String, EmbeddedSchema> sources = new TreeMap<String, EmbeddedSchema>();
-        
+
                 for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
                     XmlSchema sch = schemaInfo.getSchema();
                     String uri = sch.getTargetNamespace();
                     if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(uri)) {
                         continue;
                     }
-        
+
                     Element serialized = schemaInfo.getElement();
                     String schemaSystemId = sch.getSourceURI();
                     if (null == schemaSystemId) {
                         schemaSystemId = sch.getTargetNamespace();
                     }
-        
+
                     EmbeddedSchema embeddedSchema = new EmbeddedSchema(schemaSystemId, serialized);
                     sources.put(sch.getTargetNamespace(), embeddedSchema);
                 }
-        
+
                 W3CMultiSchemaFactory factory = new W3CMultiSchemaFactory();
                 // I don't think that we need the baseURI.
                 try {

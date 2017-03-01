@@ -62,7 +62,7 @@ public class AttachmentDeserializer {
 
     private int pbAmount = 2048;
     private PushbackInputStream stream;
-    private int createCount; 
+    private int createCount;
     private int closedCount;
     private boolean closed;
 
@@ -75,8 +75,8 @@ public class AttachmentDeserializer {
     private Message message;
 
     private InputStream body;
-    
-    private Set<DelegatingInputStream> loaded = new HashSet<DelegatingInputStream>();
+
+    private Set<DelegatingInputStream> loaded = new HashSet<>();
     private List<String> supportedTypes;
 
     public AttachmentDeserializer(Message message) {
@@ -87,7 +87,7 @@ public class AttachmentDeserializer {
         this.message = message;
         this.supportedTypes = supportedTypes;
     }
-    
+
     public void initializeAttachments() throws IOException {
         initializeRootMessage();
 
@@ -108,7 +108,7 @@ public class AttachmentDeserializer {
 
         if (AttachmentUtil.isTypeSupported(contentType.toLowerCase(), supportedTypes)) {
             String boundaryString = findBoundaryFromContentType(contentType);
-            if (null == boundaryString) {                
+            if (null == boundaryString) {
                 boundaryString = findBoundaryFromInputStream();
             }
             // If a boundary still wasn't found, throw an exception
@@ -154,7 +154,7 @@ public class AttachmentDeserializer {
         int i = in.read(buf);
         String msg = IOUtils.newStringFromBytes(buf, 0, i);
         in.unread(buf, 0, i);
-        
+
         // Reset the input stream since we'll need it again later
         message.setContent(InputStream.class, in);
 
@@ -162,7 +162,7 @@ public class AttachmentDeserializer {
         Matcher m = INPUT_STREAM_BOUNDARY_PATTERN.matcher(msg);
         return m.find() ? "--" + m.group(1) : null;
     }
-    
+
     public AttachmentImpl readNext() throws IOException {
         // Cache any mime parts that are currently being streamed
         cacheStreamedAttachments();
@@ -187,7 +187,7 @@ public class AttachmentDeserializer {
             cache((DelegatingInputStream) body);
         }
 
-        List<Attachment> atts = new ArrayList<Attachment>(attachments.getLoadedAttachments());
+        List<Attachment> atts = new ArrayList<>(attachments.getLoadedAttachments());
         for (Attachment a : atts) {
             DataSource s = a.getDataHandler().getDataSource();
             if (s instanceof AttachmentDataSource) {
@@ -263,7 +263,7 @@ public class AttachmentDeserializer {
      * @throws IOException
      */
     private Attachment createAttachment(Map<String, List<String>> headers) throws IOException {
-        InputStream partStream = 
+        InputStream partStream =
             new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount),
                                       this);
         createCount++;
@@ -308,8 +308,8 @@ public class AttachmentDeserializer {
         stream.unread(v);
         return true;
     }
-    
-    
+
+
 
     private Map<String, List<String>> loadPartHeaders(InputStream in) throws IOException {
         StringBuilder buffer = new StringBuilder(128);
@@ -394,7 +394,7 @@ public class AttachmentDeserializer {
         }
         List<String> v = heads.get(name);
         if (v == null) {
-            v = new ArrayList<String>(1);
+            v = new ArrayList<>(1);
             heads.put(name, v);
         }
         v.add(value);

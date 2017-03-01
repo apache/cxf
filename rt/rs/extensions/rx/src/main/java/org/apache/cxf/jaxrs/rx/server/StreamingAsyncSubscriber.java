@@ -31,7 +31,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
 
 public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
-    
+
     private BlockingQueue<T> queue = new LinkedBlockingQueue<T>();
     private String openTag;
     private String closeTag;
@@ -43,11 +43,11 @@ public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
     public StreamingAsyncSubscriber(AsyncResponse ar, String openTag, String closeTag, String sep) {
         this(ar, openTag, closeTag, "", 1000);
     }
-    public StreamingAsyncSubscriber(AsyncResponse ar, String openTag, String closeTag, String sep, 
+    public StreamingAsyncSubscriber(AsyncResponse ar, String openTag, String closeTag, String sep,
                                     long pollTimeout) {
         this(ar, openTag, closeTag, sep, pollTimeout, 0);
     }
-    public StreamingAsyncSubscriber(AsyncResponse ar, String openTag, String closeTag, String sep, 
+    public StreamingAsyncSubscriber(AsyncResponse ar, String openTag, String closeTag, String sep,
                                     long pollTimeout, long asyncTimeout) {
         super(ar);
         this.openTag = openTag;
@@ -73,7 +73,7 @@ public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
     public void onCompleted() {
         completed = true;
     }
-    
+
     @Override
     public void onNext(T bean) {
         if (asyncTimeout > 0 && getAsyncResponse().isSuspended()) {
@@ -88,7 +88,7 @@ public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
             if (openTag != null) {
                 writer.getEntityStream().write(StringUtils.toBytesUTF8(openTag));
             }
-            while (!completed || queue.size() > 0) {
+            while (!completed || !queue.isEmpty()) {
                 try {
                     T bean = queue.poll(pollTimeout, TimeUnit.MILLISECONDS);
                     if (bean != null) {
@@ -104,7 +104,7 @@ public class StreamingAsyncSubscriber<T> extends AbstractAsyncSubscriber<T> {
             if (closeTag != null) {
                 writer.getEntityStream().write(StringUtils.toBytesUTF8(closeTag));
             }
-            
+
         }
 
     }

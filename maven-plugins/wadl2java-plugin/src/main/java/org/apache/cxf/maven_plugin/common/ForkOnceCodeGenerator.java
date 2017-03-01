@@ -45,9 +45,9 @@ public final class ForkOnceCodeGenerator {
             for (int x = 0; x < i; x++) {
                 wargs[x] = reader.readLine();
             }
-            
+
             new WADLToJava(wargs).run(new ToolContext());
-            
+
             line = reader.readLine();
         }
         reader.close();

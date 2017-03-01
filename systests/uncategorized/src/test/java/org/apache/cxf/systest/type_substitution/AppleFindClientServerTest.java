@@ -29,11 +29,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class AppleFindClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = AppleServer.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(AppleServer.class, true));
@@ -50,8 +50,8 @@ public class AppleFindClientServerTest extends AbstractBusClientServerTestBase {
 
         service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, endpointAddress);
 
-       
-        
+
+
         AppleFinder finder = service.getPort(AppleFinder.class);
         assertEquals(2, finder.getApple("Fuji").size());
     }

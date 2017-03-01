@@ -40,9 +40,9 @@ public class AddressingPolicyInterceptorProvider extends AbstractPolicyIntercept
     private static final Collection<QName> ASSERTION_TYPES;
     private static final MAPAggregator MAP_AGGREGATOR = new MAPAggregatorImpl();
     private static final MAPCodec MAP_CODEC = new MAPCodec();
-    
+
     static {
-        Collection<QName> types = new ArrayList<QName>();
+        Collection<QName> types = new ArrayList<>();
         types.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
         types.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
         types.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
@@ -51,20 +51,20 @@ public class AddressingPolicyInterceptorProvider extends AbstractPolicyIntercept
         types.add(MetadataConstants.USING_ADDRESSING_2006_QNAME);
         ASSERTION_TYPES = types;
     }
-    
+
     public AddressingPolicyInterceptorProvider() {
         super(ASSERTION_TYPES);
         getInInterceptors().add(MAP_AGGREGATOR);
         getInInterceptors().add(MAP_CODEC);
-        
+
         getOutInterceptors().add(MAP_AGGREGATOR);
         getOutInterceptors().add(MAP_CODEC);
-        
+
         getInFaultInterceptors().add(MAP_AGGREGATOR);
         getInFaultInterceptors().add(MAP_CODEC);
-        
+
         getOutFaultInterceptors().add(MAP_AGGREGATOR);
         getOutFaultInterceptors().add(MAP_CODEC);
     }
-    
+
 }

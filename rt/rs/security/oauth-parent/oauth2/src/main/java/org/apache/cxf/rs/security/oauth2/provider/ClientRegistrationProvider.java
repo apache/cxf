@@ -41,10 +41,10 @@ public interface ClientRegistrationProvider {
      * @return Client
      */
     Client removeClient(String clientId);
-    
+
     /**
      * Get a list of clients registered by a resource owner.
-     *  
+     *
      * @param resourceOwner the resource owner, can be null
      * @return the list of clients
      */

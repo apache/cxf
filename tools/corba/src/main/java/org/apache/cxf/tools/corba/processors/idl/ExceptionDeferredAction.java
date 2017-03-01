@@ -29,21 +29,21 @@ public class ExceptionDeferredAction implements SchemaDeferredAction {
 
     protected MemberType member;
     protected XmlSchemaElement element;
-    
-    
+
+
     public ExceptionDeferredAction(MemberType memberType, XmlSchemaElement elem) {
         member = memberType;
-        element = elem;        
+        element = elem;
     }
-    
+
     public ExceptionDeferredAction(MemberType memberType) {
-        member = memberType;         
+        member = memberType;
     }
-    
+
     public ExceptionDeferredAction(XmlSchemaElement elem) {
-        element = elem;               
+        element = elem;
     }
-    
+
     public void execute(XmlSchemaType stype, CorbaTypeImpl ctype) {
         if (member != null) {
             member.setIdltype(ctype.getQName());
@@ -54,9 +54,9 @@ public class ExceptionDeferredAction implements SchemaDeferredAction {
             if (stype.getQName().equals(ReferenceConstants.WSADDRESSING_TYPE)) {
                 element.setNillable(true);
             }
-        }          
+        }
     }
-       
+
 }
 
 

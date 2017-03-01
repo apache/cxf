@@ -33,7 +33,7 @@ public class ClientTest extends Assert {
 
     @Test
     public void testClientClosed() {
-        Client client = ClientBuilder.newClient();        
+        Client client = ClientBuilder.newClient();
         try {
             WebTarget target = client.target(ADDRESS);
             client.close();
@@ -42,5 +42,5 @@ public class ClientTest extends Assert {
         } catch (java.lang.IllegalStateException e) {
             assertTrue(e.getMessage().contains("client is closed"));
         }
-    } 
+    }
 }

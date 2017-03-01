@@ -28,11 +28,11 @@ public class XmlSchemaPrimitiveUtilsTest extends Assert {
         assertEquals("xs:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(Integer.class));
         assertEquals("xs:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(int.class));
     }
-    
+
     @Test
     public void testXsdRepresentation() {
         assertEquals("xsd:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(Integer.class, "xsd"));
         assertEquals("xsd:int", XmlSchemaPrimitiveUtils.getSchemaRepresentation(int.class, "xsd"));
     }
-    
+
 }

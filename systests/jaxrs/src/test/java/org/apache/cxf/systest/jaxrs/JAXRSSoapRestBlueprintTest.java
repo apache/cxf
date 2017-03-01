@@ -53,38 +53,38 @@ public class JAXRSSoapRestBlueprintTest extends AbstractClientServerTestBase {
     @Test
     public void testHelloRest() throws Exception {
         String address = "http://localhost:" + PORT + "/bp/services/hello-rest";
-        
+
         HelloWorld service = JAXRSClientFactory.create(address, HelloWorld.class);
         useHelloService(service);
     }
-    
+
     @Test
     public void testHelloSoap() throws Exception {
         final QName serviceName = new QName("http://hello.com", "HelloWorld");
         final QName portName = new QName("http://hello.com", "HelloWorldPort");
         final String address = "http://localhost:" + PORT + "/bp/services/hello-soap";
-        
+
         Service service = Service.create(serviceName);
         service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, address);
-    
-        HelloWorld hw = service.getPort(HelloWorld.class); 
-    
+
+        HelloWorld hw = service.getPort(HelloWorld.class);
+
         useHelloService(hw);
     }
     private void useHelloService(HelloWorld service) {
         assertEquals("Hello Barry", service.sayHi("Barry"));
         assertEquals("Hello Fred", service.sayHiToUser(new UserImpl("Fred")));
-        
+
         Map<Integer, User> users = service.getUsers();
         assertEquals(1, users.size());
         assertEquals("Fred", users.entrySet().iterator().next().getValue().getName());
-        
+
         users = service.echoUsers(users);
         assertEquals(1, users.size());
         assertEquals("Fred", users.entrySet().iterator().next().getValue().getName());
-        
+
         assertEquals(1, service.clearUsers());
         assertEquals(0, service.clearUsers());
     }
-    
+
 }

@@ -39,24 +39,24 @@ import org.opensaml.saml.saml2.core.RequestedAuthnContext;
 * A set of utility methods to construct SAMLP Request statements
 */
 public final class SamlpRequestComponentBuilder {
-    
+
     private static volatile SAMLObjectBuilder<AuthnRequest> authnRequestBuilder;
-    
+
     private static volatile SAMLObjectBuilder<Issuer> issuerBuilder;
-    
+
     private static volatile SAMLObjectBuilder<NameIDPolicy> nameIDBuilder;
-    
+
     private static volatile SAMLObjectBuilder<RequestedAuthnContext> requestedAuthnCtxBuilder;
-    
+
     private static volatile SAMLObjectBuilder<AuthnContextClassRef> requestedAuthnCtxClassRefBuilder;
-    
-    private static volatile XMLObjectBuilderFactory builderFactory = 
+
+    private static volatile XMLObjectBuilderFactory builderFactory =
         XMLObjectProviderRegistrySupport.getBuilderFactory();
-    
+
     private SamlpRequestComponentBuilder() {
-        
+
     }
-    
+
     @SuppressWarnings("unchecked")
     //CHECKSTYLE:OFF
     public static AuthnRequest createAuthnRequest(
@@ -69,7 +69,7 @@ public final class SamlpRequestComponentBuilder {
         NameIDPolicy nameIDPolicy,
         RequestedAuthnContext requestedAuthnCtx
     ) {
-    //CHECKSTYLE:ON    
+    //CHECKSTYLE:ON
         if (authnRequestBuilder == null) {
             authnRequestBuilder = (SAMLObjectBuilder<AuthnRequest>)
                 builderFactory.getBuilder(AuthnRequest.DEFAULT_ELEMENT_NAME);
@@ -82,14 +82,14 @@ public final class SamlpRequestComponentBuilder {
         authnRequest.setIssueInstant(new DateTime());
         authnRequest.setProtocolBinding(protocolBinding);
         authnRequest.setVersion(version);
-        
+
         authnRequest.setIssuer(issuer);
         authnRequest.setNameIDPolicy(nameIDPolicy);
         authnRequest.setRequestedAuthnContext(requestedAuthnCtx);
-        
+
         return authnRequest;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static Issuer createIssuer(
         String issuerValue
@@ -100,10 +100,10 @@ public final class SamlpRequestComponentBuilder {
         }
         Issuer issuer = issuerBuilder.buildObject();
         issuer.setValue(issuerValue);
-        
+
         return issuer;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static NameIDPolicy createNameIDPolicy(
         boolean allowCreate,
@@ -118,10 +118,10 @@ public final class SamlpRequestComponentBuilder {
         nameId.setAllowCreate(allowCreate);
         nameId.setFormat(format);
         nameId.setSPNameQualifier(spNameQualifier);
-        
+
         return nameId;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static RequestedAuthnContext createRequestedAuthnCtxPolicy(
         AuthnContextComparisonTypeEnumeration comparison,
@@ -134,20 +134,20 @@ public final class SamlpRequestComponentBuilder {
         }
         RequestedAuthnContext authnCtx = requestedAuthnCtxBuilder.buildObject();
         authnCtx.setComparison(comparison);
-        
+
         if (authnCtxClassRefList != null) {
             List<AuthnContextClassRef> classRefList = authnCtx.getAuthnContextClassRefs();
             classRefList.addAll(authnCtxClassRefList);
         }
-        
+
         if (authnCtxDeclRefList != null) {
             List<AuthnContextDeclRef> declRefList = authnCtx.getAuthnContextDeclRefs();
             declRefList.addAll(authnCtxDeclRefList);
         }
-        
+
         return authnCtx;
     }
-    
+
     @SuppressWarnings("unchecked")
     public static AuthnContextClassRef createAuthnCtxClassRef(
         String authnCtxClassRefValue
@@ -158,8 +158,8 @@ public final class SamlpRequestComponentBuilder {
         }
         AuthnContextClassRef authnCtxClassRef = requestedAuthnCtxClassRefBuilder.buildObject();
         authnCtxClassRef.setAuthnContextClassRef(authnCtxClassRefValue);
-        
+
         return authnCtxClassRef;
     }
-    
+
 }

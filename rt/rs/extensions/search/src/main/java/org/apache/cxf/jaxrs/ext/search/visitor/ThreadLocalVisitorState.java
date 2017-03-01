@@ -26,7 +26,7 @@ package org.apache.cxf.jaxrs.ext.search.visitor;
  */
 public class ThreadLocalVisitorState<T> implements VisitorState<T> {
     private ThreadLocal<T> state = new ThreadLocal<T>();
-    
+
     public T get() {
         return state.get();
     }
@@ -39,5 +39,5 @@ public class ThreadLocalVisitorState<T> implements VisitorState<T> {
 
     public void set(T value) {
         state.set(value);
-    }    
+    }
 }

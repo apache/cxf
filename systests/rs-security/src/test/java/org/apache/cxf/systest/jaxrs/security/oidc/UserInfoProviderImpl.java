@@ -25,7 +25,7 @@ import org.apache.cxf.rs.security.oidc.common.UserInfo;
 import org.apache.cxf.rs.security.oidc.idp.UserInfoProvider;
 
 public class UserInfoProviderImpl implements UserInfoProvider {
-    
+
     @Override
     public UserInfo getUserInfo(String clientId, UserSubject authenticatedUser, List<String> scopes) {
         UserInfo userInfo = new UserInfo();

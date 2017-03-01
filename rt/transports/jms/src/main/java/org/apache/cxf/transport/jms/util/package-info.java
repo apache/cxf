@@ -19,8 +19,8 @@
 
 /**
  * Utility classes to make it easier to work with the JMS API.
- * 
+ *
  * This package might later be moved to a jms library independent of cxf.
- * So any classes in this package should only depend on the jms API. 
+ * So any classes in this package should only depend on the jms API.
  */
 package org.apache.cxf.transport.jms.util;

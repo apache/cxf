@@ -41,7 +41,7 @@ public class JwtBearerGrantHandler extends AbstractJwtHandler {
     private static final String ENCODED_JWT_BEARER_GRANT;
     static {
         //  AccessTokenService may be configured with the form provider
-        // which will not decode by default - so listing both the actual 
+        // which will not decode by default - so listing both the actual
         // and encoded grant type value will help
         ENCODED_JWT_BEARER_GRANT = HttpUtils.urlEncode(Constants.JWT_BEARER_GRANT, StandardCharsets.UTF_8.name());
     }
@@ -60,14 +60,14 @@ public class JwtBearerGrantHandler extends AbstractJwtHandler {
             JwsJwtCompactConsumer jwsReader = getJwsReader(assertion);
             JwtToken jwtToken = jwsReader.getJwtToken();
             validateSignature(new JwsHeaders(jwtToken.getJwsHeaders()),
-                                  jwsReader.getUnsignedEncodedSequence(), 
+                                  jwsReader.getUnsignedEncodedSequence(),
                                   jwsReader.getDecodedSignature());
-            
-                   
+
+
             validateClaims(client, jwtToken.getClaims());
             UserSubject grantSubject = new UserSubject(jwtToken.getClaims().getSubject());
-            
-            return doCreateAccessToken(client, 
+
+            return doCreateAccessToken(client,
                                        grantSubject,
                                        Constants.JWT_BEARER_GRANT,
                                        OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)));
@@ -75,12 +75,12 @@ public class JwtBearerGrantHandler extends AbstractJwtHandler {
             throw ex;
         } catch (Exception ex) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT, ex);
-        }    
-        
+        }
+
     }
 
     protected JwsJwtCompactConsumer getJwsReader(String assertion) {
         return new JwsJwtCompactConsumer(assertion);
     }
-        
+
 }

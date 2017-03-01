@@ -26,7 +26,7 @@ import org.apache.cxf.tools.common.Tag;
 import org.junit.Test;
 
 public class StAXUtilTest extends ProcessorTestBase {
-    
+
     @Test
     public void testGetTags() throws Exception {
         File file = new File(getClass().getResource("resources/test.wsdl").toURI());

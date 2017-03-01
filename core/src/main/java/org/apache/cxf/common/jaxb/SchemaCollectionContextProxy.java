@@ -50,16 +50,16 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.constants.Constants;
 
 /**
- * 
+ *
  */
 public class SchemaCollectionContextProxy implements JAXBContextProxy {
     private static final Map<Class<?>, QName> TYPE_MAP = new HashMap<Class<?>, QName>();
-    
+
     final JAXBContext context;
     final SchemaCollection schemas;
     final String defaultNamespace;
-    
-    
+
+
     static {
         defaultRegister(BigDecimal.class, Constants.XSD_DECIMAL);
         defaultRegister(BigInteger.class, Constants.XSD_INTEGER);
@@ -79,7 +79,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
         defaultRegister(Timestamp.class, Constants.XSD_DATETIME);
         defaultRegister(URI.class, Constants.XSD_ANYURI);
         defaultRegister(XMLStreamReader.class, Constants.XSD_ANYTYPE);
-        
+
         defaultRegister(boolean.class, Constants.XSD_BOOLEAN);
         defaultRegister(Date.class, Constants.XSD_DATETIME);
         defaultRegister(Float.class, Constants.XSD_FLOAT);
@@ -95,7 +95,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
         defaultRegister(Timestamp.class, Constants.XSD_DATETIME);
         defaultRegister(URI.class, Constants.XSD_ANYURI);
         defaultRegister(XMLStreamReader.class, Constants.XSD_ANYTYPE);
-        
+
         defaultRegister(boolean.class, Constants.XSD_BOOLEAN);
         defaultRegister(byte[].class, Constants.XSD_BASE64);
         defaultRegister(double.class, Constants.XSD_DOUBLE);
@@ -113,7 +113,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
         defaultRegister(DataHandler.class, Constants.XSD_BASE64);
         defaultRegister(Document.class, Constants.XSD_ANYTYPE);
     }
-    
+
     public SchemaCollectionContextProxy(JAXBContext ctx, SchemaCollection c, String defaultNs) {
         schemas = c;
         context = ctx;
@@ -143,7 +143,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
             if (sc != null) {
                 namespace = sc.namespace();
             }
-        }        
+        }
         if ("##default".equals(namespace) || StringUtils.isEmpty(namespace)) {
             namespace = JAXBUtils.getPackageNamespace(cls);
             if (namespace == null) {
@@ -174,7 +174,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
             return null;
         }
         final QName typeName = type == null ? null : type.getQName();
-        
+
         JAXBBeanInfo bi = new JAXBBeanInfo() {
             public boolean isElement() {
                 return el == null ? false : true;

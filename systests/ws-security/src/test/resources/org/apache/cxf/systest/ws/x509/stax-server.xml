@@ -17,7 +17,7 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans-4.3.xsd         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans-4.2.xsd         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
@@ -53,6 +53,13 @@
         </jaxws:properties>
     </jaxws:endpoint>
     <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="KeyIdentifier" address="http://localhost:${testutil.ports.x509.StaxServer}/DoubleItX509KeyIdentifier" serviceName="s:DoubleItService" endpointName="s:DoubleItKeyIdentifierPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
+        <jaxws:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
+            <entry key="security.signature.crypto" value-ref="crypto"/>
+            <entry key="ws-security.enable.streaming" value="true"/>
+        </jaxws:properties>
+    </jaxws:endpoint>
+    <jaxws:endpoint xmlns:s="http://www.example.org/contract/DoubleIt" id="SymmetricAddressing" address="http://localhost:${testutil.ports.x509.StaxServer}/DoubleItX509SymmetricAddressing" serviceName="s:DoubleItService" endpointName="s:DoubleItSymmetricAddressingPort" implementor="org.apache.cxf.systest.ws.common.DoubleItImpl" wsdlLocation="org/apache/cxf/systest/ws/x509/DoubleItX509.wsdl">
         <jaxws:properties>
             <entry key="security.callback-handler" value="org.apache.cxf.systest.ws.common.KeystorePasswordCallback"/>
             <entry key="security.signature.crypto" value-ref="crypto"/>

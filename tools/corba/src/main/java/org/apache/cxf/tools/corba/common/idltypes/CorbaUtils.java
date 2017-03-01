@@ -24,11 +24,11 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 
 public class CorbaUtils {
-    
+
     protected static final Set<String> IDL_RESERVED_WORDS = new TreeSet<String>();
-    protected static final Set<String> IGNORED_MODULES = new TreeSet<String>();    
+    protected static final Set<String> IGNORED_MODULES = new TreeSet<String>();
     protected static final Set<String> TIMEBASE_IDL_DEFS = new TreeSet<String>();
-    
+
     static {
         /* IDL Key Words */
         IDL_RESERVED_WORDS.add("abstract");
@@ -81,7 +81,7 @@ public class CorbaUtils {
         IDL_RESERVED_WORDS.add("truncatable");
 
         /**
-         * Well known IDL Definitions         
+         * Well known IDL Definitions
          */
         IGNORED_MODULES.add("TimeBase");
 
@@ -92,11 +92,11 @@ public class CorbaUtils {
         TIMEBASE_IDL_DEFS.add("TimeBase.IntervalT");
         TIMEBASE_IDL_DEFS.add("TimeBase.UtcT");*/
     }
-    
-    protected CorbaUtils() {        
+
+    protected CorbaUtils() {
     }
 
-    
+
     public static String mangleName(String cname) {
         while (isCollideWithKeyWord(cname)) {
             cname = "_" + cname;
@@ -110,7 +110,7 @@ public class CorbaUtils {
             if (cname.length() == 1) {
                 cname = "u0063";
             } else {
-                StringTokenizer tokenizer = new StringTokenizer(cname, "?");        
+                StringTokenizer tokenizer = new StringTokenizer(cname, "?");
                 String str = "";
 
                 while (tokenizer.hasMoreTokens()) {
@@ -157,7 +157,7 @@ public class CorbaUtils {
     public static boolean isReservedWord(String name) {
         return IDL_RESERVED_WORDS.contains(name);
     }
-    
+
     public static boolean isCollideWithKeyWord(String name) {
         for (String key : IDL_RESERVED_WORDS) {
             if (key.equalsIgnoreCase(name)) {
@@ -170,7 +170,7 @@ public class CorbaUtils {
     public static boolean isTimeBaseDef(String name) {
         return TIMEBASE_IDL_DEFS.contains(name);
     }
-    
+
     public static boolean ignoreModule(String name) {
         return IGNORED_MODULES.contains(name);
     }

@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookServiceImpl implements BookService {
-    private List<Book> allBooks = new ArrayList<Book>();
+    private List<Book> allBooks = new ArrayList<>();
 
     public BookServiceImpl() {
     }

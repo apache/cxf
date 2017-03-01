@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class JAXRSBPNamespaceHandlerTest extends Assert {
     @Test
     public void testGetSchemaLocation() {
         JAXRSBPNamespaceHandler handler = new JAXRSBPNamespaceHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/blueprint/jaxrs"));
     }
 

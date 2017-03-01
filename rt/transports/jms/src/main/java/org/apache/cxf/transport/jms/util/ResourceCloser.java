@@ -34,7 +34,7 @@ public class ResourceCloser implements Closeable, AutoCloseable {
     public ResourceCloser() {
         resources = new LinkedList<Object>();
     }
-    
+
     public <E> E register(E resource) {
         resources.add(0, resource);
         return resource;
@@ -47,13 +47,13 @@ public class ResourceCloser implements Closeable, AutoCloseable {
         }
         resources.clear();
     }
-    
+
     public void close(Object ...resources2) {
         for (Object resource : resources2) {
             close(resource);
         }
     }
-    
+
     public static void close(Object resource) {
         if (resource == null) {
             return;

@@ -28,34 +28,34 @@ import javax.jws.WebService;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
-@WebService(targetNamespace = "http://apache.org/sayHi", name = "SayHi", 
-            wsdlLocation = "classpath:/wsdl_systest/e/sayHi.wsdl", 
+@WebService(targetNamespace = "http://apache.org/sayHi", name = "SayHi",
+            wsdlLocation = "classpath:/wsdl_systest/e/sayHi.wsdl",
             endpointInterface = "org.apache.cxf.systest.schemaimport.SayHi")
 public class SayHiImpl2 implements SayHi {
 
     @Override
     @WebResult(name = "return", targetNamespace = "")
-    @RequestWrapper(localName = "sayHiArray", 
-                    targetNamespace = "http://apache.org/sayHi2", 
+    @RequestWrapper(localName = "sayHiArray",
+                    targetNamespace = "http://apache.org/sayHi2",
                     className = "org.apache.sayhi2.SayHiArray")
     @WebMethod
-    @ResponseWrapper(localName = "sayHiArrayResponse", 
-                     targetNamespace = "http://apache.org/sayHi2", 
+    @ResponseWrapper(localName = "sayHiArrayResponse",
+                     targetNamespace = "http://apache.org/sayHi2",
                      className = "org.apache.sayhi2.SayHiArrayResponse")
     public List<String> sayHiArray(@WebParam(name = "arg0", targetNamespace = "") List<String> arg0) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         list.add("Hi");
         return list;
     }
 
     @Override
     @WebResult(name = "return", targetNamespace = "http://apache.org/sayHi1")
-    @RequestWrapper(localName = "sayHi", 
-                    targetNamespace = "http://apache.org/sayHi1", 
+    @RequestWrapper(localName = "sayHi",
+                    targetNamespace = "http://apache.org/sayHi1",
                     className = "org.apache.sayhi1.SayHi")
     @WebMethod
-    @ResponseWrapper(localName = "sayHiResponse", 
-                     targetNamespace = "http://apache.org/sayHi1", 
+    @ResponseWrapper(localName = "sayHiResponse",
+                     targetNamespace = "http://apache.org/sayHi1",
                      className = "org.apache.sayhi1.SayHiResponse")
     public String sayHi(@WebParam(name = "arg0", targetNamespace = "http://apache.org/sayHi1") String arg0) {
         return "Hi";

@@ -44,8 +44,8 @@ public class ClientProxyFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
     }
 
     @Override
-    protected void mapAttribute(MutableBeanMetadata bean, 
-                                Element e, String name, 
+    protected void mapAttribute(MutableBeanMetadata bean,
+                                Element e, String name,
                                 String val, ParserContext context) {
         if ("endpointName".equals(name) || "serviceName".equals(name)) {
             QName q = parseQName(e, val);
@@ -66,8 +66,8 @@ public class ClientProxyFactoryBeanDefinitionParser extends SimpleBPBeanDefiniti
             || "handlers".equals(name)) {
             bean.addProperty(name, this.parseListData(ctx, bean, el));
         } else {
-            setFirstChildAsProperty(el, ctx, bean, name);            
-        }        
+            setFirstChildAsProperty(el, ctx, bean, name);
+        }
     }
     @Override
     protected boolean hasBusProperty() {

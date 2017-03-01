@@ -57,7 +57,7 @@ public class AnnotatedCorsServer {
     public String simpleGet(@PathParam("echo") String echo) {
         return echo;
     }
-    
+
     @POST
     @Produces("application/json")
     @Consumes("application/json")
@@ -87,8 +87,8 @@ public class AnnotatedCorsServer {
     }
 
     @GET
-    @CrossOriginResourceSharing(allowOrigins = { "http://area51.mil:31415" }, 
-            allowCredentials = true, 
+    @CrossOriginResourceSharing(allowOrigins = { "http://area51.mil:31415" },
+            allowCredentials = true,
             exposeHeaders = { "X-custom-3", "X-custom-4" })
     @Produces("text/plain")
     @Path("/annotatedGet/{echo}")
@@ -98,7 +98,7 @@ public class AnnotatedCorsServer {
 
     /**
      * A method annotated to test preflight.
-     * 
+     *
      * @param input
      * @return
      */

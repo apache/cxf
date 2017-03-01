@@ -30,67 +30,74 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 
 public class DefaultResourceManager implements ResourceManager {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultResourceManager.class);
 
-    protected final List<ResourceResolver> registeredResolvers 
+    protected final List<ResourceResolver> registeredResolvers
         = new CopyOnWriteArrayList<ResourceResolver>();
     protected boolean firstCalled;
 
-    public DefaultResourceManager() { 
-        initializeDefaultResolvers(); 
-    } 
-    
+    public DefaultResourceManager() {
+        initializeDefaultResolvers();
+    }
+
     public DefaultResourceManager(ResourceResolver resolver) {
         addResourceResolver(resolver);
     }
-    
+
     public DefaultResourceManager(List<? extends ResourceResolver> resolvers) {
         addResourceResolvers(resolvers);
     }
-    
+
     protected void onFirstResolve() {
         //nothing
         firstCalled = true;
     }
- 
+
     public final <T> T resolveResource(String name, Class<T> type) {
         return findResource(name, type, false, registeredResolvers);
-    } 
+    }
 
-    public final <T> T resolveResource(String name, Class<T> type, List<ResourceResolver> resolvers) { 
+    public final <T> T resolveResource(String name, Class<T> type, List<ResourceResolver> resolvers) {
         return findResource(name, type, false, resolvers);
-    } 
+    }
 
-    
-    public final InputStream getResourceAsStream(String name) { 
+
+    public final InputStream getResourceAsStream(String name) {
         return findResource(name, InputStream.class, true, registeredResolvers);
-    } 
+    }
 
-    public final void addResourceResolver(ResourceResolver resolver) { 
-        if (!registeredResolvers.contains(resolver)) { 
+    public final void addResourceResolver(ResourceResolver resolver) {
+        if (!registeredResolvers.contains(resolver)) {
             registeredResolvers.add(0, resolver);
         }
-    } 
-    public final void addResourceResolvers(Collection<? extends ResourceResolver> resolvers) { 
+    }
+    public final void addResourceResolvers(Collection<? extends ResourceResolver> resolvers) {
+        int i = 0;
         for (ResourceResolver r : resolvers) {
-            addResourceResolver(r);
+            while (!registeredResolvers.contains(r)) {
+                try {
+                    registeredResolvers.add(i++, r);
+                } catch (IndexOutOfBoundsException e) {
+                    i = registeredResolvers.size();
+                }
+            }
         }
-    } 
+    }
 
-    public final void removeResourceResolver(ResourceResolver resolver) { 
-        if (registeredResolvers.contains(resolver)) { 
+    public final void removeResourceResolver(ResourceResolver resolver) {
+        if (registeredResolvers.contains(resolver)) {
             registeredResolvers.remove(resolver);
         }
-    } 
+    }
 
 
     public final List<ResourceResolver> getResourceResolvers() {
-        return Collections.unmodifiableList(registeredResolvers); 
+        return Collections.unmodifiableList(registeredResolvers);
     }
 
-    
-    private <T> T findResource(String name, Class<T> type, boolean asStream, 
+
+    private <T> T findResource(String name, Class<T> type, boolean asStream,
                                List<ResourceResolver> resolvers) {
         if (!firstCalled) {
             onFirstResolve();
@@ -98,30 +105,30 @@ public class DefaultResourceManager implements ResourceManager {
         if (resolvers == null) {
             resolvers = registeredResolvers;
         }
-        
-        if (LOG.isLoggable(Level.FINE)) { 
-            LOG.fine("resolving resource <" + name + ">" + (asStream ? " as stream "  
+
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("resolving resource <" + name + ">" + (asStream ? " as stream "
                                                             : " type <" + type + ">"));
         }
 
-        T ret = null; 
-        
-        for (ResourceResolver rr : resolvers) { 
-            if (asStream) { 
+        T ret = null;
+
+        for (ResourceResolver rr : resolvers) {
+            if (asStream) {
                 ret = type.cast(rr.getAsStream(name));
-            } else { 
+            } else {
                 ret = rr.resolve(name, type);
             }
-            if (ret != null) { 
+            if (ret != null) {
                 break;
             }
-        } 
+        }
         return ret;
-    } 
+    }
 
-    private void initializeDefaultResolvers() { 
+    private void initializeDefaultResolvers() {
         addResourceResolver(new ClasspathResolver());
         addResourceResolver(new ClassLoaderResolver(getClass().getClassLoader()));
-    } 
+    }
 
 }

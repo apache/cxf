@@ -47,9 +47,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
- 
+
     private Server localServer;
-    
+
     @Before
     public void setUp() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
@@ -62,54 +62,54 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
         outInts.add(new CustomOutInterceptor());
         sf.setOutInterceptors(outInts);
-        
+
         List<Interceptor<? extends Message>> inInts = new ArrayList<Interceptor<? extends Message>>();
         inInts.add(new CustomInFaultyInterceptor());
         sf.setInInterceptors(inInts);
-        
+
         sf.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         sf.setAddress("local://books");
         localServer = sf.create();
     }
-    
+
     @After
     public void tearDown() {
         if (localServer != null) {
             localServer.stop();
         }
     }
-    
+
     @Test
     public void testProxyPipedDispatchGet() throws Exception {
-        BookStore localProxy = 
+        BookStore localProxy =
             JAXRSClientFactory.create("local://books", BookStore.class);
         Book book = localProxy.getBook("123");
         assertEquals(123L, book.getId());
     }
     @Test
     public void testProxyPipedDispatchGetBookType() throws Exception {
-        BookStore localProxy = 
-            JAXRSClientFactory.create("local://books", 
+        BookStore localProxy =
+            JAXRSClientFactory.create("local://books",
                                       BookStore.class,
                                       Collections.singletonList(new JacksonJsonProvider()));
         BookType book = localProxy.getBookType();
         assertEquals(124L, book.getId());
     }
-    
+
     @Test
     public void testProxyServerInFaultMapped() throws Exception {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
         Response r = localProxy.infault();
         assertEquals(401, r.getStatus());
     }
-    
+
     @Test
     public void testProxyServerInFaultEscaped() throws Exception {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
         Response r = localProxy.infault2();
         assertEquals(500, r.getStatus());
     }
-    
+
     @Test
     public void testProxyServerInFaultDirectDispatch() throws Exception {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
@@ -118,14 +118,14 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         Response r = localProxy.infault2();
         assertEquals(500, r.getStatus());
     }
-    
+
     @Test
     public void testProxyEmtpyResponse() throws Exception {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
         assertNull(localProxy.getEmptyBook());
         assertEquals(204, WebClient.client(localProxy).getResponse().getStatus());
     }
-    
+
     @Test
     public void testProxyEmptyResponseDirectDispatch() throws Exception {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
@@ -133,14 +133,14 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         assertNull(localProxy.getEmptyBook());
         assertEquals(204, WebClient.client(localProxy).getResponse().getStatus());
     }
-    
+
     @Test
     public void testProxyServerOutFault() throws Exception {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
         Response r = localProxy.outfault();
         assertEquals(403, r.getStatus());
     }
-    
+
     @Test
     public void testProxyServerOutFaultDirectDispacth() throws Exception {
         BookStore localProxy = JAXRSClientFactory.create("local://books", BookStore.class);
@@ -148,72 +148,72 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         Response r = localProxy.outfault();
         assertEquals(403, r.getStatus());
     }
-    
+
     @Test
     public void testSubresourceProxyDirectDispatchGet() throws Exception {
-        BookStore localProxy = 
+        BookStore localProxy =
             JAXRSClientFactory.create("local://books", BookStore.class);
-        
+
         WebClient.getConfig(localProxy).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, "true");
-        
+
         Book bookSubProxy = localProxy.getBookSubResource("123");
         Book book = bookSubProxy.retrieveState();
         assertEquals(123L, book.getId());
     }
-    
+
     @Test
     public void testProxyDirectDispatchPostWithGzip() throws Exception {
-        BookStore localProxy = 
+        BookStore localProxy =
             JAXRSClientFactory.create("local://books", BookStore.class);
-        
+
         WebClient.getConfig(localProxy).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
-        
+
         Response response = localProxy.addBook(new Book("New", 124L));
         assertEquals(200, response.getStatus());
         assertTrue(response.getMetadata().getFirst("Location") instanceof URI);
     }
-    
+
     @Test
     public void testProxyDirectDispatchPost() throws Exception {
-        BookStoreSpring localProxy = 
+        BookStoreSpring localProxy =
             JAXRSClientFactory.create("local://books", BookStoreSpring.class);
-        
+
         WebClient.getConfig(localProxy).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
-        
+
         Book response = localProxy.convertBook(new Book2("New", 124L));
         assertEquals(124L, response.getId());
     }
-    
+
     @Test
     public void testProxyPipedDispatchPost() throws Exception {
-        BookStoreSpring localProxy = 
+        BookStoreSpring localProxy =
             JAXRSClientFactory.create("local://books", BookStoreSpring.class);
-        
+
         Book response = localProxy.convertBook(new Book2("New", 124L));
         assertEquals(124L, response.getId());
     }
-    
+
     @Test
     public void testWebClientDirectDispatch() throws Exception {
         WebClient localClient = WebClient.create("local://books");
-        
+
         WebClient.getConfig(localClient).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
         localClient.path("bookstore/books/123");
         Book book = localClient.get(Book.class);
         assertEquals(123L, book.getId());
     }
-    
+
     @Test
     public void testWebClientDirectDispatchBookType() throws Exception {
         WebClient localClient = WebClient.create("local://books",
                                                  Collections.singletonList(new JacksonJsonProvider()));
-        
+
         WebClient.getConfig(localClient).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
         localClient.path("bookstore/booktype");
         BookType book = localClient.get(BookType.class);
         assertEquals(124L, book.getId());
     }
-    
+
     @Test
     public void testWebClientPipedDispatch() throws Exception {
         WebClient localClient = WebClient.create("local://books");
@@ -222,18 +222,18 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         Book book = localClient.post(new Book("New", 124L), Book.class);
         assertEquals(124L, book.getId());
     }
-    
+
     @Test
     public void testProxyWithQuery() throws Exception {
-        BookStore localProxy = 
+        BookStore localProxy =
             JAXRSClientFactory.create("local://books", BookStore.class);
-        
+
         WebClient.getConfig(localProxy).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
-        
+
         Book book = localProxy.getBookByURLQuery(new String[] {"1", "2", "3"});
         assertEquals(123L, book.getId());
     }
-    
+
     private static class TestFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
         TestFaultInInterceptor() {
             this(Phase.PRE_STREAM);
@@ -241,8 +241,8 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
 
         TestFaultInInterceptor(String s) {
             super(Phase.PRE_STREAM);
-            
-        } 
+
+        }
 
         public void handleMessage(Message message) throws Fault {
             message.getExchange().put(Message.RESPONSE_CODE, 500);

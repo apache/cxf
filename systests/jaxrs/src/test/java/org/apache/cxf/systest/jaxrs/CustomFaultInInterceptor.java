@@ -30,11 +30,11 @@ public class CustomFaultInInterceptor extends AbstractPhaseInterceptor<Message> 
     public CustomFaultInInterceptor(boolean useProcEx) {
         super(Phase.PRE_STREAM);
         this.useProcEx = useProcEx;
-    } 
+    }
 
     public void handleMessage(Message message) throws Fault {
         Exception ex = message.getContent(Exception.class);
-        String errorMessage = ex.getCause().getClass().getSimpleName() 
+        String errorMessage = ex.getCause().getClass().getSimpleName()
             + ": Microservice at "
             + message.get(Message.REQUEST_URI)
             + " is not available";
@@ -49,5 +49,5 @@ public class CustomFaultInInterceptor extends AbstractPhaseInterceptor<Message> 
             super(errorMessage);
         }
     }
-      
+
 }

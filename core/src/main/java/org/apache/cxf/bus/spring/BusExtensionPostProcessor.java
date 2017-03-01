@@ -37,13 +37,13 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
 
     public void setApplicationContext(ApplicationContext ctx) {
         context = ctx;
-    } 
-    
+    }
+
     public int getOrder() {
         return 1001;
     }
-    
-        
+
+
     public Object postProcessAfterInitialization(Object bean, String beanId) throws BeansException {
         return bean;
     }
@@ -60,7 +60,7 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
     private <T> void registerExt(Object bean, Class<T> cls) {
         getBus().setExtension(cls.cast(bean), cls);
     }
-    
+
     private Bus getBus() {
         if (bus == null) {
             bus = (Bus)context.getBean(Bus.DEFAULT_BUS_ID);

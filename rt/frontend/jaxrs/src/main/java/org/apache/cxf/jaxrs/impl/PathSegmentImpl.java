@@ -28,15 +28,15 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 public class PathSegmentImpl implements PathSegment {
 
     private String path;
-        
+
     public PathSegmentImpl(String path) {
         this(path, true);
     }
-    
+
     public PathSegmentImpl(String path, boolean decode) {
         this.path = decode ? HttpUtils.pathDecode(path) : path;
     }
-    
+
     public MultivaluedMap<String, String> getMatrixParameters() {
         return JAXRSUtils.getMatrixParams(path, false);
     }
@@ -47,13 +47,13 @@ public class PathSegmentImpl implements PathSegment {
         if (value.startsWith("/")) {
             value = value.length() == 1 ? "" : value.substring(1);
         }
-        return value; 
+        return value;
     }
-    
+
     public String getOriginalPath() {
         return path;
     }
-    
+
     public String getMatrixString() {
         int index = path.indexOf(';');
         if (index == -1) {
@@ -62,7 +62,7 @@ public class PathSegmentImpl implements PathSegment {
             return path.substring(index);
         }
     }
-    
+
     public String toString() {
         return path;
     }

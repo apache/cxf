@@ -24,9 +24,9 @@ import javax.jws.WebService;
 import org.apache.cxf.annotations.Policy;
 import org.apache.cxf.annotations.Policy.Placement;
 
-@WebService(name = "BindingSimpleService", 
-    endpointInterface = "org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleService", 
-    serviceName = "BindingSimpleService", 
+@WebService(name = "BindingSimpleService",
+    endpointInterface = "org.apache.cxf.systest.ws.policy.javafirst.BindingSimpleService",
+    serviceName = "BindingSimpleService",
     targetNamespace = "http://www.example.org/contract/BindingSimpleService")
 @Policy(uri = "classpath:/java_first_policies/AlternativesPolicy.xml", placement = Placement.BINDING)
 public class BindingSimpleServiceImpl implements BindingSimpleService {

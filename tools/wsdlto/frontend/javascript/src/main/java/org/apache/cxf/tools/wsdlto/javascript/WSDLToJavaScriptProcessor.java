@@ -47,7 +47,7 @@ import org.apache.ws.commons.schema.XmlSchemaCollection;
 public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLToJavaScriptProcessor.class);
     private static final Charset UTF8 = Charset.forName("utf-8");
-    
+
     public void process() throws ToolException {
         super.process();
 
@@ -57,8 +57,8 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
         BasicNameManager nameManager = BasicNameManager.newNameManager(serviceInfo, null);
         NamespacePrefixAccumulator prefixManager = new NamespacePrefixAccumulator(serviceInfo
                                                                                   .getXmlSchemaCollection());
-        
-        Map<String, String> nsPrefixMap = 
+
+        Map<String, String> nsPrefixMap =
             CastUtils.cast(
                            context.get(ToolConstants.CFG_JSPREFIXMAP, Map.class),
                            String.class, String.class);
@@ -73,21 +73,21 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(jsFile);
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
-                JavascriptGetInterceptor.writeUtilsToResponseStream(WSDLToJavaScriptProcessor.class, 
+                JavascriptGetInterceptor.writeUtilsToResponseStream(WSDLToJavaScriptProcessor.class,
                                                                   fileOutputStream);
             }
-            
+
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UTF8);
             writer = new BufferedWriter(outputStreamWriter);
-            
+
             XmlSchemaCollection collection = serviceInfo.getXmlSchemaCollection().getXmlSchemaCollection();
-            SchemaJavascriptBuilder jsBuilder = 
+            SchemaJavascriptBuilder jsBuilder =
                 new SchemaJavascriptBuilder(serviceInfo
                 .getXmlSchemaCollection(), prefixManager, nameManager);
-            String jsForSchemas = jsBuilder.generateCodeForSchemaCollection(collection); 
+            String jsForSchemas = jsBuilder.generateCodeForSchemaCollection(collection);
             writer.append(jsForSchemas);
 
-            ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, 
+            ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo,
                                                                                    null,
                                                                                    prefixManager,
                                                                                    nameManager);
@@ -108,7 +108,7 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
             }
         }
     }
-    
+
     private File getOutputFile(String defaultOutputFile) {
         String output = (String)context.get(ToolConstants.CFG_OUTPUTFILE);
         String dir = (String)context.get(ToolConstants.CFG_OUTPUTDIR);

@@ -35,17 +35,17 @@ public class CustomJAXRSInvoker extends JAXRSInvoker {
 
     @Override
     public Object invoke(Exchange exchange, Object requestParams, Object resourceObject) {
-        
+
         OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
         Method m = ori.getMethodToInvoke();
         Class<?> realClass = ClassHelper.getRealClass(exchange.getBus(), resourceObject);
-        
+
         Principal p = new SecurityContextImpl(exchange.getInMessage()).getUserPrincipal();
         if (realClass == SecureBookStore.class && "getThatBook".equals(m.getName())
             && "baddy".equals(p.getName())) {
             return new MessageContentsList(Response.status(Response.Status.FORBIDDEN).build());
         }
-        
+
         return super.invoke(exchange, requestParams, resourceObject);
     }
 }

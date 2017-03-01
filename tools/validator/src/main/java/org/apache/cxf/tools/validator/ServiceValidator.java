@@ -27,7 +27,7 @@ public class ServiceValidator extends AbstractValidator {
     public void setService(final ServiceInfo s) {
         this.service = s;
     }
-    
+
     public boolean isValid() {
         throw new RuntimeException("ServiceValidator.isValid should be extended");
     }

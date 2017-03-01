@@ -66,10 +66,10 @@ public class SamlCallbackHandler implements CallbackHandler {
     public SamlCallbackHandler(boolean signAssertion) {
         this.signAssertion = signAssertion;
     }
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         Message m = PhaseInterceptorChain.getCurrentMessage();
-        
+
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
@@ -79,80 +79,80 @@ public class SamlCallbackHandler implements CallbackHandler {
                     callback.setSamlVersion(Version.SAML_11);
                 }
                 callback.setIssuer(issuer);
-                
+
                 String subject = m != null ? (String)m.getContextualProperty("saml.subject.name") : null;
                 if (subject == null) {
                     subject = subjectName;
                 }
                 String subjectQualifier = "www.mock-sts.com";
-                SubjectBean subjectBean = 
+                SubjectBean subjectBean =
                     new SubjectBean(
                         subject, subjectQualifier, confirmationMethod
                     );
                 callback.setSubject(subjectBean);
-                
+
                 ConditionsBean conditions = new ConditionsBean();
 
                 AudienceRestrictionBean audienceRestriction = new AudienceRestrictionBean();
                 audienceRestriction.setAudienceURIs(Collections.singletonList(audience));
                 conditions.setAudienceRestrictions(Collections.singletonList(audienceRestriction));
-              
+
                 callback.setConditions(conditions);
-                
+
                 AuthDecisionStatementBean authDecBean = new AuthDecisionStatementBean();
                 authDecBean.setDecision(Decision.INDETERMINATE);
                 authDecBean.setResource("https://sp.example.com/SAML2");
                 authDecBean.setSubject(subjectBean);
-                
+
                 ActionBean actionBean = new ActionBean();
                 actionBean.setContents("Read");
                 authDecBean.setActions(Collections.singletonList(actionBean));
                 callback.setAuthDecisionStatementData(Collections.singletonList(authDecBean));
-                
+
                 AuthenticationStatementBean authBean = new AuthenticationStatementBean();
                 authBean.setSubject(subjectBean);
                 authBean.setAuthenticationInstant(new DateTime());
                 authBean.setSessionIndex("123456");
                 authBean.setSubject(subjectBean);
-                
+
                 // AuthnContextClassRef is not set
                 authBean.setAuthenticationMethod(
                         "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport");
                 callback.setAuthenticationStatementData(
                     Collections.singletonList(authBean));
-                
+
                 AttributeStatementBean attrBean = new AttributeStatementBean();
                 attrBean.setSubject(subjectBean);
-                
-                List<String> roles = m != null 
+
+                List<String> roles = m != null
                     ? CastUtils.<String>cast((List<?>)m.getContextualProperty("saml.roles")) : null;
                 if (roles == null) {
                     roles = Collections.singletonList("user");
                 }
-                List<AttributeBean> claims = new ArrayList<AttributeBean>();
+                List<AttributeBean> claims = new ArrayList<>();
                 AttributeBean roleClaim = new AttributeBean();
                 roleClaim.setSimpleName("subject-role");
                 roleClaim.setQualifiedName(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT);
                 roleClaim.setNameFormat(SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED);
-                roleClaim.setAttributeValues(new ArrayList<Object>(roles));
+                roleClaim.setAttributeValues(new ArrayList<>(roles));
                 claims.add(roleClaim);
-                
-                List<String> authMethods = 
+
+                List<String> authMethods =
                     m != null ? CastUtils.<String>cast((List<?>)m.getContextualProperty("saml.auth")) : null;
                 if (authMethods == null) {
                     authMethods = Collections.singletonList("password");
                 }
-                
+
                 AttributeBean authClaim = new AttributeBean();
                 authClaim.setSimpleName("http://claims/authentication");
                 authClaim.setQualifiedName("http://claims/authentication");
                 authClaim.setNameFormat("http://claims/authentication-format");
-                authClaim.setAttributeValues(new ArrayList<Object>(authMethods));
+                authClaim.setAttributeValues(new ArrayList<>(authMethods));
                 claims.add(authClaim);
-                
+
                 attrBean.setSamlAttributes(claims);
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
-                
+
                 if (signAssertion) {
                     try {
                         Crypto crypto = CryptoFactory.getInstance(cryptoPropertiesFile);
@@ -167,7 +167,7 @@ public class SamlCallbackHandler implements CallbackHandler {
             }
         }
     }
-    
+
     public String getCryptoPropertiesFile() {
         return cryptoPropertiesFile;
     }
@@ -207,11 +207,11 @@ public class SamlCallbackHandler implements CallbackHandler {
     public void setAudience(String audience) {
         this.audience = audience;
     }
-    
+
     public void setConfirmationMethod(String confMethod) {
         this.confirmationMethod = confMethod;
     }
-    
+
     public boolean isSaml2() {
         return saml2;
     }
@@ -227,5 +227,5 @@ public class SamlCallbackHandler implements CallbackHandler {
     public void setSubjectName(String subjectName) {
         this.subjectName = subjectName;
     }
-    
+
 }

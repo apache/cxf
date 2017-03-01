@@ -39,7 +39,7 @@ public class JettyHTTPTestHandler extends JettyHTTPHandler {
     }
 
     @Override
-    public void handle(String target, 
+    public void handle(String target,
                        Request baseRequest,
                        HttpServletRequest request,
                        HttpServletResponse resp) throws IOException, ServletException {

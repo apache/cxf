@@ -26,7 +26,7 @@ import org.apache.cxf.testutil.common.TestUtil;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class Cxf1332Test extends AbstractCXFSpringTest {
     public static final String PORT = TestUtil.getPortNumber(Cxf1332Test.class);
@@ -42,13 +42,13 @@ public class Cxf1332Test extends AbstractCXFSpringTest {
     public void tryToSendStringArray() throws Exception {
         JaxWsServerFactoryBean server = getBean(JaxWsServerFactoryBean.class, "ServiceFactory");
         server.create();
-        
+
         Cxf1332 client = getBean(Cxf1332.class, "client");
         String[] a = new String[] {"a", "b", "c"};
         client.hostSendData(a);
         assertArrayEquals(a, Cxf1332Impl.getLastStrings());
     }
-    
+
     /** {@inheritDoc}*/
     @Override
     protected String[] getConfigLocations() {

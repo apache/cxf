@@ -24,18 +24,18 @@ import java.util.List;
 import org.apache.cxf.message.Message;
 
 /**
- * 
+ *
  */
 public interface ThrottlingManager {
-    
+
     /**
      * Get the list of phases where this manager will expect to have to make throttling decisions.
-     * For example: using BasicAuth or other protocol based header, it can be a very early in the 
-     * chain, but for WS-Security based authentication, it would be later. 
+     * For example: using BasicAuth or other protocol based header, it can be a very early in the
+     * chain, but for WS-Security based authentication, it would be later.
      * @return
      */
     List<String> getDecisionPhases();
-    
+
     /**
      * Use information in the message to determine what throttling measures should be taken
      * @param phase

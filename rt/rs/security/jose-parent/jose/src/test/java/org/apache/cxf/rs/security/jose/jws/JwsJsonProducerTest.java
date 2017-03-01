@@ -33,30 +33,30 @@ public class JwsJsonProducerTest extends Assert {
     public static final String UNSIGNED_PLAIN_JSON_DOCUMENT = "{"
                        + " \"from\": \"user\"," + " \"to\": \"developer\","
                        + " \"msg\": \"good job!\" " + "}";
-    
+
     public static final String UNSIGNED_PLAIN_DOCUMENT = "$.02";
 
     public static final String UNSIGNED_PLAIN_JSON_DOCUMENT_AS_B64URL = "eyAiZnJvbSI6ICJ1c2VyIiwgInRvIjogI"
                        + "mRldmVsb3BlciIsICJtc2ciOiAiZ29vZCBqb2IhIiB9";
 
-       
+
     public static final String SIGNED_JWS_JSON_DOCUMENT = "{"
                        + "\"payload\":\""
                        + UNSIGNED_PLAIN_JSON_DOCUMENT_AS_B64URL
                        + "\",\"signatures\":[{\"protected\":\"eyJhbGciOiJIUzI1NiJ9\",\"signature\":"
                        + "\"NNksREOsFCI1nUQEqzCe6XZFa-bRAge2XXMMAU2Jj2I\"}]}";
-    
+
     public static final String SIGNED_JWS_JSON_FLAT_DOCUMENT = "{"
         + "\"payload\":\""
         + UNSIGNED_PLAIN_JSON_DOCUMENT_AS_B64URL
         + "\",\"protected\":\"eyJhbGciOiJIUzI1NiJ9\",\"signature\":"
         + "\"NNksREOsFCI1nUQEqzCe6XZFa-bRAge2XXMMAU2Jj2I\"}";
-       
+
     public static final String SIGNED_JWS_JSON_FLAT_UNENCODED_DOCUMENT = "{"
         + "\"payload\":\"" + UNSIGNED_PLAIN_DOCUMENT + "\","
         + "\"protected\":\"eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19\","
         + "\"signature\":" + "\"A5dxf2s96_n5FLueVuW1Z_vh161FwXZC4YLPff6dmDY\"}";
-    
+
     public static final String DUAL_SIGNED_JWS_JSON_DOCUMENT = "{"
                        + "\"payload\":\""
                        + UNSIGNED_PLAIN_JSON_DOCUMENT_AS_B64URL
@@ -73,13 +73,13 @@ public class JwsJsonProducerTest extends Assert {
                       producer.getUnsignedEncodedPayload());
     }
 
-       
+
     @Test
     public void testSignWithProtectedHeaderOnly() {
         JwsJsonProducer producer = new JwsJsonProducer(UNSIGNED_PLAIN_JSON_DOCUMENT);
         JwsHeaders headerEntries = new JwsHeaders();
         headerEntries.setSignatureAlgorithm(SignatureAlgorithm.HS256);
-               
+
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256),
                           headerEntries);
         assertEquals(SIGNED_JWS_JSON_DOCUMENT,
@@ -91,8 +91,8 @@ public class JwsJsonProducerTest extends Assert {
         JwsHeaders headers = new JwsHeaders();
         headers.setSignatureAlgorithm(SignatureAlgorithm.HS256);
         headers.setPayloadEncodingStatus(false);
-        
-               
+
+
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256),
                           headers);
         assertEquals(SIGNED_JWS_JSON_FLAT_UNENCODED_DOCUMENT,
@@ -103,7 +103,7 @@ public class JwsJsonProducerTest extends Assert {
         JwsJsonProducer producer = new JwsJsonProducer(UNSIGNED_PLAIN_JSON_DOCUMENT, true);
         JwsHeaders headerEntries = new JwsHeaders();
         headerEntries.setSignatureAlgorithm(SignatureAlgorithm.HS256);
-               
+
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256),
                           headerEntries);
         assertEquals(SIGNED_JWS_JSON_FLAT_DOCUMENT,
@@ -114,7 +114,7 @@ public class JwsJsonProducerTest extends Assert {
         JwsJsonProducer producer = new JwsJsonProducer(UNSIGNED_PLAIN_JSON_DOCUMENT);
         JwsHeaders headerEntries = new JwsHeaders();
         headerEntries.setSignatureAlgorithm(SignatureAlgorithm.HS256);
-               
+
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_1, SignatureAlgorithm.HS256),
                           headerEntries);
         producer.signWith(new HmacJwsSignatureProvider(ENCODED_MAC_KEY_2, SignatureAlgorithm.HS256),

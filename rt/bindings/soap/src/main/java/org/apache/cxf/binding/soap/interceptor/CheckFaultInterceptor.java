@@ -33,7 +33,7 @@ import org.apache.cxf.phase.Phase;
 
 public class CheckFaultInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(CheckFaultInterceptor.class);
-    
+
     public CheckFaultInterceptor() {
         this(Phase.POST_PROTOCOL);
     }
@@ -59,7 +59,7 @@ public class CheckFaultInterceptor extends AbstractSoapInterceptor {
                 return;
             }
         } catch (XMLStreamException e) {
-            throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e, 
+            throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e,
                                 message.getVersion().getSender());
         }
         if (message.getVersion().getFault().equals(xmlReader.getName()) && isRequestor(message)) {

@@ -95,31 +95,50 @@ public final class TLSParameterJaxBUtils {
         }
         return secureRandom;
     }
+
+    public static KeyStore getKeyStore(KeyStoreType kst) throws GeneralSecurityException, IOException {
+        return getKeyStore(kst, false);
+    }
+
     /**
      * This method converts a JAXB generated KeyStoreType into a KeyStore.
      */
-    public static KeyStore getKeyStore(KeyStoreType kst)
+    public static KeyStore getKeyStore(KeyStoreType kst, boolean trustStore)
         throws GeneralSecurityException,
                IOException {
 
         if (kst == null) {
             return null;
         }
-        String type = SSLUtils.getKeystoreType(kst.isSetType()
+        String type = null;
+        if (trustStore) {
+            type = SSLUtils.getTrustStoreType(kst.isSetType()
+                                     ? kst.getType() : null, LOG, KeyStore.getDefaultType());
+        } else {
+            type = SSLUtils.getKeystoreType(kst.isSetType()
                                  ? kst.getType() : null, LOG, KeyStore.getDefaultType());
+        }
 
         char[] password = kst.isSetPassword()
                     ? deobfuscate(kst.getPassword())
                     : null;
         if (password == null) {
-            String tmp = SSLUtils.getKeystorePassword(null, LOG);
+            String tmp = null;
+            if (trustStore) {
+                tmp = SSLUtils.getTruststorePassword(null, LOG);
+            } else {
+                tmp = SSLUtils.getKeystorePassword(null, LOG);
+            }
             if (tmp != null) {
                 password = tmp.toCharArray();
             }
         }
-        String provider = SSLUtils.getKeystoreProvider(kst.isSetProvider() 
-                                                       ? kst.getProvider() : null,
-                                                       LOG);
+        String provider = null;
+        if (trustStore) {
+            provider = SSLUtils.getTruststoreProvider(kst.isSetProvider() ? kst.getProvider() : null, LOG);
+        } else {
+            provider = SSLUtils.getKeystoreProvider(kst.isSetProvider() ? kst.getProvider() : null, LOG);
+        }
         KeyStore keyStore = provider == null
                     ? KeyStore.getInstance(type)
                     : KeyStore.getInstance(type, provider);
@@ -196,7 +215,7 @@ public final class TLSParameterJaxBUtils {
         }
         return is;
     }
-    
+
     /**
      * Create a KeyStore containing the trusted CA certificates contained
      * in the supplied input stream.
@@ -246,8 +265,8 @@ public final class TLSParameterJaxBUtils {
         }
 
         return new String(b, 0, l).toCharArray();
-    }    
-    
+    }
+
     /**
      * This method converts the JAXB KeyManagersType into a list of
      * JSSE KeyManagers.
@@ -256,7 +275,7 @@ public final class TLSParameterJaxBUtils {
         throws GeneralSecurityException,
                IOException {
 
-        KeyStore keyStore = getKeyStore(kmc.getKeyStore());
+        KeyStore keyStore = getKeyStore(kmc.getKeyStore(), false);
 
         String alg = kmc.isSetFactoryAlgorithm()
                      ? kmc.getFactoryAlgorithm()
@@ -316,7 +335,7 @@ public final class TLSParameterJaxBUtils {
 
         final KeyStore keyStore =
             tmc.isSetKeyStore()
-                ? getKeyStore(tmc.getKeyStore())
+                ? getKeyStore(tmc.getKeyStore(), true)
                 : (tmc.isSetCertStore()
                     ? getKeyStore(tmc.getCertStore())
                     : (KeyStore) null);

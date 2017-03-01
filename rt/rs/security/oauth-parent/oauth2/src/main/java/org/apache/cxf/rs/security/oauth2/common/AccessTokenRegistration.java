@@ -27,7 +27,7 @@ import java.util.Map;
  * Captures the information associated with the access token request.
  */
 public class AccessTokenRegistration {
-    private Client client; 
+    private Client client;
     private List<String> requestedScope = new LinkedList<String>();
     private List<String> approvedScope = new LinkedList<String>();
     private String grantType;
@@ -38,7 +38,7 @@ public class AccessTokenRegistration {
     private String responseType;
     private String grantCode;
     private Map<String, String> extraProperties = new LinkedHashMap<String, String>();
-    
+
     /**
      * Sets the {@link Client} instance
      * @param client the client
@@ -46,7 +46,7 @@ public class AccessTokenRegistration {
     public void setClient(Client client) {
         this.client = client;
     }
-    
+
     /**
      * Returns the {@link Client} instance
      * @return the client.
@@ -54,7 +54,7 @@ public class AccessTokenRegistration {
     public Client getClient() {
         return client;
     }
-   
+
     /**
      * Sets the requested scope
      * @param requestedScope the scope
@@ -62,7 +62,7 @@ public class AccessTokenRegistration {
     public void setRequestedScope(List<String> requestedScope) {
         this.requestedScope = requestedScope;
     }
-    
+
     /**
      * Gets the requested scope
      * @return the scope
@@ -70,7 +70,7 @@ public class AccessTokenRegistration {
     public List<String> getRequestedScope() {
         return requestedScope;
     }
-    
+
     /**
      * Sets the scope explicitly approved by the end user
      * @param approvedScope the approved scope
@@ -78,7 +78,7 @@ public class AccessTokenRegistration {
     public void setApprovedScope(List<String> approvedScope) {
         this.approvedScope = approvedScope;
     }
-    
+
     /**
      * Gets the scope explicitly approved by the end user
      * @return the scope
@@ -86,25 +86,25 @@ public class AccessTokenRegistration {
     public List<String> getApprovedScope() {
         return approvedScope;
     }
-    
+
     /**
-     * Sets the {@link UserSubject) instance capturing 
-     * the information about the end user 
+     * Sets the {@link UserSubject) instance capturing
+     * the information about the end user
      * @param subject the end user subject
      */
     public void setSubject(UserSubject subject) {
         this.subject = subject;
     }
-    
+
     /**
-     * Gets the {@link UserSubject) instance capturing 
+     * Gets the {@link UserSubject) instance capturing
      * the information about the end user
      * @return the subject
      */
     public UserSubject getSubject() {
         return subject;
     }
-    
+
     /**
      * Sets the type of grant which is exchanged for this token
      * @param grantType the grant type
@@ -127,7 +127,7 @@ public class AccessTokenRegistration {
     public void setAudiences(List<String> audiences) {
         this.audiences = audiences;
     }
-    
+
     public String getClientCodeVerifier() {
         return clientCodeVerifier;
     }
@@ -159,7 +159,7 @@ public class AccessTokenRegistration {
     public String getResponseType() {
         return responseType;
     }
-    
+
     /**
      * Set the grant code which was used to request the token
      * @param grantCode the grant code
@@ -175,7 +175,7 @@ public class AccessTokenRegistration {
     public String getGrantCode() {
         return grantCode;
     }
-    
+
     public Map<String, String> getExtraProperties() {
         return extraProperties;
     }

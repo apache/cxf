@@ -26,7 +26,7 @@ import org.junit.Assert;
 public class ControlWorker implements Runnable {
 
     private HelloContinuation helloPort;
-    private String firstName; 
+    private String firstName;
     private CountDownLatch startSignal;
     private CountDownLatch resumeSignal;
     public ControlWorker(HelloContinuation helloPort,
@@ -38,7 +38,7 @@ public class ControlWorker implements Runnable {
         this.startSignal = startSignal;
         this.resumeSignal = resumeSignal;
     }
-    
+
     public void run() {
         try {
             startSignal.await();
@@ -53,7 +53,7 @@ public class ControlWorker implements Runnable {
             ex.printStackTrace();
             Assert.fail("Control thread for " + firstName + " failed");
         }
-        
+
     }
-    
+
 }

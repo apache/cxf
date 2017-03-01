@@ -24,21 +24,21 @@ package org.apache.cxf.sts.request;
 public class RequestRequirements {
     private TokenRequirements tokenRequirements;
     private KeyRequirements keyRequirements;
-    
+
     public TokenRequirements getTokenRequirements() {
         return tokenRequirements;
     }
-    
+
     public void setTokenRequirements(TokenRequirements tokenRequirements) {
         this.tokenRequirements = tokenRequirements;
     }
-    
+
     public KeyRequirements getKeyRequirements() {
         return keyRequirements;
     }
-    
+
     public void setKeyRequirements(KeyRequirements keyRequirements) {
         this.keyRequirements = keyRequirements;
     }
-    
+
 }

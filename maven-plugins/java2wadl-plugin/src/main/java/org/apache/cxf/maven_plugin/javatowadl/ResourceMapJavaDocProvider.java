@@ -31,11 +31,11 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.doc.DocumentationProvider;
 
 public class ResourceMapJavaDocProvider implements DocumentationProvider {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(ResourceMapJavaDocProvider.class);
-    
+
     private Properties dumpedDocFile;
-    
+
     public ResourceMapJavaDocProvider(String targetFolder) {
         dumpedDocFile = new Properties();
         try (FileInputStream fis = new FileInputStream(targetFolder + "/site/apidocs/dumpFile.properties")) {
@@ -53,34 +53,34 @@ public class ResourceMapJavaDocProvider implements DocumentationProvider {
 
     @Override
     public String getMethodDoc(OperationResourceInfo ori) {
-        Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke() 
-            : ori.getAnnotatedMethod(); 
-        String methodKey = method.getDeclaringClass().getName() 
+        Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke()
+            : ori.getAnnotatedMethod();
+        String methodKey = method.getDeclaringClass().getName()
             + "." + method.getName();
         return dumpedDocFile.getProperty(methodKey);
     }
 
     @Override
     public String getMethodResponseDoc(OperationResourceInfo ori) {
-        Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke() 
-            : ori.getAnnotatedMethod(); 
-        String methodResponseKey = method.getDeclaringClass().getName() 
+        Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke()
+            : ori.getAnnotatedMethod();
+        String methodResponseKey = method.getDeclaringClass().getName()
             + "." + method.getName() + "." + "returnCommentTag";
         return dumpedDocFile.getProperty(methodResponseKey);
     }
 
     @Override
     public String getMethodParameterDoc(OperationResourceInfo ori, int paramIndex) {
-        Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke() 
-            : ori.getAnnotatedMethod(); 
-        String methodParamKey = method.getDeclaringClass().getName() 
+        Method method = ori.getAnnotatedMethod() == null ? ori.getMethodToInvoke()
+            : ori.getAnnotatedMethod();
+        String methodParamKey = method.getDeclaringClass().getName()
             + "." + method.getName()
             + ".paramCommentTag." + paramIndex;
         return dumpedDocFile.getProperty(methodParamKey);
     }
-    
+
     private Class<?> getPathAnnotatedClass(Class<?> cls) {
-        if (cls.getAnnotation(Path.class) != null) { 
+        if (cls.getAnnotation(Path.class) != null) {
             return cls;
         }
         if (cls.getSuperclass().getAnnotation(Path.class) != null) {
@@ -88,7 +88,7 @@ public class ResourceMapJavaDocProvider implements DocumentationProvider {
         }
         for (Class<?> i : cls.getInterfaces()) {
             if (i.getAnnotation(Path.class) != null) {
-                return i;    
+                return i;
             }
         }
         return cls;

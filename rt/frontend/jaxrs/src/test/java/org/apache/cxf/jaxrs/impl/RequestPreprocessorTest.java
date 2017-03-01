@@ -45,13 +45,13 @@ import org.junit.Test;
 public class RequestPreprocessorTest extends Assert {
 
     private IMocksControl control;
-    
+
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
         control.makeThreadSafe(true);
     }
-    
+
     @Test
     public void testMethodQuery() {
         Message m = mockMessage("http://localhost:8080", "/bar", "_method=GET", "POST");
@@ -59,7 +59,7 @@ public class RequestPreprocessorTest extends Assert {
         sqh.preprocess(m, new UriInfoImpl(m, null));
         assertEquals("GET", m.get(Message.HTTP_REQUEST_METHOD));
     }
-    
+
     @Test
     public void testMethodOverride() {
         Message m = mockMessage("http://localhost:8080", "/bar", "bar", "POST", "GET");
@@ -67,7 +67,7 @@ public class RequestPreprocessorTest extends Assert {
         sqh.preprocess(m, new UriInfoImpl(m, null));
         assertEquals("GET", m.get(Message.HTTP_REQUEST_METHOD));
     }
-    
+
     @Test
     public void testTypeQuery() {
         Message m = mockMessage("http://localhost:8080", "/bar", "_type=xml", "POST");
@@ -76,16 +76,16 @@ public class RequestPreprocessorTest extends Assert {
         assertEquals("POST", m.get(Message.HTTP_REQUEST_METHOD));
         assertEquals("application/xml", m.get(Message.ACCEPT_CONTENT_TYPE));
     }
-    
-    private Message mockMessage(String baseAddress, 
-                                String pathInfo, 
+
+    private Message mockMessage(String baseAddress,
+                                String pathInfo,
                                 String query,
                                 String method) {
         return mockMessage(baseAddress, pathInfo, query, method, null);
     }
-    
-    private Message mockMessage(String baseAddress, 
-                                String pathInfo, 
+
+    private Message mockMessage(String baseAddress,
+                                String pathInfo,
                                 String query,
                                 String method,
                                 String methodHeader) {
@@ -102,7 +102,7 @@ public class RequestPreprocessorTest extends Assert {
         EasyMock.expectLastCall().andReturn(ServerProviderFactory.getInstance()).anyTimes();
         ServletDestination d = control.createMock(ServletDestination.class);
         e.setDestination(d);
-        EndpointInfo epr = new EndpointInfo(); 
+        EndpointInfo epr = new EndpointInfo();
         epr.setAddress(baseAddress);
         d.getEndpointInfo();
         EasyMock.expectLastCall().andReturn(epr).anyTimes();
@@ -113,16 +113,16 @@ public class RequestPreprocessorTest extends Assert {
         m.put(Message.HTTP_REQUEST_METHOD, method);
         Map<String, List<String>> headers = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         if (methodHeader != null) {
-            headers.put("X-HTTP-Method-Override", Collections.singletonList(methodHeader));   
+            headers.put("X-HTTP-Method-Override", Collections.singletonList(methodHeader));
         }
         m.put(Message.PROTOCOL_HEADERS, headers);
         BindingInfo bi = control.createMock(BindingInfo.class);
         epr.setBinding(bi);
         bi.getProperties();
         EasyMock.expectLastCall().andReturn(Collections.emptyMap()).anyTimes();
-        
+
         control.replay();
         return m;
     }
-    
+
 }

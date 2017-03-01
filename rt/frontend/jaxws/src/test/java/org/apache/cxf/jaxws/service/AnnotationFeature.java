@@ -26,22 +26,22 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class AnnotationFeature extends AbstractFeature {
-    
+
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         provider.getInInterceptors().add(new AnnotationFeatureInterceptor());
         provider.getOutInterceptors().add(new AnnotationFeatureInterceptor());
     }
-    
+
     public static class AnnotationFeatureInterceptor extends AbstractPhaseInterceptor<Message> {
-        
+
         public AnnotationFeatureInterceptor() {
             super(Phase.SEND);
         }
-        
+
         public void handleMessage(Message message) {
             System.out.println("Handle Message in AnnotationFeatureInterceptor");
         }
-        
+
     }
-    
+
 }

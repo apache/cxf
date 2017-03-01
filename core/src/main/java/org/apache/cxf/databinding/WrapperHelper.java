@@ -24,16 +24,16 @@ import java.util.List;
 import org.apache.cxf.interceptor.Fault;
 
 /**
- *  This wrapper helper will help to create a wrapper object with part elements or 
+ *  This wrapper helper will help to create a wrapper object with part elements or
  *  get a list of part elements from a wrapper object.
  */
-public interface WrapperHelper {    
-    
+public interface WrapperHelper {
+
     Object createWrapperObject(List<?> lst) throws Fault;
-    
+
     List<Object> getWrapperParts(Object o) throws Fault;
 
     String getSignature();
-    
+
 
 }

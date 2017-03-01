@@ -43,13 +43,13 @@ import org.apache.cxf.jca.core.resourceadapter.AbstractManagedConnectionImpl;
 import org.apache.cxf.jca.core.resourceadapter.ResourceAdapterInternalException;
 import org.apache.cxf.jca.cxf.handlers.InvocationHandlerFactory;
 
-public class ManagedConnectionImpl 
-    extends AbstractManagedConnectionImpl 
+public class ManagedConnectionImpl
+    extends AbstractManagedConnectionImpl
     implements CXFManagedConnection, Connection {
 
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ConnectionFactoryImpl.class);   
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ConnectionFactoryImpl.class);
 
-    private InvocationHandlerFactory handlerFactory;    
+    private InvocationHandlerFactory handlerFactory;
     private Object cxfService;
     private boolean connectionHandleActive;
 
@@ -59,8 +59,8 @@ public class ManagedConnectionImpl
     }
 
     public void associateConnection(Object connection) throws ResourceException {
-        try {           
-            CXFInvocationHandler handler = 
+        try {
+            CXFInvocationHandler handler =
                     (CXFInvocationHandler)Proxy.getInvocationHandler(connection);
             Object managedConnection = handler.getData().getManagedConnection();
 
@@ -68,7 +68,7 @@ public class ManagedConnectionImpl
                 handler.getData().setManagedConnection(this);
                 ((ManagedConnectionImpl)managedConnection).disassociateConnectionHandle(connection);
 
-                if (getCXFService() == null) { 
+                if (getCXFService() == null) {
                     // Very unlikely as THIS
                     // managed connection is
                     // already involved in a transaction.
@@ -76,7 +76,7 @@ public class ManagedConnectionImpl
                     connectionHandleActive = true;
                 }
             }
-        } catch (Exception ex) {         
+        } catch (Exception ex) {
             throw new ResourceAdapterInternalException(
                               new Message("ASSOCIATED_ERROR", BUNDLE).toString(), ex);
         }
@@ -100,10 +100,10 @@ public class ManagedConnectionImpl
     public Object getConnection(Subject subject, ConnectionRequestInfo crInfo) throws ResourceException {
 
         Object connection = null;
-        
+
         if (getCXFService() == null) {
             initializeCXFConnection(crInfo, subject);
-            connection = getCXFService();            
+            connection = getCXFService();
         } else {
             if (!connectionHandleActive && this.crinfo.equals(crInfo)) {
                 connection = getCXFService();
@@ -141,14 +141,14 @@ public class ManagedConnectionImpl
             if (requestInfo.getAddress() != null) {
                 factoryBean.setAddress(requestInfo.getAddress());
             }
-            
+
             Object obj = factoryBean.create();
-            
+
             setSubject(subject);
-            
+
             return createConnectionProxy(obj, requestInfo, subject);
         } catch (WebServiceException wse) {
-            throw new ResourceAdapterInternalException(new Message("FAILED_TO_GET_CXF_CONNECTION", 
+            throw new ResourceAdapterInternalException(new Message("FAILED_TO_GET_CXF_CONNECTION",
                                                                    BUNDLE, requestInfo).toString(), wse);
         } finally {
             Thread.currentThread().setContextClassLoader(orig);
@@ -158,25 +158,25 @@ public class ManagedConnectionImpl
     public ManagedConnectionMetaData getMetaData() throws ResourceException {
         return new CXFManagedConnectionMetaData();
     }
-    
-    
+
+
     private boolean isJaxWsServiceInterface(Class<?> cls) {
         if (cls == null) {
             return false;
         }
         return null != cls.getAnnotation(WebService.class);
     }
-    
+
     public boolean isBound() {
         return getCXFService() != null;
     }
 
-    
+
     // Compliance: WL9 checks
     // implemention of Connection method - never used as real Connection impl is
     // a java.lang.Proxy
     public void close() throws ResourceException {
-        //TODO 
+        //TODO
     }
 
     void disassociateConnectionHandle(Object handle) {
@@ -191,10 +191,10 @@ public class ManagedConnectionImpl
 
         Class<?> classes[] = {Connection.class, BindingProvider.class, cri.getInterface()};
 
-        return Proxy.newProxyInstance(cri.getInterface().getClassLoader(), classes, 
+        return Proxy.newProxyInstance(cri.getInterface().getClassLoader(), classes,
                                       createInvocationHandler(obj, subject));
     }
-       
+
     private InvocationHandler createInvocationHandler(Object obj, Subject subject) throws ResourceException {
 
         return getHandlerFactory().createHandlers(obj, subject);
@@ -211,7 +211,7 @@ public class ManagedConnectionImpl
         return ((ManagedConnectionFactoryImpl)getManagedConnectionFactory()).getBus();
     }
 
-    
+
     public void close(Object closingHandle) throws ResourceException {
         if (closingHandle == cxfService) {
             connectionHandleActive = false;
@@ -225,9 +225,9 @@ public class ManagedConnectionImpl
         this.cxfService = null;
         super.destroy();
     }
-   
+
     public CXFTransaction getCXFTransaction() {
-        //TODO should throw the exception  
+        //TODO should throw the exception
         return null;
     }
 

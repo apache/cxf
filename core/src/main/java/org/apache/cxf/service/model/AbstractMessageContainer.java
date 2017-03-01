@@ -31,16 +31,16 @@ import javax.xml.namespace.QName;
 public abstract class AbstractMessageContainer extends AbstractPropertiesHolder implements NamedItem {
     protected QName mName;
     private OperationInfo operation;
-    private Map<QName, MessagePartInfo> messageParts 
+    private Map<QName, MessagePartInfo> messageParts
         = new LinkedHashMap<QName, MessagePartInfo>(4);
     private List<MessagePartInfo> outOfBandParts;
     private String documentation;
-    
-    
+
+
     /**
      * Initializes a new instance of the <code>MessagePartContainer</code>.
      * @param operation the operation.
-     * @param nm 
+     * @param nm
      */
     AbstractMessageContainer(OperationInfo op, QName nm) {
         operation = op;
@@ -53,11 +53,11 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
     public void setMessageDocumentation(String doc) {
         documentation = doc;
     }
-    
+
     public QName getName() {
         return mName;
     }
-    
+
     /**
      * Returns the operation of this container.
      *
@@ -82,14 +82,14 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
         addMessagePart(part);
         return part;
     }
-    
+
     public QName getMessagePartQName(String name) {
         return new QName(this.getOperation().getInterface().getName().getNamespaceURI(), name);
     }
-    
+
     public MessagePartInfo addMessagePart(String name) {
         return addMessagePart(getMessagePartQName(name));
-    }    
+    }
     /**
      * Adds a message part to this container.
      *
@@ -98,7 +98,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
     public void addMessagePart(MessagePartInfo part) {
         if (messageParts.containsKey(part.getName())) {
             part.setIndex(messageParts.get(part.getName()).getIndex());
-        } else { 
+        } else {
             part.setIndex(messageParts.size());
         }
         messageParts.put(part.getName(), part);
@@ -146,7 +146,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
             messageParts.remove(name);
         }
     }
-    
+
     /**
      * Returns the message part with the given name, if found.
      *
@@ -171,7 +171,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
         }
         return mpi;
     }
-    
+
     /**
      * Returns the n'th message part.
      *
@@ -189,9 +189,9 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
             n--;
         }
         return null;
-    }    
-    
-    
+    }
+
+
     public MessagePartInfo addOutOfBandMessagePart(QName name) {
         if (name == null) {
             throw new IllegalArgumentException("Invalid name [null]");
@@ -199,15 +199,15 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
 
         MessagePartInfo part = new MessagePartInfo(name, this);
         if (outOfBandParts == null) {
-            outOfBandParts = new ArrayList<MessagePartInfo>(1);
+            outOfBandParts = new ArrayList<>(1);
         }
         part.setIndex(messageParts.size() + outOfBandParts.size());
         outOfBandParts.add(part);
         return part;
     }
 
-    
-    
+
+
     /**
      * Returns all message parts for this message.
      *
@@ -215,9 +215,9 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
      */
     public List<MessagePartInfo> getMessageParts() {
         if (outOfBandParts == null) {
-            return new ArrayList<MessagePartInfo>(messageParts.values());
+            return new ArrayList<>(messageParts.values());
         }
-        List<MessagePartInfo> parts = new ArrayList<MessagePartInfo>(messageParts.values());
+        List<MessagePartInfo> parts = new ArrayList<>(messageParts.values());
         parts.addAll(outOfBandParts);
         return parts;
     }
@@ -230,7 +230,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
     public MessagePartInfo getFirstMessagePart() {
         if (!messageParts.isEmpty()) {
             return messageParts.values().iterator().next();
-        } else  if (outOfBandParts != null && !outOfBandParts.isEmpty()) {
+        } else if (outOfBandParts != null && !outOfBandParts.isEmpty()) {
             return outOfBandParts.get(0);
         } else {
             return null;
@@ -242,16 +242,16 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
         }
         return Collections.unmodifiableList(outOfBandParts);
     }
-    
+
     public int size() {
         return messageParts.size() + getOutOfBandParts().size();
     }
-    
-    
+
+
     public int hashCode() {
         return mName == null ? -1 : mName.hashCode();
     }
-    
+
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -261,7 +261,7 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
             return false;
         }
         AbstractMessageContainer oi = (AbstractMessageContainer)o;
-        return equals(mName, oi.mName) 
+        return equals(mName, oi.mName)
             && equals(messageParts, oi.messageParts)
             && equals(outOfBandParts, oi.outOfBandParts);
     }

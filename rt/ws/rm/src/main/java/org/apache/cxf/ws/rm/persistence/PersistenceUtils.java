@@ -42,10 +42,10 @@ import org.apache.cxf.ws.rm.RMMessageConstants;
 import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 
 /**
- * 
+ *
  */
 public final class PersistenceUtils {
-    
+
     private static PersistenceUtils instance;
     private JAXBContext context;
 
@@ -54,7 +54,7 @@ public final class PersistenceUtils {
      */
     private PersistenceUtils() {
     }
-    
+
     public static PersistenceUtils getInstance() {
         if (null == instance) {
             instance = new PersistenceUtils();
@@ -97,8 +97,8 @@ public final class PersistenceUtils {
     private JAXBContext getContext() throws JAXBException {
         if (null == context) {
             context = JAXBContext.newInstance(PackageUtils
-                .getPackageName(SequenceAcknowledgement.class), 
-                getClass().getClassLoader()); 
+                .getPackageName(SequenceAcknowledgement.class),
+                getClass().getClassLoader());
         }
         return context;
     }
@@ -144,7 +144,7 @@ public final class PersistenceUtils {
             cosSoap.flush();
             msg.put(RMMessageConstants.SAVED_CONTENT, cosSoap);
             // REVISIT -- At the moment references must be hold for retransmission
-            // and the final cleanup of the CachedOutputStream.  
+            // and the final cleanup of the CachedOutputStream.
             msg.put(RMMessageConstants.ATTACHMENTS_CLOSEABLE, new Closeable() {
 
                 @Override
@@ -158,9 +158,9 @@ public final class PersistenceUtils {
                         cos.close();
                     } catch (IOException e) {
                         // Ignore
-                    }                   
+                    }
                 }
-                
+
             });
         } else {
             msg.put(RMMessageConstants.SAVED_CONTENT, cos);

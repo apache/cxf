@@ -47,10 +47,10 @@ public final class EndpointUtils {
                 return true;
             }
         }
-        
+
         return hasWebServiceAnnotation(cls.getSuperclass());
     }
-    
+
     private static boolean hasWebServiceProviderAnnotation(Class<?> cls) {
         if (cls == null) {
             return false;
@@ -65,7 +65,7 @@ public final class EndpointUtils {
         }
         return hasWebServiceProviderAnnotation(cls.getSuperclass());
     }
-    
+
     public static boolean isValidImplementor(Object implementor) {
         return isValidImplementor(implementor.getClass());
     }
@@ -85,7 +85,7 @@ public final class EndpointUtils {
 
         LOG.info("Implementor is not annotated with WebService annotation.");
         return false;
-    } 
-    
-    
+    }
+
+
 }

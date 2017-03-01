@@ -36,7 +36,7 @@ import io.undertow.security.idm.PasswordCredential;
 import io.undertow.util.HexConverter;
 
 class MapIdentityManager implements IdentityManager {
-    
+
     private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     private final Map<String, char[]> users;

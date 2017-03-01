@@ -36,8 +36,8 @@ public final class Server {
     private Server() {
         //not created
     }
-    
-    
+
+
     static int run(ORB orb, String[] args) throws UserException {
         //
         // Resolve Root POA
@@ -78,7 +78,7 @@ public final class Server {
     public static void main(String args[]) {
         Properties props = System.getProperties();
         props.put("org.omg.CORBA.ORBInitialHost", "localhost");
-        props.put("org.omg.CORBA.ORBInitialPort", "1050");                
+        props.put("org.omg.CORBA.ORBInitialPort", "1050");
 
         int status = 0;
         ORB orb = null;

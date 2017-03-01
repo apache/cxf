@@ -42,23 +42,23 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 @NoJSR250Annotations
 public class UDPTransportFactory extends AbstractTransportFactory
     implements DestinationFactory, ConduitInitiator {
-   
+
     public static final String TRANSPORT_ID = "http://cxf.apache.org/transports/udp";
-    public static final List<String> DEFAULT_NAMESPACES 
+    public static final List<String> DEFAULT_NAMESPACES
         = Arrays.asList(TRANSPORT_ID);
 
     private static final Logger LOG = LogUtils.getL7dLogger(UDPTransportFactory.class);
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
+    private static final Set<String> URI_PREFIXES = new HashSet<>();
     static {
         URI_PREFIXES.add("udp://");
     }
-    
-    private Set<String> uriPrefixes = new HashSet<String>(URI_PREFIXES);
+
+    private Set<String> uriPrefixes = new HashSet<>(URI_PREFIXES);
 
     public UDPTransportFactory() {
         super(DEFAULT_NAMESPACES);
     }
-    
+
     public Destination getDestination(EndpointInfo ei, Bus bus) throws IOException {
         return getDestination(ei, null, bus);
     }

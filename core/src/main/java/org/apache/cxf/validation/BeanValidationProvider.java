@@ -38,7 +38,7 @@ import org.apache.cxf.common.logging.LogUtils;
 
 public class BeanValidationProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(BeanValidationProvider.class);
-    
+
     private final ValidatorFactory factory;
 
     public BeanValidationProvider() {
@@ -49,11 +49,11 @@ public class BeanValidationProvider {
             throw ex;
         }
     }
-    
+
     public BeanValidationProvider(ParameterNameProvider parameterNameProvider) {
         this(new ValidationConfiguration(parameterNameProvider));
     }
-    
+
     public BeanValidationProvider(ValidationConfiguration cfg) {
         try {
             Configuration<?> factoryCfg = Validation.byDefaultProvider().configure();
@@ -64,18 +64,18 @@ public class BeanValidationProvider {
             throw ex;
         }
     }
-    
+
     public BeanValidationProvider(ValidatorFactory factory) {
         if (factory == null) {
             throw new NullPointerException("Factory is null");
         }
         this.factory = factory;
     }
-    
+
     public BeanValidationProvider(ValidationProviderResolver resolver) {
         this(resolver, null);
     }
-    
+
     public <T extends Configuration<T>, U extends ValidationProvider<T>> BeanValidationProvider(
         ValidationProviderResolver resolver,
         Class<U> providerType) {
@@ -87,9 +87,9 @@ public class BeanValidationProvider {
         Class<U> providerType,
         ValidationConfiguration cfg) {
         try {
-            Configuration<?> factoryCfg = providerType != null 
+            Configuration<?> factoryCfg = providerType != null
                 ? Validation.byProvider(providerType).providerResolver(resolver).configure()
-                : Validation.byDefaultProvider().providerResolver(resolver).configure();   
+                : Validation.byDefaultProvider().providerResolver(resolver).configure();
             initFactoryConfig(factoryCfg, cfg);
             factory = factoryCfg.buildValidatorFactory();
         } catch (final ValidationException ex) {
@@ -109,48 +109,48 @@ public class BeanValidationProvider {
             }
         }
     }
-    
+
     public< T > void validateParameters(final T instance, final Method method, final Object[] arguments) {
-        
+
         final ExecutableValidator methodValidator = getExecutableValidator();
-        final Set< ConstraintViolation< T > > violations = methodValidator.validateParameters(instance, 
+        final Set< ConstraintViolation< T > > violations = methodValidator.validateParameters(instance,
             method, arguments);
-        
+
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
-        }                
+        }
     }
-    
+
     public< T > void validateReturnValue(final T instance, final Method method, final Object returnValue) {
         final ExecutableValidator methodValidator = getExecutableValidator();
-        final Set<ConstraintViolation< T > > violations = methodValidator.validateReturnValue(instance, 
+        final Set<ConstraintViolation< T > > violations = methodValidator.validateReturnValue(instance,
             method, returnValue);
-        
+
         if (!violations.isEmpty()) {
             throw new ResponseConstraintViolationException(violations);
-        }                
+        }
     }
-    
+
     public< T > void validateReturnValue(final T bean) {
         final Set<ConstraintViolation< T > > violations = doValidateBean(bean);
         if (!violations.isEmpty()) {
             throw new ResponseConstraintViolationException(violations);
-        }                
+        }
     }
-    
+
     public< T > void validateBean(final T bean) {
         final Set<ConstraintViolation< T > > violations = doValidateBean(bean);
         if (!violations.isEmpty()) {
             throw new ConstraintViolationException(violations);
-        }                
+        }
     }
-    
+
     private< T > Set<ConstraintViolation< T > > doValidateBean(final T bean) {
         return factory.getValidator().validate(bean);
     }
-    
+
     private ExecutableValidator getExecutableValidator() {
-        
+
         return factory.getValidator().forExecutables();
     }
 }

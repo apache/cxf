@@ -37,9 +37,9 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.util.ClassCollector;
 
 public class ClassUtils {
-    
+
     protected static final Logger LOG = LogUtils.getL7dLogger(ClassUtils.class);
-    
+
     public void compile(ToolContext context) throws ToolException {
         Compiler compiler = (Compiler)context.get(ToolConstants.COMPILER);
         if (compiler == null) {
@@ -49,17 +49,17 @@ public class ClassUtils {
         if (context.isVerbose()) {
             compiler.setVerbose(true);
         }
-        
+
         compiler.setEncoding((String)context.get(ToolConstants.CFG_ENCODING));
-        
+
         if (context.get(ToolConstants.CFG_CLASSDIR) != null) {
             compiler.setOutputDir((String)context.get(ToolConstants.CFG_CLASSDIR));
         }
-        
+
         String javaClasspath = System.getProperty("java.class.path");
         if (javaClasspath != null) {
-            if (context.get(ToolConstants.CFG_OUTPUTDIR) != null) { 
-                compiler.setClassPath(javaClasspath + File.pathSeparatorChar 
+            if (context.get(ToolConstants.CFG_OUTPUTDIR) != null) {
+                compiler.setClassPath(javaClasspath + File.pathSeparatorChar
                             + context.get(ToolConstants.CFG_OUTPUTDIR));
             } else {
                 compiler.setClassPath(javaClasspath);
@@ -67,16 +67,16 @@ public class ClassUtils {
         }
 
         String outPutDir = (String)context.get(ToolConstants.CFG_OUTPUTDIR);
-       
-        Set<String> dirSet = new HashSet<String>();
+
+        Set<String> dirSet = new HashSet<>();
         ClassCollector classCollector = context.get(ClassCollector.class);
-        List<String> fileList = new ArrayList<String>();
+        List<String> fileList = new ArrayList<>();
         Iterator<String> ite = classCollector.getGeneratedFileInfo().iterator();
         while (ite.hasNext()) {
             String fileName = ite.next();
             fileName = fileName.replace('.', File.separatorChar);
             String dirName = fileName.substring(0, fileName.lastIndexOf(File.separator) + 1);
-            
+
             String path = outPutDir + File.separator + dirName;
             if (!dirSet.contains(path)) {
 
@@ -122,9 +122,9 @@ public class ClassUtils {
         if (!compiler.compileFiles(fileList.toArray(new String[fileList.size()]))) {
             Message msg = new Message("FAIL_TO_COMPILE_GENERATE_CODES", LOG);
             throw new ToolException(msg);
-        }        
+        }
     }
-    
+
     private void copyXmlFile(File from, File to) throws ToolException, IOException {
 
         String dir = to.getCanonicalPath()
@@ -146,5 +146,5 @@ public class ClassUtils {
             Message msg = new Message("FAIL_TO_COPY_GENERATED_RESOURCE_FILE", LOG);
             throw new ToolException(msg, e);
         }
-    }    
+    }
 }

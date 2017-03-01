@@ -35,22 +35,22 @@ public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterfa
     HttpHeadersContext {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();
-    @Context 
+    @Context
     private UriInfo ui;
 
     private HttpHeaders hs;
-    
+
     public BookStoreNoAnnotationsImpl() {
         Book b = new Book();
         b.setId(123L);
         b.setName("CXF in Action");
         books.put(b.getId(), b);
     }
-    
+
     public void setHttpHeaders(HttpHeaders headers) {
-        this.hs = headers;    
+        this.hs = headers;
     }
-    
+
     public Book getBook(Long id) throws BookNotFoundFault {
         if (hs == null) {
             throw new WebApplicationException(Response.serverError().build());
@@ -61,11 +61,11 @@ public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterfa
         }
         return books.get(id);
     }
-    
+
     public ChapterNoAnnotations getBookChapter(Long id) throws BookNotFoundFault {
         Book b = books.get(id);
         Chapter ch = b.getChapter(1);
-        
+
         ChapterNoAnnotations ch2 = new ChapterNoAnnotations();
         ch2.setId(ch.getId());
         ch2.setTitle(ch.getTitle());
@@ -79,5 +79,5 @@ public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterfa
     public void pingBookStore() {
         // complete
     }
-    
+
 }

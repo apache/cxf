@@ -85,7 +85,7 @@ public class Base64DecoderStream extends FilterInputStream {
             } catch (Base64Exception e) {
                 throw new IOException(e);
             }
-            decodedCount = decodedChars.length; 
+            decodedCount = decodedChars.length;
             return true;
         }
         return false;
@@ -102,7 +102,7 @@ public class Base64DecoderStream extends FilterInputStream {
             return -1;
         }
         decodedCount--;
-        // we need to ensure this doesn't get sign extended 
+        // we need to ensure this doesn't get sign extended
         return decodedChars[decodedIndex++] & 0xff;
     }
 

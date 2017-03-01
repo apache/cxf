@@ -29,7 +29,7 @@ public class Server {
     protected Server() throws Exception {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(CustomerService.class);
-        sf.setResourceProvider(CustomerService.class, 
+        sf.setResourceProvider(CustomerService.class,
             new SingletonResourceProvider(new CustomerService()));
         sf.setAddress(HOST_URL + CONTEXT_PATH);
 

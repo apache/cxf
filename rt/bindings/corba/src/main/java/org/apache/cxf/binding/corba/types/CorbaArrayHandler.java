@@ -27,24 +27,24 @@ import org.omg.CORBA.TypeCode;
 
 public class CorbaArrayHandler extends CorbaObjectHandler {
 
-    private List<CorbaObjectHandler> elements = new ArrayList<CorbaObjectHandler>();
-    
+    private List<CorbaObjectHandler> elements = new ArrayList<>();
+
     public CorbaArrayHandler(QName arrayName, QName arrayIdlType, TypeCode arrayTC, Object arrayType) {
         super(arrayName, arrayIdlType, arrayTC, arrayType);
     }
-    
+
     public void addElement(CorbaObjectHandler el) {
         elements.add(el);
     }
-    
+
     public int getNumberOfElements() {
         return elements.size();
     }
-    
+
     public List<CorbaObjectHandler> getElements() {
         return elements;
     }
-    
+
     public CorbaObjectHandler getElement(int index) {
         return elements.get(index);
     }
@@ -53,5 +53,5 @@ public class CorbaArrayHandler extends CorbaObjectHandler {
         for (int i = 0; i < elements.size(); i++) {
             elements.get(i).clear();
         }
-    }  
+    }
 }

@@ -29,29 +29,29 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
  * This class retrieves a custom AlgorithmSuite for use with restricted security policies
  */
 public class RestrictedAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
-    
+
     public RestrictedAlgorithmSuiteLoader(Bus bus) {
         bus.setExtension(this, AlgorithmSuiteLoader.class);
     }
 
     public AlgorithmSuite getAlgorithmSuite(Bus bus, SPConstants.SPVersion version, Policy nestedPolicy) {
-        return new CustomAlgorithmSuite(version, nestedPolicy); 
+        return new CustomAlgorithmSuite(version, nestedPolicy);
     }
 
     private static class CustomAlgorithmSuite extends AlgorithmSuite {
 
         CustomAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {
             super(version, nestedPolicy);
-            
+
             for (String key : ALGORITHM_SUITE_TYPES.keySet()) {
                 AlgorithmSuiteType algSuite = ALGORITHM_SUITE_TYPES.get(key);
-                AlgorithmSuiteType newAlgSuite = 
+                AlgorithmSuiteType newAlgSuite =
                     new AlgorithmSuiteType(algSuite.getName(), algSuite.getDigest(),
                                            algSuite.getEncryption(), algSuite.getSymmetricKeyWrap(),
                                            algSuite.getAsymmetricKeyWrap(), algSuite.getEncryptionKeyDerivation(),
-                                           algSuite.getSignatureKeyDerivation(), 
+                                           algSuite.getSignatureKeyDerivation(),
                                            algSuite.getEncryptionDerivedKeyLength(),
-                                           algSuite.getSignatureDerivedKeyLength(), 
+                                           algSuite.getSignatureDerivedKeyLength(),
                                            algSuite.getMinimumSymmetricKeyLength(),
                                            algSuite.getMaximumSymmetricKeyLength(), 512,
                                            algSuite.getMaximumAsymmetricKeyLength());

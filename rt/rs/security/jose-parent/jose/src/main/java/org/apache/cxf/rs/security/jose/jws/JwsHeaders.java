@@ -39,7 +39,7 @@ public class JwsHeaders extends JoseHeaders {
     public JwsHeaders(JwsHeaders headers) {
         super(headers.asMap());
     }
-    
+
     public JwsHeaders(Map<String, Object> values) {
         super(values);
     }
@@ -59,11 +59,11 @@ public class JwsHeaders extends JoseHeaders {
     private void init(SignatureAlgorithm sigAlgo) {
         setSignatureAlgorithm(sigAlgo);
     }
-    
-    public void setSignatureAlgorithm(SignatureAlgorithm algo) {
+
+    public final void setSignatureAlgorithm(SignatureAlgorithm algo) {
         super.setAlgorithm(algo.getJwaName());
     }
-    
+
     public SignatureAlgorithm getSignatureAlgorithm() {
         String algo = super.getAlgorithm();
         return algo == null ? null : SignatureAlgorithm.getAlgorithm(algo);
@@ -79,7 +79,7 @@ public class JwsHeaders extends JoseHeaders {
                 return;
             }
             critical.add(JoseConstants.JWS_HEADER_B64_STATUS_HEADER);
-            
+
         }
     }
     public Boolean getPayloadEncodingStatus() {

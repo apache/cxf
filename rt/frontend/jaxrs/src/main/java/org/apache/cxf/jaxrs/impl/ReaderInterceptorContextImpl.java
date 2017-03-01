@@ -34,7 +34,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
-public class ReaderInterceptorContextImpl extends AbstractInterceptorContextImpl 
+public class ReaderInterceptorContextImpl extends AbstractInterceptorContextImpl
     implements ReaderInterceptorContext {
 
     private List<ReaderInterceptor> readers;
@@ -49,7 +49,7 @@ public class ReaderInterceptorContextImpl extends AbstractInterceptorContextImpl
         this.is = is;
         this.readers = readers;
     }
-    
+
     @Override
     public MultivaluedMap<String, String> getHeaders() {
         return HttpUtils.getModifiableStringHeaders(m);
@@ -87,7 +87,7 @@ public class ReaderInterceptorContextImpl extends AbstractInterceptorContextImpl
             providerSelectionPropertyChanged();
         }
         getHeaders().putSingle(HttpHeaders.CONTENT_TYPE, JAXRSUtils.mediaTypeToString(mt));
-        
+
     }
 
 }

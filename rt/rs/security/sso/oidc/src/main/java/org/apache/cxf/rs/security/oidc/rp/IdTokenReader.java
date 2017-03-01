@@ -27,12 +27,12 @@ import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 public class IdTokenReader extends OidcClaimsValidator {
     private boolean requireAtHash = true;
     private boolean requireCodeHash;
-    
+
     public IdToken getIdToken(ClientAccessToken at, String code, Consumer client) {
         JwtToken jwt = getIdJwtToken(at, code, client);
         return getIdTokenFromJwt(jwt);
     }
-    
+
     public IdToken getIdToken(ClientAccessToken at, Consumer client) {
         return getIdToken(at, null, client);
     }
@@ -42,7 +42,7 @@ public class IdTokenReader extends OidcClaimsValidator {
     }
     public JwtToken getIdJwtToken(ClientAccessToken at, String code, Consumer client) {
         String idJwtToken = at.getParameters().get(OidcUtils.ID_TOKEN);
-        JwtToken jwt = getIdJwtToken(idJwtToken, client); 
+        JwtToken jwt = getIdJwtToken(idJwtToken, client);
         OidcUtils.validateAccessTokenHash(at, jwt, requireAtHash);
         OidcUtils.validateCodeHash(code, jwt, requireCodeHash);
         return jwt;

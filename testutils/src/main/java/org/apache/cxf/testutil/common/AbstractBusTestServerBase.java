@@ -22,9 +22,9 @@ package org.apache.cxf.testutil.common;
 import org.apache.cxf.Bus;
 
 public abstract class AbstractBusTestServerBase extends AbstractTestServerBase {
-    
+
     private Bus bus;
-    
+
     public boolean stopInProcess() throws Exception {
         boolean ret = super.stopInProcess();
         if (bus != null) {
@@ -35,15 +35,15 @@ public abstract class AbstractBusTestServerBase extends AbstractTestServerBase {
             }
         }
         return ret;
-    }    
-    
-    public Bus getBus() {
-        return bus; 
-    }
-    
-    public void setBus(Bus b) {
-        bus = b; 
     }
 
-    
+    public Bus getBus() {
+        return bus;
+    }
+
+    public void setBus(Bus b) {
+        bus = b;
+    }
+
+
 }

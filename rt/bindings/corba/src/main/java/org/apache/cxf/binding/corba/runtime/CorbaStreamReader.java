@@ -32,10 +32,10 @@ import javax.xml.stream.events.Namespace;
 import org.apache.cxf.binding.corba.types.CorbaTypeEventProducer;
 
 public class CorbaStreamReader implements XMLStreamReader {
-     
+
     private CorbaTypeEventProducer eventProducer;
     private int currentState;
-    
+
     public CorbaStreamReader(CorbaTypeEventProducer evProducer) {
         eventProducer = evProducer;
         currentState = XMLStreamReader.START_DOCUMENT;
@@ -107,7 +107,7 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public int getAttributeCount() {
-        List<Attribute> currentAttributes =  eventProducer.getAttributes();
+        List<Attribute> currentAttributes = eventProducer.getAttributes();
         if (currentAttributes != null) {
             return currentAttributes.size();
         }
@@ -138,7 +138,7 @@ public class CorbaStreamReader implements XMLStreamReader {
         return ret;
     }
 
- 
+
     public String getAttributeNamespace(int arg0) {
         String ret = null;
         List<Attribute> currentAttributes = eventProducer.getAttributes();
@@ -217,7 +217,7 @@ public class CorbaStreamReader implements XMLStreamReader {
                 // TODO Auto-generated method stub
                 return null;
             }
-            
+
         };
     }
 
@@ -333,7 +333,7 @@ public class CorbaStreamReader implements XMLStreamReader {
     }
 
     public void require(int arg0, String arg1, String arg2) throws XMLStreamException {
-        // TODO Auto-generated method stub        
+        // TODO Auto-generated method stub
     }
 
     public boolean standaloneSet() {

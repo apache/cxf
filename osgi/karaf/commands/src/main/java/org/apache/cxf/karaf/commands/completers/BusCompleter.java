@@ -31,7 +31,7 @@ import org.apache.karaf.shell.support.completers.StringsCompleter;
 
 @Service
 public class BusCompleter extends CXFController implements Completer {
-    
+
     @Override
     public int complete(Session session,
                         CommandLine commandLine,
@@ -39,11 +39,11 @@ public class BusCompleter extends CXFController implements Completer {
         StringsCompleter delegate = new StringsCompleter();
         try {
             List<Bus> busses = getBusses();
-           
+
             for (Bus bus : busses) {
                 delegate.getStrings().add(bus.getId());
             }
-            
+
         } catch (Exception e) {
             // Ignore
         }

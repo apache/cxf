@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 /**
  * A collection of utilities relating to InetAddresses.
- * 
+ *
  * Copied from httpclient.
  */
 public final class InetAddressUtils {
@@ -62,7 +62,7 @@ public final class InetAddressUtils {
 
     // Must not have more than 7 colons (i.e. 8 fields)
     private static final int MAX_COLON_COUNT = 7;
-    
+
     private InetAddressUtils() {
     }
 
@@ -103,7 +103,7 @@ public final class InetAddressUtils {
                 colonCount++;
             }
         }
-        return  colonCount <= MAX_COLON_COUNT && IPV6_HEX_COMPRESSED_PATTERN.matcher(input).matches();
+        return colonCount <= MAX_COLON_COUNT && IPV6_HEX_COMPRESSED_PATTERN.matcher(input).matches();
     }
 
     /**

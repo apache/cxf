@@ -40,17 +40,17 @@ import org.apache.cxf.wsn.util.WSNHelper;
 
 public class JaxwsEndpointManager implements EndpointManager {
     protected MBeanServer mbeanServer;
-    
+
 
 
     public void setMBeanServer(MBeanServer s) {
         mbeanServer = s;
     }
-    
-    
+
+
     public Endpoint register(String address, Object service, URL wsdlLocation)
         throws EndpointRegistrationException {
-        
+
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             if (WSNHelper.getInstance().setClassLoader()) {
@@ -67,7 +67,7 @@ public class JaxwsEndpointManager implements EndpointManager {
                         endpoint.setProperties(new HashMap<String, Object>());
                     }
                     endpoint.getProperties().put("javax.xml.ws.wsdl.description", wsdlLocation.toExternalForm());
-                    List<Source> mt = new ArrayList<Source>();
+                    List<Source> mt = new ArrayList<>();
                     StreamSource src = new StreamSource(wsdlLocation.openStream(), wsdlLocation.toExternalForm());
                     mt.add(src);
                     endpoint.setMetadata(mt);
@@ -76,9 +76,9 @@ public class JaxwsEndpointManager implements EndpointManager {
                 }
             }
             endpoint.publish(address);
-            
+
             try {
-                if (mbeanServer != null 
+                if (mbeanServer != null
                     && service instanceof AbstractEndpoint) {
                     ObjectName on = ((AbstractEndpoint)service).getMBeanName();
                     if (on != null) {
@@ -99,7 +99,7 @@ public class JaxwsEndpointManager implements EndpointManager {
     }
     public void unregister(Endpoint endpoint, Object service) throws EndpointRegistrationException {
         try {
-            if (mbeanServer != null 
+            if (mbeanServer != null
                 && service instanceof AbstractEndpoint) {
                 ObjectName on = ((AbstractEndpoint)service).getMBeanName();
                 if (on != null) {

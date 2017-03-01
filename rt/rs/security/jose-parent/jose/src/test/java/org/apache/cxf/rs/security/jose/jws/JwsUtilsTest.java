@@ -39,22 +39,35 @@ public class JwsUtilsTest extends Assert {
     @Test
     public void testLoadSignatureProviderFromJKS() throws Exception {
         Properties p = new Properties();
-        p.put(JoseConstants.RSSEC_KEY_STORE_FILE, 
+        p.put(JoseConstants.RSSEC_KEY_STORE_FILE,
             "org/apache/cxf/rs/security/jose/jws/alice.jks");
         p.put(JoseConstants.RSSEC_KEY_STORE_PSWD, "password");
         p.put(JoseConstants.RSSEC_KEY_PSWD, "password");
         p.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "alice");
         JwsHeaders headers = new JwsHeaders();
         JwsSignatureProvider jws = JwsUtils.loadSignatureProvider(createMessage(),
-                                                                  p, 
+                                                                  p,
                                                                   headers);
         assertNotNull(jws);
         assertEquals("alice", headers.getKeyId());
     }
     @Test
+    public void testLoadSignatureVerifierFromJKS() throws Exception {
+        Properties p = new Properties();
+        p.put(JoseConstants.RSSEC_KEY_STORE_FILE,
+            "org/apache/cxf/rs/security/jose/jws/alice.jks");
+        p.put(JoseConstants.RSSEC_KEY_STORE_PSWD, "password");
+        p.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "alice");
+        JwsSignatureVerifier jws = JwsUtils.loadSignatureVerifier(createMessage(),
+                                                                  p,
+                                                                  new JwsHeaders(),
+                                                                  false);
+        assertNotNull(jws);
+    }
+    @Test
     public void testLoadVerificationKey() throws Exception {
         Properties p = new Properties();
-        p.put(JoseConstants.RSSEC_KEY_STORE_FILE, 
+        p.put(JoseConstants.RSSEC_KEY_STORE_FILE,
             "org/apache/cxf/rs/security/jose/jws/alice.jks");
         p.put(JoseConstants.RSSEC_KEY_STORE_PSWD, "password");
         p.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "alice");
@@ -73,7 +86,7 @@ public class JwsUtilsTest extends Assert {
     @Test
     public void testLoadVerificationKeyWithCert() throws Exception {
         Properties p = new Properties();
-        p.put(JoseConstants.RSSEC_KEY_STORE_FILE, 
+        p.put(JoseConstants.RSSEC_KEY_STORE_FILE,
             "org/apache/cxf/rs/security/jose/jws/alice.jks");
         p.put(JoseConstants.RSSEC_KEY_STORE_PSWD, "password");
         p.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "alice");
@@ -92,7 +105,7 @@ public class JwsUtilsTest extends Assert {
         assertNotNull(chain);
         assertEquals(2, chain.size());
     }
-    
+
     private Message createMessage() {
         Message m = new MessageImpl();
         Exchange e = new ExchangeImpl();

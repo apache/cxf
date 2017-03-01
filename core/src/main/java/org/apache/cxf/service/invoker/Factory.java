@@ -22,18 +22,18 @@ import org.apache.cxf.message.Exchange;
 
 /**
  * Represents an object factory.
- * 
+ *
  * Used at invoke time to find the object that the invokation will use
  */
 public interface Factory {
-    
+
     /**
-     * Creates the object that will be used for the invoke 
-     * @param e 
+     * Creates the object that will be used for the invoke
+     * @param e
      * @throws Throwable
      */
     Object create(Exchange e) throws Throwable;
-    
+
     /**
      * Post invoke, this is called to allow the factory to release
      * the object, store it, etc...

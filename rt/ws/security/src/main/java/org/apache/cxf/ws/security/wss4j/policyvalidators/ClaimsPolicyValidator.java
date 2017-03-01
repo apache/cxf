@@ -27,16 +27,16 @@ import org.apache.wss4j.common.saml.SamlAssertionWrapper;
  * Validate a WS-SecurityPolicy Claims policy.
  */
 public interface ClaimsPolicyValidator {
-    
+
     /**
-     * Validate a particular Claims policy against a received SAML Assertion. 
+     * Validate a particular Claims policy against a received SAML Assertion.
      * Return true if the policy is valid.
      */
     boolean validatePolicy(
         Element claimsPolicy,
         SamlAssertionWrapper assertion
     );
-    
+
     /**
      * Return the dialect that this ClaimsPolicyValidator can parse
      */

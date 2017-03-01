@@ -39,25 +39,25 @@ import org.junit.Test;
 
 public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTest {
     public static final String PORT = BookContinuationServlet3Server.PORT;
-   
-    
+
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         createStaticBus();
         assertTrue("server did not launch correctly",
                    launchServer(BookContinuationServlet3Server.class));
-                   
-                   
+
+
     }
-    
+
     @Test
     public void testTimeoutAndCancelAsyncExecutor() throws Exception {
         doTestTimeoutAndCancel("/asyncexecutor/bookstore");
     }
     @Test
     public void testGetBookUnmappedFromFilter() throws Exception {
-        WebClient wc = 
+        WebClient wc =
             WebClient.create("http://localhost:" + getPort() + getBaseAddress()
                              + "/books/unmappedFromFilter");
         wc.accept("text/plain");
@@ -70,17 +70,17 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
         assertTrue("server did not launch correctly", launcher.launchServer());
         Thread.sleep(4000);
     }
-    
+
     @Test
-    public void testCancelVoidOnResumedTest() throws Exception { 
+    public void testCancelVoidOnResumedTest() throws Exception {
         String base = "http://localhost:" + getPort() + "/async/resource/";
-        String expectedResponse = "Expected response"; 
-        Future<Response> suspend = invokeRequest(base + "suspend"); 
-        Future<Response> resume = invokeRequest(base + "resume?stage=0", expectedResponse); 
-        assertString(resume, AsyncResource.TRUE); 
-        assertString(suspend, expectedResponse); 
-        Future<Response> cancel = invokeRequest(base + "cancelvoid?stage=1"); 
-        assertString(cancel, AsyncResource.FALSE); 
+        String expectedResponse = "Expected response";
+        Future<Response> suspend = invokeRequest(base + "suspend");
+        Future<Response> resume = invokeRequest(base + "resume?stage=0", expectedResponse);
+        assertString(resume, AsyncResource.TRUE);
+        assertString(suspend, expectedResponse);
+        Future<Response> cancel = invokeRequest(base + "cancelvoid?stage=1");
+        assertString(cancel, AsyncResource.FALSE);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
     }
 
     @Test
-    public void testSuspendSetTimeoutt() throws Exception { 
+    public void testSuspendSetTimeoutt() throws Exception {
         final String base = "http://localhost:" + getPort() + "/async/resource2/";
         Future<Response> suspend = invokeRequest(base + "suspend");
         Thread t = new Thread(new Runnable() {
@@ -107,40 +107,40 @@ public class JAXRSContinuationsServlet3Test extends AbstractJAXRSContinuationsTe
         });
         t.start();
         t.join();
-        
+
         assertEquals(503, suspend.get().getStatus());
-         
+
     }
 
-    private static void assertString(Future<Response> future, String check) throws Exception { 
-        Response response = future.get(); 
-        assertEquals(response.getStatus(), Status.OK.getStatusCode()); 
-        String content = response.readEntity(String.class); 
-        assertEquals(check, content); 
+    private static void assertString(Future<Response> future, String check) throws Exception {
+        Response response = future.get();
+        assertEquals(response.getStatus(), Status.OK.getStatusCode());
+        String content = response.readEntity(String.class);
+        assertEquals(check, content);
     }
 
-    private <T> Future<Response> invokeRequest(String resource, T entity) { 
-        AsyncInvoker async = createAsyncInvoker(resource); 
+    private <T> Future<Response> invokeRequest(String resource, T entity) {
+        AsyncInvoker async = createAsyncInvoker(resource);
         return async.post(Entity.entity(entity, MediaType.TEXT_PLAIN_TYPE));
     }
 
-    private Future<Response> invokeRequest(String resource) { 
-        AsyncInvoker async = createAsyncInvoker(resource); 
-        return async.get(); 
+    private Future<Response> invokeRequest(String resource) {
+        AsyncInvoker async = createAsyncInvoker(resource);
+        return async.get();
     }
 
-    private AsyncInvoker createAsyncInvoker(String resource) { 
-        WebTarget target = ClientBuilder.newClient().target(resource); 
+    private AsyncInvoker createAsyncInvoker(String resource) {
+        WebTarget target = ClientBuilder.newClient().target(resource);
         return target.request().async();
-    } 
-    
+    }
+
     protected String getBaseAddress() {
         return "/async/bookstore";
     }
     protected String getBaseAddress2() {
         return "/async2/bookstore";
     }
-    
+
     protected String getPort() {
         return PORT;
     }

@@ -31,9 +31,6 @@
     </parent>
     <modules>
         <module>jaxb</module>
-        <module>xmlbeans</module>
         <module>aegis</module>
-        <module>sdo</module>
-        <module>jibx</module>
     </modules>
 </project>

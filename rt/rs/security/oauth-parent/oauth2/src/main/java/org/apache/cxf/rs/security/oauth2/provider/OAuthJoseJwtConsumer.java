@@ -26,16 +26,16 @@ import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public class OAuthJoseJwtConsumer extends JoseJwtConsumer {
-   
+
     private boolean decryptWithClientSecret;
     private boolean verifyWithClientSecret;
-    
+
     public JwtToken getJwtToken(String wrappedJwtToken, String clientSecret) {
-        return getJwtToken(wrappedJwtToken, 
+        return getJwtToken(wrappedJwtToken,
                            getInitializedDecryptionProvider(clientSecret),
                            getInitializedSignatureVerifier(clientSecret));
     }
-    
+
     protected JwsSignatureVerifier getInitializedSignatureVerifier(String clientSecret) {
         if (verifyWithClientSecret && !StringUtils.isEmpty(clientSecret)) {
             return OAuthUtils.getClientSecretSignatureVerifier(clientSecret);
@@ -51,10 +51,21 @@ public class OAuthJoseJwtConsumer extends JoseJwtConsumer {
         }
     }
 
-    public void setDecryptWithClientSecret(boolean decryptWithClientSecret) {
-        this.decryptWithClientSecret = verifyWithClientSecret;
+    public boolean isDecryptWithClientSecret() {
+        return decryptWithClientSecret;
     }
+
+    public void setDecryptWithClientSecret(boolean decryptWithClientSecret) {
+        this.decryptWithClientSecret = decryptWithClientSecret;
+    }
+
+    public boolean isVerifyWithClientSecret() {
+        return verifyWithClientSecret;
+    }
+
     public void setVerifyWithClientSecret(boolean verifyWithClientSecret) {
         this.verifyWithClientSecret = verifyWithClientSecret;
     }
+
+
 }

@@ -29,11 +29,11 @@ public class ComplexException extends org.omg.CORBA.UserException {
     private String reason;
     private MyBean[] beans;
     private int[] ints;
-    
+
     public ComplexException(String msg) {
         super(msg);
     }
-    
+
     public String getReason() {
         return reason;
     }
@@ -56,8 +56,8 @@ public class ComplexException extends org.omg.CORBA.UserException {
     public void setInts(int[] ints) {
         this.ints = ints;
     }
-    
-    
+
+
     @XmlAccessorType(XmlAccessType.PROPERTY)
     public static class MyBean {
 
@@ -79,7 +79,7 @@ public class ComplexException extends org.omg.CORBA.UserException {
         public void setAge(int age) {
             this.age = age;
         }
-        
-        
+
+
     }
 }

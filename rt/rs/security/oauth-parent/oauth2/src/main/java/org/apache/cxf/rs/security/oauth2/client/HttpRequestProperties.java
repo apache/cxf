@@ -30,28 +30,28 @@ public class HttpRequestProperties {
     private String httpMethod;
     private String requestPath;
     private String requestQuery;
-     
+
     public HttpRequestProperties(WebClient wc, String httpMethod) {
         this(wc.getCurrentURI(), httpMethod);
     }
-    
+
     public HttpRequestProperties(URI uri, String httpMethod) {
         this(uri.getHost(), getPortFromURI(uri), httpMethod,
              uri.getRawPath(), uri.getRawQuery());
     }
-    
+
     public HttpRequestProperties(String hostName, int port, String httpMethod, String requestPath) {
         this(hostName, port, httpMethod, requestPath, null);
     }
-    
-    public HttpRequestProperties(String hostName, int port, String httpMethod, 
+
+    public HttpRequestProperties(String hostName, int port, String httpMethod,
                                  String requestPath, String requestQuery) {
         this.requestPath = requestPath;
         this.hostName = hostName;
         this.port = port;
         this.httpMethod = httpMethod;
     }
-    
+
     private static int getPortFromURI(URI uri) {
         int port = uri.getPort();
         if (port == -1) {
@@ -63,11 +63,11 @@ public class HttpRequestProperties {
         }
         return port;
     }
-    
+
     public String getRequestPath() {
         return requestPath;
     }
-    
+
     public String getRequestQuery() {
         return requestQuery;
     }

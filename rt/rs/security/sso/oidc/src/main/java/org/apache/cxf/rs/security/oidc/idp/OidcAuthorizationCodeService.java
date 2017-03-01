@@ -36,7 +36,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oidc.utils.OidcUtils;
 
 public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService {
-    
+
     @Override
     protected boolean canAuthorizationBeSkipped(MultivaluedMap<String, String> params,
                                                 Client client,
@@ -51,7 +51,7 @@ public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService 
         // Check the pre-configured consent
         boolean preConfiguredConsentForScopes =
             super.canAuthorizationBeSkipped(params, client, userSubject, requestedScope, permissions);
-        
+
         if (!preConfiguredConsentForScopes && promptValues.contains(OidcUtils.PROMPT_NONE_VALUE)) {
             // An error is returned if client does not have pre-configured consent for the requested scopes/claims
             LOG.log(Level.FINE, "Prompt 'none' request can not be met");
@@ -59,26 +59,26 @@ public class OidcAuthorizationCodeService extends AuthorizationCodeGrantService 
         }
         return preConfiguredConsentForScopes;
     }
-    
+
     public void setSkipAuthorizationWithOidcScope(boolean skipAuthorizationWithOidcScope) {
         super.setScopesRequiringNoConsent(Collections.singletonList(OidcUtils.OPENID_SCOPE));
     }
-    
+
     @Override
-    protected Response startAuthorization(MultivaluedMap<String, String> params, 
+    protected Response startAuthorization(MultivaluedMap<String, String> params,
                                           UserSubject userSubject,
                                           Client client,
-                                          String redirectUri) {    
+                                          String redirectUri) {
         // Validate the prompt - if it contains "none" then an error is returned with any other value
         List<String> promptValues = OidcUtils.getPromptValues(params);
         if (promptValues != null && promptValues.size() > 1 && promptValues.contains(OidcUtils.PROMPT_NONE_VALUE)) {
             LOG.log(Level.FINE, "The prompt value {} is invalid", params.getFirst(OidcUtils.PROMPT_PARAMETER));
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_REQUEST);
         }
-        
+
         return super.startAuthorization(params, userSubject, client, redirectUri);
     }
-    
+
     @Override
     protected OAuthRedirectionState recreateRedirectionStateFromParams(
         MultivaluedMap<String, String> params) {

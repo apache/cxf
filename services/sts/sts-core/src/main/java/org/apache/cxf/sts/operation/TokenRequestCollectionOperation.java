@@ -43,12 +43,12 @@ import org.apache.cxf.ws.security.sts.provider.operation.RequestCollectionOperat
 import org.apache.cxf.ws.security.sts.provider.operation.ValidateOperation;
 
 /**
- * An implementation of the RequestCollectionOperation interface. It is composed of the different 
+ * An implementation of the RequestCollectionOperation interface. It is composed of the different
  * Operation implementations
  */
 public class TokenRequestCollectionOperation extends AbstractOperation
     implements RequestCollectionOperation {
-    
+
     public static final String WSTRUST_REQUESTTYPE_BATCH_ISSUE = STSConstants.WST_NS_05_12
         + "/BatchIssue";
     public static final String WSTRUST_REQUESTTYPE_BATCH_CANCEL = STSConstants.WST_NS_05_12
@@ -57,9 +57,9 @@ public class TokenRequestCollectionOperation extends AbstractOperation
         + "/BatchRenew";
     public static final String WSTRUST_REQUESTTYPE_BATCH_VALIDATE = STSConstants.WST_NS_05_12
         + "/BatchValidate";
-    
+
     static final Logger LOG = LogUtils.getL7dLogger(TokenRequestCollectionOperation.class);
-    
+
     private IssueSingleOperation issueSingleOperation;
     private ValidateOperation validateOperation;
     private RenewOperation renewOperation;
@@ -69,9 +69,9 @@ public class TokenRequestCollectionOperation extends AbstractOperation
         RequestSecurityTokenCollectionType requestCollection,
         Principal principal,
         Map<String, Object> messageContext) {
-        RequestSecurityTokenResponseCollectionType responseCollection = 
+        RequestSecurityTokenResponseCollectionType responseCollection =
             QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponseCollectionType();
-        
+
         String requestType = null;
         for (RequestSecurityTokenType request : requestCollection.getRequestSecurityToken()) {
             List<?> objectList = request.getAny();
@@ -83,7 +83,7 @@ public class TokenRequestCollectionOperation extends AbstractOperation
                         // All batch requests must have the same RequestType
                         if (val == null || (requestType != null && !requestType.equals(val))) {
                             LOG.log(
-                                Level.WARNING, 
+                                Level.WARNING,
                                 "All RequestSecurityTokenCollection elements do not share the same"
                                 + "RequestType"
                             );
@@ -96,14 +96,14 @@ public class TokenRequestCollectionOperation extends AbstractOperation
                     }
                 }
             }
-            
-            RequestSecurityTokenResponseType response = 
+
+            RequestSecurityTokenResponseType response =
                 handleRequest(request, principal, messageContext, requestType);
             responseCollection.getRequestSecurityTokenResponse().add(response);
         }
         return responseCollection;
     }
-    
+
     public RequestSecurityTokenResponseType handleRequest(
             RequestSecurityTokenType request,
             Principal principal,
@@ -149,7 +149,7 @@ public class TokenRequestCollectionOperation extends AbstractOperation
             );
         }
     }
-    
+
     public IssueSingleOperation getIssueSingleOperation() {
         return issueSingleOperation;
     }

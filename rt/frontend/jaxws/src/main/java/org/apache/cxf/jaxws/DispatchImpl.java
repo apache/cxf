@@ -101,7 +101,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
     private static final String INVOKE_ONEWAY_NAME = "InvokeOneWay";
     private static final QName INVOKE_QNAME = new QName(DISPATCH_NS, INVOKE_NAME);
     private static final QName INVOKE_ONEWAY_QNAME = new QName(DISPATCH_NS, INVOKE_ONEWAY_NAME);
-    
+
     private final Binding binding;
     private final EndpointReferenceBuilder builder;
 
@@ -110,7 +110,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
     private final JAXBContext context;
     private Message error;
     private Service.Mode mode;
-    
+
     DispatchImpl(Client client, Service.Mode m, JAXBContext ctx, Class<T> clazz) {
         this.binding = ((JaxWsEndpointImpl)client.getEndpoint()).getJaxwsBinding();
         this.builder = new EndpointReferenceBuilder((JaxWsEndpointImpl)client.getEndpoint());
@@ -137,33 +137,27 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                                                           .getBinding().getBindingInfo().getName()));
                 client.getInInterceptors().add(new SAAJInInterceptor());
                 client.getInInterceptors()
-                    .add(new MessageModeInInterceptor(clazz, 
+                    .add(new MessageModeInInterceptor(clazz,
                                                       client.getEndpoint()
                                                           .getBinding().getBindingInfo().getName()));
             }
-        } else if (m == Service.Mode.PAYLOAD 
+        } else if (m == Service.Mode.PAYLOAD
             && binding instanceof SOAPBinding
             && SOAPMessage.class.isAssignableFrom(clazz)) {
             error = new Message("DISPATCH_OBJECT_NOT_SUPPORTED", LOG,
                                 "SOAPMessage",
                                 m,
                                 "SOAP/HTTP");
-        } else if (DataSource.class.isAssignableFrom(clazz)
-            && binding instanceof HTTPBinding) {
-            error = new Message("DISPATCH_OBJECT_NOT_SUPPORTED", LOG,
-                                "DataSource",
-                                m,
-                                "XML/HTTP");            
-        }
+        } 
     }
-    
+
     DispatchImpl(Client cl, Service.Mode m, Class<T> clazz) {
         this(cl, m, null, clazz);
     }
-    
+
     private void addInvokeOperation(boolean oneWay) {
         String name = oneWay ? INVOKE_ONEWAY_NAME : INVOKE_NAME;
-            
+
         ServiceInfo info = client.getEndpoint().getEndpointInfo().getService();
         OperationInfo opInfo = info.getInterface()
             .addOperation(oneWay ? INVOKE_ONEWAY_QNAME : INVOKE_QNAME);
@@ -184,32 +178,32 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 mpi.setTypeClass(cl);
             }
         }
-        
+
         for (BindingInfo bind : client.getEndpoint().getEndpointInfo().getService().getBindings()) {
             BindingOperationInfo bo = new BindingOperationInfo(bind, opInfo);
             bind.addOperation(bo);
         }
     }
-    
+
     private void addInvokeOperation(QName operationName, boolean oneWay) {
         ServiceInfo info = client.getEndpoint().getEndpointInfo().getService();
-        
+
         OperationInfo invokeOpInfo = info.getInterface()
                        .getOperation(oneWay ? INVOKE_ONEWAY_QNAME : INVOKE_QNAME);
-        
+
         OperationInfo opInfo = info.getInterface().addOperation(operationName);
         opInfo.setInput(invokeOpInfo.getInputName(), invokeOpInfo.getInput());
 
         if (!oneWay) {
             opInfo.setOutput(invokeOpInfo.getOutputName(), invokeOpInfo.getOutput());
         }
-        
+
         for (BindingInfo bind : client.getEndpoint().getEndpointInfo().getService().getBindings()) {
             BindingOperationInfo bo = new BindingOperationInfo(bind, opInfo);
             bind.addOperation(bo);
         }
     }
-    
+
     public Map<String, Object> getRequestContext() {
         return new WrappedMessageContext(client.getRequestContext(),
                                          null,
@@ -223,7 +217,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
     public Binding getBinding() {
         return binding;
     }
-    public EndpointReference getEndpointReference() {            
+    public EndpointReference getEndpointReference() {
         return builder.getEndpointReference();
     }
     public <X extends EndpointReference> X getEndpointReference(Class<X> clazz) {
@@ -240,7 +234,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                                             Scope.APPLICATION);
             requestContext.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                            endpoint.getEndpointInfo().getAddress());
-        }    
+        }
     }
     public T invoke(T obj) {
         return invoke(obj, false);
@@ -271,7 +265,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         if (ex instanceof Fault && ex.getCause() instanceof IOException) {
             throw new WebServiceException(ex.getMessage(), ex.getCause());
         }
-        
+
         if (getBinding() instanceof HTTPBinding) {
             HTTPException exception = new HTTPException(HttpURLConnection.HTTP_INTERNAL_ERROR);
             exception.initCause(ex);
@@ -286,17 +280,17 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
             if (soapFault == null) {
                 return new WebServiceException(ex);
             }
-            
+
             SOAPFaultException exception = new SOAPFaultException(soapFault);
             exception.initCause(ex);
-            return exception;                
+            return exception;
         }
         return new WebServiceException(ex);
     }
-    
+
     @SuppressWarnings("unchecked")
     public T invoke(T obj, boolean isOneWay) {
-        checkError();        
+        checkError();
         try {
             if (obj instanceof SOAPMessage) {
                 SOAPMessage msg = (SOAPMessage)obj;
@@ -308,7 +302,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                 getRequestContext().put("unwrap.jaxb.element", unwrapProperty);
             }
             QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
-            
+
             boolean hasOpName;
             if (opName == null) {
                 hasOpName = false;
@@ -323,7 +317,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
             }
             Holder<T> holder = new Holder<T>(obj);
             opName = calculateOpName(holder, opName, hasOpName);
-            
+
             Object ret[] = client.invokeWrapped(opName,
                                                 holder.value);
             if (isOneWay || ret == null || ret.length == 0) {
@@ -344,11 +338,11 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         // if the addressing feature is enabled, set findDispatchOp to true
         if (!findDispatchOp) {
             // the feature list to be searched is the endpoint and the bus's lists
-            List<Feature> endpointFeatures 
+            List<Feature> endpointFeatures
                 = ((JaxWsClientEndpointImpl)client.getEndpoint()).getFeatures();
             List<Feature> allFeatures;
             if (client.getBus().getFeatures() != null) {
-                allFeatures = new ArrayList<Feature>(endpointFeatures.size() 
+                allFeatures = new ArrayList<>(endpointFeatures.size()
                     + client.getBus().getFeatures().size());
                 allFeatures.addAll(endpointFeatures);
                 allFeatures.addAll(client.getBus().getFeatures());
@@ -357,7 +351,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
             }
             for (Feature feature : allFeatures) {
                 if (feature instanceof WSAddressingFeature) {
-                    findDispatchOp = true; 
+                    findDispatchOp = true;
                 }
             }
         }
@@ -373,7 +367,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
                     Document document = StaxUtils.read(reader);
                     createdSource = new StaxSource(StaxUtils.createXMLStreamReader(document));
                     payloadElementName = getPayloadElementName(document.getDocumentElement());
-                } catch (Exception e) {                        
+                } catch (Exception e) {
                     // ignore, we are trying to get the operation name
                 } finally {
                     StaxUtils.close(reader);
@@ -421,17 +415,17 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         }
         return opName;
     }
-  
+
     public Future<?> invokeAsync(T obj, AsyncHandler<T> asyncHandler) {
         checkError();
         client.setExecutor(getClient().getEndpoint().getExecutor());
 
         ClientCallback callback = new JaxwsClientCallback<T>(asyncHandler, this);
-             
+
         Response<T> ret = new JaxwsResponseCallback<T>(callback);
-        try {           
+        try {
             boolean hasOpName;
-            
+
             QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
             if (opName == null) {
                 hasOpName = false;
@@ -447,11 +441,11 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
 
             Holder<T> holder = new Holder<T>(obj);
             opName = calculateOpName(holder, opName, hasOpName);
-            
-            client.invokeWrapped(callback, 
+
+            client.invokeWrapped(callback,
                                  opName,
                                  holder.value);
-            
+
             return ret;
         } catch (Exception ex) {
             throw mapException(ex);
@@ -466,11 +460,11 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
     public void invokeOneWay(T obj) {
         invoke(obj, true);
     }
-        
+
     public Client getClient() {
         return client;
     }
-    
+
     private QName getPayloadElementName(Element ele) {
         XMLStreamReader xmlreader = StaxUtils.createXMLStreamReader(ele);
         DepthXMLStreamReader reader = new DepthXMLStreamReader(xmlreader);
@@ -492,12 +486,12 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
             // ignore
         }
         return null;
-        
+
     }
-    
-    
+
+
     private QName getPayloadElementName(SOAPMessage soapMessage) {
-        try {            
+        try {
             // we only care about the first element node, not text nodes
             Element element = DOMUtils.getFirstElement(SAAJUtils.getBody(soapMessage));
             if (element != null) {
@@ -508,7 +502,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         }
         return null;
     }
-    
+
     private QName getPayloadElementName(Object object) {
         JAXBDataBinding dataBinding = new JAXBDataBinding();
         dataBinding.setContext(context);
@@ -542,7 +536,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
         }
         return null;
     }
-    
+
     private Map<String, QName> createPayloadEleOpNameMap(BindingInfo bindingInfo, boolean reverseMapping) {
         Map<String, QName> payloadElementMap = new java.util.HashMap<String, QName>();
         // assume a document binding style, which is default according to W3C spec on WSDL
@@ -558,7 +552,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider, Closeable 
             SoapOperationInfo soi = bop.getExtensor(SoapOperationInfo.class);
             if (soi != null) {
                 // operation style overrides binding style, if present
-                String operationStyle = soi.getStyle() != null ? soi.getStyle() : bindingStyle;  
+                String operationStyle = soi.getStyle() != null ? soi.getStyle() : bindingStyle;
                 if ("document".equals(operationStyle)) {
                     // if doc
                     if (bop.getOperationInfo().getInput() != null

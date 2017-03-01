@@ -53,11 +53,11 @@ public interface IdlDefn {
 
     boolean isEmptyDef();
 
-    
+
     boolean isCircular();
-    
-    
+
+
     void flush();
-        
+
     IdlScopeBase getCircularScope(IdlScopeBase startScope, List<Object> doneDefn);
 }

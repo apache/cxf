@@ -223,7 +223,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                 aegisContext.setTypeCreationOptions(configuration);
             }
 
-            if (implMap.size() > 0) {
+            if (!implMap.isEmpty()) {
                 aegisContext.setBeanImplementationMap(implMap);
             }
         }
@@ -235,7 +235,7 @@ public class AegisDatabinding extends AbstractDataBinding {
         s.getInInterceptors()
             .add(new StaxSchemaValidationInInterceptor());
 
-        Set<AegisType> deps = new HashSet<AegisType>();
+        Set<AegisType> deps = new HashSet<>();
 
         for (ServiceInfo info : s.getServiceInfos()) {
             for (OperationInfo opInfo : info.getInterface().getOperations()) {
@@ -410,7 +410,7 @@ public class AegisDatabinding extends AbstractDataBinding {
             String ns = t.getSchemaType().getNamespaceURI();
             Set<AegisType> types = tns2Type.get(ns);
             if (types == null) {
-                types = new HashSet<AegisType>();
+                types = new HashSet<>();
                 tns2Type.put(ns, types);
             }
             types.add(t);

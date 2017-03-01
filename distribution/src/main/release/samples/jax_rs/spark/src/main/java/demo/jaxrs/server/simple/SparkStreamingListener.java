@@ -32,7 +32,7 @@ public class SparkStreamingListener implements StreamingListener {
     private SparkStreamingOutput streamOutput;
     private boolean batchStarted;
     private long batchStartAt;
-    
+
     public SparkStreamingListener(SparkStreamingOutput streamOutput) {
         this.streamOutput = streamOutput;
     }
@@ -40,7 +40,7 @@ public class SparkStreamingListener implements StreamingListener {
     @Override
     public void onBatchCompleted(StreamingListenerBatchCompleted event) {
         System.out.println("Batch processing time in millisecs: " + (System.currentTimeMillis() - batchStartAt));
-        
+
         streamOutput.setSparkBatchCompleted();
     }
 
@@ -87,7 +87,7 @@ public class SparkStreamingListener implements StreamingListener {
                 // continue
             }
         }
-        
+
     }
-    
+
 }

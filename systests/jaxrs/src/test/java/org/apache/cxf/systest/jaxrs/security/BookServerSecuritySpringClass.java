@@ -29,7 +29,7 @@ public class BookServerSecuritySpringClass extends AbstractSpringServer {
     public BookServerSecuritySpringClass() {
         super("/jaxrs_security_cglib", PORT);
     }
-    
+
     public static void main(String args[]) {
         try {
             BookServerSecuritySpringClass s = new BookServerSecuritySpringClass();

@@ -30,7 +30,7 @@ public final class IdlConst extends IdlDefnImplBase implements IdlType {
         this.base = basetype;
         this.value = val;
     }
-    
+
     public static IdlConst create(IdlScopeBase parent, String name, IdlType base, String value) {
         return new IdlConst(parent, name, base, value);
     }
@@ -39,15 +39,15 @@ public final class IdlConst extends IdlDefnImplBase implements IdlType {
     IdlType baseType() {
         return base;
     }
-    
+
     String valueType() {
         return value;
     }
 
 
     public void write(PrintWriter pw) {
-        pw.println(indent() + "const " + base.fullName(scopeName()) + " " 
+        pw.println(indent() + "const " + base.fullName(scopeName()) + " "
                    + localName() + " = "  + value + ";");
     }
-    
+
 }

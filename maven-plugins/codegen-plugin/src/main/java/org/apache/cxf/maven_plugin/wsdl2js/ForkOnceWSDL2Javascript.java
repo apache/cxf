@@ -27,7 +27,7 @@ import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript;
 
 /**
- * 
+ *
  */
 public final class ForkOnceWSDL2Javascript {
     private ForkOnceWSDL2Javascript() {
@@ -47,9 +47,9 @@ public final class ForkOnceWSDL2Javascript {
             for (int x = 0; x < i; x++) {
                 wargs[x] = reader.readLine();
             }
-            
+
             new WSDLToJavaScript(wargs).run(new ToolContext());
-            
+
             line = reader.readLine();
         }
         reader.close();

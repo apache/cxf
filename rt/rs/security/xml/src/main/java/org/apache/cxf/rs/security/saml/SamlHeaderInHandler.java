@@ -32,26 +32,27 @@ import org.apache.cxf.message.Message;
 public class SamlHeaderInHandler extends AbstractSamlBase64InHandler {
 
     private static final String SAML_AUTH = "SAML";
-    
+
     @Context
     private HttpHeaders headers;
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
-        
+
         List<String> values = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
         if (values == null || values.size() != 1 || !values.get(0).startsWith(SAML_AUTH)) {
-            throwFault("Authorization header must be available and use SAML profile", null);    
+            throwFault("Authorization header must be available and use SAML profile", null);
         }
-        
+
         String[] parts = StringUtils.split(values.get(0), " ");
         if (parts.length != 2) {
             throwFault("Authorization header is malformed", null);
         }
-        
-        handleToken(message, parts[1]);         
+
+        handleToken(message, parts[1]);
     }
 
-    
-    
+
+
 }

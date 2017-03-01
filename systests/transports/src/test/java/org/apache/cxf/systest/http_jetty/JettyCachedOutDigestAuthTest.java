@@ -29,13 +29,13 @@ import org.junit.BeforeClass;
 
 public class JettyCachedOutDigestAuthTest extends JettyDigestAuthTest {
     private static String oldThreshold;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         oldThreshold = System.getProperty("org.apache.cxf.io.CachedOutputStream.Threshold");
         // forces the CacheOutputStream to use temporary file caching
         System.setProperty("org.apache.cxf.io.CachedOutputStream.Threshold", "8");
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(JettyDigestServer.class, true));
     }
 

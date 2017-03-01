@@ -43,16 +43,16 @@ import org.junit.runners.Parameterized.Parameters;
 public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(PolicyServer.class);
     static final String STAX_PORT = allocatePort(StaxPolicyServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     final TestParam test;
-    
+
     public UsernameTokenPolicyTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -68,17 +68,17 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxPolicyServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(PORT, true)},
                                                 {new TestParam(STAX_PORT, false)},
                                                 {new TestParam(STAX_PORT, true)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -98,25 +98,25 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSupportingTokenPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         // This should fail, as the client is not sending a UsernameToken Supporting Token
         portQName = new QName(NAMESPACE, "DoubleItSupportingTokenPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernameToken Supporting Token");
@@ -125,11 +125,11 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("UsernameToken not satisfied"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testPlaintextPassword() throws Exception {
 
@@ -143,25 +143,25 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItPlaintextPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         // This should fail, as the client is sending a hashed password
         portQName = new QName(NAMESPACE, "DoubleItPlaintextPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a hashed password");
@@ -170,27 +170,27 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("password must not be hashed"));
         }
-        
+
         // This should fail, as the client is not sending any password
         portQName = new QName(NAMESPACE, "DoubleItPlaintextPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a password");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testHashPassword() throws Exception {
 
@@ -204,25 +204,25 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItHashPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         // This should fail, as the client is sending a plaintext password
         portQName = new QName(NAMESPACE, "DoubleItHashPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on a plaintext password");
@@ -231,27 +231,27 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("UsernameToken does not contain a hashed password"));
         }
-        
+
         // This should fail, as the client is not sending any password
         portQName = new QName(NAMESPACE, "DoubleItHashPort3");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a password");
         } catch (javax.xml.ws.soap.SOAPFaultException ex) {
             // expected
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testCreated() throws Exception {
 
@@ -265,25 +265,25 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItCreatedPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         // This should fail, as the client is not sending a Created element
         portQName = new QName(NAMESPACE, "DoubleItCreatedPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a Created element");
@@ -292,11 +292,11 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("UsernameToken does not contain a created"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testNonce() throws Exception {
 
@@ -310,25 +310,25 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenPolicyTest.class.getResource("DoubleItUtPolicy.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItNoncePort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         // This should fail, as the client is not sending a Nonce element
         portQName = new QName(NAMESPACE, "DoubleItNoncePort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a Nonce element");
@@ -337,9 +337,9 @@ public class UsernameTokenPolicyTest extends AbstractBusClientServerTestBase {
             assertTrue(ex.getMessage().contains(error)
                        || ex.getMessage().contains("UsernameToken does not contain a nonce"));
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
 }

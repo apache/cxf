@@ -31,33 +31,33 @@ import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
             serviceName = "DoubleItService",
             portName = "DoubleItSoap11NoPolicyBinding",
             name = "DoubleItSoap11NoPolicyBinding",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")     
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class DoubleItPortTypeImplJavaFirst implements DoubleItPortType {
     @Resource
     WebServiceContext wsContext;
-    
+
     @Policies({
         @Policy(uri = "classpath:/org/apache/cxf/systest/ws/fault/SymmetricUTPolicy.xml"),
-        @Policy(uri = "classpath:/org/apache/cxf/systest/ws/fault/SignedEncryptedPolicy.xml", 
+        @Policy(uri = "classpath:/org/apache/cxf/systest/ws/fault/SignedEncryptedPolicy.xml",
                 placement = Placement.BINDING_OPERATION_OUTPUT)
     })
     public int doubleIt(int numberToDouble) throws DoubleItFault {
-        
+
         Principal pr = wsContext.getUserPrincipal();
         if ("alice".equals(pr.getName())) {
             return numberToDouble * 2;
         }
-        
-        org.example.schema.doubleit.DoubleItFault internalFault = 
+
+        org.example.schema.doubleit.DoubleItFault internalFault =
             new org.example.schema.doubleit.DoubleItFault();
         internalFault.setMajor((short)124);
         internalFault.setMinor((short)1256);
         throw new DoubleItFault("This is a fault", internalFault);
     }
-    
+
 }

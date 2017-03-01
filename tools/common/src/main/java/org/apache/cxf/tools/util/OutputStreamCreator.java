@@ -25,10 +25,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * 
+ *
  */
 public class OutputStreamCreator {
-    
+
     public OutputStream createOutputStream(File file) throws IOException {
         return new FileOutputStream(file);
     }

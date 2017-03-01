@@ -40,19 +40,19 @@ import org.littleshoot.proxy.ProxyAuthorizationHandler;
 
 
 /**
- * 
+ *
  */
 public class HTTPSProxyAuthConduitTest extends HTTPSConduitTest {
     static final int PROXY_PORT = Integer.parseInt(allocatePort(HTTPSProxyAuthConduitTest.class));
     static DefaultHttpProxyServer proxy;
     static CountingFilter requestFilter = new CountingFilter();
-    
+
     static class CountingFilter implements HttpRequestFilter {
         AtomicInteger count = new AtomicInteger();
         public void filter(HttpRequest httpRequest) {
             count.incrementAndGet();
         }
-        
+
         public void reset() {
             count.set(0);
         }
@@ -60,17 +60,17 @@ public class HTTPSProxyAuthConduitTest extends HTTPSConduitTest {
             return count.get();
         }
     }
-    
+
     public HTTPSProxyAuthConduitTest() {
     }
 
-    
+
     @AfterClass
     public static void stopProxy() {
         proxy.stop();
         proxy = null;
     }
-    
+
     @BeforeClass
     public static void startProxy() {
         System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
@@ -86,7 +86,7 @@ public class HTTPSProxyAuthConduitTest extends HTTPSConduitTest {
     public void resetCount() {
         requestFilter.reset();
     }
-    
+
     public void configureProxy(Client client) {
         HTTPConduit cond = (HTTPConduit)client.getConduit();
         HTTPClientPolicy pol = cond.getClient();
@@ -101,12 +101,12 @@ public class HTTPSProxyAuthConduitTest extends HTTPSConduitTest {
         auth.setPassword("password");
         cond.setProxyAuthorization(auth);
     }
-    
+
     public void resetProxyCount() {
         requestFilter.reset();
     }
     public void assertProxyRequestCount(int i) {
         assertEquals("Unexpected request count", i, requestFilter.getCount());
     }
-    
+
 }

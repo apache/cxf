@@ -46,10 +46,10 @@ import org.dom4j.io.XMLWriter;
 
 @Produces({"application/xml", "application/*+xml", "text/xml", "application/json", "application/*+json" })
 @Consumes({"application/xml", "application/*+xml", "text/xml", "application/json", "application/*+json" })
-public class DOM4JProvider extends AbstractConfigurableProvider 
+public class DOM4JProvider extends AbstractConfigurableProvider
     implements MessageBodyReader<org.dom4j.Document>, MessageBodyWriter<org.dom4j.Document> {
     public static final String SUPPRESS_XML_DECLARATION = "suppress.xml.declaration";
-    private static final Class<org.w3c.dom.Document> DOM_DOC_CLS = 
+    private static final Class<org.w3c.dom.Document> DOM_DOC_CLS =
         org.w3c.dom.Document.class;
 
     private Providers providers;
@@ -90,12 +90,12 @@ public class DOM4JProvider extends AbstractConfigurableProvider
         return org.dom4j.Document.class.isAssignableFrom(cls);
     }
 
-    public void writeTo(org.dom4j.Document doc, Class<?> cls, 
+    public void writeTo(org.dom4j.Document doc, Class<?> cls,
                         Type type, Annotation[] anns, MediaType mt,
                         MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException, WebApplicationException {
         if (!convertAlways && mt.getSubtype().contains("xml")) {
-            
+
             XMLWriter writer;
             if (MessageUtils.getContextualBoolean(getCurrentMessage(), SUPPRESS_XML_DECLARATION, false)) {
                 OutputFormat format = new org.dom4j.io.OutputFormat();

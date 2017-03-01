@@ -28,27 +28,27 @@ import org.apache.cxf.feature.Features;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class DoubleItPortTypeImpl implements DoubleItPortType {
-    
+
     @Resource
     WebServiceContext wsContext;
 
     public int doubleIt(int numberToDouble) throws DoubleItFault {
-        
+
         Principal pr = wsContext.getUserPrincipal();
         if ("alice".equals(pr.getName())) {
             return numberToDouble * 2;
         }
-        
-        org.example.schema.doubleit.DoubleItFault internalFault = 
+
+        org.example.schema.doubleit.DoubleItFault internalFault =
             new org.example.schema.doubleit.DoubleItFault();
         internalFault.setMajor((short)124);
         internalFault.setMinor((short)1256);
         throw new DoubleItFault("This is a fault", internalFault);
     }
-    
+
 }

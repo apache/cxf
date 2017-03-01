@@ -59,25 +59,25 @@ import org.apache.cxf.service.model.EndpointInfo;
  * sf.setAddress("http://acme.com/myService");
  * sf.create();
  * </pre>
- * This will start a server and register it with the ServerManager. 
+ * This will start a server and register it with the ServerManager.
  */
 public class JaxWsServerFactoryBean extends ServerFactoryBean {
     protected boolean doInit;
     @SuppressWarnings("rawtypes")
-    protected List<Handler> handlers = new ArrayList<Handler>();
+    protected List<Handler> handlers = new ArrayList<>();
 
     private boolean blockPostConstruct;
     private boolean blockInjection;
-    
+
     public JaxWsServerFactoryBean() {
         this(new JaxWsServiceFactoryBean());
     }
     public JaxWsServerFactoryBean(JaxWsServiceFactoryBean serviceFactory) {
         super(serviceFactory);
-        
-        JaxWsSoapBindingConfiguration defConfig 
+
+        JaxWsSoapBindingConfiguration defConfig
             = new JaxWsSoapBindingConfiguration(serviceFactory);
-        
+
         setBindingConfig(defConfig);
         doInit = true;
     }
@@ -117,11 +117,11 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
                 cls = cls2;
             }
         }
-        
+
         AnnotationInterceptors provider = new AnnotationInterceptors(cls);
         initializeAnnotationInterceptors(provider, ep);
-    }      
-    
+    }
+
     @Override
     protected Invoker createInvoker() {
         if (getServiceBean() == null) {
@@ -132,8 +132,8 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
 
     @Override
     protected BindingInfo createBindingInfo() {
-        JaxWsServiceFactoryBean sf = (JaxWsServiceFactoryBean)getServiceFactory(); 
-        
+        JaxWsServiceFactoryBean sf = (JaxWsServiceFactoryBean)getServiceFactory();
+
         JaxWsImplementorInfo implInfo = sf.getJaxWsImplementorInfo();
         String jaxBid = implInfo.getBindingType();
         String binding = getBindingId();
@@ -141,14 +141,14 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
             binding = jaxBid;
             setBindingId(binding);
         }
-        
-        if (binding.equals(SOAPBinding.SOAP11HTTP_BINDING) 
+
+        if (binding.equals(SOAPBinding.SOAP11HTTP_BINDING)
             || binding.equals(SOAPBinding.SOAP11HTTP_MTOM_BINDING)) {
             binding = "http://schemas.xmlsoap.org/wsdl/soap/";
             setBindingId(binding);
             if (getBindingConfig() == null) {
                 setBindingConfig(new JaxWsSoapBindingConfiguration(sf));
-            }            
+            }
         } else if (binding.equals(SOAPBinding.SOAP12HTTP_MTOM_BINDING)) {
             binding = SOAPBinding.SOAP12HTTP_BINDING;
             setBindingId(binding);
@@ -156,14 +156,14 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
                 setBindingConfig(new JaxWsSoapBindingConfiguration(sf));
             }
         }
-        
+
         if (getBindingConfig() instanceof JaxWsSoapBindingConfiguration) {
             JaxWsSoapBindingConfiguration conf = (JaxWsSoapBindingConfiguration)getBindingConfig();
-            
+
             if (jaxBid.equals(SOAPBinding.SOAP12HTTP_BINDING)) {
                 conf.setVersion(Soap12.getInstance());
             }
-            
+
             if (jaxBid.equals(SOAPBinding.SOAP12HTTP_MTOM_BINDING)) {
                 conf.setVersion(Soap12.getInstance());
                 conf.setMtomEnabled(true);
@@ -176,10 +176,10 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
                 conf.setTransportURI(transportId);
             }
             conf.setJaxWsServiceFactoryBean(sf);
-            
+
         }
-        
-        BindingInfo bindingInfo = super.createBindingInfo();        
+
+        BindingInfo bindingInfo = super.createBindingInfo();
 
         if (implInfo.isWebServiceProvider()) {
             bindingInfo.getService().setProperty("soap.force.doclit.bare", Boolean.TRUE);
@@ -197,7 +197,7 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
 
         return bindingInfo;
     }
-    
+
     public Server create() {
         ClassLoaderHolder orig = null;
         try {
@@ -211,7 +211,7 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
             Server server = super.create();
             initializeResourcesAndHandlerChain(server);
             checkPrivateEndpoint(server.getEndpoint());
-            
+
             return server;
         } finally {
             if (orig != null) {
@@ -219,33 +219,33 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
             }
         }
     }
-    
+
     private synchronized void initializeResourcesAndHandlerChain(Server server) {
         if (doInit) {
             try {
                 injectResources(getServiceBean());
                 buildHandlerChain(server);
             } catch (Exception ex) {
-                if (ex instanceof WebServiceException) { 
-                    throw (WebServiceException)ex; 
+                if (ex instanceof WebServiceException) {
+                    throw (WebServiceException)ex;
                 }
                 throw new WebServiceException("Creation of Endpoint failed", ex);
             }
         }
         doInit = false;
     }
-    
-    
+
+
     /**
      * Obtain handler chain from annotations.
-     * @param server 
+     * @param server
      *
      */
     private void buildHandlerChain(Server server) {
         AnnotationHandlerChainBuilder builder = new AnnotationHandlerChainBuilder();
         @SuppressWarnings("rawtypes")
-        List<Handler> chain = new ArrayList<Handler>(handlers);
-        
+        List<Handler> chain = new ArrayList<>(handlers);
+
         chain.addAll(builder.buildHandlerChainFromClass(getServiceBeanClass(),
                                                         server.getEndpoint().getEndpointInfo().getName(),
                                                         server.getEndpoint().getService().getName(),
@@ -255,7 +255,7 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
         }
         ((JaxWsEndpointImpl)server.getEndpoint()).getJaxwsBinding().setHandlerChain(chain);
     }
-    
+
     /**
      * inject resources into servant.  The resources are injected
      * according to @Resource annotations.  See JSR 250 for more
@@ -268,7 +268,7 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
         if (instance != null && !blockInjection) {
             ResourceManager resourceManager = getBus().getExtension(ResourceManager.class);
             List<ResourceResolver> resolvers = resourceManager.getResourceResolvers();
-            resourceManager = new DefaultResourceManager(resolvers); 
+            resourceManager = new DefaultResourceManager(resolvers);
             resourceManager.addResourceResolver(new WebServiceContextResourceResolver());
             ResourceInjector injector = new ResourceInjector(resourceManager);
             if (Proxy.isProxyClass(instance.getClass()) && getServiceClass() != null) {
@@ -286,22 +286,22 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     }
 
     /**
-     * @param blockPostConstruct @PostConstruct method will not be called 
+     * @param blockPostConstruct @PostConstruct method will not be called
      *  if this property is set to true - this may be necessary in cases
      *  when the @PostConstruct method needs to be called at a later stage,
-     *  for example, when a higher level container does its own injection.  
+     *  for example, when a higher level container does its own injection.
      */
     public void setBlockPostConstruct(boolean blockPostConstruct) {
         this.blockPostConstruct = blockPostConstruct;
     }
     /**
      * No injection or PostConstruct will be called if this is set to true.
-     * If the container has already handled the injection, this should 
+     * If the container has already handled the injection, this should
      * be set to true.
      * @param b
      */
     public void setBlockInjection(boolean b) {
         this.blockInjection = b;
     }
-      
+
 }

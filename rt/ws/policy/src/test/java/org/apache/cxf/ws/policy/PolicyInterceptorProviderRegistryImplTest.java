@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class PolicyInterceptorProviderRegistryImplTest extends Assert {
 
@@ -78,7 +78,7 @@ public class PolicyInterceptorProviderRegistryImplTest extends Assert {
         EasyMock.expect(pp.getInFaultInterceptors()).andReturn(pifl);
         EasyMock.expect(pp.getOutInterceptors()).andReturn(pol);
         EasyMock.expect(pp.getOutFaultInterceptors()).andReturn(pofl);
-        Collection<QName> assertionTypes = new ArrayList<QName>();
+        Collection<QName> assertionTypes = new ArrayList<>();
         assertionTypes.add(ASSERTION);
         EasyMock.expect(pp.getAssertionTypes()).andReturn(assertionTypes);
         control.replay();

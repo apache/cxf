@@ -67,12 +67,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
-public class BinaryDataProvider<T> extends AbstractConfigurableProvider 
+public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyReader<T>, MessageBodyWriter<T> {
-    
+
     private static final String HTTP_RANGE_PROPERTY = "http.range.support";
     private static final Logger LOG = LogUtils.getL7dLogger(BinaryDataProvider.class);
-    
+
     private int bufferSize = IOUtils.DEFAULT_BUFFER_SIZE;
     private boolean reportByteArraySize;
     private boolean closeResponseInputStream = true;
@@ -91,10 +91,10 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         }
         public void write(OutputStream outputStream) throws IOException {
             IOUtils.copy(inputStream, outputStream);
-        }        
+        }
     }
 
-    public T readFrom(Class<T> clazz, Type genericType, Annotation[] annotations, MediaType type, 
+    public T readFrom(Class<T> clazz, Type genericType, Annotation[] annotations, MediaType type,
                            MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
         try {
@@ -116,10 +116,10 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
                 }
             }
             if (File.class.isAssignableFrom(clazz)) {
-                LOG.warning("Reading data into File objects with the help of pre-packaged" 
+                LOG.warning("Reading data into File objects with the help of pre-packaged"
                     + " providers is not recommended - use InputStream or custom File reader");
                 // create a temp file, delete on exit
-                File f = FileUtils.createTempFile("File" + UUID.randomUUID().toString(), 
+                File f = FileUtils.createTempFile("File" + UUID.randomUUID().toString(),
                                                   "jaxrs",
                                                   null,
                                                   true);
@@ -139,10 +139,10 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         throw new IOException("Unrecognized class");
     }
 
-    
-    
+
+
     public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        // TODO: if it's a range request, then we should probably always return -1 and set 
+        // TODO: if it's a range request, then we should probably always return -1 and set
         // Content-Length and Content-Range in handleRangeRequest
         if (reportByteArraySize && byte[].class.isAssignableFrom(t.getClass())) {
             return ((byte[])t).length;
@@ -158,10 +158,10 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
             || StreamingOutput.class.isAssignableFrom(type);
     }
 
-    public void writeTo(T o, Class<?> clazz, Type genericType, Annotation[] annotations, 
+    public void writeTo(T o, Class<?> clazz, Type genericType, Annotation[] annotations,
                         MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
-        
+
         if (InputStream.class.isAssignableFrom(o.getClass())) {
             copyInputToOutput((InputStream)o, os, annotations, headers);
         } else if (File.class.isAssignableFrom(o.getClass())) {
@@ -172,14 +172,14 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         } else if (Reader.class.isAssignableFrom(o.getClass())) {
             try {
                 Writer writer = new OutputStreamWriter(os, getEncoding(type));
-                IOUtils.copy((Reader)o, 
+                IOUtils.copy((Reader)o,
                               writer,
                               bufferSize);
                 writer.flush();
             } finally {
                 ((Reader)o).close();
             }
-            
+
         } else if (StreamingOutput.class.isAssignableFrom(o.getClass())) {
             ((StreamingOutput)o).write(os);
         } else {
@@ -187,7 +187,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
         }
 
     }
-    
+
     private String getEncoding(MediaType mt) {
         String enc = mt.getParameters().get("charset");
         return enc == null ? StandardCharsets.UTF_8.name() : enc;
@@ -195,7 +195,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     private String getCharset(MediaType mt) {
         return mt.getParameters().get("charset");
     }
-    
+
     protected void copyInputToOutput(InputStream is, OutputStream os,
             Annotation[] anns, MultivaluedMap<String, Object> outHeaders) throws IOException {
         if (isRangeSupported()) {
@@ -209,26 +209,26 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
                     copyUsingNio(is, os, provider.getContinuation());
                 }
                 return;
-            } 
+            }
             if (closeResponseInputStream) {
                 IOUtils.copyAndCloseInput(is, os, bufferSize);
             } else {
                 IOUtils.copy(is, os, bufferSize);
             }
-            
+
         }
     }
-    
+
     protected void copyUsingNio(InputStream is, OutputStream os, Continuation cont) {
-        NioWriteListenerImpl listener = 
-            new NioWriteListenerImpl(cont, 
-                                     new NioWriteEntity(getNioHandler(is), null), 
+        NioWriteListenerImpl listener =
+            new NioWriteListenerImpl(cont,
+                                     new NioWriteEntity(getNioHandler(is), null),
                                      new DelegatingNioOutputStream(os));
         Message m = JAXRSUtils.getCurrentMessage();
         m.put(WriteListener.class, listener);
         cont.suspend(0);
     }
-    
+
     private ContinuationProvider getContinuationProvider() {
         return (ContinuationProvider)JAXRSUtils.getCurrentMessage().getExchange()
             .getInMessage().get(ContinuationProvider.class.getName());
@@ -236,19 +236,19 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
 
 
 
-    protected void handleRangeRequest(InputStream is, 
+    protected void handleRangeRequest(InputStream is,
                                       OutputStream os,
-                                      HttpHeaders inHeaders, 
+                                      HttpHeaders inHeaders,
                                       MultivaluedMap<String, Object> outHeaders) throws IOException {
-        String range = inHeaders.getRequestHeaders().getFirst("Range"); 
+        String range = inHeaders.getRequestHeaders().getFirst("Range");
         if (range == null) {
-            IOUtils.copyAndCloseInput(is, os, bufferSize);    
+            IOUtils.copyAndCloseInput(is, os, bufferSize);
         } else {
             // implement
         }
-           
+
     }
-    
+
     protected boolean isRangeSupported() {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         if (message != null) {
@@ -269,36 +269,36 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
     public void setBufferSize(int bufferSize) {
         this.bufferSize = bufferSize;
     }
-    
+
     protected NioWriterHandler getNioHandler(final InputStream in) {
-        
+
         return new NioWriterHandler() {
             final byte[] buffer = new byte[bufferSize];
             @Override
             public boolean write(NioOutputStream out) {
                 try {
                     final int n = in.read(buffer);
-    
+
                     if (n >= 0) {
                         out.write(buffer, 0, n);
                         return true;
                     }
-                    if (closeResponseInputStream) {    
-                        try { 
-                            in.close(); 
-                        } catch (IOException ex) { 
-                            /* do nothing */ 
+                    if (closeResponseInputStream) {
+                        try {
+                            in.close();
+                        } catch (IOException ex) {
+                            /* do nothing */
                         }
                     }
-                    
+
                     return false;
                 } catch (IOException ex) {
-                    throw new WebApplicationException(ex);    
+                    throw new WebApplicationException(ex);
                 }
-                
-            } 
+
+            }
         };
-            
-        
+
+
     }
 }

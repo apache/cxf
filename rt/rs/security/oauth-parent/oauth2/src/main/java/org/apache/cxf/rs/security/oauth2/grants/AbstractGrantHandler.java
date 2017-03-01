@@ -44,7 +44,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  */
 public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractGrantHandler.class);
-    
+
     private List<String> supportedGrants;
     private OAuthDataProvider dataProvider;
     private boolean partialMatchScopeValidation;
@@ -52,38 +52,38 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
     protected AbstractGrantHandler(String grant) {
         supportedGrants = Collections.singletonList(grant);
     }
-    
+
     protected AbstractGrantHandler(List<String> grants) {
         if (grants.isEmpty()) {
             throw new IllegalArgumentException("The list of grant types can not be empty");
         }
         supportedGrants = grants;
     }
-    
+
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
     }
     public OAuthDataProvider getDataProvider() {
         return dataProvider;
     }
-    
+
     public List<String> getSupportedGrantTypes() {
         return Collections.unmodifiableList(supportedGrants);
     }
-    
+
     @Deprecated
     protected void checkIfGrantSupported(Client client) {
         checkIfGrantSupported(client, getSingleGrantType());
     }
-    
+
     private void checkIfGrantSupported(Client client, String requestedGrant) {
-        if (!OAuthUtils.isGrantSupportedForClient(client, 
+        if (!OAuthUtils.isGrantSupportedForClient(client,
                                                   canSupportPublicClients,
                                                   requestedGrant)) {
-            throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);    
+            throw new OAuthServiceException(OAuthConstants.UNAUTHORIZED_CLIENT);
         }
     }
-    
+
     protected String getSingleGrantType() {
         if (supportedGrants.size() > 1) {
             String errorMessage = "Request grant type must be specified";
@@ -92,40 +92,40 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         }
         return supportedGrants.get(0);
     }
-    
+
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     MultivaluedMap<String, String> params) {
-        
-        return doCreateAccessToken(client, 
-                                   subject, 
-                                   OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)), 
+
+        return doCreateAccessToken(client,
+                                   subject,
+                                   OAuthUtils.parseScope(params.getFirst(OAuthConstants.SCOPE)),
                                    getAudiences(client, params.getFirst(OAuthConstants.CLIENT_AUDIENCE)));
     }
-    
+
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     List<String> requestedScopes) {
-        
+
         return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScopes);
     }
-    
+
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     List<String> requestedScopes,
                                                     List<String> audiences) {
-        
-        return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScopes, 
+
+        return doCreateAccessToken(client, subject, getSingleGrantType(), requestedScopes,
                                    audiences);
     }
-    
+
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     String requestedGrant,
                                                     List<String> requestedScopes) {
         return doCreateAccessToken(client, subject, requestedGrant, requestedScopes, null);
     }
-    
+
     protected ServerAccessToken doCreateAccessToken(Client client,
                                                     UserSubject subject,
                                                     String requestedGrant,
@@ -136,7 +136,7 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         if (token != null) {
             return token;
         }
-        
+
         // Delegate to the data provider to create the one
         AccessTokenRegistration reg = new AccessTokenRegistration();
         reg.setClient(client);
@@ -147,38 +147,38 @@ public abstract class AbstractGrantHandler implements AccessTokenGrantHandler {
         reg.setAudiences(audiences);
         return dataProvider.createAccessToken(reg);
     }
-    
+
     protected ServerAccessToken getPreAuthorizedToken(Client client,
                                                       UserSubject subject,
                                                       String requestedGrant,
                                                       List<String> requestedScopes,
                                                       List<String> audiences) {
-        if (!OAuthUtils.validateScopes(requestedScopes, client.getRegisteredScopes(), 
+        if (!OAuthUtils.validateScopes(requestedScopes, client.getRegisteredScopes(),
                                        partialMatchScopeValidation)) {
-            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_SCOPE));     
+            throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_SCOPE));
         }
         if (!OAuthUtils.validateAudiences(audiences, client.getRegisteredAudiences())) {
             throw new OAuthServiceException(new OAuthError(OAuthConstants.INVALID_GRANT));
         }
-        
+
         // Get a pre-authorized token if available
         return dataProvider.getPreauthorizedToken(
                                      client, requestedScopes, subject, requestedGrant);
-        
+
     }
-    
+
     public boolean isPartialMatchScopeValidation() {
         return partialMatchScopeValidation;
     }
-    
+
     public void setPartialMatchScopeValidation(boolean partialMatchScopeValidation) {
         this.partialMatchScopeValidation = partialMatchScopeValidation;
     }
-    
+
     public void setCanSupportPublicClients(boolean support) {
         canSupportPublicClients = support;
     }
-    
+
     public boolean isCanSupportPublicClients() {
         return canSupportPublicClients;
     }

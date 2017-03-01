@@ -27,13 +27,13 @@ public class Book {
     private String name;
     private long id;
     private Map<Long, BookChapter> chapters = new HashMap<Long, BookChapter>();
-    
+
     public Book() {
     }
-    
+
     public Book(String name, long id) {
-        this.setName(name);
-        this.setId(id);
+        this.name = name;
+        this.id = id;
     }
 
     public String getName() {
@@ -51,11 +51,11 @@ public class Book {
     public void setId(long id) {
         this.id = id;
     }
-    
+
     public void addChapter(long chapterId, String title) {
         chapters.put(chapterId, new BookChapter(chapterId, title));
     }
-    
+
     public Collection<BookChapter> getChapters() {
         return chapters.values();
     }

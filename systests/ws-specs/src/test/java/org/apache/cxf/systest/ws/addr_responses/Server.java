@@ -26,12 +26,12 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
     EndpointImpl ep;
-    protected void run()  {    
+    protected void run()  {
         Object implementor = new HelloImpl();
         String address = "http://localhost:" + PORT + "/wsa/responses";
-        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
-                              implementor, 
-                              null, 
+        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(),
+                              implementor,
+                              null,
                               getWsdl());
         ep.publish(address);
     }

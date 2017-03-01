@@ -25,17 +25,17 @@ import java.util.Map;
 import org.apache.cxf.message.Message;
 
 public interface RedeliveryQueue {
-    
-    
+
+
     String DEFAULT_BASE_REDELIVERY_INTERVAL = "3000";
     int DEFAULT_EXPONENTIAL_BACKOFF = 2;
-    
+
     /**
      * @param seq the sequence under consideration
      * @return the number of unacknowledged messages for that sequence
      */
     int countUndelivered(DestinationSequence seq);
-    
+
     /**
      * @return the total number of undelivered messages in this queue
      */
@@ -45,22 +45,22 @@ public interface RedeliveryQueue {
      * @return true if there are no unacknowledged messages in the queue
      */
     boolean isEmpty();
-    
+
     /**
      * Accepts a failed message for possible future redelivery.
      * @param message the message context.
      */
     void addUndelivered(Message message);
-    
+
     /**
      * Purge all candiates for the given sequence.
-     * 
+     *
      * @param seq the sequence object
      */
     void purgeAll(DestinationSequence seq);
 
     /**
-     * 
+     *
      * @param seq
      * @return
      */
@@ -73,25 +73,25 @@ public interface RedeliveryQueue {
      * @return
      */
     RetryStatus getRedeliveryStatus(DestinationSequence seq, long num);
-    
+
     /**
      * Return the retransmission status of all the messages assigned to the sequence.
      * @param seq
      * @return
      */
     Map<Long, RetryStatus> getRedeliveryStatuses(DestinationSequence seq);
-        
+
     /**
      * Initiate resends.
      */
     void start();
-    
+
     /**
      * Stops redelivery queue.
      * @param seq
      */
     void stop(DestinationSequence seq);
-    
+
     /**
      * Suspends the redelivery attempts for the specified sequence
      * @param seq

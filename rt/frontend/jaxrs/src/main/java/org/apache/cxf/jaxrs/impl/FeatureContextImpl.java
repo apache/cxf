@@ -31,7 +31,7 @@ public class FeatureContextImpl implements FeatureContext {
     }
     public FeatureContextImpl() {
     }
-    
+
     @Override
     public Configuration getConfiguration() {
         return cfg.getConfiguration();
@@ -95,5 +95,5 @@ public class FeatureContextImpl implements FeatureContext {
     }
     public void setConfigurable(Configurable<?> configurable) {
         this.cfg = configurable;
-    } 
+    }
 }

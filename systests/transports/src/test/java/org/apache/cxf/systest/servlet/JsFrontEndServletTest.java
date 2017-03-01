@@ -29,18 +29,18 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.junit.Test;
 
 public class JsFrontEndServletTest extends AbstractServletTest {
-    
+
     protected String getConfiguration() {
         return "/org/apache/cxf/systest/servlet/web-js.xml";
     }
 
     @Test
     public void testPostInvokeServices() throws Exception {
-                
+
         WebRequest req = new PostMethodWebRequest(CONTEXT_URL + "/services/Greeter",
                 getClass().getResourceAsStream("GreeterMessage.xml"),
                 "text/xml; charset=UTF-8");
-        
+
         WebResponse response = newClient().getResponse(req);
 
         assertEquals("text/xml", response.getContentType());
@@ -48,14 +48,14 @@ public class JsFrontEndServletTest extends AbstractServletTest {
 
         Document doc = StaxUtils.read(response.getInputStream());
         assertNotNull(doc);
-        
+
         addNamespace("h", "http://apache.org/hello_world_soap_http/types");
-        
+
         assertValid("/s:Envelope/s:Body", doc);
         assertValid("//h:sayHiResponse", doc);
         assertValid("//h:responseType", doc);
-        
+
     }
-    
+
 
 }

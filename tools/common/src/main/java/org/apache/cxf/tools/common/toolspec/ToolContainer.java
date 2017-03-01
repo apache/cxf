@@ -26,7 +26,7 @@ import org.apache.cxf.tools.common.ToolException;
 
 public interface ToolContainer {
     void execute(boolean exitOnFinish) throws ToolException;
-    void setContext(ToolContext context);    
+    void setContext(ToolContext context);
     void setArguments(String[] args);
     void setOutOutputStream(OutputStream outOutputStream);
     void setErrOutputStream(OutputStream errOutputStream);

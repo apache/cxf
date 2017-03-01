@@ -19,11 +19,11 @@
 package demo.hw.server.data;
 
 public class Beverage {
-    
+
     private String name;
     private Ingredient[] ingredients;
     private int proof;
-    
+
     public String getName() {
         return name;
     }

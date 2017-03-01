@@ -37,29 +37,29 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 /**
- * 
+ *
  */
 public class Servlet3ContinuationProvider implements ContinuationProvider {
     HttpServletRequest req;
-    HttpServletResponse resp; 
+    HttpServletResponse resp;
     Message inMessage;
     Servlet3Continuation continuation;
-    
+
     public Servlet3ContinuationProvider(HttpServletRequest req,
-                                        HttpServletResponse resp, 
+                                        HttpServletResponse resp,
                                         Message inMessage) {
         this.inMessage = inMessage;
         this.req = req;
         this.resp = resp;
     }
-    
+
     public void complete() {
         if (continuation != null) {
             continuation.reset();
             continuation = null;
         }
     }
-    
+
 
     /** {@inheritDoc}*/
     public Continuation getContinuation() {
@@ -74,7 +74,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
         return continuation;
     }
-    
+
     public class Servlet3Continuation implements Continuation, AsyncListener {
         private static final String BLOCK_RESTART = "org.apache.cxf.continuation.block.restart";
         AsyncContext context;
@@ -103,11 +103,11 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
                 context = req.startAsync();
                 context.addListener(this);
                 isComplete = false;
-            } catch (IllegalStateException ex) { 
+            } catch (IllegalStateException ex) {
                 context = old;
             }
         }
-        
+
         public boolean suspend(long timeout) {
             if (isPending && timeout != 0) {
                 long currentTimeout = context.getTimeout();
@@ -117,9 +117,9 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             }
             isNew = false;
             isResumed = false;
-            
+
             context.setTimeout(timeout);
-            
+
             Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
             if (currentMessage.get(WriteListener.class) != null) {
                 // CXF Continuation WriteListener will likely need to be introduced
@@ -129,7 +129,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             } else {
                 inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
             }
-            
+
             return true;
         }
         public void redispatch() {
@@ -147,20 +147,20 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
             isComplete = true;
             try {
                 context.complete();
-            } catch (IllegalStateException ex) { 
+            } catch (IllegalStateException ex) {
                 // ignore
             }
             isPending = false;
             isResumed = false;
             isNew = false;
-            
+
             obj = null;
             if (callback != null) {
                 final Exception ex = inMessage.getExchange().get(Exception.class);
                 Throwable cause = isCausedByIO(ex);
-                
+
                 if (cause != null && isClientDisconnected(cause)) {
-                    callback.onDisconnect();    
+                    callback.onDisconnect();
                 }
             }
         }
@@ -209,17 +209,17 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         public void onTimeout(AsyncEvent event) throws IOException {
             resume();
         }
-        
+
         private Throwable isCausedByIO(final Exception ex) {
             Throwable cause = ex;
-            
+
             while (cause != null && !(cause instanceof IOException)) {
                 cause = cause.getCause();
             }
-            
+
             return cause;
         }
-        
+
         private boolean isClientDisconnected(Throwable ex) {
             String exName = (String)inMessage.getContextualProperty("disconnected.client.exception.class");
             if (exName != null) {
@@ -233,7 +233,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         public boolean isReadyForWrite() {
             return getOutputStream().isReady();
         }
-        
+
         private ServletOutputStream getOutputStream() {
             try {
                 return resp.getOutputStream();

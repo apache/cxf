@@ -36,14 +36,17 @@ import org.junit.Test;
 public class JavaToJSProcessorTest extends ProcessorTestBase {
     JavaToJSProcessor processor = new JavaToJSProcessor();
     String classPath = "";
-    
+
     @Before
     public void startUp() throws Exception {
         env = new ToolContext();
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
+        if (System.getProperty("java.version").startsWith("9")) {
+            System.setProperty("org.apache.cxf.common.util.Compiler-fork", "true");
+        }
     }
-    
+
     @After
     public void tearDown() {
         super.tearDown();

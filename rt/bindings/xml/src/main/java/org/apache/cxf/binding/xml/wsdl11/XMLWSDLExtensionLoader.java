@@ -28,11 +28,11 @@ import org.apache.cxf.wsdl.WSDLExtensionLoader;
 import org.apache.cxf.wsdl.WSDLManager;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
-public final class XMLWSDLExtensionLoader implements WSDLExtensionLoader { 
-    
+public final class XMLWSDLExtensionLoader implements WSDLExtensionLoader {
+
     public XMLWSDLExtensionLoader(Bus b) {
         setupBus(b);
     }
@@ -40,22 +40,22 @@ public final class XMLWSDLExtensionLoader implements WSDLExtensionLoader {
         WSDLManager manager = b.getExtension(WSDLManager.class);
         registerExtensors(manager);
     }
-    
+
     public static void registerExtensors(WSDLManager manager) {
         createExtensor(manager, javax.wsdl.BindingInput.class,
                        org.apache.cxf.bindings.xformat.XMLBindingMessageFormat.class);
-        createExtensor(manager, javax.wsdl.BindingOutput.class, 
+        createExtensor(manager, javax.wsdl.BindingOutput.class,
                        org.apache.cxf.bindings.xformat.XMLBindingMessageFormat.class);
         createExtensor(manager, javax.wsdl.Binding.class,
                        org.apache.cxf.bindings.xformat.XMLFormatBinding.class);
     }
-    
+
     public static void createExtensor(WSDLManager manager,
                                 Class<?> parentType,
                                 Class<?> elementType) {
         try {
             JAXBExtensionHelper.addExtensions(manager.getExtensionRegistry(),
-                                              parentType, 
+                                              parentType,
                                               elementType,
                                               null,
                                               XMLWSDLExtensionLoader.class.getClassLoader());

@@ -22,7 +22,7 @@ package org.apache.cxf.demo.aegis.types;
 import java.util.Map;
 
 /**
- * 
+ *
  */
 public class Zoo {
     private String name;
@@ -35,7 +35,7 @@ public class Zoo {
     public void setFounder(String founder) {
         this.founder = founder;
     }
-    
+
     public String getName() {
         return name;
     }

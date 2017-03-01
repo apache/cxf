@@ -40,12 +40,12 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
     //
     // data
     //
-    
+
     @BeforeClass
     public static void allocatePorts() {
         BusServer.resetPortMap();
     }
-    
+
     /**
      * the package path used to locate resources specific to this test
      */
@@ -60,7 +60,7 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
             e.printStackTrace();
         }
     }
-          
+
     public void startServers() throws Exception {
         assertTrue(
             "Server failed to launch",
@@ -69,38 +69,38 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
             launchServer(BusServer.class, true)
         );
     }
-    
-    
+
+
     public void stopServers() throws Exception {
         stopAllServers();
         System.clearProperty(Configurer.USER_CFG_FILE_PROPERTY_URL);
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
-    }    
-    
-    
+    }
+
+
     //
     // tests
     //
     public final void testSuccessfulCall(String address) throws Exception {
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
-        
+
         BindingProvider provider = (BindingProvider)port;
         provider.getRequestContext().put(
               BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
               address);
-        
+
         assertEquals(port.greetMe("Kitty"), "Hello Kitty");
     }
-    
+
     public final void testFailedCall(String address) throws Exception {
         URL url = SOAPService.WSDL_LOCATION;
         SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);   
+        assertNotNull("Service is null", service);
         final Greeter port = service.getHttpsPort();
         assertNotNull("Port is null", port);
 
@@ -118,12 +118,12 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
             // expected
         }
     }
-    
+
     @Test
     public final void testCertConstraints() throws Exception {
         setTheConfiguration("jaxws-server-constraints.xml");
         startServers();
-        
+
         //
         // Good Subject DN
         //
@@ -156,8 +156,8 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
         // Bad server Issuer DN
         //
         testFailedCall("https://localhost:" + BusServer.getPort(7) + "/SoapContext/HttpsPort");
-        
+
         stopServers();
     }
-    
+
 }

@@ -35,15 +35,15 @@ public class IdToken extends AbstractUserInfo {
     public static final String ACCESS_TOKEN_HASH_CLAIM = "at_hash";
     public static final String AUTH_CODE_HASH_CLAIM = "c_hash";
     private static final long serialVersionUID = -2243170791872714855L;
-    
-    
+
+
     public IdToken() {
     }
-    
+
     public IdToken(JwtClaims claims) {
         this(claims.asMap());
     }
-    
+
     public IdToken(Map<String, Object> claims) {
         super(new LinkedHashMap<String, Object>(claims));
     }
@@ -89,5 +89,5 @@ public class IdToken extends AbstractUserInfo {
     public String getAuthorizationCodeHash() {
         return (String)getProperty(AUTH_CODE_HASH_CLAIM);
     }
-    
+
 }

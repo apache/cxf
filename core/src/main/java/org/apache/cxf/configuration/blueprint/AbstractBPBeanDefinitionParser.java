@@ -81,25 +81,25 @@ public abstract class AbstractBPBeanDefinitionParser {
         return v;
     }
 
-    protected Metadata parseListData(ParserContext context, 
-                                     ComponentMetadata enclosingComponent, 
+    protected Metadata parseListData(ParserContext context,
+                                     ComponentMetadata enclosingComponent,
                                      Element element) {
-        MutableCollectionMetadata m 
-            = (MutableCollectionMetadata) context.parseElement(CollectionMetadata.class, 
+        MutableCollectionMetadata m
+            = (MutableCollectionMetadata) context.parseElement(CollectionMetadata.class,
                                                                enclosingComponent, element);
         m.setCollectionClass(List.class);
         return m;
     }
 
-    protected Metadata parseMapData(ParserContext context, 
-                                    ComponentMetadata enclosingComponent, 
+    protected Metadata parseMapData(ParserContext context,
+                                    ComponentMetadata enclosingComponent,
                                     Element element) {
         return context.parseElement(MapMetadata.class, enclosingComponent, element);
     }
 
-    protected void setFirstChildAsProperty(Element element, 
-                                           ParserContext ctx, 
-                                           MutableBeanMetadata bean, 
+    protected void setFirstChildAsProperty(Element element,
+                                           ParserContext ctx,
+                                           MutableBeanMetadata bean,
                                            String propertyName) {
 
         Element first = DOMUtils.getFirstElement(element);
@@ -189,7 +189,7 @@ public abstract class AbstractBPBeanDefinitionParser {
         }
         return setBus;
     }
-    protected void processBusAttribute(Element element, ParserContext ctx, 
+    protected void processBusAttribute(Element element, ParserContext ctx,
                                        MutableBeanMetadata bean, String val) {
         if (this.hasBusProperty()) {
             bean.addProperty("bus", getBusRef(ctx, val));
@@ -204,14 +204,14 @@ public abstract class AbstractBPBeanDefinitionParser {
                                         String val) {
         //nothing
     }
-    protected void mapAttribute(MutableBeanMetadata bean, Element e, 
+    protected void mapAttribute(MutableBeanMetadata bean, Element e,
                                 String name, String val, ParserContext context) {
         mapToProperty(bean, name, val, context);
     }
 
     protected boolean isAttribute(String pre, String name) {
-        return !"xmlns".equals(name) && (pre == null || !pre.equals("xmlns")) 
-            && !"abstract".equals(name) && !"lazy-init".equals(name) 
+        return !"xmlns".equals(name) && (pre == null || !"xmlns".equals(pre))
+            && !"abstract".equals(name) && !"lazy-init".equals(name)
             && !"id".equals(name);
     }
 
@@ -222,9 +222,9 @@ public abstract class AbstractBPBeanDefinitionParser {
     protected void mapElement(ParserContext ctx, MutableBeanMetadata bean, Element el, String name) {
     }
 
-    protected void mapToProperty(MutableBeanMetadata bean, 
-                                 String propertyName, 
-                                 String val, 
+    protected void mapToProperty(MutableBeanMetadata bean,
+                                 String propertyName,
+                                 String val,
                                  ParserContext context) {
         if ("id".equals(propertyName)) {
             return;
@@ -266,7 +266,7 @@ public abstract class AbstractBPBeanDefinitionParser {
     protected MutableBeanMetadata getBus(ParserContext context, String name) {
         ComponentDefinitionRegistry cdr = context.getComponentDefinitionRegistry();
         ComponentMetadata meta = cdr.getComponentDefinition("blueprintBundle");
-        
+
         if (!cdr.containsComponentDefinition(InterceptorTypeConverter.class.getName())) {
             MutablePassThroughMetadata md = context.createMetadata(MutablePassThroughMetadata.class);
             md.setObject(new InterceptorTypeConverter());
@@ -312,9 +312,9 @@ public abstract class AbstractBPBeanDefinitionParser {
     }
 
     protected void mapElementToJaxbProperty(ParserContext ctx,
-                                            MutableBeanMetadata bean, Element parent, 
+                                            MutableBeanMetadata bean, Element parent,
                                             QName name,
-                                            String propertyName, 
+                                            String propertyName,
                                             Class<?> c) {
         Element data = DOMUtils.getFirstChildWithName(parent, name);
         if (data == null) {
@@ -323,7 +323,7 @@ public abstract class AbstractBPBeanDefinitionParser {
 
         mapElementToJaxbProperty(ctx, bean, data, propertyName, c);
     }
-    
+
     public static class JAXBBeanFactory {
         final JAXBContext ctx;
         final Class<?> cls;
@@ -331,8 +331,8 @@ public abstract class AbstractBPBeanDefinitionParser {
             ctx = c;
             cls = c2;
         }
-        
-        
+
+
         public Object createJAXBBean(String v) {
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(new StringReader(v));
             try {
@@ -354,10 +354,10 @@ public abstract class AbstractBPBeanDefinitionParser {
     }
 
     protected void mapElementToJaxbProperty(ParserContext ctx,
-                                            MutableBeanMetadata bean, 
-                                            Element data, 
-                                            String propertyName, 
-                                            Class<?> c) {   
+                                            MutableBeanMetadata bean,
+                                            Element data,
+                                            String propertyName,
+                                            Class<?> c) {
         try {
             XMLStreamWriter xmlWriter = null;
             Unmarshaller u = null;
@@ -366,8 +366,8 @@ public abstract class AbstractBPBeanDefinitionParser {
                 xmlWriter = StaxUtils.createXMLStreamWriter(writer);
                 StaxUtils.copy(data, xmlWriter);
                 xmlWriter.flush();
-    
-                
+
+
                 MutableBeanMetadata factory = ctx.createMetadata(MutableBeanMetadata.class);
                 factory.setClassName(c.getName());
                 factory.setFactoryComponent(createPassThrough(ctx, new JAXBBeanFactory(getContext(c), c)));
@@ -375,7 +375,7 @@ public abstract class AbstractBPBeanDefinitionParser {
                 factory.addArgument(createValue(ctx, writer.toString()), String.class.getName(), 0);
                 bean.addProperty(propertyName, factory);
 
-            } catch (Exception ex) {                
+            } catch (Exception ex) {
                 u = getContext(c).createUnmarshaller();
                 u.setEventHandler(null);
                 Object obj;
@@ -401,7 +401,7 @@ public abstract class AbstractBPBeanDefinitionParser {
             throw new RuntimeException("Could not parse configuration.", e);
         }
     }
-    
+
 
     protected synchronized JAXBContext getContext(Class<?> cls) {
         if (jaxbContext == null || jaxbClasses == null || !jaxbClasses.contains(cls)) {
@@ -410,9 +410,9 @@ public abstract class AbstractBPBeanDefinitionParser {
                 if (jaxbClasses != null) {
                     tmp.addAll(jaxbClasses);
                 }
-                JAXBContextCache.addPackage(tmp, PackageUtils.getPackageName(cls), 
-                                            cls == null 
-                                            ? getClass().getClassLoader() 
+                JAXBContextCache.addPackage(tmp, PackageUtils.getPackageName(cls),
+                                            cls == null
+                                            ? getClass().getClassLoader()
                                                 : cls.getClassLoader());
                 if (cls != null) {
                     boolean hasOf = false;
@@ -427,7 +427,7 @@ public abstract class AbstractBPBeanDefinitionParser {
                     }
                 }
                 JAXBContextCache.scanPackages(tmp);
-                CachedContextAndSchemas ccs 
+                CachedContextAndSchemas ccs
                     = JAXBContextCache.getCachedContextAndSchemas(tmp, null, null, null, false);
                 jaxbClasses = ccs.getClasses();
                 jaxbContext = ccs.getContext();

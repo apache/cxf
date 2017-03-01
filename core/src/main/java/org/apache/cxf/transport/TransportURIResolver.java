@@ -41,10 +41,10 @@ import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.service.model.EndpointInfo;
 
 /**
- * 
+ *
  */
 public class TransportURIResolver extends ExtendedURIResolver {
-    private static final Set<String> DEFAULT_URI_RESOLVER_HANDLES = new HashSet<String>();
+    private static final Set<String> DEFAULT_URI_RESOLVER_HANDLES = new HashSet<>();
     static {
         //bunch we really don't want to have the conduits checked for
         //as we know the conduits don't handle.  No point
@@ -56,17 +56,17 @@ public class TransportURIResolver extends ExtendedURIResolver {
         DEFAULT_URI_RESOLVER_HANDLES.add("zip");
     }
     protected Bus bus;
-    
+
     public TransportURIResolver(Bus b) {
         super();
         bus = b;
     }
-    
+
     public InputSource resolve(String curUri, String baseUri) {
-        
+
         // Spaces must be encoded or URI.resolve() will choke
         curUri = curUri.replace(" ", "%20");
-        
+
         InputSource is = null;
         URI base;
         try {
@@ -81,14 +81,14 @@ public class TransportURIResolver extends ExtendedURIResolver {
             base = null;
         }
         try {
-            if (base == null 
+            if (base == null
                 || DEFAULT_URI_RESOLVER_HANDLES.contains(base.getScheme())) {
                 is = super.resolve(curUri, baseUri);
             }
         } catch (Exception ex) {
             //nothing
         }
-        if (is == null && base != null 
+        if (is == null && base != null
             && base.getScheme() != null
             && !DEFAULT_URI_RESOLVER_HANDLES.contains(base.getScheme())) {
             try {
@@ -97,7 +97,7 @@ public class TransportURIResolver extends ExtendedURIResolver {
                 if ("http".equals(base.getScheme()) || "https".equals(base.getScheme())) {
                     //common case, don't "search"
                     ci = mgr.getConduitInitiator("http://cxf.apache.org/transports/http");
-                } 
+                }
                 if (ci == null) {
                     ci = mgr.getConduitInitiatorForUri(base.toString());
                 }
@@ -110,7 +110,7 @@ public class TransportURIResolver extends ExtendedURIResolver {
                     Message message = new MessageImpl();
                     Exchange exch = new ExchangeImpl();
                     message.setExchange(exch);
-                    
+
                     message.put(Message.HTTP_REQUEST_METHOD, "GET");
                     c.setMessageObserver(new MessageObserver() {
                         public void onMessage(Message message) {
@@ -143,11 +143,11 @@ public class TransportURIResolver extends ExtendedURIResolver {
                 //ignore
             }
         }
-        if (is == null 
-            && (base == null 
-                || base.getScheme() == null 
+        if (is == null
+            && (base == null
+                || base.getScheme() == null
                 || !DEFAULT_URI_RESOLVER_HANDLES.contains(base.getScheme()))) {
-            is = super.resolve(curUri, baseUri);            
+            is = super.resolve(curUri, baseUri);
         }
         return is;
     }

@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxrs;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-    
+
 public class BookContinuationServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookContinuationServer.class);
 
@@ -33,7 +33,7 @@ public class BookContinuationServer extends AbstractBusTestServerBase {
                                new SingletonResourceProvider(new BookContinuationStore()));
         sf.setAddress("http://localhost:" + PORT + "/");
 
-        sf.create();        
+        sf.create();
     }
 
     public static void main(String[] args) {

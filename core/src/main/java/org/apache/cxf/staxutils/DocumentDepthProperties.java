@@ -19,30 +19,30 @@
 package org.apache.cxf.staxutils;
 
 public class DocumentDepthProperties {
-    
+
     public static final String TOTAL_ELEMENT_COUNT = "depthTotalElementCountThreshold";
     public static final String INNER_ELEMENT_COUNT = "depthInnerElementCountThreshold";
     public static final String INNER_ELEMENT_LEVEL = "depthInnerElementLevelThreshold";
-    
+
     private int elementCountThreshold = -1;
     private int innerElementLevelThreshold = -1;
     private int innerElementCountThreshold = -1;
     public DocumentDepthProperties() {
-        
+
     }
     public DocumentDepthProperties(int elementCountThreshold,
                                    int innerElementLevelThreshold,
                                    int innerElementCountThreshold) {
         this.elementCountThreshold = elementCountThreshold;
         this.innerElementLevelThreshold = innerElementLevelThreshold;
-        this.innerElementCountThreshold = innerElementCountThreshold;    
+        this.innerElementCountThreshold = innerElementCountThreshold;
     }
-    
+
     public boolean isEffective() {
         return elementCountThreshold != -1 || innerElementLevelThreshold != -1
             || innerElementCountThreshold != -1;
     }
-    
+
     public void setElementCountThreshold(int elementCountThreshold) {
         this.elementCountThreshold = elementCountThreshold;
     }

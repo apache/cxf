@@ -29,7 +29,7 @@ import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 public interface AccessTokenValidator {
     List<String> getSupportedAuthorizationSchemes();
     AccessTokenValidation validateAccessToken(MessageContext mc,
-                                              String authScheme, 
+                                              String authScheme,
                                               String authSchemeData,
                                               MultivaluedMap<String, String> extraProps)
         throws OAuthServiceException;

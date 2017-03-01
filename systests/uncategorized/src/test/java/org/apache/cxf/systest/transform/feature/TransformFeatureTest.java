@@ -35,12 +35,12 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TransformFeatureTest extends AbstractBusClientServerTestBase {    
+public class TransformFeatureTest extends AbstractBusClientServerTestBase {
     private static final String PORT = EchoServer.PORT;
     private static final QName PORT_NAME = new QName("http://apache.org/echo", "EchoPort");
     private static final QName SERVICE_NAME = new QName("http://apache.org/echo", "EchoService");
-    private static final String XSLT_REQUEST_PATH = "request.xsl"; 
-    private static final String XSLT_RESPONSE_PATH = "response.xsl"; 
+    private static final String XSLT_REQUEST_PATH = "request.xsl";
+    private static final String XSLT_RESPONSE_PATH = "response.xsl";
     private static final String TRANSFORMED_CONSTANT = "TRANSFORMED";
 
     @BeforeClass
@@ -53,7 +53,7 @@ public class TransformFeatureTest extends AbstractBusClientServerTestBase {
         Service service = Service.create(SERVICE_NAME);
         String endpoint = "http://localhost:" + PORT + "/EchoContext/EchoPort";
         service.addPort(PORT_NAME, SOAPBinding.SOAP11HTTP_BINDING, endpoint);
-         
+
         Echo port = service.getPort(PORT_NAME, Echo.class);
         Client client = ClientProxy.getClient(port);
         XSLTOutInterceptor outInterceptor = new XSLTOutInterceptor(XSLT_REQUEST_PATH);
@@ -67,7 +67,7 @@ public class TransformFeatureTest extends AbstractBusClientServerTestBase {
         Service service = Service.create(SERVICE_NAME);
         String endpoint = "http://localhost:" + PORT + "/EchoContext/EchoPort";
         service.addPort(PORT_NAME, SOAPBinding.SOAP11HTTP_BINDING, endpoint);
-         
+
         Echo port = service.getPort(PORT_NAME, Echo.class);
         Client client = ClientProxy.getClient(port);
         XSLTInInterceptor inInterceptor = new XSLTInInterceptor(XSLT_RESPONSE_PATH);

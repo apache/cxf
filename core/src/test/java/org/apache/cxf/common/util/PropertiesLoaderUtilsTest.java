@@ -29,14 +29,14 @@ public class PropertiesLoaderUtilsTest extends Assert {
 
     Properties properties;
     String soapBindingFactory = "org.apache.cxf.bindings.soap.SOAPBindingFactory";
-    
+
     @Before
     public void setUp() throws Exception {
         properties = PropertiesLoaderUtils.
             loadAllProperties("org/apache/cxf/common/util/resources/bindings.properties.xml",
                               Thread.currentThread().getContextClassLoader());
-        assertNotNull(properties);        
-        
+        assertNotNull(properties);
+
     }
     @Test
     public void testLoadBindings() throws Exception {

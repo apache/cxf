@@ -28,7 +28,7 @@ import org.apache.cxf.rs.security.jose.common.JoseConstants;
 
 
 public class JsonWebKey extends JsonMapObject {
-    
+
     public static final String KEY_TYPE = "kty";
     public static final String PUBLIC_KEY_USE = "use";
     public static final String KEY_OPERATIONS = "key_ops";
@@ -38,7 +38,7 @@ public class JsonWebKey extends JsonMapObject {
     public static final String X509_CHAIN = JoseConstants.HEADER_X509_CHAIN;
     public static final String X509_THUMBPRINT = JoseConstants.HEADER_X509_THUMBPRINT;
     public static final String X509_THUMBPRINT_SHA256 = JoseConstants.HEADER_X509_THUMBPRINT_SHA256;
-    
+
     public static final String KEY_TYPE_RSA = "RSA";
     public static final String RSA_MODULUS = "n";
     public static final String RSA_PUBLIC_EXP = "e";
@@ -48,10 +48,10 @@ public class JsonWebKey extends JsonMapObject {
     public static final String RSA_FIRST_PRIME_CRT = "dp";
     public static final String RSA_SECOND_PRIME_CRT = "dq";
     public static final String RSA_FIRST_CRT_COEFFICIENT = "qi";
-        
+
     public static final String KEY_TYPE_OCTET = "oct";
     public static final String OCTET_KEY_VALUE = "k";
-    
+
     public static final String KEY_TYPE_ELLIPTIC = "EC";
     public static final String EC_CURVE = "crv";
     public static final String EC_CURVE_P256 = "P-256";
@@ -60,10 +60,10 @@ public class JsonWebKey extends JsonMapObject {
     public static final String EC_X_COORDINATE = "x";
     public static final String EC_Y_COORDINATE = "y";
     public static final String EC_PRIVATE_KEY = "d";
-    
+
     public static final String PUBLIC_KEY_USE_SIGN = "sig";
     public static final String PUBLIC_KEY_USE_ENCRYPT = "enc";
-    
+
     public static final String KEY_OPER_SIGN = "sign";
     public static final String KEY_OPER_VERIFY = "verify";
     public static final String KEY_OPER_ENCRYPT = "encrypt";
@@ -72,21 +72,21 @@ public class JsonWebKey extends JsonMapObject {
     public static final String KEY_OPER_UNWRAP_KEY = "unwrapKey";
     public static final String KEY_OPER_DERIVE_KEY = "deriveKey";
     public static final String KEY_OPER_DERIVE_BITS = "deriveBits";
-    
+
     private static final long serialVersionUID = 3201315996547826368L;
-    
+
     public JsonWebKey() {
-        
+
     }
-    
+
     public JsonWebKey(Map<String, Object> values) {
         super(values);
     }
-    
+
     public void setKeyType(KeyType keyType) {
         setProperty(KEY_TYPE, keyType.toString());
     }
-    
+
     public KeyType getKeyType() {
         Object prop = getProperty(KEY_TYPE);
         return prop == null ? null : KeyType.getKeyType(prop.toString());
@@ -95,14 +95,14 @@ public class JsonWebKey extends JsonMapObject {
     public void setPublicKeyUse(PublicKeyUse use) {
         setProperty(PUBLIC_KEY_USE, use.toString());
     }
-    
+
     public PublicKeyUse getPublicKeyUse() {
         Object prop = getProperty(PUBLIC_KEY_USE);
         return prop == null ? null : PublicKeyUse.getPublicKeyUse(prop.toString());
     }
 
     public void setKeyOperation(List<KeyOperation> keyOperation) {
-        List<String> ops = new ArrayList<String>(keyOperation.size());
+        List<String> ops = new ArrayList<>(keyOperation.size());
         for (KeyOperation op : keyOperation) {
             ops.add(op.toString());
         }
@@ -114,13 +114,13 @@ public class JsonWebKey extends JsonMapObject {
         if (ops == null) {
             return null;
         }
-        List<KeyOperation> keyOps = new ArrayList<KeyOperation>(ops.size());
+        List<KeyOperation> keyOps = new ArrayList<>(ops.size());
         for (Object op : ops) {
             keyOps.add(KeyOperation.getKeyOperation(op.toString()));
         }
         return keyOps;
     }
-    
+
     public void setAlgorithm(String algorithm) {
         setProperty(KEY_ALGO, algorithm);
     }
@@ -128,7 +128,7 @@ public class JsonWebKey extends JsonMapObject {
     public String getAlgorithm() {
         return (String)getProperty(KEY_ALGO);
     }
-    
+
     public void setKeyId(String kid) {
         setProperty(KEY_ID, kid);
     }
@@ -136,11 +136,11 @@ public class JsonWebKey extends JsonMapObject {
     public String getKeyId() {
         return (String)getProperty(KEY_ID);
     }
-    
+
     public void setX509Url(String x509Url) {
         setProperty(X509_URL, x509Url);
     }
-    
+
     public String getX509Url() {
         return (String)getProperty(X509_URL);
     }
@@ -152,23 +152,23 @@ public class JsonWebKey extends JsonMapObject {
     public List<String> getX509Chain() {
         return CastUtils.cast((List<?>)getProperty(X509_CHAIN));
     }
-    
+
     public void setX509Thumbprint(String x509Thumbprint) {
         setProperty(X509_THUMBPRINT, x509Thumbprint);
     }
-    
+
     public String getX509Thumbprint() {
         return (String)getProperty(X509_THUMBPRINT);
     }
-    
+
     public void setX509ThumbprintSHA256(String x509Thumbprint) {
         setProperty(X509_THUMBPRINT_SHA256, x509Thumbprint);
     }
-    
+
     public String getX509ThumbprintSHA256() {
         return (String)getProperty(X509_THUMBPRINT_SHA256);
     }
-    
+
     public JsonWebKey setKeyProperty(String name, Object value) {
         setProperty(name, value);
         return this;
@@ -176,7 +176,7 @@ public class JsonWebKey extends JsonMapObject {
     public Object getKeyProperty(String name) {
         return getProperty(name);
     }
-    
-    
-    
+
+
+
 }

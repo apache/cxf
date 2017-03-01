@@ -55,10 +55,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MetadataWriter {
-    
+
     private static final Logger LOG = LoggerFactory.getLogger(MetadataWriter.class);
     private static final XMLSignatureFactory XML_SIGNATURE_FACTORY = XMLSignatureFactory.getInstance("DOM");
-    
+
 
     //CHECKSTYLE:OFF
     public Document getMetaData(
@@ -106,69 +106,69 @@ public class MetadataWriter {
         }
         return doc;
     }
-    
+
     private void writeSAMLMetadata(
-        XMLStreamWriter writer, 
+        XMLStreamWriter writer,
         String assertionConsumerServiceURL,
         String logoutURL,
         X509Certificate signingCert,
         boolean wantRequestsSigned
     ) throws XMLStreamException, MalformedURLException, CertificateEncodingException {
-        
+
         writer.writeStartElement("md", "SPSSODescriptor", SSOConstants.SAML2_METADATA_NS);
         writer.writeAttribute("AuthnRequestsSigned", Boolean.toString(wantRequestsSigned));
         writer.writeAttribute("WantAssertionsSigned", "true");
         writer.writeAttribute("protocolSupportEnumeration", "urn:oasis:names:tc:SAML:2.0:protocol");
-        
+
         if (logoutURL != null) {
             writer.writeStartElement("md", "SingleLogoutService", SSOConstants.SAML2_METADATA_NS);
-            
+
             writer.writeAttribute("Location", logoutURL);
-            
+
             writer.writeAttribute("Binding", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST");
             writer.writeEndElement(); // SingleLogoutService
         }
-        
+
         writer.writeStartElement("md", "AssertionConsumerService", SSOConstants.SAML2_METADATA_NS);
         writer.writeAttribute("Location", assertionConsumerServiceURL);
         writer.writeAttribute("index", "0");
         writer.writeAttribute("isDefault", "true");
         writer.writeAttribute("Binding", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST");
         writer.writeEndElement(); // AssertionConsumerService
-        
+
         writer.writeStartElement("md", "AssertionConsumerService", SSOConstants.SAML2_METADATA_NS);
         writer.writeAttribute("Location", assertionConsumerServiceURL);
         writer.writeAttribute("index", "1");
         writer.writeAttribute("Binding", "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-REDIRECT");
         writer.writeEndElement(); // AssertionConsumerService
-        
+
         /*
         if (protocol.getClaimTypesRequested() != null && !protocol.getClaimTypesRequested().isEmpty()) {
             writer.writeStartElement("md", "AttributeConsumingService", SSOConstants.SAML2_METADATA_NS);
             writer.writeAttribute("index", "0");
-            
+
             writer.writeStartElement("md", "ServiceName", SSOConstants.SAML2_METADATA_NS);
             writer.writeAttribute("xml:lang", "en");
             writer.writeCharacters(config.getName());
             writer.writeEndElement(); // ServiceName
-            
+
             for (Claim claim : protocol.getClaimTypesRequested()) {
                 writer.writeStartElement("md", "RequestedAttribute", SSOConstants.SAML2_METADATA_NS);
                 writer.writeAttribute("isRequired", Boolean.toString(claim.isOptional()));
                 writer.writeAttribute("Name", claim.getType());
-                writer.writeAttribute("NameFormat", 
+                writer.writeAttribute("NameFormat",
                                       "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified");
                 writer.writeEndElement(); // RequestedAttribute
             }
-            
+
             writer.writeEndElement(); // AttributeConsumingService
         }
         */
-        
+
         if (signingCert != null) {
             writer.writeStartElement("md", "KeyDescriptor", SSOConstants.SAML2_METADATA_NS);
             writer.writeAttribute("use", "signing");
-            
+
             writer.writeStartElement("ds", "KeyInfo", "http://www.w3.org/2000/09/xmldsig#");
             writer.writeNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
             writer.writeStartElement("ds", "X509Data", "http://www.w3.org/2000/09/xmldsig#");
@@ -178,17 +178,17 @@ public class MetadataWriter {
             byte data[] = signingCert.getEncoded();
             String encodedCertificate = Base64.getMimeEncoder().encodeToString(data);
             writer.writeCharacters(encodedCertificate);
-            
+
             writer.writeEndElement(); // X509Certificate
             writer.writeEndElement(); // X509Data
             writer.writeEndElement(); // KeyInfo
             writer.writeEndElement(); // KeyDescriptor
         }
-        
+
         writer.writeEndElement(); // SPSSODescriptor
     }
 
-    private static Document signMetaInfo(X509Certificate signingCert, Key signingKey, 
+    private static Document signMetaInfo(X509Certificate signingCert, Key signingKey,
                                          Document doc, String referenceID
     ) throws Exception {
         String signatureMethod = null;
@@ -203,7 +203,7 @@ public class MetadataWriter {
             throw new RuntimeException("Unsupported signature method: " + signingCert.getSigAlgName());
         }
 
-        List<Transform> transformList = new ArrayList<Transform>();
+        List<Transform> transformList = new ArrayList<>();
         transformList.add(XML_SIGNATURE_FACTORY.newTransform(Transform.ENVELOPED, (TransformParameterSpec)null));
         transformList.add(XML_SIGNATURE_FACTORY.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE,
                                                                           (C14NMethodParameterSpec)null));
@@ -212,23 +212,23 @@ public class MetadataWriter {
         // you are signing the whole document, so a URI of "" signifies
         // that, and also specify the SHA1 digest algorithm and
         // the ENVELOPED Transform.
-        Reference ref = 
+        Reference ref =
             XML_SIGNATURE_FACTORY.newReference("#" + referenceID,
                                                XML_SIGNATURE_FACTORY.newDigestMethod(DigestMethod.SHA1, null),
                                                transformList,
                                                null, null);
 
         // Create the SignedInfo.
-        SignedInfo si = 
+        SignedInfo si =
             XML_SIGNATURE_FACTORY.newSignedInfo(
-                XML_SIGNATURE_FACTORY.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE, 
+                XML_SIGNATURE_FACTORY.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE,
                                                                 (C14NMethodParameterSpec)null),
-                                                                XML_SIGNATURE_FACTORY.newSignatureMethod(signatureMethod, null), 
+                                                                XML_SIGNATURE_FACTORY.newSignatureMethod(signatureMethod, null),
                                                                 Collections.singletonList(ref));
 
         // Create the KeyInfo containing the X509Data.
         KeyInfoFactory kif = XML_SIGNATURE_FACTORY.getKeyInfoFactory();
-        List<Object> x509Content = new ArrayList<Object>();
+        List<Object> x509Content = new ArrayList<>();
         x509Content.add(signingCert.getSubjectX500Principal().getName());
         x509Content.add(signingCert);
         X509Data xd = kif.newX509Data(x509Content);
@@ -250,5 +250,5 @@ public class MetadataWriter {
         // Output the resulting document.
         return doc;
     }
-    
+
 }

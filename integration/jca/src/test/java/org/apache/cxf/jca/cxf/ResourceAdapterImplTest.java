@@ -41,7 +41,7 @@ import org.junit.Test;
 public class ResourceAdapterImplTest extends Assert {
 
     public ResourceAdapterImplTest() {
-        
+
     }
 
     @Test
@@ -135,7 +135,7 @@ public class ResourceAdapterImplTest extends Assert {
     @Test
     public void testStopWithEmptyBusCache() throws Exception {
         ResourceAdapterImpl rai = new ResourceAdapterImpl();
-        rai.setBusCache(new HashSet<Bus>());
+        rai.setBusCache(new HashSet<>());
         try {
             assertNotNull("bus cache is not null", rai.getBusCache());
             assertTrue("bus cache is empty", rai.getBusCache().isEmpty());
@@ -148,15 +148,15 @@ public class ResourceAdapterImplTest extends Assert {
     @Test
     public void testStopWithNonEmptyBusCache() throws Exception {
         ResourceAdapterImpl rai = new ResourceAdapterImpl();
-        rai.setBusCache(new HashSet<Bus>());
+        rai.setBusCache(new HashSet<>());
         Bus bus = EasyMock.createMock(Bus.class);
         bus.shutdown(true);
         EasyMock.expectLastCall();
-        EasyMock.replay(bus);        
+        EasyMock.replay(bus);
         rai.registerBus(bus);
         rai.stop();
         EasyMock.verify(bus);
     }
 
-    
+
 }

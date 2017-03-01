@@ -54,7 +54,7 @@ import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
  */
 public class URIResolver {
     private static final Logger LOG = LogUtils.getLogger(URIResolver.class);
-    
+
     private Map<String, LoadingByteArrayOutputStream> cache
         = new HashMap<String, LoadingByteArrayOutputStream>();
     private File file;
@@ -73,17 +73,17 @@ public class URIResolver {
     public URIResolver(String baseUriStr, String uriStr) throws IOException {
         this(baseUriStr, uriStr, null);
     }
-    
+
     public URIResolver(String baseUriStr, String uriStr, Class<?> calling) throws IOException {
         this.calling = (calling != null) ? calling : getClass();
         if (uriStr.startsWith("classpath:")) {
             tryClasspath(uriStr);
-        } else if (baseUriStr != null 
-            && (baseUriStr.startsWith("jar:") 
+        } else if (baseUriStr != null
+            && (baseUriStr.startsWith("jar:")
                 || baseUriStr.startsWith("zip:")
                 || baseUriStr.startsWith("wsjar:"))) {
             tryArchive(baseUriStr, uriStr);
-        } else if (uriStr.startsWith("jar:") 
+        } else if (uriStr.startsWith("jar:")
             || uriStr.startsWith("zip:")
             || uriStr.startsWith("wsjar:")) {
             tryArchive(uriStr);
@@ -97,7 +97,7 @@ public class URIResolver {
         this.uri = null;
         this.is = null;
     }
-    
+
     public void resolve(String baseUriStr, String uriStr, Class<?> callingCls) throws IOException {
         this.calling = (callingCls != null) ? callingCls : getClass();
         this.file = null;
@@ -107,12 +107,12 @@ public class URIResolver {
 
         if (uriStr.startsWith("classpath:")) {
             tryClasspath(uriStr);
-        } else if (baseUriStr != null 
-            && (baseUriStr.startsWith("jar:") 
+        } else if (baseUriStr != null
+            && (baseUriStr.startsWith("jar:")
                 || baseUriStr.startsWith("zip:")
                 || baseUriStr.startsWith("wsjar:"))) {
             tryArchive(baseUriStr, uriStr);
-        } else if (uriStr.startsWith("jar:") 
+        } else if (uriStr.startsWith("jar:")
             || uriStr.startsWith("zip:")
             || uriStr.startsWith("wsjar:")) {
             tryArchive(uriStr);
@@ -121,20 +121,20 @@ public class URIResolver {
         }
     }
 
-    
-    
+
+
     private void tryFileSystem(String baseUriStr, String uriStr) throws IOException, MalformedURLException {
         try {
             URI relative;
 
             String orig = uriStr;
-            
+
             // It is possible that spaces have been encoded.  We should decode them first.
             uriStr = uriStr.replaceAll("%20", " ");
 
             File uriFile = new File(uriStr);
-            
-            
+
+
             uriFile = new File(uriFile.getAbsolutePath());
             if (!SecurityActions.fileExists(uriFile, CXFPermissions.RESOLVE_URI)) {
                 try {
@@ -150,11 +150,11 @@ public class URIResolver {
                 }
             }
             if (!SecurityActions.fileExists(uriFile, CXFPermissions.RESOLVE_URI)) {
-                relative =  new URI(uriStr.replaceAll(" ", "%20"));
+                relative = new URI(uriStr.replaceAll(" ", "%20"));
             } else {
                 relative = uriFile.getAbsoluteFile().toURI();
             }
-            
+
             if (relative.isAbsolute()) {
                 uri = relative;
                 url = relative.toURL();
@@ -181,14 +181,14 @@ public class URIResolver {
                     }
                     huc.setConnectTimeout(30000);
                     huc.setReadTimeout(60000);
-                    is =  huc.getInputStream();
+                    is = huc.getInputStream();
                 } catch (ClassCastException ex) {
                     is = url.openStream();
                 }
             } else if (!StringUtils.isEmpty(baseUriStr)) {
                 URI base;
                 File baseFile = new File(baseUriStr);
-          
+
                 if (!baseFile.exists() && baseUriStr.startsWith("file:")) {
                     baseFile = new File(getFilePathFromUri(baseUriStr));
                 }
@@ -198,7 +198,7 @@ public class URIResolver {
                 } else {
                     base = new URI(baseUriStr);
                 }
-                
+
                 base = base.resolve(relative);
                 if (base.isAbsolute() && "file".equalsIgnoreCase(base.getScheme())) {
                     try {
@@ -208,19 +208,19 @@ public class URIResolver {
                             is = base.toURL().openStream();
                             uri = base;
                         } else {
-                            tryClasspath(base.toString().startsWith("file:") 
+                            tryClasspath(base.toString().startsWith("file:")
                                          ? base.toString().substring(5) : base.toString());
                         }
                     } catch (Throwable th) {
-                        tryClasspath(base.toString().startsWith("file:") 
+                        tryClasspath(base.toString().startsWith("file:")
                                      ? base.toString().substring(5) : base.toString());
                     }
                 } else {
-                    tryClasspath(base.toString().startsWith("file:") 
+                    tryClasspath(base.toString().startsWith("file:")
                                  ? base.toString().substring(5) : base.toString());
                 }
             } else {
-                tryClasspath(uriStr.startsWith("file:") 
+                tryClasspath(uriStr.startsWith("file:")
                              ? uriStr.substring(5) : uriStr);
             }
         } catch (URISyntaxException e) {
@@ -253,29 +253,29 @@ public class URIResolver {
             tryClasspath(uriStr);
         }
     }
-    
+
     /**
      * Assumption: URI scheme is "file"
      */
-    private String getFilePathFromUri(String uriString) {     
+    private String getFilePathFromUri(String uriString) {
         String path = null;
-        
+
         try {
             path = new URL(uriString).getPath();
         } catch (MalformedURLException e) {
             // ignore
         }
-        
+
         if (path == null) {
             if (uriString.startsWith("file:/")) {
                 path = uriString.substring(6);
             } else if (uriString.startsWith("file:")) {
                 // handle Windows file URI such as "file:C:/foo/bar"
                 path = uriString.substring(5);
-            } 
+            }
         }
-        
-        // decode spaces before returning otherwise File.exists returns false 
+
+        // decode spaces before returning otherwise File.exists returns false
         if (path != null) {
             return path.replace("%20", " ");
         }
@@ -304,10 +304,10 @@ public class URIResolver {
         } catch (URISyntaxException e) {
             // do nothing
         }
-        
+
         tryFileSystem("", uriStr);
     }
-    
+
     private void tryArchive(String uriStr) throws IOException {
         int i = uriStr.indexOf('!');
         if (i == -1) {
@@ -327,7 +327,7 @@ public class URIResolver {
             tryClasspath(uriStr);
         }
     }
-    
+
     private void tryClasspath(String uriStr) throws IOException {
         boolean isClasspathURL = false;
         if (uriStr.startsWith("classpath:")) {
@@ -341,8 +341,8 @@ public class URIResolver {
             try {
                 uri = url.toURI();
             } catch (URISyntaxException e) {
-                // yep, some versions of the JDK can't handle spaces when URL.toURI() is called, 
-                // and lots of people on windows have their maven repositories at 
+                // yep, some versions of the JDK can't handle spaces when URL.toURI() is called,
+                // and lots of people on windows have their maven repositories at
                 // C:/Documents and Settings/<userid>/.m2/repository
                 // re: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6506304
                 if (url.toString().contains(" ")) {
@@ -367,7 +367,7 @@ public class URIResolver {
                         }
                     }
                 }
-                
+
             }
             is = url.openStream();
         }
@@ -419,7 +419,7 @@ public class URIResolver {
     public File getFile() {
         return file;
     }
-    
+
     public boolean isResolved() {
         return is != null;
     }

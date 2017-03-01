@@ -28,8 +28,8 @@ import org.apache.cxf.message.Message;
  * assert its capabilities for the underlying message.
  */
 public interface Assertor {
-    
+
     void assertMessage(Message message);
-    
+
     boolean canAssert(QName type);
 }

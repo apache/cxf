@@ -69,14 +69,14 @@ import org.junit.BeforeClass;
  * (message level, not TLS).
  */
 public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
-    
+
     private static TokenStore tokenStore;
-    
+
     @BeforeClass
     public static void init() {
         tokenStore = new DefaultInMemoryTokenStore();
     }
-    
+
     /**
      * Renew a valid SAML1 Assertion
      */
@@ -85,13 +85,13 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         // Create the Assertion
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
-        
+
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
@@ -99,15 +99,15 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         ReceivedToken validateTarget = new ReceivedToken(samlToken);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
+
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
@@ -118,18 +118,18 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
         renewerParameters.setToken(validatorResponse.getToken());
-        
+
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
-        
+
         try {
             samlTokenRenewer.renewToken(renewerParameters);
             fail("Expected failure on lack of proof of possession");
         } catch (Exception ex) {
             // expected
         }
-        
-        List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
+
+        List<WSSecurityEngineResult> signedResults = new ArrayList<>();
         WSSecurityEngineResult signedResult = new WSSecurityEngineResult(WSConstants.SIGN);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myclientkey");
@@ -137,23 +137,23 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
             WSSecurityEngineResult.TAG_X509_CERTIFICATES, crypto.getX509Certificates(cryptoType)
         );
         signedResults.add(signedResult);
-        
+
         List<WSHandlerResult> handlerResults = new ArrayList<>();
-        WSHandlerResult handlerResult = 
+        WSHandlerResult handlerResult =
             new WSHandlerResult(null, signedResults,
                                 Collections.singletonMap(WSConstants.SIGN, signedResults));
         handlerResults.add(handlerResult);
-        
+
         Map<String, Object> messageContext = validatorParameters.getMessageContext();
         messageContext.put(WSHandlerConstants.RECV_RESULTS, handlerResults);
 
         // Now successfully renew the token
-        TokenRenewerResponse renewerResponse = 
+        TokenRenewerResponse renewerResponse =
                 samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
     }
-    
+
     /**
      * Renew a valid SAML1 Assertion
      */
@@ -162,13 +162,13 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         // Create the Assertion
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
-        Element samlToken = 
+        Element samlToken =
             createSAMLAssertion(
                 WSConstants.WSS_SAML_TOKEN_TYPE, crypto, "mystskey", callbackHandler, 50000, true, false
             );
         Document doc = samlToken.getOwnerDocument();
         samlToken = (Element)doc.appendChild(samlToken);
-        
+
         // Validate the Assertion
         TokenValidator samlTokenValidator = new SAMLTokenValidator();
         TokenValidatorParameters validatorParameters = createValidatorParameters();
@@ -176,15 +176,15 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         ReceivedToken validateTarget = new ReceivedToken(samlToken);
         tokenRequirements.setValidateTarget(validateTarget);
         validatorParameters.setToken(validateTarget);
-        
+
         assertTrue(samlTokenValidator.canHandleToken(validateTarget));
-        
-        TokenValidatorResponse validatorResponse = 
+
+        TokenValidatorResponse validatorResponse =
                 samlTokenValidator.validateToken(validatorParameters);
         assertTrue(validatorResponse != null);
         assertTrue(validatorResponse.getToken() != null);
         assertTrue(validatorResponse.getToken().getState() == STATE.VALID);
-        
+
         // Renew the Assertion
         TokenRenewerParameters renewerParameters = new TokenRenewerParameters();
         renewerParameters.setAppliesToAddress("http://dummy-service.com/dummy");
@@ -195,18 +195,18 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         renewerParameters.setTokenRequirements(validatorParameters.getTokenRequirements());
         renewerParameters.setTokenStore(validatorParameters.getTokenStore());
         renewerParameters.setToken(validatorResponse.getToken());
-        
+
         TokenRenewer samlTokenRenewer = new SAMLTokenRenewer();
         assertTrue(samlTokenRenewer.canHandleToken(validatorResponse.getToken()));
-        
+
         try {
             samlTokenRenewer.renewToken(renewerParameters);
             fail("Expected failure on lack of proof of possession");
         } catch (Exception ex) {
             // expected
         }
-        
-        List<WSSecurityEngineResult> signedResults = new ArrayList<WSSecurityEngineResult>();
+
+        List<WSSecurityEngineResult> signedResults = new ArrayList<>();
         WSSecurityEngineResult signedResult = new WSSecurityEngineResult(WSConstants.SIGN);
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias("myservicekey");
@@ -214,13 +214,13 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
             WSSecurityEngineResult.TAG_X509_CERTIFICATES, crypto.getX509Certificates(cryptoType)
         );
         signedResults.add(signedResult);
-        
+
         List<WSHandlerResult> handlerResults = new ArrayList<>();
-        WSHandlerResult handlerResult = 
+        WSHandlerResult handlerResult =
             new WSHandlerResult(null, signedResults,
                                 Collections.singletonMap(WSConstants.SIGN, signedResults));
         handlerResults.add(handlerResult);
-        
+
         Map<String, Object> messageContext = validatorParameters.getMessageContext();
         messageContext.put(WSHandlerConstants.RECV_RESULTS, handlerResults);
 
@@ -231,23 +231,23 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
             // expected
         }
     }
-    
-    
+
+
     private TokenValidatorParameters createValidatorParameters() throws WSSecurityException {
         TokenValidatorParameters parameters = new TokenValidatorParameters();
-        
+
         TokenRequirements tokenRequirements = new TokenRequirements();
         parameters.setTokenRequirements(tokenRequirements);
-        
+
         KeyRequirements keyRequirements = new KeyRequirements();
         parameters.setKeyRequirements(keyRequirements);
-        
+
         parameters.setPrincipal(new CustomTokenPrincipal("alice"));
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
         parameters.setMessageContext(msgCtx);
-        
+
         // Add STSProperties object
         StaticSTSProperties stsProperties = new StaticSTSProperties();
         Crypto crypto = CryptoFactory.getInstance(getEncryptionProperties());
@@ -259,10 +259,10 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
         parameters.setTokenStore(tokenStore);
-        
+
         return parameters;
     }
-    
+
     private Element createSAMLAssertion(
             String tokenType, Crypto crypto, String signatureUsername,
             CallbackHandler callbackHandler, long ttlMs, boolean allowRenewing,
@@ -272,11 +272,11 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         DefaultConditionsProvider conditionsProvider = new DefaultConditionsProvider();
         conditionsProvider.setAcceptClientLifetime(true);
         samlTokenProvider.setConditionsProvider(conditionsProvider);
-        TokenProviderParameters providerParameters = 
+        TokenProviderParameters providerParameters =
             createProviderParameters(
                     tokenType, STSConstants.PUBLIC_KEY_KEYTYPE, crypto, signatureUsername, callbackHandler
             );
-        
+
         Renewing renewing = new Renewing();
         renewing.setAllowRenewing(allowRenewing);
         renewing.setAllowRenewingAfterExpiry(allowRenewingAfterExpiry);
@@ -300,10 +300,10 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
         return (Element)providerResponse.getToken();
-    }    
-    
+    }
+
     private TokenProviderParameters createProviderParameters(
-        String tokenType, String keyType, Crypto crypto, 
+        String tokenType, String keyType, Crypto crypto,
         String signatureUsername, CallbackHandler callbackHandler
     ) throws WSSecurityException {
         TokenProviderParameters parameters = new TokenProviderParameters();
@@ -339,10 +339,10 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
 
         parameters.setEncryptionProperties(new EncryptionProperties());
         parameters.setTokenStore(tokenStore);
-        
+
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -350,9 +350,9 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
-    
+
+
 }

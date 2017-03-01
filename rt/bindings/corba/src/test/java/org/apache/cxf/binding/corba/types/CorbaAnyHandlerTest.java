@@ -44,7 +44,7 @@ public class CorbaAnyHandlerTest extends Assert {
         props.put("yoko.orb.id", "CXF-CORBA-Server-Binding");
         orb = ORB.init(new String[0], props);
     }
-    
+
     @After
     public void tearDown() throws Exception {
         if (orb != null) {
@@ -53,7 +53,7 @@ public class CorbaAnyHandlerTest extends Assert {
             } catch (Exception ex) {
                 // Do nothing.  Throw an Exception?
             }
-        } 
+        }
     }
 
     @Test
@@ -66,7 +66,7 @@ public class CorbaAnyHandlerTest extends Assert {
         QName anyIdlType = CorbaConstants.NT_CORBA_ANY;
         TypeCode anyTC = orb.get_primitive_tc(TCKind.from_int(TCKind._tk_any));
         CorbaTypeMap tm = new CorbaTypeMap(CorbaConstants.NU_WSDL_CORBA);
-        
+
         CorbaAnyHandler anyHandler = new CorbaAnyHandler(anyName, anyIdlType, anyTC, null);
         anyHandler.setTypeMap(tm);
 

@@ -20,16 +20,16 @@
 package org.apache.cxf.javascript.fortest.aegis;
 
 /**
- * 
+ *
  */
 public class Vegetable {
-    
+
     private String family;
-    
+
     public Vegetable() {
         family = "brasica";
     }
-    
+
     public String getFamily() {
         return family;
     }

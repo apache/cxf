@@ -22,10 +22,10 @@ package org.apache.cxf.sts.event;
 import org.apache.cxf.sts.token.canceller.TokenCancellerParameters;
 
 public class STSCancelSuccessEvent extends AbstractSTSSuccessEvent implements TokenCancellerParametersSupport {
-    
+
     private static final String OPERATION = "Cancel";
-    
-    
+
+
     public STSCancelSuccessEvent(TokenCancellerParameters parameters, long duration) {
         super(parameters, duration);
     }
@@ -38,6 +38,6 @@ public class STSCancelSuccessEvent extends AbstractSTSSuccessEvent implements To
     @Override
     public TokenCancellerParameters getTokenParameters() {
         return (TokenCancellerParameters)this.getSource();
-    }    
+    }
 
 }

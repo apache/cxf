@@ -41,18 +41,18 @@ public class HelloWorker implements Runnable {
         this.startSignal = startSignal;
         this.doneSignal = doneSignal;
     }
-    
+
     public void run() {
         StringBuilder expected = new StringBuilder();
         expected.append(firstName);
         if (secondName != null && secondName.length() > 0) {
             expected.append(' ').append(secondName);
         }
-        
+
         try {
             startSignal.await();
-            
-            Assert.assertEquals("Wrong hello", "Hi " + expected.toString(), 
+
+            Assert.assertEquals("Wrong hello", "Hi " + expected.toString(),
                                 helloPort.sayHi(firstName, secondName));
             doneSignal.countDown();
         } catch (InterruptedException ex) {
@@ -60,8 +60,8 @@ public class HelloWorker implements Runnable {
         } catch (RuntimeException ex) {
             ex.printStackTrace();
             Assert.fail("Hello thread failed for : " + expected.toString());
-        } 
-        
+        }
+
     }
-    
+
 }

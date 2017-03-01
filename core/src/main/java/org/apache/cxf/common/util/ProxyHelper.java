@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
- * 
+ *
  */
 public class ProxyHelper {
     static final ProxyHelper HELPER;
@@ -37,11 +37,11 @@ public class ProxyHelper {
         }
         HELPER = theHelper;
     }
-    
-    
+
+
     protected ProxyHelper() {
     }
-    
+
     protected Object getProxyInternal(ClassLoader loader, Class<?>[] interfaces, InvocationHandler handler) {
         ClassLoader combinedLoader = getClassLoaderForInterfaces(loader, interfaces);
         return Proxy.newProxyInstance(combinedLoader, interfaces, handler);
@@ -50,7 +50,7 @@ public class ProxyHelper {
     /**
      * Return a classloader that can see all the given interfaces If the given loader can see all interfaces
      * then it is used. If not then a combined classloader of all interface classloaders is returned.
-     * 
+     *
      * @param loader use supplied class loader
      * @param interfaces
      * @return classloader that sees all interfaces
@@ -74,7 +74,7 @@ public class ProxyHelper {
                 if (ifClass != currentInterface) {
                     return false;
                 }
-                //we need to check all the params/returns as well as the Proxy creation 
+                //we need to check all the params/returns as well as the Proxy creation
                 //will try to create methods for all of this even if they aren't used
                 //by the client and not available in the clients classloader
                 for (Method m : ifClass.getMethods()) {

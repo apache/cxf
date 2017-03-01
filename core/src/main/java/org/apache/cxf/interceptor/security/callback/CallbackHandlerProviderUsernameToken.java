@@ -36,7 +36,7 @@ public class CallbackHandlerProviderUsernameToken implements CallbackHandlerProv
         }
         UsernameToken ut = (UsernameToken)token;
         if (ut.getPasswordType().endsWith("PasswordDigest")) {
-            return new NameDigestPasswordCallbackHandler(ut.getName(), 
+            return new NameDigestPasswordCallbackHandler(ut.getName(),
                                                          ut.getPassword(),
                                                          ut.getNonce(),
                                                          ut.getCreatedTime());

@@ -24,9 +24,9 @@ import javax.jws.WebService;
 
 
 
-@WebService(serviceName = "anonymous_complex_type_service", 
-        portName = "anonymous_complex_typeSOAP", 
-        endpointInterface = "org.apache.cxf.anonymous_complex_type.AnonymousComplexType", 
+@WebService(serviceName = "anonymous_complex_type_service",
+        portName = "anonymous_complex_typeSOAP",
+        endpointInterface = "org.apache.cxf.anonymous_complex_type.AnonymousComplexType",
         targetNamespace = "http://cxf.apache.org/anonymous_complex_type/",
         wsdlLocation = "testutils/anonymous_complex_type.wsdl")
 public class AnonymousComplexTypeImpl implements AnonymousComplexType {
@@ -46,7 +46,7 @@ public class AnonymousComplexTypeImpl implements AnonymousComplexType {
         return null;
     }
 
-            
+
 
     public RefSplitNameResponse refSplitName(RefSplitName refSplitName) {
         if (refSplitName.getSplitName().getName() != null) {
@@ -59,9 +59,9 @@ public class AnonymousComplexTypeImpl implements AnonymousComplexType {
                 names.setSecond(name.substring(pos + 1));
             } else {
                 names.setFirst(name);
-            
-                
-                
+
+
+
             }
             response = new SplitNameResponse();
             response.setNames(names);

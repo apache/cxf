@@ -32,11 +32,11 @@ public class SwaggerUiResolver {
         }
         HELPER = theHelper;
     }
-    
-    
+
+
     protected SwaggerUiResolver() {
     }
-    
+
     protected String findSwaggerUiRootInternal(String swaggerUiVersion) {
         try {
             ClassLoader cl = AbstractSwaggerFeature.class.getClassLoader();
@@ -44,7 +44,7 @@ public class SwaggerUiResolver {
                 final String resourcesRootStart = "META-INF/resources/webjars/swagger-ui/";
                 for (URL url : ((URLClassLoader)cl).getURLs()) {
                     String urlStr = url.toString();
-                    int swaggerUiIndex = urlStr.lastIndexOf("/swagger-ui-"); 
+                    int swaggerUiIndex = urlStr.lastIndexOf("/swagger-ui-");
                     if (swaggerUiIndex != -1) {
                         boolean urlEndsWithJarSep = urlStr.endsWith(".jar!/");
                         if (urlEndsWithJarSep || urlStr.endsWith(".jar")) {
@@ -60,15 +60,19 @@ public class SwaggerUiResolver {
                         }
                     }
                 }
-                
+
             }
         } catch (Throwable ex) {
             // ignore
-        }   
+        }
         return null;
     }
 
     public static String findSwaggerUiRoot(String swaggerUiVersion) {
-        return HELPER.findSwaggerUiRootInternal(swaggerUiVersion);
+        String root = HELPER.findSwaggerUiRootInternal(swaggerUiVersion);
+        if (root == null && HELPER.getClass() != SwaggerUiResolver.class) {
+            root = new SwaggerUiResolver().findSwaggerUiRootInternal(swaggerUiVersion);
+        }
+        return root;
     }
 }

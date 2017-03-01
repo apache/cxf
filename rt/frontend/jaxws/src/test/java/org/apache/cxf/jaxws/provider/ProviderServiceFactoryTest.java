@@ -82,7 +82,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         bean.setServiceClass(DOMSourcePayloadProvider.class);
         bean.setBus(getBus());
         bean.setInvoker(new JAXWSMethodInvoker(new DOMSourcePayloadProvider()));
-        
+
         Service service = bean.create();
 
         assertEquals("DOMSourcePayloadProviderService", service.getName().getLocalPart());
@@ -104,10 +104,10 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         Endpoint endpoint = server.getEndpoint();
         Binding binding = endpoint.getBinding();
         assertTrue(binding instanceof XMLBinding);
-        
-        Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, 
+
+        Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID,
                           "/org/apache/cxf/jaxws/provider/sayHi.xml");
-        
+
         addNamespace("j", "http://service.jaxws.cxf.apache.org/");
         assertValid("/j:sayHi", res);
     }
@@ -118,7 +118,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         bean.setServiceClass(SOAPSourcePayloadProvider.class);
         bean.setBus(getBus());
         bean.setInvoker(new JAXWSMethodInvoker(new SOAPSourcePayloadProvider()));
-        
+
         Service service = bean.create();
 
         assertEquals("SOAPSourcePayloadProviderService", service.getName().getLocalPart());
@@ -148,18 +148,18 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
 
         assertEquals(1, sb.getOperations().size());
         Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, "/org/apache/cxf/jaxws/sayHi.xml");
-        
+
         addNamespace("j", "http://service.jaxws.cxf.apache.org/");
         assertValid("/s:Envelope/s:Body/j:sayHi", res);
     }
-    
+
     @Test
     public void testSAAJProviderCodeFirst() throws Exception {
         JaxWsServiceFactoryBean bean = new JaxWsServiceFactoryBean();
         bean.setServiceClass(SAAJProvider.class);
         bean.setBus(getBus());
         bean.setInvoker(new JAXWSMethodInvoker(new SAAJProvider()));
-        
+
         Service service = bean.create();
 
         assertEquals("SAAJProviderService", service.getName().getLocalPart());
@@ -186,11 +186,11 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
 
         assertEquals(1, sb.getOperations().size());
         Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, "/org/apache/cxf/jaxws/sayHi.xml");
-        
+
         addNamespace("j", "http://service.jaxws.cxf.apache.org/");
         assertValid("/s:Envelope/s:Body/j:sayHi", res);
     }
-    
+
     @Test
     public void testStreamSourceProviderCodeFirst() throws Exception {
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
@@ -204,11 +204,11 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         svrFactory.create();
 
         Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, "/org/apache/cxf/jaxws/sayHi.xml");
-        
+
         addNamespace("j", "http://service.jaxws.cxf.apache.org/");
         assertValid("/s:Envelope/s:Body/j:sayHi", res);
     }
-    
+
 
     @Test
     public void testSourceMessageProviderCodeFirst() throws Exception {
@@ -222,7 +222,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         svrFactory.create();
 
         Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, "/org/apache/cxf/jaxws/sayHi.xml");
-        
+
         addNamespace("j", "http://service.jaxws.cxf.apache.org/");
         assertValid("/s:Envelope/s:Body/j:sayHi", res);
     }

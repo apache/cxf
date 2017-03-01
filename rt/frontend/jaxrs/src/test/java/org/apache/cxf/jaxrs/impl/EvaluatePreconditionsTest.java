@@ -55,7 +55,7 @@ public class EvaluatePreconditionsTest {
         service = new SimpleService();
         service.setEntityTag(ETAG_OLD);
         DATE_FMT_822.setTimeZone(TimeZone.getTimeZone("GMT"));
-        
+
         service.setLastModified(DATE_OLD);
     }
 
@@ -141,7 +141,7 @@ public class EvaluatePreconditionsTest {
         final Map<String, List<String>> map = new HashMap<String, List<String>>();
         message.put(Message.PROTOCOL_HEADERS, map);
         for (int i = 0; i < headers.length; i += 2) {
-            final List<String> l = new ArrayList<String>(1);
+            final List<String> l = new ArrayList<>(1);
             l.add(headers[i + 1]);
             map.put(headers[i], l);
         }

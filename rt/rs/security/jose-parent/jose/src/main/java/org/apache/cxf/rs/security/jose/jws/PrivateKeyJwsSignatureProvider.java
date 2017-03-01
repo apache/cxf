@@ -30,16 +30,16 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
 public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider {
     private PrivateKey key;
-    private SecureRandom random; 
+    private SecureRandom random;
     private AlgorithmParameterSpec signatureSpec;
-    
+
     public PrivateKeyJwsSignatureProvider(PrivateKey key, SignatureAlgorithm algo) {
         this(key, null, algo);
     }
     public PrivateKeyJwsSignatureProvider(PrivateKey key, AlgorithmParameterSpec spec, SignatureAlgorithm algo) {
         this(key, null, spec, algo);
     }
-    public PrivateKeyJwsSignatureProvider(PrivateKey key, SecureRandom random, 
+    public PrivateKeyJwsSignatureProvider(PrivateKey key, SecureRandom random,
                                           AlgorithmParameterSpec spec, SignatureAlgorithm algo) {
         super(algo);
         this.key = key;
@@ -48,7 +48,7 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
     }
     protected JwsSignature doCreateJwsSignature(JwsHeaders headers) {
         final String sigAlgo = headers.getSignatureAlgorithm().getJwaName();
-        final Signature s = CryptoUtils.getSignature(key, 
+        final Signature s = CryptoUtils.getSignature(key,
                                                      AlgorithmUtils.toJavaName(sigAlgo),
                                                      random,
                                                      signatureSpec);
@@ -57,7 +57,7 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
     protected JwsSignature doCreateJwsSignature(Signature s) {
         return new PrivateKeyJwsSignature(s);
     }
-    
+
     @Override
     protected boolean isValidAlgorithmFamily(String algo) {
         return AlgorithmUtils.isRsaSign(algo);
@@ -85,7 +85,7 @@ public class PrivateKeyJwsSignatureProvider extends AbstractJwsSignatureProvider
                 throw new JwsException(JwsException.Error.SIGNATURE_FAILURE, ex);
             }
         }
-        
+
     }
-    
+
 }

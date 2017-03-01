@@ -238,8 +238,8 @@ public class JPAOAuthDataProviderTest extends Assert {
                 emFactory.close();
             }
         } catch (Throwable ex) {
-            ex.printStackTrace();    
-        } finally {    
+            ex.printStackTrace();
+        } finally {
             try {
                 //connection.createStatement().execute("SHUTDOWN");
             } catch (Throwable ex) {
@@ -247,5 +247,5 @@ public class JPAOAuthDataProviderTest extends Assert {
             }
         }
     }
-    
+
 }

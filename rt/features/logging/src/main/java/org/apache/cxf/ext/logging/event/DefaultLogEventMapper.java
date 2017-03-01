@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
-import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -42,14 +41,13 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.ServiceInfo;
-import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 
 public class DefaultLogEventMapper implements LogEventMapper {
     private static final Set<String> BINARY_CONTENT_MEDIA_TYPES;
     static {
-        BINARY_CONTENT_MEDIA_TYPES = new HashSet<String>();
+        BINARY_CONTENT_MEDIA_TYPES = new HashSet<>();
         BINARY_CONTENT_MEDIA_TYPES.add("application/octet-stream");
         BINARY_CONTENT_MEDIA_TYPES.add("image/png");
         BINARY_CONTENT_MEDIA_TYPES.add("image/jpeg");
@@ -156,7 +154,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
                     }
                     uri = address + uri;
                 }
-            } else {
+            } else if (address != null) {
                 uri = address;
             }
         }
@@ -172,7 +170,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
         String contentType = safeGet(message, Message.CONTENT_TYPE);
         return contentType != null && BINARY_CONTENT_MEDIA_TYPES.contains(contentType);
     }
-    
+
     private boolean isMultipartContent(Message message) {
         String contentType = safeGet(message, Message.CONTENT_TYPE);
         return contentType != null && contentType.startsWith(MULTIPART_CONTENT_MEDIA_TYPE);
@@ -191,7 +189,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
 
     /**
      * Get MessageId from WS Addressing properties
-     * 
+     *
      * @param message
      * @return message id
      */
@@ -207,34 +205,12 @@ public class DefaultLogEventMapper implements LogEventMapper {
         BindingOperationInfo boi = null;
 
         boi = message.getExchange().getBindingOperationInfo();
-        if (null == boi) {
-            boi = getOperationFromContent(message);
-        }
-
-        if (null == boi) {
-            Message inMsg = message.getExchange().getInMessage();
-            if (null != inMsg) {
-                Message reqMsg = inMsg.getExchange().getInMessage();
-                if (null != reqMsg) {
-                    boi = getOperationFromContent(reqMsg);
-                }
-            }
-        }
 
         if (null != boi) {
             operationName = boi.getName().toString();
         }
 
         return operationName;
-    }
-
-    private BindingOperationInfo getOperationFromContent(Message message) {
-        XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
-        if (xmlReader != null) {
-            return ServiceModelUtil.getOperation(message.getExchange(), xmlReader.getName());
-        } else {
-            return null;
-        }
     }
 
     private Message getEffectiveMessage(Message message) {
@@ -258,17 +234,20 @@ public class DefaultLogEventMapper implements LogEventMapper {
         String requestUri = safeGet(message, Message.REQUEST_URI);
         if (requestUri != null) {
             String basePath = safeGet(message, Message.BASE_PATH);
-            int baseUriLength = (basePath != null) ? basePath.length() : 0;
-            path = requestUri.substring(baseUriLength);
+            if (basePath == null) {
+                path = requestUri;
+            } else if (requestUri.startsWith(basePath)) {
+                path = requestUri.substring(basePath.length());
+            }
             if (path.isEmpty()) {
                 path = "/";
             }
         }
         return new StringBuffer().append(httpMethod).append('[').append(path).append(']').toString();
     }
-    
+
     private static String safeGet(Message message, String key) {
-        if (!message.containsKey(key)) {
+        if (message == null || !message.containsKey(key)) {
             return null;
         }
         Object value = message.get(key);
@@ -281,7 +260,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
      * @param message the message
      * @return the event type
      */
-    private EventType getEventType(Message message) {
+    public EventType getEventType(Message message) {
         boolean isRequestor = MessageUtils.isRequestor(message);
         boolean isFault = MessageUtils.isFault(message);
         if (!isFault) {
@@ -306,7 +285,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
     /**
      * For REST we also consider a response to be a fault if the operation is not found or the response code
      * is an error
-     * 
+     *
      * @param message
      * @return
      */
@@ -320,7 +299,7 @@ public class DefaultLogEventMapper implements LogEventMapper {
         }
     }
 
-    private void setEpInfo(Message message, final LogEvent event) {
+    public void setEpInfo(Message message, final LogEvent event) {
         EndpointInfo endpoint = getEPInfo(message);
         event.setPortName(endpoint.getName());
         event.setPortTypeName(endpoint.getName());

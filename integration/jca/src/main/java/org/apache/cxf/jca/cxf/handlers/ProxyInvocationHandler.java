@@ -36,23 +36,23 @@ import org.apache.cxf.jca.cxf.ManagedConnectionFactoryImpl;
 public class ProxyInvocationHandler extends CXFInvocationHandlerBase  {
 
     private static final Logger LOG = LogUtils.getL7dLogger(ProxyInvocationHandler.class);
-    
+
     public ProxyInvocationHandler(CXFInvocationHandlerData data) {
         super(data);
-        LOG.fine("ProxyInvocationHandler instance created"); 
+        LOG.fine("ProxyInvocationHandler instance created");
     }
 
 
     public final Object invoke(final Object proxy,
                                final Method method,
                                final Object args[]) throws Throwable {
-       
+
         LOG.fine(this + " on " + method);
         Object o = getData().getManagedConnection().getManagedConnectionFactory();
         ManagedConnectionFactoryImpl mcf = (ManagedConnectionFactoryImpl)o;
         //NOTE reset the inited bus to current ,so CXF-rt can play with JCA setup bus
-        Bus bus = mcf.getBus();        
-        BusFactory.setDefaultBus(bus);        
+        Bus bus = mcf.getBus();
+        BusFactory.setDefaultBus(bus);
         return invokeNext(proxy, method, args);
     }
 }

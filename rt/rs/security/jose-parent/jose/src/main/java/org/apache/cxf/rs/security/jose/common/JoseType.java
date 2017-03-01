@@ -23,7 +23,7 @@ public enum JoseType {
     JOSE(JoseConstants.TYPE_JOSE),
     JOSE_JSON(JoseConstants.TYPE_JOSE_JSON),
     JWT(JoseConstants.TYPE_JWT);
-    
+
     private final String type;
     JoseType(String type) {
         this.type = type;
@@ -32,7 +32,7 @@ public enum JoseType {
         if (type == null) {
             return null;
         } else if (JoseConstants.TYPE_JOSE_JSON.equals(type)) {
-            return JOSE_JSON;    
+            return JOSE_JSON;
         } else {
             return valueOf(type);
         }

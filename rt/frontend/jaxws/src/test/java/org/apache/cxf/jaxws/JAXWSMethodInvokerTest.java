@@ -60,10 +60,10 @@ public class JAXWSMethodInvokerTest extends Assert {
     private static final QName TEST_HEADER_NAME = new QName("testHeader");
     Factory factory = EasyMock.createMock(Factory.class);
     Object target = EasyMock.createMock(Hello.class);
-        
+
     @Test
     public void testFactoryBeans() throws Throwable {
-        Exchange ex = EasyMock.createMock(Exchange.class);               
+        Exchange ex = EasyMock.createMock(Exchange.class);
         EasyMock.reset(factory);
         factory.create(ex);
         EasyMock.expectLastCall().andReturn(target);
@@ -73,15 +73,15 @@ public class JAXWSMethodInvokerTest extends Assert {
         assertEquals("the target object and service object should be equal ", object, target);
         EasyMock.verify(factory);
     }
-        
+
 
     @Test
     public void testSuspendedException() throws Throwable {
         Exception originalException = new RuntimeException();
-        ContinuationService serviceObject = 
+        ContinuationService serviceObject =
             new ContinuationService(originalException);
         Method serviceMethod = ContinuationService.class.getMethod("invoke", new Class[]{});
-        
+
         Exchange ex = new ExchangeImpl();
         Message inMessage = new MessageImpl();
         ex.setInMessage(inMessage);
@@ -97,15 +97,15 @@ public class JAXWSMethodInvokerTest extends Assert {
             assertSame(originalException, suspendedEx.getRuntimeException());
         }
     }
-    
+
     @Test
     public void testFaultAvoidHeadersCopy() throws Throwable {
         ExceptionService serviceObject = new ExceptionService();
         Method serviceMethod = ExceptionService.class.getMethod("invoke", new Class[]{});
-        
+
         Exchange ex = new ExchangeImpl();
         prepareInMessage(ex, false);
-        
+
 
         JAXWSMethodInvoker jaxwsMethodInvoker = prepareJAXWSMethodInvoker(ex, serviceObject, serviceMethod);
         try {
@@ -121,7 +121,7 @@ public class JAXWSMethodInvokerTest extends Assert {
     public void testFaultHeadersCopy() throws Throwable {
         ExceptionService serviceObject = new ExceptionService();
         Method serviceMethod = ExceptionService.class.getMethod("invoke", new Class[]{});
-        
+
         Exchange ex = new ExchangeImpl();
         prepareInMessage(ex, true);
         Message msg = new MessageImpl();
@@ -147,16 +147,16 @@ public class JAXWSMethodInvokerTest extends Assert {
     public void testProviderInterpretNullAsOneway() throws Throwable {
         NullableProviderService serviceObject = new NullableProviderService();
         Method serviceMethod = NullableProviderService.class.getMethod("invoke", new Class[]{Source.class});
-        
+
         Exchange ex = new ExchangeImpl();
         Message inMessage = new MessageImpl();
         inMessage.setInterceptorChain(new PhaseInterceptorChain(new TreeSet<Phase>()));
         ex.setInMessage(inMessage);
         inMessage.setExchange(ex);
         inMessage.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
-        
+
         JAXWSMethodInvoker jaxwsMethodInvoker = prepareJAXWSMethodInvoker(ex, serviceObject, serviceMethod);
-        
+
         // request-response with non-null response
         ex.setOneWay(false);
         MessageContentsList obj = (MessageContentsList)jaxwsMethodInvoker.invoke(
@@ -171,8 +171,8 @@ public class JAXWSMethodInvokerTest extends Assert {
             ex, new MessageContentsList(new Object[]{new StreamSource()}));
         assertNull(obj);
         assertTrue(ex.isOneWay());
-        
-        // request-response with null response, interpretNullAsOneway not set so 
+
+        // request-response with null response, interpretNullAsOneway not set so
         // default should be true
         ex.setOneWay(false);
         serviceObject.setNullable(true);
@@ -191,7 +191,7 @@ public class JAXWSMethodInvokerTest extends Assert {
         assertNull(obj.get(0));
         assertFalse(ex.isOneWay());
 
-        
+
         // request-response with null response, interpretNullAsOneway explicitly enabled
         ex.setOneWay(false);
         serviceObject.setNullable(true);
@@ -199,7 +199,7 @@ public class JAXWSMethodInvokerTest extends Assert {
         obj = (MessageContentsList)jaxwsMethodInvoker
             .invoke(ex, new MessageContentsList(new Object[]{new StreamSource()}));
         assertNull(obj);
-        assertTrue(ex.isOneWay());        
+        assertTrue(ex.isOneWay());
     }
 
     private JAXWSMethodInvoker prepareJAXWSMethodInvoker(Exchange ex, Object serviceObject,
@@ -210,24 +210,24 @@ public class JAXWSMethodInvokerTest extends Assert {
         factory.release(ex, serviceObject);
         EasyMock.expectLastCall().anyTimes();
         EasyMock.replay(factory);
-        
+
         BindingOperationInfo boi = new BindingOperationInfo();
         ex.put(BindingOperationInfo.class, boi);
-        
+
         Service serviceClass = EasyMock.createMock(Service.class);
         serviceClass.size();
         EasyMock.expectLastCall().andReturn(0).anyTimes();
         serviceClass.isEmpty();
         EasyMock.expectLastCall().andReturn(true).anyTimes();
         ex.put(Service.class, serviceClass);
-        
+
         MethodDispatcher md = EasyMock.createMock(MethodDispatcher.class);
         serviceClass.get(MethodDispatcher.class.getName());
         EasyMock.expectLastCall().andReturn(md).anyTimes();
-        
+
         md.getMethod(boi);
         EasyMock.expectLastCall().andReturn(serviceMethod).anyTimes();
-        
+
         EasyMock.replay(md);
         EasyMock.replay(serviceClass);
 
@@ -239,27 +239,27 @@ public class JAXWSMethodInvokerTest extends Assert {
 
     public static class ContinuationService {
         private RuntimeException ex;
-        
+
         public ContinuationService(Exception throwable) {
             ex = new SuspendedInvocationException(throwable);
         }
-        
+
         public void invoke() {
             throw ex;
         }
-        
+
         public Throwable getSuspendedException() {
             return ex;
         }
     }
-    
+
     public static class NullableProviderService implements Provider<Source> {
         private boolean nullable;
-        
+
         public void setNullable(boolean nullable) {
             this.nullable = nullable;
         }
-        
+
         public Source invoke(Source request) {
             return nullable ? null : request;
         }
@@ -267,11 +267,11 @@ public class JAXWSMethodInvokerTest extends Assert {
 
     public static class ExceptionService {
         private Throwable ex = new RuntimeException("Test Exception");
-        
+
         public void invoke() {
             throw new Fault(ex);
         }
-        
+
     }
 
     private Message prepareInMessage(Exchange ex, boolean copyHeadersByFault)
@@ -279,7 +279,7 @@ public class JAXWSMethodInvokerTest extends Assert {
         Message inMessage = new MessageImpl();
         inMessage.setExchange(ex);
         inMessage.put(JAXWSMethodInvoker.COPY_SOAP_HEADERS_BY_FAULT, Boolean.valueOf(copyHeadersByFault));
-        List<Header> headers = new ArrayList<Header>();
+        List<Header> headers = new ArrayList<>();
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document headerDoc = builder.parse(new ByteArrayInputStream("<test:testValue xmlns:test=\"test\"/>"
             .getBytes()));

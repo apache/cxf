@@ -63,7 +63,7 @@ public final class Client {
         } else {
             busURL = new URL(args[1]);
         }
-        
+
         Bus bus = bf.createBus(busFile.toString());
         BusFactory.setDefaultBus(bus);
 

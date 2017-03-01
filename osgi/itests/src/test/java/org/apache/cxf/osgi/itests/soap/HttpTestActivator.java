@@ -36,7 +36,7 @@ public class HttpTestActivator implements BundleActivator {
         factory.setAddress("/greeter");
         factory.setServiceBean(new GreeterImpl());
         server = factory.create();
-        
+
         factory = new JaxWsServerFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress("http://localhost:" + PORT + "/cxf/greeter");

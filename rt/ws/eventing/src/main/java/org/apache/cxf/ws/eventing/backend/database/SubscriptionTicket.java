@@ -91,7 +91,7 @@ public class SubscriptionTicket {
         if (nonExpiring) {
             return false;
         }
-        return  expires.toGregorianCalendar().before(new GregorianCalendar());
+        return expires.toGregorianCalendar().before(new GregorianCalendar());
     }
 
     public void setExpires(XMLGregorianCalendar expires) {
@@ -113,7 +113,7 @@ public class SubscriptionTicket {
      */
     public String getTargetURL() {
         @SuppressWarnings("unchecked")
-        JAXBElement<EndpointReferenceType> el 
+        JAXBElement<EndpointReferenceType> el
             = (JAXBElement<EndpointReferenceType>)this.getDelivery().getContent().get(0);
         return el.getValue().getAddress().getValue().trim();
     }
@@ -149,7 +149,7 @@ public class SubscriptionTicket {
 
     public ReferenceParametersType getNotificationReferenceParams() {
         @SuppressWarnings("unchecked")
-        JAXBElement<EndpointReferenceType> el 
+        JAXBElement<EndpointReferenceType> el
             = (JAXBElement<EndpointReferenceType>)this.getDelivery().getContent().get(0);
         return el.getValue().getReferenceParameters();
     }

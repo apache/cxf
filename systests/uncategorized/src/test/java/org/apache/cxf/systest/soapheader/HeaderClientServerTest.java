@@ -64,7 +64,7 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
         header.setName("mao");
         header.setPhoneNumber("108");
 
-        OrderPizzaResponseType res =  port.orderPizza(req, header);
+        OrderPizzaResponseType res = port.orderPizza(req, header);
 
         assertEquals(208, res.getMinutesUntilReady());
     }
@@ -79,7 +79,7 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
         t.getTopping().add("test");
         req.setToppings(t);
 
-        OrderPizzaResponseType res =  port.orderPizza(req);
+        OrderPizzaResponseType res = port.orderPizza(req);
 
         assertEquals(100, res.getMinutesUntilReady());
     }
@@ -93,7 +93,7 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
 
         return service.getPizzaPort();
     }
-    
+
     private PizzaNoHeader getPortNoHeader() {
         URL wsdl = getClass().getResource("/wsdl_systest/pizza_service.wsdl");
         assertNotNull("WSDL is null", wsdl);
@@ -103,8 +103,8 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
 
         return service.getPort(PizzaNoHeader.class);
     }
-    
-    
+
+
     @WebService(targetNamespace = "http://cxf.apache.org/pizza", name = "Pizza")
     @XmlSeeAlso({ org.apache.cxf.pizza.types.ObjectFactory.class })
     @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)

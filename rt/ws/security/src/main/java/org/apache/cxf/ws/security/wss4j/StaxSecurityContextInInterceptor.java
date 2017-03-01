@@ -59,23 +59,23 @@ import org.apache.xml.security.stax.securityToken.SecurityTokenConstants.TokenUs
  * security context appropriately.
  */
 public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
-    
+
     /**
      * This configuration tag specifies the default attribute name where the roles are present
      * The default is "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role".
      */
     public static final String SAML_ROLE_ATTRIBUTENAME_DEFAULT =
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
-    
+
     public StaxSecurityContextInInterceptor() {
         super(Phase.PRE_PROTOCOL);
     }
 
     @Override
     public void handleMessage(SoapMessage soapMessage) throws Fault {
-        
+
         @SuppressWarnings("unchecked")
-        final List<SecurityEvent> incomingSecurityEventList = 
+        final List<SecurityEvent> incomingSecurityEventList =
             (List<SecurityEvent>)soapMessage.get(SecurityEvent.class.getName() + ".in");
 
         if (incomingSecurityEventList != null) {
@@ -86,7 +86,7 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
             }
         }
     }
-    
+
     private void doResults(SoapMessage msg, List<SecurityEvent> incomingSecurityEventList) throws WSSecurityException {
 
         // Now go through the results in a certain order to set up a security context. Highest priority is first.
@@ -97,7 +97,7 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
         desiredSecurityEvents.add(WSSecurityEventConstants.KERBEROS_TOKEN);
         desiredSecurityEvents.add(WSSecurityEventConstants.X509Token);
         desiredSecurityEvents.add(WSSecurityEventConstants.KeyValueToken);
-            
+
         for (Event desiredEvent : desiredSecurityEvents) {
             SubjectAndPrincipalSecurityToken token = null;
             try {
@@ -108,18 +108,18 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
             if (token != null) {
                 Principal p = token.getPrincipal();
                 Subject subject = token.getSubject();
-                
+
                 if (subject != null) {
-                    String roleClassifier = 
+                    String roleClassifier =
                         (String)msg.getContextualProperty(SecurityConstants.SUBJECT_ROLE_CLASSIFIER);
                     if (roleClassifier != null && !"".equals(roleClassifier)) {
-                        String roleClassifierType = 
+                        String roleClassifierType =
                             (String)msg.getContextualProperty(SecurityConstants.SUBJECT_ROLE_CLASSIFIER_TYPE);
                         if (roleClassifierType == null || "".equals(roleClassifierType)) {
                             roleClassifierType = "prefix";
                         }
                         msg.put(
-                            SecurityContext.class, 
+                            SecurityContext.class,
                             new RolePrefixSecurityContextImpl(subject, roleClassifier, roleClassifierType)
                         );
                     } else {
@@ -129,24 +129,24 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
                 } else if (p != null) {
 
                     Object receivedAssertion = null;
-                    
+
                     if (desiredEvent == WSSecurityEventConstants.SAML_TOKEN) {
                         String roleAttributeName = (String)SecurityUtils.getSecurityPropertyValue(
                                 SecurityConstants.SAML_ROLE_ATTRIBUTENAME, msg);
                         if (roleAttributeName == null || roleAttributeName.length() == 0) {
                             roleAttributeName = SAML_ROLE_ATTRIBUTENAME_DEFAULT;
                         }
-                        
-                        receivedAssertion =  ((SAMLTokenPrincipal)token.getPrincipal()).getToken();
+
+                        receivedAssertion = ((SAMLTokenPrincipal)token.getPrincipal()).getToken();
                         if (receivedAssertion != null) {
-                            ClaimCollection claims = 
+                            ClaimCollection claims =
                                 SAMLUtils.getClaims((SamlAssertionWrapper)receivedAssertion);
-                            Set<Principal> roles = 
+                            Set<Principal> roles =
                                 SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
-                            
-                            SAMLSecurityContext context = 
+
+                            SAMLSecurityContext context =
                                 new SAMLSecurityContext(p, roles, claims);
-                            
+
                             msg.put(SecurityContext.class, context);
                         }
                     } else {
@@ -157,7 +157,7 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
             }
         }
     }
-    
+
     private SubjectAndPrincipalSecurityToken getSubjectPrincipalToken(List<SecurityEvent> incomingSecurityEventList,
                                                                       Event desiredEvent) throws XMLSecurityException {
         for (SecurityEvent event : incomingSecurityEventList) {
@@ -180,18 +180,18 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
         }
         return null;
     }
-    
+
     private boolean isUsedForPublicKeySignature(
         SubjectAndPrincipalSecurityToken token
     ) throws XMLSecurityException {
         if (token == null) {
             return false;
         }
-        
+
         // Check first of all that the token is used for Signature
         List<TokenUsage> tokenUsages = token.getTokenUsages();
         boolean usedForSignature = false;
-        
+
         if (tokenUsages != null) {
             for (TokenUsage usage : tokenUsages) {
                 if ("MainSignature".equals(usage.getName())) {
@@ -200,26 +200,26 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
                 }
             }
         }
-        
+
         if (!usedForSignature) {
             return false;
         }
-        
+
         // Now check that a PublicKey/X509Certificate was used
-        return token.getPublicKey() != null 
+        return token.getPublicKey() != null
             || (token.getX509Certificates() != null && token.getX509Certificates().length > 0);
     }
-    
+
     private boolean isSamlEventSigned(SamlTokenSecurityEvent event) {
         if (event == null) {
             return false;
         }
-        
-        return event.getSecurityToken() != null 
+
+        return event.getSecurityToken() != null
             && event.getSecurityToken().getSamlAssertionWrapper() != null
             && event.getSecurityToken().getSamlAssertionWrapper().isSigned();
     }
-    
+
     private SecurityContext createSecurityContext(final Principal p) {
         return new SecurityContext() {
 
@@ -232,14 +232,14 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
             }
         };
     }
-    
+
     /**
      * Create a SoapFault from a WSSecurityException, following the SOAP Message Security
      * 1.1 specification, chapter 12 "Error Handling".
-     * 
+     *
      * When the Soap version is 1.1 then set the Fault/Code/Value from the fault code
      * specified in the WSSecurityException (if it exists).
-     * 
+     *
      * Otherwise set the Fault/Code/Value to env:Sender and the Fault/Code/Subcode/Value
      * as the fault code from the WSSecurityException.
      */

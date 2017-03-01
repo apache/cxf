@@ -43,16 +43,16 @@ public final class JAXBUtils {
         String schemaNamespace = schema.getNamespaceURI();
         List<Element> annoList = DOMUtils.findAllElementsByTagNameNS(schema, schemaNamespace, "annotation");
         Element annotation = null;
-        if (annoList.size() > 0) {
+        if (!annoList.isEmpty()) {
             annotation = annoList.get(0);
         } else {
             annotation = schema.getOwnerDocument().createElementNS(schemaNamespace, "annotation");
         }
-        List<Element> appList = DOMUtils.findAllElementsByTagNameNS(annotation, 
-                                                                    schemaNamespace, 
+        List<Element> appList = DOMUtils.findAllElementsByTagNameNS(annotation,
+                                                                    schemaNamespace,
                                                                     "appinfo");
         Element appInfo = null;
-        if (appList.size() > 0) {
+        if (!appList.isEmpty()) {
             appInfo = appList.get(0);
         } else {
             appInfo = schema.getOwnerDocument().createElementNS(schemaNamespace, "appinfo");
@@ -60,13 +60,13 @@ public final class JAXBUtils {
         }
 
         Element jaxbBindings = null;
-        List<Element> jaxbList = DOMUtils.findAllElementsByTagNameNS(schema, 
-                                                                     ToolConstants.NS_JAXB_BINDINGS, 
+        List<Element> jaxbList = DOMUtils.findAllElementsByTagNameNS(schema,
+                                                                     ToolConstants.NS_JAXB_BINDINGS,
                                                                      "schemaBindings");
-        if (jaxbList.size() > 0) {
+        if (!jaxbList.isEmpty()) {
             jaxbBindings = jaxbList.get(0);
         } else {
-            jaxbBindings = schema.getOwnerDocument().createElementNS(ToolConstants.NS_JAXB_BINDINGS, 
+            jaxbBindings = schema.getOwnerDocument().createElementNS(ToolConstants.NS_JAXB_BINDINGS,
                                                                      "schemaBindings");
             appInfo.appendChild(jaxbBindings);
         }
@@ -78,8 +78,8 @@ public final class JAXBUtils {
         Document doc = schema.getOwnerDocument();
 
         if (!DOMUtils.hasAttribute(schema, ToolConstants.NS_JAXB_BINDINGS)) {
-            Attr attr = 
-                schema.getOwnerDocument().createAttributeNS(ToolConstants.NS_JAXB_BINDINGS, 
+            Attr attr =
+                schema.getOwnerDocument().createAttributeNS(ToolConstants.NS_JAXB_BINDINGS,
                                                             "version");
             attr.setValue("2.0");
             schema.setAttributeNodeNS(attr);
@@ -87,11 +87,11 @@ public final class JAXBUtils {
 
         Node schemaBindings = innerJaxbBinding(schema);
 
-        List<Element> pkgList = DOMUtils.findAllElementsByTagNameNS(schema, 
-                                                                    ToolConstants.NS_JAXB_BINDINGS, 
+        List<Element> pkgList = DOMUtils.findAllElementsByTagNameNS(schema,
+                                                                    ToolConstants.NS_JAXB_BINDINGS,
                                                                     "package");
         Element packagename = null;
-        if (pkgList.size() > 0) {
+        if (!pkgList.isEmpty()) {
             packagename = pkgList.get(0);
         } else {
             packagename = doc.createElementNS(ToolConstants.NS_JAXB_BINDINGS, "package");
@@ -105,7 +105,7 @@ public final class JAXBUtils {
 
     /**
      * Create the jaxb binding file to customize namespace to package mapping
-     * 
+     *
      * @param namespace
      * @param pkgName
      * @return file

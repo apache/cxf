@@ -32,15 +32,15 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 
 /**
- * 
+ *
  */
 public class StartBodyInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(StartBodyInterceptor.class);
-    
+
     public StartBodyInterceptor() {
         super(Phase.READ);
     }
-    
+
     public StartBodyInterceptor(String phase) {
         super(phase);
     }
@@ -52,8 +52,8 @@ public class StartBodyInterceptor extends AbstractSoapInterceptor {
             return;
         }
         XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
-        //advance to just outside the <soap:body> opening tag, but not 
-        //to the nextTag as that may skip over white space that is 
+        //advance to just outside the <soap:body> opening tag, but not
+        //to the nextTag as that may skip over white space that is
         //important to keep for ws-security signature digests and stuff
         try {
             int i = xmlReader.next();
@@ -62,7 +62,7 @@ public class StartBodyInterceptor extends AbstractSoapInterceptor {
                 i = xmlReader.next();
             }
         } catch (XMLStreamException e) {
-            throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e, 
+            throw new SoapFault(new Message("XML_STREAM_EXC", LOG, e.getMessage()), e,
                                 message.getVersion().getSender());
         }
 

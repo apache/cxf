@@ -38,33 +38,33 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * The "JWT Bearer" grant handler
  */
 public abstract class AbstractJwtHandler extends AbstractGrantHandler {
-    
-    private Set<String> supportedIssuers; 
+
+    private Set<String> supportedIssuers;
     private JwsSignatureVerifier jwsVerifier;
     private int ttl;
     private int clockOffset;
     private String audience;
-        
+
     protected AbstractJwtHandler(List<String> grants) {
         super(grants);
     }
-    
+
     protected void validateSignature(JwsHeaders headers, String unsignedText, byte[] signature) {
         JwsSignatureVerifier theSigVerifier = getInitializedSigVerifier(headers);
-        if (!theSigVerifier.verify(headers, unsignedText, signature)) {    
+        if (!theSigVerifier.verify(headers, unsignedText, signature)) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
     }
-    
+
     protected void validateClaims(Client client, JwtClaims claims) {
         if (getAudience() != null) {
             JAXRSUtils.getCurrentMessage().put(JwtConstants.EXPECTED_CLAIM_AUDIENCE, getAudience());
         }
         JwtUtils.validateTokenClaims(claims, ttl, clockOffset, true);
-        
+
         validateIssuer(claims.getIssuer());
         validateSubject(client, claims.getSubject());
-        
+
         // We must have an Expiry
         if (claims.getClaim(JwtConstants.CLAIM_EXPIRY) == null) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
@@ -76,7 +76,7 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
     }
-    
+
     protected void validateSubject(Client client, String subject) {
         // We must have a Subject
         if (subject == null) {
@@ -92,11 +92,11 @@ public abstract class AbstractJwtHandler extends AbstractGrantHandler {
     }
     protected JwsSignatureVerifier getInitializedSigVerifier(JwsHeaders headers) {
         if (jwsVerifier != null) {
-            return jwsVerifier;    
-        } 
+            return jwsVerifier;
+        }
         return JwsUtils.loadSignatureVerifier(headers, true);
     }
-    
+
     public int getTtl() {
         return ttl;
     }

@@ -32,7 +32,7 @@ import org.apache.karaf.shell.api.console.Terminal;
 import org.apache.karaf.shell.support.table.ShellTable;
 
 /**
- * 
+ *
  */
 @Command(scope = "cxf", name = "list-busses", description = "Lists all CXF Busses.")
 @Service

@@ -76,18 +76,18 @@ import org.junit.Test;
 
 public class ProviderFactoryTest extends Assert {
 
-    
+
     @Before
     public void setUp() {
         ServerProviderFactory.getInstance().clearProviders();
         AbstractResourceInfo.clearAllMaps();
     }
-    
+
     @Test
     public void testMultipleFactories() {
         assertNotSame(ServerProviderFactory.getInstance(), ServerProviderFactory.getInstance());
     }
-    
+
     @Test
     public void testOrderOfProvidersWithSameProperties() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
@@ -100,7 +100,7 @@ public class ProviderFactoryTest extends Assert {
         assertSame(reader1, readers.get(7).getProvider());
         assertSame(reader2, readers.get(8).getProvider());
     }
-    
+
     @Test
     public void testCustomProviderSorting() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
@@ -117,11 +117,11 @@ public class ProviderFactoryTest extends Assert {
                 } else {
                     return 0;
                 }
-            }    
-        
+            }
+
         };
         pf.setProviderComparator(comp);
-        
+
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
         assertEquals(10, writers.size());
@@ -147,11 +147,11 @@ public class ProviderFactoryTest extends Assert {
                 } else {
                     return 0;
                 }
-            }    
-        
+            }
+
         };
         pf.setProviderComparator(comp);
-        
+
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
         assertEquals(10, writers.size());
@@ -167,7 +167,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testCustomProviderSortingMBROnly() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        Comparator<ProviderInfo<MessageBodyReader>> comp = 
+        Comparator<ProviderInfo<MessageBodyReader>> comp =
             new Comparator<ProviderInfo<MessageBodyReader>>() {
 
             @Override
@@ -181,11 +181,11 @@ public class ProviderFactoryTest extends Assert {
                 } else {
                     return 0;
                 }
-            }    
-        
+            }
+
         };
         pf.setProviderComparator(comp);
-        
+
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
         assertEquals(10, writers.size());
@@ -200,7 +200,7 @@ public class ProviderFactoryTest extends Assert {
     @Test
     public void testCustomProviderSortingMBWOnly() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        Comparator<ProviderInfo<MessageBodyWriter<?>>> comp = 
+        Comparator<ProviderInfo<MessageBodyWriter<?>>> comp =
             new Comparator<ProviderInfo<MessageBodyWriter<?>>>() {
 
             @Override
@@ -214,11 +214,11 @@ public class ProviderFactoryTest extends Assert {
                 } else {
                     return 0;
                 }
-            }    
-        
+            }
+
         };
         pf.setProviderComparator(comp);
-        
+
         // writers
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
         assertEquals(10, writers.size());
@@ -230,7 +230,7 @@ public class ProviderFactoryTest extends Assert {
         Object lastReader = readers.get(8).getProvider();
         assertFalse(lastReader instanceof StringTextProvider);
     }
-    
+
     @Test
     public void testCustomProviderSortingWithBus() {
         WildcardReader wc1 = new WildcardReader();
@@ -257,53 +257,53 @@ public class ProviderFactoryTest extends Assert {
         assertSame(wc1, readers.get(7).getProvider());
         assertSame(wc2, readers.get(8).getProvider());
     }
-    
+
     @Test
     public void testCustomJaxbProvider() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         JAXBElementProvider<Book> provider = new JAXBElementProvider<Book>();
         pf.registerUserProvider(provider);
-        MessageBodyReader<Book> customJaxbReader = pf.createMessageBodyReader(Book.class, null, null, 
+        MessageBodyReader<Book> customJaxbReader = pf.createMessageBodyReader(Book.class, null, null,
                                                               MediaType.TEXT_XML_TYPE, new MessageImpl());
         assertSame(customJaxbReader, provider);
-        
-        MessageBodyWriter<Book> customJaxbWriter = pf.createMessageBodyWriter(Book.class, null, null, 
+
+        MessageBodyWriter<Book> customJaxbWriter = pf.createMessageBodyWriter(Book.class, null, null,
                                                               MediaType.TEXT_XML_TYPE, new MessageImpl());
         assertSame(customJaxbWriter, provider);
     }
-    
+
     @Test
     public void testDataSourceReader() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new DataSourceProvider<Object>());
         MessageBodyReader<DataSource> reader = pf.createMessageBodyReader(
-              DataSource.class, null, null, 
+              DataSource.class, null, null,
               MediaType.valueOf("image/png"), new MessageImpl());
         assertTrue(reader instanceof DataSourceProvider);
         MessageBodyReader<DataHandler> reader2 = pf.createMessageBodyReader(
-                          DataHandler.class, null, null, 
+                          DataHandler.class, null, null,
                           MediaType.valueOf("image/png"), new MessageImpl());
         assertSame(reader, reader2);
     }
-    
+
     @Test
     public void testDataSourceWriter() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new DataSourceProvider<Object>());
         MessageBodyWriter<DataSource> writer = pf.createMessageBodyWriter(
-              DataSource.class, null, null, 
+              DataSource.class, null, null,
               MediaType.valueOf("image/png"), new MessageImpl());
         assertTrue(writer instanceof DataSourceProvider);
         MessageBodyWriter<DataHandler> writer2 = pf.createMessageBodyWriter(
-                          DataHandler.class, null, null, 
+                          DataHandler.class, null, null,
                           MediaType.valueOf("image/png"), new MessageImpl());
         assertSame(writer, writer2);
     }
-    
+
     @Test
     public void testSchemaLocations() {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        MessageBodyReader<Book> jaxbReader = pf.createMessageBodyReader(Book.class, null, null, 
+        MessageBodyReader<Book> jaxbReader = pf.createMessageBodyReader(Book.class, null, null,
                                                               MediaType.TEXT_XML_TYPE, new MessageImpl());
         assertTrue(jaxbReader instanceof JAXBElementProvider);
         pf.setSchemaLocations(Collections.singletonList("classpath:/test.xsd"));
@@ -313,7 +313,7 @@ public class ProviderFactoryTest extends Assert {
         assertSame(jaxbReader, customJaxbReader);
         assertNotNull(((JAXBElementProvider<Book>)customJaxbReader).getSchema());
     }
-    
+
     @Test
     public void testGetFactoryInboundMessage() {
         ProviderFactory factory = ServerProviderFactory.getInstance();
@@ -327,65 +327,65 @@ public class ProviderFactoryTest extends Assert {
         e.put(Endpoint.class, endpoint);
         assertSame(ProviderFactory.getInstance(m), factory);
     }
-    
+
     @Test
     public void testDefaultUserExceptionMappers() throws Exception {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        ExceptionMapper<?> mapper = 
+        ExceptionMapper<?> mapper =
             pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
         assertNotNull(mapper);
-        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper(); 
+        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper();
         pf.registerUserProvider(wm);
-        ExceptionMapper<?> mapper2 = 
+        ExceptionMapper<?> mapper2 =
             pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
         assertNotSame(mapper, mapper2);
         assertSame(wm, mapper2);
     }
-    
+
     @Test
     public void testExceptionMappersHierarchy1() throws Exception {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper(); 
+        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper();
         pf.registerUserProvider(wm);
         assertSame(wm, pf.createExceptionMapper(WebApplicationException.class, new MessageImpl()));
         assertNull(pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
-        TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper(); 
+        TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper();
         pf.registerUserProvider(rm);
         assertSame(wm, pf.createExceptionMapper(WebApplicationException.class, new MessageImpl()));
         assertSame(rm, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
     }
-    
+
     @Test
     public void testExceptionMappersHierarchy2() throws Exception {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        
-        TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper(); 
+
+        TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper();
         pf.registerUserProvider(rm);
-        ExceptionMapper<WebApplicationException> em = 
+        ExceptionMapper<WebApplicationException> em =
             pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
         assertTrue(em instanceof WebApplicationExceptionMapper);
         assertSame(rm, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
-        
-        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper(); 
+
+        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper();
         pf.registerUserProvider(wm);
         assertSame(wm, pf.createExceptionMapper(WebApplicationException.class, new MessageImpl()));
         assertSame(rm, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
     }
-    
+
     @Test
     public void testExceptionMappersHierarchy3() throws Exception {
         Message m = new MessageImpl();
         m.put("default.wae.mapper.least.specific", true);
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        
-        TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper(); 
+
+        TestRuntimeExceptionMapper rm = new TestRuntimeExceptionMapper();
         pf.registerUserProvider(rm);
-        ExceptionMapper<WebApplicationException> em = 
+        ExceptionMapper<WebApplicationException> em =
             pf.createExceptionMapper(WebApplicationException.class, m);
         assertSame(rm, em);
         assertSame(rm, pf.createExceptionMapper(RuntimeException.class, m));
-        
-        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper(); 
+
+        WebApplicationExceptionMapper wm = new WebApplicationExceptionMapper();
         pf.registerUserProvider(wm);
         assertSame(wm, pf.createExceptionMapper(WebApplicationException.class, m));
         assertSame(rm, pf.createExceptionMapper(RuntimeException.class, m));
@@ -395,7 +395,7 @@ public class ProviderFactoryTest extends Assert {
         Message m = new MessageImpl();
         m.put("default.wae.mapper.least.specific", true);
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        ExceptionMapper<WebApplicationException> em = 
+        ExceptionMapper<WebApplicationException> em =
             pf.createExceptionMapper(WebApplicationException.class, m);
         assertTrue(em instanceof WebApplicationExceptionMapper);
     }
@@ -403,27 +403,27 @@ public class ProviderFactoryTest extends Assert {
     public void testExceptionMappersHierarchy5() throws Exception {
         Message m = new MessageImpl();
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        ExceptionMapper<WebApplicationException> em = 
+        ExceptionMapper<WebApplicationException> em =
             pf.createExceptionMapper(WebApplicationException.class, m);
         assertTrue(em instanceof WebApplicationExceptionMapper);
     }
-    
+
     @Test
     public void testExceptionMappersHierarchyWithGenerics() throws Exception {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
-        RuntimeExceptionMapper1 exMapper1 = new RuntimeExceptionMapper1(); 
+        RuntimeExceptionMapper1 exMapper1 = new RuntimeExceptionMapper1();
         pf.registerUserProvider(exMapper1);
-        RuntimeExceptionMapper2 exMapper2 = new RuntimeExceptionMapper2(); 
+        RuntimeExceptionMapper2 exMapper2 = new RuntimeExceptionMapper2();
         pf.registerUserProvider(exMapper2);
         assertSame(exMapper1, pf.createExceptionMapper(RuntimeException.class, new MessageImpl()));
         Object webExMapper = pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
         assertSame(exMapper2, webExMapper);
     }
-    
+
     @Test
     public void testMessageBodyReaderString() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        MessageBodyReader<String> mbr = pf.createMessageBodyReader(String.class, String.class, new Annotation[]{}, 
+        MessageBodyReader<String> mbr = pf.createMessageBodyReader(String.class, String.class, new Annotation[]{},
                                    MediaType.APPLICATION_XML_TYPE, new MessageImpl());
         assertTrue(mbr instanceof StringTextProvider);
     }
@@ -431,7 +431,7 @@ public class ProviderFactoryTest extends Assert {
     public void testMessageBodyReaderBoolean() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new CustomBooleanReader());
-        MessageBodyReader<Boolean> mbr = pf.createMessageBodyReader(Boolean.class, Boolean.class, new Annotation[]{}, 
+        MessageBodyReader<Boolean> mbr = pf.createMessageBodyReader(Boolean.class, Boolean.class, new Annotation[]{},
                                    MediaType.TEXT_PLAIN_TYPE, new MessageImpl());
         assertTrue(mbr instanceof PrimitiveTextProvider);
     }
@@ -439,99 +439,99 @@ public class ProviderFactoryTest extends Assert {
     public void testMessageBodyReaderBoolean2() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new CustomBooleanReader2());
-        MessageBodyReader<Boolean> mbr = pf.createMessageBodyReader(Boolean.class, Boolean.class, new Annotation[]{}, 
+        MessageBodyReader<Boolean> mbr = pf.createMessageBodyReader(Boolean.class, Boolean.class, new Annotation[]{},
                                    MediaType.TEXT_PLAIN_TYPE, new MessageImpl());
         assertTrue(mbr instanceof CustomBooleanReader2);
     }
     @Test
     public void testMessageBodyWriterString() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        MessageBodyWriter<String> mbr = pf.createMessageBodyWriter(String.class, String.class, new Annotation[]{}, 
+        MessageBodyWriter<String> mbr = pf.createMessageBodyWriter(String.class, String.class, new Annotation[]{},
                                    MediaType.APPLICATION_XML_TYPE, new MessageImpl());
         assertTrue(mbr instanceof StringTextProvider);
     }
-    
+
     @Test
     public void testMessageBodyHandlerHierarchy() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         BookReaderWriter bookHandler = new BookReaderWriter();
         providers.add(bookHandler);
         SuperBookReaderWriter superBookHandler = new SuperBookReaderWriter();
         providers.add(superBookHandler);
         pf.setUserProviders(providers);
-        assertSame(bookHandler, 
-                   pf.createMessageBodyReader(Book.class, Book.class, new Annotation[]{}, 
+        assertSame(bookHandler,
+                   pf.createMessageBodyReader(Book.class, Book.class, new Annotation[]{},
                                               MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
-        assertSame(superBookHandler, 
-                   pf.createMessageBodyReader(SuperBook.class, SuperBook.class, new Annotation[]{}, 
+        assertSame(superBookHandler,
+                   pf.createMessageBodyReader(SuperBook.class, SuperBook.class, new Annotation[]{},
                                               MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
-        assertSame(bookHandler, 
-                   pf.createMessageBodyWriter(Book.class, Book.class, new Annotation[]{}, 
+        assertSame(bookHandler,
+                   pf.createMessageBodyWriter(Book.class, Book.class, new Annotation[]{},
                                               MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
-        assertSame(superBookHandler, 
-                   pf.createMessageBodyWriter(SuperBook.class, SuperBook.class, new Annotation[]{}, 
+        assertSame(superBookHandler,
+                   pf.createMessageBodyWriter(SuperBook.class, SuperBook.class, new Annotation[]{},
                                               MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
     }
-    
+
     @Test
     public void testMessageBodyWriterNoTypes() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         SuperBookReaderWriter2<SuperBook> superBookHandler = new SuperBookReaderWriter2<SuperBook>();
         providers.add(superBookHandler);
         pf.setUserProviders(providers);
-        assertSame(superBookHandler, 
-                   pf.createMessageBodyReader(SuperBook.class, SuperBook.class, new Annotation[]{}, 
+        assertSame(superBookHandler,
+                   pf.createMessageBodyReader(SuperBook.class, SuperBook.class, new Annotation[]{},
                                               MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
-        assertSame(superBookHandler, 
-                   pf.createMessageBodyWriter(SuperBook.class, SuperBook.class, new Annotation[]{}, 
+        assertSame(superBookHandler,
+                   pf.createMessageBodyWriter(SuperBook.class, SuperBook.class, new Annotation[]{},
                                               MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
     }
-    
+
     @Test
     public void testSortEntityProviders() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new TestStringProvider());
         pf.registerUserProvider(new PrimitiveTextProvider<Object>());
-        
+
         List<ProviderInfo<MessageBodyReader<?>>> readers = pf.getMessageReaders();
 
-        assertTrue(indexOf(readers, TestStringProvider.class) 
+        assertTrue(indexOf(readers, TestStringProvider.class)
                    < indexOf(readers, PrimitiveTextProvider.class));
-        
+
         List<ProviderInfo<MessageBodyWriter<?>>> writers = pf.getMessageWriters();
 
-        assertTrue(indexOf(writers, TestStringProvider.class) 
+        assertTrue(indexOf(writers, TestStringProvider.class)
                    < indexOf(writers, PrimitiveTextProvider.class));
-        
+
     }
-    
+
     @Test
     public void testParameterHandlerProvider() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         ParamConverterProvider h = new CustomerParameterHandler();
         pf.registerUserProvider(h);
-        ParamConverter<Customer> h2 = pf.createParameterHandler(Customer.class, Customer.class, null, 
+        ParamConverter<Customer> h2 = pf.createParameterHandler(Customer.class, Customer.class, null,
                                                                 new MessageImpl());
         assertSame(h2, h);
     }
-    
+
     @Test
     public void testGetStringProvider() throws Exception {
         verifyProvider(String.class, StringTextProvider.class, "text/plain");
     }
-    
+
     @Test
     public void testGetBinaryProvider() throws Exception {
         verifyProvider(byte[].class, BinaryDataProvider.class, "*/*");
         verifyProvider(InputStream.class, BinaryDataProvider.class, "image/png");
         MessageBodyWriter<File> writer = ServerProviderFactory.getInstance()
-            .createMessageBodyWriter(File.class, null, null, MediaType.APPLICATION_OCTET_STREAM_TYPE, 
+            .createMessageBodyWriter(File.class, null, null, MediaType.APPLICATION_OCTET_STREAM_TYPE,
                                      new MessageImpl());
         assertTrue(BinaryDataProvider.class == writer.getClass());
     }
-    
+
     @Test
     public void testGetComplexProvider() throws Exception {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
@@ -541,77 +541,77 @@ public class ProviderFactoryTest extends Assert {
         m.setExchange(ex);
         m.put(ServerProviderFactory.IGNORE_TYPE_VARIABLES, true);
         MessageBodyReader<Book> reader =
-            pf.createMessageBodyReader(Book.class, Book.class, null, MediaType.APPLICATION_JSON_TYPE, 
+            pf.createMessageBodyReader(Book.class, Book.class, null, MediaType.APPLICATION_JSON_TYPE,
                                        m);
         assertTrue(ComplexMessageBodyReader.class == reader.getClass());
     }
-    
+
     @Test
     public void testGetComplexProvider2() throws Exception {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new ComplexMessageBodyReader());
         MessageBodyReader<Book> reader =
-            pf.createMessageBodyReader(Book.class, Book.class, null, MediaType.APPLICATION_JSON_TYPE, 
+            pf.createMessageBodyReader(Book.class, Book.class, null, MediaType.APPLICATION_JSON_TYPE,
                                        new MessageImpl());
         assertTrue(ComplexMessageBodyReader.class == reader.getClass());
     }
-    
-    private void verifyProvider(ProviderFactory pf, Class<?> type, Class<?> provider, String mediaType) 
+
+    private void verifyProvider(ProviderFactory pf, Class<?> type, Class<?> provider, String mediaType)
         throws Exception {
-        
+
         if (pf == null) {
             pf = ServerProviderFactory.getInstance();
         }
-        
+
         MediaType mType = MediaType.valueOf(mediaType);
-        
+
         MessageBodyReader<?> reader = pf.createMessageBodyReader(type, type, null, mType, new MessageImpl());
         assertSame("Unexpected provider found", provider, reader.getClass());
-    
+
         MessageBodyWriter<?> writer = pf.createMessageBodyWriter(type, type, null, mType, new MessageImpl());
         assertTrue("Unexpected provider found", provider == writer.getClass());
     }
-    
-    
-    private void verifyProvider(Class<?> type, Class<?> provider, String mediaType) 
+
+
+    private void verifyProvider(Class<?> type, Class<?> provider, String mediaType)
         throws Exception {
         verifyProvider(null, type, provider, mediaType);
-        
+
     }
-       
+
     @Test
     public void testGetStringProviderWildCard() throws Exception {
         verifyProvider(String.class, StringTextProvider.class, "text/*");
     }
-    
-    
+
+
     @Test
     public void testGetStringProviderUsingProviderDeclaration() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new TestStringProvider());
         verifyProvider(pf, String.class, TestStringProvider.class, "text/html");
-    }    
-    
+    }
+
     @Test
     public void testRegisterCustomJSONEntityProvider() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new CustomJSONProvider());
-        verifyProvider(pf, Book.class, CustomJSONProvider.class, 
+        verifyProvider(pf, Book.class, CustomJSONProvider.class,
                        "application/json");
     }
-    
+
     @Test
     public void testComplexExceptionMapper() {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new SecurityExceptionMapper());
-        ExceptionMapper<SecurityException> mapper = 
+        ExceptionMapper<SecurityException> mapper =
             pf.createExceptionMapper(SecurityException.class, new MessageImpl());
         assertTrue(mapper instanceof SecurityExceptionMapper);
-        ExceptionMapper<Throwable> mapper2 = 
+        ExceptionMapper<Throwable> mapper2 =
             pf.createExceptionMapper(Throwable.class, new MessageImpl());
         assertNull(mapper2);
     }
-    
+
     @Test
     public void testRegisterCustomResolver() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
@@ -619,11 +619,11 @@ public class ProviderFactoryTest extends Assert {
         Message message = prepareMessage("*/*", null);
         ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, message);
         assertFalse(cr instanceof ProviderFactory.ContextResolverProxy);
-        assertTrue("JAXBContext ContextProvider can not be found", 
+        assertTrue("JAXBContext ContextProvider can not be found",
                    cr instanceof JAXBContextProvider);
-        
+
     }
-    
+
     @Test
     public void testRegisterCustomResolver2() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
@@ -632,11 +632,11 @@ public class ProviderFactoryTest extends Assert {
         Message message = prepareMessage("text/xml+b", null);
         ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, message);
         assertFalse(cr instanceof ProviderFactory.ContextResolverProxy);
-        assertTrue("JAXBContext ContextProvider can not be found", 
+        assertTrue("JAXBContext ContextProvider can not be found",
                    cr instanceof JAXBContextProvider2);
-        
+
     }
-    
+
     @Test
     public void testNoCustomResolver() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
@@ -646,7 +646,7 @@ public class ProviderFactoryTest extends Assert {
         ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, message);
         assertNull(cr);
     }
-    
+
     @Test
     public void testCustomResolverProxy() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
@@ -655,12 +655,12 @@ public class ProviderFactoryTest extends Assert {
         Message message = prepareMessage("text/xml+*", null);
         ContextResolver<JAXBContext> cr = pf.createContextResolver(JAXBContext.class, message);
         assertTrue(cr instanceof ProviderFactory.ContextResolverProxy);
-        assertTrue(((ProviderFactory.ContextResolverProxy<?>)cr).getResolvers().get(0) 
+        assertTrue(((ProviderFactory.ContextResolverProxy<?>)cr).getResolvers().get(0)
                    instanceof JAXBContextProvider);
-        assertTrue(((ProviderFactory.ContextResolverProxy<?>)cr).getResolvers().get(1) 
+        assertTrue(((ProviderFactory.ContextResolverProxy<?>)cr).getResolvers().get(1)
                    instanceof JAXBContextProvider2);
     }
-    
+
     private Message prepareMessage(String contentType, String acceptType) {
         Message message = new MessageImpl();
         Map<String, List<String>> headers = new MetadataMap<String, String>();
@@ -677,16 +677,16 @@ public class ProviderFactoryTest extends Assert {
         message.setExchange(exchange);
         return message;
     }
-    
+
     @Test
     public void testRegisterCustomEntityProvider() throws Exception {
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(new CustomWidgetProvider());
-        
-        verifyProvider(pf, org.apache.cxf.jaxrs.resources.Book.class, CustomWidgetProvider.class, 
+
+        verifyProvider(pf, org.apache.cxf.jaxrs.resources.Book.class, CustomWidgetProvider.class,
                        "application/widget");
     }
-    
+
     private int indexOf(List<? extends Object> providerInfos, Class<?> providerType) {
         int index = 0;
         for (Object pi : providerInfos) {
@@ -701,25 +701,25 @@ public class ProviderFactoryTest extends Assert {
 
     @Consumes("text/html")
     @Produces("text/html")
-    private final class TestStringProvider 
+    private final class TestStringProvider
         implements MessageBodyReader<String>, MessageBodyWriter<String>  {
 
         public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                                   MediaType m) {
             return type == String.class;
         }
-        
+
         public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
                                    MediaType m) {
             return type == String.class;
         }
-        
-        public long getSize(String s, Class<?> type, Type genericType, Annotation[] annotations, 
+
+        public long getSize(String s, Class<?> type, Type genericType, Annotation[] annotations,
                             MediaType m) {
             return s.length();
         }
 
-        public String readFrom(Class<String> clazz, Type genericType, Annotation[] annotations, 
+        public String readFrom(Class<String> clazz, Type genericType, Annotation[] annotations,
                                MediaType m, MultivaluedMap<String, String> headers, InputStream is) {
             try {
                 return IOUtils.toString(is);
@@ -729,7 +729,7 @@ public class ProviderFactoryTest extends Assert {
             return null;
         }
 
-        public void writeTo(String obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
+        public void writeTo(String obj, Class<?> clazz, Type genericType, Annotation[] annotations,
             MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
             try {
                 os.write(obj.getBytes());
@@ -739,40 +739,40 @@ public class ProviderFactoryTest extends Assert {
         }
 
     }
-    
+
     @Consumes("application/json")
     @Produces("application/json")
-    private final class CustomJSONProvider 
+    private final class CustomJSONProvider
         implements MessageBodyReader<Book>, MessageBodyWriter<Book>  {
 
         public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                                   MediaType m) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
-        
+
         public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
                                    MediaType m) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
-        
+
         public long getSize(Book b, Class<?> type, Type genericType, Annotation[] annotations,
                             MediaType m) {
             return -1;
         }
 
-        public Book readFrom(Class<Book> clazz, Type genericType, Annotation[] annotations, 
-                               MediaType m, MultivaluedMap<String, String> headers, InputStream is) {    
+        public Book readFrom(Class<Book> clazz, Type genericType, Annotation[] annotations,
+                               MediaType m, MultivaluedMap<String, String> headers, InputStream is) {
             //Dummy
             return null;
         }
 
-        public void writeTo(Book obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
+        public void writeTo(Book obj, Class<?> clazz, Type genericType, Annotation[] annotations,
             MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
             //Dummy
         }
 
     }
-    
+
     @Consumes("application/widget")
     @Produces("application/widget")
     private final class CustomWidgetProvider
@@ -782,219 +782,219 @@ public class ProviderFactoryTest extends Assert {
                                   MediaType m) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
-        
+
         public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
                                    MediaType m) {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
-        
+
         public long getSize(Book s, Class<?> type, Type genericType, Annotation[] annotations,
                             MediaType m) {
             return -1;
         }
 
 
-        public Book readFrom(Class<Book> clazz, Type genericType, Annotation[] annotations, 
-                               MediaType m, MultivaluedMap<String, String> headers, InputStream is) {    
+        public Book readFrom(Class<Book> clazz, Type genericType, Annotation[] annotations,
+                               MediaType m, MultivaluedMap<String, String> headers, InputStream is) {
             //Dummy
             return null;
         }
 
-        public void writeTo(Book obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
+        public void writeTo(Book obj, Class<?> clazz, Type genericType, Annotation[] annotations,
             MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
             //Dummy
         }
 
     }
-    
+
     @Test
     public void testSetSchemasFromClasspath() {
         JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
         ProviderFactory pf = ServerProviderFactory.getInstance();
         pf.registerUserProvider(provider);
-        
-        List<String> locations = new ArrayList<String>();
+
+        List<String> locations = new ArrayList<>();
         locations.add("classpath:/test.xsd");
         pf.setSchemaLocations(locations);
         Schema s = provider.getSchema();
         assertNotNull("schema can not be read from classpath", s);
     }
-    
+
     private static class TestRuntimeExceptionMapper implements ExceptionMapper<RuntimeException> {
 
         public Response toResponse(RuntimeException exception) {
             // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
-    
+
     @Produces("application/xml")
     @Consumes("application/xml")
-    private static class BookReaderWriter 
+    private static class BookReaderWriter
         implements MessageBodyReader<Book>, MessageBodyWriter<Book> {
 
-        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                                   MediaType mediaType) {
             return true;
         }
 
-        public Book readFrom(Class<Book> arg0, Type arg1, Annotation[] arg2, 
-                             MediaType arg3, MultivaluedMap<String, String> arg4, InputStream arg5) 
+        public Book readFrom(Class<Book> arg0, Type arg1, Annotation[] arg2,
+                             MediaType arg3, MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public long getSize(Book t, Class<?> type, Type genericType, Annotation[] annotations, 
+        public long getSize(Book t, Class<?> type, Type genericType, Annotation[] annotations,
                             MediaType mediaType) {
             // TODO Auto-generated method stub
             return 0;
         }
 
-        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, 
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations,
                                    MediaType mediaType) {
             return true;
         }
 
-        public void writeTo(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3, 
-                            MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6) 
+        public void writeTo(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3,
+                            MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6)
             throws IOException, WebApplicationException {
             // TODO Auto-generated method stub
-            
+
         }
     }
-    
+
     @Produces("application/xml")
     @Consumes("application/xml")
-    private static class SuperBookReaderWriter 
+    private static class SuperBookReaderWriter
         implements MessageBodyReader<SuperBook>, MessageBodyWriter<SuperBook> {
 
-        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                                   MediaType mediaType) {
             return true;
         }
 
-        public SuperBook readFrom(Class<SuperBook> arg0, Type arg1, Annotation[] arg2, MediaType arg3, 
-                                  MultivaluedMap<String, String> arg4, InputStream arg5) 
+        public SuperBook readFrom(Class<SuperBook> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
+                                  MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public long getSize(SuperBook t, Class<?> type, Type genericType, 
+        public long getSize(SuperBook t, Class<?> type, Type genericType,
                             Annotation[] annotations, MediaType mediaType) {
             // TODO Auto-generated method stub
             return 0;
         }
 
-        public boolean isWriteable(Class<?> type, Type genericType, 
+        public boolean isWriteable(Class<?> type, Type genericType,
                                    Annotation[] annotations, MediaType mediaType) {
             return true;
         }
 
-        public void writeTo(SuperBook arg0, Class<?> arg1, Type arg2, 
-                            Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5, 
+        public void writeTo(SuperBook arg0, Class<?> arg1, Type arg2,
+                            Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5,
                             OutputStream arg6) throws IOException, WebApplicationException {
             // TODO Auto-generated method stub
-            
+
         }
-        
+
     }
-    
+
     @Produces("application/xml")
     @Consumes("application/xml")
-    private static class SuperBookReaderWriter2<T> 
+    private static class SuperBookReaderWriter2<T>
         implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
-        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                                   MediaType mediaType) {
             return true;
         }
 
-        public T readFrom(Class<T> arg0, Type arg1, Annotation[] arg2, MediaType arg3, 
-                          MultivaluedMap<String, String> arg4, InputStream arg5) 
+        public T readFrom(Class<T> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
+                          MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public long getSize(T t, Class<?> type, Type genericType, 
+        public long getSize(T t, Class<?> type, Type genericType,
                             Annotation[] annotations, MediaType mediaType) {
             // TODO Auto-generated method stub
             return 0;
         }
 
-        public boolean isWriteable(Class<?> type, Type genericType, 
+        public boolean isWriteable(Class<?> type, Type genericType,
                                    Annotation[] annotations, MediaType mediaType) {
             return true;
         }
 
-        
+
         public void writeTo(T t, Class<?> type, Type genericType, Annotation[] annotations,
                             MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
                             OutputStream entityStream)
             throws IOException, WebApplicationException {
             // TODO Auto-generated method stub
         }
-        
+
     }
-    
+
     @Produces("*/*")
     @Consumes("*/*")
     private static class WildcardReader implements MessageBodyReader<Object> {
 
-        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                                   MediaType mediaType) {
             return true;
         }
 
-        public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3, 
-                                  MultivaluedMap<String, String> arg4, InputStream arg5) 
+        public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
+                                  MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
             // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
     @Produces("*/*")
     @Consumes("*/*")
     private static class WildcardReader2 implements MessageBodyReader<Object> {
 
-        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                                   MediaType mediaType) {
             return true;
         }
 
-        public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3, 
-                                  MultivaluedMap<String, String> arg4, InputStream arg5) 
+        public Object readFrom(Class<Object> arg0, Type arg1, Annotation[] arg2, MediaType arg3,
+                                  MultivaluedMap<String, String> arg4, InputStream arg5)
             throws IOException, WebApplicationException {
             // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
-    
-    private static class RuntimeExceptionMapper1 
+
+    private static class RuntimeExceptionMapper1
         extends AbstractTestExceptionMapper<RuntimeException> {
-        
+
     }
-    
-    private static class RuntimeExceptionMapper2 
+
+    private static class RuntimeExceptionMapper2
         extends AbstractTestExceptionMapper<WebApplicationException> {
-        
+
     }
-    
-    private static class AbstractTestExceptionMapper<T extends RuntimeException> 
+
+    private static class AbstractTestExceptionMapper<T extends RuntimeException>
         implements ExceptionMapper<T> {
 
         public Response toResponse(T arg0) {
             // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
-        
+
     private static class ComplexMessageBodyReader extends ProviderBase<AClass> {
     }
     private abstract static class ProviderBase<A> implements
@@ -1029,19 +1029,19 @@ public class ProviderFactoryTest extends Assert {
                             MultivaluedMap<String, Object> arg5, OutputStream arg6) throws IOException,
             WebApplicationException {
             // TODO Auto-generated method stub
-            
-        }      
+
+        }
     }
     public static class AClass {
     }
-    
-    private static class SecurityExceptionMapper 
+
+    private static class SecurityExceptionMapper
         extends AbstractBadRequestExceptionMapper<SecurityException> {
     }
-    private static class CustomWebApplicationExceptionMapper 
+    private static class CustomWebApplicationExceptionMapper
         extends AbstractBadRequestExceptionMapper<WebApplicationException> {
     }
-    private abstract static class AbstractBadRequestExceptionMapper<T extends Throwable> 
+    private abstract static class AbstractBadRequestExceptionMapper<T extends Throwable>
         implements ExceptionMapper<T> {
         @Override
         public Response toResponse(T exception) {
@@ -1056,7 +1056,7 @@ public class ProviderFactoryTest extends Assert {
         Object mapperResponse = pf.createExceptionMapper(WebApplicationException.class, new MessageImpl());
         assertSame(mapperResponse, mapper);
     }
-    
+
     @Test
     public void testBadCustomExceptionMappersHierarchyWithGenerics() throws Exception {
         ServerProviderFactory pf = ServerProviderFactory.getInstance();
@@ -1134,7 +1134,7 @@ public class ProviderFactoryTest extends Assert {
     }
     @Consumes("text/plain")
     public static class CustomBooleanReader2 extends CustomBooleanReader {
-        
+
     }
     public static class CustomBooleanReader implements MessageBodyReader<Boolean> {
         @Override
@@ -1147,8 +1147,8 @@ public class ProviderFactoryTest extends Assert {
                                  Annotation[] antns,
                                  MediaType mt, MultivaluedMap<String, String> mm,
                                  InputStream in) throws IOException, WebApplicationException {
-            return Boolean.TRUE;        
+            return Boolean.TRUE;
         }
     }
-    
+
 }

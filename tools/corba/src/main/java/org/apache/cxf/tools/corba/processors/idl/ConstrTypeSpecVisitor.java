@@ -26,7 +26,7 @@ import org.apache.ws.commons.schema.XmlSchema;
 public class ConstrTypeSpecVisitor extends VisitorBase {
 
     protected AST identifierNode;
-    
+
     public ConstrTypeSpecVisitor(Scope scope,
                                  Definition defn,
                                  XmlSchema schemaRef,
@@ -35,22 +35,22 @@ public class ConstrTypeSpecVisitor extends VisitorBase {
         super(scope, defn, schemaRef, wsdlASTVisitor);
         identifierNode = identifierNodeRef;
     }
-    
+
     public static boolean accept(AST node) {
-        boolean result = 
+        boolean result =
             StructVisitor.accept(node)
             || UnionVisitor.accept(node)
             || EnumVisitor.accept(node);
         return result;
     }
-    
+
     public void visit(AST node) {
         // <constr_type_spec> ::= <struct_type>
         //                      | <union_type>
         //                      | <enum_type>
-        
+
         Visitor visitor = null;
-        
+
         if (StructVisitor.accept(node)) {
             visitor = new StructVisitor(getScope(), definition, schema, wsdlVisitor);
         }
@@ -65,10 +65,10 @@ public class ConstrTypeSpecVisitor extends VisitorBase {
 
         if (visitor != null) {
             visitor.visit(node);
-        
+
             setSchemaType(visitor.getSchemaType());
             setCorbaType(visitor.getCorbaType());
         }
     }
-    
+
 }

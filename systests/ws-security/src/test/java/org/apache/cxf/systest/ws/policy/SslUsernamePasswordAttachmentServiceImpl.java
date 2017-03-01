@@ -21,8 +21,8 @@ package org.apache.cxf.systest.ws.policy;
 
 import javax.jws.WebService;
 
-@WebService(endpointInterface = "org.apache.cxf.systest.ws.policy.SslUsernamePasswordAttachmentService", 
-            serviceName = "SslUsernamePasswordAttachmentService", 
+@WebService(endpointInterface = "org.apache.cxf.systest.ws.policy.SslUsernamePasswordAttachmentService",
+            serviceName = "SslUsernamePasswordAttachmentService",
             targetNamespace = "http://www.example.org/contract/SslUsernamePasswordAttachmentService")
 public class SslUsernamePasswordAttachmentServiceImpl implements SslUsernamePasswordAttachmentService {
     public void doSslAndUsernamePasswordPolicy() {

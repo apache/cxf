@@ -51,11 +51,11 @@ public class UndertowHTTPServerEngineFactoryBeanDefinitionParser
         extends AbstractBeanDefinitionParser {
     static final String HTTP_UNDERTOW_NS = "http://cxf.apache.org/transports/http-undertow/configuration";
 
-    protected String resolveId(Element elem, AbstractBeanDefinition definition, 
+    protected String resolveId(Element elem, AbstractBeanDefinition definition,
                                ParserContext ctx) throws BeanDefinitionStoreException {
         String id = this.getIdOrName(elem);
         if (StringUtils.isEmpty(id)) {
-            return UndertowHTTPServerEngineFactory.class.getName();            
+            return UndertowHTTPServerEngineFactory.class.getName();
         }
         id = super.resolveId(elem, definition, ctx);
         if (!ctx.getRegistry().containsBeanDefinition(UndertowHTTPServerEngineFactory.class.getName())) {
@@ -63,14 +63,14 @@ public class UndertowHTTPServerEngineFactoryBeanDefinitionParser
         }
         return id;
     }
-    
+
 
     @Override
     public void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
-         
+
         String bus = element.getAttribute("bus");
-        
-        BeanDefinitionBuilder factbean 
+
+        BeanDefinitionBuilder factbean
             = BeanDefinitionBuilder
                 .rootBeanDefinition(UndertowSpringTypesFactory.class);
 
@@ -92,38 +92,38 @@ public class UndertowHTTPServerEngineFactoryBeanDefinitionParser
                                                         ThreadingParametersIdentifiedType.class,
                                                         UndertowSpringTypesFactory.class,
                                 "createThreadingParametersMap"));
-            
+
             // parser the engine list
-            List<Object> list = 
+            List<Object> list =
                 getRequiredElementsList(element, ctx, new QName(HTTP_UNDERTOW_NS, "engine"), bean);
-            if (list.size() > 0) {
+            if (!list.isEmpty()) {
                 bean.addPropertyValue("enginesList", list);
             }
         } catch (Exception e) {
             throw new RuntimeException("Could not process configuration.", e);
         }
-    }    
-    
+    }
+
     private List<Object> getRequiredElementsList(Element parent, ParserContext ctx, QName name,
                                          BeanDefinitionBuilder bean) {
-       
-        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(parent, 
-                                                                     name.getNamespaceURI(), 
+
+        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(parent,
+                                                                     name.getNamespaceURI(),
                                                                      name.getLocalPart());
         ManagedList<Object> list = new ManagedList<Object>(elemList.size());
         list.setSource(ctx.extractSource(parent));
-        
+
         for (Element elem : elemList) {
             list.add(ctx.getDelegate().parsePropertySubElement(elem, bean.getBeanDefinition()));
         }
         return list;
     }
-    
-    
-          
+
+
+
     /*
      * We do not require an id from the configuration.
-     * 
+     *
      * (non-Javadoc)
      * @see org.springframework.beans.factory.xml.AbstractBeanDefinitionParser#shouldGenerateId()
      */
@@ -136,9 +136,9 @@ public class UndertowHTTPServerEngineFactoryBeanDefinitionParser
     protected Class<?> getBeanClass(Element arg0) {
         return SpringUndertowHTTPServerEngineFactory.class;
     }
-    
+
     @NoJSR250Annotations(unlessNull = "bus")
-    public static class SpringUndertowHTTPServerEngineFactory extends UndertowHTTPServerEngineFactory 
+    public static class SpringUndertowHTTPServerEngineFactory extends UndertowHTTPServerEngineFactory
         implements ApplicationContextAware {
 
         public SpringUndertowHTTPServerEngineFactory() {
@@ -148,8 +148,8 @@ public class UndertowHTTPServerEngineFactoryBeanDefinitionParser
                                                   Map<String, TLSServerParameters> tls,
                                                   Map<String, ThreadingParameters> threading) {
             super(bus, tls, threading);
-        }    
-        
+        }
+
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (getBus() == null) {
                 setBus(BusWiringBeanFactoryPostProcessor.addDefaultBus(ctx));

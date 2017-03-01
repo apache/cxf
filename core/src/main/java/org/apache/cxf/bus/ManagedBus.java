@@ -29,23 +29,23 @@ import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.annotation.ManagedOperation;
 import org.apache.cxf.management.annotation.ManagedResource;
 
-@ManagedResource(componentName = "Bus", 
+@ManagedResource(componentName = "Bus",
                  description = "Responsible for managing services.")
-                 
+
 public class ManagedBus implements ManagedComponent {
     private static final String TYPE_VALUE = "Bus";
     private static final String INSTANCE_ID = "managed.bus.instance.id";
     private final Bus bus;
-    
+
     public ManagedBus(Bus b) {
         bus = b;
     }
-        
-    @ManagedOperation       
+
+    @ManagedOperation
     public void shutdown(boolean wait) {
         bus.shutdown(wait);
     }
-    
+
     public ObjectName getObjectName() throws JMException {
         String busId = bus.getId();
         StringBuilder buffer = new StringBuilder(ManagementConstants.DEFAULT_DOMAIN_NAME).append(':');
@@ -57,7 +57,7 @@ public class ManagedBus implements ManagedComponent {
             instanceId = new StringBuilder().append(bus.hashCode()).toString();
         }
         buffer.append(ManagementConstants.INSTANCE_ID_PROP).append('=').append(instanceId);
-        
+
 
         return new ObjectName(buffer.toString());
     }

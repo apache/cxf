@@ -27,32 +27,32 @@ import java.security.Principal;
  */
 public class SimplePrincipal implements Principal, Serializable {
     private static final long serialVersionUID = -5171549568204891853L;
-    
+
     private String name;
-    
+
     public SimplePrincipal(String name) {
         if (name == null) {
             throw new IllegalArgumentException("Principal name can not be null");
         }
         this.name = name;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public boolean equals(Object obj) {
         if (!(obj instanceof SimplePrincipal)) {
             return false;
         }
-        
+
         return name.equals(((SimplePrincipal)obj).name);
     }
-    
+
     public int hashCode() {
         return name.hashCode();
     }
-    
+
     public String toString() {
         return name;
     }

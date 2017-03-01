@@ -57,7 +57,7 @@ public final class PublicSuffixList {
         this.rules = Collections.unmodifiableList(rules);
         this.exceptions = Collections.unmodifiableList(exceptions);
     }
-    
+
     public DomainType getType() {
         return type;
     }

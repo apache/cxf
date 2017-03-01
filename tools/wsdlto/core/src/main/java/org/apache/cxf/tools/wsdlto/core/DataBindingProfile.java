@@ -27,13 +27,13 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.model.DefaultValueWriter;
 
 public interface DataBindingProfile {
-    
+
     void generate(ToolContext context) throws ToolException;
     void initialize(ToolContext c) throws ToolException;
     String getType(QName qn, boolean element);
     String getWrappedElementType(QName wrapperElement, QName item);
-    
+
     DefaultValueWriter createDefaultValueWriter(QName qn, boolean element);
     DefaultValueWriter createDefaultValueWriterForWrappedElement(QName wrapperElement, QName qn);
-    
+
 }

@@ -51,16 +51,16 @@ import org.junit.Test;
 
 public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = TestUtil.getPortNumber(ManualHttpMulitplexClientServerTest.class);
-    public static final String FACTORY_ADDRESS = 
+    public static final String FACTORY_ADDRESS =
         "http://localhost:" + PORT + "/NumberFactoryService/NumberFactoryPort";
 
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
         Endpoint ep;
         ManualNumberFactoryImpl implementor;
         protected void run() {
             setBus(BusFactory.getDefaultBus());
             implementor = new ManualNumberFactoryImpl(getBus(), PORT);
-            ep = Endpoint.publish(FACTORY_ADDRESS, implementor);            
+            ep = Endpoint.publish(FACTORY_ADDRESS, implementor);
         }
         public void tearDown() throws Exception {
             ep.stop();
@@ -83,37 +83,37 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
     }
 
     @BeforeClass
-    public static void startServers() throws Exception {        
+    public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
                    launchServer(Server.class, true));
         createStaticBus();
     }
 
-    
+
     @Test
     public void testWithManualMultiplexEprCreation() throws Exception {
-    
+
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory nfact = service.getNumberFactoryPort();
         updateAddressPort(nfact, PORT);
-        
-        W3CEndpointReference w3cEpr = nfact.create("2");        
+
+        W3CEndpointReference w3cEpr = nfact.create("2");
         assertNotNull("reference", w3cEpr);
-        
+
         // use the epr info only
         // no wsdl so default generated soap/http binding will be used
         // address url must come from the calling context
-        EndpointReferenceType epr = ProviderImpl.convertToInternal(w3cEpr); 
+        EndpointReferenceType epr = ProviderImpl.convertToInternal(w3cEpr);
         QName serviceName = EndpointReferenceUtils.getServiceName(epr, bus);
         Service numService = Service.create(serviceName);
-        
+
         String portString = EndpointReferenceUtils.getPortName(epr);
-        QName portName = new QName(serviceName.getNamespaceURI(), portString);                
+        QName portName = new QName(serviceName.getNamespaceURI(), portString);
         numService.addPort(portName, SoapBindingFactory.SOAP_11_BINDING, "http://foo");
         Number num = numService.getPort(portName, Number.class);
 
         setupContextWithEprAddress(epr, num);
-        
+
         IsEvenResponse numResp = num.isEven();
         assertTrue("2 is even", Boolean.TRUE.equals(numResp.isEven()));
 
@@ -123,7 +123,7 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         setupContextWithEprAddress(epr, num);
         numResp = num.isEven();
         assertTrue("3 is not even", Boolean.FALSE.equals(numResp.isEven()));
-        
+
         // try again with the address from another epr
         w3cEpr = nfact.create("6");
         epr = ProviderImpl.convertToInternal(w3cEpr);
@@ -131,39 +131,39 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         numResp = num.isEven();
         assertTrue("6 is even", Boolean.TRUE.equals(numResp.isEven()));
     }
-    
+
     @Test
     public void testWithGetPortExtensionHttp() throws Exception {
-        
+
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory factory = service.getNumberFactoryPort();
         updateAddressPort(factory, PORT);
 
-        
+
         W3CEndpointReference w3cEpr = factory.create("20");
-        EndpointReferenceType numberTwoRef = ProviderImpl.convertToInternal(w3cEpr); 
+        EndpointReferenceType numberTwoRef = ProviderImpl.convertToInternal(w3cEpr);
         assertNotNull("reference", numberTwoRef);
-        
+
         // use getPort with epr api on service
         NumberService numService = new NumberService();
         ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);
-        
-        Number num =  serviceImpl.getPort(numberTwoRef, Number.class);
+
+        Number num = serviceImpl.getPort(numberTwoRef, Number.class);
         assertTrue("20 is even", num.isEven().isEven());
         w3cEpr = factory.create("23");
-        EndpointReferenceType numberTwentyThreeRef = ProviderImpl.convertToInternal(w3cEpr); 
-        num =  serviceImpl.getPort(numberTwentyThreeRef, Number.class);
+        EndpointReferenceType numberTwentyThreeRef = ProviderImpl.convertToInternal(w3cEpr);
+        num = serviceImpl.getPort(numberTwentyThreeRef, Number.class);
         assertTrue("23 is not even", !num.isEven().isEven());
     }
-    
+
     private void setupContextWithEprAddress(EndpointReferenceType epr, Number num) {
-        
+
         String address = EndpointReferenceUtils.getAddress(epr);
-        
-        InvocationHandler handler  = Proxy.getInvocationHandler(num);
-        BindingProvider  bp = null;        
+
+        InvocationHandler handler = Proxy.getInvocationHandler(num);
+        BindingProvider bp = null;
         if (handler instanceof BindingProvider) {
-            bp = (BindingProvider)handler;    
+            bp = (BindingProvider)handler;
             bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
         }
     }

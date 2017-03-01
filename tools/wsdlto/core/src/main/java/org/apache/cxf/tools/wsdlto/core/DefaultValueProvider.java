@@ -27,30 +27,30 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 public interface DefaultValueProvider {
-    
+
     byte getByteValue(String path);
     short getShortValue(String path);
     int getIntValue(String path);
     long getLongValue(String path);
-    
+
     float getFloatValue(String path);
     double getDoubleValue(String path);
-    
+
     char getCharValue(String path);
-    
+
     String getStringValue(String path);
     boolean getBooleanValue(String path);
-    
+
     QName getQNameValue(String path);
     URI getURIValue(String path);
-    
+
     BigInteger getBigIntegerValue(String path);
     BigDecimal getBigDecimalValue(String path);
-    
+
     String getXMLGregorianCalendarValueString(String path);
     String getDurationValueString(String path);
-    
+
     String chooseEnumValue(String path, Set<String> values);
-    
+
     int getListLength(String path);
 }

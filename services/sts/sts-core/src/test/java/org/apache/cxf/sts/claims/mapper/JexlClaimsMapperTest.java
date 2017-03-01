@@ -38,12 +38,12 @@ import org.junit.runners.Parameterized.Parameters;
 public class JexlClaimsMapperTest extends org.junit.Assert {
 
     JexlClaimsMapper jcm;
-    
+
     public JexlClaimsMapperTest(String scriptPath) throws IOException {
         jcm = new JexlClaimsMapper();
         jcm.setScript(scriptPath);
     }
-    
+
     @Parameters
     public static Collection<Object[]> data() {
         Object[][] data = new Object[][] {
@@ -113,7 +113,7 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
         ProcessedClaimCollection result = jcm.mapClaims("A", createClaimCollection(), "B", createProperties());
 
         assertNotNull(result);
-        ProcessedClaim staticClaim = findClaim(result, 
+        ProcessedClaim staticClaim = findClaim(result,
                                                "http://schemas.microsoft.com/identity/claims/identityprovider");
         assertNotNull(staticClaim);
     }
@@ -165,7 +165,7 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
         assertEquals(1, claim.getValues().size());
         assertEquals("test@apache.com", claim.getValues().get(0));
     }
-    
+
     @Test
     public void testSingleToMultiValue() throws IOException {
         ProcessedClaimCollection result = jcm.mapClaims("A", createClaimCollection(), "B", createProperties());
@@ -189,7 +189,7 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
         assertEquals(1, claim.getValues().size());
         assertEquals("Value1,Value2,Value3", claim.getValues().get(0));
     }
-    
+
     @Test
     public void testValueFilter() throws IOException {
         ProcessedClaimCollection result = jcm.mapClaims("A", createClaimCollection(), "B", createProperties());
@@ -255,5 +255,5 @@ public class JexlClaimsMapperTest extends org.junit.Assert {
         }
         return null;
     }
-    
+
 }

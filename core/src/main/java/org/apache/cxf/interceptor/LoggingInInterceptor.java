@@ -45,11 +45,11 @@ import org.apache.cxf.phase.Phase;
 @Deprecated
 public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     private static final Logger LOG = LogUtils.getLogger(LoggingInInterceptor.class);
-    
+
     public LoggingInInterceptor() {
         super(Phase.RECEIVE);
     }
-    
+
     public LoggingInInterceptor(String phase) {
         super(phase);
     }
@@ -75,10 +75,10 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         this(id, Phase.RECEIVE);
         this.writer = w;
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         Logger logger = getMessageLogger(message);
-        if (writer != null || logger.isLoggable(Level.INFO)) {
+        if (logger != null && (writer != null || logger.isLoggable(Level.INFO))) {
             logging(logger, message);
         }
     }
@@ -93,7 +93,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             message.getExchange().put(LoggingMessage.ID_KEY, id);
         }
         message.put(LoggingMessage.ID_KEY, id);
-        final LoggingMessage buffer 
+        final LoggingMessage buffer
             = new LoggingMessage("Inbound Message\n----------------------------", id);
 
         if (!Boolean.TRUE.equals(message.get(Message.DECOUPLED_CHANNEL_MESSAGE))) {
@@ -129,7 +129,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             if (uri != null && uri.startsWith("/")) {
                 if (address != null && !address.startsWith(uri)) {
                     if (address.endsWith("/") && address.length() > 1) {
-                        address = address.substring(0, address.length()); 
+                        address = address.substring(0, address.length());
                     }
                     uri = address + uri;
                 }
@@ -144,7 +144,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 buffer.getAddress().append("?").append(query);
             }
         }
-        
+
         if (!isShowBinaryContent() && isBinaryContent(ct)) {
             buffer.getMessage().append(BINARY_CONTENT_MESSAGE).append('\n');
             log(logger, buffer.toString());
@@ -155,7 +155,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             log(logger, buffer.toString());
             return;
         }
-        
+
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
             logInputStream(message, is, buffer, encoding, ct);
@@ -173,7 +173,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             CachedWriter writer = new CachedWriter();
             IOUtils.copyAndCloseInput(reader, writer);
             message.setContent(Reader.class, writer.getReader());
-            
+
             if (writer.getTempFile() != null) {
                 //large thing on disk...
                 buffer.getMessage().append("\nMessage (saved to tmp file):\n");
@@ -195,16 +195,16 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         }
         try {
             // use the appropriate input stream and restore it later
-            InputStream bis = is instanceof DelegatingInputStream 
+            InputStream bis = is instanceof DelegatingInputStream
                 ? ((DelegatingInputStream)is).getInputStream() : is;
-            
+
 
             //only copy up to the limit since that's all we need to log
             //we can stream the rest
             IOUtils.copyAtLeast(bis, bos, limit == -1 ? Integer.MAX_VALUE : limit);
             bos.flush();
             bis = new SequenceInputStream(bos.getInputStream(), bis);
-            
+
             // restore the delegating input stream or the input stream
             if (is instanceof DelegatingInputStream) {
                 ((DelegatingInputStream)is).setInputStream(bis);
@@ -220,8 +220,8 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
             if (bos.size() > limit && limit != -1) {
                 buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
             }
-            writePayload(buffer.getPayload(), bos, encoding, ct); 
-                
+            writePayload(buffer.getPayload(), bos, encoding, ct);
+
             bos.close();
         } catch (Exception e) {
             throw new Fault(e);

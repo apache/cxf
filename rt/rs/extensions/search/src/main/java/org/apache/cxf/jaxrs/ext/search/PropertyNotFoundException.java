@@ -32,6 +32,6 @@ public class PropertyNotFoundException extends SearchParseException {
     public String getValue() {
         return value;
     }
-    
+
 
 }

@@ -29,5 +29,5 @@ public interface AuthDecisionStatementProvider {
      * Get an AuthDecisionStatementBean using the given parameters.
      */
     AuthDecisionStatementBean getStatement(TokenProviderParameters providerParameters);
-        
+
 }

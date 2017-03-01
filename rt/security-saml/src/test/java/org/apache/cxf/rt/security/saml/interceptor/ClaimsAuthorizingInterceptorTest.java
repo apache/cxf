@@ -51,7 +51,7 @@ import org.junit.Test;
 public class ClaimsAuthorizingInterceptorTest extends Assert {
 
     private ClaimsAuthorizingInterceptor interceptor;
-    
+
     @Before
     public void setUp() {
         interceptor = new ClaimsAuthorizingInterceptor();
@@ -60,46 +60,46 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
         interceptor.setFormatAliases(
                 Collections.singletonMap("claims", "http://claims"));
         interceptor.setSecuredObject(new TestService());
-        
+
     }
-    
+
     @Test
     public void testClaimDefaultNameAndFormat() throws Exception {
         doTestClaims("claimWithDefaultNameAndFormat",
-                createDefaultClaim("admin", "user"), 
+                createDefaultClaim("admin", "user"),
                 createClaim("http://authentication", "http://claims", "password"));
         try {
             doTestClaims("claimWithDefaultNameAndFormat",
-                    createDefaultClaim("user"), 
+                    createDefaultClaim("user"),
                     createClaim("http://authentication", "http://claims", "password"));
             fail("AccessDeniedException expected");
         } catch (AccessDeniedException ex) {
             // expected
         }
     }
-    
+
     @Test
     public void testClaimMatchAll() throws Exception {
         doTestClaims("claimMatchAll",
-                createDefaultClaim("admin", "manager"), 
+                createDefaultClaim("admin", "manager"),
                 createClaim("http://authentication", "http://claims", "password"));
         try {
             doTestClaims("claimMatchAll",
-                    createDefaultClaim("admin"), 
+                    createDefaultClaim("admin"),
                     createClaim("http://authentication", "http://claims", "password"));
             doTestClaims("claimMatchAll",
-                    createDefaultClaim("manager"), 
+                    createDefaultClaim("manager"),
                     createClaim("http://authentication", "http://claims", "password"));
             fail("AccessDeniedException expected");
         } catch (AccessDeniedException ex) {
             // expected
         }
     }
-    
+
     @Test
     public void testMissingExpectedClaim() throws Exception {
         doTestClaims("claimWithDefaultNameAndFormat",
-                createDefaultClaim("admin"), 
+                createDefaultClaim("admin"),
                 createClaim("http://authentication", "http://claims", "password"));
         try {
             doTestClaims("claimWithDefaultNameAndFormat",
@@ -109,30 +109,30 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
             // expected
         }
     }
-    
+
     @Test
     public void testExtraNonExpectedClaim() throws Exception {
         doTestClaims("claimWithDefaultNameAndFormat",
-                     createDefaultClaim("admin", "user"), 
+                     createDefaultClaim("admin", "user"),
                      createClaim("http://authentication", "http://claims", "password"),
                      createClaim("http://extra/claims", "http://claims", "claim"));
     }
-    
+
     @Test
     public void testClaimSpecificNameAndFormat() throws Exception {
         doTestClaims("claimWithSpecificNameAndFormat",
-                createClaim("http://cxf/roles", "http://claims", "admin", "user"), 
+                createClaim("http://cxf/roles", "http://claims", "admin", "user"),
                 createClaim("http://authentication", "http://claims", "password"));
         try {
             doTestClaims("claimWithSpecificNameAndFormat",
-                    createDefaultClaim("admin", "user"), 
+                    createDefaultClaim("admin", "user"),
                     createClaim("http://authentication", "http://claims", "password"));
             fail("AccessDeniedException expected");
         } catch (AccessDeniedException ex) {
             // expected
         }
     }
-    
+
     @Test
     public void testClaimLaxMode() throws Exception {
         doTestClaims("claimLaxMode",
@@ -146,19 +146,19 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
             // expected
         }
     }
-    
+
     @Test
     public void testMultipleClaims() throws Exception {
-        doTestClaims("multipleClaims", 
+        doTestClaims("multipleClaims",
                      createDefaultClaim("admin"),
                      createClaim("http://authentication", "http://claims", "smartcard"),
                      createClaim("http://location", "http://claims", "UK"));
-        doTestClaims("multipleClaims", 
+        doTestClaims("multipleClaims",
                 createDefaultClaim("admin"),
                 createClaim("http://authentication", "http://claims", "password"),
                 createClaim("http://location", "http://claims", "USA"));
         try {
-            doTestClaims("multipleClaims", 
+            doTestClaims("multipleClaims",
                     createDefaultClaim("admin"),
                     createClaim("http://authentication", "http://claims", "unsecuretransport"),
                     createClaim("http://location", "http://claims", "UK"));
@@ -167,74 +167,74 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
             // expected
         }
     }
-    
+
     @Test
     public void testUserInRoleAndClaims() throws Exception {
         SecureAnnotationsInterceptor in = new SecureAnnotationsInterceptor();
         in.setAnnotationClassName(SecureRole.class.getName());
         in.setSecuredObject(new TestService2());
-        
-        Message m = prepareMessage(TestService2.class, "test", 
+
+        Message m = prepareMessage(TestService2.class, "test",
                 createDefaultClaim("admin"),
                 createClaim("a", "b", "c"));
-        
+
         in.handleMessage(m);
-        
+
         ClaimsAuthorizingInterceptor in2 = new ClaimsAuthorizingInterceptor();
         org.apache.cxf.rt.security.saml.claims.SAMLClaim claim =
             new org.apache.cxf.rt.security.saml.claims.SAMLClaim();
         claim.setNameFormat("a");
         claim.setName("b");
         claim.addValue("c");
-        in2.setClaims(Collections.singletonMap("test", 
+        in2.setClaims(Collections.singletonMap("test",
                 Collections.singletonList(
                    new ClaimBean(claim))));
         in2.handleMessage(m);
-        
+
         try {
-            in.handleMessage(prepareMessage(TestService2.class, "test", 
+            in.handleMessage(prepareMessage(TestService2.class, "test",
                     createDefaultClaim("user")));
             fail("AccessDeniedException expected");
         } catch (AccessDeniedException ex) {
             // expected
         }
     }
-    
-    
+
+
     private void doTestClaims(String methodName,
-            org.apache.cxf.rt.security.claims.Claim... claim) 
+            org.apache.cxf.rt.security.claims.Claim... claim)
         throws Exception {
         Message m = prepareMessage(TestService.class, methodName, claim);
         interceptor.handleMessage(m);
     }
-    
+
     private Message prepareMessage(Class<?> cls,
             String methodName,
-            org.apache.cxf.rt.security.claims.Claim... claim) 
+            org.apache.cxf.rt.security.claims.Claim... claim)
         throws Exception {
         ClaimCollection claims = new ClaimCollection();
         claims.addAll(Arrays.asList(claim));
-        
-        Set<Principal> roles = 
-            SAMLUtils.parseRolesFromClaims(claims, SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT, 
+
+        Set<Principal> roles =
+            SAMLUtils.parseRolesFromClaims(claims, SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT,
                                            SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED);
-        
+
         SecurityContext sc = new SAMLSecurityContext(new SimplePrincipal("user"), roles, claims);
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
         m.put(SecurityContext.class, sc);
-        m.put("org.apache.cxf.resource.method", 
+        m.put("org.apache.cxf.resource.method",
                cls.getMethod(methodName, new Class[]{}));
         return m;
     }
-    
+
     private org.apache.cxf.rt.security.claims.Claim createDefaultClaim(
             Object... values) {
         return createClaim(SAMLClaim.SAML_ROLE_ATTRIBUTENAME_DEFAULT,
                            SAML2Constants.ATTRNAME_FORMAT_UNSPECIFIED,
                            values);
     }
-    
+
     private org.apache.cxf.rt.security.claims.Claim createClaim(
             String name, String format, Object... values) {
         SAMLClaim claim = new SAMLClaim();
@@ -243,51 +243,51 @@ public class ClaimsAuthorizingInterceptorTest extends Assert {
         claim.setValues(Arrays.asList(values));
         return claim;
     }
-    
-    @Claim(name = "authentication", format = "claims", 
+
+    @Claim(name = "authentication", format = "claims",
            value = "password")
     public static class TestService {
         // default name and format are used
         @Claim({"admin", "manager" })
         public void claimWithDefaultNameAndFormat() {
-            
+
         }
-        
+
         // explicit name and format
-        @Claim(name = "http://cxf/roles", format = "http://claims", 
+        @Claim(name = "http://cxf/roles", format = "http://claims",
                value = {"admin", "manager" })
         public void claimWithSpecificNameAndFormat() {
-            
+
         }
-        
-        @Claim(name = "http://authentication", format = "http://claims", 
+
+        @Claim(name = "http://authentication", format = "http://claims",
                value = "password", mode = ClaimMode.LAX)
         public void claimLaxMode() {
-             
+
         }
-        
+
         @Claims({
-            @Claim(name = "http://location", format = "http://claims", 
+            @Claim(name = "http://location", format = "http://claims",
                     value = {"UK", "USA" }),
             @Claim(value = {"admin", "manager" }),
-            @Claim(name = "authentication", format = "claims", 
+            @Claim(name = "authentication", format = "claims",
                            value = {"password", "smartcard" })
         })
         public void multipleClaims() {
-             
+
         }
-        
+
         // user must have both admin and manager roles, default is 'or'
         @Claim(value = {"admin", "manager" },
                matchAll = true)
         public void claimMatchAll() {
-            
+
         }
     }
     public static class TestService2 {
         @SecureRole("admin")
         public void test() {
-            
+
         }
     }
     @Target(ElementType.METHOD)

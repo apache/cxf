@@ -29,7 +29,7 @@
 	<artifactId>cxf-repository</artifactId>
 	<packaging>pom</packaging>
 	<properties>
-		<bnd.version>3.1.0</bnd.version>
+		<bnd.version>3.3.0</bnd.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<local.index.policy>REQUIRED</local.index.policy>
 	</properties>
@@ -92,11 +92,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-bindings-object</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-bindings-soap</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -113,11 +108,6 @@
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-databinding-jaxb</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-databinding-xmlbeans</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

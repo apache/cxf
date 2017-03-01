@@ -47,7 +47,7 @@ public class TokenRenewerParameters {
     private TokenStore tokenStore;
     private String realm;
     private ReceivedToken token;
-    
+
     public ReceivedToken getToken() {
         return token;
     }
@@ -56,7 +56,7 @@ public class TokenRenewerParameters {
         this.token = token;
     }
 
-    
+
     public TokenStore getTokenStore() {
         return tokenStore;
     }
@@ -80,7 +80,7 @@ public class TokenRenewerParameters {
     public void setTokenRequirements(TokenRequirements tokenRequirements) {
         this.tokenRequirements = tokenRequirements;
     }
-    
+
     public KeyRequirements getKeyRequirements() {
         return keyRequirements;
     }
@@ -96,7 +96,7 @@ public class TokenRenewerParameters {
     public void setStsProperties(STSPropertiesMBean stsProperties) {
         this.stsProperties = stsProperties;
     }
-    
+
     public EncryptionProperties getEncryptionProperties() {
         return encryptionProperties;
     }
@@ -104,27 +104,27 @@ public class TokenRenewerParameters {
     public void setEncryptionProperties(EncryptionProperties encryptionProperties) {
         this.encryptionProperties = encryptionProperties;
     }
-    
+
     public void setPrincipal(Principal principal) {
         this.principal = principal;
     }
-    
+
     public Principal getPrincipal() {
         return principal;
     }
-    
+
     public void setAdditionalProperties(Map<String, Object> additionalProperties) {
         this.additionalProperties = additionalProperties;
     }
-    
+
     public Map<String, Object> getAdditionalProperties() {
         return additionalProperties;
     }
-    
+
     public void setRealm(String realm) {
         this.realm = realm;
     }
-    
+
     public String getRealm() {
         return realm;
     }
@@ -136,5 +136,5 @@ public class TokenRenewerParameters {
     public void setMessageContext(Map<String, Object> messageContext) {
         this.messageContext = messageContext;
     }
-    
+
 }

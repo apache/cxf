@@ -39,8 +39,8 @@ public class CustomAuthDecisionProvider implements AuthDecisionStatementProvider
         authzBean.setActions(Collections.singletonList(actionBean));
         authzBean.setResource("endpoint");
         authzBean.setDecision(AuthDecisionStatementBean.Decision.PERMIT);
-        
+
         return authzBean;
     }
-    
+
 }

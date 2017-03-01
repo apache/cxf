@@ -30,12 +30,12 @@ import org.apache.headers.types.OutHeader;
 import org.apache.headers.types.OutHeaderResponse;
 import org.apache.headers.types.SOAPHeaderData;
 
-@WebService(serviceName = "XMLHeaderService", 
-        portName = "XMLPort9000", 
+@WebService(serviceName = "XMLHeaderService",
+        portName = "XMLPort9000",
         endpointInterface = "org.apache.headers.HeaderTester",
         targetNamespace = "http://apache.org/headers",
         wsdlLocation = "testutils/soapheader2.wsdl")
-        
+
 public class HeaderTesterImpl implements HeaderTester {
 
     public InHeaderResponse inHeader(InHeader me, SOAPHeaderData headerInfo) {
@@ -61,8 +61,8 @@ public class HeaderTesterImpl implements HeaderTester {
             Holder<SOAPHeaderData> headerInfo) {
         theResponse.value = new OutHeaderResponse();
         theResponse.value.setResponseType("requestType=" + me.getRequestType());
-        
-        headerInfo.value = new SOAPHeaderData(); 
+
+        headerInfo.value = new SOAPHeaderData();
         headerInfo.value.setMessage("message=outMessage");
         headerInfo.value.setOriginator("orginator=outOriginator");
     }

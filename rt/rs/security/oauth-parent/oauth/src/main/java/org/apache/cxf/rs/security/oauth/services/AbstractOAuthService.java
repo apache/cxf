@@ -32,19 +32,19 @@ import org.apache.cxf.rs.security.oauth.utils.OAuthUtils;
  */
 public abstract class AbstractOAuthService {
     private MessageContext mc;
-    
+
     private OAuthDataProvider dataProvider;
     private OAuthValidator validator = new DefaultOAuthValidator();
-    
-    @Context 
+
+    @Context
     public void setMessageContext(MessageContext context) {
-        this.mc = context;    
+        this.mc = context;
     }
-    
+
     public MessageContext getMessageContext() {
         return mc;
     }
-    
+
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
     }
@@ -60,5 +60,5 @@ public abstract class AbstractOAuthService {
     public void setValidator(OAuthValidator validator) {
         this.validator = validator;
     }
-    
+
 }

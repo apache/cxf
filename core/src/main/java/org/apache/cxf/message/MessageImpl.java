@@ -35,19 +35,19 @@ import org.apache.cxf.transport.Destination;
 
 public class MessageImpl extends StringMapImpl implements Message {
     private static final long serialVersionUID = -3020763696429459865L;
-    
-    
+
+
     private Exchange exchange;
     private String id;
     private InterceptorChain interceptorChain;
-    
-    // array of Class<T>/T pairs for contents 
+
+    // array of Class<T>/T pairs for contents
     private Object[] contents = new Object[20];
     private int index;
-    
+
     private Map<String, Object> contextCache;
-    
-    
+
+
     public MessageImpl() {
         //nothing
     }
@@ -65,7 +65,7 @@ public class MessageImpl extends StringMapImpl implements Message {
             throw new RuntimeException("Not a MessageImpl! " + m.getClass());
         }
     }
-    
+
     public Collection<Attachment> getAttachments() {
         return CastUtils.cast((Collection<?>)get(ATTACHMENTS));
     }
@@ -78,7 +78,7 @@ public class MessageImpl extends StringMapImpl implements Message {
         //for sub class overriding
         return null;
     }
-    
+
     public Destination getDestination() {
         return get(Destination.class);
     }
@@ -113,7 +113,7 @@ public class MessageImpl extends StringMapImpl implements Message {
             }
         }
         if (index >= contents.length) {
-            //very unlikely to happen.   Haven't seen more than about 6, 
+            //very unlikely to happen.   Haven't seen more than about 6,
             //but just in case we'll add a few more
             Object tmp[] = new Object[contents.length + 10];
             System.arraycopy(contents, 0, tmp, 0, contents.length);
@@ -123,7 +123,7 @@ public class MessageImpl extends StringMapImpl implements Message {
         contents[index + 1] = content;
         index += 2;
     }
-    
+
     public <T> void removeContent(Class<T> format) {
         for (int x = 0; x < index; x += 2) {
             if (contents[x] == format) {
@@ -140,7 +140,7 @@ public class MessageImpl extends StringMapImpl implements Message {
     }
 
     public Set<Class<?>> getContentFormats() {
-        
+
         Set<Class<?>> c = new HashSet<Class<?>>();
         for (int x = 0; x < index; x += 2) {
             c.add((Class<?>)contents[x]);
@@ -178,13 +178,13 @@ public class MessageImpl extends StringMapImpl implements Message {
     public Set<String> getContextualPropertyKeys() {
         return contextCache.keySet();
     }
-    
+
     private void calcContextCache() {
         Map<String, Object> o = new HashMap<String, Object>() {
             private static final long serialVersionUID = 7067290677790419348L;
 
             public void putAll(Map<? extends String, ? extends Object> m) {
-                if (m != null && m.size() > 0) {
+                if (m != null && !m.isEmpty()) {
                     super.putAll(m);
                 }
             }
@@ -195,11 +195,11 @@ public class MessageImpl extends StringMapImpl implements Message {
             if (b != null) {
                 o.putAll(b.getProperties());
             }
-            Service sv = ex.getService(); 
+            Service sv = ex.getService();
             if (sv != null) {
                 o.putAll(sv);
             }
-            Endpoint ep = ex.getEndpoint(); 
+            Endpoint ep = ex.getEndpoint();
             if (ep != null) {
                 EndpointInfo ei = ep.getEndpointInfo();
                 if (ei != null) {

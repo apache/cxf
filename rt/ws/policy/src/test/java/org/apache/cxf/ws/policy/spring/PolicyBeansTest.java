@@ -31,7 +31,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class PolicyBeansTest extends Assert {
-    
+
 
     @Test
     public void testParse() {
@@ -40,11 +40,11 @@ public class PolicyBeansTest extends Assert {
             PolicyEngine pe = bus.getExtension(PolicyEngine.class);
             assertTrue("Policy engine is not enabled", pe.isEnabled());
             assertTrue("Unknown assertions are not ignored", pe.isIgnoreUnknownAssertions());
-            
-            assertEquals(MaximalAlternativeSelector.class.getName(), 
-                         pe.getAlternativeSelector().getClass().getName()); 
-            
-            
+
+            assertEquals(MaximalAlternativeSelector.class.getName(),
+                         pe.getAlternativeSelector().getClass().getName());
+
+
             PolicyEngineImpl pei = (PolicyEngineImpl)pe;
             Collection<PolicyProvider> providers = pei.getPolicyProviders();
             assertEquals(4, providers.size());
@@ -59,7 +59,7 @@ public class PolicyBeansTest extends Assert {
             bus.shutdown(true);
         }
     }
-        
-    
-   
+
+
+
 }

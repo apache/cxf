@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.springframework.context.support.GenericApplicationContext;
 
 /**
- * 
+ *
  */
 public class MissingQualification1226Test extends AbstractCXFSpringTest {
 
@@ -43,7 +43,7 @@ public class MissingQualification1226Test extends AbstractCXFSpringTest {
     @Override
     protected void additionalSpringConfiguration(GenericApplicationContext context) throws Exception {
     }
-    
+
     @Test
     public void lookForMissingNamespace() throws Exception {
         EndpointImpl endpoint = getBean(EndpointImpl.class, "helloWorld");

@@ -28,8 +28,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class IOUtilsTest extends Assert {
-    
-    
+
+
     @Test
     public void testIsEmpty() throws Exception {
         assertTrue(IOUtils.isEmpty(new ByteArrayInputStream(new byte[]{})));

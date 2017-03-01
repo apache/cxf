@@ -42,11 +42,11 @@ public class SimpleClientGenerator extends AbstractSimpleGenerator {
     public void generate(ToolContext penv) throws ToolException {
         this.env = penv;
         JavaModel javaModel = env.get(JavaModel.class);
-        
+
         if (passthrough()) {
             return;
         }
-        
+
         Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
 
         for (JavaInterface intf : interfaces.values()) {

@@ -28,10 +28,10 @@ import javax.xml.ws.BindingProvider;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.binding.soap.SoapHeader;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.headers.Header;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.intfault.BadRecordLitFault;
 import org.apache.intfault.Greeter;
@@ -40,7 +40,7 @@ import org.apache.intfault.SOAPService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {    
+public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {
     public static final String PORT = Server.PORT;
     private final QName serviceName = new QName("http://apache.org/intfault",
                                                 "SOAPService");
@@ -57,7 +57,7 @@ public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {
 
         SOAPService service = new SOAPService(wsdl, serviceName);
         assertNotNull("Service is null", service);
-        
+
         Greeter greeter = service.getSoapPort();
         ClientProxy.getClient(greeter).getInInterceptors().add(new LoggingInInterceptor());
         ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor());
@@ -70,7 +70,7 @@ public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {
         }
 
     }
-    
+
     private void assertSoapHeader(BindingProvider serviceProxy) {
         List<?> headers = (List<?>) serviceProxy.getResponseContext().get(Header.HEADER_LIST);
         QName testQName = new QName("http://test", "test");

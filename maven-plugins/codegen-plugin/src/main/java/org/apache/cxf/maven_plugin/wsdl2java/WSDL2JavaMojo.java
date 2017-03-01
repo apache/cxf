@@ -66,9 +66,9 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
 
         public void addError(final String file, int line, int column, String message, Throwable t) {
             super.addError(file, line, column, message, t);
-            
+
             File f = mapFile(file);
-            
+
             if (f != null && !errorfiles.contains(f)) {
                 buildContext.removeMessages(f);
                 errorfiles.add(f);
@@ -129,16 +129,16 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
 
     /**
      * Path where the generated sources should be placed
-     * 
+     *
      */
     @Parameter(required = true, defaultValue = "${project.build.directory}/generated-sources/cxf",
                property = "cxf.sourceRoot")
     File sourceRoot;
 
     /**
-     * Options that specify WSDLs to process and/or control the processing of wsdls. 
+     * Options that specify WSDLs to process and/or control the processing of wsdls.
      * If you have enabled wsdl scanning, these elements attach options to particular wsdls.
-     * If you have not enabled wsdl scanning, these options call out the wsdls to process. 
+     * If you have not enabled wsdl scanning, these options call out the wsdls to process.
      */
     @Parameter
     WsdlOption wsdlOptions[];
@@ -158,15 +158,15 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
     /**
      * Merge WsdlOptions that point to the same file by adding the extraargs to the first option and deleting
      * the second from the options list
-     * 
+     *
      * @param options
      */
     protected void mergeOptions(List<GenericWsdlOption> effectiveWsdlOptions) {
 
-        File outputDirFile = getGeneratedTestRoot() == null 
+        File outputDirFile = getGeneratedTestRoot() == null
                              ? getGeneratedSourceRoot() : getGeneratedTestRoot();
 
-        List<GenericWsdlOption> newList = new ArrayList<GenericWsdlOption>();
+        List<GenericWsdlOption> newList = new ArrayList<>();
 
         for (GenericWsdlOption go : effectiveWsdlOptions) {
             WsdlOption o = (WsdlOption) go;
@@ -206,13 +206,13 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
 
     /**
      * Determine if code should be generated from the given wsdl
-     * 
+     *
      * @param wsdlOption
      * @param doneFile
      * @param wsdlURI
      * @return
      */
-    protected boolean shouldRun(GenericWsdlOption genericWsdlOption, 
+    protected boolean shouldRun(GenericWsdlOption genericWsdlOption,
                                 File doneFile, URI wsdlURI) {
         WsdlOption wsdlOption = (WsdlOption) genericWsdlOption;
         long timestamp = getTimestamp(wsdlURI);
@@ -260,7 +260,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
         }
         return doWork;
     }
-    
+
     protected void createMarkerFile(GenericWsdlOption wsdlOption, File doneFile, URI wsdlURI) throws IOException {
         doneFile.createNewFile();
         URI basedir = project.getBasedir().toURI();
@@ -270,12 +270,12 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
             writer.flush();
         }
     }
-    
+
 
     /**
      * Finds the timestamp for a given URI. Calls {@link #getBaseFileURI(URI)} prior to the timestamp
      * check in order to handle "classpath" and "jar" URIs.
-     * 
+     *
      * @param uri the URI to timestamp
      * @return a timestamp
      */
@@ -298,7 +298,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
      * Finds the base file URI that 'contains' the given URI. If the URI can not be resolved to a file URI
      * then the original URI is returned. This method currently attempts to resolve only "classpath" and
      * "jar" URIs.
-     * 
+     *
      * @param uri the URI to resolve
      * @return uri a file URI if the original URI is contained in a file, otherwise the original URI
      */
@@ -338,7 +338,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
     }
 
     @Override
-    protected Bus generate(GenericWsdlOption genericWsdlOption, 
+    protected Bus generate(GenericWsdlOption genericWsdlOption,
                            Bus bus,
                            Set<URI> classPath) throws MojoExecutionException {
         WsdlOption wsdlOption = (WsdlOption) genericWsdlOption;
@@ -370,8 +370,8 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
                 }
             }
         }
-        
-        List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, 
+
+        List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI,
                                                            getLog().isDebugEnabled());
         if (encoding != null) {
             list.add(0, "-encoding");
@@ -403,8 +403,8 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
             }
             try {
                 ToolContext ctx = new ToolContext();
-                final List<File> files = new ArrayList<File>();                
-                final List<File> errorfiles = new ArrayList<File>();                
+                final List<File> files = new ArrayList<>();
+                final List<File> errorfiles = new ArrayList<>();
                 ctx.put(OutputStreamCreator.class, new OutputStreamCreator() {
                     public OutputStream createOutputStream(File file) throws IOException {
                         files.add(file);
@@ -413,7 +413,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
                 });
                 ctx.setErrorListener(new MavenToolErrorListener(errorfiles));
                 new WSDLToJava(args).run(ctx);
-                
+
                 List<File> oldFiles = CastUtils.cast((List<?>)buildContext
                                                      .getValue("cxf.file.list." + doneFile.getName()));
                 if (oldFiles != null) {
@@ -462,7 +462,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
      */
     protected List<GenericWsdlOption> createWsdlOptionsFromScansAndExplicitWsdlOptions()
         throws MojoExecutionException {
-        List<GenericWsdlOption> effectiveWsdlOptions = new ArrayList<GenericWsdlOption>();
+        List<GenericWsdlOption> effectiveWsdlOptions = new ArrayList<>();
 
         if (wsdlOptions != null) {
             for (WsdlOption wo : wsdlOptions) {
@@ -482,7 +482,7 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
             effectiveWsdlOptions.addAll(temp);
         }
         if (!disableDependencyScan) {
-            temp = WsdlOptionLoader.loadWsdlOptionsFromDependencies(project, 
+            temp = WsdlOptionLoader.loadWsdlOptionsFromDependencies(project,
                                                                     getGeneratedSourceRoot());
             effectiveWsdlOptions.addAll(temp);
         }

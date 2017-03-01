@@ -166,7 +166,7 @@ public class HandlerChainBuilderTest extends Assert {
     }
 
     private List<PortComponentHandlerType> createHandlerChainType() {
-        List<PortComponentHandlerType> handlers = new ArrayList<PortComponentHandlerType>();
+        List<PortComponentHandlerType> handlers = new ArrayList<>();
 
         PortComponentHandlerType h = new PortComponentHandlerType();
         CString name = new CString();

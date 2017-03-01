@@ -34,7 +34,7 @@ public class OidcKeysService {
 
     private volatile JsonWebKeys keySet;
     private WebClient keyServiceClient;
-    
+
     @GET
     @Produces("application/json")
     public JsonWebKeys getPublicVerificationKeys() {
@@ -44,7 +44,7 @@ public class OidcKeysService {
             } else {
                 keySet = keyServiceClient.get(JsonWebKeys.class);
             }
-            
+
         }
         return keySet;
     }
@@ -57,5 +57,5 @@ public class OidcKeysService {
     public void setKeyServiceClient(WebClient keyServiceClient) {
         this.keyServiceClient = keyServiceClient;
     }
-    
+
 }

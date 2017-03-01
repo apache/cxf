@@ -37,19 +37,19 @@ import org.apache.cxf.wsdl.WSDLExtensionLoader;
 import org.apache.cxf.wsdl.WSDLManager;
 
 /**
- * 
+ *
  */
 @NoJSR250Annotations
 public final class JMSWSDLExtensionLoader implements WSDLExtensionLoader {
     private static final Class<?>[] EXTENSORS = new Class[] {
-        DeliveryModeType.class, 
-        JndiConnectionFactoryNameType.class, 
+        DeliveryModeType.class,
+        JndiConnectionFactoryNameType.class,
         JndiContextParameterType.class,
-        JndiInitialContextFactoryType.class, 
-        JndiURLType.class, 
-        PriorityType.class, 
+        JndiInitialContextFactoryType.class,
+        JndiURLType.class,
+        PriorityType.class,
         ReplyToNameType.class,
-        TimeToLiveType.class, 
+        TimeToLiveType.class,
         TopicReplyToNameType.class
     };
 

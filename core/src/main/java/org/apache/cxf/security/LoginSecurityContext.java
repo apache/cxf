@@ -25,10 +25,10 @@ import javax.security.auth.Subject;
 
 /**
  * LoginSecurityContext provides additional information about the
- * authenticated principal. 
- * 
+ * authenticated principal.
+ *
  * {@link SecurityContext} implementations which can get the authenticated
- * Subject and/or the list of the user roles may implement this interface. 
+ * Subject and/or the list of the user roles may implement this interface.
  */
 public interface LoginSecurityContext extends SecurityContext {
 
@@ -38,7 +38,7 @@ public interface LoginSecurityContext extends SecurityContext {
      */
     Subject getSubject();
     /**
-     * Returns a set of Principals representing the roles 
+     * Returns a set of Principals representing the roles
      * assigned to the current authenticated user Principal
      * @return the roles
      */

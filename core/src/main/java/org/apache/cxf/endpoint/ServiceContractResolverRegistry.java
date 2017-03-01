@@ -29,9 +29,9 @@ import javax.xml.namespace.QName;
 public interface ServiceContractResolverRegistry {
 
     /**
-     * Resolves a service's QName to a URI representing the location of a 
-     * WSDL contract. The registry method is called by the bus and should use 
-     * the <code>getContractLocation</code> methods of the registered contract 
+     * Resolves a service's QName to a URI representing the location of a
+     * WSDL contract. The registry method is called by the bus and should use
+     * the <code>getContractLocation</code> methods of the registered contract
      * resolvers to do the actual resolution.
      *
      * @param qname the service qname to resolve into a URI

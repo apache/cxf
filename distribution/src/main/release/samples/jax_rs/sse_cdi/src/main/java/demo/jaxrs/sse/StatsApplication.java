@@ -32,7 +32,7 @@ import org.apache.cxf.jaxrs.sse.SseFeature;
 @ApplicationPath("api")
 public class StatsApplication extends Application {
     @Inject private StatsRestServiceImpl statsRestService;
-    
+
     @Override
     public Set<Object> getSingletons() {
         final Set<Object> singletons = new HashSet<>();

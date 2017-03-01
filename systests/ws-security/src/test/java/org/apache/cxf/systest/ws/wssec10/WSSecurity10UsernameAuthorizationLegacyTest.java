@@ -47,7 +47,7 @@ public class WSSecurity10UsernameAuthorizationLegacyTest extends AbstractBusClie
     static final String PORT = allocatePort(AuthorizedServer2.class);
 
     private static final String INPUT = "foo";
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
 
@@ -64,42 +64,42 @@ public class WSSecurity10UsernameAuthorizationLegacyTest extends AbstractBusClie
         SecurityTestUtil.cleanup();
         stopAllServers();
     }
-    
+
     @Test
     public void testClientServerComplexPolicyAuthorized() {
 
         String configName = "org/apache/cxf/systest/ws/wssec10/client_restricted.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
         IPingService port = getComplexPolicyPort(bus);
-        
+
         final String output = port.echo(INPUT);
         assertEquals(INPUT, output);
-        
+
         bus.shutdown(true);
     }
-    
+
     @Test
     public void testClientServerComplexPolicyUnauthorized() {
 
         String configName = "org/apache/cxf/systest/ws/wssec10/client_restricted_unauthorized.xml";
         Bus bus = new SpringBusFactory().createBus(configName);
         IPingService port = getComplexPolicyPort(bus);
-        
+
         try {
             port.echo(INPUT);
             fail("Frank is unauthorized");
         } catch (Exception ex) {
             assertEquals("Unauthorized", ex.getMessage());
         }
-        
+
         bus.shutdown(true);
     }
-    
+
     private static IPingService getComplexPolicyPort(Bus bus) {
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
         PingService svc = new PingService(getWsdlLocation("UserNameOverTransport"));
-        final IPingService port = 
+        final IPingService port =
             svc.getPort(
                 new QName(
                     "http://WSSec/wssec10",
@@ -109,8 +109,8 @@ public class WSSecurity10UsernameAuthorizationLegacyTest extends AbstractBusClie
             );
         return port;
     }
-    
-    
+
+
     private static URL getWsdlLocation(String portPrefix) {
         try {
             if ("UserNameOverTransport".equals(portPrefix)) {
@@ -125,5 +125,5 @@ public class WSSecurity10UsernameAuthorizationLegacyTest extends AbstractBusClie
         }
         return null;
     }
-    
+
 }

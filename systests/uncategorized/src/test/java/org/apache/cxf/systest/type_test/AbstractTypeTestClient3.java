@@ -80,7 +80,7 @@ import org.junit.Test;
 
 public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
 
- 
+
     protected boolean equals(ChoiceOfChoice x, ChoiceOfChoice y) {
         if (x.getVarInt() != null && y.getVarInt() != null) {
             return x.getVarInt().equals(y.getVarInt());
@@ -128,12 +128,12 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     protected boolean equals(ChoiceOfSeq x, ChoiceOfSeq y) {
-        if (x.getVarFloat() != null && x.getVarInt() != null 
+        if (x.getVarFloat() != null && x.getVarInt() != null
             && y.getVarFloat() != null && y.getVarInt() != null) {
             return x.getVarInt().equals(y.getVarInt())
                 && x.getVarFloat().compareTo(y.getVarFloat()) == 0;
         }
-        if (x.getVarOtherInt() != null && y.getVarOtherInt() != null 
+        if (x.getVarOtherInt() != null && y.getVarOtherInt() != null
             && x.getVarString() != null && y.getVarString() != null) {
             return x.getVarOtherInt().equals(y.getVarOtherInt())
                 && x.getVarString().equals(y.getVarString());
@@ -229,7 +229,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             assertTrue("testDerivedStructBaseStruct(): Incorrect return value", equals(x, ret));
         }
     }
-    
+
     protected boolean equals(DerivedStructBaseChoice x, DerivedStructBaseChoice y) {
         return equals((SimpleChoice)x, (SimpleChoice)y)
             && (Float.compare(x.getVarFloatExt(), y.getVarFloatExt()) == 0)
@@ -331,7 +331,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             assertTrue("testDerivedChoiceBaseStruct(): Incorrect return value", equals(x, ret));
         }
     }
-    
+
     //org.apache.type_test.types1.DerivedChoiceBaseArray
 
     protected boolean equals(DerivedChoiceBaseArray x, DerivedChoiceBaseArray y) {
@@ -385,7 +385,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     //org.apache.type_test.types1.DerivedChoiceBaseChoice
-    
+
     protected boolean equals(DerivedChoiceBaseChoice x, DerivedChoiceBaseChoice y) {
         boolean isEquals = x.getAttrString().equals(y.getAttrString());
         if (x.getVarStringExt() != null && y.getVarStringExt() != null) {
@@ -545,7 +545,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         assertNotNull(y.value);
         assertNotNull(z.value);
         assertNotNull(ret);
-        
+
         assertTrue(y.value instanceof DerivedEmptyBaseEmptyAll);
         assertTrue(z.value instanceof DerivedEmptyBaseEmptyAll);
         assertTrue(ret instanceof DerivedEmptyBaseEmptyAll);
@@ -574,7 +574,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         assertNotNull(y.value);
         assertNotNull(z.value);
         assertNotNull(ret);
-        
+
         assertTrue(y.value instanceof DerivedEmptyBaseEmptyChoice);
         assertTrue(z.value instanceof DerivedEmptyBaseEmptyChoice);
         assertTrue(ret instanceof DerivedEmptyBaseEmptyChoice);
@@ -720,9 +720,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             return;
         }
         SequenceWithGroupSeq x = new SequenceWithGroupSeq();
-        x.setVarInt(100);         
+        x.setVarInt(100);
         x.setVarString("hello");
-        x.setVarFloat(1.1f); 
+        x.setVarFloat(1.1f);
         x.setVarOtherInt(11);
         x.setVarOtherString("world");
         x.setVarOtherFloat(10.1f);
@@ -921,7 +921,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     //org.apache.type_test.types2.GroupDirectlyInComplexType
 
     protected boolean equals(GroupDirectlyInComplexType x, GroupDirectlyInComplexType y) {
-        return x.getVarInt() == y.getVarInt() 
+        return x.getVarInt() == y.getVarInt()
             && x.getVarString().equals(y.getVarString())
             && Float.compare(x.getVarFloat(), y.getVarFloat()) == 0
             && x.getAttr1().equals(y.getAttr1());
@@ -940,7 +940,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         yOrig.setVarInt(11);
         yOrig.setVarString("world");
         yOrig.setVarFloat(10.1f);
-        yOrig.setAttr1(new Integer(2)); 
+        yOrig.setAttr1(new Integer(2));
 
         Holder<GroupDirectlyInComplexType> y = new Holder<GroupDirectlyInComplexType>(yOrig);
         Holder<GroupDirectlyInComplexType> z = new Holder<GroupDirectlyInComplexType>();
@@ -1008,7 +1008,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         assertEquals("StructWithAny addresses don't match", a.getAddress(), b.getAddress());
         assertEquals(a.getAny(), b.getAny());
     }
-    
+
     public void assertEquals(Element elA, Element elB) throws Exception {
         if (elA instanceof SOAPElement && elB instanceof SOAPElement) {
             SOAPElement soapA = (SOAPElement)elA;
@@ -1017,14 +1017,14 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
                 soapA.getElementName(), soapB.getElementName());
             assertEquals("StructWithAny soap element text nodes don't match",
                 soapA.getValue(), soapB.getValue());
-            
+
             Iterator<?> itExp = soapA.getChildElements();
             Iterator<?> itGen = soapB.getChildElements();
             while (itExp.hasNext()) {
                 if (!itGen.hasNext()) {
                     fail("Incorrect number of child elements inside any");
                 }
-                Object objA = itExp.next();         
+                Object objA = itExp.next();
                 Object objB = itGen.next();
                 if (objA instanceof SOAPElement) {
                     if (objB instanceof SOAPElement) {
@@ -1178,7 +1178,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
 
         List<Element> ae = a.getAny();
         List<Element> be = b.getAny();
-        
+
         assertEquals("StructWithAny soap element lengths don't match", ae.size(), be.size());
         for (int i = 0; i < ae.size(); i++) {
             assertEquals(ae.get(i), be.get(i));
@@ -1373,9 +1373,9 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
                        equals(x, ret));
         }
     }
- 
+
     //org.apache.type_test.types2.StructWithBinary;
-    
+
     protected boolean equals(StructWithBinary x, StructWithBinary y) {
         return Arrays.equals(x.getBase64(), y.getBase64())
             && Arrays.equals(x.getHex(), y.getHex());
@@ -1512,7 +1512,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
                        equals(x, ret));
         }
     }
-    
+
     //org.apache.type_test.types2.ChoiceWithGroupSeq;
 
     protected boolean equals(ChoiceWithGroupSeq x, ChoiceWithGroupSeq y) {
@@ -1538,7 +1538,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         }
         return false;
     }
-    
+
     // XXX - Generated code flattens nested structs
     @Test
     public void testChoiceWithGroupSeq() throws Exception {
@@ -1574,13 +1574,13 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
                        equals(x, ret));
         }
     }
-    
+
     //org.apache.type_test.types2.ChoiceWithGroups;
 
     protected boolean equals(ChoiceWithGroups x, ChoiceWithGroups y) {
         if (x.getVarInt() != null && x.getVarString() != null
             && x.getVarFloat() != null) {
-            return x.getVarInt().compareTo(y.getVarInt()) == 0 
+            return x.getVarInt().compareTo(y.getVarInt()) == 0
                 && x.getVarString().equals(y.getVarString())
                 && x.getVarFloat().compareTo(y.getVarFloat()) == 0;
         } else {
@@ -1596,7 +1596,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             return false;
         }
     }
-    
+
     // XXX - Generated code flattens nested structs
     @Test
     public void testChoiceWithGroups() throws Exception {
@@ -1789,7 +1789,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             || !equalsNilable(x.getAtInt(), y.getAtInt())) {
             fail("grrr");
             return false;
-        } 
+        }
         return equalsQNameStringPairs(x.getOtherAttributes(), y.getOtherAttributes());
     }
 
@@ -1890,7 +1890,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             return;
         }
         OccuringStruct x = new OccuringStruct();
-        List<Serializable> theList = x.getVarFloatAndVarIntAndVarString(); 
+        List<Serializable> theList = x.getVarFloatAndVarIntAndVarString();
         theList.add(1.14f);
         theList.add(new Integer(0));
         theList.add("x1");
@@ -1928,7 +1928,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     //org.apache.type_test.types3.OccuringStruct1;
-    
+
     protected boolean equals(OccuringStruct1 x, OccuringStruct1 y) {
         return equalsFloatIntStringList(x.getVarFloatAndVarIntAndVarString(),
                                         y.getVarFloatAndVarIntAndVarString());
@@ -1939,7 +1939,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
             return;
         }
         OccuringStruct1 x = new OccuringStruct1();
-        List<Serializable> theList = x.getVarFloatAndVarIntAndVarString(); 
+        List<Serializable> theList = x.getVarFloatAndVarIntAndVarString();
         theList.add(1.1f);
         theList.add(2);
         theList.add("xX");
@@ -1972,7 +1972,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     //org.apache.type_test.types3.OccuringStruct2;
-    
+
     protected boolean equals(OccuringStruct2 x, OccuringStruct2 y) {
         if (Float.compare(x.getVarFloat(), y.getVarFloat()) != 0) {
             return false;
@@ -2121,7 +2121,7 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
     }
 
     //org.apache.type_test.types3.OccuringChoice1;
-    
+
     @SuppressWarnings("rawtypes")
     protected boolean equals(OccuringChoice1 x, OccuringChoice1 y) {
         List<Comparable> xList = x.getVarFloatOrVarInt();
@@ -2310,5 +2310,5 @@ public abstract class AbstractTypeTestClient3 extends AbstractTypeTestClient2 {
         assertEquals("testUnionWithAnonEnum(): Incorrect value for out param", yOrig, z.value);
         assertEquals("testUnionWithAnonEnum(): Incorrect return value", x, ret);
     }
-    
+
 }

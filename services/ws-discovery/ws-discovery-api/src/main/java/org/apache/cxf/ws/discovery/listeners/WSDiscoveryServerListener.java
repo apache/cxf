@@ -29,12 +29,12 @@ import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.ws.discovery.internal.WSDiscoveryServiceImpl;
 
 /**
- * 
+ *
  */
 public class WSDiscoveryServerListener implements ServerLifeCycleListener {
-    private static final String WS_DISCOVERY_SERVICE_NS = 
+    private static final String WS_DISCOVERY_SERVICE_NS =
         "http://docs.oasis-open.org/ws-dd/ns/discovery/2009/01";
-    
+
     final Bus bus;
     volatile WSDiscoveryServiceImpl service;
 
@@ -45,12 +45,12 @@ public class WSDiscoveryServerListener implements ServerLifeCycleListener {
             INSTANCE = new WSDiscoveryServiceImpl(bus);
         }
     }
-    
-    
+
+
     public WSDiscoveryServerListener(Bus bus) {
         this.bus = bus;
     }
-    
+
     private synchronized WSDiscoveryServiceImpl getService() {
         if (service == null) {
             service = bus.getExtension(WSDiscoveryServiceImpl.class);
@@ -79,10 +79,10 @@ public class WSDiscoveryServerListener implements ServerLifeCycleListener {
         }
         getService().serverStopped(server);
     }
-    
+
     private boolean isWsDiscoveryServer(Server server) {
         QName sn = ServiceModelUtil.getServiceQName(server.getEndpoint().getEndpointInfo());
         return WS_DISCOVERY_SERVICE_NS.equals(sn.getNamespaceURI());
     }
-    
+
 }

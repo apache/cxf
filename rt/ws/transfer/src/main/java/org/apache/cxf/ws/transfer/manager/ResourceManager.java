@@ -26,22 +26,22 @@ import org.apache.cxf.ws.transfer.Representation;
  * Interface for managing resource representations.
  */
 public interface ResourceManager {
-    
+
     /**
      * Returns Representation object given by reference parameter.
      * @param ref Reference parameter returned by create method.
      * @return Representation object containing the XML resource.
-     * @see ResourceManager#create(org.apache.cxf.ws.transfer.Representation) 
+     * @see ResourceManager#create(org.apache.cxf.ws.transfer.Representation)
      */
     Representation get(ReferenceParametersType ref);
-    
+
     /**
      * Deletes Representation object given by reference parameter.
      * @param ref Reference parameter returned by create method.
      * @see ResourceManager#create(org.apache.cxf.ws.transfer.Representation)
      */
     void delete(ReferenceParametersType ref);
-    
+
     /**
      * Replaces Representation object given by reference parameter with newRepresentation.
      * @param ref Reference parameter returned by create method.
@@ -49,7 +49,7 @@ public interface ResourceManager {
      * @see ResourceManager#create(org.apache.cxf.ws.transfer.Representation)
      */
     void put(ReferenceParametersType ref, Representation newRepresentation);
-    
+
     /**
      * Creates new Representation object from initRepresenation.
      * @param initRepresentation Representation object containing initial XML resource.

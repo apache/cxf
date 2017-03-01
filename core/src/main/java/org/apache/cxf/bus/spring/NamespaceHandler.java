@@ -36,7 +36,7 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
                                      new SimpleBeanDefinitionParser(LoggingFeature.class));
         registerBeanDefinitionParser("fastinfoset",
                                      new SimpleBeanDefinitionParser(FastInfosetFeature.class));
-        
+
         registerBeanDefinitionParser("workqueue",
                                      new SimpleBeanDefinitionParser(AutomaticWorkQueueImpl.class) {
 
@@ -50,7 +50,7 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
                         val = "cxf.workqueue." + val;
                         element.setAttribute("id", val);
                     }
-                    
+
                 }
             });
     }

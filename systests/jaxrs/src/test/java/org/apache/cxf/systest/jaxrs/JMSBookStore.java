@@ -56,38 +56,38 @@ public class JMSBookStore {
 
     @javax.ws.rs.core.Context
     private ProtocolHeaders headers;
-    
+
     private Map<Long, Book> books = new HashMap<Long, Book>();
 
-    
-    
+
+
     public JMSBookStore() {
         books.put(123L, new Book("CXF JMS Rocks", 123L));
     }
-    
+
 
     @GET
     @Path("/bookidarray")
     @Produces("application/xml")
     public Book getBookByURLQuery(@QueryParam("id") String[] ids) throws Exception {
         if (ids == null || ids.length != 3) {
-            throw new WebApplicationException(); 
+            throw new WebApplicationException();
         }
         return doGetBook(ids[0] + ids[1] + ids[2]);
     }
-    
+
     @GET
     @Path("/books/{bookId}/")
     @Produces("application/xml")
     public Book getBook(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);
     }
-    
+
     @Path("/booksubresource/{bookId}/")
     public Book getBookSubResource(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);
     }
-    
+
     private Book doGetBook(String id) throws BookNotFoundFault {
         Book book = books.get(Long.parseLong(id));
         if (book != null) {
@@ -98,13 +98,13 @@ public class JMSBookStore {
             throw new BookNotFoundFault(details);
         }
     }
-    
+
     @POST
     @Path("/books")
     @Produces("text/xml")
     @Consumes("application/xml")
     public Response addBook(Book book) {
-        
+
         String ct1 = headers.getRequestHeaderValue("Content-Type");
         String ct2 = headers.getRequestHeader("Content-Type").get(0);
         String ct3 = headers.getRequestHeaders().getFirst("Content-Type");
@@ -114,23 +114,23 @@ public class JMSBookStore {
         if (!"custom.value".equals(headers.getRequestHeaderValue("custom.protocol.header"))) {
             throw new RuntimeException("Custom header is not set");
         }
-        
+
         book.setId(124);
         books.put(book.getId(), book);
 
         return Response.ok(book).build();
     }
-    
+
     @PUT
     @Path("/oneway")
     @Consumes()
     @Oneway
     public void onewayRequest(Book book) throws Exception {
-        
+
         Context ctx = getContext();
         ConnectionFactory factory = (ConnectionFactory)ctx.lookup("ConnectionFactory");
         Destination replyToDestination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.response");
-                
+
         Connection connection = null;
         try {
             connection = factory.createConnection();
@@ -147,19 +147,19 @@ public class JMSBookStore {
             } catch (JMSException ex) {
                 // ignore
             }
-        }    
+        }
     }
-    
+
     private Context getContext() throws Exception {
         Properties props = new Properties();
         props.setProperty(Context.INITIAL_CONTEXT_FACTORY,
                           "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
         props.setProperty(Context.PROVIDER_URL, "tcp://localhost:" + EmbeddedJMSBrokerLauncher.PORT);
         return new InitialContext(props);
-        
+
     }
-    
-    private void postOneWayBook(Session session, Destination destination, Book book) 
+
+    private void postOneWayBook(Session session, Destination destination, Book book)
         throws Exception {
         MessageProducer producer = session.createProducer(destination);
         BytesMessage message = session.createBytesMessage();
@@ -167,7 +167,7 @@ public class JMSBookStore {
         producer.send(message);
         producer.close();
     }
-    
+
     private byte[] writeBook(Book b) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Marshaller m = c.createMarshaller();

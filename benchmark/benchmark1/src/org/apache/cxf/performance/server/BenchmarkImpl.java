@@ -41,32 +41,32 @@ import edu.indiana.extreme.wsdl.benchmark1.SimpleEvent;
 
 @javax.jws.WebService(name = "Benchmark", serviceName = "Benchmark",
                       portName = "Benchmark",
-                      targetNamespace = "http://www.extreme.indiana.edu/wsdl/Benchmark1", 
+                      targetNamespace = "http://www.extreme.indiana.edu/wsdl/Benchmark1",
                       endpointInterface = "edu.indiana.extreme.wsdl.benchmark1.Benchmark")
-                      
+
 public class BenchmarkImpl implements Benchmark {
 
-    private static final Logger LOG = 
+    private static final Logger LOG =
         Logger.getLogger(BenchmarkImpl.class.getPackage().getName());
-    
+
     public BenchmarkImpl() {
     	LOG.setLevel(Level.INFO);
     }
-    	
-    
+
+
 
     /* (non-Javadoc)
      * @see edu.indiana.extreme.wsdl.benchmark1.Benchmark#echoVoid(*
      */
-    public void echoVoid() { 
+    public void echoVoid() {
         LOG.info("Executing operation echoVoid");
     }
 
     /* (non-Javadoc)
      * @see edu.indiana.extreme.wsdl.benchmark1.Benchmark#echoBase64(byte[]  input )*
      */
-    public byte[] echoBase64 (byte[] input) { 
-        LOG.info("Executing operation echoBase64");        
+    public byte[] echoBase64 (byte[] input) {
+        LOG.info("Executing operation echoBase64");
         return input;
     }
 
@@ -76,7 +76,7 @@ public class BenchmarkImpl implements Benchmark {
     public java.util.List<java.lang.String> echoStrings(
         java.util.List<java.lang.String> input
     )
-    { 
+    {
        LOG.info("Executing operation echoStrings");
         return input;
     }
@@ -87,7 +87,7 @@ public class BenchmarkImpl implements Benchmark {
     public java.util.List<java.lang.Integer> echoInts(
         java.util.List<java.lang.Integer> input
     )
-    { 
+    {
         LOG.info("Executing operation echoInts");
         return input;
     }
@@ -98,7 +98,7 @@ public class BenchmarkImpl implements Benchmark {
     public java.util.List<java.lang.Double> echoDoubles(
         java.util.List<java.lang.Double> input
     )
-    { 
+    {
         LOG.info("Executing operation echoDoubles");
         return input;
     }
@@ -109,7 +109,7 @@ public class BenchmarkImpl implements Benchmark {
     public edu.indiana.extreme.wsdl.benchmark1.EchoSimpleEventsResponse echoSimpleEvents(
         edu.indiana.extreme.wsdl.benchmark1.EchoSimpleEventsRequest input
     )
-    { 
+    {
         LOG.info("Executing operation echoSimpleEvents");
         EchoSimpleEventsResponse ret = new EchoSimpleEventsResponse();
         ret.setEchoSimpleEventsReturn(input.getInput());
@@ -122,7 +122,7 @@ public class BenchmarkImpl implements Benchmark {
     public edu.indiana.extreme.wsdl.benchmark1.EchoMeshInterfaceObjectsResponse echoMeshInterfaceObjects(
         edu.indiana.extreme.wsdl.benchmark1.EchoMeshInterfaceObjectsRequest input
     )
-    { 
+    {
         LOG.info("Executing operation echoMeshInterfaceObjects");
         EchoMeshInterfaceObjectsResponse ret = new EchoMeshInterfaceObjectsResponse();
         List<MeshInterfaceObject> output = ret.getEchoMeshInterfaceObjectReturn();
@@ -138,10 +138,10 @@ public class BenchmarkImpl implements Benchmark {
     public int receiveBase64(
         byte[] input
     )
-    { 
+    {
         LOG.info("Executing operation receiveBase64");
         System.out.println("Executing operation receiveBase64 " + input.length);
-        return input.length;        
+        return input.length;
     }
 
     /* (non-Javadoc)
@@ -150,9 +150,9 @@ public class BenchmarkImpl implements Benchmark {
     public int receiveStrings(
         java.util.List<java.lang.String> input
     )
-    { 
+    {
         LOG.info("Executing operation receiveStrings");
-        return input.size();        
+        return input.size();
     }
 
     /* (non-Javadoc)
@@ -161,7 +161,7 @@ public class BenchmarkImpl implements Benchmark {
     public int receiveInts(
         java.util.List<java.lang.Integer> input
     )
-    { 
+    {
         LOG.info("Executing operation receiveInts");
         return input.size();
     }
@@ -172,7 +172,7 @@ public class BenchmarkImpl implements Benchmark {
     public int receiveDoubles(
         java.util.List<java.lang.Double> input
     )
-    { 
+    {
         LOG.info("Executing operation receiveDoubles");
         return input.size();
     }
@@ -183,7 +183,7 @@ public class BenchmarkImpl implements Benchmark {
     public edu.indiana.extreme.wsdl.benchmark1.ReceiveSimpleEventsResponse receiveSimpleEvents(
         edu.indiana.extreme.wsdl.benchmark1.ReceiveSimpleEventsRequest input
     )
-    { 
+    {
         LOG.info("Executing operation receiveSimpleEvents");
         ReceiveSimpleEventsResponse ret = new ReceiveSimpleEventsResponse();
         ret.setReceiveSimpleEventsReturn(input.getInput().getItem().size());
@@ -196,7 +196,7 @@ public class BenchmarkImpl implements Benchmark {
     public edu.indiana.extreme.wsdl.benchmark1.ReceiveMeshInterfaceObjectsResponse receiveMeshInterfaceObjects(
         edu.indiana.extreme.wsdl.benchmark1.ReceiveMeshInterfaceObjectsRequest input
     )
-    { 
+    {
         LOG.info("Executing operation receiveMeshInterfaceObjects");
         ReceiveMeshInterfaceObjectsResponse ret = new ReceiveMeshInterfaceObjectsResponse();
         ret.setReceiveMeshInterfaceObjectsReturn(input.getInput().getItem().size());
@@ -209,8 +209,8 @@ public class BenchmarkImpl implements Benchmark {
     public byte[] sendBase64(
         int size
     )
-    { 
-        LOG.info("Executing operation sendBase64");        
+    {
+        LOG.info("Executing operation sendBase64");
         return new byte[size];
     }
 
@@ -220,9 +220,9 @@ public class BenchmarkImpl implements Benchmark {
     public java.util.List<java.lang.String> sendStrings(
         int size
     )
-    { 
-       LOG.info("Executing operation sendStrings");       
-       List<String> ret = new ArrayList<String>(0);
+    {
+       LOG.info("Executing operation sendStrings");
+       List<String> ret = new ArrayList<>(0);
        for (int i = 0; i < size; i++) {
            String temp = "s" + i;
            ret.add(temp);
@@ -236,7 +236,7 @@ public class BenchmarkImpl implements Benchmark {
     public java.util.List<java.lang.Integer> sendInts(
         int size
     )
-    { 
+    {
         LOG.info("Executing operation sendInts");
         List<Integer> ret = new LinkedList<Integer>();
         for (int i = 0; i < size; i++) {
@@ -252,7 +252,7 @@ public class BenchmarkImpl implements Benchmark {
     public java.util.List<java.lang.Double> sendDoubles(
         int size
     )
-    { 
+    {
         LOG.info("Executing operation sendDoubles");
         List<Double> ret = new LinkedList<Double>();
         for (int i = 0; i < size; i++) {
@@ -268,12 +268,12 @@ public class BenchmarkImpl implements Benchmark {
     public edu.indiana.extreme.wsdl.benchmark1.SendSimpleEventsResponse sendSimpleEvents(
         edu.indiana.extreme.wsdl.benchmark1.SendSimpleEventsRequest size
     )
-    { 
+    {
         LOG.info("Executing operation sendSimpleEvents");
         SendSimpleEventsResponse ret = new SendSimpleEventsResponse();
         ArrayOfSimpleEvent value = new ArrayOfSimpleEvent();
         List<SimpleEvent> item = value.getItem();
-        for(int i = 0 ; i < size.getSize() ; i++) {        	
+        for(int i = 0 ; i < size.getSize() ; i++) {
         	SimpleEvent object = new SimpleEvent();
             object.setSequenceNumber(i);
             object.setMessage("Message #" + i);
@@ -290,7 +290,7 @@ public class BenchmarkImpl implements Benchmark {
     public edu.indiana.extreme.wsdl.benchmark1.SendMeshInterfaceObjectsResponse sendMeshInterfaceObjects(
         edu.indiana.extreme.wsdl.benchmark1.SendMeshInterfaceObjectsRequest size
     )
-    { 
+    {
         LOG.info("Executing operation sendMeshInterfaceObjects");
         SendMeshInterfaceObjectsResponse ret = new SendMeshInterfaceObjectsResponse();
         ArrayOfMeshInterfaceObject value = new ArrayOfMeshInterfaceObject();

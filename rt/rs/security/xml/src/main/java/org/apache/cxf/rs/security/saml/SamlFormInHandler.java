@@ -36,28 +36,29 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
 
     private static final String SAML_ELEMENT = "SAMLToken";
     private static final String SAML_RELAY_STATE = "RelayState";
-   
+
     private FormEncodingProvider<Form> provider = new FormEncodingProvider<Form>(true);
-    
+
     public SamlFormInHandler() {
     }
-    
+
+    @Override
     public void filter(ContainerRequestContext context) {
         Message message = JAXRSUtils.getCurrentMessage();
-        
-        Form form = readFormData(message);    
+
+        Form form = readFormData(message);
         MultivaluedMap<String, String> formData = form.asMap();
         String assertion = formData.getFirst(SAML_ELEMENT);
-        
-        handleToken(message, assertion);         
+
+        handleToken(message, assertion);
 
         // redirect if needed
         String samlRequestURI = formData.getFirst(SAML_RELAY_STATE);
         if (samlRequestURI != null) {
             // RelayState may actually represent a reference to a transient local state
-            // containing the actual REQUEST URI client was using before being redirected 
+            // containing the actual REQUEST URI client was using before being redirected
             // back to IDP - at the moment assume it's URI
-            UriInfoImpl ui = new UriInfoImpl(message); 
+            UriInfoImpl ui = new UriInfoImpl(message);
             if (!samlRequestURI.startsWith(ui.getBaseUri().toString())) {
                 context.abortWith(Response.status(302).location(URI.create(samlRequestURI)).build());
                 return;
@@ -65,7 +66,7 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
         }
         formData.remove(SAML_ELEMENT);
         formData.remove(SAML_RELAY_STATE);
-        
+
         // restore input stream
         try {
             FormUtils.restoreForm(provider, form, message);
@@ -73,12 +74,12 @@ public class SamlFormInHandler extends AbstractSamlBase64InHandler {
             throwFault(ex.getMessage(), ex);
         }
     }
-    
+
     private Form readFormData(Message message) {
         try {
             return FormUtils.readForm(provider, message);
         } catch (Exception ex) {
-            throwFault("Error reading the form", ex);    
+            throwFault("Error reading the form", ex);
         }
         return null;
     }

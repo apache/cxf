@@ -17,7 +17,7 @@
  * under the License.
  */
 /**
- * 
+ *
  */
 package org.apache.cxf.aegis.util.stax;
 
@@ -91,7 +91,7 @@ public class W3CNamespaceContext implements NamespaceContext {
     }
 
     public Iterator<String> getPrefixes(String uri) {
-        List<String> prefixes = new ArrayList<String>();
+        List<String> prefixes = new ArrayList<>();
 
         String prefix = getPrefix(uri);
         if (prefix != null) {

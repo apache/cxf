@@ -35,15 +35,15 @@ public final class BaseUrlHelper {
      * @return base URL
      */
     public static String getBaseURL(HttpServletRequest request) {
-        String reqPrefix = request.getRequestURL().toString();        
+        String reqPrefix = request.getRequestURL().toString();
         String pathInfo = request.getPathInfo();
         if (!"/".equals(pathInfo) || reqPrefix.contains(";")) {
             StringBuilder sb = new StringBuilder();
             // request.getScheme(), request.getLocalName() and request.getLocalPort()
-            // should be marginally cheaper - provided request.getLocalName() does 
+            // should be marginally cheaper - provided request.getLocalName() does
             // return the actual name used in request URI as opposed to localhost
             // consistently across the Servlet stacks
-            
+
             URI uri = URI.create(reqPrefix);
             sb.append(uri.getScheme()).append("://").append(uri.getRawAuthority());
             String contextPath = request.getContextPath();
@@ -54,12 +54,12 @@ public final class BaseUrlHelper {
             if (servletPath != null) {
                 sb.append(servletPath);
             }
-            
+
             reqPrefix = sb.toString();
         }
         return reqPrefix;
     }
-    
+
 
     public static void setAddress(AbstractDestination dest, String absAddress) {
         dest.getEndpointInfo().setAddress(absAddress);

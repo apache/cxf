@@ -36,10 +36,10 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import rx.Observable;
 
 public class ObservableReader<T> implements MessageBodyReader<Observable<T>> {
-    
+
     @Context
     private Providers providers;
-    
+
     @Override
     public boolean isReadable(Class<?> arg0, Type arg1, Annotation[] arg2, MediaType arg3) {
         return true;
@@ -51,7 +51,7 @@ public class ObservableReader<T> implements MessageBodyReader<Observable<T>> {
                                       throws IOException, WebApplicationException {
         @SuppressWarnings("unchecked")
         Class<T> actualCls = (Class<T>)InjectionUtils.getActualType(t);
-        final MessageBodyReader<T> mbr = 
+        final MessageBodyReader<T> mbr =
             (MessageBodyReader<T>)providers.getMessageBodyReader(actualCls, actualCls, anns, mt);
         if (mbr == null) {
             throw new ProcessingException("MBR is null");

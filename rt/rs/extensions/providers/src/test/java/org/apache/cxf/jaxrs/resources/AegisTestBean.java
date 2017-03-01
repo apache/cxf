@@ -37,5 +37,5 @@ public class AegisTestBean {
     public void setBoolValue(Boolean boolValue) {
         this.boolValue = boolValue;
     }
-    
+
 }

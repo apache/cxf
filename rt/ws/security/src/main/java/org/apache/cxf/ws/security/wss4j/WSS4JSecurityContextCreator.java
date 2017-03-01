@@ -25,10 +25,10 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
  * A pluggable way to create a CXF SecurityContext Object from a set of WSS4J processing results
  */
 public interface WSS4JSecurityContextCreator {
-    
+
     /**
      * Create a SecurityContext and store it on the SoapMessage parameter
      */
     void createSecurityContext(SoapMessage msg, WSHandlerResult handlerResult);
-    
+
 }

@@ -24,7 +24,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 public class MemoryClientTokenContextManager implements ClientTokenContextManager {
-    private ConcurrentHashMap<String, ClientTokenContext> map = 
+    private ConcurrentHashMap<String, ClientTokenContext> map =
             new ConcurrentHashMap<String, ClientTokenContext>();
 
     @Override
@@ -35,7 +35,7 @@ public class MemoryClientTokenContextManager implements ClientTokenContextManage
             OAuthUtils.setSessionToken(mc, key, "org.apache.cxf.websso.context", 0);
         }
         map.put(key, request);
-        
+
     }
 
     @Override
@@ -51,7 +51,7 @@ public class MemoryClientTokenContextManager implements ClientTokenContextManage
     public ClientTokenContext removeClientTokenContext(MessageContext mc) {
         return map.remove(getKey(mc, true));
     }
-    
+
     private String getKey(MessageContext mc, boolean remove) {
         return OAuthUtils.getSessionToken(mc, "org.apache.cxf.websso.context", remove);
     }

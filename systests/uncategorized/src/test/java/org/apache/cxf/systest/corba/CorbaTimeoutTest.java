@@ -77,7 +77,7 @@ public class CorbaTimeoutTest extends AbstractBusClientServerTestBase {
         new SpringBusFactory().createBus("org/apache/cxf/systest/corba/hello_world_client.xml");
 
         GreeterCORBAService gcs = new GreeterCORBAService(wsdlUrl, SERVICE_NAME);
-        Greeter port = gcs.getPort(new QName("http://cxf.apache.org/hello_world_corba", "GreeterTimeoutCORBAPort"), 
+        Greeter port = gcs.getPort(new QName("http://cxf.apache.org/hello_world_corba", "GreeterTimeoutCORBAPort"),
                      GreeterCORBAService.GreeterProxy.class);
 
         try {
@@ -88,6 +88,7 @@ public class CorbaTimeoutTest extends AbstractBusClientServerTestBase {
         } finally {
             System.getProperties().remove("org.omg.CORBA.ORBClass");
             System.getProperties().remove("org.omg.CORBA.ORBSingletonClass");
+            System.setProperty("org.omg.CORBA.ORBClass", "com.sun.corba.se.impl.orb.ORBImpl");
         }
     }
 

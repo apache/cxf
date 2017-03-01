@@ -28,21 +28,21 @@ import java.util.function.Supplier;
 
 public class JaxrsClientStageCallback<T> extends JaxrsClientCallback<T>  {
     private CompletableFuture<T> cf;
-    
-    public JaxrsClientStageCallback(Class<?> responseClass, 
+
+    public JaxrsClientStageCallback(Class<?> responseClass,
                              Type outGenericType,
                              Executor ex) {
         super(null, responseClass, outGenericType);
-        
+
         Supplier<T> supplier = new SupplierImpl();
-        cf = ex == null ? CompletableFuture.supplyAsync(supplier) 
+        cf = ex == null ? CompletableFuture.supplyAsync(supplier)
             : CompletableFuture.supplyAsync(supplier, ex);
     }
-    
+
     public CompletionStage<T> getCompletionStage() {
         return cf;
     }
-    
+
     @Override
     public void handleResponse(Map<String, Object> ctx, Object[] res) {
         context = ctx;
@@ -84,6 +84,6 @@ public class JaxrsClientStageCallback<T> extends JaxrsClientCallback<T>  {
                 return null;
             }
         }
-        
+
     }
 }

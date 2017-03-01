@@ -26,23 +26,23 @@ import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionProvider {
     private byte[] password;
     private KeyAlgorithm algo;
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(String password) {    
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(String password) {
         this(password, KeyAlgorithm.PBES2_HS256_A128KW, false);
     }
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(String password, KeyAlgorithm algo, boolean hashLargePasswords) {    
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(String password, KeyAlgorithm algo, boolean hashLargePasswords) {
         this(PbesHmacAesWrapKeyEncryptionAlgorithm.stringToBytes(password), algo, hashLargePasswords);
     }
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password) {    
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password) {
         this(password, KeyAlgorithm.PBES2_HS256_A128KW, false);
     }
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password, KeyAlgorithm algo, boolean hashLargePasswords) {    
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(char[] password, KeyAlgorithm algo, boolean hashLargePasswords) {
         this(PbesHmacAesWrapKeyEncryptionAlgorithm.charsToBytes(password), algo, hashLargePasswords);
     }
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password) {    
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password) {
         this(password, KeyAlgorithm.PBES2_HS256_A128KW, false);
     }
-    public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password, KeyAlgorithm algo, boolean hashLargePasswords) {    
-        this.password = 
+    public PbesHmacAesWrapKeyDecryptionAlgorithm(byte[] password, KeyAlgorithm algo, boolean hashLargePasswords) {
+        this.password =
             PbesHmacAesWrapKeyEncryptionAlgorithm.validatePassword(password, algo.getJwaName(), hashLargePasswords);
         this.algo = algo;
     }
@@ -58,10 +58,10 @@ public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionProvi
         KeyDecryptionProvider aesWrap = new AesWrapKeyDecryptionAlgorithm(derivedKey, algo) {
             protected boolean isValidAlgorithmFamily(String wrapAlgo) {
                 return AlgorithmUtils.isPbesHsWrap(wrapAlgo);
-            }    
+            }
         };
         return aesWrap.getDecryptedContentEncryptionKey(jweDecryptionInput);
-    }    
+    }
     private byte[] getDecodedBytes(Object p2sHeader) {
         try {
             return Base64UrlUtility.decode(p2sHeader.toString());
@@ -73,5 +73,5 @@ public class PbesHmacAesWrapKeyDecryptionAlgorithm implements KeyDecryptionProvi
     public KeyAlgorithm getAlgorithm() {
         return algo;
     }
-    
+
 }

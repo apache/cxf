@@ -23,7 +23,7 @@ import java.util.Map;
 public class MapEvent {
     private String topic;
     private Map<String, ?> properties;
-    
+
     public MapEvent(String topic, Map<String, ?> properties) {
         super();
         this.topic = topic;

@@ -20,14 +20,14 @@
 package org.apache.cxf.javascript.fortest;
 
 /**
- * 
+ *
  */
 public class AttributeTestServiceImpl implements AttributeTestService {
     private AttributeTestBean acceptedAttributeTestBean;
-    
+
     public void acceptAttributeTestBean(AttributeTestBean atb) {
         acceptedAttributeTestBean = atb;
-        
+
     }
 
     public AttributeTestBean returnAtrributeBean() {

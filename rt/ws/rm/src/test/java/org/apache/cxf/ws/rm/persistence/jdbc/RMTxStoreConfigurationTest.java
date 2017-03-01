@@ -33,13 +33,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class RMTxStoreConfigurationTest extends Assert {
-    
-    @Test     
+
+    @Test
     public void testTxStoreBean() {
-        // connect exception only results in a log message 
+        // connect exception only results in a log message
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/ws/rm/persistence/jdbc/txstore-bean.xml");
         RMManager manager = bus.getExtension(RMManager.class);
@@ -53,7 +53,7 @@ public class RMTxStoreConfigurationTest extends Assert {
         assertEquals("jdbc:derby://localhost:1527/rmdb;create=true", store.getUrl());
         assertNull("schema should be unset", store.getSchemaName());
     }
-   
+
     @Test
     public void testSetCustomTableExistsState() {
         SpringBusFactory factory = new SpringBusFactory();
@@ -61,9 +61,9 @@ public class RMTxStoreConfigurationTest extends Assert {
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
         RMTxStore store = (RMTxStore)manager.getStore();
-                
+
         assertTrue(store.isTableExistsError(new SQLException("Table exists", "I6000", 288)));
-        
+
         assertFalse(store.isTableExistsError(new SQLException("Unknown error", "00000", -1)));
     }
 
@@ -74,9 +74,9 @@ public class RMTxStoreConfigurationTest extends Assert {
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
         RMTxStore store = (RMTxStore)manager.getStore();
-                
+
         assertTrue(store.isTableExistsError(new SQLException("Table exists", "I6000", 288)));
-        
+
         assertFalse(store.isTableExistsError(new SQLException("Unknown error", "00000", -1)));
     }
 
@@ -87,12 +87,12 @@ public class RMTxStoreConfigurationTest extends Assert {
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
         RMTxStore store = (RMTxStore)manager.getStore();
-                
+
         assertNotNull(store.getDataSource());
-        
+
         assertNull(store.getConnection());
     }
-    
+
     @Test
     public void testTxStoreWithDataSource2() {
         SpringBusFactory factory = new SpringBusFactory();
@@ -100,12 +100,12 @@ public class RMTxStoreConfigurationTest extends Assert {
         RMManager manager = bus.getExtension(RMManager.class);
         assertNotNull(manager);
         RMTxStore store = (RMTxStore)manager.getStore();
-                
+
         assertNotNull(store.getDataSource());
-        
+
         assertNull(store.getConnection());
     }
-    
+
     static class TestDataSource implements DataSource {
         public PrintWriter getLogWriter() throws SQLException {
             return null;

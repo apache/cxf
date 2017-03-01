@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -63,9 +64,9 @@ import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
 /**
- * 
+ *
  */
-public class Jetty9WebSocketDestination extends JettyHTTPDestination implements 
+public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
     WebSocketDestinationService {
     private static final Logger LOG = LogUtils.getL7dLogger(Jetty9WebSocketDestination.class);
 
@@ -78,17 +79,19 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
 
     public Jetty9WebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                      JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
-        super(bus, registry, ei, serverEngineFactory);
+        super(bus, registry, ei,
+              serverEngineFactory == null ? null : new URL(getNonWSAddress(ei)),
+              serverEngineFactory);
         try {
             webSocketFactory = (WebSocketServletFactory)ClassLoaderUtils
                 .loadClass("org.eclipse.jetty.websocket.server.WebSocketServerFactory",
                            WebSocketServletFactory.class).newInstance();
-            
+
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
         webSocketFactory.setCreator(new Creator());
-        
+
         try {
             Field f = webSocketFactory.getClass().getDeclaredField("objectFactory");
             f.setAccessible(true);
@@ -98,15 +101,15 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         }
         executor = bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
     }
-    
+
     @Override
     public void invokeInternal(ServletConfig config, ServletContext context, HttpServletRequest req,
                                HttpServletResponse resp) throws IOException {
         super.invoke(config, context, req, resp);
     }
-    public void invoke(final ServletConfig config, 
-                       final ServletContext context, 
-                       final HttpServletRequest request, 
+    public void invoke(final ServletConfig config,
+                       final ServletContext context,
+                       final HttpServletRequest request,
                        final HttpServletResponse response) throws IOException {
         if (webSocketFactory.isUpgradeRequest(request, response)
             && webSocketFactory.acceptWebSocket(request, response)) {
@@ -115,20 +118,23 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         }
         super.invoke(config, context, request, response);
     }
-    @Override
-    protected String getAddress(EndpointInfo endpointInfo) {
+    private static String getNonWSAddress(EndpointInfo endpointInfo) {
         String address = endpointInfo.getAddress();
         if (address.startsWith("ws")) {
             address = "http" + address.substring(2);
         }
         return address;
     }
-        
+    @Override
+    protected String getAddress(EndpointInfo endpointInfo) {
+        return getNonWSAddress(endpointInfo);
+    }
+
     @Override
     protected JettyHTTPHandler createJettyHTTPHandler(JettyHTTPDestination jhd, boolean cmExact) {
         return new JettyWebSocketHandler(jhd, cmExact, webSocketFactory);
     }
-    
+
     @Override
     public void shutdown() {
         try {
@@ -139,7 +145,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
             super.shutdown();
         }
     }
-    
+
     private void invoke(final byte[] data, final int offset, final int length, final Session session) {
         // invoke the service asynchronously as the jetty websocket's onMessage is synchronously blocked
         // make sure the byte array passed to this method is immutable, as the websocket framework
@@ -175,7 +181,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
             executor.execute(r);
         } catch (RejectedExecutionException e) {
             LOG.warning(
-                "Executor queue is full, run the service invocation task in caller thread." 
+                "Executor queue is full, run the service invocation task in caller thread."
                 + "  Users can specify a larger executor queue to avoid this.");
             r.run();
         }
@@ -190,7 +196,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
         }
     }
     private WebSocketVirtualServletRequest createServletRequest(byte[] data, int offset, int length,
-                                                                WebSocketServletHolder holder) 
+                                                                WebSocketServletHolder holder)
         throws IOException {
         return new WebSocketVirtualServletRequest(holder, new ByteArrayInputStream(data, offset, length));
     }
@@ -227,9 +233,9 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                 }
             };
         }
-        
+
     }
-    
+
     class Jetty9WebSocketHolder implements WebSocketServletHolder {
         final Session session;
         Jetty9WebSocketHolder(Session s) {

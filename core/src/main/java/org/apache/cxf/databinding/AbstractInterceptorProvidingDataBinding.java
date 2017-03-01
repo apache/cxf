@@ -27,11 +27,11 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
 
 /**
- * 
+ *
  */
-public abstract class AbstractInterceptorProvidingDataBinding 
+public abstract class AbstractInterceptorProvidingDataBinding
     extends AbstractDataBinding implements InterceptorProvider {
-    
+
     protected ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> inInterceptors
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     protected ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> outInterceptors

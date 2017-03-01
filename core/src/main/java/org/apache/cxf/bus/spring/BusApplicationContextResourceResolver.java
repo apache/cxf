@@ -32,17 +32,17 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 
 @NoJSR250Annotations
-public class BusApplicationContextResourceResolver 
+public class BusApplicationContextResourceResolver
     implements ResourceResolver, ApplicationContextAware {
-    
+
     ApplicationContext context;
-    
+
     public BusApplicationContextResourceResolver() {
     }
     public BusApplicationContextResourceResolver(ApplicationContext c) {
         context = c;
     }
-    
+
 
     public InputStream getAsStream(String name) {
         Resource r = context.getResource(name);
@@ -52,7 +52,7 @@ public class BusApplicationContextResourceResolver
             } catch (IOException e) {
                 //ignore and return null
             }
-        } 
+        }
         r = context.getResource("/" + name);
         if (r != null && r.exists()) {
             try {
@@ -60,12 +60,12 @@ public class BusApplicationContextResourceResolver
             } catch (IOException e) {
                 //ignore and return null
             }
-        } 
+        }
         return null;
     }
 
     public <T> T resolve(String resourceName, Class<T> resourceType) {
-           
+
         try {
             T resource = null;
             if (resourceName == null) {
@@ -98,7 +98,7 @@ public class BusApplicationContextResourceResolver
 
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        context = applicationContext;        
+        context = applicationContext;
     }
 
 }

@@ -25,18 +25,18 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
 @WebService(serviceName = "NumberService",
-            endpointInterface = "org.apache.cxf.factory_pattern.Number", 
+            endpointInterface = "org.apache.cxf.factory_pattern.Number",
             targetNamespace = "http://cxf.apache.org/factory_pattern")
-            
+
 public class ManualNumberImpl extends NumberImpl {
 
     @Resource
     protected WebServiceContext aContext;
-    
+
     protected WebServiceContext getWebSercviceContext() {
         return aContext;
     }
-    
+
     /**
      * pull id from manual context appendage
      */

@@ -29,32 +29,32 @@ import org.junit.Test;
 
 public class JAXRSSimpleRequestDispatcherTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(JAXRSSimpleRequestDispatcherTest.class);
-    
+
     @Ignore
     public static class Server extends AbstractSpringServer {
         public Server() {
             super("/jaxrs_dispatch_simple", "/dispatch", Integer.parseInt(PORT));
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
-    
-    
+
+
+
     @Test
     public void testGetTextWelcomeFile() throws Exception {
         String address = "http://localhost:" + PORT + "/dispatch/welcome.txt";
         WebClient client = WebClient.create(address);
-        
+
         client.accept("text/plain");
         String welcome = client.get(String.class);
         assertEquals("Welcome", welcome);
     }
-    
+
     @Test
     public void testGetRedirectedBook() throws Exception {
         String address = "http://localhost:" + PORT + "/dispatch/bookstore2/books/redirectStart";
@@ -64,7 +64,7 @@ public class JAXRSSimpleRequestDispatcherTest extends AbstractBusClientServerTes
         Book book = client.get(Book.class);
         assertEquals("Redirect complete: /dispatch/bookstore/books/redirectComplete", book.getName());
     }
-    
+
     @Test
     public void testGetRedirectedBook2() throws Exception {
         String address = "http://localhost:" + PORT + "/dispatch/redirect/bookstore3/books/redirectStart";
@@ -72,8 +72,8 @@ public class JAXRSSimpleRequestDispatcherTest extends AbstractBusClientServerTes
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         client.accept("application/json");
         Book book = client.get(Book.class);
-        assertEquals("Redirect complete: /dispatch/redirect/bookstore/books/redirectComplete", 
+        assertEquals("Redirect complete: /dispatch/redirect/bookstore/books/redirectComplete",
                      book.getName());
     }
-    
+
 }

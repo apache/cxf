@@ -47,7 +47,7 @@ public class LDAPCertificateRepoTest {
     private static final String ROOT_DN = "dc=example,dc=com";
     private static final String EXPECTED_SUBJECT_DN2 = "CN=www.issuer.com,L=CGN,ST=NRW,C=DE,O=Issuer";
     private static final String EXPECTED_SERVICE_URI = "http://myservice.apache.org/MyServiceName";
-    private static final String EXPECTED_DN_FOR_SERVICE = 
+    private static final String EXPECTED_DN_FOR_SERVICE =
             "cn=http:\\/\\/myservice.apache.org\\/MyServiceName,ou=services";
     private static final LdapSchemaConfig LDAP_CERT_CONFIG = new LdapSchemaConfig();
 
@@ -94,7 +94,7 @@ public class LDAPCertificateRepoTest {
     }
 
     private CertificateRepo createLdapCertificateRepo() throws CertificateException {
-        LdapSearch ldapSearch = new LdapSearch("ldap://localhost:2389", 
+        LdapSearch ldapSearch = new LdapSearch("ldap://localhost:2389",
             "cn=Directory Manager,dc=example,dc=com", "test", 2);
         return new LdapCertificateRepo(ldapSearch, LDAP_CERT_CONFIG, "dc=example,dc=com");
     }
@@ -103,7 +103,7 @@ public class LDAPCertificateRepoTest {
         X509Certificate cert2 = persistenceManager.findBySubjectDn(EXPECTED_SUBJECT_DN);
         Assert.assertEquals(EXPECTED_SUBJECT_DN, cert2.getSubjectDN().toString());
     }
-    
+
     @Test
     public void testSaveUserCert() throws Exception {
         IMocksControl c = EasyMock.createControl();

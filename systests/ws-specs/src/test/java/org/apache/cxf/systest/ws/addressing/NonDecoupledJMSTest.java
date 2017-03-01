@@ -40,10 +40,10 @@ public class NonDecoupledJMSTest extends MAPTestBase {
     static final String PORT = allocatePort(NonDecoupledJMSTest.class);
     private static final String ADDRESS = "jms:jndi:dynamicQueues/testqueue0002?"
         + "jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-        + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:" 
+        + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:"
         + EmbeddedJMSBrokerLauncher.PORT;
-    
-    
+
+
     private static final String CONFIG =
         "org/apache/cxf/systest/ws/addressing/wsa_interceptors.xml";
 
@@ -59,11 +59,11 @@ public class NonDecoupledJMSTest extends MAPTestBase {
     public void testImplicitMAPs() throws Exception {
         super.testImplicitMAPs();
     }
-    
+
     public String getAddress() {
         return ADDRESS;
     }
-    
+
     public URL getWSDLURL() {
         return null;
     }
@@ -71,7 +71,7 @@ public class NonDecoupledJMSTest extends MAPTestBase {
     }
     @BeforeClass
     public static void startServers() throws Exception {
-        
+
         Map<String, String> props = new HashMap<String, String>();
         if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
             props.put("org.apache.activemq.default.directory.prefix",
@@ -82,18 +82,18 @@ public class NonDecoupledJMSTest extends MAPTestBase {
         assertTrue("server did not launch correctly", launchServer(EmbeddedJMSBrokerLauncher.class,
                                                                    props, null));
 
-        assertTrue("server did not launch correctly", 
-                   launchServer(Server.class, null, 
+        assertTrue("server did not launch correctly",
+                   launchServer(Server.class, null,
                                 new String[] {ADDRESS, GreeterImpl.class.getName()}, false));
     }
-    
-    @WebService(serviceName = "SOAPServiceAddressing", 
-                portName = "SoapPort", 
-                endpointInterface = "org.apache.hello_world_soap_http.Greeter", 
+
+    @WebService(serviceName = "SOAPServiceAddressing",
+                portName = "SoapPort",
+                endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http")
     public static class GreeterImpl extends org.apache.cxf.systest.ws.addressing.AbstractGreeterImpl {
 
-        
+
     }
 }
 

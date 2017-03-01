@@ -24,12 +24,12 @@ import org.apache.cxf.message.Exchange;
  * Callback interface for SendingOutputStream and SendingWriter
  */
 interface JMSExchangeSender {
-    
+
     /**
      * Sends the outMessage of the given exchange with the given payload.
      * If the exchange is not oneway a reply should be recieved
      * and set as inMessage
-     * 
+     *
      * @param exchange
      * @param payload
      */

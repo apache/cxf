@@ -73,9 +73,9 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
  * A new StAX-based interceptor for processing messages with XML Signature + Encryption content.
  */
 public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSecInInterceptor.class);
-    
+
     private EncryptionProperties encryptionProperties;
     private SignatureProperties sigProps;
     private String decryptionAlias;
@@ -92,16 +92,16 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
         super(Phase.POST_STREAM);
         getAfter().add(StaxInInterceptor.class.getName());
     }
-    
+
     public void handleMessage(Message message) throws Fault {
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         if ("GET".equals(method)) {
             return;
         }
-        
+
         Message outMs = message.getExchange().getOutMessage();
         Message inMsg = outMs == null ? message : outMs.getExchange().getInMessage();
-        
+
         XMLStreamReader originalXmlStreamReader = inMsg.getContent(XMLStreamReader.class);
         if (originalXmlStreamReader == null) {
             InputStream is = inMsg.getContent(InputStream.class);
@@ -109,21 +109,21 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
                 originalXmlStreamReader = StaxUtils.createXMLStreamReader(is);
             }
         }
-        
+
         inMsg.getInterceptorChain().add(
             new StaxActionInInterceptor(requireSignature, requireEncryption));
-        
+
         try {
             XMLSecurityProperties properties = new XMLSecurityProperties();
             configureDecryptionKeys(inMsg, properties);
             Crypto signatureCrypto = getSignatureCrypto(inMsg);
             configureSignatureKeys(signatureCrypto, inMsg, properties);
-            
-            SecurityEventListener securityEventListener = 
+
+            SecurityEventListener securityEventListener =
                 configureSecurityEventListener(signatureCrypto, inMsg, properties);
             InboundXMLSec inboundXMLSec = XMLSec.getInboundWSSec(properties);
-            
-            XMLStreamReader newXmlStreamReader = 
+
+            XMLStreamReader newXmlStreamReader =
                 inboundXMLSec.processInMessage(originalXmlStreamReader, null, securityEventListener);
             inMsg.setContent(XMLStreamReader.class, newXmlStreamReader);
 
@@ -137,11 +137,11 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             throwFault(e.getMessage(), e);
         }
     }
-    
-    private void configureDecryptionKeys(Message message, XMLSecurityProperties properties) 
-        throws IOException, 
+
+    private void configureDecryptionKeys(Message message, XMLSecurityProperties properties)
+        throws IOException,
         UnsupportedCallbackException, WSSecurityException {
-        String cryptoKey = null; 
+        String cryptoKey = null;
         String propKey = null;
         if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.SIGNATURE_CRYPTO;
@@ -150,14 +150,14 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             cryptoKey = SecurityConstants.ENCRYPT_CRYPTO;
             propKey = SecurityConstants.ENCRYPT_PROPERTIES;
         }
-        
+
         Crypto crypto = null;
         try {
             crypto = new CryptoLoader().getCrypto(message, cryptoKey, propKey);
         } catch (Exception ex) {
             throwFault("Crypto can not be loaded", ex);
         }
-        
+
         if (crypto != null) {
             String alias = decryptionAlias;
             if (alias == null) {
@@ -165,27 +165,27 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
             if (alias != null) {
                 CallbackHandler callback = RSSecurityUtils.getCallbackHandler(message, this.getClass());
-                WSPasswordCallback passwordCallback = 
+                WSPasswordCallback passwordCallback =
                     new WSPasswordCallback(alias, WSPasswordCallback.DECRYPT);
                 callback.handle(new Callback[] {passwordCallback});
-    
+
                 Key privateKey = crypto.getPrivateKey(alias, passwordCallback.getPassword());
                 properties.setDecryptionKey(privateKey);
             }
         }
     }
-    
+
     private Crypto getSignatureCrypto(Message message) {
-        String cryptoKey = null; 
+        String cryptoKey = null;
         String propKey = null;
         if (RSSecurityUtils.isSignedAndEncryptedTwoWay(message)) {
             cryptoKey = SecurityConstants.ENCRYPT_CRYPTO;
             propKey = SecurityConstants.ENCRYPT_PROPERTIES;
         } else {
             cryptoKey = SecurityConstants.SIGNATURE_CRYPTO;
-            propKey = SecurityConstants.SIGNATURE_PROPERTIES;    
+            propKey = SecurityConstants.SIGNATURE_PROPERTIES;
         }
-        
+
         try {
             return new CryptoLoader().getCrypto(message, cryptoKey, propKey);
         } catch (Exception ex) {
@@ -193,12 +193,12 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             return null;
         }
     }
-    
+
     private void configureSignatureKeys(
         Crypto sigCrypto, Message message, XMLSecurityProperties properties
-    ) throws IOException, 
+    ) throws IOException,
         UnsupportedCallbackException, WSSecurityException {
-        
+
         if (sigCrypto != null && signatureVerificationAlias != null) {
             CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
             cryptoType.setAlias(signatureVerificationAlias);
@@ -208,7 +208,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
     }
-    
+
     protected SecurityEventListener configureSecurityEventListener(
         final Crypto sigCrypto, final Message msg, XMLSecurityProperties securityProperties
     ) {
@@ -235,8 +235,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         return securityEventListener;
     }
-    
-    private void checkEncryptionAlgorithms(AlgorithmSuiteSecurityEvent event) 
+
+    private void checkEncryptionAlgorithms(AlgorithmSuiteSecurityEvent event)
         throws XMLSecurityException {
         if (XMLSecurityConstants.Enc.equals(event.getAlgorithmUsage())
             && encryptionProperties.getEncryptionSymmetricKeyAlgo() != null
@@ -256,8 +256,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
                 + event.getAlgorithmURI() + " is not allowed"});
         }
     }
-    
-    private void checkSignatureAlgorithms(AlgorithmSuiteSecurityEvent event) 
+
+    private void checkSignatureAlgorithms(AlgorithmSuiteSecurityEvent event)
         throws XMLSecurityException {
         if ((XMLSecurityConstants.Asym_Sig.equals(event.getAlgorithmUsage())
             || XMLSecurityConstants.Sym_Sig.equals(event.getAlgorithmUsage()))
@@ -283,7 +283,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
                 + event.getAlgorithmURI() + " is not allowed"});
         }
     }
-    
+
     private void checkSignatureTrust(
         Crypto sigCrypto, Message msg, TokenSecurityEvent<?> event
     ) throws XMLSecurityException {
@@ -295,22 +295,22 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             if (certs != null && certs.length > 0) {
                 cert = certs[0];
             }
-            
-            // validate trust 
+
+            // validate trust
             try {
-                new TrustValidator().validateTrust(sigCrypto, cert, publicKey, 
+                new TrustValidator().validateTrust(sigCrypto, cert, publicKey,
                                                    getSubjectContraints(msg));
             } catch (WSSecurityException e) {
                 throw new XMLSecurityException("empty", new Object[] {"Error during Signature Trust "
                                                + "validation: " + e.getMessage()});
             }
-            
+
             if (persistSignature) {
                 msg.setContent(X509Certificate.class, cert);
             }
         }
     }
-    
+
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
         Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
@@ -320,7 +320,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
     public void setEncryptionProperties(EncryptionProperties properties) {
         this.encryptionProperties = properties;
     }
-    
+
     public void setSignatureProperties(SignatureProperties properties) {
         this.sigProps = properties;
     }
@@ -340,7 +340,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
     public void setSignatureVerificationAlias(String signatureVerificationAlias) {
         this.signatureVerificationAlias = signatureVerificationAlias;
     }
-    
+
     public void setPersistSignature(boolean persist) {
         this.persistSignature = persist;
     }
@@ -360,7 +360,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
     public void setRequireEncryption(boolean requireEncryption) {
         this.requireEncryption = requireEncryption;
     }
-    
+
     /**
      * Set a list of Strings corresponding to regular expression constraints on the subject DN
      * of a certificate
@@ -377,9 +377,9 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
     }
-    
+
     private Collection<Pattern> getSubjectContraints(Message msg) throws PatternSyntaxException {
-        String certConstraints = 
+        String certConstraints =
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SUBJECT_CERT_CONSTRAINTS, msg);
         // Check the message property first. If this is not null then use it. Otherwise pick up
         // the constraints set as a property
@@ -394,66 +394,66 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         return subjectDNPatterns;
     }
-    
+
     /**
-     * This interceptor handles parsing the StaX results (events) + checks to see whether the 
+     * This interceptor handles parsing the StaX results (events) + checks to see whether the
      * required (if any) Actions (signature or encryption) were fulfilled.
      */
     private static class StaxActionInInterceptor extends AbstractPhaseInterceptor<Message> {
-        
-        private static final Logger LOG = 
+
+        private static final Logger LOG =
             LogUtils.getL7dLogger(StaxActionInInterceptor.class);
-                                                                
+
         private final boolean signatureRequired;
         private final boolean encryptionRequired;
-        
+
         StaxActionInInterceptor(boolean signatureRequired, boolean encryptionRequired) {
             super(Phase.PRE_LOGICAL);
             this.signatureRequired = signatureRequired;
             this.encryptionRequired = encryptionRequired;
         }
-        
+
         @Override
         public void handleMessage(Message message) throws Fault {
-            
+
             if (!(signatureRequired || encryptionRequired)) {
                 return;
             }
-            
+
             @SuppressWarnings("unchecked")
-            final List<SecurityEvent> incomingSecurityEventList = 
+            final List<SecurityEvent> incomingSecurityEventList =
                 (List<SecurityEvent>)message.get(SecurityEvent.class.getName() + ".in");
 
             if (incomingSecurityEventList == null) {
                 LOG.warning("Security processing failed (actions mismatch)");
-                XMLSecurityException ex = 
+                XMLSecurityException ex =
                     new XMLSecurityException("empty", new Object[] {"The request was not signed or encrypted"});
                 throwFault(ex.getMessage(), ex);
             }
-            
+
             if (signatureRequired) {
                 Event requiredEvent = SecurityEventConstants.SignatureValue;
                 if (!isEventInResults(requiredEvent, incomingSecurityEventList)) {
                     LOG.warning("The request was not signed");
-                    XMLSecurityException ex = 
+                    XMLSecurityException ex =
                         new XMLSecurityException("empty", new Object[] {"The request was not signed"});
                     throwFault(ex.getMessage(), ex);
                 }
             }
-            
+
             if (encryptionRequired) {
-                boolean foundEncryptionPart = 
+                boolean foundEncryptionPart =
                     isEventInResults(SecurityEventConstants.EncryptedElement, incomingSecurityEventList);
                 if (!foundEncryptionPart) {
                     LOG.warning("The request was not encrypted");
-                    XMLSecurityException ex = 
+                    XMLSecurityException ex =
                         new XMLSecurityException("empty", new Object[] {"The request was not encrypted"});
                     throwFault(ex.getMessage(), ex);
                 }
             }
-            
+
         }
-        
+
         private boolean isEventInResults(Event event, List<SecurityEvent> incomingSecurityEventList) {
             for (SecurityEvent incomingEvent : incomingSecurityEventList) {
                 if (event == incomingEvent.getSecurityEventType()) {
@@ -462,13 +462,13 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
             return false;
         }
-        
+
         protected void throwFault(String error, Exception ex) {
             LOG.warning(error);
             Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
             throw ExceptionUtils.toBadRequestException(null, response);
         }
-        
+
 
     }
 

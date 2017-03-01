@@ -40,7 +40,7 @@ public abstract class AbstractBindingFactory implements BindingFactory {
 
     public AbstractBindingFactory() {
     }
-    
+
     public AbstractBindingFactory(Collection<String> ns) {
         activationNamespaces = ns;
     }
@@ -48,13 +48,13 @@ public abstract class AbstractBindingFactory implements BindingFactory {
         bus = b;
         registerWithBindingManager();
     }
-    
+
     public AbstractBindingFactory(Bus b, Collection<String> ns) {
         activationNamespaces = ns;
         bus = b;
         registerWithBindingManager();
     }
-    
+
     private void registerWithBindingManager() {
         if (bus != null && activationNamespaces != null) {
             BindingFactoryManager manager = bus.getExtension(BindingFactoryManager.class);

@@ -41,13 +41,13 @@ public class NoOpPolicyInterceptorProvider
     private static final Collection<QName> ASSERTION_TYPES;
     private static final QName HTTP_CONF_NAME =
         new QName("http://cxf.apache.org/transports/http/configuration", "client");
-    
+
     static {
-        Collection<QName> types = new ArrayList<QName>();
+        Collection<QName> types = new ArrayList<>();
         types.add(HTTP_CONF_NAME);
         ASSERTION_TYPES = types;
     }
-    
+
     public NoOpPolicyInterceptorProvider() {
         super(ASSERTION_TYPES);
     }

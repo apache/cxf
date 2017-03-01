@@ -74,7 +74,7 @@ public class CorbaStreamOutInterceptor extends AbstractPhaseInterceptor<Message>
         }
         OperationType opType = boi.getExtensor(OperationType.class);
         List<ParamType> paramTypes = opType.getParam();
-        List<ArgType> params = new ArrayList<ArgType>();
+        List<ArgType> params = new ArrayList<>();
         for (Iterator<ParamType> iter = paramTypes.iterator(); iter.hasNext();) {
             ParamType param = iter.next();
             if (!param.getMode().equals(ModeType.OUT)) {
@@ -94,7 +94,7 @@ public class CorbaStreamOutInterceptor extends AbstractPhaseInterceptor<Message>
 
         ArgType returnParam = opType.getReturn();
         List<ParamType> paramTypes = opType.getParam();
-        List<ArgType> params = new ArrayList<ArgType>();
+        List<ArgType> params = new ArrayList<>();
         if (returnParam != null) {
             params.add(returnParam);
         }
@@ -105,9 +105,9 @@ public class CorbaStreamOutInterceptor extends AbstractPhaseInterceptor<Message>
             }
         }
         CorbaStreamWriter writer = new CorbaStreamWriter(orb, params, typeMap, service, wrap);
-        message.setContent(XMLStreamWriter.class, writer);      
+        message.setContent(XMLStreamWriter.class, writer);
     }
 
-    
+
 
 }

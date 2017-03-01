@@ -25,38 +25,38 @@ import javax.jws.WebService;
 import org.apache.cxf.annotations.Policies;
 import org.apache.cxf.annotations.Policy;
 
-@WebService(name = "JavaFirstPolicyService", 
+@WebService(name = "JavaFirstPolicyService",
             targetNamespace = "http://www.example.org/contract/JavaFirstPolicyService")
 public interface JavaFirstPolicyService {
     @Policies({
-        @Policy(uri = "#InternalTransportAndUsernamePolicy", 
+        @Policy(uri = "#InternalTransportAndUsernamePolicy",
             placement = Policy.Placement.PORT_TYPE_OPERATION_INPUT)
     })
     @WebMethod(operationName = "doOperationOne")
     void doOperationOne();
 
     @Policies({
-        @Policy(uri = "classpath:/java_first_policies/UsernamePasswordToken.xml", 
+        @Policy(uri = "classpath:/java_first_policies/UsernamePasswordToken.xml",
             placement = Policy.Placement.PORT_TYPE_OPERATION_INPUT)
     })
     @WebMethod(operationName = "doOperationTwo")
     void doOperationTwo();
 
     @Policies({
-        @Policy(uri = "#InternalTransportAndUsernamePolicy", 
+        @Policy(uri = "#InternalTransportAndUsernamePolicy",
             placement = Policy.Placement.PORT_TYPE_OPERATION_INPUT)
     })
     @WebMethod(operationName = "doOperationThree")
     void doOperationThree();
-    
+
     @Policies({
-        @Policy(uri = "classpath:/java_first_policies/UsernamePasswordToken.xml", 
+        @Policy(uri = "classpath:/java_first_policies/UsernamePasswordToken.xml",
             placement = Policy.Placement.PORT_TYPE_OPERATION_INPUT)
     })
     @WebMethod(operationName = "doOperationFour")
     void doOperationFour();
-    
-    
+
+
     @WebMethod(operationName = "doPing")
     void doPing();
 }

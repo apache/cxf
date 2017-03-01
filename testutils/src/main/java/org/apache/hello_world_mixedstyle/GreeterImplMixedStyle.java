@@ -32,11 +32,11 @@ import org.apache.hello_world_mixedstyle.types.GreetMeResponse;
             wsdlLocation = "testutils/hello_world_mixedstyle.wsdl")
 public class GreeterImplMixedStyle implements Greeter {
     private String version;
-    
+
     public GreeterImplMixedStyle() {
         version = "";
     }
-    
+
     public GreeterImplMixedStyle(String v) {
         version = v;
     }

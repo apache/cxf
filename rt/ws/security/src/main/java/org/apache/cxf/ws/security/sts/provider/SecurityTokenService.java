@@ -32,26 +32,26 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 
-@WebService(targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl", 
+@WebService(targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/wsdl",
             name = "SecurityTokenService")
 @XmlSeeAlso({org.apache.cxf.ws.security.sts.provider.model.ObjectFactory.class,
     org.apache.cxf.ws.security.sts.provider.model.wstrust14.ObjectFactory.class,
     org.apache.cxf.ws.security.sts.provider.model.secext.ObjectFactory.class,
-    org.apache.cxf.ws.security.sts.provider.model.utility.ObjectFactory.class, 
+    org.apache.cxf.ws.security.sts.provider.model.utility.ObjectFactory.class,
     org.apache.cxf.ws.security.sts.provider.model.xmldsig.ObjectFactory.class,
     org.apache.cxf.ws.addressing.ObjectFactory.class })
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public interface SecurityTokenService {
 
     @WebResult(name = "RequestSecurityTokenResponse",
-               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512", 
+               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512",
                partName = "response")
-    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/KET", 
+    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/KET",
             output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/KETFinal")
     @WebMethod(operationName = "KeyExchangeToken")
     RequestSecurityTokenResponseType keyExchangeToken(
-        @WebParam(partName = "request", 
-                  name = "RequestSecurityToken", 
+        @WebParam(partName = "request",
+                  name = "RequestSecurityToken",
                   targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
         RequestSecurityTokenType request
     );
@@ -59,54 +59,54 @@ public interface SecurityTokenService {
     @WebResult(name = "RequestSecurityTokenResponseCollection",
                targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512",
                partName = "responseCollection")
-    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue", 
+    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue",
             output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTRC/IssueFinal")
     @WebMethod(operationName = "Issue")
     RequestSecurityTokenResponseCollectionType issue(
         @WebParam(partName = "request",
-                  name = "RequestSecurityToken", 
+                  name = "RequestSecurityToken",
                   targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
         RequestSecurityTokenType request
     );
-    
+
     @WebResult(name = "RequestSecurityTokenResponse",
               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512",
               partName = "response")
-    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue", 
+    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Issue",
             output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTRC/IssueFinal")
     @WebMethod(operationName = "Issue")
     RequestSecurityTokenResponseType issueSingle(
         @WebParam(partName = "request",
-                  name = "RequestSecurityToken", 
+                  name = "RequestSecurityToken",
                   targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
         RequestSecurityTokenType request
     );
 
-    @WebResult(name = "RequestSecurityTokenResponse", 
-               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512", 
+    @WebResult(name = "RequestSecurityTokenResponse",
+               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512",
                partName = "response")
-    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Cancel", 
+    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Cancel",
             output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/CancelFinal")
     @WebMethod(operationName = "Cancel")
     RequestSecurityTokenResponseType cancel(
-        @WebParam(partName = "request", name = "RequestSecurityToken", 
+        @WebParam(partName = "request", name = "RequestSecurityToken",
                   targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
         RequestSecurityTokenType request
     );
 
-    @WebResult(name = "RequestSecurityTokenResponse", 
-               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512", 
+    @WebResult(name = "RequestSecurityTokenResponse",
+               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512",
                partName = "response")
-    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Validate", 
+    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Validate",
             output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/ValidateFinal")
     @WebMethod(operationName = "Validate")
     RequestSecurityTokenResponseType validate(
-        @WebParam(partName = "request", name = "RequestSecurityToken", 
+        @WebParam(partName = "request", name = "RequestSecurityToken",
                   targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
         RequestSecurityTokenType request
     );
 
-    @WebResult(name = "RequestSecurityTokenResponseCollection", 
+    @WebResult(name = "RequestSecurityTokenResponseCollection",
                targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512",
                partName = "responseCollection")
     @WebMethod(operationName = "RequestCollection")
@@ -117,15 +117,15 @@ public interface SecurityTokenService {
         RequestSecurityTokenCollectionType requestCollection
     );
 
-    @WebResult(name = "RequestSecurityTokenResponse", 
-               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512", 
+    @WebResult(name = "RequestSecurityTokenResponse",
+               targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512",
                partName = "response")
-    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Renew", 
+    @Action(input = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RST/Renew",
             output = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/RSTR/RenewFinal")
     @WebMethod(operationName = "Renew")
     RequestSecurityTokenResponseType renew(
-        @WebParam(partName = "request", 
-                  name = "RequestSecurityToken", 
+        @WebParam(partName = "request",
+                  name = "RequestSecurityToken",
                   targetNamespace = "http://docs.oasis-open.org/ws-sx/ws-trust/200512")
         RequestSecurityTokenType request
     );

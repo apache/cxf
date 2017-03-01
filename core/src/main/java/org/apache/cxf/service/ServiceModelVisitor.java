@@ -58,24 +58,24 @@ import org.apache.cxf.service.model.UnwrappedOperationInfo;
  */
 public class ServiceModelVisitor {
     protected ServiceInfo serviceInfo;
-    
+
     public ServiceModelVisitor(ServiceInfo serviceInfo) {
         super();
         this.serviceInfo = serviceInfo;
     }
-    
+
     public void walk() {
         begin(serviceInfo);
         begin(serviceInfo.getInterface());
-        
+
         for (OperationInfo o : serviceInfo.getInterface().getOperations()) {
             begin(o);
-            
+
             visitOperation(o);
-            
+
             end(o);
         }
-        
+
         end(serviceInfo.getInterface());
         for (EndpointInfo endpointInfo : serviceInfo.getEndpoints()) {
             begin(endpointInfo);
@@ -92,38 +92,38 @@ public class ServiceModelVisitor {
         MessageInfo in = o.getInput();
         if (in != null) {
             begin(in);
-            
+
             for (MessagePartInfo part : in.getMessageParts()) {
                 begin(part);
                 end(part);
             }
-            
+
             end(in);
         }
-        
+
         MessageInfo out = o.getOutput();
         if (out != null) {
             begin(out);
-            
+
             for (MessagePartInfo part : out.getMessageParts()) {
                 begin(part);
                 end(part);
             }
-            
+
             end(out);
         }
-        
+
         for (FaultInfo f : o.getFaults()) {
             begin(f);
-            
+
             for (MessagePartInfo part : f.getMessageParts()) {
                 begin(part);
                 end(part);
             }
-            
+
             end(f);
         }
-        
+
         if (o.isUnwrappedCapable()) {
             OperationInfo uop = o.getUnwrappedOperation();
             begin(uop);
@@ -131,7 +131,7 @@ public class ServiceModelVisitor {
             end(uop);
         }
     }
-    
+
     public void begin(ServiceInfo service) {
     }
     public void begin(InterfaceInfo intf) {

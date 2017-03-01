@@ -56,11 +56,11 @@ import org.apache.wss4j.common.util.DOM2Writer;
 import org.opensaml.core.xml.XMLObject;
 
 public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSSOSpHandler {
-    private static final Logger LOG = 
+    private static final Logger LOG =
         LogUtils.getL7dLogger(AbstractRequestAssertionConsumerHandler.class);
-    private static final ResourceBundle BUNDLE = 
+    private static final ResourceBundle BUNDLE =
         BundleUtils.getBundle(AbstractRequestAssertionConsumerHandler.class);
-    
+
     private boolean supportDeflateEncoding = true;
     private boolean supportBase64Encoding = true;
     private boolean enforceAssertionsSigned = true;
@@ -73,23 +73,23 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     private String applicationURL;
     private boolean parseApplicationURLFromRelayState;
     private String assertionConsumerServiceAddress;
-    
-    @Context 
+
+    @Context
     public void setMessageContext(MessageContext mc) {
         this.messageContext = mc;
     }
-    
+
     public void setSupportDeflateEncoding(boolean deflate) {
         supportDeflateEncoding = deflate;
     }
     public boolean isSupportDeflateEncoding() {
         return supportDeflateEncoding;
     }
-    
+
     public void setReplayCache(TokenReplayCache<String> replayCache) {
         this.replayCache = replayCache;
     }
-    
+
     public TokenReplayCache<String> getReplayCache() {
         if (replayCache == null) {
             Bus bus = (Bus)messageContext.getContextualProperty(Bus.class.getName());
@@ -97,14 +97,14 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         }
         return replayCache;
     }
-    
+
     /**
      * Enforce that Assertions must be signed if the POST binding was used. The default is true.
      */
     public void setEnforceAssertionsSigned(boolean enforceAssertionsSigned) {
         this.enforceAssertionsSigned = enforceAssertionsSigned;
     }
-    
+
     /**
      * Enforce that the Issuer of the received Response/Assertion is known to this RACS. The
      * default is true.
@@ -112,14 +112,14 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     public void setEnforceKnownIssuer(boolean enforceKnownIssuer) {
         this.enforceKnownIssuer = enforceKnownIssuer;
     }
-    
+
     public void setSupportBase64Encoding(boolean supportBase64Encoding) {
         this.supportBase64Encoding = supportBase64Encoding;
     }
     public boolean isSupportBase64Encoding() {
         return supportBase64Encoding;
     }
-    
+
     @PreDestroy
     @Override
     public void close() {
@@ -132,22 +132,22 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         }
         super.close();
     }
-    
+
     protected Response doProcessSamlResponse(String encodedSamlResponse,
                                              String relayState,
                                              boolean postBinding) {
         RequestState requestState = processRelayState(relayState);
-       
+
         String contextCookie = createSecurityContext(requestState,
                                                     encodedSamlResponse,
                                                    relayState,
                                                    postBinding);
-       
+
         // Finally, redirect to the service provider endpoint
         URI targetURI = getTargetURI(requestState.getTargetAddress());
         return Response.seeOther(targetURI).header("Set-Cookie", contextCookie).build();
     }
-    
+
     private URI getTargetURI(String targetAddress) {
         if (targetAddress != null) {
             try {
@@ -160,50 +160,50 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         }
         throw ExceptionUtils.toBadRequestException(null, null);
     }
-    
+
     protected String createSecurityContext(RequestState requestState,
                                            String encodedSamlResponse,
                                            String relayState,
                                            boolean postBinding) {
-           
-        org.opensaml.saml.saml2.core.Response samlResponse = 
+
+        org.opensaml.saml.saml2.core.Response samlResponse =
                readSAMLResponse(postBinding, encodedSamlResponse);
 
         // Validate the Response
         validateSamlResponseProtocol(samlResponse);
-        SSOValidatorResponse validatorResponse = 
+        SSOValidatorResponse validatorResponse =
             validateSamlSSOResponse(postBinding, samlResponse, requestState);
-           
+
         // Set the security context
         String securityContextKey = UUID.randomUUID().toString();
-           
+
         long currentTime = System.currentTimeMillis();
         Date notOnOrAfter = validatorResponse.getSessionNotOnOrAfter();
         long expiresAt = 0;
         if (notOnOrAfter != null) {
             expiresAt = notOnOrAfter.getTime();
         } else {
-            expiresAt = currentTime + getStateTimeToLive(); 
+            expiresAt = currentTime + getStateTimeToLive();
         }
-           
-        ResponseState responseState = 
+
+        ResponseState responseState =
             new ResponseState(validatorResponse.getAssertion(),
-                              relayState, 
+                              relayState,
                               requestState.getWebAppContext(),
                               requestState.getWebAppDomain(),
-                              currentTime, 
+                              currentTime,
                               expiresAt);
         getStateProvider().setResponseState(securityContextKey, responseState);
-           
+
         String contextCookie = createCookie(SSOConstants.SECURITY_CONTEXT_TOKEN,
                                             securityContextKey,
                                             requestState.getWebAppContext(),
                                             requestState.getWebAppDomain());
-           
+
         return contextCookie;
-           
+
     }
-    
+
     protected RequestState processRelayState(String relayState) {
         if (isSupportUnsolicited()) {
             String urlToForwardTo = applicationURL;
@@ -213,13 +213,13 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
                 if (requestState != null && !isStateExpired(requestState.getCreatedAt(), 0)) {
                     return requestState;
                 }
-                
+
                 // Otherwise get the application URL from the RelayState if supported
                 if (parseApplicationURLFromRelayState) {
                     urlToForwardTo = relayState;
                 }
             }
-            
+
             // Otherwise create a new one for the IdP initiated case
             return new RequestState(urlToForwardTo,
                                     getIdpServiceAddress(),
@@ -229,7 +229,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
                                     null,
                                     new Date().getTime());
         }
-        
+
         if (relayState == null) {
             reportError("MISSING_RELAY_STATE");
             throw ExceptionUtils.toBadRequestException(null, null);
@@ -250,7 +250,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
 
         return requestState;
     }
-    
+
     private org.opensaml.saml.saml2.core.Response readSAMLResponse(
         boolean postBinding,
         String samlResponse
@@ -259,7 +259,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             reportError("MISSING_SAML_RESPONSE");
             throw ExceptionUtils.toBadRequestException(null, null);
         }
-        
+
         String samlResponseDecoded = samlResponse;
         /*
         // URL Decoding only applies for the re-direct binding
@@ -275,9 +275,9 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         if (isSupportBase64Encoding()) {
             try {
                 byte[] deflatedToken = Base64Utility.decode(samlResponseDecoded);
-                tokenStream = !postBinding && isSupportDeflateEncoding() 
+                tokenStream = !postBinding && isSupportDeflateEncoding()
                     ? new DeflateEncoderDecoder().inflateToken(deflatedToken)
-                    : new ByteArrayInputStream(deflatedToken); 
+                    : new ByteArrayInputStream(deflatedToken);
             } catch (Base64Exception ex) {
                 throw ExceptionUtils.toBadRequestException(ex, null);
             } catch (DataFormatException ex) {
@@ -286,18 +286,18 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         } else {
             tokenStream = new ByteArrayInputStream(samlResponseDecoded.getBytes(StandardCharsets.UTF_8));
         }
-        
+
         Document responseDoc = null;
         try {
             responseDoc = StaxUtils.read(new InputStreamReader(tokenStream, StandardCharsets.UTF_8));
         } catch (Exception ex) {
             throw new WebApplicationException(400);
         }
-        
+
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Received response: " + DOM2Writer.nodeToString(responseDoc.getDocumentElement()));
         }
-        
+
         XMLObject responseObject = null;
         try {
             responseObject = OpenSAMLUtil.fromDom(responseDoc.getDocumentElement());
@@ -309,7 +309,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         }
         return (org.opensaml.saml.saml2.core.Response)responseObject;
     }
-    
+
     /**
      * Validate the received SAML Response as per the protocol
      */
@@ -326,7 +326,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             throw ExceptionUtils.toBadRequestException(null, null);
         }
     }
-    
+
     /**
      * Validate the received SAML Response as per the Web SSO profile
      */
@@ -362,13 +362,13 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             throw ExceptionUtils.toBadRequestException(ex, null);
         }
     }
-    
+
     protected void reportError(String code) {
-        org.apache.cxf.common.i18n.Message errorMsg = 
+        org.apache.cxf.common.i18n.Message errorMsg =
             new org.apache.cxf.common.i18n.Message(code, BUNDLE);
         LOG.warning(errorMsg.toString());
     }
-    
+
     public void setKeyInfoMustBeAvailable(boolean keyInfoMustBeAvailable) {
         this.keyInfoMustBeAvailable = keyInfoMustBeAvailable;
     }

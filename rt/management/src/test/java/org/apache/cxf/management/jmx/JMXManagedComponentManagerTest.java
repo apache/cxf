@@ -37,12 +37,12 @@ import org.junit.Test;
 
 public class JMXManagedComponentManagerTest extends Assert {
     private static final String PORT = TestUtil.getPortNumber(JMXManagedComponentManagerTest.class);
-    private static final String NAME_ATTRIBUTE = "Name";    
+    private static final String NAME_ATTRIBUTE = "Name";
     private InstrumentationManagerImpl manager;
-    
+
     @Before
     public void setUp() throws Exception {
-        manager = new InstrumentationManagerImpl(); 
+        manager = new InstrumentationManagerImpl();
         manager.setDaemon(false);
         manager.setThreaded(true);
         manager.setEnabled(true);
@@ -51,12 +51,12 @@ public class JMXManagedComponentManagerTest extends Assert {
         //Wait for MBeanServer connector to be initialized on separate thread.
         Thread.sleep(2000);
     }
-    
+
     @After
     public void tearDown() throws Exception {
         manager.shutdown();
     }
-    
+
     @Test
     public void testRegisterInstrumentation() throws Exception {
         //manager.setDaemon(false);
@@ -65,55 +65,55 @@ public class JMXManagedComponentManagerTest extends Assert {
         //manager.init();
 
         AnnotationTestInstrumentation im = new AnnotationTestInstrumentation();
-        ObjectName name = new ObjectName("org.apache.cxf:type=foo,name=bar");        
-        im.setName("John Smith");          
+        ObjectName name = new ObjectName("org.apache.cxf:type=foo,name=bar");
+        im.setName("John Smith");
         manager.register(im, name);
-        
+
         Object val = manager.getMBeanServer().getAttribute(name, NAME_ATTRIBUTE);
         assertEquals("Incorrect result", "John Smith", val);
-        
+
         try {
             manager.register(im, name);
             fail("Registering with existing name should fail.");
         } catch (JMException jmex) {
             //Expected
         }
-        
-        manager.register(im, name, true);                
-        
+
+        manager.register(im, name, true);
+
         val = manager.getMBeanServer().getAttribute(name, NAME_ATTRIBUTE);
         assertEquals("Incorrect result", "John Smith", val);
         manager.unregister(name);
-        
-        im.setName("Foo Bar");  
+
+        im.setName("Foo Bar");
         name = manager.register(im);
 
         val = manager.getMBeanServer().getAttribute(name, NAME_ATTRIBUTE);
         assertEquals("Incorrect result", "Foo Bar", val);
-        
+
         try {
             manager.register(im);
             fail("Registering with existing name should fail.");
         } catch (JMException jmex) {
             //Expected
-        }        
-        
+        }
+
         name = manager.register(im, true);
-        
+
         val = manager.getMBeanServer().getAttribute(name, NAME_ATTRIBUTE);
         assertEquals("Incorrect result", "Foo Bar", val);
-        
+
         manager.unregister(im);
     }
 
     @Test
     public void testRegisterStandardMBean() throws Exception {
         ObjectName name = this.registerStandardMBean("yo!");
-        String result = 
-            (String)manager.getMBeanServer().invoke(name, "sayHi", new Object[0], new String[0]);    
+        String result =
+            (String)manager.getMBeanServer().invoke(name, "sayHi", new Object[0], new String[0]);
         assertEquals("Wazzzuuup yo!", result);
     }
-    
+
     /**
      * Simulate repeated startup and shutdown of the CXF Bus in an environment
      * where the container and MBeanServer are not shutdown between CXF restarts.
@@ -122,10 +122,10 @@ public class JMXManagedComponentManagerTest extends Assert {
     public void testBusLifecycleListener() throws Exception {
         // We need to destroy the manager that is automatically setup by the test.
         this.tearDown();
-        
+
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        
-        this.manager = new InstrumentationManagerImpl(); 
+
+        this.manager = new InstrumentationManagerImpl();
         this.manager.setDaemon(false);
         // Turn threading off so that we get the exception in this thread
         // and the manager is set into a failed state if the connector
@@ -135,30 +135,30 @@ public class JMXManagedComponentManagerTest extends Assert {
         this.manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         this.manager.setServer(server);
         this.manager.init();
-        
+
         ObjectName name = this.registerStandardMBean("yo!");
-        String result = 
-            (String)manager.getMBeanServer().invoke(name, "sayHi", new Object[0], new String[0]);    
+        String result =
+            (String)manager.getMBeanServer().invoke(name, "sayHi", new Object[0], new String[0]);
         assertEquals("Wazzzuuup yo!", result);
-        
+
         try {
             name = this.registerStandardMBean("yo!");
             fail("registered duplicate MBean");
         } catch (InstanceAlreadyExistsException e) {
             // expected
         }
-        
+
         this.manager.preShutdown();
         this.manager.postShutdown();
-        
+
         try {
             this.manager.getMBeanServer().invoke(name, "sayHi", new Object[0], new String[0]);
             fail("MBean not unregistered on shutdown.");
         } catch (InstanceNotFoundException e) {
             // expected
         }
-        
-        this.manager = new InstrumentationManagerImpl(); 
+
+        this.manager = new InstrumentationManagerImpl();
         this.manager.setDaemon(false);
         // Turn threading off so that we get the exception in this thread
         // and the manager is set into a failed state if the connector
@@ -168,13 +168,13 @@ public class JMXManagedComponentManagerTest extends Assert {
         this.manager.setJMXServiceURL("service:jmx:rmi:///jndi/rmi://localhost:" + PORT + "/jmxrmi");
         this.manager.setServer(server);
         this.manager.init();
-        
+
         name = this.registerStandardMBean("yoyo!");
-        result = 
-            (String)manager.getMBeanServer().invoke(name, "sayHi", new Object[0], new String[0]);    
+        result =
+            (String)manager.getMBeanServer().invoke(name, "sayHi", new Object[0], new String[0]);
         assertEquals("Wazzzuuup yoyo!", result);
     }
-    
+
     private ObjectName registerStandardMBean(String name) throws Exception {
         final HelloWorld hw = new HelloWorld(name);
         final ObjectName oName = new ObjectName("org.apache.cxf:type=foo,name=bar");

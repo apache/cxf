@@ -115,7 +115,7 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
         exchangeProperty.setValue(value);
 
         if (exchange.getProperties() == null) {
-            exchange.setProperties(new ArrayList<ExchangeDataProperty>());
+            exchange.setProperties(new ArrayList<>());
         }
         exchange.getProperties().add(exchangeProperty);
     }

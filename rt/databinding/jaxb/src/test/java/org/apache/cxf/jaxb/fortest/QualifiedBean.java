@@ -33,22 +33,22 @@ public class QualifiedBean {
     public void setAriadne(String ariadne) {
         this.ariadne = ariadne;
     }
-    
+
     @XmlAttribute
     public String getDefaultAttribute() {
         return "default";
     }
-    
+
     public void setDefaultAttribute(String val) {
         //
     }
-    
-    
+
+
     @XmlAttribute(namespace = "")
     public String getEmptyNamespaceAttribute() {
         return "empty";
     }
-    
+
     public void setEmptyNamespaceAttribute() {
     }
 
@@ -56,7 +56,7 @@ public class QualifiedBean {
     public String getExplicitNamespaceAttribute() {
         return "explicit";
     }
-    
+
     public void setExplicitNamespaceAttribute() {
     }
 }

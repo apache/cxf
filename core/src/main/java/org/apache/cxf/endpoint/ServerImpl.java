@@ -39,7 +39,7 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.MultipleEndpointObserver;
 
 public class ServerImpl implements Server {
-    private static final Logger LOG = LogUtils.getL7dLogger(ServerImpl.class);    
+    private static final Logger LOG = LogUtils.getL7dLogger(ServerImpl.class);
 
     protected final Endpoint endpoint;
     protected final Bus bus;
@@ -52,22 +52,22 @@ public class ServerImpl implements Server {
     private ManagedEndpoint mep;
     private boolean stopped = true;
 
-    public ServerImpl(Bus bus, 
-                      Endpoint endpoint, 
-                      DestinationFactory destinationFactory, 
+    public ServerImpl(Bus bus,
+                      Endpoint endpoint,
+                      DestinationFactory destinationFactory,
                       BindingFactory bindingFactory) throws BusException, IOException {
         this.endpoint = endpoint;
         this.bus = bus;
         this.bindingFactory = bindingFactory;
-        
+
         initDestination(destinationFactory);
     }
 
     private void initDestination(DestinationFactory destinationFactory) throws BusException, IOException {
         EndpointInfo ei = endpoint.getEndpointInfo();
-        
+
         //Treat local transport as a special case, transports loaded by transportId can be replaced
-        //by local transport when the publishing address is a local transport protocol. 
+        //by local transport when the publishing address is a local transport protocol.
         //Of course its not an ideal situation here to use a hard-coded prefix. To be refactored.
         if (destinationFactory == null) {
             if (ei.getAddress() != null && ei.getAddress().indexOf("local://") != -1) {
@@ -80,20 +80,20 @@ public class ServerImpl implements Server {
                     .getDestinationFactory(ei.getTransportId());
             }
         }
-            
+
         destination = destinationFactory.getDestination(ei, bus);
         LOG.info("Setting the server's publish address to be " + ei.getAddress());
         serverRegistry = bus.getExtension(ServerRegistry.class);
-        
+
         mep = createManagedEndpoint();
-        
+
         slcMgr = bus.getExtension(ServerLifeCycleManager.class);
         if (slcMgr != null) {
             slcMgr.registerListener(mep);
         }
-        
-        iMgr = bus.getExtension(InstrumentationManager.class);        
-        if (iMgr != null) {   
+
+        iMgr = bus.getExtension(InstrumentationManager.class);
+        if (iMgr != null) {
             try {
                 iMgr.register(mep);
             } catch (JMException jmex) {
@@ -101,8 +101,8 @@ public class ServerImpl implements Server {
             }
         }
     }
-    
-    protected ManagedEndpoint createManagedEndpoint() {
+
+    private ManagedEndpoint createManagedEndpoint() {
         return new ManagedEndpoint(bus, endpoint, this);
     }
 
@@ -119,9 +119,9 @@ public class ServerImpl implements Server {
             return;
         }
         LOG.fine("Server is starting.");
-        
+
         bindingFactory.addListener(destination, endpoint);
-        
+
         // register the active server to run
         if (null != serverRegistry) {
             LOG.fine("register the server to serverRegistry ");
@@ -138,7 +138,7 @@ public class ServerImpl implements Server {
         }
         stopped = false;
     }
-    
+
     public boolean isStopped() {
         return stopped;
     }
@@ -150,9 +150,9 @@ public class ServerImpl implements Server {
         if (stopped) {
             return;
         }
-        
+
         LOG.fine("Server is stopping.");
-        
+
         for (Closeable c : endpoint.getCleanupHooks()) {
             try {
                 c.close();
@@ -163,7 +163,7 @@ public class ServerImpl implements Server {
         if (slcMgr != null) {
             slcMgr.stopServer(this);
         }
-        
+
         MessageObserver mo = getDestination().getMessageObserver();
         if (mo instanceof MultipleEndpointObserver) {
             ((MultipleEndpointObserver)mo).getEndpoints().remove(endpoint);
@@ -172,10 +172,10 @@ public class ServerImpl implements Server {
             }
         } else {
             getDestination().setMessageObserver(null);
-        } 
+        }
         stopped = true;
     }
-    
+
     public void destroy() {
         stop();
         // we should shutdown the destination here
@@ -186,7 +186,7 @@ public class ServerImpl implements Server {
             serverRegistry.unregister(this);
         }
 
-        if (iMgr != null) {   
+        if (iMgr != null) {
             try {
                 iMgr.unregister(mep);
             } catch (JMException jmex) {
@@ -194,11 +194,11 @@ public class ServerImpl implements Server {
             }
             iMgr = null;
         }
-        
+
     }
 
     public Endpoint getEndpoint() {
         return endpoint;
     }
-    
+
 }

@@ -51,16 +51,16 @@ import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
  * 1.0 representation using the WS-Addressing 200408 namespace specified in the WS-RM 1.0 recommendation.
  */
 public final class EncoderDecoder10Impl extends EncoderDecoder {
-    
+
     public static final EncoderDecoder10Impl INSTANCE = new EncoderDecoder10Impl();
 
     private static AtomicReference<JAXBContext> jaxbContextReference = new AtomicReference<JAXBContext>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(EncoderDecoder10Impl.class);
-    
+
     private EncoderDecoder10Impl() {
     }
-    
+
     public String getWSRMNamespace() {
         return RM10Constants.NAMESPACE_URI;
     }
@@ -115,7 +115,7 @@ public final class EncoderDecoder10Impl extends EncoderDecoder {
             }
             JAXBElement<?> element = RMUtils.getWSRM200502Factory().createSequence(toseq);
             marshaller.marshal(element, header);
-        } 
+        }
         if (null != acks) {
             LOG.log(Level.FINE, "encoding sequence acknowledgement(s) into RM header");
             for (SequenceAcknowledgement ack : acks) {
@@ -176,7 +176,7 @@ public final class EncoderDecoder10Impl extends EncoderDecoder {
             = unmarshaller.unmarshal(elem, org.apache.cxf.ws.rm.v200502.SequenceType.class);
         return VersionTransformer.convert(jaxbElement.getValue());
     }
-    
+
     public CloseSequenceType decodeSequenceTypeCloseSequence(Element elem) throws JAXBException {
         Unmarshaller unmarshaller = getContext().createUnmarshaller();
         JAXBElement<org.apache.cxf.ws.rm.v200502.SequenceType> jaxbElement
@@ -213,7 +213,7 @@ public final class EncoderDecoder10Impl extends EncoderDecoder {
     public Object convertToSend(CreateSequenceResponseType create) {
         return VersionTransformer.convert200502(create);
     }
-    
+
     public Object convertToSend(TerminateSequenceType term) {
         return VersionTransformer.convert200502(term);
     }

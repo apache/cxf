@@ -25,8 +25,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class EntityTagHeaderProviderTest extends Assert {
-    
-      
+
+
     @Test
     public void testFromString() {
         EntityTag tag = EntityTag.valueOf("\"\"");
@@ -38,7 +38,7 @@ public class EntityTagHeaderProviderTest extends Assert {
         tag = EntityTag.valueOf("\"12345\"");
         assertTrue(!tag.isWeak() && "12345".equals(tag.getValue()));
     }
-    
+
     @Test
     public void testToString() {
         EntityTag tag = new EntityTag("");
@@ -47,9 +47,9 @@ public class EntityTagHeaderProviderTest extends Assert {
         assertEquals("W/\"\"", tag.toString());
         tag = new EntityTag("bar");
         assertEquals("\"bar\"", tag.toString());
-        
+
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testNullValue() throws Exception {
         EntityTag.valueOf(null);

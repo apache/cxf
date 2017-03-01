@@ -71,7 +71,7 @@ public class UndertowServerEngineFactoryParser extends AbstractBPBeanDefinitionP
         ef.setRuntimeClass(UndertowHTTPServerEngineFactoryHolder.class);
 
         // setup the HandlersMap property for the UndertowHTTPServerEngineFactoryHolder
-        
+
         try {
             // Print the DOM node
             String xmlString = StaxUtils.toString(element);
@@ -79,7 +79,7 @@ public class UndertowServerEngineFactoryParser extends AbstractBPBeanDefinitionP
             ef.setInitMethod("init");
             ef.setActivation(ComponentMetadata.ACTIVATION_EAGER);
             ef.setDestroyMethod("destroy");
-            
+
             // setup the EngineConnector
             List<Element> engines = DOMUtils
                 .getChildrenWithName(element, HTTPUndertowTransportNamespaceHandler.UNDERTOW_TRANSPORT, "engine");
@@ -89,11 +89,11 @@ public class UndertowServerEngineFactoryParser extends AbstractBPBeanDefinitionP
             throw new RuntimeException("Could not process configuration.", e);
         }
     }
-    
-       
-    protected Metadata parseEngineHandlers(List<Element> engines, ComponentMetadata enclosingComponent, 
+
+
+    protected Metadata parseEngineHandlers(List<Element> engines, ComponentMetadata enclosingComponent,
                                            ParserContext context) {
-        List<MapEntry> entries = new ArrayList<MapEntry>();
+        List<MapEntry> entries = new ArrayList<>();
         for (Element engine : engines) {
             String port = engine.getAttribute("port");
             ValueMetadata keyValue = createValue(context, port);
@@ -107,6 +107,6 @@ public class UndertowServerEngineFactoryParser extends AbstractBPBeanDefinitionP
         }
         return new MapMetadataImpl("java.lang.String", "java.util.List", entries);
     }
-    
-    
+
+
 }

@@ -45,7 +45,7 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
 
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -55,7 +55,7 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
                 launchServer(Server.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -72,26 +72,26 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSignedMTOMInlinePort");
-        DoubleItMtomPortType port = 
+        DoubleItMtomPortType port =
                 service.getPort(portQName, DoubleItMtomPortType.class);
         updateAddressPort(port, PORT);
-        
+
         DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
         DoubleIt4 doubleIt = new DoubleIt4();
         doubleIt.setNumberToDouble(25);
         port.doubleIt4(25, new DataHandler(source));
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
-    // Here we are not-inlining, but the attachments are signed (as is the SOAP Body)
+
+    // Sign an attachment without inlining
     @org.junit.Test
-    public void testSignedMTOMSwA() throws Exception {
+    public void testSignedMTOMAction() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = MTOMSecurityTest.class.getResource("client.xml");
@@ -99,23 +99,23 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
-        QName portQName = new QName(NAMESPACE, "DoubleItSignedMTOMSwAPort");
-        DoubleItMtomPortType port = 
+        QName portQName = new QName(NAMESPACE, "DoubleItSignedMTOMActionPort");
+        DoubleItMtomPortType port =
                 service.getPort(portQName, DoubleItMtomPortType.class);
         updateAddressPort(port, PORT);
-        
+
         DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
         DoubleIt4 doubleIt = new DoubleIt4();
         doubleIt.setNumberToDouble(25);
         port.doubleIt4(25, new DataHandler(source));
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // Here we moving encrypted bytes to attachments instead, and referencing them via xop:Include
     // This avoids the BASE-64 encoding/decoding step when the raw bytes are included in the SOAP Envelope
     @org.junit.Test
@@ -127,21 +127,21 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         int result = port.doubleIt(25);
         assertEquals(result, 50);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSymmetricBytesInAttachment() throws Exception {
 
@@ -151,21 +151,21 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         int result = port.doubleIt(25);
         assertEquals(result, 50);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testActionBytesInAttachment() throws Exception {
 
@@ -175,25 +175,24 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItActionPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
-        
+
         int result = port.doubleIt(25);
         assertEquals(result, 50);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     // The difference between this test + the testAsymmetricBytesInAttachment test above is that
     // the SOAP Body already contains BASE-64 encoded content.
     @org.junit.Test
-    @org.junit.Ignore
     public void testAsymmetricBinaryBytesInAttachment() throws Exception {
 
         SpringBusFactory bf = new SpringBusFactory();
@@ -202,21 +201,72 @@ public class MTOMSecurityTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBinaryPort");
-        DoubleItMtomPortType port = 
+        DoubleItMtomPortType port =
                 service.getPort(portQName, DoubleItMtomPortType.class);
         updateAddressPort(port, PORT);
-        
+
         DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
         DoubleIt4 doubleIt = new DoubleIt4();
         doubleIt.setNumberToDouble(25);
         port.doubleIt4(25, new DataHandler(source));
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
+    @org.junit.Test
+    public void testAsymmetricBinaryEncryptBeforeSigningBytesInAttachment() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = MTOMSecurityTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBinaryEncryptBeforeSigningPort");
+        DoubleItMtomPortType port =
+                service.getPort(portQName, DoubleItMtomPortType.class);
+        updateAddressPort(port, PORT);
+
+        DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
+        DoubleIt4 doubleIt = new DoubleIt4();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt4(25, new DataHandler(source));
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSymmetricBinaryBytesInAttachment() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = MTOMSecurityTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = MTOMSecurityTest.class.getResource("DoubleItMtom.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSymmetricBinaryPort");
+        DoubleItMtomPortType port =
+                service.getPort(portQName, DoubleItMtomPortType.class);
+        updateAddressPort(port, PORT);
+
+        DataSource source = new FileDataSource(new File("src/test/resources/java.jpg"));
+        DoubleIt4 doubleIt = new DoubleIt4();
+        doubleIt.setNumberToDouble(25);
+        port.doubleIt4(25, new DataHandler(source));
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
 }

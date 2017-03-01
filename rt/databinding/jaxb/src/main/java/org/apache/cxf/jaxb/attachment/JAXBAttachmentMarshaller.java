@@ -45,14 +45,14 @@ public class JAXBAttachmentMarshaller extends AttachmentMarshaller {
         atts = attachments;
         isXop = attachments != null;
     }
-    
+
     public QName getLastMTOMElementName() {
         return lastElementName;
     }
 
     public String addMtomAttachment(byte[] data, int offset, int length, String mimeType, String elementNS,
                                     String elementLocalName) {
-        
+
         Attachment att = AttachmentUtil.createMtomAttachment(
                              isXop, mimeType, elementNS, data, offset, length, threshold);
         if (att != null) {

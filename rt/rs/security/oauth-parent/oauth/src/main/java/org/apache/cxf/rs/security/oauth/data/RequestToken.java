@@ -26,11 +26,11 @@ public class RequestToken extends Token {
     private String oauthVerifier;
     private String callback;
     private String state;
-    
-    public RequestToken(Client client, 
+
+    public RequestToken(Client client,
                         String tokenString,
                         String tokenSecret) {
-        this(client, tokenString, tokenSecret, -1L, 
+        this(client, tokenString, tokenSecret, -1L,
              System.currentTimeMillis() / 1000);
     }
 
@@ -56,7 +56,7 @@ public class RequestToken extends Token {
     }
 
     /**
-     * Sets the callback URI 
+     * Sets the callback URI
      * @param callback the callback
      */
     public void setCallback(String callback) {
@@ -73,7 +73,7 @@ public class RequestToken extends Token {
 
     /**
      * Sets the state - it will be reported back to the consumer
-     * after the authorization decision on this token has been made. 
+     * after the authorization decision on this token has been made.
      * @param state
      */
     public void setState(String state) {

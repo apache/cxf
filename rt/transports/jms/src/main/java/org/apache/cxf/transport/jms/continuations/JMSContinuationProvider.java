@@ -31,13 +31,13 @@ public class JMSContinuationProvider implements ContinuationProvider {
     private Message inMessage;
     private MessageObserver incomingObserver;
     private Counter suspendendContinuations;
-    
+
     public JMSContinuationProvider(Bus b,
-                                   Message m, 
+                                   Message m,
                                    MessageObserver observer,
                                    Counter suspendendContinuations) {
         bus = b;
-        inMessage = m;    
+        inMessage = m;
         incomingObserver = observer;
         this.suspendendContinuations = suspendendContinuations;
     }
@@ -48,7 +48,7 @@ public class JMSContinuationProvider implements ContinuationProvider {
             cw.reset();
         }
     }
-    
+
     public Continuation getContinuation() {
         Message m = inMessage;
         // Get the real message which is used in the interceptor chain
@@ -64,8 +64,8 @@ public class JMSContinuationProvider implements ContinuationProvider {
             m.put(JMSContinuation.class, cw);
         }
         return cw;
-        
-        
+
+
     }
 
 }

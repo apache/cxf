@@ -23,11 +23,11 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlType(namespace = "uri:org.apache.cxf.javascript.testns")
 public class SpecificGenericClass implements GenericInterface<String> {
-    
+
     private String value;
 
     public void doSomethingGeneric(String t) {
-        
+
     }
 
     public String getValue() {

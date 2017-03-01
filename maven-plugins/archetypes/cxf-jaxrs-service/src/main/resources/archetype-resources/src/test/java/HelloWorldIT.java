@@ -34,7 +34,7 @@ public class HelloWorldIT {
 
     @Test
     public void testJsonRoundtrip() throws Exception {
-        List<Object> providers = new ArrayList<Object>();
+        List<Object> providers = new ArrayList<>();
         providers.add(new org.codehaus.jackson.jaxrs.JacksonJsonProvider());
         JsonBean inputBean = new JsonBean();
         inputBean.setVal1("Maple");

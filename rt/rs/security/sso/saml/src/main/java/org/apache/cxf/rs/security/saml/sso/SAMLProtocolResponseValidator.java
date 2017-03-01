@@ -259,6 +259,7 @@ public class SAMLProtocolResponseValidator {
         WSSConfig wssConfig = WSSConfig.getNewInstance();
         requestData.setWssConfig(wssConfig);
         requestData.setCallbackHandler(callbackHandler);
+        requestData.setWsDocInfo(new WSDocInfo(doc));
 
         SAMLKeyInfo samlKeyInfo = null;
 
@@ -267,7 +268,7 @@ public class SAMLProtocolResponseValidator {
             try {
                 samlKeyInfo =
                     SAMLUtil.getCredentialFromKeyInfo(
-                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData, new WSDocInfo(doc)), sigCrypto
+                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData), sigCrypto
                     );
             } catch (WSSecurityException ex) {
                 LOG.log(Level.FINE, "Error in getting KeyInfo from SAML Response: " + ex.getMessage(), ex);
@@ -373,13 +374,14 @@ public class SAMLProtocolResponseValidator {
             try {
                 Signature sig = assertion.getSignature();
                 WSDocInfo docInfo = new WSDocInfo(sig.getDOM().getOwnerDocument());
+                requestData.setWsDocInfo(docInfo);
 
                 SAMLKeyInfo samlKeyInfo = null;
 
                 KeyInfo keyInfo = sig.getKeyInfo();
                 if (keyInfo != null) {
                     samlKeyInfo = SAMLUtil.getCredentialFromKeyInfo(
-                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData, docInfo), sigCrypto
+                        keyInfo.getDOM(), new WSSSAMLKeyInfoProcessor(requestData), sigCrypto
                     );
                 } else if (!keyInfoMustBeAvailable) {
                     samlKeyInfo = createKeyInfoFromDefaultAlias(sigCrypto);
@@ -393,7 +395,7 @@ public class SAMLProtocolResponseValidator {
                 assertion.verifySignature(samlKeyInfo);
 
                 assertion.parseSubject(
-                    new WSSSAMLKeyInfoProcessor(requestData, new WSDocInfo(doc)),
+                    new WSSSAMLKeyInfoProcessor(requestData),
                     requestData.getSigVerCrypto(),
                     requestData.getCallbackHandler()
                 );

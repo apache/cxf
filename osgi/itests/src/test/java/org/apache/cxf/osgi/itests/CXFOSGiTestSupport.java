@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,7 +68,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfi
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
 
 /**
- * 
+ *
  */
 public class CXFOSGiTestSupport {
     private static final String MAVEN_DEPENDENCIES_PROPERTIES = "/META-INF/maven/dependencies.properties";
@@ -95,6 +96,14 @@ public class CXFOSGiTestSupport {
         return probe;
     }
 
+    public File getConfigFile(String path) {
+        URL res = this.getClass().getResource(path);
+        if (res == null) {
+            throw new RuntimeException("Config resource " + path + " not found");
+        }
+        return new File(res.getFile());
+    }
+
     private static String getKarafVersion() {
         String karafVersion = getVersionFromPom("org.apache.karaf/apache-karaf/version");
         if (karafVersion == null) {
@@ -119,10 +128,10 @@ public class CXFOSGiTestSupport {
         } catch (Throwable t) {
             throw new IllegalStateException(MAVEN_DEPENDENCIES_PROPERTIES + " can not be found", t);
         }
-    }    
+    }
     /**
      * Create an {@link org.ops4j.pax.exam.Option} for using a .
-     * 
+     *
      * @return
      */
     protected Option cxfBaseConfig() {
@@ -151,10 +160,10 @@ public class CXFOSGiTestSupport {
     protected Option testUtils() {
         return mavenBundle().groupId("org.apache.cxf").artifactId("cxf-testutils").versionAsInProject();
     }
-    
+
     /**
      * Executes a shell command and returns output as a String. Commands have a default timeout of 10 seconds.
-     * 
+     *
      * @param command
      * @return
      */
@@ -164,7 +173,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Executes a shell command and returns output as a String. Commands have a default timeout of 10 seconds.
-     * 
+     *
      * @param command The command to execute.
      * @param timeout The amount of time in millis to wait for the command to execute.
      * @param silent Specifies if the command should be displayed in the screen.
@@ -205,7 +214,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Executes multiple commands inside a Single Session. Commands have a default timeout of 10 seconds.
-     * 
+     *
      * @param commands
      * @return
      */
@@ -277,11 +286,8 @@ public class CXFOSGiTestSupport {
         return getOsgiService(type, null, SERVICE_TIMEOUT);
     }
 
-    @SuppressWarnings({
-        "unchecked"
-    })
     protected <T> T getOsgiService(Class<T> type, String filter, long timeout) {
-        ServiceTracker tracker = null;
+        ServiceTracker<T, ?> tracker = null;
         try {
             String flt;
             if (filter != null) {
@@ -294,7 +300,7 @@ public class CXFOSGiTestSupport {
                 flt = "(" + Constants.OBJECTCLASS + "=" + type.getName() + ")";
             }
             Filter osgiFilter = FrameworkUtil.createFilter(flt);
-            tracker = new ServiceTracker(bundleContext, osgiFilter, null);
+            tracker = new ServiceTracker<T, Object>(bundleContext, osgiFilter, null);
             tracker.open(true);
             // Note that the tracker is not closed to keep the reference
             // This is buggy, as the service reference may change i think
@@ -303,11 +309,11 @@ public class CXFOSGiTestSupport {
                 Dictionary<String, String> dic = bundleContext.getBundle().getHeaders();
                 System.err.println("Test bundle headers: " + explode(dic));
 
-                for (ServiceReference ref : asCollection(bundleContext.getAllServiceReferences(null, null))) {
+                for (ServiceReference<?> ref : asCollection(bundleContext.getAllServiceReferences(null, null))) {
                     System.err.println("ServiceReference: " + ref);
                 }
 
-                for (ServiceReference ref : asCollection(bundleContext.getAllServiceReferences(null, flt))) {
+                for (ServiceReference<?> ref : asCollection(bundleContext.getAllServiceReferences(null, flt))) {
                     System.err.println("Filtered ServiceReference: " + ref);
                 }
 
@@ -323,7 +329,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Finds a free port starting from the give port numner.
-     * 
+     *
      * @return
      */
     protected int getFreePort(int port) {
@@ -335,7 +341,7 @@ public class CXFOSGiTestSupport {
 
     /**
      * Returns true if port is available for use.
-     * 
+     *
      * @param port
      * @return
      */
@@ -364,8 +370,8 @@ public class CXFOSGiTestSupport {
     /**
      * Provides an iterable collection of references, even if the original array is null
      */
-    private static Collection<ServiceReference> asCollection(ServiceReference[] references) {
-        return references != null ? Arrays.asList(references) : Collections.<ServiceReference> emptyList();
+    private static Collection<ServiceReference<?>> asCollection(ServiceReference<?>[] references) {
+        return references != null ? Arrays.asList(references) : Collections.<ServiceReference<?>> emptyList();
     }
 
     protected void assertBundleStarted(String name) {
@@ -386,7 +392,7 @@ public class CXFOSGiTestSupport {
     public void assertServicePublished(String filter, int timeout) {
         try {
             Filter serviceFilter = bundleContext.createFilter(filter);
-            ServiceTracker tracker = new ServiceTracker(bundleContext, serviceFilter, null);
+            ServiceTracker<?, ?> tracker = new ServiceTracker<>(bundleContext, serviceFilter, null);
             tracker.open();
             Object service = tracker.waitForService(timeout);
             tracker.close();

@@ -28,7 +28,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 public class SessionServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(SessionServer.class);
     Bus bus;
-    
+
     @Override
     protected void run() {
         String configurationFile = "SessionServer.xml";
@@ -37,13 +37,13 @@ public class SessionServer extends AbstractBusTestServerBase {
         bus = new SpringBusFactory().createBus(configure, true);
         SpringBusFactory.setDefaultBus(bus);
     }
-    
+
     @Override
     public void tearDown() {
         bus.shutdown(true);
         bus = null;
     }
-    
+
     public static void main(String[] args) {
         try {
             // System.out.println("!!!!start");

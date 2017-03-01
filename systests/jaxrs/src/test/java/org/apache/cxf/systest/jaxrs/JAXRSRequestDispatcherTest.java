@@ -35,20 +35,20 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(BookServerRequestDispatch.class, true));
     }
-    
+
     @Test
     public void testGetBookHTML() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/bookstore1/books/html/123"; 
+            "http://localhost:" + PORT + "/the/bookstore1/books/html/123";
         doTestGetBookHTML(endpointAddress);
     }
     @Test
     public void testGetBookHTMLInclude() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/bookstore5/books/html/123"; 
+            "http://localhost:" + PORT + "/the/bookstore5/books/html/123";
         doTestGetBookHTML(endpointAddress);
     }
 
@@ -65,26 +65,26 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         String ct = client.getResponse().getMetadata().getFirst("Content-Type").toString();
         assertEquals("text/html", ct);
     }
-    
+
     @Test
     @Ignore("JSP pages need to be precompiled by Maven build")
     public void testGetBookJSPRequestScope() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/bookstore2/books/html/123"; 
+            "http://localhost:" + PORT + "/the/bookstore2/books/html/123";
         WebClient client = WebClient.create(endpointAddress);
         client.accept("text/html");
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
         String data = client.accept("text/html").get(String.class);
         assertTrue(data.contains("<h1>Request Book 123</h1>"));
         assertTrue(data.contains("<books:bookName>CXF in Action</books:bookName>"));
-        
+
     }
-    
+
     @Test
     @Ignore("JSP pages need to be precompiled by Maven build")
     public void testGetBookJSPSessionScope() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/bookstore3/books/html/456"; 
+            "http://localhost:" + PORT + "/the/bookstore3/books/html/456";
         WebClient client = WebClient.create(endpointAddress);
         client.accept("text/html");
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
@@ -92,11 +92,11 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         assertTrue(data.contains("<h1>Session Book 456</h1>"));
         assertTrue(data.contains("<books:bookName>CXF in Action</books:bookName>"));
     }
-    
+
     @Test
     public void testGetBookHTMLFromDefaultServlet() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/the/bookstore4/books/html/123"; 
+            "http://localhost:" + PORT + "/the/bookstore4/books/html/123";
         WebClient client = WebClient.create(endpointAddress);
         client.accept("text/html");
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
@@ -112,19 +112,19 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         String endpointAddress = "http://localhost:" + PORT + "/welcome";
         doTestGetBookHTMLFromWelcomeList(endpointAddress);
     }
-    
+
     @Test
     public void testGetBookHTMLFromWelcomeList2() throws Exception {
         String endpointAddress = "http://localhost:" + PORT + "/the";
         doTestGetBookHTMLFromWelcomeList(endpointAddress);
     }
-    
+
     @Test
     public void testGetBookHTMLFromStaticWelcomeFile() throws Exception {
         String endpointAddress = "http://localhost:" + PORT + "/welcome2";
         doTestGetBookHTMLFromWelcomeList(endpointAddress);
     }
-    
+
     @Test
     public void testGetTextWelcomeFile() throws Exception {
         String address = "http://localhost:" + PORT + "/welcome2/welcome.txt";
@@ -134,7 +134,7 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         System.out.println(welcome);
         assertEquals("Welcome", welcome);
     }
-    
+
     private void doTestGetBookHTMLFromWelcomeList(String address) throws Exception {
         WebClient client = WebClient.create(address);
         client.accept("text/html");

@@ -29,7 +29,7 @@ public class TokenReference {
     private String wsseValueType;
     private boolean useDirectReference;
     private boolean useKeyIdentifier;
-    
+
     /**
      * Get the identifier associated with this token
      * @return the identifier associated with this token
@@ -37,7 +37,7 @@ public class TokenReference {
     public String getIdentifier() {
         return identifier;
     }
-    
+
     /**
      * Set the identifier associated with this token
      * @param identifier the identifier associated with this token
@@ -45,7 +45,7 @@ public class TokenReference {
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
     }
-    
+
     /**
      * Get the wsse11 TokenType attribute
      * @return the wsse11 TokenType attribute
@@ -53,7 +53,7 @@ public class TokenReference {
     public String getWsse11TokenType() {
         return wsse11TokenType;
     }
-    
+
     /**
      * Set the wsse11 TokenType attribute
      * @param wsse11TokenType the wsse11 TokenType attribute
@@ -61,7 +61,7 @@ public class TokenReference {
     public void setWsse11TokenType(String wsse11TokenType) {
         this.wsse11TokenType = wsse11TokenType;
     }
-    
+
     /**
      * Get the wsse ValueType attribute
      * @return the wsse ValueType attribute
@@ -69,7 +69,7 @@ public class TokenReference {
     public String getWsseValueType() {
         return wsseValueType;
     }
-    
+
     /**
      * Set the wsse ValueType attribute
      * @param wsseValueType the wsse ValueType attribute
@@ -77,7 +77,7 @@ public class TokenReference {
     public void setWsseValueType(String wsseValueType) {
         this.wsseValueType = wsseValueType;
     }
-    
+
     /**
      * Get whether to use direct reference to refer to this token
      * @return whether to use direct reference to refer to this token
@@ -85,7 +85,7 @@ public class TokenReference {
     public boolean isUseDirectReference() {
         return useDirectReference;
     }
-    
+
     /**
      * Set whether to use direct reference to refer to this token
      * @param useDirectReference whether to use direct reference to refer to this token
@@ -93,7 +93,7 @@ public class TokenReference {
     public void setUseDirectReference(boolean useDirectReference) {
         this.useDirectReference = useDirectReference;
     }
-    
+
     /**
      * Get whether to use a KeyIdentifier to refer to this token
      * @return whether to use a KeyIdentifier to refer to this token
@@ -101,7 +101,7 @@ public class TokenReference {
     public boolean isUseKeyIdentifier() {
         return useKeyIdentifier;
     }
-    
+
     /**
      * Set whether to use a KeyIdentifier to refer to this token
      * @param useKeyIdentifier whether to use a KeyIdentifier to refer to this token
@@ -109,6 +109,6 @@ public class TokenReference {
     public void setUseKeyIdentifier(boolean useKeyIdentifier) {
         this.useKeyIdentifier = useKeyIdentifier;
     }
-    
-    
+
+
 }

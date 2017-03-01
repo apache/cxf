@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.cxf.io.CachedOutputStream;
 
 public class RMMessage {
-    
+
     private CachedOutputStream content;
     //TODO remove attachments when we remove the deprecated attachments related methods
     private List<InputStream> attachments = Collections.emptyList();
@@ -33,15 +33,15 @@ public class RMMessage {
     private long messageNumber;
     private String to;
     private long createdTime;
-    
+
     /**
      * Returns the message number of the message within its sequence.
      * @return the message number
      */
     public long getMessageNumber() {
-        return  messageNumber;
+        return messageNumber;
     }
-    
+
     /**
      * Sets the message number of the message within its sequence.
      * @param messageNumber the message number
@@ -49,7 +49,7 @@ public class RMMessage {
     public void setMessageNumber(long mn) {
         messageNumber = mn;
     }
-    
+
     /**
      * Sets the message content using the CachedOutputStream.class.
      * @param in
@@ -57,7 +57,7 @@ public class RMMessage {
     public void setContent(CachedOutputStream cos) {
         content = cos;
     }
-    
+
     /**
      * Returns the to address of this message.
      * @return the to address
@@ -65,8 +65,8 @@ public class RMMessage {
     public String getTo() {
         return to;
     }
-    
-    
+
+
     /**
      * Sets the to address of this message.
      * @param t the to address

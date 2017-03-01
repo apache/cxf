@@ -26,7 +26,7 @@ import javax.xml.namespace.NamespaceContext;
 
 import org.w3c.dom.Node;
 
-public  final class MapNamespaceContext implements NamespaceContext {
+public final class MapNamespaceContext implements NamespaceContext {
     private Map<String, String> namespaces = new HashMap<String, String>();
     private Node targetNode;
 
@@ -72,7 +72,7 @@ public  final class MapNamespaceContext implements NamespaceContext {
             if (uri != null) {
                 return uri;
             }
-            
+
         }
         return namespaces.get(prefix);
     }

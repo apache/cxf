@@ -30,11 +30,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Books {
 
-    private List<Book> books = new ArrayList<Book>();
-    
+    private List<Book> books = new ArrayList<>();
+
     public Books() {
     }
-    
+
     public Books(Book b) {
         books.add(b);
     }

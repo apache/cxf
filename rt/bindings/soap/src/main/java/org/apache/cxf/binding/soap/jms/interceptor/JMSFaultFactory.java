@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
- * 
+ *
  */
 public final class JMSFaultFactory {
 
@@ -50,7 +50,7 @@ public final class JMSFaultFactory {
                                                           }).toString();
         return createFault(SoapJMSConstants.getContentTypeMismatchQName(), m);
     }
-    
+
     public static JMSFault createMalformedRequestURIFault(String requestURI) {
         String m = new org.apache.cxf.common.i18n.Message("MALFORMED_REQUESTURI", LOG,
                                                           new Object[] {
@@ -76,7 +76,7 @@ public final class JMSFaultFactory {
         String m = new org.apache.cxf.common.i18n.Message("MISSING_SOAPACTION", LOG).toString();
         return createFault(SoapJMSConstants.getMissingSoapActionQName(), m);
     }
-    
+
     public static JMSFault createMissingRequestURIFault() {
         String m = new org.apache.cxf.common.i18n.Message("MISSING_REQUESTURI", LOG).toString();
         return createFault(SoapJMSConstants.getMissingRequestURIQName(), m);

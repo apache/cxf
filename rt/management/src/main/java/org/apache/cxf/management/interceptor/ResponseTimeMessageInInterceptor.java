@@ -27,17 +27,17 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 public class ResponseTimeMessageInInterceptor extends AbstractMessageResponseTimeInterceptor {
-    
+
     public ResponseTimeMessageInInterceptor() {
         super(Phase.RECEIVE);
         addBefore(AttachmentInInterceptor.class.getName());
     }
-    
-    public void handleMessage(Message message) throws Fault {        
+
+    public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
         //if serviceCounter is disabled , all responseTimeInterceptors will be skipped
         Boolean forceDisabled = Boolean.FALSE.equals((Boolean)ex.get("org.apache.cxf.management.counter.enabled"));
-        if (!forceDisabled && isServiceCounterEnabled(ex)) {           
+        if (!forceDisabled && isServiceCounterEnabled(ex)) {
             if (isClient(message)) {
                 if (!ex.isOneWay()) {
                     endHandlingMessage(ex);
@@ -46,10 +46,10 @@ public class ResponseTimeMessageInInterceptor extends AbstractMessageResponseTim
                 beginHandlingMessage(ex);
             }
         }
-    }    
-    
+    }
+
     @Override
-    public void handleFault(Message message) {     
+    public void handleFault(Message message) {
         Exchange ex = message.getExchange();
         if (Boolean.TRUE.equals((Boolean)ex.get("org.apache.cxf.management.counter.enabled"))) {
             FaultMode mode = message.get(FaultMode.class);

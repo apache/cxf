@@ -56,13 +56,13 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
         Client client = ClientBuilder.newClient();
         wt = client.target(BASE_URL);
     }
-    
+
     @Test
     public void testJaxRsGet() throws Exception {
         Book book = wt.path("/books/123").request("application/xml").get(Book.class);
         Assert.assertNotNull(book);
     }
-    
+
     @Test
     public void testJaxRsPost() throws Exception {
         Book book = new Book();
@@ -104,7 +104,7 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
     }
 
-    
+
     @Configuration
     public Option[] config() {
         return new Option[] {
@@ -127,5 +127,5 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
                   .set(Constants.BUNDLE_ACTIVATOR, JaxRsTestActivator.class.getName())
                   .build(TinyBundles.withBnd());
     }
-    
+
 }

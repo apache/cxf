@@ -23,15 +23,12 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,13 +59,9 @@ public final class SSLUtils {
     private static final String DEFAULT_KEYSTORE_TYPE = "PKCS12";
     private static final String DEFAULT_TRUST_STORE_TYPE = "JKS";
     private static final String DEFAULT_SECURE_SOCKET_PROTOCOL = "TLSv1";
-    private static final String CERTIFICATE_FACTORY_TYPE = "X.509";
 
     private static final String HTTPS_CIPHER_SUITES = "https.cipherSuites";
-    
-    private static final boolean DEFAULT_REQUIRE_CLIENT_AUTHENTICATION = false;
-    private static final boolean DEFAULT_WANT_CLIENT_AUTHENTICATION = true;
-    
+
     private static final List<String> DEFAULT_CIPHERSUITE_FILTERS_INCLUDE =
         Arrays.asList(new String[] {".*"});
     /**
@@ -79,69 +72,10 @@ public final class SSLUtils {
                                     ".*_anon_.*",
                                     ".*_EXPORT_.*",
                                     ".*_DES_.*"});
-    
+
     private static volatile KeyManager[] defaultManagers;
 
     private SSLUtils() {
-    }    
-    
-    public static KeyManager[] getKeyStoreManagers(
-                                          String keyStoreLocation,
-                                          String keyStoreType,
-                                          String keyStorePassword,
-                                          String keyPassword,
-                                          String keyStoreMgrFactoryAlgorithm,
-                                          String secureSocketProtocol,
-                                          Logger log)
-        throws Exception {
-        //TODO for performance reasons we should cache
-        // the KeymanagerFactory and TrustManagerFactory 
-        if (keyStorePassword != null
-            && keyPassword != null 
-            && !keyStorePassword.equals(keyPassword)) {
-            LogUtils.log(log,
-                         Level.WARNING,
-                         "KEY_PASSWORD_NOT_SAME_KEYSTORE_PASSWORD");
-        }
-        KeyManager[] keystoreManagers = null;        
-        KeyManagerFactory kmf = 
-            KeyManagerFactory.getInstance(keyStoreMgrFactoryAlgorithm);  
-        KeyStore ks = KeyStore.getInstance(keyStoreType);
-        
-        if (keyStoreType.equalsIgnoreCase(PKCS12_TYPE)) {
-            Path path = FileSystems.getDefault().getPath(keyStoreLocation);
-            byte[] bytes = Files.readAllBytes(path);
-            try (ByteArrayInputStream bin = new ByteArrayInputStream(bytes)) {
-            
-                if (keyStorePassword != null) {
-                    keystoreManagers = loadKeyStore(kmf,
-                                                    ks,
-                                                    bin,
-                                                    keyStoreLocation,
-                                                    keyStorePassword,
-                                                    log);
-                }
-            }
-        } else {        
-            byte[] sslCert = loadFile(keyStoreLocation);
-            
-            if (sslCert != null && sslCert.length > 0 && keyStorePassword != null) {
-                try (ByteArrayInputStream bin = new ByteArrayInputStream(sslCert)) {
-                    keystoreManagers = loadKeyStore(kmf,
-                                                ks,
-                                                bin,
-                                                keyStoreLocation,
-                                                keyStorePassword,
-                                                log);
-                }
-            }  
-        }
-        if (keyStorePassword == null && keyStoreLocation != null) {
-            LogUtils.log(log, Level.WARNING,
-                         "FAILED_TO_LOAD_KEYSTORE_NULL_PASSWORD", 
-                         keyStoreLocation);
-        }
-        return keystoreManagers;
     }
 
     public static KeyManager[] getDefaultKeyStoreManagers(Logger log) {
@@ -153,24 +87,24 @@ public final class SSLUtils {
         }
         return defaultManagers;
     }
-    
+
     private static synchronized void loadDefaultKeyManagers(Logger log) {
         if (defaultManagers != null) {
             return;
         }
-            
+
         String location = getKeystore(null, log);
         String keyStorePassword = getKeystorePassword(null, log);
         String keyPassword = getKeyPassword(null, log);
         FileInputStream fis = null;
-        
+
         try {
             File file = new File(location);
             if (file.exists()) {
-                KeyManagerFactory kmf = 
-                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());  
+                KeyManagerFactory kmf =
+                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
                 KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-                
+
                 fis = new FileInputStream(file);
                 ks.load(fis, (keyStorePassword != null) ? keyStorePassword.toCharArray() : null);
                 kmf.init(ks, (keyPassword != null) ? keyPassword.toCharArray() : null);
@@ -211,53 +145,12 @@ public final class SSLUtils {
         } catch (Exception e) {
             LogUtils.log(log,
                          Level.WARNING,
-                         "FAILED_TO_LOAD_KEYSTORE", 
+                         "FAILED_TO_LOAD_KEYSTORE",
                          new Object[]{keyStoreLocation, e.getMessage()});
-        } 
+        }
         return keystoreManagers;
     }
 
-    public static TrustManager[] getTrustStoreManagers(
-                                        boolean pkcs12,
-                                        String trustStoreType,
-                                        String trustStoreLocation,
-                                        String trustStoreMgrFactoryAlgorithm,
-                                        Logger log)
-        throws Exception {
-        // ********************** Load Trusted CA file **********************
-        
-        KeyStore trustedCertStore = KeyStore.getInstance(trustStoreType);
-
-        if (pkcs12) {
-            //TODO could support multiple trust cas
-            
-            trustedCertStore.load(null, "".toCharArray());
-            CertificateFactory cf = CertificateFactory.getInstance(CERTIFICATE_FACTORY_TYPE);
-            byte[] caCert = loadFile(trustStoreLocation);
-            try {
-                if (caCert != null) {
-                    try (ByteArrayInputStream cabin = new ByteArrayInputStream(caCert)) {
-                        X509Certificate cert = (X509Certificate)cf.generateCertificate(cabin);
-                        trustedCertStore.setCertificateEntry(cert.getIssuerDN().toString(), cert);
-                    }
-                }
-            } catch (Exception e) {
-                LogUtils.log(log, Level.WARNING, "FAILED_TO_LOAD_TRUST_STORE", 
-                             new Object[]{trustStoreLocation, e.getMessage()});
-            } 
-        } else {
-            try (FileInputStream trustStoreInputStream = new FileInputStream(trustStoreLocation)) {
-                trustedCertStore.load(trustStoreInputStream, null);
-            }
-        }
-        
-        TrustManagerFactory tmf  = 
-            TrustManagerFactory.getInstance(trustStoreMgrFactoryAlgorithm);
-        tmf.init(trustedCertStore);
-        LogUtils.log(log, Level.FINE, "LOADED_TRUST_STORE", trustStoreLocation);
-        return tmf.getTrustManagers();
-    }
-    
     protected static byte[] loadFile(String fileName) throws IOException {
         if (fileName == null) {
             return null;
@@ -283,11 +176,11 @@ public final class SSLUtils {
         LogUtils.log(log, Level.FINE, logMsg, keyStoreLocation);
         return keyStoreLocation;
     }
-    
+
     public static String getKeystoreType(String keyStoreType, Logger log) {
         return getKeystoreType(keyStoreType, log, DEFAULT_KEYSTORE_TYPE);
     }
-    
+
     public static String getKeystoreType(String keyStoreType, Logger log, String def) {
         String logMsg = null;
         if (keyStoreType != null) {
@@ -298,13 +191,13 @@ public final class SSLUtils {
                 keyStoreType = def;
                 logMsg = "KEY_STORE_TYPE_NOT_SET";
             } else {
-                logMsg = "KEY_STORE_TYPE_SYSTEM_SET";                
+                logMsg = "KEY_STORE_TYPE_SYSTEM_SET";
             }
         }
         LogUtils.log(log, Level.FINE, logMsg, keyStoreType);
         return keyStoreType;
     }
-    
+
     public static String getKeystoreProvider(String keyStoreProvider, Logger log) {
         String logMsg = null;
         if (keyStoreProvider != null) {
@@ -314,13 +207,13 @@ public final class SSLUtils {
             if (keyStoreProvider == null) {
                 logMsg = "KEY_STORE_PROVIDER_NOT_SET";
             } else {
-                logMsg = "KEY_STORE_PROVIDER_SYSTEM_SET";                
+                logMsg = "KEY_STORE_PROVIDER_SYSTEM_SET";
             }
         }
         LogUtils.log(log, Level.FINE, logMsg, keyStoreProvider);
         return keyStoreProvider;
-    }  
-    
+    }
+
     public static String getKeystorePassword(String keyStorePassword,
                                              Logger log) {
         String logMsg = null;
@@ -334,9 +227,9 @@ public final class SSLUtils {
                      : "KEY_STORE_PASSWORD_NOT_SET";
         }
         LogUtils.log(log, Level.FINE, logMsg);
-        return keyStorePassword;        
+        return keyStorePassword;
     }
-    
+
     public static String getKeyPassword(String keyPassword, Logger log) {
         String logMsg = null;
         if (keyPassword != null) {
@@ -369,8 +262,8 @@ public final class SSLUtils {
         }
         LogUtils.log(log, Level.FINE, logMsg, keyStoreMgrFactoryAlgorithm);
         return keyStoreMgrFactoryAlgorithm;
-    } 
-    
+    }
+
     public static String getTrustStoreAlgorithm(
                                         String trustStoreMgrFactoryAlgorithm,
                                         Logger log) {
@@ -384,8 +277,8 @@ public final class SSLUtils {
         }
         LogUtils.log(log, Level.FINE, logMsg, trustStoreMgrFactoryAlgorithm);
         return trustStoreMgrFactoryAlgorithm;
-    }    
-    
+    }
+
     public static SSLContext getSSLContext(String protocol,
                                            KeyManager[] keyStoreManagers,
                                            TrustManager[] trustStoreManagers)
@@ -394,7 +287,7 @@ public final class SSLUtils {
         ctx.init(keyStoreManagers, trustStoreManagers, null);
         return ctx;
     }
-    
+
     public static String[] getSupportedCipherSuites(SSLContext context) {
         return context.getSocketFactory().getSupportedCipherSuites();
     }
@@ -402,7 +295,7 @@ public final class SSLUtils {
     public static String[] getServerSupportedCipherSuites(SSLContext context) {
         return context.getServerSocketFactory().getSupportedCipherSuites();
     }
-        
+
     public static String[] getCiphersuitesToInclude(List<String> cipherSuitesList,
                                            FiltersType filters,
                                            String[] defaultCipherSuites,
@@ -416,31 +309,31 @@ public final class SSLUtils {
         if (!(cipherSuitesList == null || cipherSuitesList.isEmpty())) {
             return getCiphersFromList(cipherSuitesList, log, false);
         }
-        
+
         String[] cipherSuites = getSystemCiphersuites(log);
         if (cipherSuites != null) {
             return cipherSuites;
         }
 
-        // If we have no explicit cipherSuites (for the include case as above), and no filters, 
+        // If we have no explicit cipherSuites (for the include case as above), and no filters,
         // then just use the defaults
         if ((defaultCipherSuites != null && defaultCipherSuites.length != 0)
             && (filters == null || !(filters.isSetInclude() || filters.isSetExclude()))) {
-            LogUtils.log(log, Level.FINE, "CIPHERSUITES_SET", defaultCipherSuites.toString());          
+            LogUtils.log(log, Level.FINE, "CIPHERSUITES_SET", defaultCipherSuites.toString());
             return defaultCipherSuites;
         }
-        
+
         LogUtils.log(log, Level.FINE, "CIPHERSUITES_NOT_SET");
-        
+
         return getFilteredCiphersuites(filters, supportedCipherSuites, log, false);
     }
-    
+
     public static String[] getFilteredCiphersuites(FiltersType filters,
                                            String[] supportedCipherSuites,
                                            Logger log, boolean exclude) {
         // We have explicit filters, so use the "include/exclude" cipherSuiteFilter configuration
-        List<String> filteredCipherSuites = new ArrayList<String>();
-        List<String> excludedCipherSuites = new ArrayList<String>();
+        List<String> filteredCipherSuites = new ArrayList<>();
+        List<String> excludedCipherSuites = new ArrayList<>();
         List<Pattern> includes =
             filters != null
                 ? compileRegexPatterns(filters.getInclude(), true, log)
@@ -488,13 +381,13 @@ public final class SSLUtils {
         } else {
             return null;
         }
-        
+
     }
-    
+
     private static List<Pattern> compileRegexPatterns(List<String> regexes,
                                                       boolean include,
                                                       Logger log) {
-        List<Pattern> patterns = new ArrayList<Pattern>();
+        List<Pattern> patterns = new ArrayList<>();
         if (regexes != null) {
             String msg = include
                          ? "CIPHERSUITE_INCLUDE_FILTER"
@@ -506,7 +399,7 @@ public final class SSLUtils {
         }
         return patterns;
     }
-    
+
     private static boolean matchesOneOf(String s, List<Pattern> patterns) {
         boolean matches = false;
         if (patterns != null) {
@@ -520,9 +413,9 @@ public final class SSLUtils {
         }
         return matches;
     }
-    
+
     private static String[] getCiphersFromList(List<String> cipherSuitesList,
-                                               Logger log, 
+                                               Logger log,
                                                boolean exclude) {
         int numCipherSuites = cipherSuitesList.size();
         String[] cipherSuites = cipherSuitesList.toArray(new String[numCipherSuites]);
@@ -534,39 +427,25 @@ public final class SSLUtils {
                 }
                 ciphsStr.append(s);
             }
-            LogUtils.log(log, Level.FINE, 
-                exclude ? "CIPHERSUITES_EXCLUDED" : "CIPHERSUITES_SET", ciphsStr.toString());            
+            LogUtils.log(log, Level.FINE,
+                exclude ? "CIPHERSUITES_EXCLUDED" : "CIPHERSUITES_SET", ciphsStr.toString());
         }
         return cipherSuites;
     }
-    
-    public static String getTrustStore(String trustStoreLocation, Logger log) {
-        String logMsg = null;
-        if (trustStoreLocation != null) {
-            logMsg = "TRUST_STORE_SET";
-        } else {            
-            trustStoreLocation = SystemPropertyAction.getProperty("javax.net.ssl.trustStore");
-            if (trustStoreLocation != null) {
-                logMsg = "TRUST_STORE_SYSTEM_PROPERTY_SET";
-            } else {
-                trustStoreLocation =
-                    SystemPropertyAction.getProperty("java.home") + "/lib/security/cacerts";
-                logMsg = "TRUST_STORE_NOT_SET";
-            }
-        }
-        LogUtils.log(log, Level.FINE, logMsg, trustStoreLocation);
-        return trustStoreLocation;
-    }
-    
+
     public static String getTrustStoreType(String trustStoreType, Logger log) {
+        return getTrustStoreType(trustStoreType, log, DEFAULT_TRUST_STORE_TYPE);
+    }
+
+    public static String getTrustStoreType(String trustStoreType, Logger log, String def) {
         String logMsg = null;
         if (trustStoreType != null) {
             logMsg = "TRUST_STORE_TYPE_SET";
         } else {
             //Can default to JKS
             trustStoreType = SystemPropertyAction.getProperty("javax.net.ssl.trustStoreType");
-            if (trustStoreType == null) {    
-                trustStoreType = DEFAULT_TRUST_STORE_TYPE;
+            if (trustStoreType == null) {
+                trustStoreType = def;
                 logMsg = "TRUST_STORE_TYPE_NOT_SET";
             } else {
                 logMsg = "TRUST_STORE_TYPE_SYSTEM_SET";
@@ -576,6 +455,38 @@ public final class SSLUtils {
         return trustStoreType;
     }
     
+    public static String getTruststorePassword(String trustStorePassword,
+                                             Logger log) {
+        String logMsg = null;
+        if (trustStorePassword != null) {
+            logMsg = "TRUST_STORE_PASSWORD_SET";
+        } else {
+            trustStorePassword =
+                SystemPropertyAction.getProperty("javax.net.ssl.trustStorePassword");
+            logMsg = trustStorePassword != null
+                     ? "TRUST_STORE_PASSWORD_SYSTEM_PROPERTY_SET"
+                     : "TRUST_STORE_PASSWORD_NOT_SET";
+        }
+        LogUtils.log(log, Level.FINE, logMsg);
+        return trustStorePassword;
+    }
+    
+    public static String getTruststoreProvider(String trustStoreProvider, Logger log) {
+        String logMsg = null;
+        if (trustStoreProvider != null) {
+            logMsg = "TRUST_STORE_PROVIDER_SET";
+        } else {
+            trustStoreProvider = SystemPropertyAction.getProperty("javax.net.ssl.trustStoreProvider", null);
+            if (trustStoreProvider == null) {
+                logMsg = "TRUST_STORE_PROVIDER_NOT_SET";
+            } else {
+                logMsg = "TRUST_STORE_PROVIDER_SYSTEM_SET";
+            }
+        }
+        LogUtils.log(log, Level.FINE, logMsg, trustStoreProvider);
+        return trustStoreProvider;
+    }
+
     public static String getSecureSocketProtocol(String secureSocketProtocol,
                                                  Logger log) {
         if (secureSocketProtocol != null) {
@@ -589,118 +500,5 @@ public final class SSLUtils {
         }
         return secureSocketProtocol;
     }
-    
-    public static boolean getRequireClientAuthentication(
-                                    boolean isSetRequireClientAuthentication,
-                                    Boolean isRequireClientAuthentication,
-                                    Logger log) {
-        boolean requireClientAuthentication =
-            DEFAULT_REQUIRE_CLIENT_AUTHENTICATION;
-        if (isSetRequireClientAuthentication) {
-            requireClientAuthentication =
-                isRequireClientAuthentication.booleanValue();
-            LogUtils.log(log,
-                         Level.FINE,
-                         "REQUIRE_CLIENT_AUTHENTICATION_SET", 
-                         requireClientAuthentication);
-        } else {
-            LogUtils.log(log,
-                         Level.WARNING,
-                         "REQUIRE_CLIENT_AUTHENTICATION_NOT_SET");
-        }
-        return requireClientAuthentication;
-    }
-    
-    public static boolean getWantClientAuthentication(
-                                       boolean isSetWantClientAuthentication,
-                                       Boolean isWantClientAuthentication,
-                                       Logger log) {
-        boolean wantClientAuthentication =
-            DEFAULT_WANT_CLIENT_AUTHENTICATION;
-        if (isSetWantClientAuthentication) {
-            wantClientAuthentication =
-                isWantClientAuthentication.booleanValue();
-            LogUtils.log(log,
-                         Level.FINE,
-                         "WANT_CLIENT_AUTHENTICATION_SET", 
-                         wantClientAuthentication);
-        } else {
-            LogUtils.log(log,
-                         Level.WARNING,
-                         "WANT_CLIENT_AUTHENTICATION_NOT_SET");
-        } 
-        return wantClientAuthentication;
-    }    
-   
 
-    
-    public static void logUnSupportedPolicies(Object policy,
-                                                 boolean client,
-                                                 String[] unsupported,
-                                                 Logger log) {
-        for (int i = 0; i < unsupported.length; i++) {
-            try {
-                Method method = policy.getClass().getMethod("isSet" + unsupported[i]);
-                boolean isSet =
-                    ((Boolean)method.invoke(policy, (Object[])null)).booleanValue();
-                logUnSupportedPolicy(isSet, client, unsupported[i], log);
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-    }
-    
-    private static void logUnSupportedPolicy(boolean isSet,
-                                             boolean client,
-                                             String policy,
-                                             Logger log) {
-        if (isSet) {
-            LogUtils.log(log,
-                         Level.WARNING,
-                         client
-                         ? "UNSUPPORTED_SSL_CLIENT_POLICY_DATA"
-                         : "UNSUPPORTED_SSL_SERVER_POLICY_DATA",
-                         policy);
-        }    
-    }
-    
-    public static boolean testAllDataHasSetupMethod(Object policy,
-                                                       String[] unsupported,
-                                                       String[] derivative) {
-        Method[] sslPolicyMethods = policy.getClass().getDeclaredMethods();
-        Method[] methods = SSLUtils.class.getMethods();
-        boolean ok = true;
-        
-        for (int i = 0; i < sslPolicyMethods.length && ok; i++) {
-            String sslPolicyMethodName = sslPolicyMethods[i].getName();
-            if (sslPolicyMethodName.startsWith("isSet")) {
-                String dataName = 
-                    sslPolicyMethodName.substring("isSet".length(),
-                                                  sslPolicyMethodName.length());
-                String thisMethodName = "get" + dataName;
-                ok = hasMethod(methods, thisMethodName)
-                     || isExcluded(unsupported, dataName)
-                     || isExcluded(derivative, dataName);
-            }
-        }
-        return ok;
-    }
-    
-    private static boolean hasMethod(Method[] methods, String methodName) {
-        boolean found = false;
-        for (int i = 0; i < methods.length && !found; i++) {
-            found = methods[i].getName().equals(methodName);
-        }
-        return found;
-    }
-    
-    private static boolean isExcluded(String[] excluded,
-                                      String dataName) {
-        boolean found = false;
-        for (int i = 0; i < excluded.length && !found; i++) {
-            found = excluded[i].equals(dataName);
-        }
-        return found;
-        
-    }
 }

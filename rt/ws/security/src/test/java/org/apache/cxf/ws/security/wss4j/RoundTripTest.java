@@ -22,9 +22,9 @@ import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
@@ -48,7 +48,7 @@ public class RoundTripTest extends AbstractSecurityTest {
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         Server server = factory.create();
         Service service = server.getEndpoint().getService();
-        
+
         service.getInInterceptors().add(new SAAJInInterceptor());
         service.getInInterceptors().add(new LoggingInInterceptor());
         service.getOutInterceptors().add(new SAAJOutInterceptor());
@@ -74,7 +74,7 @@ public class RoundTripTest extends AbstractSecurityTest {
         proxyFac.setServiceClass(Echo.class);
         proxyFac.setAddress("local://Echo");
         proxyFac.getClientFactoryBean().setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        
+
         echo = (Echo)proxyFac.create();
 
         client = ClientProxy.getClient(echo);

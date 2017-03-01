@@ -59,21 +59,21 @@ import org.apache.wss4j.dom.handler.WSHandlerResult;
  * coverage enforcement.
  */
 public class CryptoCoverageChecker extends AbstractSoapInterceptor {
-    
+
     /**
      * The XPath expressions for locating elements in SOAP messages
      * that must be covered.  See {@link #prefixMap}
      * for namespace prefixes available.
      */
     protected List<XPathExpression> xPaths = new ArrayList<>();
-    
+
     /**
      * Mapping of namespace prefixes to namespace URIs.
      */
     protected Map<String, String> prefixMap = new HashMap<>();
-    
+
     private boolean checkFaults = true;
-    
+
     /**
      * Creates a new instance.  See {@link #setPrefixes()} and {@link #setXpaths()}
      * for providing configuration options.
@@ -81,11 +81,11 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
     public CryptoCoverageChecker() {
         this(null, null);
     }
-    
+
     /**
      * Creates a new instance that checks for signature coverage over matches to
      * the provided XPath expressions making defensive copies of provided arguments.
-     * 
+     *
      * @param prefixes
      *            mapping of namespace prefixes to namespace URIs
      * @param xPaths
@@ -101,10 +101,10 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
     /**
      * Checks that the WSS4J results refer to the required signed/encrypted
      * elements as defined by the XPath expressions in {@link #xPaths}.
-     * 
+     *
      * @param message
      *            the SOAP message containing the signature
-     * 
+     *
      * @throws SoapFault
      *             if there is an error evaluating an XPath or an element is not
      *             covered by the required cryptographic operation
@@ -113,11 +113,11 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         if (this.xPaths == null || this.xPaths.isEmpty()) {
             // return
         }
-        
+
         if (message.getContent(SOAPMessage.class) == null) {
             throw new SoapFault("Error obtaining SOAP document", Fault.FAULT_CODE_CLIENT);
         }
-        
+
         Element documentElement = null;
         try {
             SOAPMessage saajDoc = message.getContent(SOAPMessage.class);
@@ -129,44 +129,46 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         } catch (SOAPException e) {
             throw new SoapFault("Error obtaining SOAP document", Fault.FAULT_CODE_CLIENT);
         }
-        
+
         final Collection<WSDataRef> signed = new HashSet<>();
         final Collection<WSDataRef> encrypted = new HashSet<>();
-        
+
         List<WSHandlerResult> results = CastUtils.cast(
                 (List<?>) message.get(WSHandlerConstants.RECV_RESULTS));
-        
+
         // Get all encrypted and signed references
-        for (WSHandlerResult wshr : results) {
-            List<WSSecurityEngineResult> signedResults = wshr.getActionResults().get(WSConstants.SIGN);
-            if (signedResults != null) {
-                for (WSSecurityEngineResult signedResult : signedResults) {
-                    List<WSDataRef> sl = 
-                        CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
-                    if (sl != null) {
-                        if (sl.size() == 1
-                            && sl.get(0).getName().equals(new QName(WSConstants.SIG_NS, WSConstants.SIG_LN))) {
-                            //endorsing the signature so don't include
-                            continue;
+        if (results != null) {
+            for (WSHandlerResult wshr : results) {
+                List<WSSecurityEngineResult> signedResults = wshr.getActionResults().get(WSConstants.SIGN);
+                if (signedResults != null) {
+                    for (WSSecurityEngineResult signedResult : signedResults) {
+                        List<WSDataRef> sl =
+                            CastUtils.cast((List<?>)signedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+                        if (sl != null) {
+                            if (sl.size() == 1
+                                && sl.get(0).getName().equals(new QName(WSConstants.SIG_NS, WSConstants.SIG_LN))) {
+                                //endorsing the signature so don't include
+                                continue;
+                            }
+
+                            signed.addAll(sl);
                         }
-                        
-                        signed.addAll(sl);
                     }
                 }
-            }
-            
-            List<WSSecurityEngineResult> encryptedResults = wshr.getActionResults().get(WSConstants.ENCR);
-            if (encryptedResults != null) {
-                for (WSSecurityEngineResult encryptedResult : encryptedResults) {
-                    List<WSDataRef> el = 
-                        CastUtils.cast((List<?>)encryptedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
-                    if (el != null) {
-                        encrypted.addAll(el);
+
+                List<WSSecurityEngineResult> encryptedResults = wshr.getActionResults().get(WSConstants.ENCR);
+                if (encryptedResults != null) {
+                    for (WSSecurityEngineResult encryptedResult : encryptedResults) {
+                        List<WSDataRef> el =
+                            CastUtils.cast((List<?>)encryptedResult.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+                        if (el != null) {
+                            encrypted.addAll(el);
+                        }
                     }
                 }
             }
         }
-        
+
         CryptoCoverageUtil.reconcileEncryptedSignedRefs(signed, encrypted);
 
         // XPathFactory and XPath are not thread-safe so we must recreate them
@@ -189,7 +191,7 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
                 refsToCheck = encrypted;
                 break;
             default:
-                throw new IllegalStateException("Unexpected crypto type: " 
+                throw new IllegalStateException("Unexpected crypto type: "
                     + xPathExpression.getType());
             }
 
@@ -197,7 +199,7 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
                 CryptoCoverageUtil.checkCoverage(
                                                  documentElement,
                                                  refsToCheck,
-                                                 xpath, 
+                                                 xpath,
                                                  Arrays.asList(xPathExpression.getXPath()),
                                                  xPathExpression.getType(),
                                                  xPathExpression.getScope());
@@ -221,7 +223,7 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
             this.xPaths.addAll(xpaths);
         }
     }
-    
+
     /**
      * Adds the XPath expressions to check for, adding to any previously
      * set expressions.
@@ -246,7 +248,7 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
             this.prefixMap.putAll(prefixes);
         }
     }
-    
+
     /**
      * Adds the mapping of namespace prefixes to namespace URIs, adding to any previously
      * set mappings.
@@ -273,17 +275,17 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
      * coverage requirement.
      */
     public static class XPathExpression {
-        
+
         /**
          * The XPath expression.
          */
         private final String xPath;
-        
+
         /**
          * The type of coverage that is being enforced.
          */
         private final CoverageType type;
-        
+
         /**
          * The scope of the coverage that is being enforced.
          */
@@ -292,26 +294,26 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         /**
          * Create a new expression indicating a cryptographic coverage
          * requirement with {@code scope} {@link CoverageScope#ELEMENT}.
-         * 
+         *
          * @param xPath
          *            the XPath expression
          * @param type
          *            the type of coverage that the expression is meant to
          *            enforce
-         * 
+         *
          * @throws NullPointerException
          *             if {@code xPath} or {@code type} is {@code null}
          */
         public XPathExpression(String xPath, CoverageType type) {
             this(xPath, type, CoverageScope.ELEMENT);
         }
-        
+
         /**
          * Create a new expression indicating a cryptographic coverage
          * requirement. If {@code type} is {@link CoverageType#SIGNED}, the
          * {@code scope} {@link CoverageScope#CONTENT} does not represent a
          * configuration supported in WS-Security.
-         * 
+         *
          * @param xPath
          *            the XPath expression
          * @param type
@@ -320,7 +322,7 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
          * @param scope
          *            the scope of coverage that the expression is meant to
          *            enforce, defaults to {@link CoverageScope#ELEMENT}
-         * 
+         *
          * @throws NullPointerException
          *             if {@code xPath} or {@code type} is {@code null}
          */
@@ -330,7 +332,7 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
             } else if (type == null) {
                 throw new NullPointerException("type cannot be null.");
             }
-            
+
             this.xPath = xPath;
             this.type = type;
             this.scope = scope;
@@ -359,35 +361,35 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
         public CoverageScope getScope() {
             return this.scope;
         }
-        
+
         @Override
         public boolean equals(Object xpathObject) {
             if (!(xpathObject instanceof XPathExpression)) {
                 return false;
             }
-            
+
             if (xpathObject == this) {
                 return true;
             }
-            
+
             XPathExpression xpath = (XPathExpression)xpathObject;
             if (xpath.getScope() != getScope()) {
                 return false;
             }
-            
+
             if (xpath.getType() != getType()) {
                 return false;
             }
-            
+
             if (getXPath() == null && xpath.getXPath() != null) {
                 return false;
             } else if (getXPath() != null && !getXPath().equals(xpath.getXPath())) {
                 return false;
             }
-            
+
             return true;
         }
-        
+
         @Override
         public int hashCode() {
             int result = 17;

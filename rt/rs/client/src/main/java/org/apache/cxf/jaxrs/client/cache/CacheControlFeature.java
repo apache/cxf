@@ -45,7 +45,7 @@ public class CacheControlFeature implements Feature {
     private CacheManager manager;
     private Cache<Key, Entry> cache;
     private boolean cacheResponseInputStream;
-    
+
     @Override
     public boolean configure(final FeatureContext context) {
         // TODO: read context properties to exclude some patterns?

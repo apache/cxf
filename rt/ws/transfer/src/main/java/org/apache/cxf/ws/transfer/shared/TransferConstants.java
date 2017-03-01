@@ -23,17 +23,17 @@ package org.apache.cxf.ws.transfer.shared;
  * Helper class for holding of constants.
  */
 public final class TransferConstants {
-    
+
     public static final String TRANSFER_2011_03_NAMESPACE = "http://www.w3.org/2011/03/ws-tra";
-    
+
     public static final String NAME_RESOURCE = "Resource";
     public static final String NAME_RESOURCE_FACTORY = "ResourceFactory";
-    
+
     public static final String NAME_OPERATION_GET = "Get";
     public static final String NAME_OPERATION_DELETE = "Delete";
     public static final String NAME_OPERATION_PUT = "Put";
     public static final String NAME_OPERATION_CREATE = "Create";
-    
+
     public static final String NAME_MESSAGE_GET = "Get";
     public static final String NAME_MESSAGE_GET_RESPONSE = "GetResponse";
     public static final String NAME_MESSAGE_DELETE = "Delete";
@@ -42,7 +42,7 @@ public final class TransferConstants {
     public static final String NAME_MESSAGE_PUT_RESPONSE = "PutResponse";
     public static final String NAME_MESSAGE_CREATE = "Create";
     public static final String NAME_MESSAGE_CREATE_RESPONSE = "CreateResponse";
-    
+
     public static final String ACTION_GET = "http://www.w3.org/2011/03/ws-tra/Get";
     public static final String ACTION_GET_RESPONSE = "http://www.w3.org/2011/03/ws-tra/GetResponse";
     public static final String ACTION_DELETE = "http://www.w3.org/2011/03/ws-tra/Delete";
@@ -51,10 +51,10 @@ public final class TransferConstants {
     public static final String ACTION_PUT_RESPONSE = "http://www.w3.org/2011/03/ws-tra/PutResponse";
     public static final String ACTION_CREATE = "http://www.w3.org/2011/03/ws-tra/Create";
     public static final String ACTION_CREATE_RESPONSE = "http://www.w3.org/2011/03/ws-tra/CreateResponse";
-    
+
     public static final String RESOURCE_REMOTE_SUFFIX = "_factory";
-    
+
     private TransferConstants() {
-        
+
     }
 }

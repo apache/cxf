@@ -24,7 +24,7 @@ import java.util.Vector;
 
 public abstract class AbstractValidator {
     protected List<String> errorMessages = new Vector<String>();
-    
+
     public AbstractValidator() {
     }
 

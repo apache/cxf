@@ -27,8 +27,6 @@ import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.junit.Test;
@@ -110,17 +108,12 @@ public class StudentTest extends AbstractAegisTest {
         sf.setAddress("local://StudentServiceDocLiteral");
         setupAegis(sf);
         Server server = sf.create();
-        server.getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        server.getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
         server.start();
 
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
         proxyFac.setAddress("local://StudentServiceDocLiteral");
         proxyFac.setBus(getBus());
         setupAegis(proxyFac.getClientFactoryBean());
-
-        proxyFac.getInInterceptors().add(new LoggingInInterceptor());
-        proxyFac.getOutInterceptors().add(new LoggingOutInterceptor());
 
         StudentServiceDocLiteral clientInterface = proxyFac.create(StudentServiceDocLiteral.class);
         Map<Long, Student> fullMap = clientInterface.getStudentsMap();

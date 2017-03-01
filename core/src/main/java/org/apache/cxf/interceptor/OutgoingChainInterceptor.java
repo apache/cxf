@@ -49,7 +49,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
     private static final Logger LOG = LogUtils.getL7dLogger(OutgoingChainInterceptor.class);
     private static final String CACHE_INPUT_PROPERTY = "cxf.io.cacheinput";
     private PhaseChainCache chainCache = new PhaseChainCache();
-    
+
     public OutgoingChainInterceptor() {
         super(Phase.POST_INVOKE);
     }
@@ -58,8 +58,8 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         Exchange ex = message.getExchange();
         BindingOperationInfo binding = ex.getBindingOperationInfo();
         //if we get this far, we're going to be outputting some valid content, but we COULD
-        //also be "echoing" some of the content from the input.   Thus, we need to 
-        //mark it as requiring the input to be cached.   
+        //also be "echoing" some of the content from the input.   Thus, we need to
+        //mark it as requiring the input to be cached.
         if (message.getExchange().get(CACHE_INPUT_PROPERTY) == null) {
             message.put(CACHE_INPUT_PROPERTY, Boolean.TRUE);
         }
@@ -74,7 +74,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
                 out.put(MessageInfo.class, binding.getOperationInfo().getOutput());
                 out.put(BindingMessageInfo.class, binding.getOutput());
             }
-            
+
             InterceptorChain outChain = out.getInterceptorChain();
             if (outChain == null) {
                 outChain = OutgoingChainInterceptor.getChain(ex, chainCache);
@@ -84,10 +84,10 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
                 return;
             }
             outChain.doIntercept(out);
-            
+
         }
     }
-    
+
     private void closeInput(Message message) {
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
@@ -107,7 +107,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
             && ex.getDestination() != null) {
             try {
                 conduit = ex.getDestination().getBackChannel(ex.getInMessage());
-                ex.put(ConduitSelector.class, 
+                ex.put(ConduitSelector.class,
                        new PreexistingConduitSelector(conduit, ex.getEndpoint()));
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -116,13 +116,13 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         }
         return conduit;
     }
-    
+
     public static InterceptorChain getOutInterceptorChain(Exchange ex) {
         Bus bus = ex.getBus();
         Binding binding = ex.getBinding();
         PhaseManager pm = bus.getExtension(PhaseManager.class);
         PhaseInterceptorChain chain = new PhaseInterceptorChain(pm.getOutPhases());
-        
+
         Endpoint ep = ex.getEndpoint();
         List<Interceptor<? extends Message>> il = ep.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
@@ -138,7 +138,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by bus: " + il);
         }
-        chain.add(il);        
+        chain.add(il);
         if (binding != null) {
             il = binding.getOutInterceptors();
             if (LOG.isLoggable(Level.FINE)) {
@@ -158,14 +158,14 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         if (m == null) {
             return;
         }
-        Collection<InterceptorProvider> providers 
+        Collection<InterceptorProvider> providers
             = CastUtils.cast((Collection<?>)m.get(Message.INTERCEPTOR_PROVIDERS));
         if (providers != null) {
             for (InterceptorProvider p : providers) {
                 chain.add(p.getOutInterceptors());
             }
         }
-        Collection<Interceptor<? extends Message>> is 
+        Collection<Interceptor<? extends Message>> is
             = CastUtils.cast((Collection<?>)m.get(Message.OUT_INTERCEPTORS));
         if (is != null) {
             chain.add(is);
@@ -174,13 +174,13 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
             chain.add(((InterceptorProvider)m.getDestination()).getOutInterceptors());
         }
     }
-    
+
     private static PhaseInterceptorChain getChain(Exchange ex, PhaseChainCache chainCache) {
         Bus bus = ex.getBus();
         Binding binding = ex.getBinding();
-        
+
         Endpoint ep = ex.getEndpoint();
-        
+
         List<Interceptor<? extends Message>> i1 = bus.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by bus: " + i1);
@@ -222,12 +222,12 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
             chain = chainCache.get(bus.getExtension(PhaseManager.class).getOutPhases(),
                                    i1, i2, i3);
         }
-        
+
         modifyChain(chain, ex);
         chain.setFaultObserver(ep.getOutFaultObserver());
         return chain;
     }
-    
-    
+
+
 }
 

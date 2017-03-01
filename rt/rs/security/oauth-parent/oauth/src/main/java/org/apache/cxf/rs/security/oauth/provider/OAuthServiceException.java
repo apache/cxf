@@ -29,11 +29,11 @@ public class OAuthServiceException extends RuntimeException {
     public OAuthServiceException(String message) {
         super(message);
     }
-    
+
     public OAuthServiceException(Throwable cause) {
         super(cause);
     }
-    
+
     public OAuthServiceException(String message, Throwable cause) {
         super(message, cause);
     }

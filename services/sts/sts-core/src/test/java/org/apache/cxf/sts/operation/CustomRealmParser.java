@@ -35,8 +35,8 @@ public class CustomRealmParser implements RealmParser {
         } else if (endpoint.contains("https")) {
             return "B";
         }
-        
+
         return null;
     }
-    
+
 }

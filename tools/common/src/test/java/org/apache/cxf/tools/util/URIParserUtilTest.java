@@ -31,7 +31,7 @@ public class URIParserUtilTest extends Assert {
 
     @Test
     public void testGetPackageName() {
-        
+
         String packageName = URIParserUtil.getPackageName("http://www.cxf.iona.com");
         assertEquals(packageName, "com.iona.cxf");
         packageName = URIParserUtil.getPackageName("urn://www.class.iona.com");
@@ -60,7 +60,7 @@ public class URIParserUtilTest extends Assert {
 
         uri = "/c:\\hello.wsdl";
         assertEquals("file:/c:/hello.wsdl", URIParserUtil.normalize(uri));
-        
+
         uri = "file:/home/john/test/all/../../alltest";
         assertEquals("file:/home/john/alltest", URIParserUtil.normalize(uri));
     }
@@ -93,7 +93,7 @@ public class URIParserUtilTest extends Assert {
 
         uri = "http://hello/world.wsdl";
         assertEquals(uri, URIParserUtil.getAbsoluteURI(uri));
-        
+
         uri = "file:/home/john/test/all/../../alltest";
         assertEquals("file:/home/john/alltest", URIParserUtil.getAbsoluteURI(uri));
     }

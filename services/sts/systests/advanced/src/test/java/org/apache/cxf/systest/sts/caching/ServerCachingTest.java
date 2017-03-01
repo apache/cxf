@@ -47,21 +47,21 @@ import org.junit.BeforeClass;
  * Test various server Caching properties
  */
 public class ServerCachingTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
-    private static final String SAML1_TOKEN_TYPE = 
+
+    private static final String SAML1_TOKEN_TYPE =
         "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV1.1";
-    private static final String PUBLIC_KEY_KEYTYPE = 
+    private static final String PUBLIC_KEY_KEYTYPE =
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/PublicKey";
-    
+
     private static final String PORT = allocatePort(CachingServer.class);
     private static final String PORT2 = allocatePort(CachingServer.class, 2);
-    
-    private static final String DEFAULT_ADDRESS = 
+
+    private static final String DEFAULT_ADDRESS =
         "https://localhost:" + PORT + "/doubleit/services/doubleittransportsaml1alternative";
 
     @BeforeClass
@@ -79,7 +79,7 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
                    launchServer(STSServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -101,14 +101,14 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         URL wsdl = ServerCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML1AlternativePort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
             service.getPort(portQName, DoubleItPortType.class);
         ((BindingProvider)port).getRequestContext().put("thread.local.request.context", "true");
         updateAddressPort(port, PORT);
-        
+
         // Make an initial successful invocation
         doubleIt(port, 25);
-        
+
         // Store the SAML Assertion that was obtained from the STS
         Client client = ClientProxy.getClient(port);
         Endpoint ep = client.getEndpoint();
@@ -117,13 +117,13 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         SecurityToken tok = store.getToken(id);
         assertNotNull(tok);
         Element storedToken = tok.getToken();
-        
+
         // Get another security token by invoking on the STS directly and save it on the client port
-        SecurityToken token = 
+        SecurityToken token =
             requestSecurityToken(SAML1_TOKEN_TYPE, PUBLIC_KEY_KEYTYPE, bus, DEFAULT_ADDRESS);
         assertNotNull(token);
         tok.setToken(token.getToken());
-        
+
         // Try another invocation - this will fail as the STSClient on the server side is disabled
         // after the first invocation
         try {
@@ -135,11 +135,11 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         // Try again using the original SAML token - this should work as it should be cached by the service
         tok.setToken(storedToken);
         doubleIt(port, 35);
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testServerSideUsernameTokenCaching() throws Exception {
 
@@ -153,14 +153,14 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         URL wsdl = ServerCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportUTPort");
-        DoubleItPortType transportUTPort = 
+        DoubleItPortType transportUTPort =
             service.getPort(portQName, DoubleItPortType.class);
         ((BindingProvider)transportUTPort).getRequestContext().put("thread.local.request.context", "true");
         updateAddressPort(transportUTPort, PORT);
-        
+
         // Make an initial successful invocation
         doubleIt(transportUTPort, 25);
-        
+
         BindingProvider p = (BindingProvider)transportUTPort;
         try {
             // The STSClient on the server side is disabled after the first invocation
@@ -170,15 +170,15 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         // This will pass as the UsernameToken should be cached
         p.getRequestContext().put(SecurityConstants.USERNAME, "alice");
         doubleIt(transportUTPort, 35);
-        
+
         ((java.io.Closeable)transportUTPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testServerSideBinarySecurityTokenCaching() throws Exception {
 
@@ -192,14 +192,14 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         URL wsdl = ServerCachingTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBSTPort");
-        DoubleItPortType bstPort = 
+        DoubleItPortType bstPort =
             service.getPort(portQName, DoubleItPortType.class);
         ((BindingProvider)bstPort).getRequestContext().put("thread.local.request.context", "true");
         updateAddressPort(bstPort, PORT2);
-        
+
         // Make an initial successful invocation
         doubleIt(bstPort, 25);
-        
+
         BindingProvider p = (BindingProvider)bstPort;
         try {
             // The STSClient on the server side is disabled after the first invocation
@@ -210,18 +210,18 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-        
+
         // This will pass as the BinarySecurityToken should be cached
         p.getRequestContext().put(SecurityConstants.SIGNATURE_USERNAME, "myclientkey");
         p.getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES, "clientKeystore.properties");
         doubleIt(bstPort, 35);
-        
+
         ((java.io.Closeable)bstPort).close();
         bus.shutdown(true);
     }
-    
+
     private SecurityToken requestSecurityToken(
-        String tokenType, 
+        String tokenType,
         String keyType,
         Bus bus,
         String endpointAddress
@@ -234,7 +234,7 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            SecurityConstants.CALLBACK_HANDLER, 
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
 
@@ -251,7 +251,7 @@ public class ServerCachingTest extends AbstractBusClientServerTestBase {
 
         return stsClient.requestSecurityToken(endpointAddress);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

@@ -98,7 +98,7 @@ final class InternalContextUtils {
             //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
             //we don't wait for a response.
             inMessage.getExchange().setOneWay(true);
-            ConduitInitiator conduitInitiator 
+            ConduitInitiator conduitInitiator
                 = bus.getExtension(ConduitInitiatorManager.class)
                     .getConduitInitiatorForUri(reference.getAddress().getValue());
             if (conduitInitiator != null) {
@@ -140,19 +140,19 @@ final class InternalContextUtils {
     private InternalContextUtils() {
     }
 
-    
+
     /**
      * Rebase response on replyTo
-     * 
+     *
      * @param reference the replyTo reference
      * @param inMAPs the inbound MAPs
      * @param inMessage the current message
      */
-    //CHECKSTYLE:OFF  Max executable statement count limitation
+    //CHECKSTYLE:OFF Max executable statement count limitation
     public static void rebaseResponse(EndpointReferenceType reference,
                                       AddressingProperties inMAPs,
                                       final Message inMessage) {
-        
+
         String namespaceURI = inMAPs.getNamespaceURI();
         if (!ContextUtils.retrievePartialResponseSent(inMessage)) {
             ContextUtils.storePartialResponseSent(inMessage);
@@ -160,7 +160,7 @@ final class InternalContextUtils {
             Message fullResponse = exchange.getOutMessage();
             Message partialResponse = ContextUtils.createMessage(exchange);
             ensurePartialResponseMAPs(partialResponse, namespaceURI);
-            
+
             // ensure the inbound MAPs are available in the partial response
             // message (used to determine relatesTo etc.)
             ContextUtils.propogateReceivedMAPs(inMAPs, partialResponse);
@@ -168,7 +168,7 @@ final class InternalContextUtils {
             if (target == null) {
                 return;
             }
-            
+
             try {
                 if (reference == null) {
                     reference = ContextUtils.getNoneEndpointReference();
@@ -176,8 +176,8 @@ final class InternalContextUtils {
                 Conduit backChannel = target.getBackChannel(inMessage);
                 Exception exception = inMessage.getContent(Exception.class);
                 //Add this to handle two way faultTo
-                //TODO:Look at how to refactor 
-                if (backChannel != null && !inMessage.getExchange().isOneWay() 
+                //TODO:Look at how to refactor
+                if (backChannel != null && !inMessage.getExchange().isOneWay()
                     && ContextUtils.isFault(inMessage)) {
                     // send the fault message to faultTo Endpoint
                     exchange.setOutMessage(ContextUtils.createMessage(exchange));
@@ -232,13 +232,13 @@ final class InternalContextUtils {
                     }
                     return;
                 }
-                
+
                 if (backChannel != null) {
                     partialResponse.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
                     partialResponse.put(Message.EMPTY_PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
                     boolean robust =
                         MessageUtils.isTrue(inMessage.getContextualProperty(Message.ROBUST_ONEWAY));
-                    
+
                     if (robust) {
                         BindingOperationInfo boi = exchange.getBindingOperationInfo();
                         // insert the executor in the exchange to fool the OneWayProcessorInterceptor
@@ -256,8 +256,8 @@ final class InternalContextUtils {
                         // restore the BOI for the partial response handling
                         exchange.put(BindingOperationInfo.class, boi);
                     }
-                    
-                    
+
+
                     // set up interceptor chains and send message
                     InterceptorChain chain =
                         fullResponse != null
@@ -270,14 +270,14 @@ final class InternalContextUtils {
                                                                 exchange.getEndpoint()));
                     if (ContextUtils.retrieveAsyncPostResponseDispatch(inMessage) && !robust) {
                         //need to suck in all the data from the input stream as
-                        //the transport might discard any data on the stream when this 
+                        //the transport might discard any data on the stream when this
                         //thread unwinds or when the empty response is sent back
                         DelegatingInputStream in = inMessage.getContent(DelegatingInputStream.class);
                         if (in != null) {
                             in.cacheInput();
                         }
                     }
-                    if (chain != null && !chain.doIntercept(partialResponse) 
+                    if (chain != null && !chain.doIntercept(partialResponse)
                         && partialResponse.getContent(Exception.class) != null) {
                         if (partialResponse.getContent(Exception.class) instanceof Fault) {
                             throw (Fault)partialResponse.getContent(Exception.class);
@@ -286,27 +286,27 @@ final class InternalContextUtils {
                         }
                     }
                     if (chain != null) {
-                        chain.reset();                        
+                        chain.reset();
                     }
                     exchange.put(ConduitSelector.class, new NullConduitSelector());
-                    
+
                     if (fullResponse == null) {
                         fullResponse = ContextUtils.createMessage(exchange);
                     }
                     exchange.setOutMessage(fullResponse);
-                    
+
                     Destination destination = createDecoupledDestination(
-                        exchange, 
+                        exchange,
                         reference);
                     exchange.setDestination(destination);
-                         
-                    
+
+
                     if (ContextUtils.retrieveAsyncPostResponseDispatch(inMessage) && !robust) {
-                                                
+
                         // async service invocation required *after* a response
                         // has been sent (i.e. to a oneway, or a partial response
                         // to a decoupled twoway)
-                        
+
                         //cleanup pathinfo
                         if (inMessage.get(Message.PATH_INFO) != null) {
                             inMessage.remove(Message.PATH_INFO);
@@ -323,7 +323,7 @@ final class InternalContextUtils {
                             });
                         } catch (RejectedExecutionException e) {
                             LOG.warning(
-                                        "Executor queue is full, use the caller thread." 
+                                        "Executor queue is full, use the caller thread."
                                         + "  Users can specify a larger executor queue to avoid this.");
                             // only block the thread if the prop is unset or set to false, otherwise let it go
                             if (!MessageUtils.isTrue(
@@ -334,7 +334,7 @@ final class InternalContextUtils {
                             }
                         }
                     }
-                } 
+                }
             } catch (Exception e) {
                 LOG.log(Level.WARNING, "SERVER_TRANSPORT_REBASE_FAILURE_MSG", e);
             }
@@ -347,10 +347,10 @@ final class InternalContextUtils {
         final EndpointInfo ei = exchange.getEndpoint().getEndpointInfo();
         return new DecoupledDestination(ei, reference);
     }
-    
+
     /**
      * Construct and store MAPs for partial response.
-     * 
+     *
      * @param partialResponse the partial response message
      * @param namespaceURI the current namespace URI
      */
@@ -370,10 +370,10 @@ final class InternalContextUtils {
 
 
 
-    
+
     /**
      * Construct the Action URI.
-     * 
+     *
      * @param message the current message
      * @return the Action URI
      */
@@ -382,7 +382,7 @@ final class InternalContextUtils {
         LOG.fine("Determining action");
         Exception fault = message.getContent(Exception.class);
 
-        if (fault instanceof Fault 
+        if (fault instanceof Fault
             && Names.WSA_NAMESPACE_NAME.equals(((Fault)fault).getFaultCode().getNamespaceURI())) {
             // wsa relevant faults should use the wsa-fault action value
             action = Names.WSA_DEFAULT_FAULT_ACTION;
@@ -424,7 +424,7 @@ final class InternalContextUtils {
                     action = (String) message.get(SoapBindingConstants.SOAP_ACTION);
                 }
                 if (action == null || "".equals(action)) {
-                    MessageInfo msgInfo = 
+                    MessageInfo msgInfo =
                         ContextUtils.isRequestor(message)
                         ? bindingOpInfo.getOperationInfo().getInput()
                         : bindingOpInfo.getOperationInfo().getOutput();
@@ -437,13 +437,13 @@ final class InternalContextUtils {
                     if (action == null && ContextUtils.isRequestor(message)) {
                         SoapOperationInfo soi = getSoapOperationInfo(bindingOpInfo);
                         action = soi == null ? null : soi.getAction();
-                        action = StringUtils.isEmpty(action) ? null : action; 
+                        action = StringUtils.isEmpty(action) ? null : action;
                     }
                 }
             } else {
                 Throwable t = fault.getCause();
-                
-                // FaultAction attribute is not defined in 
+
+                // FaultAction attribute is not defined in
                 // http://www.w3.org/2005/02/addressing/wsdl schema
                 for (BindingFaultInfo bfi : bindingOpInfo.getFaults()) {
                     FaultInfo fi = bfi.getFaultInfo();
@@ -457,10 +457,10 @@ final class InternalContextUtils {
                         String attr = (String)
                             fi.getExtensionAttributes().get(Names.WSAW_ACTION_QNAME);
                         if (attr == null) {
-                            attr = (String)        
+                            attr = (String)
                                 fi.getExtensionAttributes()
                                     .get(new QName(Names.WSA_NAMESPACE_WSDL_NAME_OLD,
-                                                    Names.WSAW_ACTION_NAME));                            
+                                                    Names.WSAW_ACTION_NAME));
                         }
                         if (attr != null) {
                             action = attr;
@@ -548,7 +548,7 @@ final class InternalContextUtils {
     private static Executor getExecutor(final Message message) {
         Endpoint endpoint = message.getExchange().getEndpoint();
         Executor executor = endpoint.getService().getExecutor();
-        
+
         if (executor == null || SynchronousExecutor.isA(executor)) {
             // need true asynchrony
             Bus bus = message.getExchange().getBus();
@@ -567,5 +567,5 @@ final class InternalContextUtils {
         message.getExchange().put(Executor.class, executor);
         return executor;
     }
- 
+
 }

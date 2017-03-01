@@ -28,7 +28,7 @@ import org.apache.cxf.aegis.type.java5.XmlFlattenedArray;
  * Test bean for flat='true'
  */
 public class BeanWithFlatCollection {
-    List<Integer> values = new ArrayList<Integer>();
+    List<Integer> values = new ArrayList<>();
 
     @XmlFlattenedArray
     public List<Integer> getValues() {

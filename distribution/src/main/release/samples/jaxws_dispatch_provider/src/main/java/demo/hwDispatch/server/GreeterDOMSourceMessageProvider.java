@@ -29,7 +29,7 @@ import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceProvider;
 
 @WebServiceProvider()
-@ServiceMode(value = Service.Mode.MESSAGE)            
+@ServiceMode(value = Service.Mode.MESSAGE)
 public class GreeterDOMSourceMessageProvider implements Provider<DOMSource> {
 
     public GreeterDOMSourceMessageProvider() {
@@ -42,13 +42,13 @@ public class GreeterDOMSourceMessageProvider implements Provider<DOMSource> {
             MessageFactory factory = MessageFactory.newInstance();
             SOAPMessage soapReq = factory.createMessage();
             soapReq.getSOAPPart().setContent(request);
-    
+
             System.out.println("Incoming Client Request as a DOMSource data in MESSAGE Mode");
             soapReq.writeTo(System.out);
             System.out.println("\n");
-    
+
             InputStream is = getClass().getResourceAsStream("/GreetMeDocLiteralResp2.xml");
-            SOAPMessage greetMeResponse =  factory.createMessage(null, is);
+            SOAPMessage greetMeResponse = factory.createMessage(null, is);
             is.close();
 
             response.setNode(greetMeResponse.getSOAPPart());

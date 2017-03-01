@@ -27,32 +27,32 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
-public class SimpleMethodDispatcher 
-    implements  org.apache.cxf.service.invoker.MethodDispatcher  {
+public class SimpleMethodDispatcher
+    implements org.apache.cxf.service.invoker.MethodDispatcher  {
 
-    private Map<Method, Map<BindingInfo, BindingOperationInfo>> infoMap = 
+    private Map<Method, Map<BindingInfo, BindingOperationInfo>> infoMap =
         new ConcurrentHashMap<Method, Map<BindingInfo, BindingOperationInfo>>(16, 0.75f, 2);
-    private Map<OperationInfo, Method> opToMethod = 
+    private Map<OperationInfo, Method> opToMethod =
         new ConcurrentHashMap<OperationInfo, Method>(16, 0.75f, 2);
-    private Map<Method, OperationInfo> methodToOp = 
+    private Map<Method, OperationInfo> methodToOp =
         new ConcurrentHashMap<Method, OperationInfo>(16, 0.75f, 2);
 
     public SimpleMethodDispatcher() {
         //complete
     }
-    
+
     public void bind(OperationInfo o, Method... methods) {
         Method primary = methods[0];
         for (Method m : methods) {
-            methodToOp.put(m, o);            
-            
-            Map<BindingInfo, BindingOperationInfo> biToBop 
+            methodToOp.put(m, o);
+
+            Map<BindingInfo, BindingOperationInfo> biToBop
                 = new ConcurrentHashMap<BindingInfo, BindingOperationInfo>(4, 0.75f, 2);
             infoMap.put(m, biToBop);
         }
-        
+
         opToMethod.put(o, primary);
-        
+
         if (o.isUnwrappedCapable()) {
             opToMethod.put(o.getUnwrappedOperation(), primary);
         }
@@ -63,19 +63,19 @@ public class SimpleMethodDispatcher
         if (bops == null) {
             return null;
         }
-        
+
         BindingOperationInfo bop = bops.get(endpoint.getEndpointInfo().getBinding());
         if (bop == null) {
             OperationInfo o = methodToOp.get(method);
             if (o == null) {
                 return null;
             }
-            
+
             BindingInfo b = endpoint.getEndpointInfo().getBinding();
             for (BindingOperationInfo bop2 : b.getOperations()) {
                 if (bop2.getOperationInfo().equals(o)) {
                     bop2 = getRealOperation(o, bop2);
-                    
+
                     bops.put(b, bop2);
                     return bop2;
                 }
@@ -96,7 +96,7 @@ public class SimpleMethodDispatcher
     public Method getMethod(BindingOperationInfo op) {
         return opToMethod.get(op.getOperationInfo());
     }
-    
+
     public Method getPrimaryMethod(OperationInfo op) {
         return opToMethod.get(op);
     }

@@ -52,7 +52,7 @@ public class Activator implements BundleActivator {
 
     public class ConduitConfigurer extends ServiceTracker implements ManagedService {
         private Map<String, Object> currentConfig;
-        
+
         public ConduitConfigurer(BundleContext context) {
             super(context, Bus.class.getName(), null);
         }
@@ -71,14 +71,14 @@ public class Activator implements BundleActivator {
                 configureConduitFactory(bus);
             }
         }
-        
+
         @Override
         public Object addingService(ServiceReference reference) {
             Bus bus = (Bus)super.addingService(reference);
             configureConduitFactory(bus);
             return bus;
         }
-        
+
         private Map<String, Object> toMap(Dictionary<String, ?> properties) {
             Map<String, Object> props = new HashMap<String, Object>();
             if (properties == null) {
@@ -91,12 +91,12 @@ public class Activator implements BundleActivator {
             }
             return props;
         }
-        
+
         private void configureConduitFactory(Bus bus) {
             AsyncHTTPConduitFactory conduitFactory = bus.getExtension(AsyncHTTPConduitFactory.class);
             conduitFactory.update(this.currentConfig);
         }
 
-        
+
     }
 }

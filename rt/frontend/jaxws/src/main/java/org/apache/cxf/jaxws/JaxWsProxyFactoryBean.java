@@ -54,16 +54,16 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl.service.factory.ReflectionServiceFactoryBean;
 
 /**
- * Factory for creating JAX-WS proxies, This class provides access to the 
- * internal properties used to set-up proxies. Using it provides more control 
+ * Factory for creating JAX-WS proxies, This class provides access to the
+ * internal properties used to set-up proxies. Using it provides more control
  * than the standard JAX-WS APIs.
  */
 @NoJSR250Annotations
 public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
     @SuppressWarnings("rawtypes")
-    List<Handler> handlers = new ArrayList<Handler>();
+    List<Handler> handlers = new ArrayList<>();
     boolean loadHandlers = true;
-    
+
     public JaxWsProxyFactoryBean() {
         super(new JaxWsClientFactoryBean());
     }
@@ -80,9 +80,9 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
     }
 
     /**
-     * Specifies a list of JAX-WS Handler implementations that are to be 
+     * Specifies a list of JAX-WS Handler implementations that are to be
      * used by the proxy.
-     * 
+     *
      * @param h a <code>List</code> of <code>Handler</code> objects
      */
     public void setHandlers(@SuppressWarnings("rawtypes") List<Handler> h) {
@@ -98,7 +98,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
     public List<Handler> getHandlers() {
         return handlers;
     }
-    
+
     public void setLoadHandlers(boolean b) {
         loadHandlers = b;
     }
@@ -106,10 +106,10 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
         return loadHandlers;
     }
 
-    
+
     @Override
     protected ClientProxy clientClientProxy(Client c) {
-        JaxWsClientProxy cp = new JaxWsClientProxy(c, 
+        JaxWsClientProxy cp = new JaxWsClientProxy(c,
                                                    ((JaxWsEndpointImpl)c.getEndpoint()).getJaxwsBinding());
         cp.getRequestContext().putAll(this.getProperties());
         buildHandlerChain(cp);
@@ -121,11 +121,11 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
         Class<?> cls = getClientFactoryBean().getServiceClass();
         return new Class[] {cls, BindingProvider.class, Closeable.class, Client.class};
     }
-    
+
     /**
      * Creates a JAX-WS proxy that can be used to make remote invocations.
      *
-     * @return the proxy. You must cast the returned object to the approriate class 
+     * @return the proxy. You must cast the returned object to the approriate class
      * before making remote calls
      */
     @Override
@@ -138,7 +138,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
                     orig = ClassLoaderUtils.setThreadContextClassloader(loader);
                 }
             }
-            
+
             Object obj = super.create();
             Service service = getServiceFactory().getService();
             if (needWrapperClassInterceptor(service.getServiceInfos().get(0))) {
@@ -156,7 +156,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
             }
         }
     }
-    
+
     private boolean needWrapperClassInterceptor(ServiceInfo serviceInfo) {
         if (serviceInfo == null) {
             return false;
@@ -171,12 +171,12 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
         }
         return false;
     }
-   
+
     private void buildHandlerChain(JaxWsClientProxy cp) {
         AnnotationHandlerChainBuilder builder = new AnnotationHandlerChainBuilder();
-        JaxWsServiceFactoryBean sf = (JaxWsServiceFactoryBean)getServiceFactory(); 
+        JaxWsServiceFactoryBean sf = (JaxWsServiceFactoryBean)getServiceFactory();
         @SuppressWarnings("rawtypes")
-        List<Handler> chain = new ArrayList<Handler>(handlers);
+        List<Handler> chain = new ArrayList<>(handlers);
         if (loadHandlers) {
             chain.addAll(builder.buildHandlerChainFromClass(sf.getServiceClass(),
                                                             sf.getEndpointInfo().getName(),
@@ -187,7 +187,7 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
         if (!chain.isEmpty()) {
             ResourceManager resourceManager = getBus().getExtension(ResourceManager.class);
             List<ResourceResolver> resolvers = resourceManager.getResourceResolvers();
-            resourceManager = new DefaultResourceManager(resolvers); 
+            resourceManager = new DefaultResourceManager(resolvers);
             resourceManager.addResourceResolver(new WebServiceContextResourceResolver());
             ResourceInjector injector = new ResourceInjector(resourceManager);
             for (Handler<?> h : chain) {
@@ -200,8 +200,8 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
                 }
             }
         }
-        
+
         cp.getBinding().setHandlerChain(chain);
     }
-    
+
 }

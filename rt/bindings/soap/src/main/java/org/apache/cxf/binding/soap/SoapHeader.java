@@ -33,20 +33,20 @@ public class SoapHeader extends Header {
     public SoapHeader(QName q, Object o, DataBinding b) {
         super(q, o, b);
     }
-    
+
     public String getActor() {
         return actor;
     }
     public void setActor(String actor) {
         this.actor = actor;
     }
-    
+
     public boolean isMustUnderstand() {
         return mustUnderstand;
     }
     public void setMustUnderstand(boolean mustUnderstand) {
         this.mustUnderstand = mustUnderstand;
     }
-    
+
 
 }

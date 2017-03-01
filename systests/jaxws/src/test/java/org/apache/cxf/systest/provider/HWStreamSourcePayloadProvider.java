@@ -54,12 +54,12 @@ import org.w3c.dom.ls.LSSerializer;
                 wsdlLocation = "/wsdl/hello_world_rpc_lit.wsdl")
 @ServiceMode(value = Service.Mode.PAYLOAD)
 public class HWStreamSourcePayloadProvider implements Provider<StreamSource> {
-    
+
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
-    @Resource 
+    @Resource
     WebServiceContext ctx;
-    
+
     private InputStream sayHiInputStream;
     private InputStream greetMeInputStream;
     private MessageFactory factory;
@@ -71,9 +71,9 @@ public class HWStreamSourcePayloadProvider implements Provider<StreamSource> {
             InputStream is = getClass().getResourceAsStream("resources/sayHiRpcLiteralResp.xml");
             Document sayHiDocument = factory.createMessage(null, is).getSOAPBody().extractContentAsDocument();
             sayHiInputStream = getSOAPBodyStream(sayHiDocument);
-            
+
             InputStream is2 = getClass().getResourceAsStream("resources/GreetMeRpcLiteralResp.xml");
-            Document greetMeDocument = 
+            Document greetMeDocument =
                 factory.createMessage(null, is2).getSOAPBody().extractContentAsDocument();
             greetMeInputStream = getSOAPBodyStream(greetMeDocument);
 
@@ -87,7 +87,7 @@ public class HWStreamSourcePayloadProvider implements Provider<StreamSource> {
         if (qn == null) {
             throw new RuntimeException("No Operation Name");
         }
-        
+
         StreamSource response = new StreamSource();
         try {
             DOMResult domResult = new DOMResult();
@@ -110,7 +110,7 @@ public class HWStreamSourcePayloadProvider implements Provider<StreamSource> {
         }
         return response;
     }
-    
+
     private InputStream getSOAPBodyStream(Document doc) throws Exception {
         // Try to get the DOMImplementation from the doc before
         // defaulting to the sun implementation class (which uses
@@ -134,5 +134,5 @@ public class HWStreamSourcePayloadProvider implements Provider<StreamSource> {
         return new ByteArrayInputStream(buf);
     }
 
-    
+
 }

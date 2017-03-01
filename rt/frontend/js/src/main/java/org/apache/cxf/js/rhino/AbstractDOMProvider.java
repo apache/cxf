@@ -138,17 +138,17 @@ public abstract class AbstractDOMProvider {
         } else {
             throw new JSDOMProviderException(ILLEGAL_INVOKE_TYPE);
         }
-        
+
         Bus bus = BusFactory.getThreadDefaultBus();
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setWsdlLocation(wsdlLoc);
-        factory.setBindingId(binding); 
+        factory.setBindingId(binding);
         factory.setServiceName(new QName(tgtNmspc, svcNm));
         factory.setEndpointName(new QName(tgtNmspc, portNm));
         ep = new EndpointImpl(bus, this, factory);
         ep.publish(addr);
     }
-    
+
     public void stop() {
         if (ep != null) {
             ep.stop();

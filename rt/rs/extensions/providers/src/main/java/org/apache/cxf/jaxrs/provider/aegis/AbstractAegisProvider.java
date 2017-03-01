@@ -34,29 +34,29 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.aegis.AegisContext;
 
-public abstract class AbstractAegisProvider<T> 
+public abstract class AbstractAegisProvider<T>
     implements MessageBodyReader<T>, MessageBodyWriter<T> {
-    
-    private static Map<java.lang.reflect.Type, AegisContext> classContexts      
+
+    private static Map<java.lang.reflect.Type, AegisContext> classContexts
         = new WeakHashMap<java.lang.reflect.Type, AegisContext>();
-    
+
     protected boolean writeXsiType = true;
     protected boolean readXsiType = true;
-    @Context 
+    @Context
     protected ContextResolver<AegisContext> resolver;
-    
+
     public void setWriteXsiType(boolean write) {
         writeXsiType = write;
     }
-    
+
     public void setReadXsiType(boolean read) {
         readXsiType = read;
     }
-    
+
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
         return isSupported(type, genericType, anns);
     }
-    
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return isSupported(type, genericType, annotations);
     }
@@ -66,7 +66,7 @@ public abstract class AbstractAegisProvider<T>
     }
 
     protected AegisContext getAegisContext(Class<?> plainClass, Type genericType) {
-        
+
         if (resolver != null) {
             /* wierdly, the JAX-RS API keys on Class, not AegisType, so it can't possibly
              * keep generics straight. Should we ignore the resolver?
@@ -77,20 +77,20 @@ public abstract class AbstractAegisProvider<T>
                 return context;
             }
         }
-        
+
         if (genericType == null) {
             genericType = plainClass;
         }
         return getClassContext(genericType);
     }
-    
-    
+
+
     private AegisContext getClassContext(Type reflectionType) {
         synchronized (classContexts) {
             AegisContext context = classContexts.get(reflectionType);
             if (context == null) {
                 context = new AegisContext();
-                context.setWriteXsiTypes(writeXsiType); 
+                context.setWriteXsiTypes(writeXsiType);
                 context.setReadXsiTypes(readXsiType);
                 Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
                 rootClasses.add(reflectionType);
@@ -101,7 +101,7 @@ public abstract class AbstractAegisProvider<T>
             return context;
         }
     }
-    
+
     /**
      * For Aegis, it's not obvious to me how we'd decide that a type was hopeless.
      * @param type
@@ -112,7 +112,7 @@ public abstract class AbstractAegisProvider<T>
     protected boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations) {
         return true;
     }
-    
+
     static void clearContexts() {
         classContexts.clear();
     }

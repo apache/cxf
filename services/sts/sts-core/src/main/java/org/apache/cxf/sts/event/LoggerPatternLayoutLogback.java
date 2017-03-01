@@ -24,8 +24,8 @@ import org.apache.cxf.sts.event.map.MapEventLogger;
 import ch.qos.logback.classic.PatternLayout;
 
 public class LoggerPatternLayoutLogback extends PatternLayout {
-    
-    private String header;  
+
+    private String header;
 
     @Override
     public String getFileHeader() {
@@ -37,7 +37,7 @@ public class LoggerPatternLayoutLogback extends PatternLayout {
         for (String item : ll.getFieldOrder()) {
             line.append(item).append(";");
         }
-        return line.toString() + System.getProperty("line.separator");        
+        return line.toString() + System.getProperty("line.separator");
     }
 
 }

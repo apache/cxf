@@ -49,7 +49,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLServiceFactory.class);
 
     protected final String wsdlUrl;
-    
+
     private QName serviceName;
     private QName endpointName;
     private Definition definition;
@@ -89,7 +89,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
 
         serviceName = sn;
     }
-    
+
     public void setAllowElementRefs(boolean b) {
         allowRefs = b;
     }
@@ -97,11 +97,11 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
     public void setEndpointName(QName qn) {
         endpointName = qn;
     }
-    
+
     public Definition getDefinition() {
         return definition;
     }
-    
+
     public Service create() {
 
         List<ServiceInfo> services;
@@ -145,10 +145,10 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                         }
                         WSDLFactory factory = WSDLFactory.newInstance();
                         ExtensionRegistry extReg = factory.newPopulatedExtensionRegistry();
-                        Binding binding = PartialWSDLProcessor.doAppendBinding(definition, 
+                        Binding binding = PartialWSDLProcessor.doAppendBinding(definition,
                                                                                existPortName, portType, extReg);
                         definition.addBinding(binding);
-                        wsdlService = PartialWSDLProcessor.doAppendService(definition, 
+                        wsdlService = PartialWSDLProcessor.doAppendService(definition,
                                                                            existPortName, extReg, binding);
                         definition.addService(wsdlService);
                     } catch (Exception e) {
@@ -159,7 +159,7 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                 }
             }
             try {
-                services = new WSDLServiceBuilder(getBus()).buildServices(definition, 
+                services = new WSDLServiceBuilder(getBus()).buildServices(definition,
                                                                           wsdlService,
                                                                           endpointName);
                 if (services.size() == 0) {

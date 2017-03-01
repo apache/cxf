@@ -41,12 +41,12 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
     MessageInfo outputMessage;
     Map<QName, FaultInfo> faults;
     OperationInfo unwrappedOperation;
-    List<String> parameterOrdering;     
+    List<String> parameterOrdering;
 
     public OperationInfo() {
     }
-    
-    OperationInfo(InterfaceInfo it, QName n) { 
+
+    OperationInfo(InterfaceInfo it, QName n) {
         intf = it;
         setName(n);
     }
@@ -54,7 +54,7 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
         intf = op.getInterface();
         setName(op.getName());
     }
-    
+
     /**
      * Returns the name of the Operation.
      * @return the name of the Operation
@@ -68,15 +68,15 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
      */
     public final void setName(QName name) {
         if (name == null) {
-            throw new NullPointerException("Operation Name cannot be null.");                
-        }        
+            throw new NullPointerException("Operation Name cannot be null.");
+        }
         opName = name;
     }
     public InterfaceInfo getInterface() {
         return intf;
     }
 
-    
+
     public MessageInfo createMessage(QName nm, MessageInfo.Type type) {
         return new MessageInfo(this, type, nm);
     }
@@ -93,7 +93,7 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
         if (unwrappedOperation != null && unwrappedOperation.getOutput() != null) {
             unwrappedOperation.getOutput().setDelegate(out, false);
         }
-    }    
+    }
     public boolean hasOutput() {
         return outputMessage != null;
     }
@@ -114,15 +114,15 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
     public boolean hasInput() {
         return inputMessage != null;
     }
-    
+
     public boolean isOneWay() {
         return inputMessage != null && outputMessage == null;
     }
-    
+
     public boolean isUnwrappedCapable() {
         return unwrappedOperation != null;
     }
-    
+
     public OperationInfo getUnwrappedOperation() {
         return unwrappedOperation;
     }
@@ -132,8 +132,8 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
     public boolean isUnwrapped() {
         return false;
     }
-    
-    
+
+
     /**
      * Adds an fault to this operation.
      *
@@ -142,7 +142,7 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
     public FaultInfo addFault(QName name, QName message) {
         if (name == null) {
             throw new NullPointerException(new Message("FAULT.NAME.NOT.NULL", LOG).toString());
-        } 
+        }
         if (faults != null && faults.containsKey(name)) {
             throw new IllegalArgumentException(
                 new Message("DUPLICATED.FAULT.NAME", LOG, new Object[] {name}).toString());
@@ -158,7 +158,7 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
      * @param fault the fault.
      */
     public synchronized void addFault(FaultInfo fault) {
-        if (faults == null) { 
+        if (faults == null) {
             faults = new ConcurrentHashMap<QName, FaultInfo>(4, 0.75f, 2);
         }
         faults.put(fault.getFaultName(), fault);
@@ -187,9 +187,9 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
         }
         return null;
     }
-    
+
     public boolean hasFaults() {
-        return faults != null && faults.size() > 0;
+        return faults != null && !faults.isEmpty();
     }
 
     /**
@@ -203,26 +203,26 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
         }
         return Collections.unmodifiableCollection(faults.values());
     }
-    
+
     public void setParameterOrdering(List<String> o) {
         this.parameterOrdering = o;
     }
-    
+
     public List<String> getParameterOrdering() {
         return parameterOrdering;
     }
-    
+
     @Override
     public String toString() {
         return new StringBuilder().append("[OperationInfo: ")
             .append(opName)
             .append("]").toString();
     }
-    
+
     public int hashCode() {
         return opName == null ? -1 : opName.hashCode();
     }
-    
+
     public boolean equals(Object o) {
         if (o == this) {
             return true;
@@ -232,11 +232,11 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
             return false;
         }
         OperationInfo oi = (OperationInfo)o;
-        return equals(opName, oi.opName) 
+        return equals(opName, oi.opName)
             && equals(inputMessage, oi.inputMessage)
             && equals(outputMessage, oi.outputMessage)
             && equals(faults, oi.faults)
-            && equals(intf.getName(), oi.intf.getName()); 
+            && equals(intf.getName(), oi.intf.getName());
     }
-    
+
 }

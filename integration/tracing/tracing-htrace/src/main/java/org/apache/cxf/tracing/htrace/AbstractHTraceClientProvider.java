@@ -30,44 +30,44 @@ import org.apache.htrace.core.Span;
 import org.apache.htrace.core.TraceScope;
 import org.apache.htrace.core.Tracer;
 
-public abstract class AbstractHTraceClientProvider extends AbstractTracingProvider { 
+public abstract class AbstractHTraceClientProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractHTraceClientProvider.class);
-    protected static final String TRACE_SPAN = "org.apache.cxf.tracing.htrace.span";
-        
+    protected static final String TRACE_SPAN = "org.apache.cxf.tracing.client.htrace.span";
+
     private final Tracer tracer;
-        
+
     public AbstractHTraceClientProvider(final Tracer tracer) {
         this.tracer = tracer;
     }
 
-    protected TraceScopeHolder<TraceScope> startTraceSpan(final Map<String, List<String>> requestHeaders, 
+    protected TraceScopeHolder<TraceScope> startTraceSpan(final Map<String, List<String>> requestHeaders,
             String path, String method) {
 
         Span span = Tracer.getCurrentSpan();
         TraceScope traceScope = null;
-        
+
         if (span == null) {
             traceScope = tracer.newScope(buildSpanDescription(path, method));
             span = traceScope.getSpan();
         }
-        
+
         if (span != null) {
             final String spanIdHeader = getSpanIdHeader();
             // Transfer tracing headers into the response headers
             requestHeaders.put(spanIdHeader, Collections.singletonList(span.getSpanId().toString()));
         }
-        
-        // In case of asynchronous client invocation, the span should be detached as JAX-RS 
+
+        // In case of asynchronous client invocation, the span should be detached as JAX-RS
         // client request / response filters are going to be executed in different threads.
         boolean detached = false;
         if (isAsyncInvocation() && traceScope != null) {
             traceScope.detach();
             detached = true;
         }
-        
+
         return new TraceScopeHolder<TraceScope>(traceScope, detached);
     }
-    
+
     private boolean isAsyncInvocation() {
         return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
     }
@@ -76,13 +76,13 @@ public abstract class AbstractHTraceClientProvider extends AbstractTracingProvid
         if (holder == null) {
             return;
         }
-        
+
         final TraceScope scope = holder.getScope();
         if (scope != null) {
-            // If the client invocation was asynchronous , the trace scope has been created 
+            // If the client invocation was asynchronous , the trace scope has been created
             // in another thread and should be re-attached to the current one.
             if (holder.isDetached()) {
-                scope.reattach(); 
+                scope.reattach();
                 scope.close();
             } else {
                 scope.close();

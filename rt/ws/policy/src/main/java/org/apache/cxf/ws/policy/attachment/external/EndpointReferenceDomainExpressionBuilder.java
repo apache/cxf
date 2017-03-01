@@ -38,22 +38,22 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.PolicyException;
 
 /**
- * 
+ *
  */
 public class EndpointReferenceDomainExpressionBuilder implements DomainExpressionBuilder {
 
-    private static final ResourceBundle BUNDLE 
+    private static final ResourceBundle BUNDLE
         = BundleUtils.getBundle(EndpointReferenceDomainExpressionBuilder.class);
-    
+
     private static final Collection<QName> SUPPORTED_TYPES = Collections.singletonList(
         new QName("http://www.w3.org/2005/08/addressing", "EndpointReference"));
-    
+
     private JAXBContext context;
-    
+
     public EndpointReferenceDomainExpressionBuilder() {
 
-    }  
-    
+    }
+
     public Collection<QName> getDomainExpressionTypes() {
         return SUPPORTED_TYPES;
     }
@@ -63,19 +63,19 @@ public class EndpointReferenceDomainExpressionBuilder implements DomainExpressio
         try {
             obj = JAXBUtils.unmarshall(createJAXBContext(), e);
         } catch (JAXBException ex) {
-            throw new PolicyException(new Message("EPR_DOMAIN_EXPRESSION_BUILD_EXC", BUNDLE, 
+            throw new PolicyException(new Message("EPR_DOMAIN_EXPRESSION_BUILD_EXC", BUNDLE,
                                                   (Object[])null), ex);
         }
         if (obj instanceof JAXBElement<?>) {
             JAXBElement<?> el = (JAXBElement<?>)obj;
             obj = el.getValue();
-        } 
+        }
 
         EndpointReferenceDomainExpression eprde = new EndpointReferenceDomainExpression();
         eprde.setEndpointReference((EndpointReferenceType)obj);
         return eprde;
     }
-    
+
     protected synchronized JAXBContext createJAXBContext() {
         if (context == null) {
             try {
@@ -83,7 +83,7 @@ public class EndpointReferenceDomainExpressionBuilder implements DomainExpressio
                 String pkg = PackageUtils.getPackageName(clz);
                 context = JAXBContext.newInstance(pkg, clz.getClassLoader());
             } catch (JAXBException ex) {
-                throw new PolicyException(new Message("EPR_DOMAIN_EXPRESSION_BUILDER_INIT_EXC", BUNDLE, 
+                throw new PolicyException(new Message("EPR_DOMAIN_EXPRESSION_BUILDER_INIT_EXC", BUNDLE,
                                                       (Object[])null), ex);
             }
         }

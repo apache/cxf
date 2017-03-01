@@ -32,7 +32,7 @@ public class AegisServer extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(AegisServer.class);
 
     private org.eclipse.jetty.server.Server server;
-    
+
     protected void run() {
         //System.out.println("Starting Server");
 
@@ -55,11 +55,11 @@ public class AegisServer extends AbstractBusTestServerBase {
         server.setHandler(handlers);
         try {
             server.start();
-                       
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-      
+
     }
     public void tearDown() throws Exception {
         if (server != null) {

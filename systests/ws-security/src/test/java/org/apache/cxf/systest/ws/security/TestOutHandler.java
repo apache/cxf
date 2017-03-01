@@ -52,8 +52,8 @@ public class TestOutHandler implements SOAPHandler<SOAPMessageContext> {
     }
 
     private static boolean isOutbound(SOAPMessageContext smc) {
-        return smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY) != null 
+        return smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY) != null
                && ((Boolean)smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY)).booleanValue();
     }
- 
+
 }

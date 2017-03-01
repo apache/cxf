@@ -20,7 +20,7 @@
 package org.apache.cxf.endpoint;
 
 
-public interface ClientLifeCycleManager { 
+public interface ClientLifeCycleManager {
     void clientCreated(Client client);
     void clientDestroyed(Client client);
     void registerListener(ClientLifeCycleListener listener);

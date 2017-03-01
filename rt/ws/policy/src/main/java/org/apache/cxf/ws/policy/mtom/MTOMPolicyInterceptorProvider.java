@@ -33,23 +33,23 @@ public class MTOMPolicyInterceptorProvider extends AbstractPolicyInterceptorProv
     private static final long serialVersionUID = -2101800288259099105L;
     private static final Collection<QName> ASSERTION_TYPES;
     private static final MTOMPolicyInterceptor INTERCEPTOR = new MTOMPolicyInterceptor();
-    
+
     static {
-        Collection<QName> types = new ArrayList<QName>();
+        Collection<QName> types = new ArrayList<>();
         types.add(MetadataConstants.MTOM_ASSERTION_QNAME);
         ASSERTION_TYPES = types;
     }
-    
+
     public MTOMPolicyInterceptorProvider() {
         super(ASSERTION_TYPES);
 
         getInInterceptors().add(INTERCEPTOR);
-        
+
         getOutInterceptors().add(INTERCEPTOR);
-        
+
         getInFaultInterceptors().add(INTERCEPTOR);
-        
+
         getOutFaultInterceptors().add(INTERCEPTOR);
     }
-    
+
 }

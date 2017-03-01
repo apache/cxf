@@ -35,8 +35,8 @@ import org.apache.cxf.transport.Conduit;
 public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(MessageSenderInterceptor.class);
     private MessageSenderEndingInterceptor ending = new MessageSenderEndingInterceptor();
-    
-    
+
+
     public MessageSenderInterceptor() {
         super(Phase.PREPARE_SEND);
     }
@@ -46,12 +46,12 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
             getConduit(message).prepare(message);
         } catch (IOException ex) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_SEND", BUNDLE), ex);
-        }    
-        
+        }
+
         // Add a final interceptor to close the conduit
         message.getInterceptorChain().add(ending);
     }
-    
+
     public static class MessageSenderEndingInterceptor extends AbstractPhaseInterceptor<Message> {
         public MessageSenderEndingInterceptor() {
             super(Phase.PREPARE_SEND_ENDING);
@@ -65,7 +65,7 @@ public class MessageSenderInterceptor extends AbstractPhaseInterceptor<Message> 
             }
         }
     }
-    
+
     public static Conduit getConduit(Message message) {
         Exchange exchange = message.getExchange();
         Conduit conduit = exchange.getConduit(message);

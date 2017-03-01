@@ -56,7 +56,7 @@ public class UserInfoClient extends OidcClaimsValidator {
             }
         }
     }
-    public UserInfo getUserInfoFromJwt(String profileJwtToken, 
+    public UserInfo getUserInfoFromJwt(String profileJwtToken,
                                        IdToken idToken,
                                        Consumer client) {
         JwtToken jwt = getUserInfoJwt(profileJwtToken, client);
@@ -86,5 +86,5 @@ public class UserInfoClient extends OidcClaimsValidator {
     public void setGetUserInfoFromJwt(boolean getUserInfoFromJwt) {
         this.getUserInfoFromJwt = getUserInfoFromJwt;
     }
-    
+
 }

@@ -61,30 +61,30 @@ import org.apache.cxf.staxutils.StaxUtils;
 @Provider
 @Produces({"application/xml", "application/*+xml", "text/xml" })
 @Consumes({"application/xml", "application/*+xml", "text/xml", "text/html" })
-public class SourceProvider<T> extends AbstractConfigurableProvider implements 
+public class SourceProvider<T> extends AbstractConfigurableProvider implements
     MessageBodyReader<T>, MessageBodyWriter<T> {
 
     private static final String PREFERRED_FORMAT = "source-preferred-format";
     private static final Logger LOG = LogUtils.getL7dLogger(SourceProvider.class);
     @Context
     private MessageContext context;
-    
-    
+
+
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return Source.class.isAssignableFrom(type)
             || Node.class.isAssignableFrom(type);
     }
-    
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return Source.class.isAssignableFrom(type) 
+        return Source.class.isAssignableFrom(type)
                || XMLSource.class.isAssignableFrom(type)
                || Document.class.isAssignableFrom(type);
     }
-    
-    public T readFrom(Class<T> source, Type genericType, Annotation[] annotations, MediaType m,  
-        MultivaluedMap<String, String> headers, InputStream is) 
+
+    public T readFrom(Class<T> source, Type genericType, Annotation[] annotations, MediaType m,
+        MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
-        
+
         Class<?> theSource = source;
         if (theSource == Source.class) {
             String s = getPreferredSource();
@@ -94,7 +94,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
         }
         try {
             if (DOMSource.class.isAssignableFrom(theSource) || Document.class.isAssignableFrom(theSource)) {
-                
+
                 boolean docRequired = Document.class.isAssignableFrom(theSource);
                 XMLStreamReader reader = getReader(is);
                 try {
@@ -133,7 +133,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
             LOG.warning(msg);
             throw ExceptionUtils.toInternalServerErrorException(null, null);
         }
-        
+
         throw new IOException("Unrecognized source");
     }
 
@@ -144,7 +144,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
         }
         return configureReaderRestrictions(reader);
     }
-    
+
     protected XMLStreamReader configureReaderRestrictions(XMLStreamReader reader) {
         Message message = PhaseInterceptorChain.getCurrentMessage();
         if (message != null) {
@@ -157,15 +157,15 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
             return reader;
         }
     }
-    
+
     protected InputStream getRealStream(InputStream is) throws IOException {
         XMLStreamReader reader = getReaderFromMessage();
         return reader == null ? is : getStreamFromReader(reader);
     }
-    
-    private InputStream getStreamFromReader(XMLStreamReader input) 
+
+    private InputStream getStreamFromReader(XMLStreamReader input)
         throws IOException {
-        
+
         try (CachedOutputStream out = new CachedOutputStream()) {
             StaxUtils.copy(input, out);
             return out.getInputStream();
@@ -173,7 +173,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
             throw new IOException("XMLStreamException:" + ex.getMessage());
         }
     }
-    
+
     protected XMLStreamReader getReaderFromMessage() {
         MessageContext mc = getContext();
         if (mc != null) {
@@ -182,13 +182,13 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
             return null;
         }
     }
-    
-    public void writeTo(T source, Class<?> clazz, Type genericType, Annotation[] annotations,  
+
+    public void writeTo(T source, Class<?> clazz, Type genericType, Annotation[] annotations,
         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
-        
+
         String encoding = HttpUtils.getSetEncoding(mt, headers, StandardCharsets.UTF_8.name());
-        
+
         XMLStreamReader reader = null;
         if (source instanceof Source) {
             reader = StaxUtils.createXMLStreamReader((Source)source);
@@ -201,7 +201,7 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
         try {
             StaxUtils.copy(reader, writer);
         } catch (XMLStreamException e) {
-            throw ExceptionUtils.toInternalServerErrorException(e, null); 
+            throw ExceptionUtils.toInternalServerErrorException(e, null);
         } finally {
             try {
                 reader.close();
@@ -216,23 +216,23 @@ public class SourceProvider<T> extends AbstractConfigurableProvider implements
             }
         }
     }
-    
-    public long getSize(T source, Class<?> type, Type genericType, Annotation[] annotations, 
+
+    public long getSize(T source, Class<?> type, Type genericType, Annotation[] annotations,
                         MediaType mt) {
         return -1;
     }
-    
+
     protected String getPreferredSource() {
         MessageContext mc = getContext();
         String source = null;
         if (mc != null) {
             source = (String)mc.getContextualProperty(PREFERRED_FORMAT);
-        } 
+        }
         return source != null ? source : "sax";
-        
+
     }
-    
+
     protected MessageContext getContext() {
-        return context;    
+        return context;
     }
 }

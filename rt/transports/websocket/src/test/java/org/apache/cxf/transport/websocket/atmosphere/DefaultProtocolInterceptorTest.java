@@ -36,7 +36,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class DefaultProtocolInterceptorTest extends Assert {
 
@@ -54,33 +54,33 @@ public class DefaultProtocolInterceptorTest extends Assert {
         response.headers().put("Content-Type", contentType);
 
         byte[] transformed = dpi.createResponse(response, payload.getBytes(), true);
-        verifyTransformed("200", 
-                          new String[]{"Content-Type", contentType}, 
+        verifyTransformed("200",
+                          new String[]{"Content-Type", contentType},
                           payload, transformed);
 
         response.headers().put("X-fruit", "peach");
         response.headers().put("X-vegetable", "tomato");
         transformed = dpi.createResponse(response, payload.getBytes(), true);
-        verifyTransformed("200", 
-                          new String[]{"Content-Type", contentType}, 
+        verifyTransformed("200",
+                          new String[]{"Content-Type", contentType},
                           payload, transformed);
 
         dpi.includedheaders("X-f.*");
         transformed = dpi.createResponse(response, payload.getBytes(), true);
-        verifyTransformed("200", 
-                          new String[]{"Content-Type", contentType, "X-Fruit", "peach"}, 
+        verifyTransformed("200",
+                          new String[]{"Content-Type", contentType, "X-Fruit", "peach"},
                           payload, transformed);
 
         dpi.includedheaders("X-.*");
         transformed = dpi.createResponse(response, payload.getBytes(), true);
-        verifyTransformed("200", 
-                          new String[]{"Content-Type", contentType, "X-Fruit", "peach", "X-vegetable", "tomato"}, 
+        verifyTransformed("200",
+                          new String[]{"Content-Type", contentType, "X-Fruit", "peach", "X-vegetable", "tomato"},
                           payload, transformed);
 
         dpi.excludedheaders(".*able");
         transformed = dpi.createResponse(response, payload.getBytes(), true);
-        verifyTransformed("200", 
-                          new String[]{"Content-Type", contentType, "X-Fruit", "peach"}, 
+        verifyTransformed("200",
+                          new String[]{"Content-Type", contentType, "X-Fruit", "peach"},
                           payload, transformed);
     }
 

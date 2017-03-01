@@ -32,20 +32,20 @@ import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
 
 /**
- * In this test case, a CXF client requests a SecurityContextToken from an STS, and then uses the 
+ * In this test case, a CXF client requests a SecurityContextToken from an STS, and then uses the
  * corresponding secret to secure a service request. The service endpoint must contact the STS to validate
  * the received SCT and get the secret required to decrypt/verify the client request (via a SAML2 Assertion).
  */
 public class SecureConversationTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     private static final String PORT = allocatePort(Server.class);
     private static final String PORT2 = allocatePort(Server.class, 2);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -61,7 +61,7 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
                    launchServer(STSServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -80,15 +80,15 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         URL wsdl = SecureConversationTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSecureConvPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
 
         doubleIt(transportPort, 25);
-        
+
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testSecureConversationSymmetric() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -101,12 +101,12 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         URL wsdl = SecureConversationTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSecureConvPort");
-        DoubleItPortType symmetricPort = 
+        DoubleItPortType symmetricPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(symmetricPort, PORT2);
 
         doubleIt(symmetricPort, 30);
-        
+
         bus.shutdown(true);
     }
 
@@ -122,18 +122,18 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         URL wsdl = SecureConversationTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSupportingPort");
-        DoubleItPortType transportPort = 
+        DoubleItPortType transportPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportPort, PORT);
 
         doubleIt(transportPort, 25);
-        
+
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertTrue(resp == 2 * numToDouble);
     }
-    
+
 }

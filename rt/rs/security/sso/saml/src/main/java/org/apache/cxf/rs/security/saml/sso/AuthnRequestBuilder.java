@@ -26,12 +26,12 @@ import org.opensaml.saml.saml2.core.AuthnRequest;
  * This interface defines a method to create a SAML 2.0 Protocol AuthnRequest.
  */
 public interface AuthnRequestBuilder {
-    
+
     /**
      * Create a SAML 2.0 Protocol AuthnRequest
      */
     AuthnRequest createAuthnRequest(
-        Message message, 
+        Message message,
         String issuerId,
         String assertionConsumerServiceAddress
     ) throws Exception;

@@ -28,7 +28,7 @@ import javax.xml.stream.events.Namespace;
 public class SkipStartEndEventProducer implements CorbaTypeEventProducer {
 
     private final CorbaTypeEventProducer eventProducer;
-    private QName name;   
+    private QName name;
     private int peekedEvent;
     private boolean hasNext = true;
 
@@ -48,7 +48,7 @@ public class SkipStartEndEventProducer implements CorbaTypeEventProducer {
         return name;
     }
 
-    public String getText() {    
+    public String getText() {
         return eventProducer.getText();
     }
 

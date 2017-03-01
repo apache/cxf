@@ -23,9 +23,9 @@ import javax.xml.ws.Endpoint;
 
 
 /**
- * 
+ *
  */
- 
+
 public class BenchmarkServer{
 
     protected BenchmarkServer() throws Exception {
@@ -34,11 +34,11 @@ public class BenchmarkServer{
         String address = "http://localhost:8080/cxf/services/Benchmark";
         Endpoint.publish(address, implementor);
     }
-    
-    public static void main(String args[]) throws Exception { 
+
+    public static void main(String args[]) throws Exception {
         new BenchmarkServer();
-        System.out.println("Server ready...");         
-        Thread.sleep(Integer.MAX_VALUE); 
+        System.out.println("Server ready...");
+        Thread.sleep(Integer.MAX_VALUE);
         System.out.println("Server exitting");
         System.exit(0);
     }

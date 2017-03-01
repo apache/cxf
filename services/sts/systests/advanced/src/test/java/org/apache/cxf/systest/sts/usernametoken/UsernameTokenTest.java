@@ -46,10 +46,10 @@ import org.junit.runners.Parameterized.Parameters;
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class UsernameTokenTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
@@ -57,11 +57,11 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
     private static final String STAX_PORT = allocatePort(StaxServer.class);
 
     final TestParam test;
-    
+
     public UsernameTokenTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -89,17 +89,17 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxSTSServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, "")},
                                                 {new TestParam(PORT, true, "")},
                                                 {new TestParam(STAX_PORT, false, "")},
                                                 {new TestParam(STAX_PORT, true, "")},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -115,24 +115,24 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = UsernameTokenTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportUTPort");
-        DoubleItPortType transportUTPort = 
+        DoubleItPortType transportUTPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportUTPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportUTPort);
         }
-        
+
         doubleIt(transportUTPort, 25);
-        
+
         ((java.io.Closeable)transportUTPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testBadUsernameToken() throws Exception {
 
@@ -146,25 +146,25 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportUTPort");
-        DoubleItPortType transportUTPort = 
+        DoubleItPortType transportUTPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportUTPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportUTPort);
         }
-        
+
         try {
             doubleIt(transportUTPort, 30);
             fail("Expected failure on a bad password");
         } catch (javax.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportUTPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUsernameTokenAuthorization() throws Exception {
         // Token transformation is not supported for the streaming code
@@ -178,31 +178,31 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         Bus bus = bf.createBus(busFile.toString());
         SpringBusFactory.setDefaultBus(bus);
         SpringBusFactory.setThreadDefaultBus(bus);
-        
+
         URL wsdl = UsernameTokenTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportUTAuthorizationPort");
-        DoubleItPortType transportUTPort = 
+        DoubleItPortType transportUTPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportUTPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportUTPort);
         }
-        
+
         doubleIt(transportUTPort, 25);
-        
+
         ((java.io.Closeable)transportUTPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testUnauthorizedUsernameToken() throws Exception {
         // Token transformation is not supported for the streaming code
         if (STAX_PORT.equals(test.getPort())) {
             return;
         }
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = UsernameTokenTest.class.getResource("cxf-bad-client.xml");
 
@@ -213,21 +213,21 @@ public class UsernameTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = UsernameTokenTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportUTAuthorizationPort");
-        DoubleItPortType transportUTPort = 
+        DoubleItPortType transportUTPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(transportUTPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(transportUTPort);
         }
-        
+
         try {
             doubleIt(transportUTPort, 30);
             fail("Expected failure on a bad password");
         } catch (javax.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
-        
+
         ((java.io.Closeable)transportUTPort).close();
         bus.shutdown(true);
     }

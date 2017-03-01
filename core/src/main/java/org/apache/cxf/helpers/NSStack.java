@@ -28,12 +28,12 @@ public class NSStack {
     private static final String NS_PREFIX_PREFIX = "ns";
 
     private final List<List<NSDecl>> stack = new ArrayList<List<NSDecl>>();
-    private List<NSDecl> top; 
-    private int size; 
+    private List<NSDecl> top;
+    private int size;
     private int nsPrefixCount = 1;
 
     public synchronized void push() {
-        top = new ArrayList<NSDecl>();
+        top = new ArrayList<>();
         stack.add(top);
         size++;
     }
@@ -95,7 +95,7 @@ public class NSStack {
     public synchronized String getPrefix(String uri) {
         for (int i = size - 1; i >= 0; i--) {
             List<NSDecl> scope = stack.get(i);
-            ListIterator<NSDecl> lsIterator =  scope.listIterator();
+            ListIterator<NSDecl> lsIterator = scope.listIterator();
 
             while (lsIterator.hasNext()) {
                 NSDecl nsd = lsIterator.next();
@@ -107,7 +107,7 @@ public class NSStack {
         }
         return null;
     }
-   
+
     /**
      * Return the namespace name associated with the given prefix by
      * looking thru all the namespace declarations that are in scope.

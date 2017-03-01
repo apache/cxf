@@ -32,7 +32,7 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 
 public class SparkStreamingOutput implements StreamingOutput {
     private BlockingQueue<String> responseQueue = new LinkedBlockingQueue<String>();
-    
+
     private JavaStreamingContext jssc;
     private volatile boolean sparkBatchCompleted;
     private volatile boolean outputWriteDone;
@@ -56,13 +56,13 @@ public class SparkStreamingOutput implements StreamingOutput {
                 // continue;
             }
         }
-        
+
         jssc.stop(false);
         jssc.close();
         System.out.println("Total processing time in millisecs: " + (System.currentTimeMillis() - startAt));
     }
-    
-    
+
+
     public void setSparkBatchCompleted() {
         this.sparkBatchCompleted = true;
     }

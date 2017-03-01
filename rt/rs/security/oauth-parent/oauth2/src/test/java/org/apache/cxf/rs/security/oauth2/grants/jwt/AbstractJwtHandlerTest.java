@@ -58,7 +58,7 @@ public class AbstractJwtHandlerTest {
     public void setUp() {
         handler = new AbstractJwtHandler(Arrays.asList("someGrantType")) {
             @Override
-            public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params) 
+            public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
                 throws OAuthServiceException {
                 throw new UnsupportedOperationException("not implemented");
             }

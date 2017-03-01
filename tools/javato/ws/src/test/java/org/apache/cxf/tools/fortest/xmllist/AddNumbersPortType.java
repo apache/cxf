@@ -47,22 +47,22 @@ public interface AddNumbersPortType {
         @WebParam(name = "arg", targetNamespace = "http://apache.org/xmllist")
         @XmlList
         List<String> arg);
-    
-    //test for CXF-1752 
+
+    //test for CXF-1752
     @WebMethod(action = "testCXF1752")
-    @WebResult(name = "result") 
+    @WebResult(name = "result")
     UserObject testCXF1752(
-        @WebParam(name = "receivers") List<Long> receivers, 
-        @WebParam(name = "item") UserObject item, 
-        @WebParam(name = "binaryContent") byte[] binaryContent, 
-        @WebParam(name = "userObjects") UserObject[] objects, 
-        @WebParam(name = "userObjectList") List<UserObject> objectList, 
+        @WebParam(name = "receivers") List<Long> receivers,
+        @WebParam(name = "item") UserObject item,
+        @WebParam(name = "binaryContent") byte[] binaryContent,
+        @WebParam(name = "userObjects") UserObject[] objects,
+        @WebParam(name = "userObjectList") List<UserObject> objectList,
         @WebParam(name = "fileName") String fileName);
-    
-    
+
+
     class UserObject {
         String myData;
-        
+
         public void setMyData(String s) {
             myData = s;
         }

@@ -32,7 +32,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 /**
- * 
+ *
  */
 public class OperationInfoAuthorizingInterceptor extends SimpleAuthorizingInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(OperationInfoAuthorizingInterceptor.class);
@@ -49,7 +49,7 @@ public class OperationInfoAuthorizingInterceptor extends SimpleAuthorizingInterc
         } else if (!isMethodProtected(opinfo.getName().getLocalPart()) && isAllowAnonymousUsers()) {
             return;
         }
-        
+
         throw new AccessDeniedException("Unauthorized");
 
     }
@@ -60,7 +60,7 @@ public class OperationInfoAuthorizingInterceptor extends SimpleAuthorizingInterc
             List<String> denyRoles = getDenyRoles(key);
             return denyRoles.isEmpty() ? true : isUserInRole(sc, denyRoles, true);
         }
-        
+
         if (isUserInRole(sc, expectedRoles, false)) {
             return true;
         }
@@ -87,9 +87,9 @@ public class OperationInfoAuthorizingInterceptor extends SimpleAuthorizingInterc
     }
 
     protected List<String> getDenyRoles(String key) {
-        return Collections.emptyList();    
+        return Collections.emptyList();
     }
-    
+
     protected boolean isMethodProtected(String key) {
         return !getExpectedRoles(key).isEmpty() || !getDenyRoles(key).isEmpty();
     }

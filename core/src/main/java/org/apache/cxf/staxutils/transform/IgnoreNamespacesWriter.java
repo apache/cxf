@@ -34,7 +34,7 @@ public class IgnoreNamespacesWriter extends DelegatingXMLStreamWriter {
         this.ignoreXsiAttributes = ignoreXsiAttributes;
     }
 
-    public void writeAttribute(String prefix, String uri, 
+    public void writeAttribute(String prefix, String uri,
                                String local, String value) throws XMLStreamException {
         if (ignoreXsiAttributes && XSI_PREFIX.equals(prefix)
             && ("type".equals(local) || "nil".equals(local))) {
@@ -46,19 +46,19 @@ public class IgnoreNamespacesWriter extends DelegatingXMLStreamWriter {
     public void writeAttribute(String uri, String local, String value) throws XMLStreamException {
         super.writeAttribute(local, value);
     }
-    
+
     public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
         super.writeStartElement(local);
     }
-    
+
     public void writeStartElement(String uri, String local) throws XMLStreamException {
         super.writeStartElement(local);
     }
-    
+
     public void setPrefix(String pfx, String uri) throws XMLStreamException {
         // completed
     }
-    
+
     public void setDefaultNamespace(String uri) throws XMLStreamException {
         // completed
     }

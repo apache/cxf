@@ -32,22 +32,22 @@ import org.junit.Test;
  */
 public class ClientPersistenceTest extends AbstractClientPersistenceTest {
     private static final String PORT = allocatePort(ClientPersistenceTest.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         RMTxStore.deleteDatabaseFiles("cpt-server", true);
         RMTxStore.deleteDatabaseFiles("cpt-client", true);
         startServers(PORT, "cpt");
     }
-    
+
     @AfterClass
     public static void cleanup() throws Exception {
         CachedOutputStream.setDefaultThreshold(-1);
         RMTxStore.deleteDatabaseFiles("cpt-server", false);
         RMTxStore.deleteDatabaseFiles("cpt-client", false);
     }
-   
-    @Test 
+
+    @Test
     public void testRecovery() throws Exception {
         super.testRecovery();
     }

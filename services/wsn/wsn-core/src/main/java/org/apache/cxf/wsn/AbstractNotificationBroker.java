@@ -75,14 +75,14 @@ import org.oasis_open.docs.wsrf.rw_2.ResourceUnavailableFault;
 import org.oasis_open.docs.wsrf.rw_2.ResourceUnknownFault;
 
 @WebService(endpointInterface = "org.oasis_open.docs.wsn.brw_2.NotificationBroker")
-public abstract class AbstractNotificationBroker extends AbstractEndpoint 
+public abstract class AbstractNotificationBroker extends AbstractEndpoint
     implements NotificationBroker, NotificationBrokerMBean, GetResourceProperty {
 
     public static final String NAMESPACE_URI = "http://docs.oasis-open.org/wsn/b-2";
     public static final String PREFIX = "wsnt";
     public static final QName TOPIC_EXPRESSION_QNAME = new QName(NAMESPACE_URI, "TopicExpression", PREFIX);
     public static final QName FIXED_TOPIC_SET_QNAME = new QName(NAMESPACE_URI, "FixedTopicSet", PREFIX);
-    public static final QName TOPIC_EXPRESSION_DIALECT_QNAME 
+    public static final QName TOPIC_EXPRESSION_DIALECT_QNAME
         = new QName(NAMESPACE_URI, "TopicExpressionDialect", PREFIX);
     public static final QName TOPIC_SET_QNAME = new QName(NAMESPACE_URI, "TopicSet", PREFIX);
 
@@ -93,7 +93,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
     private AbstractPublisher anonymousPublisher;
 
     private Map<String, AbstractPublisher> publishers;
-    
+
     private List<AbstractPublisher> nonContactPublishers;
 
     private Map<String, AbstractSubscription> subscriptions;
@@ -105,7 +105,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
         publishers = new ConcurrentHashMap<String, AbstractPublisher>();
         nonContactPublishers = new CopyOnWriteArrayList<AbstractPublisher>();
     }
-    
+
     @Override
     public ObjectName getMBeanName() {
         try {
@@ -126,15 +126,15 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
         anonymousPublisher.destroy();
         unregister();
     }
-    
+
     public List<String> getPublisher() {
-        return new ArrayList<String>(publishers.keySet());
+        return new ArrayList<>(publishers.keySet());
     }
-    
+
     public List<String> getSubscriptions() {
-        return new ArrayList<String>(subscriptions.keySet());
+        return new ArrayList<>(subscriptions.keySet());
     }
-    
+
     public EndpointMBean getPublisher(String name) {
         return publishers.get(name);
     }
@@ -148,14 +148,14 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
     }
 
     /**
-     * 
+     *
      * @param notify
      */
     @WebMethod(operationName = "Notify")
     @Oneway
     public void notify(
-            @WebParam(name = "Notify", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-1", 
+            @WebParam(name = "Notify",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-1",
                       partName = "Notify")
             Notify notify) {
 
@@ -186,7 +186,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
     }
 
     /**
-     * 
+     *
      * @param subscribeRequest
      * @return returns org.oasis_open.docs.wsn.b_1.SubscribeResponse
      * @throws SubscribeCreationFailedFault
@@ -200,12 +200,12 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
      * @throws UnacceptableInitialTerminationTimeFault
      */
     @WebMethod(operationName = "Subscribe")
-    @WebResult(name = "SubscribeResponse", 
-               targetNamespace = "http://docs.oasis-open.org/wsn/b-1", 
+    @WebResult(name = "SubscribeResponse",
+               targetNamespace = "http://docs.oasis-open.org/wsn/b-1",
                partName = "SubscribeResponse")
     public SubscribeResponse subscribe(
-            @WebParam(name = "Subscribe", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-1", 
+            @WebParam(name = "Subscribe",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-1",
                       partName = "SubscribeRequest")
             Subscribe subscribeRequest)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
@@ -221,7 +221,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
     }
 
     public SubscribeResponse handleSubscribe(
-                Subscribe subscribeRequest, 
+                Subscribe subscribeRequest,
                 EndpointManager manager)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
         throws InvalidFilterFault, InvalidMessageContentExpressionFault,
@@ -271,7 +271,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
     }
 
     /**
-     * 
+     *
      * @param getCurrentMessageRequest
      * @return returns org.oasis_open.docs.wsn.b_1.GetCurrentMessageResponse
      * @throws MultipleTopicsSpecifiedFault
@@ -282,12 +282,12 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
      * @throws NoCurrentMessageOnTopicFault
      */
     @WebMethod(operationName = "GetCurrentMessage")
-    @WebResult(name = "GetCurrentMessageResponse", 
-               targetNamespace = "http://docs.oasis-open.org/wsn/b-1", 
+    @WebResult(name = "GetCurrentMessageResponse",
+               targetNamespace = "http://docs.oasis-open.org/wsn/b-1",
                partName = "GetCurrentMessageResponse")
     public GetCurrentMessageResponse getCurrentMessage(
-            @WebParam(name = "GetCurrentMessage", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/b-1", 
+            @WebParam(name = "GetCurrentMessage",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/b-1",
                       partName = "GetCurrentMessageRequest")
             GetCurrentMessage getCurrentMessageRequest)
         //CHECKSTYLE:OFF - WS-Notification spec throws a lot of faults
@@ -301,7 +301,7 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
     }
 
     /**
-     * 
+     *
      * @param registerPublisherRequest
      * @return returns org.oasis_open.docs.wsn.br_1.RegisterPublisherResponse
      * @throws PublisherRegistrationRejectedFault
@@ -311,12 +311,12 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
      * @throws PublisherRegistrationFailedFault
      */
     @WebMethod(operationName = "RegisterPublisher")
-    @WebResult(name = "RegisterPublisherResponse", 
-               targetNamespace = "http://docs.oasis-open.org/wsn/br-1", 
+    @WebResult(name = "RegisterPublisherResponse",
+               targetNamespace = "http://docs.oasis-open.org/wsn/br-1",
                partName = "RegisterPublisherResponse")
     public RegisterPublisherResponse registerPublisher(
-            @WebParam(name = "RegisterPublisher", 
-                      targetNamespace = "http://docs.oasis-open.org/wsn/br-1", 
+            @WebParam(name = "RegisterPublisher",
+                      targetNamespace = "http://docs.oasis-open.org/wsn/br-1",
                       partName = "RegisterPublisherRequest")
             RegisterPublisher registerPublisherRequest) throws InvalidTopicExpressionFault,
             PublisherRegistrationFailedFault, PublisherRegistrationRejectedFault, ResourceUnknownFault,
@@ -326,10 +326,10 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
         return handleRegisterPublisher(registerPublisherRequest);
     }
 
-    public RegisterPublisherResponse handleRegisterPublisher(RegisterPublisher registerPublisherRequest) 
+    public RegisterPublisherResponse handleRegisterPublisher(RegisterPublisher registerPublisherRequest)
         throws InvalidTopicExpressionFault, PublisherRegistrationFailedFault,
         PublisherRegistrationRejectedFault, ResourceUnknownFault, TopicNotSupportedFault {
-        
+
         AbstractPublisher publisher = null;
         boolean success = false;
         try {
@@ -366,12 +366,12 @@ public abstract class AbstractNotificationBroker extends AbstractEndpoint
 
     protected abstract AbstractSubscription createSubscription(String name);
 
-    @WebResult(name = "GetResourcePropertyResponse", 
+    @WebResult(name = "GetResourcePropertyResponse",
                targetNamespace = "http://docs.oasis-open.org/wsrf/rp-2",
                partName = "GetResourcePropertyResponse")
     @WebMethod(operationName = "GetResourceProperty")
     public GetResourcePropertyResponse getResourceProperty(
-        @WebParam(partName = "GetResourcePropertyRequest", 
+        @WebParam(partName = "GetResourcePropertyRequest",
                   name = "GetResourceProperty",
                   targetNamespace = "http://docs.oasis-open.org/wsrf/rp-2")
         javax.xml.namespace.QName getResourcePropertyRequest

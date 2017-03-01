@@ -48,7 +48,7 @@ public final class STSTokenRetriever {
     private static final Logger LOG = LogUtils.getL7dLogger(STSTokenRetriever.class);
     private static final String ASSOCIATED_TOKEN =
         STSTokenRetriever.class.getName() + "-" + "Associated_Token";
-    
+
     private STSTokenRetriever() {
     }
 
@@ -137,7 +137,7 @@ public final class STSTokenRetriever {
                 Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_APPLIES_TO, message);
                 String appliesTo = o == null ? null : o.toString();
                 if (appliesTo == null) {
-                    String endpointAddress = 
+                    String endpointAddress =
                         message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
                     // Strip out any query parameters if they exist
                     int query = endpointAddress.indexOf('?');
@@ -161,7 +161,7 @@ public final class STSTokenRetriever {
                     // Check to see whether the delegated token needs to be renewed
                     secToken = renewToken(message, secToken, params);
                 } else {
-                    secToken = getTokenFromSTS(message, client, maps, appliesTo, params);
+                    secToken = getTokenFromSTS(client, maps, appliesTo, params);
                 }
                 storeDelegationTokens(
                                       message, secToken, onBehalfOfToken, actAsToken, appliesTo,
@@ -185,7 +185,7 @@ public final class STSTokenRetriever {
                                      SecurityToken tok,
                                      TokenRequestParams params) {
         String imminentExpiryValue =
-            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_TOKEN_IMMINENT_EXPIRY_VALUE, 
+            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_TOKEN_IMMINENT_EXPIRY_VALUE,
                                                            message);
         long imminentExpiry = 10L;
         if (imminentExpiryValue != null) {
@@ -409,7 +409,7 @@ public final class STSTokenRetriever {
         }
     }
 
-    private static SecurityToken getTokenFromSTS(Message message, STSClient client,
+    private static SecurityToken getTokenFromSTS(STSClient client,
                                           AddressingProperties maps, String appliesTo,
                                           TokenRequestParams params) throws Exception {
         client.setTrust(params.getTrust10());

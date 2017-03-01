@@ -57,7 +57,7 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
         if (messageInfo == null || bop == null || !bop.isUnwrapped()) {
             return;
         }
-        
+
         BindingOperationInfo newbop = bop.getWrappedOperation();
         MessageInfo wrappedMsgInfo;
         if (Boolean.TRUE.equals(message.get(Message.REQUESTOR_ROLE))) {
@@ -65,7 +65,7 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
         } else {
             wrappedMsgInfo = newbop.getOutput().getMessageInfo();
         }
-             
+
         Class<?> wrapped = null;
         if (wrappedMsgInfo.getMessagePartsNumber() > 0) {
             wrapped = wrappedMsgInfo.getFirstMessagePart().getTypeClass();
@@ -81,7 +81,7 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
             if (helper == null) {
                 return;
             }
-            
+
             try {
                 MessageContentsList newObjs = new MessageContentsList();
                 if (ServiceUtils.isSchemaValidationEnabled(SchemaValidationType.OUT, message)
@@ -90,7 +90,7 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
                 }
                 Object o2 = helper.createWrapperObject(objs);
                 newObjs.put(firstMessagePart, o2);
-                
+
                 for (MessagePartInfo p : messageInfo.getMessageParts()) {
                     if (Boolean.TRUE.equals(p.getProperty(ReflectionServiceFactoryBean.HEADER))) {
                         MessagePartInfo mpi = wrappedMsgInfo.getMessagePart(p.getName());
@@ -106,10 +106,10 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
             } catch (Exception e) {
                 throw new Fault(e);
             }
-            
+
             // we've now wrapped the object, so use the wrapped binding op
             ex.put(BindingOperationInfo.class, newbop);
-            
+
             if (messageInfo == bop.getOperationInfo().getInput()) {
                 message.put(MessageInfo.class, newbop.getOperationInfo().getInput());
                 message.put(BindingMessageInfo.class, newbop.getInput());
@@ -144,13 +144,13 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
             lst.add(null);
         }
     }
-    
-    private WrapperHelper createWrapperHelper(WrapperCapableDatabinding dataBinding, 
+
+    private WrapperHelper createWrapperHelper(WrapperCapableDatabinding dataBinding,
                                               MessageInfo messageInfo,
                                               MessageInfo wrappedMessageInfo,
                                               Class<?> wrapperClass) {
-        List<String> partNames = new ArrayList<String>();
-        List<String> elTypeNames = new ArrayList<String>();
+        List<String> partNames = new ArrayList<>();
+        List<String> elTypeNames = new ArrayList<>();
         List<Class<?>> partClasses = new ArrayList<Class<?>>();
         QName wrapperName = null;
         for (MessagePartInfo p : wrappedMessageInfo.getMessageParts()) {
@@ -167,9 +167,9 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
             ensureSize(partNames, p.getIndex());
             ensureSize(elTypeNames, p.getIndex());
             ensureSize(partClasses, p.getIndex());
-            
+
             partNames.set(p.getIndex(), p.getName().getLocalPart());
-            
+
             String elementType = null;
             if (p.getTypeQName() == null) {
                 // handling anonymous complex type
@@ -177,7 +177,7 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
             } else {
                 elementType = p.getTypeQName().getLocalPart();
             }
-            
+
             elTypeNames.set(p.getIndex(), elementType);
             partClasses.set(p.getIndex(), p.getTypeClass());
         }

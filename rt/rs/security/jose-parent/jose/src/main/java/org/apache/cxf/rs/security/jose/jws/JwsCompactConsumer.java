@@ -133,5 +133,5 @@ public class JwsCompactConsumer {
     protected JsonMapObjectReaderWriter getReader() {
         return reader;
     }
-    
+
 }

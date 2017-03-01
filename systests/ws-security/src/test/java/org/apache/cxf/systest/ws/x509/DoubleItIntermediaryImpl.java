@@ -33,36 +33,36 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class DoubleItIntermediaryImpl extends AbstractBusClientServerTestBase implements DoubleItPortType {
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     @Resource
     WebServiceContext wsc;
-    
+
     public int doubleIt(int numberToDouble) throws DoubleItFault {
-        
+
         URL wsdl = X509TokenTest.class.getResource("DoubleItX509.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItKeyIdentifierPort");
-        DoubleItPortType x509Port = 
+        DoubleItPortType x509Port =
                 service.getPort(portQName, DoubleItPortType.class);
         try {
             updateAddressPort(x509Port, X509TokenTest.PORT);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
+
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES,
                 "bob.properties");
         ((BindingProvider)x509Port).getRequestContext().put(SecurityConstants.ENCRYPT_USERNAME, "bob");
-        
+
         return x509Port.doubleIt(numberToDouble);
     }
-    
+
 }

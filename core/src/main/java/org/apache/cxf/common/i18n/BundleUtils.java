@@ -45,7 +45,7 @@ public final class BundleUtils {
 
     /**
      * Encapsulates the logic related to naming the default resource bundle
-     * for a class. 
+     * for a class.
      *
      * @param cls the Class requiring the bundle
      * @return an appropriate ResourceBundle name
@@ -53,12 +53,12 @@ public final class BundleUtils {
     public static String getBundleName(Class<?> cls) {
         // Class.getPackage() can return null, so change to another way to get Package Name
         return PackageUtils.getPackageName(cls) + MESSAGE_BUNDLE;
-        
+
     }
-    
+
     /**
      * Encapsulates the logic related to naming the resource bundle
-     * with the given relative name for a class. 
+     * with the given relative name for a class.
      *
      * @param cls the Class requiring the bundle
      * @return an appropriate ResourceBundle name
@@ -69,13 +69,13 @@ public final class BundleUtils {
 
     /**
      * Encapsulates the logic related to locating the default resource bundle
-     * for a class. 
+     * for a class.
      *
      * @param cls the Class requiring the bundle
      * @return an appropriate ResourceBundle
      */
     public static ResourceBundle getBundle(Class<?> cls) {
-        
+
         try {
             ClassLoader loader = cls.getClassLoader();
             if (loader == null) {
@@ -92,12 +92,12 @@ public final class BundleUtils {
             return ResourceBundle.getBundle(getBundleName(cls),
                                             Locale.getDefault(),
                                             loader);
-            
+
         }
     }
-    
+
     /**
-     * Encapsulates the logic related to locating the resource bundle with the given 
+     * Encapsulates the logic related to locating the resource bundle with the given
      * relative name for a class.
      *
      * @param cls the Class requiring the bundle
@@ -121,13 +121,13 @@ public final class BundleUtils {
             return ResourceBundle.getBundle(getBundleName(cls, name),
                                             Locale.getDefault(),
                                             loader);
-            
+
         }
     }
-    
+
     /**
      * Encapsulates the logic to format a string based on the key in the resource bundle
-     * 
+     *
      * @param b Resource bundle to use
      * @param key The key in the bundle to lookup
      * @param params the params to expand into the string

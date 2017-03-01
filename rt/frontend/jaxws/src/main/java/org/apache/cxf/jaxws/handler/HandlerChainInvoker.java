@@ -271,7 +271,7 @@ public class HandlerChainInvoker {
      * ProtocolException (per spec), if the exception is thrown from other
      * places other than handlers, we always invoke handleFault.
      */
-    private boolean invokeHandlerChainHandleFault(List<? extends Handler<?>> handlerChain, 
+    private boolean invokeHandlerChainHandleFault(List<? extends Handler<?>> handlerChain,
         MessageContext ctx) {
         if (handlerChain.isEmpty()) {
             LOG.log(Level.FINEST, "no handlers registered");
@@ -363,7 +363,7 @@ public class HandlerChainInvoker {
                         changeMessageDirection(ctx);
                         messageDirectionReversed = true;
                     } else {
-                        invokeReversedClose();                        
+                        invokeReversedClose();
                     }
 
                     break;
@@ -403,7 +403,7 @@ public class HandlerChainInvoker {
                         throw mapSoapFault((SOAPFaultException)e);
                     }
                     throw e;
-                } 
+                }
                 invokeReversedClose();
             }
         } catch (RuntimeException e) {
@@ -441,8 +441,8 @@ public class HandlerChainInvoker {
         if (sfe.getFault().hasDetail()) {
             sf.setDetail(sfe.getFault().getDetail());
         }
-        
-        return sf;        
+
+        return sf;
     }
 
     /*
@@ -497,7 +497,7 @@ public class HandlerChainInvoker {
                     }
                 }
             } else {
-                SAAJUtils.setFaultCode(soapFault, 
+                SAAJUtils.setFaultCode(soapFault,
                                        new QName("http://cxf.apache.org/faultcode", "HandlerFault"));
                 soapFault.setFaultString(exception.getMessage());
             }
@@ -519,7 +519,7 @@ public class HandlerChainInvoker {
                     LogicalHandler<LogicalMessageContext> lh = (LogicalHandler<LogicalMessageContext>)h;
                     continueProcessing = lh.handleFault(logicalMessageContext);
                 } else {
-                    Handler<MessageContext> ph = (Handler<MessageContext>)h; 
+                    Handler<MessageContext> ph = (Handler<MessageContext>)h;
                     continueProcessing = ph.handleFault(protocolMessageContext);
                 }
 
@@ -602,7 +602,7 @@ public class HandlerChainInvoker {
     }
 
     private <T extends Handler<?>> List<T> reverseHandlerChain(List<T> handlerChain) {
-        List<T> reversedHandlerChain = new ArrayList<T>();
+        List<T> reversedHandlerChain = new ArrayList<>();
         reversedHandlerChain.addAll(handlerChain);
         Collections.reverse(reversedHandlerChain);
         return reversedHandlerChain;

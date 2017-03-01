@@ -27,10 +27,10 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 public interface Visitor {
 
     void visit(AST node);
-    
+
     XmlSchemaType getSchemaType();
     CorbaType getCorbaType();
 
-    Scope getScope();  
-    Scope getFullyQualifiedName();  
+    Scope getScope();
+    Scope getFullyQualifiedName();
 }

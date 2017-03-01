@@ -43,10 +43,10 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(SecureBookServerSaml.class, true));
     }
-    
+
     @Test
     public void testPostBookUserRole() throws Exception {
         String address = "https://localhost:" + PORT + "/saml-roles/bookstore/books";
@@ -59,33 +59,33 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
             assertEquals(403, ex.getResponse().getStatus());
         }
     }
-    
+
     @Test
     public void testPostBookAdminRole() throws Exception {
         String address = "https://localhost:" + PORT + "/saml-roles/bookstore/books";
-        WebClient wc = createWebClient(address, 
-                                       Collections.<String, Object>singletonMap("saml.roles", 
+        WebClient wc = createWebClient(address,
+                                       Collections.<String, Object>singletonMap("saml.roles",
                                        Collections.singletonList("admin")));
         wc.type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML);
-        Book book = wc.post(new Book("CXF", 125L), Book.class);                
+        Book book = wc.post(new Book("CXF", 125L), Book.class);
         assertEquals(125L, book.getId());
     }
-    
+
     @Test
     public void testPostBookAdminRoleWithWrongSubjectNameFormat() throws Exception {
         String address = "https://localhost:" + PORT + "/saml-roles2/bookstore/books";
-        WebClient wc = createWebClient(address, 
-                                       Collections.<String, Object>singletonMap("saml.roles", 
+        WebClient wc = createWebClient(address,
+                                       Collections.<String, Object>singletonMap("saml.roles",
                                         Collections.singletonList("admin")));
         wc.type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML);
         try {
-            wc.post(new Book("CXF", 125L), Book.class);                
+            wc.post(new Book("CXF", 125L), Book.class);
             fail("403 is expected");
         } catch (WebApplicationException ex) {
             assertEquals(403, ex.getResponse().getStatus());
         }
     }
-    
+
     @Test
     public void testPostBookAdminRoleWithGoodSubjectName() throws Exception {
         String address = "https://localhost:" + PORT + "/saml-roles2/bookstore/books";
@@ -95,10 +95,10 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
         props.put("saml.subject.name", "bob@mycompany.com");
         WebClient wc = createWebClient(address, props);
         wc.type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML);
-        Book book = wc.post(new Book("CXF", 125L), Book.class);                
+        Book book = wc.post(new Book("CXF", 125L), Book.class);
         assertEquals(125L, book.getId());
     }
-    
+
     @Test
     public void testPostBookAdminWithWeakClaims() throws Exception {
         String address = "https://localhost:" + PORT + "/saml-claims/bookstore/books";
@@ -107,7 +107,7 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
         WebClient wc = createWebClient(address, props);
         wc.type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML);
         try {
-            wc.post(new Book("CXF", 125L), Book.class);                
+            wc.post(new Book("CXF", 125L), Book.class);
             fail("403 is expected");
         } catch (WebApplicationException ex) {
             assertEquals(403, ex.getResponse().getStatus());
@@ -124,13 +124,13 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
         WebClient wc = createWebClient(address, props);
         wc.type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML);
         try {
-            wc.post(new Book("CXF", 125L), Book.class);                
+            wc.post(new Book("CXF", 125L), Book.class);
             fail("403 is expected");
         } catch (WebApplicationException ex) {
             assertEquals(403, ex.getResponse().getStatus());
         }
     }
-    
+
     @Test
     public void testPostBookAdminWithClaims() throws Exception {
         String address = "https://localhost:" + PORT + "/saml-claims/bookstore/books";
@@ -140,29 +140,29 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
         props.put("saml.auth", Collections.singletonList("smartcard"));
         WebClient wc = createWebClient(address, props);
         wc.type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML);
-        Book book = wc.post(new Book("CXF", 125L), Book.class);                
+        Book book = wc.post(new Book("CXF", 125L), Book.class);
         assertEquals(125L, book.getId());
     }
-    
+
     private WebClient createWebClient(String address, Map<String, Object> extraProperties) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
-        
+
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSSamlAuthorizationTest.class.getResource("client.xml");
         Bus springBus = bf.createBus(busFile.toString());
         bean.setBus(springBus);
 
         Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.saml-callback-handler", 
+        properties.put("security.saml-callback-handler",
                        "org.apache.cxf.systest.jaxrs.security.saml.SamlCallbackHandler");
         if (extraProperties != null) {
             properties.putAll(extraProperties);
         }
         bean.setProperties(properties);
-        
+
         bean.getOutInterceptors().add(new SamlEnvelopedOutInterceptor());
-        
+
         return bean.createWebClient();
     }
 }

@@ -64,15 +64,15 @@ import org.apache.cxf.security.SecurityContext;
 public class AuthorizationRequestHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AuthorizationRequestHandler.class);
-    private static final String[] REQUIRED_PARAMETERS = 
+    private static final String[] REQUIRED_PARAMETERS =
         new String[] {
             OAuth.OAUTH_TOKEN
         };
-    
+
     public Response handle(MessageContext mc, OAuthDataProvider dataProvider) {
         HttpServletRequest request = mc.getHttpServletRequest();
         try {
-            OAuthMessage oAuthMessage = 
+            OAuthMessage oAuthMessage =
                 OAuthUtils.getOAuthMessage(mc, request, REQUIRED_PARAMETERS);
             new DefaultOAuthValidator().checkSingleParameter(oAuthMessage);
 
@@ -80,9 +80,9 @@ public class AuthorizationRequestHandler {
             if (token == null) {
                 throw new OAuthProblemException(OAuth.Problems.TOKEN_REJECTED);
             }
-            
+
             String decision = oAuthMessage.getParameter(OAuthConstants.AUTHORIZATION_DECISION_KEY);
-            
+
             OAuthAuthorizationData secData = new OAuthAuthorizationData();
             if (!compareRequestSessionTokens(request, oAuthMessage)) {
                 if (decision != null) {
@@ -95,8 +95,8 @@ public class AuthorizationRequestHandler {
                 return Response.ok(
                         addAdditionalParams(secData, dataProvider, token)).build();
             }
-            
-            
+
+
             boolean allow = OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(decision);
 
             Map<String, String> queryParams = new HashMap<String, String>();
@@ -104,21 +104,21 @@ public class AuthorizationRequestHandler {
                 SecurityContext sc = (SecurityContext)mc.get(SecurityContext.class.getName());
                 List<String> roleNames = Collections.emptyList();
                 if (sc instanceof LoginSecurityContext) {
-                    roleNames = new ArrayList<String>();
+                    roleNames = new ArrayList<>();
                     Set<Principal> roles = ((LoginSecurityContext)sc).getUserRoles();
                     for (Principal p : roles) {
                         roleNames.add(p.getName());
                     }
                 }
-                token.setSubject(new UserSubject(sc.getUserPrincipal() == null 
+                token.setSubject(new UserSubject(sc.getUserPrincipal() == null
                     ? null : sc.getUserPrincipal().getName(), roleNames));
-                
+
                 AuthorizationInput input = new AuthorizationInput();
                 input.setToken(token);
-                 
-                Set<OAuthPermission> approvedScopesSet = new HashSet<OAuthPermission>();
-                
-                List<OAuthPermission> originalScopes = token.getScopes(); 
+
+                Set<OAuthPermission> approvedScopesSet = new HashSet<>();
+
+                List<OAuthPermission> originalScopes = token.getScopes();
                 for (OAuthPermission perm : originalScopes) {
                     String param = oAuthMessage.getParameter(perm.getPermission() + "_status");
                     if (param != null && OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(param)) {
@@ -131,13 +131,13 @@ public class AuthorizationRequestHandler {
                 } else if (approvedScopes.size() < originalScopes.size()) {
                     for (OAuthPermission perm : originalScopes) {
                         if (perm.isDefault() && !approvedScopes.contains(perm)) {
-                            approvedScopes.add(perm);    
+                            approvedScopes.add(perm);
                         }
                     }
                 }
-                
+
                 input.setApprovedScopes(approvedScopes);
-                
+
                 String verifier = dataProvider.finalizeAuthorization(input);
                 queryParams.put(OAuth.OAUTH_VERIFIER, verifier);
             } else {
@@ -155,7 +155,7 @@ public class AuthorizationRequestHandler {
                 URI callbackURI = buildCallbackURI(callbackValue, queryParams);
                 return Response.seeOther(callbackURI).build();
             }
-            
+
         } catch (OAuthProblemException e) {
             LOG.log(Level.WARNING, "An OAuth related problem: {0}", new Object[]{e.fillInStackTrace()});
             int code = e.getHttpStatusCode();
@@ -183,7 +183,7 @@ public class AuthorizationRequestHandler {
         }
         return callback;
     }
-    
+
     private URI buildCallbackURI(String callback, final Map<String, String> queryParams) {
 
         UriBuilder builder = UriBuilder.fromUri(callback);
@@ -191,60 +191,60 @@ public class AuthorizationRequestHandler {
             builder.queryParam(entry.getKey(), entry.getValue());
         }
 
-        return builder.build(); 
+        return builder.build();
     }
-    
+
     private OOBAuthorizationResponse convertQueryParamsToOOB(Map<String, String> queryParams) {
 
         OOBAuthorizationResponse oob = new OOBAuthorizationResponse();
         oob.setRequestToken(queryParams.get(OAuth.OAUTH_TOKEN));
         oob.setVerifier(queryParams.get(OAuth.OAUTH_VERIFIER));
         oob.setState(queryParams.get("state"));
-        return oob; 
+        return oob;
     }
-    
+
     protected OAuthAuthorizationData addAdditionalParams(OAuthAuthorizationData secData,
                                                          OAuthDataProvider dataProvider,
                                                          RequestToken token) throws OAuthProblemException {
         secData.setOauthToken(token.getTokenKey());
-        secData.setApplicationName(token.getClient().getApplicationName()); 
+        secData.setApplicationName(token.getClient().getApplicationName());
         secData.setApplicationURI(token.getClient().getApplicationURI());
         secData.setCallbackURI(getCallbackValue(token));
         secData.setApplicationDescription(token.getClient().getApplicationDescription());
         secData.setLogoUri(token.getClient().getLogoUri());
         secData.setPermissions(token.getScopes());
-        
+
         return secData;
     }
-    
+
     private void addAuthenticityTokenToSession(OAuthAuthorizationData secData,
             HttpServletRequest request) {
         HttpSession session = request.getSession();
         String value = UUID.randomUUID().toString();
-        
+
         secData.setAuthenticityToken(value);
         session.setAttribute(OAuthConstants.AUTHENTICITY_TOKEN, value);
     }
-    
+
     private boolean compareRequestSessionTokens(HttpServletRequest request,
             OAuthMessage oAuthMessage) {
         HttpSession session = request.getSession();
-        String requestToken = null; 
+        String requestToken = null;
         try {
             requestToken = oAuthMessage.getParameter(OAuthConstants.AUTHENTICITY_TOKEN);
         } catch (IOException ex) {
             return false;
         }
         String sessionToken = (String) session.getAttribute(OAuthConstants.AUTHENTICITY_TOKEN);
-        
+
         if (StringUtils.isEmpty(requestToken) || StringUtils.isEmpty(sessionToken)) {
             return false;
         }
-        
+
         boolean b = requestToken.equals(sessionToken);
         session.removeAttribute(OAuthConstants.AUTHENTICITY_TOKEN);
         return b;
     }
 
-    
+
 }

@@ -34,9 +34,9 @@ public final class WsdlUtilities {
 
     private WsdlUtilities() {
     }
-    
-    public static boolean fillWsdlOptionFromArtifact(GenericWsdlOption option, 
-                                                        Artifact artifact, 
+
+    public static boolean fillWsdlOptionFromArtifact(GenericWsdlOption option,
+                                                        Artifact artifact,
                                                         File outputDir) {
         if (!WSDL_TYPE.equals(artifact.getType())) {
             return false;
@@ -69,7 +69,7 @@ public final class WsdlUtilities {
     public static List<File> getWsdlFiles(File dir, String includes[], String excludes[])
         throws MojoExecutionException {
 
-        List<String> exList = new ArrayList<String>();
+        List<String> exList = new ArrayList<>();
         if (excludes != null) {
             exList.addAll(Arrays.asList(excludes));
         }

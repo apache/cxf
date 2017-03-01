@@ -77,7 +77,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
     private static Charset utf8 = Charset.forName("utf-8");
     private static Set<String> validMethods;
     static {
-        validMethods = new HashSet<String>();
+        validMethods = new HashSet<>();
         validMethods.add("GET");
         validMethods.add("POST");
         validMethods.add("HEAD");
@@ -86,7 +86,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
         validMethods.add("DELETE");
     }
 
-    
+
     private static String[] invalidHeaders = {"Accept-Charset", "Accept-Encoding", "Connection",
                                               "Content-Length", "Content-Transfer-Encoding", "Date",
                                               "Expect", "Host", "Keep-Alive", "Referer", "TE", "Trailer",
@@ -114,7 +114,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
         requestHeaders = new HashMap<String, String>();
         storedMethod = null;
     }
-    
+
     public static void register(ScriptableObject scope) {
         try {
             ScriptableObject.defineClass(scope, JsXMLHttpRequest.class);
@@ -163,11 +163,11 @@ public class JsXMLHttpRequest extends ScriptableObject {
         uri = null;
         try {
             URI tempUri = new URI(urlString);
-            if (tempUri.isOpaque()) { 
+            if (tempUri.isOpaque()) {
                 LOG.fine("Relative URL syntax error.");
                 throwError("SYNTAX_ERR");
             }
-            
+
             uri = new URI(tempUri.getScheme(), tempUri.getUserInfo(), tempUri.getHost(), tempUri.getPort(),
                           tempUri.getPath(), tempUri.getQuery(), null /*
                                                                          * no
@@ -276,7 +276,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
         if (xml && !requestHeaders.containsKey("Content-Type")) {
             requestHeaders.put("Content-Type", "application/xml;charset=utf-8");
         }
-        
+
         // 5 talk to the server.
         try {
             connection = url.openConnection();
@@ -304,7 +304,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
                 throwError("HTTP_PROTOCOL_ERROR");
             }
         }
-        
+
         if (post) {
             OutputStream outputStream = null;
             try {
@@ -327,7 +327,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
         }
         // 6
         notifyReadyStateChangeListener();
-        
+
         if (storedAsync) {
             new Thread() {
                 public void run() {
@@ -352,7 +352,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
             responseHeaders = connection.getHeaderFields();
             readyState = jsGet_HEADERS_RECEIVED();
             notifyReadyStateChangeListener();
-            
+
             if (httpConnection != null) {
                 httpResponseCode = httpConnection.getResponseCode();
                 httpResponseText = httpConnection.getResponseMessage();
@@ -369,7 +369,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
                 baos.write(buffer, 0, read);
             }
             is.close();
-            
+
             // For a one-way message or whatever, there may not be a content type.
             // throw away any encoding modifier.
             String contentType = "";
@@ -383,24 +383,24 @@ public class JsXMLHttpRequest extends ScriptableObject {
             if (contentEncoding == null || contentEncoding.length() == 0) {
                 contentEncoding = "iso-8859-1";
             }
-            
+
             byte[] responseBytes = baos.toByteArray();
-            
+
             /* We need all the text in a string, independent of the
-             * XML parse. 
+             * XML parse.
              */
             Charset contentCharset = Charset.forName(contentEncoding);
             byte[] contentBytes = baos.toByteArray();
-            CharBuffer contentChars = 
+            CharBuffer contentChars =
                 contentCharset.decode(ByteBuffer.wrap(contentBytes)); // not the most efficient way.
             responseText = contentChars.toString();
             LOG.fine(responseText);
-            
+
             if (responseBytes.length > 0
                 && ("text/xml".equals(contentType)
-                    || "application/xml".equals(contentType) 
+                    || "application/xml".equals(contentType)
                     || contentType.endsWith("+xml"))) {
-                
+
                 try {
                     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                     documentBuilderFactory.setNamespaceAware(true);
@@ -468,24 +468,24 @@ public class JsXMLHttpRequest extends ScriptableObject {
         }
         return baos.toByteArray();
     }
-    
+
     public void doAbort() {
         // this is messy.
     }
-    
+
     public String doGetAllResponseHeaders() {
         // 1 check state.
         if (readyState == jsGet_UNSENT() || readyState == jsGet_OPENED()) {
             LOG.severe("Invalid state");
             throwError("INVALID_STATE_ERR");
         }
-        
+
         // 2 check error flag
         if (errorFlag) {
             LOG.severe("error flag set");
             return null;
         }
-        
+
         // 3 pile up the headers.
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<String, List<String>> headersEntry : responseHeaders.entrySet()) {
@@ -504,22 +504,22 @@ public class JsXMLHttpRequest extends ScriptableObject {
         }
         return builder.toString();
     }
-    
+
     public String doGetResponseHeader(String header) {
         // 1 check state.
         if (readyState == jsGet_UNSENT() || readyState == jsGet_OPENED()) {
             LOG.severe("invalid state");
             throwError("INVALID_STATE_ERR");
         }
-        
+
         // 2 check header format, we don't do it.
-        
+
         // 3 check error flag
         if (errorFlag) {
             LOG.severe("error flag");
             return null;
         }
-        
+
         //4 -- oh, it's CASE-INSENSITIVE. Well, we do it the hard way.
         for (Map.Entry<String, List<String>> headersEntry : responseHeaders.entrySet()) {
             if (header.equalsIgnoreCase(headersEntry.getKey())) {
@@ -534,37 +534,37 @@ public class JsXMLHttpRequest extends ScriptableObject {
         }
         return null;
     }
-    
+
     public String doGetResponseText() {
         // 1 check state.
         if (readyState == jsGet_UNSENT() || readyState == jsGet_OPENED()) {
             LOG.severe("invalid state " + readyState);
             throwError("INVALID_STATE_ERR");
         }
-        
+
         // 2 return what we have.
         return responseText;
     }
-    
+
     public Object doGetResponseXML() {
         // 1 check state.
         if (readyState == jsGet_UNSENT() || readyState == jsGet_OPENED()) {
             LOG.severe("invalid state");
             throwError("INVALID_STATE_ERR");
         }
-        
+
         return responseXml;
     }
-    
+
     public int doGetStatus() {
         if (httpResponseCode == -1) {
             LOG.severe("invalid state");
             throwError("INVALID_STATE_ERR");
         }
         return httpResponseCode;
-            
+
     }
-    
+
     public String doGetStatusText() {
         if (httpResponseText == null) {
             LOG.severe("invalid state");
@@ -614,7 +614,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
         } else {
             async = (Boolean)Context.jsToJava(asyncObj, Boolean.class);
         }
-        
+
         if (user == Context.getUndefinedValue()) {
             user = null;
         } else {
@@ -625,7 +625,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
         } else {
             password = Context.jsToJava(password, String.class);
         }
-        
+
         doOpen(method, url, async, (String)user, (String)password);
     }
 
@@ -674,4 +674,4 @@ public class JsXMLHttpRequest extends ScriptableObject {
         return doGetStatusText();
     }
 }
- 
+

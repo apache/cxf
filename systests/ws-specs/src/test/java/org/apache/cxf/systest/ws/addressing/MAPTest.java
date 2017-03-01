@@ -34,12 +34,12 @@ public class MAPTest extends MAPTestBase {
 
     private static final String CONFIG;
     static {
-        CONFIG = "org/apache/cxf/systest/ws/addressing/cxf" 
+        CONFIG = "org/apache/cxf/systest/ws/addressing/cxf"
             + (("HP-UX".equals(System.getProperty("os.name"))
                 || "Windows XP".equals(System.getProperty("os.name"))) ? "-hpux" : "")
             + ".xml";
     }
-    
+
     public String getConfigFileName() {
         return CONFIG;
     }
@@ -49,25 +49,25 @@ public class MAPTest extends MAPTestBase {
     public String getPort() {
         return PORT;
     }
-    
+
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(Server.class, null,
                                 new String[] {ADDRESS, GreeterImpl.class.getName()},  true));
     }
-    @WebService(serviceName = "SOAPServiceAddressing", 
-                portName = "SoapPort", 
-                endpointInterface = "org.apache.hello_world_soap_http.Greeter", 
+    @WebService(serviceName = "SOAPServiceAddressing",
+                portName = "SoapPort",
+                endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http",
                 wsdlLocation = "testutils/hello_world.wsdl")
     public static class GreeterImpl extends org.apache.cxf.systest.ws.addressing.AbstractGreeterImpl {
-        
+
         public GreeterImpl() {
             super(true);
         }
-        
+
     }
 }
 

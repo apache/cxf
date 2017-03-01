@@ -40,7 +40,7 @@ import org.junit.Test;
 
 public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase {
     public static final String ADDRESS = XMLServer.ADDRESS;
-    
+
     private final QName serviceName = new QName(
             "http://apache.org/hello_world_xml_http/wrapped", "XMLService");
 
@@ -87,7 +87,7 @@ public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase
         assertEquals("greetMeResponse", respDoc.getFirstChild().getLocalName());
         assertEquals("TestXMLBindingProviderMessage", respDoc.getFirstChild()
                 .getTextContent());
-        
+
         is = getClass().getResourceAsStream(
             "/messages/XML_GreetMeDocLiteralReq_invalid.xml");
         doc = StaxUtils.read(is);
@@ -96,7 +96,7 @@ public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase
 
         disp = service.createDispatch(portName,
                                       DOMSource.class, Service.Mode.PAYLOAD);
-        
+
         try {
             setAddress(disp, ADDRESS);
             result = disp.invoke(reqMsg);

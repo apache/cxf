@@ -33,7 +33,7 @@ public class ExtendedURIResolver {
     protected Stack<InputStream> resourceOpened = new Stack<InputStream>();
 
     public ExtendedURIResolver() {
-        currentResolver = new org.apache.cxf.resource.URIResolver();        
+        currentResolver = new org.apache.cxf.resource.URIResolver();
     }
 
     public InputSource resolve(String curUri, String baseUri) {
@@ -67,7 +67,7 @@ public class ExtendedURIResolver {
         return null;
         // return new InputSource(schemaLocation);
     }
-    
+
     public void close() {
         while (!resourceOpened.isEmpty()) {
             try {
@@ -80,7 +80,7 @@ public class ExtendedURIResolver {
             }
         }
     }
-    
+
     public String getLatestImportURI() {
         return this.getURI();
     }

@@ -51,7 +51,7 @@ public class PetStore {
 
         return Response.ok(CLOSED).build();
     }
-    
+
     @GET
     @Path("/petstore/pets/{petId}/")
     @Produces("text/xml")
@@ -60,7 +60,7 @@ public class PetStore {
 
         return Response.ok(CLOSED).build();
     }
-    
+
     @GET
     @Path("/petstore/jaxb/status/")
     @Produces("text/xml")
@@ -68,7 +68,7 @@ public class PetStore {
 
         return new PetStoreStatus();
     }
-    
+
     @GET
     @Path("/petstore/jaxb/statusType/")
     @Produces("text/xml")
@@ -76,7 +76,7 @@ public class PetStore {
 
         return new PetStoreStatusImpl1();
     }
-    
+
     @GET
     @Path("/petstore/jaxb/status/elements")
     @Produces({"text/xml", "application/json" })
@@ -84,7 +84,7 @@ public class PetStore {
     public List<PetStoreStatusElement> getJaxbStatusElements() {
         return Collections.singletonList(new PetStoreStatusElement());
     }
-    
+
     @GET
     @Path("/petstore/jaxb/status/element")
     @Produces("text/xml")
@@ -100,7 +100,7 @@ public class PetStore {
     public Response updateStatus(MultivaluedMap<String, String> params) throws Exception {
         return Response.ok(params.getFirst("status")).build();
     }
-    
+
     @XmlType(name = "status", namespace = "http://pets")
     public static class PetStoreStatus {
         private String status = PetStore.CLOSED;
@@ -112,13 +112,13 @@ public class PetStore {
         public void setStatus(String status) {
             this.status = status;
         }
-        
+
     }
-    
+
     @XmlRootElement(name = "elstatus", namespace = "http://pets")
     public static class PetStoreStatusElement extends PetStoreStatus {
     }
-    
+
     @XmlType(name = "statusType", namespace = "http://pets")
     @XmlSeeAlso({PetStoreStatusImpl1.class, PetStoreStatusImpl2.class })
     public static class PetStoreStatusType {
@@ -131,9 +131,9 @@ public class PetStore {
         public void setStatus(String status) {
             this.status = status;
         }
-        
+
     }
-    
+
     @XmlRootElement(name = "statusImpl1", namespace = "http://pets")
     public static class PetStoreStatusImpl1 extends PetStoreStatusType {
     }

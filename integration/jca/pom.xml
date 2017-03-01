@@ -44,6 +44,7 @@
         <dependency>
             <groupId>${cxf.asm.groupId}</groupId>
             <artifactId>${cxf.asm.artifactId}</artifactId>
+            <version>${cxf.asm.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -109,4 +110,20 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+    <profiles>
+        <profile>
+            <id>java9</id>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <!-- needed for easymock-->
+                    <groupId>org.ow2.asm</groupId>
+                    <artifactId>asm</artifactId>
+                    <version>6.0_ALPHA</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

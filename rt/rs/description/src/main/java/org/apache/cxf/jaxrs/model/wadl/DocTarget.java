@@ -22,11 +22,11 @@ package org.apache.cxf.jaxrs.model.wadl;
  * {@link Description} can use one of DocTarget constants to bind
  * itself to a specific WADL element.
  * {@link Description} annotations documenting WADL 'resource', 'method',
- * 'param' and input 'representation' elements do not have use these constants.   
+ * 'param' and input 'representation' elements do not have use these constants.
  */
 public final class DocTarget {
     /**
-     * WADL resource element, in most cases it corresponds 
+     * WADL resource element, in most cases it corresponds
      * to the root resource or sub-resource classes
      */
     public static final String RESOURCE = "resource";
@@ -35,26 +35,26 @@ public final class DocTarget {
      */
     public static final String METHOD = "method";
     /**
-     * WADL request param or representation elements, correspond to 
+     * WADL request param or representation elements, correspond to
      * input parameters of the resource method
      */
     public static final String PARAM = "param";
     /**
-     * WADL response representation element, corresponds to 
+     * WADL response representation element, corresponds to
      * the return type of the resource method
      */
     public static final String RETURN = "return";
-    
+
     /**
      * WADL request element
-     */    
+     */
     public static final String REQUEST = "request";
     /**
      * WADL request element
      */
     public static final String RESPONSE = "response";
-    
+
     private DocTarget() {
-        
+
     }
 }

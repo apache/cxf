@@ -37,7 +37,7 @@ public class JettyWarTest extends AbstractCdiMultiAppTest {
             super("/jaxrs_cdi", "/", PORT, new Listener());
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -45,7 +45,7 @@ public class JettyWarTest extends AbstractCdiMultiAppTest {
         assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
         createStaticBus();
     }
-    
+
     @Override
     protected int getPort() {
         return EmbeddedJettyServer.PORT;

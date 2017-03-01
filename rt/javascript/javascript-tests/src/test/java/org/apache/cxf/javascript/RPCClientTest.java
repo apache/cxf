@@ -34,7 +34,7 @@ import org.mozilla.javascript.Scriptable;
 import org.springframework.context.support.GenericApplicationContext;
 
 /*
- * We end up here with a part with isElement == true, a non-array element, 
+ * We end up here with a part with isElement == true, a non-array element,
  * but a complex type for an array of the element.
  */
 
@@ -50,31 +50,31 @@ public class RPCClientTest extends JavascriptRhinoTest {
 
     @Before
     public void before() throws Exception {
-        setupRhino("rpc-service-endpoint", 
-                   "/org/apache/cxf/javascript/RPCTests.js", 
-                   Boolean.FALSE); 
+        setupRhino("rpc-service-endpoint",
+                   "/org/apache/cxf/javascript/RPCTests.js",
+                   Boolean.FALSE);
         implementor = (SimpleRPCImpl)rawImplementor;
         implementor.resetLastValues();
     }
-    
+
     @Override
     protected void additionalSpringConfiguration(GenericApplicationContext context) throws Exception {
     }
-    
+
     @Override
     protected String[] getConfigLocations() {
         return new String[] {"classpath:RPCClientTestBeans.xml"};
     }
 
     private Void simpleCaller(Context context) {
-        
+
         LOG.info("About to call simpleTest " + getAddress());
-        Notifier notifier = 
-            testUtilities.rhinoCallConvert("simpleTest", Notifier.class, 
+        Notifier notifier =
+            testUtilities.rhinoCallConvert("simpleTest", Notifier.class,
                                            testUtilities.javaToJS(getAddress()),
                                            "String Parameter",
                                            testUtilities.javaToJS(new Integer(1776)));
-        
+
         boolean notified = notifier.waitForJavascript(1000 * 10);
         assertTrue(notified);
         Integer errorStatus = testUtilities.rhinoEvaluateConvert("globalErrorStatus", Integer.class);
@@ -92,8 +92,8 @@ public class RPCClientTest extends JavascriptRhinoTest {
     }
 
     private Void beanFunctionCaller(Context context) {
-        
-        TestBean1 b1 = new TestBean1(); 
+
+        TestBean1 b1 = new TestBean1();
         b1.stringItem = "strung";
         TestBean1[] beans = new TestBean1[3];
         beans[0] = new TestBean1();
@@ -105,18 +105,18 @@ public class RPCClientTest extends JavascriptRhinoTest {
         beans[2].optionalIntArrayItem = new int[2];
         beans[2].optionalIntArrayItem[0] = 4;
         beans[2].optionalIntArrayItem[1] = 6;
-        
+
         Object[] jsBeans = new Object[3];
         jsBeans[0] = testBean1ToJS(testUtilities, context, beans[0]);
         jsBeans[1] = null;
         jsBeans[2] = testBean1ToJS(testUtilities, context, beans[2]);
-        
+
         Scriptable jsBean1 = testBean1ToJS(testUtilities, context, b1);
         Scriptable jsBeanArray = context.newArray(testUtilities.getRhinoScope(), jsBeans);
-        
+
         LOG.info("About to call beanFunctionTest " + getAddress());
-        Notifier notifier = 
-            testUtilities.rhinoCallConvert("beanFunctionTest", Notifier.class, 
+        Notifier notifier =
+            testUtilities.rhinoCallConvert("beanFunctionTest", Notifier.class,
                                            testUtilities.javaToJS(getAddress()),
                                            jsBean1,
                                            jsBeanArray);
@@ -145,10 +145,10 @@ public class RPCClientTest extends JavascriptRhinoTest {
             public Void run(Context context) {
                 return simpleCaller(context);
             }
-            
+
         });
     }
-    
+
     @org.junit.Ignore
     @Test
     public void callFunctionWithBeans() {
@@ -161,12 +161,12 @@ public class RPCClientTest extends JavascriptRhinoTest {
     }
 
     public static Scriptable testBean1ToJS(JavascriptTestUtilities testUtilities,
-                                           Context context, 
+                                           Context context,
                                            TestBean1 b1) {
         if (b1 == null) {
             return null; // black is always in fashion. (Really, we can be called with a null).
         }
-        Scriptable rv = context.newObject(testUtilities.getRhinoScope(), 
+        Scriptable rv = context.newObject(testUtilities.getRhinoScope(),
                                           "org_apache_cxf_javascript_testns_testBean1");
         testUtilities.rhinoCallMethod(rv, "setStringItem", testUtilities.javaToJS(b1.stringItem));
         testUtilities.rhinoCallMethod(rv, "setIntItem", testUtilities.javaToJS(b1.intItem));
@@ -178,9 +178,9 @@ public class RPCClientTest extends JavascriptRhinoTest {
         testUtilities.rhinoCallMethod(rv, "setDoubleItem", testUtilities.javaToJS(b1.doubleItem));
         testUtilities.rhinoCallMethod(rv, "setBeanTwoItem", testBean2ToJS(testUtilities,
                                                                           context, b1.beanTwoItem));
-        testUtilities.rhinoCallMethod(rv, "setBeanTwoNotRequiredItem", 
+        testUtilities.rhinoCallMethod(rv, "setBeanTwoNotRequiredItem",
                                       testBean2ToJS(testUtilities, context, b1.beanTwoNotRequiredItem));
-        return rv; 
+        return rv;
     }
 
     public static Object testBean2ToJS(JavascriptTestUtilities testUtilities,
@@ -188,7 +188,7 @@ public class RPCClientTest extends JavascriptRhinoTest {
         if (beanTwoItem == null) {
             return null;
         }
-        Scriptable rv = context.newObject(testUtilities.getRhinoScope(), 
+        Scriptable rv = context.newObject(testUtilities.getRhinoScope(),
                                           "org_apache_cxf_javascript_testns3_testBean2");
         testUtilities.rhinoCallMethod(rv, "setStringItem", beanTwoItem.stringItem);
         return rv;

@@ -43,9 +43,9 @@ import org.apache.cxf.phase.PhaseManager;
  *
  */
 public class MultipleEndpointObserver implements MessageObserver {
-    
+
     public static final String ENDPOINTS = "multipleEndpointObserver.endpoints";
-    
+
     protected Bus bus;
     protected List<Interceptor<? extends Message>> bindingInterceptors
         = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
@@ -53,7 +53,7 @@ public class MultipleEndpointObserver implements MessageObserver {
         = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
     private Set<Endpoint> endpoints = new CopyOnWriteArraySet<Endpoint>();
     private ClassLoader loader;
-    
+
     public MultipleEndpointObserver(Bus bus) {
         super();
         this.bus = bus;
@@ -74,15 +74,15 @@ public class MultipleEndpointObserver implements MessageObserver {
                 message.setExchange(exchange);
             }
             message = createMessage(message);
-            message.setExchange(exchange);                
+            message.setExchange(exchange);
             exchange.setInMessage(message);
             setExchangeProperties(exchange, message);
-            
+
             // setup chain
             PhaseInterceptorChain chain = createChain();
-            
+
             message.setInterceptorChain(chain);
-            
+
             chain.add(bus.getInInterceptors());
             if (bindingInterceptors != null) {
                 chain.add(bindingInterceptors);
@@ -90,11 +90,11 @@ public class MultipleEndpointObserver implements MessageObserver {
             if (routingInterceptors != null) {
                 chain.add(routingInterceptors);
             }
-            
+
             if (endpoints != null) {
                 exchange.put(ENDPOINTS, endpoints);
             }
-            
+
             chain.doIntercept(message);
         } finally {
             if (origBus != bus) {
@@ -118,7 +118,7 @@ public class MultipleEndpointObserver implements MessageObserver {
             .getInPhases());
         return chain;
     }
-    
+
     protected void setExchangeProperties(Exchange exchange, Message m) {
         exchange.put(Bus.class, bus);
         if (exchange.getDestination() == null) {

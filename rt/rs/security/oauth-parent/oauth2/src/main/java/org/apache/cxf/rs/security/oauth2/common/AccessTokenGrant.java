@@ -23,19 +23,19 @@ import java.io.Serializable;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- * Access Token Grant  
+ * Access Token Grant
  */
 public interface AccessTokenGrant extends Serializable {
     /**
      * Returns the token grant type, example, "authorization_code"
      * @return the grant type
      */
-    String getType(); 
-    
+    String getType();
+
     /**
      * Returns the map containing public grant parameters;
      * can be used by clients requesting the access tokens.
-     *  
+     *
      * @return the grant parameters
      */
     MultivaluedMap<String, String> toMap();

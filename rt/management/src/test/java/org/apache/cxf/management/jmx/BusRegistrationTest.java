@@ -37,7 +37,7 @@ import org.junit.Test;
 
 
 /**
- * 
+ *
  */
 public class BusRegistrationTest extends Assert {
     private Bus serverBus;
@@ -46,11 +46,11 @@ public class BusRegistrationTest extends Assert {
     private InstrumentationManager clientIM;
     private boolean ready;
     private boolean running;
-    
+
     @Before
     public void setUp() throws Exception {
     }
-    
+
     @After
     public void tearDown() throws Exception {
         if (clientBus != null) {
@@ -72,10 +72,10 @@ public class BusRegistrationTest extends Assert {
         // integrated IM configuration in bus
         testRegisterMultipleBuses("managed-spring2.xml");
     }
-    
+
     private void testRegisterMultipleBuses(String conf) throws Exception {
         final SpringBusFactory factory = new SpringBusFactory();
-        serverBus =  factory.createBus(conf);
+        serverBus = factory.createBus(conf);
         assertEquals("CXF-Test-Bus", serverBus.getId());
         serverIM = serverBus.getExtension(InstrumentationManager.class);
         assertTrue("Instrumentation Manager should not be null", serverIM != null);
@@ -96,21 +96,21 @@ public class BusRegistrationTest extends Assert {
                 }
             }
         });
-        
+
         t.start();
         while (!ready) {
             Thread.sleep(1000);
         }
-        
+
         try {
             MBeanServer mbs = serverIM.getMBeanServer();
             assertNotNull("MBeanServer should be available.", mbs);
             MBeanServer mbs2 = clientIM.getMBeanServer();
             assertNotNull("MBeanServer should be available.", mbs2);
-            
+
             // check if these servers refer to the same server
             assertEquals("There should be one MBeanServer", mbs, mbs2);
-            
+
             // check both server and client bus can be found from this server
             Set<ObjectName> s;
             ObjectName serverName = getObjectName(serverBus);
@@ -121,11 +121,11 @@ public class BusRegistrationTest extends Assert {
             s = mbs.queryNames(clientName, null);
             assertTrue("client-side bus should be found", s.size() == 1);
         } finally {
-            running = false;            
+            running = false;
         }
     }
-    
-        
+
+
     private static ObjectName getObjectName(Bus bus) throws JMException {
         String busId = bus.getId();
         return getObjectName(busId, bus);

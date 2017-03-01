@@ -32,25 +32,25 @@ import org.apache.cxf.sts.IdentityMapper;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 public abstract class AbstractIdentityCache implements IdentityCache, IdentityMapper, ManagedComponent {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractIdentityCache.class);
-    
+
     private final IdentityMapper identityMapper;
     private final Bus bus;
     private MemoryIdentityCacheStatistics statistics;
-    
+
     public AbstractIdentityCache(IdentityMapper identityMapper) {
         this(null, identityMapper);
     }
-    
+
     public AbstractIdentityCache(Bus bus, IdentityMapper identityMapper) {
         this.identityMapper = identityMapper;
         this.bus = bus;
     }
-    
+
     public Principal mapPrincipal(String sourceRealm,
             Principal sourcePrincipal, String targetRealm) {
-        
+
         Principal targetPrincipal = null;
         Map<String, String> identities = this.get(sourcePrincipal.getName(), sourceRealm);
         if (identities != null) {
@@ -68,7 +68,7 @@ public abstract class AbstractIdentityCache implements IdentityCache, IdentityMa
                 // User identity of target realm not cached yet
                 targetPrincipal = this.identityMapper.mapPrincipal(
                         sourceRealm, sourcePrincipal, targetRealm);
-                
+
                 if (targetPrincipal == null || targetPrincipal.getName() == null) {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine("Failed to map user '" + sourcePrincipal.getName()
@@ -77,10 +77,10 @@ public abstract class AbstractIdentityCache implements IdentityCache, IdentityMa
                     }
                     return null;
                 }
-                
-                // Add the identity for target realm to the cached entry 
+
+                // Add the identity for target realm to the cached entry
                 identities.put(targetRealm, targetPrincipal.getName());
-                
+
                 // Verify whether target user has cached some identities already
                 Map<String, String> cachedItem = this.get(targetPrincipal.getName(), targetRealm);
                 if (cachedItem != null) {
@@ -100,14 +100,14 @@ public abstract class AbstractIdentityCache implements IdentityCache, IdentityMa
                 }
                 targetPrincipal = new CustomTokenPrincipal(targetUser);
             }
-            
+
         } else {
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("No mapping found for realm " + targetRealm + " of user '"
                         + sourcePrincipal.getName() + "@" + sourceRealm + "'");
             }
             getStatistics().increaseCacheMiss();
-            
+
             // Identities object NOT found for key sourceUser@sourceRealm
             targetPrincipal = this.identityMapper.mapPrincipal(
                     sourceRealm, sourcePrincipal, targetRealm);
@@ -119,7 +119,7 @@ public abstract class AbstractIdentityCache implements IdentityCache, IdentityMa
         }
         return targetPrincipal;
     }
-    
+
     public MemoryIdentityCacheStatistics getStatistics() {
         if (statistics == null) {
             this.statistics = new MemoryIdentityCacheStatistics(bus, this);
@@ -139,7 +139,7 @@ public abstract class AbstractIdentityCache implements IdentityCache, IdentityMa
             from.put(entry.getKey(), entry.getValue());
         }
     }
-    
+
     protected Bus getBus() {
         return bus;
     }

@@ -25,7 +25,7 @@ import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 
 public class CollectionCheckStatement extends PrimitiveStatement {
     private CollectionCheckInfo checkInfo;
-    
+
     public CollectionCheckStatement(String property, Object value, Type type, ConditionType condition,
                                     CollectionCheckInfo checkInfo) {
         super(property, value, type, condition);

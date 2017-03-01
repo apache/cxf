@@ -55,28 +55,28 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.util.tracker.ServiceTracker;
 
-public class HTTPJettyTransportActivator 
+public class HTTPJettyTransportActivator
     implements BundleActivator, ManagedServiceFactory {
     public static final String FACTORY_PID = "org.apache.cxf.http.jetty";
-    
-    BundleContext context; 
+
+    BundleContext context;
     MBeanServer mbeans;
     ServiceTracker mbeanServerTracker;
     ServiceRegistration reg;
-    
+
     JettyHTTPServerEngineFactory factory = new JettyHTTPServerEngineFactory() {
         public MBeanServer getMBeanServer() {
             return (MBeanServer)mbeanServerTracker.getService();
         }
     };
-    
+
     public void start(BundleContext ctx) throws Exception {
         this.context = ctx;
         Properties servProps = new Properties();
-        servProps.put(Constants.SERVICE_PID, FACTORY_PID);  
+        servProps.put(Constants.SERVICE_PID, FACTORY_PID);
         reg = context.registerService(ManagedServiceFactory.class.getName(),
                                        this, servProps);
-        
+
         mbeanServerTracker = new ServiceTracker(ctx, MBeanServer.class.getName(), null);
         try {
             BlueprintNameSpaceHandlerFactory nsHandlerFactory = new BlueprintNameSpaceHandlerFactory() {
@@ -109,7 +109,7 @@ public class HTTPJettyTransportActivator
             return;
         }
         int port = Integer.parseInt((String)properties.get("port"));
-        
+
         String host = (String)properties.get("host");
         try {
             TLSServerParameters tls = createTlsServerParameters(properties);
@@ -118,7 +118,7 @@ public class HTTPJettyTransportActivator
             } else {
                 factory.createJettyHTTPServerEngine(host, port, "http");
             }
-            
+
             JettyHTTPServerEngine e = factory.retrieveJettyHTTPServerEngine(port);
             configure(e, properties);
         } catch (GeneralSecurityException e) {
@@ -145,7 +145,7 @@ public class HTTPJettyTransportActivator
                 e.setReuseAddress(Boolean.parseBoolean(properties.get(k)));
             } else if ("maxIdleTime".equals(k)) {
                 e.setMaxIdleTime(Integer.parseInt(properties.get(k)));
-            } 
+            }
         }
     }
 
@@ -233,7 +233,7 @@ public class HTTPJettyTransportActivator
                 }
             }
         }
-        
+
         try {
             if (srp != null) {
                 p.setSecureRandom(TLSParameterJaxBUtils.getSecureRandom(srp));
@@ -384,7 +384,7 @@ public class HTTPJettyTransportActivator
     }
 
 
-    
-    
-    
+
+
+
 }

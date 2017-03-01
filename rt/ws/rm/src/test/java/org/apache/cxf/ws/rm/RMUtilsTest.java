@@ -34,12 +34,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class RMUtilsTest extends Assert {
 
     private IMocksControl control;
-    
+
     @Before
     public void setUp() {
 
@@ -50,7 +50,7 @@ public class RMUtilsTest extends Assert {
     public void tearDown() {
         control.verify();
     }
-    
+
     @Test
     public void testGetName() {
         // no bus given
@@ -64,7 +64,7 @@ public class RMUtilsTest extends Assert {
         QName sqn = new QName("ns1", "service");
         EasyMock.expect(si.getName()).andReturn(sqn);
         control.replay();
-        assertEquals("{ns1}service.{ns2}endpoint@" + Bus.DEFAULT_BUS_ID, 
+        assertEquals("{ns1}service.{ns2}endpoint@" + Bus.DEFAULT_BUS_ID,
                      RMUtils.getEndpointIdentifier(e));
 
         // a named bus
@@ -88,10 +88,10 @@ public class RMUtilsTest extends Assert {
         EasyMock.expect(si.getName()).andReturn(sqn);
         control.replay();
         Bus bus = BusFactory.getDefaultBus();
-        assertEquals("{ns1}service.{ns2}endpoint@" + Bus.DEFAULT_BUS_ID, 
+        assertEquals("{ns1}service.{ns2}endpoint@" + Bus.DEFAULT_BUS_ID,
                      RMUtils.getEndpointIdentifier(e, bus));
         bus.shutdown(true);
-        
+
         // a generated bundle artifact bus
         control.reset();
         EasyMock.expect(e.getEndpointInfo()).andReturn(ei).times(2);
@@ -100,7 +100,7 @@ public class RMUtilsTest extends Assert {
         EasyMock.expect(si.getName()).andReturn(sqn);
         EasyMock.expect(b.getId()).andReturn("mybus-" + Bus.DEFAULT_BUS_ID + "12345");
         control.replay();
-        assertEquals("{ns1}service.{ns2}endpoint@mybus-" + Bus.DEFAULT_BUS_ID, 
+        assertEquals("{ns1}service.{ns2}endpoint@mybus-" + Bus.DEFAULT_BUS_ID,
                      RMUtils.getEndpointIdentifier(e, b));
 
         // look like a generated bundle artifact bus but not
@@ -111,8 +111,8 @@ public class RMUtilsTest extends Assert {
         EasyMock.expect(si.getName()).andReturn(sqn);
         EasyMock.expect(b.getId()).andReturn("mybus." + Bus.DEFAULT_BUS_ID + ".foo");
         control.replay();
-        assertEquals("{ns1}service.{ns2}endpoint@mybus." + Bus.DEFAULT_BUS_ID + ".foo", 
+        assertEquals("{ns1}service.{ns2}endpoint@mybus." + Bus.DEFAULT_BUS_ID + ".foo",
                      RMUtils.getEndpointIdentifier(e, b));
-        
-    } 
+
+    }
 }

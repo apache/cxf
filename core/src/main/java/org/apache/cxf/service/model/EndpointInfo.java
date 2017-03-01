@@ -33,15 +33,15 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
     BindingInfo binding;
     QName name;
     EndpointReferenceType address;
-    
+
     public EndpointInfo() {
     }
-    
+
     public EndpointInfo(ServiceInfo serv, String ns) {
         transportId = ns;
         service = serv;
     }
-    
+
     public DescriptionInfo getDescription() {
         if (service == null) {
             return null;
@@ -49,33 +49,33 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
         return service.getDescription();
     }
 
-    
+
     public String getTransportId() {
         return transportId;
-    }    
-    
+    }
+
     public void setTransportId(String tid) {
         transportId = tid;
     }
-    
+
     public InterfaceInfo getInterface() {
         if (service == null) {
             return null;
         }
         return service.getInterface();
     }
-    
+
     public void setService(ServiceInfo s) {
         service = s;
     }
     public ServiceInfo getService() {
         return service;
     }
-    
+
     public QName getName() {
         return name;
     }
-    
+
     public void setName(QName n) {
         name = n;
     }
@@ -83,15 +83,15 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
     public BindingInfo getBinding() {
         return binding;
     }
-    
+
     public void setBinding(BindingInfo b) {
         binding = b;
-    }    
-    
+    }
+
     public String getAddress() {
         return (null != address && null != address.getAddress()) ? address.getAddress().getValue() : null;
     }
-    
+
     public void setAddress(String addr) {
         if (null == address) {
             address = EndpointReferenceUtils.getEndpointReference(addr);
@@ -99,29 +99,29 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
             EndpointReferenceUtils.setAddress(address, addr);
         }
     }
-    
+
     public void setAddress(EndpointReferenceType endpointReference) {
         address = endpointReference;
     }
-    
+
     @Override
     public <T> T getTraversedExtensor(T defaultValue, Class<T> type) {
         T value = getExtensor(type);
-        
+
         if (value == null) {
             if (binding != null) {
                 value = binding.getExtensor(type);
             }
-            
+
             if (service != null && value == null) {
                 value = service.getExtensor(type);
             }
-            
+
             if (value == null) {
                 value = defaultValue;
             }
         }
-        
+
         return value;
     }
 
@@ -136,8 +136,8 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
         if (epInfo == null) {
             return false;
         }
-        return binding.getName().equals(epInfo.binding.getName()) 
-            && service.getName().equals(epInfo.service.getName()) 
+        return binding.getName().equals(epInfo.binding.getName())
+            && service.getName().equals(epInfo.service.getName())
             && name.equals(epInfo.name);
     }
 

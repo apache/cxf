@@ -39,15 +39,15 @@ public class TestReceiver {
     private String staticReplyQueue;
     private Throwable ex;
     private boolean forceMessageIdAsCorrelationId;
-    
+
     /**
-     * 
+     *
      * @param connectionFactory
      * @param receiveQueueName listen on this queue
      * @param forceMessageIdAsCorrelationId force the usage of messageId even if correlationId is set
      */
-    public TestReceiver(ConnectionFactory connectionFactory, 
-                        String receiveQueueName, 
+    public TestReceiver(ConnectionFactory connectionFactory,
+                        String receiveQueueName,
                         boolean forceMessageIdAsCorrelationId) {
         this.connectionFactory = connectionFactory;
         this.receiveQueueName = receiveQueueName;
@@ -55,7 +55,7 @@ public class TestReceiver {
         assert this.connectionFactory != null;
         assert this.receiveQueueName != null;
     }
-    
+
     public String getRequestMessageId() {
         return requestMessageId;
     }
@@ -94,10 +94,10 @@ public class TestReceiver {
             requestMessageId = inMessage.getJMSMessageID();
             //System.out.println("Received message " + requestMessageId);
             final TextMessage replyMessage = session.createTextMessage("Result");
-            String correlationId = (forceMessageIdAsCorrelationId || inMessage.getJMSCorrelationID() == null) 
+            String correlationId = (forceMessageIdAsCorrelationId || inMessage.getJMSCorrelationID() == null)
                 ? inMessage.getJMSMessageID() : inMessage.getJMSCorrelationID();
             replyMessage.setJMSCorrelationID(correlationId);
-            Destination replyDest = staticReplyQueue != null 
+            Destination replyDest = staticReplyQueue != null
                 ? session.createQueue(staticReplyQueue) : inMessage.getJMSReplyTo();
             if (replyDest != null) {
                 final MessageProducer producer = closer
@@ -109,7 +109,7 @@ public class TestReceiver {
             ex = e;
         }
     }
-    
+
     public void runAsync() {
         drainQueue();
         Executors.newSingleThreadExecutor().execute(new Runnable() {
@@ -118,7 +118,7 @@ public class TestReceiver {
             }
         });
     }
-    
+
     public void close() {
         if (ex != null) {
             throw new RuntimeException("Error while receiving message or sending reply", ex);

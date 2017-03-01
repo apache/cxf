@@ -28,11 +28,11 @@ public class WsdlArtifact {
     private String version;
     private String classifier;
     private String type;
-    
+
     public WsdlArtifact() {
         type = "wsdl";
     }
-    
+
     public String getGroupId() {
         return groupId;
     }
@@ -57,9 +57,9 @@ public class WsdlArtifact {
     public void setType(String type) {
         this.type = type;
     }
-    
+
     /**
-     * Not quite the same as equals: null in version 
+     * Not quite the same as equals: null in version
      * matches anything.
      * @param artifact
      * @return
@@ -73,7 +73,7 @@ public class WsdlArtifact {
         }
         return ((classifier == null && artifact.classifier == null)
                   || classifier != null && classifier.equals(artifact.classifier))
-              && artifactId.equals(artifact.getArtifactId()) 
+              && artifactId.equals(artifact.getArtifactId())
               && (version == null || version.equals(artifact.getVersion()));
     }
 

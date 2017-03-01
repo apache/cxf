@@ -27,7 +27,7 @@ import com.example.customerservice.CustomerServiceService;
 public class CustomerServiceClient {
     protected CustomerServiceClient() {
     }
-    
+
     public static void main(String args[]) throws Exception {
         CustomerServiceService customerServiceService;
         if (args.length != 0 && args[0].length() != 0) {
@@ -46,11 +46,11 @@ public class CustomerServiceClient {
         }
 
         CustomerService customerService = customerServiceService.getCustomerServicePort();
-        
+
         // Initialize the test class and call the tests
         CustomerServiceTester client = new CustomerServiceTester();
         client.setCustomerService(customerService);
         client.testCustomerService();
-        System.exit(0); 
+        System.exit(0);
     }
 }

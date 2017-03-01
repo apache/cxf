@@ -26,28 +26,28 @@ import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 
 /**
- * 
+ *
  */
 public class LifeCycleListenerTester implements BusLifeCycleListener {
 
     static int initCount;
     static int shutdownCount;
-    
+
     public LifeCycleListenerTester() {
     }
-    
+
     @Resource(name = "cxf")
     public void setBus(Bus b) {
         b.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
     }
-    
+
     public static int getInitCount() {
         return initCount;
     }
     public static int getShutdownCount() {
         return shutdownCount;
     }
-    
+
     /** {@inheritDoc}*/
     public void initComplete() {
         initCount++;

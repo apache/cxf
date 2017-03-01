@@ -24,11 +24,11 @@ import org.apache.cxf.systest.jms.TwoWayJMSImplBase;
 
 
 
-@WebService(serviceName = "HelloWorldServiceRuntimeCorrelationIDStaticPrefix", 
+@WebService(serviceName = "HelloWorldServiceRuntimeCorrelationIDStaticPrefix",
             portName = "HelloWorldPortRuntimeCorrelationIDStaticPrefixSales",
             endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPortType",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")
-public class GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixSales extends TwoWayJMSImplBase {    
-    
+public class GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixSales extends TwoWayJMSImplBase {
+
 }

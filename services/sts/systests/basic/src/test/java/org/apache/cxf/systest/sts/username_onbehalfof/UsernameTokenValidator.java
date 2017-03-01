@@ -27,7 +27,7 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.UsernameTokenType;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 public class UsernameTokenValidator implements TokenValidator {
-    
+
     /**
      * Return true if this TokenValidator implementation is capable of validating the
      * ReceivedToken argument.
@@ -35,7 +35,7 @@ public class UsernameTokenValidator implements TokenValidator {
     public boolean canHandleToken(ReceivedToken validateTarget) {
         return canHandleToken(validateTarget, null);
     }
-    
+
     /**
      * Return true if this TokenValidator implementation is capable of validating the
      * ReceivedToken argument. The realm is ignored in this token Validator.
@@ -43,7 +43,7 @@ public class UsernameTokenValidator implements TokenValidator {
     public boolean canHandleToken(ReceivedToken validateTarget, String realm) {
         return validateTarget.getToken() instanceof UsernameTokenType;
     }
-    
+
     /**
      * Validate a Token using the given TokenValidatorParameters.
      */
@@ -52,16 +52,16 @@ public class UsernameTokenValidator implements TokenValidator {
         ReceivedToken validateTarget = tokenParameters.getToken();
         validateTarget.setState(STATE.INVALID);
         response.setToken(validateTarget);
-        
+
         UsernameTokenType usernameTokenType = (UsernameTokenType)validateTarget.getToken();
         // Ignore the fact that no password is provided
         // Some other requirements must be met to issue a token onbehalfof a subject
         // whose authentication is not proved
         validateTarget.setState(STATE.VALID);
         response.setPrincipal(new CustomTokenPrincipal(usernameTokenType.getUsername().getValue()));
-        
+
         return response;
     }
 
 }
-        
+

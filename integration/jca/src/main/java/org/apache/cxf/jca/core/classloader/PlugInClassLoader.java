@@ -36,7 +36,7 @@ import org.apache.cxf.common.logging.LogUtils;
 
 
 public class PlugInClassLoader extends SecureClassLoader {
-    private static final Logger LOG =  LogUtils.getL7dLogger(PlugInClassLoader.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(PlugInClassLoader.class);
     private static final String FILE_COLON = "file:";
     private static final String ZIP_COLON = "zip:";
     private static final String URL_SCHEME_COLON = "classloader:";
@@ -45,11 +45,11 @@ public class PlugInClassLoader extends SecureClassLoader {
     private static final String NEFILTERS_PROPS_FILE = "negativefilters.properties";
     private String jarUrls[] = new String[0];
     private final ProtectionDomain protectionDomain;
-    
+
     private final ClassLoader ploader;
 
-    public PlugInClassLoader(final ClassLoader p) throws IOException {        
-        super(new FireWallClassLoader(p, 
+    public PlugInClassLoader(final ClassLoader p) throws IOException {
+        super(new FireWallClassLoader(p,
                                       getFilterList(p, FILTERS_PROPS_FILE),
                                       getFilterList(p, NEFILTERS_PROPS_FILE)));
         ploader = p;
@@ -61,7 +61,7 @@ public class PlugInClassLoader extends SecureClassLoader {
     private void processJarUrls(String urls[]) {
         for (int i = 0; i < urls.length; i++) {
             if (urls[i].startsWith(ZIP_COLON)) {
-                urls[i] = FILE_COLON + urls[i].substring(ZIP_COLON.length());                              
+                urls[i] = FILE_COLON + urls[i].substring(ZIP_COLON.length());
             }
         }
     }
@@ -69,9 +69,9 @@ public class PlugInClassLoader extends SecureClassLoader {
     private static String[] getFilterList(ClassLoader parent, String propFile) throws IOException {
         Properties filtersProps = getProperties(parent, propFile);
         Iterator<Object> i = filtersProps.keySet().iterator();
-        while (i.hasNext()) {            
-            LOG.config("get Filter " + propFile + "::" + (String)i.next());            
-        }    
+        while (i.hasNext()) {
+            LOG.config("get Filter " + propFile + "::" + (String)i.next());
+        }
         return filtersProps.keySet().toArray(new String[filtersProps.keySet().size()]);
     }
 
@@ -100,7 +100,7 @@ public class PlugInClassLoader extends SecureClassLoader {
     }
 
     private String[] loadUrls(ClassLoader parent) throws IOException {
-        List<String> urlList = new ArrayList<String>();
+        List<String> urlList = new ArrayList<>();
 
         Properties props = getProperties(parent, JARS_PROPS_FILE);
 
@@ -127,7 +127,7 @@ public class PlugInClassLoader extends SecureClassLoader {
         byte bytes[] = null;
 
         for (int i = 0; i < jarUrls.length; i++) {
-            String fullpath = jarUrls[i] + "!/" + path;           
+            String fullpath = jarUrls[i] + "!/" + path;
             try {
                 bytes = PlugInClassLoaderHelper.getResourceAsBytes(fullpath);
 
@@ -150,21 +150,21 @@ public class PlugInClassLoader extends SecureClassLoader {
                 throw new ClassNotFoundException(name);
             } else {
                 return result;
-            }                
+            }
         }
     }
-    
-   
+
+
     protected URL findResource(String name) {
         LOG.fine("findResource: " + name);
         for (int i = 0; i < jarUrls.length; i++) {
-            String fullpath = jarUrls[i] + "!/" + name;         
-              
-            if (PlugInClassLoaderHelper.hasResource(fullpath)) {                
+            String fullpath = jarUrls[i] + "!/" + name;
+
+            if (PlugInClassLoaderHelper.hasResource(fullpath)) {
                 return genURL(fullpath);
             }
         }
-        
+
         return null;
     }
 

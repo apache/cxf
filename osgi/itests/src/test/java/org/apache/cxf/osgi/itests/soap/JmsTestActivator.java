@@ -50,7 +50,7 @@ public class JmsTestActivator implements BundleActivator {
     }
 
     private ActiveMQConnectionFactory createConnectionFactory() {
-        ActiveMQConnectionFactory connectionFactory 
+        ActiveMQConnectionFactory connectionFactory
             = new ActiveMQConnectionFactory("vm://JmsServiceTest");
         connectionFactory.setUserName("karaf");
         connectionFactory.setPassword("karaf");

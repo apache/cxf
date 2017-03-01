@@ -35,9 +35,9 @@ import org.apache.cxf.transport.AbstractDestination;
 
 public class DestinationRegistryImpl implements DestinationRegistry {
     private static final String SLASH = "/";
-    private ConcurrentMap<String, AbstractHTTPDestination> destinations 
+    private ConcurrentMap<String, AbstractHTTPDestination> destinations
         = new ConcurrentHashMap<String, AbstractHTTPDestination>();
-    private Map<String, AbstractHTTPDestination> decodedDestinations = 
+    private Map<String, AbstractHTTPDestination> decodedDestinations =
         new ConcurrentHashMap<String, AbstractHTTPDestination>();
 
     public DestinationRegistryImpl() {
@@ -74,9 +74,9 @@ public class DestinationRegistryImpl implements DestinationRegistry {
     public AbstractHTTPDestination getDestinationForPath(String path) {
         return getDestinationForPath(path, false);
     }
-    
+
     public AbstractHTTPDestination getDestinationForPath(String path, boolean tryDecoding) {
-        // to use the url context match  
+        // to use the url context match
         String m = getTrimmedPath(path);
         AbstractHTTPDestination s = destinations.get(m);
         if (s == null) {
@@ -84,7 +84,7 @@ public class DestinationRegistryImpl implements DestinationRegistry {
         }
         return s;
     }
-    
+
     public AbstractHTTPDestination checkRestfulRequest(String address) {
         AbstractHTTPDestination ret = getRestfulDestination(getDestinationsPaths(), address);
         if (ret == null) {
@@ -93,17 +93,17 @@ public class DestinationRegistryImpl implements DestinationRegistry {
         if (ret != null && ret.getMessageObserver() == null) {
             return null;
         }
-        return ret; 
+        return ret;
     }
     private AbstractHTTPDestination getRestfulDestination(Set<String> destPaths, String address) {
         int len = -1;
         AbstractHTTPDestination ret = null;
         for (String path : destPaths) {
-            String thePath = path.length() > 1 && path.endsWith(SLASH) 
+            String thePath = path.length() > 1 && path.endsWith(SLASH)
                 ? path.substring(0, path.length() - 1) : path;
-            if ((address.equals(thePath) 
+            if ((address.equals(thePath)
                 || SLASH.equals(thePath)
-                || (address.length() > thePath.length() 
+                || (address.length() > thePath.length()
                     && address.startsWith(thePath) && address.charAt(thePath.length()) == '/'))
                 && thePath.length() > len) {
                 ret = getDestinationForPath(path);
@@ -116,7 +116,7 @@ public class DestinationRegistryImpl implements DestinationRegistry {
     public Collection<AbstractHTTPDestination> getDestinations() {
         return Collections.unmodifiableCollection(destinations.values());
     }
-    
+
 
     public AbstractDestination[] getSortedDestinations() {
         List<AbstractHTTPDestination> dest2 = new LinkedList<AbstractHTTPDestination>(
@@ -147,9 +147,9 @@ public class DestinationRegistryImpl implements DestinationRegistry {
     }
 
     /**
-     * Remove the transport protocol from the path and make 
+     * Remove the transport protocol from the path and make
      * it starts with /
-     * @param path 
+     * @param path
      * @return trimmed path
      */
     public String getTrimmedPath(String path) {

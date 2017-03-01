@@ -36,7 +36,7 @@ public class ResponseCheckInterceptor extends AbstractPhaseInterceptor<Message> 
         if (message.getExchange().get(Response.class) != null) {
             throw new WebApplicationException(500);
         }
-        
+
         String query = (String)message.get(Message.QUERY_STRING);
         if (query != null && query.contains("wadl")) {
             throw new WebApplicationException(500);

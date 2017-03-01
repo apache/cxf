@@ -79,10 +79,10 @@ public class NettyClientTest extends AbstractBusClientServerTestBase {
         String response = g.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
     }
-    
+
     @Test
     public void testInovationWithNettyAddress() throws Exception {
-        String address =  "netty://http://localhost:" + PORT + "/SoapContext/SoapPort";
+        String address = "netty://http://localhost:" + PORT + "/SoapContext/SoapPort";
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress(address);
@@ -90,10 +90,10 @@ public class NettyClientTest extends AbstractBusClientServerTestBase {
         String response = greeter.greetMe("test");
         assertEquals("Get a wrong response", "Hello test", response);
     }
-    
+
     @Test
     public void testInvocationWithTransportId() throws Exception {
-        String address =  "http://localhost:" + PORT + "/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress(address);

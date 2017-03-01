@@ -61,6 +61,6 @@ public class TestingWrappedEventSinkImpl implements WrappedSink {
                 }
             }
         }
-        
+
     }
 }

@@ -31,13 +31,13 @@ import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.service.model.ServiceInfo;
 
 public class URIDomainExpression implements DomainExpression {
-    
+
     private final Wsdl11XPointer wsdl11XPointer;
-    
+
     public URIDomainExpression(final String uriContext) {
         wsdl11XPointer = new Wsdl11XPointer(uriContext);
     }
-    
+
     @Override
     public boolean appliesTo(ServiceInfo si) {
         if (si == null) {
@@ -65,7 +65,7 @@ public class URIDomainExpression implements DomainExpression {
                                           ei.getService().getName().getLocalPart(),
                                           ei.getName().getLocalPart());
     }
-    
+
     @Override
     public boolean appliesTo(BindingOperationInfo boi) {
         if (boi == null) {
@@ -79,16 +79,16 @@ public class URIDomainExpression implements DomainExpression {
         }
         if ((boi.getName() != null) && (boi.getBinding() != null) && (boi.getBinding().getName() != null)
             && wsdl11XPointer.matchesBindingOperation(
-                        boi.getBinding().getName().getNamespaceURI(), 
-                        boi.getBinding().getName().getLocalPart(), 
+                        boi.getBinding().getName().getNamespaceURI(),
+                        boi.getBinding().getName().getLocalPart(),
                         boi.getName().getLocalPart())) {
             return true;
         }
-        return (boi.getOperationInfo() != null) && (boi.getOperationInfo().getInterface() != null) 
+        return (boi.getOperationInfo() != null) && (boi.getOperationInfo().getInterface() != null)
             && (boi.getOperationInfo().getInterface().getName() != null) && (boi.getOperationInfo().getName() != null)
             && wsdl11XPointer.matchesPortTypeOperation(
-                        boi.getOperationInfo().getInterface().getName().getNamespaceURI(), 
-                        boi.getOperationInfo().getInterface().getName().getLocalPart(), 
+                        boi.getOperationInfo().getInterface().getName().getNamespaceURI(),
+                        boi.getOperationInfo().getInterface().getName().getLocalPart(),
                         boi.getOperationInfo().getName().getLocalPart());
     }
 
@@ -99,7 +99,7 @@ public class URIDomainExpression implements DomainExpression {
         }
         if ((bmi.getMessageInfo() != null) && (bmi.getMessageInfo().getName() != null)
             && wsdl11XPointer.matchesMessage(
-                        bmi.getMessageInfo().getName().getNamespaceURI(), 
+                        bmi.getMessageInfo().getName().getNamespaceURI(),
                         bmi.getMessageInfo().getName().getLocalPart())) {
             return true;
         }
@@ -107,7 +107,7 @@ public class URIDomainExpression implements DomainExpression {
         if (checkBindingOperationInOut(bmi)) {
             return true;
         }
-                
+
         return checkPortTypeOperationInOut(bmi);
     }
 
@@ -117,29 +117,29 @@ public class URIDomainExpression implements DomainExpression {
         if ((bfi == null) || (bfi.getFaultInfo() == null) || (bfi.getBindingOperation() == null)) {
             return false;
         }
-        
+
         if (checkBindingOperationFault(bfi)) {
             return true;
         }
-        
+
         return checkPortTypeOperationFault(bfi);
     }
 
     private boolean checkBindingOperationInOut(BindingMessageInfo bmi) {
-        if ((bmi.getMessageInfo() != null) && (bmi.getMessageInfo().getName() != null) 
+        if ((bmi.getMessageInfo() != null) && (bmi.getMessageInfo().getName() != null)
              && (bmi.getBindingOperation() != null) && (bmi.getBindingOperation().getName() != null)
-             && (bmi.getBindingOperation().getBinding() != null) 
+             && (bmi.getBindingOperation().getBinding() != null)
              && (bmi.getBindingOperation().getBinding().getName() != null)) {
-            if ((Type.INPUT == bmi.getMessageInfo().getType()) 
+            if ((Type.INPUT == bmi.getMessageInfo().getType())
                 && wsdl11XPointer.matchesBindingOperationInput(
-                       bmi.getMessageInfo().getName().getNamespaceURI(), 
+                       bmi.getMessageInfo().getName().getNamespaceURI(),
                        bmi.getBindingOperation().getBinding().getName().getLocalPart(),
                        bmi.getBindingOperation().getName().getLocalPart())) {
                 return true;
-            } 
-            if ((Type.OUTPUT == bmi.getMessageInfo().getType()) 
+            }
+            if ((Type.OUTPUT == bmi.getMessageInfo().getType())
                 && wsdl11XPointer.matchesBindingOperationOutput(
-                       bmi.getMessageInfo().getName().getNamespaceURI(), 
+                       bmi.getMessageInfo().getName().getNamespaceURI(),
                        bmi.getBindingOperation().getBinding().getName().getLocalPart(),
                        bmi.getBindingOperation().getName().getLocalPart())) {
                 return true;
@@ -153,9 +153,9 @@ public class URIDomainExpression implements DomainExpression {
         if ((bmi.getBindingOperation() != null) && (bmi.getBindingOperation().getOperationInfo() != null)) {
             ini = bmi.getBindingOperation().getOperationInfo().getInterface();
         }
-        
-        if ((ini != null) && (ini.getName() != null) 
-            && (bmi.getMessageInfo() != null) 
+
+        if ((ini != null) && (ini.getName() != null)
+            && (bmi.getMessageInfo() != null)
             && (bmi.getBindingOperation() != null) && (bmi.getBindingOperation().getName() != null)) {
             if ((Type.INPUT == bmi.getMessageInfo().getType())
                 && wsdl11XPointer.matchesPortTypeOperationInput(
@@ -194,7 +194,7 @@ public class URIDomainExpression implements DomainExpression {
     private boolean checkBindingOperationFault(BindingFaultInfo bfi) {
         return (bfi.getFaultInfo() != null) && (bfi.getFaultInfo().getFaultName() != null)
             &&  (bfi.getBindingOperation().getName() != null)
-            && (bfi.getBindingOperation().getBinding() != null) 
+            && (bfi.getBindingOperation().getBinding() != null)
             && (bfi.getBindingOperation().getBinding().getName() != null)
             && wsdl11XPointer.matchesBindingOperationFault(
                       bfi.getFaultInfo().getFaultName().getNamespaceURI(),
@@ -207,55 +207,55 @@ public class URIDomainExpression implements DomainExpression {
         private static final String SINGLE_PATH = "\\(([^\\)]*)\\)$";
         private static final String DOUBLE_PATH = "\\(([^/]*)/([^\\)]*)\\)$";
         private static final String TRIPPLE_PATH = "\\(([^/]*)/([^/]*)/([^\\)]*)\\)$";
-        
-        private static final Pattern PATTERN_DEFINITIONS 
+
+        private static final Pattern PATTERN_DEFINITIONS
             = Pattern.compile("^wsdl11.definitions\\(\\)$");
-        
-        private static final Pattern PATTERN_PORT_TYPE 
+
+        private static final Pattern PATTERN_PORT_TYPE
             = Pattern.compile("^wsdl11.portType" + SINGLE_PATH);
-        
-        private static final Pattern PATTERN_PORT_TYPE_OPERATION 
+
+        private static final Pattern PATTERN_PORT_TYPE_OPERATION
             = Pattern.compile("^wsdl11.portTypeOperation" + DOUBLE_PATH);
 
-        private static final Pattern PATTERN_PORT_TYPE_OPERATION_INPUT 
+        private static final Pattern PATTERN_PORT_TYPE_OPERATION_INPUT
             = Pattern.compile("^wsdl11.portTypeOperation.input" + DOUBLE_PATH);
-        
-        private static final Pattern PATTERN_PORT_TYPE_OPERATION_OUTPUT 
+
+        private static final Pattern PATTERN_PORT_TYPE_OPERATION_OUTPUT
             = Pattern.compile("^wsdl11.portTypeOperation.output" + DOUBLE_PATH);
 
-        private static final Pattern PATTERN_PORT_TYPE_OPERATION_FAULT 
+        private static final Pattern PATTERN_PORT_TYPE_OPERATION_FAULT
             = Pattern.compile("^wsdl11.portTypeOperation.fault" + TRIPPLE_PATH);
-        
-        private static final Pattern PATTERN_MESSAGE 
-            = Pattern.compile("^wsdl11.message" + SINGLE_PATH);
-    
-        private static final Pattern PATTERN_MESSAGE_PART 
-            = Pattern.compile("^wsdl11.messagePart" + DOUBLE_PATH);        
 
-        private static final Pattern PATTERN_SERVICE 
+        private static final Pattern PATTERN_MESSAGE
+            = Pattern.compile("^wsdl11.message" + SINGLE_PATH);
+
+        private static final Pattern PATTERN_MESSAGE_PART
+            = Pattern.compile("^wsdl11.messagePart" + DOUBLE_PATH);
+
+        private static final Pattern PATTERN_SERVICE
             = Pattern.compile("^wsdl11.service" + SINGLE_PATH);
-        
-        private static final Pattern PATTERN_PORT 
+
+        private static final Pattern PATTERN_PORT
             = Pattern.compile("^wsdl11.port" + DOUBLE_PATH);
-        
-        private static final Pattern PATTERN_BINDING 
+
+        private static final Pattern PATTERN_BINDING
             = Pattern.compile("^wsdl11.binding" + SINGLE_PATH);
-        
-        private static final Pattern PATTERN_BINDING_OPERATION = 
+
+        private static final Pattern PATTERN_BINDING_OPERATION =
             Pattern.compile("^wsdl11.bindingOperation" + DOUBLE_PATH);
-        
-        private static final Pattern PATTERN_BINDING_OPERATION_INPUT = 
+
+        private static final Pattern PATTERN_BINDING_OPERATION_INPUT =
             Pattern.compile("^wsdl11.bindingOperation.input" + DOUBLE_PATH);
-        
-        private static final Pattern PATTERN_BINDING_OPERATION_OUTPUT = 
+
+        private static final Pattern PATTERN_BINDING_OPERATION_OUTPUT =
             Pattern.compile("^wsdl11.bindingOperation.output" + DOUBLE_PATH);
-        
-        private static final Pattern PATTERN_BINDING_OPERATION_FAULT = 
+
+        private static final Pattern PATTERN_BINDING_OPERATION_FAULT =
             Pattern.compile("^wsdl11.bindingOperation.fault" + TRIPPLE_PATH);
 
         private final String targetNamespace;
         private final String wsdl11Pointer;
-        
+
         public Wsdl11XPointer(final String uriContext) {
             if ((uriContext == null) || uriContext.isEmpty()) {
                 throw new IllegalArgumentException(
@@ -268,7 +268,7 @@ public class URIDomainExpression implements DomainExpression {
             } else {
                 targetNamespace = "";
                 wsdl11Pointer = uriContext;
-            }        
+            }
         }
 
         boolean matchesWsdl(String wsdlTargetNamespace) {
@@ -285,7 +285,7 @@ public class URIDomainExpression implements DomainExpression {
             Matcher matcher = PATTERN_PORT_TYPE_OPERATION.matcher(wsdl11Pointer);
             return matches(wsdlTargetNamespace, matcher, portType, operation);
         }
-        
+
         boolean matchesPortTypeOperationInput(String wsdlTargetNamespace, String portType, String operation) {
             Matcher matcher = PATTERN_PORT_TYPE_OPERATION_INPUT.matcher(wsdl11Pointer);
             return matches(wsdlTargetNamespace, matcher, portType, operation);
@@ -331,7 +331,7 @@ public class URIDomainExpression implements DomainExpression {
             Matcher matcher = PATTERN_BINDING_OPERATION.matcher(wsdl11Pointer);
             return matches(wsdlTargetNamespace, matcher, binding, operation);
         }
-        
+
         boolean matchesBindingOperationInput(String wsdlTargetNamespace, String binding, String operation) {
             Matcher matcher = PATTERN_BINDING_OPERATION_INPUT.matcher(wsdl11Pointer);
             return matches(wsdlTargetNamespace, matcher, binding, operation);

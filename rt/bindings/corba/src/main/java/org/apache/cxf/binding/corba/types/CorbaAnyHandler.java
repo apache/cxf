@@ -32,16 +32,16 @@ public class CorbaAnyHandler extends CorbaObjectHandler {
     private Any value;
     private CorbaObjectHandler containedType;
     private CorbaTypeMap typeMap;
-    
-    public CorbaAnyHandler(QName anyName, 
-                           QName anyIdlType, 
-                           TypeCode anyTC, 
+
+    public CorbaAnyHandler(QName anyName,
+                           QName anyIdlType,
+                           TypeCode anyTC,
                            Object anyType) {
         super(anyName, anyIdlType, anyTC, anyType);
-        
+
         value = null;
     }
-    
+
     public Any getValue() {
         return value;
     }
@@ -65,7 +65,7 @@ public class CorbaAnyHandler extends CorbaObjectHandler {
     public CorbaTypeMap getTypeMap() {
         return typeMap;
     }
-    
+
     public void setValue(Any v) throws CorbaBindingException {
         value = v;
     }

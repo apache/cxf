@@ -66,7 +66,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     public JCacheOAuthDataProvider(String configFileURL, Bus bus) throws Exception {
         this(configFileURL, bus, false);
     }
-    
+
     public JCacheOAuthDataProvider(String configFileURL, Bus bus, boolean storeJwtTokenKeyOnly) throws Exception {
         this(configFileURL, bus, CLIENT_CACHE_KEY, ACCESS_TOKEN_CACHE_KEY, REFRESH_TOKEN_CACHE_KEY,
              storeJwtTokenKeyOnly);
@@ -84,30 +84,30 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
                                    String clientCacheKey,
                                    String accessTokenCacheKey,
                                    String refreshTokenCacheKey,
-                                   boolean storeJwtTokenKeyOnly) throws Exception {    
+                                   boolean storeJwtTokenKeyOnly) throws Exception {
 
         cacheManager = createCacheManager(configFileURL, bus);
         clientCache = createCache(cacheManager, clientCacheKey, String.class, Client.class);
-        
+
         this.storeJwtTokenKeyOnly = storeJwtTokenKeyOnly;
         if (storeJwtTokenKeyOnly) {
             jwtAccessTokenCache = createCache(cacheManager, accessTokenCacheKey, String.class, String.class);
         } else {
             accessTokenCache = createCache(cacheManager, accessTokenCacheKey, String.class, ServerAccessToken.class);
         }
-        
+
         refreshTokenCache = createCache(cacheManager, refreshTokenCacheKey, String.class, RefreshToken.class);
     }
-    
+
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
         return clientCache.get(clientId);
     }
-    
+
     public void setClient(Client client) {
         clientCache.put(client.getClientId(), client);
     }
-    
+
     @Override
     protected void doRemoveClient(Client c) {
         clientCache.remove(c.getClientId());
@@ -141,7 +141,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     public List<RefreshToken> getRefreshTokens(Client c, UserSubject sub) {
         return getTokens(refreshTokenCache, c, sub);
     }
-    
+
     @Override
     public ServerAccessToken getAccessToken(String accessTokenKey) throws OAuthServiceException {
         if (isUseJwtFormatForAccessTokens() && isStoreJwtTokenKeyOnly()) {
@@ -162,7 +162,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     @Override
-    protected void doRevokeRefreshToken(RefreshToken rt) { 
+    protected void doRevokeRefreshToken(RefreshToken rt) {
         refreshTokenCache.remove(rt.getTokenKey());
     }
 
@@ -173,7 +173,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         } else {
             accessTokenCache.put(serverToken.getTokenKey(), serverToken);
         }
-        
+
     }
 
     @Override
@@ -183,6 +183,14 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
 
     @Override
     public void close() {
+
+        clientCache.close();
+        refreshTokenCache.close();
+        if (accessTokenCache != null) {
+            accessTokenCache.close();
+        } else {
+            jwtAccessTokenCache.close();
+        }
         cacheManager.close();
     }
 
@@ -208,7 +216,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         }
         return token;
     }
-    
+
 
     protected static <K, V extends ServerAccessToken> List<V> getTokens(Cache<K, V> cache,
                                                                       Client client, UserSubject sub) {
@@ -230,7 +238,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
 
         return tokens;
     }
-    
+
     protected List<ServerAccessToken> getJwtAccessTokens(Client client, UserSubject sub) {
         final Set<String> toRemove = new HashSet<>();
         final List<ServerAccessToken> tokens = new ArrayList<>();
@@ -242,7 +250,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
             JoseJwtConsumer theConsumer = jwtTokenConsumer == null ? new JoseJwtConsumer() : jwtTokenConsumer;
             ServerAccessToken token = JwtTokenUtils.createAccessTokenFromJwt(theConsumer, jose, this,
                                                                                    super.getJwtAccessTokenClaimMap());
-          
+
             if (!isExpired(token)) {
                 toRemove.add(entry.getKey());
             } else if (isTokenMatched(token, client, sub)) {
@@ -275,7 +283,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
 
         return provider.getCacheManager(configFileURI, Thread.currentThread().getContextClassLoader());
     }
-    
+
     protected static <K, V> Cache<K, V> createCache(CacheManager cacheManager,
                                                     String cacheKey, Class<K> keyType, Class<V> valueType) {
 
@@ -300,5 +308,5 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     public void setJwtTokenConsumer(JoseJwtConsumer jwtTokenConsumer) {
         this.jwtTokenConsumer = jwtTokenConsumer;
     }
-    
+
 }

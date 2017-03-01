@@ -31,11 +31,11 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 
 /**
- * 
+ *
  */
 public class ThrottlingInterceptor extends AbstractPhaseInterceptor<Message> {
-    public static final Logger LOG = LogUtils.getL7dLogger(ThrottlingInterceptor.class); 
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(ThrottlingInterceptor.class);
+
     final ThrottlingManager manager;
     public ThrottlingInterceptor(String phase, ThrottlingManager manager) {
         super(ThrottlingInterceptor.class.getName() + "-" + phase, phase);
@@ -55,7 +55,7 @@ public class ThrottlingInterceptor extends AbstractPhaseInterceptor<Message> {
                                                                 OutgoingChainInterceptor.class.getName());
             return;
         }
-        
+
         long l = rsp.getDelay();
         if (l > 0) {
             ContinuationProvider cp = message.get(ContinuationProvider.class);

@@ -34,7 +34,7 @@ public class JwtTokenSecurityContext implements LoginSecurityContext {
     private final JwtToken token;
     private final Principal principal;
     private final Set<Principal> roles;
-    
+
     public JwtTokenSecurityContext(JwtToken jwt, String roleClaim) {
         principal = new SimplePrincipal(jwt.getClaims().getSubject());
         this.token = jwt;
@@ -48,7 +48,7 @@ public class JwtTokenSecurityContext implements LoginSecurityContext {
             roles = Collections.emptySet();
         }
     }
-    
+
     public JwtToken getToken() {
         return token;
     }

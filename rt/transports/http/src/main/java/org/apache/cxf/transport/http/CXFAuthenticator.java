@@ -37,16 +37,16 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.transport.Conduit;
 
 /**
- * 
+ *
  */
 public class CXFAuthenticator extends Authenticator {
     static CXFAuthenticator instance;
-    
-    
+
+
     public CXFAuthenticator() {
     }
-    
-    public static synchronized void addAuthenticator() { 
+
+    public static synchronized void addAuthenticator() {
         if (instance == null) {
             instance = new CXFAuthenticator();
             Authenticator wrapped = null;
@@ -55,7 +55,7 @@ public class CXFAuthenticator extends Authenticator {
                     ReflectionUtil.setAccessible(f);
                     try {
                         wrapped = (Authenticator)f.get(null);
-                        if (wrapped != null 
+                        if (wrapped != null
                             && wrapped.getClass().getName().equals(ReferencingAuthenticator.class.getName())) {
                             Method m = wrapped.getClass().getMethod("check");
                             m.setAccessible(true);
@@ -67,28 +67,28 @@ public class CXFAuthenticator extends Authenticator {
                     }
                 }
             }
-            
+
             try {
                 ClassLoader loader = AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
                         public ClassLoader run() {
                             return new URLClassLoader(new URL[0], ClassLoader.getSystemClassLoader());
                         }
                     }, null);
-                
-                
-                Method m = ClassLoader.class.getDeclaredMethod("defineClass", String.class, 
+
+
+                Method m = ClassLoader.class.getDeclaredMethod("defineClass", String.class,
                                                                byte[].class, Integer.TYPE, Integer.TYPE);
-                
+
                 InputStream ins = ReferencingAuthenticator.class
                         .getResourceAsStream("ReferencingAuthenticator.class");
                 byte b[] = IOUtils.readBytesFromStream(ins);
-                
+
                 ReflectionUtil.setAccessible(m).invoke(loader, ReferencingAuthenticator.class.getName(),
                                                        b, 0, b.length);
                 Class<?> cls = loader.loadClass(ReferencingAuthenticator.class.getName());
                 final Authenticator auth = (Authenticator)cls.getConstructor(Authenticator.class, Authenticator.class)
                     .newInstance(instance, wrapped);
-                
+
                 if (System.getSecurityManager() == null) {
                     Authenticator.setDefault(auth);
                 } else {
@@ -112,8 +112,8 @@ public class CXFAuthenticator extends Authenticator {
             }
         }
     }
-    
-    protected PasswordAuthentication getPasswordAuthentication() { 
+
+    protected PasswordAuthentication getPasswordAuthentication() {
         PasswordAuthentication auth = null;
         Message m = PhaseInterceptorChain.getCurrentMessage();
         if (m != null) {
@@ -124,19 +124,19 @@ public class CXFAuthenticator extends Authenticator {
                 if (getRequestorType() == RequestorType.PROXY
                     && httpConduit.getProxyAuthorization() != null) {
                     String un = httpConduit.getProxyAuthorization().getUserName();
-                    String pwd =  httpConduit.getProxyAuthorization().getPassword();
+                    String pwd = httpConduit.getProxyAuthorization().getPassword();
                     if (un != null && pwd != null) {
                         auth = new PasswordAuthentication(un, pwd.toCharArray());
                     }
                 } else if (getRequestorType() == RequestorType.SERVER
                     && httpConduit.getAuthorization() != null) {
-                    
+
                     if ("basic".equals(getRequestingScheme()) || "digest".equals(getRequestingScheme())) {
                         return null;
                     }
-                    
+
                     String un = httpConduit.getAuthorization().getUserName();
-                    String pwd =  httpConduit.getAuthorization().getPassword();
+                    String pwd = httpConduit.getAuthorization().getPassword();
                     if (un != null && pwd != null) {
                         auth = new PasswordAuthentication(un, pwd.toCharArray());
                     }

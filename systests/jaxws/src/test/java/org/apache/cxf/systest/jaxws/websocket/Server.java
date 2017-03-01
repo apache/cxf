@@ -47,25 +47,25 @@ public class Server extends AbstractBusTestServerBase {
 
         //publish port with soap12 binding
         address = "ws://localhost:" + PORT + "/SoapContext/SoapPort";
-        EndpointImpl e = (EndpointImpl) Endpoint.create(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING, 
+        EndpointImpl e = (EndpointImpl) Endpoint.create(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING,
                                                         new Greeter12Impl());
         e.publish(address);
         eps.add(e);
     }
-    
+
     public void tearDown() {
         while (!eps.isEmpty()) {
             Endpoint ep = eps.remove(0);
             ep.stop();
         }
-    }    
-    
+    }
+
     @WebService(endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http")
     public class Greeter12Impl extends BaseGreeterImpl {
 
     }
-    
+
 
     public static void main(String[] args) {
         try {

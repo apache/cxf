@@ -46,8 +46,8 @@ public final class IdlPrimitive extends IdlDefnImplBase implements IdlType {
         super(parent, name);
         this.wsdlName = wsdlFileName;
         this.type = typeValue;
-    }    
-    
+    }
+
     public static IdlPrimitive create(IdlScopeBase parent, short type) {
         String name = null;
         String wsdlName = null;
@@ -142,7 +142,7 @@ public final class IdlPrimitive extends IdlDefnImplBase implements IdlType {
             wsdlName = "dateTime";
 
             break;
-            
+
         default:
             break;
         }
@@ -178,6 +178,6 @@ public final class IdlPrimitive extends IdlDefnImplBase implements IdlType {
     public void write(PrintWriter pw) {
         pw.print(localName());
     }
-    
+
 }
 

@@ -48,7 +48,7 @@ public class Activator implements BundleActivator {
     public void stop(BundleContext context) throws Exception {
 
     }
-    
+
     private static final class ConfigUpdater implements ManagedService {
         private BundleContext bundleContext;
         private ServiceRegistration serviceReg;
@@ -67,6 +67,7 @@ public class Activator implements BundleActivator {
             LOG.info("CXF message logging feature " + (enabled ? "enabled" : "disabled"));
             Integer limit = Integer.valueOf(getValue(config, "limit", "65536"));
             Boolean pretty = Boolean.valueOf(getValue(config, "pretty", "false"));
+            Boolean verbose = Boolean.valueOf(getValue(config, "verbose", "true"));
             Long inMemThreshold = Long.valueOf(getValue(config, "inMemThresHold", "-1"));
 
             if (limit != null) {
@@ -78,18 +79,22 @@ public class Activator implements BundleActivator {
             if (pretty != null) {
                 logging.setPrettyLogging(pretty);
             }
+            
+            if (verbose != null) {
+                logging.setVerbose(verbose);
+            }
 
             if (intentReg == null) {
                 Dictionary<String, Object> properties = new Hashtable<>();
                 properties.put("org.apache.cxf.dosgi.IntentName", "logging");
                 bundleContext.registerService(AbstractFeature.class.getName(), logging, properties);
             }
-            
+
             if (enabled) {
                 if (serviceReg == null) {
                     Dictionary<String, Object> properties = new Hashtable<>();
                     properties.put("name", "logging");
-                    serviceReg =  bundleContext.registerService(Feature.class.getName(), logging, properties);
+                    serviceReg = bundleContext.registerService(Feature.class.getName(), logging, properties);
                 }
             } else {
                 if (serviceReg != null) {
@@ -98,7 +103,7 @@ public class Activator implements BundleActivator {
                 }
             }
         }
-        
+
         @SuppressWarnings("rawtypes")
         private String getValue(Dictionary config, String key, String defaultValue) {
             if (config == null) {

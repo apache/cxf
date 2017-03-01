@@ -24,13 +24,13 @@ import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class SamlBearerClientCredentialsGrant extends AbstractSaml2BearerGrant {
-    
+
     private static final long serialVersionUID = 4801583498206813025L;
 
     public SamlBearerClientCredentialsGrant(String assertion, boolean encoded, String scope) {
         super(OAuthConstants.CLIENT_CREDENTIALS_GRANT, assertion, encoded, scope);
     }
-    
+
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = initMap();
         map.putSingle(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);

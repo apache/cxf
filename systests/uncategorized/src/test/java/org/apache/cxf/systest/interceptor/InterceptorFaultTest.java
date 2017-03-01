@@ -38,6 +38,8 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.greeter_control.Control;
 import org.apache.cxf.greeter_control.ControlImpl;
@@ -47,7 +49,6 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.greeter_control.types.FaultLocation;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseComparator;
@@ -64,29 +65,29 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
-    
+
     private static final Logger LOG = LogUtils.getLogger(InterceptorFaultTest.class);
 
     private static final QName SOAP_FAULT_CODE = new QName("http://schemas.xmlsoap.org/soap/envelope/",
                                                            "Server");
     private static final String FAULT_MESSAGE = "Could not send Message.";
-    
-    private static final String CONTROL_PORT_ADDRESS = 
+
+    private static final String CONTROL_PORT_ADDRESS =
         "http://localhost:" + PORT + "/SoapContext/ControlPort";
-    
+
     private static int decoupledEndpointPort = 1;
     private static String decoupledEndpoint;
-    
+
 
     /**
      * Tests that a fault thrown by a server side interceptor is reported back to
-     * the client in appropriate form (plain Fault in case of one way requests, 
+     * the client in appropriate form (plain Fault in case of one way requests,
      * SoapFault in case of two way requests).
-     * Also demonstrates how an interceptor on the server out fault chain can 
+     * Also demonstrates how an interceptor on the server out fault chain can
      * distinguish different fault modes (the capability to do so is crucial to
      * QOS interceptors such as the RM, addressing and policy interceptors).
      *
@@ -126,7 +127,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             }
         }
     }
-    
+
     private Bus controlBus;
     private Control control;
     private Bus greeterBus;
@@ -134,8 +135,8 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
     private List<Phase> inPhases;
     private PhaseComparator comparator;
     private Phase postUnMarshalPhase;
-    
-    
+
+
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -155,7 +156,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         }
         b.shutdown(true);
     }
-    
+
     @After
     public void tearDown() throws Exception {
         if (null != greeter) {
@@ -164,7 +165,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             greeterBus.shutdown(true);
             greeterBus = null;
         }
-        if (null != control) {  
+        if (null != control) {
             assertTrue("Failed to stop greeter", control.stopGreeter(null));
             ((java.io.Closeable)control).close();
             controlBus.shutdown(true);
@@ -180,7 +181,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
     public void testRobustWithoutAddressing() throws Exception {
         testWithoutAddressing(true);
     }
-    
+
     @Test
     public void testRobustFailWithoutAddressingInUserLogicalPhase() throws Exception {
 
@@ -192,15 +193,15 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
             .createFaultLocation();
         location.setPhase("user-logical");
-        
+
         control.setFaultLocation(location);
 
         try {
             // writer to grab the content of soap fault.
             // robust is not yet used at client's side, but I think it should
             StringWriter writer = new StringWriter();
-            ((Client)greeter).getInInterceptors().add(new LoggingInInterceptor());
-            ((LoggingInInterceptor)greeterBus.getInInterceptors().get(0)).setPrintWriter(new PrintWriter(writer));
+            ((Client)greeter).getInInterceptors()
+                .add(new LoggingInInterceptor(new PrintWriterEventSender(new PrintWriter(writer))));
             // it should tell CXF to convert one-way robust out faults into real SoapFaultException
             ((Client)greeter).getEndpoint().put(Message.ROBUST_ONEWAY, true);
             greeter.greetMeOneWay("oneway");
@@ -211,7 +212,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
     }
 
     private void testWithoutAddressing(boolean robust) throws Exception {
-        
+
         setupGreeter("org/apache/cxf/systest/interceptor/no-addr.xml", false);
 
         control.setRobustInOnlyMode(robust);
@@ -221,13 +222,13 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
 
         // behaviour is identicial for all phases
         FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
-            .createFaultLocation();        
-        
-        // test failure occuring before and after logical addressing interceptor 
+            .createFaultLocation();
+
+        // test failure occuring before and after logical addressing interceptor
         // won't get a fault in case of oneways non-robust for the latter (partial response already sent)
         testInterceptorFail(inPhases, location, robust);
     }
-    
+
     @Test
     public void testWithAddressingAnonymousReplies() throws Exception {
         testWithAddressingAnonymousReplies(false);
@@ -240,37 +241,37 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
 
     private void testWithAddressingAnonymousReplies(boolean robust) throws Exception {
         setupGreeter("org/apache/cxf/systest/interceptor/addr.xml", false);
-        
+
         control.setRobustInOnlyMode(robust);
-        
+
         // all interceptors pass
         testInterceptorsPass(robust);
-        
+
         // test failure in phases <= Phase.UNMARSHALL
         FaultLocation location = new org.apache.cxf.greeter_control.types.ObjectFactory()
             .createFaultLocation();
         location.setAfter(MAPAggregator.class.getName());
-        
-        // test failure occuring before and after logical addressing interceptor 
+
+        // test failure occuring before and after logical addressing interceptor
         // won't get a fault in case of oneways non-robust for the latter (partial response already sent)
         testInterceptorFail(inPhases, location, robust);
     }
-    
-   
-    private void testInterceptorFail(List<Phase> phases, FaultLocation location, boolean robust) 
+
+
+    private void testInterceptorFail(List<Phase> phases, FaultLocation location, boolean robust)
         throws PingMeFault {
         for (Phase p : phases) {
             location.setPhase(p.getName());
             if (Phase.POST_INVOKE.equals(p.getName())) {
                 break;
-            }   
+            }
             testFail(location, true, robust);
         }
     }
 
     private void testInterceptorsPass(boolean robust) {
         greeter.greetMeOneWay("one");
-        
+
         // wait 5 seconds for the non-robust case
         if (!robust) {
             try {
@@ -279,7 +280,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
                 // ignore
             }
         }
-        // verify both the previous greetMeOneWay call and this greetMe call 
+        // verify both the previous greetMeOneWay call and this greetMe call
         assertEquals("one", greeter.greetMe("two"));
         try {
             greeter.pingMe();
@@ -290,11 +291,11 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private void testFail(FaultLocation location, boolean usingAddressing, boolean robust) 
+    private void testFail(FaultLocation location, boolean usingAddressing, boolean robust)
         throws PingMeFault {
-        // System.out.print("Test interceptor failing in phase: " + location.getPhase()); 
-        
-        control.setFaultLocation(location);       
+        // System.out.print("Test interceptor failing in phase: " + location.getPhase());
+
+        control.setFaultLocation(location);
 
         // oneway reports a plain fault (although server sends a soap fault)
 
@@ -302,7 +303,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         if (comparator.compare(getPhase(location.getPhase()), postUnMarshalPhase) < 0) {
             expectOnewayFault = true;
         }
-        
+
         try {
             greeter.greetMeOneWay("oneway");
             if (expectOnewayFault) {
@@ -314,7 +315,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             }
             assertEquals(FAULT_MESSAGE, ex.getMessage());
         }
-        
+
         String expectedMsg = getExpectedInterceptorFaultMessage(location.getPhase());
         try {
             greeter.greetMe("cxf");
@@ -322,11 +323,11 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         } catch (WebServiceException ex) {
             Throwable cause = ex.getCause();
             SoapFault sf = (SoapFault)cause;
-            
+
             assertEquals(expectedMsg, sf.getReason());
             assertEquals(SOAP_FAULT_CODE, sf.getFaultCode());
         }
-        
+
         try {
             greeter.pingMe();
             fail("Expected PingMeFault not thrown.");
@@ -335,47 +336,47 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             SoapFault sf = (SoapFault)cause;
             assertEquals(expectedMsg, sf.getReason());
             assertEquals(SOAP_FAULT_CODE, sf.getFaultCode());
-        }  
+        }
     }
-   
-    
-    
-    private void setupGreeter(String cfgResource, boolean useDecoupledEndpoint) 
+
+
+
+    private void setupGreeter(String cfgResource, boolean useDecoupledEndpoint)
         throws NumberFormatException, MalformedURLException {
-        
+
         SpringBusFactory bf = new SpringBusFactory();
-        
+
         controlBus = bf.createBus();
         BusFactory.setDefaultBus(controlBus);
 
         ControlService cs = new ControlService();
         control = cs.getControlPort();
         updateAddressPort(control, PORT);
-        
+
         assertTrue("Failed to start greeter", control.startGreeter(cfgResource));
-        
+
         greeterBus = bf.createBus(cfgResource);
         BusFactory.setDefaultBus(greeterBus);
         LOG.fine("Initialised greeter bus with configuration: " + cfgResource);
-        
+
         if (null == comparator) {
             comparator = new PhaseComparator();
         }
         if (null == inPhases) {
-            inPhases = new ArrayList<Phase>();
+            inPhases = new ArrayList<>();
             inPhases.addAll(greeterBus.getExtension(PhaseManager.class).getInPhases());
             Collections.sort(inPhases, comparator);
-        }        
+        }
         if (null == postUnMarshalPhase) {
             postUnMarshalPhase = getPhase(Phase.POST_UNMARSHAL);
         }
-       
+
         GreeterService gs = new GreeterService();
 
         greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");
-       
+
         if (!useDecoupledEndpoint) {
             return;
         }
@@ -383,7 +384,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         // programatically configure decoupled endpoint that is guaranteed to
         // be unique across all test cases
         decoupledEndpointPort++;
-        decoupledEndpoint = "http://localhost:" 
+        decoupledEndpoint = "http://localhost:"
             + allocatePort("decoupled-" + decoupledEndpointPort)
             + "/decoupled_endpoint";
 
@@ -398,7 +399,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
     private String getExpectedInterceptorFaultMessage(String phase) {
         return FaultThrowingInterceptor.MESSAGE_FORMAT.format(new Object[] {phase}).toUpperCase();
     }
-    
+
     private Phase getPhase(String name) {
         for (Phase p : inPhases) {
             if (p.getName().equals(name)) {

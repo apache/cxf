@@ -60,37 +60,38 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     private static final String  LIVE_LOGGING_PROP = "org.apache.cxf.logging.enable";
     private static final List<String> BINARY_CONTENT_MEDIA_TYPES;
     static {
-        BINARY_CONTENT_MEDIA_TYPES = new ArrayList<String>();
+        BINARY_CONTENT_MEDIA_TYPES = new ArrayList<>();
         BINARY_CONTENT_MEDIA_TYPES.add("application/octet-stream");
         BINARY_CONTENT_MEDIA_TYPES.add("image/png");
         BINARY_CONTENT_MEDIA_TYPES.add("image/jpeg");
         BINARY_CONTENT_MEDIA_TYPES.add("image/gif");
     }
-    
+
     protected int limit = DEFAULT_LIMIT;
     protected long threshold = -1;
     protected PrintWriter writer;
     protected boolean prettyLogging;
     private boolean showBinaryContent;
     private boolean showMultipartContent = true;
-    
+    private List<String> binaryContentMediaTypes = BINARY_CONTENT_MEDIA_TYPES;
+
     public AbstractLoggingInterceptor(String phase) {
         super(phase);
     }
     public AbstractLoggingInterceptor(String id, String phase) {
         super(id, phase);
     }
-    
+
     protected static boolean isLoggingDisabledNow(Message message) throws Fault {
         Object liveLoggingProp = message.getContextualProperty(LIVE_LOGGING_PROP);
         return liveLoggingProp != null && PropertyUtils.isFalse(liveLoggingProp);
     }
-    
+
     protected abstract Logger getLogger();
-    
+
     Logger getMessageLogger(Message message) {
         if (isLoggingDisabledNow(message)) {
-            return null; 
+            return null;
         }
         Endpoint ep = message.getExchange().getEndpoint();
         if (ep == null || ep.getEndpointInfo() == null) {
@@ -106,7 +107,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             InterfaceInfo iface = endpoint.getService().getInterface();
             String portName = endpoint.getName().getLocalPart();
             String portTypeName = iface.getName().getLocalPart();
-            String logName = "org.apache.cxf.services." + serviceName + "." 
+            String logName = "org.apache.cxf.services." + serviceName + "."
                 + portName + "." + portTypeName;
             logger = LogUtils.getL7dLogger(this.getClass(), null, logName);
             endpoint.setProperty("MessageLogger", logger);
@@ -120,7 +121,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         } else if ("<stdout>".equals(s)) {
             writer = new PrintWriter(System.out, true);
         } else if ("<stderr>".equals(s)) {
-            writer = new PrintWriter(System.err, true);  
+            writer = new PrintWriter(System.err, true);
         } else {
             try {
                 URI uri = new URI(s);
@@ -131,27 +132,27 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             }
         }
     }
-    
+
     public void setPrintWriter(PrintWriter w) {
         writer = w;
     }
-    
+
     public PrintWriter getPrintWriter() {
         return writer;
     }
-    
+
     public void setLimit(int lim) {
         limit = lim;
     }
-    
+
     public int getLimit() {
         return limit;
     }
-    
+
     public void setPrettyLogging(boolean flag) {
         prettyLogging = flag;
     }
-    
+
     public boolean isPrettyLogging() {
         return prettyLogging;
     }
@@ -165,10 +166,10 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     }
 
     protected void writePayload(StringBuilder builder, CachedOutputStream cos,
-                                String encoding, String contentType) 
+                                String encoding, String contentType)
         throws Exception {
         // Just transform the XML message when the cos has content
-        if (isPrettyLogging() && contentType != null && contentType.contains("xml") 
+        if (isPrettyLogging() && contentType != null && contentType.contains("xml")
             && !contentType.toLowerCase().contains("multipart/related") && cos.size() > 0) {
 
             StringWriter swriter = new StringWriter();
@@ -188,7 +189,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
                 }
                 in.close();
             }
-            
+
             String result = swriter.toString();
             if (result.length() < limit || limit == -1) {
                 builder.append(result);
@@ -204,19 +205,19 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             }
         }
     }
-    protected void writePayload(StringBuilder builder, 
+    protected void writePayload(StringBuilder builder,
                                 StringWriter stringWriter,
-                                String contentType) 
+                                String contentType)
         throws Exception {
-        if (isPrettyLogging() 
-            && contentType != null 
+        if (isPrettyLogging()
+            && contentType != null
             && contentType.contains("xml")
             && stringWriter.getBuffer().length() > 0) {
             try {
                 writePrettyPayload(builder, stringWriter, contentType);
                 return;
-            } catch (Exception ex) { 
-                // log it as is    
+            } catch (Exception ex) {
+                // log it as is
             }
         }
         StringBuffer buffer = stringWriter.getBuffer();
@@ -226,18 +227,18 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
             builder.append(buffer);
         }
     }
-    protected void writePrettyPayload(StringBuilder builder, 
+    protected void writePrettyPayload(StringBuilder builder,
                                 StringWriter stringWriter,
-                                String contentType) 
+                                String contentType)
         throws Exception {
         // Just transform the XML message when the cos has content
-        
+
         StringWriter swriter = new StringWriter();
         XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
         xwriter = new PrettyPrintXMLStreamWriter(xwriter, 2);
         StaxUtils.copy(new StreamSource(new StringReader(stringWriter.getBuffer().toString())), xwriter);
         xwriter.close();
-        
+
         String result = swriter.toString();
         if (result.length() < limit || limit == -1) {
             builder.append(swriter.toString());
@@ -248,16 +249,16 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
 
 
     /**
-     * Transform the string before display. The implementation in this class 
-     * does nothing. Override this method if you wish to change the contents of the 
-     * logged message before it is delivered to the output. 
+     * Transform the string before display. The implementation in this class
+     * does nothing. Override this method if you wish to change the contents of the
+     * logged message before it is delivered to the output.
      * For example, you can use this to mask out sensitive information.
      * @param originalLogString the raw log message.
      * @return transformed data
      */
     protected String transform(String originalLogString) {
         return originalLogString;
-    } 
+    }
 
     protected void log(Logger logger, String message) {
         message = transform(message);
@@ -280,7 +281,7 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
         return showBinaryContent;
     }
     protected boolean isBinaryContent(String contentType) {
-        return contentType != null && BINARY_CONTENT_MEDIA_TYPES.contains(contentType);
+        return contentType != null && binaryContentMediaTypes.contains(contentType);
     }
     public boolean isShowMultipartContent() {
         return showMultipartContent;
@@ -291,5 +292,11 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     protected boolean isMultipartContent(String contentType) {
         return contentType != null && contentType.startsWith(MULTIPART_CONTENT_MEDIA_TYPE);
     }
-    
+    public List<String> getBinaryContentMediaTypes() {
+        return binaryContentMediaTypes;
+    }
+    public void setBinaryContentMediaTypes(List<String> binaryContentMediaTypes) {
+        this.binaryContentMediaTypes = binaryContentMediaTypes;
+    }
+
 }

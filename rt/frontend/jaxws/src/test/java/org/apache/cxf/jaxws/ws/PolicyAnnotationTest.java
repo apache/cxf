@@ -50,7 +50,7 @@ import org.junit.Assert;
 
 
 /**
- * 
+ *
  */
 public class PolicyAnnotationTest extends Assert {
 
@@ -68,11 +68,11 @@ public class PolicyAnnotationTest extends Assert {
             "http://www.w3.org/2003/05/soap/bindings/HTTP/",
             "http://cxf.apache.org/transports/http/configuration",
             "http://cxf.apache.org/bindings/xformat");
-        
+
         LocalTransportFactory f = new LocalTransportFactory();
         f.getUriPrefixes().add("http");
-        f.setTransportIds(tp);        
-        
+        f.setTransportIds(tp);
+
         Server s = factory.create();
 
         try {
@@ -84,10 +84,10 @@ public class PolicyAnnotationTest extends Assert {
                 .getWSDLFactory().newWSDLWriter();
             def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
             Element wsdl = wsdlWriter.getDocument(def).getDocumentElement();
-            
+
             Map<String, String> ns = new HashMap<String, String>();
             ns.put("wsdl", WSDLConstants.NS_WSDL11);
-            ns.put("wsu", 
+            ns.put("wsu",
                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
             ns.put("wsp", Constants.URI_POLICY_13_NS);
             XPathUtils xpu = new XPathUtils(ns);
@@ -106,12 +106,12 @@ public class PolicyAnnotationTest extends Assert {
             check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/wsdl:operation/wsdl:output",
                   "echoIntBindingOpOutputPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:service/", "TestImplServiceServicePolicy");
-            
+
             assertEquals(1,
                          xpu.getValueList("/wsdl:definitions/wsdl:binding/wsdl:operation/"
                                               + "wsp:PolicyReference[@URI='#echoIntBindingOpPolicy']", wsdl)
                              .getLength());
-            
+
             EndpointPolicy policy = bus.getExtension(PolicyEngine.class)
                 .getServerEndpointPolicy(s.getEndpoint().getEndpointInfo(), null, null);
             assertNotNull(policy);
@@ -136,12 +136,12 @@ public class PolicyAnnotationTest extends Assert {
             "http://www.w3.org/2003/05/soap/bindings/HTTP/",
             "http://cxf.apache.org/transports/http/configuration",
             "http://cxf.apache.org/bindings/xformat");
-        
+
         LocalTransportFactory f = new LocalTransportFactory();
         f.getUriPrefixes().add("http");
         f.setTransportIds(tp);
-        
-        
+
+
         Server s = factory.create();
 
         try {
@@ -153,10 +153,10 @@ public class PolicyAnnotationTest extends Assert {
                 .getWSDLFactory().newWSDLWriter();
             def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
             Element wsdl = wsdlWriter.getDocument(def).getDocumentElement();
-            
+
             Map<String, String> ns = new HashMap<String, String>();
             ns.put("wsdl", WSDLConstants.NS_WSDL11);
-            ns.put("wsu", 
+            ns.put("wsu",
                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
             ns.put("wsp", Constants.URI_POLICY_13_NS);
             XPathUtils xpu = new XPathUtils(ns);
@@ -168,7 +168,7 @@ public class PolicyAnnotationTest extends Assert {
                   "echoIntPortTypeOpInputPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:portType/wsdl:operation/wsdl:output",
                   "echoIntPortTypeOpOutputPolicy");
-            check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/", 
+            check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/",
                   "TestInterfaceServiceSoapBindingBindingPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/wsdl:operation/", "echoIntBindingOpPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/wsdl:operation/wsdl:input",
@@ -176,7 +176,7 @@ public class PolicyAnnotationTest extends Assert {
             check(xpu, wsdl, "/wsdl:definitions/wsdl:binding/wsdl:operation/wsdl:output",
                   "echoIntBindingOpOutputPolicy");
             check(xpu, wsdl, "/wsdl:definitions/wsdl:service/", "TestInterfaceServiceServicePolicy");
-            
+
             assertEquals(1,
                          xpu.getValueList("/wsdl:definitions/wsdl:binding/wsdl:operation/"
                                               + "wsp:PolicyReference[@URI='#echoIntBindingOpPolicy']", wsdl)
@@ -216,7 +216,7 @@ public class PolicyAnnotationTest extends Assert {
             ns.put("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
             ns.put("wsp", Constants.URI_POLICY_13_NS);
             XPathUtils xpu = new XPathUtils(ns);
-            
+
             // org.apache.cxf.helpers.XMLUtils.printDOM(wsdl);
             assertEquals(1,
                     xpu.getValueList("/wsdl:definitions/wsdl:binding/"
@@ -259,7 +259,7 @@ public class PolicyAnnotationTest extends Assert {
             ns.put("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
             ns.put("wsp", Constants.URI_POLICY_13_NS);
             XPathUtils xpu = new XPathUtils(ns);
-            
+
             // org.apache.cxf.helpers.XMLUtils.printDOM(wsdl);
             assertEquals(1,
                     xpu.getValueList("/wsdl:definitions/wsdl:binding/"
@@ -285,12 +285,12 @@ public class PolicyAnnotationTest extends Assert {
                           wsdl,
                           XPathConstants.NODE));
     }
-    
+
     @Policies({
         @Policy(uri = "annotationpolicies/TestInterfacePolicy.xml"),
         @Policy(uri = "annotationpolicies/TestImplPolicy.xml",
                 placement = Policy.Placement.SERVICE_PORT),
-        @Policy(uri = "annotationpolicies/TestPortTypePolicy.xml", 
+        @Policy(uri = "annotationpolicies/TestPortTypePolicy.xml",
                 placement = Policy.Placement.PORT_TYPE)
     }
     )
@@ -298,22 +298,22 @@ public class PolicyAnnotationTest extends Assert {
     public interface TestInterface {
         @Policies({
             @Policy(uri = "annotationpolicies/TestOperationPolicy.xml"),
-            @Policy(uri = "annotationpolicies/TestOperationInputPolicy.xml", 
+            @Policy(uri = "annotationpolicies/TestOperationInputPolicy.xml",
                     placement = Policy.Placement.BINDING_OPERATION_INPUT),
-            @Policy(uri = "annotationpolicies/TestOperationOutputPolicy.xml", 
+            @Policy(uri = "annotationpolicies/TestOperationOutputPolicy.xml",
                     placement = Policy.Placement.BINDING_OPERATION_OUTPUT),
-            @Policy(uri = "annotationpolicies/TestOperationPTPolicy.xml", 
+            @Policy(uri = "annotationpolicies/TestOperationPTPolicy.xml",
                     placement = Policy.Placement.PORT_TYPE_OPERATION),
-            @Policy(uri = "annotationpolicies/TestOperationPTInputPolicy.xml", 
+            @Policy(uri = "annotationpolicies/TestOperationPTInputPolicy.xml",
                     placement = Policy.Placement.PORT_TYPE_OPERATION_INPUT),
-            @Policy(uri = "annotationpolicies/TestOperationPTOutputPolicy.xml", 
+            @Policy(uri = "annotationpolicies/TestOperationPTOutputPolicy.xml",
                     placement = Policy.Placement.PORT_TYPE_OPERATION_OUTPUT)
         }
         )
         int echoInt(int i);
     }
-    
-    
+
+
     @Policies({
         @Policy(uri = "annotationpolicies/TestImplPolicy.xml")
     }

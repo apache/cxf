@@ -37,8 +37,8 @@ public class PlugInClassLoaderTest extends Assert {
     private static final Logger LOG = LogUtils.getLogger(PlugInClassLoaderTest.class);
     private static boolean debug;
     PlugInClassLoader plugInClassLoader;
-   
-    
+
+
 
     @Before
     public void setUp() throws Exception {
@@ -100,14 +100,14 @@ public class PlugInClassLoaderTest extends Assert {
         throws Exception {
         String className = "javax.resource.ResourceException";
         // ensure it is available
-        getClass().getClassLoader().loadClass(className); 
+        getClass().getClassLoader().loadClass(className);
         try {
             Class<?> claz = plugInClassLoader.loadClass(className);
             assertEquals("That should be same classloader ", claz.getClassLoader(),
                         getClass().getClassLoader());
-            
+
         } catch (ClassNotFoundException ex) {
-            fail("Do not Expect ClassNotFoundException");            
+            fail("Do not Expect ClassNotFoundException");
         }
     }
 
@@ -119,7 +119,7 @@ public class PlugInClassLoaderTest extends Assert {
         URL url = resultClass.getResource("dummy.txt");
         LOG.info("URL: " + url);
         assertTrue("bad url: " + url, url.toString().startsWith("classloader:"));
-        
+
 
         InputStream configStream = url.openStream();
         assertNotNull("stream must not be null. ", configStream);
@@ -142,15 +142,15 @@ public class PlugInClassLoaderTest extends Assert {
         URL url = resultClass.getResource("/META-INF/MANIFEST.MF");
         LOG.info("URL: " + url);
         assertTrue("bad url: " + url, url.toString().startsWith("classloader:"));
-    
+
         InputStream configStream = url.openStream();
         assertNotNull("stream must not be null. ", configStream);
         assertTrue("unexpected stream class: " + configStream.getClass(),
             configStream instanceof java.io.ByteArrayInputStream);
-    
+
         byte[] bytes = new byte[21];
         configStream.read(bytes, 0, bytes.length);
-    
+
         String result = IOUtils.newStringFromBytes(bytes);
         LOG.fine("dummy.txt contents: " + result);
         assertTrue("unexpected dummy.txt contents:"  + result, result.indexOf("Manifest-Version: 1.0") != -1);
@@ -176,5 +176,5 @@ public class PlugInClassLoaderTest extends Assert {
         URL url = plugInClassLoader.findResource("foo!/bar/");
         assertNull("url must be null. ", url);
     }
-   
+
 }

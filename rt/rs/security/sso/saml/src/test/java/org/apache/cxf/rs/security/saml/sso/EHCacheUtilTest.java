@@ -29,30 +29,30 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class EHCacheUtilTest extends Assert {
 
     @Test
     public void testCreateCacheManager() {
-        Configuration conf = 
+        Configuration conf =
             ConfigurationFactory.parseConfiguration(EHCacheUtil.class.getResource("/cxf-test-ehcache.xml"));
-            
+
         assertNotNull(conf);
         conf.setName("testCache");
-        
+
         CacheManager manager1 = EHCacheUtil.createCacheManager(conf);
         assertNotNull(manager1);
         CacheManager manager2 = EHCacheUtil.createCacheManager();
         assertNotNull(manager2);
-        
+
         manager1.shutdown();
         assertEquals(Status.STATUS_SHUTDOWN, manager1.getStatus());
-        
+
         assertEquals(Status.STATUS_ALIVE, manager2.getStatus());
-        
+
         manager2.shutdown();
         assertEquals(Status.STATUS_SHUTDOWN, manager2.getStatus());
-        
+
     }
 }

@@ -40,28 +40,28 @@ import org.apache.wss4j.common.saml.builder.SAML2Constants;
  * Create a SAML2 Assertion via some authenticated information (Principal).
  */
 public class Saml2CallbackHandler implements CallbackHandler {
-    
+
     private Principal principal;
-    
+
     public Saml2CallbackHandler(Principal principal) {
         this.principal = principal;
     }
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof SAMLCallback) {
-                
+
                 SAMLCallback callback = (SAMLCallback) callbacks[i];
                 callback.setSamlVersion(Version.SAML_20);
-                
+
                 callback.setIssuer("intermediary");
                 String subjectName = "uid=" + principal.getName();
                 String confirmationMethod = SAML2Constants.CONF_SENDER_VOUCHES;
 
-                SubjectBean subjectBean = 
+                SubjectBean subjectBean =
                     new SubjectBean(subjectName, null, confirmationMethod);
                 callback.setSubject(subjectBean);
-                
+
                 AttributeStatementBean attrBean = new AttributeStatementBean();
                 if (subjectBean != null) {
                     attrBean.setSubject(subjectBean);
@@ -71,7 +71,7 @@ public class Saml2CallbackHandler implements CallbackHandler {
                 attributeBean.addAttributeValue("user");
                 attrBean.setSamlAttributes(Collections.singletonList(attributeBean));
                 callback.setAttributeStatementData(Collections.singletonList(attrBean));
-                
+
                 try {
                     String file = "serviceKeystore.properties";
                     Crypto crypto = CryptoFactory.getInstance(file);
@@ -85,5 +85,5 @@ public class Saml2CallbackHandler implements CallbackHandler {
             }
         }
     }
-    
+
 }

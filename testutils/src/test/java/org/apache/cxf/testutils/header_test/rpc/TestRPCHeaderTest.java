@@ -47,7 +47,7 @@ public class TestRPCHeaderTest extends Assert {
                 assertTrue(parm.header());
             }
         }
-        
+
     }
 
     @Test

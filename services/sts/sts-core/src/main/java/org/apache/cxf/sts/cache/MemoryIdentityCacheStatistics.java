@@ -39,7 +39,7 @@ public class MemoryIdentityCacheStatistics implements ManagedComponent {
     private long cacheMiss;
     private long cacheHit;
     private ObjectName objectName;
-    
+
     public MemoryIdentityCacheStatistics() {
     }
 
@@ -60,7 +60,7 @@ public class MemoryIdentityCacheStatistics implements ManagedComponent {
                         .append(ManagementConstants.NAME_PROP).append('=')
                         .append("MemoryIdentityCacheStatistics-" + System.identityHashCode(this));
                     objectName = new ObjectName(buffer.toString());
-                    
+
                     im.register(this);
                 } catch (JMException e) {
                     LOG.log(Level.WARNING, "Registering MemoryIdentityCacheStatistics failed.", e);
@@ -73,16 +73,16 @@ public class MemoryIdentityCacheStatistics implements ManagedComponent {
     public synchronized long getCacheMiss() {
         return cacheMiss;
     }
-    
+
     @ManagedAttribute()
     public synchronized long getCacheHit() {
         return cacheHit;
     }
-    
+
     protected synchronized void increaseCacheHit() {
         cacheHit++;
     }
-    
+
     protected synchronized void increaseCacheMiss() {
         cacheMiss++;
     }
@@ -90,5 +90,5 @@ public class MemoryIdentityCacheStatistics implements ManagedComponent {
     public ObjectName getObjectName() throws JMException {
         return objectName;
     }
-    
+
 }

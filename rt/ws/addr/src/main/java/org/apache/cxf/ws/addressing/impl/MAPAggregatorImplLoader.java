@@ -23,7 +23,7 @@ import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.MAPAggregator.MAPAggregatorLoader;
 
 /**
- * 
+ *
  */
 public class MAPAggregatorImplLoader implements MAPAggregatorLoader {
 

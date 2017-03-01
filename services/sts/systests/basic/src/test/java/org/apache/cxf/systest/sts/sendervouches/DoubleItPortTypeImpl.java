@@ -31,26 +31,26 @@ import org.apache.cxf.feature.Features;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 
-@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt", 
-            serviceName = "DoubleItService", 
+@WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+            serviceName = "DoubleItService",
             endpointInterface = "org.example.contract.doubleit.DoubleItPortType")
-@Features(features = "org.apache.cxf.feature.LoggingFeature")              
+@Features(features = "org.apache.cxf.feature.LoggingFeature")
 public class DoubleItPortTypeImpl extends AbstractBusClientServerTestBase implements DoubleItPortType {
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     @Resource
     WebServiceContext wsc;
-    
+
     private String port;
-    
+
     public int doubleIt(int numberToDouble) {
         // Delegate request to a provider
         URL wsdl = DoubleItPortTypeImpl.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTransportSAML2SupportingPort");
-        DoubleItPortType transportSAML2SupportingPort = 
+        DoubleItPortType transportSAML2SupportingPort =
             service.getPort(portQName, DoubleItPortType.class);
         try {
             updateAddressPort(transportSAML2SupportingPort, getPort());
@@ -65,7 +65,7 @@ public class DoubleItPortTypeImpl extends AbstractBusClientServerTestBase implem
         ((BindingProvider)transportSAML2SupportingPort).getRequestContext().put(
             "security.saml-callback-handler", callbackHandler
         );
-        
+
         return transportSAML2SupportingPort.doubleIt(numberToDouble);
     }
 
@@ -76,5 +76,5 @@ public class DoubleItPortTypeImpl extends AbstractBusClientServerTestBase implem
     public void setPort(String port) {
         this.port = port;
     }
-    
+
 }

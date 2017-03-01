@@ -31,7 +31,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
  * A CallbackHandler implementation for the kerberos client.
  */
 public class KerberosClientPasswordCallback implements CallbackHandler {
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (int i = 0; i < callbacks.length; i++) {
             if (callbacks[i] instanceof NameCallback) {
@@ -43,6 +43,6 @@ public class KerberosClientPasswordCallback implements CallbackHandler {
             }
         }
     }
-    
+
 
 }

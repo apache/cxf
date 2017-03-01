@@ -35,9 +35,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class CollectionService implements CollectionServiceInterface {
-    
+
     private Map<String, Map<String, BeanWithGregorianDate>> lastComplexMap;
-    
+
     /** {@inheritDoc}*/
     public Collection<String> getStrings() {
         return null;
@@ -56,11 +56,11 @@ public class CollectionService implements CollectionServiceInterface {
     public Collection<Collection<String>> getStringCollections() {
         return null;
     }
-    
+
     /** {@inheritDoc}*/
     public void takeDoubleList(List<Double> doublesList) {
     }
-    
+
     /** {@inheritDoc}*/
     public String takeSortedStrings(SortedSet<String> strings) {
         return strings.first();

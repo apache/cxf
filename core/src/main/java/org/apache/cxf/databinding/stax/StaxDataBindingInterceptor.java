@@ -48,7 +48,7 @@ public class StaxDataBindingInterceptor extends AbstractInDatabindingInterceptor
             LOG.fine("StaxDataBindingInterceptor skipped in HTTP GET method");
             return;
         }
-        
+
         DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
         DataReader<XMLStreamReader> dr = getDataReader(message);
         MessageContentsList parameters = new MessageContentsList();
@@ -56,28 +56,28 @@ public class StaxDataBindingInterceptor extends AbstractInDatabindingInterceptor
         Exchange exchange = message.getExchange();
         BindingOperationInfo bop = exchange.getBindingOperationInfo();
 
-        //if body is empty and we have BindingOperationInfo, we do not need to match 
+        //if body is empty and we have BindingOperationInfo, we do not need to match
         //operation anymore, just return
         if (!StaxUtils.toNextElement(xmlReader) && bop != null) {
             // body may be empty for partial response to decoupled request
             return;
         }
-        
+
         if (bop == null) {
             Endpoint ep = exchange.getEndpoint();
             bop = ep.getBinding().getBindingInfo().getOperations().iterator().next();
         }
-        
+
         message.getExchange().put(BindingOperationInfo.class, bop);
-        
+
         if (isRequestor(message)) {
-            parameters.put(bop.getOutput().getMessageParts().get(0), dr.read(xmlReader));            
+            parameters.put(bop.getOutput().getMessageParts().get(0), dr.read(xmlReader));
         } else {
-            parameters.put(bop.getInput().getMessageParts().get(0), dr.read(xmlReader));            
+            parameters.put(bop.getInput().getMessageParts().get(0), dr.read(xmlReader));
         }
 
-        
-        if (parameters.size() > 0) {
+
+        if (!parameters.isEmpty()) {
             message.setContent(List.class, parameters);
         }
     }

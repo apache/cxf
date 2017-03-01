@@ -52,30 +52,30 @@ public class DirectAuthorizationService extends AbstractOAuthService {
     public Response authorize(MultivaluedMap<String, String> params) {
         SecurityContext sc = getAndValidateSecurityContext(params);
         Client client = getClient(params);
-        // Create a UserSubject representing the end user 
+        // Create a UserSubject representing the end user
         UserSubject userSubject = createUserSubject(sc, params);
-        
-        
+
+
         AccessTokenRegistration reg = new AccessTokenRegistration();
         reg.setClient(client);
         reg.setGrantType(OAuthConstants.DIRECT_TOKEN_GRANT);
         reg.setSubject(userSubject);
-        
+
         String providedScope = params.getFirst(OAuthConstants.SCOPE);
-        List<String> requestedScope = OAuthUtils.getRequestedScopes(client, 
-                                                           providedScope, 
+        List<String> requestedScope = OAuthUtils.getRequestedScopes(client,
+                                                           providedScope,
                                                            useAllClientScopes,
                                                            partialMatchScopeValidation);
-        
-        reg.setRequestedScope(requestedScope);        
+
+        reg.setRequestedScope(requestedScope);
         reg.setApprovedScope(requestedScope);
         ServerAccessToken token = getDataProvider().createAccessToken(reg);
         ClientAccessToken clientToken = OAuthUtils.toClientAccessToken(token, isWriteOptionalParameters());
         return Response.ok(clientToken).build();
     }
-    
+
     protected SecurityContext getAndValidateSecurityContext(MultivaluedMap<String, String> params) {
-        SecurityContext securityContext =  
+        SecurityContext securityContext =
             (SecurityContext)getMessageContext().get(SecurityContext.class.getName());
         if (securityContext == null || securityContext.getUserPrincipal() == null) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
@@ -89,10 +89,10 @@ public class DirectAuthorizationService extends AbstractOAuthService {
         if (subjectCreator != null) {
             subject = subjectCreator.createUserSubject(getMessageContext(), params);
             if (subject != null) {
-                return subject; 
+                return subject;
             }
         }
-        
+
         subject = getMessageContext().getContent(UserSubject.class);
         if (subject != null) {
             return subject;
@@ -110,7 +110,7 @@ public class DirectAuthorizationService extends AbstractOAuthService {
     }
     protected Client getClient(MultivaluedMap<String, String> params) {
         Client client = null;
-        
+
         try {
             client = getValidClient(params.getFirst(OAuthConstants.CLIENT_ID), params);
         } catch (OAuthServiceException ex) {
@@ -118,12 +118,12 @@ public class DirectAuthorizationService extends AbstractOAuthService {
                 reportInvalidRequestError(ex.getError(), null);
             }
         }
-        
+
         if (client == null) {
             reportInvalidRequestError("Client ID is invalid", null);
         }
         return client;
-        
+
     }
 
     public boolean isPartialMatchScopeValidation() {

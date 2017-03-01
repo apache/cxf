@@ -35,15 +35,15 @@ import org.junit.Test;
 
 
 public class ClassLoaderResolverTest extends Assert {
-    private static final String RESOURCE_DATA = "this is the resource data"; 
+    private static final String RESOURCE_DATA = "this is the resource data";
 
     private String resourceName;
-    private ClassLoaderResolver clr; 
+    private ClassLoaderResolver clr;
 
     @Before
-    public void setUp() throws IOException { 
+    public void setUp() throws IOException {
         File resource = File.createTempFile("test", "resource");
-        resource.deleteOnExit(); 
+        resource.deleteOnExit();
         resourceName = resource.getName();
 
         FileWriter writer = new FileWriter(resource);
@@ -52,34 +52,34 @@ public class ClassLoaderResolverTest extends Assert {
         writer.close();
 
         URL[] urls = {resource.getParentFile().toURI().toURL()};
-        ClassLoader loader = new URLClassLoader(urls); 
+        ClassLoader loader = new URLClassLoader(urls);
         assertNotNull(loader.getResourceAsStream(resourceName));
         assertNull(ClassLoader.getSystemResourceAsStream(resourceName));
         clr = new ClassLoaderResolver(loader);
-    } 
-    
+    }
+
     @After
     public void tearDown() {
         clr = null;
         resourceName = null;
     }
- 
+
     @Test
-    public void testResolve() { 
+    public void testResolve() {
         assertNull(clr.resolve(resourceName, null));
         assertNotNull(clr.resolve(resourceName, URL.class));
-    } 
+    }
 
     @Test
-    public void testGetAsStream() throws IOException { 
+    public void testGetAsStream() throws IOException {
         InputStream in = clr.getAsStream(resourceName);
-        assertNotNull(in); 
+        assertNotNull(in);
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String content = reader.readLine(); 
+        String content = reader.readLine();
 
         assertEquals("resource content incorrect", RESOURCE_DATA, content);
         reader.close();
-    } 
+    }
 
 }

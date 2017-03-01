@@ -53,7 +53,7 @@ public abstract class AbstractXSLTInterceptor extends AbstractPhaseInterceptor<M
 
     private String contextPropertyName;
     private final Templates xsltTemplate;
-        
+
     public AbstractXSLTInterceptor(String phase, Class<?> before, Class<?> after, String xsltPath) {
         super(phase);
         if (before != null) {
@@ -62,7 +62,7 @@ public abstract class AbstractXSLTInterceptor extends AbstractPhaseInterceptor<M
         if (after != null) {
             addAfter(after.getName());
         }
-        
+
         try {
             InputStream xsltStream = ClassLoaderUtils.getResourceAsStream(xsltPath, this.getClass());
             if (xsltStream == null) {
@@ -78,7 +78,7 @@ public abstract class AbstractXSLTInterceptor extends AbstractPhaseInterceptor<M
             throw new IllegalArgumentException(
                                                String.format("Cannot create XSLT template from path: %s",
                                                              xsltPath), e);
-        }        
+        }
     }
 
     public void setContextPropertyName(String propertyName) {
@@ -86,10 +86,10 @@ public abstract class AbstractXSLTInterceptor extends AbstractPhaseInterceptor<M
     }
 
     protected boolean checkContextProperty(Message message) {
-        return contextPropertyName != null 
+        return contextPropertyName != null
             && !MessageUtils.getContextualBoolean(message, contextPropertyName, false);
     }
-    
+
     protected Templates getXSLTTemplate() {
         return xsltTemplate;
     }

@@ -21,7 +21,7 @@ package org.apache.cxf.frontend;
 
 import org.apache.cxf.interceptor.FaultOutInterceptor;
 
-public class FaultInfoException extends Exception 
+public class FaultInfoException extends Exception
     implements FaultOutInterceptor.FaultInfoException {
 
     private static final long serialVersionUID = 1392427062502667841L;

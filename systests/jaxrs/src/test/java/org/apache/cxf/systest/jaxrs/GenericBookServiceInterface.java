@@ -22,7 +22,7 @@ package org.apache.cxf.systest.jaxrs;
 
 
 public interface GenericBookServiceInterface extends GenericBookInterface<SuperBook> {
-    
+
 }
 
 

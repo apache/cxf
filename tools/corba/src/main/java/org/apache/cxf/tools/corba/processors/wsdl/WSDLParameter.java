@@ -59,9 +59,9 @@ public final class WSDLParameter {
                                   List<ArgType> returns, boolean simpleOrdering) throws Exception {
 
         definition = def;
-        List<ParamType> inputs = new ArrayList<ParamType>();
-        List<ParamType> outputs = new ArrayList<ParamType>();
-        List<ArgType> returnOutputs = new ArrayList<ArgType>();
+        List<ParamType> inputs = new ArrayList<>();
+        List<ParamType> outputs = new ArrayList<>();
+        List<ArgType> returnOutputs = new ArrayList<>();
         boolean isWrapped = isWrappedOperation(operation, xmlSchemaList);
 
         if (isWrapped) {
@@ -302,7 +302,7 @@ public final class WSDLParameter {
 
     private void processReturnParams(List<ParamType> outputs, List<ArgType> returns) {
 
-        if (outputs.size() > 0) {
+        if (!outputs.isEmpty()) {
             ParamType d2 = outputs.get(0);
 
             if (d2.getMode().value().equals("out")) {

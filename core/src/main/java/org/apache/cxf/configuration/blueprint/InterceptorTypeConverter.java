@@ -24,14 +24,14 @@ import org.osgi.service.blueprint.container.Converter;
 import org.osgi.service.blueprint.container.ReifiedType;
 
 /**
- * 
+ *
  */
 public class InterceptorTypeConverter implements Converter {
 
     /** {@inheritDoc}*/
     public boolean canConvert(Object sourceObject, ReifiedType targetType) {
         return sourceObject instanceof Interceptor
-            && targetType.getRawClass().isInstance(sourceObject); 
+            && targetType.getRawClass().isInstance(sourceObject);
     }
 
     /** {@inheritDoc}*/

@@ -29,19 +29,19 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 
 final class MessageStreamUtil {
-    
+
     private MessageStreamUtil() {
     }
 
     /**
      * Set Writer or OutputStream in message that calls the sender on close with
      * the content of the stream
-     * 
+     *
      * @param message where to set the content
      * @param isTextPayload decides about stream type true:Writer, false: OutputStream
      * @param sender will be called on close
      */
-    public static void prepareStream(final Message message, boolean isTextPayload, 
+    public static void prepareStream(final Message message, boolean isTextPayload,
                                      final JMSExchangeSender sender) {
         if (isTextPayload) {
             message.setContent(Writer.class, new SendingWriter(sender, message.getExchange()));
@@ -50,7 +50,7 @@ final class MessageStreamUtil {
             message.setContent(OutputStream.class, out);
         }
     }
-    
+
     private static final class SendingWriter extends StringWriter {
         private final JMSExchangeSender sender;
         private Exchange exchange;

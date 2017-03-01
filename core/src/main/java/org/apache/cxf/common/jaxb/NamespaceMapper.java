@@ -34,8 +34,8 @@ public final class NamespaceMapper extends NamespacePrefixMapper {
         this.nspref = nspref;
     }
 
-    public String getPreferredPrefix(String namespaceUri, 
-                                     String suggestion, 
+    public String getPreferredPrefix(String namespaceUri,
+                                     String suggestion,
                                      boolean requirePrefix) {
         String prefix = nspref.get(namespaceUri);
         if (prefix != null) {
@@ -51,6 +51,6 @@ public final class NamespaceMapper extends NamespacePrefixMapper {
     public String[] getContextualNamespaceDecls() {
         return nsctxt;
     }
-    
-    
+
+
 }

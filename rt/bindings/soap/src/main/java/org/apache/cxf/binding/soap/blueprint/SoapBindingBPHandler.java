@@ -21,18 +21,22 @@ package org.apache.cxf.binding.soap.blueprint;
 
 import java.net.URL;
 import java.util.Set;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.aries.blueprint.NamespaceHandler;
 import org.apache.aries.blueprint.ParserContext;
+import org.apache.cxf.helpers.BaseNamespaceHandler;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
 
-public class SoapBindingBPHandler implements NamespaceHandler {
+public class SoapBindingBPHandler extends BaseNamespaceHandler {
 
     public URL getSchemaLocation(String s) {
-        return getClass().getClassLoader().getResource("schemas/configuration/blueprint/soap.xsd");
+        if ("http://cxf.apache.org/blueprint/bindings/soap".equals(s)) {
+            return getClass().getClassLoader().getResource("schemas/configuration/blueprint/soap.xsd");
+        }
+        return super.findCoreSchemaLocation(s);
     }
 
     @SuppressWarnings("rawtypes")

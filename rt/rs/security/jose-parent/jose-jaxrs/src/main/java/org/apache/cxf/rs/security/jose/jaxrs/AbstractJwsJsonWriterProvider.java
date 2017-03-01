@@ -42,23 +42,23 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public class AbstractJwsJsonWriterProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractJwsJsonWriterProvider.class);
-    
+
     private List<JwsSignatureProvider> sigProviders;
-    
+
     public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
         setSignatureProviders(Collections.singletonList(signatureProvider));
     }
     public void setSignatureProviders(List<JwsSignatureProvider> signatureProviders) {
         this.sigProviders = signatureProviders;
     }
-    
+
     protected List<JwsSignatureProvider> getInitializedSigProviders() {
         if (sigProviders != null) {
-            return sigProviders;    
-        } 
+            return sigProviders;
+        }
         Message m = JAXRSUtils.getCurrentMessage();
-        Object propLocsProp = 
-            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, 
+        Object propLocsProp =
+            MessageUtils.getContextualProperty(m, JoseConstants.RSSEC_SIGNATURE_OUT_PROPS,
                                                JoseConstants.RSSEC_SIGNATURE_PROPS);
         if (propLocsProp == null) {
             LOG.warning("JWS JSON init properties resource is not identified");
@@ -77,10 +77,10 @@ public class AbstractJwsJsonWriterProvider {
         }
         return theSigProviders;
     }
-    protected void writeJws(JwsJsonProducer p, OutputStream os) 
+    protected void writeJws(JwsJsonProducer p, OutputStream os)
         throws IOException {
         byte[] bytes = StringUtils.toBytesUTF8(p.getJwsJsonSignedDocument());
         IOUtils.copy(new ByteArrayInputStream(bytes), os);
     }
-    
+
 }

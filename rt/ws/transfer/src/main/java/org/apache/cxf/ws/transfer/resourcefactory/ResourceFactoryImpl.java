@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -46,15 +44,15 @@ import org.apache.cxf.ws.transfer.validationtransformation.ValidAndTransformHelp
 public class ResourceFactoryImpl implements ResourceFactory {
 
     protected ResourceResolver resourceResolver;
-    
+
     protected List<ResourceTypeIdentifier> resourceTypeIdentifiers;
-    
+
     protected Map<String, Dialect> dialects;
-    
+
     public ResourceFactoryImpl() {
         dialects = new HashMap<String, Dialect>();
     }
-    
+
     @Override
     public CreateResponse create(Create body) {
         if (body.getDialect() != null && !body.getDialect().isEmpty()) {
@@ -95,11 +93,11 @@ public class ResourceFactoryImpl implements ResourceFactory {
     public void setResourceTypeIdentifiers(List<ResourceTypeIdentifier> resourceTypeIdentifiers) {
         this.resourceTypeIdentifiers = resourceTypeIdentifiers;
     }
-    
+
     /**
      * Register Dialect object for URI.
      * @param uri
-     * @param dialect 
+     * @param dialect
      */
     public void registerDialect(String uri, Dialect dialect) {
         if (dialects.containsKey(uri)) {
@@ -107,10 +105,10 @@ public class ResourceFactoryImpl implements ResourceFactory {
         }
         dialects.put(uri, dialect);
     }
-    
+
     /**
      * Unregister dialect URI.
-     * @param uri 
+     * @param uri
      */
     public void unregisterDialect(String uri) {
         if (!dialects.containsKey(uri)) {
@@ -118,7 +116,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
         }
         dialects.remove(uri);
     }
-    
+
     private CreateResponse createLocally(Create body, ResourceReference ref) {
         Representation representation = body.getRepresentation();
         ReferenceParametersType refParams = ref.getResourceManager().create(representation);
@@ -135,13 +133,11 @@ public class ResourceFactoryImpl implements ResourceFactory {
 
         return response;
     }
-    
+
     private CreateResponse createRemotely(Create body, ResourceReference ref) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.getInInterceptors().add(new LoggingInInterceptor());
-        factory.getOutInterceptors().add(new LoggingOutInterceptor());
         factory.setServiceClass(ResourceFactory.class);
-        factory.setAddress(ref.getResourceURL() 
+        factory.setAddress(ref.getResourceURL()
                 + TransferConstants.RESOURCE_REMOTE_SUFFIX);
         ResourceFactory client = (ResourceFactory) factory.create();
         CreateResponse response = client.create(body);

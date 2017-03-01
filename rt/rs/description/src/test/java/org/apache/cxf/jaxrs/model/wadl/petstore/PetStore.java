@@ -41,20 +41,20 @@ public class PetStore {
     @Produces("text/plain")
     /**
      * Return Pet Status with no params
-     * 
-     * @return status 
+     *
+     * @return status
      * @throws Exception
      */
     public Response getBaseStatus() throws Exception {
 
         return Response.ok(CLOSED).build();
     }
-    
+
     /**
      * Return Pet Status with 2 params
      * @param petId the pet id
      * @param query the query
-     * @return status 
+     * @return status
      * @throws Exception
      */
     @GET
@@ -65,11 +65,11 @@ public class PetStore {
 
         return Response.ok(CLOSED).build();
     }
-    
+
     /**
      * Return Pet Status With 1 Param
      * @param petId the pet id
-     * @return status 
+     * @return status
      * @throws Exception
      */
     @GET
@@ -79,14 +79,14 @@ public class PetStore {
 
         return Response.ok(CLOSED).build();
     }
-    
-    
+
+
     /**
      * Return Pet Status With 3 Params
      * @param petId the pet id
      * @param query the query
      * @param query2 the query2
-     * @return status 
+     * @return status
      * @throws Exception
      */
     @GET
@@ -98,5 +98,5 @@ public class PetStore {
 
         return Response.ok(CLOSED).build();
     }
-    
+
 }

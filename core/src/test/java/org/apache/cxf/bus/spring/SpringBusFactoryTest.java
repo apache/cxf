@@ -59,12 +59,12 @@ public class SpringBusFactoryTest extends Assert {
     public void tearDown() {
         BusFactory.setDefaultBus(null);
     }
-    
+
     @Test
     public void testDefault() {
         Bus bus = new SpringBusFactory().createBus();
         assertNotNull(bus);
-        BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);  
+        BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
         assertNotNull("No binding factory manager", bfm);
         assertNotNull("No configurer", bus.getExtension(Configurer.class));
         assertNotNull("No resource manager", bus.getExtension(ResourceManager.class));
@@ -74,27 +74,27 @@ public class SpringBusFactoryTest extends Assert {
         assertNotNull("No workqueue manager", bus.getExtension(WorkQueueManager.class));
         assertNotNull("No lifecycle manager", bus.getExtension(BusLifeCycleManager.class));
         assertNotNull("No service registry", bus.getExtension(ServerRegistry.class));
-        
+
         try {
             bfm.getBindingFactory("http://cxf.apache.org/unknown");
         } catch (BusException ex) {
             // expected
         }
-        
+
         assertEquals("Unexpected interceptors", 0, bus.getInInterceptors().size());
         assertEquals("Unexpected interceptors", 0, bus.getInFaultInterceptors().size());
         assertEquals("Unexpected interceptors", 0, bus.getOutInterceptors().size());
         assertEquals("Unexpected interceptors", 0, bus.getOutFaultInterceptors().size());
 
     }
-    
+
     @Test
     public void testCustomFileName() {
         String cfgFile = "org/apache/cxf/bus/spring/resources/bus-overwrite.xml";
         Bus bus = new SpringBusFactory().createBus(cfgFile, true);
         checkCustomerConfiguration(bus);
     }
-    
+
     @Test
     public void testCustomerBusShutdown() {
         String cfgFile = "org/apache/cxf/bus/spring/customerBus.xml";
@@ -102,23 +102,23 @@ public class SpringBusFactoryTest extends Assert {
         // We have three bus here, which should be closed rightly
         bus.shutdown(true);
     }
-    
+
     @Test
     public void testCustomFileURLFromSystemProperty() {
-        URL cfgFileURL = this.getClass().getResource("resources/bus-overwrite.xml");        
+        URL cfgFileURL = this.getClass().getResource("resources/bus-overwrite.xml");
         System.setProperty(Configurer.USER_CFG_FILE_PROPERTY_URL, cfgFileURL.toString());
         Bus bus = new SpringBusFactory().createBus((String)null, true);
         checkCustomerConfiguration(bus);
         System.clearProperty(Configurer.USER_CFG_FILE_PROPERTY_URL);
     }
-    
+
     @Test
     public void testCustomFileURL() {
         URL cfgFileURL = this.getClass().getResource("resources/bus-overwrite.xml");
         Bus bus = new SpringBusFactory().createBus(cfgFileURL, true);
         checkCustomerConfiguration(bus);
     }
-    
+
     private void checkCustomerConfiguration(Bus bus) {
         assertNotNull(bus);
         List<Interceptor<? extends Message>> interceptors = bus.getInInterceptors();
@@ -135,7 +135,7 @@ public class SpringBusFactoryTest extends Assert {
         assertEquals("Unexpected number of interceptors", 1, interceptors.size());
         assertEquals("Unexpected interceptor", "out", interceptors.get(0).toString());
     }
-    
+
     @Test
     public void testForLifeCycle() {
         BusLifeCycleListener bl = EasyMock.createMock(BusLifeCycleListener.class);
@@ -150,7 +150,7 @@ public class SpringBusFactoryTest extends Assert {
         EasyMock.replay(bl);
         bus.shutdown(true);
         EasyMock.verify(bl);
-        
+
     }
 
     @Test
@@ -176,42 +176,42 @@ public class SpringBusFactoryTest extends Assert {
         assertTrue("@PreDestroy annoated method has been called already.", !te.preDestroyMethodCalled);
         bus.shutdown(true);
         assertTrue("@PreDestroy annotated method has not been called.", te.preDestroyMethodCalled);
-        
+
     }
 
     @Test
     public void testInitialisation() {
         Bus bus = new SpringBusFactory().createBus("org/apache/cxf/bus/spring/init.xml");
-        assertNotNull(bus.getExtension(TestListener.class));           
+        assertNotNull(bus.getExtension(TestListener.class));
         assertSame(bus, bus.getExtension(BusApplicationContext.class).getBean("cxf"));
     }
 
-    
+
     static class TestInterceptor implements Interceptor<Message> {
 
         private String name;
-        
-        TestInterceptor() {            
+
+        TestInterceptor() {
         }
-        
+
         public void setName(String n) {
             name = n;
         }
-               
+
         @Override
         public String toString() {
             return name;
         }
-        
-        public void handleFault(Message message) {  
+
+        public void handleFault(Message message) {
         }
 
-        public void handleMessage(Message message) throws Fault {   
+        public void handleMessage(Message message) throws Fault {
         }
-        
-        public void postHandleMessage(Message message) throws Fault {            
+
+        public void postHandleMessage(Message message) throws Fault {
         }
-        
+
     }
 
     static class TestExtension {
@@ -222,7 +222,7 @@ public class SpringBusFactoryTest extends Assert {
         TestExtension(Bus bus) {
             bus.setExtension(this, TestExtension.class);
         }
- 
+
         @PostConstruct
         void postConstructMethod() {
             postConstructMethodCalled = true;
@@ -233,7 +233,7 @@ public class SpringBusFactoryTest extends Assert {
             preDestroyMethodCalled = true;
         }
     }
-     
+
     static class TestFeature extends AbstractFeature {
         boolean initialised;
         TestFeature() {
@@ -243,30 +243,30 @@ public class SpringBusFactoryTest extends Assert {
         @Override
         public void initialize(Bus bus) {
             initialised = true;
-        }   
+        }
     }
-    
+
     static class TestListener implements BusLifeCycleListener {
 
         Bus bus;
- 
+
         @Resource
-        public void setBus(Bus b) {        
-            bus = b;        
+        public void setBus(Bus b) {
+            bus = b;
         }
-        
+
         @PostConstruct
         public void register() {
-            bus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);            
+            bus.getExtension(BusLifeCycleManager.class).registerLifeCycleListener(this);
         }
-        
+
         public void initComplete() {
             assertNull(bus.getExtension(TestFeature.class));
             Collection<Feature> features = bus.getFeatures();
             assertEquals(1, features.size());
             TestFeature tf = (TestFeature)features.iterator().next();
             assertTrue(tf.initialised);
-            bus.setExtension(this, TestListener.class);          
+            bus.setExtension(this, TestListener.class);
         }
 
         public void postShutdown() {
@@ -274,6 +274,6 @@ public class SpringBusFactoryTest extends Assert {
 
         public void preShutdown() {
         }
-        
-    }    
+
+    }
 }

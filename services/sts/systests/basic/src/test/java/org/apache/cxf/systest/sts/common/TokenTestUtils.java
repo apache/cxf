@@ -39,11 +39,11 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public final class TokenTestUtils {
-    
+
     private TokenTestUtils() {
         // complete
     }
-    
+
     public static void verifyToken(DoubleItPortType port) throws Exception {
         Client client = ClientProxy.getClient(port);
         Endpoint ep = client.getEndpoint();
@@ -53,12 +53,12 @@ public final class TokenTestUtils {
         assertNotNull(tok);
         STSClient sts = (STSClient)ep.get(SecurityConstants.STS_CLIENT);
         if (sts == null) {
-            sts  = (STSClient)ep.get("ws-" + SecurityConstants.STS_CLIENT);
+            sts = (STSClient)ep.get("ws-" + SecurityConstants.STS_CLIENT);
         }
-        
+
         List<SecurityToken> validTokens = sts.validateSecurityToken(tok);
         assertTrue(validTokens != null && !validTokens.isEmpty());
-        
+
         //mess with the token a bit to force it to fail to validate
         Element e = tok.getToken();
         Element e2 = DOMUtils.getFirstChildWithName(e, e.getNamespaceURI(), "Conditions");
@@ -75,7 +75,7 @@ public final class TokenTestUtils {
             // expected
         }
     }
-    
+
     public static void updateSTSPort(BindingProvider p, String port) {
         STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
         if (stsClient == null) {

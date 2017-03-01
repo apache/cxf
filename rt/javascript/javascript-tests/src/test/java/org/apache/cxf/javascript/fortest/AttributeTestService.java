@@ -22,7 +22,7 @@ package org.apache.cxf.javascript.fortest;
 import javax.jws.WebService;
 
 /**
- * 
+ *
  */
 @WebService(name = "AttributeTestService", targetNamespace = "uri:cxf.apache.org.javascript.attribute")
 public interface AttributeTestService {

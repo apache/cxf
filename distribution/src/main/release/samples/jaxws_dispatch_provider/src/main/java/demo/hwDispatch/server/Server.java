@@ -29,16 +29,16 @@ public class Server {
         Object implementor = new GreeterSoapMessageProvider();
         String address = "http://localhost:9000/SoapContext/SoapPort1";
         Endpoint.publish(address, implementor);
-        
+
         System.out.println("Starting SoapService2");
         implementor = new GreeterDOMSourceMessageProvider();
         address = "http://localhost:9000/SoapContext/SoapPort2";
         Endpoint.publish(address, implementor);
-        
+
         System.out.println("Starting SoapService3");
         implementor = new GreeterDOMSourcePayloadProvider();
         address = "http://localhost:9000/SoapContext/SoapPort3";
-        Endpoint.publish(address, implementor);        
+        Endpoint.publish(address, implementor);
     }
 
     public static void main(String args[]) throws Exception {

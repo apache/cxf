@@ -35,17 +35,17 @@ public final class PrimitiveUtils {
         AUTOBOXED_PRIMITIVES_MAP.put(boolean.class, Boolean.class);
         AUTOBOXED_PRIMITIVES_MAP.put(void.class, Void.class);
     }
-    
+
     private PrimitiveUtils() {
-        
+
     }
-    
+
     public static boolean canPrimitiveTypeBeAutoboxed(Class<?> primitiveClass, Class<?> type) {
         return primitiveClass.isPrimitive() && type == AUTOBOXED_PRIMITIVES_MAP.get(primitiveClass);
     }
-    
+
     public static Class<?> getClass(String value) {
-        Class<?> clz = null;        
+        Class<?> clz = null;
         if ("int".equals(value)) {
             clz = int.class;
         }

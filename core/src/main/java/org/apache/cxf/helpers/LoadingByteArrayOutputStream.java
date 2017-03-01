@@ -32,11 +32,11 @@ import org.apache.cxf.io.Transferable;
 /**
  * Subclass of ByteArrayOutputStream that allows creation of a
  * ByteArrayInputStream directly without creating a copy of the byte[].
- * 
+ *
  * Also, on "toByteArray()" it truncates it's buffer to the current size
- * and returns the new buffer directly.  Multiple calls to toByteArray() 
+ * and returns the new buffer directly.  Multiple calls to toByteArray()
  * will return the exact same byte[] unless a write is called in between.
- * 
+ *
  * Note: once the InputStream is created, the output stream should
  * no longer be used.  In particular, make sure not to call reset()
  * and then write as that may overwrite the data that the InputStream
@@ -49,7 +49,7 @@ public class LoadingByteArrayOutputStream extends ByteArrayOutputStream {
     public LoadingByteArrayOutputStream(int i) {
         super(i);
     }
-    
+
     private static class LoadedByteArrayInputStream extends ByteArrayInputStream implements Transferable {
         LoadedByteArrayInputStream(byte[] buf, int length) {
             super(buf, 0, length);
@@ -62,31 +62,31 @@ public class LoadingByteArrayOutputStream extends ByteArrayOutputStream {
         public void transferTo(File file) throws IOException {
             FileOutputStream fout = new FileOutputStream(file);
             FileChannel channel = fout.getChannel();
-            ByteBuffer bb = ByteBuffer.wrap(buf, 0, count); 
+            ByteBuffer bb = ByteBuffer.wrap(buf, 0, count);
             while (bb.hasRemaining()) {
                 channel.write(bb);
             }
             channel.close();
             fout.close();
         }
-        
+
     }
-    
+
     public ByteArrayInputStream createInputStream() {
         return new LoadedByteArrayInputStream(buf, count);
     }
-    
+
     public void setSize(int i) {
         count = i;
     }
-    
+
     public byte[] toByteArray() {
         if (count != buf.length) {
             buf = super.toByteArray();
         }
         return buf;
     }
-    
+
     public byte[] getRawBytes() {
         return buf;
     }

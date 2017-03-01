@@ -31,7 +31,7 @@ import org.apache.htrace.core.SpanReceiver;
  * Test HTrace Span receiver
  */
 public class TestSpanReceiver extends SpanReceiver {
-    private static List<Span> spans = new ArrayList<Span>();
+    private static List<Span> spans = new ArrayList<>();
 
     public TestSpanReceiver(final HTraceConfiguration conf) {
     }
@@ -48,11 +48,11 @@ public class TestSpanReceiver extends SpanReceiver {
     public void receiveSpan(Span span) {
         spans.add(span);
     }
-    
+
     public static void clear() {
         spans.clear();
     }
-    
+
     public static List<Span> getAllSpans() {
         return spans;
     }

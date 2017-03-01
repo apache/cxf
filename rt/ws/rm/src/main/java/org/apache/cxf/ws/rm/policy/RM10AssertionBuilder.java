@@ -38,18 +38,18 @@ import org.apache.neethi.PolicyComponent;
  * direct child elements of the RMAssertion JAXB can be used directly to convert to/from XML.
  */
 public class RM10AssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
-    public static final List<QName> KNOWN_ELEMENTS 
+    public static final List<QName> KNOWN_ELEMENTS
         = Collections.singletonList(RM10Constants.WSRMP_RMASSERTION_QNAME);
 
     public RM10AssertionBuilder() throws JAXBException {
-        super(RMAssertion.class, RM10Constants.WSRMP_RMASSERTION_QNAME);     
+        super(RMAssertion.class, RM10Constants.WSRMP_RMASSERTION_QNAME);
     }
 
     @Override
     protected JaxbAssertion<RMAssertion> buildAssertion() {
         return new RMPolicyAssertion();
     }
-    
+
     class RMPolicyAssertion extends JaxbAssertion<RMAssertion> {
         RMPolicyAssertion() {
             super(RM10Constants.WSRMP_RMASSERTION_QNAME, false);
@@ -67,16 +67,16 @@ public class RM10AssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
                 || !getName().equals(((Assertion)policyComponent).getName())) {
                 return false;
             }
-            JaxbAssertion<RMAssertion> other = 
-                    JaxbAssertion.cast((Assertion)policyComponent);            
-            return RMPolicyUtilities.equals(this.getData(), other.getData());  
+            JaxbAssertion<RMAssertion> other =
+                    JaxbAssertion.cast((Assertion)policyComponent);
+            return RMPolicyUtilities.equals(this.getData(), other.getData());
         }
-        
+
         @Override
         protected Assertion clone(boolean b) {
             RMPolicyAssertion a = new RMPolicyAssertion();
             a.setData(getData());
-            return a;        
+            return a;
         }
     }
 }

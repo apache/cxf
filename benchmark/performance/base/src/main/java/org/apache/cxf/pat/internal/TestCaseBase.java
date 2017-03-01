@@ -27,7 +27,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 
 public abstract class TestCaseBase<T> {
     private boolean initialized;
-    
+
     protected String wsdlPath;
 
     protected String serviceName;
@@ -46,14 +46,14 @@ public abstract class TestCaseBase<T> {
 
     protected int amount = 1;
 
-    protected String wsdlNameSpace;   
+    protected String wsdlNameSpace;
 
-    protected List<TestResult> results = new ArrayList<TestResult>();
+    protected List<TestResult> results = new ArrayList<>();
 
     protected int numberOfThreads;
-    
+
     protected String busCfg;
-    
+
     private String name;
 
     private String[] args;
@@ -63,7 +63,7 @@ public abstract class TestCaseBase<T> {
     private boolean timedTestDone = false;
 
     private boolean doWarmup = true;
- 
+
     public TestCaseBase() {
         this("DEFAULT TESTCASE", null);
     }
@@ -91,7 +91,7 @@ public abstract class TestCaseBase<T> {
 
     public void processArgs() {
         int count = 0;
-        int argc = args.length; 
+        int argc = args.length;
         while (count < argc) {
             if ("-WSDL".equals(args[count])) {
                 wsdlPath = args[count + 1];
@@ -167,11 +167,11 @@ public abstract class TestCaseBase<T> {
         }
     }
 
-    public void tearDown() {        
+    public void tearDown() {
     }
 
     protected void setUp() throws Exception {
-       
+
         clearTestResults();
         printTitle();
         printSetting("Default Setting: ");
@@ -199,7 +199,7 @@ public abstract class TestCaseBase<T> {
             final int threadCount = 4;
             final long timeLimit = 30;
             final int countLimit = 1200;
-            
+
             System.out.println("TestCase " + name + " is warming up the jit. (" + timeLimit + " sec/" + countLimit + " iterations, " + threadCount + " threads)");
             final long startTime = System.currentTimeMillis();
             final long endTime = startTime + (timeLimit * 1000l);
@@ -276,9 +276,9 @@ public abstract class TestCaseBase<T> {
 
     public void testRun() throws Exception {
         if (numberOfThreads == 0) {
-            numberOfThreads = 1; 
+            numberOfThreads = 1;
 	}
-        List<Thread> threadList = new ArrayList<Thread>();
+        List<Thread> threadList = new ArrayList<>();
         for (int i = 0; i < numberOfThreads; i++) {
             TestRunner<T> runner = new TestRunner<T>("No." + i + " TestRunner", this);
             Thread thread = new Thread(runner, "RunnerThread No." + i);
@@ -316,7 +316,7 @@ public abstract class TestCaseBase<T> {
         System.out.println("Overall AVG. response time: " + totalAvgResponseTime * 1000 + TestResult.AVG_UNIT);
         System.out.println(totalInvocations + " (invocations), running " + totalDuration  + " (sec) ");
         System.out.println("============================================");
-        
+
     }
 
     public void run() {
@@ -400,6 +400,6 @@ public abstract class TestCaseBase<T> {
     public String getName() {
         return this.name;
     }
-  
+
 
 }

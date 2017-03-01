@@ -27,7 +27,7 @@ public class EndpointUtilsException extends Exception {
     public EndpointUtilsException(Message msg) {
         super(msg);
     }
-    
+
     public EndpointUtilsException(Message msg, Throwable t) {
         super(msg, t);
     }

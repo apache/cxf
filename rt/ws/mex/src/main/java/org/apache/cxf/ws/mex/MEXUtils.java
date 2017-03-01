@@ -35,7 +35,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.EndpointInfo;
 
 /**
- * 
+ *
  */
 public final class MEXUtils {
     private MEXUtils() {
@@ -54,17 +54,17 @@ public final class MEXUtils {
         for (String id : utils.getWSDLIds(message, base, ctxUri, info)) {
             Map<String, String> params = new HashMap<String, String>();
             params.put("wsdl", id);
-            ret.add(utils.getDocument(message, base, 
-                                      params, ctxUri, 
+            ret.add(utils.getDocument(message, base,
+                                      params, ctxUri,
                                       info).getDocumentElement());
-            
+
         }
         return ret;
     }
 
     public static Map<String, String> getSchemaLocations(Server server) {
         Message message = PhaseInterceptorChain.getCurrentMessage();
-        
+
         String base = (String)message.get(Message.REQUEST_URL);
         String ctxUri = (String)message.get(Message.PATH_INFO);
 
@@ -75,7 +75,7 @@ public final class MEXUtils {
 
     public static List<Element> getSchemas(Server server, String id) {
         Message message = PhaseInterceptorChain.getCurrentMessage();
-        
+
         String base = (String)message.get(Message.REQUEST_URL);
         String ctxUri = (String)message.get(Message.PATH_INFO);
 
@@ -87,8 +87,8 @@ public final class MEXUtils {
                                                       info);
         List<Element> ret = new LinkedList<Element>();
         for (Map.Entry<String, String> xsd : locs.entrySet()) {
-            
-            if (StringUtils.isEmpty(id) 
+
+            if (StringUtils.isEmpty(id)
                 || id.equals(xsd.getKey())) {
                 String query = xsd.getValue().substring(xsd.getValue().indexOf('?') + 1);
                 Map<String, String> params = UrlUtils.parseQueryString(query);
@@ -107,5 +107,5 @@ public final class MEXUtils {
     public static List<Element> getPolicies(Server server, String id) {
         return null;
     }
-    
+
 }

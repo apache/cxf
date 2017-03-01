@@ -116,7 +116,7 @@ public class GZIPAcceptEncodingTest extends Assert {
         interceptor.handleMessage(outMessage);
     }
 
-    private void singleTest(String encoding, 
+    private void singleTest(String encoding,
                             GZIPOutInterceptor.UseGzip expectedUseGzip, String expectedGzipEncoding)
         throws Exception {
 
@@ -130,7 +130,7 @@ public class GZIPAcceptEncodingTest extends Assert {
     }
 
     private void setAcceptEncoding(String enc) {
-        Map<String, List<String>> protocolHeaders 
+        Map<String, List<String>> protocolHeaders
             = new TreeMap<String, List<String>>(String.CASE_INSENSITIVE_ORDER);
         protocolHeaders.put(HttpHeaderHelper.getHeaderKey(HttpHeaderHelper.ACCEPT_ENCODING), Collections
             .singletonList(enc));

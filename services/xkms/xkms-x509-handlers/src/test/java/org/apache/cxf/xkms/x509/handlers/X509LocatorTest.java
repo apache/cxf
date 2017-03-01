@@ -41,7 +41,7 @@ import org.junit.Test;
  */
 public class X509LocatorTest {
 
-    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF = 
+    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF =
         new org.apache.cxf.xkms.model.xkms.ObjectFactory();
 
     @Test

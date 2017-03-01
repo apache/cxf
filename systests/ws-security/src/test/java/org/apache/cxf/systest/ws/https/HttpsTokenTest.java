@@ -43,12 +43,12 @@ import org.junit.runners.Parameterized.Parameters;
 public class HttpsTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
-    
+
     final TestParam test;
-    
+
     public HttpsTokenTest(TestParam type) {
         this.test = type;
     }
@@ -68,17 +68,17 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false)},
                                                 {new TestParam(PORT, true)},
                                                 {new TestParam(STAX_PORT, false)},
                                                 {new TestParam(STAX_PORT, true)},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -98,25 +98,25 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = HttpsTokenTest.class.getResource("DoubleItHttps.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItRequireClientCertPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         // This should fail, as the client does not use a client cert
         portQName = new QName(NAMESPACE, "DoubleItRequireClientCertPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not using a client cert");
@@ -126,11 +126,11 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
                 assertTrue(ex.getMessage().contains(error));
             }
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testBasicAuth() throws Exception {
 
@@ -144,25 +144,25 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = HttpsTokenTest.class.getResource("DoubleItHttps.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBasicAuthPort");
-        DoubleItPortType port = 
+        DoubleItPortType port =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         port.doubleIt(25);
-        
+
         // This should fail, as the client does not send a UsernamePassword
         portQName = new QName(NAMESPACE, "DoubleItBasicAuthPort2");
         port = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(port);
         }
-        
+
         try {
             port.doubleIt(25);
             fail("Failure expected on not sending a UsernamePassword");
@@ -172,9 +172,9 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
                 assertTrue(ex.getMessage().contains(error));
             }
         }
-        
+
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-    
+
 }

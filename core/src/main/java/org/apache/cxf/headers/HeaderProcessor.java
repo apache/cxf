@@ -22,11 +22,11 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 public interface HeaderProcessor {
-    
+
     String getNamespace();
-    
+
     DataBinding getDataBinding();
-    
+
     InterceptorProvider getInterceptorProvider();
 
 }

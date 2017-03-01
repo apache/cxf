@@ -43,43 +43,43 @@ public class JAXRSOverlappingDestinationsTest extends AbstractBusClientServerTes
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", 
+        assertTrue("server did not launch correctly",
                    launchServer(SpringServer.class, true));
     }
-    
+
     @Test
     public void testAbsolutePathOne() throws Exception {
-        
+
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/one/bookstore/request");
         String path = wc.accept("text/plain").get(String.class);
         assertEquals("Absolute RequestURI is wrong", wc.getBaseURI().toString(), path);
     }
-    
+
     @Test
     public void testAbsolutePathTwo() throws Exception {
-        
+
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/two/bookstore/request");
         String path = wc.accept("text/plain").get(String.class);
         assertEquals("Absolute RequestURI is wrong", wc.getBaseURI().toString(), path);
     }
-    
+
     @Test
     public void testAbsolutePathOneAndTwo() throws Exception {
-        
+
         final String requestURI = "http://localhost:" + PORT + "/one/bookstore/request?delay";
-        
+
         Callable<String> callable = new Callable<String>() {
             public String call() {
                 WebClient wc = WebClient.create(requestURI);
                 return wc.accept("text/plain").get(String.class);
-                    
+
             }
         };
         FutureTask<String> task = new FutureTask<String>(callable);
         ExecutorService executor = Executors.newFixedThreadPool(1);
         executor.execute(task);
         Thread.sleep(1000);
-        
+
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
@@ -91,72 +91,72 @@ public class JAXRSOverlappingDestinationsTest extends AbstractBusClientServerTes
         };
         new Thread(runnable).start();
         Thread.sleep(2000);
-        
+
         String path = task.get();
         assertEquals("Absolute RequestURI is wrong", requestURI, path);
-        
-        
+
+
     }
-    
+
     @Test
     public void testAbsolutePathOneAndTwoWithLock() throws Exception {
-        
+
         WebClient.create("http://localhost:" + PORT + "/one/bookstore/lock").accept("text/plain").get();
-        
+
         final String requestURI = "http://localhost:" + PORT + "/one/bookstore/uris";
-        
+
         Callable<String> callable = new Callable<String>() {
             public String call() {
                 WebClient wc = WebClient.create(requestURI);
                 return wc.accept("text/plain").get(String.class);
-                
+
             }
         };
         FutureTask<String> task = new FutureTask<String>(callable);
         ExecutorService executor = Executors.newFixedThreadPool(1);
         executor.execute(task);
         Thread.sleep(3000);
-        
+
         WebClient wc2 = WebClient.create("http://localhost:" + PORT + "/two/bookstore/unlock");
         wc2.accept("text/plain").get();
-        
+
         String path = task.get();
         assertEquals("Absolute RequestURI is wrong", requestURI, path);
     }
-    
+
     @Ignore
     public static class SpringServer extends AbstractSpringServer {
         public static final int PORT = allocatePortAsInt(SpringServer.class);
-        
+
         public SpringServer() {
             super("/jaxrs_many_destinations", PORT);
         }
     }
-    
+
     @Path("/bookstore")
     public static class Resource {
 
         private volatile boolean locked;
-        
+
         @GET
         @Produces("text/plain")
         @Path("request")
-        public String getRequestPath(@Context UriInfo ui, @QueryParam("delay") String delay) 
+        public String getRequestPath(@Context UriInfo ui, @QueryParam("delay") String delay)
             throws Exception {
             if (delay != null) {
                 Thread.sleep(5000);
             }
             return ui.getRequestUri().toString();
         }
-        
-        
+
+
         @GET
         @Path("/uris")
         @Produces("text/plain")
         public String getUris(@Context UriInfo uriInfo) {
             String baseUriOnEntry = uriInfo.getRequestUri().toString();
             try {
-                while (locked) { 
+                while (locked) {
                     Thread.sleep(1000);
                 }
             } catch (InterruptedException x) {
@@ -172,15 +172,15 @@ public class JAXRSOverlappingDestinationsTest extends AbstractBusClientServerTes
         @GET
         @Path("/lock")
         @Produces("text/plain")
-        public String lock() { 
-            locked = true; return "locked"; 
+        public String lock() {
+            locked = true; return "locked";
         }
 
         @GET
         @Path("/unlock")
         @Produces("text/plain")
-        public String unlock() { 
-            locked = false; return "unlocked"; 
+        public String unlock() {
+            locked = false; return "unlocked";
         }
     }
 }

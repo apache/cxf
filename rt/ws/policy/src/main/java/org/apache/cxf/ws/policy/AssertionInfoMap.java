@@ -41,14 +41,14 @@ import org.apache.neethi.PolicyContainingAssertion;
 import org.apache.neethi.PolicyOperator;
 
 public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> {
-    
+
     private static final long serialVersionUID = -4059701923851991413L;
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(AssertionInfoMap.class, "APIMessages");
-    
+
     public AssertionInfoMap(Policy p) {
         this(getAssertions(p));
     }
-    
+
     public AssertionInfoMap(Collection<? extends Assertion> assertions) {
         super(assertions.size() < 6 ? 6 : assertions.size());
         for (Assertion a : assertions) {
@@ -60,7 +60,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         if (a instanceof PolicyContainingAssertion) {
             Policy p = ((PolicyContainingAssertion)a).getPolicy();
             if (p != null) {
-                List<Assertion> pcs = new ArrayList<Assertion>();
+                List<Assertion> pcs = new ArrayList<>();
                 getAssertions(p, pcs);
                 for (Assertion na : pcs) {
                     putAssertionInfo(na);
@@ -70,7 +70,7 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         AssertionInfo ai = new AssertionInfo(a);
         Collection<AssertionInfo> ail = get(a.getName());
         if (ail == null) {
-            ail = new ArrayList<AssertionInfo>();
+            ail = new ArrayList<>();
             put(a.getName(), ail);
         }
         for (AssertionInfo ai2 : ail) {
@@ -80,14 +80,14 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         }
         ail.add(ai);
     }
-    
+
     public Collection<AssertionInfo> getAssertionInfo(QName name) {
         Collection<AssertionInfo> ail = get(name);
         return ail != null ? ail
             : CastUtils.cast(Collections.EMPTY_LIST, AssertionInfo.class);
 
     }
-    
+
     public boolean supportsAlternative(PolicyComponent assertion,
                                        List<QName> errors) {
         boolean pass = true;
@@ -102,11 +102,11 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
             Collection<AssertionInfo> ail = getAssertionInfo(ass.getName());
             boolean found = false;
             for (AssertionInfo ai : ail) {
-                if (ai.getAssertion().equal(ass)) {
+                if (ai.getAssertion().equal(ass) || ai.getAssertion().equals(ass)) {
                     found = true;
                     if (!ai.isAsserted() && !ass.isOptional()) {
                         errors.add(ass.getName());
-                        pass = false;                    
+                        pass = false;
                     }
                 }
             }
@@ -137,10 +137,10 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         }
         return pass;
     }
-    
+
     public List<List<Assertion>> checkEffectivePolicy(Policy policy) {
-        List<List<Assertion>> validated = new ArrayList<List<Assertion>>(4);       
-        List<QName> errors = new ArrayList<QName>();
+        List<List<Assertion>> validated = new ArrayList<List<Assertion>>(4);
+        List<QName> errors = new ArrayList<>();
         Iterator<List<Assertion>> alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
             List<Assertion> pc = alternatives.next();
@@ -151,9 +151,9 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         if (!validated.isEmpty()) {
             return validated;
         }
-        
+
         Set<String> msgs = new LinkedHashSet<String>();
-        
+
         for (QName name : errors) {
             Collection<AssertionInfo> ais = getAssertionInfo(name);
             boolean found = false;
@@ -175,11 +175,11 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         for (String msg : msgs) {
             error.append("\n").append(msg);
         }
-        
+
         throw new PolicyException(new Message("NO_ALTERNATIVE_EXC", BUNDLE, error.toString()));
     }
 
-    
+
     public void check() {
         for (Collection<AssertionInfo> ais : values()) {
             for (AssertionInfo ai : ais) {
@@ -191,11 +191,11 @@ public class AssertionInfoMap extends HashMap<QName, Collection<AssertionInfo>> 
         }
     }
     private static Collection<Assertion> getAssertions(PolicyOperator p) {
-        Collection<Assertion> assertions = new ArrayList<Assertion>();
+        Collection<Assertion> assertions = new ArrayList<>();
         getAssertions(p, assertions);
         return assertions;
     }
-    
+
     private static void getAssertions(PolicyOperator p, Collection<Assertion> assertions) {
         List<PolicyComponent> pcs = p.getPolicyComponents();
         for (PolicyComponent pc : pcs) {

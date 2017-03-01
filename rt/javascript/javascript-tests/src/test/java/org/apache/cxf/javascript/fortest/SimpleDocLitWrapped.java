@@ -27,7 +27,7 @@ import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
 /**
- * 
+ *
  */
 @WebService(targetNamespace = "uri:org.apache.cxf.javascript.fortest")
 public interface SimpleDocLitWrapped {
@@ -35,48 +35,48 @@ public interface SimpleDocLitWrapped {
     @ResponseWrapper(className = "org.apache.cxf.javascript.fortest.StringWrapper")
     @WebResult(name = "returnValue", targetNamespace = "uri:org.apache.cxf.javascript.testns")
     @WebMethod
-    String basicTypeFunctionReturnString(@WebParam(name = "s") String s, 
-                                         @WebParam(name = "i") int i, 
-                                         @WebParam(name = "l") long l, 
-                                         @WebParam(name = "f") float f, 
+    String basicTypeFunctionReturnString(@WebParam(name = "s") String s,
+                                         @WebParam(name = "i") int i,
+                                         @WebParam(name = "l") long l,
+                                         @WebParam(name = "f") float f,
                                          @WebParam(name = "d") double d);
-    
+
     @WebMethod
-    String basicTypeFunctionReturnStringNoWrappers(@WebParam(name = "s") String s, 
-                                                   @WebParam(name = "i") int i, 
-                                                   @WebParam(name = "l") long l, 
-                                                   @WebParam(name = "f") float f, 
+    String basicTypeFunctionReturnStringNoWrappers(@WebParam(name = "s") String s,
+                                                   @WebParam(name = "i") int i,
+                                                   @WebParam(name = "l") long l,
+                                                   @WebParam(name = "f") float f,
                                                    @WebParam(name = "d") double d);
 
     @WebMethod
     TestBean1 functionReturnTestBean1();
-    
+
     @WebMethod
     String echoWithHeader(@WebParam(name = "what") String what);
-    
+
     @WebMethod
-    int basicTypeFunctionReturnInt(@WebParam(name = "s") String s, 
-                                   @WebParam(name = "i") int i, 
-                                   @WebParam(name = "l") long l, 
-                                   @WebParam(name = "f") float f, 
+    int basicTypeFunctionReturnInt(@WebParam(name = "s") String s,
+                                   @WebParam(name = "i") int i,
+                                   @WebParam(name = "l") long l,
+                                   @WebParam(name = "f") float f,
                                    @WebParam(name = "d") double d);
-    
+
     @RequestWrapper(className = "org.apache.cxf.javascript.fortest.BeanRequestWrapper")
     @WebMethod
-    void beanFunctionWithWrapper(@WebParam(name = "bean1") TestBean1 bean, 
+    void beanFunctionWithWrapper(@WebParam(name = "bean1") TestBean1 bean,
                                  @WebParam(name = "beanArray") TestBean1[] beans);
-    
+
     @WebMethod
-    void beanFunction(@WebParam(name = "bean1") TestBean1 bean, 
+    void beanFunction(@WebParam(name = "bean1") TestBean1 bean,
                       @WebParam(name = "beanArray") TestBean1[] beans);
-    
+
     @WebMethod
     void genericTestFunction(@WebParam(name = "g1") SpecificGenericClass sgc,
                              @WebParam(name = "g2") GenericGenericClass<Double> ggc);
-    
-    @WebMethod 
+
+    @WebMethod
     void inheritanceTestFunction(@WebParam(name = "d") InheritanceTestDerived d);
-    
+
     @WebMethod
     AnEnum enumEcho(@WebParam(name = "ev") AnEnum value);
 }

@@ -37,7 +37,7 @@ public class ResolverTest extends AbstractBusClientServerTestBase {
 
     public ResolverTest() {
     }
-    
+
     @Test
     public void startServer() throws Throwable {
         Server server = new org.eclipse.jetty.server.Server(Integer.parseInt(PORT));
@@ -48,7 +48,7 @@ public class ResolverTest extends AbstractBusClientServerTestBase {
         String warPath = null;
         URL res = getClass().getResource("/resolver");
         warPath = res.toURI().getPath();
-        
+
         webappcontext.setWar(warPath);
 
         HandlerCollection handlers = new HandlerCollection();
@@ -61,7 +61,7 @@ public class ResolverTest extends AbstractBusClientServerTestBase {
         }
         server.stop();
     }
-    
-    
+
+
 }
 

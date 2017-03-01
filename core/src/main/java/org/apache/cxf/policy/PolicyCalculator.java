@@ -24,9 +24,9 @@ import org.apache.cxf.message.Message;
 
 public interface PolicyCalculator<T> {
     Class<T> getDataClass();
-    
+
     QName getDataClassName();
-    
+
     T intersect(T policy1, T policy2);
 
     boolean isAsserted(Message message, T policy, T refPolicy);

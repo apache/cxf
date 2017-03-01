@@ -34,60 +34,60 @@ import javax.ws.rs.core.UriBuilder;
  *
  */
 public class ThreadLocalClientState implements ClientState {
-    private Map<Thread, LocalClientState> state = 
+    private Map<Thread, LocalClientState> state =
         Collections.synchronizedMap(new WeakHashMap<Thread, LocalClientState>());
-    
+
     private LocalClientState initialState;
-    
+
     private Map<Thread, Long> checkpointMap;
     private long timeToKeepState;
-    
+
     public ThreadLocalClientState(String baseURI) {
         this.initialState = new LocalClientState(URI.create(baseURI));
     }
-    
+
     public ThreadLocalClientState(String baseURI, long timeToKeepState) {
         this.initialState = new LocalClientState(URI.create(baseURI));
         this.timeToKeepState = timeToKeepState;
     }
-    
+
     public ThreadLocalClientState(LocalClientState initialState, long timeToKeepState) {
         this.initialState = initialState;
         this.timeToKeepState = timeToKeepState;
     }
-    
+
     public void setCurrentBuilder(UriBuilder currentBuilder) {
         getState().setCurrentBuilder(currentBuilder);
     }
-    
+
     public UriBuilder getCurrentBuilder() {
         return getState().getCurrentBuilder();
     }
-    
+
     public void setBaseURI(URI baseURI) {
         getState().setBaseURI(baseURI);
     }
-    
+
     public URI getBaseURI() {
         return getState().getBaseURI();
     }
-    
+
     public void setResponse(Response response) {
         getState().setResponse(response);
     }
-    
+
     public Response getResponse() {
         return getState().getResponse();
     }
-    
+
     public void setRequestHeaders(MultivaluedMap<String, String> requestHeaders) {
         getState().setRequestHeaders(requestHeaders);
     }
-    
+
     public MultivaluedMap<String, String> getRequestHeaders() {
         return getState().getRequestHeaders();
     }
-    
+
     public MultivaluedMap<String, String> getTemplates() {
         return getState().getTemplates();
     }
@@ -95,25 +95,25 @@ public class ThreadLocalClientState implements ClientState {
     public void setTemplates(MultivaluedMap<String, String> map) {
         getState().setTemplates(map);
     }
-    
+
     public void reset() {
         removeThreadLocalState(Thread.currentThread());
     }
-    
-    public ClientState newState(URI currentURI, 
+
+    public ClientState newState(URI currentURI,
                                 MultivaluedMap<String, String> headers,
                                 MultivaluedMap<String, String> templates) {
         LocalClientState ls = (LocalClientState)getState().newState(currentURI, headers, templates);
         return new ThreadLocalClientState(ls, timeToKeepState);
     }
-    
+
     private void removeThreadLocalState(Thread t) {
         state.remove(t);
         if (checkpointMap != null) {
             checkpointMap.remove(t);
         }
     }
-    
+
     protected ClientState getState() {
         LocalClientState cs = state.get(Thread.currentThread());
         if (cs == null) {
@@ -123,7 +123,9 @@ public class ThreadLocalClientState implements ClientState {
                 prepareCheckpointMap();
                 long currentTime = System.currentTimeMillis();
                 checkpointMap.put(Thread.currentThread(), currentTime);
-                new CleanupThread(Thread.currentThread(), currentTime).start();
+                Thread clThread = new CleanupThread(Thread.currentThread(), currentTime);
+                clThread.setName("Client state cleanup thread " + clThread.hashCode());
+                clThread.start();
             }
         }
         return cs;
@@ -141,16 +143,16 @@ public class ThreadLocalClientState implements ClientState {
             checkpointMap = new ConcurrentHashMap<Thread, Long>();
         }
     }
-    
+
     private class CleanupThread extends Thread {
         private Thread thread;
         private long originalTime;
-        
+
         CleanupThread(Thread thread, long originalTime) {
             this.thread = thread;
             this.originalTime = originalTime;
         }
-        
+
         @Override
         public void run() {
             try {
@@ -160,7 +162,7 @@ public class ThreadLocalClientState implements ClientState {
                 // has called reset() but came back again to create new local state
                 // hence there's another cleanup thread nearby which will clean the state
                 if (actualTime == originalTime) {
-                    removeThreadLocalState(thread);    
+                    removeThreadLocalState(thread);
                 }
             } catch (InterruptedException ex) {
                 // ignore
@@ -168,5 +170,5 @@ public class ThreadLocalClientState implements ClientState {
         }
     }
 
-    
+
 }

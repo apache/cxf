@@ -33,12 +33,12 @@ import org.apache.cxf.message.Message;
  * The PhaseChainCache provides default interceptor chains for SOAP requests
  * and responses, both from the client and web service side.  The list of
  * phases supplied in the get() methods of this class are defined by default
- * within org.apache.cxf.phase.PhaseManagerImpl.  For an example of this class 
+ * within org.apache.cxf.phase.PhaseManagerImpl.  For an example of this class
  * in use, check the sourcecode of org.apache.cxf.endpoint.ClientImpl.
  */
 public final class PhaseChainCache {
     AtomicReference<ChainHolder> lastData = new AtomicReference<ChainHolder>();
-    
+
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
                                      List<Interceptor<? extends Message>> p1) {
         return getChain(lastData, phaseList, p1);
@@ -70,18 +70,18 @@ public final class PhaseChainCache {
                                      List<Interceptor<? extends Message>> p5) {
         return getChain(lastData, phaseList, p1, p2, p3, p4, p5);
     }
-    
+
     @SafeVarargs
     static PhaseInterceptorChain getChain(AtomicReference<ChainHolder> lastData,
                                           SortedSet<Phase> phaseList,
                                          List<Interceptor<? extends Message>> ... providers) {
         ChainHolder last = lastData.get();
-        
-        if (last == null 
+
+        if (last == null
             || !last.matches(providers)) {
-            
+
             PhaseInterceptorChain chain = new PhaseInterceptorChain(phaseList);
-            List<ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>> copy 
+            List<ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>> copy
                 = new ArrayList<ModCountCopyOnWriteArrayList<
                     Interceptor<? extends Message>>>(providers.length);
             for (List<Interceptor<? extends Message>> p : providers) {
@@ -91,21 +91,21 @@ public final class PhaseChainCache {
             last = new ChainHolder(chain, copy);
             lastData.set(last);
         }
-        
-        
+
+
         return last.chain.cloneChain();
     }
-    
+
     private static class ChainHolder {
         List<ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>> lists;
         PhaseInterceptorChain chain;
-        
-        ChainHolder(PhaseInterceptorChain c, 
+
+        ChainHolder(PhaseInterceptorChain c,
                     List<ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>> l) {
             lists = l;
             chain = c;
         }
-        
+
         @SafeVarargs
         final boolean matches(List<Interceptor<? extends Message>> ... providers) {
             if (lists.size() == providers.length) {
@@ -113,7 +113,7 @@ public final class PhaseChainCache {
                     if (lists.get(x).size() != providers[x].size()) {
                         return false;
                     }
-                    
+
                     if (providers[x].getClass() == ModCountCopyOnWriteArrayList.class) {
                         if (((ModCountCopyOnWriteArrayList<?>)providers[x]).getModCount()
                             != lists.get(x).getModCount()) {
@@ -122,7 +122,7 @@ public final class PhaseChainCache {
                     } else {
                         ListIterator<Interceptor<? extends Message>> i1 = lists.get(x).listIterator();
                         ListIterator<Interceptor<? extends Message>> i2 = providers[x].listIterator();
-                        
+
                         while (i1.hasNext()) {
                             if (i1.next() != i2.next()) {
                                 return false;

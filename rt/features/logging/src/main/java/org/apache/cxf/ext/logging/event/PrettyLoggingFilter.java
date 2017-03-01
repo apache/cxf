@@ -51,9 +51,9 @@ public class PrettyLoggingFilter implements LogEventSender {
     }
 
     private boolean shouldPrettyPrint(LogEvent event) {
-        String contentType = event.getContentType(); 
-        return prettyLogging 
-            && contentType != null 
+        String contentType = event.getContentType();
+        return prettyLogging
+            && contentType != null
             && contentType.indexOf("xml") >= 0
             && contentType.toLowerCase().indexOf("multipart/related") < 0
             && event.getPayload().length() > 0;
@@ -90,7 +90,7 @@ public class PrettyLoggingFilter implements LogEventSender {
     public void setNext(LogEventSender next) {
         this.next = next;
     }
-    
+
     public void setPrettyLogging(boolean prettyLogging) {
         this.prettyLogging = prettyLogging;
     }

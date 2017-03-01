@@ -142,7 +142,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     }
 
     private void loadWSFeatureAnnotation(Class<?> serviceClass, Class<?> implementorClass) {
-        List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
+        List<WebServiceFeature> features = new ArrayList<>();
         MTOM mtom = implInfo.getImplementorClass().getAnnotation(MTOM.class);
         if (mtom == null && serviceClass != null) {
             mtom = serviceClass.getAnnotation(MTOM.class);
@@ -170,7 +170,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         }
 
         if (addressing != null) {
-            features.add(new AddressingFeature(addressing.enabled(), 
+            features.add(new AddressingFeature(addressing.enabled(),
                                                addressing.required(),
                                                addressing.responses()));
         }
@@ -184,7 +184,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             features.add(new RespectBindingFeature(respectBinding.enabled()));
         }
 
-        if (features.size() > 0) {
+        if (!features.isEmpty()) {
             wsFeatures = features;
             if (setWsFeatures != null) {
                 wsFeatures.addAll(setWsFeatures);
@@ -278,7 +278,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             getMethodDispatcher().bind(op, method);
         }
     }
-    
+
     @Override
     protected void initializeWSDLOperations() {
         if (implInfo.isWebServiceProvider()) {
@@ -302,7 +302,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             //the invoke method, however, this CAN cause other problems
             //such as addresses in the wsdl not getting updated and such
             //so we'll WARN about it.....
-            List<QName> enames = new ArrayList<QName>();
+            List<QName> enames = new ArrayList<>();
             for (ServiceInfo si : getService().getServiceInfos()) {
                 for (EndpointInfo ep : si.getEndpoints()) {
                     enames.add(ep.getName());

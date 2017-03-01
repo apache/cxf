@@ -17,7 +17,7 @@
  * under the License.
  */
 /**
- * 
+ *
  */
 package org.apache.cxf.aegis.type.basic;
 
@@ -68,8 +68,8 @@ class InterfaceInvocationHandler implements InvocationHandler {
 
         if (methodName.startsWith("get") && methodName.length() > 3) {
             return true;
-        } 
-            
+        }
+
         return methodName.length() > 2 && methodName.startsWith("is");
         /*
          * // should "hasXXX()" be considered a getter method? else if
@@ -103,7 +103,7 @@ class InterfaceInvocationHandler implements InvocationHandler {
         } else {
             throw new IllegalAccessError(methodName + " is not a valid getter method.");
         }
-        
+
         Object prop = readProperty(attrName);
         if (prop == null && method.getReturnType().isPrimitive()) {
             if (method.getReturnType() == int.class) {

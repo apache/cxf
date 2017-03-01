@@ -25,7 +25,7 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
 /**
- * 
+ *
  */
 
 @WebService(targetNamespace = "http://cxf.apache.org/swa", name = "SwAServiceInterface")

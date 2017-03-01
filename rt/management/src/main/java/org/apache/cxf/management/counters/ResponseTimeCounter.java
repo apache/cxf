@@ -27,37 +27,37 @@ import javax.management.ObjectName;
 
 import org.apache.cxf.message.FaultMode;
 
-public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {    
-    
+public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
+
     private ObjectName objectName;
     private final AtomicInteger invocations = new AtomicInteger();
     private final AtomicInteger checkedApplicationFaults = new AtomicInteger();
     private final AtomicInteger unCheckedApplicationFaults = new AtomicInteger();
     private final AtomicInteger runtimeFaults = new AtomicInteger();
     private final AtomicInteger logicalRuntimeFaults = new AtomicInteger();
-    private final AtomicLong totalHandlingTime = new AtomicLong();  
+    private final AtomicLong totalHandlingTime = new AtomicLong();
     private final ReentrantLock write = new ReentrantLock();
     private final AtomicLong maxHandlingTime = new AtomicLong();
     private final AtomicLong minHandlingTime = new AtomicLong();;
     private final AtomicLong averageProcessingTime = new AtomicLong();;
     private boolean enabled = true;
-    
+
     public ResponseTimeCounter(ObjectName on) {
-        objectName = on;     
+        objectName = on;
     }
-    
+
     public void  increase(MessageHandlingTimeRecorder mhtr) {
         if (!enabled) {
             return;
         }
         long handlingTime = 0;
         if (mhtr.isOneWay()) {
-            // We can count the response time 
+            // We can count the response time
             if (mhtr.getEndTime() > 0) {
-                handlingTime = mhtr.getHandlingTime(); 
-            }    
+                handlingTime = mhtr.getHandlingTime();
+            }
         } else {
-            handlingTime = mhtr.getHandlingTime(); 
+            handlingTime = mhtr.getHandlingTime();
         }
         write.lock();
         try {
@@ -86,7 +86,7 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
                 }
             }
             totalHandlingTime.addAndGet(handlingTime);
-            averageProcessingTime.getAndSet(totalHandlingTime.get() / invocations.get());          
+            averageProcessingTime.getAndSet(totalHandlingTime.get() / invocations.get());
         } finally {
             write.unlock();
         }
@@ -100,30 +100,30 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
         unCheckedApplicationFaults.set(0);
         runtimeFaults.set(0);
         logicalRuntimeFaults.set(0);
-        
+
         totalHandlingTime.set(0);
         maxHandlingTime.set(0);
         minHandlingTime.set(0);
         averageProcessingTime.set(0);
     }
-    
+
     public ObjectName getObjectName() {
         return objectName;
     }
 
-    public Number getAvgResponseTime() {        
+    public Number getAvgResponseTime() {
         return averageProcessingTime.get();
     }
-    
-    public Number getMaxResponseTime() {        
+
+    public Number getMaxResponseTime() {
         return maxHandlingTime.get();
     }
 
-    public Number getMinResponseTime() {        
+    public Number getMinResponseTime() {
         return minHandlingTime.get();
     }
 
-    public Number getNumInvocations() {        
+    public Number getNumInvocations() {
         return invocations.get();
     }
 
@@ -134,30 +134,30 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
     public Number getNumLogicalRuntimeFaults() {
         return logicalRuntimeFaults.get();
     }
-    
+
     public Number getNumRuntimeFaults() {
         return runtimeFaults.get();
     }
-    
+
     public Number getNumUnCheckedApplicationFaults() {
         return unCheckedApplicationFaults.get();
     }
-    
-    public Number getTotalHandlingTime() {        
+
+    public Number getTotalHandlingTime() {
         return totalHandlingTime;
     }
 
     @Override
     public void enable(boolean value) {
         enabled = value;
-        
+
     }
 
     @Override
     public boolean isEnabled() {
         return enabled;
     }
-    
+
     private void updateMax(long handleTime) {
         while (true) {
             long current = maxHandlingTime.get();
@@ -169,7 +169,7 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
             }
         }
     }
-    
+
     private void updateMin(long handleTime) {
         while (true) {
             long current = minHandlingTime.get();

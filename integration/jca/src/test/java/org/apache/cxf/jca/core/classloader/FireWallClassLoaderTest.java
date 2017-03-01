@@ -34,18 +34,18 @@ public class FireWallClassLoaderTest extends Assert {
 
     public FireWallClassLoaderTest() {
     }
-    
+
     @Test
     public void testJavaLangStringAlt() throws Exception {
         ClassLoader c = new FireWallClassLoader(ClassLoader.getSystemClassLoader(), new String[] {"java.*"});
         Class<?> c1 = c.loadClass("java.lang.String");
         assertNotNull("Should have returned a class here", c1);
     }
-    
+
     @Test
     public void testJavaLangStringBlock() throws Exception {
-        ClassLoader c = new FireWallClassLoader(ClassLoader.getSystemClassLoader(), 
-                                                new String[] {}, 
+        ClassLoader c = new FireWallClassLoader(ClassLoader.getSystemClassLoader(),
+                                                new String[] {},
                                                 new String[] {"java.lang.String"});
         try {
             c.loadClass("java.lang.String");
@@ -86,7 +86,7 @@ public class FireWallClassLoaderTest extends Assert {
         }
         fail("Should not have found the " + urlConn.getClass().getName() + " class");
     }
-   
+
     @Test
     public void testSecurityException() {
         try {
@@ -94,7 +94,7 @@ public class FireWallClassLoaderTest extends Assert {
         } catch (SecurityException se) {
             return;
         }
-        fail("Constructing a FireWallClassLoader that does not pass through java." 
+        fail("Constructing a FireWallClassLoader that does not pass through java."
              + " should cause a SecurityException.");
     }
 

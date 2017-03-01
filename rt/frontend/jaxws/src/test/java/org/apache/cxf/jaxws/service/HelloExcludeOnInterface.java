@@ -31,10 +31,10 @@ public interface HelloExcludeOnInterface {
     List<String> getGreetings();
 
     String[] getStringArray(String[] strs);
-    
+
     List<String> getStringList(List<String> list);
-    
-    
+
+
     @WebMethod(exclude = true)
     int echoExcluded(int i);
 }

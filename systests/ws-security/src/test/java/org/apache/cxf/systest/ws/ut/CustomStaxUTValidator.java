@@ -33,7 +33,7 @@ import org.apache.xml.security.stax.securityToken.InboundSecurityToken;
 /**
  * A custom UsernameToken Validator that wraps the default Validator in WSS4J and set a Subject
  * on the context as well. It adds a role for "Alice" of "manager", and a role for everyone of
- * "worker". 
+ * "worker".
  */
 public class CustomStaxUTValidator extends UsernameTokenValidatorImpl {
 
@@ -41,9 +41,9 @@ public class CustomStaxUTValidator extends UsernameTokenValidatorImpl {
     @Override
     public <T extends UsernameSecurityToken & InboundSecurityToken> T validate(
             UsernameTokenType usernameTokenType, TokenContext tokenContext) throws WSSecurityException {
-        UsernameSecurityTokenImpl token = 
+        UsernameSecurityTokenImpl token =
             super.</*fake @see above*/UsernameSecurityTokenImpl>validate(usernameTokenType, tokenContext);
-        
+
         Subject subject = new Subject();
         subject.getPrincipals().add(token.getPrincipal());
         if ("Alice".equals(token.getUsername())) {
@@ -51,7 +51,7 @@ public class CustomStaxUTValidator extends UsernameTokenValidatorImpl {
         }
         subject.getPrincipals().add(new SimpleGroup("worker", token.getUsername()));
         token.setSubject(subject);
-        
+
         return (T)token;
     }
 }

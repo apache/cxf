@@ -29,19 +29,19 @@ import java.util.concurrent.Executor;
 public final class SynchronousExecutor implements Executor {
 
     private static final SynchronousExecutor INSTANCE = new SynchronousExecutor();
-    
+
     private SynchronousExecutor() {
     }
-    
+
     public void execute(Runnable command) {
         command.run();
     }
-    
+
     public static SynchronousExecutor getInstance() {
         return INSTANCE;
     }
-    
+
     public static boolean isA(Executor executor) {
-        return executor == INSTANCE; 
+        return executor == INSTANCE;
     }
 }

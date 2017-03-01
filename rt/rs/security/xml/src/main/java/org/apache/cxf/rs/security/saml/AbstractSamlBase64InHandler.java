@@ -30,31 +30,31 @@ import org.apache.cxf.message.Message;
 public abstract class AbstractSamlBase64InHandler extends AbstractSamlInHandler {
 
     private boolean useDeflateEncoding = true;
-    
+
     public void setUseDeflateEncoding(boolean deflate) {
         useDeflateEncoding = deflate;
     }
     public boolean useDeflateEncoding() {
         return useDeflateEncoding;
     }
-    
+
     protected void handleToken(Message message, String assertion) {
-        // the assumption here is that saml:Assertion is directly available, however, it 
+        // the assumption here is that saml:Assertion is directly available, however, it
         // may be contained inside saml:Response or saml:ArtifactResponse/saml:Response
         if (assertion == null) {
             throwFault("SAML assertion is not available", null);
         }
-        
+
         try {
             byte[] deflatedToken = Base64Utility.decode(assertion);
-            InputStream is = useDeflateEncoding() 
+            InputStream is = useDeflateEncoding()
                 ? new DeflateEncoderDecoder().inflateToken(deflatedToken)
-                : new ByteArrayInputStream(deflatedToken); 
-            validateToken(message, is); 
+                : new ByteArrayInputStream(deflatedToken);
+            validateToken(message, is);
         } catch (Base64Exception ex) {
             throwFault("Base64 decoding has failed", ex);
         } catch (DataFormatException ex) {
             throwFault("Encoded assertion can not be inflated", ex);
-        }         
+        }
     }
 }

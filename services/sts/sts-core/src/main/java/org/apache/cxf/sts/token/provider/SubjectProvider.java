@@ -30,5 +30,5 @@ public interface SubjectProvider {
      * Get a SubjectBean object.
      */
     SubjectBean getSubject(SubjectProviderParameters subjectProviderParameters);
-        
+
 }

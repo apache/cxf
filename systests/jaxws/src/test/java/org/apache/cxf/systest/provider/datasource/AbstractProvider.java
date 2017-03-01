@@ -33,9 +33,9 @@ public abstract class AbstractProvider<T> implements WebProvider {
     protected WebServiceContext wsContext;
 
     public T invoke(T req) {
-        
+
         MessageContext mc = wsContext.getMessageContext();
-        String method = (String)mc.get(MessageContext.HTTP_REQUEST_METHOD); 
+        String method = (String)mc.get(MessageContext.HTTP_REQUEST_METHOD);
         LOG.info("method: " + method);
 
         T ret = null;
@@ -48,21 +48,21 @@ public abstract class AbstractProvider<T> implements WebProvider {
         return ret;
     }
 
-    protected  T get(T req) {
+    protected T get(T req) {
         return req;
     }
 
-    
-    public WebServiceContext getWebServiceContext() { 
+
+    public WebServiceContext getWebServiceContext() {
         return wsContext;
     }
-    
+
     protected T post(T req) {
         return req;
     }
 
-    
-    public void publish(String url) { 
+
+    public void publish(String url) {
         Endpoint ep = Endpoint.create(HTTPBinding.HTTP_BINDING, this);
         ep.publish(url);
     }

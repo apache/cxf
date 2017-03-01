@@ -42,13 +42,13 @@ import org.apache.locator.types.QueryEndpointsResponse;
 
 
 /**
- * 
+ *
  */
 
-@javax.jws.WebService(name = "LocatorService",  
-                      serviceName = "LocatorService", 
-                      portName = "LocatorServicePort", 
-                      targetNamespace = "http://apache.org/locator", 
+@javax.jws.WebService(name = "LocatorService",
+                      serviceName = "LocatorService",
+                      portName = "LocatorServicePort",
+                      targetNamespace = "http://apache.org/locator",
                       endpointInterface = "org.apache.locator.LocatorService",
                       wsdlLocation = "testutils/locator.wsdl")
 public class LocatorServiceImpl implements LocatorService {
@@ -58,7 +58,7 @@ public class LocatorServiceImpl implements LocatorService {
     public void registerPeerManager(
                                     javax.xml.ws.wsaddressing.W3CEndpointReference peerManager,
                                     javax.xml.ws.Holder<
-                                    javax.xml.ws.wsaddressing.W3CEndpointReference> 
+                                    javax.xml.ws.wsaddressing.W3CEndpointReference>
                                             peerManagerReference,
                                     javax.xml.ws.Holder<java.lang.String> nodeId) {
         LOG.info("Executing operation registerPeerManager");
@@ -86,14 +86,14 @@ public class LocatorServiceImpl implements LocatorService {
         eprBuilder.address("http://bar");
         eprBuilder.serviceName(serviceQname);
         eprBuilder.wsdlDocumentLocation("wsdlLoc");
-        
+
         // just in case, for backward compatibility, the builder may be asked to
         // create a wsdlLocation attribute with a location only
         if (serviceQname.getNamespaceURI().endsWith("2")) {
             Message m = PhaseInterceptorChain.getCurrentMessage();
             m.put("org.apache.cxf.wsa.metadata.wsdlLocationOnly", "true");
         }
-        
+
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
@@ -104,14 +104,14 @@ public class LocatorServiceImpl implements LocatorService {
         }
     }
 
-    
+
     public List<Endpoint> listEndpoints() {
         LOG.info("Executing operation listEndpoints");
-        return new ArrayList<Endpoint>();
+        return new ArrayList<>();
     }
 
-    
-    
+
+
     public QueryEndpointsResponse queryEndpoints(QueryEndpoints parameters) {
         LOG.info("Executing operation queryEndpoints");
         return null;

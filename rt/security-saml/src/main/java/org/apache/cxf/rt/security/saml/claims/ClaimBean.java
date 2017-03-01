@@ -24,27 +24,27 @@ public class ClaimBean {
     private SAMLClaim claim;
     private ClaimMode claimMode;
     private boolean matchAll;
-    
+
     public ClaimBean(SAMLClaim claim) {
         this.claim = claim;
     }
-    
+
     public ClaimBean(SAMLClaim claim,
-                     ClaimMode claimMode, 
+                     ClaimMode claimMode,
                      boolean matchAll) {
         this.claim = claim;
         this.claimMode = claimMode;
         this.matchAll = matchAll;
     }
-    
+
     public SAMLClaim getClaim() {
         return claim;
     }
-    
+
     public boolean isMatchAll() {
         return matchAll;
     }
-    
+
     public ClaimMode getClaimMode() {
         return claimMode;
     }

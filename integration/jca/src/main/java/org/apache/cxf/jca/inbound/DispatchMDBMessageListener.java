@@ -20,9 +20,9 @@ package org.apache.cxf.jca.inbound;
 
 
 /**
- * The DispatchMDBMessageListener is intended to be used as the 
- * <messagelistener-type> of an <inbound-resourcesadapter>  in the resource 
- * adapter's deployment descriptor (ra.xml).  The default implementation 
+ * The DispatchMDBMessageListener is intended to be used as the
+ * <messagelistener-type> of an <inbound-resourcesadapter>  in the resource
+ * adapter's deployment descriptor (ra.xml).  The default implementation
  * class is {@link DispatchMDBMessageListenerImpl}.
  * The benefit of using DispatchMDBMessageListener is that users
  * are not required to put the Service Endpoint Interface (SEI) in the resource
@@ -33,7 +33,7 @@ public interface DispatchMDBMessageListener {
 
     /**
      * Looks up the target object by JNDI name.
-     * 
+     *
      * @param targetJndiName
      * @return
      */

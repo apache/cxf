@@ -38,9 +38,9 @@ public class IDLProcessor implements Processor {
     protected ProcessorEnvironment env;
 
     protected IdlPreprocessorReader preprocessor;
-    
+
     private IDLParser parser;
-    
+
     public void setEnvironment(ProcessorEnvironment penv) {
         env = penv;
     }
@@ -84,13 +84,13 @@ public class IDLProcessor implements Processor {
 
     private DefaultIncludeResolver getDefaultIncludeResolver(File currentDir) {
         DefaultIncludeResolver includeResolver;
-        if (env.optionSet(ToolCorbaConstants.CFG_INCLUDEDIR)) {      
+        if (env.optionSet(ToolCorbaConstants.CFG_INCLUDEDIR)) {
             String[] includedDirs = (String[]) env.get(ToolCorbaConstants.CFG_INCLUDEDIR);
             File[] includeDirs = new File[includedDirs.length];
             for (int i = 0; i < includedDirs.length; i++) {
                 includeDirs[i] = new File(includedDirs[i]);
             }
-            
+
             includeResolver = new DefaultIncludeResolver(includeDirs);
         } else {
             includeResolver = new DefaultIncludeResolver(currentDir);

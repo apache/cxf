@@ -30,7 +30,7 @@ import io.swagger.models.Swagger;
 public interface Swagger2Serializers extends MessageBodyWriter<Swagger> {
 
     void setBeanConfig(BeanConfig beanConfig);
-    
+
     void setDynamicBasePath(boolean dynamicBasePath);
 
     void setClassResourceInfos(List<ClassResourceInfo> classResourceInfos);

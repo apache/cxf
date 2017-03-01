@@ -34,7 +34,7 @@ import org.junit.Test;
 
 public class JMSContinuationProviderTest extends Assert {
     private static Bus bus = BusFactory.getDefaultBus();
-    
+
     @AfterClass
     public static void cleanUpBus() {
         BusFactory.setDefaultBus(null);
@@ -47,23 +47,23 @@ public class JMSContinuationProviderTest extends Assert {
         Message m = new MessageImpl();
         m.setExchange(exchange);
         Counter counter = EasyMock.createMock(Counter.class);
-        JMSContinuationProvider provider = 
+        JMSContinuationProvider provider =
             new JMSContinuationProvider(null, m, null, counter);
         assertNull(provider.getContinuation());
     }
-    
+
     @Test
     public void testGetNewContinuation() {
         Message m = new MessageImpl();
         m.setExchange(new ExchangeImpl());
         Counter counter = EasyMock.createMock(Counter.class);
-        JMSContinuationProvider provider = 
+        JMSContinuationProvider provider =
             new JMSContinuationProvider(bus, m, null, counter);
-        Continuation cw = provider.getContinuation(); 
+        Continuation cw = provider.getContinuation();
         assertTrue(cw.isNew());
         assertSame(cw, m.get(JMSContinuation.class));
     }
-    
+
     @Test
     public void testGetExistingContinuation() {
         Message m = new MessageImpl();

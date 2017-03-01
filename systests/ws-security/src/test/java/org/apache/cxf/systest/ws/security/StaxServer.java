@@ -35,15 +35,15 @@ public class StaxServer extends AbstractBusTestServerBase {
         BusFactory.setDefaultBus(bus);
         setBus(bus);
     }
-        
+
     public static void main(String[] args) {
-        try { 
-            StaxServer s = new StaxServer(); 
+        try {
+            StaxServer s = new StaxServer();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally { 
+        } finally {
             System.out.println("done!");
         }
     }

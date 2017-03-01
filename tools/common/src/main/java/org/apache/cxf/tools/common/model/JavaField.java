@@ -27,7 +27,7 @@ import org.apache.cxf.common.util.URIParserUtil;
 
 public class JavaField extends JavaType implements JavaAnnotatable {
     private String modifier;
-    private List<JAnnotation> annotations = new ArrayList<JAnnotation>();
+    private List<JAnnotation> annotations = new ArrayList<>();
     private Annotation[] jaxbAnnotations;
 
     public JavaField() {
@@ -50,7 +50,7 @@ public class JavaField extends JavaType implements JavaAnnotatable {
         annotations.add(anno);
         for (String importClz : anno.getImports()) {
             getOwner().addImport(importClz);
-        }        
+        }
     }
 
     public List<JAnnotation> getAnnotations() {
@@ -67,23 +67,23 @@ public class JavaField extends JavaType implements JavaAnnotatable {
         }*/
         return this.name;
     }
-    
+
     public void setJaxbAnnotations(Annotation[] anns) {
         jaxbAnnotations = anns;
     }
-    
+
     public Annotation[] getJaxbAnnotaions() {
         if (jaxbAnnotations == null) {
             return new Annotation[]{};
-        } 
+        }
         return jaxbAnnotations;
     }
-    
+
     public String getParaName() {
         if (URIParserUtil.containsReservedKeywords(this.name)) {
             return "_" + this.name;
         }
         return this.name;
     }
-    
+
 }

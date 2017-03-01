@@ -30,9 +30,9 @@ import org.apache.cxf.service.model.OperationInfo;
 
 public abstract class AbstractServiceConfiguration {
     protected String serviceNamespace;
-    
+
     private ReflectionServiceFactoryBean serviceFactory;
-    
+
     public ReflectionServiceFactoryBean getServiceFactory() {
         return serviceFactory;
     }
@@ -44,18 +44,18 @@ public abstract class AbstractServiceConfiguration {
     public String getWsdlURL() {
         return null;
     }
-    
+
     public String getServiceName() {
         return null;
     }
-    
+
     public String getServiceNamespace() {
         return serviceNamespace;
     }
     public void setServiceNamespace(String s) {
         serviceNamespace = s;
     }
-    
+
     public Boolean isOperation(final Method method) {
         return null;
     }
@@ -67,11 +67,11 @@ public abstract class AbstractServiceConfiguration {
     public Boolean isWrapped() {
         return null;
     }
-    
-    public Boolean isWrapped(Method m) { 
+
+    public Boolean isWrapped(Method m) {
         return null;
     }
-    
+
     public Boolean isOutParam(Method method, int j) {
         return null;
     }
@@ -79,7 +79,7 @@ public abstract class AbstractServiceConfiguration {
     public Boolean isInParam(Method method, int j) {
         return null;
     }
-    
+
     public Boolean isInOutParam(Method method, int j) {
         return null;
     }
@@ -114,7 +114,7 @@ public abstract class AbstractServiceConfiguration {
      * to the end. I.e. if there is already two methods named
      * <code>doSomething</code>, the first one will have an operation name of
      * "doSomething" and the second "doSomething1".
-     * 
+     *
      * @param service
      * @param method
      */
@@ -147,7 +147,7 @@ public abstract class AbstractServiceConfiguration {
     public QName getOutPartName(final OperationInfo op, final Method method, final int paramNumber) {
         return null;
     }
-    
+
     public QName getInterfaceName() {
         return null;
     }
@@ -155,25 +155,25 @@ public abstract class AbstractServiceConfiguration {
     public QName getEndpointName() {
         return null;
     }
-    
+
     public QName getRequestWrapperName(OperationInfo op, Method method) {
-        return null;        
-    }  
-    
+        return null;
+    }
+
     public QName getResponseWrapperName(OperationInfo op, Method method) {
-        return null;        
-    }  
+        return null;
+    }
     public String getResponseWrapperPartName(OperationInfo op, Method method) {
-        return null;        
-    }  
+        return null;
+    }
     public String getRequestWrapperPartName(OperationInfo op, Method method) {
-        return null;        
-    }  
- 
+        return null;
+    }
+
     public Class<?> getResponseWrapper(Method selected) {
         return null;
     }
-    
+
     public Class<?> getRequestWrapper(Method selected) {
         return null;
     }
@@ -183,23 +183,23 @@ public abstract class AbstractServiceConfiguration {
     public String getRequestWrapperClassName(Method selected) {
         return null;
     }
-    
+
     public Boolean isRPC(Method selected) {
         return null;
     }
-    
+
     public Boolean isHolder(Class<?> cls, Type type) {
         return null;
     }
-    
+
     public Type getHolderType(Class<?> cls, Type type) {
         return null;
     }
-    
+
     public Boolean isWrapperPartNillable(MessagePartInfo mpi) {
         return null;
     }
-    
+
     public Boolean isWrapperPartQualified(MessagePartInfo mpi) {
         return null;
     }

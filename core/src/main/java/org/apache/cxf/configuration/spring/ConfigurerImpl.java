@@ -52,16 +52,16 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 
 @NoJSR250Annotations
-public class ConfigurerImpl extends BeanConfigurerSupport 
+public class ConfigurerImpl extends BeanConfigurerSupport
     implements Configurer, ApplicationContextAware, BusExtension {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurerImpl.class);
 
     private Set<ApplicationContext> appContexts;
     private final Map<String, List<MatcherHolder>> wildCardBeanDefinitions
         = new TreeMap<String, List<MatcherHolder>>();
     private BeanFactory beanFactory;
-    
+
     static class MatcherHolder implements Comparable<MatcherHolder> {
         Matcher matcher;
         String wildCardId;
@@ -77,20 +77,20 @@ public class ConfigurerImpl extends BeanConfigurerSupport
             return literalCharsLen1.compareTo(literalCharsLen2) * -1;
         }
     }
-    
+
     public ConfigurerImpl() {
         // complete
     }
-    
+
     public ConfigurerImpl(ApplicationContext ac) {
         setApplicationContext(ac);
     }
-        
+
     public void setBeanFactory(BeanFactory beanFactory) {
         this.beanFactory = beanFactory;
         super.setBeanFactory(beanFactory);
     }
-    
+
     private void initWildcardDefinitionMap() {
         if (null != appContexts) {
             for (ApplicationContext appContext : appContexts) {
@@ -104,22 +104,22 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                             String orig = n;
                             if (n.charAt(0) == '*') {
                                 //old wildcard
-                                n = "." + n.replaceAll("\\.", "\\."); 
+                                n = "." + n.replaceAll("\\.", "\\.");
                             }
                             try {
                                 Matcher matcher = Pattern.compile(n).matcher("");
                                 List<MatcherHolder> m = wildCardBeanDefinitions.get(className);
                                 if (m == null) {
-                                    m = new ArrayList<MatcherHolder>();
+                                    m = new ArrayList<>();
                                     wildCardBeanDefinitions.put(className, m);
                                 }
                                 MatcherHolder holder = new MatcherHolder(orig, matcher);
                                 m.add(holder);
-                            } catch (PatternSyntaxException npe) { 
+                            } catch (PatternSyntaxException npe) {
                                 //not a valid patter, we'll ignore
                             }
                         } else {
-                            LogUtils.log(LOG, Level.WARNING, "WILDCARD_BEAN_ID_WITH_NO_CLASS_MSG", n); 
+                            LogUtils.log(LOG, Level.WARNING, "WILDCARD_BEAN_ID_WITH_NO_CLASS_MSG", n);
                         }
                     }
                 }
@@ -130,7 +130,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     public void configureBean(Object beanInstance) {
         configureBean(null, beanInstance, true);
     }
-    
+
     public void configureBean(String bn, Object beanInstance) {
         configureBean(bn, beanInstance, true);
     }
@@ -139,18 +139,18 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         if (null == appContexts) {
             return;
         }
-        
+
         if (null == bn) {
             bn = getBeanName(beanInstance);
         }
-        
+
         if (null == bn) {
             return;
         }
         if (checkWildcards) {
             configureWithWildCard(bn, beanInstance);
         }
-        
+
         final String beanName = bn;
         setBeanWiringInfoResolver(new BeanWiringInfoResolver() {
             public BeanWiringInfo resolveWiringInfo(Object instance) {
@@ -160,13 +160,13 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                 return null;
             }
         });
-        
+
         for (ApplicationContext appContext : appContexts) {
             if (appContext.containsBean(bn)) {
                 this.setBeanFactory(appContext.getAutowireCapableBeanFactory());
             }
         }
-        
+
         try {
             //this will prevent a call into the AbstractBeanFactory.markBeanAsCreated(...)
             //which saves ALL the names into a HashSet.  For URL based configuration,
@@ -187,10 +187,10 @@ public class ConfigurerImpl extends BeanConfigurerSupport
             }
         }
     }
-    
+
     private void configureWithWildCard(String bn, Object beanInstance) {
         if (!wildCardBeanDefinitions.isEmpty()) {
-            Class<?> clazz = beanInstance.getClass();            
+            Class<?> clazz = beanInstance.getClass();
             while (!Object.class.equals(clazz)) {
                 String className = clazz.getName();
                 List<MatcherHolder> matchers = wildCardBeanDefinitions.get(className);
@@ -237,26 +237,26 @@ public class ConfigurerImpl extends BeanConfigurerSupport
                 LogUtils.log(LOG, Level.WARNING, "ERROR_DETERMINING_BEAN_NAME_EXC", ex);
             }
         }
-        
+
         if (null == beanName) {
             LogUtils.log(LOG, Level.FINE, "COULD_NOT_DETERMINE_BEAN_NAME_MSG",
                          beanInstance.getClass().getName());
         }
-      
+
         return beanName;
     }
-    
+
     public final void setApplicationContext(ApplicationContext ac) {
         appContexts = new CopyOnWriteArraySet<ApplicationContext>();
         addApplicationContext(ac);
         this.beanFactory = ac.getAutowireCapableBeanFactory();
         super.setBeanFactory(this.beanFactory);
     }
-    
+
     public final void addApplicationContext(ApplicationContext ac) {
         if (!appContexts.contains(ac)) {
             appContexts.add(ac);
-            List<ApplicationContext> inactiveApplicationContexts = new ArrayList<ApplicationContext>();
+            List<ApplicationContext> inactiveApplicationContexts = new ArrayList<>();
             Iterator<ApplicationContext> it = appContexts.iterator();
             while (it.hasNext()) {
                 ApplicationContext c = it.next();
@@ -272,18 +272,18 @@ public class ConfigurerImpl extends BeanConfigurerSupport
             initWildcardDefinitionMap();
         }
     }
-    
+
     public void destroy() {
-        super.destroy();       
+        super.destroy();
         appContexts.clear();
     }
 
     public Class<?> getRegistrationType() {
         return Configurer.class;
     }
-    
+
     protected Set<ApplicationContext> getAppContexts() {
         return appContexts;
     }
-    
+
 }

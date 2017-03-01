@@ -43,7 +43,7 @@ public final class MethodMapper {
             && opBinding.getMethodName() != null) {
             method.setName(opBinding.getMethodName());
         }
-        
+
         if (opBinding != null
             && opBinding.getMethodJavaDoc() != null) {
             method.setJavaDoc(opBinding.getMethodJavaDoc());

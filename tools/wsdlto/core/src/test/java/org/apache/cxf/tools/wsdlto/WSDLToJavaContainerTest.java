@@ -29,7 +29,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class WSDLToJavaContainerTest extends Assert {
-    
+
     @Test
     public void testNoPlugin() throws Exception {
         WSDLToJavaContainer container = new WSDLToJavaContainer("dummy", null);
@@ -37,7 +37,7 @@ public class WSDLToJavaContainerTest extends Assert {
         ToolContext context = new ToolContext();
         context.put(ToolConstants.CFG_WSDLURL, getLocation("hello_world.wsdl"));
         container.setContext(context);
-        
+
         try {
             container.execute();
         } catch (ToolException te) {

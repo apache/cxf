@@ -29,36 +29,36 @@ import org.apache.cxf.message.Message;
  * This Callback class provides a pluggable way of performing delegation. A CallbackHandler
  * instance will be supplied with this class, which contains a reference to the current
  * Message. The CallbackHandler implementation is required to set the token Element to be
- * sent in the request. 
+ * sent in the request.
  */
 public class DelegationCallback implements Callback {
-    
+
     private Element token;
-    
+
     private Message currentMessage;
-    
+
     public DelegationCallback() {
         //
     }
-    
+
     public DelegationCallback(Message currentMessage) {
         this.currentMessage = currentMessage;
     }
-    
+
     public void setToken(Element token) {
         this.token = token;
     }
-    
+
     public Element getToken() {
         return token;
     }
-    
+
     public void setCurrentMessage(Message currentMessage) {
         this.currentMessage = currentMessage;
     }
-    
+
     public Message getCurrentMessage() {
         return currentMessage;
     }
-    
+
 }

@@ -29,9 +29,9 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.EndpointReferenceUtils;
 
-@WebService(serviceName = "NumberFactoryService", 
-            portName = "NumberFactoryPort", 
-            endpointInterface = "org.apache.cxf.factory_pattern.NumberFactory", 
+@WebService(serviceName = "NumberFactoryService",
+            portName = "NumberFactoryPort",
+            endpointInterface = "org.apache.cxf.factory_pattern.NumberFactory",
             targetNamespace = "http://cxf.apache.org/factory_pattern")
 public class HttpNumberFactoryImpl extends NumberFactoryImpl {
 
@@ -42,17 +42,17 @@ public class HttpNumberFactoryImpl extends NumberFactoryImpl {
         //
         manageNumberServantInitialisation();
     }
-    
+
     public W3CEndpointReference create(String id) {
         String portName = null;
-        EndpointReferenceType epr = EndpointReferenceUtils.getEndpointReferenceWithId(NUMBER_SERVICE_QNAME, 
-                                                                 portName, 
+        EndpointReferenceType epr = EndpointReferenceUtils.getEndpointReferenceWithId(NUMBER_SERVICE_QNAME,
+                                                                 portName,
                                                                  id,
                                                                  bus);
-        
+
         Source source = EndpointReferenceUtils.convertToXML(epr);
-        return  new W3CEndpointReference(source);
-        
+        return new W3CEndpointReference(source);
+
     }
 
     protected void initDefaultServant() {
@@ -60,11 +60,11 @@ public class HttpNumberFactoryImpl extends NumberFactoryImpl {
 
         String wsdlLocation = "testutils/factory_pattern.wsdl";
         String bindingId = null;
-        EndpointImpl ep = 
+        EndpointImpl ep =
             new EndpointImpl(bus, servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPort"));
         ep.publish(getServantAddressRoot());
         endpoints.add(ep);
-        templateEpr = ep.getServer().getDestination().getAddress();        
+        templateEpr = ep.getServer().getDestination().getAddress();
     }
 }

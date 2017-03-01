@@ -24,19 +24,19 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class Book {
     private String name;
     private Integer id;
-    
+
     public Book() {
     }
-    
+
     public Book(Integer id) {
         this.id = id;
     }
-    
+
     public Book(String name, Integer id) {
         this.name = name;
         this.id = id;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
@@ -44,11 +44,11 @@ public class Book {
     public String getName() {
         return name;
     }
-    
+
     public void setId(Integer i) {
         id = i;
     }
- 
+
     public Integer getId() {
         return id;
     }

@@ -130,7 +130,7 @@ public abstract class ServerAccessToken extends AccessToken {
     }
 
     /**
-     * Returns a subject capturing the login name 
+     * Returns a subject capturing the login name
      * the end user used to login to the resource server
      * when authorizing a given client request
      * @return UserSubject

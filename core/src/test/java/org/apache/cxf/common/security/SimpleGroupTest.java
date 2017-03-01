@@ -32,25 +32,25 @@ public class SimpleGroupTest extends Assert {
         assertEquals("group", new SimpleGroup("group", "friend").getName());
         assertEquals("group", new SimpleGroup("group", new SimplePrincipal("friend")).getName());
     }
-    
+
     @Test
     public void testIsMember() {
         assertTrue(new SimpleGroup("group", "friend").isMember(new SimplePrincipal("friend")));
         assertFalse(new SimpleGroup("group", "friend").isMember(new SimplePrincipal("frogs")));
     }
-        
+
     @Test
     public void testAddRemoveMembers() {
-        
-        Group group = new SimpleGroup("group");   
+
+        Group group = new SimpleGroup("group");
         assertFalse(group.members().hasMoreElements());
-        
+
         group.addMember(new SimpleGroup("group", "friend"));
-        
+
         Enumeration<? extends Principal> members = group.members();
         assertEquals(new SimpleGroup("group", "friend"), members.nextElement());
         assertFalse(members.hasMoreElements());
-        
+
         group.removeMember(new SimpleGroup("group", "friend"));
         assertFalse(group.members().hasMoreElements());
     }

@@ -21,7 +21,7 @@ package org.apache.cxf.jca.servant;
 import java.rmi.RemoteException;
 
 
-public class GreeterImpl implements Greeter { 
+public class GreeterImpl implements Greeter {
     private boolean sayHiCalled;
 
     public GreeterImpl() {
@@ -37,5 +37,5 @@ public class GreeterImpl implements Greeter {
     public String sayHi() throws RemoteException {
         sayHiCalled = true;
         return "hi";
-    } 
+    }
 }

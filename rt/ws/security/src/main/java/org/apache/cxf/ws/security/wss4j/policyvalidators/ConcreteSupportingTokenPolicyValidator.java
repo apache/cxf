@@ -40,36 +40,36 @@ import org.apache.wss4j.policy.model.X509Token;
  * Validate SupportingToken policies.
  */
 public class ConcreteSupportingTokenPolicyValidator extends AbstractSupportingTokenPolicyValidator {
-    
+
     /**
-     * Return true if this SecurityPolicyValidator implementation is capable of validating a 
+     * Return true if this SecurityPolicyValidator implementation is capable of validating a
      * policy defined by the AssertionInfo parameter
      */
     public boolean canValidatePolicy(AssertionInfo assertionInfo) {
-        return assertionInfo.getAssertion() != null 
+        return assertionInfo.getAssertion() != null
             && (SP12Constants.SUPPORTING_TOKENS.equals(assertionInfo.getAssertion().getName())
                 || SP11Constants.SUPPORTING_TOKENS.equals(assertionInfo.getAssertion().getName()));
     }
-    
+
     /**
-     * Validate policies. 
+     * Validate policies.
      */
     public void validatePolicies(PolicyValidatorParameters parameters, Collection<AssertionInfo> ais) {
         for (AssertionInfo ai : ais) {
             SupportingTokens binding = (SupportingTokens)ai.getAssertion();
             ai.setAsserted(true);
-            
+
             setSignedParts(binding.getSignedParts());
             setEncryptedParts(binding.getEncryptedParts());
             setSignedElements(binding.getSignedElements());
             setEncryptedElements(binding.getEncryptedElements());
-            
+
             List<AbstractToken> tokens = binding.getTokens();
             for (AbstractToken token : tokens) {
                 if (!isTokenRequired(token, parameters.getMessage())) {
                     continue;
                 }
-                
+
                 boolean processingFailed = false;
                 if (token instanceof UsernameToken) {
                     if (!processUsernameTokens(parameters, false)) {
@@ -99,7 +99,7 @@ public class ConcreteSupportingTokenPolicyValidator extends AbstractSupportingTo
                 } else if (!(token instanceof IssuedToken)) {
                     processingFailed = true;
                 }
-                
+
                 if (processingFailed) {
                     ai.setNotAsserted(
                         "The received token does not match the supporting token requirement"
@@ -109,15 +109,15 @@ public class ConcreteSupportingTokenPolicyValidator extends AbstractSupportingTo
             }
         }
     }
-    
+
     protected boolean isSigned() {
         return false;
     }
-    
+
     protected boolean isEncrypted() {
         return false;
     }
-    
+
     protected boolean isEndorsing() {
         return false;
     }

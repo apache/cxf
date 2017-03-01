@@ -31,18 +31,18 @@ public class ProtocolHeadersImpl implements ProtocolHeaders {
     // ProtocolHeaderImpl and HttpHeadersImpl inheriting from it given that
     // HttpHeadersImpl is just a wrapper around Message.PROTOCOL_HEADERS
     private HttpHeadersImpl httpHeaders;
-    
+
     public ProtocolHeadersImpl(Message m) {
         httpHeaders = new HttpHeadersImpl(m);
     }
-    
+
     public List<String> getRequestHeader(String name) {
         return httpHeaders.getRequestHeader(name);
     }
 
     public String getRequestHeaderValue(String name) {
         List<String> values = getRequestHeader(name);
-        return values.size() > 0 ? values.get(0) : null;
+        return !values.isEmpty() ? values.get(0) : null;
     }
 
     public MultivaluedMap<String, String> getRequestHeaders() {

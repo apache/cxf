@@ -44,22 +44,22 @@ public class OAuthJSONProviderTest extends Assert {
         token.setRefreshToken("5678");
         token.setApprovedScope("read");
         token.setParameters(Collections.singletonMap("my_parameter", "http://abc"));
-        
+
         OAuthJSONProvider provider = new OAuthJSONProvider();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        provider.writeTo(token, 
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(token,
                          ClientAccessToken.class,
-                         ClientAccessToken.class, 
-                         new Annotation[]{}, 
-                         MediaType.APPLICATION_JSON_TYPE, 
-                         new MetadataMap<String, Object>(), 
+                         ClientAccessToken.class,
+                         new Annotation[]{},
+                         MediaType.APPLICATION_JSON_TYPE,
+                         new MetadataMap<String, Object>(),
                          bos);
         doReadClientAccessToken(bos.toString(), OAuthConstants.BEARER_TOKEN_TYPE, token.getParameters());
     }
-    
+
     @Test
     public void testReadBearerClientAccessToken() throws Exception {
-        String response = 
+        String response =
             "{"
             + "\"access_token\":\"1234\","
             + "\"token_type\":\"bearer\","
@@ -71,23 +71,23 @@ public class OAuthJSONProviderTest extends Assert {
         doReadClientAccessToken(response, OAuthConstants.BEARER_TOKEN_TYPE,
                                 Collections.singletonMap("my_parameter", "http://abc"));
     }
-    
-    
+
+
     @Test
     @SuppressWarnings({
         "unchecked", "rawtypes"
     })
     public void testReadTokenIntrospection() throws Exception {
-        String response = 
+        String response =
             "{\"active\":true,\"client_id\":\"WjcK94pnec7CyA\",\"username\":\"alice\",\"token_type\":\"Bearer\""
             + ",\"scope\":\"a\",\"aud\":\"https://localhost:8082/service\","
                 + "\"iat\":1453472181,\"exp\":1453475781}";
         OAuthJSONProvider provider = new OAuthJSONProvider();
-        TokenIntrospection t = (TokenIntrospection)provider.readFrom((Class)TokenIntrospection.class, 
-                                                                     TokenIntrospection.class, 
-                          new Annotation[]{}, 
-                          MediaType.APPLICATION_JSON_TYPE, 
-                          new MetadataMap<String, String>(), 
+        TokenIntrospection t = (TokenIntrospection)provider.readFrom((Class)TokenIntrospection.class,
+                                                                     TokenIntrospection.class,
+                          new Annotation[]{},
+                          MediaType.APPLICATION_JSON_TYPE,
+                          new MetadataMap<String, String>(),
                           new ByteArrayInputStream(response.getBytes()));
         assertTrue(t.isActive());
         assertEquals("WjcK94pnec7CyA", t.getClientId());
@@ -103,16 +103,16 @@ public class OAuthJSONProviderTest extends Assert {
         "unchecked", "rawtypes"
     })
     public void testReadTokenIntrospectionMultipleAuds() throws Exception {
-        String response = 
+        String response =
             "{\"active\":true,\"client_id\":\"WjcK94pnec7CyA\",\"username\":\"alice\",\"token_type\":\"Bearer\""
             + ",\"scope\":\"a\",\"aud\":[\"https://localhost:8082/service\",\"https://localhost:8083/service\"],"
                 + "\"iat\":1453472181,\"exp\":1453475781}";
         OAuthJSONProvider provider = new OAuthJSONProvider();
         TokenIntrospection t = (TokenIntrospection)provider.readFrom((Class)TokenIntrospection.class,
-                                                                     TokenIntrospection.class, 
-                          new Annotation[]{}, 
-                          MediaType.APPLICATION_JSON_TYPE, 
-                          new MetadataMap<String, String>(), 
+                                                                     TokenIntrospection.class,
+                          new Annotation[]{},
+                          MediaType.APPLICATION_JSON_TYPE,
+                          new MetadataMap<String, String>(),
                           new ByteArrayInputStream(response.getBytes()));
         assertTrue(t.isActive());
         assertEquals("WjcK94pnec7CyA", t.getClientId());
@@ -124,22 +124,22 @@ public class OAuthJSONProviderTest extends Assert {
         assertEquals(1453472181L, t.getIat().longValue());
         assertEquals(1453475781L, t.getExp().longValue());
     }
-    
+
     @Test
     @SuppressWarnings({
         "unchecked", "rawtypes"
     })
     public void testReadTokenIntrospectionSingleAudAsArray() throws Exception {
-        String response = 
+        String response =
             "{\"active\":false,\"client_id\":\"WjcK94pnec7CyA\",\"username\":\"alice\",\"token_type\":\"Bearer\""
             + ",\"scope\":\"a\",\"aud\":[\"https://localhost:8082/service\"],"
                 + "\"iat\":1453472181,\"exp\":1453475781}";
         OAuthJSONProvider provider = new OAuthJSONProvider();
         TokenIntrospection t = (TokenIntrospection)provider.readFrom((Class)TokenIntrospection.class,
-                                                                     TokenIntrospection.class, 
-                          new Annotation[]{}, 
-                          MediaType.APPLICATION_JSON_TYPE, 
-                          new MetadataMap<String, String>(), 
+                                                                     TokenIntrospection.class,
+                          new Annotation[]{},
+                          MediaType.APPLICATION_JSON_TYPE,
+                          new MetadataMap<String, String>(),
                           new ByteArrayInputStream(response.getBytes()));
         assertFalse(t.isActive());
         assertEquals("WjcK94pnec7CyA", t.getClientId());
@@ -150,20 +150,20 @@ public class OAuthJSONProviderTest extends Assert {
         assertEquals(1453472181L, t.getIat().longValue());
         assertEquals(1453475781L, t.getExp().longValue());
     }
-    
+
     @SuppressWarnings({
         "unchecked", "rawtypes"
     })
-    
-    public ClientAccessToken doReadClientAccessToken(String response, 
+
+    public ClientAccessToken doReadClientAccessToken(String response,
                                         String expectedTokenType,
                                         Map<String, String> expectedParams) throws Exception {
         OAuthJSONProvider provider = new OAuthJSONProvider();
-        ClientAccessToken token = (ClientAccessToken)provider.readFrom((Class)ClientAccessToken.class, 
-                          ClientAccessToken.class, 
-                          new Annotation[]{}, 
-                          MediaType.APPLICATION_JSON_TYPE, 
-                          new MetadataMap<String, String>(), 
+        ClientAccessToken token = (ClientAccessToken)provider.readFrom((Class)ClientAccessToken.class,
+                          ClientAccessToken.class,
+                          new Annotation[]{},
+                          MediaType.APPLICATION_JSON_TYPE,
+                          new MetadataMap<String, String>(),
                           new ByteArrayInputStream(response.getBytes()));
         assertEquals("1234", token.getTokenKey());
         assertTrue(expectedTokenType.equalsIgnoreCase(token.getTokenType()));
@@ -175,11 +175,11 @@ public class OAuthJSONProviderTest extends Assert {
             assertEquals(expectedParams, extraParams);
         }
         assertEquals("http://abc", extraParams.get("my_parameter"));
-        
+
         return token;
-        
+
     }
-    
+
     @Test
     public void testWriteHawkClientAccessToken() throws Exception {
         ClientAccessToken token = new ClientAccessToken("hawk", "1234");
@@ -190,19 +190,19 @@ public class OAuthJSONProviderTest extends Assert {
         params.put(OAuthConstants.HAWK_TOKEN_KEY, "test_mac_secret");
         params.put(OAuthConstants.HAWK_TOKEN_ALGORITHM, OAuthConstants.HMAC_ALGO_SHA_1);
         params.put("my_parameter", "http://abc");
-        
+
         token.setParameters(params);
-        
+
         OAuthJSONProvider provider = new OAuthJSONProvider();
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(token, ClientAccessToken.class, ClientAccessToken.class, new Annotation[] {},
                          MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), bos);
-        doReadClientAccessToken(bos.toString(), 
+        doReadClientAccessToken(bos.toString(),
                                 OAuthConstants.HAWK_TOKEN_TYPE,
                                 params);
-        
+
     }
-    
+
     @Test
     public void testReadHawkClientAccessToken() throws Exception {
         String response = "{" + "\"access_token\":\"1234\"," + "\"token_type\":\"hawk\","
@@ -210,10 +210,10 @@ public class OAuthJSONProviderTest extends Assert {
             + "\"secret\":\"adijq39jdlaska9asud\"," + "\"algorithm\":\"hmac-sha-256\","
             + "\"my_parameter\":\"http://abc\"" + "}";
         ClientAccessToken macToken = doReadClientAccessToken(response, "hawk", null);
-        assertEquals("adijq39jdlaska9asud", 
+        assertEquals("adijq39jdlaska9asud",
                      macToken.getParameters().get(OAuthConstants.HAWK_TOKEN_KEY));
         assertEquals("hmac-sha-256",
                      macToken.getParameters().get(OAuthConstants.HAWK_TOKEN_ALGORITHM));
     }
-    
+
 }

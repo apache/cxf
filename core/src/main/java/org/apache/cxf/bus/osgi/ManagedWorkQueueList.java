@@ -40,18 +40,18 @@ import org.osgi.util.tracker.ServiceTracker;
  * List of work queues that can be managed using the OSGi configuration admin service
  */
 public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChangeListener {
-    public static final String FACTORY_PID = "org.apache.cxf.workqueues";    
+    public static final String FACTORY_PID = "org.apache.cxf.workqueues";
     private static final Logger LOG = LogUtils.getL7dLogger(ManagedWorkQueueList.class);
-    
-    private Map<String, AutomaticWorkQueueImpl> queues = 
+
+    private Map<String, AutomaticWorkQueueImpl> queues =
         new ConcurrentHashMap<String, AutomaticWorkQueueImpl>(4, 0.75f, 2);
     private ServiceTracker configAdminTracker;
-    
+
     public String getName() {
         return FACTORY_PID;
     }
 
-    public void updated(String pid, @SuppressWarnings("rawtypes") Dictionary props) 
+    public void updated(String pid, @SuppressWarnings("rawtypes") Dictionary props)
         throws ConfigurationException {
         if (pid == null) {
             return;
@@ -107,7 +107,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
         }
         return selectedConfig;
     }
-    
+
     public void addAllToWorkQueueManager(WorkQueueManager manager) {
         if (manager != null) {
             for (AutomaticWorkQueueImpl wq : queues.values()) {

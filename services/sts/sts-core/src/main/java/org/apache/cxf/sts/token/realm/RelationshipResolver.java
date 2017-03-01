@@ -26,8 +26,8 @@ import java.util.Map;
 public class RelationshipResolver {
 
     private Map<String, Relationship> relationshipMap;
-    
-    
+
+
     public RelationshipResolver(List<Relationship> relationships) {
         relationshipMap = new HashMap<>();
         for (Relationship rel : relationships) {
@@ -35,17 +35,17 @@ public class RelationshipResolver {
             relationshipMap.put(key, rel);
         }
     }
-    
+
     public Relationship resolveRelationship(String sourceRealm, String targetRealm) {
         String key = generateKey(sourceRealm, targetRealm);
         return relationshipMap.get(key);
     }
-    
-    
+
+
     private String generateKey(String sourceRealm, String targetRealm) {
         return new StringBuilder().append(sourceRealm).append(">").append(targetRealm).toString();
-        
+
     }
-    
-    
+
+
 }

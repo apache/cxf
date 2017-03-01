@@ -25,24 +25,24 @@ import java.util.Map;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 
 public class AttachmentOutputInterceptor extends AttachmentOutInterceptor {
-    
+
     private String multipartType;
     private Map<String, List<String>> rootHeaders;
-    
-    public AttachmentOutputInterceptor(String multipartType, 
+
+    public AttachmentOutputInterceptor(String multipartType,
                                        Map<String, List<String>> headers) {
         this.multipartType = multipartType;
         this.rootHeaders = headers;
     }
-    
+
     protected String getMultipartType() {
         return multipartType;
     }
-    
+
     protected Map<String, List<String>> getRootHeaders() {
         return Collections.unmodifiableMap(rootHeaders);
     }
-    
+
     protected boolean writeOptionalTypeParameters() {
         return false;
     }

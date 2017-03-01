@@ -39,7 +39,7 @@ public class SearchContextImplTest extends Assert {
         String exp = new SearchContextImpl(m).getSearchExpression();
         assertEquals("a==b", exp);
     }
-    
+
     @Test
     public void testWrongQueryNoException() {
         Message m = new MessageImpl();
@@ -47,14 +47,14 @@ public class SearchContextImplTest extends Assert {
         m.put(Message.QUERY_STRING, "_s=ab");
         assertNull(new SearchContextImpl(m).getCondition(Book.class));
     }
-    
+
     @Test(expected = SearchParseException.class)
     public void testWrongQueryException() {
         Message m = new MessageImpl();
         m.put(Message.QUERY_STRING, "_s=ab");
         new SearchContextImpl(m).getCondition(Book.class);
     }
-    
+
     @Test
     public void testPlainQuery2() {
         Message m = new MessageImpl();
@@ -63,7 +63,7 @@ public class SearchContextImplTest extends Assert {
         String exp = new SearchContextImpl(m).getSearchExpression();
         assertEquals("(a==b,a==b1)", exp);
     }
-    
+
     @Test
     public void testPlainQuery3() {
         Message m = new MessageImpl();
@@ -72,7 +72,7 @@ public class SearchContextImplTest extends Assert {
         String exp = new SearchContextImpl(m).getSearchExpression();
         assertEquals("(a==b;c==d)", exp);
     }
-    
+
     @Test
     public void testPlainQuery4() {
         Message m = new MessageImpl();
@@ -81,7 +81,7 @@ public class SearchContextImplTest extends Assert {
         String exp = new SearchContextImpl(m).getSearchExpression();
         assertEquals("((a==b,a==b2);c==d;f==g)", exp);
     }
-    
+
     @Test
     public void testPlainQuery5() {
         Message m = new MessageImpl();
@@ -90,15 +90,15 @@ public class SearchContextImplTest extends Assert {
         String exp = new SearchContextImpl(m).getSearchExpression();
         assertEquals("(a=ge=1;a=le=3)", exp);
     }
-    
-    
-    
+
+
+
     @Test
     public void testFiqlSearchCondition() {
         doTestFiqlSearchCondition(
             SearchContextImpl.SEARCH_QUERY + "=" + "name==CXF%20Rocks;id=gt=123");
     }
-    
+
     @Test
     public void testFiqlSearchConditionCustomQueryName() {
         Message m = new MessageImpl();
@@ -106,13 +106,13 @@ public class SearchContextImplTest extends Assert {
         doTestFiqlSearchCondition(m,
             "thequery" + "=" + "name==CXF%20Rocks;id=gt=123");
     }
-    
+
     @Test
     public void testFiqlSearchBean() {
         doTestFiqlSearchBean(
             SearchContextImpl.SEARCH_QUERY + "=" + "name==CXF%20Rocks;id=gt=123");
     }
-    
+
     @Test(expected = IllegalArgumentException.class)
     public void testIllegalConditionType() {
         SearchContext context = new SearchContextImpl(new MessageImpl());
@@ -123,7 +123,7 @@ public class SearchContextImplTest extends Assert {
         doTestFiqlSearchCondition(
             SearchContextImpl.SHORT_SEARCH_QUERY + "=" + "name==CXF%20Rocks;id=gt=123");
     }
-    
+
     @Test
     public void testFiqlSearchConditionWithNonFiqlQuery() {
         doTestFiqlSearchCondition(
@@ -133,34 +133,34 @@ public class SearchContextImplTest extends Assert {
         doTestFiqlSearchCondition(
             "a=b&_s=name==CXF%20Rocks;id=gt=123&c=d");
     }
-    
+
     private void doTestFiqlSearchCondition(String queryString) {
         doTestFiqlSearchCondition(new MessageImpl(), queryString);
     }
-    
+
     private void doTestFiqlSearchCondition(Message m, String queryString) {
         m.put(Message.QUERY_STRING, queryString);
         SearchContext context = new SearchContextImpl(m);
         SearchCondition<Book> sc = context.getCondition(Book.class);
         assertNotNull(sc);
-        
-        List<Book> books = new ArrayList<Book>();
+
+        List<Book> books = new ArrayList<>();
         books.add(new Book("CXF is cool", 125L));
         books.add(new Book("CXF Rocks", 125L));
-        
+
         List<Book> found = sc.findAll(books);
         assertEquals(1, found.size());
         assertEquals(new Book("CXF Rocks", 125L), found.get(0));
     }
-    
+
     private void doTestFiqlSearchBean(String queryString) {
         Message m = new MessageImpl();
         m.put(Message.QUERY_STRING, queryString);
         SearchContext context = new SearchContextImpl(m);
         SearchCondition<SearchBean> sc = context.getCondition(SearchBean.class);
         assertNotNull(sc);
-        
-        List<SearchBean> beans = new ArrayList<SearchBean>();
+
+        List<SearchBean> beans = new ArrayList<>();
         SearchBean sb1 = new SearchBean();
         sb1.set("name", "CXF is cool");
         beans.add(sb1);
@@ -168,11 +168,11 @@ public class SearchContextImplTest extends Assert {
         sb2.set("name", "CXF Rocks");
         sb2.set("id", "124");
         beans.add(sb2);
-        
+
         List<SearchBean> found = sc.findAll(beans);
         assertEquals(1, found.size());
         assertEquals(sb2, found.get(0));
-        
+
         assertTrue(sc instanceof AndSearchCondition);
         assertNull(sc.getStatement());
         List<SearchCondition<SearchBean>> scs = sc.getSearchConditions();
@@ -181,14 +181,14 @@ public class SearchContextImplTest extends Assert {
         assertEquals("name", sc1.getStatement().getProperty());
         SearchCondition<SearchBean> sc2 = scs.get(1);
         assertEquals("id", sc2.getStatement().getProperty());
-        
+
         assertTrue("123".equals(sc1.getStatement().getValue())
                    && "CXF Rocks".equals(sc2.getStatement().getValue())
                    || "123".equals(sc2.getStatement().getValue())
                    && "CXF Rocks".equals(sc1.getStatement().getValue()));
-        
+
     }
-    
+
     @Test
     public void testPrimitiveStatementSearchBean() {
         Message m = new MessageImpl();
@@ -196,16 +196,16 @@ public class SearchContextImplTest extends Assert {
         SearchContext context = new SearchContextImpl(m);
         SearchCondition<SearchBean> sc = context.getCondition(SearchBean.class);
         assertNotNull(sc);
-        
+
         PrimitiveStatement ps = sc.getStatement();
         assertNotNull(ps);
-        
+
         assertEquals("name", ps.getProperty());
         assertEquals("CXF", ps.getValue());
         assertEquals(ConditionType.EQUALS, ps.getCondition());
         assertEquals(String.class, ps.getValueType());
     }
-    
+
     @Test
     public void testPrimitiveStatementSearchBeanComlexName() {
         Message m = new MessageImpl();
@@ -213,16 +213,16 @@ public class SearchContextImplTest extends Assert {
         SearchContext context = new SearchContextImpl(m);
         SearchCondition<SearchBean> sc = context.getCondition(SearchBean.class);
         assertNotNull(sc);
-        
+
         PrimitiveStatement ps = sc.getStatement();
         assertNotNull(ps);
-        
+
         assertEquals("complex.name", ps.getProperty());
         assertEquals("CXF", ps.getValue());
         assertEquals(ConditionType.EQUALS, ps.getCondition());
         assertEquals(String.class, ps.getValueType());
     }
-    
+
     @Test
     public void testSingleEquals() {
         Message m = new MessageImpl();
@@ -231,46 +231,46 @@ public class SearchContextImplTest extends Assert {
         SearchContext context = new SearchContextImpl(m);
         SearchCondition<SearchBean> sc = context.getCondition(SearchBean.class);
         assertNotNull(sc);
-        
+
         PrimitiveStatement ps = sc.getStatement();
         assertNotNull(ps);
-        
+
         assertEquals("name", ps.getProperty());
         assertEquals("CXF", ps.getValue());
         assertEquals(ConditionType.EQUALS, ps.getCondition());
         assertEquals(String.class, ps.getValueType());
     }
-    
+
     @Test
     public void testIsMetCompositeObject() throws Exception {
-        SearchCondition<TheBook> filter = 
+        SearchCondition<TheBook> filter =
             new FiqlParser<TheBook>(TheBook.class,
-                null,                          
+                null,
                 Collections.singletonMap("address", "address.street")).parse("address==Street1");
-        
+
         TheBook b = new TheBook();
         b.setAddress(new TheOwnerAddress("Street1"));
         assertTrue(filter.isMet(b));
-        
+
         b.setAddress(new TheOwnerAddress("Street2"));
         assertFalse(filter.isMet(b));
     }
     @Test
     public void testIsMetCompositeInterface() throws Exception {
-        SearchCondition<TheBook> filter = 
+        SearchCondition<TheBook> filter =
             new FiqlParser<TheBook>(TheBook.class,
-                null,                          
+                null,
                 Collections.singletonMap("address", "addressInterface.street"))
                     .parse("address==Street1");
-        
+
         TheBook b = new TheBook();
         b.setAddress(new TheOwnerAddress("Street1"));
         assertTrue(filter.isMet(b));
-        
+
         b.setAddress(new TheOwnerAddress("Street2"));
         assertFalse(filter.isMet(b));
     }
-        
+
     public static class TheBook {
         private TheOwnerAddressInterface address;
 
@@ -281,7 +281,7 @@ public class SearchContextImplTest extends Assert {
         public void setAddress(TheOwnerAddress a) {
             this.address = a;
         }
-        
+
         public TheOwnerAddressInterface getAddressInterface() {
             return address;
         }
@@ -298,12 +298,12 @@ public class SearchContextImplTest extends Assert {
         private String street;
 
         public TheOwnerAddress() {
-            
+
         }
         public TheOwnerAddress(String s) {
             this.street = s;
         }
-        
+
         public String getStreet() {
             return street;
         }

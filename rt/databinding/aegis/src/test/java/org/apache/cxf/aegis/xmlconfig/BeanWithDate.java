@@ -20,7 +20,7 @@
 package org.apache.cxf.aegis.xmlconfig;
 
 /**
- * class used to test remapping the schema type of date. 
+ * class used to test remapping the schema type of date.
  */
 public class BeanWithDate {
     private java.util.Date fig;

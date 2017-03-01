@@ -28,9 +28,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for addNumbersResponse complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="addNumbersResponse">
  *   &lt;complexContent>
@@ -42,8 +42,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 //CHECKSTYLE:OFF
 @XmlRootElement(name = "addNumbersResponse",
@@ -59,7 +59,7 @@ public class AddNumbersResponse {
 
     /**
      * Gets the value of the return property.
-     * 
+     *
      */
     public int getReturn() {
         return _return;
@@ -67,7 +67,7 @@ public class AddNumbersResponse {
 
     /**
      * Sets the value of the return property.
-     * 
+     *
      */
     public void setReturn(int value) {
         this._return = value;

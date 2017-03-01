@@ -23,9 +23,9 @@ package org.apache.cxf.xkms.handlers;
  * A couple of utility methods for working with X500 Distinguished Names
  */
 public final class DnUtils {
-    
+
     private DnUtils() {
-        
+
     }
 
     public static String extractMostSignificantAttribute(String identifier) {
@@ -69,7 +69,7 @@ public final class DnUtils {
         }
         return attr;
     }
-    
+
     private static String normalizeAttribute(String val) {
         String[] split;
         String normalized = val;

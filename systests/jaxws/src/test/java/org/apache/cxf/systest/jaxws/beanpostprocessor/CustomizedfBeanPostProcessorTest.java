@@ -28,20 +28,20 @@ import org.junit.Test;
  * The majority of this test happens when the context is loaded.
  */
 public class CustomizedfBeanPostProcessorTest extends AbstractCXFSpringTest {
-    
+
     @Test
     public void verifyServices() throws Exception {
-        JaxWsWebServicePublisherBeanPostProcessor 
+        JaxWsWebServicePublisherBeanPostProcessor
             bpp = (JaxWsWebServicePublisherBeanPostProcessor)applicationContext.getBean("postprocess");
         assertTrue(bpp.isCustomizedDataBinding());
         assertTrue(bpp.isCustomizedServerFactory());
-        
+
     }
 
     @Override
     protected String[] getConfigLocations() {
         return new String[] {"/org/apache/cxf/systest/jaxws/beanpostprocessor/customized-context.xml" };
     }
-    
+
 
 }

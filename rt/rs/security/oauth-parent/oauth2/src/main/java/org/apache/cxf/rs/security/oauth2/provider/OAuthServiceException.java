@@ -27,30 +27,30 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
  * Encapsulates OAuth-related problems
  */
 public class OAuthServiceException extends RuntimeException {
-    
+
     private static final long serialVersionUID = 343738539234766320L;
     private OAuthError error;
-    
+
     public OAuthServiceException() {
         super(OAuthConstants.SERVER_ERROR);
     }
-    
+
     public OAuthServiceException(String message) {
         super(message);
     }
-    
+
     public OAuthServiceException(String message, Throwable cause) {
         super(message, cause);
     }
-    
+
     public OAuthServiceException(Throwable cause) {
         super(OAuthConstants.SERVER_ERROR, cause);
     }
-    
+
     public OAuthServiceException(OAuthError error) {
         this.error = error;
     }
-    
+
     public OAuthServiceException(OAuthError error, Throwable cause) {
         super(cause);
         this.error = error;
@@ -59,5 +59,5 @@ public class OAuthServiceException extends RuntimeException {
     public OAuthError getError() {
         return error;
     }
-    
+
 }

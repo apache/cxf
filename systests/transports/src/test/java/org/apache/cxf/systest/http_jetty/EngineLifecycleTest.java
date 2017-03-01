@@ -62,13 +62,13 @@ import org.springframework.core.io.Resource;
 public class EngineLifecycleTest extends Assert {
     private static final String PORT1 = TestUtil.getPortNumber(EngineLifecycleTest.class, 1);
     private static final String PORT2 = TestUtil.getPortNumber(EngineLifecycleTest.class, 2);
-    private GenericApplicationContext applicationContext;    
-        
+    private GenericApplicationContext applicationContext;
+
     private void readBeans(Resource beanResource) {
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(applicationContext);
         reader.loadBeanDefinitions(beanResource);
     }
-    
+
     public void setUpBus(boolean includeService) throws Exception {
         applicationContext = new GenericApplicationContext();
         readBeans(new ClassPathResource("/org/apache/cxf/systest/http_jetty/cxf.xml"));
@@ -77,44 +77,44 @@ public class EngineLifecycleTest extends Assert {
         if (includeService) {
             readBeans(new ClassPathResource("server-lifecycle-beans.xml", getClass()));
         }
-        
+
         // bring in some property values from a Properties file
         PropertyPlaceholderConfigurer cfg = new PropertyPlaceholderConfigurer();
         Properties properties = new Properties();
         properties.setProperty("staticResourceURL", getStaticResourceURL());
         cfg.setProperties(properties);
         // now actually do the replacement
-        cfg.postProcessBeanFactory(applicationContext.getBeanFactory());        
+        cfg.postProcessBeanFactory(applicationContext.getBeanFactory());
         applicationContext.refresh();
     }
-    
-    private void invokeService() {        
+
+    private void invokeService() {
         DummyInterface client = (DummyInterface) applicationContext.getBean("dummy-client");
         assertEquals("We should get out put from this client", "hello world", client.echo("hello world"));
     }
 
-    private void invokeService8801() {        
+    private void invokeService8801() {
         DummyInterface client = (DummyInterface) applicationContext.getBean("dummy-client-8801");
         assertEquals("We should get out put from this client", "hello world", client.echo("hello world"));
     }
-    
+
     private HttpURLConnection getHttpConnection(String target) throws Exception {
-        URL url = new URL(target);       
-        
-        URLConnection connection = url.openConnection();            
-        
+        URL url = new URL(target);
+
+        URLConnection connection = url.openConnection();
+
         assertTrue(connection instanceof HttpURLConnection);
-        return (HttpURLConnection)connection;        
+        return (HttpURLConnection)connection;
     }
-    
+
     private void getTestHtml() throws Exception {
         CachedOutputStream response = null;
         for (int i = 0; i < 10; i++) {
             try {
-                HttpURLConnection httpConnection = 
-                    getHttpConnection("http://localhost:" + PORT2 + "/test.html");    
+                HttpURLConnection httpConnection =
+                    getHttpConnection("http://localhost:" + PORT2 + "/test.html");
                 httpConnection.connect();
-                InputStream in = httpConnection.getInputStream();        
+                InputStream in = httpConnection.getInputStream();
                 assertNotNull(in);
                 response = new CachedOutputStream();
                 IOUtils.copy(in, response);
@@ -127,17 +127,17 @@ public class EngineLifecycleTest extends Assert {
             }
         }
         assertNotNull("Test doc can not be read", response);
-              
-        FileInputStream htmlFile = 
-            new FileInputStream("target/test-classes/org/apache/cxf/systest/http_jetty/test.html");    
+
+        FileInputStream htmlFile =
+            new FileInputStream("target/test-classes/org/apache/cxf/systest/http_jetty/test.html");
         CachedOutputStream html = new CachedOutputStream();
         IOUtils.copy(htmlFile, html);
         htmlFile.close();
         html.close();
-        
+
         assertEquals("Can't get the right test html", html.toString(), response.toString());
     }
-    
+
     public String getStaticResourceURL() throws Exception {
         File staticFile = new File(this.getClass().getResource("test.html").toURI());
         staticFile = staticFile.getParentFile();
@@ -146,16 +146,16 @@ public class EngineLifecycleTest extends Assert {
         return furl.toString();
     }
 
-    public void shutdownService() throws Exception {   
+    public void shutdownService() throws Exception {
         applicationContext.destroy();
         applicationContext.close();
     }
-    
-    
+
+
     @Test
-    public void testUpDownWithServlets() throws Exception {        
+    public void testUpDownWithServlets() throws Exception {
         setUpBus(true);
-       
+
         Bus bus = (Bus)applicationContext.getBean("cxf");
         ServerRegistry sr = bus.getExtension(ServerRegistry.class);
         ServerImpl si = (ServerImpl) sr.getServers().get(0);
@@ -174,54 +174,54 @@ public class EngineLifecycleTest extends Assert {
         }
         servletContext.addServlet("org.eclipse.jetty.servlet.DefaultServlet", "/bloop");
         getTestHtml();
-        invokeService();        
+        invokeService();
         shutdownService();
         verifyNoServer(PORT2);
         verifyNoServer(PORT1);
     }
-        
+
     private void verifyNoServer(String port) {
         try {
             Socket socket = new Socket(InetAddress.getLoopbackAddress().getHostName(), Integer.parseInt(port));
             socket.close();
         } catch (UnknownHostException e) {
             fail("Unknown host for local address");
-        } catch (IOException e) {            
+        } catch (IOException e) {
             return; // this is what we want.
         }
         fail("Server on port " + port + " accepted a connection.");
-        
+
     }
 
     /**
-     * 
+     *
      * @throws Exception
      */
-    @Test   
+    @Test
     public void testServerUpDownUp() throws Exception {
-        
+
         setUpBus(true);
-        
+
         getTestHtml();
-        invokeService();    
+        invokeService();
         invokeService8801();
         shutdownService();
         System.gc(); //make sure the port is cleaned up a bit
         Thread.sleep(2 * 100);
-        System.gc(); 
+        System.gc();
         verifyNoServer(PORT2);
         verifyNoServer(PORT1);
-        
-        
+
+
         setUpBus(true);
-        Thread.sleep(2 * 100);       
-        invokeService();            
+        Thread.sleep(2 * 100);
+        invokeService();
         invokeService8801();
         getTestHtml();
         shutdownService();
         verifyNoServer(PORT2);
         verifyNoServer(PORT1);
-        
+
 
     }
 

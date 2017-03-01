@@ -63,7 +63,7 @@ public class Server extends AbstractBusTestServerBase {
         implementor = new AsyncGreeter();
         address = "http://localhost:" + PORT + "/SoapContext/AsyncSoapPort";
         eps.add(Endpoint.publish(address, implementor));
-        
+
         implementor = new AsyncEchoProvider();
         address = "http://localhost:" + PORT + "/SoapContext/AsyncEchoProvider";
         eps.add(Endpoint.publish(address, implementor));
@@ -75,12 +75,12 @@ public class Server extends AbstractBusTestServerBase {
         implementor = new DocLitBareGreeterMultiPort();
         address = "http://localhost:" + PORT + "/MultiPort/DocBarePort";
         eps.add(Endpoint.publish(address, implementor));
-        
+
         implementor = new GreeterImpl();
         address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint ep = Endpoint.publish(address, implementor);
         eps.add(ep);
-        
+
         implementor = new GreeterImpl();
         address = "http://localhost:" + PORT + "/SoapContext/SoapPortWithGzip";
         Endpoint ep2 = Endpoint.publish(address, implementor);
@@ -91,39 +91,39 @@ public class Server extends AbstractBusTestServerBase {
         implementor = new RefGreeterImpl();
         address = "http://localhost:" + PORT + "/SoapContext/SoapPort2";
         eps.add(Endpoint.publish(address, implementor));
-        
+
         //publish port with soap12 binding
         address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
-        
-        EndpointImpl e = (EndpointImpl) Endpoint.create(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING, 
+
+        EndpointImpl e = (EndpointImpl) Endpoint.create(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING,
                                                         new Greeter12Impl());
         e.publish(address);
         eps.add(e);
-        
+
         implementor = new DocLitBareGreeterImpl();
         address = "http://localhost:" + BARE_PORT + "/SoapContext/SoapPort";
         eps.add(Endpoint.publish(address, implementor));
-        
-        
+
+
         implementor = new GreeterImplBogus();
         address = "http://localhost:" + BOGUS_REAL_PORT + "/SoapContext/SoapPort";
         eps.add(Endpoint.publish(address, implementor));
     }
-    
+
     public void tearDown() {
         while (!eps.isEmpty()) {
             Endpoint ep = eps.remove(0);
             ep.stop();
         }
-    }    
-    
+    }
+
     @WebService(endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http")
     public class Greeter12Impl extends BaseGreeterImpl {
 
     }
-    
+
     @WebService(endpointInterface = "org.apache.hello_world_soap_http.Greeter",
         targetNamespace = "http://apache.org/hello_world_soap_http")
     public class AsyncGreeter extends BaseGreeterImpl {
@@ -146,7 +146,7 @@ public class Server extends AbstractBusTestServerBase {
                     GreetMeResponse resp = new GreetMeResponse();
                     resp.setResponseType("Hello " + requestType);
                     r.set(resp);
-                    asyncHandler.handleResponse(r);                    
+                    asyncHandler.handleResponse(r);
                 }
             } .start();
             return r;
@@ -191,12 +191,12 @@ public class Server extends AbstractBusTestServerBase {
             System.out.println("done!");
         }
     }
-    
+
     @WebService(serviceName = "SOAPService",
                 portName = "SoapPort",
                 endpointInterface = "org.apache.cxf.hello_world.elrefs.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http",
-                wsdlLocation = "testutils/hello_world_ref.wsdl")    
+                wsdlLocation = "testutils/hello_world_ref.wsdl")
     public class RefGreeterImpl implements org.apache.cxf.hello_world.elrefs.Greeter {
         public String greetMe(String requestType) {
             return "Hello " + requestType;
@@ -213,24 +213,24 @@ public class Server extends AbstractBusTestServerBase {
                 targetNamespace = "http://apache.org/hello_world_soap_http",
                 wsdlLocation = "testutils/hello_world.wsdl")
     public class GreeterImplBogus extends GreeterImpl {
-    
-    } 
-    
-    @WebService(serviceName = "SOAPServiceMultiPortTypeTest", 
-                portName = "GreeterPort", 
+
+    }
+
+    @WebService(serviceName = "SOAPServiceMultiPortTypeTest",
+                portName = "GreeterPort",
                 endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http",
-                wsdlLocation = "testutils/hello_world.wsdl") 
+                wsdlLocation = "testutils/hello_world.wsdl")
     public class GreeterImplMultiPort extends GreeterImpl {
-    
-    } 
-    
-    @WebService(serviceName = "SOAPServiceMultiPortTypeTest", 
-            portName = "DocLitBarePort", 
+
+    }
+
+    @WebService(serviceName = "SOAPServiceMultiPortTypeTest",
+            portName = "DocLitBarePort",
             endpointInterface = "org.apache.hello_world_soap_http.DocLitBare",
             targetNamespace = "http://apache.org/hello_world_soap_http",
             wsdlLocation = "testutils/hello_world.wsdl")
     public class DocLitBareGreeterMultiPort extends DocLitBareGreeterImpl {
-    
-    }  
+
+    }
 }

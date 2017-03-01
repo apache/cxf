@@ -45,9 +45,9 @@ import org.junit.Test;
 
 public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     public static final String PORT = AtomBookServer.PORT;
-    
+
     private Abdera abdera = new Abdera();
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -55,38 +55,38 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
                    launchServer(AtomBookServer.class, true));
         createStaticBus();
     }
-    
+
     @Test
     public void testGetBooks() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/bookstore/books/feed"; 
+            "http://localhost:" + PORT + "/bookstore/bookstore/books/feed";
         Feed feed = getFeed(endpointAddress, null);
-        assertEquals("http://localhost:" + PORT + "/bookstore/bookstore/books/feed", 
+        assertEquals("http://localhost:" + PORT + "/bookstore/bookstore/books/feed",
                      feed.getBaseUri().toString());
         assertEquals("Collection of Books", feed.getTitle());
-        
+
         getAndCompareJson("http://localhost:" + PORT + "/bookstore/bookstore/books/feed",
                                "resources/expected_atom_books_json.txt",
                                "application/json");
-        
+
         getAndCompareJson("http://localhost:" + PORT + "/bookstore/bookstore/books/jsonfeed",
                           "resources/expected_atom_books_jsonfeed.txt",
                           "application/json, text/html, application/xml;q=0.9,"
                           + " application/xhtml+xml, image/png, image/jpeg, image/gif,"
                           + " image/x-xbitmap, */*;q=0.1");
-        
+
         Entry entry = addEntry(endpointAddress);
         entry = addEntry(endpointAddress + "/relative");
-        
+
         endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/bookstore/books/subresources/123"; 
+            "http://localhost:" + PORT + "/bookstore/bookstore/books/subresources/123";
         entry = getEntry(endpointAddress, null);
         assertEquals("CXF in Action", entry.getTitle());
-        
+
         getAndCompareJson("http://localhost:" + PORT + "/bookstore/bookstore/books/entries/123",
                                "resources/expected_atom_book_json.txt",
                                "application/json");
-        
+
         getAndCompareJson("http://localhost:" + PORT + "/bookstore/bookstore/books/entries/123?_type="
                                + "application/json",
                                "resources/expected_atom_book_json.txt",
@@ -95,7 +95,7 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
                                + "json",
                                "resources/expected_atom_book_json.txt",
                                "*/*");
-        
+
         // do the same using extension mappings
         getAndCompareJson("http://localhost:" + PORT + "/bookstore/bookstore/books/entries/123.json",
                                "resources/expected_atom_book_json.txt",
@@ -104,20 +104,20 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         getAndCompareJson("http://localhost:" + PORT + "/bookstore/bookstore/books/entries/123.json;a=b",
                                "resources/expected_atom_book_json_matrix.txt",
                                "*/*");
-        
-        
+
+
     }
-    
+
     private Entry addEntry(String endpointAddress) throws Exception {
         Entry e = createBookEntry(256, "AtomBook");
         StringWriter w = new StringWriter();
         e.writeTo(w);
-        
+
         PostMethod post = new PostMethod(endpointAddress);
         post.setRequestEntity(
              new StringRequestEntity(w.toString(), "application/atom+xml", null));
         HttpClient httpclient = new HttpClient();
-        
+
         String location = null;
         try {
             int result = httpclient.executeMethod(post);
@@ -128,46 +128,46 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
             assertEquals(entryDoc.getRoot().toString(), e.toString());
         } finally {
             post.releaseConnection();
-        }         
-        
+        }
+
         Entry entry = getEntry(location, null);
         assertEquals(location, entry.getBaseUri().toString());
         assertEquals("AtomBook", entry.getTitle());
         return entry;
     }
-    
+
     @Test
     public void testGetBooks2() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/sub/"; 
+            "http://localhost:" + PORT + "/bookstore/sub/";
         Feed feed = getFeed(endpointAddress, null);
-        assertEquals("http://localhost:" + PORT + "/bookstore/sub/", 
+        assertEquals("http://localhost:" + PORT + "/bookstore/sub/",
                      feed.getBaseUri().toString());
         assertEquals("Collection of Books", feed.getTitle());
-        
+
         getAndCompareJson("http://localhost:" + PORT + "/bookstore/sub/books/entries/123.json",
                         "resources/expected_atom_book_json2.txt",
                         "*/*");
     }
-    
+
     @Test
     public void testGetBooks3() throws Exception {
         getAndCompareJson("http://localhost:" + PORT + "/atom/atomservice3/atom/books/entries/123.json",
                         "resources/expected_atom_book_json3.txt",
                         "*/*");
     }
-    
+
     @Test
     public void testGetBooksWithCustomProvider() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/bookstore/bookstore4/books/feed"; 
+            "http://localhost:" + PORT + "/bookstore/bookstore4/books/feed";
         Feed feed = getFeed(endpointAddress, null);
-        assertEquals("http://localhost:" + PORT + "/bookstore/bookstore4/books/feed", 
+        assertEquals("http://localhost:" + PORT + "/bookstore/bookstore4/books/feed",
                      feed.getBaseUri().toString());
         assertEquals("Collection of Books", feed.getTitle());
     }
-    
-    private void getAndCompareJson(String address, 
+
+    private void getAndCompareJson(String address,
                                    String resourcePath,
                                    String type) throws Exception {
         GetMethod get = new GetMethod(address);
@@ -175,46 +175,46 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         get.setRequestHeader("Accept", type);
         HttpClient httpClient = new HttpClient();
         try {
-            httpClient.executeMethod(get);           
+            httpClient.executeMethod(get);
             String jsonContent = getStringFromInputStream(get.getResponseBodyAsStream());
             String expected = getStringFromInputStream(
                   getClass().getResourceAsStream(resourcePath));
             expected = expected.replaceAll("9080", PORT);
-            
+
             JSONObject obj1 = new JSONObject(jsonContent);
             JSONObject obj2 = new JSONObject(expected);
-            
-            assertEquals("Atom entry should've been formatted as json", 
+
+            assertEquals("Atom entry should've been formatted as json",
                          obj1.toString(), obj2.toString());
         } finally {
             get.releaseConnection();
         }
     }
-    
+
     private Entry createBookEntry(int id, String name) throws Exception {
-        
+
         Book b = new Book();
         b.setId(id);
         b.setName(name);
-        
-        
+
+
         Factory factory = Abdera.getNewFactory();
         JAXBContext jc = JAXBContext.newInstance(Book.class);
-        
+
         Entry e = factory.getAbdera().newEntry();
         e.setTitle(b.getName());
         e.setId(Long.toString(b.getId()));
-        
-        
+
+
         StringWriter writer = new StringWriter();
         jc.createMarshaller().marshal(b, writer);
-        
+
         Content ct = factory.newContent(Content.Type.XML);
         ct.setValue(writer.toString());
         e.setContentElement(ct);
         return e;
-    }   
-    
+    }
+
     private Feed getFeed(String endpointAddress, String acceptType) throws Exception {
         GetMethod get = new GetMethod(endpointAddress);
         get.setRequestHeader("Content-Type", "*/*");
@@ -223,14 +223,14 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         }
         HttpClient httpClient = new HttpClient();
         try {
-            httpClient.executeMethod(get);           
+            httpClient.executeMethod(get);
             Document<Feed> doc = abdera.getParser().parse(copyIn(get.getResponseBodyAsStream()));
             return doc.getRoot();
         } finally {
             get.releaseConnection();
         }
     }
-    
+
     private Entry getEntry(String endpointAddress, String acceptType) throws Exception {
         GetMethod get = new GetMethod(endpointAddress);
         get.setRequestHeader("Content-Type", "*/*");
@@ -239,14 +239,14 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         }
         HttpClient httpClient = new HttpClient();
         try {
-            httpClient.executeMethod(get);           
+            httpClient.executeMethod(get);
             Document<Entry> doc = abdera.getParser().parse(copyIn(get.getResponseBodyAsStream()));
             return doc.getRoot();
         } finally {
             get.releaseConnection();
         }
     }
-    
+
     private InputStream copyIn(InputStream in) throws Exception {
         try (CachedOutputStream bos = new CachedOutputStream()) {
             IOUtils.copyAndCloseInput(in, bos);

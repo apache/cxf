@@ -46,26 +46,26 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionStoreException;
 
 
 public class ApplicationContextTest extends Assert {
-    
-    private static final String S1 = 
+
+    private static final String S1 =
         ApplicationContextTest.class.getResource("/META-INF/cxf/cxf.xml").toString();
-    
+
     @Before
     public void setUp() {
         BusFactory.setDefaultBus(null);
     }
-    
+
     @After
     public void clearBus() {
         BusFactory.setDefaultBus(null);
     }
-    
- 
+
+
     @Test
     public void testInvalid() throws Exception {
         String s4 = getClass()
             .getResource("/org/apache/cxf/transport/http/netty/server/spring/invalid-beans.xml").toString();
-    
+
         try {
             new TestApplicationContext(new String[] {S1, s4}).close();
             fail("Expected XmlBeanDefinitionStoreException not thrown.");
@@ -73,26 +73,26 @@ public class ApplicationContextTest extends Assert {
             assertTrue(ex.getCause() instanceof SAXParseException);
         }
     }
-    
+
     @Test
     public void testContext() throws Exception {
         String s4 = getClass()
             .getResource("/org/apache/cxf/transport/http/netty/server/spring/beans.xml").toString();
-        
+
         TestApplicationContext ctx = new TestApplicationContext(
             new String[] {S1, s4});
-        
+
         //ctx.refresh();
         checkContext(ctx);
         ctx.close();
         ctx.destroy();
     }
-    
+
     @Test
     public void testContextWithProperties() throws Exception {
         String s4 = getClass()
             .getResource("/org/apache/cxf/transport/http/netty/server/spring/beans-props.xml").toString();
-        
+
         TestApplicationContext ctx = new TestApplicationContext(
             new String[] {S1, s4});
         checkContext(ctx);
@@ -101,78 +101,78 @@ public class ApplicationContextTest extends Assert {
     }
     private void checkContext(TestApplicationContext ctx) throws Exception {
         ConfigurerImpl cfg = new ConfigurerImpl(ctx);
-        
+
         EndpointInfo info = getEndpointInfo("bla", "Foo", "http://localhost:9000");
-        
+
         Bus bus = (Bus) ctx.getBean(Bus.DEFAULT_BUS_ID);
         bus.setExtension(cfg, Configurer.class);
-        
+
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         DestinationFactory factory = dfm.getDestinationFactory("http://cxf.apache.org/transports/http");
         Destination d = factory.getDestination(info, bus);
         assertTrue(d instanceof NettyHttpDestination);
-        NettyHttpDestination jd = (NettyHttpDestination) d;        
-        assertEquals("foobar", jd.getServer().getContentEncoding());   
-        
+        NettyHttpDestination jd = (NettyHttpDestination) d;
+        assertEquals("foobar", jd.getServer().getContentEncoding());
+
         NettyHttpServerEngine engine = (NettyHttpServerEngine)jd.getEngine();
         assertEquals(120, engine.getThreadingParameters().getThreadPoolSize());
-        
-       
+
+
         ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
         ConduitInitiator ci = cim.getConduitInitiator("http://cxf.apache.org/transports/http");
         HTTPConduit conduit = (HTTPConduit) ci.getConduit(info, bus);
         assertEquals(97, conduit.getClient().getConnectionTimeout());
-        
+
         info.setName(new QName("urn:test:ns", "Bar"));
         conduit = (HTTPConduit) ci.getConduit(info, bus);
         assertEquals(79, conduit.getClient().getConnectionTimeout());
 
-        NettyHttpDestination jd2 = 
+        NettyHttpDestination jd2 =
             (NettyHttpDestination)factory.getDestination(
                 getEndpointInfo("foo", "bar", "http://localhost:9001"), bus);
-        
+
         engine = (NettyHttpServerEngine)jd2.getEngine();
         assertEquals(40000, engine.getReadIdleTime());
         assertEquals(10000, engine.getMaxChunkContentSize());
         assertTrue("The engine should support session manager", engine.isSessionSupport());
-        
-        NettyHttpDestination jd3 = 
+
+        NettyHttpDestination jd3 =
             (NettyHttpDestination)factory.getDestination(
                 getEndpointInfo("sna", "foo", "https://localhost:9002"), bus);
-        
+
         engine = (NettyHttpServerEngine)jd3.getEngine();
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), true);
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), true);
-        
-        NettyHttpDestination jd4 = 
+
+        NettyHttpDestination jd4 =
             (NettyHttpDestination)factory.getDestination(
                 getEndpointInfo("sna", "foo2", "https://localhost:9003"), bus);
-        
+
         engine = (NettyHttpServerEngine)jd4.getEngine();
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isWant(), false);
         assertEquals(engine.getTlsServerParameters().getClientAuthentication().isRequired(), false);
 
-        /*NettyHttpDestination jd5 = 
+        /*NettyHttpDestination jd5 =
             (NettyHttpDestination)factory.getDestination(
                 getEndpointInfo("sna", "foo", "http://localhost:9100"));*/
-        
+
         /*engine = (NettyHttpServerEngine)jd5.getEngine();
         String r = "expected fallback thread parameters configured for port 0";
         assertNotNull(r, engine.getThreadingParameters());
         assertEquals(r, 21, engine.getThreadingParameters().getMinThreads());
         assertEquals(r, 389, engine.getThreadingParameters().getMaxThreads());*/
     }
-    
-    private EndpointInfo getEndpointInfo(String serviceNS, 
-                                         String endpointLocal, 
+
+    private EndpointInfo getEndpointInfo(String serviceNS,
+                                         String endpointLocal,
                                          String address) {
         ServiceInfo serviceInfo2 = new ServiceInfo();
-        serviceInfo2.setName(new QName(serviceNS, "Service"));        
+        serviceInfo2.setName(new QName(serviceNS, "Service"));
         EndpointInfo info2 = new EndpointInfo(serviceInfo2, "");
         info2.setName(new QName("urn:test:ns", endpointLocal));
         info2.setAddress(address);
         return info2;
     }
-    
+
 
 }

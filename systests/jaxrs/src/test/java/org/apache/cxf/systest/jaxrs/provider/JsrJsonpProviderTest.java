@@ -47,13 +47,13 @@ import static org.hamcrest.core.IsNull.nullValue;
 
 public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(JsrJsonpProviderTest.class);
-    
+
     @Ignore
-    public static class Server extends AbstractBusTestServerBase {        
+    public static class Server extends AbstractBusTestServerBase {
         protected void run() {
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookJsonStore.class);
-            sf.setResourceProvider(BookJsonStore.class, 
+            sf.setResourceProvider(BookJsonStore.class,
                 new SingletonResourceProvider(new BookJsonStore()));
             sf.setProvider(new JsrJsonpProvider());
             sf.setAddress("http://localhost:" + PORT + "/");
@@ -72,7 +72,7 @@ public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
             }
         }
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
@@ -86,13 +86,13 @@ public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
         final Response r = createWebClient("/bookstore/books").delete();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
     }
-       
+
     @Test
     public void testNoResultsAreReturned() throws Exception {
         final Response r = createWebClient("/bookstore/books/155").get();
         assertEquals(Status.NO_CONTENT.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testPostSimpleJsonObject() {
         final Response r = createWebClient("/bookstore/books")
@@ -104,9 +104,9 @@ public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
                     .add("name", "Book 1")
                     .build()
             );
-        assertEquals(Status.CREATED.getStatusCode(), r.getStatus());        
+        assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testPostComplexJsonObject() {
         final Response r = createWebClient("/bookstore/books")
@@ -131,16 +131,16 @@ public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
                     )
                     .build()
             );
-        assertEquals(Status.CREATED.getStatusCode(), r.getStatus());        
+        assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
     }
-    
+
     @Test
     public void testPostAndGetSimpleJsonObject() {
         testPostSimpleJsonObject();
-        
+
         final Response r = createWebClient("/bookstore/books/1").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        
+
         JsonObject obj = r.readEntity(JsonObject.class);
         assertThat(obj.getInt("id"), equalTo(1));
         assertThat(obj.getString("name"), equalTo("Book 1"));
@@ -150,15 +150,15 @@ public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostAndGetComplexJsonObject() {
         testPostComplexJsonObject();
-        
+
         final Response r = createWebClient("/bookstore/books/1").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        
+
         JsonObject obj = r.readEntity(JsonObject.class);
         assertThat(obj.getInt("id"), equalTo(1));
         assertThat(obj.getString("name"), equalTo("Book 1"));
         assertThat(obj.get("chapters"), instanceOf(JsonArray.class));
-        
+
         final JsonArray chapters = (JsonArray)obj.get("chapters");
         assertThat(chapters.size(), equalTo(2));
         assertThat(((JsonObject)chapters.get(0)).getInt("id"), equalTo(1));
@@ -170,29 +170,29 @@ public class JsrJsonpProviderTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostAndGetBooks() {
         testPostSimpleJsonObject();
-        
+
         final Response r = createWebClient("/bookstore/books").get();
         assertEquals(Status.OK.getStatusCode(), r.getStatus());
-        
+
         final JsonArray obj = r.readEntity(JsonArray.class);
         assertThat(obj.size(), equalTo(1));
         assertThat(obj.get(0), instanceOf(JsonObject.class));
-        
+
         assertThat(((JsonObject)obj.get(0)).getInt("id"), equalTo(1));
         assertThat(((JsonObject)obj.get(0)).getString("name"), equalTo("Book 1"));
     }
-    
+
     @Test
     public void testPostBadJsonObject() {
         final Response r = createWebClient("/bookstore/books")
             .header("Content-Type", MediaType.APPLICATION_JSON)
             .post("blabla");
-        assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());        
+        assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
 
     private static WebClient createWebClient(final String url) {
         return WebClient
-            .create("http://localhost:" + PORT + url, 
+            .create("http://localhost:" + PORT + url,
                 Arrays.< Object >asList(new JsrJsonpProvider()))
             .accept(MediaType.APPLICATION_JSON);
     }

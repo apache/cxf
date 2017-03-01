@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class SimpleBPNamespaceHandlerTest extends Assert {
     @Test
     public void testGetSchemaLocation() {
         SimpleBPNamespaceHandler handler = new SimpleBPNamespaceHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/blueprint/simple"));
     }
 

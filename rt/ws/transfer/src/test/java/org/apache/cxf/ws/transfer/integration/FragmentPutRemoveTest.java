@@ -35,7 +35,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class FragmentPutRemoveTest extends IntegrationBaseTest {
-    
+
     @Test
     public void removeAttrTest() throws XMLStreamException {
         String content = "<a foo=\"1\"/>";
@@ -43,7 +43,7 @@ public class FragmentPutRemoveTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -53,14 +53,14 @@ public class FragmentPutRemoveTest extends IntegrationBaseTest {
         expression.getContent().add("/a/@foo");
         fragment.setExpression(expression);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertNull(rootEl.getAttributeNode("foo"));
-        
+
         resource.destroy();
     }
-    
+
     @Test
     public void removeElementTest() throws XMLStreamException {
         String content = "<a><b/></a>";
@@ -68,7 +68,7 @@ public class FragmentPutRemoveTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -78,14 +78,14 @@ public class FragmentPutRemoveTest extends IntegrationBaseTest {
         expression.getContent().add("/a/b");
         fragment.setExpression(expression);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals(0, rootEl.getChildNodes().getLength());
-        
+
         resource.destroy();
     }
-    
+
     @Test
     public void removeElement2Test() throws XMLStreamException {
         String content = "<a><b/><b/></a>";
@@ -93,7 +93,7 @@ public class FragmentPutRemoveTest extends IntegrationBaseTest {
         ReferenceParametersType refParams = resourceManager.create(getRepresentation(content));
         Server resource = createLocalResource(resourceManager);
         Resource client = createClient(refParams);
-        
+
         Put request = new Put();
         request.setDialect(FragmentDialectConstants.FRAGMENT_2011_03_IRI);
         Fragment fragment = new Fragment();
@@ -103,11 +103,11 @@ public class FragmentPutRemoveTest extends IntegrationBaseTest {
         expression.getContent().add("/a/b[1]");
         fragment.setExpression(expression);
         request.getAny().add(fragment);
-        
+
         PutResponse response = client.put(request);
         Element rootEl = (Element) response.getRepresentation().getAny();
         Assert.assertEquals(1, rootEl.getChildNodes().getLength());
-        
+
         resource.destroy();
     }
 }

@@ -38,8 +38,8 @@ public class JarLoaderTest extends Assert {
     @Before
     public void setUp() throws Exception {
         exampleRarURL = getClass().getClassLoader().getResource("blackbox-notx.rar");
-    }    
-        
+    }
+
     @Test
     public void testGetBytesFromImputStream() throws Exception {
         byte[] bytes = JarLoader.getBytesFromInputStream(exampleRarURL
@@ -52,7 +52,7 @@ public class JarLoaderTest extends Assert {
     @Test
     public void testGetJarContents() throws Exception {
         String urlPath = exampleRarURL.toString();
-        
+
         LOG.info("URLPath: " + urlPath);
 
         Map<?, ?> map = JarLoader.getJarContents(urlPath + "!/blackbox-notx.jar!/");

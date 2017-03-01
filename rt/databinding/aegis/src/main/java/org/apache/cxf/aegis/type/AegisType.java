@@ -31,9 +31,9 @@ import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
 /**
- * Aegis abstraction for a object. Types are responsible for reading and writing the contents 
+ * Aegis abstraction for a object. Types are responsible for reading and writing the contents
  * of objects, but not, almost always, their own outermost XML element.
- * 
+ *
  */
 public abstract class AegisType {
 
@@ -50,7 +50,7 @@ public abstract class AegisType {
 
     /**
      * Read in the XML fragment and create an object.
-     * 
+     *
      * @param reader
      * @param context
      * @return
@@ -60,7 +60,7 @@ public abstract class AegisType {
 
     /**
      * Writes the object to the MessageWriter.
-     * 
+     *
      * @param object
      * @param writer
      * @param context
@@ -76,10 +76,10 @@ public abstract class AegisType {
      */
     public void writeSchema(XmlSchema root) {
     }
-    
+
     /**
-     * If the type object merely wants to contribute attributes to the 
-     * xsd:element element, it can implement this. 
+     * If the type object merely wants to contribute attributes to the
+     * xsd:element element, it can implement this.
      * @param schemaElement
      */
     public void addToSchemaElement(XmlSchemaElement schemaElement) {
@@ -100,14 +100,14 @@ public abstract class AegisType {
     }
 
     /**
-     * @return Returns the java type as a Class. 
+     * @return Returns the java type as a Class.
      * For a generic, return the raw type. For something
      * truly exotic, return null.
      */
     public Class<?> getTypeClass() {
         return TypeUtil.getTypeRelatedClass(typeClass);
     }
-    
+
     /**
      * @return Return the Java type.
      */
@@ -155,7 +155,7 @@ public abstract class AegisType {
     /**
      * Return a set of AegisType dependencies. Returns null if this type has no
      * dependencies.
-     * 
+     *
      * @return Set of <code>AegisType</code> dependencies
      */
     public Set<AegisType> getDependencies() {
@@ -223,11 +223,11 @@ public abstract class AegisType {
     public void setWriteOuter(boolean writeOuter) {
         this.writeOuter = writeOuter;
     }
-    
+
     public boolean usesXmime() {
         return false;
     }
-    
+
     /**
      * True if this type requires the import of the aegisTypes schema.
      * @return
@@ -235,19 +235,19 @@ public abstract class AegisType {
     public boolean usesUtilityTypes() {
         return false;
     }
-    
+
     public boolean hasMinOccurs() {
         return false;
     }
-    
+
     public boolean hasMaxOccurs() {
         return false;
     }
-    
+
     public long getMinOccurs() {
         return 0; // not valid in general
     }
-    
+
     public long getMaxOccurs() {
         return 0;
     }

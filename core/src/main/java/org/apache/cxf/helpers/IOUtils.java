@@ -43,7 +43,7 @@ public final class IOUtils {
     private IOUtils() {
 
     }
-    
+
     public static boolean isEmpty(InputStream is) throws IOException {
         if (is == null) {
             return true;
@@ -56,7 +56,7 @@ public final class IOUtils {
         } catch (IOException ex) {
             // ignore
         }
-        
+
         final byte[] bytes = new byte[1];
         try {
             if (is.markSupported()) {
@@ -85,7 +85,7 @@ public final class IOUtils {
         return result == -1;
     }
     /**
-     * Use this function instead of new String(byte[], String) to avoid surprises from 
+     * Use this function instead of new String(byte[], String) to avoid surprises from
      * non-standard default encodings.
      * @param bytes
      * @param charsetName
@@ -94,24 +94,24 @@ public final class IOUtils {
         try {
             return new String(bytes, charsetName);
         } catch (UnsupportedEncodingException e) {
-            throw 
+            throw
                 new RuntimeException("Impossible failure: Charset.forName(\""
                                      + charsetName + "\") returns invalid name.");
 
         }
     }
-    
-    
+
+
     /**
      * Use this function instead of new String(byte[]) to avoid surprises from non-standard default encodings.
      * @param bytes
      */
     public static String newStringFromBytes(byte[] bytes) {
-        return newStringFromBytes(bytes, UTF8_CHARSET.name());        
+        return newStringFromBytes(bytes, UTF8_CHARSET.name());
     }
-    
+
     /**
-     * Use this function instead of new String(byte[], int, int, String) 
+     * Use this function instead of new String(byte[], int, int, String)
      * to avoid surprises from non-standard default encodings.
      * @param bytes
      * @param charsetName
@@ -122,7 +122,7 @@ public final class IOUtils {
         try {
             return new String(bytes, start, length, charsetName);
         } catch (UnsupportedEncodingException e) {
-            throw 
+            throw
                 new RuntimeException("Impossible failure: Charset.forName(\""
                                      + charsetName + "\") returns invalid name.");
 
@@ -130,7 +130,7 @@ public final class IOUtils {
     }
 
     /**
-     * Use this function instead of new String(byte[], int, int) 
+     * Use this function instead of new String(byte[], int, int)
      * to avoid surprises from non-standard default encodings.
      * @param bytes
      * @param start
@@ -168,7 +168,7 @@ public final class IOUtils {
             input.close();
         }
     }
-    
+
     public static void copyAndCloseInput(final Reader input,
                                         final Writer output) throws IOException {
         try {
@@ -185,7 +185,7 @@ public final class IOUtils {
         } finally {
             input.close();
         }
-    }    
+    }
 
     public static int copy(final InputStream input, final OutputStream output,
             int bufferSize) throws IOException {
@@ -210,16 +210,16 @@ public final class IOUtils {
         }
         return total;
     }
-    
+
     /**
      * Copy at least the specified number of bytes from the input to the output
-     * or until the inputstream is finished.   
+     * or until the inputstream is finished.
      * @param input
      * @param output
      * @param atLeast
      * @throws IOException
      */
-    public static void copyAtLeast(final InputStream input, 
+    public static void copyAtLeast(final InputStream input,
                                final OutputStream output,
                                int atLeast) throws IOException {
         final byte[] buffer = new byte[4096];
@@ -238,8 +238,8 @@ public final class IOUtils {
             n = input.read(buffer, 0, n);
         }
     }
-    
-    public static void copyAtLeast(final Reader input, 
+
+    public static void copyAtLeast(final Reader input,
                                    final Writer output,
                                    int atLeast) throws IOException {
         final char[] buffer = new char[4096];
@@ -269,7 +269,7 @@ public final class IOUtils {
             n = input.read(buffer);
         }
     }
-    
+
     public static void transferTo(InputStream inputStream, File destinationFile) throws IOException {
         if (Transferable.class.isAssignableFrom(inputStream.getClass())) {
             ((Transferable)inputStream).transferTo(destinationFile);
@@ -294,12 +294,12 @@ public final class IOUtils {
     public static String toString(final InputStream input, int bufferSize, String charset)
         throws IOException {
 
-        
+
         int avail = input.available();
         if (avail > bufferSize) {
             bufferSize = avail;
         }
-        Reader reader = charset == null ? new InputStreamReader(input, UTF8_CHARSET) 
+        Reader reader = charset == null ? new InputStreamReader(input, UTF8_CHARSET)
             : new InputStreamReader(input, charset);
         return toString(reader, bufferSize);
     }
@@ -335,7 +335,7 @@ public final class IOUtils {
     /**
      * Load the InputStream into memory and return a ByteArrayInputStream that
      * represents it. Closes the in stream.
-     * 
+     *
      * @param in
      * @throws IOException
      */
@@ -350,12 +350,12 @@ public final class IOUtils {
         in.close();
         return bout.createInputStream();
     }
-    
+
     public static void consume(InputStream in) throws IOException {
         int i = in.available();
         if (i == 0) {
             //if i is 0, then we MAY have already hit the end of the stream
-            //so try a read and return rather than allocate a buffer and such 
+            //so try a read and return rather than allocate a buffer and such
             int i2 = in.read();
             if (i2 == -1) {
                 return;
@@ -374,14 +374,14 @@ public final class IOUtils {
             //nothing - just discarding
         }
     }
-    
+
     /**
      * Consumes at least the given number of bytes from the input stream
      * @param input
      * @param atLeast
      * @throws IOException
      */
-    public static void consume(final InputStream input, 
+    public static void consume(final InputStream input,
                                int atLeast) throws IOException {
         final byte[] buffer = new byte[4096];
         int n = atLeast > buffer.length ? buffer.length : atLeast;
@@ -397,7 +397,7 @@ public final class IOUtils {
             n = atLeast > buffer.length ? buffer.length : atLeast;
             n = input.read(buffer, 0, n);
         }
-    }    
+    }
 
     public static byte[] readBytesFromStream(InputStream in) throws IOException {
         int i = in.available();

@@ -37,7 +37,7 @@ public class Book {
     private Library library;
     private List<BookReview> reviews = new LinkedList<BookReview>();
     private List<String> authors = new LinkedList<String>();
-    
+
     @Id
     public int getId() {
         return id;

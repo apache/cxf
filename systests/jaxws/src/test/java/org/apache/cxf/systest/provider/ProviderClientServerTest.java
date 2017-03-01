@@ -28,8 +28,8 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPFaultException;
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -41,10 +41,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
-    public static final String ADDRESS 
+    public static final String ADDRESS
         = "http://localhost:" + TestUtil.getPortNumber(Server.class)
             + "/SoapContext/SoapProviderPort";
-    
+
     public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
@@ -56,7 +56,7 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
             ((EndpointImpl)ep).getInInterceptors().add(new LoggingInInterceptor());
             ((EndpointImpl)ep).getOutInterceptors().add(new LoggingOutInterceptor());
             ep.publish(ADDRESS);
-            
+
         }
 
         public static void main(String[] args) {
@@ -76,13 +76,13 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testSOAPMessageModeDocLit() throws Exception {
-        
-        QName serviceName = 
+
+        QName serviceName =
             new QName("http://apache.org/hello_world_soap_http", "SOAPProviderService");
-        QName portName = 
+        QName portName =
             new QName("http://apache.org/hello_world_soap_http", "SoapProviderPort");
 
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
@@ -100,7 +100,7 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
                 greeter.greetMe("Return sayHi");
                 fail("Should have thrown an exception");
             } catch (Exception ex) {
-                //expected 
+                //expected
                 assertTrue(ex.getMessage().contains("sayHiResponse"));
             }
             for (int idx = 0; idx < 2; idx++) {
@@ -122,16 +122,16 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
-        
+
     }
 
-    
+
     @Test
     public void testSOAPMessageModeDocLitWithSchemaValidation() throws Exception {
-        
-        QName serviceName = 
+
+        QName serviceName =
             new QName("http://apache.org/hello_world_soap_http", "SOAPProviderService");
-        QName portName = 
+        QName portName =
             new QName("http://apache.org/hello_world_soap_http", "SoapProviderPort");
 
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
@@ -140,31 +140,31 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
         SOAPService service = new SOAPService(wsdl, serviceName);
         assertNotNull(service);
 
-        
+
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
             setAddress(greeter, ADDRESS);
             try {
-                greeter.greetMe("this is a greetMe message which length is more " 
+                greeter.greetMe("this is a greetMe message which length is more "
                     + "than 30 so that I wanna a schema validation error");
                 fail("Should have thrown an exception");
             } catch (Exception ex) {
-                //expected 
+                //expected
                 assertTrue(ex.getMessage().contains("the length of the value is 96, but the required maximum is 30"));
             }
-            
+
             try {
                 greeter.greetMe("exceed maxLength");
                 fail("Should have thrown an exception");
             } catch (Exception ex) {
-                //expected 
+                //expected
                 assertTrue(ex.getMessage().contains("cvc-maxLength-valid"));
             }
-            
+
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
-        
+
     }
 
 }

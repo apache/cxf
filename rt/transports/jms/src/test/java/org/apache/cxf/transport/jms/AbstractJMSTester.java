@@ -61,7 +61,7 @@ public abstract class AbstractJMSTester extends Assert {
     protected static BrokerService broker;
 
     protected enum ExchangePattern { oneway, requestReply };
-    
+
     protected EndpointReferenceType target;
     protected Message inMessage;
     protected Message destMessage;
@@ -87,7 +87,7 @@ public abstract class AbstractJMSTester extends Assert {
         bus.shutdown(false);
         broker.stop();
     }
-    
+
     protected EndpointInfo setupServiceInfo(String serviceName, String portName) {
         return setupServiceInfo(SERVICE_NS, WSDL, serviceName, portName);
     }
@@ -97,14 +97,14 @@ public abstract class AbstractJMSTester extends Assert {
         if (wsdlUrl == null) {
             throw new IllegalArgumentException("Wsdl file not found on class path " + wsdl);
         }
-        WSDLServiceFactory factory = new WSDLServiceFactory(bus, wsdlUrl.toExternalForm(), 
+        WSDLServiceFactory factory = new WSDLServiceFactory(bus, wsdlUrl.toExternalForm(),
                                                             new QName(ns, serviceName));
 
         Service service = factory.create();
         return service.getEndpointInfo(new QName(ns, portName));
 
     }
-    
+
 
     protected MessageObserver createMessageObserver() {
         return new MessageObserver() {
@@ -116,26 +116,26 @@ public abstract class AbstractJMSTester extends Assert {
             }
         };
     }
-    
+
     protected void sendMessageAsync(Conduit conduit, Message message) throws IOException {
         sendoutMessage(conduit, message, false, false);
     }
-    
+
     protected void sendMessageSync(Conduit conduit, Message message) throws IOException {
         sendoutMessage(conduit, message, false, true);
     }
-    
+
     protected void sendMessage(Conduit conduit, Message message, boolean synchronous) throws IOException {
         sendoutMessage(conduit, message, false, synchronous);
     }
-    
+
     protected void sendOneWayMessage(Conduit conduit, Message message) throws IOException {
         sendoutMessage(conduit, message, true, true);
     }
-    
-    private void sendoutMessage(Conduit conduit, 
-                                  Message message, 
-                                  boolean isOneWay, 
+
+    private void sendoutMessage(Conduit conduit,
+                                  Message message,
+                                  boolean isOneWay,
                                   boolean synchronous) throws IOException {
 
         Exchange exchange = new ExchangeImpl();
@@ -161,7 +161,7 @@ public abstract class AbstractJMSTester extends Assert {
         jmsConfig.setConnectionFactory(cf);
         return new JMSConduit(target, jmsConfig, bus);
     }
-    
+
     protected JMSConduit setupJMSConduitWithObserver(EndpointInfo ei) throws IOException {
         JMSConduit jmsConduit = setupJMSConduit(ei);
         MessageObserver observer = new MessageObserver() {
@@ -172,7 +172,7 @@ public abstract class AbstractJMSTester extends Assert {
         jmsConduit.setMessageObserver(observer);
         return jmsConduit;
     }
-    
+
     protected JMSDestination setupJMSDestination(EndpointInfo ei) throws IOException {
         JMSConfiguration jmsConfig = JMSConfigFactory.createFromEndpointInfo(bus, ei, null);
         jmsConfig.setConnectionFactory(cf);
@@ -207,7 +207,7 @@ public abstract class AbstractJMSTester extends Assert {
 
     protected void waitForReceiveInMessage() {
         int waitTime = 0;
-        while (inMessage == null && waitTime < MAX_RECEIVE_TIME) {
+        while (inMessage == null && waitTime < MAX_RECEIVE_TIME * 10) {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
@@ -229,7 +229,7 @@ public abstract class AbstractJMSTester extends Assert {
             }
             waitTime++;
         }
-        assertNotNull("Can't receive the Destination message in " + MAX_RECEIVE_TIME 
+        assertNotNull("Can't receive the Destination message in " + MAX_RECEIVE_TIME
                    + " seconds", destMessage);
     }
 

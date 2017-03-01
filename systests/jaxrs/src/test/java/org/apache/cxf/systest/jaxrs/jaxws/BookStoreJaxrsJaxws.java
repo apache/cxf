@@ -39,7 +39,7 @@ import org.apache.cxf.systest.jaxrs.BookSubresource;
 @Consumes("application/xml")
 @Produces("application/xml")
 public interface BookStoreJaxrsJaxws {
-    
+
     @WebMethod
     @GET
     @Path("/{id}")
@@ -50,19 +50,19 @@ public interface BookStoreJaxrsJaxws {
     @POST
     @Path("/books")
     Book addBook(@WebParam(name = "book") Book book);
-    
+
     @Path("/books/{id}")
     BookSubresource getBookSubresource(@PathParam("id") String id);
-    
+
     @Path("/thestore/{id}")
     BookStoreJaxrsJaxws getBookStore(@PathParam("id") String id);
-    
+
     @POST
     @Path("/fastinfoset")
     @Consumes({"application/fastinfoset", "text/xml" })
     @Produces({"application/fastinfoset", "text/xml", "application/xml" })
     Book addFastinfoBook(Book book);
-    
+
     @GET
     @Path("/fastinfoset2")
     @Produces({"application/fastinfoset", "text/xml", "application/xml" })

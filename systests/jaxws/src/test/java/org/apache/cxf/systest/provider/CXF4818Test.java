@@ -51,15 +51,15 @@ import org.junit.Test;
 
 public class CXF4818Test extends AbstractBusClientServerTestBase {
 
-    public static final String ADDRESS 
+    public static final String ADDRESS
         = "http://localhost:" + TestUtil.getPortNumber(Server.class)
             + "/AddressProvider/AddressProvider";
-    
+
     public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
             Object implementor = new CXF4818Provider();
-            Endpoint.publish(ADDRESS, implementor);                                 
+            Endpoint.publish(ADDRESS, implementor);
         }
 
         public static void main(String[] args) {
@@ -79,20 +79,20 @@ public class CXF4818Test extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
-    
+
     @Test
     public void testCXF4818() throws Exception {
         InputStream body = getClass().getResourceAsStream("cxf4818data.txt");
         HttpClient client = new HttpClient();
         PostMethod post = new PostMethod(ADDRESS);
         post.setRequestEntity(new InputStreamRequestEntity(body, "text/xml"));
-        client.executeMethod(post); 
+        client.executeMethod(post);
 
         Document doc = StaxUtils.read(post.getResponseBodyAsStream());
         //System.out.println(StaxUtils.toString(doc));
         Element root = doc.getDocumentElement();
         Node child = root.getFirstChild();
-        
+
         boolean foundBody = false;
         boolean foundHeader = false;
         while (child != null) {
@@ -109,10 +109,10 @@ public class CXF4818Test extends AbstractBusClientServerTestBase {
         assertTrue("Did not find the soap:Header element", foundHeader);
     }
 
-    
-    
+
+
     @WebServiceProvider(serviceName = "GenericService",
-        targetNamespace = "http://cxf.apache.org/basictest", 
+        targetNamespace = "http://cxf.apache.org/basictest",
         portName = "GenericServicePosrt")
     @ServiceMode(value = javax.xml.ws.Service.Mode.MESSAGE)
     @Addressing
@@ -129,7 +129,7 @@ public class CXF4818Test extends AbstractBusClientServerTestBase {
                     + "<ns2:FooResponse xmlns:ns2=\"http://cxf.apache.org/soapheader/inband\">"
                     + "<ns2:Return>Foo Response Body</ns2:Return>"
                     + "</ns2:FooResponse>"
-                    + "</SOAP-ENV:Body>" 
+                    + "</SOAP-ENV:Body>"
                     + "</SOAP-ENV:Envelope>\n";
 
 
@@ -150,5 +150,5 @@ public class CXF4818Test extends AbstractBusClientServerTestBase {
 
         }
 
-    }    
+    }
 }

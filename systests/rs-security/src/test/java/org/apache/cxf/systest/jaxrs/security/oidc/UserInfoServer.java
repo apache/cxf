@@ -26,23 +26,23 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
-    
+
 public class UserInfoServer extends AbstractBusTestServerBase {
     public static final String PORT = TestUtil.getPortNumber("jaxrs-userinfo");
     private static final URL SERVER_CONFIG_FILE =
         UserInfoServer.class.getResource("userinfo-server.xml");
-    
+
     protected void run() {
         SpringBusFactory bf = new SpringBusFactory();
         Bus springBus = bf.createBus(SERVER_CONFIG_FILE);
         BusFactory.setDefaultBus(springBus);
         setBus(springBus);
-        
+
         try {
             new UserInfoServer();
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }        
+        }
     }
 
 }

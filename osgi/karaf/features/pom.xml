@@ -46,6 +46,52 @@
             <type>xml</type>
             <scope>provided</scope>
         </dependency>
+		
+		<dependency>
+	        <groupId>org.apache.cxf.karaf</groupId>
+		    <artifactId>cxf-karaf-commands</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.cxf.services.wsn</groupId>
+		    <artifactId>cxf-services-wsn-osgi</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.cxf.services.sts</groupId>
+		    <artifactId>cxf-services-sts-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.cxf.services.ws-discovery</groupId>
+		    <artifactId>cxf-services-ws-discovery-service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-addr</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-rm</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-policy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-mex</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-ws-security</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <resources>
@@ -106,6 +152,7 @@
                                 <descriptor>mvn:org.apache.karaf.features/framework/${cxf.karaf.version}/xml/features</descriptor>
                                 <descriptor>mvn:org.apache.karaf.features/standard/${cxf.karaf.version}/xml/features</descriptor>
                                 <descriptor>mvn:org.apache.karaf.features/spring/${cxf.karaf.version}/xml/features</descriptor>
+								<descriptor>mvn:org.ops4j.pax.web/pax-web-features/6.0.2/xml/features</descriptor>
                                 <descriptor>file:${project.build.directory}/classes/features.xml</descriptor>
                             </descriptors>
                             <distribution>org.apache.karaf.features:framework</distribution>
@@ -114,9 +161,9 @@
                                 <feature>framework</feature>
                             </framework>
                             <features>
-                                <!--<feature>cxf-*</feature>-->
-                                <feature>cxf-management-web</feature>
-                                <feature>cxf-wsn</feature>
+                                <feature>cxf-*</feature>
+                                <!-- <feature>cxf-management-web</feature> -->
+                                <!-- <feature>cxf-wsn</feature> -->
                             </features>
                         </configuration>
                     </execution>

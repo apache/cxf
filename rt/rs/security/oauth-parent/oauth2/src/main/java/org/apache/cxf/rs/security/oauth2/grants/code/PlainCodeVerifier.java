@@ -29,6 +29,6 @@ public class PlainCodeVerifier implements CodeVerifierTransformer {
         return "plain";
     }
 
-    
+
 
 }

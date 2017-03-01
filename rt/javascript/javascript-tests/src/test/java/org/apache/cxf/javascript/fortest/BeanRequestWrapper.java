@@ -27,12 +27,12 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlRootElement(namespace = "uri:org.apache.cxf.javascript.testns")
 // specify alphabetical order explicitly to remind us that there is JavaScript code that knows this order!
-@XmlType(namespace = "uri:org.apache.cxf.javascript.testns", 
+@XmlType(namespace = "uri:org.apache.cxf.javascript.testns",
          propOrder = {"bean1", "beanArray" })
 public class BeanRequestWrapper {
     private TestBean1 bean1;
     private TestBean1[] beanArray;
-    
+
     public TestBean1 getBean1() {
         return bean1;
     }

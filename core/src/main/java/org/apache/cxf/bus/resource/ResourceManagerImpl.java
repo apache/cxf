@@ -43,7 +43,7 @@ public class ResourceManagerImpl extends DefaultResourceManager implements BusEx
     public ResourceManagerImpl(Bus b) {
         super();
         setBus(b);
-    } 
+    }
     protected void onFirstResolve() {
         super.onFirstResolve();
         if (bus != null) {
@@ -62,7 +62,7 @@ public class ResourceManagerImpl extends DefaultResourceManager implements BusEx
         registeredResolvers.clear();
         registeredResolvers.addAll(resolvers);
     }
-    
+
     @Resource
     public final void setBus(Bus b) {
         if (bus != b) {

@@ -36,8 +36,8 @@ import org.apache.cxf.binding.soap.saaj.SAAJUtils;
 import org.apache.cxf.helpers.DOMUtils;
 
 @WebServiceProvider(serviceName = "InBandSoapHeaderService",
-    targetNamespace = "http://cxf.apache.org/soapheader/inband", 
-    portName = "InBandSoapHeaderSoapHttpPort", 
+    targetNamespace = "http://cxf.apache.org/soapheader/inband",
+    portName = "InBandSoapHeaderSoapHttpPort",
     wsdlLocation = "/wsdl_systest_jaxws/cxf4130.wsdl")
 @ServiceMode(value = javax.xml.ws.Service.Mode.MESSAGE)
 public class CXF4130Provider implements Provider<SOAPMessage> {
@@ -62,7 +62,7 @@ public class CXF4130Provider implements Provider<SOAPMessage> {
                                + "<ns2:FooResponse xmlns:ns2=\"http://cxf.apache.org/soapheader/inband\">"
                                + "<ns2:Return>Foo Response Body</ns2:Return>"
                                + "</ns2:FooResponse>"
-                               + "</SOAP-ENV:Body>" 
+                               + "</SOAP-ENV:Body>"
                                + "</SOAP-ENV:Envelope>\n";
 
             } else {

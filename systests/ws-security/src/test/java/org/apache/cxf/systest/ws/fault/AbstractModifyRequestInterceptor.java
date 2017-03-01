@@ -42,39 +42,39 @@ import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.wss4j.dom.WSConstants;
 
 public abstract class AbstractModifyRequestInterceptor implements PhaseInterceptor<SoapMessage> {
-    
-    private static final QName SEC_HEADER = 
+
+    private static final QName SEC_HEADER =
         new QName(WSConstants.WSSE_NS, WSConstants.WSSE_LN, WSConstants.WSSE_PREFIX);
-    private Set<String> afterInterceptors = new HashSet<String>();
-    
+    private Set<String> afterInterceptors = new HashSet<>();
+
     public AbstractModifyRequestInterceptor() {
         getAfter().add(PolicyBasedWSS4JOutInterceptor.class.getName());
     }
-    
+
     public void handleMessage(SoapMessage mc) throws Fault {
         SOAPMessage saaj = mc.getContent(SOAPMessage.class);
         try {
-            Iterator<?> secHeadersIterator = 
+            Iterator<?> secHeadersIterator =
                 SAAJUtils.getHeader(saaj).getChildElements(SEC_HEADER);
             if (secHeadersIterator.hasNext()) {
-                SOAPHeaderElement securityHeader = 
+                SOAPHeaderElement securityHeader =
                     (SOAPHeaderElement)secHeadersIterator.next();
                 modifySecurityHeader(securityHeader);
             }
-            
+
             modifySOAPBody(SAAJUtils.getBody(saaj));
         } catch (SOAPException ex) {
             throw new Fault(ex);
         }
     }
-    
+
     public abstract void modifySecurityHeader(Element securityHeader);
-    
+
     public abstract void modifySOAPBody(Element soapBody);
 
     public void clear() {
     }
-    
+
     public void handleFault(SoapMessage arg0) {
         // Complete
     }
@@ -98,5 +98,5 @@ public abstract class AbstractModifyRequestInterceptor implements PhaseIntercept
     public String getPhase() {
         return Phase.PRE_PROTOCOL_ENDING;
     }
-    
+
 }

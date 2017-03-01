@@ -42,14 +42,14 @@ import org.apache.log4j.spi.LoggingEvent;
  *   setUseParentHandlers / getUseParentHandlers
  */
 public class Log4jLogger extends AbstractDelegatingLogger {
-    private static final Map<Level, org.apache.log4j.Level> TO_LOG4J = 
+    private static final Map<Level, org.apache.log4j.Level> TO_LOG4J =
                                                 new HashMap<Level, org.apache.log4j.Level>();
     private static final org.apache.log4j.Level TRACE;
 
 
     private final org.apache.log4j.Logger log;
 
-    static {        
+    static {
         //older versions of log4j don't have TRACE, use debug
         org.apache.log4j.Level t = org.apache.log4j.Level.DEBUG;
         try {
@@ -59,7 +59,7 @@ public class Log4jLogger extends AbstractDelegatingLogger {
             //ignore, assume old version of log4j
         }
         TRACE = t;
-        
+
         TO_LOG4J.put(Level.ALL,     org.apache.log4j.Level.ALL);
         TO_LOG4J.put(Level.SEVERE,  org.apache.log4j.Level.ERROR);
         TO_LOG4J.put(Level.WARNING, org.apache.log4j.Level.WARN);
@@ -83,11 +83,11 @@ public class Log4jLogger extends AbstractDelegatingLogger {
         }
         return null;
     }
-    
+
     public void setLevel(Level newLevel) throws SecurityException {
         log.setLevel(TO_LOG4J.get(newLevel));
     }
-    
+
     public synchronized void addHandler(Handler handler) throws SecurityException {
         log.addAppender(new HandlerWrapper(handler));
     }
@@ -95,7 +95,7 @@ public class Log4jLogger extends AbstractDelegatingLogger {
         log.removeAppender("HandlerWrapper-" + handler.hashCode());
     }
     public synchronized Handler[] getHandlers() {
-        List<Handler> ret = new ArrayList<Handler>();
+        List<Handler> ret = new ArrayList<>();
         Enumeration<?> en = log.getAllAppenders();
         while (en.hasMoreElements()) {
             Appender ap = (Appender)en.nextElement();
@@ -105,7 +105,7 @@ public class Log4jLogger extends AbstractDelegatingLogger {
         }
         return ret.toArray(new Handler[ret.size()]);
     }
-    
+
     protected void internalLogFormatted(String msg, LogRecord record) {
         log.log(AbstractDelegatingLogger.class.getName(),
                 TO_LOG4J.get(record.getLevel()),
@@ -142,19 +142,19 @@ public class Log4jLogger extends AbstractDelegatingLogger {
             if (l.toInt() == TRACE.toInt()) {
                 l2 = Level.FINEST;
             }
-        } 
+        }
         return l2;
-    } 
-    
-    
+    }
+
+
     private class HandlerWrapper extends AppenderSkeleton {
         Handler handler;
-        
+
         HandlerWrapper(Handler h) {
             handler = h;
-            name = "HandlerWrapper-" + h.hashCode(); 
+            name = "HandlerWrapper-" + h.hashCode();
         }
-        
+
         public Handler getHandler() {
             return handler;
         }
@@ -183,8 +183,8 @@ public class Log4jLogger extends AbstractDelegatingLogger {
 
         public boolean requiresLayout() {
             return false;
-        }    
-        
+        }
+
         @Override
         public Priority getThreshold() {
             return TO_LOG4J.get(handler.getLevel());
@@ -193,7 +193,7 @@ public class Log4jLogger extends AbstractDelegatingLogger {
         public boolean isAsSevereAsThreshold(Priority priority) {
             Priority p = getThreshold();
             return (p == null) || priority.isGreaterOrEqual(p);
-        }        
+        }
     }
     private static void getFullInfoForLogUtils(LogRecord lr, String cname) {
         StackTraceElement el[] = Thread.currentThread().getStackTrace();

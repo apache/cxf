@@ -36,7 +36,7 @@ public class TokenRenewerResponse {
     private Date created;
     private Date expires;
     private long lifetime;
-    
+
     /**
      * Set the token
      * @param token the token to set
@@ -44,7 +44,7 @@ public class TokenRenewerResponse {
     public void setToken(Element token) {
         this.token = token;
     }
-    
+
     /**
      * Get the token
      * @return the token to set
@@ -60,7 +60,7 @@ public class TokenRenewerResponse {
     public void setTokenId(String tokenId) {
         this.tokenId = tokenId;
     }
-    
+
     /**
      * Get the token Id
      * @return the token Id
@@ -68,7 +68,7 @@ public class TokenRenewerResponse {
     public String getTokenId() {
         return tokenId;
     }
-    
+
     /**
      * Set the attached TokenReference
      * @param attachtedReference the attached TokenReference
@@ -76,7 +76,7 @@ public class TokenRenewerResponse {
     public void setAttachedReference(TokenReference attachedReference) {
         this.attachedReference = attachedReference;
     }
-    
+
     /**
      * Get the attached TokenReference
      * @return the attached TokenReference
@@ -84,7 +84,7 @@ public class TokenRenewerResponse {
     public TokenReference getAttachedReference() {
         return attachedReference;
     }
-    
+
     /**
      * Set the unattached TokenReference
      * @param unAttachedReference  Set the unattached TokenReference
@@ -92,7 +92,7 @@ public class TokenRenewerResponse {
     public void setUnattachedReference(TokenReference unattachedReference) {
         this.unAttachedReference = unattachedReference;
     }
-    
+
     /**
      * Get the unattached TokenReference
      * @return the unattached TokenReference
@@ -102,15 +102,15 @@ public class TokenRenewerResponse {
     }
 
     /**
-     * Get the Date that this Token was Created 
-     * @return the Date that this Token was Created 
+     * Get the Date that this Token was Created
+     * @return the Date that this Token was Created
      */
     public Date getCreated() {
         return created;
     }
 
     /**
-     * Set the Date that this Token was Created 
+     * Set the Date that this Token was Created
      * @param created the Date that this Token was Created
      */
     public void setCreated(Date created) {
@@ -132,7 +132,7 @@ public class TokenRenewerResponse {
     public void setExpires(Date expires) {
         this.expires = expires;
     }
-    
+
     /**
      * Set the lifetime of the Token to be returned in seconds.
      * @deprecated use setCreated/setExpires instead
@@ -150,5 +150,5 @@ public class TokenRenewerResponse {
     public long getLifetime() {
         return lifetime;
     }
-    
+
 }

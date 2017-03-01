@@ -38,6 +38,7 @@
     </cxf.osgi.import>
     <hibernate.em.version>4.1.0.Final</hibernate.em.version>
     <hsqldb.version>2.3.4</hsqldb.version>
+    <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
   </properties>
   <dependencies>
     <dependency>
@@ -191,7 +192,7 @@
       <plugin>
         <groupId>org.bsc.maven</groupId>
         <artifactId>maven-processor-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
         <executions>
           <execution>
             <id>process</id>
@@ -200,7 +201,7 @@
             </goals>
             <phase>generate-sources</phase>
             <configuration>
-              <compilerArguments>-Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
+              <compilerArguments>${compilerArguments}</compilerArguments>
               <processors>
                 <processor>org.apache.openjpa.persistence.meta.AnnotationProcessor6</processor>
               </processors>
@@ -219,7 +220,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>1.10</version>
         <executions>
           <execution>
             <id>add-source</id>
@@ -235,27 +235,13 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>3.0.1</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <!-- this configures the surefire plugin to run your tests with the javaagent enabled -->
       <!-- (openJPA loadtime weaving) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <argLine>-javaagent:${project.basedir}/target/openjpa-${cxf.openjpa.version}.jar</argLine>
+          <argLine>-javaagent:${project.basedir}/target/openjpa-${cxf.openjpa.version}.jar ${cxf.surefire.fork.vmargs}</argLine>
           <workingDirectory>${project.basedir}/target</workingDirectory>
         </configuration>
       </plugin>
@@ -286,5 +272,74 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+        <profile>
+            <id>java9</id>
+            <properties>
+                <compilerArguments>--patch-module java.annotations.common=${project.basedir}/target/java9/javax.annotation-api-1.2.jar --add-modules java.se.ee,java.activation,java.xml.ws,java.xml.bind -Aopenjpa.source=7 -Aopenjpa.metamodel=true</compilerArguments>
+            </properties>
+            <activation>
+                <jdk>9</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>2.10</version>
+                        <executions>
+                            <execution>
+                                <id>copy</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>javax.annotation</groupId>
+                                            <artifactId>javax.annotation-api</artifactId>
+                                            <type>jar</type>
+                                            <version>${cxf.javax.annotation-api.version}</version>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>org.apache.openjpa</groupId>
+                                            <artifactId>openjpa</artifactId>
+                                            <version>${cxf.openjpa.version}</version>
+                                            <outputDirectory>${project.build.directory}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.apache.geronimo.specs</groupId>
+                                            <artifactId>geronimo-jta_1.1_spec</artifactId>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${project.basedir}/target/java9</outputDirectory>
+                                            <excludes>**/xa/*.class</excludes>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <overWriteReleases>false</overWriteReleases>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+      </profiles>
 </project>
 

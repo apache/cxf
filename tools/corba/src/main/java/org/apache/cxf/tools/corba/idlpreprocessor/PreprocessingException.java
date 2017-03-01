@@ -34,7 +34,7 @@ public final class PreprocessingException extends RuntimeException {
         this.url = link;
         this.line = lineNo;
     }
-    
+
     public PreprocessingException(String message, URL link, int lineNo) {
         this(message, link, lineNo, null);
     }

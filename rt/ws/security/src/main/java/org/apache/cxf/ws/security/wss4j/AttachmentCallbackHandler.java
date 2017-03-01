@@ -34,6 +34,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.cxf.attachment.AttachmentDataSource;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Attachment;
+import org.apache.wss4j.common.ext.AttachmentRemovalCallback;
 import org.apache.wss4j.common.ext.AttachmentRequestCallback;
 import org.apache.wss4j.common.ext.AttachmentResultCallback;
 
@@ -41,9 +42,9 @@ import org.apache.wss4j.common.ext.AttachmentResultCallback;
  * A CallbackHandler to be used to sign/encrypt SOAP Attachments.
  */
 public class AttachmentCallbackHandler implements CallbackHandler {
-    
+
     private final SoapMessage soapMessage;
-    
+
     public AttachmentCallbackHandler(SoapMessage soapMessage) {
         this.soapMessage = soapMessage;
     }
@@ -56,16 +57,16 @@ public class AttachmentCallbackHandler implements CallbackHandler {
 
                 List<org.apache.wss4j.common.ext.Attachment> attachmentList = new ArrayList<>();
                 attachmentRequestCallback.setAttachments(attachmentList);
-                
+
                 String attachmentId = attachmentRequestCallback.getAttachmentId();
                 if ("Attachments".equals(attachmentId)) {
                     // Load all attachments
                     attachmentId = null;
                 }
-                loadAttachments(attachmentList, attachmentId);
+                loadAttachments(attachmentList, attachmentId, attachmentRequestCallback.isRemoveAttachments());
             } else if (callback instanceof AttachmentResultCallback) {
                 AttachmentResultCallback attachmentResultCallback = (AttachmentResultCallback) callback;
-                
+
                 if (soapMessage.getAttachments() == null) {
                     soapMessage.setAttachments(new ArrayList<Attachment>());
                 }
@@ -81,13 +82,31 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                                 attachmentResultCallback.getAttachment().getSourceStream())
                         )
                     );
-                
+
                 Map<String, String> headers = attachmentResultCallback.getAttachment().getHeaders();
                 for (Map.Entry<String, String> entry : headers.entrySet()) {
                     securedAttachment.setHeader(entry.getKey(), entry.getValue());
                 }
                 attachments.add(securedAttachment);
 
+            } else if (callback instanceof AttachmentRemovalCallback) {
+                AttachmentRemovalCallback attachmentRemovalCallback = (AttachmentRemovalCallback) callback;
+                String attachmentId = attachmentRemovalCallback.getAttachmentId();
+                if (attachmentId != null) {
+                    final Collection<org.apache.cxf.message.Attachment> attachments = soapMessage.getAttachments();
+                    // Calling LazyAttachmentCollection.size() here to force it to load the attachments
+                    if (attachments != null && attachments.size() > 0) {
+                        for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator(); 
+                            iterator.hasNext();) {
+                            org.apache.cxf.message.Attachment attachment = iterator.next();
+
+                            if (attachmentId.equals(attachment.getId())) {
+                                iterator.remove();
+                                break;
+                            }
+                        }
+                    }
+                }
             } else {
                 throw new UnsupportedCallbackException(callback, "Unsupported callback");
             }
@@ -96,12 +115,13 @@ public class AttachmentCallbackHandler implements CallbackHandler {
 
     private void loadAttachments(
         List<org.apache.wss4j.common.ext.Attachment> attachmentList,
-        String attachmentId
+        String attachmentId,
+        boolean removeAttachments
     ) throws IOException {
         final Collection<org.apache.cxf.message.Attachment> attachments = soapMessage.getAttachments();
         // Calling LazyAttachmentCollection.size() here to force it to load the attachments
         if (attachments != null && attachments.size() > 0) {
-            for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator(); 
+            for (Iterator<org.apache.cxf.message.Attachment> iterator = attachments.iterator();
                 iterator.hasNext();) {
                 org.apache.cxf.message.Attachment attachment = iterator.next();
 
@@ -121,7 +141,9 @@ public class AttachmentCallbackHandler implements CallbackHandler {
                 }
                 attachmentList.add(att);
 
-                iterator.remove();
+                if (removeAttachments) {
+                    iterator.remove();
+                }
             }
         }
     }

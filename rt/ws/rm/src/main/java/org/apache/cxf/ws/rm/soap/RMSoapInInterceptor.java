@@ -75,41 +75,41 @@ import org.apache.cxf.ws.rm.v200702.SequenceAcknowledgement;
 import org.apache.cxf.wsdl.interceptors.BareInInterceptor;
 
 /**
- * Protocol Handler responsible for {en|de}coding the RM 
+ * Protocol Handler responsible for {en|de}coding the RM
  * Properties for {outgo|incom}ing messages.
  */
 public class RMSoapInInterceptor extends AbstractSoapInterceptor {
 
     protected static JAXBContext jaxbContext;
-    
+
     private static final Set<QName> HEADERS;
     static {
-        Set<QName> set = new HashSet<QName>();
+        Set<QName> set = new HashSet<>();
         set.addAll(RM10Constants.HEADERS);
         set.addAll(RM11Constants.HEADERS);
         HEADERS = set;
     }
 
     private static final Logger LOG = LogUtils.getL7dLogger(RMSoapInInterceptor.class);
-    
+
     /**
      * Constructor.
      */
     public RMSoapInInterceptor() {
         super(Phase.PRE_PROTOCOL);
-        
+
         addAfter(MAPCodec.class.getName());
-    } 
-    
-    // AbstractSoapInterceptor interface 
-    
+    }
+
+    // AbstractSoapInterceptor interface
+
     /**
-     * @return the set of SOAP headers understood by this handler 
+     * @return the set of SOAP headers understood by this handler
      */
     public Set<QName> getUnderstoodHeaders() {
         return HEADERS;
     }
-    
+
     // Interceptor interface
 
     /* (non-Javadoc)
@@ -119,11 +119,11 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
         decode(message);
         updateServiceModelInfo(message);
     }
-    
+
     /**
      * Decode the RM properties from protocol-specific headers
      * and store them in the message.
-     *  
+     *
      * @param message the SOAP mesage
      */
     void decode(SoapMessage message) {
@@ -131,14 +131,14 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
         RMContextUtils.storeRMProperties(message, rmps, false);
         // TODO: decode SequenceFault ?
     }
-    
+
     /**
      * Decode the RM properties from protocol-specific headers.
-     * 
+     *
      * @param message the SOAP message
      * @return the RM properties
      */
-    public RMProperties unmarshalRMProperties(SoapMessage message) { 
+    public RMProperties unmarshalRMProperties(SoapMessage message) {
         RMProperties rmps = (RMProperties)message.get(RMContextUtils.getRMPropertiesKey(false));
         if (rmps == null) {
             rmps = new RMProperties();
@@ -146,15 +146,15 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
         List<Header> headers = message.getHeaders();
         if (headers != null) {
             decodeHeaders(message, headers, rmps);
-        } 
+        }
         return rmps;
     }
 
     public void decodeHeaders(SoapMessage message, List<Header> headers, RMProperties rmps) {
         try {
-            Collection<SequenceAcknowledgement> acks = new ArrayList<SequenceAcknowledgement>();
-            Collection<AckRequestedType> requested = new ArrayList<AckRequestedType>();           
-            
+            Collection<SequenceAcknowledgement> acks = new ArrayList<>();
+            Collection<AckRequestedType> requested = new ArrayList<>();
+
             String rmUri = null;
             EncoderDecoder codec = null;
             Iterator<Header> iter = headers.iterator();
@@ -184,7 +184,7 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
                             }
                             ProtocolVariation protocol = ProtocolVariation.findVariant(rmUri, wsauri);
                             if (protocol == null) {
-                                LOG.log(Level.WARNING, "NAMESPACE_ERROR_MSG", wsauri); 
+                                LOG.log(Level.WARNING, "NAMESPACE_ERROR_MSG", wsauri);
                                 break;
                             }
                             codec = protocol.getCodec();
@@ -202,25 +202,25 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
                     }
                 }
             }
-            if (acks.size() > 0) {
+            if (!acks.isEmpty()) {
                 rmps.setAcks(acks);
             }
-            if (requested.size() > 0) {
+            if (!requested.isEmpty()) {
                 rmps.setAcksRequested(requested);
             }
         } catch (JAXBException ex) {
-            LOG.log(Level.WARNING, "SOAP_HEADER_DECODE_FAILURE_MSG", ex); 
+            LOG.log(Level.WARNING, "SOAP_HEADER_DECODE_FAILURE_MSG", ex);
         }
     }
-    
+
     /**
-     * When invoked inbound, check if the action indicates that this is one of the 
+     * When invoked inbound, check if the action indicates that this is one of the
      * RM protocol messages (CreateSequence, CreateSequenceResponse, TerminateSequence)
      * and if so, replace references to the application service model with references to
      * the RM service model.
-     * The addressing protocol handler must have extracted the action beforehand. 
+     * The addressing protocol handler must have extracted the action beforehand.
      * @see org.apache.cxf.transport.ChainInitiationObserver
-     * 
+     *
      * @param message the message
      */
     private void updateServiceModelInfo(SoapMessage message) throws Fault {
@@ -228,7 +228,7 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
         AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
         AttributedURIType actionURI = null == maps ? null : maps.getAction();
         String action = null == actionURI ? null : actionURI.getValue().trim();
-        
+
         LOG.fine("action: " + action);
         RMConstants consts;
         if (RM10Constants.ACTIONS.contains(action)) {
@@ -240,14 +240,14 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
         }
         RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
         rmps.exposeAs(consts.getWSRMNamespace());
-        ProtocolVariation protocol = 
+        ProtocolVariation protocol =
             ProtocolVariation.findVariant(consts.getWSRMNamespace(), maps.getNamespaceURI());
-        
+
         LOG.info("Updating service model info in exchange");
-        
+
         RMManager manager = getManager(message);
         assert manager != null;
-        
+
         RMEndpoint rme = null;
         try {
             rme = manager.getReliableEndpoint(message);
@@ -255,17 +255,17 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
             throw new SoapFault(new org.apache.cxf.common.i18n.Message("CANNOT_PROCESS", LOG), e,
                 message.getVersion().getSender());
         }
-  
+
         Exchange exchange = message.getExchange();
         Endpoint ep = rme.getEndpoint(protocol);
         exchange.put(Endpoint.class, ep);
         exchange.put(Service.class, ep.getService());
         exchange.put(Binding.class, ep.getBinding());
-        
+
         // Also set BindingOperationInfo as some operations (SequenceAcknowledgment) have
         // neither in nor out messages, and thus the WrappedInInterceptor cannot
         // determine the operation name.
-        
+
         BindingInfo bi = ep.getEndpointInfo().getBinding();
         BindingOperationInfo boi = null;
         boolean isOneway = true;
@@ -284,37 +284,37 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
                 isOneway = false;
             }
         } else if (consts.getSequenceAckAction().equals(action)) {
-            boi = bi.getOperation(consts.getSequenceAckOperationName()); 
+            boi = bi.getOperation(consts.getSequenceAckOperationName());
         } else if (consts.getAckRequestedAction().equals(action)) {
-            boi = bi.getOperation(consts.getAckRequestedOperationName()); 
+            boi = bi.getOperation(consts.getAckRequestedOperationName());
         } else if (consts.getTerminateSequenceAction().equals(action)) {
-            boi = bi.getOperation(consts.getTerminateSequenceOperationName()); 
+            boi = bi.getOperation(consts.getTerminateSequenceOperationName());
         } else if (RM11Constants.INSTANCE.getTerminateSequenceResponseAction().equals(action)) {
             //TODO add server-side TSR handling
             boi = bi.getOperation(RM11Constants.INSTANCE.getTerminateSequenceOperationName());
             isOneway = false;
         } else if (consts.getCloseSequenceAction().equals(action)) {
-            boi = bi.getOperation(consts.getCloseSequenceOperationName()); 
+            boi = bi.getOperation(consts.getCloseSequenceOperationName());
         } else if (RM11Constants.INSTANCE.getCloseSequenceResponseAction().equals(action)) {
             boi = bi.getOperation(RM11Constants.INSTANCE.getCloseSequenceOperationName());
             isOneway = false;
         }
-        
+
         // make sure the binding information has been set
         if (boi == null) {
             LOG.fine("No BindingInfo for action " + action);
         } else {
             exchange.put(BindingOperationInfo.class, boi);
-            exchange.setOneWay(isOneway); 
+            exchange.setOneWay(isOneway);
         }
-        
-        // Fix requestor role (as the client side message observer always sets it to TRUE) 
+
+        // Fix requestor role (as the client side message observer always sets it to TRUE)
         // to allow unmarshalling the body of a server originated TerminateSequence request.
         // In the logical RM interceptor set it back to what it was so that the logical
-        // addressing interceptor does not try to send a partial response to 
-        // server originated oneway RM protocol messages.        
-        // 
-        
+        // addressing interceptor does not try to send a partial response to
+        // server originated oneway RM protocol messages.
+        //
+
         if (!consts.getCreateSequenceResponseAction().equals(action)
             && !consts.getSequenceAckAction().equals(action)
             && !RM11Constants.INSTANCE.getTerminateSequenceResponseAction().equals(action)
@@ -326,13 +326,13 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
                 message.put(RMMessageConstants.ORIGINAL_REQUESTOR_ROLE, originalRequestorRole);
             }
             message.put(Message.REQUESTOR_ROLE, Boolean.FALSE);
-        }       
-        
+        }
+
         // replace WrappedInInterceptor with BareInInterceptor if necessary
         // as RM protocol messages use parameter style BARE
 
         InterceptorChain chain = message.getInterceptorChain();
-        ListIterator<Interceptor<? extends Message>> it = chain.getIterator();            
+        ListIterator<Interceptor<? extends Message>> it = chain.getIterator();
         boolean bareIn = false;
         boolean wrappedIn = false;
         while (it.hasNext() && !wrappedIn && !bareIn) {
@@ -340,7 +340,7 @@ public class RMSoapInInterceptor extends AbstractSoapInterceptor {
             if (BareInInterceptor.class.getName().equals(pi.getId())) {
                 bareIn = true;
             }
-      
+
         }
         if (!bareIn) {
             chain.add(new BareInInterceptor());

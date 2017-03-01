@@ -34,15 +34,15 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  * Typically, an HTML view will be returned to a resource owner who
  * will authorize or deny the third-party client
  */
-@XmlRootElement(name = "authorizationData", 
+@XmlRootElement(name = "authorizationData",
                 namespace = "http://org.apache.cxf.rs.security.oauth")
 public class OAuthAuthorizationData extends OAuthRedirectionState implements Serializable {
     private static final long serialVersionUID = -7755998413495017637L;
-    
+
     private String endUserName;
     private String authenticityToken;
     private String replyTo;
-    
+
     private String applicationName;
     private String applicationWebUri;
     private String applicationDescription;
@@ -50,12 +50,12 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     private List<String> applicationCertificates = new LinkedList<String>();
     private Map<String, String> extraApplicationProperties = new HashMap<String, String>();
     private boolean implicitFlow;
-    
+
     private List<OAuthPermission> permissions;
     private List<OAuthPermission> alreadyAuthorizedPermissions;
     private boolean hidePreauthorizedScopesInForm;
     private boolean applicationRegisteredDynamically;
-    
+
     public OAuthAuthorizationData() {
     }
 
@@ -91,8 +91,8 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     public void setPermissions(List<OAuthPermission> permissions) {
         this.permissions = permissions;
     }
-    
-    /** 
+
+    /**
      * Get the list of scopes already approved by a user
      * @return the list of approved scopes
      */
@@ -109,17 +109,17 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     }
 
     /**
-     * Set the authenticity token linking the authorization 
+     * Set the authenticity token linking the authorization
      * challenge to the current end user session
-     * 
-     * @param authenticityToken the session authenticity token 
+     *
+     * @param authenticityToken the session authenticity token
      */
     public void setAuthenticityToken(String authenticityToken) {
         this.authenticityToken = authenticityToken;
     }
 
     /**
-     * Get the authenticity token linking the authorization 
+     * Get the authenticity token linking the authorization
      * challenge to the current end user session
      * @return the session authenticity token
      */
@@ -176,7 +176,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     }
 
     /**
-     * Set the absolute URI where the authorization decision data 
+     * Set the absolute URI where the authorization decision data
      * will need to be sent to
      * @param replyTo authorization decision handler URI
      */
@@ -185,7 +185,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     }
 
     /**
-     * Get the absolute URI where the authorization decision data 
+     * Get the absolute URI where the authorization decision data
      * will need to be sent to
      * @return authorization decision handler URI
      */
@@ -232,12 +232,12 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
         this.hidePreauthorizedScopesInForm = hidePreauthorizedScopesInForm;
     }
     public List<String> getPermissionsAsStrings() {
-        return permissions != null ? OAuthUtils.convertPermissionsToScopeList(permissions) 
+        return permissions != null ? OAuthUtils.convertPermissionsToScopeList(permissions)
             : Collections.emptyList();
     }
     public List<String> getAlreadyAuthorizedPermissionsAsStrings() {
-        return alreadyAuthorizedPermissions != null 
-            ? OAuthUtils.convertPermissionsToScopeList(alreadyAuthorizedPermissions) 
+        return alreadyAuthorizedPermissions != null
+            ? OAuthUtils.convertPermissionsToScopeList(alreadyAuthorizedPermissions)
             : Collections.emptyList();
     }
     public List<OAuthPermission> getAllPermissions() {

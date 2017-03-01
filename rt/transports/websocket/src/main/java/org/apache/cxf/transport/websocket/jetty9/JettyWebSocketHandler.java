@@ -32,22 +32,22 @@ import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 /**
  * The extended version of JettyHTTPHandler that can support websocket.
  */
-class JettyWebSocketHandler extends JettyHTTPHandler { 
+class JettyWebSocketHandler extends JettyHTTPHandler {
     final WebSocketServletFactory webSocketFactory;
-    
-    JettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact, 
+
+    JettyWebSocketHandler(JettyHTTPDestination jhd, boolean cmExact,
                           WebSocketServletFactory webSocketFactory) {
         super(jhd, cmExact);
         this.webSocketFactory = webSocketFactory;
     }
-    
+
     @Override
-    public void handle(String target, 
-                       Request baseRequest, 
-                       HttpServletRequest request, 
-                       HttpServletResponse response) 
+    public void handle(String target,
+                       Request baseRequest,
+                       HttpServletRequest request,
+                       HttpServletResponse response)
         throws IOException, ServletException {
-        
+
         if (webSocketFactory.isUpgradeRequest(request, response)
             && webSocketFactory.acceptWebSocket(request, response)) {
             baseRequest.setHandled(true);

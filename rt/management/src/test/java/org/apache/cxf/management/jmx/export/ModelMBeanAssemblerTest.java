@@ -42,15 +42,15 @@ import org.junit.Test;
 
 
 public class ModelMBeanAssemblerTest extends  Assert {
-    
+
     protected static final String AGE_ATTRIBUTE = "Age";
 
     protected static final String NAME_ATTRIBUTE = "Name";
-    
+
     protected static AnnotationTestInstrumentation ati = new AnnotationTestInstrumentation();
-   
+
     protected MBeanServer server;
-    
+
     protected ObjectName ton;
 
     @Before
@@ -63,7 +63,7 @@ public class ModelMBeanAssemblerTest extends  Assert {
             throw e;
         }
     }
-    
+
     @After
     public void tearDown() throws Exception {
         releaseServer();
@@ -80,35 +80,35 @@ public class ModelMBeanAssemblerTest extends  Assert {
     }
 
     protected void onSetUp() throws Exception {
-        
+
         try {
             ton = new ObjectName("org.apache.cxf:Type=testInstrumentation");
-        } catch (MalformedObjectNameException e) {            
+        } catch (MalformedObjectNameException e) {
             e.printStackTrace();
-        } catch (NullPointerException e) {            
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
-       
-        
+
+
         //create the mbean and register it
         ModelMBeanInfo mbi = getMBeanInfoFromAssembler();
-        
+
         RequiredModelMBean rtMBean;
-        
+
         rtMBean = (RequiredModelMBean)server.instantiate(
             "javax.management.modelmbean.RequiredModelMBean");
-                       
+
         rtMBean.setModelMBeanInfo(mbi);
-    
+
         rtMBean.setManagedResource(ati, "ObjectReference");
-                           
+
         server.registerMBean(rtMBean, ton);
     }
 
     public MBeanServer getServer() {
         return server;
     }
-    
+
     //the client get and set the ModelObject and setup the ManagerBean
     @Test
     public void testRegisterOperations() throws Exception {
@@ -116,7 +116,7 @@ public class ModelMBeanAssemblerTest extends  Assert {
         assertEquals("Incorrect number of operations registered",
                       10, info.getOperations().length);
     }
-    
+
     @Test
     public void testGetMBeanInfo() throws Exception {
         ModelMBeanInfo info = getMBeanInfoFromAssembler();
@@ -159,27 +159,27 @@ public class ModelMBeanAssemblerTest extends  Assert {
     }
 
     @Test
-    public void testSetAttribute() throws Exception {        
+    public void testSetAttribute() throws Exception {
         getServer().setAttribute(ton, new Attribute(AGE_ATTRIBUTE, 12));
         assertEquals("The Age should be ", 12, ati.getAge());
-        getServer().setAttribute(ton, new Attribute(NAME_ATTRIBUTE, "Rob Harrop"));                
+        getServer().setAttribute(ton, new Attribute(NAME_ATTRIBUTE, "Rob Harrop"));
         assertEquals("The name should be ", "Rob Harrop", ati.getName());
     }
 
     @Test
-    public void testGetAttribute() throws Exception {        
+    public void testGetAttribute() throws Exception {
         ati.setName("John Smith");
-        Object val = getServer().getAttribute(ton, NAME_ATTRIBUTE);        
+        Object val = getServer().getAttribute(ton, NAME_ATTRIBUTE);
         assertEquals("Incorrect result", "John Smith", val);
-    } 
+    }
 
     @Test
-    public void testOperationInvocation() throws Exception {       
+    public void testOperationInvocation() throws Exception {
         Object result = getServer().invoke(ton, "add",
                                 new Object[] {new Integer(20), new Integer(30)}, new String[] {"int", "int"});
         assertEquals("Incorrect result", new Integer(50), result);
     }
-    
+
     @Test
     public void testAttributeHasCorrespondingOperations() throws Exception {
         ModelMBeanInfo info = getMBeanInfoFromAssembler();
@@ -187,11 +187,11 @@ public class ModelMBeanAssemblerTest extends  Assert {
         ModelMBeanOperationInfo myOperation = info.getOperation("myOperation");
         assertNotNull("get operation should not be null", myOperation);
         assertEquals("Incorrect myOperation return type", "long", myOperation.getReturnType());
-                
-        ModelMBeanOperationInfo add = info.getOperation("add");                
+
+        ModelMBeanOperationInfo add = info.getOperation("add");
         assertNotNull("set operation should not be null", add);
         assertEquals("Incorrect add method description", "Add Two Numbers Together", add.getDescription());
-                
+
     }
 
     @Test
@@ -208,13 +208,13 @@ public class ModelMBeanAssemblerTest extends  Assert {
         assertEquals("Notification type.bar not found", "type.bar", notifTypes[1]);
     }
 
-    
+
     protected ModelMBeanInfo getMBeanInfoFromAssembler() {
         ModelMBeanAssembler assembler = new ModelMBeanAssembler();
-        return assembler.getModelMbeanInfo(AnnotationTestInstrumentation.class);        
+        return assembler.getModelMbeanInfo(AnnotationTestInstrumentation.class);
     }
-     
-        
-  
+
+
+
 
 }

@@ -39,15 +39,15 @@ import org.apache.wss4j.policy.model.AbstractSecurityAssertion;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 
 /**
- * This class retrieves the default AlgorithmSuites plus a custom AlgorithmSuite with the RSA SHA-512 
+ * This class retrieves the default AlgorithmSuites plus a custom AlgorithmSuite with the RSA SHA-512
  * signature
  */
 public class SHA512PolicyLoader implements AlgorithmSuiteLoader {
-    
+
     public SHA512PolicyLoader(Bus bus) {
         bus.setExtension(this, AlgorithmSuiteLoader.class);
     }
-    
+
     public AlgorithmSuite getAlgorithmSuite(Bus bus, SPConstants.SPVersion version, Policy nestedPolicy) {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg != null) {
@@ -55,7 +55,7 @@ public class SHA512PolicyLoader implements AlgorithmSuiteLoader {
             final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
             QName qName = new QName(ns, "Basic128RsaSha512");
             assertions.put(qName, new PrimitiveAssertion(qName));
-            
+
             reg.registerBuilder(new PrimitiveAssertionBuilder(assertions.keySet()) {
                 public Assertion build(Element element, AssertionBuilderFactory fact) {
                     if (XMLPrimitiveAssertionBuilder.isOptional(element)
@@ -64,17 +64,17 @@ public class SHA512PolicyLoader implements AlgorithmSuiteLoader {
                     }
                     QName q = new QName(element.getNamespaceURI(), element.getLocalName());
                     return assertions.get(q);
-                }            
+                }
             });
         }
         return new SHA512AlgorithmSuite(version, nestedPolicy);
     }
-    
+
     public static class SHA512AlgorithmSuite extends AlgorithmSuite {
-        
+
         static {
             ALGORITHM_SUITE_TYPES.put(
-                "Basic128RsaSha512", 
+                "Basic128RsaSha512",
                 new AlgorithmSuiteType(
                     "Basic128RsaSha512",
                     "http://www.w3.org/2001/04/xmlenc#sha512",

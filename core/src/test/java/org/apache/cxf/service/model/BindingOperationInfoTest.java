@@ -28,7 +28,7 @@ import org.junit.Test;
 public class BindingOperationInfoTest extends Assert {
     private static final String TEST_NS = "urn:test:ns";
     private BindingOperationInfo bindingOperationInfo;
-    
+
     @Before
     public void setUp() throws Exception {
         OperationInfo operationInfo = new OperationInfo(null, new QName(TEST_NS, "operationTest"));
@@ -36,7 +36,7 @@ public class BindingOperationInfoTest extends Assert {
             "http://apache.org/hello_world_soap_http", "testInputMessage"),
             MessageInfo.Type.INPUT);
         operationInfo.setInput("input", inputMessage);
-        
+
         MessageInfo outputMessage = operationInfo.createMessage(new QName(
             "http://apache.org/hello_world_soap_http", "testOutputMessage"),
             MessageInfo.Type.OUTPUT);
@@ -45,17 +45,17 @@ public class BindingOperationInfoTest extends Assert {
             "http://apache.org/hello_world_soap_http", "faultMessage"));
         bindingOperationInfo = new BindingOperationInfo(null, operationInfo);
     }
-    
+
     @Test
     public void testName() throws Exception {
         assertEquals(bindingOperationInfo.getName(), new QName(TEST_NS, "operationTest"));
     }
-    
+
     @Test
     public void testBinding() throws Exception {
         assertNull(bindingOperationInfo.getBinding());
     }
-    
+
     @Test
     public void testOperation() throws Exception {
         assertEquals(bindingOperationInfo.getOperationInfo().getName(), new QName(TEST_NS, "operationTest"));
@@ -67,25 +67,25 @@ public class BindingOperationInfoTest extends Assert {
                      new QName(TEST_NS, "fault"));
         assertEquals(1, bindingOperationInfo.getFaults().size());
     }
-    
+
     @Test
     public void testInputMessage() throws Exception {
         BindingMessageInfo inputMessage = bindingOperationInfo.getInput();
         assertNotNull(inputMessage);
         assertEquals(inputMessage.getMessageInfo().getName().getLocalPart(), "testInputMessage");
-        assertEquals(inputMessage.getMessageInfo().getName().getNamespaceURI(), 
+        assertEquals(inputMessage.getMessageInfo().getName().getNamespaceURI(),
                      "http://apache.org/hello_world_soap_http");
     }
-    
+
     @Test
     public void testOutputMessage() throws Exception {
         BindingMessageInfo outputMessage = bindingOperationInfo.getOutput();
         assertNotNull(outputMessage);
         assertEquals(outputMessage.getMessageInfo().getName().getLocalPart(), "testOutputMessage");
-        assertEquals(outputMessage.getMessageInfo().getName().getNamespaceURI(), 
+        assertEquals(outputMessage.getMessageInfo().getName().getNamespaceURI(),
                      "http://apache.org/hello_world_soap_http");
     }
-    
+
     @Test
     public void testFaultMessage() throws Exception {
         BindingFaultInfo faultMessage = bindingOperationInfo.getFaults().iterator().next();

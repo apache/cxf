@@ -37,7 +37,7 @@ public class ServerMixedStyle extends AbstractBusTestServerBase {
         Object implementor = new GreeterImplMixedStyle();
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
-        
+
         Endpoint.publish("http://localhost:" + PORT + "/cxf885", new MixedTestImpl());
     }
 
@@ -52,37 +52,37 @@ public class ServerMixedStyle extends AbstractBusTestServerBase {
             System.out.println("done!");
         }
     }
-    
-    @WebService(targetNamespace = "http://example.com") 
-    public interface MixedTest { 
-        @WebMethod(operationName = "Simple") 
-        @WebResult(name = "SimpleResponse", targetNamespace = "http://example.com") 
-        @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE) 
+
+    @WebService(targetNamespace = "http://example.com")
+    public interface MixedTest {
+        @WebMethod(operationName = "Simple")
+        @WebResult(name = "SimpleResponse", targetNamespace = "http://example.com")
+        @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
         String simple(@WebParam(name = "Simple") String req);
-        
-        @WebMethod(operationName = "Hello") 
-        @WebResult(name = "Result") 
-        @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.WRAPPED) 
+
+        @WebMethod(operationName = "Hello")
+        @WebResult(name = "Result")
+        @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
         String hello(@WebParam(name = "A") String a,
                      @WebParam(name = "B") String b);
-        
-        @WebMethod(operationName = "Simple2") 
-        @WebResult(name = "Simple2Response", targetNamespace = "http://example.com") 
-        @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE) 
+
+        @WebMethod(operationName = "Simple2")
+        @WebResult(name = "Simple2Response", targetNamespace = "http://example.com")
+        @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
         String simple2(@WebParam(name = "Simple2") int a);
-        
-        @WebMethod(operationName = "Tripple") 
-        @WebResult(name = "Result") 
-        @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.WRAPPED) 
+
+        @WebMethod(operationName = "Tripple")
+        @WebResult(name = "Result")
+        @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
         String tripple(@WebParam(name = "A") String a,
                      @WebParam(name = "B") String b,
                      @WebParam(name = "C") String c);
-    } 
+    }
     @WebService(targetNamespace = "http://example.com")
     public class MixedTestImpl implements MixedTest {
 
         public String hello(String a, String b) {
-            return "Hello " + a + " and " + b; 
+            return "Hello " + a + " and " + b;
         }
 
         public String simple(String req) {

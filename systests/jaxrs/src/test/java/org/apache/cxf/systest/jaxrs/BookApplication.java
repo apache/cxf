@@ -46,7 +46,7 @@ public class BookApplication extends Application {
     private long defaultId;
     @Context
     private UriInfo uriInfo;
-    
+
     public BookApplication(@Context ServletContext sc) {
         if (sc == null) {
             throw new IllegalArgumentException("ServletContext is null");
@@ -55,7 +55,7 @@ public class BookApplication extends Application {
             throw new IllegalStateException("ServletContext is not initialized");
         }
     }
-    
+
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
@@ -68,10 +68,10 @@ public class BookApplication extends Application {
         return classes;
     }
 
-    @Override 
+    @Override
     public Set<Object> getSingletons() {
-        Set<Object> classes = new HashSet<Object>();
-        org.apache.cxf.systest.jaxrs.BookStore store = 
+        Set<Object> classes = new HashSet<>();
+        org.apache.cxf.systest.jaxrs.BookStore store =
             new org.apache.cxf.systest.jaxrs.BookStore(uriInfo);
         store.setDefaultNameAndId(defaultName, defaultId);
         classes.add(store);
@@ -80,17 +80,17 @@ public class BookApplication extends Application {
         classes.add(mapper);
         return classes;
     }
-    
+
 
     @Override
     public Map<String, Object> getProperties() {
         return Collections.<String, Object>singletonMap("book", "cxf");
     }
-    
+
     public void setDefaultName(String name) {
         defaultName = name;
     }
-    
+
     public void setDefaultId(List<String> ids) {
         StringBuilder sb = new StringBuilder();
         for (String id : ids) {
@@ -98,7 +98,7 @@ public class BookApplication extends Application {
         }
         defaultId = Long.valueOf(sb.toString());
     }
-    
+
     @GlobalNameBinding
     public static class BookWriter implements WriterInterceptor {
 
@@ -108,19 +108,19 @@ public class BookApplication extends Application {
             context.getHeaders().putSingle("BookWriter", "TheBook");
             context.proceed();
         }
-        
+
     }
-    
+
     @Priority(1)
     public static class BookRequestFilter implements ContainerRequestFilter {
         private UriInfo ui;
         private Application ap;
-        
+
         public BookRequestFilter(@Context UriInfo ui, @Context Application ap) {
             this.ui = ui;
             this.ap = ap;
         }
-        
+
         @Override
         public void filter(ContainerRequestContext context) throws IOException {
             if (ap == null) {
@@ -129,24 +129,24 @@ public class BookApplication extends Application {
             String uri = ui.getRequestUri().toString();
             if (uri.endsWith("/application11/thebooks/bookstore2/bookheaders")
                 || uri.contains("/application6")) {
-                context.getHeaders().put("BOOK", Arrays.asList("1", "2"));    
+                context.getHeaders().put("BOOK", Arrays.asList("1", "2"));
             }
-            
+
         }
-        
+
     }
-    
+
     @Priority(2)
     public static class BookRequestFilter2 implements ContainerRequestFilter {
         private UriInfo ui;
         @Context
         private Application ap;
-        
+
         @Context
         public void setUriInfo(UriInfo context) {
             this.ui = context;
         }
-        
+
         @Override
         public void filter(ContainerRequestContext context) throws IOException {
             if (ap == null) {
@@ -155,10 +155,10 @@ public class BookApplication extends Application {
             String uri = ui.getRequestUri().toString();
             if (uri.endsWith("/application11/thebooks/bookstore2/bookheaders")
                 || uri.contains("/application6")) {
-                context.getHeaders().add("BOOK", "3");    
+                context.getHeaders().add("BOOK", "3");
             }
-            
+
         }
-        
+
     }
 }

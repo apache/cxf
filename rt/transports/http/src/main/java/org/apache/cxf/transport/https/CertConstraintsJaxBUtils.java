@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 package org.apache.cxf.transport.https;
 
 import java.util.List;
@@ -29,11 +29,11 @@ import org.apache.cxf.configuration.security.DNConstraintsType;
  * A set of static methods that operate on the generated CertificateConstraintsType.
  */
 public final class CertConstraintsJaxBUtils {
-    
+
     private CertConstraintsJaxBUtils() {
         // complete
     }
-    
+
     /**
      * Create a CertConstraints object from a JAXB CertificateConstraintsType
      */
@@ -41,7 +41,7 @@ public final class CertConstraintsJaxBUtils {
         CertificateConstraintsType certConstraints
     ) {
         List<String> subjectRegexps = getSubjectConstraints(certConstraints);
-        CertConstraints.Combinator subjectCombinator = 
+        CertConstraints.Combinator subjectCombinator =
             getSubjectConstraintsCombinator(certConstraints);
         List<String> issuerRegexps = getIssuerConstraints(certConstraints);
         CertConstraints.Combinator issuerCombinator =
@@ -50,7 +50,7 @@ public final class CertConstraintsJaxBUtils {
         return new CertConstraints(
             subjectRegexps, subjectCombinator, issuerRegexps, issuerCombinator);
     }
-    
+
     /**
      * Get a List of Strings that corresponds to the subject regular expression
      * constraints from a JAXB CertificateConstraintsType
@@ -64,7 +64,7 @@ public final class CertConstraintsJaxBUtils {
         }
         return java.util.Collections.emptyList();
     }
-    
+
     /**
      * Get a List of Strings that corresponds to the issuer regular expression
      * constraints from a JAXB CertificateConstraintsType
@@ -96,7 +96,7 @@ public final class CertConstraintsJaxBUtils {
         }
         return CertConstraints.Combinator.ALL;
     }
-    
+
     /**
      * Get a (issuer) CertConstrains.Combinator from a JAXB CertificateConstraintsType
      */
@@ -114,6 +114,6 @@ public final class CertConstraintsJaxBUtils {
         }
         return CertConstraints.Combinator.ALL;
     }
-    
-    
+
+
 }

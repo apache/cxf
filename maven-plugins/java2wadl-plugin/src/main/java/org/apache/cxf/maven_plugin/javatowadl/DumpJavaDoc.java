@@ -31,11 +31,11 @@ import com.sun.javadoc.RootDoc;
 import com.sun.javadoc.Tag;
 
 public final class DumpJavaDoc {
-    
+
     private DumpJavaDoc() {
-        
+
     }
-    
+
     public static boolean start(RootDoc root) throws IOException {
         String dumpFileName = readOptions(root.options());
         FileOutputStream fos = new FileOutputStream(dumpFileName);
@@ -48,7 +48,7 @@ public final class DumpJavaDoc {
                     Parameter[] parameters = method.parameters();
                     for (int i = 0; i < parameters.length; ++i) {
                         if (parameters[i].name().equals(paramTag.parameterName())) {
-                            javaDocMap.put(method.qualifiedName() + ".paramCommentTag." + i, 
+                            javaDocMap.put(method.qualifiedName() + ".paramCommentTag." + i,
                                    paramTag.parameterComment());
                         }
                     }
@@ -56,18 +56,18 @@ public final class DumpJavaDoc {
                 Tag retTags[] = method.tags("return");
                 if (retTags != null && retTags.length == 1) {
                     Tag retTag = method.tags("return")[0];
-                    javaDocMap.put(method.qualifiedName() + "." + "returnCommentTag", 
+                    javaDocMap.put(method.qualifiedName() + "." + "returnCommentTag",
                                    retTag.text());
                 }
             }
-                
+
         }
         javaDocMap.store(fos, "");
         fos.flush();
         fos.close();
         return true;
     }
-    
+
     private static String readOptions(String[][] options) {
         String tagName = null;
         for (int i = 0; i < options.length; i++) {

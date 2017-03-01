@@ -50,7 +50,7 @@ public class AbstractTokenService extends AbstractOAuthService {
     private boolean writeCustomErrors;
     private ClientIdProvider clientIdProvider;
     private ClientSecretVerifier clientSecretVerifier;
-    
+
     /**
      * Make sure the client is authenticated
      */
@@ -58,7 +58,7 @@ public class AbstractTokenService extends AbstractOAuthService {
         Client client = null;
         SecurityContext sc = getMessageContext().getSecurityContext();
         Principal principal = sc.getUserPrincipal();
-        
+
         if (principal == null) {
             String clientId = retrieveClientId(params);
             if (clientId != null) {
@@ -74,10 +74,15 @@ public class AbstractTokenService extends AbstractOAuthService {
         } else {
             String clientId = retrieveClientId(params);
             if (clientId != null) {
-                client = getClient(clientId, params);
+                if (clientId.equals(principal.getName())) {
+                    client = (Client)getMessageContext().get(Client.class.getName());
+                }
+                if (client == null) {
+                    client = getClient(clientId, params);
+                }
             } else if (principal.getName() != null) {
                 client = getClient(principal.getName(), params);
-            } 
+            }
         }
         if (client == null) {
             client = getClientFromTLSCertificates(sc, getTlsSessionInfo(), params);
@@ -95,12 +100,12 @@ public class AbstractTokenService extends AbstractOAuthService {
         }
         return client;
     }
-    
+
     private TLSSessionInfo getTlsSessionInfo() {
 
         return (TLSSessionInfo)getMessageContext().get(TLSSessionInfo.class.getName());
     }
-    
+
     protected String retrieveClientId(MultivaluedMap<String, String> params) {
         String clientId = params.getFirst(OAuthConstants.CLIENT_ID);
         if (clientId == null) {
@@ -111,9 +116,9 @@ public class AbstractTokenService extends AbstractOAuthService {
         }
         return clientId;
     }
-    
+
     // Get the Client and check the id and secret
-    protected Client getAndValidateClientFromIdAndSecret(String clientId, 
+    protected Client getAndValidateClientFromIdAndSecret(String clientId,
                                                          String providedClientSecret,
                                                          MultivaluedMap<String, String> params) {
         Client client = getClient(clientId, params);
@@ -133,17 +138,17 @@ public class AbstractTokenService extends AbstractOAuthService {
         if (clientSecretVerifier != null) {
             return clientSecretVerifier.validateClientSecret(client, providedClientSecret);
         } else {
-            return client.getClientSecret() != null 
+            return client.getClientSecret() != null
                 && providedClientSecret != null && client.getClientSecret().equals(providedClientSecret);
         }
     }
     protected boolean isValidPublicClient(Client client, String clientId, String clientSecret) {
-        return canSupportPublicClients 
-            && !client.isConfidential() 
-            && client.getClientSecret() == null 
+        return canSupportPublicClients
+            && !client.isConfidential()
+            && client.getClientSecret() == null
             && clientSecret == null;
     }
-    
+
     protected Client getClientFromBasicAuthScheme(MultivaluedMap<String, String> params) {
         String[] userInfo = AuthorizationUtils.getBasicAuthUserInfo(getMessageContext());
         if (userInfo != null && userInfo.length == 2) {
@@ -152,8 +157,8 @@ public class AbstractTokenService extends AbstractOAuthService {
             return null;
         }
     }
-    
-    protected Client getClientFromTLSCertificates(SecurityContext sc, 
+
+    protected Client getClientFromTLSCertificates(SecurityContext sc,
                                                   TLSSessionInfo tlsSessionInfo,
                                                   MultivaluedMap<String, String> params) {
         Client client = null;
@@ -169,17 +174,17 @@ public class AbstractTokenService extends AbstractOAuthService {
         // Pure 2-way TLS authentication
         return tlsSessionInfo != null && StringUtils.isEmpty(sc.getAuthenticationScheme());
     }
-    
+
     protected String getClientIdFromTLSCertificates(SecurityContext sc, TLSSessionInfo tlsInfo) {
         Certificate[] clientCerts = tlsInfo.getPeerCertificates();
         if (clientCerts != null && clientCerts.length > 0) {
             X500Principal x509Principal = ((X509Certificate)clientCerts[0]).getSubjectX500Principal();
-            return x509Principal.getName();    
+            return x509Principal.getName();
         }
         return null;
     }
-    
-    protected void compareTlsCertificates(TLSSessionInfo tlsInfo, 
+
+    protected void compareTlsCertificates(TLSSessionInfo tlsInfo,
                                           List<String> base64EncodedCerts) {
         if (tlsInfo != null) {
             Certificate[] clientCerts = tlsInfo.getPeerCertificates();
@@ -196,14 +201,14 @@ public class AbstractTokenService extends AbstractOAuthService {
                     return;
                 } catch (Exception ex) {
                     // throw exception later
-                }    
+                }
             }
         }
         reportInvalidClient();
     }
-    
-    
-    
+
+
+
     protected Response handleException(OAuthServiceException ex, String error) {
         OAuthError customError = ex.getError();
         if (writeCustomErrors && customError != null) {
@@ -212,24 +217,24 @@ public class AbstractTokenService extends AbstractOAuthService {
             return createErrorResponseFromBean(new OAuthError(error));
         }
     }
-    
+
     protected Response createErrorResponse(MultivaluedMap<String, String> params,
                                            String error) {
         return createErrorResponseFromBean(new OAuthError(error));
     }
-    
+
     protected Response createErrorResponseFromErrorCode(String error) {
         return createErrorResponseFromBean(new OAuthError(error));
     }
-    
+
     protected Response createErrorResponseFromBean(OAuthError errorBean) {
         return JAXRSUtils.toResponseBuilder(400).entity(errorBean).build();
     }
-    
+
     /**
      * Get the {@link Client} reference
      * @param clientId the provided client id
-     * @return Client the client reference 
+     * @return Client the client reference
      * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found
      */
     protected Client getClient(String clientId, MultivaluedMap<String, String> params) {
@@ -253,17 +258,17 @@ public class AbstractTokenService extends AbstractOAuthService {
         }
         return client;
     }
-    
+
     protected void reportInvalidClient() {
         reportInvalidClient(new OAuthError(OAuthConstants.INVALID_CLIENT));
     }
-    
+
     protected void reportInvalidClient(OAuthError error) {
         ResponseBuilder rb = JAXRSUtils.toResponseBuilder(401);
-        throw ExceptionUtils.toNotAuthorizedException(null, 
+        throw ExceptionUtils.toNotAuthorizedException(null,
             rb.type(MediaType.APPLICATION_JSON_TYPE).entity(error).build());
     }
-    
+
     public void setCanSupportPublicClients(boolean support) {
         this.canSupportPublicClients = support;
     }
@@ -271,7 +276,7 @@ public class AbstractTokenService extends AbstractOAuthService {
     public boolean isCanSupportPublicClients() {
         return canSupportPublicClients;
     }
-    
+
     public void setWriteCustomErrors(boolean writeCustomErrors) {
         this.writeCustomErrors = writeCustomErrors;
     }

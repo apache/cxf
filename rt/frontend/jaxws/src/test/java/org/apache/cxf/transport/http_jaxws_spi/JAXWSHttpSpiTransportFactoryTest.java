@@ -32,8 +32,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class JAXWSHttpSpiTransportFactoryTest extends Assert {
-    
-    private IMocksControl control; 
+
+    private IMocksControl control;
     private HttpContext context;
     private JAXWSHttpSpiTransportFactory factory;
     private Bus bus;
@@ -45,31 +45,31 @@ public class JAXWSHttpSpiTransportFactoryTest extends Assert {
         bus = control.createMock(Bus.class);
         factory = new JAXWSHttpSpiTransportFactory(context);
     }
-    
+
     @After
     public void tearDown() {
         factory = null;
         context = null;
         bus = null;
     }
-    
+
     @Test
     public void testGetDestination1() throws Exception {
         getDestination("/bar");
     }
-    
+
     @Test
     public void testGetDestination2() throws Exception {
         getDestination("http://localhost:8080/foo/bar");
     }
-    
+
     public void getDestination(String endpointAddress) throws Exception {
         context.setHandler(EasyMock.isA(HttpHandler.class));
         control.replay();
-        
+
         EndpointInfo endpoint = new EndpointInfo();
         endpoint.setAddress(endpointAddress);
-        
+
         Destination destination = factory.getDestination(endpoint, bus);
         assertNotNull(destination);
         assertNotNull(destination.getAddress());
@@ -78,5 +78,5 @@ public class JAXWSHttpSpiTransportFactoryTest extends Assert {
         assertEquals(endpointAddress, endpoint.getAddress());
         control.verify();
     }
-    
+
 }

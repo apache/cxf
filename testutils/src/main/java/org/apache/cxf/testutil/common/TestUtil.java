@@ -44,10 +44,10 @@ public final class TestUtil {
     private static final Logger LOG = LogUtils.getL7dLogger(TestUtil.class);
     private static int portNum = -1;
     private static Properties ports = new Properties();
-    
+
     @SuppressWarnings("unused")
     private static ServerSocket lock;
-    
+
     static {
         int pn = 9000;
         if (Boolean.getBoolean("cxf.useRandomFirstPort")) {
@@ -58,8 +58,8 @@ public final class TestUtil {
                 //we'll hold a socket open and allocate ports up from that socket.
                 //if a second CXF build process (like running parallel builds)
                 //tries to open the socket, it will throw an exception and it
-                //will try again 100 ports up.   At this point, 100 ports is WAY 
-                //more than enough.  We can adjust later if needed. 
+                //will try again 100 ports up.   At this point, 100 ports is WAY
+                //more than enough.  We can adjust later if needed.
                 ServerSocket sock = new ServerSocket(pn);
                 lock = sock;
                 portNum = pn + 1;
@@ -68,11 +68,11 @@ public final class TestUtil {
             }
         }
     }
-    
+
     private TestUtil() {
         //Complete
     }
-    
+
     // Deletes all files and subdirectories under dir.
     // Returns true if all deletions were successful.
     // If a deletion fails, the method stops attempting to delete and returns false.
@@ -88,11 +88,11 @@ public final class TestUtil {
                 }
             }
         }
-    
+
         // The directory is now empty so delete it
         return dir.delete();
     }
-    
+
     public static String getClassPath(ClassLoader loader) throws URISyntaxException {
         StringBuilder classPath = new StringBuilder();
         if (loader instanceof URLClassLoader) {
@@ -120,7 +120,7 @@ public final class TestUtil {
     public static Properties getAllPorts() {
         return ports;
     }
-    
+
     public static String getPortNumber(Class<?> cls) {
         return getPortNumber(cls.getName(), cls.getSimpleName());
     }
@@ -131,7 +131,7 @@ public final class TestUtil {
     public static String getPortNumber(String name) {
         return getPortNumber(name, name);
     }
-    
+
     public static String getNewPortNumber(Class<?> cls) {
         return getNewPortNumber(cls.getName(), cls.getSimpleName());
     }
@@ -142,7 +142,7 @@ public final class TestUtil {
     public static String getNewPortNumber(String name) {
         return getNewPortNumber(name, name);
     }
-    
+
     private static void applyNames(String fullName, String simpleName, String p) {
         ports.setProperty("testutil.ports." + fullName, p);
         ports.setProperty("testutil.ports." + simpleName, p);
@@ -162,7 +162,7 @@ public final class TestUtil {
         ports.remove("testutil.ports." + fullName);
         ports.remove("testutil.ports." + simpleName);
         System.clearProperty("testutil.ports." + fullName);
-        System.clearProperty("testutil.ports." + simpleName);        
+        System.clearProperty("testutil.ports." + simpleName);
         if (fullName.endsWith("." + simpleName)) {
             int idx = fullName.lastIndexOf('.', fullName.lastIndexOf('.'));
             while (idx != -1) {
@@ -173,11 +173,11 @@ public final class TestUtil {
             }
         }
     }
-    
+
     public static String getNewPortNumber(String fullName, String simpleName) {
         removeNames(fullName, simpleName);
         return getPortNumber(fullName, simpleName);
-    } 
+    }
     public static String getPortNumber(String fullName, String simpleName) {
         String p = ports.getProperty("testutil.ports." + fullName);
         if (p == null) {
@@ -202,8 +202,8 @@ public final class TestUtil {
         applyNames(fullName, simpleName, p);
         return p;
     }
-    
-    public static void updateAddressPort(Object o, String port) 
+
+    public static void updateAddressPort(Object o, String port)
         throws NumberFormatException, MalformedURLException {
         updateAddressPort(o, Integer.parseInt(port));
     }
@@ -226,7 +226,7 @@ public final class TestUtil {
         }
         //maybe simple frontend proxy?
     }
-    
+
     // extra methods to help support the dynamic port allocations
     public static void setAddress(Object o, String address) {
         if (o instanceof BindingProvider) {

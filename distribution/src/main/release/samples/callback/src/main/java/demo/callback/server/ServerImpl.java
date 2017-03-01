@@ -27,15 +27,15 @@ import org.apache.callback.CallbackPortType;
 import org.apache.callback.ServerPortType;
 
 
-@javax.jws.WebService(serviceName = "SOAPService", 
+@javax.jws.WebService(serviceName = "SOAPService",
                       portName = "SOAPPort",
                       targetNamespace = "http://apache.org/callback",
-                      endpointInterface = "org.apache.callback.ServerPortType") 
-                  
+                      endpointInterface = "org.apache.callback.ServerPortType")
+
 public class ServerImpl implements ServerPortType  {
-    
+
     public String registerCallback(W3CEndpointReference callback) {
-        
+
         try {
 
             WebServiceFeature[] wfs = new WebServiceFeature[] {};
@@ -44,16 +44,16 @@ public class ServerImpl implements ServerPortType  {
             System.out.println("Invoking callback object");
             String resp = port.serverSayHi(System.getProperty("user.name"));
             System.out.println("Response from callback object: " + resp);
-  
 
-            
+
+
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
-        
-        return "registerCallback called";     
+
+        return "registerCallback called";
     }
-    
-    
+
+
 }

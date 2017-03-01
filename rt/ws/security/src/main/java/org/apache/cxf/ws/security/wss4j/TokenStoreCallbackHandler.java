@@ -39,7 +39,7 @@ public class TokenStoreCallbackHandler implements CallbackHandler {
         internal = in;
         store = st;
     }
-    
+
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         for (Callback callback : callbacks) {
             if (callback instanceof WSPasswordCallback) {
@@ -64,7 +64,7 @@ public class TokenStoreCallbackHandler implements CallbackHandler {
             internal.handle(callbacks);
         }
     }
-    
+
     private static String getSHA1(byte[] input) {
         try {
             byte[] digestBytes = KeyUtils.generateDigest(input);

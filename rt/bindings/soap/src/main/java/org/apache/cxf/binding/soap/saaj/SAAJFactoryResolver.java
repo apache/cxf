@@ -30,13 +30,13 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.util.SystemPropertyAction;
 
 /**
- * 
+ *
  */
 public final class SAAJFactoryResolver {
 
-    public static final String MESSAGE_FACTORY_KEY 
+    public static final String MESSAGE_FACTORY_KEY
         = "org.apache.cxf.binding.soap.messageFactoryClassName";
-    public static final String SOAP_FACTORY_KEY 
+    public static final String SOAP_FACTORY_KEY
         = "org.apache.cxf.binding.soap.soapFactoryClassName";
 
     private SAAJFactoryResolver() {

@@ -34,7 +34,7 @@ public class AbstractJweDecryptingFilter {
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
     protected JweDecryptionOutput decrypt(InputStream is) throws IOException {
-        JweCompactConsumer jwe = new JweCompactConsumer(new String(IOUtils.readBytesFromStream(is), 
+        JweCompactConsumer jwe = new JweCompactConsumer(new String(IOUtils.readBytesFromStream(is),
                                                                    StandardCharsets.UTF_8));
         JweDecryptionProvider theDecryptor = getInitializedDecryptionProvider(jwe.getJweHeaders());
         JweDecryptionOutput out = new JweDecryptionOutput(jwe.getJweHeaders(), jwe.getDecryptedContent(theDecryptor));
@@ -51,8 +51,8 @@ public class AbstractJweDecryptingFilter {
     }
     protected JweDecryptionProvider getInitializedDecryptionProvider(JweHeaders headers) {
         if (decryption != null) {
-            return decryption;    
-        } 
+            return decryption;
+        }
         return JweUtils.loadDecryptionProvider(headers, true);
     }
     public String getDefaultMediaType() {

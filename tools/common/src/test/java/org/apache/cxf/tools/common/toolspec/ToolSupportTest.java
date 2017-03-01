@@ -28,7 +28,7 @@ public class ToolSupportTest extends Assert {
     @Test
     public void testProtect() throws ToolException {
         ToolSupport toolSupport = new ToolSupport();
-        
+
         toolSupport.performFunction();
         toolSupport.destroy();
     }

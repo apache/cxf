@@ -68,8 +68,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) {
-        final Exchange exchange = message.getExchange(); 
-        
+        final Exchange exchange = message.getExchange();
+
         exchange.put(Message.REST_MESSAGE, Boolean.TRUE);
         Response response = exchange.get(Response.class);
         if (response == null) {
@@ -84,7 +84,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 convertExceptionToResponseIfPossible(ex, message);
             }
         }
-        
+
         response = exchange.get(Response.class);
         if (response != null) {
             createOutMessage(message, response);
@@ -92,29 +92,29 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                                 OutgoingChainInterceptor.class.getName());
         }
     }
-    
+
     private void processRequest(Message message, Exchange exchange) {
-        
+
         ServerProviderFactory providerFactory = ServerProviderFactory.getInstance(message);
-        
+
         RequestPreprocessor rp = providerFactory.getRequestPreprocessor();
         if (rp != null) {
             rp.preprocess(message, new UriInfoImpl(message, null));
         }
-        
+
         // Global pre-match request filters
         if (JAXRSUtils.runContainerRequestFilters(providerFactory, message, true, null)) {
             return;
         }
         // HTTP method
-        String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, 
+        String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD,
                                                         HttpMethod.POST, true);
-        
+
         // Path to match
         String rawPath = HttpUtils.getPathToMatch(message, true);
-        
+
         Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-        
+
         // Content-Type
         String requestContentType = null;
         List<String> ctHeaderValues = protocolHeaders.get(Message.CONTENT_TYPE);
@@ -124,20 +124,20 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         if (requestContentType == null) {
             requestContentType = (String)message.get(Message.CONTENT_TYPE);
-        
+
             if (requestContentType == null) {
                 requestContentType = MediaType.WILDCARD;
             }
         }
-        
+
         // Accept
         String acceptTypes = null;
         List<String> acceptHeaderValues = protocolHeaders.get(Message.ACCEPT_CONTENT_TYPE);
-        if (acceptHeaderValues != null) {
+        if (acceptHeaderValues != null && !acceptHeaderValues.isEmpty()) {
             acceptTypes = acceptHeaderValues.get(0);
             message.put(Message.ACCEPT_CONTENT_TYPE, acceptTypes);
         }
-        
+
         if (acceptTypes == null) {
             acceptTypes = HttpUtils.getProtocolHeader(message, Message.ACCEPT_CONTENT_TYPE, null);
             if (acceptTypes == null) {
@@ -155,26 +155,26 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         //1. Matching target resource class
         List<ClassResourceInfo> resources = JAXRSUtils.getRootResources(message);
-        Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources = 
+        Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources =
             JAXRSUtils.selectResourceClass(resources, rawPath, message);
         if (matchedResources == null) {
-            org.apache.cxf.common.i18n.Message errorMsg = 
-                new org.apache.cxf.common.i18n.Message("NO_ROOT_EXC", 
+            org.apache.cxf.common.i18n.Message errorMsg =
+                new org.apache.cxf.common.i18n.Message("NO_ROOT_EXC",
                                                    BUNDLE,
                                                    message.get(Message.REQUEST_URI),
                                                    rawPath);
             LOG.warning(errorMsg.toString());
-            Response resp = JAXRSUtils.createResponse(resources, message, errorMsg.toString(), 
+            Response resp = JAXRSUtils.createResponse(resources, message, errorMsg.toString(),
                     Response.Status.NOT_FOUND.getStatusCode(), false);
             throw ExceptionUtils.toNotFoundException(null, resp);
         }
 
         MultivaluedMap<String, String> matchedValues = new MetadataMap<String, String>();
-                
-        OperationResourceInfo ori = null;     
-        
-        try {                
-            ori = JAXRSUtils.findTargetMethod(matchedResources, message, 
+
+        OperationResourceInfo ori = null;
+
+        try {
+            ori = JAXRSUtils.findTargetMethod(matchedResources, message,
                       httpMethod, matchedValues, requestContentType, acceptContentTypes, true);
             setExchangeProperties(message, exchange, ori, matchedValues, resources.size());
         } catch (WebApplicationException ex) {
@@ -186,7 +186,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 throw ex;
             }
         }
-        
+
 
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Request path is: " + rawPath);
@@ -196,17 +196,17 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
             LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
         }
-        
+
         // Global and name-bound post-match request filters
         if (!ori.isSubResourceLocator()
             && JAXRSUtils.runContainerRequestFilters(providerFactory,
                                                       message,
-                                                      false, 
+                                                      false,
                                                       ori.getNameBindings())) {
             return;
         }
-        
-        
+
+
         //Process parameters
         try {
             List<Object> params = JAXRSUtils.processParameters(ori, matchedValues, message);
@@ -214,25 +214,25 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         } catch (IOException ex) {
             convertExceptionToResponseIfPossible(ex, message);
         }
-        
+
     }
-    
+
     private void convertExceptionToResponseIfPossible(Throwable ex, Message message) {
         Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
         if (excResponse == null) {
             ServerProviderFactory.getInstance(message).clearThreadLocalProxies();
-            message.getExchange().put(Message.PROPOGATE_EXCEPTION, 
+            message.getExchange().put(Message.PROPOGATE_EXCEPTION,
                                       ExceptionUtils.propogateException(message));
-            throw ex instanceof RuntimeException ? (RuntimeException)ex 
+            throw ex instanceof RuntimeException ? (RuntimeException)ex
                 : ExceptionUtils.toInternalServerErrorException(ex, null);
         }
         message.getExchange().put(Response.class, excResponse);
         message.getExchange().put(Throwable.class, ex);
     }
-    
+
     private void setExchangeProperties(Message message,
                                        Exchange exchange,
-                                       OperationResourceInfo ori, 
+                                       OperationResourceInfo ori,
                                        MultivaluedMap<String, String> values,
                                        int numberOfResources) {
         final ClassResourceInfo cri = ori.getClassResourceInfo();
@@ -240,29 +240,29 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         exchange.put(JAXRSUtils.ROOT_RESOURCE_CLASS, cri);
         message.put(RESOURCE_METHOD, ori.getMethodToInvoke());
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
-        
+
         String plainOperationName = ori.getMethodToInvoke().getName();
         if (numberOfResources > 1) {
             plainOperationName = cri.getServiceClass().getSimpleName() + "#" + plainOperationName;
         }
         exchange.put(RESOURCE_OPERATION_NAME, plainOperationName);
-        
-        if (ori.isOneway() 
+
+        if (ori.isOneway()
             || MessageUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_REQUEST, null))) {
-            exchange.setOneWay(true);        
+            exchange.setOneWay(true);
         }
-        ResourceProvider rp = cri.getResourceProvider(); 
+        ResourceProvider rp = cri.getResourceProvider();
         if (rp instanceof SingletonResourceProvider) {
-            //cri.isSingleton is not guaranteed to indicate we have a 'pure' singleton 
+            //cri.isSingleton is not guaranteed to indicate we have a 'pure' singleton
             exchange.put(Message.SERVICE_OBJECT, rp.getInstance(message));
         }
     }
-    
+
     @Override
     public void handleFault(Message message) {
         super.handleFault(message);
     }
-    
+
     private Message createOutMessage(Message inMessage, Response r) {
         Endpoint e = inMessage.getExchange().getEndpoint();
         Message mout = e.getBinding().createMessage();

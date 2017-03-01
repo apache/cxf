@@ -39,7 +39,7 @@ import org.junit.Test;
 import org.springframework.context.support.GenericApplicationContext;
 
 /**
- * 
+ *
  */
 public class QueryHandlerTest extends AbstractCXFSpringTest {
     private static final Charset UTF8 = Charset.forName("utf-8");
@@ -67,7 +67,7 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
                              "classpath:HelloWorldGreeterBeans.xml"};
 
     }
-    
+
     @Before
     public void before() {
         ServerFactoryBean serverFactoryBean = getBean(ServerFactoryBean.class, "hw-service-endpoint");
@@ -77,7 +77,7 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
         serverFactoryBean = getBean(ServerFactoryBean.class, "dlb-service-endpoint");
         dlbEndpoint = serverFactoryBean.create().getEndpoint();
     }
-    
+
     private String getStringFromURL(URL url) throws IOException {
         InputStream jsStream = url.openStream();
         return readStringFromStream(jsStream);
@@ -99,14 +99,14 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
         }
         return js.toString();
     }
-    
+
     @Test
     public void hwQueryTest() throws Exception {
         URL endpointURL = new URL(hwEndpoint.getEndpointInfo().getAddress()  + "?js");
-        String js = getStringFromURL(endpointURL); 
+        String js = getStringFromURL(endpointURL);
         assertNotSame(0, js.length());
     }
-    
+
     @Test
     public void dlbQueryTest() throws Exception {
         LOG.finest("logged to avoid warning on LOG");
@@ -117,7 +117,7 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
         String js = readStringFromStream(jsStream);
         assertNotSame("", js);
     }
-    
+
     @Test
     public void utilsTest() throws Exception {
         URL endpointURL = new URL(dlbEndpoint.getEndpointInfo().getAddress()  + "?js&nojsutils");
@@ -127,10 +127,10 @@ public class QueryHandlerTest extends AbstractCXFSpringTest {
         String jsString = readStringFromStream(jsStream);
         assertFalse(jsString.contains("function CxfApacheOrgUtil"));
     }
-    
+
     // this is in here since we need to use the query handler to perform the test.
     @org.junit.Ignore
-    @Test 
+    @Test
     public void namespacePrefixTest() throws Exception {
         URL endpointURL = new URL(hwgEndpoint.getEndpointInfo().getAddress()  + "?js");
         String js = getStringFromURL(endpointURL);

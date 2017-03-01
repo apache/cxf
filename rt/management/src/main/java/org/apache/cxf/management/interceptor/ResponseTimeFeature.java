@@ -27,18 +27,18 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 public class ResponseTimeFeature extends AbstractFeature {
     private static final ResponseTimeMessageInInterceptor IN =
         new ResponseTimeMessageInInterceptor();
-    private static final ResponseTimeMessageInvokerInterceptor INVOKER = 
+    private static final ResponseTimeMessageInvokerInterceptor INVOKER =
         new ResponseTimeMessageInvokerInterceptor();
-    private static final ResponseTimeMessageOutInterceptor OUT = 
+    private static final ResponseTimeMessageOutInterceptor OUT =
         new ResponseTimeMessageOutInterceptor();
-    
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         provider.getInInterceptors().add(IN);
         provider.getInFaultInterceptors().add(IN);
         provider.getInInterceptors().add(INVOKER);
         provider.getOutInterceptors().add(OUT);
-        
+
     }
 
 }

@@ -42,33 +42,33 @@ public class ClientRequestFilterInterceptor extends AbstractOutDatabindingInterc
     public ClientRequestFilterInterceptor() {
         super(Phase.PRE_LOGICAL);
     }
-    
+
     public void handleMessage(Message outMessage) throws Fault {
         ClientProviderFactory pf = ClientProviderFactory.getInstance(outMessage);
         if (pf == null) {
             return;
         }
-        
+
         List<ProviderInfo<ClientRequestFilter>> filters = pf.getClientRequestFilters();
         if (!filters.isEmpty()) {
-            
-            final Exchange exchange = outMessage.getExchange(); 
-            final ClientRequestContext context = new ClientRequestContextImpl(outMessage, false); 
+
+            final Exchange exchange = outMessage.getExchange();
+            final ClientRequestContext context = new ClientRequestContextImpl(outMessage, false);
             for (ProviderInfo<ClientRequestFilter> filter : filters) {
                 InjectionUtils.injectContexts(filter.getProvider(), filter, outMessage);
                 try {
                     filter.getProvider().filter(context);
-                    
+
                     Response response = outMessage.getExchange().get(Response.class);
                     if (response != null) {
                         outMessage.getInterceptorChain().abort();
-                        
+
                         Message inMessage = new MessageImpl();
                         inMessage.setExchange(exchange);
                         inMessage.put(Message.RESPONSE_CODE, response.getStatus());
                         inMessage.put(Message.PROTOCOL_HEADERS, response.getMetadata());
                         exchange.setInMessage(inMessage);
-                        
+
                         MessageObserver observer = exchange.get(MessageObserver.class);
                         observer.onMessage(inMessage);
                         return;
@@ -79,5 +79,5 @@ public class ClientRequestFilterInterceptor extends AbstractOutDatabindingInterc
             }
         }
     }
-    
+
 }

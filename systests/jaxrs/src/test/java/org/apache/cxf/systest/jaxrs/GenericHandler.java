@@ -21,13 +21,13 @@ package org.apache.cxf.systest.jaxrs;
 public class GenericHandler<T> {
 
     private T entity;
-    
+
     public GenericHandler(T t) {
         entity = t;
     }
-    
+
     public T getEntity() {
         return entity;
     }
-    
+
 }

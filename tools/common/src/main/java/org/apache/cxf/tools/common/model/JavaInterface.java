@@ -41,22 +41,22 @@ public class JavaInterface implements JavaAnnotatable {
     private SOAPBinding.Style soapStyle;
     private SOAPBinding.Use soapUse;
     private SOAPBinding.ParameterStyle soapParameterStyle;
-    
-    private final List<JavaMethod> methods = new ArrayList<JavaMethod>();
-    private final List<JAnnotation> annotations = new ArrayList<JAnnotation>();
+
+    private final List<JavaMethod> methods = new ArrayList<>();
+    private final List<JAnnotation> annotations = new ArrayList<>();
     private final Set<String> imports = new TreeSet<String>();
-    private final List<String> supers = new ArrayList<String>();
+    private final List<String> supers = new ArrayList<>();
 
     private String webserviceName;
     private Element handlerChains;
-      
+
     public JavaInterface() {
     }
     public JavaInterface(JavaModel m) {
         this.model = m;
     }
 
-    
+
     static String formatJavaDoc(String d, String spaces) {
         if (d != null) {
             StringBuilder d2 = new StringBuilder(d.length());
@@ -93,7 +93,7 @@ public class JavaInterface implements JavaAnnotatable {
         }
         return d;
     }
-    
+
     public void setWebServiceName(String wsn) {
         this.webserviceName = wsn;
     }
@@ -120,20 +120,20 @@ public class JavaInterface implements JavaAnnotatable {
 
     public void setSOAPParameterStyle(SOAPBinding.ParameterStyle p) {
         this.soapParameterStyle = p;
-    }    
-    
+    }
+
     public SOAPBinding.ParameterStyle getSOAPParameterStyle() {
         return this.soapParameterStyle;
     }
-    
+
     public JavaModel getJavaModel() {
         return this.model;
     }
-    
+
     public void setName(String n) {
         this.name = n;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -197,7 +197,7 @@ public class JavaInterface implements JavaAnnotatable {
             methods.add(method);
         }
     }
-    
+
     public void addSuperInterface(String s) {
         if (s.contains(".")) {
             if (!s.startsWith("java.lang.")) {
@@ -223,20 +223,20 @@ public class JavaInterface implements JavaAnnotatable {
     public void setNamespace(String ns) {
         this.namespace = ns;
     }
-    
+
     public void setPackageJavaDoc(String doc) {
         packageJavaDoc = formatJavaDoc(doc, " ");
     }
-    
-    public String getPackageJavaDoc() {   
+
+    public String getPackageJavaDoc() {
         return (packageJavaDoc != null) ? packageJavaDoc : "";
     }
-    
+
     public void setClassJavaDoc(String doc) {
         classJavaDoc = formatJavaDoc(doc, " ");
     }
-    
-    public String getClassJavaDoc() {   
+
+    public String getClassJavaDoc() {
         return (classJavaDoc != null) ? classJavaDoc : "";
     }
 
@@ -244,7 +244,7 @@ public class JavaInterface implements JavaAnnotatable {
         this.annotations.add(annotation);
         for (String importClz : annotation.getImports()) {
             addImport(importClz);
-        }        
+        }
     }
 
     public List<JAnnotation> getAnnotations() {
@@ -261,7 +261,7 @@ public class JavaInterface implements JavaAnnotatable {
             imports.add(i.replaceAll("\\$", "\\."));
         }
     }
-    
+
     public void addImports(Collection<String> ii) {
         for (String i : ii) {
             // replace "$" with "." to correctly deal with member classes
@@ -280,7 +280,7 @@ public class JavaInterface implements JavaAnnotatable {
     public void annotate(Annotator annotator) {
         annotator.annotate(this);
     }
-    
+
     public Element getHandlerChains() {
         return this.handlerChains;
     }

@@ -22,8 +22,8 @@ import java.util.logging.Logger;
 import org.apache.hello_world_rpclit.GreeterRPCLit;
 import org.apache.hello_world_rpclit.types.MyComplexStruct;
 
-@javax.jws.WebService(portName = "SoapPortRPCLit", serviceName = "SOAPServiceRPCLit", 
-                      targetNamespace = "http://apache.org/hello_world_rpclit", 
+@javax.jws.WebService(portName = "SoapPortRPCLit", serviceName = "SOAPServiceRPCLit",
+                      targetNamespace = "http://apache.org/hello_world_rpclit",
                       endpointInterface = "org.apache.hello_world_rpclit.GreeterRPCLit")
 public class GreeterRPCLitImpl implements GreeterRPCLit {
 

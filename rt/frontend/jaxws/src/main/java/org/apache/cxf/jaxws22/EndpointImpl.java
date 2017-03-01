@@ -29,7 +29,7 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
  */
 @Deprecated
 public class EndpointImpl extends org.apache.cxf.jaxws.EndpointImpl {
-    
+
     /**
      * @param implementor
      */
@@ -93,5 +93,5 @@ public class EndpointImpl extends org.apache.cxf.jaxws.EndpointImpl {
     public EndpointImpl(Bus bus, Object implementor) {
         super(bus, implementor);
     }
-        
+
 }

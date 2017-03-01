@@ -87,13 +87,13 @@ public class SOAPHandlerInterceptor extends
     }
 
     public Set<URI> getRoles() {
-        Set<URI> roles = new HashSet<URI>();
+        Set<URI> roles = new HashSet<>();
         //TODO
         return roles;
     }
 
     public Set<QName> getUnderstoodHeaders() {
-        Set<QName> understood = new HashSet<QName>();
+        Set<QName> understood = new HashSet<>();
         for (Handler<?> h : getBinding().getHandlerChain()) {
             if (h instanceof SOAPHandler) {
                 Set<QName> headers = CastUtils.cast(((SOAPHandler<?>) h).getHeaders());
@@ -138,7 +138,7 @@ public class SOAPHandlerInterceptor extends
                 message.getInterceptorChain().abort();
                 if (ep.getInFaultObserver() != null) {
                     ep.getInFaultObserver().onMessage(message);
-                    
+
                 }
             }
         }
@@ -157,12 +157,12 @@ public class SOAPHandlerInterceptor extends
     }
 
     private boolean handleMessageInternal(SoapMessage message) {
-        
+
         MessageContext context = createProtocolMessageContext(message);
         if (context == null) {
             return true;
         }
-                
+
         HandlerChainInvoker invoker = getInvoker(message);
         invoker.setProtocolMessageContext(context);
 
@@ -185,7 +185,7 @@ public class SOAPHandlerInterceptor extends
             // client side outbound
             if (getInvoker(message).isOutbound()) {
                 message.getInterceptorChain().abort();
-                
+
                 MessageObserver observer = message.getExchange().get(MessageObserver.class);
                 if (!message.getExchange().isOneWay()
                     && observer != null) {
@@ -193,7 +193,7 @@ public class SOAPHandlerInterceptor extends
                     Message responseMsg = new MessageImpl();
                     responseMsg.setExchange(message.getExchange());
                     responseMsg = e.getBinding().createMessage(responseMsg);
-    
+
                     // the request message becomes the response message
                     message.getExchange().setInMessage(responseMsg);
                     SOAPMessage soapMessage = ((SOAPMessageContext)context).getMessage();
@@ -237,7 +237,7 @@ public class SOAPHandlerInterceptor extends
                     // well for outbound case, as many outbound interceptors
                     // have their ending interceptors.
                     // For example, we can not skip MessageSenderInterceptor.
-                    chain.doInterceptStartingAfter(responseMsg, 
+                    chain.doInterceptStartingAfter(responseMsg,
                                                    SoapPreProtocolOutInterceptor.class.getName());
                 }
 
@@ -251,12 +251,12 @@ public class SOAPHandlerInterceptor extends
     @Override
     protected MessageContext createProtocolMessageContext(SoapMessage message) {
         SOAPMessageContextImpl sm = new SOAPMessageContextImpl(message);
-        
+
         Exchange exch = message.getExchange();
         setupBindingOperationInfo(exch, sm);
         SOAPMessage msg = sm.getMessage();
-        try {            
-            List<SOAPElement> params = new ArrayList<SOAPElement>();
+        try {
+            List<SOAPElement> params = new ArrayList<>();
             message.put(MessageContext.REFERENCE_PARAMETERS, params);
             SOAPHeader head = SAAJUtils.getHeader(msg);
             if (head != null) {
@@ -275,15 +275,15 @@ public class SOAPHandlerInterceptor extends
                     }
                 }
             }
-            if (isRequestor(message) && msg.getSOAPPart().getEnvelope().getBody() != null 
+            if (isRequestor(message) && msg.getSOAPPart().getEnvelope().getBody() != null
                 && msg.getSOAPPart().getEnvelope().getBody().hasFault()) {
                 return null;
-            }            
+            }
         } catch (SOAPException e) {
             throw new Fault(e);
         }
-        
-        
+
+
         return sm;
     }
 
@@ -310,11 +310,11 @@ public class SOAPHandlerInterceptor extends
         if (getInvoker(message).getProtocolHandlers().isEmpty()) {
             return;
         }
-        if (getInvoker(message).isOutbound() 
+        if (getInvoker(message).isOutbound()
             && !chainAlreadyContainsSAAJ(message)) {
             SAAJ_OUT.handleFault(message);
         }
-    }    
+    }
 
     protected QName getOpQName(Exchange ex, Object data) {
         SOAPMessageContextImpl sm = (SOAPMessageContextImpl)data;

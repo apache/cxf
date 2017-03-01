@@ -23,7 +23,7 @@ public class TestRunner<T> implements Runnable {
 
     protected TestCaseBase<T> testCase;
     private String name;
-    private T port;    
+    private T port;
 
     public TestRunner() {
         this("Default runner");
@@ -39,16 +39,16 @@ public class TestRunner<T> implements Runnable {
         this.port = test.getPort();
     }
 
-    public void run() {     
+    public void run() {
         System.out.println("TestRunner " + name + " is running");
         try {
             testCase.internalTestRun(name, port);
         } catch (Exception e) {
             e.printStackTrace();
-        }    
+        }
         System.out.println("TestRunner " + name + " is finished");
     }
-  
+
     public void start() {
         Thread thread = new Thread(this);
         thread.start();

@@ -66,7 +66,7 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
 
         super.doRemoveClient(c);
     }
-    
+
     @Override
     public ServerAuthorizationCodeGrant createCodeGrant(AuthorizationCodeRegistration reg)
         throws OAuthServiceException {
@@ -96,7 +96,7 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
 
         return grants;
     }
-    
+
     @Override
     public ServerAuthorizationCodeGrant removeCodeGrant(String code) throws OAuthServiceException {
         ServerAuthorizationCodeGrant grant = getCodeGrant(code);
@@ -122,5 +122,11 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
 
     protected static boolean isExpired(ServerAuthorizationCodeGrant grant) {
         return System.currentTimeMillis() < (grant.getIssuedAt() + grant.getExpiresIn());
+    }
+
+    @Override
+    public void close() {
+        grantCache.close();
+        super.close();
     }
 }

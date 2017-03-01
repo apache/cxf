@@ -61,7 +61,7 @@ public class GetProtectedResourceController {
             provider);
         OAuthAccessor accessor = new OAuthAccessor(consumer);
         accessor.requestToken = oAuthParams.getOauthToken();
-        accessor.tokenSecret = oAuthParams.getOauthTokenSecret(); 
+        accessor.tokenSecret = oAuthParams.getOauthTokenSecret();
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, oAuthParams.getSignatureMethod());

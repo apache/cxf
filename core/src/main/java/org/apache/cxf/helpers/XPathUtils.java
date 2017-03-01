@@ -35,11 +35,11 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils.ClassLoaderHolder;
 
 
 public class XPathUtils {
-    
-    private static XPathFactory xpathFactory =  XPathFactory.newInstance();
+
+    private static XPathFactory xpathFactory = XPathFactory.newInstance();
 
     private XPath xpath;
-    
+
     public XPathUtils() {
         xpath = xpathFactory.newXPath();
     }
@@ -58,7 +58,7 @@ public class XPathUtils {
     }
 
     public Object getValue(String xpathExpression, Node node, QName type) {
-        ClassLoaderHolder loader 
+        ClassLoaderHolder loader
             = ClassLoaderUtils.setThreadContextClassloader(xpath.getClass().getClassLoader());
         try {
             return xpath.evaluate(xpathExpression, node, type);

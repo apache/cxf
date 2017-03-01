@@ -210,8 +210,8 @@ public class RMEndpointTest extends Assert {
         control.reset();
         ExtensibilityElement ua = control.createMock(ExtensibilityElement.class);
         ei = control.createMock(EndpointInfo.class);
-        List<ExtensibilityElement> noExts = new ArrayList<ExtensibilityElement>();
-        List<ExtensibilityElement> exts = new ArrayList<ExtensibilityElement>();
+        List<ExtensibilityElement> noExts = new ArrayList<>();
+        List<ExtensibilityElement> exts = new ArrayList<>();
         exts.add(ua);
         EasyMock.expect(ei.getExtensors(ExtensibilityElement.class)).andReturn(noExts);
         BindingInfo bi = control.createMock(BindingInfo.class);
@@ -227,7 +227,7 @@ public class RMEndpointTest extends Assert {
 
     @Test
     public void testGetUsingAddressingFromExtensions() {
-        List<ExtensibilityElement> exts = new ArrayList<ExtensibilityElement>();
+        List<ExtensibilityElement> exts = new ArrayList<>();
         ExtensibilityElement ua = control.createMock(ExtensibilityElement.class);
         exts.add(ua);
         EasyMock.expect(ua.getElementType()).andReturn(Names.WSAW_USING_ADDRESSING_QNAME);
@@ -277,13 +277,13 @@ public class RMEndpointTest extends Assert {
         EasyMock.expect(ds.getIdentifier()).andReturn(did).anyTimes();
         EasyMock.expect(ds.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
         String d = "d";
-        EasyMock.expect(did.getValue()).andReturn(d).anyTimes();        
+        EasyMock.expect(did.getValue()).andReturn(d).anyTimes();
         SourceSequence ss = control.createMock(SourceSequence.class);
         Identifier sid = control.createMock(Identifier.class);
         EasyMock.expect(ss.getIdentifier()).andReturn(sid).anyTimes();
         EasyMock.expect(ss.getProtocol()).andReturn(ProtocolVariation.RM10WSA200408).anyTimes();
         String s = "s";
-        EasyMock.expect(sid.getValue()).andReturn(s).anyTimes();        
+        EasyMock.expect(sid.getValue()).andReturn(s).anyTimes();
         ds.cancelDeferredAcknowledgments();
         EasyMock.expectLastCall().anyTimes();
         ds.cancelTermination();
@@ -330,11 +330,11 @@ public class RMEndpointTest extends Assert {
         oi = intf.getOperation(new QName(ns, "SequenceAcknowledgement"));
         assertNotNull("No operation info.", oi);
         assertTrue("Operation is toway.", oi.isOneWay());
-        
+
         oi = intf.getOperation(new QName(ns, "CloseSequence"));
         assertNotNull("No operation info.", oi);
         assertTrue("Operation is toway.", oi.isOneWay());
-        
+
         oi = intf.getOperation(new QName(ns, "AckRequested"));
         assertNotNull("No operation info.", oi);
         assertTrue("Operation is toway.", oi.isOneWay());

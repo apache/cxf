@@ -27,10 +27,10 @@ import javax.xml.ws.Holder;
 
 import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 
-@WebService(serviceName = "JMSMTOMService", 
-            portName = "JMSMTOMPortType", 
-            endpointInterface = "org.apache.cxf.jms_mtom.JMSMTOMPortType", 
-            targetNamespace = "http://cxf.apache.org/jms_mtom", 
+@WebService(serviceName = "JMSMTOMService",
+            portName = "JMSMTOMPortType",
+            endpointInterface = "org.apache.cxf.jms_mtom.JMSMTOMPortType",
+            targetNamespace = "http://cxf.apache.org/jms_mtom",
             wsdlLocation = "testutils/jms_test_mtom.wsdl")
 public class JMSMTOMImpl implements JMSMTOMPortType {
 
@@ -44,7 +44,7 @@ public class JMSMTOMImpl implements JMSMTOMPortType {
         System.out.println("TestDataHandler End");
     }
 
-   
+
     public DataHandler testOutMtom() {
         URL fileURL = this.getClass().getResource("/org/apache/cxf/systest/jms/JMSClientServerTest.class");
         return new DataHandler(fileURL);

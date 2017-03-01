@@ -57,7 +57,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
     private JMSConfiguration jmsConfig;
     private Message inMessage;
     private Connection connection;
-    
+
     BackChannelConduit(Message inMessage, JMSConfiguration jmsConfig, Connection connection) {
         super(EndpointReferenceUtils.getAnonymousEndpointReference());
         this.inMessage = inMessage;
@@ -69,10 +69,10 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
         MessageStreamUtil.closeStreams(msg);
         super.close(msg);
     }
-    
+
     /**
      * Register a message observer for incoming messages.
-     * 
+     *
      * @param observer the observer to notify on receipt of incoming
      */
     public void setMessageObserver(MessageObserver observer) {
@@ -82,7 +82,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
     /**
      * Send an outbound message, assumed to contain all the name-value mappings of the corresponding input
      * message (if any).
-     * 
+     *
      * @param message the message to be sent.
      */
     public void prepare(final Message message) throws IOException {
@@ -96,14 +96,14 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
             message.put(JMSConstants.JMS_SERVER_RESPONSE_HEADERS, inMessage
                 .get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS));
         }
-        
+
         Exchange exchange = inMessage.getExchange();
         exchange.setOutMessage(message);
 
         boolean isTextMessage = (jmsMessage instanceof TextMessage) && !JMSMessageUtils.isMtomEnabled(message);
         MessageStreamUtil.prepareStream(message, isTextMessage, this);
     }
-    
+
     protected Logger getLogger() {
         return LOG;
     }
@@ -124,7 +124,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
     private void send(final Message outMessage, final Object replyObj, ResourceCloser closer)
         throws JMSException {
         Session session = closer.register(connection.createSession(false, Session.AUTO_ACKNOWLEDGE));
-        
+
         JMSMessageHeadersType outProps = (JMSMessageHeadersType)outMessage.get(JMS_SERVER_RESPONSE_HEADERS);
         JMSMessageHeadersType inProps = (JMSMessageHeadersType)inMessage.get(JMS_SERVER_REQUEST_HEADERS);
         initResponseMessageProperties(outProps, inProps);
@@ -142,9 +142,9 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
 
         final String msgType = getMessageType(outMessage, request);
         String correlationId = determineCorrelationID(request);
-        javax.jms.Message reply = JMSMessageUtils.asJMSMessage(jmsConfig, 
-                                  outMessage, 
-                                  replyObj, 
+        javax.jms.Message reply = JMSMessageUtils.asJMSMessage(jmsConfig,
+                                  outMessage,
+                                  replyObj,
                                   msgType,
                                   session,
                                   correlationId, JMS_SERVER_RESPONSE_HEADERS);
@@ -155,22 +155,22 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
 
     private String getMessageType(final Message outMessage, final javax.jms.Message request) {
         String msgType;
-        if (JMSMessageUtils.isMtomEnabled(outMessage) 
+        if (JMSMessageUtils.isMtomEnabled(outMessage)
             && !jmsConfig.getMessageType().equals(JMSConstants.TEXT_MESSAGE_TYPE)) {
             //get chance to set messageType from JMSConfiguration with MTOM enabled
             msgType = jmsConfig.getMessageType();
         } else {
             msgType = JMSMessageUtils.getMessageType(request);
         }
-        if (JMSConstants.TEXT_MESSAGE_TYPE.equals(msgType) 
+        if (JMSConstants.TEXT_MESSAGE_TYPE.equals(msgType)
             && JMSMessageUtils.isMtomEnabled(outMessage)) {
-            org.apache.cxf.common.i18n.Message msg = 
+            org.apache.cxf.common.i18n.Message msg =
                 new org.apache.cxf.common.i18n.Message("INVALID_MESSAGE_TYPE", LOG);
             throw new ConfigurationException(msg);
         }
         return msgType;
     }
-    
+
     /**
      * @param messageProperties
      * @param inMessageProperties
@@ -196,7 +196,7 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
         }
         return false;
     }
-    
+
     private Destination getReplyToDestination(Session session, Message inMessage2) throws JMSException {
         javax.jms.Message message = (javax.jms.Message)inMessage2.get(JMSConstants.JMS_REQUEST_MESSAGE);
         // If WS-Addressing had set the replyTo header.
@@ -209,17 +209,17 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
             return jmsConfig.getReplyDestination(session);
         }
     }
-    
+
     /**
      * Decides what correlationId to use for the reply by looking at the request headers
-     * 
+     *
      * @param request jms request message
      * @return correlation id of request if set else message id from request
      * @throws JMSException
      */
     public String determineCorrelationID(javax.jms.Message request) throws JMSException {
         return StringUtils.isEmpty(request.getJMSCorrelationID())
-            ? request.getJMSMessageID() 
+            ? request.getJMSMessageID()
             : request.getJMSCorrelationID();
     }
 

@@ -25,7 +25,7 @@ public final class HttpSessionThreadLocal {
     public static final ThreadLocal<NettyHttpSession> SESSION_THREAD_LOCAL = new ThreadLocal<NettyHttpSession>();
 
     private static HttpSessionStore sessionStore;
-    
+
     private HttpSessionThreadLocal() {
         // Utils class
     }

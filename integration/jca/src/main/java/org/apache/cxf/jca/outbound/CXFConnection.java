@@ -25,23 +25,23 @@ package org.apache.cxf.jca.outbound;
  */
 
 public interface CXFConnection {
-    
+
     /**
      * Retrieves a service object to invoke.  The serviceInterface class must
      * match the serviceClass in the CXFConnectionSpec that is used to
      * obtain this CXFConnection.  Application should not continue to use the service
      * object after the the connection has been closed by calling {@link #close()}.
-     * 
+     *
      * @param <T>
      * @param serviceClass
      * @return service object
      * @throws Exception
      */
     <T> T getService(Class<T> serviceClass) throws Exception;
-    
+
     /**
      * Closes the connection handle. A caller should not use a closed connection.
-     * 
+     *
      * @throws Exception if an error occurs during close.
      */
     void close() throws Exception;

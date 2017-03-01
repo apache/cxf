@@ -30,31 +30,31 @@ import org.apache.cxf.service.model.ServiceModelUtil;
 
 public abstract class AbstractJAXWSHandlerInterceptor<T extends Message> extends AbstractPhaseInterceptor<T> {
     protected Binding binding;
-    
+
     protected AbstractJAXWSHandlerInterceptor(Binding b, String phase) {
         super(phase);
         binding = b;
     }
-    
+
     protected boolean isOutbound(T message) {
         return isOutbound(message, message.getExchange());
     }
-    
+
     private boolean isOutbound(T message, Exchange ex) {
         return message == ex.getOutMessage()
             || message == ex.getOutFaultMessage();
     }
-    
+
     protected HandlerChainInvoker getInvoker(T message) {
         Exchange ex = message.getExchange();
-        HandlerChainInvoker invoker = 
+        HandlerChainInvoker invoker =
             ex.get(HandlerChainInvoker.class);
         if (null == invoker) {
             invoker = new HandlerChainInvoker(binding.getHandlerChain(),
                                               isOutbound(message));
             ex.put(HandlerChainInvoker.class, invoker);
         }
-        
+
         boolean outbound = isOutbound(message, ex);
         if (outbound) {
             invoker.setOutbound();
@@ -62,48 +62,48 @@ public abstract class AbstractJAXWSHandlerInterceptor<T extends Message> extends
             invoker.setInbound();
         }
         invoker.setRequestor(isRequestor(message));
-        
+
         if (ex.isOneWay()
-            || ((isRequestor(message) && !outbound) 
+            || ((isRequestor(message) && !outbound)
                 || (!isRequestor(message) && outbound))) {
             invoker.setResponseExpected(false);
-        } else { 
+        } else {
             invoker.setResponseExpected(true);
         }
-        
+
         return invoker;
     }
-    
+
     protected Binding getBinding() {
         return binding;
     }
-    
+
     public void onCompletion(T message) {
         getInvoker(message).mepComplete(message);
-    }   
-    
+    }
+
     public boolean isMEPComlete(T message) {
         HandlerChainInvoker invoker = getInvoker(message);
-      
+
         if (invoker.isRequestor()) {
             //client inbound and client outbound with no response are end of MEP
             if (invoker.isInbound()) {
                 return true;
             } else if (!invoker.isResponseExpected()) {
                 return true;
-            }            
+            }
         } else {
             //server outbound and server inbound with no response are end of MEP
             if (!invoker.isInbound()) {
                 return true;
             } else if (!invoker.isResponseExpected()) {
                 return true;
-            }            
-        } 
-        
+            }
+        }
+
         return false;
     }
-    
+
     protected void setupBindingOperationInfo(Exchange exch, Object data) {
         if (exch.getBindingOperationInfo() == null) {
             //need to know the operation to determine if oneway
@@ -125,7 +125,7 @@ public abstract class AbstractJAXWSHandlerInterceptor<T extends Message> extends
 
         }
     }
-    
+
     protected QName getOpQName(Exchange ex, Object data) {
         return null;
     }

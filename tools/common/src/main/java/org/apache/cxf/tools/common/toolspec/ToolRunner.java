@@ -39,7 +39,7 @@ public final class ToolRunner {
                                boolean validate, String[] args) throws Exception {
         runTool(clz, toolspecStream, validate, args, true);
     }
-    
+
     public static void runTool(Class<? extends ToolContainer> clz, InputStream toolspecStream,
                                boolean validate, String[] args, OutputStream os) throws Exception {
         runTool(clz, toolspecStream, validate, args, true, null, os);
@@ -57,7 +57,7 @@ public final class ToolRunner {
                                boolean exitOnFinish) throws Exception {
         runTool(clz, toolspecStream, validate, args, true, null, null);
     }
-    
+
     public static void runTool(Class<? extends ToolContainer> clz,
                                InputStream toolspecStream,
                                boolean validate,
@@ -66,7 +66,7 @@ public final class ToolRunner {
                                ToolContext context) throws Exception {
         runTool(clz, toolspecStream, validate, args, exitOnFinish, context, null);
     }
-    
+
     public static void runTool(Class<? extends ToolContainer> clz,
                                InputStream toolspecStream,
                                boolean validate,
@@ -78,7 +78,7 @@ public final class ToolRunner {
         ToolContainer container = null;
 
         try {
-            Constructor<? extends ToolContainer> cons 
+            Constructor<? extends ToolContainer> cons
                 = clz.getConstructor(
                                      new Class[] {
                                          ToolSpec.class

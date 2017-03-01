@@ -30,17 +30,17 @@ public class SoapVersionFactory {
         getInstance().register(Soap11.getInstance());
         getInstance().register(Soap12.getInstance());
     }
-    
+
     private Map<String, SoapVersion> versions = new HashMap<String, SoapVersion>();
-    
+
     public static SoapVersionFactory getInstance() {
         return factory;
     }
-    
+
     public SoapVersion getSoapVersion(String namespace) {
         return versions.get(namespace);
     }
-    
+
     public void register(SoapVersion version) {
         versions.put(version.getNamespace(), version);
     }

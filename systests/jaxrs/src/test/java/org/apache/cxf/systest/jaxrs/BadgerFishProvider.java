@@ -53,19 +53,19 @@ import org.codehaus.jettison.badgerfish.BadgerFishXMLOutputFactory;
 @Produces("application/json")
 @Consumes("application/json")
 @Provider
-public final class BadgerFishProvider 
+public final class BadgerFishProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object>  {
 
-    
-    private static Map<Class<?>, JAXBContext> jaxbContexts 
+
+    private static Map<Class<?>, JAXBContext> jaxbContexts
         = new WeakHashMap<Class<?>, JAXBContext>();
     @Context
-    private HttpHeaders requestHeaders;  
-    
+    private HttpHeaders requestHeaders;
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType m) {
         return type.getAnnotation(XmlRootElement.class) != null;
     }
-    
+
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType m) {
         return type.getAnnotation(XmlRootElement.class) != null;
     }
@@ -73,20 +73,20 @@ public final class BadgerFishProvider
     public long getSize(Object o, Class<?> type, Type genericType, Annotation[] annotations, MediaType m) {
         return -1;
     }
-    
-    public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, 
+
+    public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations,
                            MediaType m, MultivaluedMap<String, String> headers, InputStream is) {
         try {
             JAXBContext context = getJAXBContext(type);
             Unmarshaller unmarshaller = context.createUnmarshaller();
-               
+
             BadgerFishXMLInputFactory factory = new BadgerFishXMLInputFactory();
-            XMLStreamReader xsw = factory.createXMLStreamReader(is);            
+            XMLStreamReader xsw = factory.createXMLStreamReader(is);
             Object obj = unmarshaller.unmarshal(xsw);
             xsw.close();
             return obj;
         } catch (JAXBException e) {
-            e.printStackTrace();         
+            e.printStackTrace();
         } catch (XMLStreamException e) {
             e.printStackTrace();
         }
@@ -94,21 +94,21 @@ public final class BadgerFishProvider
         return null;
     }
 
-    public void writeTo(Object obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
+    public void writeTo(Object obj, Class<?> clazz, Type genericType, Annotation[] annotations,
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
         try {
             if (!new Locale("badgerFishLanguage").equals(requestHeaders.getLanguage())) {
                 throw new RuntimeException();
             }
-            
+
             JAXBContext context = getJAXBContext(obj.getClass());
             Marshaller marshaller = context.createMarshaller();
-                        
+
             XMLOutputFactory factory = new BadgerFishXMLOutputFactory();
-            XMLStreamWriter xsw = factory.createXMLStreamWriter(os);            
+            XMLStreamWriter xsw = factory.createXMLStreamWriter(os);
             marshaller.marshal(obj, xsw);
             xsw.close();
-            
+
         } catch (JAXBException e) {
             e.printStackTrace();
         } catch (XMLStreamException e) {

@@ -47,14 +47,14 @@ import org.apache.cxf.wsdl.interceptors.BareOutInterceptor;
 public class CorbaBindingFactory extends AbstractWSDLBindingFactory
     implements ConduitInitiator, DestinationFactory {
 
-    public static final Collection<String> DEFAULT_NAMESPACES 
+    public static final Collection<String> DEFAULT_NAMESPACES
         = Arrays.asList(
             "http://cxf.apache.org/bindings/corba",
             "http://schemas.apache.org/yoko/bindings/corba"
         );
 
-    
-    protected List<String> transportIds = new ArrayList<String>(DEFAULT_NAMESPACES);
+
+    protected List<String> transportIds = new ArrayList<>(DEFAULT_NAMESPACES);
     protected OrbConfig orbConfig = new OrbConfig();
 
     public CorbaBindingFactory() {
@@ -65,7 +65,7 @@ public class CorbaBindingFactory extends AbstractWSDLBindingFactory
     public void setOrbClass(String cls) {
         orbConfig.setOrbClass(cls);
     }
-    
+
     public void setOrbSingletonClass(String cls) {
         orbConfig.setOrbSingletonClass(cls);
     }
@@ -109,7 +109,7 @@ public class CorbaBindingFactory extends AbstractWSDLBindingFactory
     public void setOrbArgs(List<String> args) {
         orbConfig.setOrbArgs(args);
     }
-    
+
     public Set<String> getUriPrefixes() {
         Set<String> uriPrefixes = new java.util.HashSet<String>();
         uriPrefixes.add("IOR");
@@ -119,7 +119,7 @@ public class CorbaBindingFactory extends AbstractWSDLBindingFactory
         uriPrefixes.add("corba");
         return uriPrefixes;
     }
-    
+
     public OrbConfig getOrbConfig() {
         return orbConfig;
     }

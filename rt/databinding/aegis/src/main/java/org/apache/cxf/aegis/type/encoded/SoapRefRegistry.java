@@ -99,7 +99,7 @@ public class SoapRefRegistry {
         } else {
             List<SoapRef> list = unresolvedRefs.get(id);
             if (list == null) {
-                list = new ArrayList<SoapRef>();
+                list = new ArrayList<>();
                 unresolvedRefs.put(id, list);
             }
             list.add(soapRef);

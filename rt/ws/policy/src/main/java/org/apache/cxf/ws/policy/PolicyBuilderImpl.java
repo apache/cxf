@@ -30,13 +30,13 @@ import org.apache.cxf.extension.BusExtension;
  * from DOM elements, but also from an input stream etc.
  */
 @NoJSR250Annotations
-public class PolicyBuilderImpl extends org.apache.neethi.PolicyBuilder 
+public class PolicyBuilderImpl extends org.apache.neethi.PolicyBuilder
     implements PolicyBuilder, BusExtension {
     private Bus bus;
-   
+
     public PolicyBuilderImpl() {
     }
-    
+
     public PolicyBuilderImpl(Bus theBus) {
         super(null);
         setBus(theBus);
@@ -45,11 +45,11 @@ public class PolicyBuilderImpl extends org.apache.neethi.PolicyBuilder
     public Class<?> getRegistrationType() {
         return PolicyBuilder.class;
     }
-    
+
     public void setAssertionBuilderRegistry(AssertionBuilderRegistry reg) {
         factory = reg;
     }
-    
+
     public final void setBus(Bus theBus) {
         bus = theBus;
         if (bus != null) {
@@ -58,14 +58,14 @@ public class PolicyBuilderImpl extends org.apache.neethi.PolicyBuilder
             if (reg != null) {
                 factory = reg;
             }
-            org.apache.cxf.ws.policy.PolicyEngine e 
+            org.apache.cxf.ws.policy.PolicyEngine e
                 = bus.getExtension(org.apache.cxf.ws.policy.PolicyEngine.class);
             if (e != null) {
                 this.setPolicyRegistry(e.getRegistry());
             }
         }
     }
-    
+
     public Bus getBus() {
         return bus;
     }

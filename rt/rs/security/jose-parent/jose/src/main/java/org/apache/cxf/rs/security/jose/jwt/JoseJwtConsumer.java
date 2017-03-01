@@ -29,7 +29,10 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public class JoseJwtConsumer extends AbstractJoseConsumer {
     private boolean jwsRequired = true;
     private boolean jweRequired;
-    
+
+    private int clockOffset;
+    private int ttl;
+
     public JwtToken getJwtToken(String wrappedJwtToken) {
         return getJwtToken(wrappedJwtToken, null, null);
     }
@@ -39,32 +42,32 @@ public class JoseJwtConsumer extends AbstractJoseConsumer {
         if (!isJwsRequired() && !isJweRequired()) {
             throw new JwtException("Unable to process JWT");
         }
-        
+
         JweHeaders jweHeaders = new JweHeaders();
         if (isJweRequired()) {
             JweJwtCompactConsumer jwtConsumer = new JweJwtCompactConsumer(wrappedJwtToken);
-            
+
             if (theDecryptor == null) {
                 theDecryptor = getInitializedDecryptionProvider(jwtConsumer.getHeaders());
             }
             if (theDecryptor == null) {
                 throw new JwtException("Unable to decrypt JWT");
             }
-            
+
             if (!isJwsRequired()) {
-                return jwtConsumer.decryptWith(theDecryptor);    
+                return jwtConsumer.decryptWith(theDecryptor);
             }
-            
+
             JweDecryptionOutput decOutput = theDecryptor.decrypt(wrappedJwtToken);
             wrappedJwtToken = decOutput.getContentText();
             jweHeaders = decOutput.getHeaders();
         }
-        
+
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(wrappedJwtToken);
         JwtToken jwt = jwtConsumer.getJwtToken();
         // Store the encryption headers as well
         jwt = new JwtToken(jwt.getJwsHeaders(), jweHeaders, jwt.getClaims());
-        
+
         if (isJwsRequired()) {
             if (theSigVerifier == null) {
                 theSigVerifier = getInitializedSignatureVerifier(jwt);
@@ -72,20 +75,20 @@ public class JoseJwtConsumer extends AbstractJoseConsumer {
             if (theSigVerifier == null) {
                 throw new JwtException("Unable to validate JWT");
             }
-            
+
             if (!jwtConsumer.verifySignatureWith(theSigVerifier)) {
                 throw new JwtException("Invalid Signature");
             }
         }
-        
+
         validateToken(jwt);
-        return jwt; 
+        return jwt;
     }
-    
+
     protected JwsSignatureVerifier getInitializedSignatureVerifier(JwtToken jwt) {
         return super.getInitializedSignatureVerifier(jwt.getJwsHeaders());
     }
-    
+
     protected void validateToken(JwtToken jwt) {
     }
     public boolean isJwsRequired() {
@@ -103,5 +106,20 @@ public class JoseJwtConsumer extends AbstractJoseConsumer {
     public void setJweRequired(boolean jweRequired) {
         this.jweRequired = jweRequired;
     }
-    
+
+    public int getClockOffset() {
+        return clockOffset;
+    }
+
+    public void setClockOffset(int clockOffset) {
+        this.clockOffset = clockOffset;
+    }
+
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
+    }
 }

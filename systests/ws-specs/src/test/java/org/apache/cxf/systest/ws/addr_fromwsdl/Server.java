@@ -34,32 +34,32 @@ import org.apache.cxf.ws.addressing.WSAddressingFeature;
 public class Server extends AbstractBusTestServerBase {
     static final String PORT = allocatePort(Server.class);
     List<EndpointImpl> eps = new LinkedList<EndpointImpl>();
-    
+
     @WebService(serviceName = "AddNumbersService",
                 portName = "AddNumbersPort",
                 targetNamespace = "http://apache.org/cxf/systest/ws/addr_feature/")
     public static class AddNumberReg extends AddNumberImpl implements AddNumbersPortType {
-        
+
     }
     @WebService(serviceName = "AddNumbersService",
                 portName = "AddNumbersNonAnonPort",
                 targetNamespace = "http://apache.org/cxf/systest/ws/addr_feature/")
     public static class AddNumberNonAnon extends AddNumberImpl implements AddNumbersPortType {
-        
+
     }
     @WebService(serviceName = "AddNumbersService",
                 portName = "AddNumbersOnlyAnonPort",
                 targetNamespace = "http://apache.org/cxf/systest/ws/addr_feature/")
     public static class AddNumberOnlyAnon extends AddNumberImpl implements AddNumbersPortType {
-        
+
     }
-    protected void run()  {    
+    protected void run()  {
         Object implementor = new AddNumberReg();
         String address = "http://localhost:" + PORT + "/jaxws/add";
         EndpointImpl ep;
-        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
-                                           implementor, 
-                                           null, 
+        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(),
+                                           implementor,
+                                           null,
                                            getWsdl());
 
         ep.getFeatures().add(new WSAddressingFeature());
@@ -68,10 +68,10 @@ public class Server extends AbstractBusTestServerBase {
 
         implementor = new AddNumberNonAnon();
         address = "http://localhost:" + PORT + "/jaxws/addNonAnon";
-        
-        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
-                                           implementor, 
-                                           null, 
+
+        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(),
+                                           implementor,
+                                           null,
                                            getWsdl());
 
         ep.getFeatures().add(new WSAddressingFeature());
@@ -80,24 +80,24 @@ public class Server extends AbstractBusTestServerBase {
 
         implementor = new AddNumberOnlyAnon();
         address = "http://localhost:" + PORT + "/jaxws/addAnon";
-        
-        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
-                                           implementor, 
-                                           null, 
+
+        ep = new EndpointImpl(BusFactory.getThreadDefaultBus(),
+                                           implementor,
+                                           null,
                                            getWsdl());
 
         ep.getFeatures().add(new WSAddressingFeature());
         ep.publish(address);
         eps.add(ep);
     }
-    
+
     public void tearDown() {
         for (EndpointImpl ep : eps) {
             ep.stop();
         }
         eps = null;
     }
-    
+
 
     private String getWsdl() {
         try {

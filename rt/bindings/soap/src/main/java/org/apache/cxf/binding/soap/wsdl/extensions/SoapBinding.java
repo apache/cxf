@@ -23,5 +23,5 @@ import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap12.SOAP12Binding;
 
 public interface SoapBinding extends SOAPBinding, SOAP12Binding {
-    
+
 }

@@ -31,7 +31,7 @@ import org.junit.Test;
  * Test motivated by CXF-1504
  */
 public class DocLitBareTest extends AbstractCXFTest {
-    
+
     @Test
     public void testNamespaceCrash() {
         ServerFactoryBean svrFactory = new ServerFactoryBean();
@@ -40,16 +40,16 @@ public class DocLitBareTest extends AbstractCXFTest {
         svrFactory.setAddress("local://dlbTest");
         svrFactory.setServiceBean(new UniversityImpl());
         svrFactory.getServiceFactory().setDataBinding(new AegisDatabinding());
-        svrFactory.create(); 
+        svrFactory.create();
 
         ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
         factory.getServiceFactory().setDataBinding(new AegisDatabinding());
-       
+
         factory.setServiceClass(University.class);
         factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         factory.setAddress("local://dlbTest");
         University client = (University) factory.create();
-       
+
         Teacher tr = client.getTeacher(new Course(40, "Intro to CS", "Introductory Comp Sci"));
         assertNotNull(tr);
         assertEquals(52, tr.getAge());

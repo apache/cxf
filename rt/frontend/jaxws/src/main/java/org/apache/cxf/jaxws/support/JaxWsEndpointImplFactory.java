@@ -27,10 +27,10 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 
 /**
- * 
+ *
  */
 public class JaxWsEndpointImplFactory implements EndpointImplFactory {
-    
+
     private static JaxWsEndpointImplFactory singleton = new JaxWsEndpointImplFactory();
 
     /** {@inheritDoc}*/

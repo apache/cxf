@@ -59,7 +59,7 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
     public void testValidationFailureOnServerOut() throws Exception {
         FixedArray x = new FixedArray();
         FixedArray yOrig = new FixedArray();
-        
+
         x.getItem().addAll(Arrays.asList(24, 42, 2008));
         yOrig.getItem().addAll(Arrays.asList(24, 0, 1));
 
@@ -72,7 +72,7 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
             assertTrue(ex.getMessage(), ex.getMessage().contains("Marshalling"));
         }
     }
-    
+
     @Test
     public void testStructWithAnyStrict() throws Exception {
         SOAPFactory factory = SOAPFactory.newInstance();
@@ -85,12 +85,12 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
         x.setName("Name x");
         x.setAddress("Some Address x");
         x.setAny(elem);
-        
+
         elem = factory.createElement("StringElementQualified",
             "x1", "http://apache.org/type_test/types1");
         elem.addNamespaceDeclaration("x1", "http://apache.org/type_test/types1");
         elem.addTextNode("This is the text of the second node");
-                                
+
         StructWithAnyStrict yOrig = new StructWithAnyStrict();
         yOrig.setName("Name y");
         yOrig.setAddress("Some Address y");
@@ -105,7 +105,7 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
             assertEqualsStructWithAnyStrict(x, ret);
         }
     }
-   
+
     @Test
     public void testStructWithAnyStrictComplex() throws Exception {
         SOAPFactory factory = SOAPFactory.newInstance();
@@ -124,12 +124,12 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
             "http://apache.org/type_test/types1");
         stringElem.addTextNode("test string within any");
         elem.addChildElement(stringElem);
-                                 
+
         StructWithAnyStrict x = new StructWithAnyStrict();
         x.setName("Name x");
         x.setAddress("Some Address x");
         x.setAny(elem);
-        
+
         elem = factory.createElement("AnonTypeElementQualified", "x1",
             "http://apache.org/type_test/types1");
         elem.addNamespaceDeclaration("x1", "http://apache.org/type_test/types1");
@@ -145,7 +145,7 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
             "http://apache.org/type_test/types1");
         stringElem.addTextNode("test string");
         elem.addChildElement(stringElem);
-        
+
         StructWithAnyStrict yOrig = new StructWithAnyStrict();
         yOrig.setName("Name y");
         yOrig.setAddress("Some Address y");
@@ -164,7 +164,7 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
     @Test
     public void testStructWithAnyArrayLax() throws Exception {
         SOAPFactory factory = SOAPFactory.newInstance();
-        SOAPElement elem = factory.createElement("StringElementQualified", 
+        SOAPElement elem = factory.createElement("StringElementQualified",
             "x1", "http://apache.org/type_test/types1");
         elem.addNamespaceDeclaration("x1", "http://apache.org/type_test/types1");
         elem.addTextNode("This is the text of the node");
@@ -193,7 +193,7 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
             assertEqualsStructWithAnyArrayLax(x, ret);
         }
     }
-    
+
     @Test
     public void testStructWithAnyArrayLaxComplex() throws Exception {
         SOAPFactory factory = SOAPFactory.newInstance();
@@ -231,7 +231,7 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
             assertEqualsStructWithAnyArrayLax(x, ret);
         }
     }
-    
+
     public void assertEqualsStructWithAnyStrict(StructWithAnyStrict a,
             StructWithAnyStrict b) throws Exception {
         assertEquals("StructWithAnyStrict names don't match", a.getName(), b.getName());
@@ -255,5 +255,5 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
             }
         }
     }
-    
+
 }

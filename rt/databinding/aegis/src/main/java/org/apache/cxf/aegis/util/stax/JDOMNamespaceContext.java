@@ -44,7 +44,7 @@ public class JDOMNamespaceContext implements NamespaceContext {
     }
 
     public Iterator<String> getPrefixes(String uri) {
-        List<String> prefixes = new ArrayList<String>();
+        List<String> prefixes = new ArrayList<>();
         rawGetPrefixes(element, uri, prefixes);
         return prefixes.iterator();
     }
@@ -56,7 +56,7 @@ public class JDOMNamespaceContext implements NamespaceContext {
     public void setElement(Element element) {
         this.element = element;
     }
-    
+
     public static String rawGetPrefix(Element element, String namespaceURI) {
         if (element.getNamespaceURI().equals(namespaceURI)) {
             return element.getNamespacePrefix();
@@ -78,7 +78,7 @@ public class JDOMNamespaceContext implements NamespaceContext {
             return null;
         }
     }
-    
+
     static void rawGetPrefixes(Element element, String namespaceURI, List<String> prefixes) {
         if (element.getNamespaceURI().equals(namespaceURI)) {
             prefixes.add(element.getNamespacePrefix());

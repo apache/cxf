@@ -30,10 +30,10 @@ import org.apache.neethi.Assertion;
 import org.apache.neethi.Policy;
 
 /**
- * 
+ *
  */
 public class FirstAlternativeSelector extends BaseAlternativeSelector {
-    
+
     public Collection<Assertion> selectAlternative(Policy policy,
                                                    PolicyEngine engine,
                                                    Assertor assertor,
@@ -47,14 +47,14 @@ public class FirstAlternativeSelector extends BaseAlternativeSelector {
                 && this.isCompatibleWithRequest(alternative, request)) {
                 return alternative;
             }
-        }        
+        }
         alternatives = policy.getAlternatives();
         while (alternatives.hasNext()) {
             List<Assertion> alternative = alternatives.next();
             if (engine.supportsAlternative(alternative, assertor, msg)) {
                 return alternative;
             }
-        }        
+        }
         return null;
     }
 

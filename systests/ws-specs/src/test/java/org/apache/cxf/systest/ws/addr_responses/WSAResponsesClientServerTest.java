@@ -59,7 +59,7 @@ public class WSAResponsesClientServerTest extends AbstractWSATestBase {
             } else {
                 throw e;
             }
-            
+
         }
     }
 

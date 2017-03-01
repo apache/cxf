@@ -112,7 +112,7 @@ public class PhaseManagerImpl implements PhaseManager, BusExtension {
         //Make sure ending interceptors are put in positions symmetric
         // to their starting interceptors
         outPhases.add(new Phase(Phase.SEND_ENDING, ++i * 1000));
-        
+
         outPhases.add(new Phase(Phase.POST_STREAM_ENDING, ++i * 1000));
         outPhases.add(new Phase(Phase.USER_STREAM_ENDING, ++i * 1000));
 
@@ -123,7 +123,7 @@ public class PhaseManagerImpl implements PhaseManager, BusExtension {
         outPhases.add(new Phase(Phase.WRITE_ENDING, ++i * 1000));
 
         outPhases.add(new Phase(Phase.PRE_PROTOCOL_ENDING, ++i * 1000));
-        
+
         outPhases.add(new Phase(Phase.PRE_STREAM_ENDING, ++i * 1000));
 
         outPhases.add(new Phase(Phase.PREPARE_SEND_ENDING, ++i * 1000));

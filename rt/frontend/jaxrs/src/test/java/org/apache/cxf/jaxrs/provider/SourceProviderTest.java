@@ -53,8 +53,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class SourceProviderTest extends Assert {
-    
-       
+
+
     @Test
     public void testIsWriteable() {
         SourceProvider<Source> p = new SourceProvider<Source>();
@@ -62,7 +62,7 @@ public class SourceProviderTest extends Assert {
                    && p.isWriteable(DOMSource.class, null, null, null)
                    && p.isWriteable(Source.class, null, null, null));
     }
-    
+
     @Test
     public void testIsReadable() {
         SourceProvider<Source> p = new SourceProvider<Source>();
@@ -81,68 +81,68 @@ public class SourceProviderTest extends Assert {
         assertSame(DOMSource.class, verifyRead(p, DOMSource.class).getClass());
         assertTrue(Document.class.isAssignableFrom(verifyRead(p, Document.class).getClass()));
     }
-    
+
     @Test
     public void testReadFromStreamReader() throws Exception {
         TestSourceProvider<Source> p = new TestSourceProvider<Source>();
-        
+
         InputStream is = new ByteArrayInputStream("<test xmlns=\"http://bar\"/>".getBytes());
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
-        reader = new InTransformReader(reader, 
+        reader = new InTransformReader(reader,
                                        Collections.singletonMap("{http://bar}test", "test2"),
                                        null,
                                        null,
                                        null,
                                        false);
-        
+
         p.getMessage().setContent(XMLStreamReader.class, reader);
-        
+
         Source source = p.readFrom(Source.class,
                    null, null, null, null, is);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
         transformerFactory.newTransformer().transform(source, new StreamResult(bos));
         assertTrue(bos.toString().contains("test2"));
     }
-    
+
     @Test
     public void testWriteToDocument() throws Exception {
         SourceProvider<Document> p = new SourceProvider<Document>();
-        
+
         Document doc = StaxUtils.read(new StringReader("<test/>"));
-        
+
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        
-        p.writeTo(doc, Document.class, Document.class, 
-                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE, 
+
+        p.writeTo(doc, Document.class, Document.class,
+                  new Annotation[]{}, MediaType.APPLICATION_JSON_TYPE,
                   new MetadataMap<String, Object>(), os);
         String s = os.toString();
         assertEquals("<test/>", s);
-           
+
     }
-    
+
     @Test
     public void testReadFromWithPreferredFormat() throws Exception {
         TestSourceProvider<Source> p = new TestSourceProvider<Source>();
-        p.getMessage().put("source-preferred-format", "sax");        
+        p.getMessage().put("source-preferred-format", "sax");
         assertSame(StaxSource.class, verifyRead(p, Source.class).getClass());
     }
-    
+
     @Test
     public void testWriteTo() throws Exception {
         SourceProvider<Source> p = new TestSourceProvider<Source>();
         StreamSource s = new StreamSource(new ByteArrayInputStream("<test/>".getBytes()));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        p.writeTo(s, null, null, null, MediaType.APPLICATION_XML_TYPE, 
+        p.writeTo(s, null, null, null, MediaType.APPLICATION_XML_TYPE,
                   new MetadataMap<String, Object>(), os);
         assertTrue(os.toString().contains("<test/>"));
         os = new ByteArrayOutputStream();
-        p.writeTo(createDomSource(), null, null, null, MediaType.APPLICATION_XML_TYPE, 
+        p.writeTo(createDomSource(), null, null, null, MediaType.APPLICATION_XML_TYPE,
                   new MetadataMap<String, Object>(), os);
         assertTrue(os.toString().contains("<test/>"));
     }
-    
+
     private <T> T verifyRead(MessageBodyReader<T> p, Class<?> type) throws Exception {
         @SuppressWarnings("unchecked")
         Class<T> cls = (Class<T>)type;
@@ -150,25 +150,25 @@ public class SourceProviderTest extends Assert {
                    null, null, null, null,
                    new ByteArrayInputStream("<test/>".getBytes()));
     }
-    
+
     private DOMSource createDomSource() throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder;
         builder = factory.newDocumentBuilder();
         return new DOMSource(builder.parse(new ByteArrayInputStream("<test/>".getBytes())));
     }
-    
+
     private static class TestSourceProvider<T> extends SourceProvider<T> {
-        
+
         private Message m = new MessageImpl();
-        
+
         TestSourceProvider() {
         }
-        
+
         public Message getMessage() {
             return m;
         }
-        
+
         protected MessageContext getContext() {
             return new MessageContextImpl(m);
         };

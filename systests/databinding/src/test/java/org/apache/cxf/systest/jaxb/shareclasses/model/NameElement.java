@@ -38,5 +38,5 @@ public abstract class NameElement {
     public void setName(String name) {
         this.name = name;
     }
-    
+
 }

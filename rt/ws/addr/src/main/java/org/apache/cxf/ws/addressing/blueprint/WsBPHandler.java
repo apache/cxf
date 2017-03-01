@@ -20,6 +20,7 @@ package org.apache.cxf.ws.addressing.blueprint;
 
 import java.net.URL;
 import java.util.Set;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -33,7 +34,11 @@ import org.osgi.service.blueprint.reflect.Metadata;
 public class WsBPHandler implements NamespaceHandler {
 
     public URL getSchemaLocation(String s) {
-        return getClass().getClassLoader().getResource("schemas/ws-addr-conf.xsd");
+        if ("http://cxf.apache.org/ws/addressing".equals(s)) {
+            return getClass().getClassLoader().getResource("schemas/ws-addr-conf.xsd");
+        }
+        // no imported XSDs, so we don't have to delegate to cxf-core namespace handler
+        return null;
     }
 
     @SuppressWarnings("rawtypes")

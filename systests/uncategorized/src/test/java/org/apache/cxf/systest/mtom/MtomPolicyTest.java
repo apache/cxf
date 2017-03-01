@@ -55,7 +55,7 @@ import org.junit.Test;
 public class MtomPolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = TestUtil.getPortNumber(MtomPolicyTest.class);
     public static final String PORT2 = TestUtil.getPortNumber(MtomPolicyTest.class, 2);
-    
+
     static TestUtilities testUtilities = new TestUtilities(MtomPolicyTest.class);
 
     @BeforeClass
@@ -63,36 +63,36 @@ public class MtomPolicyTest extends AbstractBusClientServerTestBase {
         createStaticBus();
         testUtilities.setBus(getStaticBus());
     }
-    
-    
+
+
     @Test
     public void testRequiredMtom() throws Exception {
         String address = "http://localhost:" + PORT + "/EchoService";
         setupServer(true, address);
-        
+
         sendMtomMessage(address);
-        
+
         Node res = testUtilities.invoke(address, "http://schemas.xmlsoap.org/soap/http", "nonmtom.xml");
-        
+
         NodeList list = testUtilities.assertValid("//faultstring", res);
         String text = list.item(0).getTextContent();
         assertTrue(text.contains("These policy alternatives can not be satisfied: "));
         assertTrue(text.contains("{http://schemas.xmlsoap.org/ws/2004/09/policy/optimizedmimeserialization}"
                     + "OptimizedMimeSerialization"));
     }
-    
+
     @Test
     public void testOptionalMtom() throws Exception {
         String address = "http://localhost:" + PORT2 + "/EchoService";
         setupServer(false, address);
-        
+
         sendMtomMessage(address);
-        
+
         Node res = testUtilities.invoke(address, "http://schemas.xmlsoap.org/soap/http", "nonmtom.xml");
-        
+
         testUtilities.assertNoFault(res);
     }
-    
+
     public void setupServer(boolean mtomRequired, String address) throws Exception {
         getStaticBus().getExtension(PolicyEngine.class).setAlternativeSelector(
             new FirstAlternativeSelector());
@@ -100,9 +100,9 @@ public class MtomPolicyTest extends AbstractBusClientServerTestBase {
         sf.setServiceBean(new EchoService());
         sf.setBus(getStaticBus());
         sf.setAddress(address);
-        
+
         WSPolicyFeature policyFeature = new WSPolicyFeature();
-        List<Element> policyElements = new ArrayList<Element>();
+        List<Element> policyElements = new ArrayList<>();
         if (mtomRequired) {
             policyElements.add(StaxUtils.read(
                 getClass().getResourceAsStream("mtom-policy.xml"))
@@ -111,11 +111,11 @@ public class MtomPolicyTest extends AbstractBusClientServerTestBase {
             policyElements.add(StaxUtils.read(
                 getClass().getResourceAsStream("mtom-policy-optional.xml"))
                            .getDocumentElement());
-        } 
-        policyFeature.setPolicyElements(policyElements);       
-        
+        }
+        policyFeature.setPolicyElements(policyElements);
+
         sf.getFeatures().add(policyFeature);
-        
+
         sf.create();
     }
 

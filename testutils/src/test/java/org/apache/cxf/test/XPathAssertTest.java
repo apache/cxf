@@ -32,7 +32,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class XPathAssertTest extends Assert {
-    
+
     @Test
     public void testAssert() throws Exception {
         Document document = StaxUtils.read(getClass().getResourceAsStream("test.xml"));

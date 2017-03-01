@@ -33,14 +33,14 @@ import org.junit.Test;
 
 public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestBase {
     private static final String PORT = BookServerWebSocket.PORT;
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(new BookServerWebSocket()));
         createStaticBus();
     }
-    
+
     @Test
     public void testBookWithWebSocket() throws Exception {
         String address = "ws://localhost:" + getPort() + getContext() + "/websocket/web/bookstore";
@@ -58,7 +58,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             assertEquals("text/plain", resp.getContentType());
             String value = resp.getTextEntity();
             assertEquals("CXF in Action", value);
-            
+
             // call the same GET service in the text mode
             wsclient.reset(1);
             wsclient.sendTextMessage("GET " +  getContext() + "/websocket/web/bookstore/booknames");
@@ -81,7 +81,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             assertEquals("application/xml", resp.getContentType());
             value = resp.getTextEntity();
             assertTrue(value.startsWith("<?xml ") && value.endsWith("</Book>"));
-            
+
             // call the POST service
             wsclient.reset(1);
             wsclient.sendMessage(
@@ -94,8 +94,8 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             assertEquals("text/plain", resp.getContentType());
             value = resp.getTextEntity();
             assertEquals("123", value);
-            
-            // call the same POST service in the text mode 
+
+            // call the same POST service in the text mode
             wsclient.reset(1);
             wsclient.sendTextMessage(
                 "POST " +  getContext() + "/websocket/web/bookstore/booksplain\r\nContent-Type: text/plain\r\n\r\n123");
@@ -128,7 +128,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             wsclient.close();
         }
     }
-    
+
     @Test
     public void testGetBookStream() throws Exception {
         String address = "ws://localhost:" + getPort() + getContext() + "/websocket/web/bookstore";
@@ -158,7 +158,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             wsclient.close();
         }
     }
-    
+
     @Test
     public void testGetBookStreamWithIDReferences() throws Exception {
         String address = "ws://localhost:" + getPort() + getContext() + "/websocket/web/bookstore";
@@ -191,11 +191,11 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             wsclient.close();
         }
     }
-    
+
     private String getBookJson(int index) {
         return "{\"Book\":{\"id\":" + index + ",\"name\":\"WebSocket" + index + "\"}}";
     }
-    
+
     @Test
     public void testBookWithWebSocketAndHTTP() throws Exception {
         String address = "ws://localhost:" + getPort() + getContext() + "/websocket/web/bookstore";
@@ -213,14 +213,14 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             assertEquals("text/plain", resp.getContentType());
             String value = resp.getTextEntity();
             assertEquals("CXF in Action", value);
-           
+
             testGetBookHTTPFromWebSocketEndpoint();
-            
+
         } finally {
             wsclient.close();
         }
     }
-    
+
     @Test
     public void testGetBookHTTPFromWebSocketEndpoint() throws Exception {
         String address = "http://localhost:" + getPort() + getContext() + "/websocket/web/bookstore/books/1";
@@ -229,7 +229,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         Book book = wc.get(Book.class);
         assertEquals(1L, book.getId());
     }
-    
+
     @Test
     public void testBookWithWebSocketServletStream() throws Exception {
         String address = "ws://localhost:" + getPort() + getContext() + "/websocket/web/bookstore";
@@ -251,7 +251,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             wsclient.close();
         }
     }
-    
+
     @Test
     public void testWrongMethod() throws Exception {
         String address = "ws://localhost:" + getPort() + getContext() + "/websocket/web/bookstore";
@@ -271,7 +271,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             wsclient.close();
         }
     }
-    
+
     @Test
     public void testPathRestriction() throws Exception {
         String address = "ws://localhost:" + getPort() + getContext() + "/websocket/web/bookstore";
@@ -290,7 +290,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             wsclient.close();
         }
     }
-    
+
     @Test
     public void testCallsWithIDReferences() throws Exception {
         String address = "ws://localhost:" + getPort() + getContext() + "/websocket/web/bookstore";
@@ -310,16 +310,16 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             assertEquals("459", value);
             String id = resp.getId();
             assertNull("response id is incorrect", id);
-            
-            // call the POST service twice with a unique requestId 
+
+            // call the POST service twice with a unique requestId
             wsclient.reset(2);
             String reqid1 = UUID.randomUUID().toString();
             String reqid2 = UUID.randomUUID().toString();
             wsclient.sendTextMessage(
-                "POST " +  getContext() + "/websocket/web/bookstore/booksplain\r\nContent-Type: text/plain\r\n" 
+                "POST " +  getContext() + "/websocket/web/bookstore/booksplain\r\nContent-Type: text/plain\r\n"
                 + WebSocketConstants.DEFAULT_REQUEST_ID_KEY + ": " + reqid1 + "\r\n\r\n549");
             wsclient.sendTextMessage(
-                "POST " +  getContext() + "/websocket/web/bookstore/booksplain\r\nContent-Type: text/plain\r\n" 
+                "POST " +  getContext() + "/websocket/web/bookstore/booksplain\r\nContent-Type: text/plain\r\n"
                 + WebSocketConstants.DEFAULT_REQUEST_ID_KEY + ": " + reqid2 + "\r\n\r\n495");
             assertTrue("response expected", wsclient.await(3));
             received = wsclient.getReceivedResponses();
@@ -340,7 +340,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             wsclient.close();
         }
     }
-    
+
     @Test
     public void testCallsInParallel() throws Exception {
         String address = "ws://localhost:" + getPort() + getContext() + "/websocket/web/bookstore";
@@ -376,7 +376,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
 
             EventCreatorRunner runner = new EventCreatorRunner(wsclient2, regkey, 1000, 1000);
             new Thread(runner).start();
-            
+
             // register for the event stream with requestId ane expect to get 2 messages
             wsclient1.reset(3);
             wsclient1.sendTextMessage(
@@ -385,7 +385,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
             assertFalse("only 2 responses expected", wsclient1.await(5));
             List<WebSocketTestClient.Response> received = wsclient1.getReceivedResponses();
             assertEquals(2, received.size());
-            
+
             // the first response is the registration confirmation
             WebSocketTestClient.Response resp = received.get(0);
             assertEquals(200, resp.getStatusCode());
@@ -411,7 +411,7 @@ public class JAXRSClientServerWebSocketTest extends AbstractBusClientServerTestB
         } finally {
             wsclient1.close();
             wsclient2.close();
-        }        
+        }
     }
 
     private class EventCreatorRunner implements Runnable {

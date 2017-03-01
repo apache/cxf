@@ -39,17 +39,17 @@ import org.apache.nested_callback.CallbackPortType;
 import org.apache.nested_callback.NestedCallback;
 import org.apache.nested_callback.ServerPortType;
 
-@javax.jws.WebService(serviceName = "SOAPService", 
+@javax.jws.WebService(serviceName = "SOAPService",
                       portName = "SOAPPort",
                       targetNamespace = "http://apache.org/nested_callback",
                       endpointInterface = "org.apache.nested_callback.ServerPortType",
-                      wsdlLocation = "testutils/nested_callback.wsdl") 
-                      
-                  
+                      wsdlLocation = "testutils/nested_callback.wsdl")
+
+
 public class ServerImpl implements ServerPortType  {
     @Resource
     Bus bus;
-    
+
     public String foo(String s) {
         return s;
     }
@@ -57,51 +57,51 @@ public class ServerImpl implements ServerPortType  {
     public String registerCallback(NestedCallback callbackObject) {
         try {
             W3CEndpointReference w3cEpr = callbackObject.getCallback();
-            
+
             EndpointReferenceType callback = ProviderImpl.convertToInternal(w3cEpr);
 
             WSDLManager manager = new WSDLManagerImpl();
-        
+
             QName interfaceName = EndpointReferenceUtils.getInterfaceName(callback, bus);
             String wsdlLocation = EndpointReferenceUtils.getWSDLLocation(callback);
             QName serviceName = EndpointReferenceUtils.getServiceName(callback, bus);
             String address = EndpointReferenceUtils.getAddress(callback);
-            
+
             String portString = EndpointReferenceUtils.getPortName(callback);
-            
+
             QName portName = new QName(serviceName.getNamespaceURI(), portString);
-            
+
             StringBuilder seiName = new StringBuilder();
             seiName.append(JAXBUtils.namespaceURIToPackage(interfaceName.getNamespaceURI()));
             seiName.append(".");
             seiName.append(JAXBUtils.nameToIdentifier(interfaceName.getLocalPart(),
                                                       JAXBUtils.IdentifierType.INTERFACE));
-            
-            Class<?> sei = null; 
+
+            Class<?> sei = null;
             try {
-                sei = Class.forName(seiName.toString(), 
+                sei = Class.forName(seiName.toString(),
                                     true, manager.getClass().getClassLoader());
             } catch (ClassNotFoundException ex) {
                 ex.printStackTrace();
             }
-            
-            URL wsdlURL = new URL(wsdlLocation);            
+
+            URL wsdlURL = new URL(wsdlLocation);
             Service service = Service.create(wsdlURL, serviceName);
-            CallbackPortType port =  (CallbackPortType)service.getPort(portName, sei);
+            CallbackPortType port = (CallbackPortType)service.getPort(portName, sei);
             ((BindingProvider)port).getRequestContext()
                 .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
 
             port.serverSayHi("Sean");
 
-            
+
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
         }
-        
-        return "registerCallback called";     
+
+        return "registerCallback called";
     }
 
-    
-        
-}    
+
+
+}

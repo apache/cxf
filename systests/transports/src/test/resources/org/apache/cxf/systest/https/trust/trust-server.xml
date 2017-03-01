@@ -17,7 +17,7 @@
  specific language governing permissions and limitations
  under the License.
 -->
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans-4.3.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:http="http://cxf.apache.org/transports/http/configuration" xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration" xmlns:sec="http://cxf.apache.org/configuration/security" xmlns:cxf="http://cxf.apache.org/core" xmlns:p="http://cxf.apache.org/policy" xsi:schemaLocation="         http://www.springframework.org/schema/beans                     http://www.springframework.org/schema/beans/spring-beans-4.2.xsd         http://cxf.apache.org/jaxws                                     http://cxf.apache.org/schemas/jaxws.xsd         http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd         http://cxf.apache.org/policy http://cxf.apache.org/schemas/policy.xsd         http://cxf.apache.org/transports/http/configuration             http://cxf.apache.org/schemas/configuration/http-conf.xsd         http://cxf.apache.org/transports/http-jetty/configuration       http://cxf.apache.org/schemas/configuration/http-jetty.xsd         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     <cxf:bus>
         <cxf:features>
@@ -34,6 +34,14 @@
                 <sec:clientAuthentication want="false" required="false"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
+        <httpj:engine port="${testutil.ports.TrustServer.2}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="keys/alice.jks"/>
+                </sec:keyManagers>
+                <sec:clientAuthentication want="false" required="false"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
     </httpj:engine-factory>
     
     <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
@@ -41,6 +49,14 @@
                      id="TrustServer" 
                      implementor="org.apache.cxf.systest.http.GreeterImpl" 
                      address="https://localhost:${testutil.ports.TrustServer}/SoapContext/HttpsPort" 
+                     serviceName="s:SOAPService" 
+                     endpointName="e:HttpsPort" depends-on="tls-settings"/>
+                     
+    <jaxws:endpoint xmlns:e="http://apache.org/hello_world/services" 
+                     xmlns:s="http://apache.org/hello_world/services" 
+                     id="TrustServer2" 
+                     implementor="org.apache.cxf.systest.http.GreeterImpl" 
+                     address="https://localhost:${testutil.ports.TrustServer.2}/SoapContext/HttpsPort" 
                      serviceName="s:SOAPService" 
                      endpointName="e:HttpsPort" depends-on="tls-settings"/>
     

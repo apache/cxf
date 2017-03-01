@@ -58,9 +58,9 @@ public class OperationProcessor  extends AbstractProcessor {
     public void process(JavaInterface intf, OperationInfo operation) throws ToolException {
         JavaMethod method = new MethodMapper().map(operation);
         method.setInterface(intf);
-        
+
         processMethod(method, operation);
-        
+
         Collection<FaultInfo> faults = operation.getFaults();
         FaultProcessor faultProcessor = new FaultProcessor(context);
         faultProcessor.process(method, faults);
@@ -70,7 +70,7 @@ public class OperationProcessor  extends AbstractProcessor {
         intf.addMethod(method);
     }
 
-    void processMethod(JavaMethod method, 
+    void processMethod(JavaMethod method,
                        OperationInfo operation) throws ToolException {
         if (isAsyncMethod(method)) {
             return;
@@ -88,12 +88,12 @@ public class OperationProcessor  extends AbstractProcessor {
 
         ParameterProcessor paramProcessor = new ParameterProcessor(context);
         method.clear();
-        
+
         JAXWSBinding opBinding = operation.getExtensor(JAXWSBinding.class);
         JAXWSBinding ptBinding = operation.getInterface().getExtensor(JAXWSBinding.class);
         JAXWSBinding defBinding = operation.getInterface().getService()
             .getDescription().getExtensor(JAXWSBinding.class);
-        
+
         boolean enableAsync = false;
         boolean enableMime = false;
         boolean enableWrapper = method.isWrapperStyle();
@@ -130,14 +130,14 @@ public class OperationProcessor  extends AbstractProcessor {
                 enableWrapper = opBinding.isEnableWrapperStyle();
             }
         }
-        
+
         enableWrapper = checkEnableWrapper(enableWrapper, method);
         enableAsync = checkEnableAsync(enableAsync, method);
         enableMime = checkEnableMime(enableMime, method);
-        
+
         method.setWrapperStyle(enableWrapper && method.isWrapperStyle());
-        
-        
+
+
         paramProcessor.process(method,
                                inputMessage,
                                outputMessage,
@@ -274,7 +274,7 @@ public class OperationProcessor  extends AbstractProcessor {
         callbackMethod.addAnnotation("RequestWrapper", method.getAnnotationMap().get("RequestWrapper"));
         callbackMethod.addAnnotation("SOAPBinding", method.getAnnotationMap().get("SOAPBinding"));
 
-        boolean convertOutToAsync = !method.isWrapperStyle() 
+        boolean convertOutToAsync = !method.isWrapperStyle()
             && "void".equals(method.getReturn().getClassName());
         String asyncCname = null;
         for (JavaParameter param : method.getParameters()) {
@@ -282,7 +282,7 @@ public class OperationProcessor  extends AbstractProcessor {
                 if (param.isHolder()) {
                     if (param.isINOUT()) {
                         JavaParameter p2 = new JavaParameter();
-                        
+
                         p2.setName(param.getName());
                         p2.setClassName(param.getHolderName());
                         p2.setStyle(JavaType.Style.IN);
@@ -302,20 +302,20 @@ public class OperationProcessor  extends AbstractProcessor {
             }
         }
         JavaParameter asyncHandler = new JavaParameter();
-        
+
         asyncHandler.setName("asyncHandler");
         asyncHandler.setCallback(true);
-        asyncHandler.setClassName(getAsyncClassName(method, 
+        asyncHandler.setClassName(getAsyncClassName(method,
                                                     "AsyncHandler",
                                                     asyncCname));
         asyncHandler.setStyle(JavaType.Style.IN);
-        
+
         callbackMethod.addParameter(asyncHandler);
-        
+
         JAnnotation asyncHandlerAnnotation = new JAnnotation(WebParam.class);
         asyncHandlerAnnotation.addElement(new JAnnotationElement("name", "asyncHandler"));
         asyncHandlerAnnotation.addElement(new JAnnotationElement("targetNamespace", ""));
-        asyncHandler.addAnnotation("WebParam", asyncHandlerAnnotation);                
+        asyncHandler.addAnnotation("WebParam", asyncHandlerAnnotation);
 
         method.getInterface().addImport("javax.jws.WebParam");
         method.getInterface().addMethod(callbackMethod);
@@ -331,7 +331,7 @@ public class OperationProcessor  extends AbstractProcessor {
         pollingMethod.setOperationName(method.getOperationName());
 
 
-        boolean convertOutToAsync = !method.isWrapperStyle() 
+        boolean convertOutToAsync = !method.isWrapperStyle()
             && "void".equals(method.getReturn().getClassName());
         String asyncCname = null;
         for (JavaParameter param : method.getParameters()) {
@@ -339,7 +339,7 @@ public class OperationProcessor  extends AbstractProcessor {
                 if (param.isHolder()) {
                     if (param.isINOUT()) {
                         JavaParameter p2 = new JavaParameter();
-                        
+
                         p2.setName(param.getName());
                         p2.setClassName(param.getHolderName());
                         p2.setStyle(JavaType.Style.IN);

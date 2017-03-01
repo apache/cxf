@@ -25,7 +25,7 @@ import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 
 public class JwsJwtCompactProducer extends JwsCompactProducer {
-    
+
     public JwsJwtCompactProducer(JwtToken token) {
         this(token, null);
     }
@@ -36,9 +36,9 @@ public class JwsJwtCompactProducer extends JwsCompactProducer {
         this(new JwtToken(headers, claims), null);
     }
     protected JwsJwtCompactProducer(JwtToken token, JsonMapObjectReaderWriter w) {
-        super(new JwsHeaders(token.getJwsHeaders()), w, 
+        super(new JwsHeaders(token.getJwsHeaders()), w,
               JwtUtils.claimsToJson(token.getClaims(), w));
     }
-    
-    
+
+
 }

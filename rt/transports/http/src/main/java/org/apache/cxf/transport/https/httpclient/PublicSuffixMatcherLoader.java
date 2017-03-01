@@ -44,10 +44,10 @@ import org.apache.cxf.common.logging.LogUtils;
  * Copied from httpclient.
  */
 public final class PublicSuffixMatcherLoader {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(PublicSuffixMatcherLoader.class);
     private static volatile PublicSuffixMatcher defaultInstance;
-    
+
     private PublicSuffixMatcherLoader() {
         //
     }
@@ -88,8 +88,8 @@ public final class PublicSuffixMatcherLoader {
                         } catch (IOException ex) {
                             // Should never happen
                             if (LOG.isLoggable(Level.WARNING)) {
-                                LOG.log(Level.WARNING, 
-                                        "Failure loading public suffix list from default resource", 
+                                LOG.log(Level.WARNING,
+                                        "Failure loading public suffix list from default resource",
                                         ex);
                             }
                         }

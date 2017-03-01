@@ -31,7 +31,7 @@ import org.apache.cxf.aegis.util.NamespaceHelper;
 public class AnnotatedTypeInfo extends BeanTypeInfo {
     private final AnnotationReader annotationReader;
 
-    public AnnotatedTypeInfo(TypeMapping tm, Class<?> typeClass, 
+    public AnnotatedTypeInfo(TypeMapping tm, Class<?> typeClass,
                              String ns, TypeCreationOptions typeCreationOptions) {
         this(tm, typeClass, ns, new AnnotationReader(), typeCreationOptions);
     }
@@ -52,9 +52,9 @@ public class AnnotatedTypeInfo extends BeanTypeInfo {
     protected void mapProperty(PropertyDescriptor pd) {
         // skip ignored properties
         if (annotationReader.isIgnored(pd.getReadMethod())) {
-            return; 
+            return;
         }
-        
+
         String explicitNamespace = annotationReader.getNamespace(pd.getReadMethod());
         boolean mustQualify = null != explicitNamespace && !"".equals(explicitNamespace);
 

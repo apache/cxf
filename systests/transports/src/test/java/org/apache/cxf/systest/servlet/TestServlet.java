@@ -22,7 +22,7 @@ package org.apache.cxf.systest.servlet;
 import javax.servlet.http.HttpServlet;
 
 /**
- * 
+ *
  */
 public class TestServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;

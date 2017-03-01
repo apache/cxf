@@ -77,20 +77,20 @@ public class SmallNumberHandler implements LogicalHandler<LogicalMessageContext>
                         //System.out.printf("SmallNumberHandler addNumbers(%d, %d) == %d\n", a, b, answer);
                         // ok, we've done the calculation, so build the
                         // response and set it as the payload of the message
-                        
+
                         AddNumbersResponse resp = new AddNumbersResponse();
                         resp.setReturn(answer);
                         msg.setPayload(new ObjectFactory().createAddNumbersResponse(resp),
                                        jaxbContext);
-                        
-                        Source src = msg.getPayload();                                             
+
+                        Source src = msg.getPayload();
                         msg.setPayload(src);
-                        
+
                         payload = msg.getPayload(jaxbContext);
                         if (payload instanceof JAXBElement) {
                             payload = ((JAXBElement)payload).getValue();
                         }
-                        
+
                         AddNumbersResponse resp2 = (AddNumbersResponse)payload;
                         if (resp2 == resp) {
                             throw new WebServiceException("Shouldn't be the same object");

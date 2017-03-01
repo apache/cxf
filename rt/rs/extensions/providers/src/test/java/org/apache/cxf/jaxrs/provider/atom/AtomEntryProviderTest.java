@@ -37,52 +37,52 @@ import org.junit.Test;
 public class AtomEntryProviderTest extends Assert {
 
     private AtomEntryProvider afd;
-    
+
     @Before
     public void setUp() {
         afd = new AtomEntryProvider();
     }
-    
+
     @Test
     public void testReadFrom() throws Exception {
         InputStream is = getClass().getResourceAsStream("atomEntry.xml");
         Entry simple = afd.readFrom(Entry.class, null, null, null, null, is);
-        assertEquals("Wrong entry title", 
+        assertEquals("Wrong entry title",
                      "Atom-Powered Robots Run Amok", simple.getTitle());
-        
+
     }
-    
+
     @Test
     public void testWriteTo() throws Exception {
         InputStream is = getClass().getResourceAsStream("atomEntry.xml");
-        Entry simple = afd.readFrom(Entry.class, null, 
+        Entry simple = afd.readFrom(Entry.class, null,
             null, MediaType.valueOf("application/atom+xml;type=entry"), null, is);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        afd.writeTo(simple, null, null, null, 
+        afd.writeTo(simple, null, null, null,
             MediaType.valueOf("application/atom+xml;type=entry"), null, bos);
         ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-        Entry simpleCopy = afd.readFrom(Entry.class, null, 
+        Entry simpleCopy = afd.readFrom(Entry.class, null,
             null, MediaType.valueOf("application/atom+xml"), null, bis);
-        assertEquals("Wrong entry title", 
+        assertEquals("Wrong entry title",
                      "Atom-Powered Robots Run Amok", simpleCopy.getTitle());
-        assertEquals("Wrong entry title", 
+        assertEquals("Wrong entry title",
                      simple.getTitle(), simpleCopy.getTitle());
     }
-    
+
     @Test
     public void testWriteable() {
         assertTrue(afd.isWriteable(Entry.class, null, null, null));
         assertTrue(afd.isWriteable(FOMEntry.class, null, null, null));
         assertFalse(afd.isWriteable(Feed.class, null, null, null));
     }
-    
+
     @Test
     public void testReadable() {
         assertTrue(afd.isReadable(Entry.class, null, null, null));
         assertTrue(afd.isReadable(FOMEntry.class, null, null, null));
         assertFalse(afd.isReadable(Feed.class, null, null, null));
     }
-    
+
     @Test
     public void testAnnotations() {
         String[] values = afd.getClass().getAnnotation(Produces.class).value();
@@ -95,5 +95,5 @@ public class AtomEntryProviderTest extends Assert {
         assertTrue("application/atom+xml".equals(values[0])
                    && "application/atom+xml;type=entry".equals(values[1]));
     }
-    
+
 }

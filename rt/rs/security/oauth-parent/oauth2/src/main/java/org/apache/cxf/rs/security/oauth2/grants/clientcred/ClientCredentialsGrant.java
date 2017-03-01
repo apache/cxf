@@ -24,30 +24,30 @@ import org.apache.cxf.rs.security.oauth2.grants.AbstractGrant;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 
 public class ClientCredentialsGrant extends AbstractGrant {
-    
+
     private static final long serialVersionUID = 5586488165697954347L;
     private String clientId;
     private String clientSecret;
     public ClientCredentialsGrant() {
         this(null);
     }
-    
+
     public ClientCredentialsGrant(String scope) {
         this(scope, null);
     }
-     
+
     public ClientCredentialsGrant(String scope, String audience) {
         super(OAuthConstants.CLIENT_CREDENTIALS_GRANT, scope, audience);
     }
-    
+
     public MultivaluedMap<String, String> toMap() {
         MultivaluedMap<String, String> map = super.toMap();
         if (clientId != null) {
             map.putSingle(OAuthConstants.CLIENT_ID, clientId);
             if (clientSecret != null) {
                 map.putSingle(OAuthConstants.CLIENT_SECRET, clientSecret);
-                
-            }    
+
+            }
         }
         return map;
     }

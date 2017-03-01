@@ -121,7 +121,7 @@ import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
  */
 public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(SimpleBatchSTSClient.class);
-    
+
     protected Bus bus;
     protected String name = "default.sts-client";
     protected Client client;
@@ -150,7 +150,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     protected int ttl = 300;
     protected boolean allowRenewing = true;
     protected boolean allowRenewingAfterExpiry;
-    
+
     protected Object actAs;
     protected String tokenType;
     protected String keyType;
@@ -159,14 +159,14 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     protected String context;
 
     protected Map<String, Object> ctx = new HashMap<String, Object>();
-    
-    protected List<Interceptor<? extends Message>> in 
+
+    protected List<Interceptor<? extends Message>> in
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    protected List<Interceptor<? extends Message>> out 
+    protected List<Interceptor<? extends Message>> out
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    protected List<Interceptor<? extends Message>> outFault  
+    protected List<Interceptor<? extends Message>> outFault
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    protected List<Interceptor<? extends Message>> inFault 
+    protected List<Interceptor<? extends Message>> inFault
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     protected List<AbstractFeature> features;
 
@@ -185,7 +185,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     public void setLocation(String location) {
         this.location = location;
     }
-    
+
     public void setMessage(Message message) {
         this.message = message;
     }
@@ -193,11 +193,11 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     public void setTtl(int ttl) {
         this.ttl = ttl;
     }
-    
+
     public void setEnableLifetime(boolean enableLifetime) {
         this.enableLifetime = enableLifetime;
     }
-    
+
     /**
      * Sets the WS-P policy that is applied to communications between this client and the remote server
      * if no value is supplied for {@link #setWsdlLocation(String)}.
@@ -212,7 +212,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         if (newPolicy instanceof Policy) {
             this.setPolicyInternal((Policy) newPolicy);
         } else if (newPolicy instanceof Element) {
-            this.setPolicyInternal((Element) newPolicy);    
+            this.setPolicyInternal((Element) newPolicy);
         } else {
             throw new IllegalArgumentException("Unsupported policy object.  Type must be "
                        + "org.apache.neethi.Policy or org.w3c.dom.Element.");
@@ -268,7 +268,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     public void setSecureConv(boolean secureConv) {
         this.isSecureConv = secureConv;
     }
-    
+
     public boolean isSpnego() {
         return isSpnego;
     }
@@ -276,7 +276,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     public void setSpnego(boolean spnego) {
         this.isSpnego = spnego;
     }
-    
+
     public boolean isAllowRenewing() {
         return allowRenewing;
     }
@@ -292,19 +292,19 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     public void setAllowRenewingAfterExpiry(boolean allowRenewingAfterExpiry) {
         this.allowRenewingAfterExpiry = allowRenewingAfterExpiry;
     }
-    
+
     public boolean isEnableAppliesTo() {
         return enableAppliesTo;
     }
-    
+
     public void setEnableAppliesTo(boolean enableAppliesTo) {
         this.enableAppliesTo = enableAppliesTo;
     }
-    
+
     public String getContext() {
         return context;
     }
-    
+
     public void setContext(String context) {
         this.context = context;
     }
@@ -339,7 +339,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     public void setEndpointName(String qn) {
         endpointName = QName.valueOf(qn);
     }
-    
+
     public void setServiceQName(QName qn) {
         serviceName = qn;
     }
@@ -353,15 +353,15 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     public QName getEndpointQName() {
         return endpointName;
     }
-    
+
     public void setActAs(Object actAs) {
         this.actAs = actAs;
     }
-    
+
     public void setKeySize(int i) {
         keySize = i;
     }
-    
+
     public int getKeySize() {
         return keySize;
     }
@@ -369,19 +369,19 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     public void setTokenType(String tokenType) {
         this.tokenType = tokenType;
     }
-    
+
     public String getTokenType() {
         return tokenType;
     }
-    
+
     public void setSendKeyType(boolean sendKeyType) {
         this.sendKeyType = sendKeyType;
     }
-    
+
     public void setKeyType(String keyType) {
         this.keyType = keyType;
     }
-    
+
     @Deprecated
     public void setOnBehalfOfElement(Element onBehalfOfElement) {
         this.onBehalfOf = onBehalfOfElement;
@@ -390,23 +390,23 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     public void setOnBehalfOf(Object onBehalfOf) {
         this.onBehalfOf = onBehalfOf;
     }
-    
+
     /**
-     * Indicate whether to use the signer's public X509 certificate for the subject confirmation key info 
-     * when creating a RequestsSecurityToken message. If the property is set to 'false', only the public key 
-     * value will be provided in the request. If the property is set to 'true' the complete certificate will 
+     * Indicate whether to use the signer's public X509 certificate for the subject confirmation key info
+     * when creating a RequestsSecurityToken message. If the property is set to 'false', only the public key
+     * value will be provided in the request. If the property is set to 'true' the complete certificate will
      * be sent in the request.
-     * 
+     *
      * Note: this setting is only applicable for assertions that use an asymmetric proof key
      */
     public void setUseCertificateForConfirmationKeyInfo(boolean useCertificate) {
         this.useCertificateForConfirmationKeyInfo = useCertificate;
     }
-    
+
     public boolean isUseCertificateForConfirmationKeyInfo() {
         return useCertificateForConfirmationKeyInfo;
     }
-    
+
     protected void setPolicyInternal(Policy newPolicy) {
         this.policy = newPolicy;
         if (algorithmSuite == null) {
@@ -421,7 +421,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             }
         }
     }
-    
+
     protected void setPolicyInternal(Element newPolicy) {
         this.setPolicyInternal(bus.getExtension(PolicyBuilder.class).getPolicy(newPolicy));
     }
@@ -432,7 +432,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         }
         return client;
     }
-    
+
     protected String findMEXLocation(EndpointReferenceType ref) {
         if (ref.getMetadata() != null && ref.getMetadata().getAny() != null) {
             for (Object any : ref.getMetadata().getAny()) {
@@ -484,7 +484,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
 
             client = new ClientImpl(bus, endpoint);
         }
-        
+
         client.getInFaultInterceptors().addAll(inFault);
         client.getInInterceptors().addAll(in);
         client.getOutInterceptors().addAll(out);
@@ -542,18 +542,18 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         for (BatchRequest batchRequest : batchRequestList) {
             writer.writeStartElement("wst", "RequestSecurityToken", namespace);
             writer.writeNamespace("wst", namespace);
-            
+
             addRequestType(requestType, writer);
             if (enableAppliesTo) {
                 addAppliesTo(writer, batchRequest.getAppliesTo());
             }
-            
+
             writeKeyType(writer, batchRequest.getKeyType());
-            
+
             addLifetime(writer);
-            
+
             addTokenType(writer, batchRequest.getTokenType());
-            
+
             writer.writeEndElement();
         }
         writer.writeEndElement();
@@ -562,11 +562,11 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
 
         Element responseCollection = getDocumentElement((DOMSource)obj[0]);
         Node child = responseCollection.getFirstChild();
-        List<SecurityToken> tokens = new ArrayList<SecurityToken>();
+        List<SecurityToken> tokens = new ArrayList<>();
         while (child != null) {
-            if (child instanceof Element 
+            if (child instanceof Element
                 && "RequestSecurityTokenResponse".equals(((Element)child).getLocalName())) {
-                SecurityToken token = 
+                SecurityToken token =
                     createSecurityToken((Element)child, null);
                 tokens.add(token);
             }
@@ -575,7 +575,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
 
         return tokens;
     }
-    
+
     protected List<SecurityToken> validateBatchSecurityTokens(
         List<BatchRequest> batchRequestList, String action, String requestType
     ) throws Exception {
@@ -592,40 +592,40 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         for (BatchRequest batchRequest : batchRequestList) {
             writer.writeStartElement("wst", "RequestSecurityToken", namespace);
             writer.writeNamespace("wst", namespace);
-            
+
             addRequestType(requestType, writer);
-            
+
             addTokenType(writer, batchRequest.getTokenType());
-            
+
             writer.writeStartElement("wst", "ValidateTarget", namespace);
 
             Element el = batchRequest.getValidateTarget();
             StaxUtils.copy(el, writer);
 
             writer.writeEndElement();
-            
+
             writer.writeEndElement();
         }
         writer.writeEndElement();
 
         Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
-        
+
         Element responseCollection = getDocumentElement((DOMSource)obj[0]);
         Node child = responseCollection.getFirstChild();
-        List<SecurityToken> tokens = new ArrayList<SecurityToken>();
+        List<SecurityToken> tokens = new ArrayList<>();
         while (child != null) {
-            if (child instanceof Element 
+            if (child instanceof Element
                 && "RequestSecurityTokenResponse".equals(((Element)child).getLocalName())) {
                 Element rstrChild = DOMUtils.getFirstElement((Element)child);
                 while (rstrChild != null) {
                     if ("Status".equals(rstrChild.getLocalName())) {
-                        Element e2 = 
+                        Element e2 =
                             DOMUtils.getFirstChildWithName(rstrChild, rstrChild.getNamespaceURI(), "Code");
                         String s = DOMUtils.getContent(e2);
                         if (!s.endsWith("/status/valid")) {
                             throw new TrustException(LOG, "VALIDATION_FAILED");
                         }
-                        
+
                     } else if ("RequestedSecurityToken".equals(rstrChild.getLocalName())) {
                         Element requestedSecurityTokenElement = DOMUtils.getFirstElement(rstrChild);
                         String id = findID(null, null, requestedSecurityTokenElement);
@@ -641,7 +641,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             }
             child = child.getNextSibling();
         }
-        
+
         return tokens;
     }
 
@@ -708,9 +708,9 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         writer.writeEndElement();
         writer.writeEndElement();
     }
-    
+
     protected void addBinaryExchange(
-        String binaryExchange, 
+        String binaryExchange,
         W3CDOMStreamWriter writer
     ) throws XMLStreamException {
         writer.writeStartElement("wst", "BinaryExchange", namespace);
@@ -719,7 +719,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         writer.writeCharacters(binaryExchange);
         writer.writeEndElement();
     }
-    
+
     protected void addKeySize(int keysize, W3CDOMStreamWriter writer) throws XMLStreamException {
         writer.writeStartElement("wst", "KeySize", namespace);
         writer.writeCharacters(Integer.toString(keysize));
@@ -731,7 +731,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         writer.writeCharacters(requestType);
         writer.writeEndElement();
     }
-    
+
     protected Element getDocumentElement(DOMSource ds) {
         Node nd = ds.getNode();
         if (nd instanceof Document) {
@@ -749,12 +749,12 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         }
         return new PrimitiveAssertion(new QName(ns, local), true);
     }
-    
+
     protected boolean useSecondaryParameters() {
         return !STSUtils.WST_NS_05_02.equals(namespace);
     }
 
-    protected String writeKeyType(W3CDOMStreamWriter writer, String keyTypeToWrite) 
+    protected String writeKeyType(W3CDOMStreamWriter writer, String keyTypeToWrite)
         throws XMLStreamException {
         if (isSecureConv) {
             if (keyTypeToWrite == null) {
@@ -786,7 +786,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         }
         CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
         cryptoType.setAlias(alias);
-        
+
         X509Certificate certs[] = crypto.getX509Certificates(cryptoType);
         if (certs == null || certs.length == 0) {
             throw new Fault("Could not get X509Certificate for alias " + alias, LOG);
@@ -833,7 +833,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
             writer.writeEndElement();
         }
     }
-    
+
     protected void addClaims(XMLStreamWriter writer) throws XMLStreamException {
         if (claims != null) {
             StaxUtils.copy(claims, writer);
@@ -915,7 +915,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
                         serviceEntr = Base64.getMimeDecoder().decode(content);
                     }
                 }
-                
+
                 if (serviceEntr != null) {
                     // Right now we only use PSHA1 as the computed key algo
                     P_SHA1 psha1 = new P_SHA1();
@@ -943,17 +943,17 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
 
         return token;
     }
-    
+
     protected byte[] decryptKey(Element child) throws TrustException, WSSecurityException {
         String encryptionAlgorithm = X509Util.getEncAlgo(child);
         // For the SPNEGO case just return the decoded cipher value and decrypt it later
         if (encryptionAlgorithm != null && encryptionAlgorithm.endsWith("spnego#GSS_Wrap")) {
             // Get the CipherValue
-            Element tmpE = 
+            Element tmpE =
                 XMLUtils.getDirectChildElement(child, "CipherData", WSConstants.ENC_NS);
             byte[] cipherValue = null;
             if (tmpE != null) {
-                tmpE = 
+                tmpE =
                     XMLUtils.getDirectChildElement(tmpE, "CipherValue", WSConstants.ENC_NS);
                 if (tmpE != null) {
                     String content = DOMUtils.getContent(tmpE);
@@ -967,14 +967,16 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
         } else {
             try {
                 EncryptedKeyProcessor proc = new EncryptedKeyProcessor();
-                WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
                 RequestData data = new RequestData();
                 data.setWssConfig(WSSConfig.getNewInstance());
                 data.setDecCrypto(createCrypto(true));
                 data.setCallbackHandler(createHandler());
-                List<WSSecurityEngineResult> result =
-                    proc.handleToken(child, data, docInfo);
-                return 
+
+                WSDocInfo docInfo = new WSDocInfo(child.getOwnerDocument());
+                data.setWsDocInfo(docInfo);
+
+                List<WSSecurityEngineResult> result = proc.handleToken(child, data);
+                return
                     (byte[])result.get(0).get(
                         WSSecurityEngineResult.TAG_SECRET
                     );
@@ -1103,7 +1105,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     public void setClaims(Element rstClaims) {
         claims = rstClaims;
     }
-    
+
     public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         if (client != null) {
             return client.getOutFaultInterceptors();
@@ -1147,7 +1149,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
         getOutFaultInterceptors().addAll(interceptors);
     }
-        
+
     public void setFeatures(List<AbstractFeature> f) {
         features = f;
     }

@@ -22,8 +22,8 @@ public class CorbaPrimitiveListener extends AbstractCorbaTypeListener {
 
     public CorbaPrimitiveListener(CorbaObjectHandler handler) {
         super(handler);
-    }   
-    
+    }
+
     public void processCharacters(String text) {
         ((CorbaPrimitiveHandler) handler).setValueFromData(text);
     }

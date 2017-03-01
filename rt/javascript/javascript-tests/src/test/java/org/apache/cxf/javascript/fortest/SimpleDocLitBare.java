@@ -31,30 +31,30 @@ import javax.jws.soap.SOAPBinding;
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public interface SimpleDocLitBare {
     @WebMethod
-    String basicTypeFunctionReturnString(@WebParam(name = "s") String s, 
-                                         @WebParam(name = "i") int i, 
+    String basicTypeFunctionReturnString(@WebParam(name = "s") String s,
+                                         @WebParam(name = "i") int i,
                                          @WebParam(name = "d") double d);
     /*
     @WebMethod
     TestBean1 functionReturnTestBean1();
     */
     @WebMethod
-    int basicTypeFunctionReturnInt(@WebParam(name = "s") String s, 
+    int basicTypeFunctionReturnInt(@WebParam(name = "s") String s,
                                    @WebParam(name = "d") double d);
-    
+
     @WebMethod
-    void beanFunction(@WebParam(name = "bean1") TestBean1 bean, 
+    void beanFunction(@WebParam(name = "bean1") TestBean1 bean,
                       @WebParam(name = "beanArray") TestBean1[] beans);
-    
-    @WebMethod 
+
+    @WebMethod
     String compliant(@WebParam(name = "beanParam") TestBean1 green);
-    
-    @WebMethod(action = "lightsCamera") 
+
+    @WebMethod(action = "lightsCamera")
     String actionMethod(@WebParam(name = "stringParam") String param);
-    
+
     @WebMethod(action = "compliantNoArgs")
     TestBean2 compliantNoArgs();
-    
+
     @Oneway
     @WebMethod
     void oneWay(@WebParam(name = "corrigan") String param);

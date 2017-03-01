@@ -46,7 +46,7 @@ public class LoggerHelperTest extends Assert {
     public void testEnableDisableConsoleLogging() {
         Logger rootLogger = LogUtils.getLogger(this.getClass(), null, "");
         Handler handler;
-        
+
         /*Handler handler = LoggerHelper.getHandler(rootLogger, LoggerHelper.CONSOLE_HANDLER);
         assertNotNull("default console appender is there", handler);*/
 
@@ -104,5 +104,5 @@ public class LoggerHelperTest extends Assert {
 
     }
 
-    
+
 }

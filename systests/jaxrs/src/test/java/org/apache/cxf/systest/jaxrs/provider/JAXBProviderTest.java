@@ -76,7 +76,7 @@ public class JAXBProviderTest extends AbstractBusClientServerTestBase {
         WebClient client = WebClient.create("http://localhost:" + PORT + "/resource/jaxb");
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(3000000);
 
-        List<String> values = new ArrayList<String>();
+        List<String> values = new ArrayList<>();
         values.add(MediaType.APPLICATION_XML);
         client.getHeaders().put("content-type", values);
         JAXBElement<String> test = new JAXBElement<String>(new QName("org.apache.cxf", "jaxbelement"),

@@ -28,14 +28,14 @@ import org.apache.cxf.connector.CXFConnectionParam;
 
 
 public class CXFConnectionRequestInfo extends CXFConnectionParam implements ConnectionRequestInfo {
-   
+
     public CXFConnectionRequestInfo() {
         super();
     }
-    
-    public CXFConnectionRequestInfo(Class<?> aIface, URL aWsdlLocation, 
+
+    public CXFConnectionRequestInfo(Class<?> aIface, URL aWsdlLocation,
                                        QName aServiceName, QName aPortName) {
         super(aIface, aWsdlLocation, aServiceName, aPortName);
     }
-    
+
 }

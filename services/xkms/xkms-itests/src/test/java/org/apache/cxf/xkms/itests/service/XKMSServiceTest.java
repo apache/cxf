@@ -45,9 +45,9 @@ import org.ops4j.pax.exam.junit.PaxExam;
 
 @RunWith(PaxExam.class)
 public class XKMSServiceTest extends BasicIntegrationTest {
-    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF = 
+    private static final org.apache.cxf.xkms.model.xkms.ObjectFactory XKMS_OF =
         new org.apache.cxf.xkms.model.xkms.ObjectFactory();
-    
+
     @Test
     public void testLocatePKIX() throws URISyntaxException, Exception {
         LocateRequestType request = XKMS_OF.createLocateRequestType();
@@ -120,5 +120,5 @@ public class XKMSServiceTest extends BasicIntegrationTest {
         Assert.assertEquals(ResultMinorEnum.HTTP_WWW_W_3_ORG_2002_03_XKMS_FAILURE.value(),
                             result.getResultMinor());
     }
-    
+
 }

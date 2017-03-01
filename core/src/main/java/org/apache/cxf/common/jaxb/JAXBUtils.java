@@ -92,8 +92,10 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.JavaUtils;
 
 public final class JAXBUtils {
-    public static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
-    
+    public static final String JAXB_URI = "http://java.sun.com/xml/ns/jaxb";
+
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
+
     public enum IdentifierType {
         CLASS,
         INTERFACE,
@@ -102,12 +104,9 @@ public final class JAXBUtils {
         VARIABLE,
         CONSTANT
     };
-    
-    public static final String JAXB_URI = "http://java.sun.com/xml/ns/jaxb";
-    
-    
+
     private static final char[] XML_NAME_PUNCTUATION_CHARS = new char[] {
-        /* hyphen                       */ '\u002D', 
+        /* hyphen                       */ '\u002D',
         /* period                       */ '\u002E',
         /* colon                        */'\u003A',
         /* dot                          */ '\u00B7',
@@ -116,15 +115,15 @@ public final class JAXBUtils {
         /* arabic start of rub el hizb  */'\u06DE',
         /* underscore                   */ '\u005F',
     };
-    
+
     private static final String XML_NAME_PUNCTUATION_STRING = new String(XML_NAME_PUNCTUATION_CHARS);
-    
+
     private static final Map<String, String> BUILTIN_DATATYPES_MAP;
     private static final Map<String, Class<?>> HOLDER_TYPES_MAP;
     private static ClassLoader jaxbXjcLoader;
 
     static {
-        BUILTIN_DATATYPES_MAP = new HashMap<String, String>();        
+        BUILTIN_DATATYPES_MAP = new HashMap<String, String>();
         BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
         BUILTIN_DATATYPES_MAP.put("integer", "java.math.BigInteger");
         BUILTIN_DATATYPES_MAP.put("int", "int");
@@ -152,7 +151,7 @@ public final class JAXBUtils {
         BUILTIN_DATATYPES_MAP.put("duration", "javax.xml.datatype.Duration");
         BUILTIN_DATATYPES_MAP.put("NOTATION", "javax.xml.namespace.QName");
         BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
-        
+
         HOLDER_TYPES_MAP = new HashMap<String, Class<?>>();
         HOLDER_TYPES_MAP.put("int", java.lang.Integer.class);
         HOLDER_TYPES_MAP.put("long", java.lang.Long.class);
@@ -162,15 +161,15 @@ public final class JAXBUtils {
         HOLDER_TYPES_MAP.put("boolean", java.lang.Boolean.class);
         HOLDER_TYPES_MAP.put("byte", java.lang.Byte.class);
     }
-    
-    
+
+
     /**
      * prevents instantiation
      *
      */
     private JAXBUtils() {
     }
-    
+
     public static void closeUnmarshaller(Unmarshaller u) {
         if (u instanceof Closeable) {
             //need to do this to clear the ThreadLocal cache
@@ -231,18 +230,18 @@ public final class JAXBUtils {
             closeUnmarshaller(u);
         }
     }
-    
+
     public static String builtInTypeToJavaType(String type) {
         return BUILTIN_DATATYPES_MAP.get(type);
     }
-    
+
     public static Class<?> holderClass(String type) {
         return HOLDER_TYPES_MAP.get(type);
     }
-    
-    /** 
+
+    /**
      * Checks if the specified word is a Java keyword (as defined in JavaUtils).
-     * 
+     *
      * @param word the word to check.
      * @return true if the word is a keyword.
      * @see org.apache.cxf.helpers.JavaUtils
@@ -254,7 +253,7 @@ public final class JAXBUtils {
     /**
      * Generates a Java package name from a URI according to the
      * algorithm outlined in JAXB 2.0.
-     * 
+     *
      * @param namespaceURI the namespace URI.
      * @return the package name.
      */
@@ -265,23 +264,23 @@ public final class JAXBUtils {
             return null;
         }
     }
-    
+
     /**
      * Generates a Java package name from a URI according to the
      * algorithm outlined in Appendix D of JAXB (2.0+).
-     * 
+     *
      * @param uri the namespace URI.
      * @return the package name.
      */
     public static String nameSpaceURIToPackage(URI uri) {
-       
+
         StringBuilder packageName = new StringBuilder();
         String authority = uri.getAuthority();
         String scheme = uri.getScheme();
         if (authority == null && "urn".equals(scheme)) {
             authority = uri.getSchemeSpecificPart();
         }
-        
+
         if (null != authority && !"".equals(authority)) {
             if ("urn".equals(scheme)) {
                 packageName.append(authority);
@@ -289,11 +288,11 @@ public final class JAXBUtils {
                 for (int i = 0; i < packageName.length(); i++) {
                     if (packageName.charAt(i) == '-') {
                         packageName.setCharAt(i, '.');
-                    } 
+                    }
                 }
                 authority = packageName.toString();
                 packageName.setLength(0);
-                
+
                 StringTokenizer st = new StringTokenizer(authority, ":");
                 while (st.hasMoreTokens()) {
                     String token = st.nextToken();
@@ -306,9 +305,9 @@ public final class JAXBUtils {
                 }
                 authority = packageName.toString();
                 packageName.setLength(0);
-                
-            }  
-            
+
+            }
+
             StringTokenizer st = new StringTokenizer(authority, ".");
             if (st.hasMoreTokens()) {
                 String token = null;
@@ -324,12 +323,12 @@ public final class JAXBUtils {
                     packageName.insert(0, normalizePackageNamePart(token));
                 }
             }
-            
+
             if (!("http".equalsIgnoreCase(scheme) || "urn".equalsIgnoreCase(scheme))) {
                 packageName.insert(0, ".");
                 packageName.insert(0, normalizePackageNamePart(scheme));
             }
-            
+
         }
 
         String path = uri.getPath();
@@ -342,7 +341,7 @@ public final class JAXBUtils {
             index = path.length();
         } else {
             String ending = path.substring(index + 1);
-            if (ending.length() < 2 || (ending.length() > 3 
+            if (ending.length() < 2 || (ending.length() > 3
                 && !"html".equalsIgnoreCase(ending))) {
                 index = path.length();
             }
@@ -357,36 +356,36 @@ public final class JAXBUtils {
         }
         return packageName.toString();
     }
-    
+
     private static String normalizePackageNamePart(String name) {
         StringBuilder sname = new StringBuilder(name.toLowerCase());
 
         for (int i = 0; i < sname.length(); i++) {
             sname.setCharAt(i, Character.toLowerCase(sname.charAt(i)));
         }
-        
+
         for (int i = 0; i < sname.length(); i++) {
             if (!Character.isJavaIdentifierPart(sname.charAt(i))) {
                 sname.setCharAt(i, '_');
             }
         }
-        
+
         if (isJavaKeyword(sname.toString())) {
             sname.insert(0, '_');
         }
-        
+
         if (!Character.isJavaIdentifierStart(sname.charAt(0))) {
-            sname.insert(0, '_');  
+            sname.insert(0, '_');
         }
-                
+
         return sname.toString();
     }
-    
-    
+
+
     /**
      * Converts an XML name to a Java identifier according to the mapping
      * algorithm outlined in the JAXB specification
-     * 
+     *
      * @param name the XML name
      * @return the Java identifier
      */
@@ -406,31 +405,31 @@ public final class JAXBUtils {
         for (int i = 1; i < name.length() && legalIdentifier; i++) {
             legalIdentifier = legalIdentifier && Character.isJavaIdentifierPart(buf.charAt(i));
         }
-        
-        boolean conventionalIdentifier = isConventionalIdentifier(buf, type); 
+
+        boolean conventionalIdentifier = isConventionalIdentifier(buf, type);
         if (legalIdentifier && conventionalIdentifier) {
             if (JAXBUtils.isJavaKeyword(name) && type == IdentifierType.VARIABLE) {
                 name = normalizePackageNamePart(name);
             }
             return name;
         }
-        
-        // split into words 
 
-        List<String> words = new ArrayList<String>();
+        // split into words
+
+        List<String> words = new ArrayList<>();
 
         StringTokenizer st = new StringTokenizer(name, XML_NAME_PUNCTUATION_STRING);
         while (st.hasMoreTokens()) {
             words.add(st.nextToken());
-        }        
+        }
 
         for (int i = 0; i < words.size(); i++) {
             splitWord(words, i);
         }
-        
+
         return makeConventionalIdentifier(words, type);
     }
-    
+
     private static void splitWord(List<String> words, int listIndex) {
         String word = words.get(listIndex);
         if (word.length() <= 1) {
@@ -444,34 +443,34 @@ public final class JAXBUtils {
             sword.setCharAt(first, Character.toUpperCase(firstChar));
         }
         int i = 1;
-        
-        while (i < sword.length()) {  
+
+        while (i < sword.length()) {
             if (Character.isDigit(firstChar)) {
                 while (i < sword.length() && Character.isDigit(sword.charAt(i))) {
                     i++;
                 }
             } else if (isCasedLetter(firstChar)) {
-                boolean previousIsLower = Character.isLowerCase(firstChar); 
+                boolean previousIsLower = Character.isLowerCase(firstChar);
                 while (i < sword.length() && isCasedLetter(sword.charAt(i))) {
                     if (Character.isUpperCase(sword.charAt(i)) && previousIsLower) {
                         break;
-                    } 
+                    }
                     previousIsLower = Character.isLowerCase(sword.charAt(i));
                     i++;
-                }             
-            } else { 
+                }
+            } else {
                 // first must be a mark or an uncased letter
                 while (i < sword.length() && (isMark(sword.charAt(i)) || !isCasedLetter(sword.charAt(i)))) {
                     i++;
-                }       
+                }
             }
-            
+
             // characters from first to i are all either
             // * digits
             // * upper or lower case letters, with only the first one an upper
             // * uncased letters or marks
-            
-            
+
+
             String newWord = sword.substring(first, i);
             words.add(index, newWord);
             index++;
@@ -482,20 +481,20 @@ public final class JAXBUtils {
                 firstChar = sword.charAt(first);
             }
         }
-        
+
         if (index > (listIndex + 1)) {
             words.remove(listIndex);
         }
     }
-    
+
     private static boolean isMark(char c) {
         return Character.isJavaIdentifierPart(c) && !Character.isLetter(c) && !Character.isDigit(c);
     }
-    
+
     private static boolean isCasedLetter(char c) {
         return Character.isUpperCase(c) || Character.isLowerCase(c);
     }
-    
+
     private static boolean isConventionalIdentifier(StringBuilder buf, IdentifierType type) {
         if (null == buf || buf.length() == 0) {
             return false;
@@ -504,7 +503,7 @@ public final class JAXBUtils {
         if (IdentifierType.CONSTANT == type) {
             for (int i = 0; i < buf.length(); i++) {
                 if (Character.isLowerCase(buf.charAt(i))) {
-                    return false;                  
+                    return false;
                 }
             }
             result = true;
@@ -512,11 +511,11 @@ public final class JAXBUtils {
             result = Character.isLowerCase(buf.charAt(0));
         } else {
             int pos = 3;
-            if (IdentifierType.GETTER == type 
-                && !(buf.length() >= pos 
+            if (IdentifierType.GETTER == type
+                && !(buf.length() >= pos
                     && "get".equals(buf.subSequence(0, 3)))) {
                 return false;
-            } else if (IdentifierType.SETTER == type 
+            } else if (IdentifierType.SETTER == type
                 && !(buf.length() >= pos && "set".equals(buf.subSequence(0, 3)))) {
                 return false;
             } else {
@@ -526,7 +525,7 @@ public final class JAXBUtils {
         }
         return result;
     }
-    
+
     private static String makeConventionalIdentifier(List<String> words, IdentifierType type) {
         StringBuilder buf = new StringBuilder();
         boolean firstWord = true;
@@ -545,7 +544,7 @@ public final class JAXBUtils {
             if (IdentifierType.CONSTANT == type) {
                 for (int i = l; i < buf.length(); i++) {
                     if (Character.isLowerCase(buf.charAt(i))) {
-                        buf.setCharAt(i, Character.toUpperCase(buf.charAt(i)));                  
+                        buf.setCharAt(i, Character.toUpperCase(buf.charAt(i)));
                     }
                 }
             } else if (IdentifierType.VARIABLE == type) {
@@ -561,7 +560,7 @@ public final class JAXBUtils {
         }
         return buf.toString();
     }
-    
+
     public static Class<?> getValidClass(Class<?> cls) {
         if (cls.isEnum()) {
             return cls;
@@ -599,7 +598,7 @@ public final class JAXBUtils {
                 Class.forName("com.sun.tools.internal.xjc.api.XJC");
                 jaxbXjcLoader = ClassLoader.getSystemClassLoader();
             } catch (Exception t2) {
-                //couldn't find either, probably cause tools.jar isn't on 
+                //couldn't find either, probably cause tools.jar isn't on
                 //the classpath.   Let's see if we can find the tools jar
                 String s = SystemPropertyAction.getProperty("java.home");
                 if (!StringUtils.isEmpty(s)) {
@@ -617,11 +616,11 @@ public final class JAXBUtils {
                         }
                     }
                 }
-            } 
+            }
         }
         return jaxbXjcLoader;
     }
-    
+
     public static Object setNamespaceMapper(final Map<String, String> nspref,
                                            Marshaller marshaller) throws PropertyException {
         Object mapper = createNamespaceWrapper(marshaller.getClass(), nspref);
@@ -656,31 +655,31 @@ public final class JAXBUtils {
                 pkg = "com.sun.xml.internal.bind.";
                 refClass = Class.forName(pkg + "api.TypeReference", true, getXJCClassLoader());
             }
-            Object ref = refClass.getConstructor(QName.class, 
-                                                 Type.class, 
+            Object ref = refClass.getConstructor(QName.class,
+                                                 Type.class,
                                                  anns.getClass()).newInstance(qname, refcls, anns);
-            List<Object> typeRefs = new ArrayList<Object>();
+            List<Object> typeRefs = new ArrayList<>();
             typeRefs.add(ref);
             List<Class<?>> clses = new ArrayList<Class<?>>(ctxClasses);
             clses.add(refClass.getField("type").get(ref).getClass());
             if (!refcls.isInterface()) {
                 clses.add(refcls);
             }
-            
+
             Object ctx = null;
             for (Method m : cls.getDeclaredMethods()) {
                 if (m.getName().equals("newInstance")
                     && m.getParameterTypes().length == 6) {
                     ctx = m.invoke(null, clses.toArray(new Class[clses.size()]),
                                          typeRefs, null, null, true, null);
-                    
+
                 }
             }
 
             if (ctx == null) {
                 throw new JAXBException("No ctx found");
             }
-                
+
             Object bridge = ctx.getClass().getMethod("createBridge", refClass).invoke(ctx, ref);
             return ReflectionInvokationHandler.createProxyWrapper(bridge,
                                                                   BridgeWrapper.class);
@@ -702,8 +701,8 @@ public final class JAXBUtils {
 
         void marshal(Object elValue, Node source, AttachmentMarshaller am) throws JAXBException;
     }
-    
-    
+
+
     public static SchemaCompiler createSchemaCompiler() throws JAXBException {
         try {
             Class<?> cls;
@@ -715,7 +714,7 @@ public final class JAXBUtils {
                 cls = Class.forName("com.sun.tools.internal.xjc.api.XJC", true, getXJCClassLoader());
                 sc = cls.getMethod("createSchemaCompiler").invoke(null);
             }
-            
+
             return ReflectionInvokationHandler.createProxyWrapper(sc,
                                                                   SchemaCompiler.class);
         } catch (Exception ex) {
@@ -724,7 +723,7 @@ public final class JAXBUtils {
     }
 
     public static SchemaCompiler createSchemaCompilerWithDefaultAllocator(Set<String> allocatorSet) {
-        
+
         try {
             SchemaCompiler compiler = JAXBUtils.createSchemaCompiler();
             Object allocator = ReflectionInvokationHandler
@@ -732,23 +731,23 @@ public final class JAXBUtils {
                                 JAXBUtils.getParamClass(compiler, "setClassNameAllocator"));
 
             compiler.setClassNameAllocator(allocator);
-            return compiler;    
+            return compiler;
         } catch (JAXBException e1) {
             throw new IllegalStateException("Unable to create schema compiler", e1);
         }
-        
+
     }
-    
+
     public static void logGeneratedClassNames(Logger logger, JCodeModel codeModel) {
         if (!logger.isLoggable(Level.INFO)) {
             return;
         }
-        
+
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Iterator<JPackage> itr = codeModel.packages(); itr.hasNext();) {
             JPackage package1 = itr.next();
-            
+
             for (Iterator<JDefinedClass> citr = package1.classes(); citr.hasNext();) {
                 if (!first) {
                     sb.append(", ");
@@ -758,15 +757,15 @@ public final class JAXBUtils {
                 sb.append(citr.next().fullName());
             }
         }
-        
+
         logger.log(Level.INFO, "Created classes: " + sb.toString());
     }
-    
+
     public static List<String> getGeneratedClassNames(JCodeModel codeModel) {
-        List<String> classes = new ArrayList<String>();
+        List<String> classes = new ArrayList<>();
         for (Iterator<JPackage> itr = codeModel.packages(); itr.hasNext();) {
             JPackage package1 = itr.next();
-            
+
             for (Iterator<JDefinedClass> citr = package1.classes(); citr.hasNext();) {
                 classes.add(citr.next().fullName());
             }
@@ -799,7 +798,7 @@ public final class JAXBUtils {
             throw new JAXBException(ex);
         }
     }
-    
+
     public static Class<?> getParamClass(SchemaCompiler sc, String method) {
         Object o = ((ReflectionInvokationHandler)Proxy.getInvocationHandler(sc)).getTarget();
         for (Method m : o.getClass().getMethods()) {
@@ -809,17 +808,17 @@ public final class JAXBUtils {
         }
         return null;
     }
-    
-    
+
+
     public static List<DOMResult> generateJaxbSchemas(
         JAXBContext context, final Map<String, DOMResult> builtIns) throws IOException {
-        final List<DOMResult> results = new ArrayList<DOMResult>();
+        final List<DOMResult> results = new ArrayList<>();
 
         context.generateSchema(new SchemaOutputResolver() {
             @Override
             public Result createOutput(String ns, String file) throws IOException {
                 DOMResult result = new DOMResult();
-                
+
                 if (builtIns.containsKey(ns)) {
                     DOMResult dr = builtIns.get(ns);
                     result.setSystemId(dr.getSystemId());
@@ -833,11 +832,11 @@ public final class JAXBUtils {
         });
         return results;
     }
-    
+
     public static String getPackageNamespace(Class<?> cls) {
         Package p = cls.getPackage();
         if (p != null) {
-            javax.xml.bind.annotation.XmlSchema schemaAnn = 
+            javax.xml.bind.annotation.XmlSchema schemaAnn =
                 p.getAnnotation(javax.xml.bind.annotation.XmlSchema.class);
             if (schemaAnn != null) {
                 return schemaAnn.namespace();
@@ -845,7 +844,7 @@ public final class JAXBUtils {
         }
         return null;
     }
-    
+
     public static void scanPackages(Set<Class<?>> classes,
                                     Map<Package, CachedClass> objectFactoryCache) {
         scanPackages(classes, null, objectFactoryCache);
@@ -853,14 +852,14 @@ public final class JAXBUtils {
     public static void scanPackages(Set<Class<?>> classes,
                                     Class<?>[] extraClass,
                                     Map<Package, CachedClass> objectFactoryCache) {
-        
+
         // add user extra class into jaxb context
         if (extraClass != null && extraClass.length > 0) {
             for (Class<?> clz : extraClass) {
                 classes.add(clz);
             }
         }
-        
+
         // try and read any jaxb.index files that are with the other classes.
         // This should
         // allow loading of extra classes (such as subclasses for inheritance
@@ -873,7 +872,7 @@ public final class JAXBUtils {
             String pkgName = PackageUtils.getPackageName(jcls);
             if (!packages.containsKey(pkgName)) {
                 Package pkg = jcls.getPackage();
-                   
+
                 packages.put(pkgName, jcls.getResourceAsStream("jaxb.index"));
                 packageLoaders.put(pkgName, jcls.getClassLoader());
                 String objectFactoryClassName = pkgName + "." + "ObjectFactory";
@@ -897,7 +896,7 @@ public final class JAXBUtils {
                         addToObjectFactoryCache(pkg, null, objectFactoryCache);
                     }
                 } else {
-                    objectFactories.add(ofactory);                    
+                    objectFactories.add(ofactory);
                 }
             }
         }
@@ -945,26 +944,26 @@ public final class JAXBUtils {
         classes.addAll(objectFactories);
     }
 
-       
-    private static void addToObjectFactoryCache(Package objectFactoryPkg, 
+
+    private static void addToObjectFactoryCache(Package objectFactoryPkg,
                                          Class<?> ofactory,
                                          Map<Package, CachedClass> objectFactoryCache) {
         if (objectFactoryPkg == null || objectFactoryCache == null) {
             return;
         }
         synchronized (objectFactoryCache) {
-            objectFactoryCache.put(objectFactoryPkg, 
+            objectFactoryCache.put(objectFactoryPkg,
                                      new CachedClass(ofactory));
         }
     }
-    
+
     public static class DefaultClassNameAllocator {
         private final Set<String> typesClassNames;
 
         public DefaultClassNameAllocator() {
-            this(new HashSet<String>());
+            this(new HashSet<>());
         }
-        
+
         public DefaultClassNameAllocator(Set<String> set) {
             typesClassNames = set;
         }
@@ -981,12 +980,12 @@ public final class JAXBUtils {
             typesClassNames.add(fullPckClass);
             return fullClassName;
         }
-       
+
     }
-    
+
     public interface SchemaCompiler {
         void setEntityResolver(EntityResolver entityResolver);
-        
+
         void setErrorListener(Object elForRun);
 
         void setClassNameAllocator(Object allocator);
@@ -1006,7 +1005,7 @@ public final class JAXBUtils {
 
         @WrapReturn(JCodeModel.class)
         JCodeModel generateCode(Object object, Object elForRun);
-        
+
         @WrapReturn(Mapping.class)
         Mapping get(QName qn);
 
@@ -1015,7 +1014,7 @@ public final class JAXBUtils {
     }
     public interface Mapping {
         @WrapReturn(TypeAndAnnotation.class)
-        TypeAndAnnotation getType();        
+        TypeAndAnnotation getType();
     }
     public interface TypeAndAnnotation {
         @WrapReturn(JType.class)
@@ -1045,7 +1044,7 @@ public final class JAXBUtils {
         void addBindFile(InputSource is);
 
         void parseArguments(String[] args);
-        
+
         String getBuildID();
     }
     public interface JCodeModel {
@@ -1067,7 +1066,7 @@ public final class JAXBUtils {
 
         String fullName();
     }
- 
+
     public static boolean isJAXB22() {
         Target t = XmlElement.class.getAnnotation(Target.class);
         //JAXB 2.2 allows XmlElement on params.
@@ -1078,9 +1077,9 @@ public final class JAXBUtils {
         }
         return false;
     }
-    
+
     private static synchronized Object createNamespaceWrapper(Class<?> mcls, Map<String, String> map) {
-        String postFix = ""; 
+        String postFix = "";
         if (mcls.getName().contains("eclipse")) {
             return createEclipseNamespaceMapper(mcls, map);
         } else if (mcls.getName().contains(".internal")) {
@@ -1096,7 +1095,7 @@ public final class JAXBUtils {
         if (cls == null) {
             try {
                 ClassWriter cw = helper.createClassWriter();
-                if (cw != null) { 
+                if (cw != null) {
                     cls = createNamespaceWrapperInternal(helper, cw, postFix, mcls);
                 }
             } catch (RuntimeException ex) {
@@ -1107,7 +1106,7 @@ public final class JAXBUtils {
         if (cls == null
             && (!mcls.getName().contains(".internal.") && mcls.getName().contains("com.sun"))) {
             try {
-                cls = ClassLoaderUtils.loadClass("org.apache.cxf.common.jaxb.NamespaceMapper", 
+                cls = ClassLoaderUtils.loadClass("org.apache.cxf.common.jaxb.NamespaceMapper",
                                                  JAXBUtils.class);
             } catch (Throwable ex2) {
                 // ignore
@@ -1127,11 +1126,11 @@ public final class JAXBUtils {
     }
     /*
     // This is the "prototype" for the ASM generated class below
-    public static class MapNamespacePrefixMapper2 
+    public static class MapNamespacePrefixMapper2
         extends org.eclipse.persistence.internal.oxm.record.namespaces.MapNamespacePrefixMapper {
-        
+
         String nsctxt[];
-        
+
         public MapNamespacePrefixMapper2(Map<String, String> foo) {
             super(foo);
         }
@@ -1140,7 +1139,7 @@ public final class JAXBUtils {
             if (nsctxt == null) {
                 return sup;
             }
-            List<String> s = new ArrayList<String>(Arrays.asList(sup));
+            List<String> s = new ArrayList<>(Arrays.asList(sup));
             for (int x = 1; x < nsctxt.length; x = x + 2) {
                 s.remove(nsctxt[x]);
             }
@@ -1161,7 +1160,7 @@ public final class JAXBUtils {
         String className = "org.apache.cxf.jaxb.EclipseNamespaceMapper";
         String slashedName = "org/apache/cxf/jaxb/EclipseNamespaceMapper";
         Class<?> cls = helper.findClass(className, JAXBUtils.class);
-        
+
         if (cls == null) {
             ClassWriter cw = helper.createClassWriter();
             if (cw == null) {
@@ -1176,12 +1175,12 @@ public final class JAXBUtils {
                      superName, null);
 
             cw.visitSource("EclipseNamespaceMapper.java", null);
-            
+
             fv = cw.visitField(Opcodes.ACC_PRIVATE, "nsctxt", "[Ljava/lang/String;", null, null);
             fv.visitEnd();
-            
-           
-            mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "(Ljava/util/Map;)V", 
+
+
+            mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "(Ljava/util/Map;)V",
                                 "(Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;)V", null);
             mv.visitCode();
             Label l0 = helper.createLabel();
@@ -1196,9 +1195,9 @@ public final class JAXBUtils {
             Label l2 = helper.createLabel();
             mv.visitLabel(l2);
             mv.visitMaxs(2, 2);
-            mv.visitEnd();            
-            
-            
+            mv.visitEnd();
+
+
             mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "setContextualNamespaceDecls", "([Ljava/lang/String;)V",
                                 null, null);
             mv.visitCode();
@@ -1231,18 +1230,18 @@ public final class JAXBUtils {
 
             mv.visitLabel(l1);
             mv.visitLocalVariable("this", "L" + slashedName + ";", null, l0, l1, 0);
-            
+
             mv.visitMaxs(1, 1);
             mv.visitEnd();
-            
-            
+
+
             mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "getPreDeclaredNamespaceUris", "()[Ljava/lang/String;", null, null);
             mv.visitCode();
             l0 = helper.createLabel();
             mv.visitLabel(l0);
             mv.visitLineNumber(1036, l0);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
-            mv.visitMethodInsn(Opcodes.INVOKESPECIAL, 
+            mv.visitMethodInsn(Opcodes.INVOKESPECIAL,
                                superName,
                                "getPreDeclaredNamespaceUris", "()[Ljava/lang/String;", false);
             mv.visitVarInsn(Opcodes.ASTORE, 1);
@@ -1264,7 +1263,7 @@ public final class JAXBUtils {
             mv.visitTypeInsn(Opcodes.NEW, "java/util/ArrayList");
             mv.visitInsn(Opcodes.DUP);
             mv.visitVarInsn(Opcodes.ALOAD, 1);
-            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Arrays", "asList", 
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC, "java/util/Arrays", "asList",
                                "([Ljava/lang/Object;)Ljava/util/List;", false);
             mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/ArrayList", "<init>", "(Ljava/util/Collection;)V", false);
             mv.visitVarInsn(Opcodes.ASTORE, 2);
@@ -1297,7 +1296,7 @@ public final class JAXBUtils {
             mv.visitVarInsn(Opcodes.ILOAD, 3);
             mv.visitVarInsn(Opcodes.ALOAD, 0);
             mv.visitFieldInsn(Opcodes.GETFIELD,
-                              slashedName, 
+                              slashedName,
                               "nsctxt", "[Ljava/lang/String;");
             mv.visitInsn(Opcodes.ARRAYLENGTH);
             mv.visitJumpInsn(Opcodes.IF_ICMPLT, l7);
@@ -1308,7 +1307,7 @@ public final class JAXBUtils {
             mv.visitVarInsn(Opcodes.ALOAD, 2);
             mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List", "size", "()I", true);
             mv.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/String");
-            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List", 
+            mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List",
                                "toArray", "([Ljava/lang/Object;)[Ljava/lang/Object;", true);
             mv.visitTypeInsn(Opcodes.CHECKCAST, "[Ljava/lang/String;");
             mv.visitInsn(Opcodes.ARETURN);
@@ -1336,14 +1335,14 @@ public final class JAXBUtils {
         }
     }
 
-    private static Class<?> createNamespaceWrapperInternal(ASMHelper helper, ClassWriter cw, 
+    private static Class<?> createNamespaceWrapperInternal(ASMHelper helper, ClassWriter cw,
                                                            String postFix, Class<?> ref) {
         String className = "org.apache.cxf.jaxb.NamespaceMapper" + postFix;
-        String superName = "com/sun/xml/" 
-            + ("RI".equals(postFix) ? "" : "internal/") 
+        String superName = "com/sun/xml/"
+            + ("RI".equals(postFix) ? "" : "internal/")
             + "bind/marshaller/NamespacePrefixMapper";
         String postFixedName = "org/apache/cxf/jaxb/NamespaceMapper" + postFix;
-        
+
         FieldVisitor fv;
         MethodVisitor mv;
 
@@ -1354,7 +1353,7 @@ public final class JAXBUtils {
 
         cw.visitSource("NamespaceMapper.java", null);
 
-        fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_FINAL, 
+        fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_FINAL,
                            "nspref", "Ljava/util/Map;",
                            "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;", null);
         fv.visitEnd();
@@ -1362,10 +1361,10 @@ public final class JAXBUtils {
         fv = cw.visitField(Opcodes.ACC_PRIVATE, "nsctxt", "[Ljava/lang/String;", null, null);
         fv.visitEnd();
 
-        fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_FINAL + Opcodes.ACC_STATIC, 
+        fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_FINAL + Opcodes.ACC_STATIC,
                            "EMPTY_STRING", "[Ljava/lang/String;", null, null);
         fv.visitEnd();
-        
+
         mv = cw.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
         mv.visitCode();
         Label l0 = helper.createLabel();
@@ -1406,8 +1405,8 @@ public final class JAXBUtils {
         Label l4 = helper.createLabel();
         mv.visitLabel(l4);
         mv.visitLocalVariable("this", "L" + postFixedName + ";", null, l0, l4, 0);
-        mv.visitLocalVariable("nspref", 
-                              "Ljava/util/Map;", "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;", 
+        mv.visitLocalVariable("nspref",
+                              "Ljava/util/Map;", "Ljava/util/Map<Ljava/lang/String;Ljava/lang/String;>;",
                               l0, l4, 1);
         mv.visitMaxs(2, 2);
         mv.visitEnd();
@@ -1422,7 +1421,7 @@ public final class JAXBUtils {
         mv.visitVarInsn(Opcodes.ALOAD, 0);
         mv.visitFieldInsn(Opcodes.GETFIELD, postFixedName, "nspref", "Ljava/util/Map;");
         mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map", 
+        mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/Map",
                            "get", "(Ljava/lang/Object;)Ljava/lang/Object;", true);
         mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/String");
         mv.visitVarInsn(Opcodes.ASTORE, 4);
@@ -1483,7 +1482,7 @@ public final class JAXBUtils {
 
         mv.visitLabel(l1);
         mv.visitLocalVariable("this", "L" + postFixedName + ";", null, l0, l1, 0);
-        
+
         mv.visitMaxs(1, 1);
         mv.visitEnd();
 
@@ -1494,7 +1493,7 @@ public final class JAXBUtils {
                                 ref, bts);
     }
     //CHECKSTYLE:ON
-    
+
     public static JAXBContextProxy createJAXBContextProxy(final JAXBContext ctx) {
         return createJAXBContextProxy(ctx, null, null);
     }

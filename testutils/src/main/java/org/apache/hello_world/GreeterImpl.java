@@ -23,8 +23,8 @@ import javax.jws.WebService;
 
 import org.apache.hello_world.messages.PingMeFault;
 
-@WebService(serviceName = "SOAPService", 
-            portName = "SoapPort", 
+@WebService(serviceName = "SOAPService",
+            portName = "SoapPort",
             endpointInterface = "org.apache.hello_world.Greeter",
             targetNamespace = "http://apache.org/hello_world/services",
             wsdlLocation = "testutils/others/hello_world_services_catalog.wsdl")
@@ -32,7 +32,7 @@ public class GreeterImpl implements Greeter {
 
     public GreeterImpl() {
     }
-    
+
     public String greetMe(String requestType) {
         return "Hello " + requestType;
     }

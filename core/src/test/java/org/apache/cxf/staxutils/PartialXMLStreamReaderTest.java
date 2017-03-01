@@ -34,8 +34,8 @@ public class PartialXMLStreamReaderTest extends Assert {
 
     @Test
     public void testReader() throws Exception {
-        String test = 
-                "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" 
+        String test =
+                "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                 + "<soap:Header>"
                 + "<ns2:SoapHeaderIn xmlns:ns4=\"http://cxf.apache.org/transform/fault\" "
                 + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
@@ -53,22 +53,22 @@ public class PartialXMLStreamReaderTest extends Assert {
                 + "xmlns:ns3=\"http://cxf.apache.org/transform/header/element\" "
                 + "xmlns:ns4=\"http://cxf.apache.org/transform/fault\" />"
                 + "</soap:Body></soap:Envelope>";
-        
-        XMLStreamReader reader = 
+
+        XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(new StringReader(test));
         QName bodyTag = new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body");
         PartialXMLStreamReader filteredReader = new PartialXMLStreamReader(reader, bodyTag);
-        
+
         Document doc = StaxUtils.read(filteredReader);
-        
+
         assertNotNull(doc);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(bos);
         StaxUtils.copy(doc, writer);
         writer.flush();
         String value = bos.toString();
-        
+
         assertTrue(("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
                 + "<soap:Header>"
                 + "<ns2:SoapHeaderIn xmlns=\"http://cxf.apache.org/transform/test\" "
@@ -82,7 +82,7 @@ public class PartialXMLStreamReaderTest extends Assert {
                 + "<soap:Body/>"
                 + "</soap:Envelope>").
                 equals(value.trim()));
-        
+
     }
 }
 

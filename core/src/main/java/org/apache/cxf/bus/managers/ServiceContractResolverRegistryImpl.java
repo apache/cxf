@@ -38,16 +38,16 @@ import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
 public class ServiceContractResolverRegistryImpl implements ServiceContractResolverRegistry {
 
     private Bus bus;
-    private List<ServiceContractResolver> resolvers 
+    private List<ServiceContractResolver> resolvers
         = new CopyOnWriteArrayList<ServiceContractResolver>();
 
     public ServiceContractResolverRegistryImpl() {
-        
+
     }
     public ServiceContractResolverRegistryImpl(Bus b) {
         setBus(b);
     }
-    
+
 
     /**
      * Sets the bus with which the registry is associated.
@@ -63,7 +63,7 @@ public class ServiceContractResolverRegistryImpl implements ServiceContractResol
 
     /**
      * Calls each of the registered <code>ServiceContractResolver</code> instances
-     * to resolve the location of the service's contract. It returns the location 
+     * to resolve the location of the service's contract. It returns the location
      * from the first resolver that matches the QName to a location.
      *
      * @param qname QName to be resolved into a contract location
@@ -95,7 +95,7 @@ public class ServiceContractResolverRegistryImpl implements ServiceContractResol
      * @param resolver the contract resolver to register
      */
     public synchronized void register(ServiceContractResolver resolver) {
-        resolvers.add(resolver);        
+        resolvers.add(resolver);
     }
 
     /**
@@ -104,10 +104,10 @@ public class ServiceContractResolverRegistryImpl implements ServiceContractResol
      * @param resolver the contract resolver to remove
      */
     public synchronized void unregister(ServiceContractResolver resolver) {
-        resolvers.remove(resolver);        
+        resolvers.remove(resolver);
     }
 
-    
+
     protected List<ServiceContractResolver> getResolvers() {
         return resolvers;
     }

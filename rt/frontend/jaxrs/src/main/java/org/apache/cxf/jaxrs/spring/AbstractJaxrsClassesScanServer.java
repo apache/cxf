@@ -33,26 +33,26 @@ import org.springframework.beans.factory.annotation.Value;
 public abstract class AbstractJaxrsClassesScanServer extends AbstractSpringConfigurationFactory {
     @Value("${cxf.jaxrs.classes-scan-packages}")
     private String basePackages;
-    
+
     protected AbstractJaxrsClassesScanServer() {
-        
+
     }
     protected void setJaxrsResources(JAXRSServerFactoryBean factory) {
         try {
             final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
                 ClasspathScanner.findClasses(basePackages, Provider.class, Path.class);
-                                      
+
             List<Object> jaxrsServices = JAXRSServerFactoryBeanDefinitionParser
-                .createBeansFromDiscoveredClasses(super.applicationContext, classes.get(Path.class), null); 
+                .createBeansFromDiscoveredClasses(super.applicationContext, classes.get(Path.class), null);
             List<Object> jaxrsProviders = JAXRSServerFactoryBeanDefinitionParser
                 .createBeansFromDiscoveredClasses(super.applicationContext, classes.get(Provider.class), null);
-            
+
             factory.setServiceBeans(jaxrsServices);
             factory.setProviders(jaxrsProviders);
         } catch (Exception ex) {
             throw new ServiceConstructionException(ex);
         }
-        
+
     }
-        
+
 }

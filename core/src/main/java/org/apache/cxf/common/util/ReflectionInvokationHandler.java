@@ -32,19 +32,19 @@ import java.lang.reflect.Proxy;
 import java.util.Iterator;
 
 /**
- * 
+ *
  */
 public class ReflectionInvokationHandler implements InvocationHandler {
     private Object target;
-    
+
     public ReflectionInvokationHandler(Object obj) {
         target = obj;
     }
-    
+
     public Object getTarget() {
-        return target;        
+        return target;
     }
-    
+
     /** {@inheritDoc}*/
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         WrapReturn wr = method.getAnnotation(WrapReturn.class);
@@ -55,7 +55,7 @@ public class ReflectionInvokationHandler implements InvocationHandler {
             try {
                 m = targetClass.getMethod(method.getName(), parameterTypes);
             } catch (NoSuchMethodException nsme) {
-                
+
                 boolean[] optionals = new boolean[method.getParameterTypes().length];
                 int i = 0;
                 int optionalNumber = 0;
@@ -70,7 +70,7 @@ public class ReflectionInvokationHandler implements InvocationHandler {
                     }
                     i++;
                 }
-                
+
                 Class<?>[] newParams = new Class<?>[args.length - optionalNumber];
                 Object[] newArgs = new Object[args.length - optionalNumber];
                 int argI = 0;
@@ -96,14 +96,14 @@ public class ReflectionInvokationHandler implements InvocationHandler {
                     && m2.getParameterTypes().length == method.getParameterTypes().length) {
                     boolean found = true;
                     for (int x = 0; x < m2.getParameterTypes().length; x++) {
-                        if (args[x] != null 
+                        if (args[x] != null
                             && !m2.getParameterTypes()[x].isInstance(args[x])) {
                             found = false;
                         }
                     }
                     if (found) {
                         ReflectionUtil.setAccessible(m2);
-                        return wrapReturn(wr, m2.invoke(target, args));                            
+                        return wrapReturn(wr, m2.invoke(target, args));
                     }
                 }
             }
@@ -153,7 +153,7 @@ public class ReflectionInvokationHandler implements InvocationHandler {
         }
         return createProxyWrapper(t, wr.value());
     }
-    
+
     public static <T> T createProxyWrapper(Object target, Class<T> inf) {
         InvocationHandler h = new ReflectionInvokationHandler(target);
         return inf.cast(Proxy.newProxyInstance(inf.getClassLoader(), new Class[] {inf}, h));
@@ -170,14 +170,14 @@ public class ReflectionInvokationHandler implements InvocationHandler {
         Class<?> value();
         boolean iterator() default false;
     }
-    
+
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
     public static @interface UnwrapParam {
         String methodName() default "getValue";
         String typeMethodName() default "#default";
     }
-    
+
     private static class WrapperIterator implements Iterator<Object> {
         Class<?> cls;
         Iterator<?> internal;

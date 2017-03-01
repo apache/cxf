@@ -25,9 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MemorySPStateManager implements SPStateManager {
 
     private final Map<String, RequestState> requestStateMap = new ConcurrentHashMap<>(16, 0.75f, 4);
-    
+
     private final Map<String, ResponseState> responseStateMap = new ConcurrentHashMap<>(16, 0.75f, 4);
-    
+
     public ResponseState getResponseState(String securityContextKey) {
         return responseStateMap.get(securityContextKey);
     }
@@ -39,7 +39,7 @@ public class MemorySPStateManager implements SPStateManager {
     public void setResponseState(String securityContextKey, ResponseState state) {
         responseStateMap.put(securityContextKey, state);
     }
-    
+
     public void setRequestState(String relayState, RequestState state) {
         requestStateMap.put(relayState, state);
     }
@@ -47,7 +47,7 @@ public class MemorySPStateManager implements SPStateManager {
     public RequestState removeRequestState(String relayState) {
         return requestStateMap.remove(relayState);
     }
-    
+
     public void close() throws IOException {
         requestStateMap.clear();
         responseStateMap.clear();

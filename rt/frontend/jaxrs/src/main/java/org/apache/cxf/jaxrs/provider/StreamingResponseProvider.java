@@ -34,12 +34,12 @@ import javax.ws.rs.ext.Providers;
 import org.apache.cxf.jaxrs.ext.StreamingResponse;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
-public class StreamingResponseProvider<T> extends AbstractConfigurableProvider 
+public class StreamingResponseProvider<T> extends AbstractConfigurableProvider
     implements MessageBodyWriter<StreamingResponse<T>> {
 
     @Context
     private Providers providers;
-    
+
     @Override
     public boolean isWriteable(Class<?> cls, Type type, Annotation[] anns, MediaType mt) {
         return StreamingResponse.class.isAssignableFrom(cls);
@@ -62,19 +62,19 @@ public class StreamingResponseProvider<T> extends AbstractConfigurableProvider
     public long getSize(StreamingResponse<T> arg0, Class<?> arg1, Type arg2, Annotation[] arg3, MediaType arg4) {
         return -1;
     }
-    
+
     private class StreamingResponseWriter implements StreamingResponse.Writer<T> {
         private volatile MessageBodyWriter<T> writer;
         private Class<?> entityCls;
         private MediaType mt;
         private Annotation[] anns;
-        private MultivaluedMap<String, Object> headers; 
+        private MultivaluedMap<String, Object> headers;
         private OutputStream os;
-                
+
         StreamingResponseWriter(Class<?> entityCls,
                                 Annotation[] anns,
                                 MediaType mt,
-                                MultivaluedMap<String, Object> headers, 
+                                MultivaluedMap<String, Object> headers,
                                 OutputStream os) {
             this.entityCls = entityCls;
             this.anns = anns;
@@ -82,11 +82,11 @@ public class StreamingResponseProvider<T> extends AbstractConfigurableProvider
             this.headers = headers;
             this.os = os;
         }
-        
+
         @SuppressWarnings("unchecked")
         @Override
         public void write(T data) throws IOException {
-            Class<?> actualCls = entityCls != Object.class ? entityCls : data.getClass(); 
+            Class<?> actualCls = entityCls != Object.class ? entityCls : data.getClass();
             if (writer == null) {
                 writer = (MessageBodyWriter<T>)providers.getMessageBodyWriter(actualCls, actualCls, anns, mt);
                 if (writer == null) {
@@ -100,6 +100,6 @@ public class StreamingResponseProvider<T> extends AbstractConfigurableProvider
         public OutputStream getEntityStream() {
             return os;
         }
-        
+
     }
 }

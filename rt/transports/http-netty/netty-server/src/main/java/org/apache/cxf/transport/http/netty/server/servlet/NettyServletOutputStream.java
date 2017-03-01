@@ -27,7 +27,7 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.handler.codec.http.HttpContent;
 
 public class NettyServletOutputStream extends ServletOutputStream {
-    
+
     private ByteBufOutputStream out;
 
     private boolean flushed;
@@ -68,6 +68,6 @@ public class NettyServletOutputStream extends ServletOutputStream {
     public int getBufferSize() {
         return this.out.buffer().capacity();
     }
-    
-    
+
+
 }

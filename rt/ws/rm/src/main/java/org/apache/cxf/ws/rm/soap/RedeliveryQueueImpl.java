@@ -70,24 +70,24 @@ import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.SequenceType;
 
 /**
- * 
+ *
  */
 public class RedeliveryQueueImpl implements RedeliveryQueue {
     private static final Logger LOG = LogUtils.getL7dLogger(RedeliveryQueueImpl.class);
 
-    private Map<String, List<RedeliverCandidate>> candidates = 
+    private Map<String, List<RedeliverCandidate>> candidates =
         new HashMap<String, List<RedeliverCandidate>>();
-    private Map<String, List<RedeliverCandidate>> suspendedCandidates = 
+    private Map<String, List<RedeliverCandidate>> suspendedCandidates =
         new HashMap<String, List<RedeliverCandidate>>();
-    
+
     private RMManager manager;
-    
+
     private int undeliveredCount;
 
     public RedeliveryQueueImpl(RMManager m) {
         manager = m;
     }
-    
+
     public RMManager getManager() {
         return manager;
     }
@@ -117,7 +117,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
         return 0 == getUndelivered().size();
     }
     public void purgeAll(DestinationSequence seq) {
-        Collection<Long> purged = new ArrayList<Long>();
+        Collection<Long> purged = new ArrayList<>();
         synchronized (this) {
             LOG.fine("Start purging redeliver candidates.");
             List<RedeliverCandidate> sequenceCandidates = getSequenceCandidates(seq);
@@ -136,7 +136,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
             }
             LOG.fine("Completed purging redeliver candidates.");
         }
-        if (purged.size() > 0) {
+        if (!purged.isEmpty()) {
             RMStore store = manager.getStore();
             if (null != store) {
                 store.removeMessages(seq.getIdentifier(), purged, false);
@@ -145,7 +145,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
     }
 
     public List<Long> getUndeliveredMessageNumbers(DestinationSequence seq) {
-        List<Long> undelivered = new ArrayList<Long>();
+        List<Long> undelivered = new ArrayList<>();
         List<RedeliverCandidate> sequenceCandidates = getSequenceCandidates(seq);
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {
@@ -189,7 +189,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
     protected boolean isSequenceSuspended(String key) {
         return suspendedCandidates.containsKey(key);
     }
-    
+
     public RetryStatus getRedeliveryStatus(DestinationSequence seq, long num) {
         List<RedeliverCandidate> sequenceCandidates = getSequenceCandidates(seq);
         if (null != sequenceCandidates) {
@@ -222,7 +222,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
         return cp;
     }
 
-    
+
     public void start() {
         // TODO Auto-generated method stub
 
@@ -237,9 +237,9 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
                     RedeliverCandidate candidate = sequenceCandidates.get(i);
                     candidate.cancel();
                 }
-                LOG.log(Level.FINE, "Cancelled redeliveriss for sequence {0}.", 
+                LOG.log(Level.FINE, "Cancelled redeliveriss for sequence {0}.",
                         seq.getIdentifier().getValue());
-            }           
+            }
         }
     }
 
@@ -271,28 +271,28 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
                 }
                 candidates.put(key, sequenceCandidates);
                 LOG.log(Level.FINE, "Resumed redeliveries for sequence {0}.", key);
-            }           
+            }
         }
     }
-    
+
     /**
      * Accepts a new resend candidate.
-     * 
+     *
      * @param ctx the message context.
      * @return ResendCandidate
-     */    
+     */
     protected RedeliverCandidate cacheUndelivered(Message message) {
         RMProperties rmps = RMContextUtils.retrieveRMProperties(message, false);
         SequenceType st = rmps.getSequence();
         Identifier sid = st.getIdentifier();
         String key = sid.getValue();
-        
+
         RedeliverCandidate candidate = null;
-        
+
         synchronized (this) {
             List<RedeliverCandidate> sequenceCandidates = getSequenceCandidates(key);
             if (null == sequenceCandidates) {
-                sequenceCandidates = new ArrayList<RedeliverCandidate>();
+                sequenceCandidates = new ArrayList<>();
                 candidates.put(key, sequenceCandidates);
             }
             candidate = getRedeliverCandidate(st, sequenceCandidates);
@@ -348,12 +348,12 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
     protected Map<String, List<RedeliverCandidate>> getUndelivered() {
         return candidates;
     }
-    
+
     private static InterceptorChain getRedeliveryInterceptorChain(Message m, String phase) {
         Exchange exchange = m.getExchange();
         Endpoint ep = exchange.getEndpoint();
         Bus bus = exchange.getBus();
-                
+
         PhaseManager pm = bus.getExtension(PhaseManager.class);
         SortedSet<Phase> phases = new TreeSet<Phase>(pm.getInPhases());
         for (Iterator<Phase> it = phases.iterator(); it.hasNext();) {
@@ -376,11 +376,11 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
             il = ((InterceptorProvider)ep.getService().getDataBinding()).getInInterceptors();
             addInterceptors(chain, il);
         }
-        
+
         return chain;
     }
 
-    private static void addInterceptors(PhaseInterceptorChain chain, 
+    private static void addInterceptors(PhaseInterceptorChain chain,
                                         List<Interceptor<? extends Message>> il) {
         for (Interceptor<? extends Message> i : il) {
             final String iname = i.getClass().getSimpleName();
@@ -412,8 +412,8 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
                 // remove old message headers like WSS headers
                 ((SoapMessage)message).getHeaders().clear();
             }
-            RetryPolicyType rmrp = null != manager.getDestinationPolicy() 
-                ? manager.getDestinationPolicy().getRetryPolicy() : null; 
+            RetryPolicyType rmrp = null != manager.getDestinationPolicy()
+                ? manager.getDestinationPolicy().getRetryPolicy() : null;
             long baseRedeliveryInterval = Long.parseLong(DEFAULT_BASE_REDELIVERY_INTERVAL);
             if (null != rmrp && rmrp.getInterval() > 0L) {
                 baseRedeliveryInterval = rmrp.getInterval();
@@ -436,7 +436,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
 
         /**
          * Initiate redelivery asynchronsly.
-         * 
+         *
          */
         protected void initiate() {
             pending = true;
@@ -448,7 +448,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
             } else {
                 LOG.log(Level.FINE, "Using endpoint executor {0}", executor.getClass().getName());
             }
-            
+
             try {
                 executor.execute(this);
             } catch (RejectedExecutionException ex) {
@@ -470,15 +470,15 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
                 attempted();
             }
         }
-        
-        
+
+
         private void redeliver() throws Exception {
             LOG.log(Level.INFO, "Redelivering ... for " + (1 + retries));
             String restartingPhase;
             if (message.getContent(Exception.class) != null) {
                 message.removeContent(Exception.class);
                 message.getExchange().put(Exception.class, null);
-                
+
                 // clean-up message for redelivery
                 closeStreamResources();
                 message.removeContent(Node.class);
@@ -508,7 +508,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
                 throw ex;
             }
         }
-        
+
         public long getNumber() {
             return number;
         }
@@ -547,7 +547,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
         public boolean isSuspended() {
             return suspended;
         }
-        
+
         /**
          * the message has been delivered to the application
          */
@@ -569,7 +569,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
                 releaseSavedMessage();
             }
         }
-        
+
         protected void suspend() {
             suspended = true;
             pending = false;
@@ -578,15 +578,15 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
             if (null != nextTask) {
                 nextTask.cancel();
             }
-            
+
         }
-        
+
         protected void resume() {
             suspended = false;
             next = new Date(System.currentTimeMillis());
             attempted();
         }
-        
+
         private void releaseSavedMessage() {
             CachedOutputStream saved = (CachedOutputStream)message.remove(RMMessageConstants.SAVED_CONTENT);
             if (saved != null) {
@@ -605,9 +605,9 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
                 } catch (IOException e) {
                     // ignore
                 }
-            }  
+            }
         }
-        
+
         /*
          * Close all stream-like resources stored in the message
          */
@@ -630,15 +630,15 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
                 }
                 message.removeContent(XMLStreamReader.class);
             }
-            List olist = message.getContent(List.class);
+            List<?> olist = message.getContent(List.class);
             if (olist != null && olist.size() == 1) {
                 Object o = olist.get(0);
                 if (o instanceof XMLStreamReader) {
                     oreader = (XMLStreamReader)o;
                 } else if (o instanceof StaxSource) {
-                    oreader = ((StaxSource)o).getXMLStreamReader();    
+                    oreader = ((StaxSource)o).getXMLStreamReader();
                 }
-                
+
                 if (oreader != null) {
                     try {
                         oreader.close();
@@ -656,7 +656,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
         protected Message getMessage() {
             return message;
         }
-        
+
         /**
          * A resend has been attempted. Schedule the next attempt.
          */

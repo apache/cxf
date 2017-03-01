@@ -28,12 +28,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.greeter_control.BasicGreeterService;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.systest.ws.util.MessageFlow;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -55,10 +55,10 @@ import org.junit.Test;
  */
 public class RMPolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
-    public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString(); 
+    public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString();
 
     private static final Logger LOG = LogUtils.getLogger(RMPolicyTest.class);
-    private static final String GREETMEONEWAY_ACTION 
+    private static final String GREETMEONEWAY_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
     private static final String GREETME_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeRequest";
@@ -67,7 +67,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
     private static final String PINGME_ACTION = "http://cxf.apache.org/greeter_control/Greeter/pingMeRequest";
     private static final String PINGME_RESPONSE_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/pingMeResponse";
-    private static final String GREETER_FAULT_ACTION 
+    private static final String GREETER_FAULT_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/pingMe/Fault/faultDetail";
 
     public static class Server extends AbstractBusTestServerBase {
@@ -92,7 +92,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
             LoggingOutInterceptor out = new LoggingOutInterceptor();
             bus.getOutInterceptors().add(out);
             bus.getOutFaultInterceptors().add(out);
-            
+
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             ep = Endpoint.publish(address, implementor);
@@ -104,20 +104,20 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         }
 
         public static void main(String[] args) {
-            try { 
+            try {
                 if (args.length == 0) {
                     args = new String[] {TEMPDIR};
                 }
-                Server s = new Server(args[0]); 
+                Server s = new Server(args[0]);
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 System.exit(-1);
-            } finally { 
+            } finally {
                 System.out.println("done!");
             }
         }
-    }    
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -128,7 +128,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(Server.class, null,
                                                                    new String[] {TEMPDIR}));
     }
-         
+
     @Test
     public void testUsingRM() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -138,7 +138,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
         bus.getOutInterceptors().add(outRecorder);
         InMessageRecorder inRecorder = new InMessageRecorder();
         bus.getInInterceptors().add(inRecorder);
-        
+
         BasicGreeterService gs = new BasicGreeterService();
         final Greeter greeter = gs.getGreeterPort();
         updateAddressPort(greeter, PORT);
@@ -148,7 +148,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
 
         // two-way
 
-        assertEquals("CXF", greeter.greetMe("cxf")); 
+        assertEquals("CXF", greeter.greetMe("cxf"));
 
         // oneway
 
@@ -160,26 +160,26 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
             greeter.pingMe();
         } catch (PingMeFault ex) {
             fail("First invocation should have succeeded.");
-        } 
-       
+        }
+
         try {
             greeter.pingMe();
             fail("Expected PingMeFault not thrown.");
         } catch (PingMeFault ex) {
             assertEquals(2, ex.getFaultInfo().getMajor());
             assertEquals(1, ex.getFaultInfo().getMinor());
-        } 
+        }
 
         MessageRecorder mr = new MessageRecorder(outRecorder, inRecorder);
         mr.awaitMessages(5, 4, 5000);
 
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages(),
             Names200408.WSA_NAMESPACE_NAME, RM10Constants.NAMESPACE_URI);
-        
-        
+
+
         mf.verifyMessages(5, true);
-        String[] expectedActions = new String[] {RM10Constants.INSTANCE.getCreateSequenceAction(), 
-                                                 GREETME_ACTION, 
+        String[] expectedActions = new String[] {RM10Constants.INSTANCE.getCreateSequenceAction(),
+                                                 GREETME_ACTION,
                                                  GREETMEONEWAY_ACTION,
                                                  PINGME_ACTION,
                                                  PINGME_ACTION};
@@ -190,7 +190,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
 
         mf.verifyMessages(4, false);
 //        mf.verifyMessages(9, false);
-//        mf.verifyPartialResponses(5);        
+//        mf.verifyPartialResponses(5);
 //        mf.purgePartialResponses();
 
         expectedActions = new String[] {

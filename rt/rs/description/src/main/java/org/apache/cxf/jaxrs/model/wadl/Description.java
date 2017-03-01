@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 
 /**
  * Can be used to document resource classes and methods
- * 
+ *
  * See <a href="http://www.w3.org/Submission/wadl/#x3-80002.3">WADL Documentation</a>.
  */
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER, ElementType.FIELD })
@@ -37,19 +37,19 @@ public @interface Description {
      */
     String value() default "";
     /**
-     * Maps to WADL doc/@xml:lang attribute 
+     * Maps to WADL doc/@xml:lang attribute
      **/
     String lang() default "";
     /**
-     * Maps to WADL doc/@title attribute 
+     * Maps to WADL doc/@title attribute
      **/
     String title() default "";
     /**
-     * This uri, if set, will be used to retrieve 
+     * This uri, if set, will be used to retrieve
      * the content which will be set as WADL doc content
      */
     String docuri() default "";
-    
+
     /**
      * Target of this description, see {@link DocTarget}
      */

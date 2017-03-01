@@ -25,7 +25,7 @@ import org.apache.cxf.common.security.TokenType;
 import org.apache.cxf.common.security.UsernameToken;
 
 public abstract class AbstractUsernameTokenInInterceptor extends AbstractSecurityContextInInterceptor {
-    
+
     protected Subject createSubject(SecurityToken token) {
         if (token.getTokenType() != TokenType.UsernameToken) {
             reportSecurityException("Unsupported token type " + token.getTokenType().toString());
@@ -33,8 +33,8 @@ public abstract class AbstractUsernameTokenInInterceptor extends AbstractSecurit
         UsernameToken ut = (UsernameToken)token;
         return createSubject(ut);
     }
-    
+
     protected abstract Subject createSubject(UsernameToken token);
-    
-    
+
+
 }

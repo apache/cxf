@@ -43,7 +43,7 @@ public class StaxSource extends SAXSource implements XMLReader {
     private XMLStreamReader streamReader;
 
     private ContentHandler contentHandler;
-    
+
     private LexicalHandler lexicalHandler;
 
     public StaxSource(XMLStreamReader streamReader) {
@@ -102,7 +102,7 @@ public class StaxSource extends SAXSource implements XMLReader {
                         int start = streamReader.getTextStart();
                         char[] chars = streamReader.getTextCharacters();
                         lexicalHandler.comment(chars, start, length);
-                    } 
+                    }
                     break;
                 case XMLStreamConstants.DTD:
                     break;
@@ -113,7 +113,7 @@ public class StaxSource extends SAXSource implements XMLReader {
                     String uri = streamReader.getNamespaceURI();
                     String localName = streamReader.getLocalName();
                     String prefix = streamReader.getPrefix();
-                    String qname = prefix != null && prefix.length() > 0 
+                    String qname = prefix != null && prefix.length() > 0
                         ? prefix + ":" + localName : localName;
                     contentHandler.endElement(uri, localName, qname);
                     // namespaces
@@ -141,7 +141,7 @@ public class StaxSource extends SAXSource implements XMLReader {
                     String uri = streamReader.getNamespaceURI();
                     String localName = streamReader.getLocalName();
                     String prefix = streamReader.getPrefix();
-                    String qname = prefix != null && prefix.length() > 0 
+                    String qname = prefix != null && prefix.length() > 0
                         ? prefix + ":" + localName : localName;
                     // namespaces
                     for (int i = 0; i < streamReader.getNamespaceCount(); i++) {
@@ -214,7 +214,7 @@ public class StaxSource extends SAXSource implements XMLReader {
         return false;
     }
 
-    public void setFeature(String name, boolean value) 
+    public void setFeature(String name, boolean value)
         throws SAXNotRecognizedException, SAXNotSupportedException {
     }
 
@@ -222,7 +222,7 @@ public class StaxSource extends SAXSource implements XMLReader {
         return null;
     }
 
-    public void setProperty(String name, Object value) 
+    public void setProperty(String name, Object value)
         throws SAXNotRecognizedException, SAXNotSupportedException {
         if ("http://xml.org/sax/properties/lexical-handler".equals(name)) {
             lexicalHandler = (LexicalHandler) value;

@@ -118,44 +118,44 @@ public class ReadHeaderInterceptorTest extends TestBase {
     public void testNoClosingEnvTage() throws Exception {
         assertTrue(testNoClosingEnvTag(Boolean.TRUE));
     }
-    
+
     @Test
     public void testNoClosingEnvTagValidationTypeBoth() throws Exception {
         assertTrue(testNoClosingEnvTag(SchemaValidationType.BOTH));
     }
-    
+
     @Test
     public void testNoClosingEnvTagValidationTypeIn() throws Exception {
         assertTrue(testNoClosingEnvTag(SchemaValidationType.IN));
     }
-    
+
     @Test
     public void testNoClosingEnvTagValidationTypeOut() throws Exception {
         assertFalse(testNoClosingEnvTag(SchemaValidationType.OUT));
     }
-    
+
     @Test
     public void testNoClosingEnvTagValidationTypeNone() throws Exception {
         assertFalse(testNoClosingEnvTag(SchemaValidationType.NONE));
     }
-    
+
     @Test
     public void testNoClosingEnvTagValidationTypeFalse() throws Exception {
         assertFalse(testNoClosingEnvTag(Boolean.FALSE));
     }
-    
+
     private boolean testNoClosingEnvTag(Object validationType) {
         soapMessage = TestUtil.createEmptySoapMessage(Soap12.getInstance(), chain);
         InputStream in = getClass().getResourceAsStream("test-no-endenv.xml");
         assertNotNull(in);
-        
+
         soapMessage.put(Message.SCHEMA_VALIDATION_ENABLED, validationType);
         soapMessage.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader(in));
 
         soapMessage.getInterceptorChain().doIntercept(soapMessage);
         return soapMessage.getContent(Exception.class) != null;
     }
-    
+
     @Test
     public void testHandleHeader() {
         try {
@@ -169,10 +169,10 @@ public class ReadHeaderInterceptorTest extends TestBase {
         // check the xmlReader should be placed on the first entry of the body element
         XMLStreamReader xmlReader = soapMessage.getContent(XMLStreamReader.class);
         assertEquals("check the first entry of body", "itinerary", xmlReader.getLocalName());
-        
+
         List<Header> eleHeaders = soapMessage.getHeaders();
-        
-        List<Element> headerChilds = new ArrayList<Element>();
+
+        List<Element> headerChilds = new ArrayList<>();
         Iterator<Header> iter = eleHeaders.iterator();
         while (iter.hasNext()) {
             Header hdr = iter.next();
@@ -186,7 +186,7 @@ public class ReadHeaderInterceptorTest extends TestBase {
             Element ele = headerChilds.get(i);
             if (ele.getLocalName().equals("reservation")) {
                 Element reservation = ele;
-                List<Element> reservationChilds = new ArrayList<Element>();
+                List<Element> reservationChilds = new ArrayList<>();
                 Element elem = DOMUtils.getFirstElement(reservation);
                 while (elem != null) {
                     reservationChilds.add(elem);
@@ -205,7 +205,7 @@ public class ReadHeaderInterceptorTest extends TestBase {
                 Element passenger = ele;
                 assertNotNull(passenger);
                 Element child = DOMUtils.getFirstElement(passenger);
-                assertNotNull("passenger should have a child element", child);                
+                assertNotNull("passenger should have a child element", child);
                 assertEquals("name", child.getLocalName());
                 assertEquals("Bob", child.getTextContent());
             }

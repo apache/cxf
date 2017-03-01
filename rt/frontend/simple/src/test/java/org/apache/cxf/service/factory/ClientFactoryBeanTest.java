@@ -41,42 +41,42 @@ public class ClientFactoryBeanTest extends AbstractSimpleFrontendTest {
 
     @Test
     public void testClientFactoryBean() throws Exception {
-        
+
         ClientFactoryBean cfBean = new ClientFactoryBean();
         cfBean.setAddress("http://localhost/Hello");
         cfBean.setBus(getBus());
         cfBean.setServiceClass(HelloService.class);
-        
+
         Client client = cfBean.create();
         assertNotNull(client);
-        
+
         Service service = client.getEndpoint().getService();
         Map<QName, Endpoint> eps = service.getEndpoints();
         assertEquals(1, eps.size());
-        
+
         Endpoint ep = eps.values().iterator().next();
         EndpointInfo endpointInfo = ep.getEndpointInfo();
-        
+
         BindingInfo b = endpointInfo.getService().getBindings().iterator().next();
-        
+
         assertTrue(b instanceof SoapBindingInfo);
-        
+
         SoapBindingInfo sb = (SoapBindingInfo) b;
         assertEquals("HelloServiceSoapBinding", b.getName().getLocalPart());
         assertEquals("document", sb.getStyle());
-        
+
         assertEquals(4, b.getOperations().size());
-        
+
         BindingOperationInfo bop = b.getOperations().iterator().next();
         SoapOperationInfo sop = bop.getExtensor(SoapOperationInfo.class);
         assertNotNull(sop);
         assertEquals("", sop.getAction());
         assertEquals("document", sop.getStyle());
     }
-    
+
     @Test
     public void testJaxbExtraClass() throws Exception {
-        
+
         ClientFactoryBean cfBean = new ClientFactoryBean();
         cfBean.setAddress("http://localhost/Hello");
         cfBean.setBus(getBus());
@@ -85,7 +85,7 @@ public class ClientFactoryBeanTest extends AbstractSimpleFrontendTest {
         if (props == null) {
             props = new HashMap<String, Object>();
         }
-        props.put("jaxb.additionalContextClasses", 
+        props.put("jaxb.additionalContextClasses",
                   new Class[] {GreetMe.class, GreetMeOneWay.class});
         cfBean.setProperties(props);
         Client client = cfBean.create();

@@ -41,7 +41,7 @@ import org.apache.wss4j.policy.model.AlgorithmSuite;
  * This class retrieves the default AlgorithmSuites plus the CXF specific GCM AlgorithmSuites.
  */
 public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
-    
+
     public AlgorithmSuite getAlgorithmSuite(Bus bus, SPConstants.SPVersion version, Policy nestedPolicy) {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg != null) {
@@ -53,7 +53,7 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
             assertions.put(qName, new PrimitiveAssertion(qName));
             qName = new QName(ns, "Basic256GCM");
             assertions.put(qName, new PrimitiveAssertion(qName));
-            
+
             reg.registerBuilder(new PrimitiveAssertionBuilder(assertions.keySet()) {
                 public Assertion build(Element element, AssertionBuilderFactory fact) {
                     if (XMLPrimitiveAssertionBuilder.isOptional(element)
@@ -62,17 +62,17 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     }
                     QName q = new QName(element.getNamespaceURI(), element.getLocalName());
                     return assertions.get(q);
-                }            
+                }
             });
         }
         return new GCMAlgorithmSuite(version, nestedPolicy);
     }
-    
+
     public static class GCMAlgorithmSuite extends AlgorithmSuite {
-        
+
         static {
             ALGORITHM_SUITE_TYPES.put(
-                "Basic128GCM", 
+                "Basic128GCM",
                 new AlgorithmSuiteType(
                     "Basic128GCM",
                     SPConstants.SHA1,
@@ -84,9 +84,9 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     128, 128, 128, 256, 1024, 4096
                 )
             );
-            
+
             ALGORITHM_SUITE_TYPES.put(
-                "Basic192GCM", 
+                "Basic192GCM",
                 new AlgorithmSuiteType(
                     "Basic192GCM",
                     SPConstants.SHA1,
@@ -98,9 +98,9 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     192, 192, 192, 256, 1024, 4096
                 )
             );
-            
+
             ALGORITHM_SUITE_TYPES.put(
-                "Basic256GCM", 
+                "Basic256GCM",
                 new AlgorithmSuiteType(
                     "Basic256GCM",
                     SPConstants.SHA1,
@@ -111,7 +111,7 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
                     SPConstants.P_SHA1_L192,
                     256, 192, 256, 256, 1024, 4096
                 )
-            );        
+            );
         }
 
         GCMAlgorithmSuite(SPConstants.SPVersion version, Policy nestedPolicy) {

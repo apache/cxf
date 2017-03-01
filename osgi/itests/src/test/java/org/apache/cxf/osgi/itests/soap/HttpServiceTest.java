@@ -56,14 +56,14 @@ public class HttpServiceTest extends CXFOSGiTestSupport {
         String res = greeter.greetMe("Chris");
         Assert.assertEquals("Hi Chris", res);
     }
-    
+
     private Greeter greeterHttpProxy(String port) {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
         factory.setAddress("http://localhost:" + port + "/cxf/greeter");
         return factory.create(Greeter.class);
     }
-    
+
     @Configuration
     public Option[] config() {
         return new Option[] {
@@ -83,5 +83,5 @@ public class HttpServiceTest extends CXFOSGiTestSupport {
                   .set(Constants.BUNDLE_ACTIVATOR, HttpTestActivator.class.getName())
                   .build(TinyBundles.withBnd());
     }
-    
+
 }

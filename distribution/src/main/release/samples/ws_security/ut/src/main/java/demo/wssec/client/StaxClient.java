@@ -59,14 +59,14 @@ public final class StaxClient {
             properties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_DIGEST);
             properties.setTokenUser("abcd");
             properties.setCallbackHandler(new UTPasswordCallback());
-            
+
             WSSSecurityProperties inProperties = new WSSSecurityProperties();
             inProperties.addAction(WSSConstants.USERNAMETOKEN);
             inProperties.addAction(WSSConstants.TIMESTAMP);
 
             inProperties.setUsernameTokenPasswordType(WSSConstants.UsernameTokenPasswordType.PASSWORD_TEXT);
             inProperties.setCallbackHandler(new UTPasswordCallback());
-            
+
             GreeterService service = new GreeterService();
             Greeter port = service.getGreeterPort();
             org.apache.cxf.endpoint.Client client = ClientProxy.getClient(port);

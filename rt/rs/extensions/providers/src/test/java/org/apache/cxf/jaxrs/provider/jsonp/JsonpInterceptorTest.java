@@ -56,7 +56,7 @@ public class JsonpInterceptorTest extends Assert {
         message.put(Message.QUERY_STRING, JsonpInInterceptor.CALLBACK_PARAM + "=" + "myCallback");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         message.setContent(OutputStream.class, bos);
-        
+
         // Process the message
         in.handleMessage(message);
         preStream.handleMessage(message);
@@ -64,7 +64,7 @@ public class JsonpInterceptorTest extends Assert {
         assertEquals("myCallback();", bos.toString());
 
     }
-    
+
     @Test
     public void testJsonWithPaddingCustomCallbackParam() throws Exception {
         Message message = new MessageImpl();
@@ -73,7 +73,7 @@ public class JsonpInterceptorTest extends Assert {
         message.put(Message.QUERY_STRING, "_customjsonp=myCallback");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         message.setContent(OutputStream.class, bos);
-        
+
         // Process the message
         try {
             in.setCallbackParam("_customjsonp");
@@ -86,7 +86,7 @@ public class JsonpInterceptorTest extends Assert {
         }
 
     }
-    
+
     @Test
     public void testJsonWithDefaultPadding() throws Exception {
         Message message = new MessageImpl();
@@ -94,7 +94,7 @@ public class JsonpInterceptorTest extends Assert {
         message.setExchange(new ExchangeImpl());
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         message.setContent(OutputStream.class, bos);
-        
+
         // Process the message
         in.handleMessage(message);
         preStream.handleMessage(message);
@@ -109,7 +109,7 @@ public class JsonpInterceptorTest extends Assert {
         message.setExchange(new ExchangeImpl());
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         message.setContent(OutputStream.class, bos);
-        
+
         // Process the message
         in.handleMessage(message);
         preStream.handleMessage(message);

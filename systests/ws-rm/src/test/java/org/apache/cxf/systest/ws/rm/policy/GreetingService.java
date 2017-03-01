@@ -22,8 +22,8 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
-@WebService(targetNamespace = "http://ws.samples.apache.org/", 
-            serviceName = "GreetingService", portName = "GreetingServicePort", 
+@WebService(targetNamespace = "http://ws.samples.apache.org/",
+            serviceName = "GreetingService", portName = "GreetingServicePort",
             wsdlLocation = "classpath:/org/apache/cxf/systest/ws/rm/policy/greeting.wsdl")
 public class GreetingService implements Greeting {
 

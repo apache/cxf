@@ -20,10 +20,10 @@
 package org.apache.cxf.rs.security.oauth.utils;
 
 /**
- * Miscellaneous constants 
+ * Miscellaneous constants
  */
 public final class OAuthConstants {
-    
+
     public static final String OAUTH_DATA_PROVIDER_CLASS = "oauth.data.provider-class";
     public static final String OAUTH_VALIDATOR_CLASS = "oauth.data.validator-class";
     public static final String OAUTH_DATA_PROVIDER_INSTANCE_KEY = "oauth.data.provider-instance.key";
@@ -32,7 +32,7 @@ public final class OAuthConstants {
     public static final String VERIFIER_INVALID = "verifier_invalid";
 
     public static final String AUTHENTICITY_TOKEN = "session_authenticity_token";
-    
+
     public static final String AUTHORIZATION_DECISION_KEY = "oauthDecision";
     public static final String AUTHORIZATION_DECISION_ALLOW = "allow";
     public static final String AUTHORIZATION_DECISION_DENY = "deny";
@@ -40,11 +40,11 @@ public final class OAuthConstants {
     public static final String X_OAUTH_SCOPE = "scope";
     public static final String X_OAUTH_STATE = "state";
     public static final String OAUTH_CONSUMER_SECRET = "oauth_consumer_secret";
-    
+
     public static final String OAUTH_CALLBACK_OOB = "oob";
-    
+
     private OAuthConstants() {
-        
+
     }
 
 }

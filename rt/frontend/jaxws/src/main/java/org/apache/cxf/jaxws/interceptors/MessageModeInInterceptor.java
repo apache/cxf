@@ -53,9 +53,9 @@ import org.apache.cxf.staxutils.W3CDOMStreamReader;
 public class MessageModeInInterceptor extends AbstractPhaseInterceptor<Message> {
     Class<?> type;
     QName bindingName;
-    
+
     Class<?> soapMsgClass;
-    
+
     public MessageModeInInterceptor(Class<?> c, QName bName) {
         super(Phase.POST_LOGICAL);
         bindingName = bName;
@@ -68,7 +68,7 @@ public class MessageModeInInterceptor extends AbstractPhaseInterceptor<Message> 
     }
 
     public void handleMessage(Message message) throws Fault {
-        BindingOperationInfo bop = message.getExchange().getBindingOperationInfo(); 
+        BindingOperationInfo bop = message.getExchange().getBindingOperationInfo();
         if (bop == null || !bindingName.equals(bop.getBinding().getName())) {
             return;
         }
@@ -82,10 +82,10 @@ public class MessageModeInInterceptor extends AbstractPhaseInterceptor<Message> 
     }
 
     private void doDataSource(final Message message) {
-        MessageContentsList list = (MessageContentsList)message.getContent(List.class); 
+        MessageContentsList list = (MessageContentsList)message.getContent(List.class);
         //reconstitute all the parts into a Mime data source
-        if (message.getAttachments() != null && !message.getAttachments().isEmpty() 
-            && list != null 
+        if (message.getAttachments() != null && !message.getAttachments().isEmpty()
+            && list != null
             && !list.isEmpty() && list.get(0) instanceof DataSource) {
             list.set(0, new MultiPartDataSource(message, (DataSource)list.get(0)));
         }
@@ -93,13 +93,13 @@ public class MessageModeInInterceptor extends AbstractPhaseInterceptor<Message> 
 
     private void doFromSoapMessage(Message message, Object sm) {
         SOAPMessage m = (SOAPMessage)sm;
-        MessageContentsList list = (MessageContentsList)message.getContent(List.class); 
+        MessageContentsList list = (MessageContentsList)message.getContent(List.class);
         if (list == null) {
             list = new MessageContentsList();
             message.setContent(List.class, list);
         }
         Object o = m;
-        
+
         if (StreamSource.class.isAssignableFrom(type)) {
             try {
                 try (CachedOutputStream out = new CachedOutputStream()) {
@@ -118,21 +118,21 @@ public class MessageModeInInterceptor extends AbstractPhaseInterceptor<Message> 
         }
         list.set(0, o);
     }
-    
+
     private static class MultiPartDataSource implements DataSource {
         final Iterator<Attachment> atts;
         final String contentType;
         final String boundary;
         final String start;
-        
+
         final LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream();
         Writer writer;
-        
+
         DataSource rootPart;
         InputStream current;
         boolean writingHeaders;
         Attachment att;
-        
+
         MultiPartDataSource(Message message, DataSource root) {
             atts = message.getAttachments().iterator();
             String s = (String)message.get(Message.CONTENT_TYPE);

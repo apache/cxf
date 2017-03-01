@@ -66,7 +66,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
     public static final Map<String, String> DEFAULT_CLAIM_TYPE_MAP;
     public static final Map<String, String> DEFAULT_TOKEN_TYPE_MAP;
-    
+
     private static final Map<String, String> DEFAULT_KEY_TYPE_MAP = new HashMap<String, String>();
 
     private static final String CLAIM_TYPE = "ClaimType";
@@ -89,7 +89,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         DEFAULT_TOKEN_TYPE_MAP.put("saml1.1", WSConstants.WSS_SAML_TOKEN_TYPE);
         DEFAULT_TOKEN_TYPE_MAP.put("jwt", JWTTokenProvider.JWT_TOKEN_TYPE);
         DEFAULT_TOKEN_TYPE_MAP.put("sct", STSUtils.TOKEN_TYPE_SCT_05_12);
-        
+
         DEFAULT_KEY_TYPE_MAP.put("SymmetricKey", STSConstants.SYMMETRIC_KEY_KEYTYPE);
         DEFAULT_KEY_TYPE_MAP.put("PublicKey", STSConstants.PUBLIC_KEY_KEYTYPE);
         DEFAULT_KEY_TYPE_MAP.put("Bearer", STSConstants.BEARER_KEY_KEYTYPE);
@@ -97,7 +97,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
     @Context
     private MessageContext messageContext;
-    
+
     @Context
     private javax.ws.rs.core.SecurityContext securityContext;
 
@@ -112,54 +112,54 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     private boolean useDeflateEncoding = true;
 
     @Override
-    public Response getXMLToken(String tokenType, String keyType, 
+    public Response getXMLToken(String tokenType, String keyType,
                              List<String> requestedClaims, String appliesTo,
                              boolean wstrustResponse) {
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             issueToken(tokenType, keyType, requestedClaims, appliesTo);
-        
+
         if (wstrustResponse) {
-            JAXBElement<RequestSecurityTokenResponseType> jaxbResponse = 
+            JAXBElement<RequestSecurityTokenResponseType> jaxbResponse =
                 QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponse(response);
-            
+
             return Response.ok(jaxbResponse).build();
         }
-        
+
         RequestedSecurityTokenType requestedToken = getRequestedSecurityToken(response);
         return Response.ok(requestedToken.getAny()).build();
     }
-    
+
     @Override
-    public Response getJSONToken(String tokenType, String keyType, 
+    public Response getJSONToken(String tokenType, String keyType,
                              List<String> requestedClaims, String appliesTo) {
         if (!"jwt".equals(tokenType)) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             issueToken(tokenType, keyType, requestedClaims, appliesTo);
-        
+
         RequestedSecurityTokenType requestedToken = getRequestedSecurityToken(response);
-        
+
         // Discard the XML Wrapper + create a new JSON Wrapper
         String token = ((Element)requestedToken.getAny()).getTextContent();
         return Response.ok(new JSONWrapper(token)).build();
     }
-    
+
     @Override
-    public Response getPlainToken(String tokenType, String keyType, 
+    public Response getPlainToken(String tokenType, String keyType,
                              List<String> requestedClaims, String appliesTo) {
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             issueToken(tokenType, keyType, requestedClaims, appliesTo);
-        
+
         RequestedSecurityTokenType requestedToken = getRequestedSecurityToken(response);
-        
+
         if ("jwt".equals(tokenType)) {
             // Discard the wrapper here
             return Response.ok(((Element)requestedToken.getAny()).getTextContent()).build();
         } else {
             // Base-64 encode the token + return it
             try {
-                String encodedToken = 
+                String encodedToken =
                     encodeToken(DOM2Writer.nodeToString((Element)requestedToken.getAny()));
                 return Response.ok(encodedToken).build();
             } catch (Exception ex) {
@@ -168,7 +168,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
             }
         }
     }
-    
+
     private RequestedSecurityTokenType getRequestedSecurityToken(RequestSecurityTokenResponseType response) {
         for (Object obj : response.getAny()) {
             if (obj instanceof JAXBElement<?>) {
@@ -180,7 +180,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         }
         return null;
     }
-    
+
     private RequestSecurityTokenResponseType issueToken(
         String tokenType,
         String keyType,
@@ -191,12 +191,12 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         if (tokenTypeMap != null && tokenTypeMap.containsKey(tokenTypeToUse)) {
             tokenTypeToUse = tokenTypeMap.get(tokenTypeToUse);
         }
-        
+
         String keyTypeToUse = keyType;
         if (DEFAULT_KEY_TYPE_MAP.containsKey(keyTypeToUse)) {
             keyTypeToUse = DEFAULT_KEY_TYPE_MAP.get(keyTypeToUse);
         }
-        
+
         ObjectFactory of = new ObjectFactory();
         RequestSecurityTokenType request = of.createRequestSecurityTokenType();
 
@@ -206,22 +206,22 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
         String desiredKeyType = keyTypeToUse != null ? keyTypeToUse : defaultKeyType;
         request.getAny().add(of.createKeyType(desiredKeyType));
-        
+
         // Add the TLS client Certificate as the UseKey Element if the KeyType is PublicKey
         if (STSConstants.PUBLIC_KEY_KEYTYPE.equals(desiredKeyType)) {
             X509Certificate clientCert = getTLSClientCertificate();
             if (clientCert != null) {
                 Document doc = DOMUtils.createDocument();
                 Element keyInfoElement = doc.createElementNS("http://www.w3.org/2000/09/xmldsig#", "KeyInfo");
-                
+
                 try {
                     X509Data certElem = new X509Data(doc);
                     certElem.addCertificate(clientCert);
                     keyInfoElement.appendChild(certElem.getElement());
-                    
+
                     UseKeyType useKeyType = of.createUseKeyType();
                     useKeyType.setAny(keyInfoElement);
-                    
+
                     JAXBElement<UseKeyType> useKey = of.createUseKey(useKeyType);
                     request.getAny().add(useKey);
                 } catch (XMLSecurityException ex) {
@@ -253,12 +253,12 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
             }
             request.getAny().add(claims);
         }
-        
+
         if (appliesTo != null) {
             String wspNamespace = "http://www.w3.org/ns/ws-policy";
             Document doc = DOMUtils.createDocument();
             Element appliesToElement = doc.createElementNS(wspNamespace, "AppliesTo");
-            
+
             String addressingNamespace = "http://www.w3.org/2005/08/addressing";
             Element eprElement = doc.createElementNS(addressingNamespace, "EndpointReference");
             Element addressElement = doc.createElementNS(addressingNamespace, "Address");
@@ -266,7 +266,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
 
             eprElement.appendChild(addressElement);
             appliesToElement.appendChild(eprElement);
-            
+
             request.getAny().add(appliesToElement);
         }
 
@@ -289,14 +289,14 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     @Override
     public Response getToken(Action action, RequestSecurityTokenType request) {
         RequestSecurityTokenResponseType response = processRequest(action, request);
-        
-        JAXBElement<RequestSecurityTokenResponseType> jaxbResponse = 
+
+        JAXBElement<RequestSecurityTokenResponseType> jaxbResponse =
             QNameConstants.WS_TRUST_FACTORY.createRequestSecurityTokenResponse(response);
 
         return Response.ok(jaxbResponse).build();
     }
-    
-    private RequestSecurityTokenResponseType processRequest(Action action, 
+
+    private RequestSecurityTokenResponseType processRequest(Action action,
                                                             RequestSecurityTokenType request) {
         switch (action) {
         case validate:
@@ -354,33 +354,33 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     public void setClaimTypeMap(Map<String, String> claimTypeMap) {
         this.claimTypeMap = claimTypeMap;
     }
-    
+
     @Override
     protected Principal getPrincipal() {
         // Try JAX-RS SecurityContext first
         if (securityContext != null && securityContext.getUserPrincipal() != null) {
             return securityContext.getUserPrincipal();
         }
-        
+
         // Then try the CXF SecurityContext
         SecurityContext sc = (SecurityContext)messageContext.get(SecurityContext.class);
         if (sc != null && sc.getUserPrincipal() != null) {
             return sc.getUserPrincipal();
         }
-        
+
         // Get the TLS client principal if no security context is set up
         X509Certificate clientCert = getTLSClientCertificate();
         if (clientCert != null) {
             return clientCert.getSubjectX500Principal();
         }
-        
+
         return null;
     }
-    
+
     private X509Certificate getTLSClientCertificate() {
-        TLSSessionInfo tlsInfo = 
+        TLSSessionInfo tlsInfo =
             (TLSSessionInfo)PhaseInterceptorChain.getCurrentMessage().get(TLSSessionInfo.class);
-        if (tlsInfo != null && tlsInfo.getPeerCertificates() != null 
+        if (tlsInfo != null && tlsInfo.getPeerCertificates() != null
                 && tlsInfo.getPeerCertificates().length > 0
                 && (tlsInfo.getPeerCertificates()[0] instanceof X509Certificate)
         ) {
@@ -388,7 +388,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         }
         return null;
     }
-    
+
     @Override
     protected Map<String, Object> getMessageContext() {
         return PhaseInterceptorChain.getCurrentMessage();
@@ -397,7 +397,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     public void setUseDeflateEncoding(boolean deflate) {
         useDeflateEncoding = deflate;
     }
-    
+
     protected String encodeToken(String assertion) throws Base64Exception {
         byte[] tokenBytes = assertion.getBytes(StandardCharsets.UTF_8);
 
@@ -408,10 +408,10 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         Base64Utility.encode(tokenBytes, 0, tokenBytes.length, writer);
         return writer.toString();
     }
-    
+
     private static int getDeflateLevel() {
         Integer level = null;
-        
+
         Message m = PhaseInterceptorChain.getCurrentMessage();
         if (m != null) {
             level = PropertyUtils.getInteger(m, "deflate.level");
@@ -421,14 +421,14 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         }
         return level;
     }
-    
+
     private static class JSONWrapper {
         private String token;
-        
+
         JSONWrapper(String token) {
             this.token = token;
         }
-        
+
         @SuppressWarnings("unused")
         public String getToken() {
             return token;

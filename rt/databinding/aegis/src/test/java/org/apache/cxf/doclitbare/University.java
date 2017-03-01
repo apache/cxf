@@ -20,7 +20,7 @@
 package org.apache.cxf.doclitbare;
 
 /**
- * 
+ *
  */
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -29,13 +29,13 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
 @WebService(name = "University", targetNamespace = "http://cxf.apache.org/dlb/")
-@SOAPBinding(use = SOAPBinding.Use.LITERAL, style = SOAPBinding.Style.DOCUMENT, 
+@SOAPBinding(use = SOAPBinding.Use.LITERAL, style = SOAPBinding.Style.DOCUMENT,
              parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public interface University {
     @WebResult(targetNamespace = "http://education.toorosystems.com/", name = "return", partName = "return")
     @WebMethod(operationName = "getTeacher", exclude = false)
     Teacher getTeacher(
-                              @WebParam(targetNamespace = "http://cxf.apache.org/dlb/", 
+                              @WebParam(targetNamespace = "http://cxf.apache.org/dlb/",
                                         name = "course", mode = WebParam.Mode.IN)
                               Course course);
 }

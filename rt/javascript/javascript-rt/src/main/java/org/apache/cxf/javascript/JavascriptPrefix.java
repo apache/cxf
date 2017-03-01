@@ -26,14 +26,14 @@ import java.lang.annotation.Target;
 
 /**
  * This annotation specifies the string prefix for names of JavaScript objects derived from a particular
- * namespace. It is used with {@link JavascriptPrefixes}. 
+ * namespace. It is used with {@link JavascriptPrefixes}.
  */
-@Retention(RetentionPolicy.RUNTIME) 
+@Retention(RetentionPolicy.RUNTIME)
 @Target({ })
 public @interface JavascriptPrefix {
     /**
      * The namespace URI of the namespace.
-     */ 
+     */
     String namespace();
     /**
      * The prefix for JavaScript object names.

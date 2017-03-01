@@ -37,7 +37,7 @@ import org.junit.Test;
 
 public class ClientServiceConfigTest extends AbstractAegisTest {
     EndpointImpl impl;
-    
+
     @Before
     public void before() throws Exception {
         super.setUp();

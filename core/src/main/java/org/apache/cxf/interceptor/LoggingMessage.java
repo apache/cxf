@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class LoggingMessage {
     public static final String ID_KEY = LoggingMessage.class.getName() + ".ID";
     private static final AtomicInteger ID = new AtomicInteger();
-    
+
     private final String heading;
     private final StringBuilder address;
     private final StringBuilder contentType;
@@ -34,7 +34,7 @@ public final class LoggingMessage {
     private final StringBuilder payload;
     private final StringBuilder responseCode;
     private final String id;
-    
+
 
     public LoggingMessage(String h, String i) {
         heading = h;
@@ -49,16 +49,16 @@ public final class LoggingMessage {
         payload = new StringBuilder();
         responseCode = new StringBuilder();
     }
-    
+
     public String getId() {
         return id;
     }
-    
+
     public static String nextId() {
         return Integer.toString(ID.incrementAndGet());
     }
-        
-    
+
+
     public StringBuilder getAddress() {
         return address;
     }
@@ -70,7 +70,7 @@ public final class LoggingMessage {
     public StringBuilder getHeader() {
         return header;
     }
-    
+
     public StringBuilder getHttpMethod() {
         return httpMethod;
     }

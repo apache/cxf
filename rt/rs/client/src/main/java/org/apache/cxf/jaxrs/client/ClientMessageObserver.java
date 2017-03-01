@@ -31,14 +31,14 @@ class ClientMessageObserver implements MessageObserver {
 
     private ClientConfiguration cfg;
     private ClassLoader loader;
-    
+
     ClientMessageObserver(ClientConfiguration cfg) {
         this.cfg = cfg;
         loader = cfg.getBus().getExtension(ClassLoader.class);
     }
-    
+
     public void onMessage(Message m) {
-        
+
         Message message = cfg.getConduitSelector().getEndpoint().getBinding().createMessage(m);
         message.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
@@ -66,5 +66,5 @@ class ClientMessageObserver implements MessageObserver {
             }
         }
     }
-    
+
 }

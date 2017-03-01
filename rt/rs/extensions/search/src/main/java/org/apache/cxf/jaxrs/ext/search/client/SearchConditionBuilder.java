@@ -35,13 +35,13 @@ public abstract class SearchConditionBuilder implements PartialCondition {
     public static final String FIQL = DEFAULT_LANGUAGE;
     /**
      * Creates instance of builder.
-     * 
+     *
      * @return default implementation of builder.
      */
     public static SearchConditionBuilder instance() {
         return instance(DEFAULT_LANGUAGE);
     }
-    
+
     /**
      * Creates instance of builder with provided properties
      * @param properties
@@ -53,7 +53,7 @@ public abstract class SearchConditionBuilder implements PartialCondition {
 
     /**
      * Creates instance of builder for specific language.
-     * 
+     *
      * @param language alias of language, case insensitive. If alias is unknown, default FIQL implementation
      *            is returned.
      * @return implementation of expected or default builder.
@@ -61,7 +61,7 @@ public abstract class SearchConditionBuilder implements PartialCondition {
     public static SearchConditionBuilder instance(String language) {
         return instance(language, Collections.<String, String>emptyMap());
     }
-    
+
     public static SearchConditionBuilder instance(String language, Map<String, String> properties) {
         if (!DEFAULT_LANGUAGE.equalsIgnoreCase(language)) {
             throw new IllegalArgumentException("Unsupported query language: " + language);

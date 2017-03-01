@@ -29,8 +29,8 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.systest.mtom_feature.Hello;
 import org.apache.cxf.systest.mtom_feature.HelloService;
 import org.apache.cxf.systest.mtom_feature.ImageHelper;
@@ -98,7 +98,7 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
         assertEquals("CXF", new String(photo.value));
         assertNotNull(image.value);
     }
-    
+
     @Test
     @org.junit.Ignore
     public void testEcho() throws Exception {
@@ -129,8 +129,8 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             //ignore
         }
-        
+
         return hello;
-        
+
     }
 }

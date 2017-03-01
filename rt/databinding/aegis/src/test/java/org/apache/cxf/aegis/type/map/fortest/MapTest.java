@@ -26,9 +26,9 @@ import javax.jws.WebService;
 import org.apache.cxf.aegis.type.map.ns2.ObjectWithAMapNs2;
 
 /**
- * 
+ *
  */
-@WebService(targetNamespace = "uri:org.apache.cxf.aegis.fortest.map", 
+@WebService(targetNamespace = "uri:org.apache.cxf.aegis.fortest.map",
             name = "MapTest")
 public interface MapTest {
     ObjectWithAMap returnObjectWithAMap();
@@ -36,8 +36,8 @@ public interface MapTest {
     Map<String, Long> getMapStringToLong();
     Map<?, ?> getRawMapStringToInteger();
     Map<Long, String> getMapLongToString();
-    
+
     ObjectWithAMapNs2 returnObjectWithAMapNs2();
     void takeMapNs2(ObjectWithAMapNs2 map);
-    
+
 }

@@ -52,7 +52,7 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
     public WsdlArtifact getWsdlArtifact() {
         return wsdlArtifact;
     }
-    
+
     public void setArtifact(WsdlArtifact artifact) {
         wsdlArtifact = artifact;
     }
@@ -60,11 +60,11 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
     public void setWsdlArtifact(WsdlArtifact wsdlArtifact) {
         this.wsdlArtifact = wsdlArtifact;
     }
-    
+
     /**
      * Try to find a file matching the wsdl path (either absolutely, relatively to the current dir or to
      * the project base dir)
-     * 
+     *
      * @return wsdl file
      */
     public File getWsdlFile(File baseDir) {
@@ -88,14 +88,14 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
         }
         return file;
     }
-    
+
     public URI getWsdlURI(URI baseURI) throws MojoExecutionException {
         String wsdlLocation = getWsdl();
         if (wsdlLocation == null) {
             throw new MojoExecutionException("No wsdl available for base URI " + baseURI);
         }
         File wsdlFile = new File(wsdlLocation);
-        return wsdlFile.exists() ? wsdlFile.toURI() 
+        return wsdlFile.exists() ? wsdlFile.toURI()
             : baseURI.resolve(URIParserUtil.escapeChars(wsdlLocation));
     }
 
@@ -145,7 +145,7 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
     }
 
     public List<String> generateCommandLine(File outputDirFile, URI basedir, URI wsdlURI, boolean debug) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         addList(list, "-p", true, getPackagenames());
         addList(list, "-nexclude", true, getNamespaceExcludes());
         addIfNotNull(list, outputDirFile, "-d");
@@ -179,10 +179,10 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
                      + ToolConstants.CFG_EXCEPTION_SUPER);
         addList(list, "-" + ToolConstants.CFG_SEI_SUPER, true,
                 getSeiSuper());
-        
-        addIfTrue(list, isAutoNameResolution(), "-" 
+
+        addIfTrue(list, isAutoNameResolution(), "-"
                      + ToolConstants.CFG_AUTORESOLVE);
-        addIfTrue(list, isNoAddressBinding(), "-" 
+        addIfTrue(list, isNoAddressBinding(), "-"
                   + ToolConstants.CFG_NO_ADDRESS_BINDING);
         addList(list, "-xjc", false, getXJCargs());
         addList(list, "", false, getExtraargs());
@@ -196,7 +196,7 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
         addEqualsArray(list, "-bareMethods", getBareMethods());
         addEqualsArray(list, "-mimeMethods", getMimeMethods());
         list.add(wsdlURI.toString());
-        
+
         return list;
     }
 
@@ -229,8 +229,8 @@ public class WsdlOption extends Option implements org.apache.cxf.maven_plugin.Ge
             }
         }
     }
-    private static void addEqualsArray(List<String> destList, 
-                                      String key, 
+    private static void addEqualsArray(List<String> destList,
+                                      String key,
                                       String[] sourceList) {
         if (sourceList == null) {
             return;

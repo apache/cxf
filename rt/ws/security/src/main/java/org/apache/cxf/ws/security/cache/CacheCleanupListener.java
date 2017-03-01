@@ -32,13 +32,13 @@ import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.cache.ReplayCache;
 
 /**
- * 
+ *
  */
 public class CacheCleanupListener implements ServerLifeCycleListener, ClientLifeCycleListener {
-    
+
     public CacheCleanupListener() {
     }
-    
+
     public void clientCreated(Client client) {
     }
     public void startServer(Server server) {
@@ -50,8 +50,8 @@ public class CacheCleanupListener implements ServerLifeCycleListener, ClientLife
     public void stopServer(Server server) {
         shutdownResources(server.getEndpoint().getEndpointInfo());
     }
-    
-    
+
+
     protected void shutdownResources(EndpointInfo info) {
         TokenStore ts = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
         if (ts instanceof Closeable) {
@@ -66,7 +66,7 @@ public class CacheCleanupListener implements ServerLifeCycleListener, ClientLife
             close((Closeable)rc);
         }
     }
-    
+
     private void close(Closeable ts) {
         try {
             ts.close();

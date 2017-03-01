@@ -35,16 +35,16 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     volatile boolean isPending;
     volatile long pendingTimeout;
     volatile Object obj;
-    
+
     private Message message;
     private org.eclipse.jetty.continuation.Continuation continuation;
     private ContinuationCallback callback;
-    
-    public JettyContinuationWrapper(HttpServletRequest request, 
-                                    HttpServletResponse resp, 
+
+    public JettyContinuationWrapper(HttpServletRequest request,
+                                    HttpServletResponse resp,
                                     Message m) {
         continuation = ContinuationSupport.getContinuation(request);
-        
+
         message = m;
         isNew = request.getAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE) == null;
         if (isNew) {
@@ -83,12 +83,12 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     public boolean isExpired() {
         return continuation.isExpired();
     }
-    
+
     public void reset() {
         try {
             continuation.complete();
         } catch (Throwable ex) {
-            // explicit complete call does not seem to work 
+            // explicit complete call does not seem to work
             // with the non-Servlet3 Jetty Continuation
         }
         obj = null;
@@ -103,9 +103,9 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
             pendingTimeout = timeout;
         }
         isNew = false;
-        
+
         message.getExchange().getInMessage().getInterceptorChain().suspend();
-        
+
         continuation.setTimeout(pendingTimeout);
         if (!isPending) {
             continuation.suspend();
@@ -113,7 +113,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         }
         return true;
     }
-    
+
     protected Message getMessage() {
         Message m = message;
         if (m != null && m.getExchange().getInMessage() != null) {
@@ -121,7 +121,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
         }
         return m;
     }
-    
+
 
     public void onComplete(org.eclipse.jetty.continuation.Continuation cont) {
         getMessage().remove(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE);
@@ -143,5 +143,5 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     public boolean isReadyForWrite() {
         return true;
     }
-    
+
 }

@@ -41,11 +41,11 @@ import org.opensaml.saml.saml2.core.AttributeValue;
  * A custom ClaimsHandler implementation for use in the tests.
  */
 public class CustomClaimsHandler implements ClaimsHandler {
-    
-    private static List<URI> knownURIs = new ArrayList<URI>();
-    private static final URI ROLE_CLAIM = 
+
+    private static List<URI> knownURIs = new ArrayList<>();
+    private static final URI ROLE_CLAIM =
             URI.create("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role");
-    
+
     static {
         knownURIs.add(ClaimTypes.FIRSTNAME);
         knownURIs.add(ClaimTypes.LASTNAME);
@@ -57,12 +57,12 @@ public class CustomClaimsHandler implements ClaimsHandler {
 
     public List<URI> getSupportedClaimTypes() {
         return knownURIs;
-    }    
-    
+    }
+
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
-      
-        if (claims != null && claims.size() > 0) {
+
+        if (claims != null && !claims.isEmpty()) {
             ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
             for (Claim requestClaim : claims) {
                 ProcessedClaim claim = new ProcessedClaim();
@@ -70,7 +70,7 @@ public class CustomClaimsHandler implements ClaimsHandler {
                 if (ClaimTypes.FIRSTNAME.equals(requestClaim.getClaimType())) {
                     if (requestClaim instanceof CustomRequestClaim) {
                         CustomRequestClaim customClaim = (CustomRequestClaim) requestClaim;
-                        String customName = customClaim.getValues().get(0) + "@" 
+                        String customName = customClaim.getValues().get(0) + "@"
                             + customClaim.getScope();
                         claim.addValue(customName);
                     } else {
@@ -84,16 +84,16 @@ public class CustomClaimsHandler implements ClaimsHandler {
                     claim.addValue("1234 1st Street");
                 } else if (ClaimTypes.MOBILEPHONE.equals(requestClaim.getClaimType())) {
                     // Test custom (Integer) attribute value
-                    XMLObjectBuilderFactory builderFactory = 
+                    XMLObjectBuilderFactory builderFactory =
                         XMLObjectProviderRegistrySupport.getBuilderFactory();
-                    
+
                     @SuppressWarnings("unchecked")
-                    XMLObjectBuilder<XSInteger> xsIntegerBuilder = 
+                    XMLObjectBuilder<XSInteger> xsIntegerBuilder =
                         (XMLObjectBuilder<XSInteger>)builderFactory.getBuilder(XSInteger.TYPE_NAME);
-                    XSInteger attributeValue = 
+                    XSInteger attributeValue =
                         xsIntegerBuilder.buildObject(AttributeValue.DEFAULT_ELEMENT_NAME, XSInteger.TYPE_NAME);
                     attributeValue.setValue(185912592);
-                    
+
                     claim.addValue(attributeValue);
 
                 } else if (ROLE_CLAIM.equals(requestClaim.getClaimType())) {
@@ -107,20 +107,20 @@ public class CustomClaimsHandler implements ClaimsHandler {
                             continue;
                         }
                     } else {
-                        // If no specific role was requested return DUMMY role for user 
+                        // If no specific role was requested return DUMMY role for user
                         claim.addValue("DUMMY");
                     }
-                }                
+                }
                 claimCollection.add(claim);
             }
             return claimCollection;
         }
-        
+
         return null;
     }
 
     private boolean isUserInRole(Principal principal, String requestedRole) {
         return true;
     }
-        
+
 }

@@ -50,6 +50,7 @@ public class Client implements Serializable {
     private String applicationDescription;
     private String applicationWebUri;
     private String applicationLogoUri;
+    private String applicationLogoutUri;
     private List<String> applicationCertificates = new LinkedList<String>();
     private List<String> redirectUris = new LinkedList<String>();
 
@@ -64,7 +65,7 @@ public class Client implements Serializable {
     private long registeredAt;
     private String homeRealm;
     private boolean registeredDynamically;
-    
+
     public Client() {
 
     }
@@ -316,12 +317,12 @@ public class Client implements Serializable {
     }
 
     /**
-     * Set the list of registered scopes. 
+     * Set the list of registered scopes.
      * Registering the scopes will allow the clients not to include the scopes
      * and delegate to the runtime to enforce that the current request scopes are
      * a subset of the pre-registered scopes.
      *
-     * Client Registration service is expected to reject unknown scopes. 
+     * Client Registration service is expected to reject unknown scopes.
      * @param registeredScopes the scopes
      */
     public void setRegisteredScopes(List<String> registeredScopes) {
@@ -350,7 +351,7 @@ public class Client implements Serializable {
 
     /*
      * Set the Base64 encoded Application Public X509 Certificate
-     * It can be used in combination with the clientSecret property to support 
+     * It can be used in combination with the clientSecret property to support
      * Basic or other password-aware authentication on top of 2-way TLS.
      */
     public void setApplicationCertificates(List<String> applicationCertificates) {
@@ -379,7 +380,7 @@ public class Client implements Serializable {
 
     /**
      * Hint to the authentication system how the users
-     * redirected by this client need to be authenticated   
+     * redirected by this client need to be authenticated
      * @param homeRealm user home realm
      */
     public void setHomeRealm(String homeRealm) {
@@ -392,5 +393,13 @@ public class Client implements Serializable {
 
     public void setRegisteredDynamically(boolean registeredDynamically) {
         this.registeredDynamically = registeredDynamically;
+    }
+
+    public String getApplicationLogoutUri() {
+        return applicationLogoutUri;
+    }
+
+    public void setApplicationLogoutUri(String applicationLogoutUri) {
+        this.applicationLogoutUri = applicationLogoutUri;
     }
 }

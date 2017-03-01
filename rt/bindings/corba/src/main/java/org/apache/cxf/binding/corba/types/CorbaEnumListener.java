@@ -26,5 +26,5 @@ public class CorbaEnumListener extends AbstractCorbaTypeListener {
 
     public void processCharacters(String text) {
         ((CorbaEnumHandler) handler).setValue(text);
-    }    
+    }
 }

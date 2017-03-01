@@ -27,7 +27,7 @@ import javax.jws.WebService;
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 
-@WebService(name = "PersonServiceWithRequestResponseAnns", 
+@WebService(name = "PersonServiceWithRequestResponseAnns",
     targetNamespace = "http://org.apache.cxf/service/PersonServiceWithRequestResponseAnns")
 @SchemaValidation(type = SchemaValidationType.BOTH)
 public interface PersonServiceWithRequestResponseAnns {

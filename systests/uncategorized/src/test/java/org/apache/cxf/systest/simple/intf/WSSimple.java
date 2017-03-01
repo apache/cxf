@@ -23,6 +23,6 @@ import javax.jws.WebService;
 
 @WebService(name = "WSSimple ", targetNamespace = "http://systest.cxf.apache.org")
 public interface WSSimple {
-    
+
     void pingMe();
 }

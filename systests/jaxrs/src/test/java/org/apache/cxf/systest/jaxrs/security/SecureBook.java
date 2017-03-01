@@ -30,17 +30,17 @@ import org.springframework.security.access.annotation.Secured;
 public class SecureBook {
     private String name;
     private long id;
-    
+
     public SecureBook() {
         name = "CXF in Action";
         id = 123L;
     }
-    
+
     public SecureBook(String name, long id) {
         this.name = name;
         this.id = id;
     }
-    
+
     public void setName(String n) {
         name = n;
     }
@@ -48,21 +48,21 @@ public class SecureBook {
     public String getName() {
         return name;
     }
-    
+
     public void setId(long i) {
         id = i;
     }
     public long getId() {
         return id;
     }
-    
+
     @GET
-    @Path("self")    
+    @Path("self")
     @Produces("application/xml")
     @Secured("ROLE_ADMIN")
     @RolesAllowed("ROLE_ADMIN")
     public Book getBook() {
         return new Book(name, id);
-    } 
-    
+    }
+
 }

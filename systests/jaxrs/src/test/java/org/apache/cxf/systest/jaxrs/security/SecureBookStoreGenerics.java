@@ -29,14 +29,14 @@ import org.apache.cxf.systest.jaxrs.Book;
 @Path("/bookstoregenerics/")
 public class SecureBookStoreGenerics implements SecureBookInterfaceGenerics<Long> {
     private Map<Long, Book> books = new HashMap<Long, Book>();
-    
+
     public SecureBookStoreGenerics() {
         Book book = new Book();
         book.setId(123L);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
-    
+
     public Book getThatBook(Long id) {
         return books.get(id);
     }

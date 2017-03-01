@@ -25,12 +25,12 @@ import org.apache.wss4j.dom.message.token.UsernameToken;
  * This interface defines a pluggable way to return a realm associated with a UsernameToken.
  */
 public interface UsernameTokenRealmCodec {
-    
+
     /**
      * Get the realm associated with the UsernameToken parameter
      * @param usernameToken a WSS4J UsernameToken object
      * @return the realm associated with the UsernameToken parameter
      */
     String getRealmFromToken(UsernameToken usernameToken);
-    
+
 }

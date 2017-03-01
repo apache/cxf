@@ -54,21 +54,21 @@ public class GenericExceptionTest extends AbstractBusClientServerTestBase {
         URL wsdlURL = new URL(address + "?wsdl");
         //check wsdl element
         InputStream ins = wsdlURL.openStream();
-        
+
         Document doc = StaxUtils.read(ins);
-        
+
         Map<String, String> ns = new HashMap<String, String>();
         ns.put("xsd", "http://www.w3.org/2001/XMLSchema");
         ns.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         ns.put("tns", "http://cxf.apache.org/test/HelloService");
         XPathUtils xpu = new XPathUtils(ns);
-        
+
 
         Node nd = xpu.getValueNode("//xsd:complexType[@name='objectWithGenerics']", doc);
         assertNotNull(nd);
         assertNotNull(xpu.getValueNode("//xsd:element[@name='a']", nd));
         assertNotNull(xpu.getValueNode("//xsd:element[@name='b']", nd));
-        
+
         Service service = Service.create(wsdlURL, serviceName);
         service.addPort(new QName("http://cxf.apache.org/test/HelloService", "HelloPort"),
                         SOAPBinding.SOAP11HTTP_BINDING, address);

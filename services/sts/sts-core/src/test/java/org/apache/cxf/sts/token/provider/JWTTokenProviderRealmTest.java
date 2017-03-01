@@ -43,13 +43,13 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
  * Some unit tests for creating JWT Tokens via the JWTTokenProvider in different realms
  */
 public class JWTTokenProviderRealmTest extends org.junit.Assert {
-    
+
     @org.junit.Test
     public void testRealms() throws Exception {
         TokenProvider jwtTokenProvider = new JWTTokenProvider();
         TokenProviderParameters providerParameters = createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
         providerParameters.setRealm("A");
-        
+
         // Create Realms
         Map<String, RealmProperties> jwtRealms = new HashMap<String, RealmProperties>();
         RealmProperties jwtRealm = new RealmProperties();
@@ -59,49 +59,49 @@ public class JWTTokenProviderRealmTest extends org.junit.Assert {
         jwtRealm.setIssuer("B-Issuer");
         jwtRealms.put("B", jwtRealm);
         ((JWTTokenProvider)jwtTokenProvider).setRealmMap(jwtRealms);
-        
+
         // Realm "A"
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE, "A"));
         TokenProviderResponse providerResponse = jwtTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        
+
         assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUER), "A-Issuer");
-        
+
         // Realm "B"
         providerParameters.setRealm("B");
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE, "B"));
         providerResponse = jwtTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         token = (String)providerResponse.getToken();
         assertNotNull(token);
         jwtConsumer = new JwsJwtCompactConsumer(token);
         jwt = jwtConsumer.getJwtToken();
-        
+
         assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUER), "B-Issuer");
-        
+
         // Default Realm
         providerParameters.setRealm(null);
         assertTrue(jwtTokenProvider.canHandleToken(JWTTokenProvider.JWT_TOKEN_TYPE, null));
         providerResponse = jwtTokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        
+
         token = (String)providerResponse.getToken();
         assertNotNull(token);
         jwtConsumer = new JwsJwtCompactConsumer(token);
         jwt = jwtConsumer.getJwtToken();
-        
+
         assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUER), "STS");
     }
-    
+
     private TokenProviderParameters createProviderParameters(
         String tokenType
     ) throws WSSecurityException {
@@ -132,12 +132,12 @@ public class JWTTokenProviderRealmTest extends org.junit.Assert {
         stsProperties.setCallbackHandler(new PasswordCallbackHandler());
         stsProperties.setIssuer("STS");
         parameters.setStsProperties(stsProperties);
-        
+
         parameters.setEncryptionProperties(new EncryptionProperties());
 
         return parameters;
     }
-    
+
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
@@ -145,8 +145,8 @@ public class JWTTokenProviderRealmTest extends org.junit.Assert {
         );
         properties.put("org.apache.wss4j.crypto.merlin.keystore.password", "stsspass");
         properties.put("org.apache.wss4j.crypto.merlin.keystore.file", "keys/stsstore.jks");
-        
+
         return properties;
     }
-    
+
 }

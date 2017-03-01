@@ -44,18 +44,18 @@ import org.osgi.framework.SynchronousBundleListener;
 public class CXFExtensionBundleListener implements SynchronousBundleListener {
     private static final Logger LOG = LogUtils.getL7dLogger(CXFActivator.class);
     private long id;
-    private ConcurrentMap<Long, List<OSGiExtension>> extensions 
+    private ConcurrentMap<Long, List<OSGiExtension>> extensions
         = new ConcurrentHashMap<Long, List<OSGiExtension>>(16, 0.75f, 4);
-    
+
     public CXFExtensionBundleListener(long bundleId) {
         this.id = bundleId;
     }
-    
+
     public void registerExistingBundles(BundleContext context) throws IOException {
         for (Bundle bundle : context.getBundles()) {
-            if ((bundle.getState() == Bundle.RESOLVED 
-                || bundle.getState() == Bundle.STARTING 
-                || bundle.getState() == Bundle.ACTIVE 
+            if ((bundle.getState() == Bundle.RESOLVED
+                || bundle.getState() == Bundle.STARTING
+                || bundle.getState() == Bundle.ACTIVE
                 || bundle.getState() == Bundle.STOPPING)
                 && bundle.getBundleId() != context.getBundle().getBundleId()) {
                 register(bundle);
@@ -71,7 +71,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             unregister(event.getBundle().getBundleId());
         }
     }
-  
+
     protected void register(final Bundle bundle) {
         Enumeration<?> e = bundle.findEntries("META-INF/cxf/", "bus-extensions.txt", false);
         while (e != null && e.hasMoreElements()) {
@@ -84,13 +84,13 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
         if (orig.isEmpty()) {
             return false;
         }
-        
-        List<String> names = new ArrayList<String>(orig.size());
+
+        List<String> names = new ArrayList<>(orig.size());
         for (Extension ext : orig) {
             names.add(ext.getName());
         }
-        LOG.info("Adding the extensions from bundle " + bundle.getSymbolicName() 
-                 + " (" + bundle.getBundleId() + ") " + names); 
+        LOG.info("Adding the extensions from bundle " + bundle.getSymbolicName()
+                 + " (" + bundle.getBundleId() + ") " + names);
         List<OSGiExtension> list = extensions.get(bundle.getBundleId());
         if (list == null) {
             list = new CopyOnWriteArrayList<OSGiExtension>();
@@ -119,7 +119,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
             unregister(extensions.keySet().iterator().next());
         }
     }
-    
+
     public class OSGiExtension extends Extension {
         final Bundle bundle;
         Object serviceObject;

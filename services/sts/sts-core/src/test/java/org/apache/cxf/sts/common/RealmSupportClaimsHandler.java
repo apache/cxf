@@ -34,12 +34,12 @@ import org.junit.Assert;
  * A custom ClaimsHandler implementation for use in the tests.
  */
 public class RealmSupportClaimsHandler implements ClaimsHandler, RealmSupport {
-    
+
     private List<String> supportedRealms;
     private String realm;
     private List<URI> supportedClaimTypes;
-       
-   
+
+
     public void setSupportedRealms(List<String> supportedRealms) {
         this.supportedRealms = supportedRealms;
     }
@@ -47,35 +47,35 @@ public class RealmSupportClaimsHandler implements ClaimsHandler, RealmSupport {
     public void setRealm(String realm) {
         this.realm = realm;
     }
-    
+
 
     public List<URI> getSupportedClaimTypes() {
         return supportedClaimTypes;
     }
-    
+
     public void setSupportedClaimTypes(List<URI> supportedClaimTypes) {
         this.supportedClaimTypes = supportedClaimTypes;
     }
-    
+
     public ProcessedClaimCollection retrieveClaimValues(
             ClaimCollection claims, ClaimsParameters parameters) {
-        
+
         if ("A".equals(realm)) {
             Assert.assertEquals("ClaimHandler in realm A. Alice username must be 'alice'",
                     "alice", parameters.getPrincipal().getName());
         }
-        
+
         if ("B".equals(realm)) {
             Assert.assertEquals("ClaimHandler in realm B. Alice username must be 'ALICE'",
                     "ALICE", parameters.getPrincipal().getName());
         }
-        
+
         if (supportedRealms != null && !supportedRealms.contains(parameters.getRealm())) {
             Assert.fail("ClaimHandler must not be called. Source realm '" + parameters.getRealm()
                     + "' not in supportedRealm list: " + supportedRealms);
         }
-        
-        if (claims != null && claims.size() > 0) {
+
+        if (claims != null && !claims.isEmpty()) {
             ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
             for (Claim requestClaim : claims) {
                 if (getSupportedClaimTypes().indexOf(requestClaim.getClaimType()) != -1) {
@@ -87,7 +87,7 @@ public class RealmSupportClaimsHandler implements ClaimsHandler, RealmSupport {
             }
             return claimCollection;
         }
-        
+
         return null;
     }
 
@@ -100,5 +100,5 @@ public class RealmSupportClaimsHandler implements ClaimsHandler, RealmSupport {
     public String getHandlerRealm() {
         return realm;
     }
-        
+
 }

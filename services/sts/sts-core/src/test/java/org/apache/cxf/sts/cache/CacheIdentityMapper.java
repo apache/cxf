@@ -31,8 +31,8 @@ public class CacheIdentityMapper implements IdentityMapper {
 
     Map<String, Map<String, String>> mappingTable =
             Collections.synchronizedMap(new HashMap<String, Map<String, String>>());
-        
-    
+
+
     CacheIdentityMapper() {
         Map<String, String> identities = new HashMap<String, String>();
         identities.put("REALM_A", "user_aaa");
@@ -46,11 +46,11 @@ public class CacheIdentityMapper implements IdentityMapper {
         mappingTable.put("user_ddd@REALM_D", identities);
         mappingTable.put("user_eee@REALM_E", identities);
     }
-    
+
     @Override
     public Principal mapPrincipal(String sourceRealm,
             Principal sourcePrincipal, String targetRealm) {
-        
+
         Map<String, String> identities = mappingTable.get(sourcePrincipal.getName() + "@" + sourceRealm);
         if (identities == null) {
             return null;
@@ -60,7 +60,7 @@ public class CacheIdentityMapper implements IdentityMapper {
             return null;
         }
         return new CustomTokenPrincipal(targetUser);
-        
+
     }
 
 }

@@ -25,19 +25,19 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class LinkHeaderProviderTest extends Assert {
-    
+
     @Test
     public void testFromSimpleString() {
         Link l = Link.valueOf("<http://bar>");
         assertEquals("http://bar", l.getUri().toString());
     }
-    
+
     @Test
     public void testFromSimpleString2() {
         Link l = Link.valueOf("</>");
         assertEquals("/", l.getUri().toString());
     }
-    
+
     @Test
     public void testFromComplexString() {
         Link l = Link.valueOf("<http://bar>;rel=next;title=\"Next Link\";type=text/xml;method=get");
@@ -48,7 +48,7 @@ public class LinkHeaderProviderTest extends Assert {
         assertEquals("text/xml", l.getType());
         assertEquals("get", l.getParams().get("method"));
     }
-    
+
     @Test
     public void testToString() {
         String headerValue = "<http://bar>;rel=next;title=\"Next Link\";type=text/xml;method=get";
@@ -57,6 +57,6 @@ public class LinkHeaderProviderTest extends Assert {
         String result = l.toString();
         assertEquals(expected, result);
     }
-    
-        
+
+
 }

@@ -41,7 +41,7 @@ public final class FilteringUtil {
     public static final String NAMESPACE_XPATH20 = "http://www.w3.org/2011/03/ws-evt/Dialects/XPath20";
 
     private static final Logger LOG = LogUtils.getLogger(FilteringUtil.class);
-    private static XPathFactory xPathFactory =  XPathFactory.newInstance();
+    private static XPathFactory xPathFactory = XPathFactory.newInstance();
 
     private FilteringUtil() {
 
@@ -78,10 +78,10 @@ public final class FilteringUtil {
             return false;
         }
     }
-    
+
     public static boolean runFilterOnMessage(SOAPMessage msg, FilterType filter) {
         try {
-            Iterator<?> i  = msg.getSOAPBody().getChildElements();
+            Iterator<?> i = msg.getSOAPBody().getChildElements();
             final String xPath = (String)filter.getContent().get(0);
             while (i.hasNext()) {
                 Element elm = (Element)i.next();

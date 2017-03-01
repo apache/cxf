@@ -50,7 +50,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     public static final String CLIENT_ID = "12345678";
     public static final String CLIENT_SECRET = "secret";
 
-    private static final ConcurrentHashMap<String, OAuthPermission> AVAILABLE_PERMISSIONS = 
+    private static final ConcurrentHashMap<String, OAuthPermission> AVAILABLE_PERMISSIONS =
         new ConcurrentHashMap<String, OAuthPermission>();
 
     static {
@@ -58,7 +58,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
                 .put("read_info", new OAuthPermission("read_info", "Read your personal information",
                                                       Collections.singletonList("ROLE_USER")));
         AVAILABLE_PERMISSIONS.put("modify_info",
-                new OAuthPermission("modify_info", "Modify your personal information", 
+                new OAuthPermission("modify_info", "Modify your personal information",
                                     Collections.singletonList("ROLE_ADMIN")));
     }
 
@@ -76,17 +76,17 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         Client client = new Client(CLIENT_ID, CLIENT_SECRET, APPLICATION_NAME, CALLBACK);
         clientAuthInfo.put(CLIENT_ID, client);
     }
-    
+
     private List<OAuthPermission> getPermissionsInfo(List<String> requestPermissions) {
-        List<OAuthPermission> permissions = new ArrayList<OAuthPermission>();
+        List<OAuthPermission> permissions = new ArrayList<>();
         for (String requestScope : requestPermissions) {
             OAuthPermission oAuthPermission = AVAILABLE_PERMISSIONS.get(requestScope);
             permissions.add(oAuthPermission);
         }
-    
+
         return permissions;
     }
-    
+
     public Client getClient(String consumerKey) {
         return clientAuthInfo.get(consumerKey);
     }
@@ -95,7 +95,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
         String token = generateToken();
         String tokenSecret = generateToken();
 
-        RequestToken reqToken = new RequestToken(reg.getClient(), token, tokenSecret, 
+        RequestToken reqToken = new RequestToken(reg.getClient(), token, tokenSecret,
                                                  reg.getLifetime(), reg.getIssuedAt());
         reqToken.setScopes(getPermissionsInfo(reg.getScopes()));
         reqToken.setCallback(reg.getCallback());
@@ -134,7 +134,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
             tokenSecretString, 3600, System.currentTimeMillis() / 1000);
 
         accessToken.setScopes(requestToken.getScopes());
- 
+
         synchronized (oauthTokens) {
             oauthTokens.remove(requestToken.getTokenKey());
             oauthTokens.put(accessTokenString, accessToken);
@@ -155,7 +155,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
     }
 
     public void removeToken(Token t) {
-        
+
         for (Token token : oauthTokens.values()) {
             Client authNInfo = token.getClient();
             if (t.getClient().getConsumerKey().equals(authNInfo.getConsumerKey())) {
@@ -163,7 +163,7 @@ public class MemoryOAuthDataProvider implements OAuthDataProvider {
                 break;
             }
         }
-        
+
     }
 
     protected String generateToken() throws OAuthServiceException {

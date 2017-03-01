@@ -51,11 +51,11 @@ public class JwsJsonContainerRequestFilter extends AbstractJwsJsonReaderProvider
             context.abortWith(JAXRSUtils.toResponse(400));
             return;
         }
-        
+
         byte[] bytes = c.getDecodedJwsPayloadBytes();
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
-        
+
         // the list is guaranteed to be non-empty
         JwsJsonSignatureEntry sigEntry = c.getSignatureEntries().get(0);
         String ct = JoseUtils.checkContentType(sigEntry.getUnionHeader().getContentType(), getDefaultMediaType());

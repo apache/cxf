@@ -93,9 +93,9 @@ public class IdlPreprocessorReaderTest extends TestCase {
             assertTrue(ex.getUrl().getPath().endsWith("/UnresolvableInclude.idl"));
         }
     }
-    
+
     public void testDefaultIncludeResolver() throws Exception {
-        final String location = "B.idl"; 
+        final String location = "B.idl";
         // uses <> notation for include
         final URL orig = findTestResource(location);
         final File origFile = new File(orig.toURI());
@@ -103,7 +103,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
                                   .substring(0, origFile.getAbsolutePath().indexOf(location)));
         final DefaultIncludeResolver includeResolver = new DefaultIncludeResolver(dir);
         final DefineState defineState = new DefineState(new HashMap<String, String>());
-        
+
         final IdlPreprocessorReader includeReader = new IdlPreprocessorReader(orig,
                                                                              location,
                                                                              includeResolver,

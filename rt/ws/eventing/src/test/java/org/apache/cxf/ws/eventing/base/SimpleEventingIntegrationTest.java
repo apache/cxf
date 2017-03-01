@@ -24,9 +24,9 @@ import javax.xml.bind.JAXBElement;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.LoggingFeature;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.ext.logging.LoggingFeature;
+import org.apache.cxf.ext.logging.LoggingInInterceptor;
+import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.local.LocalTransportFactory;
@@ -114,7 +114,7 @@ public abstract class SimpleEventingIntegrationTest {
         factory.setAddress(address);
         return factory.create();
     }
-    
+
     protected Server createWrappedEventSink(String address) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setBus(bus);
@@ -221,7 +221,7 @@ public abstract class SimpleEventingIntegrationTest {
         eventSinkERT.setAddress(eventSinkAddr);
         return new ObjectFactory().createNotifyTo(eventSinkERT);
     }
-    
+
     protected static String allocatePort(Class<?> cls) {
         return org.apache.cxf.testutil.common.TestUtil.getPortNumber(cls);
     }

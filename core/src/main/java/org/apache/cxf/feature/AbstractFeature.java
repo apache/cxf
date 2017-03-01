@@ -32,7 +32,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * adding capabilities. For instance, there may be a LoggingFeature which configures
  * one of the above to log each of their messages.
  * <p>
- * By default the initialize methods all delegate to initializeProvider(InterceptorProvider). 
+ * By default the initialize methods all delegate to initializeProvider(InterceptorProvider).
  * If you're simply adding interceptors to a Server, Client, or Bus, this allows you to add
  * them easily.
  */
@@ -40,30 +40,30 @@ public abstract class AbstractFeature extends WebServiceFeature implements Featu
     public String getID() {
         return getClass().getName();
     }
-    
+
     public void initialize(Server server, Bus bus) {
         initializeProvider(server.getEndpoint(), bus);
     }
-    
+
     public void initialize(Client client, Bus bus) {
         initializeProvider(client, bus);
     }
-    
+
     public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
         initializeProvider(interceptorProvider, bus);
     }
-    
+
     public void initialize(Bus bus) {
         initializeProvider(bus, bus);
     }
-    
+
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        
+
     }
 
     /**
      * Convenience method to extract a feature by type from an active list.
-     * 
+     *
      * @param features the given feature list
      * @param type the feature type required
      * @return the feature of the specified type if active

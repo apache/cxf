@@ -23,13 +23,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class CXFAPINamespaceHandlerTest extends Assert {
     @Test
     public void testGetSchemaLocation() {
         CXFAPINamespaceHandler handler = new CXFAPINamespaceHandler();
-        
+
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/configuration/beans"));
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/configuration/parameterized-types"));
         assertNotNull(handler.getSchemaLocation("http://cxf.apache.org/configuration/security"));

@@ -41,7 +41,7 @@ public abstract class AbstractRequestContextImpl extends AbstractPropertiesImpl 
         this.h = new HttpHeadersImpl(message);
         this.responseContext = responseContext;
     }
-    
+
     public void abortWith(Response response) {
         checkContext();
         m.getExchange().put(Response.class, JAXRSUtils.copyResponseIfNeeded(response));
@@ -92,7 +92,7 @@ public abstract class AbstractRequestContextImpl extends AbstractPropertiesImpl 
     protected HttpHeaders getHttpHeaders() {
         return h != null ? h : new HttpHeadersImpl(m);
     }
-    
+
     protected void checkContext() {
         if (responseContext) {
             throw new IllegalStateException();

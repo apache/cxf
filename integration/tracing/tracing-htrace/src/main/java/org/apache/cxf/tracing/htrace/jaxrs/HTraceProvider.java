@@ -35,35 +35,35 @@ import org.apache.htrace.core.TraceScope;
 import org.apache.htrace.core.Tracer;
 
 @Provider
-public class HTraceProvider extends AbstractHTraceProvider 
+public class HTraceProvider extends AbstractHTraceProvider
     implements ContainerRequestFilter, ContainerResponseFilter {
-    @Context 
+    @Context
     private ResourceInfo resourceInfo;
-    
+
     public HTraceProvider(final Tracer tracer) {
         super(tracer);
     }
 
     @Override
     public void filter(final ContainerRequestContext requestContext) throws IOException {
-        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(requestContext.getHeaders(), 
+        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(requestContext.getHeaders(),
                                                 requestContext.getUriInfo().getPath(),
                                                 requestContext.getMethod());
-        
+
         if (holder != null) {
             requestContext.setProperty(TRACE_SPAN, holder);
         }
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public void filter(final ContainerRequestContext requestContext,
             final ContainerResponseContext responseContext) throws IOException {
-        super.stopTraceSpan(requestContext.getHeaders(), 
-                            responseContext.getHeaders(), 
+        super.stopTraceSpan(requestContext.getHeaders(),
+                            responseContext.getHeaders(),
                             (TraceScopeHolder<TraceScope>)requestContext.getProperty(TRACE_SPAN));
     }
-    
+
     @Override
     protected boolean isAsyncResponse() {
         for (final Annotation[] annotations: resourceInfo.getResourceMethod().getParameterAnnotations()) {

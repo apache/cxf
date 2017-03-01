@@ -28,7 +28,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 
 /**
- * 
+ *
  */
 public class ServerPasswordCallback implements CallbackHandler {
 

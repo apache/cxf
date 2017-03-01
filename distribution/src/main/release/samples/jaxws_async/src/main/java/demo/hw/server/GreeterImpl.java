@@ -32,15 +32,15 @@ import org.apache.cxf.jaxws.ServerAsyncResponse;
 import org.apache.hello_world_async_soap_http.GreeterAsync;
 import org.apache.hello_world_async_soap_http.types.GreetMeSometimeResponse;
 
-@WebService(serviceName = "SOAPService", 
-            portName = "SoapPort", 
+@WebService(serviceName = "SOAPService",
+            portName = "SoapPort",
             endpointInterface = "org.apache.hello_world_async_soap_http.GreeterAsync",
             targetNamespace = "http://apache.org/hello_world_async_soap_http")
-                  
+
 public class GreeterImpl implements GreeterAsync {
-    private static final Logger LOG = 
+    private static final Logger LOG =
         Logger.getLogger(GreeterImpl.class.getPackage().getName());
- 
+
     /* (non-Javadoc)
      * @see org.apache.hello_world_soap_http.Greeter#greetMeSometime(java.lang.String)
      */
@@ -50,12 +50,12 @@ public class GreeterImpl implements GreeterAsync {
         System.out.println("Executing operation greetMeSometime synchronously\n");
         return "How are you " + me;
     }
-    
-    public Future<?> greetMeSometimeAsync(final String me, 
+
+    public Future<?> greetMeSometimeAsync(final String me,
                                            final AsyncHandler<GreetMeSometimeResponse> asyncHandler) {
         LOG.info("Executing operation greetMeSometimeAsync asynchronously");
         System.out.println("Executing operation greetMeSometimeAsync asynchronously\n");
-        final ServerAsyncResponse<GreetMeSometimeResponse> r 
+        final ServerAsyncResponse<GreetMeSometimeResponse> r
             = new ServerAsyncResponse<GreetMeSometimeResponse>();
         new Thread() {
             public void run() {
@@ -66,14 +66,14 @@ public class GreeterImpl implements GreeterAsync {
                 asyncHandler.handleResponse(r);
             }
         } .start();
-        
-        return r; 
+
+        return r;
     }
-    
+
     public Response<GreetMeSometimeResponse> greetMeSometimeAsync(String requestType) {
-        return null; 
+        return null;
         /*not called */
     }
 
-    
+
 }

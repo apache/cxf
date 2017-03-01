@@ -36,5 +36,5 @@ public class MetricsMessageOutInterceptor extends AbstractMetricsInterceptor {
             //one way on the client, it's sent, now stop
             stop(message);
         }
-    }    
+    }
 }

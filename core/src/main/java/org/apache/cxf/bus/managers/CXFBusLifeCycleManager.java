@@ -38,7 +38,7 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
     private boolean initCalled;
     private boolean preShutdownCalled;
     private boolean postShutdownCalled;
-    
+
     public CXFBusLifeCycleManager() {
         listeners = new CopyOnWriteArrayList<BusLifeCycleListener>();
     }
@@ -46,7 +46,7 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
         listeners = new CopyOnWriteArrayList<BusLifeCycleListener>();
         setBus(b);
     }
-    
+
     @Resource
     public final void setBus(Bus b) {
         bus = b;
@@ -54,7 +54,7 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
             bus.setExtension(this, BusLifeCycleManager.class);
         }
     }
-    
+
     /* (non-Javadoc)
      * @see org.apache.cxf.buslifecycle.BusLifeCycleManager#registerLifeCycleListener(
      * org.apache.cxf.buslifecycle.BusLifeCycleListener)
@@ -64,7 +64,7 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
         if (initCalled) {
             listener.initComplete();
         }
-        
+
     }
 
     /* (non-Javadoc)
@@ -72,10 +72,10 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
      * org.apache.cxf.buslifecycle.BusLifeCycleListener)
      */
     public void unregisterLifeCycleListener(BusLifeCycleListener listener) {
-        listeners.remove(listener);      
+        listeners.remove(listener);
     }
-    
-    
+
+
     public void initComplete() {
         if (bus != null) {
             bus.getExtension(ConfiguredBeanLocator.class)
@@ -88,9 +88,9 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
             listener.initComplete();
         }
     }
-    
+
     public void preShutdown() {
-        if (!preShutdownCalled) { 
+        if (!preShutdownCalled) {
             preShutdownCalled = true;
             ListIterator<BusLifeCycleListener> li = listeners.listIterator(listeners.size());
             while (li.hasPrevious()) {
@@ -98,7 +98,7 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
             }
         }
     }
-    
+
     public void postShutdown() {
         if (!preShutdownCalled) {
             preShutdown();
@@ -112,5 +112,5 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
 
         }
     }
-        
+
 }

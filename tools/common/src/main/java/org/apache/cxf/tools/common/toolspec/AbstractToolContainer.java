@@ -42,13 +42,13 @@ import org.apache.cxf.tools.common.toolspec.parser.CommandLineParser;
 
 public abstract class AbstractToolContainer implements ToolContainer {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractToolContainer.class);
-    
+
 
     protected ToolSpec toolspec;
     protected ToolContext context;
     protected PrintStream out = System.out;
     protected PrintStream err = System.err;
-    
+
     private String arguments[];
     private boolean isVerbose;
     private boolean isQuiet;
@@ -56,7 +56,7 @@ public abstract class AbstractToolContainer implements ToolContainer {
     private CommandLineParser parser;
     private OutputStream outOutputStream;
     private OutputStream errOutputStream;
- 
+
     public static class GenericOutputStream extends OutputStream {
         public void write(int b) throws IOException {
 
@@ -64,9 +64,9 @@ public abstract class AbstractToolContainer implements ToolContainer {
     }
 
     public AbstractToolContainer() {
-        
+
     }
-    
+
     public AbstractToolContainer(ToolSpec ts) throws BadUsageException {
         toolspec = ts;
     }
@@ -80,13 +80,13 @@ public abstract class AbstractToolContainer implements ToolContainer {
         setMode(args);
         if (isQuietMode()) {
             redirectOutput();
-        }        
+        }
     }
-    
+
     public void parseCommandLine() throws BadUsageException, IOException {
         if (toolspec != null) {
             parser = new CommandLineParser(toolspec);
-            commandDoc = parser.parseArguments(arguments);           
+            commandDoc = parser.parseArguments(arguments);
         }
     }
 
@@ -128,7 +128,7 @@ public abstract class AbstractToolContainer implements ToolContainer {
         outOutputStream = new GenericOutputStream();
         errOutputStream = new GenericOutputStream();
     }
-    
+
     public boolean isQuietMode() {
         return isQuiet;
     }
@@ -144,7 +144,7 @@ public abstract class AbstractToolContainer implements ToolContainer {
     public OutputStream getOutOutputStream() {
         return outOutputStream;
     }
-    
+
     public void setOutOutputStream(OutputStream outOutputStream) {
         this.outOutputStream = outOutputStream;
         this.out = (outOutputStream instanceof PrintStream)
@@ -154,17 +154,17 @@ public abstract class AbstractToolContainer implements ToolContainer {
     public OutputStream getErrOutputStream() {
         return errOutputStream;
     }
-    
+
     public void setErrOutputStream(OutputStream errOutputStream) {
         this.errOutputStream = errOutputStream;
         this.err = (errOutputStream instanceof PrintStream)
             ? (PrintStream)errOutputStream : new PrintStream(errOutputStream);
     }
-    
+
     public void setContext(ToolContext c) {
         context = c;
     }
-    
+
     public ToolContext getContext() {
         if (context == null) {
             context = new ToolContext();
@@ -178,18 +178,18 @@ public abstract class AbstractToolContainer implements ToolContainer {
             parseCommandLine();
         } catch (BadUsageException | IOException e) {
             throw new ToolException(e);
-        }        
+        }
     }
 
     public void tearDown() {
         //nothing to do
     }
-    
+
     public Bus getBus() {
         Bus bus = BusFactory.getDefaultBus();
 
         OASISCatalogManager catalogManager = bus.getExtension(OASISCatalogManager.class);
-        
+
         String catalogLocation = getCatalogURL();
         if (!StringUtils.isEmpty(catalogLocation)) {
             try {
@@ -205,5 +205,5 @@ public abstract class AbstractToolContainer implements ToolContainer {
     protected String getCatalogURL() {
         String catalogLocation = (String) context.get(ToolConstants.CFG_CATALOG);
         return URIParserUtil.getAbsoluteURI(catalogLocation);
-    }    
+    }
 }

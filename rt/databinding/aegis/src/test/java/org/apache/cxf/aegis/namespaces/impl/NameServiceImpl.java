@@ -26,12 +26,12 @@ import javax.jws.WebService;
 import org.apache.cxf.aegis.namespaces.data.Name;
 import org.apache.cxf.aegis.namespaces.intf.NameService;
 
-@WebService(serviceName = "NameService", 
-            endpointInterface = "org.apache.cxf.aegis.namespaces.intf.NameService", 
+@WebService(serviceName = "NameService",
+            endpointInterface = "org.apache.cxf.aegis.namespaces.intf.NameService",
             targetNamespace = "urn:org.apache.cxf.aegis.namespace")
 public class NameServiceImpl implements NameService {
 
     public List<Name> listAvailableNames() {
-        return new ArrayList<Name>();
+        return new ArrayList<>();
     }
 }

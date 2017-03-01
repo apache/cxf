@@ -26,7 +26,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 public class AbstractJwsReaderProvider {
     private JwsSignatureVerifier sigVerifier;
     private String defaultMediaType;
-    
+
     public void setSignatureVerifier(JwsSignatureVerifier signatureVerifier) {
         this.sigVerifier = signatureVerifier;
     }
@@ -34,11 +34,11 @@ public class AbstractJwsReaderProvider {
     protected JwsSignatureVerifier getInitializedSigVerifier(JwsHeaders headers) {
         JoseUtils.traceHeaders(headers);
         if (sigVerifier != null) {
-            return sigVerifier;    
-        } 
+            return sigVerifier;
+        }
         return JwsUtils.loadSignatureVerifier(headers, true);
     }
-    
+
     public String getDefaultMediaType() {
         return defaultMediaType;
     }
@@ -46,5 +46,5 @@ public class AbstractJwsReaderProvider {
     public void setDefaultMediaType(String defaultMediaType) {
         this.defaultMediaType = defaultMediaType;
     }
-    
+
 }

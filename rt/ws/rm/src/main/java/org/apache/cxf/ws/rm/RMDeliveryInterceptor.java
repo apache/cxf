@@ -37,16 +37,16 @@ import org.apache.cxf.ws.addressing.ContextUtils;
  * destination (since otherwise there is no way to enforce in-order delivery).
  */
 public class RMDeliveryInterceptor extends AbstractRMInterceptor<Message> {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(RMDeliveryInterceptor.class);
-  
+
     public RMDeliveryInterceptor() {
         super(Phase.POST_INVOKE);
         addBefore(OutgoingChainInterceptor.class.getName());
     }
-    
-    // Interceptor interface 
-    
+
+    // Interceptor interface
+
     public void handle(Message message) throws SequenceFault, RMException {
         final AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, false, false);
         //if wsrmp:RMAssertion and addressing is optional
@@ -62,7 +62,7 @@ public class RMDeliveryInterceptor extends AbstractRMInterceptor<Message> {
             dest.acknowledge(message);
         }
         dest.processingComplete(message);
-        
+
         // close InputStream of RMCaptureInInterceptor, to delete tmp files in filesystem
         Closeable closable = (Closeable)message.get("org.apache.cxf.ws.rm.content.closeable");
         if (null != closable) {

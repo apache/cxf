@@ -29,13 +29,13 @@ import org.apache.cxf.greeter_control.AbstractGreeterImpl;
             targetNamespace = "http://cxf.apache.org/greeter_control",
             wsdlLocation = "testutils/greeter_control.wsdl")
 public class GreeterImplB extends AbstractGreeterImpl {
-    
+
     private String address;
-    
+
     GreeterImplB() {
-        address = FailoverTest.REPLICA_B;    
+        address = FailoverTest.REPLICA_B;
     }
-    
+
     public String greetMe(String s) {
         return super.greetMe(s)
                + " from: " + address;

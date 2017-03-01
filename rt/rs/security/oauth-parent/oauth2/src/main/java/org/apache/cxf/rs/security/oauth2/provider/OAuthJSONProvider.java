@@ -60,7 +60,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
     public boolean isWriteable(Class<?> cls, Type t, Annotation[] anns, MediaType mt) {
         return cls == ClientAccessToken.class || cls == OAuthError.class || cls == TokenIntrospection.class;
     }
-    
+
     public void writeTo(Object obj, Class<?> cls, Type t, Annotation[] anns, MediaType mt,
                         MultivaluedMap<String, Object> headers, OutputStream os) throws IOException,
         WebApplicationException {
@@ -110,7 +110,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
                     }
                     arr.append("]");
                     appendJsonPair(sb, "aud", arr.toString(), false);
-                    
+
                 }
             }
             if (obj.getIss() != null) {
@@ -123,12 +123,18 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
                 sb.append(",");
                 appendJsonPair(sb, "exp", obj.getExp(), false);
             }
+            if (!obj.getExtensions().isEmpty()) {
+                for (Map.Entry<String, String> entry : obj.getExtensions().entrySet()) {
+                    sb.append(",");
+                    appendJsonPair(sb, entry.getKey(), entry.getValue());
+                }
+            }
         }
         sb.append("}");
         String result = sb.toString();
         os.write(result.getBytes(StandardCharsets.UTF_8));
         os.flush();
-        
+
     }
 
     private void writeOAuthError(OAuthError obj, OutputStream os) throws IOException {
@@ -143,7 +149,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             sb.append(",");
             appendJsonPair(sb, OAuthConstants.ERROR_URI_KEY, obj.getErrorUri());
         }
-        
+
         sb.append("}");
         String result = sb.toString();
         os.write(result.getBytes(StandardCharsets.UTF_8));
@@ -182,7 +188,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
     private void appendJsonPair(StringBuilder sb, String key, Object value) {
         appendJsonPair(sb, key, value, true);
     }
-    
+
     private void appendJsonPair(StringBuilder sb, String key, Object value,
                                 boolean valueQuote) {
         sb.append("\"").append(key).append("\"");
@@ -195,15 +201,15 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             sb.append("\"");
         }
     }
-    
+
     public boolean isReadable(Class<?> cls, Type t, Annotation[] anns, MediaType mt) {
-        return Map.class.isAssignableFrom(cls) 
+        return Map.class.isAssignableFrom(cls)
             || ClientAccessToken.class.isAssignableFrom(cls)
             || TokenIntrospection.class.isAssignableFrom(cls);
     }
 
-    public Object readFrom(Class<Object> cls, Type t, Annotation[] anns, 
-                           MediaType mt, MultivaluedMap<String, String> headers, InputStream is) 
+    public Object readFrom(Class<Object> cls, Type t, Annotation[] anns,
+                           MediaType mt, MultivaluedMap<String, String> headers, InputStream is)
         throws IOException, WebApplicationException {
         if (TokenIntrospection.class.isAssignableFrom(cls)) {
             return fromMapToTokenIntrospection(is);
@@ -218,8 +224,8 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             } else {
                 return token;
             }
-        } 
-        
+        }
+
     }
 
     private Object fromMapToTokenIntrospection(InputStream is) throws IOException {
@@ -264,7 +270,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         if (exp != null) {
             resp.setExp(exp);
         }
-        
+
         return resp;
     }
 
@@ -277,7 +283,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             throw new IOException("JSON Sequence is broken");
         }
         Map<String, String> map = new LinkedHashMap<String, String>();
-        
+
         str = str.substring(1, str.length() - 1).trim();
         String[] jsonPairs = str.split(",");
         for (int i = 0; i < jsonPairs.length; i++) {
@@ -296,7 +302,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             }
             map.put(key, value);
         }
-        
+
         return map;
     }
 

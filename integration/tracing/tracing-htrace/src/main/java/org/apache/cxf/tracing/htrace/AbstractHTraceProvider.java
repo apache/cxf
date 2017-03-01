@@ -25,35 +25,35 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.tracing.AbstractTracingProvider;
 import org.apache.htrace.core.SpanId;
 import org.apache.htrace.core.TraceScope;
 import org.apache.htrace.core.Tracer;
 
-public abstract class AbstractHTraceProvider extends AbstractTracingProvider { 
+public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractHTraceProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.htrace.span";
-        
+
     private final Tracer tracer;
-        
+
     public AbstractHTraceProvider(final Tracer tracer) {
         this.tracer = tracer;
     }
 
-    protected TraceScopeHolder<TraceScope> startTraceSpan(final Map<String, List<String>> requestHeaders, 
+    protected TraceScopeHolder<TraceScope> startTraceSpan(final Map<String, List<String>> requestHeaders,
             String path, String method) {
-        
+
         // Try to extract the Span Id value from the request header
-        final SpanId spanId = getFirstValueOrDefault(requestHeaders, getSpanIdHeader(), SpanId.INVALID); 
-        
+        final SpanId spanId = getFirstValueOrDefault(requestHeaders, getSpanIdHeader(), SpanId.INVALID);
+
         TraceScope traceScope = null;
         if (SpanId.INVALID.equals(spanId)) {
             traceScope = tracer.newScope(buildSpanDescription(path, method));
         } else {
             traceScope = tracer.newScope(buildSpanDescription(path, method), spanId);
         }
-        
+
         // If the service resource is using asynchronous processing mode, the trace
         // scope will be closed in another thread and as such should be detached.
         boolean detached = false;
@@ -62,7 +62,7 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
             propagateContinuationSpan(traceScope);
             detached = true;
         }
-        
+
         return new TraceScopeHolder<TraceScope>(traceScope, detached);
     }
 
@@ -75,34 +75,34 @@ public abstract class AbstractHTraceProvider extends AbstractTracingProvider {
         if (requestHeaders.containsKey(spanIdHeader)) {
             responseHeaders.put(spanIdHeader, CastUtils.cast(requestHeaders.get(spanIdHeader)));
         }
-        
+
         if (holder == null) {
             return;
         }
-        
+
         final TraceScope span = holder.getScope();
         if (span != null) {
             // If the service resource is using asynchronous processing mode, the trace
-            // scope has been created in another thread and should be re-attached to the current 
+            // scope has been created in another thread and should be re-attached to the current
             // one.
             if (holder.isDetached()) {
-                span.reattach(); 
+                span.reattach();
                 span.close();
-            } else {            
+            } else {
                 span.close();
             }
         }
     }
-    
+
     private void propagateContinuationSpan(final TraceScope continuationScope) {
-        JAXRSUtils.getCurrentMessage().put(TraceScope.class, continuationScope);
+        PhaseInterceptorChain.getCurrentMessage().put(TraceScope.class, continuationScope);
     }
-    
+
     protected boolean isAsyncResponse() {
-        return !JAXRSUtils.getCurrentMessage().getExchange().isSynchronous();
+        return !PhaseInterceptorChain.getCurrentMessage().getExchange().isSynchronous();
     }
-    
-    private static SpanId getFirstValueOrDefault(final Map<String, List<String>> headers, 
+
+    private static SpanId getFirstValueOrDefault(final Map<String, List<String>> headers,
             final String header, final SpanId defaultValue) {
         List<String> value = headers.get(header);
         if (value != null && !value.isEmpty()) {

@@ -54,14 +54,14 @@ import org.apache.cxf.staxutils.StaxUtils;
                     wsdlLocation = "/wsdl/hello_world_rpc_lit.wsdl")
 @ServiceMode(value = Service.Mode.PAYLOAD)
 public class HWSAXSourcePayloadProvider implements Provider<SAXSource> {
-    
+
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
-    
-    @Resource 
+
+    @Resource
     WebServiceContext ctx;
 
-    
+
     private MessageFactory factory;
     private InputSource sayHiInputSource;
     private InputSource greetMeInputSource;
@@ -73,9 +73,9 @@ public class HWSAXSourcePayloadProvider implements Provider<SAXSource> {
             InputStream is = getClass().getResourceAsStream("resources/sayHiRpcLiteralResp.xml");
             Document sayHiDocument = factory.createMessage(null, is).getSOAPBody().extractContentAsDocument();
             sayHiInputSource = new InputSource(getSOAPBodyFile(sayHiDocument).toURI().toString());
-            
+
             InputStream is2 = getClass().getResourceAsStream("resources/GreetMeRpcLiteralResp.xml");
-            Document greetMeDocument = 
+            Document greetMeDocument =
                 factory.createMessage(null, is2).getSOAPBody().extractContentAsDocument();
             greetMeInputSource = new InputSource(getSOAPBodyFile(greetMeDocument).toURI().toString());
         } catch (Exception ex) {
@@ -90,7 +90,7 @@ public class HWSAXSourcePayloadProvider implements Provider<SAXSource> {
         }
         SAXSource response = new SAXSource();
         try {
-            
+
             DOMResult domResult = new DOMResult();
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             transformerFactory.setFeature(javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING, true);
@@ -103,7 +103,7 @@ public class HWSAXSourcePayloadProvider implements Provider<SAXSource> {
             }
             if (n.getLocalName().equals(sayHi.getLocalPart())) {
                 response.setInputSource(sayHiInputSource);
-                
+
             } else if (n.getLocalName().equals(greetMe.getLocalPart())) {
                 response.setInputSource(greetMeInputSource);
             }
@@ -112,7 +112,7 @@ public class HWSAXSourcePayloadProvider implements Provider<SAXSource> {
         }
         return response;
     }
-    
+
     private File getSOAPBodyFile(Document doc) throws Exception {
         File file = FileUtils.createTempFile("cxf-systest", "xml");
         try (FileOutputStream out = new FileOutputStream(file)) {

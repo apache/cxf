@@ -27,7 +27,7 @@ import demo.wseventing.eventapi.CatastrophicEventSinkImpl;
 public final class ApplicationSingleton {
 
     private static ApplicationSingleton instance;
-    private List<CatastrophicEventSinkImpl> eventSinks = new ArrayList<CatastrophicEventSinkImpl>();
+    private List<CatastrophicEventSinkImpl> eventSinks = new ArrayList<>();
 
     private ApplicationSingleton() {
     }

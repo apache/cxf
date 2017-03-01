@@ -28,14 +28,14 @@ import org.w3c.dom.Element;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 
 /**
- * The ServiceInfo class has schema in two forms: the XmlSchema, in a SchemaCollection, and the 
+ * The ServiceInfo class has schema in two forms: the XmlSchema, in a SchemaCollection, and the
  * DOM trees in the SchemaInfo objects. This class exists in order to allow the WSDL cache to store both.
  */
 public class ServiceSchemaInfo {
     private SchemaCollection schemaCollection;
     private List<SchemaInfo> schemaInfoList;
     private Map<String, Element> schemaElementList;
-    
+
     public SchemaCollection getSchemaCollection() {
         return schemaCollection;
     }
@@ -46,7 +46,7 @@ public class ServiceSchemaInfo {
         return schemaInfoList;
     }
     public void setSchemaInfoList(List<SchemaInfo> schemaInfoList) {
-        this.schemaInfoList = new ArrayList<SchemaInfo>(schemaInfoList);
+        this.schemaInfoList = new ArrayList<>(schemaInfoList);
     }
     public Map<String, Element> getSchemaElementList() {
         return schemaElementList;

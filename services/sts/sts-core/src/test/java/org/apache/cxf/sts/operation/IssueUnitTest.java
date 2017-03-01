@@ -52,133 +52,133 @@ import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
  * Some unit tests for the issue operation.
  */
 public class IssueUnitTest extends org.junit.Assert {
-    
+
     /**
      * Test to successfully issue a (dummy) token.
      */
     @org.junit.Test
     public void testIssueToken() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, DummyTokenProvider.TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-    
+
     /**
      * Test to successfully issue multiple (dummy) tokens.
      */
     @org.junit.Test
     public void testIssueMultipleTokens() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
-        RequestSecurityTokenCollectionType requestCollection = 
+        RequestSecurityTokenCollectionType requestCollection =
             new RequestSecurityTokenCollectionType();
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, DummyTokenProvider.TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         requestCollection.getRequestSecurityToken().add(request);
-        
+
         request = new RequestSecurityTokenType();
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         requestCollection.getRequestSecurityToken().add(request);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(requestCollection, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertEquals(securityTokenResponse.size(), 2);
     }
-    
+
     /**
      * Test to issue a token of an unknown or missing TokenType value.
      */
     @org.junit.Test
     public void testTokenType() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, "UnknownTokenType"
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Issue a token - failure expected on an unknown token type
         try {
             issueOperation.issue(request, null, msgCtx);
@@ -186,7 +186,7 @@ public class IssueUnitTest extends org.junit.Assert {
         } catch (STSException ex) {
             // expected
         }
-        
+
         // Issue a token - failure expected as no token type is sent
         request.getAny().remove(0);
         try {
@@ -195,19 +195,19 @@ public class IssueUnitTest extends org.junit.Assert {
         } catch (STSException ex) {
             // expected
         }
-        
+
         // Issue a token - this time it defaults to a known token type
         service.setTokenType(DummyTokenProvider.TOKEN_TYPE);
         issueOperation.setServices(Collections.singletonList(service));
-        
-        RequestSecurityTokenResponseCollectionType response = 
+
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-    
-    
+
+
     /**
      * Test the endpoint address sent to the STS as part of AppliesTo. If the STS does not
      * recognise the endpoint address it does not issue a token.
@@ -215,34 +215,34 @@ public class IssueUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testIssueEndpointAddress() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, DummyTokenProvider.TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy-unknown"));
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Issue a token - failure expected on an unknown address
         try {
             issueOperation.issue(request, null, msgCtx);
@@ -250,60 +250,60 @@ public class IssueUnitTest extends org.junit.Assert {
         } catch (STSException ex) {
             // expected
         }
-        
+
         // Issue a token - This should work as wildcards are used
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy.*"));
         issueOperation.setServices(Collections.singletonList(service));
-        
-        RequestSecurityTokenResponseCollectionType response = 
+
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-        
+
     /**
      * Test that a request with no AppliesTo is not rejected
      */
     @org.junit.Test
     public void testNoAppliesTo() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, DummyTokenProvider.TOKEN_TYPE
             );
         request.getAny().add(tokenType);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-    
-    
+
+
     /**
      * Test that sends a Context attribute when requesting a token, and checks it gets
      * a response with the Context attribute properly set.
@@ -311,44 +311,44 @@ public class IssueUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testContext() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, DummyTokenProvider.TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         request.setContext("AuthenticationContext");
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
         assertTrue("AuthenticationContext".equals(securityTokenResponse.get(0).getContext()));
     }
-    
+
     /**
      * Test to successfully issue a (dummy) token with a supplied lifetime. It only tests that
      * the lifetime can be successfully processed by the RequestParser for now.
@@ -356,87 +356,87 @@ public class IssueUnitTest extends org.junit.Assert {
     @org.junit.Test
     public void testLifetime() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, DummyTokenProvider.TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
         LifetimeType lifetime = createLifetime(300L * 5L);
-        JAXBElement<LifetimeType> lifetimeJaxb = 
+        JAXBElement<LifetimeType> lifetimeJaxb =
             new JAXBElement<LifetimeType>(QNameConstants.LIFETIME, LifetimeType.class, lifetime);
         request.getAny().add(lifetimeJaxb);
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Issue a token
-        RequestSecurityTokenResponseCollectionType response = 
+        RequestSecurityTokenResponseCollectionType response =
             issueOperation.issue(request, null, msgCtx);
-        List<RequestSecurityTokenResponseType> securityTokenResponse = 
+        List<RequestSecurityTokenResponseType> securityTokenResponse =
             response.getRequestSecurityTokenResponse();
         assertTrue(!securityTokenResponse.isEmpty());
     }
-    
+
     /**
      * Test to successfully issue a single (dummy) token.
      */
     @org.junit.Test
     public void testIssueSingleToken() throws Exception {
         TokenIssueOperation issueOperation = new TokenIssueOperation();
-        
+
         // Add Token Provider
-        List<TokenProvider> providerList = new ArrayList<TokenProvider>();
+        List<TokenProvider> providerList = new ArrayList<>();
         providerList.add(new DummyTokenProvider());
         issueOperation.setTokenProviders(providerList);
-        
+
         // Add Service
         ServiceMBean service = new StaticService();
         service.setEndpoints(Collections.singletonList("http://dummy-service.com/dummy"));
         issueOperation.setServices(Collections.singletonList(service));
-        
+
         // Add STSProperties object
         STSPropertiesMBean stsProperties = new StaticSTSProperties();
         issueOperation.setStsProperties(stsProperties);
-        
+
         // Mock up a request
         RequestSecurityTokenType request = new RequestSecurityTokenType();
-        JAXBElement<String> tokenType = 
+        JAXBElement<String> tokenType =
             new JAXBElement<String>(
                 QNameConstants.TOKEN_TYPE, String.class, DummyTokenProvider.TOKEN_TYPE
             );
         request.getAny().add(tokenType);
         request.getAny().add(createAppliesToElement("http://dummy-service.com/dummy"));
-        
+
         // Mock up message context
         MessageImpl msg = new MessageImpl();
         WrappedMessageContext msgCtx = new WrappedMessageContext(msg);
-        
+
         // Issue a token
-        RequestSecurityTokenResponseType response = 
+        RequestSecurityTokenResponseType response =
             issueOperation.issueSingle(request, null, msgCtx);
         assertTrue(!response.getAny().isEmpty());
     }
-    
-    
+
+
     /*
      * Mock up an AppliesTo element using the supplied address
      */
@@ -453,14 +453,14 @@ public class IssueUnitTest extends org.junit.Assert {
         appliesTo.appendChild(endpointRef);
         return appliesTo;
     }
-    
+
     /**
      * Create a LifetimeType object given a lifetime in seconds
      */
     private LifetimeType createLifetime(long lifetime) {
         AttributedDateTime created = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
         AttributedDateTime expires = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
-        
+
         Date creationTime = new Date();
         Date expirationTime = new Date();
         if (lifetime <= 0) {
@@ -471,12 +471,12 @@ public class IssueUnitTest extends org.junit.Assert {
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         created.setValue(fmt.format(creationTime));
         expires.setValue(fmt.format(expirationTime));
-        
+
         LifetimeType lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetimeType();
         lifetimeType.setCreated(created);
         lifetimeType.setExpires(expires);
         return lifetimeType;
     }
 
-    
+
 }

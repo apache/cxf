@@ -52,13 +52,13 @@ public class URIConfiguredConduitTest {
         sync,
         async
     };
-    
+
     @BeforeClass
     public static void initConnectionFactory() {
         cf = new ActiveMQConnectionFactory(BROKER_URI);
     }
 
-    // @Ignoring due to continually failing on Jenkins 
+    // @Ignoring due to continually failing on Jenkins
     @Test
     @org.junit.Ignore
     public void testSendReceive() throws Exception {
@@ -67,7 +67,7 @@ public class URIConfiguredConduitTest {
                            + SERVICE_QUEUE
                            + "?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
                            + "&useConduitIdSelector=false"
-                           + "&replyToName=dynamicQueues/testreply" 
+                           + "&replyToName=dynamicQueues/testreply"
                            + "&messageType=text"
                            + "&jndiConnectionFactoryName=ConnectionFactory"
                            + "&jndiURL=" + BROKER_URI);
@@ -77,7 +77,7 @@ public class URIConfiguredConduitTest {
     public void testSendReceiveCFFromContext() throws Exception {
         sendAndReceive(SyncType.sync, "jms:queue:" + SERVICE_QUEUE + "?replyToName=testreply"
                                       + "&useConduitIdSelector=false"
-                                      + "&messageType=text" 
+                                      + "&messageType=text"
                                       + "&receiveTimeout=10000"
                                       + "&jndiConnectionFactoryName=ConnectionFactory");
     }

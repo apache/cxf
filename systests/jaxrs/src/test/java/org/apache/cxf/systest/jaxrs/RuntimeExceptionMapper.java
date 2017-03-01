@@ -26,9 +26,9 @@ import javax.ws.rs.ext.ExceptionMapper;
 
 public class RuntimeExceptionMapper implements ExceptionMapper<WebApplicationException> {
 
-    @Context 
+    @Context
     private UriInfo ui;
-    
+
     public Response toResponse(WebApplicationException exception) {
         String path = ui.getPath();
         if (path.endsWith("nonexistent")) {

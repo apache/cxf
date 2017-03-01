@@ -25,7 +25,7 @@ import org.apache.cxf.ws.transfer.dialect.fragment.ExpressionType;
  * Interface for FragmentDialect languages.
  */
 public interface FragmentDialectLanguage {
-    
+
     /**
      * Returns fragment of resource, which is described by expression.
      * @param representation Resource, from which is fragment computed.
@@ -33,5 +33,5 @@ public interface FragmentDialectLanguage {
      * @return It can return org.w3c.dom.Node | org.w3c.dom.NodeList | String
      */
     Object getResourceFragment(Representation representation, ExpressionType expression);
-    
+
 }

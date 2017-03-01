@@ -51,7 +51,7 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
     boolean unwrapJAXBElement = true;
     ValidationEventHandler veventHandler;
     boolean setEventHandler = true;
-    
+
     public DataReaderImpl(JAXBDataBinding binding, boolean unwrap) {
         super(binding.getContext());
         unwrapJAXBElement = unwrap;
@@ -61,31 +61,31 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
     public Object read(T input) {
         return read(null, input);
     }
-    
+
     private static class WSUIDValidationHandler implements ValidationEventHandler {
         ValidationEventHandler origHandler;
         WSUIDValidationHandler(ValidationEventHandler o) {
             origHandler = o;
         }
-        
+
         public boolean handleEvent(ValidationEvent event) {
             // if the original handler has already handled the event, no need for us
-            // to do anything, otherwise if not yet handled, then do this 'hack' 
+            // to do anything, otherwise if not yet handled, then do this 'hack'
             if (origHandler != null && origHandler.handleEvent(event)) {
                 return true;
             } else {
                 // hack for CXF-3453
                 String msg = event.getMessage();
-                return msg != null 
-                    && msg.contains(":Id") 
-                    && (msg.startsWith("cvc-type.3.1.1: ") 
-                        || msg.startsWith("cvc-type.3.2.2: ") 
-                        || msg.startsWith("cvc-complex-type.3.1.1: ")
-                        || msg.startsWith("cvc-complex-type.3.2.2: "));
+                return msg != null
+                    && msg.contains(":Id")
+                    && (msg.startsWith("cvc-type.3.1.1")
+                        || msg.startsWith("cvc-type.3.2.2")
+                        || msg.startsWith("cvc-complex-type.3.1.1")
+                        || msg.startsWith("cvc-complex-type.3.2.2"));
             }
         }
     }
-    
+
     public void setProperty(String prop, Object value) {
         if (prop.equals(JAXBDataBinding.UNWRAP_JAXB_ELEMENT)) {
             unwrapJAXBElement = Boolean.TRUE.equals(value);
@@ -100,9 +100,9 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             if (veventHandler == null) {
                 veventHandler = databinding.getValidationEventHandler();
             }
-            setEventHandler = MessageUtils.getContextualBoolean(m, 
+            setEventHandler = MessageUtils.getContextualBoolean(m,
                     JAXBDataBinding.SET_VALIDATION_EVENT_HANDLER, true);
-            
+
             Object unwrapProperty = m.get(JAXBDataBinding.UNWRAP_JAXB_ELEMENT);
             if (unwrapProperty == null) {
                 unwrapProperty = m.getExchange().get(JAXBDataBinding.UNWRAP_JAXB_ELEMENT);
@@ -112,7 +112,7 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             }
         }
     }
-    
+
     private Unmarshaller createUnmarshaller() {
         try {
             Unmarshaller um = null;
@@ -124,7 +124,7 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
                 um.setEventHandler(new WSUIDValidationHandler(veventHandler));
             }
             if (databinding.getUnmarshallerProperties() != null) {
-                for (Map.Entry<String, Object> propEntry 
+                for (Map.Entry<String, Object> propEntry
                     : databinding.getUnmarshallerProperties().entrySet()) {
                     try {
                         um.setProperty(propEntry.getKey(), propEntry.getValue());
@@ -161,25 +161,25 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
                 // TODO:Cache the JAXBRIContext
                 QName qname = new QName(null, part.getConcreteName().getLocalPart());
 
-                Object obj = JAXBEncoderDecoder.unmarshalWithBridge(qname, 
-                                                              part.getTypeClass(), 
-                                                              anns, 
-                                                              databinding.getContextClasses(), 
-                                                              reader, 
+                Object obj = JAXBEncoderDecoder.unmarshalWithBridge(qname,
+                                                              part.getTypeClass(),
+                                                              anns,
+                                                              databinding.getContextClasses(),
+                                                              reader,
                                                               getAttachmentUnmarshaller());
-                
+
                 onCompleteUnmarshalling();
-                
+
                 return obj;
             }
         }
-        
+
         Unmarshaller um = createUnmarshaller();
         try {
-            Object obj = JAXBEncoderDecoder.unmarshall(um, reader, part, 
+            Object obj = JAXBEncoderDecoder.unmarshall(um, reader, part,
                                                  unwrapJAXBElement);
             onCompleteUnmarshalling();
-            
+
             return obj;
         } finally {
             JAXBUtils.closeUnmarshaller(um);
@@ -188,13 +188,13 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
 
     public Object read(QName name, T input, Class<?> type) {
         Unmarshaller um = createUnmarshaller();
-        
+
         try {
             Object obj = JAXBEncoderDecoder.unmarshall(um, input,
-                                             name, type, 
+                                             name, type,
                                              unwrapJAXBElement);
             onCompleteUnmarshalling();
-            
+
             return obj;
         } finally {
             JAXBUtils.closeUnmarshaller(um);
@@ -208,7 +208,7 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
                 ((UnmarshallerEventHandler) veventHandler).onUnmarshalComplete();
             } catch (UnmarshalException e) {
                 if (e.getLinkedException() != null) {
-                    throw new Fault(new Message("UNMARSHAL_ERROR", LOG, 
+                    throw new Fault(new Message("UNMARSHAL_ERROR", LOG,
                             e.getLinkedException().getMessage()), e);
                 } else {
                     throw new Fault(new Message("UNMARSHAL_ERROR", LOG, e.getMessage()), e);

@@ -48,26 +48,26 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     private static final Logger LOG =
         LogUtils.getL7dLogger(WorkQueueManagerImpl.class);
 
-    Map<String, AutomaticWorkQueue> namedQueues 
+    Map<String, AutomaticWorkQueue> namedQueues
         = new ConcurrentHashMap<String, AutomaticWorkQueue>(4, 0.75f, 2);
-    
+
     boolean inShutdown;
     InstrumentationManager imanager;
-    Bus bus;  
-    
+    Bus bus;
+
     public WorkQueueManagerImpl() {
-        
+
     }
     public WorkQueueManagerImpl(Bus b) {
         setBus(b);
     }
-    
+
     public Bus getBus() {
         return bus;
     }
-    
+
     @Resource
-    public final void setBus(Bus bus) {        
+    public final void setBus(Bus bus) {
         this.bus = bus;
         if (null != bus) {
             bus.setExtension(this, WorkQueueManager.class);
@@ -87,15 +87,15 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
                     addNamedWorkQueue(awq.getName(), awq);
                 }
             }
-            
+
             if (!namedQueues.containsKey(DEFAULT_QUEUE_NAME)) {
-                AutomaticWorkQueue defaultQueue 
+                AutomaticWorkQueue defaultQueue
                     = locator.getBeanOfType(DEFAULT_WORKQUEUE_BEAN_NAME, AutomaticWorkQueue.class);
                 if (defaultQueue != null) {
                     addNamedWorkQueue(DEFAULT_QUEUE_NAME, defaultQueue);
                 }
             }
-            
+
             bus.getExtension(BusLifeCycleManager.class)
                 .registerLifeCycleListener(new WQLifecycleListener());
         }
@@ -117,9 +117,9 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
                 if (impl.isShared()) {
                     synchronized (impl) {
                         impl.removeSharedUser();
-                        
-                        if (impl.getShareCount() == 0 
-                            && imanager != null 
+
+                        if (impl.getShareCount() == 0
+                            && imanager != null
                             && imanager.getMBeanServer() != null) {
                             try {
                                 imanager.unregister(new WorkQueueImplMBeanWrapper(impl, this));
@@ -144,7 +144,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     public void run() {
         synchronized (this) {
             while (!inShutdown) {
-                try {            
+                try {
                     wait();
                 } catch (InterruptedException ex) {
                     // ignore
@@ -152,7 +152,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
             }
             for (AutomaticWorkQueue q : namedQueues.values()) {
                 while (!q.isShutdown()) {
-                    try {            
+                    try {
                         wait(100);
                     } catch (InterruptedException ex) {
                         // ignore
@@ -163,7 +163,7 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
         for (java.util.logging.Handler h : LOG.getHandlers())  {
             h.flush();
         }
-        
+
     }
 
     public AutomaticWorkQueue getNamedWorkQueue(String name) {
@@ -175,8 +175,8 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
             AutomaticWorkQueueImpl impl = (AutomaticWorkQueueImpl)q;
             if (impl.isShared()) {
                 synchronized (impl) {
-                    if (impl.getShareCount() == 0 
-                        && imanager != null 
+                    if (impl.getShareCount() == 0
+                        && imanager != null
                         && imanager.getMBeanServer() != null) {
                         try {
                             imanager.register(new WorkQueueImplMBeanWrapper((AutomaticWorkQueueImpl)q, this));
@@ -195,17 +195,17 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
             }
         }
     }
-    
-    private AutomaticWorkQueue createAutomaticWorkQueue() {        
+
+    private AutomaticWorkQueue createAutomaticWorkQueue() {
         AutomaticWorkQueue q = new AutomaticWorkQueueImpl(DEFAULT_QUEUE_NAME);
         addNamedWorkQueue(DEFAULT_QUEUE_NAME, q);
         return q;
     }
-    
-    
+
+
     class WQLifecycleListener implements BusLifeCycleListener {
         public void initComplete() {
-            
+
         }
         public void preShutdown() {
             shutdown(true);

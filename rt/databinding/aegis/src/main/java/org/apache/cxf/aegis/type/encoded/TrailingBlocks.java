@@ -86,7 +86,7 @@ public class TrailingBlocks {
      * @throws DatabindingException if a trailing block element does not contain a soap id attribute
      */
     public List<Object> readBlocks(MessageReader reader, Context context) throws DatabindingException {
-        List<Object> blocks = new ArrayList<Object>();
+        List<Object> blocks = new ArrayList<>();
 
         // read extra serialization roots
         while (reader.hasMoreElementReaders()) {
@@ -103,7 +103,7 @@ public class TrailingBlocks {
             Object instance = objectType.readObject(creader, context);
             blocks.add(instance);
 
-            // register the instance 
+            // register the instance
             SoapRefRegistry.get(context).addInstance(id, instance);
 
             // close the element reader
@@ -120,7 +120,7 @@ public class TrailingBlocks {
      * @return a list containing the object instances written
      */
     public List<Object> writeBlocks(MessageWriter writer, Context context) {
-        List<Object> blocks = new ArrayList<Object>();
+        List<Object> blocks = new ArrayList<>();
 
         for (Object instance : MarshalRegistry.get(context)) {
             // determine instance type

@@ -42,10 +42,10 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class PersistenceUtilsTest extends Assert {
-    
+
     private static final String MULTIPART_TYPE = "multipart/related; type=\"text/xml\";"
         + " boundary=\"uuid:74b6a245-2e17-40eb-a86c-308664e18460\"; start=\"<root."
         + "message@cxf.apache.org>\"; start-info=\"application/soap+xml\"";
@@ -68,11 +68,11 @@ public class PersistenceUtilsTest extends Assert {
         assertEquals(range.getLower(), refRange.getLower());
         assertEquals(range.getUpper(), refRange.getUpper());
     }
-    
+
     @Test
     public void testEncodeRMContent() throws Exception {
         ByteArrayInputStream bis = new ByteArrayInputStream(SOAP_PART.getBytes());
-        
+
         RMMessage rmmsg = new RMMessage();
         Message messageImpl = new MessageImpl();
         messageImpl.put(Message.CONTENT_TYPE, "text/xml");
@@ -118,7 +118,7 @@ public class PersistenceUtilsTest extends Assert {
         CachedOutputStream cos = (CachedOutputStream)messageImplRestored.get(RMMessageConstants.SAVED_CONTENT);
         assertStartsWith(cos.getInputStream(), SOAP_PART);
     }
-    
+
     @Test
     public void testDecodeRMContentWithAttachment() throws Exception {
         InputStream is = getClass().getResourceAsStream("SerializedRMMessage.txt");
@@ -126,19 +126,19 @@ public class PersistenceUtilsTest extends Assert {
         IOUtils.copyAndCloseInput(is, cos);
         cos.flush();
         RMMessage msg = new RMMessage();
-        msg.setContent(cos);      
+        msg.setContent(cos);
         msg.setContentType(MULTIPART_TYPE);
         Message messageImpl = new MessageImpl();
         PersistenceUtils.decodeRMContent(msg, messageImpl);
 
         assertEquals(1, messageImpl.getAttachments().size());
-        CachedOutputStream cos1 =  (CachedOutputStream)messageImpl
+        CachedOutputStream cos1 = (CachedOutputStream)messageImpl
             .get(RMMessageConstants.SAVED_CONTENT);
         assertStartsWith(cos1.getInputStream(), "<soap:Envelope");
     }
 
     private static void addAttachment(Message msg) throws IOException {
-        Collection<Attachment> attachments = new ArrayList<Attachment>();
+        Collection<Attachment> attachments = new ArrayList<>();
         DataHandler dh = new DataHandler(new ByteArrayDataSource("hello world!", "text/plain"));
         Attachment a = new AttachmentImpl("test.xml", dh);
         attachments.add(a);

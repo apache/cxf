@@ -27,32 +27,32 @@ import javax.resource.spi.work.WorkListener;
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
- * 
+ *
  */
 public class CXFWorkAdapter implements WorkListener {
-    
+
     public static final long DEFAULT_START_TIME_OUT = 1 * 60 * 1000; // 1 minute
 
     private static final Logger LOG = LogUtils.getL7dLogger(CXFWorkAdapter.class);
-    
+
     public void workAccepted(WorkEvent e) {
         LOG.fine("workAccepted: [" + e.getWork() + "], source is [" + e.getSource() + "]");
     }
 
-    
+
     public void workCompleted(WorkEvent e) {
         LOG.fine("workCompleted: [" + e.getWork() + "], source is [" + e.getSource() + "]");
     }
 
-    
+
     public void workRejected(WorkEvent e) {
         LOG.severe("workRejected: [" + e.getWork() + "], source is [" + e.getSource() + "]");
         LOG.severe("root cause is:" + e.getException().getMessage());
-        
+
         e.getException().printStackTrace();
     }
 
-    
+
     public void workStarted(WorkEvent e) {
         LOG.fine("workStarted: [" + e.getWork() + "], source is [" + e.getSource() + "]");
     }

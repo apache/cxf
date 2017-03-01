@@ -22,12 +22,12 @@ package org.apache.cxf.ordered_param_holder;
 import javax.jws.WebService;
 import javax.xml.ws.Holder;
 
-@WebService(serviceName = "ordered_param_holder", 
-        portName = "ordered_param_holderSOAP", 
-        targetNamespace = "http://cxf.apache.org/ordered_param_holder/", 
+@WebService(serviceName = "ordered_param_holder",
+        portName = "ordered_param_holderSOAP",
+        targetNamespace = "http://cxf.apache.org/ordered_param_holder/",
         endpointInterface = "org.apache.cxf.ordered_param_holder.OrderedParamHolder",
         wsdlLocation = "testutils/ordered_param_holder.wsdl")
-     
+
 public class OrderedParamHolderImpl implements OrderedParamHolder {
 
     public void orderedParamHolder(Holder<ComplexStruct> part3, Holder<Integer> part2, Holder<String> part1) {

@@ -31,9 +31,9 @@ import org.apache.wss4j.policy.stax.PolicyAsserter;
  * Assert policies in CXF that are asserted in the WSS4J policy stax module
  */
 public class WSS4JPolicyAsserter implements PolicyAsserter {
-    
+
     private AssertionInfoMap aim;
-    
+
     public WSS4JPolicyAsserter(AssertionInfoMap aim) {
         this.aim = aim;
     }
@@ -48,7 +48,7 @@ public class WSS4JPolicyAsserter implements PolicyAsserter {
             }
         }
     }
-    
+
     public void assertPolicy(QName qName) {
         Collection<AssertionInfo> ais = aim.getAssertionInfo(qName);
         if (ais != null && !ais.isEmpty()) {
@@ -79,5 +79,5 @@ public class WSS4JPolicyAsserter implements PolicyAsserter {
             }
         }
     }
-    
+
 }

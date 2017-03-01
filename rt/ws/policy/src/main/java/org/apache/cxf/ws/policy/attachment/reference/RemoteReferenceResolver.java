@@ -33,13 +33,13 @@ import org.apache.neethi.Constants;
 import org.apache.neethi.Policy;
 
 /**
- * 
+ *
  */
 public class RemoteReferenceResolver implements ReferenceResolver {
-    
+
     private String baseURI;
     private PolicyBuilder builder;
-    
+
     public RemoteReferenceResolver(String uri, PolicyBuilder b) {
         baseURI = uri;
         builder = b;
@@ -68,14 +68,14 @@ public class RemoteReferenceResolver implements ReferenceResolver {
             for (Element elem : PolicyConstants
                     .findAllPolicyElementsOfLocalName(doc,
                                                       Constants.ELEM_POLICY)) {
-                
+
                 if (id.equals(elem.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
                                                   PolicyConstants.WSU_ID_ATTR_NAME))) {
                     return builder.getPolicy(elem);
                 }
             }
-        } 
-        
+        }
+
         return null;
     }
 }

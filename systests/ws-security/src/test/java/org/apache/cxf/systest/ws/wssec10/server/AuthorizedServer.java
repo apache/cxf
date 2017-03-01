@@ -28,11 +28,11 @@ public class AuthorizedServer extends AbstractBusTestServerBase {
 
     private static String configFileName =
         "org/apache/cxf/systest/ws/wssec10/server_restricted_authorized.xml";
-    
+
     public AuthorizedServer() throws Exception {
-        
+
     }
-    
+
     protected void run()  {
         Bus busLocal = new SpringBusFactory().createBus(configFileName);
         BusFactory.setDefaultBus(busLocal);

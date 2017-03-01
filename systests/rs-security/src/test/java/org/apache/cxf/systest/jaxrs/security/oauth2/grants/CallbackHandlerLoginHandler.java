@@ -40,30 +40,30 @@ import org.apache.wss4j.dom.validate.UsernameTokenValidator;
 public class CallbackHandlerLoginHandler implements ResourceOwnerLoginHandler {
 
     private CallbackHandler callbackHandler;
-    
+
     static {
         WSSConfig.init();
     }
-    
+
     @Override
     public UserSubject createSubject(String user, String pass) {
         Document doc = DOMUtils.createDocument();
-        UsernameToken token = new UsernameToken(false, doc, 
+        UsernameToken token = new UsernameToken(false, doc,
                                                 WSConstants.PASSWORD_TEXT);
         token.setName(user);
         token.setPassword(pass);
-        
+
         Credential credential = new Credential();
         credential.setUsernametoken(token);
-        
+
         RequestData data = new RequestData();
         data.setMsgContext(PhaseInterceptorChain.getCurrentMessage());
         data.setCallbackHandler(callbackHandler);
         UsernameTokenValidator validator = new UsernameTokenValidator();
-        
+
         try {
             credential = validator.validate(credential, data);
-            
+
             UserSubject subject = new UserSubject();
             subject.setLogin(user);
             return subject;
@@ -71,7 +71,7 @@ public class CallbackHandlerLoginHandler implements ResourceOwnerLoginHandler {
             throw ExceptionUtils.toInternalServerErrorException(ex, null);
         }
     }
-    
+
     public CallbackHandler getCallbackHandler() {
         return callbackHandler;
     }

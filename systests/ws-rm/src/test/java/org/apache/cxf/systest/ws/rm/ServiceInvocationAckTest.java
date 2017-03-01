@@ -26,7 +26,7 @@ import org.junit.BeforeClass;
  */
 public class ServiceInvocationAckTest extends ServiceInvocationAckBase {
     static final String PORT = allocatePort(ServiceInvocationAckTest.class);
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         startServer(PORT, "");
@@ -35,7 +35,7 @@ public class ServiceInvocationAckTest extends ServiceInvocationAckBase {
         return PORT;
     }
 
-    
+
     protected void setupGreeter() throws Exception {
         setupGreeter("org/apache/cxf/systest/ws/rm/sync-ack-server.xml");
     }

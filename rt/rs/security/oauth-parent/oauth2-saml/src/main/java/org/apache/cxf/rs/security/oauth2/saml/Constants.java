@@ -22,14 +22,14 @@ public final class Constants {
     public static final String SAML2_BEARER_GRANT =
         "urn:ietf:params:oauth:grant-type:saml2-bearer";
     public static final String CLIENT_GRANT_ASSERTION_PARAM = "assertion";
-    
+
     public static final String CLIENT_AUTH_ASSERTION_PARAM = "client_assertion";
     public static final String CLIENT_AUTH_ASSERTION_TYPE = "client_assertion_type";
-    public static final String CLIENT_AUTH_SAML2_BEARER = 
+    public static final String CLIENT_AUTH_SAML2_BEARER =
         "urn:ietf:params:oauth:client-assertion-type:saml2-bearer";
-   
-    
+
+
     private Constants() {
-        
+
     }
 }

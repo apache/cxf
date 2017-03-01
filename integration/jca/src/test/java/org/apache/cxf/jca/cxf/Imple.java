@@ -25,8 +25,8 @@ import javax.jws.WebService;
 
 @WebService
 public class Imple implements HelloInterface {
-    
-    
+
+
     public String sayHi(String s) {
         return "hello world ." + s;
     }

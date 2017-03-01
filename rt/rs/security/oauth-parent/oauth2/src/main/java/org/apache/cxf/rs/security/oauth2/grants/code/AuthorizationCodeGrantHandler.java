@@ -38,20 +38,20 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
  * Authorization Code Grant Handler
  */
 public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
-    
+
     private CodeVerifierTransformer codeVerifierTransformer;
     private boolean expectCodeVerifierForPublicClients;
-    
+
     public AuthorizationCodeGrantHandler() {
         super(OAuthConstants.AUTHORIZATION_CODE_GRANT);
     }
-    
-    public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params) 
+
+    public ServerAccessToken createAccessToken(Client client, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
-                
-        // Get the grant representation from the provider 
+
+        // Get the grant representation from the provider
         String codeValue = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VALUE);
-        ServerAuthorizationCodeGrant grant = 
+        ServerAuthorizationCodeGrant grant =
             ((AuthorizationCodeDataProvider)getDataProvider()).removeCodeGrant(codeValue);
         if (grant == null) {
             return null;
@@ -71,12 +71,12 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                 throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
             }
         } else if (expectedRedirectUri == null && !isCanSupportPublicClients()
-            || expectedRedirectUri != null 
-                && (client.getRedirectUris().size() != 1 
+            || expectedRedirectUri != null
+                && (client.getRedirectUris().size() != 1
                 || !client.getRedirectUris().contains(expectedRedirectUri))) {
             throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
         }
-        
+
         String clientCodeVerifier = params.getFirst(OAuthConstants.AUTHORIZATION_CODE_VERIFIER);
         String clientCodeChallenge = grant.getClientCodeChallenge();
         if (!compareCodeVerifierWithChallenge(client, clientCodeVerifier, clientCodeChallenge)) {
@@ -85,14 +85,14 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
         List<String> audiences = getAudiences(client, params, grant.getAudience());
         return doCreateAccessToken(client, grant, getSingleGrantType(), clientCodeVerifier, audiences);
     }
-    
-    protected List<String> getAudiences(Client client, MultivaluedMap<String, String> params, 
+
+    protected List<String> getAudiences(Client client, MultivaluedMap<String, String> params,
                                         String grantAudience) {
         String clientAudience = params.getFirst(OAuthConstants.CLIENT_AUDIENCE);
         if (client.getRegisteredAudiences().isEmpty() && clientAudience == null && grantAudience == null) {
             return Collections.emptyList();
         }
-        // if the audience was approved at the grant creation time and the audience is also 
+        // if the audience was approved at the grant creation time and the audience is also
         // sent to the token endpoint then both values must match
         if (grantAudience != null && clientAudience != null && !grantAudience.equals(clientAudience)) {
             throw new OAuthServiceException(OAuthConstants.INVALID_REQUEST);
@@ -106,10 +106,10 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
                                                   String codeVerifier,
                                                   List<String> audiences) {
         if (grant.isPreauthorizedTokenAvailable()) {
-            ServerAccessToken token = getPreAuthorizedToken(client, 
-                                                            grant.getSubject(), 
+            ServerAccessToken token = getPreAuthorizedToken(client,
+                                                            grant.getSubject(),
                                                             requestedGrant,
-                                                            grant.getRequestedScopes(), 
+                                                            grant.getRequestedScopes(),
                                                             getAudiences(client, grant.getAudience()));
             if (token != null) {
                 if (grant.getNonce() != null) {
@@ -119,11 +119,16 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
             } else {
                 // the grant was issued based on the authorization time check confirming the
                 // token was available but it has expired by now or been removed then
-                // creating a completely new token can be wrong - though this needs to be reviewed 
+                // creating a completely new token can be wrong - though this needs to be reviewed
                 throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
             }
         }
-        
+        // Make sure the client supports the authorization code in cases where
+        // the implicit/hybrid service was initiating the code grant processing flow
+
+        if (!client.getAllowedGrantTypes().isEmpty() && !client.getAllowedGrantTypes().contains(requestedGrant)) {
+            throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
+        }
         // Delegate to the data provider to create the one
         AccessTokenRegistration reg = new AccessTokenRegistration();
         reg.setGrantCode(grant.getCode());
@@ -143,18 +148,18 @@ public class AuthorizationCodeGrantHandler extends AbstractGrantHandler {
         reg.setGrantType(OAuthConstants.CODE_RESPONSE_TYPE);
         return getDataProvider().createAccessToken(reg);
     }
-    
-    private boolean compareCodeVerifierWithChallenge(Client c, String clientCodeVerifier, 
+
+    private boolean compareCodeVerifierWithChallenge(Client c, String clientCodeVerifier,
                                                      String clientCodeChallenge) {
-        if (clientCodeChallenge == null && clientCodeVerifier == null 
+        if (clientCodeChallenge == null && clientCodeVerifier == null
             && (c.isConfidential() || !expectCodeVerifierForPublicClients)) {
             return true;
-        } else if (clientCodeChallenge != null && clientCodeVerifier == null 
+        } else if (clientCodeChallenge != null && clientCodeVerifier == null
             || clientCodeChallenge == null && clientCodeVerifier != null) {
             return false;
         } else {
-            String transformedCodeVerifier = codeVerifierTransformer == null 
-                ? clientCodeVerifier : codeVerifierTransformer.transformCodeVerifier(clientCodeVerifier); 
+            String transformedCodeVerifier = codeVerifierTransformer == null
+                ? clientCodeVerifier : codeVerifierTransformer.transformCodeVerifier(clientCodeVerifier);
             return clientCodeChallenge.equals(transformedCodeVerifier);
         }
     }

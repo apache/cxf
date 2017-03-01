@@ -38,28 +38,28 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * In this test case, a CXF client sends a BinarySecurityToken via the Asymmetric message 
- * binding to a CXF provider. The provider dispatches the BinarySecurityToken to an STS for 
- * validation (via TLS). 
+ * In this test case, a CXF client sends a BinarySecurityToken via the Asymmetric message
+ * binding to a CXF provider. The provider dispatches the BinarySecurityToken to an STS for
+ * validation (via TLS).
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
 public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
-    
+
     static final String STSPORT = allocatePort(STSServer.class);
     static final String STAX_STSPORT = allocatePort(StaxSTSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
     private static final String PORT = allocatePort(Server.class);
     private static final String STAX_PORT = allocatePort(StaxServer.class);
-    
+
     final TestParam test;
-    
+
     public BinarySecurityTokenTest(TestParam type) {
         this.test = type;
     }
-    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -87,17 +87,17 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
                    launchServer(StaxSTSServer.class, true)
         );
     }
-    
+
     @Parameters(name = "{0}")
     public static Collection<TestParam[]> data() {
-       
+
         return Arrays.asList(new TestParam[][] {{new TestParam(PORT, false, "")},
                                                 {new TestParam(PORT, true, "")},
                                                 {new TestParam(STAX_PORT, false, "")},
                                                 {new TestParam(STAX_PORT, true, "")},
         });
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -117,20 +117,20 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = BinarySecurityTokenTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBSTPort");
-        DoubleItPortType asymmetricBSTPort = 
+        DoubleItPortType asymmetricBSTPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(asymmetricBSTPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(asymmetricBSTPort);
         }
-        
+
         doubleIt(asymmetricBSTPort, 25);
-        
+
         ((java.io.Closeable)asymmetricBSTPort).close();
         bus.shutdown(true);
     }
-    
+
     @org.junit.Test
     public void testBadBinarySecurityToken() throws Exception {
 
@@ -144,10 +144,10 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = BinarySecurityTokenTest.class.getResource("DoubleIt.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricBSTPort");
-        DoubleItPortType asymmetricBSTPort = 
+        DoubleItPortType asymmetricBSTPort =
             service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(asymmetricBSTPort, test.getPort());
-        
+
         if (test.isStreaming()) {
             SecurityTestUtil.enableStreaming(asymmetricBSTPort);
         }
@@ -158,11 +158,11 @@ public class BinarySecurityTokenTest extends AbstractBusClientServerTestBase {
         } catch (javax.xml.ws.soap.SOAPFaultException fault) {
             // expected
         }
-        
+
         ((java.io.Closeable)asymmetricBSTPort).close();
         bus.shutdown(true);
     }
-    
+
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
         int resp = port.doubleIt(numToDouble);
         assertEquals(numToDouble * 2, resp);

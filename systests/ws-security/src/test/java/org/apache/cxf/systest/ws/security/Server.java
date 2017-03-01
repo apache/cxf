@@ -35,15 +35,15 @@ public class Server extends AbstractBusTestServerBase {
         BusFactory.setDefaultBus(bus);
         setBus(bus);
     }
-        
+
     public static void main(String[] args) {
-        try { 
-            Server s = new Server(); 
+        try {
+            Server s = new Server();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();
             System.exit(-1);
-        } finally { 
+        } finally {
             System.out.println("done!");
         }
     }

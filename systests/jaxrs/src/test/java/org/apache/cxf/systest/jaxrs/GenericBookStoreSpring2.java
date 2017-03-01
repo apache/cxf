@@ -43,7 +43,7 @@ public class GenericBookStoreSpring2 extends AbstractBookStoreSpring {
         }
         throw new WebApplicationException(400);
     }
-    
+
     @POST
     @Path("/books/superbooks")
     public <T extends Book> List<T> echoSuperBookCollection(List<T> book) {
@@ -52,7 +52,7 @@ public class GenericBookStoreSpring2 extends AbstractBookStoreSpring {
         }
         throw new WebApplicationException(400);
     }
-    
+
     @POST
     @Path("/books/superbooktype")
     public <T extends BookType> T echoSuperBookType(T book) {
@@ -61,7 +61,7 @@ public class GenericBookStoreSpring2 extends AbstractBookStoreSpring {
         }
         throw new WebApplicationException(400);
     }
-    
+
     @POST
     @Path("/books/superbooktypes")
     public <T extends BookType> List<T> echoSuperBookTypeCollection(List<T> book) {
@@ -70,8 +70,8 @@ public class GenericBookStoreSpring2 extends AbstractBookStoreSpring {
         }
         throw new WebApplicationException(400);
     }
-    
-    
+
+
 }
 
 

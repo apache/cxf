@@ -24,8 +24,8 @@ import org.apache.cxf.sts.token.renewer.TokenRenewerParameters;
 public class STSRenewSuccessEvent extends AbstractSTSSuccessEvent implements TokenRenewerParametersSupport {
 
     private static final String OPERATION = "Renew";
-    
-    
+
+
     public STSRenewSuccessEvent(TokenRenewerParameters parameters, long duration) {
         super(parameters, duration);
     }
@@ -38,6 +38,6 @@ public class STSRenewSuccessEvent extends AbstractSTSSuccessEvent implements Tok
     @Override
     public TokenRenewerParameters getTokenParameters() {
         return (TokenRenewerParameters)this.getSource();
-    }    
+    }
 
 }

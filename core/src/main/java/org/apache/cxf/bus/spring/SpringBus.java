@@ -34,21 +34,21 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.AbstractApplicationContext;
 
 /**
- * 
+ *
  */
-public class SpringBus extends ExtensionManagerBus 
+public class SpringBus extends ExtensionManagerBus
     implements ApplicationContextAware {
 
     AbstractApplicationContext ctx;
     boolean closeContext;
-    
+
     public SpringBus() {
     }
-    
+
     public void setBusConfig(BusDefinitionParser.BusConfig bc) {
         bc.setBus(this);
     }
-    
+
     /** {@inheritDoc}*/
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         ctx = (AbstractApplicationContext)applicationContext;
@@ -66,15 +66,15 @@ public class SpringBus extends ExtensionManagerBus
             }
             ac = ac.getParent();
         }
-        
+
         // set the classLoader extension with the application context classLoader
         setExtension(applicationContext.getClassLoader(), ClassLoader.class);
-        
+
         setExtension(new ConfigurerImpl(applicationContext), Configurer.class);
-        
+
         ResourceManager m = getExtension(ResourceManager.class);
         m.addResourceResolver(new BusApplicationContextResourceResolver(applicationContext));
-        
+
         setExtension(applicationContext, ApplicationContext.class);
         ConfiguredBeanLocator loc = getExtension(ConfiguredBeanLocator.class);
         if (!(loc instanceof SpringBeanLocator)) {
@@ -104,20 +104,20 @@ public class SpringBus extends ExtensionManagerBus
                     initialize();
                 }
             } else if (event instanceof ContextClosedEvent && getState() == BusState.RUNNING) {
-                // The bus could be create by using SpringBusFactory.createBus("/cxf.xml"); 
+                // The bus could be create by using SpringBusFactory.createBus("/cxf.xml");
                 // Just to make sure the shutdown is called rightly
                 shutdown();
             }
         }
     }
-    
+
     public void destroyBeans() {
         if (closeContext) {
             ctx.close();
         }
         super.destroyBeans();
     }
-    
+
     public String getId() {
         if (id == null) {
             try {

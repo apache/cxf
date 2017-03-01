@@ -25,20 +25,20 @@ import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlType;
 
 /**
- * 
+ *
  */
 @XmlType(namespace = "uri:org.apache.cxf.javascript.testns")
 public class MtoMParameterBeanNoDataHandler {
     private String ordinary;
     private String notXml10;
-    
+
     public String getOrdinary() {
         return ordinary;
     }
     public void setOrdinary(String ordinary) {
         this.ordinary = ordinary;
     }
-    
+
     @XmlMimeType("text/plain;charset=utf-8")
     public byte[] getNotXml10() throws UnsupportedEncodingException {
         return notXml10.getBytes("utf-8");

@@ -38,7 +38,7 @@ import org.apache.wss4j.policy.SPConstants;
  * Interceptor verifies critical policy security assertions for client side
  */
 public class SecurityVerificationOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
-    public static final SecurityVerificationOutInterceptor INSTANCE = 
+    public static final SecurityVerificationOutInterceptor INSTANCE =
         new SecurityVerificationOutInterceptor();
 
     private static final Logger LOG = LogUtils.getL7dLogger(SecurityVerificationOutInterceptor.class);
@@ -50,7 +50,7 @@ public class SecurityVerificationOutInterceptor extends AbstractPhaseInterceptor
     /**
      * Checks if some security assertions are specified without binding assertion and cannot be fulfilled.
      * Throw PolicyException in this case
-     * 
+     *
      * @param message
      * @throws PolicyException if assertions are specified without binding
      */
@@ -74,38 +74,38 @@ public class SecurityVerificationOutInterceptor extends AbstractPhaseInterceptor
             }
         }
     }
-    
+
     private AssertionInfo getSecuredPart(AssertionInfoMap aim) {
-        AssertionInfo assertion = 
+        AssertionInfo assertion =
             PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_PARTS);
         if (assertion != null) {
             return assertion;
         }
-        
-        assertion = 
+
+        assertion =
             PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.SIGNED_ELEMENTS);
         if (assertion != null) {
             return assertion;
         }
-        
-        assertion = 
+
+        assertion =
             PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ENCRYPTED_PARTS);
         if (assertion != null) {
             return assertion;
         }
-        
-        assertion = 
+
+        assertion =
             PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.ENCRYPTED_ELEMENTS);
         if (assertion != null) {
             return assertion;
         }
-        
-        assertion = 
+
+        assertion =
             PolicyUtils.getFirstAssertionByLocalname(aim, SPConstants.CONTENT_ENCRYPTED_ELEMENTS);
         if (assertion != null) {
             return assertion;
         }
-        
+
         return null;
     }
 

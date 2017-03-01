@@ -35,15 +35,15 @@ public class ProviderJMSContinuationTest extends AbstractVmJMSTest {
     @BeforeClass
     public static void startServers() throws Exception {
         startBusAndJMS(ProviderJMSContinuationTest.class);
-        Object implementor = new HWSoapMessageDocProvider();        
+        Object implementor = new HWSoapMessageDocProvider();
         String address = "jms:queue:test.jmstransport.text?replyToQueueName=test.jmstransport.text.reply";
-        EndpointImpl ep = (EndpointImpl)Endpoint.create(address, implementor);
+        EndpointImpl ep = (EndpointImpl)Endpoint.create(implementor);
         ep.getInInterceptors().add(new IncomingMessageCounterInterceptor());
         ep.setBus(bus);
         ep.getFeatures().add(cff);
-        ep.publish();
+        ep.publish(address);
     }
-        
+
     @Test
     public void testProviderContinuation() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldService");
@@ -52,6 +52,6 @@ public class ProviderJMSContinuationTest extends AbstractVmJMSTest {
         HelloWorldPortType greeter = markForClose(service.getPort(HelloWorldPortType.class, cff));
         greeter.greetMe("ffang");
     }
-        
+
 }
 

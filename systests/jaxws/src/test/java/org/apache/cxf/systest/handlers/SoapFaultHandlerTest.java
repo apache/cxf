@@ -35,12 +35,12 @@ public class SoapFaultHandlerTest extends AbstractCXFSpringTest {
 
     static String port = TestUtil.getPortNumber("SoapFaultHandler");
     static String addNumbersAddress = "http://localhost:" + port + "/SpringEndpoint";
-   
+
     @Override
     protected String[] getConfigLocations() {
         return new String[] {"classpath:/org/apache/cxf/systest/handlers/soap_fault_beans.xml" };
     }
-    
+
     @Test
     public void testFaultThrowingHandler() throws Exception {
         // set the post request using url connection
@@ -54,7 +54,7 @@ public class SoapFaultHandlerTest extends AbstractCXFSpringTest {
         connection.connect();
         DataOutputStream out = new DataOutputStream(connection.getOutputStream());
         InputStream is = this.getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
-        
+
         IOUtils.copyAndCloseInput(is, out);
         out.flush();
         out.close();
@@ -63,9 +63,9 @@ public class SoapFaultHandlerTest extends AbstractCXFSpringTest {
         String result = IOUtils.toString(response, StandardCharsets.UTF_8.name());
         // just make sure the custom namespace is working
         assertTrue("The custom namespace is not working.", result.indexOf("cxf:Provider") > 0);
-        
+
     }
-    
+
     protected InputStream getInputStream(HttpURLConnection connection) throws IOException {
         InputStream in = null;
         if (connection.getResponseCode() >= HttpURLConnection.HTTP_BAD_REQUEST) {
@@ -83,7 +83,7 @@ public class SoapFaultHandlerTest extends AbstractCXFSpringTest {
         }
         return in;
     }
-    
-    
+
+
 
 }

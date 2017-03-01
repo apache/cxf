@@ -40,9 +40,9 @@ public class DualOutServiceTest extends AbstractAegisTest {
 
         Document wsdl = getWSDLDocument("DualOutService");
         assertNotNull(wsdl);
- 
+
         addNamespace("xsd", Constants.URI_2001_SCHEMA_XSD);
- 
+
         assertValid(
                     "//xsd:complexType[@name='getValuesResponse']//xsd:element"
                     + "[@name='return'][@type='xsd:string']",

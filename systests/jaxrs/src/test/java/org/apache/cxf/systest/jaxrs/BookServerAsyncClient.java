@@ -39,12 +39,12 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-    
+
 public class BookServerAsyncClient extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookServerAsyncClient.class);
- 
-    org.apache.cxf.endpoint.Server server; 
-    
+
+    org.apache.cxf.endpoint.Server server;
+
     protected void run() {
         Bus bus = BusFactory.getDefaultBus();
         setBus(bus);
@@ -60,7 +60,7 @@ public class BookServerAsyncClient extends AbstractBusTestServerBase {
         BusFactory.setDefaultBus(null);
         BusFactory.setThreadDefaultBus(null);
     }
-    
+
     public void tearDown() throws Exception {
         server.stop();
         server.destroy();
@@ -78,10 +78,10 @@ public class BookServerAsyncClient extends AbstractBusTestServerBase {
             System.out.println("done!");
         }
     }
-    
+
     @Consumes("text/boolean")
     @Produces("text/boolean")
-    public static class BooleanReaderWriter implements 
+    public static class BooleanReaderWriter implements
         MessageBodyReader<Object>, MessageBodyWriter<Boolean> {
 
         @Override
@@ -114,9 +114,9 @@ public class BookServerAsyncClient extends AbstractBusTestServerBase {
                             OutputStream os) throws IOException, WebApplicationException {
             byte[] bytes = t.toString().getBytes("UTF-8");
             os.write(bytes);
-            
+
         }
 
-                
+
     }
 }

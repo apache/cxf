@@ -51,7 +51,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ClassResourceInfoTest extends Assert {
-    
+
     @Path("/bar")
     @Produces("test/bar")
     @Consumes("test/foo")
@@ -62,81 +62,81 @@ public class ClassResourceInfoTest extends Assert {
         @Context HttpServletResponse res;
         @Context ServletContext c;
         int i;
-        
+
         @GET
-        public void getIt() { 
-            
+        public void getIt() {
+
         }
     }
-    
+
     static class TestClass1 extends TestClass {
         @GET
-        public void getIt() { 
-            
+        public void getIt() {
+
         }
     }
-    
+
     static class TestClass2 extends TestClass1 {
         @GET
-        public void getIt() { 
-            
+        public void getIt() {
+
         }
-      
+
         @Path("/same")
-        public TestClass2 getThis() { 
+        public TestClass2 getThis() {
             return this;
         }
-        
+
         @Path("sub")
-        public TestClass3 getTestClass3() { 
+        public TestClass3 getTestClass3() {
             return new TestClass3();
         }
     }
-    
+
     @Produces("test/foo")
     static class TestClassWithProduces extends TestClass1 {
         @GET
-        public void getIt() { 
-            
+        public void getIt() {
+
         }
-      
+
         @Path("/same")
-        public TestClassWithProduces getThis() { 
+        public TestClassWithProduces getThis() {
             return this;
         }
-        
+
         @Path("sub")
-        public TestClass3 getTestClass3() { 
+        public TestClass3 getTestClass3() {
             return new TestClass3();
         }
     }
-    
+
     static class TestClass3 {
         @Context HttpServletRequest req;
         @Context HttpServletResponse res;
         @Context ServletContext c;
-        
+
         @GET
-        public void getIt() { 
-            
+        public void getIt() {
+
         }
-        
+
         @HEAD
-        public void head() { 
-            
+        public void head() {
+
         }
     }
-    
+
     @After
     public void tearDown() {
         AbstractResourceInfo.clearAllMaps();
     }
-    
+
     @Test
     public void testGetHttpContexts() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class, true);
         List<Field> fields = c.getContextFields();
-        Set<Class<?>> clses = new HashSet<Class<?>>(); 
+        Set<Class<?>> clses = new HashSet<Class<?>>();
         for (Field f : fields) {
             clses.add(f.getType());
         }
@@ -153,38 +153,38 @@ public class ClassResourceInfoTest extends Assert {
     public void testGetPath() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
         assertEquals("/bar", c.getPath().value());
-        
+
         c = new ClassResourceInfo(TestClass1.class);
         assertEquals("/bar", c.getPath().value());
-        
+
         c = new ClassResourceInfo(TestClass2.class);
         assertEquals("/bar", c.getPath().value());
     }
-    
+
     @Test
     public void testGetProduce() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
         assertEquals("test/bar", c.getProduceMime().get(0).toString());
-        
+
         c = new ClassResourceInfo(TestClass1.class);
         assertEquals("test/bar", c.getProduceMime().get(0).toString());
-        
+
         c = new ClassResourceInfo(TestClass2.class);
         assertEquals("test/bar", c.getProduceMime().get(0).toString());
     }
-    
+
     @Test
     public void testGetConsume() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
         assertEquals("test/foo", c.getConsumeMime().get(0).toString());
-        
+
         c = new ClassResourceInfo(TestClass1.class);
         assertEquals("test/foo", c.getConsumeMime().get(0).toString());
-        
+
         c = new ClassResourceInfo(TestClass2.class);
         assertEquals("test/foo", c.getConsumeMime().get(0).toString());
     }
-    
+
     @Test
     public void testGetSameSubresource() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
@@ -196,7 +196,7 @@ public class ClassResourceInfoTest extends Assert {
         assertSame(c1, c.getSubResource(TestClass.class, TestClass.class));
         assertEquals("Single subresources expected", 1, c.getSubResources().size());
     }
-    
+
     @Test
     public void testGetSubresourceSubclass() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
@@ -211,9 +211,9 @@ public class ClassResourceInfoTest extends Assert {
         assertSame(c2, c.findResource(TestClass.class, TestClass2.class));
         assertSame(c2, c.getSubResource(TestClass.class, TestClass2.class));
         assertNotSame(c1, c2);
-        
+
     }
-    
+
     @Test
     public void testAllowedMethods() {
         ClassResourceInfo c = ResourceUtils.createClassResourceInfo(
@@ -222,7 +222,7 @@ public class ClassResourceInfoTest extends Assert {
         assertEquals(2, methods.size());
         assertTrue(methods.contains("HEAD") && methods.contains("GET"));
     }
-    
+
     @Test
     public void testSubresourceInheritProduces() {
         ClassResourceInfo c = ResourceUtils.createClassResourceInfo(
@@ -235,7 +235,7 @@ public class ClassResourceInfoTest extends Assert {
         assertNotNull(sub);
         assertEquals("test/bar", sub.getProduceMime().get(0).toString());
     }
-    
+
     @Test
     public void testSubresourceWithProduces() {
         ClassResourceInfo parent = ResourceUtils.createClassResourceInfo(
@@ -245,23 +245,23 @@ public class ClassResourceInfoTest extends Assert {
         c.setParent(parent);
         assertEquals("test/foo", c.getProduceMime().get(0).toString());
     }
-    
+
     @Test
     public void testNameBindings() {
         Application app = new TestApplication();
-        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, true, true);
+        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, true, true, false, null);
         ClassResourceInfo cri = bean.getServiceFactory().getClassResourceInfo().get(0);
         Set<String> names = cri.getNameBindings();
         assertEquals(Collections.singleton(CustomNameBinding.class.getName()), names);
     }
-    
+
     @Target({ ElementType.TYPE, ElementType.METHOD })
     @Retention(value = RetentionPolicy.RUNTIME)
     @NameBinding
-    public @interface CustomNameBinding { 
-        
+    public @interface CustomNameBinding {
+
     }
-    
+
     @CustomNameBinding
     public class TestApplication extends Application {
         @Override

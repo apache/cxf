@@ -43,7 +43,7 @@ public class MemoryClientDataProvider implements ClientRegistrationProvider {
 
     @Override
     public List<Client> getClients(UserSubject resourceOwner) {
-        return new ArrayList<Client>(clients.values());
+        return new ArrayList<>(clients.values());
     }
 
 

@@ -31,7 +31,7 @@ public final class ParameterizedCollectionType implements ParameterizedType {
         this.collectionMemberClass = collectionMemberClass;
         this.typeArgs = new Type[] {collectionMemberClass};
     }
-     
+
     public Type[] getActualTypeArguments() {
         return typeArgs;
     }

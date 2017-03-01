@@ -32,7 +32,7 @@ public abstract class AbstractHTraceInterceptor extends AbstractHTraceProvider i
         super(tracer);
         this.phase = phase;
     }
-    
+
     public Collection<PhaseInterceptor<? extends Message>> getAdditionalInterceptors() {
         return null;
     }
@@ -52,7 +52,7 @@ public abstract class AbstractHTraceInterceptor extends AbstractHTraceProvider i
     public String getPhase() {
         return phase;
     }
-    
+
     public void handleFault(Message message) {
     }
 

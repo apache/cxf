@@ -26,32 +26,32 @@ import org.apache.cxf.rt.security.claims.Claim;
  * This represents a Claim that is coupled to a SAML Assertion
  */
 public class SAMLClaim extends Claim {
-    
+
     /**
      * This configuration tag specifies the default attribute name where the roles are present
      * The default is "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role".
      */
     public static final String SAML_ROLE_ATTRIBUTENAME_DEFAULT =
         "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
-    
+
     private static final long serialVersionUID = 5530712294179589442L;
 
     private String nameFormat;
     private String name;
     private String friendlyName;
-    
+
     public String getNameFormat() {
         return nameFormat;
     }
-    
+
     public void setNameFormat(String nameFormat) {
         this.nameFormat = nameFormat;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
@@ -63,11 +63,11 @@ public class SAMLClaim extends Claim {
     public void setFriendlyName(String friendlyName) {
         this.friendlyName = friendlyName;
     }
-    
+
     @Override
     public int hashCode() {
         int hashCode = super.hashCode();
-        
+
         if (nameFormat != null) {
             hashCode = 31 * hashCode + nameFormat.hashCode();
         }
@@ -77,45 +77,45 @@ public class SAMLClaim extends Claim {
         if (friendlyName != null) {
             hashCode = 31 * hashCode + friendlyName.hashCode();
         }
-        
+
         return hashCode;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
-        
+
         if (!super.equals(obj)) {
             return false;
         }
-        
+
         if (!(obj instanceof SAMLClaim)) {
             return false;
         }
-        
+
         if (nameFormat == null && ((SAMLClaim)obj).getNameFormat() != null) {
             return false;
         } else if (nameFormat != null
             && !nameFormat.equals(((SAMLClaim)obj).getNameFormat())) {
             return false;
         }
-        
+
         if (name == null && ((SAMLClaim)obj).getName() != null) {
             return false;
         } else if (name != null
              && !name.equals(((SAMLClaim)obj).getName())) {
             return false;
         }
-        
+
         if (friendlyName == null && ((SAMLClaim)obj).getFriendlyName() != null) {
             return false;
         } else if (friendlyName != null
             && !friendlyName.equals(((SAMLClaim)obj).getFriendlyName())) {
             return false;
         }
-        
+
         return true;
     }
 }

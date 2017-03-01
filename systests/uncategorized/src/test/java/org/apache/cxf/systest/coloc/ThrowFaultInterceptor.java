@@ -33,6 +33,6 @@ public class ThrowFaultInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void handleMessage(Message message) throws Fault {
         String str = new String("Collocated Invocation should have been detected.");
-        throw new ProtocolException(str);        
+        throw new ProtocolException(str);
     }
 }

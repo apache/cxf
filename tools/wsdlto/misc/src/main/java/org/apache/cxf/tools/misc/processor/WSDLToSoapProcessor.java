@@ -86,7 +86,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
         }
         if (WSDLConstants.RPC.equalsIgnoreCase((String)env.get(ToolConstants.CFG_STYLE))) {
             Collection<Operation> ops = CastUtils.cast(portType.getOperations());
-                
+
             for (Operation op : ops) {
                 Input input = op.getInput();
                 if (input != null && input.getMessage() != null) {
@@ -298,7 +298,7 @@ public class WSDLToSoapProcessor extends AbstractWSDLToProcessor {
         if (extReg == null) {
             extReg = wsdlFactory.newPopulatedExtensionRegistry();
         }
-        SoapFault  soapFault = null;
+        SoapFault soapFault = null;
         try {
             soapFault = SOAPBindingUtil.createSoapFault(extReg, isSOAP12());
         } catch (WSDLException wse) {

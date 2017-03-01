@@ -88,13 +88,13 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
 
         orb = (ORB) message.get(CorbaConstants.ORB);
         if (orb == null) {
-            orb = exchange.get(ORB.class); 
+            orb = exchange.get(ORB.class);
         }
-        
+
         DataWriter<XMLStreamWriter> writer = getDataWriter(message);
 
         Throwable ex = message.getContent(Exception.class);
-        // JCGS. If the cause is not available I can only continue if the exception 
+        // JCGS. If the cause is not available I can only continue if the exception
         //       is a Fault instance and contains a detail object.
         if (ex.getCause() == null) {
             if ((ex instanceof Fault) && (((Fault)ex).getDetail() != null)) {
@@ -105,7 +105,7 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         } else {
             ex = ex.getCause();
         }
-       
+
         if (ex instanceof InvocationTargetException) {
             ex = ex.getCause();
         }
@@ -114,7 +114,7 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
             setSystemException(message, ex, destination);
             return;
         }
-        
+
         String exClassName = null;
         if (faultEx == null) {
             //REVISIT, we should not have to depend on WebFault annotation
@@ -134,14 +134,14 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         // definition.
         // We need this to marshal data correctly
 
-        BindingInfo bInfo = destination.getBindingInfo();     
-        
+        BindingInfo bInfo = destination.getBindingInfo();
+
         String opName = message.getExchange().get(String.class);
-                
+
         Iterator<BindingOperationInfo> iter = bInfo.getOperations().iterator();
 
         BindingOperationInfo bopInfo = null;
-        OperationType opType = null;           
+        OperationType opType = null;
         while (iter.hasNext()) {
             bopInfo = iter.next();
             if (bopInfo.getName().getLocalPart().equals(opName)) {
@@ -154,13 +154,13 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         }
 
         OperationInfo opInfo = bopInfo.getOperationInfo();
-        
+
         if (faultEx != null) {
             MessagePartInfo partInfo = getFaultMessagePartInfo(opInfo, new QName("", exClassName));
             if (partInfo != null) {
                 exClassName = partInfo.getTypeQName().getLocalPart();
             }
-            
+
         }
 
         RaisesType exType = getRaisesType(opType, exClassName, ex);
@@ -168,8 +168,8 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         try {
             if (exType != null) {
                 if (faultEx != null) {
-                    setUserExceptionFromFaultDetail(message, 
-                            faultEx.getDetail(), 
+                    setUserExceptionFromFaultDetail(message,
+                            faultEx.getDetail(),
                             exType, opInfo, writer,
                             exchange.getEndpoint().getEndpointInfo().getService());
                 } else {
@@ -224,7 +224,7 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
                                       CorbaDestination dest) {
         SystemException sysEx = (SystemException)ex;
         message.setSystemException(sysEx);
-        ServerRequest request  = message.getExchange().get(ServerRequest.class);
+        ServerRequest request = message.getExchange().get(ServerRequest.class);
         Any exAny = dest.getOrbConfig().createSystemExceptionAny(orb, sysEx);
         request.set_exception(exAny);
     }
@@ -255,12 +255,12 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
             Class<?> faultClass = faultMethod.getReturnType();
             fault = faultClass.newInstance();
         }
-        
-        CorbaFaultStreamWriter faultWriter = new CorbaFaultStreamWriter(orb, exType, 
+
+        CorbaFaultStreamWriter faultWriter = new CorbaFaultStreamWriter(orb, exType,
                 message.getCorbaTypeMap(), service);
         writer.write(fault, faultPart, faultWriter);
 
-        CorbaObjectHandler[] objs = faultWriter.getCorbaObjects();      
+        CorbaObjectHandler[] objs = faultWriter.getCorbaObjects();
         CorbaStreamable streamable = message.createStreamableObject(objs[0], elName);
         message.setStreamableException(streamable);
     }
@@ -275,42 +275,42 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         QName exIdlType = exType.getException();
         QName elName = new QName("", exIdlType.getLocalPart());
         MessagePartInfo faultPart = getFaultMessagePartInfo(opInfo, elName);
-        
+
         // faultDetailt.getFirstChild() skips the "detail" element
         Object fault = extractPartsInfoFromDetail((Element) faultDetail.getFirstChild(), exType);
 
-        
-        CorbaFaultStreamWriter faultWriter = new CorbaFaultStreamWriter(orb, exType, 
+
+        CorbaFaultStreamWriter faultWriter = new CorbaFaultStreamWriter(orb, exType,
                                                 message.getCorbaTypeMap(), service);
         writer.write(fault, faultPart, faultWriter);
 
-        CorbaObjectHandler[] objs = faultWriter.getCorbaObjects();      
+        CorbaObjectHandler[] objs = faultWriter.getCorbaObjects();
         CorbaStreamable streamable = message.createStreamableObject(objs[0], elName);
         message.setStreamableException(streamable);
     }
-    
+
     private Object extractPartsInfoFromDetail(Element faultDetail, RaisesType exType) {
         Document faultDoc = DOMUtils.createDocument();
         Element faultElement = faultDoc.createElement(exType.getException().getLocalPart());
         faultDoc.appendChild(faultElement);
-        
+
         Node node = faultDetail.getFirstChild();
         while (node != null) {
             Node importedFaultData = faultDoc.importNode(node, true);
             faultElement.appendChild(importedFaultData);
-            node = node.getNextSibling();     
+            node = node.getNextSibling();
         }
-        
+
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Exception DOM: " + StaxUtils.toString(faultElement));
         }
         return faultDoc;
     }
-    
+
     protected DataWriter<XMLStreamWriter> getDataWriter(CorbaMessage message) {
         Service serviceModel = ServiceModelUtil.getService(message.getExchange());
 
-        DataWriter<XMLStreamWriter> dataWriter = 
+        DataWriter<XMLStreamWriter> dataWriter =
             serviceModel.getDataBinding().createWriter(XMLStreamWriter.class);
         if (dataWriter == null) {
             throw new CorbaBindingException("Couldn't create data writer for outgoing fault message");
@@ -332,6 +332,6 @@ public class CorbaStreamFaultOutInterceptor extends AbstractPhaseInterceptor<Mes
         }
         return null;
     }
-    
+
 
 }

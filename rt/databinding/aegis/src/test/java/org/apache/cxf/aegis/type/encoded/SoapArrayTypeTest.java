@@ -126,7 +126,7 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
                           new Object[]{42, new BigDecimal("42.42"), "Forty Two"},
                           objects);
     }
-    
+
     @Test
     public void testUrTypeArrayReadWriteRef1() throws Exception {
         Object[] objects;
@@ -141,7 +141,7 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
         // round trip tests
         objects = readWriteReadRef("arrayUrType2.xml", Object[].class);
         assertArrayEquals(new Object[]{42, new BigDecimal("42.42"), "Forty Two"}, objects);
-        
+
     }
 
     @Test
@@ -312,7 +312,7 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
                     if (strings[i][j] != null) {
                         assertEquals(4, strings[i][j].length);
                         for (int k = 0; k < strings[i][j].length; k++) {
-                            assertNull("strings[" + i + "][" + j + "][" + k + "] is not null", 
+                            assertNull("strings[" + i + "][" + j + "][" + k + "] is not null",
                                     strings[i][j][k]);
                         }
                     }

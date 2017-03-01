@@ -29,12 +29,12 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-    
+
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
  * (not thread safe)
- * 
+ *
  */
 public final class SchemaValidatingSAXParser {
 
@@ -61,7 +61,7 @@ public final class SchemaValidatingSAXParser {
         String toolspec = "/org/apache/cxf/tools/common/toolspec/tool-specification.xsd";
         return getClass().getResourceAsStream(toolspec);
     }
-    
+
     public void setValidating(boolean validate) {
         if (validate) {
             this.schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);

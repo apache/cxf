@@ -133,13 +133,13 @@ public class CustomerService {
     @Produces("text/*")
     public StreamingOutput monitorCustomers(
             @HeaderParam(WebSocketConstants.DEFAULT_REQUEST_ID_KEY) String reqid) {
-        final String key = reqid == null ? "*" : reqid; 
+        final String key = reqid == null ? "*" : reqid;
         return new StreamingOutput() {
             public void write(final OutputStream out) throws IOException, WebApplicationException {
                 monitors.put(key, new WriterHolder(out, MAX_ERROR_COUNT));
                 out.write(("Subscribed at " + new java.util.Date()).getBytes());
             }
-            
+
         };
     }
 
@@ -149,7 +149,7 @@ public class CustomerService {
     public void monitorCustomers2(
             @javax.ws.rs.core.Context final HttpServletResponse httpResponse,
             @HeaderParam(WebSocketConstants.DEFAULT_REQUEST_ID_KEY) String reqid) {
-        final String key = reqid == null ? "*" : reqid; 
+        final String key = reqid == null ? "*" : reqid;
         monitors2.put(key, new WriterHolder(httpResponse, MAX_ERROR_COUNT));
         try {
             httpResponse.getOutputStream().write(("Subscribed at " + new java.util.Date()).getBytes());
@@ -162,14 +162,14 @@ public class CustomerService {
     @Path("/unmonitor/{key}")
     @Produces("text/*")
     public String unmonitorCustomers(@PathParam("key") String key) {
-        return (monitors.remove(key) != null ? "Removed: " : "Already removed: ") + key; 
+        return (monitors.remove(key) != null ? "Removed: " : "Already removed: ") + key;
     }
 
     @GET
     @Path("/unmonitor2/{key}")
     @Produces("text/*")
     public String unmonitorCustomers2(@PathParam("key") String key) {
-        return (monitors2.remove(key) != null ? "Removed: " : "Already removed: ") + key; 
+        return (monitors2.remove(key) != null ? "Removed: " : "Already removed: ") + key;
     }
 
     // CHECKSTYLE:OFF
@@ -199,7 +199,7 @@ public class CustomerService {
                             }
                         }
                     }
-                    for (Iterator<WriterHolder<HttpServletResponse>> it = monitors2.values().iterator(); 
+                    for (Iterator<WriterHolder<HttpServletResponse>> it = monitors2.values().iterator();
                             it.hasNext();) {
                         WriterHolder<HttpServletResponse> wh = it.next();
                         try {
@@ -229,7 +229,7 @@ public class CustomerService {
 
     }
     // CHECKSTYLE:ON
-    
+
     final void init() {
         Customer c = new Customer();
         c.setName("John");
@@ -239,7 +239,7 @@ public class CustomerService {
         c.setName("Homer");
         c.setId(235);
         customers.put(c.getId(), c);
-        
+
         Order o = new Order();
         o.setDescription("order 223");
         o.setId(223);
@@ -248,7 +248,7 @@ public class CustomerService {
 
     private static class WriterHolder<T> {
         private final T value;
-        private final int max; 
+        private final int max;
         private final AtomicInteger errorCount;
 
         WriterHolder(T object, int max) {

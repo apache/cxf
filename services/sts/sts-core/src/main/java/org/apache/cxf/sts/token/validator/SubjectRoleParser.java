@@ -28,13 +28,13 @@ import javax.security.auth.Subject;
  * This interface defines a way to extract roles from a JAAS Subject
  */
 public interface SubjectRoleParser {
-    
+
     /**
      * Return the set of User/Principal roles from the Subject.
-     * @param principal the optional Principal 
+     * @param principal the optional Principal
      * @param subject the JAAS Subject
      * @return the set of User/Principal roles from the Subject.
      */
     Set<Principal> parseRolesFromSubject(Principal principal, Subject subject);
-    
+
 }

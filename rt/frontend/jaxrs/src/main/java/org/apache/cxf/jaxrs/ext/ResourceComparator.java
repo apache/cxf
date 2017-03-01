@@ -24,7 +24,7 @@ import org.apache.cxf.message.Message;
 
 /**
  * Can be used to affect the way the JAXRS selection algorithm chooses
- * between multiple matching resource classes and methods 
+ * between multiple matching resource classes and methods
  *
  */
 public interface ResourceComparator {
@@ -34,20 +34,20 @@ public interface ResourceComparator {
      * @param cri1 First resource class
      * @param cri2 Second resource class
      * @param message incoming message
-     * @return -1 if cri1 < cri2, 1 if if cri1 > cri2, 0 otherwise 
+     * @return -1 if cri1 < cri2, 1 if if cri1 > cri2, 0 otherwise
      */
-    int compare(ClassResourceInfo cri1, 
+    int compare(ClassResourceInfo cri1,
                 ClassResourceInfo cri2,
                 Message message);
-    
+
     /**
      * Compares two resource methods
      * @param oper1 First resource method
      * @param oper2 Second resource method
      * @param message incoming message
-     * @return -1 if oper1 < oper2, 1 if if oper1 > oper2, 0 otherwise 
+     * @return -1 if oper1 < oper2, 1 if if oper1 > oper2, 0 otherwise
      */
-    int compare(OperationResourceInfo oper1, 
+    int compare(OperationResourceInfo oper1,
                 OperationResourceInfo oper2,
                 Message message);
 }

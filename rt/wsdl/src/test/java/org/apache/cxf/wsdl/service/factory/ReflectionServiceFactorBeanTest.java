@@ -35,39 +35,39 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class ReflectionServiceFactorBeanTest extends Assert {
     protected IMocksControl control;
-    
+
     @Before
     public void setUp() throws Exception {
         control = EasyMock.createNiceControl();
     }
-    
-    @After 
+
+    @After
     public void tearDown() throws Exception {
         control.verify();
     }
-    
+
     @Test
     public void testEmptyWsdlAndNoServiceClass() throws Exception {
         final String dummyWsdl = "target/dummy.wsdl";
         ReflectionServiceFactoryBean bean = new ReflectionServiceFactoryBean();
         Bus bus = control.createMock(Bus.class);
-        
+
         WSDLManager wsdlmanager = control.createMock(WSDLManager.class);
         EasyMock.expect(bus.getExtension(WSDLManager.class)).andReturn(wsdlmanager);
         EasyMock.expect(wsdlmanager.getDefinition(dummyWsdl))
             .andThrow(new WSDLException("PARSER_ERROR", "Problem parsing '" + dummyWsdl + "'."));
         EasyMock.expect(bus.getExtension(FactoryBeanListenerManager.class)).andReturn(null);
-        
+
         control.replay();
-        
+
         bean.setWsdlURL(dummyWsdl);
         bean.setServiceName(new QName("http://cxf.apache.org/hello_world_soap_http", "GreeterService"));
         bean.setBus(bus);
-        
+
         try {
             bean.create();
             fail("no valid wsdl nor service class specified");

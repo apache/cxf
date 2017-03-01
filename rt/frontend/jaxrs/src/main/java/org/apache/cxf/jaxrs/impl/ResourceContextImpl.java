@@ -38,21 +38,21 @@ public class ResourceContextImpl implements ResourceContext {
         this.cri = ori.getClassResourceInfo();
         this.subClass = ori.getMethodToInvoke().getReturnType();
     }
-    
+
     @Override
     public <T> T getResource(Class<T> cls) {
         ResourceProvider rp = null;
-        
+
         Object propValue = m.getContextualProperty(CONTEXT_PROVIDER_PROP);
         if (propValue instanceof ResourceContextProvider) {
             rp = ((ResourceContextProvider)propValue).getResourceProvider(cls);
-        } else { 
+        } else {
             rp = new PerRequestResourceProvider(cls);
         }
         T resource = cls.cast(rp.getInstance(m));
         return doInitResource(cls, resource);
     }
-    
+
     public <T> T initResource(T resource) {
         return doInitResource(resource.getClass(), resource);
     }
