@@ -25,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -310,6 +312,12 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
     protected String getCurrentClientSecret() {
         return (String)messageContext.get(OAuthConstants.CLIENT_SECRET);
+    }
+    protected MultivaluedMap<String, String> getCurrentRequestParams() {
+        @SuppressWarnings("unchecked")
+        MultivaluedMap<String, String> params = 
+            (MultivaluedMap<String, String>)messageContext.get(OAuthConstants.TOKEN_REQUEST_PARAMS);
+        return params;
     }
     protected RefreshToken updateRefreshToken(RefreshToken rt, ServerAccessToken at) {
         linkAccessTokenToRefreshToken(rt, at);
