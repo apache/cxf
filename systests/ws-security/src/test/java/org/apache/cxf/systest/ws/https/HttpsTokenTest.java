@@ -130,6 +130,50 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+    
+    @org.junit.Test
+    public void testNoClientCertRequirement() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = HttpsTokenTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = HttpsTokenTest.class.getResource("DoubleItHttps.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItNoClientCertRequirementPort");
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
+
+        try {
+            port.doubleIt(25);
+            fail("(Policy) Failure expected on not using a client cert");
+        } catch (Exception ex) {
+            // expected
+        }
+     
+        // This should work, as we're disable the RequireClientCertificate check via a
+        // JAX-WS property
+        portQName = new QName(NAMESPACE, "DoubleItNoClientCertRequirementPort2");
+        port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, test.getPort());
+
+        if (test.isStreaming()) {
+            SecurityTestUtil.enableStreaming(port);
+        }
+
+        port.doubleIt(25);
+        
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
 
     @org.junit.Test
     public void testBasicAuth() throws Exception {

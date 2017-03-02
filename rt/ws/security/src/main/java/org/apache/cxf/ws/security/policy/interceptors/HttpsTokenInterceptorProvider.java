@@ -36,6 +36,7 @@ import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.SecurityContext;
@@ -48,6 +49,7 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyException;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.wss4j.WSS4JStaxInInterceptor;
 import org.apache.wss4j.policy.SP11Constants;
@@ -121,26 +123,32 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 if ("https".equals(scheme)) {
                     if (token.getAuthenticationType()
                         == HttpsToken.AuthenticationType.RequireClientCertificate) {
-                        final MessageTrustDecider orig = message.get(MessageTrustDecider.class);
-                        MessageTrustDecider trust = new MessageTrustDecider() {
-                            public void establishTrust(String conduitName,
-                                                       URLConnectionInfo connectionInfo,
-                                                       Message message)
-                                throws UntrustedURLConnectionIOException {
-                                if (orig != null) {
-                                    orig.establishTrust(conduitName, connectionInfo, message);
+                        boolean disableClientCertCheck =
+                            MessageUtils.getContextualBoolean(message, 
+                                                              SecurityConstants.DISABLE_REQ_CLIENT_CERT_CHECK, 
+                                                              false);
+                        if (!disableClientCertCheck) {
+                            final MessageTrustDecider orig = message.get(MessageTrustDecider.class);
+                            MessageTrustDecider trust = new MessageTrustDecider() {
+                                public void establishTrust(String conduitName,
+                                                           URLConnectionInfo connectionInfo,
+                                                           Message message)
+                                    throws UntrustedURLConnectionIOException {
+                                    if (orig != null) {
+                                        orig.establishTrust(conduitName, connectionInfo, message);
+                                    }
+                                    HttpsURLConnectionInfo info = (HttpsURLConnectionInfo)connectionInfo;
+                                    if (info.getLocalCertificates() == null
+                                        || info.getLocalCertificates().length == 0) {
+                                        throw new UntrustedURLConnectionIOException(
+                                            "RequireClientCertificate is set, "
+                                            + "but no local certificates were negotiated.  Is"
+                                            + " the server set to ask for client authorization?");
+                                    }
                                 }
-                                HttpsURLConnectionInfo info = (HttpsURLConnectionInfo)connectionInfo;
-                                if (info.getLocalCertificates() == null
-                                    || info.getLocalCertificates().length == 0) {
-                                    throw new UntrustedURLConnectionIOException(
-                                        "RequireClientCertificate is set, "
-                                        + "but no local certificates were negotiated.  Is"
-                                        + " the server set to ask for client authorization?");
-                                }
-                            }
-                        };
-                        message.put(MessageTrustDecider.class, trust);
+                            };
+                            message.put(MessageTrustDecider.class, trust);
+                        }
                         PolicyUtils.assertPolicy(aim, new QName(token.getName().getNamespaceURI(),
                                                                 SPConstants.REQUIRE_CLIENT_CERTIFICATE));
                     }

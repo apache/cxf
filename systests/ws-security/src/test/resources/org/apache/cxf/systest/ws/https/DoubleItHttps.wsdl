@@ -41,6 +41,12 @@
         <wsdl:port name="DoubleItRequireClientCertPort2" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="https://localhost:9009/DoubleItRequireClientCert2"/>
         </wsdl:port>
+        <wsdl:port name="DoubleItNoClientCertRequirementPort" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="https://localhost:9009/DoubleItNoClientCertRequirement"/>
+        </wsdl:port>
+        <wsdl:port name="DoubleItNoClientCertRequirementPort2" binding="tns:DoubleItInlinePolicyBinding">
+            <soap:address location="https://localhost:9009/DoubleItNoClientCertRequirement2"/>
+        </wsdl:port>
         <wsdl:port name="DoubleItBasicAuthPort" binding="tns:DoubleItInlinePolicyBinding">
             <soap:address location="https://localhost:9009/DoubleItBasicAuth"/>
         </wsdl:port>

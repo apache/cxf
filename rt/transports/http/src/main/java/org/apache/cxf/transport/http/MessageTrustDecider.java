@@ -29,9 +29,9 @@ import org.apache.cxf.message.Message;
  * java.net.URLConnection implementations.
  *
  * The HttpURLConnection will be set up and connected, but no data
- * yet sent (at least according to the JDK 1.5 default implemenation),
+ * yet sent (at least according to the JDK 1.5 default implementation),
  * and in the case of an HttpsURLConnection (again with caveat on
- * particular java.net.HttpsURLConnection implemenation), the TLS handshake
+ * particular java.net.HttpsURLConnection implementation), the TLS handshake
  * will be completed and certain TLS artifacts will be available.
  * <p>
  * Each MessageTrustDecider has a "logical" name that may be used in logging
@@ -89,7 +89,7 @@ public abstract class MessageTrustDecider {
      * The HTTPConduit calls this message on every redirect, however, it is
      * impossible to tell where it has been redirected from.
      *
-     * TODO: What are the exising Message Properties at the point of this call?
+     * TODO: What are the existing Message Properties at the point of this call?
      *
      * @param conduitName    This parameter contains the logical name
      *                       for the conduit that this trust decider
