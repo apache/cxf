@@ -146,23 +146,9 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                                             + " the server set to ask for client authorization?");
                                     }
                                 }
-<<<<<<< HEAD
-                                HttpsURLConnectionInfo info = (HttpsURLConnectionInfo)connectionInfo;
-                                if (info.getLocalCertificates() == null 
-                                    || info.getLocalCertificates().length == 0) {
-                                    throw new UntrustedURLConnectionIOException(
-                                        "RequireClientCertificate is set, "
-                                        + "but no local certificates were negotiated.  Is"
-                                        + " the server set to ask for client authorization?");
-                                }
-                            }
-                        };
-                        message.put(MessageTrustDecider.class, trust);
-=======
                             };
                             message.put(MessageTrustDecider.class, trust);
                         }
->>>>>>> 0252de5... [CXF-5525] - Adding a JAX-WS property to disable client cert verification policy check + tests
                         PolicyUtils.assertPolicy(aim, new QName(token.getName().getNamespaceURI(),
                                                                 SPConstants.REQUIRE_CLIENT_CERTIFICATE));
                     }

@@ -29,15 +29,9 @@ import org.apache.cxf.message.Message;
  * java.net.URLConnection implementations. 
  * 
  * The HttpURLConnection will be set up and connected, but no data
-<<<<<<< HEAD
- * yet sent (at least according to the JDK 1.5 default implemenation), 
- * and in the case of an HttpsURLConnection (again with caveat on
- * particular java.net.HttpsURLConnection implemenation), the TLS handshake 
-=======
  * yet sent (at least according to the JDK 1.5 default implementation),
  * and in the case of an HttpsURLConnection (again with caveat on
  * particular java.net.HttpsURLConnection implementation), the TLS handshake
->>>>>>> 0252de5... [CXF-5525] - Adding a JAX-WS property to disable client cert verification policy check + tests
  * will be completed and certain TLS artifacts will be available.
  * <p>
  * Each MessageTrustDecider has a "logical" name that may be used in logging

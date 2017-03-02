@@ -131,8 +131,6 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
     
-<<<<<<< HEAD
-=======
     @org.junit.Test
     public void testNoClientCertRequirement() throws Exception {
 
@@ -177,7 +175,6 @@ public class HttpsTokenTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
->>>>>>> 0252de5... [CXF-5525] - Adding a JAX-WS property to disable client cert verification policy check + tests
     @org.junit.Test
     public void testBasicAuth() throws Exception {
 
