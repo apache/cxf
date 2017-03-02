@@ -44,6 +44,7 @@ public final class OAuthConstants {
     public static final String RESPONSE_MODE = "response_mode";
     public static final String FORM_RESPONSE_MODE = "form_post";
     // CXF-Specific
+    public static final String TOKEN_REQUEST_PARAMS = "token_request_params";
     public static final String ACCESS_TOKEN_ISSUED_AT = "issued_at";
 
 

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.oauth2.utils;
 
+import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,6 +66,23 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
 
+    public static void injectContextIntoOAuthProvider(MessageContext context, Object provider) {
+        Method dataProviderContextMethod = null;
+        try {
+            dataProviderContextMethod = provider.getClass().getMethod("setMessageContext",
+                                                                          new Class[]{MessageContext.class});
+        } catch (Throwable t) {
+            // ignore
+        }
+        if (dataProviderContextMethod != null) {
+            try {
+                dataProviderContextMethod.invoke(provider, new Object[]{context});
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+        }
+    }
+    
     public static String setSessionToken(MessageContext mc) {
         return setSessionToken(mc, 0);
     }

@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.services;
 
-import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.Context;
@@ -35,6 +34,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthError;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 
 /**
  * Abstract OAuth service
@@ -45,8 +45,7 @@ public abstract class AbstractOAuthService {
     private OAuthDataProvider dataProvider;
     private boolean blockUnsecureRequests;
     private boolean writeOptionalParameters = true;
-    private Method dataProviderContextMethod;
-
+    
     public void setWriteOptionalParameters(boolean write) {
         writeOptionalParameters = write;
     }
@@ -58,13 +57,11 @@ public abstract class AbstractOAuthService {
     @Context
     public void setMessageContext(MessageContext context) {
         this.mc = context;
-        if (dataProviderContextMethod != null) {
-            try {
-                dataProviderContextMethod.invoke(dataProvider, new Object[]{mc});
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
-        }
+        injectContextIntoOAuthProviders();
+    }
+
+    protected void injectContextIntoOAuthProviders() {
+        OAuthUtils.injectContextIntoOAuthProvider(mc, dataProvider);
     }
 
     public MessageContext getMessageContext() {
@@ -73,13 +70,6 @@ public abstract class AbstractOAuthService {
 
     public void setDataProvider(OAuthDataProvider dataProvider) {
         this.dataProvider = dataProvider;
-        try {
-            dataProviderContextMethod = dataProvider.getClass().getMethod("setMessageContext",
-                                                                          new Class[]{MessageContext.class});
-        } catch (Throwable t) {
-            // ignore
-        }
-
     }
 
     public OAuthDataProvider getDataProvider() {
@@ -101,6 +91,7 @@ public abstract class AbstractOAuthService {
         if (clientId != null) {
             mc.put(OAuthConstants.CLIENT_SECRET, params.getFirst(OAuthConstants.CLIENT_SECRET));
             mc.put(OAuthConstants.GRANT_TYPE, params.getFirst(OAuthConstants.GRANT_TYPE));
+            mc.put(OAuthConstants.TOKEN_REQUEST_PARAMS, params);
             return dataProvider.getClient(clientId);
         }
         LOG.fine("No valid client found as the given clientId is null");
@@ -152,4 +143,7 @@ public abstract class AbstractOAuthService {
     public void setBlockUnsecureRequests(boolean blockUnsecureRequests) {
         this.blockUnsecureRequests = blockUnsecureRequests;
     }
+    
+    
+
 }

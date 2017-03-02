@@ -19,6 +19,7 @@
 
 package org.apache.cxf.rs.security.oauth2.services;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -60,12 +61,20 @@ public class AccessTokenService extends AbstractTokenService {
         grantHandlers = handlers;
     }
 
+    @Override
+    protected void injectContextIntoOAuthProviders() {
+        super.injectContextIntoOAuthProviders();
+        for (AccessTokenGrantHandler grantHandler : grantHandlers) {
+            OAuthUtils.injectContextIntoOAuthProvider(getMessageContext(), grantHandler);    
+        }
+    }
+    
     /**
      * Sets a grant handler
      * @param handler the grant handler
      */
     public void setGrantHandler(AccessTokenGrantHandler handler) {
-        grantHandlers.add(handler);
+        setGrantHandlers(Collections.singletonList(handler));
     }
 
     public void setResponseFilters(List<AccessTokenResponseFilter> handlers) {
