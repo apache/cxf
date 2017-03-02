@@ -1762,10 +1762,9 @@ public abstract class HTTPConduit
                     // already connected.
                     HttpsURLConnectionInfo info = getHttpsURLConnectionInfo();
                     if (trustDecider != null) {
-                        trustDecider.establishTrust(
-                                conduitName, 
-                            info,
-                            outMessage);
+                        trustDecider.establishTrust(conduitName,
+                                                    info,
+                                                    outMessage);
                         if (LOG.isLoggable(Level.FINE)) {
                             LOG.log(Level.FINE, "Trust Decider "
                                 + trustDecider.getLogicalName()
