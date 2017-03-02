@@ -49,7 +49,7 @@ public class ResourceOwnerGrantHandler extends AbstractGrantHandler {
             throw new OAuthServiceException(
                  new OAuthError(OAuthConstants.INVALID_REQUEST));
         }
-        UserSubject subject = loginHandler.createSubject(ownerName, ownerPassword);
+        UserSubject subject = loginHandler.createSubject(client, ownerName, ownerPassword);
         if (subject == null) {
             throw new OAuthServiceException(OAuthConstants.INVALID_GRANT);
         }
