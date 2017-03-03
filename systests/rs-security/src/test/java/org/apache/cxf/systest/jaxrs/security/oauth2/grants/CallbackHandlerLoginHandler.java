@@ -25,6 +25,7 @@ import org.w3c.dom.Document;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.grants.owner.ResourceOwnerLoginHandler;
 import org.apache.wss4j.dom.WSConstants;
@@ -46,7 +47,7 @@ public class CallbackHandlerLoginHandler implements ResourceOwnerLoginHandler {
     }
     
     @Override
-    public UserSubject createSubject(String user, String pass) {
+    public UserSubject createSubject(Client client, String user, String pass) {
         Document doc = DOMUtils.createDocument();
         UsernameToken token = new UsernameToken(false, doc, 
                                                 WSConstants.PASSWORD_TEXT);
