@@ -259,12 +259,15 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         if (!isEnabled() || connectFailed) {
             return;           
         }
-        
-        busMBeans.remove(name);       
-        mbs.unregisterMBean(name);                    
-    }  
-    
-    public MBeanServer getMBeanServer() {        
+
+        if (LOG.isLoggable(Level.INFO)) {
+            LOG.info("unregistering MBean " + name);
+        }
+        busMBeans.remove(name);
+        mbs.unregisterMBean(name);
+    }
+
+    public MBeanServer getMBeanServer() {
         return mbs;
     }
 
