@@ -1078,8 +1078,10 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test 
     public void testAddBookProxyResponse() {
-        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Book b = new Book("CXF rocks", 123L);
+        
+        System.out.println(Arrays.deepToString(Arrays.asList(b, b).toArray()));
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Response r = store.addBook(b);
         assertNotNull(r);
         InputStream is = (InputStream)r.getEntity();
