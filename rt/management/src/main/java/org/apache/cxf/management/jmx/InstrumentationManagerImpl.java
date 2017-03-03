@@ -260,6 +260,9 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
             return;
         }
 
+        if (LOG.isLoggable(Level.INFO)) {
+            LOG.info("unregistering MBean " + name);
+        }
         busMBeans.remove(name);
         mbs.unregisterMBean(name);
     }
