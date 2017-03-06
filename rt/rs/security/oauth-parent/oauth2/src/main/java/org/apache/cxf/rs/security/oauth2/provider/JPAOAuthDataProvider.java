@@ -59,7 +59,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     @Override
-    public Client getClient(final String clientId) throws OAuthServiceException {
+    public Client doGetClient(final String clientId) throws OAuthServiceException {
         return execute(new EntityManagerOperation<Client>() {
             @Override
             public Client execute(EntityManager em) {

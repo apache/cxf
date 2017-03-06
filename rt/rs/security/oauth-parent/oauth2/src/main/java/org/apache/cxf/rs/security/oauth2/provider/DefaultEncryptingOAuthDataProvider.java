@@ -52,7 +52,7 @@ public class DefaultEncryptingOAuthDataProvider extends AbstractOAuthDataProvide
     }
 
     @Override
-    public Client getClient(String clientId) throws OAuthServiceException {
+    public Client doGetClient(String clientId) throws OAuthServiceException {
         return ModelEncryptionSupport.decryptClient(clientsMap.get(clientId), key);
     }
 

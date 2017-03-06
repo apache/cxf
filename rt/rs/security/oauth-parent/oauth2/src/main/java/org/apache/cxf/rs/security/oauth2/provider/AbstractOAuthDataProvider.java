@@ -440,10 +440,15 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
 
     @Override
     public Client removeClient(String clientId) {
-        Client c = getClient(clientId);
+        Client c = doGetClient(clientId);
         removeClientTokens(c);
         doRemoveClient(c);
         return c;
+    }
+    
+    @Override
+    public Client getClient(String clientId) {
+        return doGetClient(clientId);
     }
 
     protected ServerAccessToken revokeAccessToken(String accessTokenKey) {
@@ -467,6 +472,9 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     protected abstract void doRevokeAccessToken(ServerAccessToken accessToken);
     protected abstract void doRevokeRefreshToken(RefreshToken  refreshToken);
     protected abstract RefreshToken getRefreshToken(String refreshTokenKey);
+    
+    protected abstract Client doGetClient(String clientId);
+    
     protected abstract void doRemoveClient(Client c);
 
     public List<String> getDefaultScopes() {
