@@ -1873,7 +1873,7 @@ public class BookStore {
     public static class BookBean2 {
         private long id;
         @QueryParam("id_2")
-        private long id2;
+        private long mId2;
         private long id3;
         public long getId() {
             return id;
@@ -1885,11 +1885,11 @@ public class BookStore {
         }
         
         public long getId2() {
-            return id2;
+            return mId2;
         }
 
         public void setId2(long id2) {
-            this.id2 = id2;
+            this.mId2 = id2;
         }
         
         @Context
