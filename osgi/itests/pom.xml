@@ -201,6 +201,18 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <org.ops4j.pax.logging.DefaultServiceLog.level>WARN</org.ops4j.pax.logging.DefaultServiceLog.level>
+                        <karaf.version>${cxf.karaf.version}</karaf.version>
+                        <localRepository>${maven.repo.local}</localRepository>
+                    </systemPropertyVariables>
+                    <reuseForks>false</reuseForks>
+                </configuration>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
