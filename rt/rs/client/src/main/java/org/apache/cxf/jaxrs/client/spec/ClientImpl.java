@@ -460,21 +460,14 @@ public class ClientImpl implements Client {
             }
             return newWebTarget(getUriBuilder().resolveTemplatesFromEncoded(templatesMap));
         }
-        
-        private WebTarget newWebTarget(UriBuilder newBuilder) {            
-            boolean complete = false;
+
+        private WebTarget newWebTarget(UriBuilder newBuilder) {
+            WebClient newClient;
             if (targetClient != null) {
-                try {
-                    newBuilder.build();
-                    complete = true;
-                } catch (IllegalArgumentException ex) {
-                    //the builder still has unresolved vars
-                }
+                newClient = WebClient.fromClient(targetClient);
+            } else {
+                newClient = null;
             }
-            if (!complete) {
-                return new WebTargetImpl(newBuilder, getConfiguration());
-            }
-            WebClient newClient = WebClient.fromClient(targetClient);
             return new WebTargetImpl(newBuilder, getConfiguration(), newClient);
         }
         
