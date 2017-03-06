@@ -140,6 +140,7 @@
                         <karaf.version>${cxf.karaf.version}</karaf.version>
                         <localRepository>${maven.repo.local}</localRepository>
                     </systemPropertyVariables>
+                    <reuseForks>false</reuseForks>
                 </configuration>
             </plugin>
         </plugins>
