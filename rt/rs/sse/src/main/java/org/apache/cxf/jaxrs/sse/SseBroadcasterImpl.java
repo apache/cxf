@@ -38,7 +38,7 @@ public class SseBroadcasterImpl implements SseBroadcaster {
     private final Set<Consumer<Subscriber<? super OutboundSseEvent>>> closers =
             new CopyOnWriteArraySet<>();
 
-    private final Set<BiConsumer<Subscriber<? super OutboundSseEvent>, Exception>> exceptioners =
+    private final Set<BiConsumer<Subscriber<? super OutboundSseEvent>, Throwable>> exceptioners =
             new CopyOnWriteArraySet<>();
 
     @Override
@@ -77,7 +77,7 @@ public class SseBroadcasterImpl implements SseBroadcaster {
     }
 
     @Override
-    public void onException(BiConsumer<Subscriber<? super OutboundSseEvent>, Exception> exceptioner) {
+    public void onError(BiConsumer<Subscriber<? super OutboundSseEvent>, Throwable> exceptioner) {
         exceptioners.add(exceptioner);
     }
 
