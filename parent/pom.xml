@@ -67,7 +67,7 @@
         <!-- please maintain alphabetical order here -->
         <cxf.abdera.version>1.1.3</cxf.abdera.version>
         <cxf.abdera.osgi.version>1.1.3_2</cxf.abdera.osgi.version>
-        <cxf.activemq.version>5.14.3</cxf.activemq.version>
+        <cxf.activemq.version>5.14.4</cxf.activemq.version>
         <cxf.ahc.version>1.9.8</cxf.ahc.version>
         <cxf.apacheds.version>2.0.0-M23</cxf.apacheds.version>
         <cxf.atmosphere.version>2.3.7</cxf.atmosphere.version>
@@ -80,7 +80,7 @@
         <cxf.commons-codec.version>1.10</cxf.commons-codec.version>
         <cxf.commons-collections.version>3.2.2</cxf.commons-collections.version>
         <cxf.commons-lang.version>2.6</cxf.commons-lang.version>
-        <cxf.commons-lang3.version>3.4</cxf.commons-lang3.version>
+        <cxf.commons-lang3.version>3.5</cxf.commons-lang3.version>
         <cxf.derby.version>10.2.2.0</cxf.derby.version>
         <cxf.dropwizard.version>3.1.2</cxf.dropwizard.version>
         <cxf.ehcache.version>2.10.3</cxf.ehcache.version>
@@ -98,7 +98,8 @@
         <cxf.logback.classic.version>1.0.13</cxf.logback.classic.version>
         <cxf.log4j.version>1.2.17</cxf.log4j.version>
         <cxf.lucene.version>4.9.0</cxf.lucene.version>
-        <cxf.mina.version>2.0.13</cxf.mina.version>
+        <cxf.mina.version>2.0.14</cxf.mina.version>
+        <cxf.rx.java.version>1.1.3</cxf.rx.java.version>
         <cxf.javax.annotation-api.version>1.2</cxf.javax.annotation-api.version>
         <cxf.jcache.version>1.0.0</cxf.jcache.version>
         <cxf.geronimo.jms.version>1.1.1</cxf.geronimo.jms.version>
@@ -182,7 +183,7 @@
         <cxf.osgi.version>4.2.0</cxf.osgi.version>
         <cxf.karaf.version>3.0.8</cxf.karaf.version>
         <cxf.pax.logging.version>1.6.0</cxf.pax.logging.version>
-        <cxf.pax.exam.version>4.7.0</cxf.pax.exam.version>
+        <cxf.pax.exam.version>4.10.0</cxf.pax.exam.version>
         <cxf.felix.framework.version>2.0.5</cxf.felix.framework.version>
         <cxf.felix.configadmin.version>1.2.4</cxf.felix.configadmin.version>
         <cxf.xmlbeans.bundle.version>2.6.0_2</cxf.xmlbeans.bundle.version>
@@ -208,7 +209,7 @@
         <cxf.dom4j.bundle.version>1.6.1_5</cxf.dom4j.bundle.version>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
         <cxf.olingo.version>1.2.0</cxf.olingo.version>
-        <cxf.tika.version>1.6</cxf.tika.version>
+        <cxf.tika.version>1.14</cxf.tika.version>
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.htrace.version>4.0.1-incubating</cxf.htrace.version>
         <cxf.checkstyle.extension />
@@ -852,7 +853,7 @@
             <dependency>
                 <groupId>org.apache.ant</groupId>
                 <artifactId>ant</artifactId>
-                <version>1.9.6</version>
+                <version>1.10.1</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.ant</groupId>
