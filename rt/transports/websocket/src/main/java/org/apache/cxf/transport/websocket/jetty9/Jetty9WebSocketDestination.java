@@ -23,6 +23,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -42,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
@@ -55,8 +59,10 @@ import org.apache.cxf.transport.websocket.jetty.WebSocketVirtualServletRequest;
 import org.apache.cxf.transport.websocket.jetty.WebSocketVirtualServletResponse;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WebSocketAdapter;
+import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeRequest;
 import org.eclipse.jetty.websocket.servlet.ServletUpgradeResponse;
 import org.eclipse.jetty.websocket.servlet.WebSocketCreator;
@@ -85,7 +91,16 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
                            WebSocketServletFactory.class).newInstance();
             
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            try {
+                //jetty >9.3.14 - yes.. they change API's in a patch release
+                Method m = ReflectionUtil.getDeclaredMethod(WebSocketServletFactory.Loader.class, "load", 
+                                                                ServletContext.class, WebSocketPolicy.class);
+                ReflectionUtil.setAccessible(m);
+                webSocketFactory = (WebSocketServletFactory)m.invoke(null, new ContextHandler.StaticContext(), null);
+            } catch (NoSuchMethodException | IllegalAccessException 
+                | IllegalArgumentException | InvocationTargetException e2) {
+                throw new RuntimeException(e);
+            }            
         }
         webSocketFactory.setCreator(new Creator());
         
@@ -132,7 +147,15 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
     @Override
     public void shutdown() {
         try {
-            webSocketFactory.cleanup();
+            Method m;
+            try {
+                //jetty <9.3.14
+                m = ReflectionUtil.getDeclaredMethod(webSocketFactory.getClass(), "cleanup");
+            } catch (Throwable t) {
+                //jetty >= 9.3.14
+                m = ReflectionUtil.getDeclaredMethod(webSocketFactory.getClass(), "stop");
+            }
+            m.invoke(webSocketFactory);
         } catch (Exception e) {
             // ignore
         } finally {
