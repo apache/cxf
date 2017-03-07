@@ -22,7 +22,6 @@ package org.apache.cxf.transport.websocket.jetty9;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -83,9 +82,7 @@ public class Jetty9WebSocketDestination extends JettyHTTPDestination implements
 
     public Jetty9WebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                      JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
-        super(bus, registry, ei,
-              serverEngineFactory == null ? null : new URL(getNonWSAddress(ei)),
-              serverEngineFactory);
+        super(bus, registry, ei, serverEngineFactory);
         executor = bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
     }
     
