@@ -60,6 +60,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.helpers.IOUtils;
@@ -960,7 +961,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             int result = httpClient.executeMethod(get);
             assertEquals(500, result);
             String content = getStringFromInputStream(get.getResponseBodyAsStream());
-            assertTrue(content.contains("Error") && content.contains("500"));
+            if (!StringUtils.isEmpty(content)) {
+                assertTrue(content, content.contains("Error") && content.contains("500"));
+            }
         } finally {
             get.releaseConnection();
         }
