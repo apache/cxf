@@ -34,6 +34,10 @@
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:exclude>SSL_RSA_WITH_DES_CBC_SHA</sec:exclude>
+                </sec:cipherSuitesFilter>
                 <sec:clientAuthentication want="true" required="false"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
@@ -56,6 +60,10 @@
                 <sec:trustManagers>
                     <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
                 </sec:trustManagers>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:exclude>SSL_RSA_WITH_DES_CBC_SHA</sec:exclude>
+                </sec:cipherSuitesFilter>
                 <sec:clientAuthentication want="true" required="false"/>
             </httpj:tlsServerParameters>
         </httpj:engine>
@@ -85,6 +93,10 @@
                     <sec:excludeProtocol>TLSv1.1</sec:excludeProtocol>
                     <sec:excludeProtocol>TLSv1.2</sec:excludeProtocol>
                 </sec:excludeProtocols>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:exclude>SSL_RSA_WITH_DES_CBC_SHA</sec:exclude>
+                </sec:cipherSuitesFilter>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
@@ -111,6 +123,10 @@
                     <sec:includeProtocol>SSLv3</sec:includeProtocol>
                     <sec:includeProtocol>SSLv2Hello</sec:includeProtocol>
                 </sec:includeProtocols>
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:exclude>SSL_RSA_WITH_DES_CBC_SHA</sec:exclude>
+                </sec:cipherSuitesFilter>
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
