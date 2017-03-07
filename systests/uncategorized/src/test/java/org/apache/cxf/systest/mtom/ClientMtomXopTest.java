@@ -51,6 +51,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.mime.types.XopStringType;
 import org.apache.cxf.mtom_xop.TestMtomImpl;
+import org.apache.cxf.mtom_xop.TestMtomProviderImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -63,7 +64,9 @@ import org.junit.Test;
 public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(ClientMtomXopTest.class);
     public static final QName MTOM_PORT = new QName("http://cxf.apache.org/mime", "TestMtomPort");
+    public static final QName MTOM_PORT_PROVIDER = new QName("http://cxf.apache.org/mime", "TestMtomProviderPort");
     public static final QName MTOM_SERVICE = new QName("http://cxf.apache.org/mime", "TestMtomService");
+    
 
     
     public static class Server extends AbstractBusTestServerBase {
@@ -71,14 +74,21 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         protected void run() {
             Object implementor = new TestMtomImpl();
             String address = "http://localhost:" + PORT + "/mime-test";
+            String addressProvider = "http://localhost:" + PORT + "/mime-test-provider";
             try {
                 jaxep = (EndpointImpl) javax.xml.ws.Endpoint.publish(address, implementor);
                 Endpoint ep = jaxep.getServer().getEndpoint();
                 ep.getInInterceptors().add(new TestMultipartMessageInterceptor());
                 ep.getOutInterceptors().add(new TestAttachmentOutInterceptor());
-                
+                jaxep.getInInterceptors().add(new LoggingInInterceptor());
+                jaxep.getOutInterceptors().add(new LoggingOutInterceptor());
                 SOAPBinding jaxWsSoapBinding = (SOAPBinding) jaxep.getBinding();
                 jaxWsSoapBinding.setMTOMEnabled(true);
+                EndpointImpl endpoint = 
+                    (EndpointImpl)javax.xml.ws.Endpoint.publish(addressProvider, new TestMtomProviderImpl());
+                endpoint.getProperties().put("schema-validation-enabled", "true");
+                endpoint.getInInterceptors().add(new LoggingInInterceptor());
+                endpoint.getOutInterceptors().add(new LoggingOutInterceptor());
 
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -189,6 +199,109 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
                 && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
                 //There seems to be a bug/interaction with Java 1.6 and Jetty where
                 //Jetty will occasionally send back a RST prior to all the data being 
+                //sent back to the client when using localhost (which is what we do)
+                //we'll ignore for now
+                return;
+            }
+            System.out.println(System.getProperties());
+            throw ex;
+        }
+    }
+        
+       
+    @Test
+    public void testMtomXopProvider() throws Exception {
+        TestMtom mtomPort = createPort(MTOM_SERVICE, MTOM_PORT_PROVIDER, TestMtom.class, true, true);
+        try {
+            Holder<DataHandler> param = new Holder<DataHandler>();
+            Holder<String> name;
+            byte bytes[];
+            InputStream in;
+
+            InputStream pre = this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl");
+            int fileSize = 0;
+            for (int i = pre.read(); i != -1; i = pre.read()) {
+                fileSize++;
+            }
+
+            int count = 50;
+            byte[] data = new byte[fileSize *  count];
+            for (int x = 0; x < count; x++) {
+                this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl").read(data,
+                                                                                fileSize * x,
+                                                                                fileSize);
+            }
+
+            Object[] validationTypes = new Object[]{Boolean.TRUE, SchemaValidationType.IN, SchemaValidationType.BOTH};
+
+            for (Object validationType : validationTypes) {
+                ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
+                                                                    validationType);
+
+                param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
+                name = new Holder<String>("call detail");
+                mtomPort.testXop(name, param);
+                assertEquals("name unchanged", "return detail + call detail", name.value);
+                assertNotNull(param.value);
+
+                in = param.value.getInputStream();
+                bytes = IOUtils.readBytesFromStream(in);
+                assertEquals(data.length, bytes.length);
+                in.close();
+
+                param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
+                name = new Holder<String>("call detail");
+                mtomPort.testXop(name, param);
+                assertEquals("name unchanged", "return detail + call detail", name.value);
+                assertNotNull(param.value);
+
+                in = param.value.getInputStream();
+                bytes = IOUtils.readBytesFromStream(in);
+                assertEquals(data.length, bytes.length);
+                in.close();
+            }
+
+            validationTypes = new Object[]{Boolean.FALSE, SchemaValidationType.OUT, SchemaValidationType.NONE};
+            for (Object validationType : validationTypes) {
+                ((BindingProvider)mtomPort).getRequestContext().put(Message.SCHEMA_VALIDATION_ENABLED,
+                                                                validationType);
+                SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
+                SAAJInInterceptor saajIn = new SAAJInInterceptor();
+
+                param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
+                name = new Holder<String>("call detail");
+                mtomPort.testXop(name, param);
+                assertEquals("name unchanged", "return detail + call detail", name.value);
+                assertNotNull(param.value);
+
+                in = param.value.getInputStream();
+                bytes = IOUtils.readBytesFromStream(in);
+                assertEquals(data.length, bytes.length);
+                in.close();
+
+                ClientProxy.getClient(mtomPort).getInInterceptors().add(saajIn);
+                ClientProxy.getClient(mtomPort).getInInterceptors().add(saajOut);
+                param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
+                name = new Holder<String>("call detail");
+                mtomPort.testXop(name, param);
+                assertEquals("name unchanged", "return detail + call detail", name.value);
+                assertNotNull(param.value);
+
+                in = param.value.getInputStream();
+                bytes = IOUtils.readBytesFromStream(in);
+                assertEquals(data.length, bytes.length);
+                in.close();
+
+                ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajIn);
+                ClientProxy.getClient(mtomPort).getInInterceptors().remove(saajOut);
+            }
+        } catch (UndeclaredThrowableException ex) {
+            throw (Exception)ex.getCause();
+        } catch (Exception ex) {
+            if (ex.getMessage().contains("Connection reset")
+                && System.getProperty("java.specification.version", "1.5").contains("1.6")) {
+                //There seems to be a bug/interaction with Java 1.6 and Jetty where
+                //Jetty will occasionally send back a RST prior to all the data being
                 //sent back to the client when using localhost (which is what we do)
                 //we'll ignore for now
                 return;
