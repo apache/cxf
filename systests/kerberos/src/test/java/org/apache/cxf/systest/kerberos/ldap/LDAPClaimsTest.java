@@ -53,11 +53,12 @@ import org.apache.directory.server.core.annotations.CreatePartition;
 import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
 import org.apache.directory.server.core.integ.FrameworkRunner;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.util.Assert;
 
 @RunWith(FrameworkRunner.class)
 
@@ -132,7 +133,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
 
         String user = props.getProperty("claimUser");
-        Assert.notNull(user, "Property 'claimUser' not configured");
+        Assert.assertNotNull(user, "Property 'claimUser' not configured");
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
 
@@ -146,17 +147,17 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         ProcessedClaimCollection retrievedClaims =
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
-        Assert.isTrue(
-                      retrievedClaims.size() == expectedClaims.size(),
+        Assert.assertTrue(
                       "Retrieved number of claims [" + retrievedClaims.size()
-                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
+                      + "] doesn't match with expected [" + expectedClaims.size() + "]",
+                      retrievedClaims.size() == expectedClaims.size()
         );
 
         for (ProcessedClaim c : retrievedClaims) {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
-                Assert.isTrue(false, "Claim '" + c.getClaimType() + "' not requested");
+                Assert.assertTrue("Claim '" + c.getClaimType() + "' not requested", false);
             }
         }
     }
@@ -177,17 +178,17 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         ProcessedClaimCollection retrievedClaims =
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
-        Assert.isTrue(
-                      retrievedClaims.size() == expectedClaims.size(),
+        Assert.assertTrue(
                       "Retrieved number of claims [" + retrievedClaims.size()
-                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
+                      + "] doesn't match with expected [" + expectedClaims.size() + "]",
+                      retrievedClaims.size() == expectedClaims.size()
         );
 
         for (ProcessedClaim c : retrievedClaims) {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
-                Assert.isTrue(false, "Claim '" + c.getClaimType() + "' not requested");
+                Assert.assertTrue("Claim '" + c.getClaimType() + "' not requested", false);
             }
         }
     }
@@ -197,9 +198,9 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandlerMultipleUserBaseDNs");
 
         String user = props.getProperty("claimUser");
-        Assert.notNull(user, "Property 'claimUser' not configured");
+        Assert.assertNotNull(user, "Property 'claimUser' not configured");
         String otherUser = props.getProperty("otherClaimUser");
-        Assert.notNull(otherUser, "Property 'otherClaimUser' not configured");
+        Assert.assertNotNull(otherUser, "Property 'otherClaimUser' not configured");
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
 
@@ -214,17 +215,17 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         ProcessedClaimCollection retrievedClaims =
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
-        Assert.isTrue(
-                      retrievedClaims.size() == expectedClaims.size(),
+        Assert.assertTrue(
                       "Retrieved number of claims [" + retrievedClaims.size()
-                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
+                      + "] doesn't match with expected [" + expectedClaims.size() + "]",
+                      retrievedClaims.size() == expectedClaims.size()
         );
 
         for (ProcessedClaim c : retrievedClaims) {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
-                Assert.isTrue(false, "Claim '" + c.getClaimType() + "' not requested");
+                Assert.assertTrue("Claim '" + c.getClaimType() + "' not requested", false);
             }
         }
 
@@ -236,17 +237,17 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         expectedClaims.add(ClaimTypes.LASTNAME);
         expectedClaims.add(ClaimTypes.EMAILADDRESS);
 
-        Assert.isTrue(
-                      retrievedClaims.size() == expectedClaims.size(),
+        Assert.assertTrue(
                       "Retrieved number of claims [" + retrievedClaims.size()
-                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
+                      + "] doesn't match with expected [" + expectedClaims.size() + "]",
+                      retrievedClaims.size() == expectedClaims.size()
         );
 
         for (ProcessedClaim c : retrievedClaims) {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
-                Assert.isTrue(false, "Claim '" + c.getClaimType() + "' not requested");
+                Assert.assertTrue("Claim '" + c.getClaimType() + "' not requested", false);
             }
         }
     }
@@ -256,7 +257,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
 
         String user = props.getProperty("claimUser");
-        Assert.notNull(user, "Property 'claimUser' not configured");
+        Assert.assertNotNull(user, "Property 'claimUser' not configured");
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
         // add unsupported but mandatory claim
@@ -292,7 +293,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
 
         String user = props.getProperty("claimUser");
-        Assert.notNull(user, "Property 'claimUser' not configured");
+        Assert.assertNotNull(user, "Property 'claimUser' not configured");
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
         // add unsupported but optional unsupported claim
@@ -312,17 +313,17 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         ProcessedClaimCollection retrievedClaims =
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
-        Assert.isTrue(
-                      retrievedClaims.size() == expectedClaims.size(),
+        Assert.assertTrue(
                       "Retrieved number of claims [" + retrievedClaims.size()
-                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
+                      + "] doesn't match with expected [" + expectedClaims.size() + "]",
+                      retrievedClaims.size() == expectedClaims.size()
         );
 
         for (ProcessedClaim c : retrievedClaims) {
             if (expectedClaims.contains(c.getClaimType())) {
                 expectedClaims.remove(c.getClaimType());
             } else {
-                Assert.isTrue(false, "Claim '" + c.getClaimType() + "' not requested");
+                Assert.assertTrue("Claim '" + c.getClaimType() + "' not requested", false);
             }
         }
     }
@@ -338,15 +339,15 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         List<URI> supportedClaims = cHandler.getSupportedClaimTypes();
 
-        Assert.isTrue(
-                      mapping.size() == supportedClaims.size(),
-                      "Supported claims and claims/ldap attribute mapping size different"
+        Assert.assertTrue(
+                      "Supported claims and claims/ldap attribute mapping size different",
+                      mapping.size() == supportedClaims.size()
         );
 
         for (String claim : mapping.keySet()) {
-            Assert.isTrue(
-                          supportedClaims.contains(new URI(claim)),
-                          "Claim '" + claim + "' not listed in supported list"
+            Assert.assertTrue(
+                          "Claim '" + claim + "' not listed in supported list",
+                          supportedClaims.contains(new URI(claim))
             );
         }
     }
@@ -356,7 +357,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
 
         String user = props.getProperty("binaryClaimUser");
-        Assert.notNull(user, "Property 'binaryClaimUser' not configured");
+        Assert.assertNotNull(user, "Property 'binaryClaimUser' not configured");
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
         // Ask for the (binary) cert as well
@@ -376,25 +377,25 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         ProcessedClaimCollection retrievedClaims =
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
-        Assert.isTrue(
-                      retrievedClaims.size() == expectedClaims.size(),
+        Assert.assertTrue(
                       "Retrieved number of claims [" + retrievedClaims.size()
-                      + "] doesn't match with expected [" + expectedClaims.size() + "]"
+                      + "] doesn't match with expected [" + expectedClaims.size() + "]",
+                      retrievedClaims.size() == expectedClaims.size()
         );
 
         boolean foundCert = false;
         for (ProcessedClaim c : retrievedClaims) {
             if (URI.create("http://custom/x509").equals(c.getClaimType())) {
                 foundCert = true;
-                Assert.isTrue(c.getValues().get(0) instanceof byte[]);
+                Assert.assertTrue(c.getValues().get(0) instanceof byte[]);
                 CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
                 InputStream in = new ByteArrayInputStream((byte[])c.getValues().get(0));
                 X509Certificate cert = (X509Certificate)certFactory.generateCertificate(in);
-                Assert.isTrue(cert != null);
+                Assert.assertTrue(cert != null);
             }
         }
 
-        Assert.isTrue(foundCert);
+        Assert.assertTrue(foundCert);
     }
 
     @org.junit.Test
@@ -403,7 +404,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             (LdapGroupClaimsHandler)appContext.getBean("testGroupClaimsHandler");
 
         String user = props.getProperty("claimUser");
-        Assert.notNull(user, "Property 'claimUser' not configured");
+        Assert.assertNotNull(user, "Property 'claimUser' not configured");
 
         ClaimCollection requestedClaims = new ClaimCollection();
         Claim claim = new Claim();
@@ -416,9 +417,9 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         ProcessedClaimCollection retrievedClaims =
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
-        Assert.isTrue(retrievedClaims.size() == 1);
-        Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
-        Assert.isTrue(retrievedClaims.get(0).getValues().size() == 2);
+        Assert.assertTrue(retrievedClaims.size() == 1);
+        Assert.assertTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.assertTrue(retrievedClaims.get(0).getValues().size() == 2);
     }
 
     @org.junit.Test
@@ -437,9 +438,9 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         ProcessedClaimCollection retrievedClaims =
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
-        Assert.isTrue(retrievedClaims.size() == 1);
-        Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
-        Assert.isTrue(retrievedClaims.get(0).getValues().size() == 2);
+        Assert.assertTrue(retrievedClaims.size() == 1);
+        Assert.assertTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.assertTrue(retrievedClaims.get(0).getValues().size() == 2);
     }
 
     @org.junit.Test
@@ -448,7 +449,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             (LdapGroupClaimsHandler)appContext.getBean("testGroupClaimsHandlerOtherUsers");
 
         String user = props.getProperty("otherClaimUser");
-        Assert.notNull(user, "Property 'claimUser' not configured");
+        Assert.assertNotNull(user, "Property 'claimUser' not configured");
 
         ClaimCollection requestedClaims = new ClaimCollection();
         Claim claim = new Claim();
@@ -461,9 +462,9 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         ProcessedClaimCollection retrievedClaims =
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
-        Assert.isTrue(retrievedClaims.size() == 1);
-        Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
-        Assert.isTrue(retrievedClaims.get(0).getValues().size() == 2);
+        Assert.assertTrue(retrievedClaims.size() == 1);
+        Assert.assertTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.assertTrue(retrievedClaims.get(0).getValues().size() == 2);
     }
 
     @org.junit.Test
@@ -472,7 +473,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
             (LdapGroupClaimsHandler)appContext.getBean("testGroupClaimsHandlerFilter");
 
         String user = props.getProperty("otherClaimUser");
-        Assert.notNull(user, "Property 'claimUser' not configured");
+        Assert.assertNotNull(user, "Property 'claimUser' not configured");
 
         ClaimCollection requestedClaims = new ClaimCollection();
         Claim claim = new Claim();
@@ -485,9 +486,9 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         ProcessedClaimCollection retrievedClaims =
             claimsHandler.retrieveClaimValues(requestedClaims, params);
 
-        Assert.isTrue(retrievedClaims.size() == 1);
-        Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
-        Assert.isTrue(retrievedClaims.get(0).getValues().size() == 1);
+        Assert.assertTrue(retrievedClaims.size() == 1);
+        Assert.assertTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
+        Assert.assertTrue(retrievedClaims.get(0).getValues().size() == 1);
     }
 
     private ClaimCollection createRequestClaimCollection() {
