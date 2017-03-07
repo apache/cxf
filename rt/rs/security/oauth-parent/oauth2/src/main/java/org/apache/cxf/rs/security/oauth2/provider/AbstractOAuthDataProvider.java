@@ -55,7 +55,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private boolean useJwtFormatForAccessTokens;
     private OAuthJoseJwtProducer jwtAccessTokenProducer;
     private Map<String, String> jwtAccessTokenClaimMap;
-    
+    private ProviderAuthenticationStrategy authenticationStrategy;
+
     protected AbstractOAuthDataProvider() {
     }
     
@@ -308,16 +309,20 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
 
     protected String getCurrentRequestedGrantType() {
-        return (String)messageContext.get(OAuthConstants.GRANT_TYPE);
+        return messageContext != null ? (String)messageContext.get(OAuthConstants.GRANT_TYPE) : null;
     }
     protected String getCurrentClientSecret() {
-        return (String)messageContext.get(OAuthConstants.CLIENT_SECRET);
+        return messageContext != null ? (String)messageContext.get(OAuthConstants.CLIENT_SECRET) : null;
     }
-    protected MultivaluedMap<String, String> getCurrentRequestParams() {
-        @SuppressWarnings("unchecked")
-        MultivaluedMap<String, String> params = 
-            (MultivaluedMap<String, String>)messageContext.get(OAuthConstants.TOKEN_REQUEST_PARAMS);
-        return params;
+    protected MultivaluedMap<String, String> getCurrentTokenRequestParams() {
+        if (messageContext != null) {
+            @SuppressWarnings("unchecked")
+            MultivaluedMap<String, String> params = 
+                (MultivaluedMap<String, String>)messageContext.get(OAuthConstants.TOKEN_REQUEST_PARAMS);
+            return params;
+        } else {
+            return null;
+        }
     }
     protected RefreshToken updateRefreshToken(RefreshToken rt, ServerAccessToken at) {
         linkAccessTokenToRefreshToken(rt, at);
@@ -426,6 +431,9 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
 
     public void setMessageContext(MessageContext messageContext) {
         this.messageContext = messageContext;
+        if (authenticationStrategy != null) {
+            OAuthUtils.injectContextIntoOAuthProvider(messageContext, authenticationStrategy);
+        }
     }
     
     protected void removeClientTokens(Client c) {
@@ -453,9 +461,39 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     
     @Override
     public Client getClient(String clientId) {
-        return doGetClient(clientId);
+        Client client = doGetClient(clientId);
+        if (client != null) {
+            return client;
+        }
+        
+        String grantType = getCurrentRequestedGrantType();
+        if (OAuthConstants.CLIENT_CREDENTIALS_GRANT.equals(grantType)) {
+            String clientSecret = getCurrentClientSecret();
+            if (clientSecret != null) {
+                return createClientCredentialsClient(clientId, clientSecret);
+            }
+        }
+        return null;
     }
 
+    public void setAuthenticationStrategy(ProviderAuthenticationStrategy authenticationStrategy) {
+        this.authenticationStrategy = authenticationStrategy;
+    }
+    
+    protected boolean authenticateUnregisteredClient(String clientId, String clientSecret) {
+        return authenticationStrategy != null
+            && authenticationStrategy.authenticate(clientId, clientSecret);
+    }
+    
+    protected Client createClientCredentialsClient(String clientId, String password) {
+        if (authenticateUnregisteredClient(clientId, password)) {
+            Client c = new Client(clientId, password, true);
+            c.setAllowedGrantTypes(Collections.singletonList(OAuthConstants.CLIENT_CREDENTIALS_GRANT));
+            return c;
+        }
+        return null;
+    }
+    
     protected ServerAccessToken revokeAccessToken(String accessTokenKey) {
         ServerAccessToken at = getAccessToken(accessTokenKey);
         if (at != null) {
