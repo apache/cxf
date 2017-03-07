@@ -28,9 +28,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.IntegrationTest;
-import org.springframework.boot.test.OutputCapture;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.ws.client.core.WebServiceTemplate;
@@ -42,9 +41,8 @@ import sample.ws.SampleWsApplication;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SampleWsApplication.class)
+@SpringBootTest(classes = SampleWsApplication.class, properties = "server.port=0")
 @WebAppConfiguration
-@IntegrationTest("server.port=0")
 public class SampleWsApplicationTests {
 
     //CHECKSTYLE:OFF

@@ -18,7 +18,6 @@
  */
 package demo.jaxrs.sse;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Random;
 
@@ -67,7 +66,7 @@ public class StatsRestServiceImpl {
                     Thread.sleep(1000);
                     sink.onNext(createStatsEvent(builder.name("stats"), 8));
                     sink.close();
-                } catch (final InterruptedException | IOException e) {
+                } catch (final Exception e) {
                     e.printStackTrace();
                 }
             }

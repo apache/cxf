@@ -877,6 +877,11 @@
                 <version>2.7.7</version>
             </dependency>
             <dependency>
+                <groupId>org.atmosphere</groupId>
+                <artifactId>atmosphere-runtime</artifactId>
+                <version>${cxf.atmosphere.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.neethi</groupId>
                 <artifactId>neethi</artifactId>
                 <version>${cxf.neethi.version}</version>
