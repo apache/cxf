@@ -155,7 +155,7 @@
                             org.apache.cxf.services.wsn.cxf-services-wsn-api
                         </Require-Bundle>
                         <Import-Package>
-                            org.apache.cxf.wsn.util.*;version=${project.version},
+                            org.apache.cxf.wsn.util.*;version=${cxf.osgi.version.clean},
                             !org.apache.cxf.wsn*,
                             javax.xml.bind*;version="[0.0,3)",
                             javax.jws*;version="[0.0,3)",
@@ -164,7 +164,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            org.apache.cxf.wsn.services;version=${project.version}
+                            org.apache.cxf.wsn.services;version=${cxf.osgi.version.clean}
                         </Export-Package>
                         <_nouses>true</_nouses>
                         <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
