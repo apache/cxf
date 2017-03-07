@@ -30,7 +30,7 @@
                 <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
             </sec:trustManagers>
             <sec:cipherSuites>
-                <sec:cipherSuite>TLS_RSA_WITH_AES_256_CBC_SHA</sec:cipherSuite>
+                <sec:cipherSuite>TLS_RSA_WITH_AES_256_CBC_SHA256</sec:cipherSuite>
             </sec:cipherSuites>
         </http:tlsClientParameters>
     </http:conduit>
