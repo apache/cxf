@@ -249,9 +249,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     
     @Override
     public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScopes) {
-        if (requiredScopes != null && !requestedScopes.containsAll(requiredScopes)) {
-            throw new OAuthServiceException("Required scopes are missing");
-        }
+        checkRequestedScopes(client, requestedScopes);
         if (requestedScopes.isEmpty()) {
             return Collections.emptyList();
         } else {
@@ -265,6 +263,12 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         } 
         throw new OAuthServiceException("Requested scopes can not be mapped");
         
+    }
+    
+    protected void checkRequestedScopes(Client client, List<String> requestedScopes) {
+        if (requiredScopes != null && !requestedScopes.containsAll(requiredScopes)) {
+            throw new OAuthServiceException("Required scopes are missing");
+        }
     }
 
     protected void convertSingleScopeToPermission(Client client, 
