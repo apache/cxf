@@ -222,7 +222,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
         
         private boolean isCVC312Exception(SAXParseException exception) {
             String msg = exception.getMessage();
-            return msg.startsWith("cvc-type.3.1.2: ") 
+            return msg.startsWith("cvc-type.3.1.2") 
                 && msg.endsWith("is a simple type, so it must have no element information item [children].");
                 
            
