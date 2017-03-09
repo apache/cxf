@@ -485,7 +485,7 @@ public class IssueSamlRealmUnitTest extends org.junit.Assert {
      * Create some SAML Realms
      */
     private Map<String, RealmProperties> createRealms() {
-        Map<String, RealmProperties> samlRealms = new HashMap<String, RealmProperties>();
+        Map<String, RealmProperties> samlRealms = new HashMap<>();
         RealmProperties samlRealm = new RealmProperties();
         samlRealm.setIssuer("A-Issuer");
         samlRealms.put("A", samlRealm);

@@ -46,7 +46,7 @@ public class DefaultAlgorithmSuiteLoader implements AlgorithmSuiteLoader {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg != null) {
             String ns = "http://cxf.apache.org/custom/security-policy";
-            final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
+            final Map<QName, Assertion> assertions = new HashMap<>();
             QName qName = new QName(ns, "Basic128GCM");
             assertions.put(qName, new PrimitiveAssertion(qName));
             qName = new QName(ns, "Basic192GCM");

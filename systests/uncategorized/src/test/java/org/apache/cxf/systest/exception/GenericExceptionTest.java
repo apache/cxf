@@ -57,7 +57,7 @@ public class GenericExceptionTest extends AbstractBusClientServerTestBase {
 
         Document doc = StaxUtils.read(ins);
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("xsd", "http://www.w3.org/2001/XMLSchema");
         ns.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         ns.put("tns", "http://cxf.apache.org/test/HelloService");

@@ -68,7 +68,7 @@ public class FragmentDialect implements Dialect {
     private Pattern goodXPathPattern;
 
     public FragmentDialect() {
-        languages = new HashMap<String, FragmentDialectLanguage>();
+        languages = new HashMap<>();
         languages.put(FragmentDialectConstants.QNAME_LANGUAGE_IRI, new FragmentDialectLanguageQName());
         languages.put(FragmentDialectConstants.XPATH10_LANGUAGE_IRI, new FragmentDialectLanguageXPath10());
         if (badXPathPattern == null) {

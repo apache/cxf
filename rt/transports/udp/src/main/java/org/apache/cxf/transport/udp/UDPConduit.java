@@ -98,7 +98,7 @@ public class UDPConduit extends AbstractConduit {
 
                 Map<String, Object> mp = null;
                 if (multi) {
-                    mp = new HashMap<String, Object>(message.getExchange());
+                    mp = new HashMap<>(message.getExchange());
                 }
 
                 if (async) {

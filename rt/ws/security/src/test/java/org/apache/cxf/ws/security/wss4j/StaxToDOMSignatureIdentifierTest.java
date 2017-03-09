@@ -52,7 +52,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
@@ -90,7 +90,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
@@ -128,7 +128,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
@@ -166,7 +166,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
@@ -205,7 +205,7 @@ public class StaxToDOMSignatureIdentifierTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");

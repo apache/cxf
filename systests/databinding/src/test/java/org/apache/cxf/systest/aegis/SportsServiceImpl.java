@@ -55,7 +55,7 @@ public class SportsServiceImpl implements SportsService {
     public Map<String, Map<Integer, Integer>> testComplexMapResult() {
         CustomerMap result
             = new CustomerMap();
-        Map<Integer, Integer> map1 = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> map1 = new HashMap<>();
         map1.put(1, 3);
         result.put("key1", map1);
         return result;

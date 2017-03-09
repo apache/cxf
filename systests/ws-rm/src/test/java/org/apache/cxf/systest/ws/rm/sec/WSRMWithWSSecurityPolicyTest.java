@@ -104,9 +104,9 @@ public class WSRMWithWSSecurityPolicyTest extends AbstractBusClientServerTestBas
             Client client = ClientProxy.getClient(greeter);
             QName operationQName = new QName("http://cxf.apache.org/greeter_control", "greetMe");
             BindingOperationInfo boi = client.getEndpoint().getBinding().getBindingInfo().getOperation(operationQName);
-            Map<String, Object> invocationContext = new HashMap<String, Object>();
-            Map<String, Object> requestContext = new HashMap<String, Object>();
-            Map<String, Object> responseContext = new HashMap<String, Object>();
+            Map<String, Object> invocationContext = new HashMap<>();
+            Map<String, Object> requestContext = new HashMap<>();
+            Map<String, Object> responseContext = new HashMap<>();
             invocationContext.put(Client.REQUEST_CONTEXT, requestContext);
             invocationContext.put(Client.RESPONSE_CONTEXT, responseContext);
 

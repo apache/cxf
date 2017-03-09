@@ -52,7 +52,7 @@ public final class MEXUtils {
         EndpointInfo info = server.getEndpoint().getEndpointInfo();
         List<Element> ret = new LinkedList<Element>();
         for (String id : utils.getWSDLIds(message, base, ctxUri, info)) {
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             params.put("wsdl", id);
             ret.add(utils.getDocument(message, base,
                                       params, ctxUri,

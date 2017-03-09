@@ -56,7 +56,7 @@ public class URIResolver {
     private static final Logger LOG = LogUtils.getLogger(URIResolver.class);
 
     private Map<String, LoadingByteArrayOutputStream> cache
-        = new HashMap<String, LoadingByteArrayOutputStream>();
+        = new HashMap<>();
     private File file;
     private URI uri;
     private URL url;

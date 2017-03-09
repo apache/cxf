@@ -125,7 +125,7 @@ public class AegisTest extends ToolTestBase {
 
 
     private Map<String, String> getNSMap() {
-        Map<String, String> namespaces = new HashMap<String, String>();
+        Map<String, String> namespaces = new HashMap<>();
         namespaces.put("s", "http://schemas.xmlsoap.org/soap/envelope/");
         namespaces.put("xsd", "http://www.w3.org/2001/XMLSchema");
         namespaces.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");

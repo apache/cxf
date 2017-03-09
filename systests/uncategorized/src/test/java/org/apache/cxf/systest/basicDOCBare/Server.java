@@ -38,7 +38,7 @@ public class Server extends AbstractBusTestServerBase {
         Object implementor = new PutLastTradedPriceImpl();
         String address = "http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPort";
         ep = Endpoint.create(implementor);
-        Map<String, Object> props = new HashMap<String, Object>(2);
+        Map<String, Object> props = new HashMap<>(2);
         props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare",
                                                    "SOAPService"));
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));

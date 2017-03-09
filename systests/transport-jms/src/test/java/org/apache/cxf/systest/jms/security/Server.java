@@ -42,7 +42,7 @@ public class Server extends AbstractBusTestServerBase {
         Bus bus = BusFactory.getDefaultBus();
         setBus(bus);
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_SIGNED);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "bob.properties");

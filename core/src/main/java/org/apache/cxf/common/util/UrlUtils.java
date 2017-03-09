@@ -142,7 +142,7 @@ public final class UrlUtils {
      * @return the map.
      */
     public static Map<String, String> parseQueryString(String s) {
-        Map<String, String> ht = new HashMap<String, String>();
+        Map<String, String> ht = new HashMap<>();
         StringTokenizer st = new StringTokenizer(s, "&");
         while (st.hasMoreTokens()) {
             String pair = st.nextToken();

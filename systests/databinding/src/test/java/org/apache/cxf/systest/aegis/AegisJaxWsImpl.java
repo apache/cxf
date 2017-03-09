@@ -33,7 +33,7 @@ import org.apache.cxf.systest.aegis.bean.Item;
 @WebService(endpointInterface = "org.apache.cxf.systest.aegis.AegisJaxWs")
 public class AegisJaxWsImpl implements AegisJaxWs {
 
-    Map<Integer, Item> items = new HashMap<Integer, Item>();
+    Map<Integer, Item> items = new HashMap<>();
 
     public void addItem(Item item) {
         items.put(item.getKey(), item);

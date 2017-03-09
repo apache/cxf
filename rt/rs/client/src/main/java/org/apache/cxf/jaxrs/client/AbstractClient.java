@@ -1066,12 +1066,12 @@ public abstract class AbstractClient implements Client {
         Map<String, Object> reqContext = null;
         Map<String, Object> resContext = null;
         if (context == null) {
-            context = new HashMap<String, Object>();
+            context = new HashMap<>();
         }
         reqContext = CastUtils.cast((Map<?, ?>)context.get(REQUEST_CONTEXT));
         resContext = CastUtils.cast((Map<?, ?>)context.get(RESPONSE_CONTEXT));
         if (reqContext == null) {
-            reqContext = new HashMap<String, Object>(cfg.getRequestContext());
+            reqContext = new HashMap<>(cfg.getRequestContext());
             context.put(REQUEST_CONTEXT, reqContext);
         }
         reqContext.put(Message.PROTOCOL_HEADERS, message.get(Message.PROTOCOL_HEADERS));
@@ -1080,7 +1080,7 @@ public abstract class AbstractClient implements Client {
         reqContext.put(PROXY_PROPERTY, proxy);
 
         if (resContext == null) {
-            resContext = new HashMap<String, Object>();
+            resContext = new HashMap<>();
             context.put(RESPONSE_CONTEXT, resContext);
         }
 

@@ -71,7 +71,7 @@ class SpringClasspathScanner extends ClasspathScanner {
             new HashMap< Class< ? extends Annotation >, Collection< Class< ? > > >();
         final Map< Class< ? extends Annotation >, Collection< String > > matchingInterfaces =
             new HashMap< Class< ? extends Annotation >, Collection< String > >();
-        final Map<String, String[]> nonMatchingClasses = new HashMap<String, String[]>();
+        final Map<String, String[]> nonMatchingClasses = new HashMap<>();
 
         for (Class< ? extends Annotation > annotation: annotations) {
             classes.put(annotation, new HashSet< Class < ? > >());

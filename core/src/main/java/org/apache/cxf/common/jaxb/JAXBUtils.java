@@ -123,7 +123,7 @@ public final class JAXBUtils {
     private static ClassLoader jaxbXjcLoader;
 
     static {
-        BUILTIN_DATATYPES_MAP = new HashMap<String, String>();
+        BUILTIN_DATATYPES_MAP = new HashMap<>();
         BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
         BUILTIN_DATATYPES_MAP.put("integer", "java.math.BigInteger");
         BUILTIN_DATATYPES_MAP.put("int", "int");
@@ -152,7 +152,7 @@ public final class JAXBUtils {
         BUILTIN_DATATYPES_MAP.put("NOTATION", "javax.xml.namespace.QName");
         BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
 
-        HOLDER_TYPES_MAP = new HashMap<String, Class<?>>();
+        HOLDER_TYPES_MAP = new HashMap<>();
         HOLDER_TYPES_MAP.put("int", java.lang.Integer.class);
         HOLDER_TYPES_MAP.put("long", java.lang.Long.class);
         HOLDER_TYPES_MAP.put("short", java.lang.Short.class);
@@ -865,8 +865,8 @@ public final class JAXBUtils {
         // allow loading of extra classes (such as subclasses for inheritance
         // reasons)
         // that are in the same package. Also check for ObjectFactory classes
-        Map<String, InputStream> packages = new HashMap<String, InputStream>();
-        Map<String, ClassLoader> packageLoaders = new HashMap<String, ClassLoader>();
+        Map<String, InputStream> packages = new HashMap<>();
+        Map<String, ClassLoader> packageLoaders = new HashMap<>();
         Set<Class<?>> objectFactories = new HashSet<Class<?>>();
         for (Class<?> jcls : classes) {
             String pkgName = PackageUtils.getPackageName(jcls);

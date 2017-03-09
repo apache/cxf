@@ -84,7 +84,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
 
     private Set<QName> portTypeRefNames = new HashSet<>();
     private Set<QName> messageRefNames = new HashSet<>();
-    private Map<QName, Service> services = new HashMap<QName, Service>();
+    private Map<QName, Service> services = new HashMap<>();
 
     private ValidationResult vResults = new ValidationResult();
 
@@ -108,7 +108,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         processSchemas(bus);
     }
     private void getSchemas(Bus bus) {
-        Map<String, Element> schemaList = new HashMap<String, Element>();
+        Map<String, Element> schemaList = new HashMap<>();
         SchemaUtil schemaUtil = new SchemaUtil(bus, schemaList);
         List<SchemaInfo> si = new ArrayList<>();
         schemaUtil.getSchemas(definition, schemaCollection, si);
@@ -267,7 +267,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     }
 
     private Map<QName, XNode> getBindings(Service service) {
-        Map<QName, XNode> bindings = new HashMap<QName, XNode>();
+        Map<QName, XNode> bindings = new HashMap<>();
 
         if (service.getPorts().values().size() == 0) {
             throw new ToolException("Service " + service.getQName() + " does not contain any usable ports");
@@ -287,7 +287,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     }
 
     private Map<QName, Operation> getOperations(PortType portType) {
-        Map<QName, Operation> operations = new HashMap<QName, Operation>();
+        Map<QName, Operation> operations = new HashMap<>();
         Collection<Operation> pops = CastUtils.cast(portType.getOperations());
         for (Operation op : pops) {
             operations.put(new QName(portType.getQName().getNamespaceURI(), op.getName()), op);
@@ -402,7 +402,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     }
 
     private void collectValidationPointsForBindings() throws Exception {
-        Map<QName, XNode> vBindingNodes = new HashMap<QName, XNode>();
+        Map<QName, XNode> vBindingNodes = new HashMap<>();
         for (Service service : services.values()) {
             vBindingNodes.putAll(getBindings(service));
         }

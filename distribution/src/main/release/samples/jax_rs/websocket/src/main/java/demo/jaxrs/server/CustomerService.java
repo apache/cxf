@@ -50,10 +50,10 @@ public class CustomerService {
     private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
     long currentId = 123;
-    Map<Long, Customer> customers = new HashMap<Long, Customer>();
-    Map<Long, Order> orders = new HashMap<Long, Order>();
-    Map<String, WriterHolder<OutputStream>> monitors = new HashMap<String, WriterHolder<OutputStream>>();
-    Map<String, WriterHolder<HttpServletResponse>> monitors2 = new HashMap<String, WriterHolder<HttpServletResponse>>();
+    Map<Long, Customer> customers = new HashMap<>();
+    Map<Long, Order> orders = new HashMap<>();
+    Map<String, WriterHolder<OutputStream>> monitors = new HashMap<>();
+    Map<String, WriterHolder<HttpServletResponse>> monitors2 = new HashMap<>();
 
     public CustomerService() {
         init();

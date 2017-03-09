@@ -82,7 +82,7 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
                 name = name.substring(0, name.lastIndexOf(".wsdl"));
             }
             builder.setBaseFileName(name);
-            Map<String, SchemaInfo> imports = new HashMap<String, SchemaInfo>();
+            Map<String, SchemaInfo> imports = new HashMap<>();
             def = builder.build(imports);
             wsdlWriter.writeWSDL(def, os);
             os.close();

@@ -48,7 +48,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     private String applicationDescription;
     private String applicationLogoUri;
     private List<String> applicationCertificates = new LinkedList<String>();
-    private Map<String, String> extraApplicationProperties = new HashMap<String, String>();
+    private Map<String, String> extraApplicationProperties = new HashMap<>();
     private boolean implicitFlow;
 
     private List<OAuthPermission> permissions;

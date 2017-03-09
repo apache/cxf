@@ -37,7 +37,7 @@ public class TokenIntrospection {
     private String iss;
     private String jti;
 
-    private Map<String, String> extensions = new HashMap<String, String>();
+    private Map<String, String> extensions = new HashMap<>();
 
     public TokenIntrospection() {
 

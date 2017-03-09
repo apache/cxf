@@ -82,7 +82,7 @@ public class DigestAuthSupplierTest {
         HttpAuthHeader authHeader = new HttpAuthHeader(authToken);
         assertEquals("Digest", authHeader.getAuthType());
         Map<String, String> params = authHeader.getParams();
-        Map<String, String> expectedParams = new HashMap<String, String>();
+        Map<String, String> expectedParams = new HashMap<>();
         expectedParams.put("response", "28e616b6868f60aaf9b19bb5b172f076");
         expectedParams.put("cnonce", "27db039b76362f3d55da10652baee38c");
         expectedParams.put("username", "testUser");

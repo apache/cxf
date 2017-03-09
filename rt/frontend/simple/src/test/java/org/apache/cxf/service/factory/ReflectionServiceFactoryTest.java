@@ -128,7 +128,7 @@ public class ReflectionServiceFactoryTest extends AbstractSimpleFrontendTest {
         serviceFactory.setServiceClass(HelloService.class);
         serviceFactory.setWrapped(wrapped);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("test", "test");
         serviceFactory.setProperties(props);
 
@@ -158,7 +158,7 @@ public class ReflectionServiceFactoryTest extends AbstractSimpleFrontendTest {
         svrBean.setServiceBean(new HelloServiceImpl());
         svrBean.setBus(getBus());
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("test", "test");
         serviceFactory.setProperties(props);
         svrBean.setProperties(props);

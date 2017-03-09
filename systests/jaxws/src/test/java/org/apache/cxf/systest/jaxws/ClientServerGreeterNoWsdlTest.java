@@ -47,7 +47,7 @@ public class ClientServerGreeterNoWsdlTest extends AbstractBusClientServerTestBa
     public void testWSDLImports() throws Exception {
         URL url = new URL("http://localhost:" + PORT + "/SoapContext/GreeterPort?wsdl");
         Document doc = StaxUtils.read(url.openStream());
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("xsd", "http://www.w3.org/2001/XMLSchema");
         Node nd = new XPathUtils(ns)
             .getValueNode("//xsd:import[@namespace='http://cxf.apache.org/greeter_control/types']",

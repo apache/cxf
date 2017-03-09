@@ -44,7 +44,7 @@ import java.util.Map;
  */
 class ParamReader extends ClassReader {
     private String methodName;
-    private Map<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
+    private Map<String, MethodInfo> methods = new HashMap<>();
     private Class<?>[] paramTypes;
 
     /**

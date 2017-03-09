@@ -133,7 +133,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
             configureObject();
 
             if (properties == null) {
-                properties = new HashMap<String, Object>();
+                properties = new HashMap<>();
             }
 
             if (username != null) {

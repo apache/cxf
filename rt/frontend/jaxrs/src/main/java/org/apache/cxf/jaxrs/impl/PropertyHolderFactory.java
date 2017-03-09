@@ -64,7 +64,7 @@ public final class PropertyHolderFactory {
 
         public void setProperty(String name, Object value) {
             if (props == null) {
-                props = new HashMap<String, Object>();
+                props = new HashMap<>();
                 m.getExchange().put(PROPERTY_KEY, props);
             }
             if (value == null) {

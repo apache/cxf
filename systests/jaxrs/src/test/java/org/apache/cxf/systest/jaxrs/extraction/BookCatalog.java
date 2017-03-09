@@ -128,7 +128,7 @@ public class BookCatalog {
     }
 
     private static LuceneQueryVisitor< SearchBean > createVisitor() {
-        final Map< String, Class< ? > > fieldTypes = new HashMap< String, Class< ? > >();
+        final Map< String, Class< ? > > fieldTypes = new HashMap<>();
         fieldTypes.put("modified", Date.class);
 
         LuceneQueryVisitor<SearchBean> visitor = new LuceneQueryVisitor<SearchBean>("ct", "contents");

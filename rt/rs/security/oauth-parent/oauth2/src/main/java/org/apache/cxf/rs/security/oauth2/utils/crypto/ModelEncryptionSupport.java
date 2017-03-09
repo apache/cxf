@@ -463,7 +463,7 @@ public final class ModelEncryptionSupport {
     }
 
     public static Map<String, String> parseSimpleMap(String mapStr) {
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<>();
         List<String> entries = parseSimpleList(mapStr);
         for (String entry : entries) {
             String[] pair = entry.split("=");

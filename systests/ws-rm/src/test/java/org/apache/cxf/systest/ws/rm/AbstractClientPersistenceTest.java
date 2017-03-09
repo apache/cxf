@@ -101,7 +101,7 @@ public abstract class AbstractClientPersistenceTest extends AbstractBusClientSer
             GreeterImpl implementor = new GreeterImpl();
             String address = "http://localhost:" + port + "/SoapContext/GreeterPort";
             ep = Endpoint.create(implementor);
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(properties);
             ep.publish(address);

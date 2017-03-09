@@ -97,7 +97,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testWSDLDocs() throws Exception {
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("wsdl", WSDLConstants.NS_WSDL11);
         XPathUtils xpu = new XPathUtils(ns);
         Document wsdl = StaxUtils.read(this.getHttpConnection(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl")
@@ -866,7 +866,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertNotNull(doc);
 
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("soap", Soap11.SOAP_NAMESPACE);
         ns.put("tns", "http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService");
         ns.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");

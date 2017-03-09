@@ -51,14 +51,14 @@ public class JavaMethod implements JavaAnnotatable {
     private JavaInterface javaInterface;
     private final List<JavaParameter> parameters = new ArrayList<>();
     private final List<JavaException> exceptions = new ArrayList<>();
-    private final Map<String, JAnnotation> annotations = new HashMap<String, JAnnotation>();
+    private final Map<String, JAnnotation> annotations = new HashMap<>();
 
     private JavaCodeBlock block;
 
     private boolean async;
 
     static {
-        PRIMITIVE_MAP = new HashMap<String, String>();
+        PRIMITIVE_MAP = new HashMap<>();
         PRIMITIVE_MAP.put("java.lang.Character", "char");
         PRIMITIVE_MAP.put("java.lang.Boolean", "boolean");
         PRIMITIVE_MAP.put("java.lang.Integer", "int");

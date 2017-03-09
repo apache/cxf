@@ -52,7 +52,7 @@ import demo.jaxrs.server.SparkUtils;
 public class StreamingService {
     private static final Map<String, MediaType> MEDIA_TYPE_TABLE;
     static {
-        MEDIA_TYPE_TABLE = new HashMap<String, MediaType>();
+        MEDIA_TYPE_TABLE = new HashMap<>();
         MEDIA_TYPE_TABLE.put("pdf", MediaType.valueOf("application/pdf"));
         MEDIA_TYPE_TABLE.put("odt", MediaType.valueOf("application/vnd.oasis.opendocument.text"));
         MEDIA_TYPE_TABLE.put("odp", MediaType.valueOf("application/vnd.oasis.opendocument.presentation"));

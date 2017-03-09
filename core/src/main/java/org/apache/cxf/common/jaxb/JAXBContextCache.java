@@ -189,7 +189,7 @@ public final class JAXBContextCache {
             }
         }
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         if (defaultNs != null) {
             if (HAS_MOXY) {
                 map.put("eclipselink.default-target-namespace", defaultNs);

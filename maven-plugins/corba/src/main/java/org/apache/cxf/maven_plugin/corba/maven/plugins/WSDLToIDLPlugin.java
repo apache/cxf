@@ -119,7 +119,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
         //will set some system properties that then interferes with mavens
         //dependency resolution.  (OSX is the major culprit here)
         //We'll save the props and then set them back later.
-        Map<Object, Object> origProps = new HashMap<Object, Object>(System.getProperties());
+        Map<Object, Object> origProps = new HashMap<>(System.getProperties());
 
         String cp = System.getProperty("java.class.path");
 
@@ -173,7 +173,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
                 System.setProperty("java.class.path", cp);
             }
 
-            Map<Object, Object> newProps = new HashMap<Object, Object>(System.getProperties());
+            Map<Object, Object> newProps = new HashMap<>(System.getProperties());
             for (Object o : newProps.keySet()) {
                 if (!origProps.containsKey(o)) {
                     System.clearProperty(o.toString());

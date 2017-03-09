@@ -45,7 +45,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private long accessTokenLifetime = 3600L;
     private long refreshTokenLifetime; // refresh tokens are eternal by default
     private boolean recycleRefreshTokens = true;
-    private Map<String, OAuthPermission> permissionMap = new HashMap<String, OAuthPermission>();
+    private Map<String, OAuthPermission> permissionMap = new HashMap<>();
     private MessageContext messageContext;
     private List<String> defaultScopes;
     private List<String> requiredScopes;

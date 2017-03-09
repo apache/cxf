@@ -158,7 +158,7 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     protected Message message;
     protected String context;
 
-    protected Map<String, Object> ctx = new HashMap<String, Object>();
+    protected Map<String, Object> ctx = new HashMap<>();
 
     protected List<Interceptor<? extends Message>> in
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();

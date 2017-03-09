@@ -30,7 +30,7 @@ public class JavaParameter extends JavaType implements JavaAnnotatable {
     private String partName;
 
     private JavaMethod javaMethod;
-    private Map<String, JAnnotation> annotations = new HashMap<String, JAnnotation>();
+    private Map<String, JAnnotation> annotations = new HashMap<>();
 
     /**
      * Describe callback here.

@@ -34,7 +34,7 @@ public final class AddressFactory {
     private static final String PREFIX = "org.apache.cxf.tools.misc.processor.address";
     private static final AddressFactory INSTANCE = new AddressFactory();
 
-    private final Map<String, Address> addresses = new HashMap<String, Address>();
+    private final Map<String, Address> addresses = new HashMap<>();
 
     private AddressFactory() {
     }

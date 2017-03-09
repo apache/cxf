@@ -205,7 +205,7 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
 
         stsClient.setPolicy(createSymmetricBindingPolicy());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("security.encryption.username", "bob");
         TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
         properties.put("security.callback-handler", callbackHandler);
@@ -240,7 +240,7 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
 
         stsClient.setPolicy(createSymmetricBindingPolicy());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("security.encryption.username", "bob");
         TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
         properties.put("security.callback-handler", callbackHandler);

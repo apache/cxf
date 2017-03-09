@@ -58,7 +58,7 @@ public class AccessTokenValidation {
     private List<OAuthPermission> tokenScopes = new LinkedList<OAuthPermission>();
     private List<String> audiences = new LinkedList<String>();
     private String clientCodeVerifier;
-    private Map<String, String> extraProps = new HashMap<String, String>();
+    private Map<String, String> extraProps = new HashMap<>();
 
     public AccessTokenValidation() {
 

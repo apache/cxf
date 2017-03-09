@@ -131,7 +131,7 @@ public final class AlgorithmUtils {
     private static final Map<String, String> JAVA_TO_JWA_NAMES;
     private static final Map<String, String> JWA_TO_JAVA_NAMES;
     static {
-        JAVA_TO_JWA_NAMES = new HashMap<String, String>();
+        JAVA_TO_JWA_NAMES = new HashMap<>();
         JAVA_TO_JWA_NAMES.put(HMAC_SHA_256_JAVA, HMAC_SHA_256_ALGO);
         JAVA_TO_JWA_NAMES.put(HMAC_SHA_384_JAVA, HMAC_SHA_384_ALGO);
         JAVA_TO_JWA_NAMES.put(HMAC_SHA_512_JAVA, HMAC_SHA_512_ALGO);
@@ -156,7 +156,7 @@ public final class AlgorithmUtils {
         JAVA_TO_JWA_NAMES.put(AES_CBC_ALGO_JAVA, A128CBC_HS256_ALGO);
         JAVA_TO_JWA_NAMES.put(AES_CBC_ALGO_JAVA, A192CBC_HS384_ALGO);
         JAVA_TO_JWA_NAMES.put(AES_CBC_ALGO_JAVA, A256CBC_HS512_ALGO);
-        JWA_TO_JAVA_NAMES = new HashMap<String, String>();
+        JWA_TO_JAVA_NAMES = new HashMap<>();
         JWA_TO_JAVA_NAMES.put(HMAC_SHA_256_ALGO, HMAC_SHA_256_JAVA);
         JWA_TO_JAVA_NAMES.put(HMAC_SHA_384_ALGO, HMAC_SHA_384_JAVA);
         JWA_TO_JAVA_NAMES.put(HMAC_SHA_512_ALGO, HMAC_SHA_512_JAVA);

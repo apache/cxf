@@ -202,7 +202,7 @@ public class SAMLClaimsTest extends org.junit.Assert {
 
         ClaimsManager claimsManager = new ClaimsManager();
         StaticClaimsHandler claimsHandler = new StaticClaimsHandler();
-        Map<String, String> staticClaimsMap = new HashMap<String, String>();
+        Map<String, String> staticClaimsMap = new HashMap<>();
         staticClaimsMap.put(CLAIM_STATIC_COMPANY.toString(), CLAIM_STATIC_COMPANY_VALUE);
         claimsHandler.setGlobalClaims(staticClaimsMap);
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)claimsHandler));
@@ -247,10 +247,10 @@ public class SAMLClaimsTest extends org.junit.Assert {
         StaticEndpointClaimsHandler claimsHandler = new StaticEndpointClaimsHandler();
 
         // Create claims map for specific application
-        Map<String, String> endpointClaimsMap = new HashMap<String, String>();
+        Map<String, String> endpointClaimsMap = new HashMap<>();
         endpointClaimsMap.put(CLAIM_APPLICATION.toString(), CLAIM_APPLICATION_VALUE);
 
-        Map<String, Map<String, String>> staticClaims = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> staticClaims = new HashMap<>();
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);
         claimsHandler.setEndpointClaims(staticClaims);
 
@@ -302,10 +302,10 @@ public class SAMLClaimsTest extends org.junit.Assert {
         StaticEndpointClaimsHandler claimsHandler = new StaticEndpointClaimsHandler();
 
         // Create claims map for specific application
-        Map<String, String> endpointClaimsMap = new HashMap<String, String>();
+        Map<String, String> endpointClaimsMap = new HashMap<>();
         endpointClaimsMap.put(CLAIM_APPLICATION.toString(), CLAIM_APPLICATION_VALUE);
 
-        Map<String, Map<String, String>> staticClaims = new HashMap<String, Map<String, String>>();
+        Map<String, Map<String, String>> staticClaims = new HashMap<>();
         staticClaims.put(APPLICATION_APPLIES_TO, endpointClaimsMap);
         claimsHandler.setEndpointClaims(staticClaims);
 

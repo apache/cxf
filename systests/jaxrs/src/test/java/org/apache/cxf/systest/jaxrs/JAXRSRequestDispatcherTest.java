@@ -57,7 +57,7 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         client.accept("text/html");
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
         XMLSource source = client.accept("text/html").get(XMLSource.class);
-        Map<String, String> namespaces = new HashMap<String, String>();
+        Map<String, String> namespaces = new HashMap<>();
         namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
         namespaces.put("books", "http://www.w3.org/books");
         String value = source.getValue("xhtml:html/xhtml:body/xhtml:ul/books:bookTag", namespaces);
@@ -101,7 +101,7 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         client.accept("text/html");
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
         XMLSource source = client.accept("text/html").get(XMLSource.class);
-        Map<String, String> namespaces = new HashMap<String, String>();
+        Map<String, String> namespaces = new HashMap<>();
         namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
         namespaces.put("books", "http://www.w3.org/books");
         String value = source.getValue("xhtml:html/xhtml:body/xhtml:ul/books:bookTag", namespaces);
@@ -140,7 +140,7 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         client.accept("text/html");
         WebClient.getConfig(client).getHttpConduit().getClient().setReceiveTimeout(100000000);
         XMLSource source = client.accept("text/html").get(XMLSource.class);
-        Map<String, String> namespaces = new HashMap<String, String>();
+        Map<String, String> namespaces = new HashMap<>();
         namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
         namespaces.put("books", "http://www.w3.org/books");
         String value = source.getValue("xhtml:html/xhtml:body/xhtml:ul/books:bookTag", namespaces);

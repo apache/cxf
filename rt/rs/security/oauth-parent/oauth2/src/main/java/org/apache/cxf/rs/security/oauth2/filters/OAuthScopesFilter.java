@@ -58,8 +58,8 @@ public class OAuthScopesFilter implements ContainerRequestFilter {
 
     @Context
     private MessageContext mc;
-    private Map<String, List<String>> scopesMap = new HashMap<String, List<String>>();
-    private Map<String, Boolean> scopesMatchAllMap = new HashMap<String, Boolean>();
+    private Map<String, List<String>> scopesMap = new HashMap<>();
+    private Map<String, Boolean> scopesMatchAllMap = new HashMap<>();
     private Set<String> confidentialClientMethods = new HashSet<>();
 
     public void setSecuredObject(Object object) {

@@ -171,7 +171,7 @@ public class HandlerChainBuilder {
             return;
         }
 
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
 
         for (ParamValueType param : h.getInitParam()) {
             params.put(trimString(param.getParamName() == null ? null : param.getParamName().getValue()),

@@ -33,7 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class StringUtils {
-    public static final Map<String, Pattern> PATTERN_MAP = new HashMap<String, Pattern>();
+    public static final Map<String, Pattern> PATTERN_MAP = new HashMap<>();
     static {
         String patterns[] = {"/", " ", ":", ",", ";", "=", "\\.", "\\+"};
         for (String p : patterns) {

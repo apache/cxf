@@ -29,7 +29,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 
 public class UsernamePasswordCallback implements CallbackHandler {
-    private Map<String, String> passwords = new HashMap<String, String>();
+    private Map<String, String> passwords = new HashMap<>();
 
     public UsernamePasswordCallback() {
         passwords.put("Alice", "ecilA");

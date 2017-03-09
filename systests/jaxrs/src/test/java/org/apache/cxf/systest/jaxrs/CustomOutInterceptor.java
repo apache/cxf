@@ -53,7 +53,7 @@ public class CustomOutInterceptor extends AbstractPhaseInterceptor<Message> {
             Map<String, List<String>> headers = (Map<String, List<String>>)
                 message.get(Message.PROTOCOL_HEADERS);
             if (headers == null) {
-                headers = new HashMap<String, List<String>>();
+                headers = new HashMap<>();
                 message.put(Message.PROTOCOL_HEADERS, headers);
             }
             headers.put("BookId", Arrays.asList("321"));

@@ -67,14 +67,14 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
     public static final Map<String, String> DEFAULT_CLAIM_TYPE_MAP;
     public static final Map<String, String> DEFAULT_TOKEN_TYPE_MAP;
 
-    private static final Map<String, String> DEFAULT_KEY_TYPE_MAP = new HashMap<String, String>();
+    private static final Map<String, String> DEFAULT_KEY_TYPE_MAP = new HashMap<>();
 
     private static final String CLAIM_TYPE = "ClaimType";
     private static final String CLAIM_TYPE_NS = "http://schemas.xmlsoap.org/ws/2005/05/identity";
     private static final Logger LOG = LogUtils.getL7dLogger(RESTSecurityTokenServiceImpl.class);
 
     static {
-        DEFAULT_CLAIM_TYPE_MAP = new HashMap<String, String>();
+        DEFAULT_CLAIM_TYPE_MAP = new HashMap<>();
         DEFAULT_CLAIM_TYPE_MAP.put("emailaddress", CLAIM_TYPE_NS + "/claims/emailaddress");
         DEFAULT_CLAIM_TYPE_MAP.put("role", CLAIM_TYPE_NS + "/claims/role");
         DEFAULT_CLAIM_TYPE_MAP.put("surname", CLAIM_TYPE_NS + "/claims/surname");
@@ -83,7 +83,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         DEFAULT_CLAIM_TYPE_MAP.put("upn", CLAIM_TYPE_NS + "/claims/upn");
         DEFAULT_CLAIM_TYPE_MAP.put("nameidentifier", CLAIM_TYPE_NS + "/claims/nameidentifier");
 
-        DEFAULT_TOKEN_TYPE_MAP = new HashMap<String, String>();
+        DEFAULT_TOKEN_TYPE_MAP = new HashMap<>();
         DEFAULT_TOKEN_TYPE_MAP.put("saml", WSConstants.WSS_SAML2_TOKEN_TYPE);
         DEFAULT_TOKEN_TYPE_MAP.put("saml2.0", WSConstants.WSS_SAML2_TOKEN_TYPE);
         DEFAULT_TOKEN_TYPE_MAP.put("saml1.1", WSConstants.WSS_SAML_TOKEN_TYPE);

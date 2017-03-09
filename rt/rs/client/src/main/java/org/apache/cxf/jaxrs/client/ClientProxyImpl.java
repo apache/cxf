@@ -408,7 +408,7 @@ public class ClientProxyImpl extends AbstractClient implements
 
         List<String> methodVars = ori.getURITemplate().getVariables();
         List<Parameter> paramsList = getParameters(map, ParameterType.PATH);
-        Map<String, BeanPair> beanParamValues = new HashMap<String, BeanPair>(beanParams.size());
+        Map<String, BeanPair> beanParamValues = new HashMap<>(beanParams.size());
         for (Parameter p : beanParams) {
             beanParamValues.putAll(getValuesFromBeanParam(params[p.getIndex()], PathParam.class));
         }
@@ -515,7 +515,7 @@ public class ClientProxyImpl extends AbstractClient implements
     }
 
     private Map<String, BeanPair> getValuesFromBeanParam(Object bean, Class<? extends Annotation> annClass) {
-        Map<String, BeanPair> values = new HashMap<String, BeanPair>();
+        Map<String, BeanPair> values = new HashMap<>();
         getValuesFromBeanParam(bean, annClass, values);
         return values;
     }

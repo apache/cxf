@@ -105,7 +105,7 @@ public class ClassLoaderSwitcher {
 
         log.debug("Classpath: " + urlList.toString());
 
-        origProps = new HashMap<Object, Object>(System.getProperties());
+        origProps = new HashMap<>(System.getProperties());
 
         origClassPath = System.getProperty("java.class.path");
 
@@ -127,7 +127,7 @@ public class ClassLoaderSwitcher {
         }
 
         if (origProps != null) {
-            Map<Object, Object> newProps = new HashMap<Object, Object>(System.getProperties());
+            Map<Object, Object> newProps = new HashMap<>(System.getProperties());
             for (Object o : newProps.keySet()) {
                 if (!origProps.containsKey(o)) {
                     System.clearProperty(o.toString());

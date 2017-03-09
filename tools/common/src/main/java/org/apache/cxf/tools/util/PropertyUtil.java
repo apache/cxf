@@ -31,7 +31,7 @@ import org.apache.cxf.common.util.StringUtils;
 
 public class PropertyUtil {
     private static final String DEFAULT_DELIM = "=";
-    private Map<String, String>  maps = new HashMap<String, String>();
+    private Map<String, String>  maps = new HashMap<>();
 
     public void load(InputStream is, String delim) throws IOException {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {

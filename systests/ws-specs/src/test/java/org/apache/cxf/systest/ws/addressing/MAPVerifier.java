@@ -46,7 +46,7 @@ public class MAPVerifier extends AbstractPhaseInterceptor<Message> {
 
     public MAPVerifier() {
         super(Phase.POST_LOGICAL);
-        mapProperties = new HashMap<String, Object>();
+        mapProperties = new HashMap<>();
         mapProperties.put(MAPTest.INBOUND_KEY, ADDRESSING_PROPERTIES_INBOUND);
         mapProperties.put(MAPTest.OUTBOUND_KEY, ADDRESSING_PROPERTIES_OUTBOUND);
     }

@@ -37,7 +37,7 @@ import org.junit.Test;
 public class WrappedAttachmentsTest extends Assert {
     @Test
     public void testCreateAndModify() {
-        Map<String, DataHandler> content = new HashMap<String, DataHandler>();
+        Map<String, DataHandler> content = new HashMap<>();
         content.put("att-1", new DataHandler(new ByteArrayDataSource("Hello world!".getBytes(), "text/plain")));
         content.put("att-2", new DataHandler(new ByteArrayDataSource("Hola mundo!".getBytes(), "text/plain")));
         WrappedAttachments attachments = new WrappedAttachments(content);

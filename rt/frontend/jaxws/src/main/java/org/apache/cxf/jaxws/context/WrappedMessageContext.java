@@ -47,8 +47,8 @@ import org.apache.cxf.service.model.EndpointInfo;
 public class WrappedMessageContext implements MessageContext {
     public static final String SCOPES = WrappedMessageContext.class.getName() + ".SCOPES";
 
-    private static Map<String, String> cxf2jaxwsMap = new HashMap<String, String>();
-    private static Map<String, String> jaxws2cxfMap = new HashMap<String, String>();
+    private static Map<String, String> cxf2jaxwsMap = new HashMap<>();
+    private static Map<String, String> jaxws2cxfMap = new HashMap<>();
 
     static {
         cxf2jaxwsMap.put(Message.ENDPOINT_ADDRESS,
@@ -131,7 +131,7 @@ public class WrappedMessageContext implements MessageContext {
             }
         }
         if (scopes == null) {
-            scopes = new HashMap<String, Scope>();
+            scopes = new HashMap<>();
             message.put(SCOPES, scopes);
         }
     }

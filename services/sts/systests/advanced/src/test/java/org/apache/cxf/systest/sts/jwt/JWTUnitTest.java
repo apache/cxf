@@ -99,7 +99,7 @@ public class JWTUnitTest extends AbstractBusClientServerTestBase {
 
         Map<String, Object> properties = msgProperties;
         if (properties == null) {
-            properties = new HashMap<String, Object>();
+            properties = new HashMap<>();
             properties.put(SecurityConstants.USERNAME, "alice");
             properties.put(
                            SecurityConstants.CALLBACK_HANDLER,
@@ -133,7 +133,7 @@ public class JWTUnitTest extends AbstractBusClientServerTestBase {
 
         Map<String, Object> properties = msgProperties;
         if (properties == null) {
-            properties = new HashMap<String, Object>();
+            properties = new HashMap<>();
             properties.put(SecurityConstants.USERNAME, "alice");
             properties.put(
                 SecurityConstants.CALLBACK_HANDLER,

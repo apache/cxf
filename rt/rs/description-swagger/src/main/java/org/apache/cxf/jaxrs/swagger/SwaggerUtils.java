@@ -48,7 +48,7 @@ public final class SwaggerUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(ResourceUtils.class);
     private static final Map<String, String> SWAGGER_TYPE_MAP;
     static {
-        SWAGGER_TYPE_MAP = new HashMap<String, String>();
+        SWAGGER_TYPE_MAP = new HashMap<>();
         SWAGGER_TYPE_MAP.put("string", "String");
         SWAGGER_TYPE_MAP.put("integer", "long");
         SWAGGER_TYPE_MAP.put("float", "float");

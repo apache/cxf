@@ -315,9 +315,9 @@ public class ClientImpl
     public Object[] invoke(BindingOperationInfo oi,
                            Object[] params,
                            Exchange exchange) throws Exception {
-        Map<String, Object> context = new HashMap<String, Object>();
-        Map<String, Object> resp = new HashMap<String, Object>();
-        Map<String, Object> req = new HashMap<String, Object>(getRequestContext());
+        Map<String, Object> context = new HashMap<>();
+        Map<String, Object> resp = new HashMap<>();
+        Map<String, Object> req = new HashMap<>(getRequestContext());
         context.put(RESPONSE_CONTEXT, resp);
         context.put(REQUEST_CONTEXT, req);
         try {
@@ -450,16 +450,16 @@ public class ClientImpl
             Map<String, Object> reqContext = null;
             Map<String, Object> resContext = null;
             if (context == null) {
-                context = new HashMap<String, Object>();
+                context = new HashMap<>();
             }
             reqContext = CastUtils.cast((Map<?, ?>)context.get(REQUEST_CONTEXT));
             resContext = CastUtils.cast((Map<?, ?>)context.get(RESPONSE_CONTEXT));
             if (reqContext == null) {
-                reqContext = new HashMap<String, Object>(getRequestContext());
+                reqContext = new HashMap<>(getRequestContext());
                 context.put(REQUEST_CONTEXT, reqContext);
             }
             if (resContext == null) {
-                resContext = new HashMap<String, Object>();
+                resContext = new HashMap<>();
                 context.put(RESPONSE_CONTEXT, resContext);
             }
 

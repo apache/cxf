@@ -53,7 +53,7 @@ import org.apache.ws.commons.schema.constants.Constants;
  *
  */
 public class SchemaCollectionContextProxy implements JAXBContextProxy {
-    private static final Map<Class<?>, QName> TYPE_MAP = new HashMap<Class<?>, QName>();
+    private static final Map<Class<?>, QName> TYPE_MAP = new HashMap<>();
 
     final JAXBContext context;
     final SchemaCollection schemas;

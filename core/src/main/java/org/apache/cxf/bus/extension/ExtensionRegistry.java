@@ -40,7 +40,7 @@ public final class ExtensionRegistry {
     }
 
     public static Map<String, Extension> getRegisteredExtensions() {
-        Map<String, Extension> exts = new HashMap<String, Extension>(extensions.size());
+        Map<String, Extension> exts = new HashMap<>(extensions.size());
         for (Map.Entry<String, Extension> ext : extensions.entrySet()) {
             exts.put(ext.getKey(), ext.getValue().cloneNoObject());
         }

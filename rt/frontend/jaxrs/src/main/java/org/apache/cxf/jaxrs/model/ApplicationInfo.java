@@ -43,7 +43,7 @@ public class ApplicationInfo extends ProviderInfo<Application> {
         if (overridingProps.isEmpty()) {
             return appProps;
         } else {
-            Map<String, Object> props = new HashMap<String, Object>(appProps);
+            Map<String, Object> props = new HashMap<>(appProps);
             props.putAll(overridingProps);
             return props;
         }

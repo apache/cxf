@@ -202,7 +202,7 @@ public final class STSUtils {
         basicStsClient.setAllowRenewingAfterExpiry(true);
         basicStsClient.setEnableLifetime(true);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         if (authParams.getUserName() != null) {
             props.put(SecurityConstants.USERNAME, authParams.getUserName());
         }

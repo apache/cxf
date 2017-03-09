@@ -197,7 +197,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     private Map<String, UserResource> userResourcesAsMap(List<UserResource> resources) {
-        Map<String, UserResource> map = new HashMap<String, UserResource>();
+        Map<String, UserResource> map = new HashMap<>();
         for (UserResource ur : resources) {
             map.put(ur.getName(), ur);
         }

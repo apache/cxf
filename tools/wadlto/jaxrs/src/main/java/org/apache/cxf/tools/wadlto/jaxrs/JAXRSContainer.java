@@ -298,7 +298,7 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
             typeToClasses = value instanceof String ? new String[]{(String)value}
                                                    : (String[])value;
         }
-        Map<String, String> typeMap = new HashMap<String, String>();
+        Map<String, String> typeMap = new HashMap<>();
         for (int i = 0; i < typeToClasses.length; i++) {
             int pos = typeToClasses[i].indexOf("=");
             if (pos != -1) {

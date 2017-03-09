@@ -48,7 +48,7 @@ import static org.apache.cxf.helpers.CastUtils.cast;
 
 public final class SchemaUtil {
     private final Map<String, Element> schemaList;
-    private final Map<String, String> catalogResolved = new HashMap<String, String>();
+    private final Map<String, String> catalogResolved = new HashMap<>();
     private final Bus bus;
 
     public SchemaUtil(final Bus b, final Map<String, Element> s) {

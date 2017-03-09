@@ -95,7 +95,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -131,7 +131,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -167,7 +167,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -203,7 +203,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -240,7 +240,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -277,7 +277,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -307,7 +307,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         claims.setIssuedAt(new Date().getTime() / 1000L);
         claims.setAudiences(toList(address));
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_CLAIMS, claims);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -338,7 +338,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         String badAddress = "https://localhost:" + PORT + "/badunsignedjwt/bookstore/books";
         claims.setAudiences(toList(badAddress));
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_CLAIMS, claims);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -367,7 +367,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         claims.setIssuer("DoubleItSTSIssuer");
         claims.setIssuedAt(new Date().getTime() / 1000L);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_CLAIMS, claims);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -402,7 +402,7 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         audiences.add(badAddress);
         claims.setAudiences(audiences);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_CLAIMS, claims);
         WebClient.getConfig(client).getRequestContext().putAll(properties);

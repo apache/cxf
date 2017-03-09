@@ -171,7 +171,7 @@ public final class TransformTestUtils {
     private static void verifyAttributes(XMLStreamReader teacher, XMLStreamReader reader) {
         int acount = teacher.getAttributeCount();
         Assert.assertEquals(acount, reader.getAttributeCount());
-        Map<QName, String> attributesMap = new HashMap<QName, String>();
+        Map<QName, String> attributesMap = new HashMap<>();
         // temporarily store all the attributes
         for (int i = 0; i < acount; i++) {
             attributesMap.put(reader.getAttributeName(i), reader.getAttributeValue(i));

@@ -31,7 +31,7 @@ public class SoapVersionFactory {
         getInstance().register(Soap12.getInstance());
     }
 
-    private Map<String, SoapVersion> versions = new HashMap<String, SoapVersion>();
+    private Map<String, SoapVersion> versions = new HashMap<>();
 
     public static SoapVersionFactory getInstance() {
         return factory;

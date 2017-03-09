@@ -43,7 +43,7 @@ public final class JarLoader {
     // this keys to this map are full distinguished names of the fromat
     // someOuterArchive!/someInnerArchive!/....
     // the values of the archives map are maps of entry names to bytes
-    static Map<String, Object> archives = new HashMap<String, Object>();
+    static Map<String, Object> archives = new HashMap<>();
     static final int CHUNK_SIZE = 4096;
     static final int MAX_CHUNK_SIZE = CHUNK_SIZE * 16;
 
@@ -156,7 +156,7 @@ public final class JarLoader {
 
     private static Map<String, Object> readZipStream(InputStream is) throws IOException {
         ZipInputStream zis = new ZipInputStream(is);
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         for (ZipEntry ze = zis.getNextEntry(); ze != null; ze = zis.getNextEntry()) {
             if (ze.isDirectory()) {

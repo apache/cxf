@@ -34,12 +34,12 @@ public class AesCbcHmacJweEncryption extends JweEncryption {
     private static final Map<String, String> AES_HMAC_MAP;
     private static final Map<String, Integer> AES_CEK_SIZE_MAP;
     static {
-        AES_HMAC_MAP = new HashMap<String, String>();
+        AES_HMAC_MAP = new HashMap<>();
         AES_HMAC_MAP.put(ContentAlgorithm.A128CBC_HS256.getJwaName(), AlgorithmUtils.HMAC_SHA_256_JAVA);
         AES_HMAC_MAP.put(ContentAlgorithm.A192CBC_HS384.getJwaName(), AlgorithmUtils.HMAC_SHA_384_JAVA);
         AES_HMAC_MAP.put(ContentAlgorithm.A256CBC_HS512.getJwaName(), AlgorithmUtils.HMAC_SHA_512_JAVA);
 
-        AES_CEK_SIZE_MAP = new HashMap<String, Integer>();
+        AES_CEK_SIZE_MAP = new HashMap<>();
         AES_CEK_SIZE_MAP.put(ContentAlgorithm.A128CBC_HS256.getJwaName(), 32);
         AES_CEK_SIZE_MAP.put(ContentAlgorithm.A192CBC_HS384.getJwaName(), 48);
         AES_CEK_SIZE_MAP.put(ContentAlgorithm.A256CBC_HS512.getJwaName(), 64);

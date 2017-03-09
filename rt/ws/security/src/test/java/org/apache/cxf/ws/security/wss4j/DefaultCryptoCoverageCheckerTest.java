@@ -85,7 +85,7 @@ public class DefaultCryptoCoverageCheckerTest extends AbstractSecurityTest {
     }
 
     private Map<String, String> getPrefixes() {
-        final Map<String, String> prefixes = new HashMap<String, String>();
+        final Map<String, String> prefixes = new HashMap<>();
         prefixes.put("ser", "http://www.sdj.pl");
 
         return prefixes;

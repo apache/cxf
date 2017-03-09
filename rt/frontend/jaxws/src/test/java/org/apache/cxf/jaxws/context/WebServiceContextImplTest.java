@@ -84,7 +84,7 @@ public class WebServiceContextImplTest extends Assert {
     public void testSetHttpRequestHeadersScope() {
         MessageImpl msg = new MessageImpl();
         MessageContext context = new WrappedMessageContext(msg);
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new HashMap<>();
         List<String> values = new ArrayList<>();
         values.add("Value1");
         headers.put("Header1", values);

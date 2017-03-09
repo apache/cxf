@@ -144,7 +144,7 @@ public class WSDLToCorbaBindingTest extends Assert {
                                 "YCORBABinding", "tns");
         Binding binding = model.getBinding(bName);
         TypeMappingType mapType = (TypeMappingType)model.getExtensibilityElements().get(0);
-        Map<String, CorbaType> tmap = new HashMap<String, CorbaType>();
+        Map<String, CorbaType> tmap = new HashMap<>();
         for (CorbaType type : mapType.getStructOrExceptionOrUnion()) {
             tmap.put(type.getName(), type);
         }

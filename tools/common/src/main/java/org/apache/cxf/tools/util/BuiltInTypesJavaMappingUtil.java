@@ -38,7 +38,7 @@ public final class BuiltInTypesJavaMappingUtil {
         nameSpaces.add(NS_XSI.toLowerCase());
     }
 
-    private static Map<String, String> jTypeMapping = new HashMap<String, String>();
+    private static Map<String, String> jTypeMapping = new HashMap<>();
     static {
         jTypeMapping.put("string", "java.lang.String");
         jTypeMapping.put("integer", "java.math.BigInteger");

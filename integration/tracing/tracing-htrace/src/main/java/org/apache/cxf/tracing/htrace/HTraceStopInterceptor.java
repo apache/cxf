@@ -38,7 +38,7 @@ public class HTraceStopInterceptor extends AbstractHTraceInterceptor {
         Map<String, List<Object>> responseHeaders = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
 
         if (responseHeaders == null) {
-            responseHeaders = new HashMap<String, List<Object>>();
+            responseHeaders = new HashMap<>();
             message.put(Message.PROTOCOL_HEADERS, responseHeaders);
         }
 

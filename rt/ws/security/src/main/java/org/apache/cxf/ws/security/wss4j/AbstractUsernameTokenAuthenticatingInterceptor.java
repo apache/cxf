@@ -197,7 +197,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
 
     @Override
     protected WSSecurityEngine getSecurityEngine(boolean utNoCallbacks) {
-        Map<QName, Object> profiles = new HashMap<QName, Object>(1);
+        Map<QName, Object> profiles = new HashMap<>(1);
 
         Validator validator = new CustomValidator();
         profiles.put(WSConstants.USERNAME_TOKEN, validator);

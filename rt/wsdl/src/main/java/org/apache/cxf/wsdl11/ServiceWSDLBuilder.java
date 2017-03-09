@@ -112,7 +112,7 @@ public class ServiceWSDLBuilder {
     public ServiceWSDLBuilder(Bus b, List<ServiceInfo> services) {
         this.services = services;
         bus = b;
-        ns2prefix = new HashMap<String, String>();
+        ns2prefix = new HashMap<>();
         nsMan = new NSManager();
     }
 
@@ -376,8 +376,8 @@ public class ServiceWSDLBuilder {
 
         Types types = def.createTypes();
 
-        Map<String, Schema> namespaceToSchemaMap = new HashMap<String, Schema>();
-        Map<String, SchemaInfo> namespaceToSchemaInfo = new HashMap<String, SchemaInfo>();
+        Map<String, Schema> namespaceToSchemaMap = new HashMap<>();
+        Map<String, SchemaInfo> namespaceToSchemaInfo = new HashMap<>();
 
         for (SchemaInfo schemaInfo : schemas) {
             Schema schema = getSchemaImplementation(def);

@@ -1670,7 +1670,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     private static String parseResponse(DOMSource domResponse) {
         Element el = ((Document)domResponse.getNode()).getDocumentElement();
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
         ns.put("ns", "http://cxf.apache.org/greeter_control/types");
         XPathUtils xp = new XPathUtils(ns);
@@ -1716,10 +1716,10 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
     private static class RMMemoryStore implements RMStore {
         // during this particular test, the operations are expected to be invoked sequentially so use just HashMap
-        Map<Identifier, SourceSequence> ssmap = new HashMap<Identifier, SourceSequence>();
-        Map<Identifier, DestinationSequence> dsmap = new HashMap<Identifier, DestinationSequence>();
-        Map<Identifier, Collection<RMMessage>> ommap = new HashMap<Identifier, Collection<RMMessage>>();
-        Map<Identifier, Collection<RMMessage>> immap = new HashMap<Identifier, Collection<RMMessage>>();
+        Map<Identifier, SourceSequence> ssmap = new HashMap<>();
+        Map<Identifier, DestinationSequence> dsmap = new HashMap<>();
+        Map<Identifier, Collection<RMMessage>> ommap = new HashMap<>();
+        Map<Identifier, Collection<RMMessage>> immap = new HashMap<>();
         Set<Identifier> ssclosed = new HashSet<>();
 
         @Override

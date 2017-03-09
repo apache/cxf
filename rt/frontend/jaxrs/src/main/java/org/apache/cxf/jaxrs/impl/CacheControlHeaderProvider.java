@@ -67,7 +67,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         boolean proxyRevalidate = false;
         int maxAge = -1;
         int sMaxAge = -1;
-        Map<String, String> extensions = new HashMap<String, String>();
+        Map<String, String> extensions = new HashMap<>();
 
         String[] tokens = getTokens(c);
         for (String rawToken : tokens) {

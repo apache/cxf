@@ -79,8 +79,8 @@ public class LifeCycleTest extends Assert {
         manager = bus.getExtension(ServerLifeCycleManager.class);
         recursiveCount = 0;
         recursiveEndpoints = new Endpoint[RECURSIVE_LIMIT];
-        startNotificationMap = new HashMap<String, Integer>();
-        stopNotificationMap = new HashMap<String, Integer>();
+        startNotificationMap = new HashMap<>();
+        stopNotificationMap = new HashMap<>();
     }
 
     @After

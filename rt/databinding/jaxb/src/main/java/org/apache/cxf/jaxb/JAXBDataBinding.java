@@ -143,7 +143,7 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
             return nd;
         }
     }
-    private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<String, DOMResult>();
+    private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<>();
     static {
         URIResolver resolver = new URIResolver();
         try {
@@ -195,10 +195,10 @@ public class JAXBDataBinding extends AbstractInterceptorProvidingDataBinding
 
     Class<?> cls;
 
-    private Map<String, Object> contextProperties = new HashMap<String, Object>();
+    private Map<String, Object> contextProperties = new HashMap<>();
     private List<XmlAdapter<?, ?>> adapters = new ArrayList<XmlAdapter<?, ?>>();
-    private Map<String, Object> marshallerProperties = new HashMap<String, Object>();
-    private Map<String, Object> unmarshallerProperties = new HashMap<String, Object>();
+    private Map<String, Object> marshallerProperties = new HashMap<>();
+    private Map<String, Object> unmarshallerProperties = new HashMap<>();
     private Unmarshaller.Listener unmarshallerListener;
     private Marshaller.Listener marshallerListener;
     private ValidationEventHandler validationEventHandler;

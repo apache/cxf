@@ -141,7 +141,7 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
             output = operation.getOutput().getFirstMessagePart();
         }
         if (!c) {
-            Map<String, QName> names = new HashMap<String, QName>();
+            Map<String, QName> names = new HashMap<>();
             if (input != null) {
                 for (WrapperElement element : ProcessorUtil.getWrappedElement(context,
                                                                               input.getElementQName())) {

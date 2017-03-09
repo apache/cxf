@@ -76,7 +76,7 @@ public class Tag {
 
     public Map<QName, String> getAttributes() {
         if (attributes == null) {
-            attributes = new HashMap<QName, String>();
+            attributes = new HashMap<>();
         }
         return attributes;
     }

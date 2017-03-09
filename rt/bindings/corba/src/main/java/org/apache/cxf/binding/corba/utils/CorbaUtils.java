@@ -71,7 +71,7 @@ import org.omg.CORBA.UnionMember;
 public final class CorbaUtils {
 
     static final QName EMPTY_QNAME = new QName("", "");
-    static final Map<QName, TCKind> PRIMITIVE_TYPECODES = new HashMap<QName, TCKind>();
+    static final Map<QName, TCKind> PRIMITIVE_TYPECODES = new HashMap<>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaUtils.class);
     private static final class LastExport {

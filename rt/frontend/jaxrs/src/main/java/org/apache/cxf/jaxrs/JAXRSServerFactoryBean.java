@@ -75,7 +75,7 @@ import org.apache.cxf.service.invoker.Invoker;
  */
 public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
 
-    protected Map<Class<?>, ResourceProvider> resourceProviders = new HashMap<Class<?>, ResourceProvider>();
+    protected Map<Class<?>, ResourceProvider> resourceProviders = new HashMap<>();
 
     private Server server;
     private boolean start = true;

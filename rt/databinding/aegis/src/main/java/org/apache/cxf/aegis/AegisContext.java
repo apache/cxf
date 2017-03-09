@@ -99,7 +99,7 @@ public class AegisContext {
      * Construct a context.
      */
     public AegisContext() {
-        beanImplementationMap = new HashMap<Class<?>, String>();
+        beanImplementationMap = new HashMap<>();
         rootClasses = new HashSet<java.lang.reflect.Type>();
         rootTypeQNames = new HashSet<>();
     }

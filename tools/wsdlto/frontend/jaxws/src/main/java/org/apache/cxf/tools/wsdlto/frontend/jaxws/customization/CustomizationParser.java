@@ -65,9 +65,9 @@ public final class CustomizationParser {
 
     private ToolContext env;
     // map for jaxws binding and wsdl element
-    private final Map<Element, Element> jaxwsBindingsMap = new HashMap<Element, Element>();
+    private final Map<Element, Element> jaxwsBindingsMap = new HashMap<>();
     private final List<InputSource> jaxbBindings = new ArrayList<>();
-    private final Map<String, Element> customizedElements = new HashMap<String, Element>();
+    private final Map<String, Element> customizedElements = new HashMap<>();
 
     private Element handlerChains;
     private Element wsdlNode;

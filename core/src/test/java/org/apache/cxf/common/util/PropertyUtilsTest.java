@@ -30,7 +30,7 @@ public class PropertyUtilsTest extends Assert {
 
     @Test
     public void testIsTrueWithMap() {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         assertFalse(PropertyUtils.isTrue(props, TEST_KEY));
 
         props.put(TEST_KEY, "false");
@@ -48,7 +48,7 @@ public class PropertyUtilsTest extends Assert {
 
     @Test
     public void testIsFalseWithMap() {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         assertFalse(PropertyUtils.isFalse(props, TEST_KEY));
 
         props.put(TEST_KEY, "true");

@@ -83,7 +83,7 @@ public class ClientFactoryBeanTest extends AbstractSimpleFrontendTest {
         cfBean.setServiceClass(HelloService.class);
         Map<String, Object> props = cfBean.getProperties();
         if (props == null) {
-            props = new HashMap<String, Object>();
+            props = new HashMap<>();
         }
         props.put("jaxb.additionalContextClasses",
                   new Class[] {GreetMe.class, GreetMeOneWay.class});

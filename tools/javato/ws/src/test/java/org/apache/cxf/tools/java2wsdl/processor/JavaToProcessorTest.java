@@ -664,7 +664,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         // schema element
 
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -757,7 +757,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlFile.exists());
 
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -802,7 +802,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlFile.exists());
 
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -846,7 +846,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlFile.exists());
 
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -891,7 +891,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlFile.exists());
 
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -928,7 +928,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue(wsdlFile.exists());
 
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -955,7 +955,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         File wsdlFile = new File(output, "exception-type-adapter.wsdl");
         assertTrue(wsdlFile.exists());
         Document doc = StaxUtils.read(wsdlFile);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         XPathUtils util = new XPathUtils(map);
         Node nd = util.getValueNode("//xsd:complexType[@name='myClass2']", doc);
@@ -1003,7 +1003,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
 
         Document doc = StaxUtils.read(wsdlFile);
         //StaxUtils.print(doc);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");

@@ -62,7 +62,7 @@ import org.apache.cxf.wsdl.WSDLConstants;
 
 
 public final class SOAPBindingUtil {
-    private static Map<String, String> bindingMap = new HashMap<String, String>();
+    private static Map<String, String> bindingMap = new HashMap<>();
 
     static {
         bindingMap.put("RPC", "SOAPBinding.Style.RPC");

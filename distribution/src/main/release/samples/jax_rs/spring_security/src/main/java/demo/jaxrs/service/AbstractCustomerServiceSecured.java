@@ -33,8 +33,8 @@ import javax.ws.rs.core.Response;
 public abstract class AbstractCustomerServiceSecured implements CustomerServiceSecured {
 
     protected long currentId = 123;
-    protected Map<Long, Customer> customers = new HashMap<Long, Customer>();
-    protected Map<Long, Order> orders = new HashMap<Long, Order>();
+    protected Map<Long, Customer> customers = new HashMap<>();
+    protected Map<Long, Order> orders = new HashMap<>();
 
     protected AbstractCustomerServiceSecured() {
         init();

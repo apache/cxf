@@ -347,7 +347,7 @@ public class JavaToWSTest extends ToolTestBase {
         File file = new File(output.getPath() + "/xml-list.wsdl");
 
         Document doc = StaxUtils.read(file);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -382,7 +382,7 @@ public class JavaToWSTest extends ToolTestBase {
         File file = new File(output.getPath() + "/xmladapter.wsdl");
 
         Document doc = StaxUtils.read(file);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("xsd", "http://www.w3.org/2001/XMLSchema");
         map.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         map.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");

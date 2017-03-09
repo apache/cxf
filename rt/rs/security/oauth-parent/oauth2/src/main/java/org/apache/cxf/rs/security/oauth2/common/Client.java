@@ -59,7 +59,7 @@ public class Client implements Serializable {
     private List<String> registeredScopes = new LinkedList<String>();
     private List<String> registeredAudiences = new LinkedList<String>();
 
-    private Map<String, String> properties = new HashMap<String, String>();
+    private Map<String, String> properties = new HashMap<>();
     private UserSubject subject;
     private UserSubject resourceOwnerSubject;
     private long registeredAt;

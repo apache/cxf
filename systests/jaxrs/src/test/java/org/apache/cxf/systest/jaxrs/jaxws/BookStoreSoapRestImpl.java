@@ -46,7 +46,7 @@ import org.apache.http.HttpStatus;
 @SchemaValidation
 public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
 
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
     private boolean ignoreJaxrsClient;
     @Context
     private MessageContext jaxrsContext;

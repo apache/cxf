@@ -318,7 +318,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
         private CorbaNamespaceContext parent;
 
         public CorbaNamespaceContext() {
-            this.map = new HashMap<String, String>();
+            this.map = new HashMap<>();
         }
 
         private CorbaNamespaceContext(Map<String, String> map, CorbaNamespaceContext p) {
@@ -328,7 +328,7 @@ public class CorbaStreamWriter implements XMLStreamWriter {
 
         public void push() {
             parent = new CorbaNamespaceContext(map, parent);
-            map = new HashMap<String, String>();
+            map = new HashMap<>();
         }
         public void pop() {
             if (parent != null) {

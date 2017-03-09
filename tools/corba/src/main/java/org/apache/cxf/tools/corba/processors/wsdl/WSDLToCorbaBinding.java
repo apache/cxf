@@ -93,7 +93,7 @@ public class WSDLToCorbaBinding {
     ExtensionRegistry extReg;
 
     List<String> interfaceNames = new ArrayList<>();
-    Map<Object, Object> bindingNameMap = new HashMap<Object, Object>();
+    Map<Object, Object> bindingNameMap = new HashMap<>();
     String bindingName;
     String address;
     String addressFile;

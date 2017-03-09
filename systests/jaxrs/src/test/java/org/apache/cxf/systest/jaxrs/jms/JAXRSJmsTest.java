@@ -64,7 +64,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
             return;
         }
         AbstractResourceInfo.clearAllMaps();
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<>();
         if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
             props.put("org.apache.activemq.default.directory.prefix",
                       System.getProperty("org.apache.activemq.default.directory.prefix"));

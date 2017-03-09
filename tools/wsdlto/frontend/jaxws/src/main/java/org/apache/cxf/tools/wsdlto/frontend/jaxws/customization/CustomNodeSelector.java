@@ -31,7 +31,7 @@ import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 
 public final class CustomNodeSelector {
-    private static final Map<String, String> BINDING_NS_MAP = new HashMap<String, String>();
+    private static final Map<String, String> BINDING_NS_MAP = new HashMap<>();
 
     private MapNamespaceContext context = new MapNamespaceContext();
 

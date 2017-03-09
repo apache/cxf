@@ -223,7 +223,7 @@ public class TestHandler<T extends LogicalMessageContext>
             DOMSource source = (DOMSource)ctx.getMessage().getPayload();
             Node node = source.getNode();
 
-            Map<String, String> ns = new HashMap<String, String>();
+            Map<String, String> ns = new HashMap<>();
             ns.put("s", Soap11.SOAP_NAMESPACE);
             XPathUtils xu = new XPathUtils(ns);
             String exceptionText = (String)xu.getValue("//s:Fault/faultstring/text()", node,

@@ -79,14 +79,14 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
             bus.getOutFaultInterceptors().add(new LoggingOutInterceptor(serverlogOut));
 
 
-            Map<String, String> inElements = new HashMap<String, String>();
+            Map<String, String> inElements = new HashMap<>();
             inElements.put("{http://cxf.apache.org/greeter_control/types}dontPingMe",
                            "{http://cxf.apache.org/greeter_control/types}pingMe");
             servertransIn.setInTransformElements(inElements);
             bus.getInInterceptors().add(servertransIn);
 
 
-            Map<String, String> outElements = new HashMap<String, String>();
+            Map<String, String> outElements = new HashMap<>();
             outElements.put("{http://cxf.apache.org/greeter_control/types}faultDetail",
                 "{http://cxf.apache.org/greeter_control/types}noFaultDetail");
             servertransOut.setOutTransformElements(outElements);
@@ -157,13 +157,13 @@ public class StaxTransformFeatureTest extends AbstractBusClientServerTestBase {
         bus.getOutFaultInterceptors().add(new LoggingOutInterceptor(logOut));
 
         TransformInInterceptor transIn = new TransformInInterceptor();
-        Map<String, String> inElements = new HashMap<String, String>();
+        Map<String, String> inElements = new HashMap<>();
         inElements.put("{http://cxf.apache.org/greeter_control/types}noFaultDetail",
             "{http://cxf.apache.org/greeter_control/types}faultDetail");
         bus.getInInterceptors().add(transIn);
 
         TransformOutInterceptor transOut = new TransformOutInterceptor();
-        Map<String, String> outElements = new HashMap<String, String>();
+        Map<String, String> outElements = new HashMap<>();
         outElements.put("{http://cxf.apache.org/greeter_control/types}pingMe",
             "{http://cxf.apache.org/greeter_control/types}dontPingMe");
         transOut.setOutTransformElements(outElements);

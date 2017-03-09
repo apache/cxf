@@ -98,7 +98,7 @@ public class STSUnitTest extends BasicSTSIntegrationTest {
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}X509_Port");
         stsClient.setEnableAppliesTo(false);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
             SecurityConstants.CALLBACK_HANDLER, new CommonCallbackHandler()

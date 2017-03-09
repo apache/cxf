@@ -298,7 +298,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setTokenType(tokenType);
         stsClient.setKeyType("http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
             SecurityConstants.CALLBACK_HANDLER,
@@ -327,7 +327,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
             SecurityConstants.CALLBACK_HANDLER,
@@ -349,7 +349,7 @@ public class SAMLRenewUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
             SecurityConstants.CALLBACK_HANDLER,

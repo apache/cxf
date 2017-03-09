@@ -472,8 +472,8 @@ public class DynamicClientFactory {
                             List<ServiceInfo> serviceList,
                             SchemaCollection schemaCollection) {
 
-        Map<String, Element> done = new HashMap<String, Element>();
-        Map<String, Element> notDone = new HashMap<String, Element>();
+        Map<String, Element> done = new HashMap<>();
+        Map<String, Element> notDone = new HashMap<>();
         OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
             if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {

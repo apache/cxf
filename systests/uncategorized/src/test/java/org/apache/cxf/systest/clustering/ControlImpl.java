@@ -50,13 +50,13 @@ public class ControlImpl implements Control {
     private Map<String, Endpoint> endpoints;
 
     ControlImpl() {
-        implementors = new HashMap<String, Greeter>();
+        implementors = new HashMap<>();
         implementors.put(FailoverTest.REPLICA_A, new GreeterImplA());
         implementors.put(FailoverTest.REPLICA_B, new GreeterImplB());
         implementors.put(FailoverTest.REPLICA_C, new GreeterImplC());
         implementors.put(FailoverTest.REPLICA_D, new GreeterImplD());
         implementors.put(FailoverTest.REPLICA_E, new GreeterImplE());
-        endpoints = new HashMap<String, Endpoint>();
+        endpoints = new HashMap<>();
     }
 
     public boolean startGreeter(String address) {

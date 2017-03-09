@@ -126,7 +126,7 @@ class EventSinkInterfaceNotificationTask implements Runnable {
         }
 
         if (extraClasses != null && extraClasses.length > 0) {
-            Map<String, Object> props = new HashMap<String, Object>();
+            Map<String, Object> props = new HashMap<>();
             props.put("jaxb.additionalContextClasses", extraClasses);
             service.getClientFactoryBean().getServiceFactory().setProperties(props);
         }

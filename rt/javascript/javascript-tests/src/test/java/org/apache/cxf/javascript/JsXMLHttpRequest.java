@@ -111,7 +111,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
     private boolean errorFlag;
 
     public JsXMLHttpRequest() {
-        requestHeaders = new HashMap<String, String>();
+        requestHeaders = new HashMap<>();
         storedMethod = null;
     }
 

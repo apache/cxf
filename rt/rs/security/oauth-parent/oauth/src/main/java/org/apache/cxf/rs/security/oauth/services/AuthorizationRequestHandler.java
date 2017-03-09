@@ -99,7 +99,7 @@ public class AuthorizationRequestHandler {
 
             boolean allow = OAuthConstants.AUTHORIZATION_DECISION_ALLOW.equals(decision);
 
-            Map<String, String> queryParams = new HashMap<String, String>();
+            Map<String, String> queryParams = new HashMap<>();
             if (allow) {
                 SecurityContext sc = (SecurityContext)mc.get(SecurityContext.class.getName());
                 List<String> roleNames = Collections.emptyList();

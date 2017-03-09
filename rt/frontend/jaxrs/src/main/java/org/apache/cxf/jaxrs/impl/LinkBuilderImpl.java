@@ -39,7 +39,7 @@ public class LinkBuilderImpl implements Builder {
     private static final String DOUBLE_QUOTE = "\"";
     private UriBuilder ub;
     private URI baseUri;
-    private Map<String, String> params = new HashMap<String, String>(6);
+    private Map<String, String> params = new HashMap<>(6);
 
     @Override
     public Link build(Object... values) {

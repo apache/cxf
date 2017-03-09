@@ -110,7 +110,7 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
         void addHeader(String key, String value) {
             Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
             if (headers == null) {
-                headers = new HashMap<String, List<String>>();
+                headers = new HashMap<>();
                 message.put(Message.PROTOCOL_HEADERS, headers);
             }
             headers.put(key, Arrays.asList(value));

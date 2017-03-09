@@ -467,7 +467,7 @@ public class ManagedRMManagerTest extends Assert {
     private class TestRetransmissionQueue implements RetransmissionQueue {
         private Set<String> suspended = new HashSet<>();
         private RetryStatus status = new TestRetransmissionStatus();
-        private Map<String, List<Long>> numlists = new HashMap<String, List<Long>>();
+        private Map<String, List<Long>> numlists = new HashMap<>();
 
         TestRetransmissionQueue() {
             numlists.put("seq1", new ArrayList<>());

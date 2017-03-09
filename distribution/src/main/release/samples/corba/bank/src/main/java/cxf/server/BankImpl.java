@@ -35,7 +35,7 @@ import bank.common.Bank;
 
 public class BankImpl implements Bank {
 
-    Map<String, Account> accounts = new HashMap<String, Account>();
+    Map<String, Account> accounts = new HashMap<>();
 
     public boolean createAccount(String name, javax.xml.ws.Holder<Account> account)
         throws AccountAlreadyExistsException {

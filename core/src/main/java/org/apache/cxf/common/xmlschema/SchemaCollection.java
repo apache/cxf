@@ -62,7 +62,7 @@ public class SchemaCollection {
 
     private XmlSchemaCollection schemaCollection;
     private Map<XmlSchema, Set<XmlSchemaType>> xmlTypesCheckedForCrossImportsPerSchema
-        = new HashMap<XmlSchema, Set<XmlSchemaType>>();
+        = new HashMap<>();
 
     public SchemaCollection() {
         this(new XmlSchemaCollection());

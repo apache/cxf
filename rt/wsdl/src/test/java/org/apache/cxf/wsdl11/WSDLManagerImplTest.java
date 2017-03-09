@@ -113,7 +113,7 @@ public class WSDLManagerImplTest extends Assert {
 
     @Test
     public void testXMLStreamReaderWrapper() throws Exception {
-        final Map<String, String> map = new HashMap<String, String>();
+        final Map<String, String> map = new HashMap<>();
         map.put("org.apache.cxf.test.wsdl11.port", "99999");
         String wsdlUrl = getClass().getResource("hello_world_wrap.wsdl").toString();
         WSDLManagerImpl builder = new WSDLManagerImpl();

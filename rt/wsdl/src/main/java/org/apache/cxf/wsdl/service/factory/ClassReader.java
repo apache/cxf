@@ -107,7 +107,7 @@ class ClassReader extends ByteArrayInputStream {
     }
 
     protected static Map<String, Method> findAttributeReaders(Class<?> c) {
-        Map<String, Method> map = new HashMap<String, Method>();
+        Map<String, Method> map = new HashMap<>();
         Method[] methods = c.getMethods();
 
         for (int i = 0; i < methods.length; i++) {

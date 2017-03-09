@@ -135,7 +135,7 @@ public class JAXBEncoderDecoderTest extends Assert {
 
     @Test
     public void testCXF3611() throws Exception {
-        Map<String, String> foo = new HashMap<String, String>();
+        Map<String, String> foo = new HashMap<>();
 
         assertTrue(JAXBSchemaInitializer.isArray(getFieldType("arrayField")));
         assertTrue(JAXBSchemaInitializer.isArray(getFieldType("listField")));
@@ -226,7 +226,7 @@ public class JAXBEncoderDecoderTest extends Assert {
 
     @Test
     public void testCustomNamespaces() throws Exception {
-        Map<String, String> mapper = new HashMap<String, String>();
+        Map<String, String> mapper = new HashMap<>();
         mapper.put("http://apache.org/hello_world_soap_http/types", "Omnia");
         mapper.put("http://cxf.apache.org/jaxb_form", "Gallia");
         ObjectWithQualifiedElementElement testObject = new ObjectWithQualifiedElementElement();

@@ -98,7 +98,7 @@ public final class HttpAuthHeader {
     }
 
     private Map<String, String> parseHeader() {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         try {
             StreamTokenizer tok = new StreamTokenizer(new StringReader(this.fullContent));
             tok.quoteChar('"');

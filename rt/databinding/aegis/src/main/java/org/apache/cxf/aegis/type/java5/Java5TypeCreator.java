@@ -163,9 +163,9 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         Map<String, Type> pm = generic.getTypeVars();
         if (map) {
             if (pm == null) {
-                pm = new HashMap<String, Type>();
+                pm = new HashMap<>();
             } else {
-                pm = new HashMap<String, Type>(pm);
+                pm = new HashMap<>(pm);
             }
             paramType = getComponentTypeForMap(generic.getType(), pm, index == 0);
         } else {
@@ -228,7 +228,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
 
     protected Type getComponentTypeForMap(Type genericType, Map<String, Type> pm, boolean key) {
         if (pm == null) {
-            pm = new HashMap<String, Type>();
+            pm = new HashMap<>();
         }
         return findMapGenericTypes(genericType, pm, key);
     }
@@ -262,7 +262,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
             if (Map.class.isAssignableFrom(c)) {
 
                 for (Type tp : c.getGenericInterfaces()) {
-                    Map<String, Type> cp = new HashMap<String, Type>(pm);
+                    Map<String, Type> cp = new HashMap<>(pm);
 
                     Type types = findMapGenericTypes(tp, cp, key);
                     if (types != null) {

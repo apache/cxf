@@ -65,7 +65,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         properties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -113,7 +113,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         properties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -162,7 +162,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
@@ -194,7 +194,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
@@ -239,7 +239,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT
@@ -275,7 +275,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -307,7 +307,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.USERNAME_TOKEN
@@ -339,7 +339,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
 
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
@@ -368,7 +368,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE
@@ -408,7 +408,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.SIGNATURE
@@ -453,7 +453,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "alice.properties");
@@ -488,7 +488,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT
@@ -538,7 +538,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -548,7 +548,7 @@ public class DOMToStaxRoundTripTest extends AbstractSecurityTest {
         WSS4JOutInterceptor ohandler = new WSS4JOutInterceptor(properties);
         client.getOutInterceptors().add(ohandler);
 
-        Map<String, Object> domInProperties = new HashMap<String, Object>();
+        Map<String, Object> domInProperties = new HashMap<>();
         domInProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         domInProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         domInProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");

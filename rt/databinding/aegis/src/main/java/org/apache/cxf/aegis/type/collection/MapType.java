@@ -127,7 +127,7 @@ public class MapType extends AegisType {
 
         Class<?> cls = getTypeClass();
         if (cls.equals(Map.class)) {
-            map = new HashMap<Object, Object>();
+            map = new HashMap<>();
         } else if (cls.equals(Hashtable.class)) {
             map = new Hashtable<Object, Object>();
         } else if (cls.equals(ConcurrentMap.class)) {
@@ -137,7 +137,7 @@ public class MapType extends AegisType {
         } else if (cls.equals(SortedMap.class) || cls.equals(NavigableMap.class)) {
             map = new TreeMap<Object, Object>();
         } else if (cls.isInterface()) {
-            map = new HashMap<Object, Object>();
+            map = new HashMap<>();
         } else {
             try {
                 map = (Map<Object, Object>)cls.newInstance();

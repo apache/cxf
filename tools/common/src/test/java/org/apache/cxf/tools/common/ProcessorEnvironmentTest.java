@@ -28,7 +28,7 @@ import org.junit.Test;
 public class ProcessorEnvironmentTest extends Assert {
     @Test
     public void testGet() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("k1", "v1");
         ToolContext env = new ToolContext();
         env.setParameters(map);
@@ -38,7 +38,7 @@ public class ProcessorEnvironmentTest extends Assert {
 
     @Test
     public void testPut() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("k1", "v1");
         ToolContext env = new ToolContext();
         env.setParameters(map);
@@ -49,7 +49,7 @@ public class ProcessorEnvironmentTest extends Assert {
 
     @Test
     public void testRemove() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("k1", "v1");
         ToolContext env = new ToolContext();
         env.setParameters(map);
@@ -62,7 +62,7 @@ public class ProcessorEnvironmentTest extends Assert {
 
     @Test
     public void testContainsKey() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("k1", "v1");
         ToolContext env = new ToolContext();
         env.setParameters(map);
@@ -71,7 +71,7 @@ public class ProcessorEnvironmentTest extends Assert {
 
     @Test
     public void testGetDefaultValue() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("k1", "v1");
         ToolContext env = new ToolContext();
         env.setParameters(map);
@@ -84,7 +84,7 @@ public class ProcessorEnvironmentTest extends Assert {
 
     @Test
     public void testOptionSet() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("k1", "true");
         ToolContext env = new ToolContext();
         env.setParameters(map);
@@ -95,7 +95,7 @@ public class ProcessorEnvironmentTest extends Assert {
 
     @Test
     public void testGetBooleanValue() {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("k1", "true");
         ToolContext env = new ToolContext();
         env.setParameters(map);

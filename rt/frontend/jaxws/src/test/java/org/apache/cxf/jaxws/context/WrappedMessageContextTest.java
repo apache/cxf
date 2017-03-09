@@ -48,7 +48,7 @@ public class WrappedMessageContextTest extends Assert {
         DataHandler dh1 = new DataHandler(new ByteArrayDataSource("Hello world!".getBytes(), "text/plain"));
         DataHandler dh2 = new DataHandler(new ByteArrayDataSource("Hola mundo!".getBytes(), "text/plain"));
         DataHandler dh3 = new DataHandler(new ByteArrayDataSource("Bonjour tout le monde!".getBytes(), "text/plain"));
-        Map<String, DataHandler> jattachments = new HashMap<String, DataHandler>();
+        Map<String, DataHandler> jattachments = new HashMap<>();
         context.put(MessageContext.OUTBOUND_MESSAGE_ATTACHMENTS, jattachments);
 
         jattachments.put("attachment-1", dh1);

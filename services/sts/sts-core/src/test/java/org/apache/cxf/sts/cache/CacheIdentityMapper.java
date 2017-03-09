@@ -34,7 +34,7 @@ public class CacheIdentityMapper implements IdentityMapper {
 
 
     CacheIdentityMapper() {
-        Map<String, String> identities = new HashMap<String, String>();
+        Map<String, String> identities = new HashMap<>();
         identities.put("REALM_A", "user_aaa");
         identities.put("REALM_B", "user_bbb");
         identities.put("REALM_C", "user_ccc");

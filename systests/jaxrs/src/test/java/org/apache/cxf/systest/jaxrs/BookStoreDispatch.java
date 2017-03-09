@@ -30,7 +30,7 @@ import javax.ws.rs.Produces;
 @Path("/")
 public class BookStoreDispatch {
 
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
     private Long mainId = 123L;
 
     public BookStoreDispatch() {

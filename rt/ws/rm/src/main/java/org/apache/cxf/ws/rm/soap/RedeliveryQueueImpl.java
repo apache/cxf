@@ -208,7 +208,7 @@ public class RedeliveryQueueImpl implements RedeliveryQueue {
 
 
     public Map<Long, RetryStatus> getRedeliveryStatuses(DestinationSequence seq) {
-        Map<Long, RetryStatus> cp = new HashMap<Long, RetryStatus>();
+        Map<Long, RetryStatus> cp = new HashMap<>();
         List<RedeliverCandidate> sequenceCandidates = getSequenceCandidates(seq);
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {

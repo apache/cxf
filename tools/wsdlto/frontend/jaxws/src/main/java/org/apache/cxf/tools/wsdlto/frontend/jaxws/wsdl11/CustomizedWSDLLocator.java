@@ -44,7 +44,7 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
 
     private Map<String, Element> elementMap;
     private String latestImportURI;
-    private Map<String, String> resolvedMap = new HashMap<String, String>();
+    private Map<String, String> resolvedMap = new HashMap<>();
     private boolean resolveFromMap;
 
     public CustomizedWSDLLocator(String wsdlUrl, Map<String, Element> map) {

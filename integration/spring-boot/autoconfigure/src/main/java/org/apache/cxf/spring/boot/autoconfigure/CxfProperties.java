@@ -60,7 +60,7 @@ public class CxfProperties {
         /**
          * Servlet init parameters to pass to Apache CXF.
          */
-        private Map<String, String> init = new HashMap<String, String>();
+        private Map<String, String> init = new HashMap<>();
 
         /**
          * Load on startup priority of the Apache CXF servlet.

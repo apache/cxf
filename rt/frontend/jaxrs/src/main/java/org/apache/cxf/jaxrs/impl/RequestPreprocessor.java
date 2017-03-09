@@ -45,7 +45,7 @@ public class RequestPreprocessor {
     private static final Map<String, String> MEDIA_TYPE_SHORTCUTS;
 
     static {
-        MEDIA_TYPE_SHORTCUTS = new HashMap<String, String>();
+        MEDIA_TYPE_SHORTCUTS = new HashMap<>();
         MEDIA_TYPE_SHORTCUTS.put("json", "application/json");
         MEDIA_TYPE_SHORTCUTS.put("text", "text/*");
         MEDIA_TYPE_SHORTCUTS.put("xml", "application/xml");

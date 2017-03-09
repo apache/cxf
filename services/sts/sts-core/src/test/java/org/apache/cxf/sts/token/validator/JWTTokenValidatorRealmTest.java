@@ -163,7 +163,7 @@ public class JWTTokenValidatorRealmTest extends org.junit.Assert {
 
     private Map<String, RealmProperties> getRealms() {
         // Create Realms
-        Map<String, RealmProperties> realms = new HashMap<String, RealmProperties>();
+        Map<String, RealmProperties> realms = new HashMap<>();
         RealmProperties realm = new RealmProperties();
         realm.setIssuer("A-Issuer");
         realms.put("A", realm);

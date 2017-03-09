@@ -282,7 +282,7 @@ public class LdapCertificateRepo implements CertificateRepo {
     public void saveCertificate(X509Certificate cert, UseKeyWithType key) {
         Applications application = Applications.fromUri(key.getApplication());
         String dn = null;
-        Map<String, String> attrs = new HashMap<String, String>();
+        Map<String, String> attrs = new HashMap<>();
         if (application == Applications.PKIX) {
             dn = key.getIdentifier() + "," + rootDN;
         } else if (application == Applications.SERVICE_NAME) {

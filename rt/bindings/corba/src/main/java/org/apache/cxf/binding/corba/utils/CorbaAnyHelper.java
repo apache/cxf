@@ -43,8 +43,8 @@ import org.omg.CORBA.TypeCode;
 
 public final class CorbaAnyHelper {
 
-    private static final Map<QName, QName> SCHEMA_TO_IDL_TYPES = new HashMap<QName, QName>();
-    private static final Map<QName, QName> IDL_TO_SCHEMA_TYPES = new HashMap<QName, QName>();
+    private static final Map<QName, QName> SCHEMA_TO_IDL_TYPES = new HashMap<>();
+    private static final Map<QName, QName> IDL_TO_SCHEMA_TYPES = new HashMap<>();
 
     private static Constructor<?> fixedAnyConstructor;
 

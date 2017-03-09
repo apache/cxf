@@ -269,7 +269,7 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
 
     protected Map<String, Object> removeHandlerProperties(WrappedMessageContext ctx) {
         Map<String, Scope> scopes = CastUtils.cast((Map<?, ?>)ctx.get(WrappedMessageContext.SCOPES));
-        Map<String, Object> handlerScopedStuff = new HashMap<String, Object>();
+        Map<String, Object> handlerScopedStuff = new HashMap<>();
         if (scopes != null) {
             for (Map.Entry<String, Scope> scope : scopes.entrySet()) {
                 if (scope.getValue() == Scope.HANDLER) {

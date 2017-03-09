@@ -581,7 +581,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
 
         if (!utWithCallbacks) {
-            Map<QName, Object> profiles = new HashMap<QName, Object>(1);
+            Map<QName, Object> profiles = new HashMap<>(1);
             Validator validator = new NoOpValidator();
             profiles.put(WSConstants.USERNAME_TOKEN, validator);
             return createSecurityEngine(profiles);

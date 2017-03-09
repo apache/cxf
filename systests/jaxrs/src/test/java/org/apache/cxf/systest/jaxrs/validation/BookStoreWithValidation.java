@@ -41,7 +41,7 @@ import javax.ws.rs.core.UriInfo;
 
 @Path("/bookstore/")
 public class BookStoreWithValidation extends AbstractBookStoreWithValidation implements  BookStoreValidatable {
-    private Map< String, BookWithValidation > books = new HashMap< String, BookWithValidation >();
+    private Map< String, BookWithValidation > books = new HashMap<>();
 
     public BookStoreWithValidation() {
     }

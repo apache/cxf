@@ -203,7 +203,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
                                      "{http://www.example.org/super-books}*"));
 
         TransformInInterceptor in = new TransformInInterceptor();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
 
         // If Book2 didn't have {http://www.example.org/books}Book
         // then we'd just do '"*" : "{http://www.example.org/books}*'
@@ -240,7 +240,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
         bean.setProvider(p);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(FIStaxInInterceptor.FI_GET_SUPPORTED, Boolean.TRUE);
         bean.setProperties(props);
 
@@ -262,7 +262,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         p.setProduceMediaTypes(Collections.singletonList("application/fastinfoset"));
         bean.setProvider(p);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(FIStaxOutInterceptor.FI_ENABLED, Boolean.TRUE);
         bean.setProperties(props);
 
@@ -468,7 +468,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     public void testNoBook357WebClient() throws Exception {
 
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("org.apache.cxf.http.throw_io_exceptions", Boolean.TRUE);
         bean.setProperties(properties);
         bean.setAddress("http://localhost:" + PORT + "/test/services/rest/bookstore/356");
@@ -794,7 +794,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         BookStoreJaxrsJaxws store = service.getBookPort();
 
         TransformOutInterceptor out = new TransformOutInterceptor();
-        Map<String, String> mapOut = new HashMap<String, String>();
+        Map<String, String> mapOut = new HashMap<>();
         // Book content (id, name) is unqualified, thus the following works
         // because JAXB will report
         // - {http://jaxws.jaxrs.systest.cxf.apache.org/}Book
@@ -806,7 +806,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         out.setOutTransformElements(mapOut);
 
         TransformInInterceptor in = new TransformInInterceptor();
-        Map<String, String> mapIn = new HashMap<String, String>();
+        Map<String, String> mapIn = new HashMap<>();
         // mapIn.put("*", "{http://jaxws.jaxrs.systest.cxf.apache.org/}*");
         // won't work for a case where a totally unqualified getBookResponse needs to be
         // qualified such that only the top-level getBookResponse is processed because of '*'.

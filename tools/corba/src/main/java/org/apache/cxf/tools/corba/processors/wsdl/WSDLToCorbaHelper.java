@@ -104,7 +104,7 @@ public class WSDLToCorbaHelper {
     SchemaCollection xmlSchemaList;
     TypeMappingType typeMappingType;
     Definition def;
-    Map<QName, CorbaType> recursionMap = new HashMap<QName, CorbaType>();
+    Map<QName, CorbaType> recursionMap = new HashMap<>();
 
     public void setTypeMap(TypeMappingType map) {
         typeMappingType = map;

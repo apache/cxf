@@ -55,7 +55,7 @@ public class UserApplication {
     }
 
     public Map<String, UserResource> getResourcesAsMap() {
-        Map<String, UserResource> map = new HashMap<String, UserResource>();
+        Map<String, UserResource> map = new HashMap<>();
         if (resources != null) {
             for (UserResource r : resources) {
                 map.put(r.getName(), r);

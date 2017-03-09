@@ -156,7 +156,7 @@ class XercesSchemaValidationUtils {
         throws Exception {
 
         final List<DOMLSInput> inputs = new ArrayList<>();
-        final Map<String, LSInput> resolverMap = new HashMap<String, LSInput>();
+        final Map<String, LSInput> resolverMap = new HashMap<>();
 
         for (XmlSchema schema : collection.getXmlSchemas()) {
             if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {

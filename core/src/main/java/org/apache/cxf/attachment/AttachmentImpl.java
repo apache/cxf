@@ -31,7 +31,7 @@ public class AttachmentImpl implements Attachment {
 
     private DataHandler dataHandler;
     private String id;
-    private Map<String, String> headers = new HashMap<String, String>();
+    private Map<String, String> headers = new HashMap<>();
     private boolean xop;
 
     public AttachmentImpl(String idParam) {

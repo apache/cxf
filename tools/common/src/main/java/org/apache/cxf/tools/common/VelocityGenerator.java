@@ -43,7 +43,7 @@ public final class VelocityGenerator {
     private static final Logger LOG = LogUtils.getL7dLogger(VelocityGenerator.class);
     private static boolean initialized;
 
-    private final Map<String, Object> attributes = new HashMap<String, Object>();
+    private final Map<String, Object> attributes = new HashMap<>();
     private String baseDir;
 
     public VelocityGenerator() {

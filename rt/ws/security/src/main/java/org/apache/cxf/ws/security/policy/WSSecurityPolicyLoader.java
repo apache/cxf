@@ -268,7 +268,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
             new QName(SP11Constants.SP_NS, SPConstants.INCLUSIVE_C14N),
             new QName(SP12Constants.SP_NS, SPConstants.INCLUSIVE_C14N),
         });
-        final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
+        final Map<QName, Assertion> assertions = new HashMap<>();
         for (QName q : others) {
             assertions.put(q, new PrimitiveAssertion(q));
         }

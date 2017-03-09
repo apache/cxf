@@ -298,7 +298,7 @@ public class XMLStreamDataWriterTest extends Assert {
     @Test
     public void testWriteWithNamespacePrefixMapping() throws Exception {
         JAXBDataBinding db = getTestWriterFactory(GreetMe.class);
-        Map<String, String> nspref = new HashMap<String, String>();
+        Map<String, String> nspref = new HashMap<>();
         nspref.put("http://apache.org/hello_world_soap_http/types", "x");
         db.setNamespaceMap(nspref);
 
@@ -336,7 +336,7 @@ public class XMLStreamDataWriterTest extends Assert {
     @Test
     public void testWriteWithContextualNamespaceDecls() throws Exception {
         JAXBDataBinding db = getTestWriterFactory(GreetMe.class);
-        Map<String, String> nspref = new HashMap<String, String>();
+        Map<String, String> nspref = new HashMap<>();
         nspref.put("http://apache.org/hello_world_soap_http/types", "x");
         db.setNamespaceMap(nspref);
         db.setContextualNamespaceMap(nspref);

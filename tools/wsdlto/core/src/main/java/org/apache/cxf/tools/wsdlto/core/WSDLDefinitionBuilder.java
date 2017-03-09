@@ -56,7 +56,7 @@ public class WSDLDefinitionBuilder implements WSDLBuilder<Definition> {
 
 
     private final Map<String, WSDLExtensibilityPlugin> wsdlPlugins
-        = new HashMap<String, WSDLExtensibilityPlugin>();
+        = new HashMap<>();
     private Bus bus;
 
     public WSDLDefinitionBuilder(Bus b) {

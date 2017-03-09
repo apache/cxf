@@ -763,7 +763,7 @@ public final class InjectionUtils {
             }
             return theValues;
         } else {
-            Map<Object, Object> theValues = new HashMap<Object, Object>();
+            Map<Object, Object> theValues = new HashMap<>();
             Class<?> valueType =
                 (Class<?>) InjectionUtils.getType(paramType.getActualTypeArguments(), 1);
             for (Map.Entry<String, List<String>> processedValuesEntry : processedValues.entrySet()) {

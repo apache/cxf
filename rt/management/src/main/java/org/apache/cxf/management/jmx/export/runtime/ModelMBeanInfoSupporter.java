@@ -42,13 +42,13 @@ import org.apache.cxf.management.annotation.ManagedResource;
 
 public class ModelMBeanInfoSupporter {
     protected Map<String, ModelMBeanAttributeInfo> attributes
-        = new HashMap<String, ModelMBeanAttributeInfo>();
+        = new HashMap<>();
     protected Map<String, ModelMBeanNotificationInfo> notifications
-        = new HashMap<String, ModelMBeanNotificationInfo>();
+        = new HashMap<>();
     protected Map<Constructor<?>, ModelMBeanConstructorInfo> constructors
-        = new HashMap<Constructor<?>, ModelMBeanConstructorInfo>();
+        = new HashMap<>();
     protected Map<String, ModelMBeanOperationInfo> operations
-        = new HashMap<String, ModelMBeanOperationInfo>();
+        = new HashMap<>();
 
     public ModelMBeanInfoSupporter() {
 

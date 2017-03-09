@@ -49,7 +49,7 @@ public class XPathProviderTest extends Assert {
         XPathProvider<?> provider = new XPathProvider<Object>();
         assertFalse(provider.isReadable(Book.class, null, null, null));
         assertFalse(provider.isReadable(BookStore.class, null, null, null));
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(Book.class.getName(), "/");
         provider.setExpressions(map);
         assertFalse(provider.isReadable(BookStore.class, null, null, null));

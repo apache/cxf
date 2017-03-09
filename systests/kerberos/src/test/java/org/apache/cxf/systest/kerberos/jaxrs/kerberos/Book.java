@@ -40,7 +40,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 public class Book {
     private String name;
     private long id;
-    private Map<Long, Chapter> chapters = new HashMap<Long, Chapter>();
+    private Map<Long, Chapter> chapters = new HashMap<>();
 
     public Book() {
         init();

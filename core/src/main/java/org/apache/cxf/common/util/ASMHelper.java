@@ -37,9 +37,9 @@ import org.apache.cxf.common.util.ReflectionInvokationHandler.UnwrapParam;
 import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
 
 public class ASMHelper {
-    protected static final Map<Class<?>, String> PRIMITIVE_MAP = new HashMap<Class<?>, String>();
-    protected static final Map<Class<?>, String> NONPRIMITIVE_MAP = new HashMap<Class<?>, String>();
-    protected static final Map<Class<?>, Integer> PRIMITIVE_ZERO_MAP = new HashMap<Class<?>, Integer>();
+    protected static final Map<Class<?>, String> PRIMITIVE_MAP = new HashMap<>();
+    protected static final Map<Class<?>, String> NONPRIMITIVE_MAP = new HashMap<>();
+    protected static final Map<Class<?>, Integer> PRIMITIVE_ZERO_MAP = new HashMap<>();
 
     protected static final Map<ClassLoader, WeakReference<TypeHelperClassLoader>> LOADER_MAP
         = new WeakIdentityHashMap<ClassLoader, WeakReference<TypeHelperClassLoader>>();

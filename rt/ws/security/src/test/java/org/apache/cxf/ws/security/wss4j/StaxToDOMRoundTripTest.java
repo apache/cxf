@@ -57,7 +57,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -107,7 +107,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -121,7 +121,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> outConfig = new HashMap<String, Object>();
+        Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
         outConfig.put(ConfigurationConstants.PASSWORD_TYPE, "PasswordText");
         outConfig.put(ConfigurationConstants.USER, "username");
@@ -155,7 +155,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -204,7 +204,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         inProperties.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_DIGEST);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -218,7 +218,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> outConfig = new HashMap<String, Object>();
+        Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.USERNAME_TOKEN);
         outConfig.put(ConfigurationConstants.PASSWORD_TYPE, "PasswordDigest");
         outConfig.put(ConfigurationConstants.USER, "username");
@@ -252,7 +252,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
@@ -288,7 +288,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
@@ -302,7 +302,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> outConfig = new HashMap<String, Object>();
+        Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
         outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -320,7 +320,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
@@ -365,7 +365,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
@@ -379,7 +379,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> outConfig = new HashMap<String, Object>();
+        Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.ENCRYPT);
         outConfig.put(ConfigurationConstants.ENCRYPTION_USER, "myalias");
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -413,7 +413,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT
@@ -457,7 +457,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT
@@ -474,7 +474,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> outConfig = new HashMap<String, Object>();
+        Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(
             ConfigurationConstants.ACTION,
             ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.ENCRYPT
@@ -500,7 +500,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
@@ -535,7 +535,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
@@ -549,7 +549,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> outConfig = new HashMap<String, Object>();
+        Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
         outConfig.put(ConfigurationConstants.SIGNATURE_USER, "myalias");
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
@@ -566,7 +566,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.USERNAME_TOKEN
@@ -613,7 +613,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.USERNAME_TOKEN
@@ -630,7 +630,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> outConfig = new HashMap<String, Object>();
+        Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(
             ConfigurationConstants.ACTION,
             ConfigurationConstants.USERNAME_TOKEN + " " + ConfigurationConstants.SIGNATURE
@@ -656,7 +656,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
@@ -701,7 +701,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.TIMESTAMP);
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
@@ -713,7 +713,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> outConfig = new HashMap<String, Object>();
+        Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.TIMESTAMP);
         WSS4JStaxOutInterceptor ohandler = new WSS4JStaxOutInterceptor(outConfig);
 
@@ -744,7 +744,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP
@@ -789,7 +789,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP
@@ -806,7 +806,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> outConfig = new HashMap<String, Object>();
+        Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(
             ConfigurationConstants.ACTION,
             ConfigurationConstants.TIMESTAMP + " " + ConfigurationConstants.SIGNATURE
@@ -831,7 +831,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.TIMESTAMP
@@ -881,7 +881,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "cxfca.properties");
@@ -921,7 +921,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "cxfca.properties");
@@ -935,7 +935,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> outConfig = new HashMap<String, Object>();
+        Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE);
         outConfig.put(ConfigurationConstants.SIGNATURE_USER, "alice");
         outConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new KeystorePasswordCallback());
@@ -954,7 +954,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT
@@ -997,7 +997,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(
             WSHandlerConstants.ACTION,
             WSHandlerConstants.SIGNATURE + " " + WSHandlerConstants.ENCRYPT
@@ -1015,7 +1015,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> outConfig = new HashMap<String, Object>();
+        Map<String, Object> outConfig = new HashMap<>();
         outConfig.put(
             ConfigurationConstants.ACTION,
             ConfigurationConstants.ENCRYPT + " " + ConfigurationConstants.SIGNATURE
@@ -1038,14 +1038,14 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
-        Map<String, Object> outProperties = new HashMap<String, Object>();
+        Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         outProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -1092,14 +1092,14 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.SIG_VER_PROP_FILE, "insecurity.properties");
         WSS4JInInterceptor inInterceptor = new WSS4JInInterceptor(inProperties);
         service.getInInterceptors().add(inInterceptor);
 
-        Map<String, Object> outProperties = new HashMap<String, Object>();
+        Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         outProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         outProperties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -1116,7 +1116,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> clientOutConfig = new HashMap<String, Object>();
+        Map<String, Object> clientOutConfig = new HashMap<>();
         clientOutConfig.put(
             ConfigurationConstants.ACTION, ConfigurationConstants.SIGNATURE
         );
@@ -1127,7 +1127,7 @@ public class StaxToDOMRoundTripTest extends AbstractSecurityTest {
 
         client.getOutInterceptors().add(clientOhandler);
 
-        Map<String, Object> clientInConfig = new HashMap<String, Object>();
+        Map<String, Object> clientInConfig = new HashMap<>();
         clientInConfig.put(ConfigurationConstants.PW_CALLBACK_REF, new TestPwdCallback());
         clientInConfig.put(ConfigurationConstants.ENABLE_SIGNATURE_CONFIRMATION, "true");
         clientInConfig.put(ConfigurationConstants.SIG_VER_PROP_FILE, "insecurity.properties");

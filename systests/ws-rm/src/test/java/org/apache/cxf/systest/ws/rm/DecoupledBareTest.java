@@ -65,7 +65,7 @@ public class DecoupledBareTest extends AbstractBusClientServerTestBase {
             Object implementor = new DocLitBareGreeterImpl();
             String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
             ep = Endpoint.create(implementor);
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(properties);
             ep.publish(address);

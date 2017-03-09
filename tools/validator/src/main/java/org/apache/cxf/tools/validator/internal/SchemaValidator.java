@@ -345,7 +345,7 @@ class NewStackTraceErrorHandler implements ErrorHandler {
 
 class SchemaResourceResolver implements LSResourceResolver {
     private static final Logger LOG = LogUtils.getL7dLogger(SchemaValidator.class);
-    private static final Map<String, String> NSFILEMAP = new HashMap<String, String>();
+    private static final Map<String, String> NSFILEMAP = new HashMap<>();
     static {
         NSFILEMAP.put(ToolConstants.XML_NAMESPACE_URI, "xml.xsd");
         NSFILEMAP.put(ToolConstants.WSDL_NAMESPACE_URI, "wsdl.xsd");

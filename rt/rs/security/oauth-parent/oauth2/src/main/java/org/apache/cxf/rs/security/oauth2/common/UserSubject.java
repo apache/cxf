@@ -45,7 +45,7 @@ public class UserSubject implements Serializable {
     private String login;
     private String id;
     private List<String> roles = new LinkedList<String>();
-    private Map<String, String> properties = new HashMap<String, String>();
+    private Map<String, String> properties = new HashMap<>();
     private AuthenticationMethod am;
 
     public UserSubject() {

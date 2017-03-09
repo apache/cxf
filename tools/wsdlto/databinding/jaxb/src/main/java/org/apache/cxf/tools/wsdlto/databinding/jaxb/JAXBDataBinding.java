@@ -292,7 +292,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBDataBinding.class);
 
     private static final Set<String> DEFAULT_TYPE_MAP = new HashSet<>();
-    private static final Map<String, String> JLDEFAULT_TYPE_MAP = new HashMap<String, String>();
+    private static final Map<String, String> JLDEFAULT_TYPE_MAP = new HashMap<>();
 
     private S2JJAXBModel rawJaxbModelGenCode;
     private ToolContext context;

@@ -27,7 +27,7 @@ import httpsdemo.common.CustomerService;
 
 public class CustomerServiceImpl implements CustomerService {
     long currentId = 123;
-    Map<Long, Customer> customers = new HashMap<Long, Customer>();
+    Map<Long, Customer> customers = new HashMap<>();
 
     public CustomerServiceImpl() {
         init();

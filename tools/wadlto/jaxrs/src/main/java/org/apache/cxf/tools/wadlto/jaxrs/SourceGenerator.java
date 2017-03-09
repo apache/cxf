@@ -141,7 +141,7 @@ public class SourceGenerator {
     private static final Map<String, String> XSD_SPECIFIC_TYPE_MAP;
 
     static {
-        HTTP_METHOD_ANNOTATIONS = new HashMap<String, Class<?>>();
+        HTTP_METHOD_ANNOTATIONS = new HashMap<>();
         HTTP_METHOD_ANNOTATIONS.put("get", GET.class);
         HTTP_METHOD_ANNOTATIONS.put("put", PUT.class);
         HTTP_METHOD_ANNOTATIONS.put("post", POST.class);
@@ -149,7 +149,7 @@ public class SourceGenerator {
         HTTP_METHOD_ANNOTATIONS.put("head", HEAD.class);
         HTTP_METHOD_ANNOTATIONS.put("options", OPTIONS.class);
 
-        PARAM_ANNOTATIONS = new HashMap<String, Class<?>>();
+        PARAM_ANNOTATIONS = new HashMap<>();
         PARAM_ANNOTATIONS.put("template", PathParam.class);
         PARAM_ANNOTATIONS.put("header", HeaderParam.class);
         PARAM_ANNOTATIONS.put("query", QueryParam.class);
@@ -159,7 +159,7 @@ public class SourceGenerator {
         RESOURCE_LEVEL_PARAMS.add("template");
         RESOURCE_LEVEL_PARAMS.add("matrix");
 
-        AUTOBOXED_PRIMITIVES_MAP = new HashMap<String, String>();
+        AUTOBOXED_PRIMITIVES_MAP = new HashMap<>();
         AUTOBOXED_PRIMITIVES_MAP.put(byte.class.getSimpleName(), Byte.class.getSimpleName());
         AUTOBOXED_PRIMITIVES_MAP.put(short.class.getSimpleName(), Short.class.getSimpleName());
         AUTOBOXED_PRIMITIVES_MAP.put(int.class.getSimpleName(), Integer.class.getSimpleName());
@@ -168,7 +168,7 @@ public class SourceGenerator {
         AUTOBOXED_PRIMITIVES_MAP.put(double.class.getSimpleName(), Double.class.getSimpleName());
         AUTOBOXED_PRIMITIVES_MAP.put(boolean.class.getSimpleName(), Boolean.class.getSimpleName());
 
-        XSD_SPECIFIC_TYPE_MAP = new HashMap<String, String>();
+        XSD_SPECIFIC_TYPE_MAP = new HashMap<>();
         XSD_SPECIFIC_TYPE_MAP.put("string", "String");
         XSD_SPECIFIC_TYPE_MAP.put("integer", "long");
         XSD_SPECIFIC_TYPE_MAP.put("float", "float");
@@ -405,7 +405,7 @@ public class SourceGenerator {
             return new GrammarInfo();
         }
 
-        Map<String, String> nsMap = new HashMap<String, String>();
+        Map<String, String> nsMap = new HashMap<>();
         NamedNodeMap attrMap = app.getAppElement().getAttributes();
         for (int i = 0; i < attrMap.getLength(); i++) {
             Node node = attrMap.item(i);
@@ -415,7 +415,7 @@ public class SourceGenerator {
                 nsMap.put(nodeName.substring(6), nsValue);
             }
         }
-        Map<String, String> elementTypeMap = new HashMap<String, String>();
+        Map<String, String> elementTypeMap = new HashMap<>();
         for (SchemaInfo schemaEl : schemaElements) {
             populateElementTypeMap(app, schemaEl.getElement(), schemaEl.getSystemId(), elementTypeMap);
         }
@@ -509,7 +509,7 @@ public class SourceGenerator {
         writeImplementsInterface(sbCode, qname.getLocalPart(), info.isInterfaceGenerated());
         sbCode.append(" {" + getLineSep() + getLineSep());
 
-        Map<String, Integer> methodNameMap = new HashMap<String, Integer>();
+        Map<String, Integer> methodNameMap = new HashMap<>();
         writeMethods(rElement, classPackage, imports, sbCode,
                      info, resourceId, isRoot, "",
                      methodNameMap);
@@ -2033,8 +2033,8 @@ public class SourceGenerator {
     }
 
     private static class GrammarInfo {
-        private Map<String, String> nsMap = new HashMap<String, String>();
-        private Map<String, String> elementTypeMap = new HashMap<String, String>();
+        private Map<String, String> nsMap = new HashMap<>();
+        private Map<String, String> elementTypeMap = new HashMap<>();
         private boolean noTargetNamespace;
         GrammarInfo() {
 

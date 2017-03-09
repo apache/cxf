@@ -30,7 +30,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/bookstore/")
 public class BookStoreWithValidationPerRequest  {
-    private Map<String, BookWithValidation> books = new HashMap<String, BookWithValidation>();
+    private Map<String, BookWithValidation> books = new HashMap<>();
     @NotNull private String id;
 
     public BookStoreWithValidationPerRequest() {

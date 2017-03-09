@@ -112,7 +112,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
@@ -157,7 +157,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
@@ -205,7 +205,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
@@ -254,7 +254,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
@@ -299,7 +299,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
@@ -347,7 +347,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
@@ -400,7 +400,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "Timestamp Signature Encrypt");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("encryptionPropFile", "bob.properties");
@@ -447,7 +447,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "Timestamp Signature Encrypt");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("encryptionPropFile", "bob.properties");
@@ -500,7 +500,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
@@ -576,7 +576,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");
@@ -700,7 +700,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "UsernameToken Encrypt");
         outProps.put("encryptionPropFile", "bob.properties");
         outProps.put("user", "alice");
@@ -749,7 +749,7 @@ public class CryptoCoverageCheckerTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, test.getPort());
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "UsernameToken Encrypt");
         outProps.put("encryptionPropFile", "bob.properties");
         outProps.put("user", "alice");

@@ -420,7 +420,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         }
 
         SecurityToken wstoken = new SecurityToken(id, samlToken, null, null);
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.TOKEN, wstoken);
         properties.put(SecurityConstants.TOKEN_ID, wstoken.getId());
 
@@ -506,7 +506,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
         Map<String, Object> properties = msgProperties;
         if (properties == null) {
-            properties = new HashMap<String, Object>();
+            properties = new HashMap<>();
             properties.put(SecurityConstants.USERNAME, "alice");
             properties.put(
                 SecurityConstants.CALLBACK_HANDLER,
@@ -620,7 +620,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
             SecurityConstants.CALLBACK_HANDLER,

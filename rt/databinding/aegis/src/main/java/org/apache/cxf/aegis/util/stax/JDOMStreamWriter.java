@@ -43,7 +43,7 @@ public class JDOMStreamWriter implements XMLStreamWriter {
 
     private NamespaceContext context;
 
-    private Map<String, Object> properties = new HashMap<String, Object>();
+    private Map<String, Object> properties = new HashMap<>();
 
     public JDOMStreamWriter() {
     }

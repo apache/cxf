@@ -75,7 +75,7 @@ final class JMSURIParser {
     }
 
     public Map<String, Object> parseQuery() {
-        Map<String, Object> rc = new HashMap<String, Object>();
+        Map<String, Object> rc = new HashMap<>();
         if (query != null) {
             String[] parameters = StringUtils.split(query, "&");
             for (String parameter : parameters) {

@@ -50,7 +50,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(StaxInInterceptor.class);
 
-    private static Map<Object, XMLInputFactory> factories = new HashMap<Object, XMLInputFactory>();
+    private static Map<Object, XMLInputFactory> factories = new HashMap<>();
 
     public StaxInInterceptor() {
         super(Phase.POST_STREAM);

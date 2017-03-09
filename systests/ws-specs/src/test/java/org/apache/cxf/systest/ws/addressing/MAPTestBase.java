@@ -339,7 +339,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
                 return null;
             }
         } else {
-            checkPointMessageIDs = new HashMap<String, String>();
+            checkPointMessageIDs = new HashMap<>();
             messageIDs.put(checkPoint, checkPointMessageIDs);
         }
         checkPointMessageIDs.put(id, id);

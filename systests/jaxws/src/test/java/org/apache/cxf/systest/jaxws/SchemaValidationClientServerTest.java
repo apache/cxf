@@ -55,7 +55,7 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
             Object implementor = new ServicePortTypeImpl();
             address = "http://localhost:" + PORT + "/schemavalidation";
             Endpoint ep = Endpoint.create(implementor);
-            Map<String, Object> map = new HashMap<String, Object>();
+            Map<String, Object> map = new HashMap<>();
             map.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(map);
             ((EndpointImpl)ep).setWsdlLocation("wsdl_systest_jaxws/schemaValidation.wsdl");

@@ -30,7 +30,7 @@ import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 
 @Path("/bookstorestorage/")
 public class SecureBookStoreNoAnnotations implements BookInterface {
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
 
     public SecureBookStoreNoAnnotations() {
         Book book = new Book();

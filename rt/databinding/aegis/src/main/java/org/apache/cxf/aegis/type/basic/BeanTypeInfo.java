@@ -41,9 +41,9 @@ import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.common.util.ReflectionUtil;
 
 public class BeanTypeInfo {
-    private Map<QName, QName> mappedName2typeName = new HashMap<QName, QName>();
-    private Map<QName, String> mappedName2pdName = new HashMap<QName, String>();
-    private Map<QName, AegisType> mappedName2type = new HashMap<QName, AegisType>();
+    private Map<QName, QName> mappedName2typeName = new HashMap<>();
+    private Map<QName, String> mappedName2pdName = new HashMap<>();
+    private Map<QName, AegisType> mappedName2type = new HashMap<>();
     private Class<?> beanClass;
     private List<QName> attributes = new ArrayList<>();
     private List<QName> elements = new ArrayList<>();

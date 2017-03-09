@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class InterfaceInvocationHandler implements InvocationHandler {
-    private Map<Object, Object> attributes = new HashMap<Object, Object>();
+    private Map<Object, Object> attributes = new HashMap<>();
 
     InterfaceInvocationHandler() {
     }

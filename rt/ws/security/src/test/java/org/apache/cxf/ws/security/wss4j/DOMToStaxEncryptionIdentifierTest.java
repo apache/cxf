@@ -63,7 +63,7 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
@@ -96,7 +96,7 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
@@ -129,7 +129,7 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
@@ -162,7 +162,7 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");
@@ -195,7 +195,7 @@ public class DOMToStaxEncryptionIdentifierTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.ENC_PROP_FILE, "outsecurity.properties");

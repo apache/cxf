@@ -135,7 +135,7 @@ public abstract class JmsPublisher extends AbstractPublisher implements Consumer
     protected void start() throws PublisherRegistrationFailedFault {
         if (demand) {
             try {
-                producers = new HashMap<Destination, Object>();
+                producers = new HashMap<>();
                 advisories = new ArrayList<>();
                 for (TopicExpressionType topic : this.topic) {
                     ConsumerEventSource advisory

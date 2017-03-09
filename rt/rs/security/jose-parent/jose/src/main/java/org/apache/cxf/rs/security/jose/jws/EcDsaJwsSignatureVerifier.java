@@ -31,7 +31,7 @@ import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
 public class EcDsaJwsSignatureVerifier extends PublicKeyJwsSignatureVerifier {
     static final Map<String, Integer> SIGNATURE_LENGTH_MAP;
     static {
-        SIGNATURE_LENGTH_MAP = new HashMap<String, Integer>();
+        SIGNATURE_LENGTH_MAP = new HashMap<>();
         SIGNATURE_LENGTH_MAP.put(SignatureAlgorithm.ES256.getJwaName(), 64);
         SIGNATURE_LENGTH_MAP.put(SignatureAlgorithm.ES384.getJwaName(), 96);
         SIGNATURE_LENGTH_MAP.put(SignatureAlgorithm.ES512.getJwaName(), 132);

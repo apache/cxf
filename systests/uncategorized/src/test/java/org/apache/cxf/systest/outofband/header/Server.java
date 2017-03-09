@@ -53,7 +53,7 @@ public class Server extends AbstractBusTestServerBase {
 
         Object implementor = new OOBHdrServiceImpl();
         Endpoint ep = Endpoint.create(implementor);
-        Map<String, Object> props = new HashMap<String, Object>(2);
+        Map<String, Object> props = new HashMap<>(2);
         props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare",
                                                    "SOAPService"));
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
@@ -61,7 +61,7 @@ public class Server extends AbstractBusTestServerBase {
         ep.publish("http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPort");
 
         ep = Endpoint.create(implementor);
-        props = new HashMap<String, Object>(2);
+        props = new HashMap<>(2);
         props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare",
                                                    "SOAPService"));
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
@@ -70,7 +70,7 @@ public class Server extends AbstractBusTestServerBase {
         ep.publish("http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPortNoHeader");
 
         ep = Endpoint.create(implementor);
-        props = new HashMap<String, Object>(2);
+        props = new HashMap<>(2);
         props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare",
                                                    "SOAPService"));
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
@@ -79,7 +79,7 @@ public class Server extends AbstractBusTestServerBase {
         ep.publish("http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPortHeader");
 
         ep = Endpoint.create(new OOBHdrPropertyServiceImpl());
-        props = new HashMap<String, Object>(2);
+        props = new HashMap<>(2);
         props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare",
                                                    "SOAPService"));
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));

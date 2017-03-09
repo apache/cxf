@@ -59,7 +59,7 @@ public class ResourceLocal implements Resource {
     protected Map<String, Dialect> dialects;
 
     public ResourceLocal() {
-        dialects = new HashMap<String, Dialect>();
+        dialects = new HashMap<>();
         dialects.put(FragmentDialectConstants.FRAGMENT_2011_03_IRI, new FragmentDialect());
     }
 

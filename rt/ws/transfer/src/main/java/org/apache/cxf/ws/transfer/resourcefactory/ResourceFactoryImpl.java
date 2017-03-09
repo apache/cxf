@@ -50,7 +50,7 @@ public class ResourceFactoryImpl implements ResourceFactory {
     protected Map<String, Dialect> dialects;
 
     public ResourceFactoryImpl() {
-        dialects = new HashMap<String, Dialect>();
+        dialects = new HashMap<>();
     }
 
     @Override

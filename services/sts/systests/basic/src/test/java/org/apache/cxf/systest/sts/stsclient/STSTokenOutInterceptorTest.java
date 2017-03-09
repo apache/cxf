@@ -219,7 +219,7 @@ public class STSTokenOutInterceptorTest extends AbstractBusClientServerTestBase 
         stsClient.setAllowRenewingAfterExpiry(true);
         stsClient.setEnableLifetime(true);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(SecurityConstants.CALLBACK_HANDLER, "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         props.put(SecurityConstants.ENCRYPT_USERNAME, "mystskey");
         props.put(SecurityConstants.ENCRYPT_PROPERTIES, "clientKeystore.properties");
@@ -244,7 +244,7 @@ public class STSTokenOutInterceptorTest extends AbstractBusClientServerTestBase 
         stsClient.setAllowRenewingAfterExpiry(true);
         stsClient.setEnableLifetime(true);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(SecurityConstants.USERNAME, "alice");
         props.put(SecurityConstants.CALLBACK_HANDLER, "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         stsClient.setProperties(props);

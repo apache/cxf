@@ -37,7 +37,7 @@ public class BankImpl implements Bank {
 
     private Map<String, W3CEndpointReference> accountList =
         new HashMap<String, W3CEndpointReference>();
-    private Map<String, Endpoint> endpointList = new HashMap<String, Endpoint>();
+    private Map<String, Endpoint> endpointList = new HashMap<>();
 
     public BankImpl() {
     }

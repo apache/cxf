@@ -2097,7 +2097,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostGetBookAdapterList() throws Exception {
         JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
-        Map<String, String> outMap = new HashMap<String, String>();
+        Map<String, String> outMap = new HashMap<>();
         outMap.put("Books", "CollectionWrapper");
         outMap.put("books", "Book");
         provider.setOutTransformElements(outMap);
@@ -2112,7 +2112,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostGetBookAdapterListJSON() throws Exception {
         JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
-        Map<String, String> outMap = new HashMap<String, String>();
+        Map<String, String> outMap = new HashMap<>();
         outMap.put("Books", "CollectionWrapper");
         outMap.put("books", "Book");
         provider.setOutTransformElements(outMap);

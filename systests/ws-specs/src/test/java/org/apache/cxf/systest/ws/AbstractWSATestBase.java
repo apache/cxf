@@ -75,7 +75,7 @@ public class AbstractWSATestBase extends AbstractBusClientServerTestBase {
         String s = log.substring(log.indexOf("Payload: ") + 9);
         Document doc = StaxUtils.read(new StringReader(s));
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("wsa", "http://www.w3.org/2005/08/addressing");
         ns.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
         XPathUtils xpathu = new XPathUtils(ns);
@@ -85,7 +85,7 @@ public class AbstractWSATestBase extends AbstractBusClientServerTestBase {
         String s = log.substring(log.indexOf("Payload: ") + 9);
         Document doc = StaxUtils.read(new StringReader(s));
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("wsa", "http://www.w3.org/2005/08/addressing");
         ns.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
         XPathUtils xpathu = new XPathUtils(ns);

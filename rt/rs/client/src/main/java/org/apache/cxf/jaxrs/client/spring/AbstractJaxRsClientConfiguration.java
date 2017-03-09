@@ -76,7 +76,7 @@ public abstract class AbstractJaxRsClientConfiguration implements ApplicationCon
             }
         }
 
-        Map<String, String> extraHeaders = new HashMap<String, String>();
+        Map<String, String> extraHeaders = new HashMap<>();
         if (!StringUtils.isEmpty(accept)) {
             extraHeaders.put("Accept", accept);
         }

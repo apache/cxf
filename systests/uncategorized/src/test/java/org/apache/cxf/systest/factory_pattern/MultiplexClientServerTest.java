@@ -87,7 +87,7 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         createStaticBus("org/apache/cxf/systest/factory_pattern/cxf_multiplex.xml");
         // requires ws-a support to propagate reference parameters
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<>();
         if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
             props.put("org.apache.activemq.default.directory.prefix",
                       System.getProperty("org.apache.activemq.default.directory.prefix"));

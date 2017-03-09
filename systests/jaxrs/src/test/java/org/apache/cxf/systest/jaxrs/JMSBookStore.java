@@ -57,7 +57,7 @@ public class JMSBookStore {
     @javax.ws.rs.core.Context
     private ProtocolHeaders headers;
 
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
 
 
 

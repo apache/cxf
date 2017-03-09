@@ -80,7 +80,7 @@ public class Activator implements BundleActivator {
         }
 
         private Map<String, Object> toMap(Dictionary<String, ?> properties) {
-            Map<String, Object> props = new HashMap<String, Object>();
+            Map<String, Object> props = new HashMap<>();
             if (properties == null) {
                 return props;
             }

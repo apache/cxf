@@ -90,7 +90,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
@@ -130,7 +130,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
@@ -169,7 +169,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
@@ -209,7 +209,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
@@ -246,7 +246,7 @@ public class JWTAuthnAuthzTest extends AbstractBusClientServerTestBase {
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",

@@ -25,10 +25,10 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 public class ResourceTypes {
-    private Map<Class<?>, Type> allTypes = new HashMap<Class<?>, Type>();
-    private Map<Class<?>, QName> collectionMap = new HashMap<Class<?>, QName>();
-    private Map<Class<?>, QName> xmlNameMap = new HashMap<Class<?>, QName>();
-    private Map<Class<?>, Class<?>> substitutions = new HashMap<Class<?>, Class<?>>();
+    private Map<Class<?>, Type> allTypes = new HashMap<>();
+    private Map<Class<?>, QName> collectionMap = new HashMap<>();
+    private Map<Class<?>, QName> xmlNameMap = new HashMap<>();
+    private Map<Class<?>, Class<?>> substitutions = new HashMap<>();
     public Map<Class<?>, Type> getAllTypes() {
         return allTypes;
     }

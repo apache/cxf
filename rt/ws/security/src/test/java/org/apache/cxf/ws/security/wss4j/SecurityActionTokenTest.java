@@ -84,10 +84,10 @@ public class SecurityActionTokenTest extends AbstractSecurityTest {
         List<HandlerAction> actions =
             Collections.singletonList(new HandlerAction(WSConstants.ENCR, actionToken));
 
-        Map<String, Object> outProperties = new HashMap<String, Object>();
+        Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.HANDLER_ACTIONS, actions);
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());

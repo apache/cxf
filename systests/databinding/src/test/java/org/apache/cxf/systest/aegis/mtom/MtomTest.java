@@ -78,7 +78,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         jaxwsFac.setDataBinding(new AegisDatabinding());
         jaxwsFac.setAddress("http://localhost:" + PORT + "/jaxWsMtom");
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         if (enableClientMTOM) {
             props.put("mtom-enabled", Boolean.TRUE);
         }

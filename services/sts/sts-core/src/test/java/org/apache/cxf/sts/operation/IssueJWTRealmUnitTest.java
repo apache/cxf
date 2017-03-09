@@ -391,7 +391,7 @@ public class IssueJWTRealmUnitTest extends org.junit.Assert {
      * Create some JWT Realms
      */
     private Map<String, RealmProperties> createRealms() {
-        Map<String, RealmProperties> realms = new HashMap<String, RealmProperties>();
+        Map<String, RealmProperties> realms = new HashMap<>();
         RealmProperties realm = new RealmProperties();
         realm.setIssuer("A-Issuer");
         realms.put("A", realm);

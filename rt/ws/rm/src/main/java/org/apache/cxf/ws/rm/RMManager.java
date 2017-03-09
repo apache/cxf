@@ -472,7 +472,7 @@ public class RMManager {
             Proxy proxy = source.getReliableEndpoint().getProxy();
             ProtocolVariation protocol = config.getProtocolVariation();
             Exchange exchange = new ExchangeImpl();
-            Map<String, Object> context = new HashMap<String, Object>(16);
+            Map<String, Object> context = new HashMap<>(16);
             for (String key : message.getContextualPropertyKeys()) {
                 //copy other properties?
                 if (key.startsWith("ws-security")) {

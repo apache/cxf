@@ -77,7 +77,7 @@ public final class OAuthClientUtils {
     }
 
     public static Map<String, Object> prepareOAuthRsaProperties(PrivateKey pk) {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.RSA_SHA1);
         props.put(RSA_SHA1.PRIVATE_KEY, pk);
         return props;
@@ -88,7 +88,7 @@ public final class OAuthClientUtils {
                                         URI callback,
                                         Map<String, String> extraParams,
                                         Map<String, Object> oauthConsumerProps) throws OAuthServiceException {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         if (extraParams != null) {
             parameters.putAll(extraParams);
         }
@@ -134,7 +134,7 @@ public final class OAuthClientUtils {
                                        Token requestToken,
                                        String verifier,
                                        Map<String, Object> oauthConsumerProps) throws OAuthServiceException {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put(OAuth.OAUTH_CONSUMER_KEY, consumer.getKey());
         parameters.put(OAuth.OAUTH_TOKEN, requestToken.getToken());
         parameters.put(OAuth.OAUTH_VERIFIER, verifier);
@@ -168,7 +168,7 @@ public final class OAuthClientUtils {
                                                    String method,
                                                    String requestURI,
                                                    Map<String, Object> oauthConsumerProps) {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put(OAuth.OAUTH_CONSUMER_KEY, consumer.getKey());
         if (accessToken != null) {
             parameters.put(OAuth.OAUTH_TOKEN, accessToken.getToken());

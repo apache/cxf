@@ -46,7 +46,7 @@ import java.util.Set;
  */
 public class WeakIdentityHashMap<K, V> implements Map<K, V> {
     private final ReferenceQueue<K> queue = new ReferenceQueue<K>();
-    private Map<IdentityWeakReference, V> backingStore = new HashMap<IdentityWeakReference, V>();
+    private Map<IdentityWeakReference, V> backingStore = new HashMap<>();
 
 
     public WeakIdentityHashMap() {

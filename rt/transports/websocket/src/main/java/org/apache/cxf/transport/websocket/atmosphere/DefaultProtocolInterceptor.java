@@ -66,7 +66,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
     private static final String REQUEST_DISPATCHED = "request.dispatched";
     private static final String RESPONSE_PARENT = "response.parent";
 
-    private Map<String, AtmosphereResponse> suspendedResponses = new HashMap<String, AtmosphereResponse>();
+    private Map<String, AtmosphereResponse> suspendedResponses = new HashMap<>();
 
     private final AsyncIOInterceptor interceptor = new Interceptor();
 
@@ -304,7 +304,7 @@ public class DefaultProtocolInterceptor extends AtmosphereInterceptorAdapter {
         if (AtmosphereResource.TRANSPORT.WEBSOCKET != response.resource().transport()) {
             return payload;
         }
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<>();
         if (refid != null) {
             response.addHeader(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, refid);
             headers.put(WebSocketConstants.DEFAULT_RESPONSE_ID_KEY, refid);

@@ -80,7 +80,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.encryption.properties",
                        "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -107,7 +107,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
@@ -137,7 +137,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
@@ -163,7 +163,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
@@ -193,7 +193,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
@@ -219,7 +219,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "AliceCert");
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
@@ -245,7 +245,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.alias", "smallkey");
         properties.put("rs.security.keystore.password", "security");
@@ -277,7 +277,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.properties",
                        "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -304,7 +304,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
@@ -334,7 +334,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
@@ -360,7 +360,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
@@ -387,7 +387,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
@@ -414,7 +414,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "ECKey");
         properties.put("rs.security.keystore.file",
@@ -443,7 +443,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         WebClient.getConfig(client).getRequestContext().putAll(properties);
 
         String header = "eyJhbGciOiJSUzI1NiIsImN0eSI6Impzb24ifQ";
@@ -491,7 +491,7 @@ public class JweJwsAlgorithmTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.alias", "smallkey");
         properties.put("rs.security.keystore.password", "security");

@@ -221,7 +221,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         assertNotNull(doc);
 
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("soap", Soap11.SOAP_NAMESPACE);
         ns.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         ns.put("xs", "http://www.w3.org/2001/XMLSchema");

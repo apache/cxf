@@ -52,8 +52,8 @@ public class AtomBookStore {
 
     @Context protected UriInfo uField;
     private HttpHeaders headers;
-    private Map<Long, Book> books = new HashMap<Long, Book>();
-    private Map<Long, CD> cds = new HashMap<Long, CD>();
+    private Map<Long, Book> books = new HashMap<>();
+    private Map<Long, CD> cds = new HashMap<>();
     private long bookId = 123;
     private long cdId = 123;
 

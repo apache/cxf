@@ -157,7 +157,7 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
     }
     public Map<String, Object> getProperties(boolean create) {
         if (create && properties == null) {
-            properties = new HashMap<String, Object>();
+            properties = new HashMap<>();
         }
         return properties;
     }

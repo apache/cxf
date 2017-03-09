@@ -64,11 +64,11 @@ public class HTraceTracingCustomHeadersTest extends AbstractBusClientServerTestB
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
         protected void run() {
-            final Map<String, String> properties = new HashMap<String, String>();
+            final Map<String, String> properties = new HashMap<>();
             properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, StandardOutSpanReceiver.class.getName());
             properties.put(Tracer.SAMPLER_CLASSES_KEY, AlwaysSampler.class.getName());
 
-            final Map<String, Object> headers = new HashMap<String, Object>();
+            final Map<String, Object> headers = new HashMap<>();
             headers.put(TracerHeaders.HEADER_SPAN_ID, CUSTOM_HEADER_SPAN_ID);
 
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
@@ -92,7 +92,7 @@ public class HTraceTracingCustomHeadersTest extends AbstractBusClientServerTestB
 
     @Before
     public void setUp() {
-        final Map<String, String> properties = new HashMap<String, String>();
+        final Map<String, String> properties = new HashMap<>();
         properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, StandardOutSpanReceiver.class.getName());
         properties.put(Tracer.SAMPLER_CLASSES_KEY, AlwaysSampler.class.getName());
 

@@ -76,7 +76,7 @@ public class TestUtilities {
     /**
      * Namespaces for the XPath expressions.
      */
-    private Map<String, String> namespaces = new HashMap<String, String>();
+    private Map<String, String> namespaces = new HashMap<>();
 
     /**
      * This class provides utilities to several conflicting inheritance stacks

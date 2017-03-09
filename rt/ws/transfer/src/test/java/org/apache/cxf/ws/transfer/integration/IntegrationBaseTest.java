@@ -172,7 +172,7 @@ public class IntegrationBaseTest {
 
         Map<String, Object> props = factory.getProperties();
         if (props == null) {
-            props = new HashMap<String, Object>();
+            props = new HashMap<>();
         }
         props.put("jaxb.additionalContextClasses",
                 ExpressionType.class);

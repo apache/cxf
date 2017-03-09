@@ -1036,8 +1036,8 @@ public class RMTxStore implements RMStore {
             return;
         }
         // create a statement specific lock table
-        statementLocks = new HashMap<Statement, Lock>();
-        cachedStatements = new HashMap<String, PreparedStatement>();
+        statementLocks = new HashMap<>();
+        cachedStatements = new HashMap<>();
 
         // create the statements in advance if the connection is to be kept
         cacheStatement(connection, CREATE_DEST_SEQUENCE_STMT_STR);

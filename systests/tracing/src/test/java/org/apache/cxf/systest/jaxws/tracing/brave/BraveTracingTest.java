@@ -119,7 +119,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             .sampled(true)
             .build();
 
-        final Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        final Map<String, List<String>> headers = new HashMap<>();
         headers.put(BraveHttpHeaders.SpanId.getName(), Arrays.asList(Long.toString(spanId.spanId)));
         headers.put(BraveHttpHeaders.TraceId.getName(), Arrays.asList(Long.toString(spanId.traceId)));
         headers.put(BraveHttpHeaders.Sampled.getName(), Arrays.asList(Boolean.toString(spanId.sampled())));

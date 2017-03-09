@@ -381,14 +381,14 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
     }
 
     public void setInMediaTemplates(Map<String, String> map) {
-        inMediaTemplates = new HashMap<String, Templates>();
+        inMediaTemplates = new HashMap<>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             inMediaTemplates.put(entry.getKey(), createTemplates(entry.getValue()));
         }
     }
 
     public void setOutMediaTemplates(Map<String, String> map) {
-        outMediaTemplates = new HashMap<String, Templates>();
+        outMediaTemplates = new HashMap<>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             outMediaTemplates.put(entry.getKey(), createTemplates(entry.getValue()));
         }
@@ -547,8 +547,8 @@ public class XSLTJaxbProvider<T> extends JAXBElementProvider<T> {
 
         private Templates templates;
         private URIResolver resolver;
-        private Map<String, Object> transformParameters = new HashMap<String, Object>();
-        private Map<String, String> outProps = new HashMap<String, String>();
+        private Map<String, Object> transformParameters = new HashMap<>();
+        private Map<String, String> outProps = new HashMap<>();
 
         TemplatesImpl(Templates templates, URIResolver resolver) {
             this.templates = templates;

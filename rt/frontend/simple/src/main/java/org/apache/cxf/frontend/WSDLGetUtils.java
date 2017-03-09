@@ -95,7 +95,7 @@ public class WSDLGetUtils {
                             String base,
                             String ctxUri,
                             EndpointInfo endpointInfo) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("wsdl", "");
         getDocument(message, base,
                     params, ctxUri,
@@ -109,7 +109,7 @@ public class WSDLGetUtils {
                                                   String base,
                                                   String ctxUri,
                                                   EndpointInfo endpointInfo) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("wsdl", "");
         getDocument(message, base,
                     params, ctxUri,
@@ -118,7 +118,7 @@ public class WSDLGetUtils {
         Map<String, SchemaReference> mp = CastUtils.cast((Map<?, ?>)endpointInfo.getService()
                                                          .getProperty(SCHEMAS_KEY));
 
-        Map<String, String> schemas = new HashMap<String, String>();
+        Map<String, String> schemas = new HashMap<>();
         for (Map.Entry<String, SchemaReference> ent : mp.entrySet()) {
             params.clear();
             params.put("xsd", ent.getKey());

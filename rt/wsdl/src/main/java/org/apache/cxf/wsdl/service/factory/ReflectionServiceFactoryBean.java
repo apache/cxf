@@ -155,7 +155,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
     protected ParameterizedType serviceType;
     protected Map<Type, Map<String, Class<?>>> parameterizedTypes;
 
-    protected final Map<String, String> schemaLocationMapping = new HashMap<String, String>();
+    protected final Map<String, String> schemaLocationMapping = new HashMap<>();
 
     private List<AbstractServiceConfiguration> serviceConfigurations =
         new ArrayList<>();
@@ -175,8 +175,8 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
     private List<Feature> features;
 
-    private Map<Method, Boolean> wrappedCache = new HashMap<Method, Boolean>();
-    private Map<Method, Boolean> isRpcCache = new HashMap<Method, Boolean>();
+    private Map<Method, Boolean> wrappedCache = new HashMap<>();
+    private Map<Method, Boolean> isRpcCache = new HashMap<>();
     private String styleCache;
     private Boolean defWrappedCache;
 
@@ -640,7 +640,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
 
         InterfaceInfo intf = getInterfaceInfo();
 
-        Map<QName, Method> validMethods = new HashMap<QName, Method>();
+        Map<QName, Method> validMethods = new HashMap<>();
         for (Method m : methods) {
             if (isValidMethod(m)) {
                 QName opName = getOperationName(intf, m);
@@ -892,7 +892,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
             //early iterate over FaultInfo before cycling on exception types
             //as fi.getMessageParts() is very time-consuming due to elements
             //copy in ArrayList constructor
-            mpiMap = new HashMap<FaultInfo, List<MessagePartInfo>>();
+            mpiMap = new HashMap<>();
             for (FaultInfo fi : o.getFaults()) {
                 mpiMap.put(fi, fi.getMessageParts());
             }
@@ -2353,7 +2353,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         return serviceClass;
     }
     private void processParameterizedTypes() {
-        parameterizedTypes = new HashMap<Type, Map<String, Class<?>>>();
+        parameterizedTypes = new HashMap<>();
         if (serviceClass.isInterface()) {
             processTypes(serviceClass, serviceType);
         } else {
@@ -2369,7 +2369,7 @@ public class ReflectionServiceFactoryBean extends org.apache.cxf.service.factory
         if (tp instanceof ParameterizedType) {
             ParameterizedType ptp = (ParameterizedType)tp;
             Type c = ptp.getRawType();
-            Map<String, Class<?>> m = new HashMap<String, Class<?>>();
+            Map<String, Class<?>> m = new HashMap<>();
             parameterizedTypes.put(c, m);
             final Type[] ptpActualTypeArgs = ptp.getActualTypeArguments();
             final TypeVariable<?>[] scTypeArgs = sc.getTypeParameters();
