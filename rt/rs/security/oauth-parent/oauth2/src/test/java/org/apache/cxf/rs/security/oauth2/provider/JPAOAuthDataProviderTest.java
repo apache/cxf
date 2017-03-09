@@ -177,6 +177,27 @@ public class JPAOAuthDataProviderTest extends Assert {
     }
 
     @Test
+    public void testAddGetDeleteAccessTokenWithNullSubject() {
+        Client c = addClient("102", "bob");
+
+        AccessTokenRegistration atr = new AccessTokenRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Collections.singletonList("a"));
+        atr.setSubject(null);
+
+        getProvider().createAccessToken(atr);
+        List<ServerAccessToken> tokens = getProvider().getAccessTokens(c, null);
+        assertNotNull(tokens);
+        assertEquals(1, tokens.size());
+
+        getProvider().removeClient(c.getClientId());
+
+        tokens = getProvider().getAccessTokens(c, null);
+        assertNotNull(tokens);
+        assertEquals(0, tokens.size());
+    }
+
+    @Test
     public void testAddGetDeleteRefreshToken() {
         Client c = addClient("101", "bob");
 
