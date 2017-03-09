@@ -32,6 +32,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.util.Base64UrlUtility;
@@ -39,6 +40,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.ClientRegistrationProvider;
 import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
@@ -261,6 +263,12 @@ public class DynamicRegistrationService {
         // Add more typed properties like tosUri, policyUri, etc to Client
         // or set them as Client extra properties
 
+        SecurityContext sc = mc.getSecurityContext();
+        if (sc != null && sc.getUserPrincipal() != null && sc.getUserPrincipal().getName() != null) {
+            UserSubject subject = new UserSubject(sc.getUserPrincipal().getName());
+            newClient.setResourceOwnerSubject(subject);
+        }
+        
         newClient.setRegisteredDynamically(true);
         return newClient;
     }
