@@ -124,7 +124,7 @@ public class LoggingFeature extends AbstractFeature {
     }
 
     /**
-     * This function has no effect at this time.
+     * Set a limit on how much content can be logged
      * @param lim
      */
     public void setLimit(int lim) {
