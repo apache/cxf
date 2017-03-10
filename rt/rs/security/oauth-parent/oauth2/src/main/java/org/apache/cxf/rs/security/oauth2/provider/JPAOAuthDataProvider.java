@@ -263,14 +263,12 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
                 }
                 serverToken.setScopes(perms);
 
-                if (serverToken.getSubject() != null) {
-                    UserSubject sub = em.find(UserSubject.class, serverToken.getSubject().getLogin());
-                    if (sub == null) {
-                        em.persist(serverToken.getSubject());
-                    } else {
-                        sub = serverToken.getSubject();
-                        serverToken.setSubject(sub);
-                    }
+                UserSubject sub = em.find(UserSubject.class, serverToken.getSubject().getLogin());
+                if (sub == null) {
+                    em.persist(serverToken.getSubject());
+                } else {
+                    sub = em.merge(serverToken.getSubject());
+                    serverToken.setSubject(sub);
                 }
                 // ensure we have a managed association
                 // (needed for OpenJPA : InvalidStateException: Encountered unmanaged object)
