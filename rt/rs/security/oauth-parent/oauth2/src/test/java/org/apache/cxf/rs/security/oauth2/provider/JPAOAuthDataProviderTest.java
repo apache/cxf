@@ -34,6 +34,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JPAOAuthDataProviderTest extends Assert {
@@ -177,6 +178,7 @@ public class JPAOAuthDataProviderTest extends Assert {
     }
 
     @Test
+    @Ignore("uncomment when CXF-7264 is fixed")
     public void testAddGetDeleteAccessTokenWithNullSubject() {
         Client c = addClient("102", "bob");
 
