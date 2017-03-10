@@ -40,6 +40,7 @@ public class FactoryBeanListenerManager {
 
     public FactoryBeanListenerManager() {
         listeners.add(new AnnotationsFactoryBeanListener());
+        listeners.add(new OldLoggingFactoryBeanListener());
     }
     public FactoryBeanListenerManager(Bus b) {
         this();
@@ -55,7 +56,7 @@ public class FactoryBeanListenerManager {
         ConfiguredBeanLocator loc = bus.getExtension(ConfiguredBeanLocator.class);
         if (loc != null) {
             for (FactoryBeanListener f : loc.getBeansOfType(FactoryBeanListener.class)) {
-                listeners.addIfAbsent(f);
+                listeners.add(0, f);
             }
         }
     }

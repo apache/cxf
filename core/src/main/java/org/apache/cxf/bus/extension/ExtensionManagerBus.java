@@ -40,7 +40,6 @@ import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.NullConfigurer;
 import org.apache.cxf.feature.Feature;
-import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.resource.DefaultResourceManager;
 import org.apache.cxf.resource.ObjectTypeResolver;
@@ -59,30 +58,7 @@ import org.apache.cxf.transport.DestinationFactoryManager;
  */
 public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implements Bus {
     public static final String BUS_PROPERTY_NAME = "bus";
-    static final boolean FORCE_LOGGING;
-    static final boolean FORCE_PRETTY;
-    static {
-        boolean b = false;
-        boolean pretty = false;
-        try {
-            String prop = System.getProperty("org.apache.cxf.logging.enabled", "false");
-            if ("pretty".equals(prop)) {
-                b = true;
-                pretty = true;
-            } else {
-                b = Boolean.parseBoolean(prop);
-                //treat these all the same
-                b |= Boolean.getBoolean("com.sun.xml.ws.transport.local.LocalTransportPipe.dump");
-                b |= Boolean.getBoolean("com.sun.xml.ws.util.pipe.StandaloneTubeAssembler.dump");
-                b |= Boolean.getBoolean("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump");
-                b |= Boolean.getBoolean("com.sun.xml.ws.transport.http.HttpAdapter.dump");
-            }
-        } catch (Throwable t) {
-            //ignore
-        }
-        FORCE_LOGGING = b;
-        FORCE_PRETTY = pretty;
-    }
+
     private static final String BUS_ID_PROPERTY_NAME = "org.apache.cxf.bus.id";
 
     protected final Map<Class<?>, Object> extensions;
@@ -109,11 +85,6 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
         state = BusState.INITIAL;
 
         CXFBusFactory.possiblySetDefaultBus(this);
-        if (FORCE_LOGGING) {
-            LoggingFeature feature = new LoggingFeature();
-            feature.setPrettyLogging(FORCE_PRETTY);
-            features.add(feature);
-        }
         if (null != props) {
             properties.putAll(props);
         }
@@ -354,11 +325,6 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
     public synchronized void setFeatures(Collection<? extends Feature> features) {
         this.features.clear();
         this.features.addAll(features);
-        if (FORCE_LOGGING) {
-            LoggingFeature feature = new LoggingFeature();
-            feature.setPrettyLogging(FORCE_PRETTY);
-            this.features.add(feature);
-        }
         if (state == BusState.RUNNING) {
             initializeFeatures();
         }

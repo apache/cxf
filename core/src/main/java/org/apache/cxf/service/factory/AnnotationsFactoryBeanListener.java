@@ -30,7 +30,6 @@ import org.apache.cxf.annotations.EndpointProperty;
 import org.apache.cxf.annotations.FactoryType;
 import org.apache.cxf.annotations.FastInfoset;
 import org.apache.cxf.annotations.GZIP;
-import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.annotations.WSDLDocumentation;
 import org.apache.cxf.annotations.WSDLDocumentation.Placement;
@@ -39,7 +38,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.FIStaxInInterceptor;
 import org.apache.cxf.interceptor.FIStaxOutInterceptor;
@@ -97,7 +95,6 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             addSchemaValidationSupport(ep, cls.getAnnotation(SchemaValidation.class));
             addFastInfosetSupport(ep, cls.getAnnotation(FastInfoset.class));
             addGZipSupport(ep, bus, cls.getAnnotation(GZIP.class));
-            addLoggingSupport(ep, bus, cls.getAnnotation(Logging.class));
             addEndpointProperties(ep, bus, cls.getAnnotation(EndpointProperty.class));
             EndpointProperties props = cls.getAnnotation(EndpointProperties.class);
             if (props != null) {
@@ -151,7 +148,6 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             addGZipSupport(server.getEndpoint(), bus, cls.getAnnotation(GZIP.class));
             addSchemaValidationSupport(server.getEndpoint(), cls.getAnnotation(SchemaValidation.class));
             addFastInfosetSupport(server.getEndpoint(), cls.getAnnotation(FastInfoset.class));
-            addLoggingSupport(server.getEndpoint(), bus, cls.getAnnotation(Logging.class));
             addEndpointProperties(server.getEndpoint(), bus, cls.getAnnotation(EndpointProperty.class));
             EndpointProperties props = cls.getAnnotation(EndpointProperties.class);
             if (props != null) {
@@ -273,13 +269,6 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             } catch (Exception e) {
                 //REVISIT - log a warning
             }
-        }
-    }
-
-    private void addLoggingSupport(Endpoint endpoint, Bus bus, Logging annotation) {
-        if (annotation != null) {
-            LoggingFeature lf = new LoggingFeature(annotation);
-            lf.initialize(endpoint, bus);
         }
     }
 
