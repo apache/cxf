@@ -312,13 +312,12 @@ public final class IOUtils {
         StringBuilder buf = new StringBuilder();
         final char[] buffer = new char[bufSize];
         try {
-            int n = 0;
-            n = input.read(buffer);
+            int n = input.read(buffer);
             while (-1 != n) {
                 if (n == 0) {
                     throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
                 }
-                buf.append(new String(buffer, 0, n));
+                buf.append(buffer, 0, n);
                 n = input.read(buffer);
             }
             return buf.toString();
