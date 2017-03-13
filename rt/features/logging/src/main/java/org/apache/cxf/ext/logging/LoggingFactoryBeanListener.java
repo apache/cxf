@@ -27,9 +27,10 @@ import java.net.URI;
 import org.apache.cxf.Bus;
 
 import org.apache.cxf.annotations.Logging;
-
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.apache.cxf.ext.logging.event.PrintWriterEventSender;
 import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
 import org.apache.cxf.service.factory.FactoryBeanListener;
@@ -78,6 +79,28 @@ public class LoggingFactoryBeanListener implements FactoryBeanListener {
         }
     }
 
+    
+    private LogEventSender createEventSender(String location) {
+        if (StringUtils.isEmpty(location)) {
+            return null;
+        }
+        if ("<stdout>".equals(location)) {
+            return new PrintWriterEventSender(System.out);
+        } else if ("<stderr>".equals(location)) {
+            return new PrintWriterEventSender(System.err);                
+        } else if (location.startsWith("file:")) {
+            try {
+                URI uri = new URI(location);
+                File file = new File(uri);
+                PrintWriter writer = new PrintWriter(new FileWriter(file, true), true);
+                return new PrintWriterEventSender(writer);
+            } catch (Exception ex) {
+                //stick with default
+            }
+        }
+        return null;
+    }
+    
     private void addLoggingSupport(Endpoint endpoint, Bus bus, Logging annotation) {
         if (annotation != null) {
             LoggingFeature lf = new LoggingFeature();
@@ -85,19 +108,13 @@ public class LoggingFactoryBeanListener implements FactoryBeanListener {
             lf.setLimit(annotation.limit());
             lf.setLogBinary(annotation.showBinary());
             
-            if ("<stdout>".equals(annotation.outLocation())) {
-                lf.setOutSender(new PrintWriterEventSender(System.out));
-            } else if ("<stderr>".equals(annotation.outLocation())) {
-                lf.setOutSender(new PrintWriterEventSender(System.err));                
-            } else if (annotation.outLocation().startsWith("file:")) {
-                try {
-                    URI uri = new URI(annotation.outLocation());
-                    File file = new File(uri);
-                    PrintWriter writer = new PrintWriter(new FileWriter(file, true), true);
-                    lf.setOutSender(new PrintWriterEventSender(writer));
-                } catch (Exception ex) {
-                    //stick with default
-                }
+            LogEventSender les = createEventSender(annotation.outLocation());
+            if (les != null) {
+                lf.setOutSender(les);
+            }
+            les = createEventSender(annotation.inLocation());
+            if (les != null) {
+                lf.setInSender(les);
             }
             lf.initialize(endpoint, bus);
         }
