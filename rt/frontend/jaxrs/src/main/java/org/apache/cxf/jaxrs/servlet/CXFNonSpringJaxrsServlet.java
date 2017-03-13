@@ -415,9 +415,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         return map;
     }
 
-    protected boolean isResourceLifecycleASingleton(ServletConfig servletConfig) {
+    protected boolean isAppResourceLifecycleASingleton(Application app, ServletConfig servletConfig) {
         String scope = servletConfig.getInitParameter(SERVICE_SCOPE_PARAM);
-        return SERVICE_SCOPE_SINGLETON.equals(scope);
+        if (scope != null) {
+            scope = (String)app.getProperties().get(SERVICE_SCOPE_PARAM);
+        }
+        return SERVICE_SCOPE_SINGLETON.equals(scope);    
     }
     
     protected Object createSingletonInstance(Class<?> cls, Map<String, List<String>> props, ServletConfig sc)
@@ -504,11 +507,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         for (String cName : classNames) {
             ApplicationInfo providerApp = createApplicationInfo(cName, servletConfig);
 
+            Application app = providerApp.getProvider();
             JAXRSServerFactoryBean bean = ResourceUtils.createApplication(
-                                                providerApp.getProvider(),
+                                                app,
                                                 ignoreApplicationPath,
                                                 getStaticSubResolutionValue(servletConfig),
-                                                isResourceLifecycleASingleton(servletConfig),
+                                                isAppResourceLifecycleASingleton(app, servletConfig),
                                                 getBus());
             String splitChar = getParameterSplitChar(servletConfig);
             setAllInterceptors(bean, servletConfig, splitChar);
@@ -530,11 +534,12 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     protected void createServerFromApplication(ServletConfig servletConfig)
         throws ServletException {
 
+        Application app = getApplication();
         JAXRSServerFactoryBean bean = ResourceUtils.createApplication(
-                                          getApplication(),
+                                          app,
                                           isIgnoreApplicationPath(servletConfig),
                                           getStaticSubResolutionValue(servletConfig),
-                                          isResourceLifecycleASingleton(servletConfig),
+                                          isAppResourceLifecycleASingleton(app, servletConfig),
                                           getBus());
         bean.setBus(getBus());
         bean.setApplication(getApplication());
