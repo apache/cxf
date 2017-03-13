@@ -417,7 +417,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
     protected boolean isAppResourceLifecycleASingleton(Application app, ServletConfig servletConfig) {
         String scope = servletConfig.getInitParameter(SERVICE_SCOPE_PARAM);
-        if (scope != null) {
+        if (scope == null) {
             scope = (String)app.getProperties().get(SERVICE_SCOPE_PARAM);
         }
         return SERVICE_SCOPE_SINGLETON.equals(scope);    
