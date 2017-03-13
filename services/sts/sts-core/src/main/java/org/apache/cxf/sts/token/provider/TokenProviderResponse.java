@@ -19,7 +19,7 @@
 
 package org.apache.cxf.sts.token.provider;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 /**
  * This class encapsulates the response from a TokenProvider instance after creating a token.
@@ -33,8 +33,8 @@ public class TokenProviderResponse {
     private boolean computedKey;
     private TokenReference attachedReference;
     private TokenReference unAttachedReference;
-    private Date created;
-    private Date expires;
+    private ZonedDateTime created;
+    private ZonedDateTime expires;
 
     /**
      * Return true if the entropy represents a Computed Key.
@@ -145,49 +145,35 @@ public class TokenProviderResponse {
     }
 
     /**
-     * Get the Date that this Token was Created
-     * @return the Date that this Token was Created
+     * Get the ZonedDateTime that this Token was Created
+     * @return the ZonedDateTime that this Token was Created
      */
-    public Date getCreated() {
-        if (created != null) {
-            return new Date(created.getTime());
-        }
-        return null;
+    public ZonedDateTime getCreated() {
+        return created;
     }
 
     /**
-     * Set the Date that this Token was Created
-     * @param created the Date that this Token was Created
+     * Set the ZonedDateTime that this Token was Created
+     * @param created the ZonedDateTime that this Token was Created
      */
-    public void setCreated(Date created) {
-        if (created != null) {
-            this.created = new Date(created.getTime());
-        } else {
-            this.created = null;
-        }
+    public void setCreated(ZonedDateTime created) {
+        this.created = created;
     }
 
     /**
-     * Get the Date that this Token expires
-     * @return the Date that this Token expires
+     * Get the ZonedDateTime that this Token expires
+     * @return the ZonedDateTime that this Token expires
      */
-    public Date getExpires() {
-        if (expires != null) {
-            return new Date(expires.getTime());
-        }
-        return null;
+    public ZonedDateTime getExpires() {
+        return expires;
     }
 
     /**
-     * Set the Date that this Token expires
-     * @param expires the Date that this Token expires
+     * Set the ZonedDateTime that this Token expires
+     * @param expires the ZonedDateTime that this Token expires
      */
-    public void setExpires(Date expires) {
-        if (expires != null) {
-            this.expires = new Date(expires.getTime());
-        } else {
-            this.expires = null;
-        }
+    public void setExpires(ZonedDateTime expires) {
+        this.expires = expires;
     }
 
 }

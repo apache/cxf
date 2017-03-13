@@ -327,17 +327,10 @@ public class SAMLTokenValidator implements TokenValidator {
         // Store the successfully validated token in the cache
         byte[] signatureValue = assertion.getSignatureValue();
         if (tokenStore != null && signatureValue != null && signatureValue.length > 0) {
-            DateTime validTill = null;
-            if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-                validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
-            } else {
-                validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
-            }
-
+            
             SecurityToken securityToken =
                 CacheUtils.createSecurityTokenForStorage(assertion.getElement(), assertion.getId(),
-                    validTill.toDate(), principal, tokenRealm,
-                    null);
+                                                         assertion.getNotOnOrAfter(), principal, tokenRealm, null);
             CacheUtils.storeTokenInCache(securityToken, tokenStore, signatureValue);
         }
     }

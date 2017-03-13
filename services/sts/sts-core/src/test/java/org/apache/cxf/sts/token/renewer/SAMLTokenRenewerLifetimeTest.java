@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.sts.token.renewer;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.Properties;
 
@@ -110,8 +111,9 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
-        assertEquals(requestedLifetime * 1000L, renewerResponse.getExpires().getTime()
-                     - renewerResponse.getCreated().getTime());
+        
+        long duration = Duration.between(renewerResponse.getCreated(), renewerResponse.getExpires()).getSeconds();
+        assertEquals(requestedLifetime, duration);
     }
 
 
@@ -151,8 +153,9 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
-        assertEquals(providerLifetime * 1000L, renewerResponse.getExpires().getTime()
-                     - renewerResponse.getCreated().getTime());
+        
+        long duration = Duration.between(renewerResponse.getCreated(), renewerResponse.getExpires()).getSeconds();
+        assertEquals(providerLifetime, duration);
     }
 
 
@@ -311,8 +314,9 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
-        assertEquals(maxLifetime * 1000L, renewerResponse.getExpires().getTime()
-                     - renewerResponse.getCreated().getTime());
+        
+        long duration = Duration.between(renewerResponse.getCreated(), renewerResponse.getExpires()).getSeconds();
+        assertEquals(maxLifetime, duration);
     }
 
 

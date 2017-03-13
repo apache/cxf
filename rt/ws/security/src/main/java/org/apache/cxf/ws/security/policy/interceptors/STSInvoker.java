@@ -20,8 +20,8 @@
 package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.security.NoSuchAlgorithmException;
+import java.time.ZonedDateTime;
 import java.util.Base64;
-import java.util.Date;
 import java.util.logging.Logger;
 
 import javax.xml.stream.XMLStreamException;
@@ -50,10 +50,10 @@ import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.token.SecurityTokenReference;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.token.SecurityContextToken;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 /**
  * An abstract Invoker used by the Spnego and SecureConversationInInterceptors.
@@ -286,20 +286,19 @@ abstract class STSInvoker implements Invoker {
 
     void writeLifetime(
         W3CDOMStreamWriter writer,
-        Date created,
-        Date expires,
+        ZonedDateTime created,
+        ZonedDateTime expires,
         String prefix,
         String namespace
     ) throws Exception {
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         writer.writeStartElement(prefix, "Lifetime", namespace);
         writer.writeNamespace("wsu", WSConstants.WSU_NS);
         writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
-        writer.writeCharacters(fmt.format(created.getTime()));
+        writer.writeCharacters(DateUtil.getDateTimeFormatter(true).format(created));
         writer.writeEndElement();
 
         writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
-        writer.writeCharacters(fmt.format(expires.getTime()));
+        writer.writeCharacters(DateUtil.getDateTimeFormatter(true).format(expires));
         writer.writeEndElement();
         writer.writeEndElement();
     }

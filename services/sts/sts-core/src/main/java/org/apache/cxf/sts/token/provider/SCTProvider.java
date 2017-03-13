@@ -19,7 +19,8 @@
 
 package org.apache.cxf.sts.token.provider;
 
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -134,17 +135,15 @@ public class SCTProvider implements TokenProvider {
             response.setComputedKey(keyHandler.isComputedKey());
 
             // putting the secret key into the cache
-            Date currentDate = new Date();
-            response.setCreated(currentDate);
-            Date expires = null;
+            ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
+            response.setCreated(created);
+            ZonedDateTime expires = null;
             if (lifetime > 0) {
-                expires = new Date();
-                long currentTime = currentDate.getTime();
-                expires.setTime(currentTime + (lifetime * 1000L));
+                expires = created.plusSeconds(lifetime);
+                response.setExpires(expires);
             }
-            response.setExpires(expires);
 
-            SecurityToken token = new SecurityToken(sct.getIdentifier(), currentDate, expires);
+            SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setSecret(keyHandler.getSecret());
             token.setPrincipal(tokenParameters.getPrincipal());
 

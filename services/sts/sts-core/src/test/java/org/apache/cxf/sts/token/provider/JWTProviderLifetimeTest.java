@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.sts.token.provider;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.Properties;
 
@@ -75,15 +76,16 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(requestedLifetime * 1000L, providerResponse.getExpires().getTime()
-                     - providerResponse.getCreated().getTime());
+        
+        long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
+        assertEquals(requestedLifetime, duration);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
     }
 
     /**
@@ -105,15 +107,15 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-        assertEquals(providerLifetime * 1000L, providerResponse.getExpires().getTime()
-                     - providerResponse.getCreated().getTime());
+        long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
+        assertEquals(providerLifetime, duration);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
     }
 
 
@@ -219,15 +221,15 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(maxLifetime * 1000L, providerResponse.getExpires().getTime()
-                     - providerResponse.getCreated().getTime());
+        long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
+        assertEquals(maxLifetime, duration);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
     }
 
     /**
@@ -260,15 +262,15 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(50L * 1000L, providerResponse.getExpires().getTime()
-                     - providerResponse.getCreated().getTime());
+        long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
+        assertEquals(50, duration);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
     }
 
     /**
@@ -317,7 +319,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
     }
 
     /**
@@ -346,15 +348,15 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(claimsProvider.getLifetime() * 1000L, providerResponse.getExpires().getTime()
-                     - providerResponse.getCreated().getTime());
+        long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
+        assertEquals(claimsProvider.getLifetime(), duration);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
     }
 
     private TokenProviderParameters createProviderParameters(String tokenType) throws WSSecurityException {

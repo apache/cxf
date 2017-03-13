@@ -26,7 +26,8 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -266,7 +267,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         Assert.assertNotNull(token);
         Assert.assertEquals(TOKEN_TYPE_SAML_2_0, token.getTokenType());
         Assert.assertNotNull(token.getId());
-        Assert.assertTrue(token.getExpires().after(new Date()));
+        Assert.assertTrue(token.getExpires().isAfter(ZonedDateTime.now(ZoneOffset.UTC)));
         Assert.assertEquals("Assertion", token.getToken().getLocalName());
     }
 
