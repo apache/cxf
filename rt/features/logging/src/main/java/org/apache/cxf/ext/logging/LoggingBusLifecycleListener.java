@@ -24,7 +24,7 @@ import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 
 /**
- * 
+ * Add LoggingFeature based on system properties
  */
 public class LoggingBusLifecycleListener implements BusLifeCycleListener {
     

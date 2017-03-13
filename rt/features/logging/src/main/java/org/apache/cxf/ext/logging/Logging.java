@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.annotations;
+package org.apache.cxf.ext.logging;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -26,12 +26,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
-
 /**
  * Enables message Logging
  */
-@Deprecated
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
@@ -43,13 +40,10 @@ public @interface Logging {
     int limit() default AbstractLoggingInterceptor.DEFAULT_LIMIT;
 
     /**
-     * the locations where the messages are logged.   The default is
-     * <logger> which means to log to the java.util.logging.Logger,
-     * but <stdout>, <stderr>, and a "file:/.." URI are acceptable.
+     * Size limit when messages are written to disk.
+     * -1 means do not write to disk.
      */
-    String inLocation() default "<logger>";
-    String outLocation() default "<logger>";
-
+    int inMemThresHold() default AbstractLoggingInterceptor.DEFAULT_THRESHOLD;
 
     /**
      * For XML content, turn on pretty printing in the logs
@@ -59,6 +53,11 @@ public @interface Logging {
     /**
      * Ignore binary payloads by default
      */
-    boolean showBinary() default false;
+    boolean logBinary() default false;
+    
+    /**
+     * Ignore binary payloads by default
+     */
+    boolean logMultiplart() default true;
 }
 
