@@ -28,7 +28,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 
-import org.apache.cxf.annotations.Logging;
+import org.apache.cxf.ext.logging.Logging;
 
 @Path("/")
 @Consumes({"application/json", "application/xml" })
