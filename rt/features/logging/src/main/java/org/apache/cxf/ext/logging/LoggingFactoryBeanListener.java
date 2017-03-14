@@ -66,7 +66,7 @@ public class LoggingFactoryBeanListener implements FactoryBeanListener {
             lf.setPrettyLogging(annotation.pretty());
             lf.setLimit(annotation.limit());
             lf.setLogBinary(annotation.logBinary());
-            lf.setLogMultipart(annotation.logBinary());
+            lf.setLogMultipart(annotation.logMultipart());
             lf.initialize(endpoint, bus);
         }
     }
