@@ -1504,7 +1504,7 @@ public final class InjectionUtils {
                     type = new ParameterizedCollectionType((Class<?>)theType);
                 } else {
                     type = processGenericTypeIfNeeded(serviceCls, paramCls, theType);
-                    type = new ParameterizedCollectionType(getRawType(type));
+                    type = new ParameterizedCollectionType(type);
                 }
             }
         }
