@@ -56,8 +56,8 @@ public @interface Logging {
     boolean logBinary() default false;
     
     /**
-     * Ignore binary payloads by default
+     * Log multipart payloads by default
      */
-    boolean logMultiplart() default true;
+    boolean logMultipart() default true;
 }
 
