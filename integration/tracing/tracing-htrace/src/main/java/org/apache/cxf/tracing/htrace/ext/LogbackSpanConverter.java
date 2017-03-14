@@ -39,17 +39,16 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
  * 
  * Which produces the following sample output:
  *  
- *  [INFO] [spanId: -, tracerId: -] 2017-03-11 14:40:13.603 org.eclipse.jetty.server.Server Started @2731ms
- *  [INFO] [spanId: 6d3e0d975d4c883cce12aee1fd8f3e7e, tracerId: tracer-server/192.168.0.101] 2017-03-11 14:40:24.013 
+ *  [INFO] [-, -] 2017-03-11 14:40:13.603 org.eclipse.jetty.server.Server Started @2731ms
+ *  [INFO] [tracer-server/192.168.0.101, span: 6d3e0d975d4c883cce12aee1fd8f3e7e] 2017-03-11 14:40:24.013 
  *     com.example.rs.PeopleRestService Getting all employees
- *  [INFO] [spanId: 6d3e0d975d4c883c7592f4c2317dec22, tracerId: tracer-server/192.168.0.101] 2017-03-11 14:40:28.017 
+ *  [INFO] [tracer-server/192.168.0.101, span: 6d3e0d975d4c883c7592f4c2317dec22] 2017-03-11 14:40:28.017 
  *     com.example.rs.PeopleRestService Looking up manager in the DB database
  *
  */
 public class LogbackSpanConverter extends ClassicConverter {
-    private static final String TRACER_ID = "tracerId";
-    private static final String SPAN_ID = "spanId";
-    private static final String EMPTY_TRACE = String.format("%s: -, %s: -", SPAN_ID, TRACER_ID);
+    private static final String SPAN = "span";
+    private static final String EMPTY_TRACE = "-, -";
 
     @Override
     public String convert(ILoggingEvent event) {
@@ -57,13 +56,11 @@ public class LogbackSpanConverter extends ClassicConverter {
         
         if (currentSpan != null) {
             return new StringBuilder()
-                .append(SPAN_ID)
+                .append(currentSpan.getTracerId())
+                .append(", ")
+                .append(SPAN)
                 .append(": ")
                 .append(currentSpan.getSpanId())
-                .append(", ")
-                .append(TRACER_ID)
-                .append(": ")
-                .append(currentSpan.getTracerId())
                 .toString();
         }
         
