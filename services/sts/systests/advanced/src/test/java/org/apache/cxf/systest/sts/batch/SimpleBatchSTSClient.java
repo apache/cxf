@@ -24,9 +24,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -96,6 +97,7 @@ import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -105,7 +107,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.X509Util;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.policy.model.AbstractBinding;
 import org.apache.wss4j.policy.model.AlgorithmSuite;
 import org.apache.wss4j.policy.model.AlgorithmSuite.AlgorithmSuiteType;
@@ -795,19 +796,17 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     }
 
     protected void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (ttl * 1000L));
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime expirationTime = creationTime.plusSeconds(ttl); 
 
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         writer.writeStartElement("wst", "Lifetime", namespace);
         writer.writeNamespace("wsu", WSConstants.WSU_NS);
         writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
-        writer.writeCharacters(fmt.format(creationTime));
+        writer.writeCharacters(DateUtil.getDateTimeFormatter(true).format(creationTime));
         writer.writeEndElement();
 
         writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
-        writer.writeCharacters(fmt.format(expirationTime));
+        writer.writeCharacters(DateUtil.getDateTimeFormatter(true).format(expirationTime));
         writer.writeEndElement();
         writer.writeEndElement();
     }

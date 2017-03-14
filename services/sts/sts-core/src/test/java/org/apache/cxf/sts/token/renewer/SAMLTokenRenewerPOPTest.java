@@ -18,9 +18,10 @@
  */
 package org.apache.cxf.sts.token.renewer;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -57,11 +58,11 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.junit.BeforeClass;
 
 /**
@@ -283,14 +284,12 @@ public class SAMLTokenRenewerPOPTest extends org.junit.Assert {
         providerParameters.getTokenRequirements().setRenewing(renewing);
 
         if (ttlMs != 0) {
-            Lifetime lifetime = new Lifetime();
-            Date creationTime = new Date();
-            Date expirationTime = new Date();
-            expirationTime.setTime(creationTime.getTime() + ttlMs);
+            ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
+            ZonedDateTime expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
 
-            XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-            lifetime.setCreated(fmt.format(creationTime));
-            lifetime.setExpires(fmt.format(expirationTime));
+            Lifetime lifetime = new Lifetime();
+            lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+            lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
 
             providerParameters.getTokenRequirements().setLifetime(lifetime);
         }

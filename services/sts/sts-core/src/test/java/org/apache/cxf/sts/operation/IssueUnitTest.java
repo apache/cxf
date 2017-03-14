@@ -18,9 +18,10 @@
  */
 package org.apache.cxf.sts.operation;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
@@ -45,8 +46,8 @@ import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenRespons
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenResponseType;
 import org.apache.cxf.ws.security.sts.provider.model.RequestSecurityTokenType;
 import org.apache.cxf.ws.security.sts.provider.model.utility.AttributedDateTime;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 /**
  * Some unit tests for the issue operation.
@@ -461,16 +462,14 @@ public class IssueUnitTest extends org.junit.Assert {
         AttributedDateTime created = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
         AttributedDateTime expires = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
 
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
         if (lifetime <= 0) {
             lifetime = 300L;
         }
-        expirationTime.setTime(creationTime.getTime() + (lifetime * 1000L));
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime expirationTime = creationTime.plusSeconds(lifetime);
 
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        created.setValue(fmt.format(creationTime));
-        expires.setValue(fmt.format(expirationTime));
+        created.setValue(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        expires.setValue(DateUtil.getDateTimeFormatter(true).format(expirationTime));
 
         LifetimeType lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetimeType();
         lifetimeType.setCreated(created);

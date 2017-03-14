@@ -19,7 +19,8 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Properties;
 
 import org.w3c.dom.Element;
@@ -39,8 +40,8 @@ import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 
 /**
@@ -66,13 +67,12 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
             );
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
@@ -138,14 +138,13 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
             );
 
         // Set expected lifetime to 35 minutes
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
         long requestedLifetime = 35 * 60L;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
@@ -176,14 +175,13 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
             );
 
         // Set expected lifetime to Default max lifetime plus 1
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
         long requestedLifetime = DefaultConditionsProvider.DEFAULT_MAX_LIFETIME + 1;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
@@ -218,14 +216,14 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
             );
 
         // Set expected lifetime to 35 minutes
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
         long requestedLifetime = 35 * 60L;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
@@ -259,14 +257,14 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
             );
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
-        creationTime.setTime(creationTime.getTime() + (10 * 1000L));
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+        creationTime = creationTime.plusSeconds(10L);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
@@ -300,14 +298,13 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
             );
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        creationTime.setTime(creationTime.getTime() + (60L * 2L * 1000L));
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(120L);
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));
@@ -347,11 +344,11 @@ public class SAMLProviderLifetimeTest extends org.junit.Assert {
             );
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        creationTime.setTime(creationTime.getTime() + (60L * 2L * 1000L));
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(120L);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         assertTrue(samlTokenProvider.canHandleToken(WSConstants.WSS_SAML2_TOKEN_TYPE));

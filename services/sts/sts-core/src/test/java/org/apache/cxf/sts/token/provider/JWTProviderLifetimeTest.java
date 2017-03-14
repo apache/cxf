@@ -19,7 +19,8 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Properties;
 
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -40,7 +41,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
+import org.apache.wss4j.common.util.DateUtil;
 
 
 /**
@@ -64,13 +65,13 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
@@ -136,14 +137,14 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         TokenProviderParameters providerParameters = createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 35 minutes
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
         long requestedLifetime = 35 * 60L;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         try {
@@ -170,14 +171,14 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to Default max lifetime plus 1
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
         long requestedLifetime = DefaultConditionsProvider.DEFAULT_MAX_LIFETIME + 1;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         try {
@@ -208,14 +209,14 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 35 minutes
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
         long requestedLifetime = 35 * 60L;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
@@ -249,14 +250,14 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
-        creationTime.setTime(creationTime.getTime() + (10 * 1000L));
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+        creationTime = creationTime.plusSeconds(10);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
@@ -290,14 +291,13 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        creationTime.setTime(creationTime.getTime() + (60L * 2L * 1000L));
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(120L);
+        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         try {
@@ -338,11 +338,11 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        creationTime.setTime(creationTime.getTime() + (60L * 2L * 1000L));
+        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(120L);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
+        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
