@@ -233,6 +233,14 @@
             <entry key="depthInnerElementCountThreshold" value="2"/>
         </jaxrs:properties>
     </jaxrs:server>
+    <jaxrs:server id="thedocs" address="/thedocs">
+        <jaxrs:serviceBeans>
+            <bean class="org.apache.cxf.systest.jaxrs.DocumentResourceImpl"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider"/>
+        </jaxrs:providers>
+    </jaxrs:server>
     <bean id="jaxbProviderForTypes" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
         <property name="unmarshallAsJaxbElement" value="true"/>
         <property name="schemaLocations" ref="theSchemaLocations"/>

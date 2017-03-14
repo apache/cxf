@@ -1445,15 +1445,21 @@ public final class InjectionUtils {
        
         if (type instanceof TypeVariable) {
             type = InjectionUtils.getSuperType(serviceCls, (TypeVariable<?>)type);
-        } else if (type instanceof ParameterizedType
-            && ((ParameterizedType)type).getActualTypeArguments()[0] instanceof TypeVariable
-            && isSupportedCollectionOrArray(getRawType(type))) {
-            TypeVariable<?> typeVar = (TypeVariable<?>)((ParameterizedType)type).getActualTypeArguments()[0];
-            Type theType = InjectionUtils.getSuperType(serviceCls, typeVar);
-            Class<?> cls = theType instanceof Class 
-                ? (Class<?>)theType : InjectionUtils.getActualType(theType, 0);
-            type = new ParameterizedCollectionType(cls);
-        } 
+        } else if (type instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType)type;
+            if (pt.getActualTypeArguments()[0] instanceof TypeVariable
+                && isSupportedCollectionOrArray(getRawType(pt))) {
+                TypeVariable<?> typeVar = (TypeVariable<?>)pt.getActualTypeArguments()[0];
+                Type theType = InjectionUtils.getSuperType(serviceCls, typeVar);
+                if (theType instanceof Class) {
+                    type = new ParameterizedCollectionType((Class<?>)theType);
+                } else {
+                    type = processGenericTypeIfNeeded(serviceCls, paramCls, theType);
+                    type = new ParameterizedCollectionType(getRawType(type));
+                }
+            }
+        }
+            
         if (type == null || type == Object.class) {
             type = paramCls;
         }
