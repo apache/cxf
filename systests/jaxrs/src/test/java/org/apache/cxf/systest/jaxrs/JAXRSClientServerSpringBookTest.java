@@ -90,6 +90,14 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         Book book = wc.replaceHeader("Accept", "application/xml").query("id", 1L).get(Book.class);
         assertEquals("CXF", book.getName());
     }
+    
+    @Test
+    public void testGetDocuments() throws Exception {
+        String baseAddress = "http://localhost:" + PORT + "/the/thedocs/resource/doc";
+        WebClient wc = WebClient.create(baseAddress);
+        Response r = wc.accept("application/json").get();
+        assertEquals("[{\"t\":\"doc\"}]", r.readEntity(String.class));
+    }
 
     @Test
     public void testGetBookWebEx() throws Exception {
