@@ -76,6 +76,12 @@ public class JMSConfiguration {
      */
     private String replyToDestination;
     private volatile Destination replyToDestinationDest;
+    
+    /**
+     * Session that was used to cache the replyToDestinationDest
+     */
+    private volatile Session replyDestinationSession;
+    
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
     private boolean replyPubSubDomain;
@@ -94,8 +100,6 @@ public class JMSConfiguration {
     // For jms spec. Do not configure manually
     private String targetService;
     private String requestURI;
-
-
 
     public void ensureProperlyConfigured() {
         ConnectionFactory cf = getConnectionFactory();
@@ -441,19 +445,17 @@ public class JMSConfiguration {
     }
 
     public Destination getReplyDestination(Session session) throws JMSException {
-        Destination result = replyDestinationDest;
-        if (result == null) {
+        if (this.replyDestinationDest == null || this.replyDestinationSession == null) {
             synchronized (this) {
-                result = replyDestinationDest;
-                if (result == null) {
-                    result = replyDestination == null 
+                if (this.replyDestinationDest == null || this.replyDestinationSession == null) {
+                    this.replyDestinationDest = replyDestination == null
                         ? session.createTemporaryQueue()
                         : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
-                    replyDestinationDest = result;
+                    this.replyDestinationSession = session;
                 }
             }
         }
-        return result;
+        return this.replyDestinationDest;
     }
 
     public Destination getTargetDestination(Session session) throws JMSException {
