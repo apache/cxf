@@ -889,8 +889,15 @@ public class WebClient extends AbstractClient {
         }
         MultivaluedMap<String, String> headers = prepareHeaders(responseClass, body);
         resetResponse();
-        Response r = doChainedInvocation(httpMethod, headers, body, requestClass, inGenericType, 
-                                         inAnns, responseClass, outGenericType, null, null);
+
+        Response r = null;
+        try {
+            r = doChainedInvocation(httpMethod, headers, body, requestClass, inGenericType,
+                                             inAnns, responseClass, outGenericType, null, null);
+        } finally {
+            resetResponseStateImmediatelyIfNeeded();
+        }
+        
         if (r.getStatus() >= 300 && responseClass != Response.class) {
             throw convertToWebApplicationException(r);
         }

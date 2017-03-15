@@ -230,10 +230,13 @@ public class ClientProxyImpl extends AbstractClient implements
         
         setRequestHeaders(headers, ori, types.containsKey(ParameterType.FORM), 
             body == null ? null : body.getClass(), m.getReturnType());
-        
-        
-        return doChainedInvocation(uri, headers, ori, params, body, bodyIndex, null, null);
-        
+
+        try {
+            return doChainedInvocation(uri, headers, ori, params, body, bodyIndex, null, null);
+        } finally {
+            resetResponseStateImmediatelyIfNeeded();
+        }
+
     }
 
     private void addNonEmptyPath(UriBuilder builder, String pathValue) {
