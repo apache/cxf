@@ -23,7 +23,6 @@ package org.apache.cxf.service.factory;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
@@ -35,6 +34,7 @@ public class OldLoggingFactoryBeanListener implements FactoryBeanListener {
     static final Logger LOG = LogUtils.getL7dLogger(OldLoggingFactoryBeanListener.class);
 
     /** {@inheritDoc}*/
+    @SuppressWarnings("deprecation")
     public void handleEvent(Event ev, AbstractServiceFactoryBean factory, Object... args) {
         switch (ev) {
         case ENDPOINT_SELECTED: {
@@ -45,7 +45,7 @@ public class OldLoggingFactoryBeanListener implements FactoryBeanListener {
             if (cls == null) {
                 return;
             }
-            addLoggingSupport(ep, bus, cls.getAnnotation(Logging.class));
+            addLoggingSupport(ep, bus, cls.getAnnotation(org.apache.cxf.annotations.Logging.class));
             break;
         }
         case SERVER_CREATED: {
@@ -55,7 +55,7 @@ public class OldLoggingFactoryBeanListener implements FactoryBeanListener {
             }
             Server server = (Server)args[0];
             Bus bus = factory.getBus();
-            addLoggingSupport(server.getEndpoint(), bus, cls.getAnnotation(Logging.class));
+            addLoggingSupport(server.getEndpoint(), bus, cls.getAnnotation(org.apache.cxf.annotations.Logging.class));
             break;
         }
         default:
@@ -64,9 +64,9 @@ public class OldLoggingFactoryBeanListener implements FactoryBeanListener {
     }
 
 
-    private void addLoggingSupport(Endpoint endpoint, Bus bus, Logging annotation) {
+    @SuppressWarnings("deprecation")
+    private void addLoggingSupport(Endpoint endpoint, Bus bus, org.apache.cxf.annotations.Logging annotation) {
         if (annotation != null) {
-            @SuppressWarnings("deprecation")
             org.apache.cxf.feature.LoggingFeature lf = new org.apache.cxf.feature.LoggingFeature(annotation);
             LOG.warning("Deprecated logging interceptors being used, switch to cxf-rt-ext-logging based logging.");
             lf.initialize(endpoint, bus);
