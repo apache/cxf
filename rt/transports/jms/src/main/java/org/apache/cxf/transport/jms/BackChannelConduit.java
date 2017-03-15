@@ -19,10 +19,8 @@
 package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -185,9 +183,8 @@ class BackChannelConduit extends AbstractConduit implements JMSExchangeSender {
 
     private boolean isTimedOut(final javax.jms.Message request) throws JMSException {
         if (request.getJMSExpiration() > 0) {
-            TimeZone tz = new SimpleTimeZone(0, "GMT");
-            Calendar cal = new GregorianCalendar(tz);
-            long timeToLive = request.getJMSExpiration() - cal.getTimeInMillis();
+            ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC);
+            long timeToLive = request.getJMSExpiration() - dateTime.toInstant().toEpochMilli();
             if (timeToLive < 0) {
                 getLogger()
                     .log(Level.INFO, "Message time to live is already expired skipping response.");

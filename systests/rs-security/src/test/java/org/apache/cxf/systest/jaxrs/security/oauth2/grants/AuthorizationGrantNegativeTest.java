@@ -20,9 +20,9 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
 import java.net.URL;
-import java.util.Calendar;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Properties;
 
 import javax.ws.rs.client.ResponseProcessingException;
@@ -818,10 +818,9 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         JwtClaims claims = new JwtClaims();
         claims.setSubject("consumer-id");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 60);
-        claims.setExpiryTime(cal.getTimeInMillis() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
+        claims.setExpiryTime(now.plusSeconds(60L).toEpochSecond());
         String audience = "https://localhost:" + PORT + "/services/token";
         claims.setAudiences(Collections.singletonList(audience));
 

@@ -21,10 +21,10 @@ package org.apache.cxf.systest.jaxrs.security.jose.jwt;
 
 import java.net.URL;
 import java.security.Security;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,13 +85,12 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
         claims.setAudiences(toList(address));
 
         // Set the expiry date to be yesterday
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        claims.setExpiryTime(cal.getTimeInMillis() / 1000L);
+        claims.setExpiryTime(now.minusDays(1L).toEpochSecond());
 
         JwtToken token = new JwtToken(claims);
 
@@ -125,9 +124,8 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         claims.setAudiences(toList(address));
 
         // Set the issued date to be in the future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, 1);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.plusDays(1L).toEpochSecond());
 
         JwtToken token = new JwtToken(claims);
 
@@ -161,9 +159,8 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         claims.setAudiences(toList(address));
 
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.plusSeconds(30L).toEpochSecond());
 
         JwtToken token = new JwtToken(claims);
 
@@ -197,9 +194,8 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         claims.setAudiences(toList(address));
 
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.plusSeconds(30L).toEpochSecond());
 
         JwtToken token = new JwtToken(claims);
 
@@ -233,10 +229,9 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         claims.setAudiences(toList(address));
 
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        claims.setNotBefore(cal.getTimeInMillis() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
+        claims.setNotBefore(now.plusSeconds(30L).toEpochSecond());
 
         JwtToken token = new JwtToken(claims);
 
@@ -270,10 +265,9 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         claims.setAudiences(toList(address));
 
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        claims.setNotBefore(cal.getTimeInMillis() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
+        claims.setNotBefore(now.plusSeconds(30L).toEpochSecond());
 
         JwtToken token = new JwtToken(claims);
 
@@ -304,7 +298,8 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
         claims.setAudiences(toList(address));
 
         Map<String, Object> properties = new HashMap<>();
@@ -334,7 +329,8 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
         String badAddress = "https://localhost:" + PORT + "/badunsignedjwt/bookstore/books";
         claims.setAudiences(toList(badAddress));
 
@@ -365,7 +361,8 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
@@ -394,7 +391,8 @@ public class JWTPropertiesTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(now.toEpochSecond());
 
         String badAddress = "https://localhost:" + PORT + "/badunsignedjwt/bookstore/books";
         List<String> audiences = new ArrayList<>();
