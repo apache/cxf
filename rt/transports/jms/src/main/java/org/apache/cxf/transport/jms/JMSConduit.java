@@ -364,28 +364,40 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             String correlationId = jmsMessage.getJMSCorrelationID();
             LOG.log(Level.FINE, "Received reply message with correlation id " + correlationId);
 
-            // Try to correlate the incoming message with some timeout as it may have been
-            // added to the map after the message was sent
-            int count = 0;
-            Exchange exchange = null;
-            while (exchange == null && count < 100) {
-                exchange = correlationMap.remove(correlationId);
-                if (exchange == null) {
-                    Thread.sleep(1);
-                }
-                count++;
-            }
+            Exchange exchange = getExchange(correlationId);
             if (exchange == null) {
                 LOG.log(Level.WARNING, "Could not correlate message with correlationId " + correlationId);
-                return;
+            } else {
+                processReplyMessage(exchange, jmsMessage);
             }
-            processReplyMessage(exchange, jmsMessage);
         } catch (JMSException e) {
             throw JMSUtil.convertJmsException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException("Interrupted while correlating", e);
         }
 
+    }
+
+    /**
+     *  Try to correlate the incoming message with some timeout as it may have been
+     *  added to the map after the message was sent
+     *  
+     * @param correlationId
+     * @return exchange for correlationId or null if none was found
+     */
+    private Exchange getExchange(String correlationId) {
+        int count = 0;
+        Exchange exchange = null;
+        while (exchange == null && count < 100) {
+            exchange = correlationMap.remove(correlationId);
+            if (exchange == null) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException("Interrupted while correlating", e);
+                }
+            }
+            count++;
+        }
+        return exchange;
     }
 
     /**
