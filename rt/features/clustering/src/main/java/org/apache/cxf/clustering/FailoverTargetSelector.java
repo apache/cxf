@@ -392,6 +392,11 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         this.supportNotAvailableErrorsOnly = support;
     }
 
+
+    protected InvocationKey getInvocationKey(Exchange e) {
+        return new InvocationKey(e);
+    }
+
     /**
      * Used to wrap an Exchange for usage as a Map key. The raw Exchange
      * is not a suitable key type, as the hashCode is computed from its
@@ -400,9 +405,9 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      */
     protected static class InvocationKey {
         private Exchange exchange;
-        
-        InvocationKey(Exchange ex) {
-            exchange = ex;     
+
+        protected InvocationKey(Exchange ex) {
+            exchange = ex;
         }
         
         @Override
@@ -429,7 +434,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         private Map<String, Object> context;
         private List<Endpoint> alternateEndpoints;
         private List<String> alternateAddresses;
-        
+
         InvocationContext(Endpoint endpoint,
                           BindingOperationInfo boi,
                           Object[] prms, 
@@ -441,7 +446,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
             context = ctx;
         }
 
-        Endpoint retrieveOriginalEndpoint(Endpoint endpoint) {
+        public Endpoint retrieveOriginalEndpoint(Endpoint endpoint) {
             if (endpoint != null) {
                 if (endpoint != originalEndpoint) {
                     getLogger().log(Level.INFO,
@@ -457,36 +462,36 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
             }
             return originalEndpoint;
         }
-        
-        BindingOperationInfo getBindingOperationInfo() {
+
+        public BindingOperationInfo getBindingOperationInfo() {
             return bindingOperationInfo;
         }
-        
-        Object[] getParams() {
+
+        public Object[] getParams() {
             return params;
         }
-        
-        Map<String, Object> getContext() {
+
+        public Map<String, Object> getContext() {
             return context;
         }
-        
-        List<Endpoint> getAlternateEndpoints() {
+
+        public List<Endpoint> getAlternateEndpoints() {
             return alternateEndpoints;
         }
 
-        List<String> getAlternateAddresses() {
+        public List<String> getAlternateAddresses() {
             return alternateAddresses;
         }
 
-        void setAlternateEndpoints(List<Endpoint> alternates) {
+        protected void setAlternateEndpoints(List<Endpoint> alternates) {
             alternateEndpoints = alternates;
         }
 
-        void setAlternateAddresses(List<String> alternates) {
+        protected void setAlternateAddresses(List<String> alternates) {
             alternateAddresses = alternates;
         }
 
-        boolean hasAlternates() {
+        public boolean hasAlternates() {
             return !(alternateEndpoints == null && alternateAddresses == null);
         }
     }    
