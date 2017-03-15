@@ -62,7 +62,8 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     private Map<String, Object> responseContext = new HashMap<String, Object>();
     private long synchronousTimeout = 60000;
     private boolean shutdownBusOnClose;
-    
+    private boolean resetThreadLocalStateImmediately;
+
     public long getSynchronousTimeout() {
         Conduit conduit = getConduit();
         if (conduit instanceof HTTPConduit) {
@@ -244,5 +245,12 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
 
     public void setShutdownBusOnClose(boolean shutdownBusOnClose) {
         this.shutdownBusOnClose = shutdownBusOnClose;
+    }
+
+    public boolean isResetThreadLocalStateImmediately() {
+        return resetThreadLocalStateImmediately;
+    }
+    public void setResetThreadLocalStateImmediately(boolean reset) {
+        resetThreadLocalStateImmediately = reset;
     }
 }

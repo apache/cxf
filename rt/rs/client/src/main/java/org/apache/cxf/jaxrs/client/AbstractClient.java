@@ -1136,6 +1136,13 @@ public abstract class AbstractClient implements Client {
         }
         return respClass;
     }
+
+    protected void resetResponseStateImmediatelyIfNeeded() {
+        if (state instanceof ThreadLocalClientState
+            && cfg.isResetThreadLocalStateImmediately()) {
+            state.reset();
+        }
+    }
     
     protected abstract class AbstractBodyWriter extends AbstractOutDatabindingInterceptor {
 
