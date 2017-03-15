@@ -218,14 +218,17 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 correlationMap.put(correlationId, exchange);
             }
 
-            if (exchange.isSynchronous()) {
+            if (!exchange.isSynchronous()) {
+                return;
+            }
+
+            try {
                 if (useSyncReceive) {
                     // TODO Not sure if replyToDestination is correct here
                     javax.jms.Message replyMessage = JMSUtil.receive(session, replyToDestination,
                                                                      correlationId,
                                                                      jmsConfig.getReceiveTimeout(),
                                                                      jmsConfig.isPubSubNoLocal());
-                    correlationMap.remove(correlationId);
                     processReplyMessage(exchange, replyMessage);
                 } else {
                     try {
@@ -239,6 +242,8 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                     }
 
                 }
+            } finally {
+                correlationMap.remove(correlationId);
             }
         }
     }
