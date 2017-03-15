@@ -60,7 +60,7 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
     private Bus bus;
     private Map<String, Object> requestContext = new HashMap<>();
     private Map<String, Object> responseContext = new HashMap<>();
-    private long synchronousTimeout = 60000;;
+    private long synchronousTimeout = 60000;
     private boolean shutdownBusOnClose;
     private boolean resetThreadLocalStateImmediately;
 
