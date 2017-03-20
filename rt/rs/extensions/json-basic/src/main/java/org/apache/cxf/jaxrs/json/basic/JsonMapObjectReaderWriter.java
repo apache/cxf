@@ -243,6 +243,11 @@ public class JsonMapObjectReaderWriter {
         int commaIndex = json.indexOf(",", from);
         if (commaIndex == -1) {
             commaIndex = json.length();
+        } else if (json.charAt(commaIndex - 1) != '\"' && json.charAt(from) == '\"') {
+            String value = json.substring(0, commaIndex).trim();
+            if (value.lastIndexOf("\"") != value.length() - 1) {
+                commaIndex = getCommaIndex(json, commaIndex + 1);
+            }
         }
         return commaIndex;
     }
