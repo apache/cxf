@@ -32,6 +32,9 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.OrderColumn;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.rt.security.crypto.CryptoUtils;
+
 /**
  * Represents a login name which AuthorizationService
  * may capture after the end user approved a given third party request
@@ -49,26 +52,28 @@ public class UserSubject implements Serializable {
     private AuthenticationMethod am;
 
     public UserSubject() {
-
+        this.id = newId();
     }
 
     public UserSubject(String login) {
+        this();
         this.login = login;
     }
 
     public UserSubject(String login, List<String> roles) {
+        this();
         this.login = login;
         this.roles = roles;
     }
 
     public UserSubject(String login, String id) {
         this.login = login;
-        this.id = id;
+        this.id = id != null ? id : newId();
     }
 
     public UserSubject(String login, String id, List<String> roles) {
         this.login = login;
-        this.id = id;
+        this.id = id != null ? id : newId();
         this.roles = roles;
     }
 
@@ -76,7 +81,10 @@ public class UserSubject implements Serializable {
         this(sub.getLogin(), sub.getId(), sub.getRoles());
         this.properties = sub.getProperties();
         this.am = sub.getAuthenticationMethod();
+    }
 
+    private String newId() {
+        return Base64UrlUtility.encode(CryptoUtils.generateSecureRandomBytes(16));
     }
 
     /**
@@ -84,7 +92,6 @@ public class UserSubject implements Serializable {
      *
      * @return the login name
      */
-    @Id
     public String getLogin() {
         return login;
     }
@@ -145,6 +152,7 @@ public class UserSubject implements Serializable {
      *
      * @return the user's id
      */
+    @Id
     public String getId() {
         return this.id;
     }

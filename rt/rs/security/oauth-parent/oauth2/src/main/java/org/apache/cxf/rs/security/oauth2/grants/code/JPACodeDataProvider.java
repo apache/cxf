@@ -50,7 +50,7 @@ public class JPACodeDataProvider extends JPAOAuthDataProvider implements Authori
             @Override
             public Void execute(EntityManager em) {
                 if (grant.getSubject() != null) {
-                    UserSubject sub = em.find(UserSubject.class, grant.getSubject().getLogin());
+                    UserSubject sub = em.find(UserSubject.class, grant.getSubject().getId());
                     if (sub == null) {
                         em.persist(grant.getSubject());
                     } else {
