@@ -20,6 +20,7 @@
 package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -290,20 +291,21 @@ public abstract class AbstractOperation {
      * Create a LifetimeType object given a created + expires Dates
      */
     protected static LifetimeType createLifetime(
-        ZonedDateTime tokenCreated, ZonedDateTime tokenExpires
+        Instant tokenCreated, Instant tokenExpires
     ) {
         AttributedDateTime created = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
         AttributedDateTime expires = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
 
-        ZonedDateTime creationTime = tokenCreated;
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-        if (creationTime == null) {
-            creationTime = now;
+        ZonedDateTime creationTime = now;
+        if (tokenCreated != null) {
+            creationTime = ZonedDateTime.ofInstant(tokenCreated, ZoneOffset.UTC);
         }
-        ZonedDateTime expirationTime = tokenExpires;
-        if (expirationTime == null) {
-            long lifeTimeOfToken = 300L;
-            expirationTime = now.plusSeconds(lifeTimeOfToken);
+        
+        long lifeTimeOfToken = 300L;
+        ZonedDateTime expirationTime = now.plusSeconds(lifeTimeOfToken);
+        if (tokenExpires != null) {
+            expirationTime = ZonedDateTime.ofInstant(tokenExpires, ZoneOffset.UTC);
         }
 
         created.setValue(DateUtil.getDateTimeFormatter(true).format(creationTime));

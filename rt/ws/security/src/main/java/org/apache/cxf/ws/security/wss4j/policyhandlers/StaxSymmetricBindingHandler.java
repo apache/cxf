@@ -604,7 +604,7 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
         ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
         ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
         SecurityToken tempTok =
-            new SecurityToken(IDGenerator.generateID(null), created, expires);
+            new SecurityToken(IDGenerator.generateID(null), created.toInstant(), expires.toInstant());
 
         KeyGenerator keyGenerator =
             KeyUtils.getKeyGenerator(sbinding.getAlgorithmSuite().getAlgorithmSuiteType().getEncryption());

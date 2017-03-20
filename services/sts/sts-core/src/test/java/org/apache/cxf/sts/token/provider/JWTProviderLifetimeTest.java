@@ -86,7 +86,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
     /**
@@ -116,7 +116,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
 
@@ -230,7 +230,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
     /**
@@ -271,7 +271,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
     /**
@@ -319,7 +319,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
     /**
@@ -356,7 +356,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().toEpochSecond());
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
     private TokenProviderParameters createProviderParameters(String tokenType) throws WSSecurityException {

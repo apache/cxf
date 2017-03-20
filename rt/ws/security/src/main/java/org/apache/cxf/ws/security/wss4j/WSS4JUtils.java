@@ -163,9 +163,10 @@ public final class WSS4JUtils {
         SecurityToken existingToken = TokenStoreUtils.getTokenStore(message).getToken(securityToken.getId());
         if (existingToken == null || existingToken.isExpired()) {
             ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-            ZonedDateTime expires = created.plusSeconds(getSecurityTokenLifetime(message) / 1000L); 
+            ZonedDateTime expires = created.plusSeconds(getSecurityTokenLifetime(message) / 1000L);
 
-            SecurityToken cachedTok = new SecurityToken(securityToken.getId(), created, expires);
+            SecurityToken cachedTok =
+                new SecurityToken(securityToken.getId(), created.toInstant(), expires.toInstant());
             cachedTok.setSHA1(securityToken.getSha1Identifier());
 
             if (securityToken.getTokenType() != null) {

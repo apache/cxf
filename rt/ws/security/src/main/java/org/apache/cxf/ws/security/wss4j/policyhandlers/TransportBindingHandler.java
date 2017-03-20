@@ -331,8 +331,10 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
 
             ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
             ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
-            SecurityToken tempTok =
-                new SecurityToken(id, usernameToken.getUsernameTokenElement(), created, expires);
+            SecurityToken tempTok = new SecurityToken(id,
+                                                      usernameToken.getUsernameTokenElement(),
+                                                      created.toInstant(),
+                                                      expires.toInstant());
             tempTok.setSecret(secret);
             getTokenStore().add(tempTok);
             message.put(SecurityConstants.TOKEN_ID, tempTok.getId());

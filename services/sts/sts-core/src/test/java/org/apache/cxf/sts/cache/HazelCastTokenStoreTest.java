@@ -59,13 +59,13 @@ public class HazelCastTokenStoreTest extends org.junit.Assert {
     public void testTokenAddExpiration() throws Exception {
         SecurityToken expiredToken = new SecurityToken("expiredToken");
         ZonedDateTime expiry = ZonedDateTime.now(ZoneOffset.UTC).minusSeconds(5L);
-        expiredToken.setExpires(expiry);
+        expiredToken.setExpires(expiry.toInstant());
         store.add(expiredToken);
         assertTrue(store.getTokenIdentifiers().isEmpty());
 
         SecurityToken farFutureToken = new SecurityToken("farFuture");
         expiry = ZonedDateTime.now(ZoneOffset.UTC).plusYears(50L);
-        farFutureToken.setExpires(expiry);
+        farFutureToken.setExpires(expiry.toInstant());
         store.add(farFutureToken);
 
         assertTrue(store.getTokenIdentifiers().size() == 1);

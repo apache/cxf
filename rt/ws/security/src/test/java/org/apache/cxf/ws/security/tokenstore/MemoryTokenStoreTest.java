@@ -77,7 +77,7 @@ public class MemoryTokenStoreTest extends org.junit.Assert {
         SecurityToken token = new SecurityToken();
 
         ZonedDateTime expires = ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(5L);
-        token.setExpires(expires);
+        token.setExpires(expires.toInstant());
 
         assertFalse(token.isExpired());
         assertFalse(token.isAboutToExpire(100L));

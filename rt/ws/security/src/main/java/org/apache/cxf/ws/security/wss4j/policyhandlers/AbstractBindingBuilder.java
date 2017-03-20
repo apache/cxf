@@ -1933,8 +1933,10 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
                 ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
                 ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
-                SecurityToken secToken =
-                    new SecurityToken(id, utBuilder.getUsernameTokenElement(), created, expires);
+                SecurityToken secToken = new SecurityToken(id, 
+                                                           utBuilder.getUsernameTokenElement(), 
+                                                           created.toInstant(), 
+                                                           expires.toInstant());
 
                 if (isTokenProtection) {
                     sigParts.add(new WSEncryptionPart(secToken.getId()));

@@ -817,7 +817,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                     || actInt.intValue() == WSConstants.ST_UNSIGNED) {
                     ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
                     ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
-                    SecurityToken tempTok = new SecurityToken(id, created, expires);
+                    SecurityToken tempTok = new SecurityToken(id, created.toInstant(), expires.toInstant());
                     tempTok.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
                     tempTok.setX509Certificate(
                         (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE), null

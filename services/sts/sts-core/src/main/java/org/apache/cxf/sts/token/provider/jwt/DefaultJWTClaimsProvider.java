@@ -24,7 +24,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -169,13 +168,13 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     protected void handleConditions(JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims) {
         TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
 
-        Date currentDate = new Date();
-        long currentTimeInSeconds = currentDate.getTime() / 1000L;
-
+        ZonedDateTime currentDate = ZonedDateTime.now(ZoneOffset.UTC);
+        long currentTime = currentDate.toEpochSecond();
+        
         // Set the defaults first
-        claims.setIssuedAt(currentTimeInSeconds);
-        claims.setNotBefore(currentTimeInSeconds);
-        claims.setExpiryTime(currentTimeInSeconds + lifetime);
+        claims.setIssuedAt(currentTime);
+        claims.setNotBefore(currentTime);
+        claims.setExpiryTime(currentTime + lifetime);
 
         Lifetime tokenLifetime = providerParameters.getTokenRequirements().getLifetime();
         if (lifetime > 0 && acceptClientLifetime && tokenLifetime != null

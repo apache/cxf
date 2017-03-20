@@ -21,8 +21,6 @@ package org.apache.cxf.sts.token.provider.jwt;
 
 import java.security.KeyStore;
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -133,11 +131,11 @@ public class JWTTokenProvider implements TokenProvider {
             response.setTokenId(claims.getTokenId());
 
             if (claims.getIssuedAt() > 0) {
-                response.setCreated(Instant.ofEpochMilli(claims.getIssuedAt() * 1000L).atZone(ZoneOffset.UTC));
+                response.setCreated(Instant.ofEpochMilli(claims.getIssuedAt() * 1000L));
             }
-            ZonedDateTime expires = null;
+            Instant expires = null;
             if (claims.getExpiryTime() > 0) {
-                expires = Instant.ofEpochMilli(claims.getExpiryTime() * 1000L).atZone(ZoneOffset.UTC);
+                expires = Instant.ofEpochMilli(claims.getExpiryTime() * 1000L);
                 response.setExpires(expires);
             }
 

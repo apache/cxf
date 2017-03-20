@@ -379,7 +379,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
             ZonedDateTime expires = created.plusSeconds(ttl / 1000L);
 
-            SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
+            SecurityToken token = new SecurityToken(sct.getIdentifier(), created.toInstant(), expires.toInstant());
             token.setToken(sct.getElement());
             token.setTokenType(sct.getTokenType());
 

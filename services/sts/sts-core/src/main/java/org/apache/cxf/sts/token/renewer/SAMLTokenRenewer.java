@@ -21,8 +21,6 @@ package org.apache.cxf.sts.token.renewer;
 
 import java.security.Principal;
 import java.security.cert.Certificate;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -227,8 +225,8 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
                 validFrom = renewedAssertion.getSaml1().getConditions().getNotBefore();
                 validTill = renewedAssertion.getSaml1().getConditions().getNotOnOrAfter();
             }
-            response.setCreated(ZonedDateTime.ofInstant(validFrom.toDate().toInstant(), ZoneOffset.UTC));
-            response.setExpires(ZonedDateTime.ofInstant(validTill.toDate().toInstant(), ZoneOffset.UTC));
+            response.setCreated(validFrom.toDate().toInstant());
+            response.setExpires(validTill.toDate().toInstant());
 
             LOG.fine("SAML Token successfully renewed");
             return response;

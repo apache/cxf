@@ -27,6 +27,7 @@ import java.io.StringReader;
 import java.security.Key;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
@@ -125,12 +126,12 @@ public class SecurityToken implements Serializable {
     /**
      * Created time
      */
-    private ZonedDateTime created;
+    private Instant created;
 
     /**
      * Expiration time
      */
-    private ZonedDateTime expires;
+    private Instant expires;
 
     /**
      * Issuer end point address
@@ -179,7 +180,7 @@ public class SecurityToken implements Serializable {
         this.id = XMLUtils.getIDFromReference(id);
     }
 
-    public SecurityToken(String id, ZonedDateTime created, ZonedDateTime expires) {
+    public SecurityToken(String id, Instant created, Instant expires) {
         this.id = XMLUtils.getIDFromReference(id);
 
         this.created = created;
@@ -188,8 +189,8 @@ public class SecurityToken implements Serializable {
 
     public SecurityToken(String id,
                  Element tokenElem,
-                 ZonedDateTime created,
-                 ZonedDateTime expires) {
+                 Instant created,
+                 Instant expires) {
         this.id = XMLUtils.getIDFromReference(id);
 
         this.token = cloneElement(tokenElem);
@@ -229,13 +230,13 @@ public class SecurityToken implements Serializable {
                 DOMUtils.getFirstChildWithName(lifetimeElem,
                                                 WSConstants.WSU_NS,
                                                 WSConstants.CREATED_LN);
-            this.created = ZonedDateTime.parse(DOMUtils.getContent(createdElem));
+            this.created = ZonedDateTime.parse(DOMUtils.getContent(createdElem)).toInstant();
 
             Element expiresElem =
                 DOMUtils.getFirstChildWithName(lifetimeElem,
                                                 WSConstants.WSU_NS,
                                                 WSConstants.EXPIRES_LN);
-            this.expires = ZonedDateTime.parse(DOMUtils.getContent(expiresElem));
+            this.expires = ZonedDateTime.parse(DOMUtils.getContent(expiresElem)).toInstant();
         } catch (DateTimeParseException e) {
             //shouldn't happen
         }
@@ -348,14 +349,14 @@ public class SecurityToken implements Serializable {
     /**
      * @return Returns the created.
      */
-    public ZonedDateTime getCreated() {
+    public Instant getCreated() {
         return created;
     }
 
     /**
      * @return Returns the expires.
      */
-    public ZonedDateTime getExpires() {
+    public Instant getExpires() {
         return expires;
     }
 
@@ -365,7 +366,7 @@ public class SecurityToken implements Serializable {
     public boolean isExpired() {
         if (expires != null) {
             ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-            if (expires.isBefore(now)) {
+            if (expires.isBefore(now.toInstant())) {
                 return true;
             }
         }
@@ -378,7 +379,7 @@ public class SecurityToken implements Serializable {
     public boolean isAboutToExpire(long secondsToExpiry) {
         if (expires != null && secondsToExpiry > 0) {
             ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(secondsToExpiry);
-            if (expires.isBefore(now)) {
+            if (expires.isBefore(now.toInstant())) {
                 return true;
             }
         }
@@ -388,7 +389,7 @@ public class SecurityToken implements Serializable {
     /**
      * @param expires The expires to set.
      */
-    public void setExpires(ZonedDateTime expires) {
+    public void setExpires(Instant expires) {
         this.expires = expires;
     }
 

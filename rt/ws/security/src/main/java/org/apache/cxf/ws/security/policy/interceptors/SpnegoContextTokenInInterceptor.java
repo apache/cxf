@@ -199,7 +199,7 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             ZonedDateTime expires = 
                 created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(exchange.getOutMessage()) / 1000L);
 
-            SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
+            SecurityToken token = new SecurityToken(sct.getIdentifier(), created.toInstant(), expires.toInstant());
             token.setToken(sct.getElement());
             token.setTokenType(sct.getTokenType());
 

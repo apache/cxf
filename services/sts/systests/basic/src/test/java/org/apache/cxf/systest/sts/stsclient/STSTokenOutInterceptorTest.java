@@ -329,7 +329,7 @@ public class STSTokenOutInterceptorTest extends AbstractBusClientServerTestBase 
         Assert.assertNotNull(token);
         Assert.assertEquals(TOKEN_TYPE_SAML_2_0, token.getTokenType());
         Assert.assertNotNull(token.getId());
-        Assert.assertTrue(token.getExpires().isAfter(ZonedDateTime.now(ZoneOffset.UTC)));
+        Assert.assertTrue(token.getExpires().isAfter(ZonedDateTime.now(ZoneOffset.UTC).toInstant()));
         Assert.assertEquals("Assertion", token.getToken().getLocalName());
     }
 

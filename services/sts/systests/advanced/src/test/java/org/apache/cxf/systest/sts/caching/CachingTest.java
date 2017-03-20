@@ -196,7 +196,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         assertNotNull(tok);
 
         // Make the token "about to expire"
-        tok.setExpires(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(5L));
+        tok.setExpires(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(5L).toInstant());
         assertTrue(tok.isAboutToExpire(10L));
 
         doubleIt(port, 25);

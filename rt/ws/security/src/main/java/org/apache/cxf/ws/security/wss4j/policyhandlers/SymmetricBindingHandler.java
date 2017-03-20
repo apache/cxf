@@ -926,8 +926,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         SecurityToken tempTok = new SecurityToken(
                         id,
                         encrKey.getEncryptedKeyElement(),
-                        created,
-                        expires);
+                        created.toInstant(),
+                        expires.toInstant());
 
 
         tempTok.setSecret(secret);
@@ -968,7 +968,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
         ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
         SecurityToken tempTok =
-            new SecurityToken(id, usernameToken.getUsernameTokenElement(), created, expires);
+            new SecurityToken(id, usernameToken.getUsernameTokenElement(), created.toInstant(), expires.toInstant());
         tempTok.setSecret(secret);
 
         tokenStore.add(tempTok);
@@ -984,7 +984,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
 
             String encryptedKeyID = (String)encryptedKeyResult.get(WSSecurityEngineResult.TAG_ID);
-            SecurityToken securityToken = new SecurityToken(encryptedKeyID, created, expires);
+            SecurityToken securityToken = new SecurityToken(encryptedKeyID, created.toInstant(), expires.toInstant());
             securityToken.setSecret((byte[])encryptedKeyResult.get(WSSecurityEngineResult.TAG_SECRET));
             securityToken.setSHA1(getSHA1((byte[])encryptedKeyResult
                                     .get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY)));
@@ -1012,7 +1012,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     }
                     ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
                     ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
-                    SecurityToken securityToken = new SecurityToken(utID, created, expires);
+                    SecurityToken securityToken = new SecurityToken(utID, created.toInstant(), expires.toInstant());
 
                     byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                     securityToken.setSecret(secret);

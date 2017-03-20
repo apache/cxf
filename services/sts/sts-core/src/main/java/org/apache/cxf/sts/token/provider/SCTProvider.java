@@ -136,14 +136,15 @@ public class SCTProvider implements TokenProvider {
 
             // putting the secret key into the cache
             ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-            response.setCreated(created);
+            response.setCreated(created.toInstant());
             ZonedDateTime expires = null;
             if (lifetime > 0) {
                 expires = created.plusSeconds(lifetime);
-                response.setExpires(expires);
+                response.setExpires(expires.toInstant());
             }
 
-            SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
+            SecurityToken token =
+                new SecurityToken(sct.getIdentifier(), created.toInstant(), expires.toInstant());
             token.setSecret(keyHandler.getSecret());
             token.setPrincipal(tokenParameters.getPrincipal());
 

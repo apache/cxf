@@ -19,8 +19,6 @@
 
 package org.apache.cxf.sts.token.provider;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -160,8 +158,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 validFrom = assertion.getSaml1().getConditions().getNotBefore();
                 validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
             }
-            response.setCreated(ZonedDateTime.ofInstant(validFrom.toDate().toInstant(), ZoneOffset.UTC));
-            response.setExpires(ZonedDateTime.ofInstant(validTill.toDate().toInstant(), ZoneOffset.UTC));
+            response.setCreated(validFrom.toDate().toInstant());
+            response.setExpires(validTill.toDate().toInstant());
 
             response.setEntropy(entropyBytes);
             if (keySize > 0) {

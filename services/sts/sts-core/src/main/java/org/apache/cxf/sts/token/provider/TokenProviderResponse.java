@@ -19,7 +19,7 @@
 
 package org.apache.cxf.sts.token.provider;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 /**
  * This class encapsulates the response from a TokenProvider instance after creating a token.
@@ -33,8 +33,8 @@ public class TokenProviderResponse {
     private boolean computedKey;
     private TokenReference attachedReference;
     private TokenReference unAttachedReference;
-    private ZonedDateTime created;
-    private ZonedDateTime expires;
+    private Instant created;
+    private Instant expires;
 
     /**
      * Return true if the entropy represents a Computed Key.
@@ -145,34 +145,34 @@ public class TokenProviderResponse {
     }
 
     /**
-     * Get the ZonedDateTime that this Token was Created
-     * @return the ZonedDateTime that this Token was Created
+     * Get the Instant that this Token was Created
+     * @return the Instant that this Token was Created
      */
-    public ZonedDateTime getCreated() {
+    public Instant getCreated() {
         return created;
     }
 
     /**
-     * Set the ZonedDateTime that this Token was Created
-     * @param created the ZonedDateTime that this Token was Created
+     * Set the Instant that this Token was Created
+     * @param created the Instant that this Token was Created
      */
-    public void setCreated(ZonedDateTime created) {
+    public void setCreated(Instant created) {
         this.created = created;
     }
 
     /**
-     * Get the ZonedDateTime that this Token expires
-     * @return the ZonedDateTime that this Token expires
+     * Get the Instant that this Token expires
+     * @return the Instant that this Token expires
      */
-    public ZonedDateTime getExpires() {
+    public Instant getExpires() {
         return expires;
     }
 
     /**
-     * Set the ZonedDateTime that this Token expires
-     * @param expires the ZonedDateTime that this Token expires
+     * Set the Instant that this Token expires
+     * @param expires the Instant that this Token expires
      */
-    public void setExpires(ZonedDateTime expires) {
+    public void setExpires(Instant expires) {
         this.expires = expires;
     }
 
