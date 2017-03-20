@@ -190,7 +190,7 @@ public class JsonMapObjectReaderWriter {
                 values.put(name, internalFromJsonAsList(name, newJson));
                 i = closingIndex + 1;
             } else {
-                int commaIndex = getCommaIndex(json, sepIndex + j);
+                int commaIndex = getCommaIndex(json, sepIndex + j, sepIndex + j);
                 Object value = readPrimitiveValue(name, json, sepIndex + j, commaIndex);
                 values.put(name, value);
                 i = commaIndex + 1;
@@ -211,7 +211,7 @@ public class JsonMapObjectReaderWriter {
                 values.add(nextMap.map);
                 i = closingIndex + 1;
             } else {
-                int commaIndex = getCommaIndex(json, i);
+                int commaIndex = getCommaIndex(json, i, i);
                 Object value = readPrimitiveValue(name, json, i, commaIndex);
                 values.add(value);
                 i = commaIndex;
@@ -239,14 +239,14 @@ public class JsonMapObjectReaderWriter {
         return value;
     }
 
-    protected static int getCommaIndex(String json, int from) {
+    protected static int getCommaIndex(String json, int start, int from) {
         int commaIndex = json.indexOf(",", from);
         if (commaIndex == -1) {
             commaIndex = json.length();
-        } else if (json.charAt(commaIndex - 1) != '\"' && json.charAt(from) == '\"') {
+        } else if (json.charAt(commaIndex - 1) != '\"' && json.charAt(start) == '\"') {
             String value = json.substring(0, commaIndex).trim();
             if (value.lastIndexOf("\"") != value.length() - 1) {
-                commaIndex = getCommaIndex(json, commaIndex + 1);
+                commaIndex = getCommaIndex(json, start, commaIndex + 1);
             }
         }
         return commaIndex;
