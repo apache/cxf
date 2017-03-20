@@ -369,14 +369,16 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                                                      RefreshToken oldRefreshToken, 
                                                      List<String> restrictedScopes) {
         ServerAccessToken at = createNewAccessToken(client, oldRefreshToken.getSubject());
-        at.setAudiences(oldRefreshToken.getAudiences());
+        at.setAudiences(oldRefreshToken.getAudiences() != null
+                ? new ArrayList<String>(oldRefreshToken.getAudiences()) : null);
         at.setGrantType(oldRefreshToken.getGrantType());
         at.setGrantCode(oldRefreshToken.getGrantCode());
         at.setSubject(oldRefreshToken.getSubject());
         at.setNonce(oldRefreshToken.getNonce());
         at.setClientCodeVerifier(oldRefreshToken.getClientCodeVerifier());
         if (restrictedScopes.isEmpty()) {
-            at.setScopes(oldRefreshToken.getScopes());
+            at.setScopes(oldRefreshToken.getScopes() != null
+                    ? new ArrayList<OAuthPermission>(oldRefreshToken.getScopes()) : null);
         } else {
             List<OAuthPermission> theNewScopes = convertScopeToPermissions(client, restrictedScopes);
             if (oldRefreshToken.getScopes().containsAll(theNewScopes)) {

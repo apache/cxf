@@ -15,6 +15,7 @@
         <class>org.apache.cxf.rs.security.oauth2.common.OAuthPermission</class>
         <class>org.apache.cxf.rs.security.oauth2.common.Permission</class>
         <class>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</class>
+        <class>org.apache.cxf.rs.security.oauth2.provider.TestingUserSubject</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
@@ -43,6 +44,7 @@
         <class>org.apache.cxf.rs.security.oauth2.common.OAuthPermission</class>
         <class>org.apache.cxf.rs.security.oauth2.common.Permission</class>
         <class>org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken</class>
+        <class>org.apache.cxf.rs.security.oauth2.provider.TestingUserSubject</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
