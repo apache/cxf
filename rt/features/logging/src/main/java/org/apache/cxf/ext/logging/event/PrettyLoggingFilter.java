@@ -30,6 +30,10 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Formats the log message with indents.
+ * If the log message was truncated then this filter might additionally cut incomplete tags
+ */
 public class PrettyLoggingFilter implements LogEventSender {
     private static final Logger LOG = LoggerFactory.getLogger(PrettyLoggingFilter.class);
     private LogEventSender next;
