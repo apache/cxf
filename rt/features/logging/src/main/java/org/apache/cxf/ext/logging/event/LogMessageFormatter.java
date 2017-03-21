@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.common.util.StringUtils;
 
 /**
- *
+ * Formats a log message showing the most important meta data
  */
 public final class LogMessageFormatter {
     

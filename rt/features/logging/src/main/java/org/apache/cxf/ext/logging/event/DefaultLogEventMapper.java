@@ -45,7 +45,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 
-public class DefaultLogEventMapper implements LogEventMapper {
+public class DefaultLogEventMapper {
     private static final Set<String> BINARY_CONTENT_MEDIA_TYPES;
     static {
         BINARY_CONTENT_MEDIA_TYPES = new HashSet<String>();
