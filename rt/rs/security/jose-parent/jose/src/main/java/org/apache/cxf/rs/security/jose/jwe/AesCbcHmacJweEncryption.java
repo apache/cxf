@@ -44,13 +44,16 @@ public class AesCbcHmacJweEncryption extends JweEncryption {
         AES_CEK_SIZE_MAP.put(ContentAlgorithm.A192CBC_HS384.getJwaName(), 48);
         AES_CEK_SIZE_MAP.put(ContentAlgorithm.A256CBC_HS512.getJwaName(), 64);
     }
-    public AesCbcHmacJweEncryption(String cekAlgo,
-                                   KeyEncryptionProvider keyEncryptionAlgorithm) {
-        this(ContentAlgorithm.getAlgorithm(cekAlgo), keyEncryptionAlgorithm);
-    }
     public AesCbcHmacJweEncryption(ContentAlgorithm cekAlgoJwt,
                                    KeyEncryptionProvider keyEncryptionAlgorithm) {
-        this(cekAlgoJwt, null, null, keyEncryptionAlgorithm);
+        this(cekAlgoJwt, keyEncryptionAlgorithm, false);
+    }
+    public AesCbcHmacJweEncryption(ContentAlgorithm cekAlgoJwt,
+                                   KeyEncryptionProvider keyEncryptionAlgorithm,
+                                   boolean generateCekOnce) {
+        super(keyEncryptionAlgorithm,
+              new AesCbcContentEncryptionAlgorithm(validateCekAlgorithm(cekAlgoJwt),
+                                                   generateCekOnce));
     }
     public AesCbcHmacJweEncryption(ContentAlgorithm cekAlgoJwt, byte[] cek,
                                    byte[] iv, KeyEncryptionProvider keyEncryptionAlgorithm) {
@@ -62,10 +65,6 @@ public class AesCbcHmacJweEncryption extends JweEncryption {
     @Override
     protected byte[] getActualCek(byte[] theCek, String algoJwt) {
         return doGetActualCek(theCek, algoJwt);
-    }
-    @Override
-    protected int getCekSize(String algoJwt) {
-        return getFullCekKeySize(algoJwt) * 8;
     }
     protected static byte[] doGetActualCek(byte[] theCek, String algoJwt) {
         int size = getFullCekKeySize(algoJwt) / 2;
@@ -147,6 +146,9 @@ public class AesCbcHmacJweEncryption extends JweEncryption {
     }
 
     private static class AesCbcContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {
+        AesCbcContentEncryptionAlgorithm(ContentAlgorithm algo, boolean generateCekOnce) {
+            super(algo, generateCekOnce);
+        }
         AesCbcContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) {
             super(cek, iv, algo);
         }
@@ -157,6 +159,10 @@ public class AesCbcHmacJweEncryption extends JweEncryption {
         @Override
         public byte[] getAdditionalAuthenticationData(String headersJson, byte[] aad) {
             return null;
+        }
+        @Override
+        protected int getContentEncryptionKeySize(JweHeaders headers) {
+            return getFullCekKeySize(getAlgorithm().getJwaName()) * 8;
         }
     }
 
