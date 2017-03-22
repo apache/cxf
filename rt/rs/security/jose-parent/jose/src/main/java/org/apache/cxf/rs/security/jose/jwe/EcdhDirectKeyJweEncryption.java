@@ -95,15 +95,9 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
         
             headers.setHeader("apu", Base64UrlUtility.encode(apuBytes));
             headers.setHeader("apv", Base64UrlUtility.encode(apvBytes));
-<<<<<<< HEAD
-            headers.setJsonWebKey("epv", JwkUtils.fromECPublicKey(publicKey, ecurve));
-            
-            return JweUtils.getECDHKey(privateKey, peerPublicKey, apuBytes, apvBytes, 
-=======
             headers.setJsonWebKey("epk", JwkUtils.fromECPublicKey(publicKey, ecurve));
 
             return JweUtils.getECDHKey(privateKey, peerPublicKey, apuBytes, apvBytes,
->>>>>>> a2efc18... CXF-7294 - Incorrect header parameter for Jose ECDH KA public key
                                        jwtAlgo.getJwaName(), jwtAlgo.getKeySizeBits());
             
         }
