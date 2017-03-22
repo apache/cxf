@@ -25,6 +25,8 @@ import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 @Entity
 public class TestingUserSubject extends UserSubject {
 
+    private static final long serialVersionUID = 1336647038197837075L;
+
     public TestingUserSubject() {
         super();
     }
