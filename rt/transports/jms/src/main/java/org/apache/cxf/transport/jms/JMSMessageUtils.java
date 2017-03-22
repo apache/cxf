@@ -384,7 +384,31 @@ final class JMSMessageUtils {
 
         if (messageProperties.isSetProperty()) {
             for (JMSPropertyType prop : messageProperties.getProperty()) {
-                jmsMessage.setStringProperty(prop.getName(), prop.getValue());
+                Object o = prop.getValue();
+                if (o != null) {
+                    Class<?> cls = o.getClass();
+                    if (cls == String.class) {
+                        jmsMessage.setStringProperty(prop.getName(), (String)o);
+                    } else if (cls == Integer.TYPE || cls == Integer.class) {
+                        jmsMessage.setIntProperty(prop.getName(), (Integer)o);
+                    } else if (cls == Double.TYPE || cls == Double.class) {
+                        jmsMessage.setDoubleProperty(prop.getName(), (Double)o);
+                    } else if (cls == Float.TYPE || cls == Float.class) {
+                        jmsMessage.setFloatProperty(prop.getName(), (Float)o);
+                    } else if (cls == Long.TYPE || cls == Long.class) {
+                        jmsMessage.setLongProperty(prop.getName(), (Long)o);
+                    } else if (cls == Boolean.TYPE || cls == Boolean.class) {
+                        jmsMessage.setBooleanProperty(prop.getName(), (Boolean)o);
+                    } else if (cls == Short.TYPE || cls == Short.class) {
+                        jmsMessage.setShortProperty(prop.getName(), (Short)o);
+                    } else if (cls == Byte.TYPE || cls == Byte.class) {
+                        jmsMessage.setShortProperty(prop.getName(), (Byte)o);
+                    } else {
+                        jmsMessage.setObjectProperty(prop.getName(), o);
+                    }
+                } else {
+                    jmsMessage.setStringProperty(prop.getName(), null);
+                }
             }
         }
     }
