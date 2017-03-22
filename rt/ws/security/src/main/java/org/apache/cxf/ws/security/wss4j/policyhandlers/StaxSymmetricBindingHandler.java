@@ -19,8 +19,7 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -601,10 +600,10 @@ public class StaxSymmetricBindingHandler extends AbstractStaxBindingHandler {
 
     private String setupEncryptedKey(AbstractTokenWrapper wrapper, AbstractToken sigToken) throws WSSecurityException {
 
-        ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-        ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
+        Instant created = Instant.now();
+        Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
         SecurityToken tempTok =
-            new SecurityToken(IDGenerator.generateID(null), created.toInstant(), expires.toInstant());
+            new SecurityToken(IDGenerator.generateID(null), created, expires);
 
         KeyGenerator keyGenerator =
             KeyUtils.getKeyGenerator(sbinding.getAlgorithmSuite().getAlgorithmSuiteType().getEncryption());

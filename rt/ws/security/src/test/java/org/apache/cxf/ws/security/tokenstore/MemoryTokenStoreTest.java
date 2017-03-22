@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.ws.security.tokenstore;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -76,8 +75,8 @@ public class MemoryTokenStoreTest extends org.junit.Assert {
     public void testTokenExpiry() {
         SecurityToken token = new SecurityToken();
 
-        ZonedDateTime expires = ZonedDateTime.now(ZoneOffset.UTC).plusMinutes(5L);
-        token.setExpires(expires.toInstant());
+        Instant expires = Instant.now().plusSeconds(5L * 60L);
+        token.setExpires(expires);
 
         assertFalse(token.isExpired());
         assertFalse(token.isAboutToExpire(100L));

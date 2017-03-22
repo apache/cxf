@@ -19,8 +19,7 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
@@ -376,10 +375,10 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                         .createSecureId("sctId-", sct.getElement()));
             }
 
-            ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-            ZonedDateTime expires = created.plusSeconds(ttl / 1000L);
+            Instant created = Instant.now();
+            Instant expires = created.plusSeconds(ttl / 1000L);
 
-            SecurityToken token = new SecurityToken(sct.getIdentifier(), created.toInstant(), expires.toInstant());
+            SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setToken(sct.getElement());
             token.setTokenType(sct.getTokenType());
 

@@ -19,8 +19,7 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -329,12 +328,12 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             String id = usernameToken.getId();
             byte[] secret = usernameToken.getDerivedKey();
 
-            ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-            ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
+            Instant created = Instant.now();
+            Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
             SecurityToken tempTok = new SecurityToken(id,
                                                       usernameToken.getUsernameTokenElement(),
-                                                      created.toInstant(),
-                                                      expires.toInstant());
+                                                      created,
+                                                      expires);
             tempTok.setSecret(secret);
             getTokenStore().add(tempTok);
             message.put(SecurityConstants.TOKEN_ID, tempTok.getId());

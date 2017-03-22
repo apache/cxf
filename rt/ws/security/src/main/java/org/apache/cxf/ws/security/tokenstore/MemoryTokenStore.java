@@ -20,8 +20,6 @@
 package org.apache.cxf.ws.security.tokenstore;
 
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -86,7 +84,7 @@ public class MemoryTokenStore implements TokenStore {
     }
 
     protected void processTokenExpiry() {
-        Instant current = ZonedDateTime.now(ZoneOffset.UTC).toInstant();
+        Instant current = Instant.now();
         synchronized (tokens) {
             for (Map.Entry<String, CacheEntry> entry : tokens.entrySet()) {
                 if (entry.getValue().getExpiry().isBefore(current)) {
@@ -97,8 +95,8 @@ public class MemoryTokenStore implements TokenStore {
     }
 
     private CacheEntry createCacheEntry(SecurityToken token) {
-        ZonedDateTime expires = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(ttl);
-        return new CacheEntry(token, expires.toInstant());
+        Instant expires = Instant.now().plusSeconds(ttl);
+        return new CacheEntry(token, expires);
     }
 
     private static class CacheEntry {

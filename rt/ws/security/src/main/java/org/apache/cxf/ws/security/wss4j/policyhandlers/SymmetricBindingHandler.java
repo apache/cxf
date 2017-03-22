@@ -19,8 +19,7 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -921,13 +920,13 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         String id = encrKey.getId();
         byte[] secret = encrKey.getEphemeralKey();
 
-        ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-        ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
+        Instant created = Instant.now();
+        Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
         SecurityToken tempTok = new SecurityToken(
                         id,
                         encrKey.getEncryptedKeyElement(),
-                        created.toInstant(),
-                        expires.toInstant());
+                        created,
+                        expires);
 
 
         tempTok.setSecret(secret);
@@ -965,10 +964,10 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         String id = usernameToken.getId();
         byte[] secret = usernameToken.getDerivedKey();
 
-        ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-        ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
+        Instant created = Instant.now();
+        Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
         SecurityToken tempTok =
-            new SecurityToken(id, usernameToken.getUsernameTokenElement(), created.toInstant(), expires.toInstant());
+            new SecurityToken(id, usernameToken.getUsernameTokenElement(), created, expires);
         tempTok.setSecret(secret);
 
         tokenStore.add(tempTok);
@@ -980,11 +979,11 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         WSSecurityEngineResult encryptedKeyResult = getEncryptedKeyResult();
         if (encryptedKeyResult != null) {
             // Store it in the cache
-            ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-            ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
+            Instant created = Instant.now();
+            Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
 
             String encryptedKeyID = (String)encryptedKeyResult.get(WSSecurityEngineResult.TAG_ID);
-            SecurityToken securityToken = new SecurityToken(encryptedKeyID, created.toInstant(), expires.toInstant());
+            SecurityToken securityToken = new SecurityToken(encryptedKeyID, created, expires);
             securityToken.setSecret((byte[])encryptedKeyResult.get(WSSecurityEngineResult.TAG_SECRET));
             securityToken.setSHA1(getSHA1((byte[])encryptedKeyResult
                                     .get(WSSecurityEngineResult.TAG_ENCRYPTED_EPHEMERAL_KEY)));
@@ -1010,9 +1009,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     if (utID == null || utID.length() == 0) {
                         utID = wssConfig.getIdAllocator().createId("UsernameToken-", null);
                     }
-                    ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-                    ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
-                    SecurityToken securityToken = new SecurityToken(utID, created.toInstant(), expires.toInstant());
+                    Instant created = Instant.now();
+                    Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
+                    SecurityToken securityToken = new SecurityToken(utID, created, expires);
 
                     byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);
                     securityToken.setSecret(secret);

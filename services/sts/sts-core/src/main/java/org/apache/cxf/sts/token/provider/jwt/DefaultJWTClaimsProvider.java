@@ -20,7 +20,7 @@ package org.apache.cxf.sts.token.provider.jwt;
 
 import java.security.Principal;
 import java.time.Duration;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -168,8 +168,8 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     protected void handleConditions(JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims) {
         TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
 
-        ZonedDateTime currentDate = ZonedDateTime.now(ZoneOffset.UTC);
-        long currentTime = currentDate.toEpochSecond();
+        Instant currentDate = Instant.now();
+        long currentTime = currentDate.getEpochSecond();
         
         // Set the defaults first
         claims.setIssuedAt(currentTime);
@@ -179,11 +179,11 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
         Lifetime tokenLifetime = providerParameters.getTokenRequirements().getLifetime();
         if (lifetime > 0 && acceptClientLifetime && tokenLifetime != null
             && tokenLifetime.getCreated() != null && tokenLifetime.getExpires() != null) {
-            ZonedDateTime creationTime = null;
-            ZonedDateTime expirationTime = null;
+            Instant creationTime = null;
+            Instant expirationTime = null;
             try {
-                creationTime = ZonedDateTime.parse(tokenLifetime.getCreated());
-                expirationTime = ZonedDateTime.parse(tokenLifetime.getExpires());
+                creationTime = ZonedDateTime.parse(tokenLifetime.getCreated()).toInstant();
+                expirationTime = ZonedDateTime.parse(tokenLifetime.getExpires()).toInstant();
             } catch (DateTimeParseException ex) {
                 LOG.fine("Error in parsing Timestamp Created or Expiration Strings");
                 throw new STSException(
@@ -193,7 +193,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
             }
 
             // Check to see if the created time is in the future
-            ZonedDateTime validCreation = ZonedDateTime.now(ZoneOffset.UTC);
+            Instant validCreation = Instant.now();
             if (futureTimeToLive > 0) {
                 validCreation = validCreation.plusSeconds(futureTimeToLive);
             }
@@ -217,10 +217,10 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
                 }
             }
 
-            long creationTimeInSeconds = creationTime.toEpochSecond();
+            long creationTimeInSeconds = creationTime.getEpochSecond();
             claims.setIssuedAt(creationTimeInSeconds);
             claims.setNotBefore(creationTimeInSeconds);
-            claims.setExpiryTime(expirationTime.toEpochSecond());
+            claims.setExpiryTime(expirationTime.getEpochSecond());
         }
     }
 

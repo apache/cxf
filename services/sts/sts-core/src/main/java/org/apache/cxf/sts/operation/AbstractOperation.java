@@ -22,7 +22,6 @@ package org.apache.cxf.sts.operation;
 import java.security.Principal;
 import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -296,20 +295,20 @@ public abstract class AbstractOperation {
         AttributedDateTime created = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
         AttributedDateTime expires = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
 
-        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-        ZonedDateTime creationTime = now;
-        if (tokenCreated != null) {
-            creationTime = ZonedDateTime.ofInstant(tokenCreated, ZoneOffset.UTC);
+        Instant now = Instant.now();
+        Instant creationTime = tokenCreated;
+        if (tokenCreated == null) {
+            creationTime = now;
         }
         
-        long lifeTimeOfToken = 300L;
-        ZonedDateTime expirationTime = now.plusSeconds(lifeTimeOfToken);
-        if (tokenExpires != null) {
-            expirationTime = ZonedDateTime.ofInstant(tokenExpires, ZoneOffset.UTC);
+        Instant expirationTime = tokenExpires;
+        if (tokenExpires == null) {
+            long lifeTimeOfToken = 300L;
+            expirationTime = now.plusSeconds(lifeTimeOfToken);
         }
 
-        created.setValue(DateUtil.getDateTimeFormatter(true).format(creationTime));
-        expires.setValue(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        created.setValue(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        expires.setValue(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Token lifetime creation: " + created.getValue());
             LOG.fine("Token lifetime expiration: " + expires.getValue());

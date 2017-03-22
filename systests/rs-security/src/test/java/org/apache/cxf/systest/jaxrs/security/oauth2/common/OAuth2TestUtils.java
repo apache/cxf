@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oauth2.common;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -210,10 +209,10 @@ public final class OAuth2TestUtils {
         if (issuer != null) {
             claims.setIssuer(issuer);
         }
-        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-        claims.setIssuedAt(now.toEpochSecond());
+        Instant now = Instant.now();
+        claims.setIssuedAt(now.getEpochSecond());
         if (expiry) {
-            claims.setExpiryTime(now.plusSeconds(60L).toEpochSecond());
+            claims.setExpiryTime(now.plusSeconds(60L).getEpochSecond());
         }
         if (audience != null) {
             claims.setAudiences(Collections.singletonList(audience));

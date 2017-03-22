@@ -19,8 +19,8 @@
 package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -502,11 +502,11 @@ public class RenewSamlUnitTest extends org.junit.Assert {
         if (ttlMs != 0) {
             Lifetime lifetime = new Lifetime();
             
-            ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
-            ZonedDateTime expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
+            Instant creationTime = Instant.now();
+            Instant expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
 
-            lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
-            lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+            lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+            lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
 
             providerParameters.getTokenRequirements().setLifetime(lifetime);
         }

@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oidc;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -36,9 +35,9 @@ public class IdTokenProviderImpl implements IdTokenProvider {
     public IdToken getIdToken(String clientId, UserSubject authenticatedUser, List<String> scopes) {
         IdToken token = new IdToken();
 
-        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-        token.setIssuedAt(now.toEpochSecond());
-        token.setExpiryTime(now.plusSeconds(60L).toEpochSecond());
+        Instant now = Instant.now();
+        token.setIssuedAt(now.getEpochSecond());
+        token.setExpiryTime(now.plusSeconds(60L).getEpochSecond());
         token.setAudience(clientId);
         token.setSubject(authenticatedUser.getLogin());
         token.setIssuer("OIDC IdP");

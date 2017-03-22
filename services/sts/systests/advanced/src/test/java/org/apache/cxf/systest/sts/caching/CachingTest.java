@@ -19,8 +19,7 @@
 package org.apache.cxf.systest.sts.caching;
 
 import java.net.URL;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
@@ -196,7 +195,7 @@ public class CachingTest extends AbstractBusClientServerTestBase {
         assertNotNull(tok);
 
         // Make the token "about to expire"
-        tok.setExpires(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(5L).toInstant());
+        tok.setExpires(Instant.now().plusSeconds(5L));
         assertTrue(tok.isAboutToExpire(10L));
 
         doubleIt(port, 25);

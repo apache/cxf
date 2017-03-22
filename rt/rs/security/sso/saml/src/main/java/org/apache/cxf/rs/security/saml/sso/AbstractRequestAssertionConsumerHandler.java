@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.time.Instant;
 import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -178,10 +178,10 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
         String securityContextKey = UUID.randomUUID().toString();
 
         long currentTime = System.currentTimeMillis();
-        Date notOnOrAfter = validatorResponse.getSessionNotOnOrAfter();
+        Instant notOnOrAfter = validatorResponse.getSessionNotOnOrAfter();
         long expiresAt = 0;
         if (notOnOrAfter != null) {
-            expiresAt = notOnOrAfter.getTime();
+            expiresAt = notOnOrAfter.toEpochMilli();
         } else {
             expiresAt = currentTime + getStateTimeToLive();
         }
@@ -221,13 +221,14 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             }
 
             // Otherwise create a new one for the IdP initiated case
+            Instant now = Instant.now();
             return new RequestState(urlToForwardTo,
                                     getIdpServiceAddress(),
                                     null,
                                     getIssuerId(JAXRSUtils.getCurrentMessage()),
                                     "/",
                                     null,
-                                    new Date().getTime());
+                                    now.toEpochMilli());
         }
 
         if (relayState == null) {

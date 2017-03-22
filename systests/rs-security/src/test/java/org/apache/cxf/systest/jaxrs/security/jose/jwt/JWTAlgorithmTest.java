@@ -21,9 +21,9 @@ package org.apache.cxf.systest.jaxrs.security.jose.jwt;
 
 import java.net.URL;
 import java.security.Security;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +92,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -132,7 +132,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -175,7 +175,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -217,7 +217,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -260,7 +260,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -300,7 +300,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -337,7 +337,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -377,7 +377,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -413,7 +413,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -450,7 +450,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -491,7 +491,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -529,7 +529,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -565,7 +565,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -600,7 +600,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -640,7 +640,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -682,7 +682,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
@@ -721,7 +721,7 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);

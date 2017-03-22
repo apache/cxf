@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.sts.token.renewer;
 
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -577,12 +577,13 @@ public class SAMLTokenRenewerTest extends org.junit.Assert {
         providerParameters.getTokenRequirements().setRenewing(renewing);
 
         if (ttlMs != 0) {
-            ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
-            ZonedDateTime expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
-
             Lifetime lifetime = new Lifetime();
-            lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
-            lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+            
+            Instant creationTime = Instant.now();
+            Instant expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
+
+            lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+            lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
             
             providerParameters.getTokenRequirements().setLifetime(lifetime);
         }

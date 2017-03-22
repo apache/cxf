@@ -21,8 +21,7 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.net.URL;
 import java.security.cert.X509Certificate;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -545,8 +544,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return ret;
     }
     
-    private SupportingToken signSupportingToken(SecurityToken secToken, String id, 
-                                                AbstractToken token, SupportingTokens suppTokens) 
+    private SupportingToken signSupportingToken(SecurityToken secToken, String id,
+                                                AbstractToken token, SupportingTokens suppTokens)
         throws SOAPException {
         WSSecSignature sig = new WSSecSignature(secHeader);
         sig.setIdAllocator(wssConfig.getIdAllocator());
@@ -1931,12 +1930,12 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 WSSecUsernameToken utBuilder = (WSSecUsernameToken)tempTok;
                 String id = utBuilder.getId();
 
-                ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-                ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
-                SecurityToken secToken = new SecurityToken(id, 
-                                                           utBuilder.getUsernameTokenElement(), 
-                                                           created.toInstant(), 
-                                                           expires.toInstant());
+                Instant created = Instant.now();
+                Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
+                SecurityToken secToken = new SecurityToken(id,
+                                                           utBuilder.getUsernameTokenElement(),
+                                                           created,
+                                                           expires);
 
                 if (isTokenProtection) {
                     sigParts.add(new WSEncryptionPart(secToken.getId()));

@@ -19,8 +19,8 @@
 package org.apache.cxf.systest.jaxrs.security.oidc;
 
 import java.net.URL;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 
 import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.Form;
@@ -245,7 +245,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
 
         JwtClaims claims = new JwtClaims();
         claims.setIssuer("consumer-id");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(
             Collections.singletonList("https://localhost:" + PORT + "/unsignedjwtservices/"));
         claims.setProperty("response_type", "token");
@@ -287,7 +287,7 @@ public class OIDCNegativeTest extends AbstractBusClientServerTestBase {
 
         JwtClaims claims = new JwtClaims();
         claims.setIssuer("consumer-id");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(
             Collections.singletonList("https://localhost:" + PORT + "/unsignedjwtservices/"));
         claims.setProperty("client_id", "consumer-id2");

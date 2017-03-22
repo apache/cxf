@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.sts.operation;
 
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -465,11 +465,11 @@ public class IssueUnitTest extends org.junit.Assert {
         if (lifetime <= 0) {
             lifetime = 300L;
         }
-        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
-        ZonedDateTime expirationTime = creationTime.plusSeconds(lifetime);
+        Instant creationTime = Instant.now();
+        Instant expirationTime = creationTime.plusSeconds(lifetime);
 
-        created.setValue(DateUtil.getDateTimeFormatter(true).format(creationTime));
-        expires.setValue(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        created.setValue(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        expires.setValue(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
 
         LifetimeType lifetimeType = QNameConstants.WS_TRUST_FACTORY.createLifetimeType();
         lifetimeType.setCreated(created);

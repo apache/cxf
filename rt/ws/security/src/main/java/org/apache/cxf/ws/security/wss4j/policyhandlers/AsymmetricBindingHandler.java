@@ -21,8 +21,7 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -815,9 +814,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 String id = (String)wser.get(WSSecurityEngineResult.TAG_ID);
                 if (actInt.intValue() == WSConstants.ST_SIGNED
                     || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                    ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-                    ZonedDateTime expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
-                    SecurityToken tempTok = new SecurityToken(id, created.toInstant(), expires.toInstant());
+                    Instant created = Instant.now();
+                    Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
+                    SecurityToken tempTok = new SecurityToken(id, created, expires);
                     tempTok.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
                     tempTok.setX509Certificate(
                         (X509Certificate)wser.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE), null

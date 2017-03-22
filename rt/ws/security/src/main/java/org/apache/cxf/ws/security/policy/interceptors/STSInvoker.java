@@ -20,7 +20,8 @@
 package org.apache.cxf.ws.security.policy.interceptors;
 
 import java.security.NoSuchAlgorithmException;
-import java.time.ZonedDateTime;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Base64;
 import java.util.logging.Logger;
 
@@ -286,19 +287,19 @@ abstract class STSInvoker implements Invoker {
 
     void writeLifetime(
         W3CDOMStreamWriter writer,
-        ZonedDateTime created,
-        ZonedDateTime expires,
+        Instant created,
+        Instant expires,
         String prefix,
         String namespace
     ) throws Exception {
         writer.writeStartElement(prefix, "Lifetime", namespace);
         writer.writeNamespace("wsu", WSConstants.WSU_NS);
         writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
-        writer.writeCharacters(DateUtil.getDateTimeFormatter(true).format(created));
+        writer.writeCharacters(created.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
 
         writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
-        writer.writeCharacters(DateUtil.getDateTimeFormatter(true).format(expires));
+        writer.writeCharacters(expires.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
         writer.writeEndElement();
     }

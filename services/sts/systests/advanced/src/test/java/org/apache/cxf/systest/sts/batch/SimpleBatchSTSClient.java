@@ -24,8 +24,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -796,17 +796,17 @@ public class SimpleBatchSTSClient implements Configurable, InterceptorProvider {
     }
 
     protected void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
-        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
-        ZonedDateTime expirationTime = creationTime.plusSeconds(ttl); 
+        Instant creationTime = Instant.now();
+        Instant expirationTime = creationTime.plusSeconds(ttl);
 
         writer.writeStartElement("wst", "Lifetime", namespace);
         writer.writeNamespace("wsu", WSConstants.WSU_NS);
         writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
-        writer.writeCharacters(DateUtil.getDateTimeFormatter(true).format(creationTime));
+        writer.writeCharacters(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
 
         writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
-        writer.writeCharacters(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        writer.writeCharacters(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
         writer.writeEndElement();
     }

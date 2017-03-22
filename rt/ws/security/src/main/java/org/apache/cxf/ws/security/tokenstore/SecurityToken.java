@@ -28,7 +28,6 @@ import java.security.Key;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
@@ -365,8 +364,8 @@ public class SecurityToken implements Serializable {
      */
     public boolean isExpired() {
         if (expires != null) {
-            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-            if (expires.isBefore(now.toInstant())) {
+            Instant now = Instant.now();
+            if (expires.isBefore(now)) {
                 return true;
             }
         }
@@ -378,8 +377,8 @@ public class SecurityToken implements Serializable {
      */
     public boolean isAboutToExpire(long secondsToExpiry) {
         if (expires != null && secondsToExpiry > 0) {
-            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(secondsToExpiry);
-            if (expires.isBefore(now.toInstant())) {
+            Instant now = Instant.now().plusSeconds(secondsToExpiry);
+            if (expires.isBefore(now)) {
                 return true;
             }
         }

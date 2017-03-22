@@ -19,7 +19,7 @@
 package org.apache.cxf.sts.token.provider;
 
 import java.time.Duration;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -141,11 +141,11 @@ public class DefaultConditionsProvider implements ConditionsProvider {
         if (lifetime > 0) {
             if (acceptClientLifetime && tokenLifetime != null
                 && tokenLifetime.getCreated() != null && tokenLifetime.getExpires() != null) {
-                ZonedDateTime creationTime = null;
-                ZonedDateTime expirationTime = null;
+                Instant creationTime = null;
+                Instant expirationTime = null;
                 try {
-                    creationTime = ZonedDateTime.parse(tokenLifetime.getCreated());
-                    expirationTime = ZonedDateTime.parse(tokenLifetime.getExpires());
+                    creationTime = ZonedDateTime.parse(tokenLifetime.getCreated()).toInstant();
+                    expirationTime = ZonedDateTime.parse(tokenLifetime.getExpires()).toInstant();
                 } catch (DateTimeParseException ex) {
                     LOG.fine("Error in parsing Timestamp Created or Expiration Strings");
                     throw new STSException(
@@ -155,7 +155,7 @@ public class DefaultConditionsProvider implements ConditionsProvider {
                 }
 
                 // Check to see if the created time is in the future
-                ZonedDateTime validCreation = ZonedDateTime.now(ZoneOffset.UTC);
+                Instant validCreation = Instant.now();
                 if (futureTimeToLive > 0) {
                     validCreation = validCreation.plusSeconds(futureTimeToLive);
                 }

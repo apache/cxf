@@ -21,8 +21,6 @@ package org.apache.cxf.sts.cache;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
@@ -129,12 +127,12 @@ public class HazelCastTokenStore implements TokenStore {
         int parsedTTL = 0;
         if (token.getExpires() != null) {
             Instant expires = token.getExpires();
-            ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-            if (expires.isBefore(now.toInstant())) {
+            Instant now = Instant.now();
+            if (expires.isBefore(now)) {
                 return 0;
             }
             
-            Duration duration = Duration.between(now.toInstant(), expires);
+            Duration duration = Duration.between(now, expires);
 
             parsedTTL = (int)duration.getSeconds();
             if (duration.getSeconds() != (long)parsedTTL || parsedTTL > MAX_TTL) {

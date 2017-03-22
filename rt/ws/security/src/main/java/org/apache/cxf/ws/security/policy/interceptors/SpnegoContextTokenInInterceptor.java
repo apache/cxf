@@ -19,8 +19,7 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Collection;
 
@@ -195,11 +194,11 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             sct.setID(wssConfig.getIdAllocator().createId("sctId-", sct));
 
             // Lifetime
-            ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-            ZonedDateTime expires = 
+            Instant created = Instant.now();
+            Instant expires =
                 created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(exchange.getOutMessage()) / 1000L);
 
-            SecurityToken token = new SecurityToken(sct.getIdentifier(), created.toInstant(), expires.toInstant());
+            SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setToken(sct.getElement());
             token.setTokenType(sct.getTokenType());
 

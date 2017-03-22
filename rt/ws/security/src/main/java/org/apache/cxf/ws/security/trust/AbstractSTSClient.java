@@ -24,8 +24,8 @@ import java.io.StringReader;
 import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -1376,17 +1376,17 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     }
 
     protected void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
-        ZonedDateTime created = ZonedDateTime.now(ZoneOffset.UTC);
-        ZonedDateTime expires = created.plusSeconds(ttl);
+        Instant created = Instant.now();
+        Instant expires = created.plusSeconds(ttl);
 
         writer.writeStartElement("wst", "Lifetime", namespace);
         writer.writeNamespace("wsu", WSConstants.WSU_NS);
         writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
-        writer.writeCharacters(DateUtil.getDateTimeFormatter(true).format(created));
+        writer.writeCharacters(created.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
 
         writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
-        writer.writeCharacters(DateUtil.getDateTimeFormatter(true).format(expires));
+        writer.writeCharacters(expires.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
         writer.writeEndElement();
     }

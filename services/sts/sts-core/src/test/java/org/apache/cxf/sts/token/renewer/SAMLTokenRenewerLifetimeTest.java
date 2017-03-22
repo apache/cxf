@@ -19,8 +19,8 @@
 package org.apache.cxf.sts.token.renewer;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -84,12 +84,12 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerParameters renewerParameters = createRenewerParameters();
 
         // Set expected lifetime to 1 minute
-        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
-        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+        Instant creationTime = Instant.now();
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
 
         Lifetime lifetime = new Lifetime();
-        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
-        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
@@ -179,13 +179,13 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerParameters renewerParameters = createRenewerParameters();
 
         // Set expected lifetime to 35 minutes
-        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
+        Instant creationTime = Instant.now();
         long requestedLifetime = 35 * 60L;
-        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
 
         Lifetime lifetime = new Lifetime();
-        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
-        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
@@ -230,13 +230,13 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerParameters renewerParameters = createRenewerParameters();
 
         // Set expected lifetime to Default max lifetime plus 1
-        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
+        Instant creationTime = Instant.now();
         long requestedLifetime = DefaultConditionsProvider.DEFAULT_MAX_LIFETIME + 1;
-        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
 
         Lifetime lifetime = new Lifetime();
-        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
-        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
@@ -286,13 +286,13 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerParameters renewerParameters = createRenewerParameters();
 
         // Set expected lifetime to 35 minutes
-        ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
+        Instant creationTime = Instant.now();
         long requestedLifetime = 35 * 60L;
-        ZonedDateTime expirationTime = creationTime.plusSeconds(requestedLifetime);
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
 
         Lifetime lifetime = new Lifetime();
-        lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
-        lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
@@ -374,12 +374,12 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         providerParameters.getTokenRequirements().setRenewing(renewing);
 
         if (ttlMs != 0) {
-            ZonedDateTime creationTime = ZonedDateTime.now(ZoneOffset.UTC);
-            ZonedDateTime expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
+            Instant creationTime = Instant.now();
+            Instant expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
 
             Lifetime lifetime = new Lifetime();
-            lifetime.setCreated(DateUtil.getDateTimeFormatter(true).format(creationTime));
-            lifetime.setExpires(DateUtil.getDateTimeFormatter(true).format(expirationTime));
+            lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+            lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
 
             providerParameters.getTokenRequirements().setLifetime(lifetime);
         }

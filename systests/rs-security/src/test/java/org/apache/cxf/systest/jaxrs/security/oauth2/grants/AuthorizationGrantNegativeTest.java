@@ -20,8 +20,7 @@
 package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
 
 import java.net.URL;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -818,9 +817,9 @@ public class AuthorizationGrantNegativeTest extends AbstractBusClientServerTestB
         JwtClaims claims = new JwtClaims();
         claims.setSubject("consumer-id");
         claims.setIssuer("DoubleItSTSIssuer");
-        ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-        claims.setIssuedAt(now.toEpochSecond());
-        claims.setExpiryTime(now.plusSeconds(60L).toEpochSecond());
+        Instant now = Instant.now();
+        claims.setIssuedAt(now.getEpochSecond());
+        claims.setExpiryTime(now.plusSeconds(60L).getEpochSecond());
         String audience = "https://localhost:" + PORT + "/services/token";
         claims.setAudiences(Collections.singletonList(audience));
 

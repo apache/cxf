@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.oauth2.filters;
 
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +74,8 @@ public class JwtAccessTokenValidator extends JoseJwtConsumer implements AccessTo
         if (claims.getIssuedAt() != null) {
             atv.setTokenIssuedAt(claims.getIssuedAt());
         } else {
-            atv.setTokenIssuedAt(new Date().getTime());
+            Instant now = Instant.now();
+            atv.setTokenIssuedAt(now.toEpochMilli());
         }
         if (claims.getExpiryTime() != null) {
             atv.setTokenLifetime(claims.getExpiryTime() - atv.getTokenIssuedAt());
