@@ -34,7 +34,7 @@ public class EcdhDirectKeyJweDecryption extends JweDecryption {
     protected static byte[] getDecryptedContentEncryptionKeyFromHeaders(JweHeaders headers,
                                                                         ECPrivateKey privateKey) {
         ContentAlgorithm jwtAlgo = headers.getContentEncryptionAlgorithm();
-        JsonWebKey publicJwk = headers.getJsonWebKey("epv");
+        JsonWebKey publicJwk = headers.getJsonWebKey("epk");
         String apuHeader = (String)headers.getHeader("apu");
         byte[] apuBytes = apuHeader == null ? null : JoseUtils.decode(apuHeader);
         String apvHeader = (String)headers.getHeader("apv");
