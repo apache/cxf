@@ -28,7 +28,10 @@ import org.apache.cxf.rt.security.crypto.CryptoUtils;
 public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionAlgorithm {
     private static final int DEFAULT_IV_SIZE = 96;
     public AesGcmContentEncryptionAlgorithm(ContentAlgorithm algo) {
-        this((byte[])null, null, algo);
+        this(algo, false);
+    }
+    public AesGcmContentEncryptionAlgorithm(ContentAlgorithm algo, boolean generateCekOnce) {
+        super(checkAlgorithm(algo), generateCekOnce);
     }
     public AesGcmContentEncryptionAlgorithm(String encodedCek, String encodedIv, ContentAlgorithm algo) {
         this((byte[])CryptoUtils.decodeSequence(encodedCek), CryptoUtils.decodeSequence(encodedIv), algo);
@@ -58,4 +61,5 @@ public class AesGcmContentEncryptionAlgorithm extends AbstractContentEncryptionA
         LOG.warning("Invalid content encryption algorithm");
         throw new JweException(JweException.Error.INVALID_CONTENT_ALGORITHM);
     }
+    
 }
