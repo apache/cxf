@@ -25,12 +25,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.message.Exchange;
@@ -44,6 +47,8 @@ import org.apache.cxf.service.model.EndpointInfo;
  * 
  */
 public class TransportURIResolver extends ExtendedURIResolver {
+    static final Logger LOG = LogUtils.getL7dLogger(TransportURIResolver.class);
+    
     private static final Set<String> DEFAULT_URI_RESOLVER_HANDLES = new HashSet<String>();
     static {
         //bunch we really don't want to have the conduits checked for
@@ -63,7 +68,6 @@ public class TransportURIResolver extends ExtendedURIResolver {
     }
     
     public InputSource resolve(String curUri, String baseUri) {
-        
         // Spaces must be encoded or URI.resolve() will choke
         curUri = curUri.replace(" ", "%20");
         
@@ -79,6 +83,7 @@ public class TransportURIResolver extends ExtendedURIResolver {
         } catch (URISyntaxException use) {
             //ignore
             base = null;
+            LOG.log(Level.FINEST, "Could not resolve curUri " + curUri, use);
         }
         try {
             if (base == null 
@@ -87,6 +92,7 @@ public class TransportURIResolver extends ExtendedURIResolver {
             }
         } catch (Exception ex) {
             //nothing
+            LOG.log(Level.FINEST, "Default URI handlers could not resolve " + baseUri + " " + curUri, ex);
         }
         if (is == null && base != null 
             && base.getScheme() != null
@@ -141,6 +147,7 @@ public class TransportURIResolver extends ExtendedURIResolver {
                 }
             } catch (Exception e) {
                 //ignore
+                LOG.log(Level.FINEST, "Conduit initiator could not resolve " + baseUri + " " + curUri, e);
             }
         }
         if (is == null 
