@@ -18,12 +18,16 @@
  */
 package sample.ws.service;
 
-import static org.hamcrest.Matchers.containsString;
 
 import java.io.StringReader;
 
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,11 +36,8 @@ import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.ws.client.core.WebServiceTemplate;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import sample.ws.SampleWsApplication;
