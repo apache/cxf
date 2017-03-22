@@ -27,13 +27,13 @@ import javax.ws.rs.sse.OutboundSseEvent;
 
 class SseUnboundedSubscription implements Subscription {
     // Has subscription been cancelled or not?
-    private boolean cancelled = false;
+    private boolean cancelled;
     // Current demand: what has been requested but not yet delivered
-    private long demand = 0;
+    private long demand;
     private final BlockingQueue<OutboundSseEvent> buffer = new LinkedBlockingQueue<>(); 
     private final Flow.Subscriber<? super OutboundSseEvent> subscriber;
     
-    public SseUnboundedSubscription(Flow.Subscriber<? super OutboundSseEvent> subscriber) {
+    SseUnboundedSubscription(Flow.Subscriber<? super OutboundSseEvent> subscriber) {
         this.subscriber = subscriber;
     }
     

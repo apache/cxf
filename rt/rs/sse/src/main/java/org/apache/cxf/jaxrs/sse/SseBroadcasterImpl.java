@@ -56,7 +56,8 @@ public class SseBroadcasterImpl implements SseBroadcaster {
 
     @Override
     public void broadcast(OutboundSseEvent event) {
-        for (Map.Entry<Flow.Subscriber<? super OutboundSseEvent>, SseUnboundedSubscription> entry: subscribers.entrySet()) {
+        for (Map.Entry<Flow.Subscriber<? super OutboundSseEvent>, SseUnboundedSubscription> entry 
+            : subscribers.entrySet()) {
             try {
                 entry.getValue().send(event);
             } catch (final Exception ex) {
