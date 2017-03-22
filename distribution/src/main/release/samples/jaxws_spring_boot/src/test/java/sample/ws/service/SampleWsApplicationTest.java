@@ -18,32 +18,33 @@
  */
 package sample.ws.service;
 
+import static org.hamcrest.Matchers.containsString;
+
 import java.io.StringReader;
 
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.springframework.boot.context.embedded.LocalServerPort;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.ws.client.core.WebServiceTemplate;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.rule.OutputCapture;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.ws.client.core.WebServiceTemplate;
 
-import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import sample.ws.SampleWsApplication;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = SampleWsApplication.class, properties = "server.port=0")
-@WebAppConfiguration
-public class SampleWsApplicationTests {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = SampleWsApplication.class, webEnvironment = WebEnvironment.RANDOM_PORT)
+public class SampleWsApplicationTest {
 
     //CHECKSTYLE:OFF
     @Rule
@@ -52,12 +53,12 @@ public class SampleWsApplicationTests {
 
     private WebServiceTemplate webServiceTemplate = new WebServiceTemplate();
 
-    @Value("${local.server.port}")
-    private int serverPort;
+    @LocalServerPort
+    private int port;
 
     @Before
     public void setUp() {
-        this.webServiceTemplate.setDefaultUri("http://localhost:" + this.serverPort + "/Service/Hello");
+        this.webServiceTemplate.setDefaultUri("http://localhost:" + this.port + "/Service/Hello");
     }
 
     @Test
