@@ -326,7 +326,7 @@ public final class TLSParameterJaxBUtils {
     }
 
     /**
-     * This method converts the JAXB KeyManagersType into a list of
+     * This method converts the JAXB TrustManagersType into a list of
      * JSSE TrustManagers.
      */
     public static TrustManager[] getTrustManagers(TrustManagersType tmc)
