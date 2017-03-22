@@ -113,7 +113,7 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
                     if (!future.isDone()) {
                         // Let us wait at least 200 milliseconds before returning to ensure
                         // that SSE had the opportunity to be delivered.
-                        LOG.info("Waiting 200ms to ensure SSE Atmosphere response is delivered");
+                        LOG.fine("Waiting 200ms to ensure SSE Atmosphere response is delivered");
                         future.get(200, TimeUnit.MILLISECONDS);
                     }
                 } catch (final ExecutionException | InterruptedException ex) {

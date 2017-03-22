@@ -27,12 +27,11 @@ import java.util.function.Consumer;
 
 import javax.ws.rs.Flow;
 import javax.ws.rs.Flow.Subscriber;
-import javax.ws.rs.Flow.Subscription;
 import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.SseBroadcaster;
 
 public class SseBroadcasterImpl implements SseBroadcaster {
-    private final Map<Flow.Subscriber<? super OutboundSseEvent>, Subscription> subscribers =
+    private final Map<Flow.Subscriber<? super OutboundSseEvent>, SseUnboundedSubscription> subscribers =
             new ConcurrentHashMap<>();
 
     private final Set<Consumer<Subscriber<? super OutboundSseEvent>>> closers =
@@ -43,18 +42,13 @@ public class SseBroadcasterImpl implements SseBroadcaster {
 
     @Override
     public void subscribe(Flow.Subscriber<? super OutboundSseEvent> subscriber) {
-        final Subscription subscription = new Subscription() {
-            public void request(long n) {
-            }
-
-            @Override
-            public void cancel() {
-            }
-        };
-
         try {
-            subscriber.onSubscribe(subscription);
-            subscribers.put(subscriber, subscription);
+            if (!subscribers.containsKey(subscriber)) {
+                final SseUnboundedSubscription subscription = new SseUnboundedSubscription(subscriber);
+                if (subscribers.putIfAbsent(subscriber, subscription) == null) {
+                    subscriber.onSubscribe(subscription);
+                }
+            }
         } catch (final Exception ex) {
             subscriber.onError(ex);
         }
@@ -62,11 +56,11 @@ public class SseBroadcasterImpl implements SseBroadcaster {
 
     @Override
     public void broadcast(OutboundSseEvent event) {
-        for (final Flow.Subscriber<? super OutboundSseEvent> subscriber: subscribers.keySet()) {
+        for (Map.Entry<Flow.Subscriber<? super OutboundSseEvent>, SseUnboundedSubscription> entry: subscribers.entrySet()) {
             try {
-                subscriber.onNext(event);
+                entry.getValue().send(event);
             } catch (final Exception ex) {
-                exceptioners.forEach(exceptioner -> exceptioner.accept(subscriber, ex));
+                exceptioners.forEach(exceptioner -> exceptioner.accept(entry.getKey(), ex));
             }
         }
     }

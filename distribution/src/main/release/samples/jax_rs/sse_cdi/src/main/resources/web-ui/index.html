@@ -31,7 +31,7 @@
 	}); 
 
 	if( !!window.EventSource ) {
-	    var event = new EventSource("http://localhost:8686/rest/api/stats/sse/1");
+	    var event = new EventSource("http://localhost:8686/rest/api/stats/sse");
 	
 	    event.addEventListener('message', function( event ) {	
 	    	var datapoint = jQuery.parseJSON( event.data );
