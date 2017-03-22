@@ -914,7 +914,7 @@ function org_apache_cxf_client_onReadyState() {
 			this.utils
 					.trace("onreadystatechange DONE ERROR retrieving status (connection error?)");
 			if (this.onerror != null) {
-				this.onerror(e);
+				this.onerror(this);
 			}
 			return;
 
