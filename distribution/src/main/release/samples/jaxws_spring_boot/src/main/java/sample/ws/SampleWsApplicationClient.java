@@ -19,30 +19,36 @@
 package sample.ws;
 
 import java.io.StringReader;
+import java.net.URL;
 
-import javax.xml.transform.stream.StreamResult;
+import javax.xml.namespace.QName;
+import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.Dispatch;
+import javax.xml.ws.Service;
+import javax.xml.ws.Service.Mode;
+
+import org.apache.cxf.staxutils.StaxUtils;
 
 
 //CHECKSTYLE:OFF
 public class SampleWsApplicationClient {
- 
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws Exception {
         String address = "http://localhost:8080/Service/Hello";
-        // final String request =
-        // "<q0:sayHello xmlns:q0=\"http://service.ws.sample\">Elan</q0:sayHello>";
         String request = "<q0:sayHello xmlns:q0=\"http://service.ws.sample/\"><myname>Elan</myname></q0:sayHello>";
 
         StreamSource source = new StreamSource(new StringReader(request));
-        StreamResult result = new StreamResult(System.out);
-
-        //assertThat(this.output.toString(),
-        //           containsString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-        //                          + "<ns2:sayHelloResponse xmlns:ns2=\"http://service.ws.sample/\">"
-        //                          + "<return>Hello, Welcome to CXF Spring boot Elan!!!</return>"
-        //                          + "</ns2:sayHelloResponse>"));
+        Service service = Service.create(new URL(address + "?wsdl"), 
+                                         new QName("http://service.ws.sample/" , "HelloService"));
+        Dispatch<Source> disp = service.createDispatch(new QName("http://service.ws.sample/" , "HelloPort"),
+                                                       Source.class, Mode.PAYLOAD);
+        
+        Source result = disp.invoke(source);
+        String resultAsString = StaxUtils.toString(result);
+        System.out.println(resultAsString);
+       
     }
-
 }
 //CHECKSTYLE:ON
 
