@@ -740,7 +740,7 @@ public final class JAXBUtils {
     }
     
     public static void logGeneratedClassNames(Logger logger, JCodeModel codeModel) {
-        if (!logger.isLoggable(Level.INFO)) {
+        if (!logger.isLoggable(Level.FINE)) {
             return;
         }
         
@@ -759,7 +759,7 @@ public final class JAXBUtils {
             }
         }
         
-        logger.log(Level.INFO, "Created classes: " + sb.toString());
+        logger.log(Level.FINE, "Created classes: " + sb.toString());
     }
     
     public static List<String> getGeneratedClassNames(JCodeModel codeModel) {
