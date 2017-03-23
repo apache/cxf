@@ -65,12 +65,12 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                             if (session.getTransacted()) {
                                 session.commit();
                             }
-                        } catch (Exception e) {
+                        } catch (Throwable e) {
                             LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
                             safeRollBack(session);
                         }
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     catchUnexpectedExceptionDuringPolling(null, e);
                 }
             }
@@ -83,7 +83,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                 if (session != null && session.getTransacted()) {
                     session.rollback();
                 }
-            } catch (Exception e1) {
+            } catch (Throwable e1) {
                 LOG.log(Level.WARNING, "Rollback of Local transaction failed", e1);
             }
         }
