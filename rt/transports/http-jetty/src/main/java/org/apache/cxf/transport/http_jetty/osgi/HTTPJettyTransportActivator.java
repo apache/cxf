@@ -177,6 +177,7 @@ public class HTTPJettyTransportActivator
         SecureRandomParameters srp = null;
         KeyManagersType kmt = null;
         TrustManagersType tmt = null;
+        boolean enableRevocation = false;
         while (keys.hasMoreElements()) {
             String k = keys.nextElement();
             if (k.startsWith("tlsServerParameters.")) {
@@ -202,6 +203,8 @@ public class HTTPJettyTransportActivator
                         p.setClientAuthentication(new ClientAuthentication());
                     }
                     p.getClientAuthentication().setRequired(Boolean.parseBoolean(v));
+                } else if ("enableRevocation".equals(k)) {
+                    enableRevocation = Boolean.parseBoolean(v);
                 } else if (k.startsWith("certConstraints.")) {
                     configureCertConstraints(p, k, v);
                 } else if (k.startsWith("secureRandomParameters.")) {
@@ -238,7 +241,7 @@ public class HTTPJettyTransportActivator
                 p.setKeyManagers(TLSParameterJaxBUtils.getKeyManagers(kmt));
             }
             if (tmt != null) {
-                p.setTrustManagers(TLSParameterJaxBUtils.getTrustManagers(tmt));
+                p.setTrustManagers(TLSParameterJaxBUtils.getTrustManagers(tmt, enableRevocation));
             }
         } catch (RuntimeException e) {
             throw e;

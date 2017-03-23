@@ -526,6 +526,14 @@
                 </xs:documentation>
              </xs:annotation>
            </xs:attribute>
+           <xs:attribute name="enableRevocation" type="pt:ParameterizedBoolean" default="false">
+             <xs:annotation>
+                <xs:documentation>
+                This attribute specifies whether to enable revocation when checking the server certificate.
+                The default is false.
+                </xs:documentation>
+             </xs:annotation>
+           </xs:attribute>
            <xs:attribute name="jsseProvider"          type="xs:string">
               <xs:annotation>
                 <xs:documentation>
@@ -640,6 +648,14 @@
                 example is "SSL", "TLS" or "TLSv1".
                 </xs:documentation>
               </xs:annotation>
+           </xs:attribute>
+           <xs:attribute name="enableRevocation" type="pt:ParameterizedBoolean" default="false">
+             <xs:annotation>
+                <xs:documentation>
+                This attribute specifies whether to enable revocation when checking the client certificate,
+                if client authentication is enabled. The default is false.
+                </xs:documentation>
+             </xs:annotation>
            </xs:attribute>
     </xs:complexType>
 </xs:schema>
