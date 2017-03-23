@@ -20,18 +20,13 @@
 package org.apache.cxf.systest.https.trust;
 
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.Security;
-import java.security.cert.CertPathBuilder;
 import java.security.cert.CertificateException;
 import java.security.cert.PKIXBuilderParameters;
-import java.security.cert.PKIXRevocationChecker;
-import java.security.cert.PKIXRevocationChecker.Option;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
-import java.util.EnumSet;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.TrustManager;
@@ -215,14 +210,8 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         try {
             Security.setProperty("ocsp.enable", "true");
             
-            CertPathBuilder cpb = CertPathBuilder.getInstance("PKIX");
-            PKIXRevocationChecker rc = (PKIXRevocationChecker)cpb.getRevocationChecker();
-            rc.setOcspResponder(URI.create("http://localhost:12345"));
-            rc.setOptions(EnumSet.of(Option.NO_FALLBACK));
-    
             PKIXBuilderParameters param = new PKIXBuilderParameters(ts, new X509CertSelector());
             param.setRevocationEnabled(true);
-            param.addCertPathChecker(rc);
             
             TrustManagerFactory tmf  =
                 TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
