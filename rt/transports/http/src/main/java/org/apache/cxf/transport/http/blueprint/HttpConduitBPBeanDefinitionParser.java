@@ -101,6 +101,7 @@ public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionP
                 if ("useHttpsURLConnectionDefaultSslSocketFactory".equals(aname)
                     || "useHttpsURLConnectionDefaultHostnameVerifier".equals(aname)
                     || "disableCNCheck".equals(aname)
+                    || "enableRevocation".equals(aname)
                     || "jsseProvider".equals(aname)
                     || "secureSocketProtocol".equals(aname)
                     || "sslCacheTimeout".equals(aname)) {
