@@ -871,11 +871,14 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         if (artifactSet != null && !artifactSet.isEmpty()) {
             for (Artifact pArtifact : artifactSet) {
                 if (targetArtifact.getGroupId().equals(pArtifact.getGroupId())
-                    && targetArtifact.getArtifactId().equals(pArtifact.getArtifactId())
-                    && targetArtifact.getVersion().equals(pArtifact.getVersion())
-                    && "wsdl".equals(pArtifact.getType())) {
-                    getLog().info(String.format("%s resolved to %s", pArtifact.toString(), pArtifact
-                                      .getFile().getAbsolutePath()));
+                        && targetArtifact.getArtifactId().equals(pArtifact.getArtifactId())
+                        && targetArtifact.getVersion().equals(pArtifact.getVersion()) 
+                        && ("wsdl".equals(pArtifact.getType()) 
+                        || (
+                                targetArtifact.getClassifier() != null
+                                        && pArtifact.getType() != null
+                                        && (targetArtifact.getClassifier() + ".wsdl").equals(pArtifact.getType())
+                        ))) {
                     return pArtifact;
                 }
             }
