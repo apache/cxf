@@ -53,7 +53,9 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
             theCek = CryptoUtils.getSecretKey(AlgorithmUtils.stripAlgoProperties(algoJava),
                           getContentEncryptionKeySize(headers)).getEncoded();
             if (generateCekOnce) {
-                cek = theCek;
+                synchronized (this) {
+                    cek = theCek;
+                }
             }
         } else {
             theCek = cek;
