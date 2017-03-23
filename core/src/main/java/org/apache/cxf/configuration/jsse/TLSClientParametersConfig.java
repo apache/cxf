@@ -114,7 +114,7 @@ public final class TLSClientParametersConfig {
         if (params.isSetTrustManagers() && !usingDefaults) {
             ret.setTrustManagers(
                 TLSParameterJaxBUtils.getTrustManagers(
-                        params.getTrustManagers()));
+                        params.getTrustManagers(), params.isEnableRevocation()));
         }
         if (params.isSetCertConstraints()) {
             ret.setCertConstraints(params.getCertConstraints());

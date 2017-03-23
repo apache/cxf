@@ -65,6 +65,7 @@ class HttpConduitConfigApplier {
         SecureRandomParameters srp = null;
         KeyManagersType kmt = null;
         TrustManagersType tmt = null;
+        boolean enableRevocation = false;
         while (keys.hasMoreElements()) {
             String k = keys.nextElement();
             if (k.startsWith("tlsClientParameters.")) {
@@ -87,36 +88,10 @@ class HttpConduitConfigApplier {
                     p.setUseHttpsURLConnectionDefaultHostnameVerifier(Boolean.parseBoolean(v));
                 } else if ("useHttpsURLConnectionDefaultSslSocketFactory".equals(k)) {
                     p.setUseHttpsURLConnectionDefaultSslSocketFactory(Boolean.parseBoolean(v));
+                } else if ("enableRevocation".equals(k)) {
+                    enableRevocation = Boolean.parseBoolean(v);
                 } else if (k.startsWith("certConstraints.")) {
-                    k = k.substring("certConstraints.".length());
-                    CertificateConstraintsType cct = p.getCertConstraints();
-                    if (cct == null) {
-                        cct = new CertificateConstraintsType();
-                        p.setCertConstraints(cct);
-                    }
-                    DNConstraintsType dnct = null;
-                    if (k.startsWith("SubjectDNConstraints.")) {
-                        dnct = cct.getSubjectDNConstraints();
-                        if (dnct == null) {
-                            dnct = new DNConstraintsType();
-                            cct.setSubjectDNConstraints(dnct);
-                        }
-                        k = k.substring("SubjectDNConstraints.".length());
-                    } else if (k.startsWith("IssuerDNConstraints.")) {
-                        dnct = cct.getIssuerDNConstraints();
-                        if (dnct == null) {
-                            dnct = new DNConstraintsType();
-                            cct.setIssuerDNConstraints(dnct);
-                        }
-                        k = k.substring("IssuerDNConstraints.".length());
-                    }
-                    if (dnct != null) {
-                        if ("combinator".equals(k)) {
-                            dnct.setCombinator(CombinatorType.fromValue(v));
-                        } else if ("RegularExpression".equals(k)) {
-                            dnct.getRegularExpression().add(k);
-                        }
-                    }
+                    parseCertConstaints(p, k, v);
                 } else if (k.startsWith("secureRandomParameters.")) {
                     k = k.substring("secureRandomParameters.".length());
                     if (srp == null) {
@@ -164,12 +139,44 @@ class HttpConduitConfigApplier {
                 p.setKeyManagers(TLSParameterJaxBUtils.getKeyManagers(kmt));
             }
             if (tmt != null) {
-                p.setTrustManagers(TLSParameterJaxBUtils.getTrustManagers(tmt));
+                p.setTrustManagers(TLSParameterJaxBUtils.getTrustManagers(tmt, enableRevocation));
             }
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void parseCertConstaints(TLSClientParameters p, String k, String v) {
+        k = k.substring("certConstraints.".length());
+        CertificateConstraintsType cct = p.getCertConstraints();
+        if (cct == null) {
+            cct = new CertificateConstraintsType();
+            p.setCertConstraints(cct);
+        }
+        DNConstraintsType dnct = null;
+        if (k.startsWith("SubjectDNConstraints.")) {
+            dnct = cct.getSubjectDNConstraints();
+            if (dnct == null) {
+                dnct = new DNConstraintsType();
+                cct.setSubjectDNConstraints(dnct);
+            }
+            k = k.substring("SubjectDNConstraints.".length());
+        } else if (k.startsWith("IssuerDNConstraints.")) {
+            dnct = cct.getIssuerDNConstraints();
+            if (dnct == null) {
+                dnct = new DNConstraintsType();
+                cct.setIssuerDNConstraints(dnct);
+            }
+            k = k.substring("IssuerDNConstraints.".length());
+        }
+        if (dnct != null) {
+            if ("combinator".equals(k)) {
+                dnct.setCombinator(CombinatorType.fromValue(v));
+            } else if ("RegularExpression".equals(k)) {
+                dnct.getRegularExpression().add(k);
+            }
         }
     }
 

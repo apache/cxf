@@ -139,7 +139,7 @@ public class HttpConduitConfigurationTest extends Assert {
         
             tmt.setKeyStore(kst);
             try {
-                return TLSParameterJaxBUtils.getTrustManagers(tmt);
+                return TLSParameterJaxBUtils.getTrustManagers(tmt, false);
             } catch (Exception e) {
                 throw new RuntimeException("failed to retrieve trust managers", e);
             }
