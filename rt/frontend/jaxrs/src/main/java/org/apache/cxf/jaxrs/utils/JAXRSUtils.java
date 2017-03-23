@@ -46,10 +46,6 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.Produces;
@@ -104,8 +100,6 @@ import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.impl.ContainerRequestContextImpl;
 import org.apache.cxf.jaxrs.impl.ContainerResponseContextImpl;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
-import org.apache.cxf.jaxrs.impl.HttpServletRequestFilter;
-import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MediaTypeHeaderProvider;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
@@ -142,7 +136,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public final class JAXRSUtils {
 
@@ -955,8 +948,7 @@ public final class JAXRSUtils {
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
                 String enc = HttpUtils.getEncoding(mt, StandardCharsets.UTF_8.name());
                 String body = FormUtils.readBody(m.getContent(InputStream.class), enc);
-                HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
-                FormUtils.populateMapFromString(params, m, body, enc, decode, request);
+                FormUtils.populateMapFromStringOrHttpRequest(params, m, body, enc, decode);
             } else {
                 if ("multipart".equalsIgnoreCase(mt.getType())
                     && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
@@ -1117,7 +1109,7 @@ public final class JAXRSUtils {
             }
         }
         if (o == null && contextMessage != null && !MessageUtils.isRequestor(contextMessage)) {
-            o = createServletResourceValue(contextMessage, clazz);
+            o = HttpUtils.createServletResourceValue(contextMessage, clazz);
         }
         return clazz.cast(o);
     }
@@ -1157,23 +1149,7 @@ public final class JAXRSUtils {
         return createContextValue(m, genericType, clazz);
     }
 
-    public static <T> T createServletResourceValue(Message m, Class<T> clazz) {
-
-        Object value = null;
-        if (clazz == HttpServletRequest.class) {
-            HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
-            value = request != null ? new HttpServletRequestFilter(request, m) : null;
-        } else if (clazz == HttpServletResponse.class) {
-            HttpServletResponse response = (HttpServletResponse)m.get(AbstractHTTPDestination.HTTP_RESPONSE);
-            value = response != null ? new HttpServletResponseFilter(response, m) : null;
-        } else if (clazz == ServletContext.class) {
-            value = m.get(AbstractHTTPDestination.HTTP_CONTEXT);
-        } else if (clazz == ServletConfig.class) {
-            value = m.get(AbstractHTTPDestination.HTTP_CONFIG);
-        }
-
-        return clazz.cast(value);
-    }
+    
     //CHECKSTYLE:OFF
     private static Object readFromUriParam(Message m,
                                            String parameterName,

@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Form;
@@ -50,6 +51,7 @@ import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public final class FormUtils {
     public static final String FORM_PARAMS_FROM_HTTP_PARAMS = "set.form.parameters.from.http.parameters";
@@ -151,6 +153,16 @@ public final class FormUtils {
 
     }
 
+    public static void populateMapFromStringOrHttpRequest(MultivaluedMap<String, String> params,
+                                             Message m,
+                                             String postBody,
+                                             String enc,
+                                             boolean decode) {
+        HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
+        populateMapFromString(params, m, postBody, enc, decode, request);
+        
+    }
+    
     public static void populateMapFromString(MultivaluedMap<String, String> params,
                                              Message m,
                                              String postBody,
