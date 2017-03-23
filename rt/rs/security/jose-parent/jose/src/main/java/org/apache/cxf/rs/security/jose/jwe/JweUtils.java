@@ -269,8 +269,12 @@ public final class JweUtils {
         return null;
     }
     public static ContentEncryptionProvider getContentEncryptionProvider(ContentAlgorithm algorithm) {
+        return getContentEncryptionProvider(algorithm, false);
+    }
+    public static ContentEncryptionProvider getContentEncryptionProvider(ContentAlgorithm algorithm, 
+                                                                         boolean generateCekOnce) {
         if (AlgorithmUtils.isAesGcm(algorithm.getJwaName())) {
-            return new AesGcmContentEncryptionAlgorithm(algorithm);
+            return new AesGcmContentEncryptionAlgorithm(algorithm, generateCekOnce);
         }
         return null;
     }
