@@ -101,12 +101,8 @@ public class HttpConduitBPBeanDefinitionParser extends AbstractBPBeanDefinitionP
                 if ("useHttpsURLConnectionDefaultSslSocketFactory".equals(aname) 
                     || "useHttpsURLConnectionDefaultHostnameVerifier".equals(aname)
                     || "disableCNCheck".equals(aname)
-<<<<<<< HEAD
-                    || "jsseProvider".equals(aname) 
-=======
                     || "enableRevocation".equals(aname)
                     || "jsseProvider".equals(aname)
->>>>>>> a7d5d52... CXF-7296 - Add support to enable revocation for TLS via configuration
                     || "secureSocketProtocol".equals(aname)
                     || "sslCacheTimeout".equals(aname)) {
                     paramsbean.addProperty(aname, createValue(ctx, a.getValue()));
