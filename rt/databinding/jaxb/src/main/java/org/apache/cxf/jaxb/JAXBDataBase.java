@@ -23,8 +23,11 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlAttachmentRef;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -32,9 +35,12 @@ import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.validation.Schema;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentMarshaller;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentUnmarshaller;
 import org.apache.cxf.message.Attachment;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -44,6 +50,7 @@ import org.apache.cxf.service.model.OperationInfo;
  *
  */
 public abstract class JAXBDataBase {
+    static final Logger LOG = LogUtils.getL7dLogger(JAXBDataBase.class);
 
     protected JAXBContext context;
     protected Schema schema;
@@ -151,6 +158,34 @@ public abstract class JAXBDataBase {
         //JAXBSchemaInitializer will set this.
         Boolean b = (Boolean)part.getProperty("honor.jaxb.annotations");
         return b == null ? false : b;
+    }
+    
+    protected ValidationEventHandler getValidationEventHandler(String cn) {
+        try {
+            return (ValidationEventHandler)ClassLoaderUtils.loadClass(cn, getClass()).newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            LOG.log(Level.INFO, "Could not create validation event handler", e);
+        }
+        return null;
+    }
+    
+    protected ValidationEventHandler getValidationEventHandler(Message m, String property) {
+        Object value = m.getContextualProperty(property);
+        ValidationEventHandler veventHandler = null;
+        if (value instanceof String) {
+            veventHandler = getValidationEventHandler((String)value);
+        } else {
+            veventHandler = (ValidationEventHandler)value;
+        }
+        if (veventHandler == null) {
+            value = m.getContextualProperty(JAXBDataBinding.VALIDATION_EVENT_HANDLER);
+            if (value instanceof String) {
+                veventHandler = getValidationEventHandler((String)value);
+            } else {
+                veventHandler = (ValidationEventHandler)value;
+            }
+        }
+        return veventHandler;
     }
 
 
