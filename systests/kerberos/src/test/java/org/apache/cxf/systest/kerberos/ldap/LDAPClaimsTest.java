@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -38,6 +39,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.sts.claims.ClaimTypes;
+import org.apache.cxf.sts.claims.ClaimsManager;
 import org.apache.cxf.sts.claims.ClaimsParameters;
 import org.apache.cxf.sts.claims.LdapClaimsHandler;
 import org.apache.cxf.sts.claims.LdapGroupClaimsHandler;
@@ -130,6 +132,8 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
     @org.junit.Test
     public void testRetrieveClaims() throws Exception {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
+        ClaimsManager claimsManager = new ClaimsManager();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
 
         String user = props.getProperty("claimUser");
         Assert.notNull(user, "Property 'claimUser' not configured");
@@ -143,8 +147,13 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
        
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
+<<<<<<< HEAD
         ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
+=======
+        ProcessedClaimCollection retrievedClaims =
+            claimsManager.retrieveClaimValues(requestedClaims, params);
+>>>>>>> a719adc... CXF-6044 - Obsolet Testing Method in LDAPClaimsTest
 
         Assert.isTrue(
                       retrievedClaims.size() == expectedClaims.size(), 
@@ -164,6 +173,8 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
     @org.junit.Test
     public void testRetrieveClaimsUsingLDAPLookup() throws Exception {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
+        ClaimsManager claimsManager = new ClaimsManager();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
 
         ClaimCollection requestedClaims = createRequestClaimCollection();
 
@@ -174,8 +185,13 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
        
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal("cn=alice,ou=users,dc=example,dc=com"));
+<<<<<<< HEAD
         ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
+=======
+        ProcessedClaimCollection retrievedClaims =
+            claimsManager.retrieveClaimValues(requestedClaims, params);
+>>>>>>> a719adc... CXF-6044 - Obsolet Testing Method in LDAPClaimsTest
 
         Assert.isTrue(
                       retrievedClaims.size() == expectedClaims.size(), 
@@ -195,6 +211,8 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
     @org.junit.Test
     public void testMultiUserBaseDNs() throws Exception {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandlerMultipleUserBaseDNs");
+        ClaimsManager claimsManager = new ClaimsManager();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
 
         String user = props.getProperty("claimUser");
         Assert.notNull(user, "Property 'claimUser' not configured");
@@ -211,8 +229,13 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         // First user
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
+<<<<<<< HEAD
         ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
+=======
+        ProcessedClaimCollection retrievedClaims =
+            claimsManager.retrieveClaimValues(requestedClaims, params);
+>>>>>>> a719adc... CXF-6044 - Obsolet Testing Method in LDAPClaimsTest
 
         Assert.isTrue(
                       retrievedClaims.size() == expectedClaims.size(), 
@@ -230,7 +253,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         
         // Second user
         params.setPrincipal(new CustomTokenPrincipal(otherUser));
-        retrievedClaims = claimsHandler.retrieveClaimValues(requestedClaims, params);
+        retrievedClaims = claimsManager.retrieveClaimValues(requestedClaims, params);
 
         expectedClaims.add(ClaimTypes.FIRSTNAME);
         expectedClaims.add(ClaimTypes.LASTNAME);
@@ -254,6 +277,8 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
     @org.junit.Test(expected = STSException.class)
     public void testRetrieveClaimsWithUnsupportedMandatoryClaimType() throws Exception {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
+        ClaimsManager claimsManager = new ClaimsManager();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
 
         String user = props.getProperty("claimUser");
         Assert.notNull(user, "Property 'claimUser' not configured");
@@ -267,6 +292,7 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
+<<<<<<< HEAD
         ProcessedClaimCollection processedClaim = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
         
@@ -285,11 +311,16 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
                 }
             }
         }
+=======
+        claimsManager.retrieveClaimValues(requestedClaims, params);
+>>>>>>> a719adc... CXF-6044 - Obsolet Testing Method in LDAPClaimsTest
     }
     
     @org.junit.Test
     public void testRetrieveClaimsWithUnsupportedOptionalClaimType() throws Exception {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
+        ClaimsManager claimsManager = new ClaimsManager();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
 
         String user = props.getProperty("claimUser");
         Assert.notNull(user, "Property 'claimUser' not configured");
@@ -309,8 +340,13 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
         
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
+<<<<<<< HEAD
         ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
+=======
+        ProcessedClaimCollection retrievedClaims =
+            claimsManager.retrieveClaimValues(requestedClaims, params);
+>>>>>>> a719adc... CXF-6044 - Obsolet Testing Method in LDAPClaimsTest
 
         Assert.isTrue(
                       retrievedClaims.size() == expectedClaims.size(), 
@@ -354,6 +390,8 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
     @org.junit.Test
     public void testRetrieveBinaryClaims() throws Exception {
         LdapClaimsHandler claimsHandler = (LdapClaimsHandler)appContext.getBean("testClaimsHandler");
+        ClaimsManager claimsManager = new ClaimsManager();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
 
         String user = props.getProperty("binaryClaimUser");
         Assert.notNull(user, "Property 'binaryClaimUser' not configured");
@@ -373,8 +411,13 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
        
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
+<<<<<<< HEAD
         ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
+=======
+        ProcessedClaimCollection retrievedClaims =
+            claimsManager.retrieveClaimValues(requestedClaims, params);
+>>>>>>> a719adc... CXF-6044 - Obsolet Testing Method in LDAPClaimsTest
 
         Assert.isTrue(
                       retrievedClaims.size() == expectedClaims.size(), 
@@ -401,6 +444,8 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
     public void testRetrieveRolesForAlice() throws Exception {
         LdapGroupClaimsHandler claimsHandler = 
             (LdapGroupClaimsHandler)appContext.getBean("testGroupClaimsHandler");
+        ClaimsManager claimsManager = new ClaimsManager();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
 
         String user = props.getProperty("claimUser");
         Assert.notNull(user, "Property 'claimUser' not configured");
@@ -413,8 +458,13 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
+<<<<<<< HEAD
         ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
+=======
+        ProcessedClaimCollection retrievedClaims =
+            claimsManager.retrieveClaimValues(requestedClaims, params);
+>>>>>>> a719adc... CXF-6044 - Obsolet Testing Method in LDAPClaimsTest
 
         Assert.isTrue(retrievedClaims.size() == 1);
         Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
@@ -425,6 +475,8 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
     public void testRetrieveRolesForAliceUsingLDAPLookup() throws Exception {
         LdapGroupClaimsHandler claimsHandler = 
             (LdapGroupClaimsHandler)appContext.getBean("testGroupClaimsHandler");
+        ClaimsManager claimsManager = new ClaimsManager();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
 
         ClaimCollection requestedClaims = new ClaimCollection();
         Claim claim = new Claim();
@@ -434,8 +486,13 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal("cn=alice,ou=users,dc=example,dc=com"));
+<<<<<<< HEAD
         ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
+=======
+        ProcessedClaimCollection retrievedClaims =
+            claimsManager.retrieveClaimValues(requestedClaims, params);
+>>>>>>> a719adc... CXF-6044 - Obsolet Testing Method in LDAPClaimsTest
 
         Assert.isTrue(retrievedClaims.size() == 1);
         Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
@@ -446,6 +503,8 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
     public void testRetrieveRolesForBob() throws Exception {
         LdapGroupClaimsHandler claimsHandler = 
             (LdapGroupClaimsHandler)appContext.getBean("testGroupClaimsHandlerOtherUsers");
+        ClaimsManager claimsManager = new ClaimsManager();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
 
         String user = props.getProperty("otherClaimUser");
         Assert.notNull(user, "Property 'claimUser' not configured");
@@ -458,8 +517,13 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
+<<<<<<< HEAD
         ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
+=======
+        ProcessedClaimCollection retrievedClaims =
+            claimsManager.retrieveClaimValues(requestedClaims, params);
+>>>>>>> a719adc... CXF-6044 - Obsolet Testing Method in LDAPClaimsTest
 
         Assert.isTrue(retrievedClaims.size() == 1);
         Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
@@ -470,6 +534,8 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
     public void testRetrieveRolesForBobInBusinessCategoryWidgets() throws Exception {
         LdapGroupClaimsHandler claimsHandler = 
             (LdapGroupClaimsHandler)appContext.getBean("testGroupClaimsHandlerFilter");
+        ClaimsManager claimsManager = new ClaimsManager();
+        claimsManager.setClaimHandlers(Collections.singletonList(claimsHandler));
 
         String user = props.getProperty("otherClaimUser");
         Assert.notNull(user, "Property 'claimUser' not configured");
@@ -482,8 +548,13 @@ public class LDAPClaimsTest extends AbstractLdapTestUnit {
 
         ClaimsParameters params = new ClaimsParameters();
         params.setPrincipal(new CustomTokenPrincipal(user));
+<<<<<<< HEAD
         ProcessedClaimCollection retrievedClaims = 
             claimsHandler.retrieveClaimValues(requestedClaims, params);
+=======
+        ProcessedClaimCollection retrievedClaims =
+            claimsManager.retrieveClaimValues(requestedClaims, params);
+>>>>>>> a719adc... CXF-6044 - Obsolet Testing Method in LDAPClaimsTest
 
         Assert.isTrue(retrievedClaims.size() == 1);
         Assert.isTrue(retrievedClaims.get(0).getClaimType().equals(roleURI));
