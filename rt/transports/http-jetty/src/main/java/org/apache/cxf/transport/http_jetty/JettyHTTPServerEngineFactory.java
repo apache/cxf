@@ -268,13 +268,6 @@ public class JettyHTTPServerEngineFactory {
      * @throws GeneralSecurityException
      * @throws IOException
      */
-<<<<<<< HEAD
-    public synchronized JettyHTTPServerEngine createJettyHTTPServerEngine(String host, int port, 
-        String protocol) throws GeneralSecurityException, IOException {
-        LOG.fine("Creating Jetty HTTP Server Engine for port " + port + ".");        
-        JettyHTTPServerEngine ref = getOrCreate(this, host, port, null);
-        // checking the protocol    
-=======
     public synchronized JettyHTTPServerEngine createJettyHTTPServerEngine(String host, int port,
         String protocol, String id) throws GeneralSecurityException, IOException {
         LOG.fine("Creating Jetty HTTP Server Engine for port " + port + ".");
@@ -284,7 +277,6 @@ public class JettyHTTPServerEngineFactory {
         }
         JettyHTTPServerEngine ref = getOrCreate(this, host, port, tlsParameters);
         // checking the protocol
->>>>>>> e70c78e... CXF-7299 - No way to configure TLS for the JettyHTTPServerEngineFactory in code
         if (!protocol.equals(ref.getProtocol())) {
             throw new IOException("Protocol mismatch for port " + port + ": "
                         + "engine's protocol is " + ref.getProtocol()
@@ -314,16 +306,12 @@ public class JettyHTTPServerEngineFactory {
         String protocol) throws GeneralSecurityException, IOException {
         return createJettyHTTPServerEngine(null, port, protocol);
     }
-<<<<<<< HEAD
-    
-=======
 
     public synchronized JettyHTTPServerEngine createJettyHTTPServerEngine(String host, int port,
         String protocol) throws GeneralSecurityException, IOException {
         return createJettyHTTPServerEngine(host, port, protocol, null);
     }
 
->>>>>>> e70c78e... CXF-7299 - No way to configure TLS for the JettyHTTPServerEngineFactory in code
     /**
      * This method removes the Server Engine from the port map and stops it.
      */
