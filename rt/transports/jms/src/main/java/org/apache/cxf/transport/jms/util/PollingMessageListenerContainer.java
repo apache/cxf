@@ -70,12 +70,17 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                                 session.commit();
                             }
                         } catch (Throwable e) {
-                            LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back", e);
+                            if (e instanceof Exception) {
+                                LOG.log(Level.WARNING, "Exception while processing jms message in cxf. Rolling back",
+                                        (Exception)e);
+                            }
                             safeRollBack(session, e);
                         }
                     }
                 } catch (Throwable e) {
-                    LOG.log(Level.WARNING, "Unexpected exception. Restarting session and consumer", e);
+                    if (e instanceof Exception) {
+                        LOG.log(Level.WARNING, "Unexpected exception. Restarting session and consumer", (Exception)e);
+                    }
                 } finally {
                     ResourceCloser.close(consumer);
                     ResourceCloser.close(session);
@@ -84,7 +89,7 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
         }
         
-        private void safeRollBack(Session session, Exception e) {
+        private void safeRollBack(Session session, Throwable e) {
             try {
                 if (session.getTransacted()) {
                     session.rollback();
