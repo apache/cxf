@@ -20,13 +20,13 @@ package org.apache.cxf.systest.sts.common;
 
 import java.security.Principal;
 
-import org.apache.cxf.sts.IdentityMapper;
+import org.apache.cxf.sts.cache.MemoryIdentityCache;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 
 /**
  * A test implementation of IdentityMapper.
  */
-public class CustomIdentityMapper implements IdentityMapper {
+public class CustomIdentityMapper extends MemoryIdentityCache {
 
     /**
      * Map a principal in the source realm to the target realm
