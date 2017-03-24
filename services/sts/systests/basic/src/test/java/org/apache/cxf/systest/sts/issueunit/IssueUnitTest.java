@@ -388,7 +388,6 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
-  //CHECKSTYLE:OFF
     @org.junit.Test
     public void testSAMLinWSSecToOtherRealm() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -477,6 +476,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         return requestSecurityToken(tokenType, keyType, null, bus, endpointAddress, context, null, null, null);
     }
 
+    // CHECKSTYLE:OFF
     private SecurityToken requestSecurityToken(
         String tokenType,
         String keyType,
@@ -533,6 +533,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
 
         return stsClient.requestSecurityToken(endpointAddress);
     }
+    // CHECKSTYLE:ON
 
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
