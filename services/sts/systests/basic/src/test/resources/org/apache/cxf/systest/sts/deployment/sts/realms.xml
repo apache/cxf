@@ -36,13 +36,18 @@
     </util:map>
     
     <!-- Relationships between realms -->
-    <bean id="identityMapper" class="org.apache.cxf.systest.sts.common.CustomIdentityMapper"/>
+    <bean id="identityMapper" class="org.apache.cxf.systest.sts.common.CustomIdentityMapper">
+    </bean>
+    
+    <bean id="identityCache" class="org.apache.cxf.sts.cache.MemoryIdentityCache">
+        <constructor-arg ref="identityMapper"></constructor-arg>
+    </bean>
     
     <util:list id="relationships">
         <bean class="org.apache.cxf.sts.token.realm.Relationship">
             <property name="sourceRealm" value="#{realmA.getName()}"/>
             <property name="targetRealm" value="#{realmB.getName()}"/>
-            <property name="identityMapper" ref="identityMapper"/>
+            <property name="identityMapper" ref="identityCache"/>
             <property name="type" value="FederatedIdentity"/>
         </bean>
     </util:list>
