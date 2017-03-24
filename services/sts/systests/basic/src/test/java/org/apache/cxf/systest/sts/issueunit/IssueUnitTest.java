@@ -387,12 +387,7 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         
         bus.shutdown(true);
     }
-<<<<<<< HEAD
-    
-  //CHECKSTYLE:OFF
-=======
 
->>>>>>> a42362e... CXF-6549 - JMX MBean for IdentityCache throws RuntimeOperationsException
     @org.junit.Test
     public void testSAMLinWSSecToOtherRealm() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -480,12 +475,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
     ) throws Exception {
         return requestSecurityToken(tokenType, keyType, null, bus, endpointAddress, context, null, null, null);
     }
-<<<<<<< HEAD
-    
-=======
 
     // CHECKSTYLE:OFF
->>>>>>> a42362e... CXF-6549 - JMX MBean for IdentityCache throws RuntimeOperationsException
     private SecurityToken requestSecurityToken(
         String tokenType, 
         String keyType,
@@ -542,12 +533,8 @@ public class IssueUnitTest extends AbstractBusClientServerTestBase {
         
         return stsClient.requestSecurityToken(endpointAddress);
     }
-<<<<<<< HEAD
-    
-=======
     // CHECKSTYLE:ON
 
->>>>>>> a42362e... CXF-6549 - JMX MBean for IdentityCache throws RuntimeOperationsException
     private Properties getEncryptionProperties() {
         Properties properties = new Properties();
         properties.put(
