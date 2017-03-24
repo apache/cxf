@@ -66,8 +66,8 @@ public class SpringBusFactory extends BusFactory {
             if (r != null && !r.isEmpty()) {
                 return r.get(0);
             }
-        } catch (Throwable t) {
-            //ignore
+        } catch (Exception t) {
+            LOG.log(Level.FINEST, "Could not find NamespaceHandlerResolver",  t);
         }
         return null;
     }
