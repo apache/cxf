@@ -183,8 +183,13 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
             throw ex;
         }            
     }
+<<<<<<< HEAD
     
     private RequestSecurityTokenResponseType createResponse(
+=======
+
+    protected RequestSecurityTokenResponseType createResponse(
+>>>>>>> 4824bfe... CXF-4692 - Allow customization of Request Security Token Response
         TokenValidatorResponse tokenResponse,
         TokenProviderResponse tokenProviderResponse,
         TokenRequirements tokenRequirements

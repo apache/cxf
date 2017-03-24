@@ -150,8 +150,13 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
         }
     }
 
+<<<<<<< HEAD
     
     private RequestSecurityTokenResponseType createResponse(
+=======
+
+    protected RequestSecurityTokenResponseType createResponse(
+>>>>>>> 4824bfe... CXF-4692 - Allow customization of Request Security Token Response
         TokenRequirements tokenRequirements
     ) throws WSSecurityException {
         RequestSecurityTokenResponseType response = 
