@@ -199,13 +199,8 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
             throw ex;
         }            
     }
-<<<<<<< HEAD
-   
-    private RequestSecurityTokenResponseType createResponse(
-=======
 
     protected RequestSecurityTokenResponseType createResponse(
->>>>>>> 4824bfe... CXF-4692 - Allow customization of Request Security Token Response
             EncryptionProperties encryptionProperties,
             TokenRenewerResponse tokenRenewerResponse, 
             TokenRequirements tokenRequirements,
