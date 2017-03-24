@@ -790,6 +790,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             }
 
             //get imported wsdls
+            int wsdlImportCount = 0;
             List<Definition> defs = (List<Definition>)context.get(ToolConstants.IMPORTED_DEFINITION);
             Map<String, String> importWSDLMap = new HashMap<>();
             for (Definition importDef : defs) {
@@ -799,9 +800,11 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 } else {
                     importedWsdlFile = new File(importDef.getQName().getLocalPart() + ".wsdl");
                 }
+                if (!FileUtils.isValidFileName(importedWsdlFile.getName())) {
+                    importedWsdlFile = new File("import" + (++wsdlImportCount) + ".wsdl");
+                }
                 importWSDLMap.put(importDef.getTargetNamespace(), importedWsdlFile.getName());
             }
-
 
             OutputStreamCreator outputStreamCreator = null;
             if (context.get(OutputStreamCreator.class) != null) {
