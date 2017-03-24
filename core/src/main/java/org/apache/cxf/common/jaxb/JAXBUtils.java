@@ -38,6 +38,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -875,7 +877,7 @@ public final class JAXBUtils {
                 Package pkg = jcls.getPackage();
                    
                 packages.put(pkgName, jcls.getResourceAsStream("jaxb.index"));
-                packageLoaders.put(pkgName, jcls.getClassLoader());
+                packageLoaders.put(pkgName, getClassLoader(jcls));
                 String objectFactoryClassName = pkgName + "." + "ObjectFactory";
                 Class<?> ofactory = null;
                 CachedClass cachedFactory = null;
@@ -889,8 +891,7 @@ public final class JAXBUtils {
                 }
                 if (ofactory == null) {
                     try {
-                        ofactory = Class.forName(objectFactoryClassName, false, jcls
-                                                 .getClassLoader());
+                        ofactory = Class.forName(objectFactoryClassName, false, getClassLoader(jcls));
                         objectFactories.add(ofactory);
                         addToObjectFactoryCache(pkg, ofactory, objectFactoryCache);
                     } catch (ClassNotFoundException e) {
@@ -945,6 +946,18 @@ public final class JAXBUtils {
         classes.addAll(objectFactories);
     }
 
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                @Override
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
+    }
        
     private static void addToObjectFactoryCache(Package objectFactoryPkg, 
                                          Class<?> ofactory,

@@ -30,6 +30,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.logging.Level;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -254,10 +257,24 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             OutputStream cout = null;
             try {
                 try {
-                    cout = connection.getOutputStream();
+//                    cout = connection.getOutputStream();
+                    if (System.getSecurityManager() != null) {
+                        try {
+                            cout = AccessController.doPrivileged(new PrivilegedExceptionAction<OutputStream>() {
+                                @Override
+                                public OutputStream run() throws IOException {
+                                    return connection.getOutputStream();
+                                }
+                            });
+                        } catch (PrivilegedActionException e) {
+                            throw (IOException) e.getException();
+                        }
+                    } else {
+                        cout = connection.getOutputStream();
+                    }
                 } catch (ProtocolException pe) {
                     Boolean b =  (Boolean)outMessage.get(HTTPURL_CONNECTION_METHOD_REFLECTION);
-                    cout = connectAndGetOutputStream(b); 
+                    cout = connectAndGetOutputStream(b);
                 }
             } catch (SocketException e) {
                 if ("Socket Closed".equals(e.getMessage())) {
