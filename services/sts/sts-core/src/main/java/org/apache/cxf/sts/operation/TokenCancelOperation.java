@@ -151,7 +151,7 @@ public class TokenCancelOperation extends AbstractOperation implements CancelOpe
     }
 
 
-    private RequestSecurityTokenResponseType createResponse(
+    protected RequestSecurityTokenResponseType createResponse(
         TokenRequirements tokenRequirements
     ) throws WSSecurityException {
         RequestSecurityTokenResponseType response =

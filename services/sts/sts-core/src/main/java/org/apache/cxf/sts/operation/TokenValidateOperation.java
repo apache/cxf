@@ -184,7 +184,7 @@ public class TokenValidateOperation extends AbstractOperation implements Validat
         }
     }
 
-    private RequestSecurityTokenResponseType createResponse(
+    protected RequestSecurityTokenResponseType createResponse(
         TokenValidatorResponse tokenResponse,
         TokenProviderResponse tokenProviderResponse,
         TokenRequirements tokenRequirements
