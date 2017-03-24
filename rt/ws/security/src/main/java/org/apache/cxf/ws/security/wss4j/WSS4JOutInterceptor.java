@@ -218,6 +218,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 for (HandlerAction handlerAction : actions) {
                     if ((handlerAction.getAction() == WSConstants.SIGN
                         || handlerAction.getAction() == WSConstants.UT
+                        || handlerAction.getAction() == WSConstants.UT_NOPASSWORD
                         || handlerAction.getAction() == WSConstants.UT_SIGN)
                         && (handlerAction.getActionToken() == null
                             || handlerAction.getActionToken().getUser() == null)) {
