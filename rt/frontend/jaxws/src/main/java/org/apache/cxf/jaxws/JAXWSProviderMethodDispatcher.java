@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 
 import javax.xml.ws.Provider;
 
+import org.apache.cxf.common.util.ReflectionUtil;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.service.factory.ServiceConstructionException;
@@ -36,9 +37,16 @@ public class JAXWSProviderMethodDispatcher
     
     public JAXWSProviderMethodDispatcher(JaxWsImplementorInfo implInfo) {
         try {
-            invoke = Provider.class.getMethod("invoke", new Class[] {Object.class});
-        } catch (Exception e) {
-            throw new ServiceConstructionException(e);
+            invoke = ReflectionUtil.getMethod(implInfo.getImplementorClass(), "invoke", 
+                                              new Class[] {implInfo.getProviderParameterType()});
+            ReflectionUtil.setAccessible(invoke);
+        } catch (Exception e1) {
+            //fall back to the raw Provider provided invoke method
+            try {
+                invoke = Provider.class.getMethod("invoke", new Class[] {Object.class});
+            } catch (Exception e) {
+                throw new ServiceConstructionException(e);
+            }
         }
     }
 
