@@ -20,17 +20,27 @@ package org.apache.cxf.rs.security.xml;
 
 import java.io.IOException;
 
-import javax.ws.rs.client.ClientRequestContext;
-import javax.ws.rs.client.ClientResponseContext;
-import javax.ws.rs.client.ClientResponseFilter;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.ReaderInterceptorContext;
 
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 
-public class ClientXmlSecInInterceptor extends XmlSecInInterceptor implements ClientResponseFilter {
+public class ClientXmlSecInInterceptor extends XmlSecInInterceptor implements ReaderInterceptor {
 
     @Override
-    public void filter(ClientRequestContext reqCtx, ClientResponseContext respCtx) throws IOException {
-        handleMessage(JAXRSUtils.getCurrentMessage());
+    public Object aroundReadFrom(ReaderInterceptorContext ctx) throws IOException, WebApplicationException {
+        Message message = JAXRSUtils.getCurrentMessage();    
+        handleMessage(message);
+        Object object = ctx.proceed();
+        new StaxActionInInterceptor(super.isRequireSignature(), 
+                                    super.isRequireEncryption()).handleMessage(message);
+        return object;
     }
     
+    @Override
+    protected void registerStaxActionInInterceptor(Message inMsg) {
+        // complete
+    }
 }
