@@ -131,6 +131,24 @@ public final class CryptoUtils {
                                                byte[] publicExponentBytes) {
         BigInteger modulus = toBigInteger(modulusBytes);
         BigInteger publicExponent = toBigInteger(publicExponentBytes);
+        return getRSAPublicKey(factory, modulus, publicExponent);
+    }
+    
+    public static RSAPublicKey getRSAPublicKey(BigInteger modulusBytes,
+                                               BigInteger publicExponentBytes) {
+        try {
+            return getRSAPublicKey(KeyFactory.getInstance("RSA"),
+                                   modulusBytes,
+                                   publicExponentBytes);
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
+
+    
+    public static RSAPublicKey getRSAPublicKey(KeyFactory factory,
+                                               BigInteger modulus,
+                                               BigInteger publicExponent) {
         try {
             return (RSAPublicKey)factory.generatePublic(
                 new RSAPublicKeySpec(modulus, publicExponent));
@@ -281,11 +299,7 @@ public final class CryptoUtils {
         }    
     }
     private static BigInteger toBigInteger(byte[] bytes) {
-        if (bytes[0] == -128) { 
-            return new BigInteger(bytes); 
-        } else {
-            return new BigInteger(1, bytes);
-        }
+        return new BigInteger(1, bytes);
     }
     public static AlgorithmParameterSpec getContentEncryptionCipherSpec(int authTagLength, byte[] iv) {
         if (authTagLength > 0) {
