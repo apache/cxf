@@ -39,6 +39,7 @@ public class JavaToWS {
     }
 
     public static void main(String[] args) {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         CommandInterfaceUtils.commandCommonMain();
         JavaToWS j2w = new JavaToWS(args);
         try {
