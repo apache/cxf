@@ -26,7 +26,7 @@ import javax.ws.rs.client.ClientResponseFilter;
 
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
-public class ClientXmlEncInterceptor extends XmlEncInInterceptor implements ClientResponseFilter {
+public class ClientXmlEncInInterceptor extends XmlEncInInterceptor implements ClientResponseFilter {
 
     @Override
     public void filter(ClientRequestContext reqCtx, ClientResponseContext respCtx) throws IOException {
