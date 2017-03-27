@@ -110,8 +110,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
 
-        inMsg.getInterceptorChain().add(
-            new StaxActionInInterceptor(requireSignature, requireEncryption));
+        registerStaxActionInInterceptor(inMsg);
 
         try {
             XMLSecurityProperties properties = new XMLSecurityProperties();
@@ -136,6 +135,12 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
         } catch (UnsupportedCallbackException e) {
             throwFault(e.getMessage(), e);
         }
+    }
+
+    protected void registerStaxActionInInterceptor(Message inMsg) {
+        inMsg.getInterceptorChain().add(
+            new StaxActionInInterceptor(requireSignature, requireEncryption));
+        
     }
 
     private void configureDecryptionKeys(Message message, XMLSecurityProperties properties)
@@ -399,7 +404,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
      * This interceptor handles parsing the StaX results (events) + checks to see whether the
      * required (if any) Actions (signature or encryption) were fulfilled.
      */
-    private static class StaxActionInInterceptor extends AbstractPhaseInterceptor<Message> {
+    protected static class StaxActionInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         private static final Logger LOG =
             LogUtils.getL7dLogger(StaxActionInInterceptor.class);
