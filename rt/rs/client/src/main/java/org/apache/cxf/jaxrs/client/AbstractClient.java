@@ -568,7 +568,9 @@ public abstract class AbstractClient implements Client {
                 }
             }
         }
-        ex = message.getContent(Exception.class);
+        if (ex == null) {
+            ex = message.getContent(Exception.class);
+        }
         if (ex != null
             || PropertyUtils.isTrue(exchange.get(SERVICE_NOT_AVAIL_PROPERTY))
                 && PropertyUtils.isTrue(exchange.get(COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY))) {
@@ -589,6 +591,7 @@ public abstract class AbstractClient implements Client {
         Exchange exchange = outMessage.getExchange();
         Integer responseCode = getResponseCode(exchange);
         if (responseCode == null
+            || responseCode < 300 && !(actualEx instanceof IOException) 
             || actualEx instanceof IOException && exchange.get("client.redirect.exception") != null) {
             if (actualEx instanceof ProcessingException) {
                 throw (RuntimeException)actualEx;

@@ -45,6 +45,7 @@ import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.xml.security.encryption.XMLCipher;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -305,11 +306,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         } catch (WebApplicationException ex) {
             fail(ex.getMessage());
         } catch (ProcessingException ex) {
-            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
-                fail(ex.getCause().getMessage());
-            } else {
-                fail(ex.getMessage());
-            }
+            assertTrue(ex.getCause() instanceof BadRequestException);
         }
     }
 
@@ -519,11 +516,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
                 fail(ex.getMessage());
             }
         } catch (ProcessingException ex) {
-            if (ex.getCause() != null && ex.getCause().getMessage() != null) {
-                fail(ex.getCause().getMessage());
-            } else {
-                fail(ex.getMessage());
-            }
+            assertTrue(ex.getCause() instanceof BadRequestException);
         }
 
     }
