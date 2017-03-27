@@ -37,6 +37,7 @@ public final class CommandInterfaceUtils {
 
     public static void commandCommonMain() {
         if (!testInProgress) {
+            System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
             // force commons-logging into j.u.l so we can
             // configure it.
             System.setProperty("org.apache.commons.logging.Log",

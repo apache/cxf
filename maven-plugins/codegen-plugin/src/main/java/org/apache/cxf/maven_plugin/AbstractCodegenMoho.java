@@ -202,6 +202,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
+
         // add the generated source into compile source
         // do this step first to ensure the source folder will be added to the Eclipse classpath
         if (project != null && getGeneratedSourceRoot() != null) {
@@ -237,20 +239,20 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         String originalProxyUser = SystemPropertyAction.getProperty(HTTP_PROXY_USER);
         String originalProxyPassword = SystemPropertyAction.getProperty(HTTP_PROXY_PASSWORD);
                 
-        configureProxyServerSettings();
-
-        List<GenericWsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
-
-        if (effectiveWsdlOptions.size() == 0) {
-            getLog().info("Nothing to generate");
-            return;
-        }
-
-        ClassLoaderSwitcher classLoaderSwitcher = new ClassLoaderSwitcher(getLog());
-        boolean result = true;
-
         Bus bus = null;
+        ClassLoaderSwitcher classLoaderSwitcher = null;
         try {
+            configureProxyServerSettings();
+
+            List<GenericWsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
+
+            if (effectiveWsdlOptions.size() == 0) {
+                getLog().info("Nothing to generate");
+                return;
+            }
+            classLoaderSwitcher = new ClassLoaderSwitcher(getLog());
+            boolean result = true;
+    
             Set<URI> cp = classLoaderSwitcher.switchClassLoader(project, useCompileClasspath, classesDir);
 
             if ("once".equals(fork) || "true".equals(fork)) {
@@ -272,7 +274,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             if (bus != null) {
                 bus.shutdown(true);
             }
-            classLoaderSwitcher.restoreClassLoader();
+            if (classLoaderSwitcher != null) {
+                classLoaderSwitcher.restoreClassLoader();
+            }
             restoreProxySetting(originalProxyHost, originalProxyPort, originalNonProxyHosts,
                                 originalProxyUser, originalProxyPassword);
         }

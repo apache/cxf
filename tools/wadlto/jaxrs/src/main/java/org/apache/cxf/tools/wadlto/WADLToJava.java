@@ -91,7 +91,7 @@ public class WADLToJava {
 
     
     public static void main(String[] pargs) {
-
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         CommandInterfaceUtils.commandCommonMain();
         WADLToJava w2j = new WADLToJava(pargs);
         try {
