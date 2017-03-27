@@ -164,6 +164,23 @@ public final class ReflectionUtil {
             }
         }
     }
+    public static Method getMethod(final Class<?> clazz, final String name,
+                                   final Class<?>... parameterTypes) throws NoSuchMethodException {
+        try {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<Method>() {
+                public Method run() throws Exception {
+                    return clazz.getMethod(name, parameterTypes);
+                }
+            });
+        } catch (PrivilegedActionException pae) {
+            Exception e = pae.getException();
+            if (e instanceof NoSuchMethodException) {
+                throw (NoSuchMethodException)e;
+            } else {
+                throw new SecurityException(e);
+            }
+        }
+    }
 
     public static Field[] getDeclaredFields(final Class<?> cls) {
         return AccessController.doPrivileged(new PrivilegedAction<Field[]>() {
