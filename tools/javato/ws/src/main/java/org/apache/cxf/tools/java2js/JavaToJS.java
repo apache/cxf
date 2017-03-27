@@ -99,6 +99,8 @@ public class JavaToJS extends AbstractCXFToolContainer {
     }
 
     public static void main(String[] pargs) {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
+
         try {
             ToolRunner.runTool(JavaToJS.class,
                                JavaToJS.class.getResourceAsStream("java2js.xml"),

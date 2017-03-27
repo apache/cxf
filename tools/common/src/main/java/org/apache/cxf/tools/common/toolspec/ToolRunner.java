@@ -30,7 +30,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 public final class ToolRunner {
-    private static final Logger LOG = LogUtils.getL7dLogger(ToolRunner.class);
+    
     private ToolRunner() {
         // utility class - never constructed
     }
@@ -74,6 +74,7 @@ public final class ToolRunner {
                                boolean exitOnFinish,
                                ToolContext context,
                                OutputStream os) throws Exception {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
 
         ToolContainer container = null;
 
@@ -88,8 +89,9 @@ public final class ToolRunner {
                                             new ToolSpec(toolspecStream, validate)
                                         });
         } catch (Exception ex) {
-            Message message = new Message("CLZ_CANNOT_BE_CONSTRUCTED", LOG, clz.getName());
-            LOG.log(Level.SEVERE, message.toString());
+            Logger log = LogUtils.getL7dLogger(ToolRunner.class);
+            Message message = new Message("CLZ_CANNOT_BE_CONSTRUCTED", log, clz.getName());
+            log.log(Level.SEVERE, message.toString());
             throw new ToolException(message, ex);
         }
 
