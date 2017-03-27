@@ -79,7 +79,7 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
         final MessageContext oldCtx = WebServiceContextImpl.setMessageContext(ctx);
         List<Object> res = null;
         try {
-            if ((params == null || params.isEmpty()) && m.getDeclaringClass().equals(Provider.class)) {
+            if ((params == null || params.isEmpty()) && serviceObject instanceof Provider) {
                 params = Collections.singletonList(null);
             }
             res = CastUtils.cast((List<?>)super.invoke(exchange, serviceObject, m, params));
