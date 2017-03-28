@@ -34,17 +34,10 @@ import org.example.contract.doubleit.DoubleItPortType;
 @Features(features = "org.apache.cxf.feature.LoggingFeature")    
 
 @EndpointProperties({
-<<<<<<< HEAD
-    @EndpointProperty(key = "security.encryption.username", value = "alice"),
-    @EndpointProperty(key = "security.encryption.properties", value = "alice.properties"),
-    @EndpointProperty(key = "security.signature.properties", value = "bob.properties"),
-    @EndpointProperty(key = "security.callback-handler", 
-=======
     @EndpointProperty(key = SecurityConstants.ENCRYPT_USERNAME, value = "alice"),
     @EndpointProperty(key = SecurityConstants.ENCRYPT_PROPERTIES, value = "alice.properties"),
     @EndpointProperty(key = SecurityConstants.SIGNATURE_PROPERTIES, value = "bob.properties"),
     @EndpointProperty(key = SecurityConstants.CALLBACK_HANDLER,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
                       value = "org.apache.cxf.systest.ws.common.KeystorePasswordCallback")
 })
 public class DoubleItPropertiesImpl implements DoubleItPortType {

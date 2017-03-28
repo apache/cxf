@@ -205,15 +205,9 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setLocation("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
         
         stsClient.setPolicy(createSymmetricBindingPolicy());
-<<<<<<< HEAD
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.encryption.username", "bob");
-=======
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.ENCRYPT_USERNAME, "bob");
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
         TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
         properties.put(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
         properties.put(SecurityConstants.SIGNATURE_PROPERTIES, "alice.properties");
@@ -246,15 +240,9 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setLocation("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
         
         stsClient.setPolicy(createSymmetricBindingPolicy());
-<<<<<<< HEAD
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.encryption.username", "bob");
-=======
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.ENCRYPT_USERNAME, "bob");
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
         TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
         properties.put(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
         properties.put(SecurityConstants.SIGNATURE_PROPERTIES, "alice.properties");
