@@ -35,6 +35,7 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rs.security.xml.EncryptionProperties;
+import org.apache.cxf.rs.security.xml.SignatureProperties;
 import org.apache.cxf.rs.security.xml.XmlEncInInterceptor;
 import org.apache.cxf.rs.security.xml.XmlEncOutInterceptor;
 import org.apache.cxf.rs.security.xml.XmlSecInInterceptor;
@@ -393,6 +394,50 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         } catch (ProcessingException ex) {
             assertTrue(ex.getCause() instanceof BadRequestException);
         }
+    }
+
+    @Test
+    public void testPostBookWithEnvelopedSigKeyName() throws Exception {
+        // This test only applies to StAX - see CXF-7084
+        if (!test.streaming || !STAX_PORT.equals(test.port)) {
+            return;
+        }
+        String address = "https://localhost:" + test.port + "/xmlsigkeyname/bookstore/books";
+
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(SecurityConstants.CALLBACK_HANDLER,
+                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+        properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
+        properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
+                       "org/apache/cxf/systest/jaxrs/security/alice.properties");
+        bean.setProperties(properties);
+        XmlSecOutInterceptor sigOutInterceptor = new XmlSecOutInterceptor();
+        sigOutInterceptor.setSignRequest(true);
+        sigOutInterceptor.setKeyInfoMustBeAvailable(true);
+
+        SignatureProperties sigProps = new SignatureProperties();
+        sigProps.setSignatureKeyName("alice");
+        sigProps.setSignatureKeyIdType("KeyName");
+        sigOutInterceptor.setSignatureProperties(sigProps);
+
+        bean.getOutInterceptors().add(sigOutInterceptor);
+
+        XmlSecInInterceptor sigInInterceptor = new XmlSecInInterceptor();
+        sigInInterceptor.setRequireSignature(true);
+        bean.setProvider(sigInInterceptor);
+
+        WebClient wc = bean.createWebClient();
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        Book book = wc.post(new Book("CXF", 126L), Book.class);
+        assertEquals(126L, book.getId());
     }
 
     @Test
