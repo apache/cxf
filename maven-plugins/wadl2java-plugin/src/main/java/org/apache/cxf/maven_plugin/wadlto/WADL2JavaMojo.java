@@ -73,6 +73,8 @@ public class WADL2JavaMojo extends AbstractCodeGeneratorMojo {
     }
 
     public void execute() throws MojoExecutionException {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
+
         File classesDir = new File(classesDirectory);
         classesDir.mkdirs();
         markerDirectory.mkdirs();
