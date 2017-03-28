@@ -47,4 +47,8 @@ public abstract class AbstractPropertiesImpl {
     public Collection<String> getPropertyNames() {
         return holder.getPropertyNames();
     }
+    
+    public Message getMessage() {
+        return m;
+    }
 }
