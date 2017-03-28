@@ -70,6 +70,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
     boolean useCompileClasspath;
 
     public void execute() throws MojoExecutionException {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         if (outputDir == null) {
             throw new MojoExecutionException("The outputDir must be specified");
         }
