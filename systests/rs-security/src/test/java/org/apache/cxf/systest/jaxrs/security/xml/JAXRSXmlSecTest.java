@@ -279,7 +279,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
             if (!useKeyInfo) {
                 sigInInterceptor.setSignatureVerificationAlias("alice");
             }
-            bean.getInInterceptors().add(sigInInterceptor);
+            bean.setProvider(sigInInterceptor);
         } else {
             XmlSigOutInterceptor sigOutInterceptor = new XmlSigOutInterceptor();
             if (enveloping) {
@@ -295,19 +295,13 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
 
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
-        try {
-            Book book;
-            if (!fromResponse) {
-                book = wc.post(new Book("CXF", 126L), Book.class);
-            } else {
-                book = wc.post(new Book("CXF", 126L)).readEntity(Book.class);
-            }
-            assertEquals(126L, book.getId());
-        } catch (WebApplicationException ex) {
-            fail(ex.getMessage());
-        } catch (ProcessingException ex) {
-            assertTrue(ex.getCause() instanceof BadRequestException);
+        Book book;
+        if (!fromResponse) {
+            book = wc.post(new Book("CXF", 126L), Book.class);
+        } else {
+            book = wc.post(new Book("CXF", 126L)).readEntity(Book.class);
         }
+        assertEquals(126L, book.getId());
     }
 
     @Test
@@ -336,7 +330,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
 
             XmlSecInInterceptor sigInInterceptor = new XmlSecInInterceptor();
             sigInInterceptor.setRequireSignature(true);
-            bean.getInInterceptors().add(sigInInterceptor);
+            bean.setProvider(sigInInterceptor);
         } else {
             XmlSigOutInterceptor sigOutInterceptor = new XmlSigOutInterceptor();
             bean.getOutInterceptors().add(sigOutInterceptor);
@@ -381,7 +375,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
 
             XmlSecInInterceptor sigInInterceptor = new XmlSecInInterceptor();
             sigInInterceptor.setRequireSignature(true);
-            bean.getInInterceptors().add(sigInInterceptor);
+            bean.setProvider(sigInInterceptor);
         } else {
             XmlSigOutInterceptor sigOutInterceptor = new XmlSigOutInterceptor();
             bean.getOutInterceptors().add(sigOutInterceptor);
@@ -577,7 +571,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
 
             XmlSecInInterceptor encInInterceptor = new XmlSecInInterceptor();
             encInInterceptor.setRequireEncryption(true);
-            bean.getInInterceptors().add(encInInterceptor);
+            bean.setProvider(encInInterceptor);
         } else {
             if (sign) {
                 bean.getOutInterceptors().add(new XmlSigOutInterceptor());
