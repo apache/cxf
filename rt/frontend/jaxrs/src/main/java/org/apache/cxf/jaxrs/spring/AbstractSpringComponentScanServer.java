@@ -19,6 +19,8 @@
 package org.apache.cxf.jaxrs.spring;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Proxy;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -42,6 +44,7 @@ import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 
@@ -54,6 +57,10 @@ import org.springframework.context.annotation.FilterType;
 public abstract class AbstractSpringComponentScanServer extends AbstractSpringConfigurationFactory {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractSpringComponentScanServer.class);
+    /**
+     * used to identify e.g. org.apache.cxf.jaxrs.client.ClientProxyImpl, cannot be referenced directly
+     */
+    private static final String CLIENT_PROXY = "ClientProxy";
     @Value("${cxf.jaxrs.classes-scan-packages:}")
     private String classesScanPackages;
     @Value("${cxf.jaxrs.component-scan-packages:}")
@@ -79,22 +86,26 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
         boolean checkJaxrsProviders = checkJaxrsProviders();
         boolean checkCxfProviders = checkCxfProviders();
 
-        Set<String> componentScanPackagesSet = !StringUtils.isEmpty(componentScanPackages) 
+        Set<String> componentScanPackagesSet = !StringUtils.isEmpty(componentScanPackages)
             ? ClasspathScanner.parsePackages(componentScanPackages) : null;
-        Set<String> componentScanBeansSet = !StringUtils.isEmpty(componentScanBeans) 
-                ? ClasspathScanner.parsePackages(componentScanBeans) : null;    
-            
-        for (String beanName : applicationContext.getBeanDefinitionNames()) {
-            if (checkJaxrsRoots 
+        Set<String> componentScanBeansSet = !StringUtils.isEmpty(componentScanBeans)
+                ? ClasspathScanner.parsePackages(componentScanBeans) : null;
+        Set<String> clientProxyBeanNames = determineProxyBeanNames(applicationContext);
+
+        Set<String> beanDefinitionNames = new HashSet<>(Arrays.asList(applicationContext.getBeanDefinitionNames()));
+        beanDefinitionNames.removeAll(clientProxyBeanNames);
+
+        for (String beanName : beanDefinitionNames) {
+            if (checkJaxrsRoots
                 && isValidComponent(beanName, Path.class, componentScanPackagesSet, componentScanBeansSet)) {
                 SpringResourceFactory resourceFactory = new SpringResourceFactory(beanName);
                 resourceFactory.setApplicationContext(applicationContext);
                 resourceProviders.add(resourceFactory);
-            } else if (checkJaxrsProviders 
+            } else if (checkJaxrsProviders
                 && isValidComponent(beanName, Provider.class, componentScanPackagesSet, componentScanBeansSet)) {
                 jaxrsProviders.add(getProviderBean(beanName));
-            } else if (checkCxfProviders 
-                && isValidComponent(beanName, org.apache.cxf.annotations.Provider.class, 
+            } else if (checkCxfProviders
+                && isValidComponent(beanName, org.apache.cxf.annotations.Provider.class,
                                     componentScanPackagesSet, componentScanBeansSet)) {
                 addCxfProvider(getProviderBean(beanName));
             }
@@ -130,7 +141,26 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
 
     }
 
-    protected boolean isValidComponent(String beanName, 
+    /**
+     * the applicationContext might contain client proxy beans
+     * e.g. org.apache.cxf.jaxrs.client.ClientProxyImpl
+     * that should not be exported
+     * @param applicationContext the applicationContext containing all beans
+     * @return Set with proxy bean names
+     */
+    protected Set<String> determineProxyBeanNames(ApplicationContext applicationContext) {
+        Set<String> clientProxyBeanNames = new HashSet<>();
+        Map<String, Proxy> proxyBeanMap = applicationContext.getBeansOfType(Proxy.class);
+        for (Map.Entry<String, Proxy> proxyBeanEntry : proxyBeanMap.entrySet()) {
+            if (Proxy.getInvocationHandler(proxyBeanEntry.getValue())
+               .getClass().getSimpleName().contains(CLIENT_PROXY)) {
+                clientProxyBeanNames.add(proxyBeanEntry.getKey());
+            }
+        }
+        return clientProxyBeanNames;
+    }
+
+    protected boolean isValidComponent(String beanName,
                                       Class<? extends Annotation> ann,
                                       Set<String> componentScanPackagesSet,
                                       Set<String> componentScanBeansSet) {
@@ -143,11 +173,11 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
         return componentScanBeansSet == null || componentScanBeansSet.contains(beanName);
     }
     protected boolean matchesComponentPackage(String beanName, Set<String> componentScanPackagesSet) {
-        return componentScanPackagesSet == null 
+        return componentScanPackagesSet == null
             || !applicationContext.isSingleton(beanName)
             || componentScanPackagesSet.contains(
                 PackageUtils.getPackageName(applicationContext.getBean(beanName).getClass()));
-        
+
     }
     private static void warnIfDuplicatesAvailable(List<? extends Object> providers) {
         Set<String> classNames = new HashSet<>();
