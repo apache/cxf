@@ -49,6 +49,7 @@ public class IDLToWSDLPlugin extends AbstractMojo {
 
 
     public void execute() throws MojoExecutionException {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         File outputDirFile = new File(outputDir);
         outputDirFile.mkdirs();
         
