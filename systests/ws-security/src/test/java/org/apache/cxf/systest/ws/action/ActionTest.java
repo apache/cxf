@@ -291,4 +291,116 @@ public class ActionTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
+
+    @org.junit.Test
+    public void testSignatureNegativeClient() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureNegativeClientPort");
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+
+        try {
+            port.doubleIt(25);
+            fail("Failure expected as the client doesn't trust the cert of the service");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSignatureNegativeClientStreaming() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureNegativeClientPort2");
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+
+        try {
+            port.doubleIt(25);
+            fail("Failure expected as the client doesn't trust the cert of the service");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSignatureNegativeServer() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureNegativeServerPort");
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+
+        try {
+            port.doubleIt(25);
+            fail("Failure expected as the service doesn't trust the client cert");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
+
+    @org.junit.Test
+    public void testSignatureNegativeServerStreaming() throws Exception {
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = ActionTest.class.getResource("client.xml");
+
+        Bus bus = bf.createBus(busFile.toString());
+        SpringBusFactory.setDefaultBus(bus);
+        SpringBusFactory.setThreadDefaultBus(bus);
+
+        URL wsdl = ActionTest.class.getResource("DoubleItAction.wsdl");
+        Service service = Service.create(wsdl, SERVICE_QNAME);
+        QName portQName = new QName(NAMESPACE, "DoubleItSignatureNegativeServerPort2");
+        DoubleItPortType port =
+                service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(port, PORT);
+
+        try {
+            port.doubleIt(25);
+            fail("Failure expected as the service doesn't trust the client cert");
+        } catch (javax.xml.ws.soap.SOAPFaultException ex) {
+            // expected
+        }
+
+        ((java.io.Closeable)port).close();
+        bus.shutdown(true);
+    }
 }
