@@ -92,10 +92,11 @@ public class ASMHelper {
     private static synchronized Class<?> getASMClass() throws ClassNotFoundException {
         if (cwClass == null) {
             //try the "real" asm first, then the others
-            tryClass("org.objectweb.asm.ClassWriter"); 
-            tryClass("org.apache.xbean.asm5.ClassWriter"); 
-            tryClass("org.apache.xbean.asm4.ClassWriter"); 
-            tryClass("org.apache.xbean.asm.ClassWriter"); 
+            tryClass("org.objectweb.asm.ClassWriter");
+            tryClass("org.apache.xbean.asm5.ClassWriter");
+            tryClass("org.apache.xbean.asm6.ClassWriter");
+            tryClass("org.apache.xbean.asm4.ClassWriter");
+            tryClass("org.apache.xbean.asm.ClassWriter");
             tryClass("org.springframework.asm.ClassWriter");
             if (cwClass == null) {
                 cwClass = getASMClassWriterClass();
