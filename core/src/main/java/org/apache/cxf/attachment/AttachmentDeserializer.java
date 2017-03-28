@@ -132,9 +132,14 @@ public class AttachmentDeserializer {
                     message.put(Message.ENCODING, HttpHeaderHelper.mapCharset(cs));
                 }
             }
+            val = AttachmentUtil.getHeader(ih, "Content-Transfer-Encoding");
 
-            body = new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount),
-                                             this);
+            MimeBodyPartInputStream mmps = new MimeBodyPartInputStream(stream, boundary, pbAmount);
+            InputStream ins = AttachmentUtil.decode(mmps, val);
+            if (ins != mmps) {
+                ih.remove("Content-Transfer-Encoding");
+            }
+            body = new DelegatingInputStream(ins, this);
             createCount++;
             message.setContent(InputStream.class, body);
         }

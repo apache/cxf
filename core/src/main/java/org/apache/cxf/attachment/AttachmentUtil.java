@@ -400,8 +400,11 @@ public final class AttachmentUtil {
         if (encoding == null) {
             encoding = "binary";
         }
-        DataSource source = new AttachmentDataSource(ct,
-                                                     decode(stream, encoding));
+        InputStream ins =  decode(stream, encoding);
+        if (ins != stream) {
+            headers.remove("Content-Transfer-Encoding");
+        }
+        DataSource source = new AttachmentDataSource(ct, ins);
         if (!StringUtils.isEmpty(fileName)) {
             ((AttachmentDataSource)source).setName(fileName);
         }
@@ -423,6 +426,9 @@ public final class AttachmentUtil {
     }
 
     public static InputStream decode(InputStream in, String encoding) throws IOException {
+        if (encoding == null) {
+            return in;
+        }
         encoding = encoding.toLowerCase();
 
         // some encodings are just pass-throughs, with no real decoding.
