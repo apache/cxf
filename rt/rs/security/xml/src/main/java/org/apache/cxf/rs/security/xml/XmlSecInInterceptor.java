@@ -44,6 +44,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
+import org.apache.cxf.jaxrs.impl.ReaderInterceptorContextImpl;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -406,7 +407,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
 
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext ctx) throws IOException, WebApplicationException {
-        Message message = JAXRSUtils.getCurrentMessage();    
+        Message message = ((ReaderInterceptorContextImpl)ctx).getMessage();
+        
         if (isServerGet(message)) {
             return ctx.proceed();    
         } else {
