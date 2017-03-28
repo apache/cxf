@@ -98,7 +98,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Bus springBus = bf.createBus(busFile.toString());
         bean.setBus(springBus);
 
-        Map<String, Object> newProperties = new HashMap<>();
+        Map<String, Object> newProperties = new HashMap<String, Object>();
         newProperties.put(SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         newProperties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
@@ -143,13 +143,8 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         String address = "https://localhost:" + test.port + "/xmlsigconstraints";
         
         // Successful test with "bob"
-<<<<<<< HEAD
-        Map<String, Object> newProperties = new HashMap<String, Object>();
-        newProperties.put("security.callback-handler", 
-=======
         Map<String, Object> newProperties = new HashMap<>();
         newProperties.put(SecurityConstants.CALLBACK_HANDLER,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
             "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         newProperties.put(SecurityConstants.SIGNATURE_USERNAME, "bob");
 
@@ -159,11 +154,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         
         // Constraint validation fails with "alice"
         newProperties.clear();
-<<<<<<< HEAD
-        newProperties.put("security.callback-handler", 
-=======
         newProperties.put(SecurityConstants.CALLBACK_HANDLER,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
             "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         newProperties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
 
@@ -196,17 +187,10 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
 
         Map<String, Object> newProperties = new HashMap<String, Object>(properties);
         if (newProperties.isEmpty()) {
-<<<<<<< HEAD
-            newProperties.put("security.callback-handler", 
-                           "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-            newProperties.put("security.signature.username", "alice");
-            
-=======
             newProperties.put(SecurityConstants.CALLBACK_HANDLER,
                            "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
             newProperties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
 
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
             String cryptoUrl = "org/apache/cxf/systest/jaxrs/security/alice.properties";
             if (cryptoUrlPrefix != null) {
                 cryptoUrl = cryptoUrlPrefix + this.getClass().getResource("/" + cryptoUrl).toURI().getPath();
@@ -278,19 +262,11 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Bus springBus = bf.createBus(busFile.toString());
         bean.setBus(springBus);
 
-<<<<<<< HEAD
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.signature.username", "alice");
-        properties.put("security.signature.properties", 
-=======
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
         properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         if (streaming) {
@@ -422,19 +398,11 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostEncryptedBook() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlenc/bookstore/books";
-<<<<<<< HEAD
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.encryption.username", "bob");
-        properties.put("security.encryption.properties", 
-=======
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put(SecurityConstants.ENCRYPT_USERNAME, "bob");
         properties.put(SecurityConstants.ENCRYPT_PROPERTIES,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         doTestPostEncryptedBook(address, false, properties, test.streaming);
     }
@@ -454,19 +422,11 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         }
         
         String address = "https://localhost:" + test.port + "/xmlenc/bookstore/books";
-<<<<<<< HEAD
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.encryption.username", "bob");
-        properties.put("security.encryption.properties", 
-=======
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put(SecurityConstants.ENCRYPT_USERNAME, "bob");
         properties.put(SecurityConstants.ENCRYPT_PROPERTIES,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         
         EncryptionProperties encryptionProperties = new EncryptionProperties();
@@ -480,19 +440,11 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostEncryptedBookSHA256() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlenc/bookstore/books";
-<<<<<<< HEAD
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.encryption.username", "bob");
-        properties.put("security.encryption.properties", 
-=======
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put(SecurityConstants.ENCRYPT_USERNAME, "bob");
         properties.put(SecurityConstants.ENCRYPT_PROPERTIES,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         
         EncryptionProperties encryptionProperties = new EncryptionProperties();
@@ -508,19 +460,11 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostEncryptedBookIssuerSerial() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlenc/bookstore/books";
-<<<<<<< HEAD
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.encryption.username", "bob");
-        properties.put("security.encryption.properties", 
-=======
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put(SecurityConstants.ENCRYPT_USERNAME, "bob");
         properties.put(SecurityConstants.ENCRYPT_PROPERTIES,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         
         EncryptionProperties encryptionProperties = new EncryptionProperties();
@@ -535,16 +479,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostEncryptedSignedBook() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlsec-validate/bookstore/books";
-<<<<<<< HEAD
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.encryption.username", "bob");
-        properties.put("security.encryption.properties", 
-                       "org/apache/cxf/systest/jaxrs/security/bob.properties");
-        properties.put("security.signature.username", "alice");
-        properties.put("security.signature.properties", 
-=======
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
@@ -553,7 +487,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
         properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         doTestPostEncryptedBook(address, true, properties, test.streaming);
         
@@ -562,16 +495,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostEncryptedSignedBookInvalid() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlsec-validate/bookstore/books";
-<<<<<<< HEAD
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.encryption.username", "bob");
-        properties.put("security.encryption.properties", 
-                       "org/apache/cxf/systest/jaxrs/security/bob.properties");
-        properties.put("security.signature.username", "alice");
-        properties.put("security.signature.properties", 
-=======
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
@@ -580,7 +503,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
         properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         
         EncryptionProperties encryptionProperties = new EncryptionProperties();
@@ -599,16 +521,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostEncryptedSignedBookUseReqSigCert() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlsec-useReqSigCert/bookstore/books";
-<<<<<<< HEAD
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.encryption.username", "bob");
-        properties.put("security.encryption.properties", 
-                       "org/apache/cxf/systest/jaxrs/security/bob.properties");
-        properties.put("security.signature.username", "alice");
-        properties.put("security.signature.properties", 
-=======
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
@@ -617,7 +529,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
         properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         doTestPostEncryptedBook(address, true, properties, test.streaming);
     }
@@ -738,16 +649,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
         Bus springBus = bf.createBus(busFile.toString());
         bean.setBus(springBus);
-<<<<<<< HEAD
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.encryption.username", "bob");
-        properties.put("security.encryption.properties", 
-                       "org/apache/cxf/systest/jaxrs/security/bob.properties");
-        properties.put("security.signature.properties", 
-=======
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
@@ -756,7 +657,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put(SecurityConstants.ENCRYPT_PROPERTIES,
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         
@@ -793,16 +693,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
         Bus springBus = bf.createBus(busFile.toString());
         bean.setBus(springBus);
-<<<<<<< HEAD
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler", 
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put("security.encryption.username", "bob");
-        properties.put("security.encryption.properties", 
-                       "org/apache/cxf/systest/jaxrs/security/bob.properties");
-        properties.put("security.signature.properties", 
-=======
 
         Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
@@ -811,7 +701,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         properties.put(SecurityConstants.ENCRYPT_PROPERTIES,
                        "org/apache/cxf/systest/jaxrs/security/bob.properties");
         properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
->>>>>>> 428f770... Switching to use security constants in the tests instead of strings
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         
