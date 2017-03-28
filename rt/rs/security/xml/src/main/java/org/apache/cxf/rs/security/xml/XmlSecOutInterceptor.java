@@ -48,6 +48,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.rs.security.common.CryptoLoader;
 import org.apache.cxf.rs.security.common.RSSecurityUtils;
 import org.apache.cxf.rt.security.SecurityConstants;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.ext.WSPasswordCallback;
 import org.apache.wss4j.common.ext.WSSecurityException;
@@ -159,9 +160,14 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
         properties.setEncryptionKey(getSymmetricKey(symEncAlgo));
         if (encryptSymmetricKey) {
             X509Certificate sendingCert = null;
+<<<<<<< HEAD
             String userName = 
                 (String)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
                     SecurityConstants.ENCRYPT_USERNAME, message);
+=======
+            String userName =
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_USERNAME, message);
+>>>>>>> b30d620... CXF-7084 - Pass a value for the KeyName element from the XmlSecOutInterceptor to Santuario
             if (RSSecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
                 && !MessageUtils.isRequestor(message)) {
                 sendingCert = 
@@ -193,7 +199,13 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
             
             properties.setEncryptionKeyIdentifier(
                 convertKeyIdentifier(encryptionProperties.getEncryptionKeyIdType()));
+<<<<<<< HEAD
                                       
+=======
+
+            properties.setEncryptionKeyName(encryptionProperties.getEncryptionKeyName());
+
+>>>>>>> b30d620... CXF-7084 - Pass a value for the KeyName element from the XmlSecOutInterceptor to Santuario
             if (encryptionProperties.getEncryptionKeyTransportAlgo() != null) {
                 properties.setEncryptionKeyTransportAlgorithm(
                     encryptionProperties.getEncryptionKeyTransportAlgo());
@@ -313,6 +325,7 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (this.keyInfoMustBeAvailable) {
             properties.setSignatureKeyIdentifier(
                 convertKeyIdentifier(sigProps.getSignatureKeyIdType()));
+            properties.setSignatureKeyName(sigProps.getSignatureKeyName());
         } else {
             properties.setSignatureKeyIdentifier(SecurityTokenConstants.KeyIdentifier_NoKeyInfo);
         }

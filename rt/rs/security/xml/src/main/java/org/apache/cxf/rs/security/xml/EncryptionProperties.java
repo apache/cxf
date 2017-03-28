@@ -25,7 +25,12 @@ public class EncryptionProperties {
     private String encryptionSymmetricKeyAlgo;
     private String encryptionDigestAlgo;
     private String encryptionKeyIdType;
+<<<<<<< HEAD
     
+=======
+    private String encryptionKeyName;
+
+>>>>>>> b30d620... CXF-7084 - Pass a value for the KeyName element from the XmlSecOutInterceptor to Santuario
     public void setEncryptionKeyTransportAlgo(String encryptionKeyTransportAlgo) {
         this.encryptionKeyTransportAlgo = encryptionKeyTransportAlgo;
     }
@@ -50,5 +55,15 @@ public class EncryptionProperties {
     public String getEncryptionKeyIdType() {
         return encryptionKeyIdType;
     }
+<<<<<<< HEAD
     
+=======
+    public String getEncryptionKeyName() {
+        return encryptionKeyName;
+    }
+    public void setEncryptionKeyName(String encryptionKeyName) {
+        this.encryptionKeyName = encryptionKeyName;
+    }
+
+>>>>>>> b30d620... CXF-7084 - Pass a value for the KeyName element from the XmlSecOutInterceptor to Santuario
 }
