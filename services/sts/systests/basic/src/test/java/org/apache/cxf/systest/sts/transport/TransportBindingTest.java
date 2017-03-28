@@ -437,8 +437,8 @@ public class TransportBindingTest extends AbstractBusClientServerTestBase {
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("security.username", "alice");
-        properties.put("security.callback-handler",
+        properties.put(SecurityConstants.USERNAME, "alice");
+        properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         properties.put("ws-security.sts.token.username", "myclientkey");
         properties.put("ws-security.sts.token.properties", "clientKeystore.properties");

@@ -26,6 +26,7 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -35,7 +36,7 @@ import org.junit.BeforeClass;
 /**
  * In this test case, a CXF client requests a Security Token from an STS, passing a username that
  * it has obtained from an unknown client as an "OnBehalfOf" element. This username is obtained
- * by parsing the "security.username" property. The client then invokes on the service
+ * by parsing the SecurityConstants.USERNAME property. The client then invokes on the service
  * provider using the returned (custom BinarySecurityToken) token from the STS. The service
  * provider dispatches the received BinarySecurityToken to the STS for validation, and receives
  * a transformed SAML Token in response.
@@ -89,7 +90,7 @@ public class CustomOnBehalfOfTest extends AbstractBusClientServerTestBase {
 
         // Transport port
         ((BindingProvider)transportPort).getRequestContext().put(
-            "security.username", "alice"
+            SecurityConstants.USERNAME, "alice"
         );
         doubleIt(transportPort, 25);
 

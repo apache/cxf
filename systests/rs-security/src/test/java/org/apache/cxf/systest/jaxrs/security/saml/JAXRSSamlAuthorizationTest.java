@@ -32,6 +32,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.saml.SamlEnvelopedOutInterceptor;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -154,7 +155,7 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
         bean.setBus(springBus);
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("security.saml-callback-handler",
+        properties.put(SecurityConstants.SAML_CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.SamlCallbackHandler");
         if (extraProperties != null) {
             properties.putAll(extraProperties);
