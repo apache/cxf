@@ -80,7 +80,11 @@ public abstract class AbstractXmlSecInHandler {
     }
     
     protected void throwFault(String error, Exception ex) {
-        LOG.warning(error);
+        StringBuilder log = new StringBuilder(error);
+        if (ex != null) {
+            log = log.append(" - ").append(ex.getMessage());
+        }
+        LOG.warning(log.toString());
         Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
         throw ExceptionUtils.toBadRequestException(null, response);
     }

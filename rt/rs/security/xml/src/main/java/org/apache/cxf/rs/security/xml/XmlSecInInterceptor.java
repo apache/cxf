@@ -308,8 +308,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
             try {
                 new TrustValidator().validateTrust(sigCrypto, cert, publicKey, subjectDNPatterns);
             } catch (WSSecurityException e) {
-                throw new XMLSecurityException("empty", new Object[] {"Error during Signature Trust "
-                                               + "validation: " + e.getMessage()});
+                String error = "Signature validation failed";
+                throw new XMLSecurityException("empty", new Object[] {error});
             }
             
             if (persistSignature) {
@@ -400,7 +400,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
         }
 
     }
-    
+
     /**
      * This interceptor handles parsing the StaX results (events) + checks to see whether the 
      * required (if any) Actions (signature or encryption) were fulfilled.
