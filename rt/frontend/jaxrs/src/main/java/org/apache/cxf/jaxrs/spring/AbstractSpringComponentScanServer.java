@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.spring;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,6 +33,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -135,9 +137,25 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
                                       Set<String> componentScanPackagesSet,
                                       Set<String> componentScanBeansSet) {
         return isAnnotationAvailable(beanName, ann)
+            && nonProxyClass(beanName)
             && matchesServiceAnnotation(beanName)
             && matchesComponentPackage(beanName, componentScanPackagesSet)
             && matchesComponentName(beanName, componentScanBeansSet);
+    }
+    protected boolean nonProxyClass(String beanName) {
+        // JAX-RS runtime needs to be able to access the real component class to introspect it for
+        // JAX-RS annotations; the following check ensures that the valid proxified components
+        // are accepted while the client proxies are ignored.
+        Class<?> type = ClassHelper.getRealClassFromClass(applicationContext.getType(beanName));
+        if (Proxy.isProxyClass(type) && applicationContext.isSingleton(beanName)) {
+            type = ClassHelper.getRealClass(applicationContext.getBean(beanName));
+        }
+        if (Proxy.isProxyClass(type)) {
+            LOG.fine("Can not determine the real class of the component '" + beanName + "'");
+            return false;
+        } else {
+            return true;
+        }
     }
     protected boolean matchesComponentName(String beanName, Set<String> componentScanBeansSet) {
         return componentScanBeansSet == null || componentScanBeansSet.contains(beanName);
