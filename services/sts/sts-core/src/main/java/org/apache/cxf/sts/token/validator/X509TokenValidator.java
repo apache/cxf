@@ -113,11 +113,16 @@ public class X509TokenValidator implements TokenValidator {
     public TokenValidatorResponse validateToken(TokenValidatorParameters tokenParameters) {
         LOG.fine("Validating X.509 Token");
         STSPropertiesMBean stsProperties = tokenParameters.getStsProperties();
-        Crypto sigCrypto = stsProperties.getSignatureCrypto();
         CallbackHandler callbackHandler = stsProperties.getCallbackHandler();
 
+        // See CXF-4028
+        Crypto crypto = stsProperties.getEncryptionCrypto();
+        if (crypto == null) {
+            crypto = stsProperties.getSignatureCrypto();
+        }
+
         RequestData requestData = new RequestData();
-        requestData.setSigVerCrypto(sigCrypto);
+        requestData.setSigVerCrypto(crypto);
         requestData.setWssConfig(WSSConfig.getNewInstance());
         requestData.setCallbackHandler(callbackHandler);
         requestData.setMsgContext(tokenParameters.getMessageContext());
@@ -177,8 +182,8 @@ public class X509TokenValidator implements TokenValidator {
         try {
             Credential credential = new Credential();
             credential.setBinarySecurityToken(binarySecurity);
-            if (sigCrypto != null) {
-                X509Certificate cert = ((X509Security)binarySecurity).getX509Certificate(sigCrypto);
+            if (crypto != null) {
+                X509Certificate cert = ((X509Security)binarySecurity).getX509Certificate(crypto);
                 credential.setCertificates(new X509Certificate[]{cert});
             }
 
