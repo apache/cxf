@@ -46,6 +46,8 @@ public class KeystorePasswordCallback implements CallbackHandler {
         passwords.put("6e0e88f36ebb8744d470f62f604d03ea4ebe5094", "password");
         passwords.put("wss40rev", "security");
         passwords.put("morpit", "password");
+        passwords.put("myclientkey", "ckpass");
+        passwords.put("myservicekey", "skpass");
     }
 
     /**
