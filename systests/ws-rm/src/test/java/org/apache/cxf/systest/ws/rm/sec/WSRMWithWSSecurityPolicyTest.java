@@ -33,6 +33,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.types.GreetMe;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -45,7 +46,7 @@ import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * Tests the correct interaction of ws-rm calls with ws-security when policy validator verifies the calls.
+ * Tests the correct interaction of ws-rm calls with security.when policy validator verifies the calls.
  */
 public class WSRMWithWSSecurityPolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class); 
@@ -95,6 +96,7 @@ public class WSRMWithWSSecurityPolicyTest extends AbstractBusClientServerTestBas
 
     @Test
     public void testContextProperty() throws Exception {
+<<<<<<< HEAD
         ClassPathXmlApplicationContext context =
                 new ClassPathXmlApplicationContext("org/apache/cxf/systest/ws/rm/sec/client-policy.xml");
         Bus bus = (Bus)context.getBean("bus");
@@ -126,6 +128,41 @@ public class WSRMWithWSSecurityPolicyTest extends AbstractBusClientServerTestBas
         Thread.sleep(5000);
         empty = manager.getRetransmissionQueue().isEmpty();
         assertTrue("RetransmissionQueue not empty", empty);
+=======
+        try (ClassPathXmlApplicationContext context =
+                new ClassPathXmlApplicationContext("org/apache/cxf/systest/ws/rm/sec/client-policy.xml")) {
+            Bus bus = (Bus)context.getBean("bus");
+            BusFactory.setDefaultBus(bus);
+            BusFactory.setThreadDefaultBus(bus);
+            Greeter greeter = (Greeter)context.getBean("GreeterCombinedClientNoProperty");
+            Client client = ClientProxy.getClient(greeter);
+            QName operationQName = new QName("http://cxf.apache.org/greeter_control", "greetMe");
+            BindingOperationInfo boi = client.getEndpoint().getBinding().getBindingInfo().getOperation(operationQName);
+            Map<String, Object> invocationContext = new HashMap<>();
+            Map<String, Object> requestContext = new HashMap<>();
+            Map<String, Object> responseContext = new HashMap<>();
+            invocationContext.put(Client.REQUEST_CONTEXT, requestContext);
+            invocationContext.put(Client.RESPONSE_CONTEXT, responseContext);
+
+            requestContext.put(SecurityConstants.USERNAME, "Alice");
+            requestContext.put(SecurityConstants.CALLBACK_HANDLER,
+                "org.apache.cxf.systest.ws.rm.sec.UTPasswordCallback");
+            requestContext.put(SecurityConstants.ENCRYPT_PROPERTIES, "bob.properties");
+            requestContext.put(SecurityConstants.ENCRYPT_USERNAME, "bob");
+            requestContext.put(SecurityConstants.SIGNATURE_PROPERTIES, "alice.properties");
+            requestContext.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
+            RMManager manager = bus.getExtension(RMManager.class);
+            boolean empty = manager.getRetransmissionQueue().isEmpty();
+            assertTrue("RetransmissionQueue is not empty", empty);
+            GreetMe param = new GreetMe();
+            param.setRequestType("testContextProperty");
+            Object[] answer = client.invoke(boi, new Object[]{param}, invocationContext);
+            Assert.assertEquals("TESTCONTEXTPROPERTY", answer[0].toString());
+            Thread.sleep(5000);
+            empty = manager.getRetransmissionQueue().isEmpty();
+            assertTrue("RetransmissionQueue not empty", empty);
+        }
+>>>>>>> 428f770... Switching to use security constants in the tests instead of strings
     }
 
 }

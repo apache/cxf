@@ -475,8 +475,8 @@ public class RMManager {
             Map<String, Object> context = new HashMap<String, Object>(16);
             for (String key : message.getContextualPropertyKeys()) {
                 //copy other properties?
-                if (key.startsWith("ws-security")) {
-                    context.put(key, message.getContextualProperty(key));                  
+                if (key.startsWith("ws-security") || key.startsWith("security.")) {
+                    context.put(key, message.getContextualProperty(key));
                 }
             }
             

@@ -28,6 +28,7 @@ import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.feature.Features;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.example.contract.doubleit.DoubleItPortType;
 
@@ -63,7 +64,7 @@ public class DoubleItPortTypeImpl extends AbstractBusClientServerTestBase implem
         //
         Saml2CallbackHandler callbackHandler = new Saml2CallbackHandler(wsc.getUserPrincipal());
         ((BindingProvider)transportSAML2SupportingPort).getRequestContext().put(
-            "security.saml-callback-handler", callbackHandler
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         
         return transportSAML2SupportingPort.doubleIt(numberToDouble);
