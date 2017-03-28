@@ -34,16 +34,21 @@ import java.util.regex.PatternSyntaxException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
+import org.apache.cxf.jaxrs.impl.ReaderInterceptorContextImpl;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.rs.security.common.CryptoLoader;
@@ -71,7 +76,7 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 /**
  * A new StAX-based interceptor for processing messages with XML Signature + Encryption content.
  */
-public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
+public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> implements ReaderInterceptor {
     
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSecInInterceptor.class);
     
@@ -93,14 +98,16 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     public void handleMessage(Message message) throws Fault {
-        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
-        if ("GET".equals(method)) {
+        if (isServerGet(message)) {
             return;
         }
-        
-        Message outMs = message.getExchange().getOutMessage();
-        Message inMsg = outMs == null ? message : outMs.getExchange().getInMessage();
-        
+        prepareMessage(message);
+        message.getInterceptorChain().add(
+              new StaxActionInInterceptor(requireSignature, requireEncryption));
+    }
+
+    private void prepareMessage(Message inMsg) throws Fault {
+
         XMLStreamReader originalXmlStreamReader = inMsg.getContent(XMLStreamReader.class);
         if (originalXmlStreamReader == null) {
             InputStream is = inMsg.getContent(InputStream.class);
@@ -108,10 +115,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
                 originalXmlStreamReader = StaxUtils.createXMLStreamReader(is);
             }
         }
-        
-        inMsg.getInterceptorChain().add(
-            new StaxActionInInterceptor(requireSignature, requireEncryption));
-        
+
         try {
             XMLSecurityProperties properties = new XMLSecurityProperties();
             configureDecryptionKeys(inMsg, properties);
@@ -135,6 +139,11 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
         } catch (UnsupportedCallbackException e) {
             throwFault(e.getMessage(), e);
         }
+    }
+
+    private boolean isServerGet(Message message) {
+        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
+        return "GET".equals(method) && !MessageUtils.isRequestor(message);
     }
     
     private void configureDecryptionKeys(Message message, XMLSecurityProperties properties) 
@@ -374,6 +383,22 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
                 }
             }
         }
+    }
+    
+    @Override
+    public Object aroundReadFrom(ReaderInterceptorContext ctx) throws IOException, WebApplicationException {
+        Message message = ((ReaderInterceptorContextImpl)ctx).getMessage();
+
+        if (isServerGet(message)) {
+            return ctx.proceed();
+        } else {
+            prepareMessage(message);
+            Object object = ctx.proceed();
+            new StaxActionInInterceptor(requireSignature,
+                                        requireEncryption).handleMessage(message);
+            return object;
+        }
+
     }
     
     /**
