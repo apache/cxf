@@ -107,8 +107,8 @@ under the License.
             <ref bean="xmlSigOutHandler"/>
         </jaxrs:outInterceptors>
         <jaxrs:properties>
-            <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
-            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/morpit.properties"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/morpit.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     
@@ -123,8 +123,8 @@ under the License.
             <ref bean="xmlSigOutHandler"/>
         </jaxrs:outInterceptors>
         <jaxrs:properties>
-            <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
-            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/morpittrust.properties"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+            <entry key="ws-security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/morpittrust.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
     
