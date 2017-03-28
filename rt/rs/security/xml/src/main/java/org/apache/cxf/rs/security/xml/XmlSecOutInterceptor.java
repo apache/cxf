@@ -160,14 +160,8 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
         properties.setEncryptionKey(getSymmetricKey(symEncAlgo));
         if (encryptSymmetricKey) {
             X509Certificate sendingCert = null;
-<<<<<<< HEAD
-            String userName = 
-                (String)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
-                    SecurityConstants.ENCRYPT_USERNAME, message);
-=======
             String userName =
                 (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.ENCRYPT_USERNAME, message);
->>>>>>> b30d620... CXF-7084 - Pass a value for the KeyName element from the XmlSecOutInterceptor to Santuario
             if (RSSecurityUtils.USE_REQUEST_SIGNATURE_CERT.equals(userName)
                 && !MessageUtils.isRequestor(message)) {
                 sendingCert = 
@@ -199,13 +193,9 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
             
             properties.setEncryptionKeyIdentifier(
                 convertKeyIdentifier(encryptionProperties.getEncryptionKeyIdType()));
-<<<<<<< HEAD
-                                      
-=======
 
             properties.setEncryptionKeyName(encryptionProperties.getEncryptionKeyName());
 
->>>>>>> b30d620... CXF-7084 - Pass a value for the KeyName element from the XmlSecOutInterceptor to Santuario
             if (encryptionProperties.getEncryptionKeyTransportAlgo() != null) {
                 properties.setEncryptionKeyTransportAlgorithm(
                     encryptionProperties.getEncryptionKeyTransportAlgo());
