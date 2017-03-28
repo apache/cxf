@@ -106,9 +106,9 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
         message.getInterceptorChain().add(
               new StaxActionInInterceptor(requireSignature, requireEncryption));
     }
-    
+
     private void prepareMessage(Message inMsg) throws Fault {
-        
+
         XMLStreamReader originalXmlStreamReader = inMsg.getContent(XMLStreamReader.class);
         if (originalXmlStreamReader == null) {
             InputStream is = inMsg.getContent(InputStream.class);
@@ -147,7 +147,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
         return "GET".equals(method) && !MessageUtils.isRequestor(message);
     }
 
-    
+
     private void configureDecryptionKeys(Message message, XMLSecurityProperties properties)
         throws IOException,
         UnsupportedCallbackException, WSSecurityException {
@@ -311,8 +311,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
                 new TrustValidator().validateTrust(sigCrypto, cert, publicKey,
                                                    getSubjectContraints(msg));
             } catch (WSSecurityException e) {
-                throw new XMLSecurityException("empty", new Object[] {"Error during Signature Trust "
-                                               + "validation: " + e.getMessage()});
+                String error = "Signature validation failed";
+                throw new XMLSecurityException("empty", new Object[] {error});
             }
 
             if (persistSignature) {
@@ -408,19 +408,19 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext ctx) throws IOException, WebApplicationException {
         Message message = ((ReaderInterceptorContextImpl)ctx).getMessage();
-        
+
         if (isServerGet(message)) {
-            return ctx.proceed();    
+            return ctx.proceed();
         } else {
             prepareMessage(message);
             Object object = ctx.proceed();
-            new StaxActionInInterceptor(requireSignature, 
+            new StaxActionInInterceptor(requireSignature,
                                         requireEncryption).handleMessage(message);
             return object;
         }
-        
+
     }
-    
+
     /**
      * This interceptor handles parsing the StaX results (events) + checks to see whether the
      * required (if any) Actions (signature or encryption) were fulfilled.

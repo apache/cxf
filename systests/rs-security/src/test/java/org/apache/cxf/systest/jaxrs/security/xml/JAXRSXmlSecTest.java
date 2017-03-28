@@ -311,6 +311,96 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testSignatureNegativeServer() throws Exception {
+        String address = "https://localhost:" + test.port + "/xmlsignegativeserver/bookstore/books";
+
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("security.callback-handler",
+                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+        properties.put("security.signature.username", "bethal");
+        properties.put("security.signature.properties",
+                       "org/apache/cxf/systest/jaxrs/security/bethal.properties");
+        bean.setProperties(properties);
+        if (test.streaming) {
+            XmlSecOutInterceptor sigOutInterceptor = new XmlSecOutInterceptor();
+            sigOutInterceptor.setSignRequest(true);
+            bean.getOutInterceptors().add(sigOutInterceptor);
+
+            XmlSecInInterceptor sigInInterceptor = new XmlSecInInterceptor();
+            sigInInterceptor.setRequireSignature(true);
+            bean.getInInterceptors().add(sigInInterceptor);
+        } else {
+            XmlSigOutInterceptor sigOutInterceptor = new XmlSigOutInterceptor();
+            bean.getOutInterceptors().add(sigOutInterceptor);
+
+            XmlSigInInterceptor sigInInterceptor = new XmlSigInInterceptor();
+            bean.getInInterceptors().add(sigInInterceptor);
+        }
+
+        WebClient wc = bean.createWebClient();
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        try {
+            wc.post(new Book("CXF", 126L), Book.class);
+            fail("Failure expected on signature trust failure");
+        } catch (WebApplicationException ex) {
+            assertTrue(ex.getMessage().contains("400 Bad Request"));
+        }
+    }
+
+    @Test
+    public void testSignatureNegativeClient() throws Exception {
+        String address = "https://localhost:" + test.port + "/xmlsignegativeclient/bookstore/books";
+
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("security.callback-handler",
+                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+        properties.put("security.signature.username", "bethal");
+        properties.put("security.signature.properties",
+                       "org/apache/cxf/systest/jaxrs/security/bethal.properties");
+        bean.setProperties(properties);
+        if (test.streaming) {
+            XmlSecOutInterceptor sigOutInterceptor = new XmlSecOutInterceptor();
+            sigOutInterceptor.setSignRequest(true);
+            bean.getOutInterceptors().add(sigOutInterceptor);
+
+            XmlSecInInterceptor sigInInterceptor = new XmlSecInInterceptor();
+            sigInInterceptor.setRequireSignature(true);
+            bean.getInInterceptors().add(sigInInterceptor);
+        } else {
+            XmlSigOutInterceptor sigOutInterceptor = new XmlSigOutInterceptor();
+            bean.getOutInterceptors().add(sigOutInterceptor);
+
+            XmlSigInInterceptor sigInInterceptor = new XmlSigInInterceptor();
+            bean.getInInterceptors().add(sigInInterceptor);
+        }
+
+        WebClient wc = bean.createWebClient();
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        try {
+            wc.post(new Book("CXF", 126L), Book.class);
+            fail("Failure expected on signature trust failure");
+        } catch (ProcessingException ex) {
+            assertTrue(ex.getCause() instanceof BadRequestException);
+        }
+    }
+
+    @Test
     public void testPostEncryptedBook() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlenc/bookstore/books";
         Map<String, Object> properties = new HashMap<>();
