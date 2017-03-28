@@ -98,8 +98,8 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}UT_Port");
         
         Map<String, Object> properties = new HashMap<>();
-        properties.put("security.username", "alice");
-        properties.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
+        properties.put(SecurityConstants.USERNAME, "alice");
+        properties.put(SecurityConstants.CALLBACK_HANDLER, "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         properties.put("security.sts.token.username", "myclientkey");
         properties.put("security.sts.token.properties", "clientKeystore.properties");
         properties.put("security.sts.token.usecert", "true");
@@ -143,8 +143,8 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}UT_Port");
         
         Map<String, Object> properties = new HashMap<>();
-        properties.put("security.username", "alice");
-        properties.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
+        properties.put(SecurityConstants.USERNAME, "alice");
+        properties.put(SecurityConstants.CALLBACK_HANDLER, "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         properties.put("security.sts.token.username", "myclientkey");
         properties.put("security.sts.token.properties", "clientKeystore.properties");
         properties.put("security.sts.token.usecert", "true");
@@ -193,8 +193,8 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
         
         Map<String, Object> properties = new HashMap<>();
-        properties.put("security.username", "alice");
-        properties.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
+        properties.put(SecurityConstants.USERNAME, "alice");
+        properties.put(SecurityConstants.CALLBACK_HANDLER, "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         properties.put("security.sts.token.username", "myclientkey");
         properties.put("security.sts.token.properties", "clientKeystore.properties");
         properties.put("security.sts.token.usecert", "true");
@@ -238,8 +238,8 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
         
         Map<String, Object> properties = new HashMap<>();
-        properties.put("security.username", "alice");
-        properties.put("security.callback-handler", "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
+        properties.put(SecurityConstants.USERNAME, "alice");
+        properties.put(SecurityConstants.CALLBACK_HANDLER, "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         properties.put("security.sts.token.username", "myclientkey");
         properties.put("security.sts.token.properties", "clientKeystore.properties");
         properties.put("security.sts.token.usecert", "true");

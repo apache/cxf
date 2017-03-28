@@ -29,6 +29,7 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.systest.ws.saml.client.SamlCallbackHandler;
@@ -117,7 +118,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         callbackHandler.setCryptoPropertiesFile("morpit.properties");
         
         ((BindingProvider)port).getRequestContext().put(
-            "security.saml-callback-handler", callbackHandler
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         int result = port.doubleIt(25);
         assertTrue(result == 50);
@@ -131,7 +132,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         callbackHandler.setCryptoPropertiesFile("morpit.properties");
         
         ((BindingProvider)port).getRequestContext().put(
-            "security.saml-callback-handler", callbackHandler
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         try {
             port.doubleIt(25);
@@ -165,7 +166,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler(true, true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_HOLDER_KEY);
         ((BindingProvider)port).getRequestContext().put(
-            "security.saml-callback-handler", callbackHandler
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         
         try {
@@ -205,7 +206,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         callbackHandler.setCryptoPropertiesFile("morpit.properties");
         
         ((BindingProvider)port).getRequestContext().put(
-            "security.saml-callback-handler", callbackHandler
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         try {
             port.doubleIt(25);
@@ -244,7 +245,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
         ((BindingProvider)port).getRequestContext().put(
-            "security.saml-callback-handler", callbackHandler
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         int result = port.doubleIt(25);
         assertTrue(result == 50);
@@ -275,7 +276,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_SENDER_VOUCHES);
         
         ((BindingProvider)port).getRequestContext().put(
-            "security.saml-callback-handler", callbackHandler
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         try {
             port.doubleIt(25);
@@ -318,7 +319,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         callbackHandler.setCryptoPropertiesFile("morpit.properties");
         
         ((BindingProvider)port).getRequestContext().put(
-            "security.saml-callback-handler", callbackHandler
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         int result = port.doubleIt(25);
         assertTrue(result == 50);
@@ -349,7 +350,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         
         ((BindingProvider)port).getRequestContext().put(
-            "security.saml-callback-handler", callbackHandler
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         
         try {
@@ -385,7 +386,7 @@ public class SamlSubjectConfTest extends AbstractBusClientServerTestBase {
         callbackHandler.setConfirmationMethod("urn:oasis:names:tc:SAML:2.0:cm:custom");
         
         ((BindingProvider)port).getRequestContext().put(
-            "security.saml-callback-handler", callbackHandler
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         
         try {

@@ -36,6 +36,7 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.systest.ws.common.TestParam;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -204,13 +205,19 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setLocation("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
         
         stsClient.setPolicy(createSymmetricBindingPolicy());
+<<<<<<< HEAD
         
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("security.encryption.username", "bob");
+=======
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(SecurityConstants.ENCRYPT_USERNAME, "bob");
+>>>>>>> 428f770... Switching to use security constants in the tests instead of strings
         TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
-        properties.put("security.callback-handler", callbackHandler);
-        properties.put("security.signature.properties", "alice.properties");
-        properties.put("security.encryption.properties", "bob.properties");
+        properties.put(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
+        properties.put(SecurityConstants.SIGNATURE_PROPERTIES, "alice.properties");
+        properties.put(SecurityConstants.ENCRYPT_PROPERTIES, "bob.properties");
         stsClient.setProperties(properties);
         
         SecurityToken securityToken = 
@@ -239,13 +246,19 @@ public class WSSCUnitTest extends AbstractBusClientServerTestBase {
         stsClient.setLocation("http://localhost:" + PORT2 + "/" + "DoubleItSymmetric");
         
         stsClient.setPolicy(createSymmetricBindingPolicy());
+<<<<<<< HEAD
         
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("security.encryption.username", "bob");
+=======
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(SecurityConstants.ENCRYPT_USERNAME, "bob");
+>>>>>>> 428f770... Switching to use security constants in the tests instead of strings
         TokenCallbackHandler callbackHandler = new TokenCallbackHandler();
-        properties.put("security.callback-handler", callbackHandler);
-        properties.put("security.signature.properties", "alice.properties");
-        properties.put("security.encryption.properties", "bob.properties");
+        properties.put(SecurityConstants.CALLBACK_HANDLER, callbackHandler);
+        properties.put(SecurityConstants.SIGNATURE_PROPERTIES, "alice.properties");
+        properties.put(SecurityConstants.ENCRYPT_PROPERTIES, "bob.properties");
         stsClient.setProperties(properties);
         
         SecurityToken securityToken = 
