@@ -203,6 +203,7 @@ public class Java2WSMojo extends AbstractMojo {
     private String additionalJvmArgs;
 
     public void execute() throws MojoExecutionException {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         if (skip) {
             getLog().info("Skipping Java2WS execution");
             return;

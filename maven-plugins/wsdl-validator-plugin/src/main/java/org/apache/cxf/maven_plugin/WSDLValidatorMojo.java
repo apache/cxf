@@ -172,6 +172,7 @@ public class WSDLValidatorMojo extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         if (includes == null) {
             includes = new String[] {
                 "*.wsdl"
