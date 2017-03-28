@@ -148,6 +148,22 @@ under the License.
         </jaxrs:properties>
     </jaxrs:server>
     
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec-stax}/xmlsigkeyname">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+            <ref bean="xmlSigInHandler"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outInterceptors>
+            <ref bean="xmlSigOutHandler"/>
+        </jaxrs:outInterceptors>
+        <jaxrs:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec-stax}/xmlsigconstraints">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
