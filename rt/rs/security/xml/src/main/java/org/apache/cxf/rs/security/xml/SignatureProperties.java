@@ -24,12 +24,8 @@ public class SignatureProperties {
     private String signatureC14nMethod;
     private String signatureC14nTransform;
     private String signatureKeyIdType;
-<<<<<<< HEAD
-    
-=======
     private String signatureKeyName;
 
->>>>>>> b30d620... CXF-7084 - Pass a value for the KeyName element from the XmlSecOutInterceptor to Santuario
     public void setSignatureAlgo(String signatureAlgo) {
         this.signatureAlgo = signatureAlgo;
     }
@@ -76,9 +72,6 @@ public class SignatureProperties {
     public void setSignatureKeyIdType(String signatureKeyIdType) {
         this.signatureKeyIdType = signatureKeyIdType;
     }
-<<<<<<< HEAD
-    
-=======
     public String getSignatureKeyName() {
         return signatureKeyName;
     }
@@ -86,5 +79,4 @@ public class SignatureProperties {
         this.signatureKeyName = signatureKeyName;
     }
 
->>>>>>> b30d620... CXF-7084 - Pass a value for the KeyName element from the XmlSecOutInterceptor to Santuario
 }
