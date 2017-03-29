@@ -424,7 +424,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         sigOutInterceptor.setKeyInfoMustBeAvailable(true);
 
         SignatureProperties sigProps = new SignatureProperties();
-        sigProps.setSignatureKeyName("alice");
+        sigProps.setSignatureKeyName("alice-kn");
         sigProps.setSignatureKeyIdType("KeyName");
         sigOutInterceptor.setSignatureProperties(sigProps);
 
