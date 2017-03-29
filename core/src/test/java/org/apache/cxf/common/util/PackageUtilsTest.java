@@ -20,11 +20,14 @@
 package org.apache.cxf.common.util;
 
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.apache.cxf.validation.BeanValidationProvider;
+import org.apache.cxf.validation.ValidationConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -98,6 +101,16 @@ public class PackageUtilsTest extends Assert {
         String packageName = PackageUtils.getSharedPackageName(
             Arrays.asList(org.apache.cxf.bus.spring.BusApplicationContext.class,
                     org.apache.cxf.configuration.spring.JAXBBeanFactory.class));
+        assertEquals("org.apache.cxf", packageName);
+    }
+    @Test
+    public void testSharedPackageNameIgnoreProxyClasses() {
+        // build any proxy object resulting in com.sun.proxy...
+        Object proxy = ProxyHelper.getProxy(BeanValidationProvider.class.getClassLoader(),
+           new Class[]{Serializable.class}, new ReflectionInvokationHandler(new ValidationConfiguration()));
+        String packageName = PackageUtils.getSharedPackageName(
+           Arrays.asList(proxy.getClass(), org.apache.cxf.bus.spring.BusApplicationContext.class,
+              org.apache.cxf.configuration.spring.JAXBBeanFactory.class));
         assertEquals("org.apache.cxf", packageName);
     }
 }

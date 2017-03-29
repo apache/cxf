@@ -19,6 +19,7 @@
 
 package org.apache.cxf.common.util;
 
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -56,7 +57,9 @@ public final class PackageUtils {
         List<List<String>> lParts = new  ArrayList<List<String>>(classes.size());
         List<String> currentParts = new ArrayList<String>();
         for (Class<?> cls : classes) {
-            lParts.add(StringUtils.getParts(getPackageName(cls), "\\."));
+            if (!Proxy.isProxyClass(cls)) {
+                lParts.add(StringUtils.getParts(getPackageName(cls), "\\."));
+            }
         }
         for (int i = 0; i < lParts.get(0).size(); i++) {
             int j = 1;
