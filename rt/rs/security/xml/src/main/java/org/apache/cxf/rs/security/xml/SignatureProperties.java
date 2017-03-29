@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.rs.security.xml;
 
+import java.util.Map;
+
 public class SignatureProperties {
     private String signatureAlgo;
     private String signatureDigestAlgo;
@@ -25,6 +27,7 @@ public class SignatureProperties {
     private String signatureC14nTransform;
     private String signatureKeyIdType;
     private String signatureKeyName;
+    private Map<String, String> keyNameAliasMap;
 
     public void setSignatureAlgo(String signatureAlgo) {
         this.signatureAlgo = signatureAlgo;
@@ -61,6 +64,19 @@ public class SignatureProperties {
     }
     public void setSignatureKeyName(String signatureKeyName) {
         this.signatureKeyName = signatureKeyName;
+    }
+
+    public Map<String, String> getKeyNameAliasMap() {
+        return keyNameAliasMap;
+    }
+
+    /**
+     * Set the Signature KeyName alias lookup map. It is used on the receiving side for signature.
+     * It maps a KeyName to a key alias - so it allows us to associate a (e.g.) key alias in
+     * a keystore with a given KeyName contained in a KeyInfo structure of the Signature.
+     */
+    public void setKeyNameAliasMap(Map<String, String> keyNameAliasMap) {
+        this.keyNameAliasMap = keyNameAliasMap;
     }
 
 }
