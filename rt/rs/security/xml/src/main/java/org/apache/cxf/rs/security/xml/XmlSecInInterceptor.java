@@ -338,9 +338,6 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
             }
         }
     }
-<<<<<<< HEAD
-    
-=======
 
     private X509Certificate[] getX509CertificatesForKeyName(Crypto sigCrypto, Message msg, KeyNameSecurityToken token)
         throws XMLSecurityException {
@@ -360,8 +357,6 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
         return certs;
     }
 
-
->>>>>>> 2ea81b5... CXF-7084 - Dynamically load signature validation keys using KeyName.
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
         Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
