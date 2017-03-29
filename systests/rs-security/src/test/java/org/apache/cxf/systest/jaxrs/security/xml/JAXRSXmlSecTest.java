@@ -397,6 +397,55 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testUnsignedServerResponse() throws Exception {
+        if (STAX_PORT.equals(test.port)) {
+            // We are only testing the client here
+            return;
+        }
+        String address = "https://localhost:" + test.port + "/xmlnosigresponse/bookstore/books";
+
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(SecurityConstants.CALLBACK_HANDLER,
+                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
+        properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
+        properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
+                       "org/apache/cxf/systest/jaxrs/security/alice.properties");
+        bean.setProperties(properties);
+        if (test.streaming) {
+            XmlSecOutInterceptor sigOutInterceptor = new XmlSecOutInterceptor();
+            sigOutInterceptor.setSignRequest(true);
+            bean.getOutInterceptors().add(sigOutInterceptor);
+
+            XmlSecInInterceptor sigInInterceptor = new XmlSecInInterceptor();
+            sigInInterceptor.setRequireSignature(true);
+            bean.setProvider(sigInInterceptor);
+        } else {
+            XmlSigOutInterceptor sigOutInterceptor = new XmlSigOutInterceptor();
+            bean.getOutInterceptors().add(sigOutInterceptor);
+
+            XmlSigInInterceptor sigInInterceptor = new XmlSigInInterceptor();
+            bean.getInInterceptors().add(sigInInterceptor);
+        }
+
+        WebClient wc = bean.createWebClient();
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
+        try {
+            wc.post(new Book("CXF", 126L), Book.class);
+            fail("Failure expected on an unsigned response message");
+        } catch (ProcessingException ex) {
+            assertTrue(ex.getCause() instanceof BadRequestException);
+        }
+    }
+
+    @Test
     public void testPostBookWithEnvelopedSigKeyName() throws Exception {
         // This test only applies to StAX - see CXF-7084
         if (!test.streaming || !STAX_PORT.equals(test.port)) {
