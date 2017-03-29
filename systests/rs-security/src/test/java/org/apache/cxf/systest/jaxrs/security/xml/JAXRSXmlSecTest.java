@@ -360,8 +360,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-<<<<<<< HEAD
-=======
     public void testUnsignedServerResponse() throws Exception {
         if (STAX_PORT.equals(test.port)) {
             // We are only testing the client here
@@ -377,11 +375,11 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         Bus springBus = bf.createBus(busFile.toString());
         bean.setBus(springBus);
 
-        Map<String, Object> properties = new HashMap<>();
-        properties.put(SecurityConstants.CALLBACK_HANDLER,
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("ws-security.callback-handler",
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
-        properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
+        properties.put("ws-security.signature.username", "alice");
+        properties.put("ws-security.signature.properties",
                        "org/apache/cxf/systest/jaxrs/security/alice.properties");
         bean.setProperties(properties);
         if (test.streaming) {
@@ -411,51 +409,6 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testPostBookWithEnvelopedSigKeyName() throws Exception {
-        // This test only applies to StAX - see CXF-7084
-        if (!test.streaming || !STAX_PORT.equals(test.port)) {
-            return;
-        }
-        String address = "https://localhost:" + test.port + "/xmlsigkeyname/bookstore/books";
-
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress(address);
-
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAXRSXmlSecTest.class.getResource("client.xml");
-        Bus springBus = bf.createBus(busFile.toString());
-        bean.setBus(springBus);
-
-        Map<String, Object> properties = new HashMap<>();
-        properties.put(SecurityConstants.CALLBACK_HANDLER,
-                       "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
-        properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
-        properties.put(SecurityConstants.SIGNATURE_PROPERTIES,
-                       "org/apache/cxf/systest/jaxrs/security/alice.properties");
-        bean.setProperties(properties);
-        XmlSecOutInterceptor sigOutInterceptor = new XmlSecOutInterceptor();
-        sigOutInterceptor.setSignRequest(true);
-        sigOutInterceptor.setKeyInfoMustBeAvailable(true);
-
-        SignatureProperties sigProps = new SignatureProperties();
-        sigProps.setSignatureKeyName("alice-kn");
-        sigProps.setSignatureKeyIdType("KeyName");
-        sigOutInterceptor.setSignatureProperties(sigProps);
-
-        bean.getOutInterceptors().add(sigOutInterceptor);
-
-        XmlSecInInterceptor sigInInterceptor = new XmlSecInInterceptor();
-        sigInInterceptor.setRequireSignature(true);
-        bean.setProvider(sigInInterceptor);
-
-        WebClient wc = bean.createWebClient();
-        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
-        Book book = wc.post(new Book("CXF", 126L), Book.class);
-        assertEquals(126L, book.getId());
-    }
-
-    @Test
->>>>>>> 533daf2... Add another test to check that an exception is thrown if a service response is not signed
     public void testPostEncryptedBook() throws Exception {
         String address = "https://localhost:" + test.port + "/xmlenc/bookstore/books";
         Map<String, Object> properties = new HashMap<String, Object>();
