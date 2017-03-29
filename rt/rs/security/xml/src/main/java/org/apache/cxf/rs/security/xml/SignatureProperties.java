@@ -38,30 +38,14 @@ public class SignatureProperties {
     public String getSignatureDigestAlgo() {
         return signatureDigestAlgo;
     }
-    @Deprecated
-    public void setSignatureC14Method(String signatureC14Method) {
-        setSignatureC14nMethod(signatureC14Method);
-    }
     public void setSignatureC14nMethod(String signatureC14nMethod) {
         this.signatureC14nMethod = signatureC14nMethod;
-    }
-    @Deprecated
-    public String getSignatureC14Method() {
-        return getSignatureC14nMethod();
     }
     public String getSignatureC14nMethod() {
         return signatureC14nMethod;
     }
-    @Deprecated
-    public void setSignatureC14Transform(String signatureC14Transform) {
-        setSignatureC14nTransform(signatureC14Transform);
-    }
     public void setSignatureC14nTransform(String signatureC14nTransform) {
         this.signatureC14nTransform = signatureC14nTransform;
-    }
-    @Deprecated
-    public String getSignatureC14Transform() {
-        return getSignatureC14nTransform();
     }
     public String getSignatureC14nTransform() {
         return signatureC14nTransform;
