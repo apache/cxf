@@ -101,7 +101,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
     }
 
     public void handleMessage(Message message) throws Fault {
-        if (isServerGet(message)) {
+        if (!canDocumentBeRead(message)) {
             return;
         }
         prepareMessage(message);
@@ -144,6 +144,18 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
         }
     }
 
+    private boolean canDocumentBeRead(Message message) {
+        if (isServerGet(message)) {
+            return false;
+        } else {
+            Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+            if (responseCode != null && responseCode != 200) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     private boolean isServerGet(Message message) {
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         return "GET".equals(method) && !MessageUtils.isRequestor(message);
@@ -360,7 +372,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
 
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
-        Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
+        Response response = JAXRSUtils.toResponseBuilder(400).entity(error).type("text/plain").build();
         throw ExceptionUtils.toBadRequestException(null, response);
     }
 
@@ -446,7 +458,7 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> imple
     public Object aroundReadFrom(ReaderInterceptorContext ctx) throws IOException, WebApplicationException {
         Message message = ((ReaderInterceptorContextImpl)ctx).getMessage();
 
-        if (isServerGet(message)) {
+        if (!canDocumentBeRead(message)) {
             return ctx.proceed();
         } else {
             prepareMessage(message);
