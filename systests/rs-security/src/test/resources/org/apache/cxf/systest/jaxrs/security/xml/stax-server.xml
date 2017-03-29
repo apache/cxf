@@ -148,12 +148,22 @@ under the License.
         </jaxrs:properties>
     </jaxrs:server>
     
+    <util:map id="keyNameMap">
+        <entry key="alice-kn" value="alice" />
+    </util:map>
+    <bean id="keyNameSigProps" class="org.apache.cxf.rs.security.xml.SignatureProperties">
+        <property name="keyNameAliasMap" ref="keyNameMap"/>
+    </bean>
+    <bean id="xmlSecInHandlerKeyName" class="org.apache.cxf.rs.security.xml.XmlSecInInterceptor">
+        <property name="signatureProperties" ref="keyNameSigProps"/>
+        <property name="requireSignature" value="true"/>
+    </bean>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec-stax}/xmlsigkeyname">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
         <jaxrs:inInterceptors>
-            <ref bean="xmlSigInHandler"/>
+            <ref bean="xmlSecInHandlerKeyName"/>
         </jaxrs:inInterceptors>
         <jaxrs:outInterceptors>
             <ref bean="xmlSigOutHandler"/>
