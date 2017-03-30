@@ -20,7 +20,10 @@ package org.apache.cxf.aegis.type.java5;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+
+import javax.xml.bind.annotation.XmlEnumValue;
 
 import org.apache.cxf.aegis.type.AegisType;
 
@@ -271,7 +274,7 @@ public class AnnotationReader {
             Class<? extends Annotation>... annotations) {
 
         for (Class<?> annotation : annotations) {
-            if (annotation != null) {
+            if (annotation != null && element != null) {
                 try {
                     Annotation ann = element.getAnnotation(annotation.asSubclass(Annotation.class));
                     if (ann != null) {
@@ -369,5 +372,19 @@ public class AnnotationReader {
         return false;
     }
 
+    public static String getEnumValue(Enum<?> enumConstant) {
+        @SuppressWarnings("rawtypes")
+        Class<? extends Enum> enumClass = enumConstant.getClass();
+        try {
+            Field constantField = enumClass.getDeclaredField(enumConstant.name());
+            XmlEnumValue constantValueAnnotation = constantField.getAnnotation(XmlEnumValue.class);
+            if (constantValueAnnotation == null) {
+                return null;
+            }
+            return constantValueAnnotation.value();
+        } catch (NoSuchFieldException e) {
+            return null;
+        }
+    }
 
 }
