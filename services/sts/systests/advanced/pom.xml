@@ -133,6 +133,11 @@
             <artifactId>hazelcast</artifactId>
             <version>${cxf.hazelcast.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.hazelcast</groupId>
+            <artifactId>hazelcast-spring</artifactId>
+            <version>${cxf.hazelcast.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <testSourceDirectory>${basedir}/src/test/java</testSourceDirectory>
