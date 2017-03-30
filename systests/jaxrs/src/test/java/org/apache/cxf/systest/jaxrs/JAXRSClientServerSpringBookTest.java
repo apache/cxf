@@ -172,6 +172,13 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform4";
         doTestEchoBookForm(address);
     }
+    
+    @Test
+    public void testEchoBookForm5() throws Exception {
+        String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform5";
+        doTestEchoBookForm(address);
+    }
+    
     private void doTestEchoBookForm(String address) throws Exception {
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
