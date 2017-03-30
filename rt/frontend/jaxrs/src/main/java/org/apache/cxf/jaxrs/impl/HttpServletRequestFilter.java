@@ -111,14 +111,19 @@ public class HttpServletRequestFilter extends HttpServletRequestWrapper {
             
         };
     }
-    
+
+    @SuppressWarnings("unchecked")
     private void readFromParamsIfNeeded() {
         if (formParams == null) {
-            formParams = new MetadataMap<String, String>();
-            MediaType mt = JAXRSUtils.toMediaType((String)m.get(Message.CONTENT_TYPE));
-            String enc = HttpUtils.getEncoding(mt, "UTF-8");
-            String body = FormUtils.readBody(m.getContent(InputStream.class), enc);
-            FormUtils.populateMapFromString(formParams, m, body, enc, true);
+            if (m.containsKey(FormUtils.FORM_PARAM_MAP)) {
+                formParams = (MultivaluedMap<String, String>)m.get(FormUtils.FORM_PARAM_MAP);
+            } else {
+                formParams = new MetadataMap<String, String>();
+                MediaType mt = JAXRSUtils.toMediaType((String)m.get(Message.CONTENT_TYPE));
+                String enc = HttpUtils.getEncoding(mt, "UTF-8");
+                String body = FormUtils.readBody(m.getContent(InputStream.class), enc);
+                FormUtils.populateMapFromString(formParams, m, body, enc, true);
+            }
         }
         
     }
