@@ -163,7 +163,8 @@ public class WSDLGetUtils {
         return doc;
     }
 
-    protected String mapUri(Bus bus, String base, Map<String, SchemaReference> smp, String loc, String xsd)
+    protected String mapUri(Bus bus, String base, Map<String, SchemaReference> smp, 
+                            String loc, String xsd, String resolvedXsd)
         throws UnsupportedEncodingException {
         String key = loc;
         try {
@@ -172,7 +173,8 @@ public class WSDLGetUtils {
                 // resolve requested location with relative import path
                 key = new URI(xsd).resolve(loc).toString();
 
-                if (!smp.containsKey(URLDecoder.decode(key, "utf-8"))) {
+                SchemaReference ref = smp.get(URLDecoder.decode(key, "utf-8"));
+                if (ref == null) {
                     // if the result is not known, check if we can resolve it into something known
                     String resolved = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus), key, base);
                     if (resolved != null  && smp.containsKey(URLDecoder.decode(resolved, "utf-8"))) {
@@ -187,6 +189,34 @@ public class WSDLGetUtils {
            //ignore
         }
         SchemaReference ref = smp.get(URLDecoder.decode(key, "utf-8"));
+        if (ref == null && resolvedXsd != null) {
+            try {
+                String key2 = new URI(resolvedXsd).resolve(loc).toString();
+                SchemaReference ref2 = smp.get(URLDecoder.decode(key2, "utf-8"));
+                if (ref2 == null) {
+                    // if the result is not known, check if we can resolve it into something known
+                    String resolved = resolveWithCatalogs(OASISCatalogManager.getCatalogManager(bus), key2, base);
+                    if (resolved != null  && smp.containsKey(URLDecoder.decode(resolved, "utf-8"))) {
+                        // if it is resolvable, we can use it
+                        ref = smp.get(URLDecoder.decode(resolved, "utf-8"));
+                    }
+                } else {
+                    ref = smp.get(URLDecoder.decode(key2, "utf-8"));
+                }
+            } catch (URISyntaxException e) {
+                //ignore, ref can remain null
+            }
+            if (ref != null) {
+                // we are able to map this, but for some reason the default key passed in cannot
+                // be used for a direct lookup, we need to create a unique import key
+                int count = 1;
+                while (smp.containsKey("_import" + count + ".xsd")) {
+                    count++;
+                }
+                key = "_import" + count + ".xsd";
+                smp.put(key, ref);
+            }
+        }
         if (ref != null) {
             return base + "?xsd=" + key.replace(" ", "%20");
         }
@@ -218,7 +248,7 @@ public class WSDLGetUtils {
                                                               "http://www.w3.org/2001/XMLSchema", "import");
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
-                sl = mapUri(bus, base, smp, sl, xsdWsdlPar);
+                sl = mapUri(bus, base, smp, sl, xsdWsdlPar, doc.getDocumentURI());
                 if (sl != null) {
                     el.setAttribute("schemaLocation", sl);
                 }
@@ -229,7 +259,7 @@ public class WSDLGetUtils {
                                                               "include");
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
-                sl = mapUri(bus, base, smp, sl, xsdWsdlPar);
+                sl = mapUri(bus, base, smp, sl, xsdWsdlPar, doc.getDocumentURI());
                 if (sl != null) {
                     el.setAttribute("schemaLocation", sl);
                 }
@@ -239,7 +269,7 @@ public class WSDLGetUtils {
                                                               "redefine");
             for (Element el : elementList) {
                 String sl = el.getAttribute("schemaLocation");
-                sl = mapUri(bus, base, smp, sl, xsdWsdlPar);
+                sl = mapUri(bus, base, smp, sl, xsdWsdlPar, doc.getDocumentURI());
                 if (sl != null) {
                     el.setAttribute("schemaLocation", sl);
                 }
@@ -534,8 +564,12 @@ public class WSDLGetUtils {
                         //check to see if it's already in a URL format.  If so, leave it.
                         new URL(start);
                     } catch (MalformedURLException e) {
+                        
                         doneSchemas.put(decodedStart, schemaReference);
                         doneSchemas.put(schemaReference.getReferencedSchema().getDocumentBaseURI(), schemaReference);
+                        if (!doneSchemas.containsKey(decodedOrigLocation)) {
+                            doneSchemas.put(decodedOrigLocation, schemaReference);
+                        }
                         try {
                             if (!(new URI(origLocation).isAbsolute()) && parentResolved != null) {
                                 resolvedSchemaLocation = resolveRelativePath(parentResolved, decodedOrigLocation);
