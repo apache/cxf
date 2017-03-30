@@ -43,13 +43,8 @@ import org.junit.BeforeClass;
  */
 public class TrustManagerTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(TrustServer.class);
-<<<<<<< HEAD
-    
-=======
-    static final String PORT2 = allocatePort(TrustServer.class, 2);
     static final String PORT3 = allocatePort(TrustServer.class, 3);
 
->>>>>>> 16163d8... Adding Jetty programmatic tests
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue(
@@ -143,9 +138,6 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
-<<<<<<< HEAD
-    
-=======
 
     // Here the Trust Manager checks the server cert. this time we are invoking on the
     // service that is configured in code (not by spring)
@@ -186,7 +178,6 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         bus.shutdown(true);
     }
 
->>>>>>> 16163d8... Adding Jetty programmatic tests
     @org.junit.Test
     public void testInvalidServerCertX509TrustManager() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
@@ -224,72 +215,11 @@ public class TrustManagerTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             // expected
         }
-<<<<<<< HEAD
-        
-=======
 
         ((java.io.Closeable)port).close();
         bus.shutdown(true);
     }
 
-    @org.junit.Test
-    public void testOSCPOverride() throws Exception {
-        SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = TrustManagerTest.class.getResource("client-trust.xml");
-
-        Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
-
-        URL url = SOAPService.WSDL_LOCATION;
-        SOAPService service = new SOAPService(url, SOAPService.SERVICE);
-        assertNotNull("Service is null", service);
-        final Greeter port = service.getHttpsPort();
-        assertNotNull("Port is null", port);
-
-        updateAddressPort(port, PORT2);
-
-        // Read truststore
-        KeyStore ts = KeyStore.getInstance("JKS");
-        try (InputStream trustStore =
-            ClassLoaderUtils.getResourceAsStream("keys/cxfca.jks", TrustManagerTest.class)) {
-            ts.load(trustStore, "password".toCharArray());
-        }
-
-        try {
-            Security.setProperty("ocsp.enable", "true");
-
-            PKIXBuilderParameters param = new PKIXBuilderParameters(ts, new X509CertSelector());
-            param.setRevocationEnabled(true);
-
-            TrustManagerFactory tmf  =
-                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(new CertPathTrustManagerParameters(param));
-
-            TLSClientParameters tlsParams = new TLSClientParameters();
-            tlsParams.setTrustManagers(tmf.getTrustManagers());
-            tlsParams.setDisableCNCheck(true);
-
-            Client client = ClientProxy.getClient(port);
-            HTTPConduit http = (HTTPConduit) client.getConduit();
-            http.setTlsClientParameters(tlsParams);
-
-            try {
-                port.greetMe("Kitty");
-                fail("Failure expected on an invalid OCSP responder URL");
-            } catch (Exception ex) {
-                // expected
-            }
-
-        } finally {
-            Security.setProperty("ocsp.enable", "false");
-        }
-
->>>>>>> 16163d8... Adding Jetty programmatic tests
-        ((java.io.Closeable)port).close();
-        bus.shutdown(true);
-    }
-    
     public static class NoOpX509TrustManager implements X509TrustManager {
 
         public NoOpX509TrustManager() {
