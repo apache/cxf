@@ -608,7 +608,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                             SchemaCompiler schemaCompiler,
                             SchemaCollection schemaCollection) {
 
-        Set<String> ids = new HashSet<>();
+        Set<String> ids = new HashSet<String>();
         @SuppressWarnings("unchecked")
         List<ServiceInfo> serviceList = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
         for (ServiceInfo si : serviceList) {
@@ -715,7 +715,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                                           Options opts,
                                           SchemaCompiler schemaCompiler,
                                           SchemaCollection schemaCollection) {
-        Set<String> ids = new HashSet<>();
+        Set<String> ids = new HashSet<String>();
         for (ServiceInfo si : serviceList) {
             for (SchemaInfo sci : si.getSchemas()) {
                 String key = sci.getSystemId();
