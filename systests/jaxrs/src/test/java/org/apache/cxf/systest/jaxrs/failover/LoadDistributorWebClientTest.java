@@ -19,11 +19,12 @@
 
 package org.apache.cxf.systest.jaxrs.failover;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.cxf.clustering.FailoverFeature;
+import org.apache.cxf.clustering.LoadDistributorFeature;
 import org.apache.cxf.clustering.SequentialStrategy;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
@@ -33,51 +34,47 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * A test for failover using a WebClient object
+ * A test for the load distributor using a WebClient object
  */
-public class FailoverWebClientTest extends AbstractBusClientServerTestBase {
-    static final String PORT1 = allocatePort(FailoverBookServer.class);
-    static final String PORT2 = allocatePort(FailoverBookServer.class, 2);
-    static final String PORT3 = allocatePort(FailoverBookServer.class, 3);
+public class LoadDistributorWebClientTest extends AbstractBusClientServerTestBase {
+    static final String PORT1 = allocatePort(LoadDistributorServer.class);
+    static final String PORT2 = allocatePort(LoadDistributorServer.class, 2);
 
 
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly",
-                   launchServer(FailoverBookServer.class, true));
+                   launchServer(LoadDistributorServer.class, true));
         createStaticBus();
     }
 
     @Test
-    public void testFailover() throws Exception {
+    public void testLoadDistributor() throws Exception {
+        URL busFile = LoadDistributorWebClientTest.class.getResource("cxf-client.xml");
+
         String address = "http://localhost:" + PORT1 + "/bookstore";
 
-        FailoverFeature failoverFeature = new FailoverFeature();
+        LoadDistributorFeature feature = new LoadDistributorFeature();
         SequentialStrategy strategy = new SequentialStrategy();
         List<String> addresses = new ArrayList<>();
+        addresses.add(address);
         addresses.add("http://localhost:" + PORT2 + "/bookstore");
-        addresses.add("http://localhost:" + PORT3 + "/bookstore");
         strategy.setAlternateAddresses(addresses);
-        failoverFeature.setStrategy(strategy);
+        feature.setStrategy(strategy);
 
         WebClient webClient = WebClient.create(address, null,
-                                               Collections.singletonList(failoverFeature),
-                                               null).accept("application/xml");
-        // Should hit PORT1
+                                               Collections.singletonList(feature),
+                                               busFile.toString()).accept("application/xml");
+
         Book b = webClient.get(Book.class);
         assertEquals(124L, b.getId());
         assertEquals("root", b.getName());
 
-        // Should failover to PORT2
-        webClient.get(Book.class);
+        b = webClient.get(Book.class);
         assertEquals(124L, b.getId());
         assertEquals("root", b.getName());
 
-        // Should failover to PORT3
-        webClient.get(Book.class);
-        assertEquals(124L, b.getId());
-        assertEquals("root", b.getName());
     }
 
 }
