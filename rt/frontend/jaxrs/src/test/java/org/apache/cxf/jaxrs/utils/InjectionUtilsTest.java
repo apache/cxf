@@ -162,7 +162,7 @@ public class InjectionUtilsTest extends Assert {
         Float f = InjectionUtils.handleParameter("", false, float.class,
                 float.class, null,
                 ParameterType.QUERY, null);
-        assertEquals("Long is not 0", Float.valueOf(0F), f);
+        assertEquals("Float is not 0", Float.valueOf(0F), f);
     }
 
     @Test
