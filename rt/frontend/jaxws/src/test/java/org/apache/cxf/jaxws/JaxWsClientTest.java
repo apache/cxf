@@ -235,6 +235,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         } catch (Fault fault) {
             assertEquals(true, fault.getMessage().indexOf("Foo") >= 0);
         }
+        client.close();
 
     }
 

@@ -151,11 +151,13 @@ public class ClientImpl
         if (bus == null) {
             return;
         }
-        for (Closeable c : getEndpoint().getCleanupHooks()) {
-            try {
-                c.close();
-            } catch (IOException e) {
-                //ignore
+        if (getEndpoint() != null) {
+            for (Closeable c : getEndpoint().getCleanupHooks()) {
+                try {
+                    c.close();
+                } catch (IOException e) {
+                    //ignore
+                }
             }
         }
         ClientLifeCycleManager mgr = bus.getExtension(ClientLifeCycleManager.class);
@@ -175,11 +177,6 @@ public class ClientImpl
             }
         }
 
-        ClassLoaderHolder holder = bus.getExtension(ClassLoaderHolder.class);
-        if (null != holder){
-            holder.reset();
-        }
-        
         bus = null;
         conduitSelector = null;
         outFaultObserver = null;

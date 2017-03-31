@@ -299,7 +299,7 @@ public class ProxyTest extends Assert {
     }
 
     @Test
-    public void testRMClientGetConduit() {
+    public void testRMClientGetConduit() throws Exception {
         Proxy proxy = new Proxy(rme);
         Bus bus = control.createMock(Bus.class);
         Endpoint endpoint = control.createMock(Endpoint.class);
@@ -309,6 +309,7 @@ public class ProxyTest extends Assert {
         control.replay();
         Proxy.RMClient client = proxy.new RMClient(bus, endpoint, cs);
         assertSame(conduit, client.getConduit());
+        client.close();
     }
 
 
