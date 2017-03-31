@@ -1195,6 +1195,14 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
             fail("shouldn't get exception");
         }
     }
+    
+
+    @Test
+    public void testsdfasdf() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, "/Users/dkulp/Downloads/test/WSDL.wsdl");
+        processor.setContext(env);
+        processor.execute();
+    }
 
     @Test
     public void testCXF5280() throws Exception {
