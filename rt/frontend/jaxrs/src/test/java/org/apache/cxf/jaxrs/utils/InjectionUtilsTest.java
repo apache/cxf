@@ -150,6 +150,22 @@ public class InjectionUtilsTest extends Assert {
     }
 
     @Test
+    public void testInstantiateIntegerInQuery() {
+        Integer integer = InjectionUtils.handleParameter("", false, Integer.class,
+                Integer.class, null,
+                ParameterType.QUERY, null);
+        assertNull("Integer is not null", integer);
+    }
+
+    @Test
+    public void testInstantiateFloatInQuery() {
+        Float f = InjectionUtils.handleParameter("", false, float.class,
+                float.class, null,
+                ParameterType.QUERY, null);
+        assertEquals("Float is not 0", Float.valueOf(0F), f);
+    }
+
+    @Test
     public void testGenericInterfaceType() throws NoSuchMethodException {
         Type str = InjectionUtils.getGenericResponseType(GenericInterface.class.getMethod("get"),
                        TestService.class, "", String.class, new ExchangeImpl());
