@@ -40,6 +40,29 @@ import org.junit.Test;
 public class HttpUtilsTest extends Assert {
 
     @Test
+    public void testEncodePartiallyEncoded() {
+        assertEquals("/address", HttpUtils.encodePartiallyEncoded("/address", false));
+    }
+    @Test
+    public void testEncodePartiallyEncoded2() {
+        assertEquals("/add%20ress", HttpUtils.encodePartiallyEncoded("/add ress", false));
+    }
+    @Test
+    public void testEncodePartiallyEncoded3() {
+        assertEquals("/add%20ress", HttpUtils.encodePartiallyEncoded("/add%20ress", false));
+    }
+    @Test
+    public void testEncodePartiallyEncoded4() {
+        assertEquals("http://localhost:8080/", 
+                     HttpUtils.encodePartiallyEncoded("http://localhost:8080/", false));
+    }
+    @Test
+    public void testEncodePartiallyEncoded5() {
+        assertEquals("http://localhost:8080/1/%202", 
+                     HttpUtils.encodePartiallyEncoded("http://localhost:8080/1/ 2", false));
+    }
+    
+    @Test
     public void testUrlDecode() {
         assertEquals("+ ", HttpUtils.urlDecode("%2B+"));
     }
