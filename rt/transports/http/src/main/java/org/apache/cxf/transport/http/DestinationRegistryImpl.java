@@ -50,9 +50,9 @@ public class DestinationRegistryImpl implements DestinationRegistry {
             throw new RuntimeException("Already a destination on " + path);
         }
         try {
-            String path2 = URLDecoder.decode(path, "ISO-8859-1");
+            String path2 = URLDecoder.decode(path, "UTF-8");
             if (!path.equals(path2)) {
-                decodedDestinations.put(URLDecoder.decode(path, "ISO-8859-1"), destination);
+                decodedDestinations.put(path2, destination);
             }
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Unsupported Encoding", e);
@@ -62,9 +62,9 @@ public class DestinationRegistryImpl implements DestinationRegistry {
     public synchronized void removeDestination(String path) {
         destinations.remove(path);
         try {
-            String path2 = URLDecoder.decode(path, "ISO-8859-1");
+            String path2 = URLDecoder.decode(path, "UTF-8");
             if (!path.equals(path2)) {
-                decodedDestinations.remove(URLDecoder.decode(path, "ISO-8859-1"));
+                decodedDestinations.remove(path2);
             }
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Unsupported Encoding", e);
