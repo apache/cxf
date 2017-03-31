@@ -23,9 +23,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -41,7 +40,7 @@ public class ClassLoaderSwitcher {
 
     private Log log;
     private String origClassPath;
-    private Map<Object, Object> origProps;
+    private Properties origProps;
     private ClassLoader origContextClassloader;
 
     public ClassLoaderSwitcher(Log log) {
@@ -98,8 +97,7 @@ public class ClassLoaderSwitcher {
 
         log.debug("Classpath: " + urlList.toString());
 
-        origProps = new HashMap<Object, Object>(System.getProperties());
-
+        origProps = (Properties)System.getProperties().clone();
         origClassPath = System.getProperty("java.class.path");
 
         Thread.currentThread().setContextClassLoader(loader);
@@ -115,18 +113,11 @@ public class ClassLoaderSwitcher {
             Thread.currentThread().setContextClassLoader(origContextClassloader);
             origContextClassloader = null; // don't hold a reference.
         }
-        if (origClassPath != null) {
-            System.setProperty("java.class.path", origClassPath);
-        }
 
         if (origProps != null) {
-            Map<Object, Object> newProps = new HashMap<Object, Object>(System.getProperties());
-            for (Object o : newProps.keySet()) {
-                if (!origProps.containsKey(o)) {
-                    System.clearProperty(o.toString());
-                }
-            }
-            System.getProperties().putAll(origProps);
+            System.setProperties(origProps);
+        } else if (origClassPath != null) {
+            System.setProperty("java.class.path", origClassPath);
         }
     }
 }
