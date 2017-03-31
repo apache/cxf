@@ -75,6 +75,11 @@ public final class PrimitiveUtils {
 
     public static <T> Object read(String value, Class<T> type) {
         Object ret = value;
+        if (!(Character.TYPE.equals(type) || Character.class.equals(type))
+                && value != null && value.equals("")) {
+            //pass empty string to number type will result in Exception
+            value = "0";
+        }
         if (Integer.TYPE.equals(type) || Integer.class.equals(type)) {
             ret = Integer.valueOf(value);
         }

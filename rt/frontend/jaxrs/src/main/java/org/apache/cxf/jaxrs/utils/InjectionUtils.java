@@ -406,6 +406,11 @@ public final class InjectionUtils {
             }
             return theResult;
         }
+
+        if (Number.class.isAssignableFrom(pClass) && "".equals(value)) {
+            //pass empty string to boxed number type will result in 404
+            return null;
+        }
         if (pClass.isPrimitive()) {
             try {
                 T ret = (T)PrimitiveUtils.read(value, pClass);
