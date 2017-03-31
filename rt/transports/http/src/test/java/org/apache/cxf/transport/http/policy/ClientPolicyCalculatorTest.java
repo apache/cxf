@@ -37,6 +37,7 @@ public class ClientPolicyCalculatorTest extends Assert {
         p1.setConnectionTimeout(10000);
         assertTrue("Policies are not compatible.", calc.compatible(p1, p2));
         p1.setAllowChunking(false);
+        p2.setAllowChunking(true);
         assertTrue("Policies are compatible.", !calc.compatible(p1, p2));
         p2.setAllowChunking(false);
         assertTrue("Policies are compatible.", calc.compatible(p1, p2));
