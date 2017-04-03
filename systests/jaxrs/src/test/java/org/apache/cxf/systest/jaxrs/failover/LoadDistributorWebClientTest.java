@@ -57,7 +57,7 @@ public class LoadDistributorWebClientTest extends AbstractBusClientServerTestBas
 
         LoadDistributorFeature feature = new LoadDistributorFeature();
         SequentialStrategy strategy = new SequentialStrategy();
-        List<String> addresses = new ArrayList<>();
+        List<String> addresses = new ArrayList<String>();
         addresses.add(address);
         addresses.add("http://localhost:" + PORT2 + "/bookstore");
         strategy.setAlternateAddresses(addresses);

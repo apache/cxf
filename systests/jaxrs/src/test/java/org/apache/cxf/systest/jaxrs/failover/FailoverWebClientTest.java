@@ -55,7 +55,7 @@ public class FailoverWebClientTest extends AbstractBusClientServerTestBase {
 
         FailoverFeature failoverFeature = new FailoverFeature();
         SequentialStrategy strategy = new SequentialStrategy();
-        List<String> addresses = new ArrayList<>();
+        List<String> addresses = new ArrayList<String>();
         addresses.add("http://localhost:" + PORT2 + "/bookstore");
         addresses.add("http://localhost:" + PORT3 + "/bookstore");
         strategy.setAlternateAddresses(addresses);
