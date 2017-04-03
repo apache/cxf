@@ -247,8 +247,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                                   List<OAuthPermission> permissions) {
         return scopesRequiringNoConsent != null
                && requestedScope != null
-               && requestedScope.size() == scopesRequiringNoConsent.size()
-               && requestedScope.containsAll(scopesRequiringNoConsent);
+               && scopesRequiringNoConsent.containsAll(requestedScope);
     }
 
     /**
