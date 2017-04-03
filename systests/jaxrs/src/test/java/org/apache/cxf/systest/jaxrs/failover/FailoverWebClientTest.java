@@ -68,16 +68,22 @@ public class FailoverWebClientTest extends AbstractBusClientServerTestBase {
         Book b = webClient.get(Book.class);
         assertEquals(124L, b.getId());
         assertEquals("root", b.getName());
+        assertEquals("http://localhost:" + PORT1 + "/bookstore",
+                     webClient.getBaseURI().toString());
 
         // Should failover to PORT2
         webClient.get(Book.class);
         assertEquals(124L, b.getId());
         assertEquals("root", b.getName());
+        assertEquals("http://localhost:" + PORT2 + "/bookstore",
+                     webClient.getBaseURI().toString());
 
         // Should failover to PORT3
         webClient.get(Book.class);
         assertEquals(124L, b.getId());
         assertEquals("root", b.getName());
+        assertEquals("http://localhost:" + PORT3 + "/bookstore",
+                     webClient.getBaseURI().toString());
     }
 
 }
