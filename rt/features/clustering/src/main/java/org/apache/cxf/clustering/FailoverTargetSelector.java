@@ -370,6 +370,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                     endpointAddress = endpointAddress + (startsWithSlash ? pathInfo : (slash + pathInfo));
                 }
                 message.put(Message.ENDPOINT_ADDRESS, endpointAddress);
+                message.put(Message.REQUEST_URI, endpointAddress);
 
                 Exchange exchange = message.getExchange();
                 InvocationKey key = new InvocationKey(exchange);
