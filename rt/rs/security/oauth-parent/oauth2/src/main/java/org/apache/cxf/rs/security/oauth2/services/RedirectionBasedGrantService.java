@@ -71,7 +71,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     private boolean hidePreauthorizedScopesInForm;
     private AuthorizationRequestFilter authorizationFilter;
     private List<String> scopesRequiringNoConsent;
-    
+    private boolean supportSinglePageApplications = true;
+
     protected RedirectionBasedGrantService(String supportedResponseType,
                                            String supportedGrantType) {
         this(Collections.singleton(supportedResponseType), supportedGrantType);
@@ -288,6 +289,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             Map<String, String> extraProperties = client.getProperties();
             secData.setExtraApplicationProperties(extraProperties);
             secData.setApplicationRegisteredDynamically(client.isRegisteredDynamically());
+            secData.setSupportSinglePageApplications(supportSinglePageApplications);
             String replyTo = getMessageContext().getUriInfo()
                 .getAbsolutePathBuilder().path("decision").build().toString();
             secData.setReplyTo(replyTo);
@@ -577,5 +579,8 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     }
     public void setScopesRequiringNoConsent(List<String> scopesRequiringNoConsent) {
         this.scopesRequiringNoConsent = scopesRequiringNoConsent;
+    }
+    public void setSupportSinglePageApplications(boolean supportSinglePageApplications) {
+        this.supportSinglePageApplications = supportSinglePageApplications;
     }
 }

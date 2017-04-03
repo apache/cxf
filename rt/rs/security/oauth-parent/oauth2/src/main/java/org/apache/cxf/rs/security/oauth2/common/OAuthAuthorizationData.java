@@ -55,7 +55,8 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     private List<OAuthPermission> alreadyAuthorizedPermissions;
     private boolean hidePreauthorizedScopesInForm;
     private boolean applicationRegisteredDynamically;
-    
+    private boolean supportSinglePageApplications;
+
     public OAuthAuthorizationData() {
     }
 
@@ -266,4 +267,13 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
         this.applicationRegisteredDynamically = applicationRegisteredDynamically;
     }
 
+    public boolean isSupportSinglePageApplications() {
+        return supportSinglePageApplications;
+    }
+
+    public void setSupportSinglePageApplications(boolean supportSinglePageApplications) {
+        this.supportSinglePageApplications = supportSinglePageApplications;
+    }
+
+    
 }
