@@ -30,9 +30,9 @@ public final class CustomerServiceSpringServer {
     public static void main(String args[]) throws Exception {
         ClassPathXmlApplicationContext ctx
             = new ClassPathXmlApplicationContext("server-applicationContext.xml");
-        System.out.println("Server started. Press any key to shut down.");
-        System.in.read();
+        Thread.sleep(5 * 60 * 1000);
         ctx.close();
+        System.out.println("Server exiting");
     }
 
 }
