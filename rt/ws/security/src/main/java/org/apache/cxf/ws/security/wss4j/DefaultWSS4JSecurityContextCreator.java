@@ -94,38 +94,17 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
             List<WSSecurityEngineResult> foundResults = actionResults.get(resultPriority);
             if (foundResults != null && !foundResults.isEmpty()) {
                 for (WSSecurityEngineResult result : foundResults) {
-<<<<<<< HEAD
-                    final Object binarySecurity = result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                    PublicKey publickey = 
-                        (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
-                    X509Certificate cert = 
-                        (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-                    
-                    if ((resultPriority == WSConstants.BST && !(binarySecurity instanceof KerberosSecurity))
-                        || (resultPriority == WSConstants.SIGN && publickey == null && cert == null)) {
-                        continue;
-                    }
-                    SecurityContext context = createSecurityContext(msg, useJAASSubject, result);
-                    if (context != null) {
-                        msg.put(SecurityContext.class, context);
-                        return;
-=======
-
                     if (!skipResult(resultPriority, result)) {
                         SecurityContext context = createSecurityContext(msg, useJAASSubject, result);
                         if (context != null) {
                             msg.put(SecurityContext.class, context);
                             return;
                         }
->>>>>>> d1b8ff6... CXF-7314 - Custom BinarySecurityTokens are not used to set up the security context
                     }
                 }
             }
         }
     }
-<<<<<<< HEAD
-    
-=======
 
     private boolean skipResult(Integer resultPriority, WSSecurityEngineResult result) {
         Object binarySecurity = result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
@@ -139,7 +118,6 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
             || resultPriority == WSConstants.SIGN && publickey == null && cert == null;
     }
 
->>>>>>> d1b8ff6... CXF-7314 - Custom BinarySecurityTokens are not used to set up the security context
     protected SecurityContext createSecurityContext(
         SoapMessage msg, boolean useJAASSubject, WSSecurityEngineResult wsResult
     ) {
