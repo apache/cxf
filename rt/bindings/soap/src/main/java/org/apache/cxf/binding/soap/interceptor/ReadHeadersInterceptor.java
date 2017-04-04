@@ -53,6 +53,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.headers.HeaderManager;
 import org.apache.cxf.headers.HeaderProcessor;
 import org.apache.cxf.helpers.DOMUtils;
@@ -254,7 +255,11 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                                 obj = hel;
                             } else {
                                 dataBinding = p.getDataBinding();
-                                obj = dataBinding.createReader(Node.class).read(hel);
+                                DataReader<Node> dataReader = dataBinding.createReader(Node.class);
+                                dataReader.setAttachments(message.getAttachments());
+                                dataReader.setProperty(DataReader.ENDPOINT, message.getExchange().getEndpoint());
+                                dataReader.setProperty(Message.class.getName(), message);
+                                obj = dataReader.read(hel);
                             }
                             // TODO - add the interceptors
 
