@@ -32,12 +32,15 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.PolicyUtils;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.trust.DefaultSTSTokenCacher;
+import org.apache.cxf.ws.security.trust.STSTokenCacher;
 import org.apache.cxf.ws.security.trust.STSTokenRetriever;
 import org.apache.cxf.ws.security.trust.STSTokenRetriever.TokenRequestParams;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
@@ -130,7 +133,15 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     params.setTrust13(NegotiationUtils.getTrust13(aim));
                     params.setTokenTemplate(itok.getRequestSecurityTokenTemplate());
 
-                    SecurityToken tok = STSTokenRetriever.getToken(message, params);
+                    // Get a custom STSTokenCacher implementation if specified
+                    STSTokenCacher tokenCacher =
+                        (STSTokenCacher)SecurityUtils.getSecurityPropertyValue(
+                            SecurityConstants.STS_TOKEN_CACHER_IMPL, message
+                        );
+                    if (tokenCacher == null) {
+                        tokenCacher = new DefaultSTSTokenCacher();
+                    }
+                    SecurityToken tok = STSTokenRetriever.getToken(message, params, tokenCacher);
 
                     if (tok != null) {
                         assertIssuedToken(itok, aim);

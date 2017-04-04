@@ -31,8 +31,10 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.trust.DefaultSTSTokenCacher;
 import org.apache.cxf.ws.security.trust.STSAuthParams;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.cxf.ws.security.trust.STSTokenCacher;
 import org.apache.cxf.ws.security.trust.STSTokenRetriever;
 import org.apache.cxf.ws.security.trust.STSTokenRetriever.TokenRequestParams;
 import org.apache.cxf.ws.security.trust.STSUtils;
@@ -47,6 +49,7 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private STSClient stsClient;
     private TokenRequestParams tokenParams;
+    private STSTokenCacher tokenCacher = new DefaultSTSTokenCacher();
 
     public STSTokenOutInterceptor(STSAuthParams authParams, String stsWsdlLocation, Bus bus) {
         this(Phase.PREPARE_SEND, authParams, stsWsdlLocation, bus);
@@ -77,7 +80,7 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (stsClient != null) {
             message.put(SecurityConstants.STS_CLIENT, stsClient);
         }
-        SecurityToken tok = STSTokenRetriever.getToken(message, tokenParams);
+        SecurityToken tok = STSTokenRetriever.getToken(message, tokenParams, tokenCacher);
         if (tok == null) {
             LOG.warning("Security token was not retrieved from STS");
         }
@@ -91,6 +94,14 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public STSClient getSTSClient() {
         return stsClient;
+    }
+
+    public STSTokenCacher getTokenCacher() {
+        return tokenCacher;
+    }
+
+    public void setTokenCacher(STSTokenCacher tokenCacher) {
+        this.tokenCacher = tokenCacher;
     }
 
     /**
