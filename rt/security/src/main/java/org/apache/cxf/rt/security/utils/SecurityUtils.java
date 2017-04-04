@@ -183,11 +183,16 @@ public final class SecurityUtils {
      * values. If none is configured, then the defaultValue parameter is returned.
      */
     public static boolean getSecurityPropertyBoolean(String property, Message message, boolean defaultValue) {
+<<<<<<< HEAD
         Object value = message.getContextualProperty(property);
         if (value == null) {
             value = message.getContextualProperty("ws-" + property);
         }
         
+=======
+        Object value = getSecurityPropertyValue(property, message);
+
+>>>>>>> b77e43f... Disable taking a UsernameToken with no password as the security context principal
         if (value != null) {
             return PropertyUtils.isTrue(value);
         }

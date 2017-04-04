@@ -66,6 +66,7 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
      * Create a SecurityContext and store it on the SoapMessage parameter
      */
     public void createSecurityContext(SoapMessage msg, WSHandlerResult handlerResult) {
+<<<<<<< HEAD
         
         String allowUnsigned = 
             (String)SecurityUtils.getSecurityPropertyValue(
@@ -74,6 +75,20 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
         boolean allowUnsignedSamlPrincipals = Boolean.parseBoolean(allowUnsigned);
         boolean useJAASSubject = true; 
         String useJAASSubjectStr = 
+=======
+
+        boolean allowUnsignedSamlPrincipals =
+            SecurityUtils.getSecurityPropertyBoolean(
+                SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, msg, false
+            );
+        boolean allowUTNoPassword =
+            SecurityUtils.getSecurityPropertyBoolean(
+                SecurityConstants.ENABLE_UT_NOPASSWORD_PRINCIPAL, msg, false
+            );
+
+        boolean useJAASSubject = true;
+        String useJAASSubjectStr =
+>>>>>>> b77e43f... Disable taking a UsernameToken with no password as the security context principal
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SC_FROM_JAAS_SUBJECT, msg);
         if (useJAASSubjectStr != null) {
             useJAASSubject = Boolean.parseBoolean(useJAASSubjectStr);
@@ -82,7 +97,8 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
         // Now go through the results in a certain order to set up a security context. Highest priority is first.
         Map<Integer, List<WSSecurityEngineResult>> actionResults = handlerResult.getActionResults();
         for (Integer resultPriority : securityPriorities) {
-            if (resultPriority == WSConstants.ST_UNSIGNED && !allowUnsignedSamlPrincipals) {
+            if ((resultPriority == WSConstants.ST_UNSIGNED && !allowUnsignedSamlPrincipals)
+                || (resultPriority == WSConstants.UT_NOPASSWORD && !allowUTNoPassword)) {
                 continue;
             }
             
