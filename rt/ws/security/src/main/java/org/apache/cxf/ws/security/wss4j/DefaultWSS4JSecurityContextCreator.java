@@ -67,11 +67,15 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
      */
     public void createSecurityContext(SoapMessage msg, WSHandlerResult handlerResult) {
 
-        String allowUnsigned =
-            (String)SecurityUtils.getSecurityPropertyValue(
-                SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, msg
+        boolean allowUnsignedSamlPrincipals =
+            SecurityUtils.getSecurityPropertyBoolean(
+                SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, msg, false
             );
-        boolean allowUnsignedSamlPrincipals = Boolean.parseBoolean(allowUnsigned);
+        boolean allowUTNoPassword =
+            SecurityUtils.getSecurityPropertyBoolean(
+                SecurityConstants.ENABLE_UT_NOPASSWORD_PRINCIPAL, msg, false
+            );
+
         boolean useJAASSubject = true;
         String useJAASSubjectStr =
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SC_FROM_JAAS_SUBJECT, msg);
@@ -82,7 +86,8 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
         // Now go through the results in a certain order to set up a security context. Highest priority is first.
         Map<Integer, List<WSSecurityEngineResult>> actionResults = handlerResult.getActionResults();
         for (Integer resultPriority : securityPriorities) {
-            if (resultPriority == WSConstants.ST_UNSIGNED && !allowUnsignedSamlPrincipals) {
+            if ((resultPriority == WSConstants.ST_UNSIGNED && !allowUnsignedSamlPrincipals)
+                || (resultPriority == WSConstants.UT_NOPASSWORD && !allowUTNoPassword)) {
                 continue;
             }
 
