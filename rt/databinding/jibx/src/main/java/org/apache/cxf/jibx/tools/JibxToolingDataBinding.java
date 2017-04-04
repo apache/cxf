@@ -140,7 +140,17 @@ public class JibxToolingDataBinding implements DataBindingProfile {
             if (bindingFiles == null || bindingFiles.length == 0) {
                 customRoot = defaultSchemasetCustom(schemaMap);
             } else {
-                customRoot = SchemasetCustom.loadCustomizations(bindingFiles[0], handler);
+                System.out.println();
+                String path = bindingFiles[0];
+                try {
+                    File file = new File(new java.net.URI(bindingFiles[0]));
+                    if (file.exists()) {
+                        path = file.getAbsolutePath();
+                    }
+                } catch (Throwable t) {
+                    //ignore
+                }
+                customRoot = SchemasetCustom.loadCustomizations(path, handler);
             }
             // force to retrain types information in the generated binding model
             forceTypes(customRoot);
