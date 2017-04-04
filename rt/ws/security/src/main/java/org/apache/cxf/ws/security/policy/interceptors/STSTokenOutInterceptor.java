@@ -97,9 +97,6 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public STSClient getSTSClient() {
         return stsClient;
     }
-<<<<<<< HEAD
-    
-=======
 
     public STSTokenCacher getTokenCacher() {
         return tokenCacher;
@@ -114,7 +111,6 @@ public class STSTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * @deprecated use {@link org.apache.cxf.ws.security.trust.STSAuthParams.AuthMode}
      */
     @Deprecated
->>>>>>> 048b46d... CXF-7315 - Abstract the STS client token caching behaviour to allow the user to plug in a custom implementation
     public enum AuthMode {
         X509(X509_ENDPOINT, KEY_TYPE_X509), 
         TRANSPORT(TRANSPORT_ENDPOINT, null);
