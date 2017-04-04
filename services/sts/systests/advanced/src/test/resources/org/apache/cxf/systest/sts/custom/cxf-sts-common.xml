@@ -126,4 +126,8 @@
         <property name="issuer" value="${issuer}"/>
         <property name="encryptionUsername" value="${encryption.username}"/>
     </bean>
+    
+    <bean id="restSTS" class="org.apache.cxf.sts.rest.RESTSecurityTokenServiceImpl">
+        <property name="issueSingleOperation" ref="transportIssueDelegate" />
+    </bean>
 </beans>
