@@ -212,15 +212,6 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
         return token.getPublicKey() != null 
             || (token.getX509Certificates() != null && token.getX509Certificates().length > 0);
     }
-<<<<<<< HEAD
-    
-    private boolean isSamlEventSigned(SamlTokenSecurityEvent event) {
-        if (event == null) {
-            return false;
-        }
-        
-        return event.getSecurityToken() != null 
-=======
 
     private boolean isSamlEventAllowed(SamlTokenSecurityEvent event, Message msg) {
         if (event == null) {
@@ -234,7 +225,6 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
 
         // The SAML Assertion must be signed by default
         return event.getSecurityToken() != null
->>>>>>> b77e43f... Disable taking a UsernameToken with no password as the security context principal
             && event.getSecurityToken().getSamlAssertionWrapper() != null
             && (allowUnsignedSamlPrincipals || event.getSecurityToken().getSamlAssertionWrapper().isSigned());
     }
@@ -246,7 +236,7 @@ public class StaxSecurityContextInInterceptor extends AbstractPhaseInterceptor<S
 
         boolean allowUTNoPassword =
             SecurityUtils.getSecurityPropertyBoolean(
-                SecurityConstants.ENABLE_UT_NOPASSWORD_PRINCIPAL, msg, false
+                SecurityConstants.ENABLE_UT_NOPASSWORD_PRINCIPAL, msg, true
             );
 
         // The "no password" case is not allowed by default
