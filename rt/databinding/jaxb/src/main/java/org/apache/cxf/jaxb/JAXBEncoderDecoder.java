@@ -872,7 +872,7 @@ public final class JAXBEncoderDecoder {
                 reader = findExtraNamespaces(reader);
             }
             obj = unmarshalWithClass ? u.unmarshal(reader, clazz) : u
-                .unmarshal((XMLStreamReader)source);
+                .unmarshal(reader);
         } else if (source instanceof XMLEventReader) {
             // allows the XML Event Reader to adjust it's behaviour based on the state of the unmarshaller
             if (source instanceof UnmarshallerAwareXMLReader) {
