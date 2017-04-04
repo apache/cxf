@@ -109,7 +109,10 @@ public final class Names {
         "/fault";
     public static final String WSA_DEFAULT_FAULT_ACTION =
         WSA_NAMESPACE_NAME + WSA_FAULT_DELIMITER;
-        
+
+    public static final String WSA_DEFAULT_SOAP_FAULT_ACTION =
+        WSA_NAMESPACE_NAME + "/soap" + WSA_FAULT_DELIMITER;
+
     public static final String WSAW_ACTION_NAME = "Action";
     public static final QName WSAW_ACTION_QNAME = 
         new QName(WSA_NAMESPACE_WSDL_NAME, WSAW_ACTION_NAME);
