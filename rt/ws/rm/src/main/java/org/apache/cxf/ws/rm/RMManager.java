@@ -404,6 +404,14 @@ public class RMManager {
         }
         return rme;
     }
+    public RMEndpoint findReliableEndpoint(QName qn) {
+        for (RMEndpoint rpe : reliableEndpoints.values()) {
+            if (qn.equals(rpe.getApplicationEndpoint().getService().getName())) {
+                return rpe;
+            }
+        }
+        return null;
+    }
 
     public Destination getDestination(Message message) throws RMException {
         RMEndpoint rme = getReliableEndpoint(message);
