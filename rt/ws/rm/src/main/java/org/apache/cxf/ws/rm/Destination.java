@@ -78,8 +78,11 @@ public class Destination extends AbstractEndpoint {
 
     // this method ensures to keep the sequence until all the messages are delivered
     public void terminateSequence(DestinationSequence seq) {
+        terminateSequence(seq, false);
+    }
+    public void terminateSequence(DestinationSequence seq, boolean forceRemove) {
         seq.terminate();
-        if (seq.allAcknowledgedMessagesDelivered()) {
+        if (forceRemove || seq.allAcknowledgedMessagesDelivered()) {
             removeSequence(seq);
         }
     }

@@ -590,11 +590,16 @@ public class DestinationSequence extends AbstractSequence {
 
                     // terminate regardless outstanding acknowledgments - as we assume that the client is
                     // gone there is no point in sending a SequenceAcknowledgment
-
                     LogUtils.log(LOG, Level.WARNING, "TERMINATING_INACTIVE_SEQ_MSG",
                                  DestinationSequence.this.getIdentifier().getValue());
-                    DestinationSequence.this.destination.terminateSequence(DestinationSequence.this);
-
+                    DestinationSequence.this.destination.terminateSequence(DestinationSequence.this, true);
+                    Source source = rme.getSource();
+                    if (source != null) {
+                        SourceSequence ss = source.getAssociatedSequence(DestinationSequence.this.getIdentifier());
+                        if (ss != null) {
+                            source.removeSequence(ss);
+                        }
+                    }
                 } else {
                    // reschedule
                     SequenceTermination st = new SequenceTermination();
