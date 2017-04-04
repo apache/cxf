@@ -120,7 +120,7 @@ public final class STSTokenRetriever {
                     // Check to see whether the delegated token needs to be renewed
                     secToken = renewToken(message, secToken, params, tokenCacher);
                 } else {
-                    secToken = getTokenFromSTS(message, client, maps, appliesTo, params);
+                    secToken = getTokenFromSTS(client, maps, appliesTo, params);
                 }
 
                 if (secToken != null) {
