@@ -385,10 +385,11 @@ public class CustomParameterTest extends AbstractBusClientServerTestBase {
         Crypto crypto = CryptoFactory.getInstance("serviceKeystore.properties");
         requestData.setDecCrypto(crypto);
         requestData.setSigVerCrypto(crypto);
-        requestData.setWsDocInfo(new WSDocInfo(assertionElement.getOwnerDocument()));
 
         Processor processor = new SAMLTokenProcessor();
-        return processor.handleToken(assertionElement, requestData);
+        return processor.handleToken(
+            assertionElement, requestData, new WSDocInfo(assertionElement.getOwnerDocument())
+        );
     }
 
     private static void doubleIt(DoubleItPortType port, int numToDouble) {
