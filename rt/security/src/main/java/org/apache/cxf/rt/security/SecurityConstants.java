@@ -159,7 +159,7 @@ public class SecurityConstants {
     
     /**
      * Whether to allow UsernameTokens with no password to be used as SecurityContext Principals.
-     * The default is false.
+     * The default is true.
      */
     public static final String ENABLE_UT_NOPASSWORD_PRINCIPAL =
             "security.enable.ut-no-password.principal";
@@ -352,12 +352,8 @@ public class SecurityConstants {
             CALLBACK_HANDLER, SAML_CALLBACK_HANDLER, SIGNATURE_PROPERTIES, 
             SIGNATURE_CRYPTO, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO, ENCRYPT_CERT,
             ENABLE_REVOCATION, SUBJECT_CERT_CONSTRAINTS, ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL,
-<<<<<<< HEAD
-            AUDIENCE_RESTRICTION_VALIDATION, SAML_ROLE_ATTRIBUTENAME, 
-=======
             ENABLE_UT_NOPASSWORD_PRINCIPAL,
             AUDIENCE_RESTRICTION_VALIDATION, SAML_ROLE_ATTRIBUTENAME,
->>>>>>> b77e43f... Disable taking a UsernameToken with no password as the security context principal
             ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, SC_FROM_JAAS_SUBJECT,
             STS_TOKEN_USE_CERT_FOR_KEYINFO, STS_TOKEN_DO_CANCEL, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
