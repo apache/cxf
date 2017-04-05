@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +33,11 @@ import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.CDATASection;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -59,6 +65,7 @@ import org.apache.cxf.ws.security.wss4j.policyvalidators.IssuedTokenPolicyValida
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.saml.SAMLKeyInfo;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -71,6 +78,7 @@ import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.model.IssuedToken;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
+import org.apache.xml.security.utils.Base64;
 
 /**
  * 
@@ -312,18 +320,71 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             return null;
         }
         
-        private String getIdFromToken(Element token) {
+        // Get an id from the token that is unique to that token
+        private static String getIdFromToken(Element token) {
             if (token != null) {
-                // Try to find the "Id" on the token.
-                if (token.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
-                    return token.getAttributeNS(WSConstants.WSU_NS, "Id");
-                } else if (token.hasAttributeNS(null, "ID")) {
+                // For SAML tokens get the ID/AssertionID
+                if ("Assertion".equals(token.getLocalName())
+                        && WSConstants.SAML2_NS.equals(token.getNamespaceURI())) {
                     return token.getAttributeNS(null, "ID");
-                } else if (token.hasAttributeNS(null, "AssertionID")) {
+                } else if ("Assertion".equals(token.getLocalName())
+                        && WSConstants.SAML_NS.equals(token.getNamespaceURI())) {
                     return token.getAttributeNS(null, "AssertionID");
+                }
+
+                // For UsernameTokens get the username
+                if (WSConstants.USERNAME_TOKEN_LN.equals(token.getLocalName())
+                        && WSConstants.WSSE_NS.equals(token.getNamespaceURI())) {
+                    Element usernameElement =
+                        XMLUtils.getDirectChildElement(token, WSConstants.USERNAME_LN, WSConstants.WSSE_NS);
+                    if (usernameElement != null) {
+                        return getElementText(usernameElement);
+                    }
+                }
+
+                // For BinarySecurityTokens take the hash of the value
+                if (WSConstants.BINARY_TOKEN_LN.equals(token.getLocalName())
+                        && WSConstants.WSSE_NS.equals(token.getNamespaceURI())) {
+                    String text = getElementText(token);
+                    if (text != null && !"".equals(text)) {
+                        try {
+                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                            byte[] bytes = digest.digest(text.getBytes());
+                            return Base64.encode(bytes);
+                        } catch (NoSuchAlgorithmException e) {
+                            // SHA-256 must be supported so not going to happen...
+                        }
+                    }
                 }
             }
             return "";
+        }
+
+        /**
+         * Return the text content of an Element, or null if no such text content exists
+         */
+        private static String getElementText(Element e) {
+            if (e != null) {
+                Node node = e.getFirstChild();
+                StringBuilder builder = new StringBuilder();
+                boolean found = false;
+                while (node != null) {
+                    if (Node.TEXT_NODE == node.getNodeType()) {
+                        found = true;
+                        builder.append(((Text)node).getData());
+                    } else if (Node.CDATA_SECTION_NODE == node.getNodeType()) {
+                        found = true;
+                        builder.append(((CDATASection)node).getData());
+                    }
+                    node = node.getNextSibling();
+                }
+
+                if (!found) {
+                    return null;
+                }
+                return builder.toString();
+            }
+            return null;
         }
         
         private void storeDelegationTokens(
