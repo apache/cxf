@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -30,8 +33,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 
 
-public class ServletDestination extends AbstractHTTPDestination {
-    
+public class ServletDestination extends AbstractHTTPDestination implements ServletConfigAware {
     static final Logger LOG = LogUtils.getL7dLogger(ServletDestination.class);
         
     /**
@@ -76,6 +78,11 @@ public class ServletDestination extends AbstractHTTPDestination {
         }
         
         return contextPath + address;
+    }
+    
+    @Override
+    public void onServletConfigAvailable(ServletConfig config) throws ServletException {
+        // Do nothing
     }
   
 }
