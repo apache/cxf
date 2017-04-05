@@ -23,7 +23,7 @@ import javax.servlet.ServletException;
 
 /**
  * Interface to be implemented by any Destination that wishes to be notified of the
- * SerlvetConfig availability. 
+ * ServletConfig availability. 
  */
 public interface ServletConfigAware {
     default void onServletConfigAvailable(ServletConfig config) throws ServletException {
