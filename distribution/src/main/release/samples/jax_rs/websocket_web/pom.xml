@@ -118,6 +118,5 @@
             <artifactId>atmosphere-runtime</artifactId>
             <version>${cxf.atmosphere.version}</version>
         </dependency>
-                
     </dependencies>
 </project>
