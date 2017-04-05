@@ -1,4 +1,4 @@
-Apache CXF 3.0.12 Release Notes
+Apache CXF 3.0.13 Release Notes
 
 1. Overview
 
@@ -22,7 +22,7 @@ Users are encourage to review the migration guide at:
 http://cxf.apache.org/docs/30-migration-guide.html
 for further information and requirements for upgrading from 2.7.x.
 
-3.0.12 fixes over 17 JIRA issues reported by users and the community.
+3.0.13 fixes over 58 JIRA issues reported by users and the community.
 
 
 
@@ -65,51 +65,65 @@ for caveats when upgrading from CXF 2.7.x to 3.0.0
 
 
 7. Specific issues, features, and improvements fixed in this version
-
+** Sub-task
+* [CXF-6942] - cxf-codegen-plugin wsdlArtifact failed to resolve WSDL
 
 ** Bug
-    * [CXF-6216] - No output sanitizing in FormattedServiceListWriter 
-    * [CXF-6604] - Sporadic ClassCastException in AsymmetricBindingHandler#doSignBeforeEncrypt
-    * [CXF-7015] - Invalid URL encoding causes error 500
-    * [CXF-7091] - JAXRSBeanValidationOutInterceptor fails to validate Response entity on the 2nd try
-    * [CXF-7099] - Technical user should be the SAML Subject for the ActAs use-case
-    * [CXF-7114] - Disable HTTP TRACE method on CXF http-jetty transport
-    * [CXF-7116] - AsyncResponse.resume() infinitely hangs up after first call
-    * [CXF-7121] - Need to log a warning when async method returns a non-void type
-    * [CXF-7123] - JAXRS Clients will hang if they do not set a oneway exchange status before the call and 202 is returned
-    * [CXF-7124] - PackageUtils.getSharedPackageName(List<Class<?>>) has bug
-    * [CXF-7135] - ConcurrentModificationException in MessageImpl.calcContextCache() when using JMS Transport and JAXRS Client
-    * [CXF-7139] - BufferOverflowException when decoding a parameter values with a trailing %
-    * [CXF-7140] - Multiple calls to AsyncResponse.cancel() returns different values
-    * [CXF-7148] - Race Condition while handling symmetric key in SymmetricBindingHandler
-    * [CXF-7154] - WSDL2JAVA Allows Unsafe Characters in to Generated Javadocs
-    * [CXF-7155] - JAXRSOutInterceptor do not close CachedOutputStream when out buffering is enabled
-    * [CXF-7162] - Inconsistent reading of formatted xml when validating schema
+* [CXF-3574] - JMSPropertyType should support non string properties
+* [CXF-4821] - UseAsyncMethod annotation does not work with Provider interface
+* [CXF-4851] - AttachmentDeserializer cannot handle attachments with Quoted Printable content transfer encoding in initializeRootMessage
+* [CXF-5436] - Poorly crafted response caused NullPointerException when processing incoming message
+* [CXF-5697] - WHICH_JARS inconsistent with lib/ contents for 2.7.11
+* [CXF-5743] - Full path is missing from schema included in imported schema when parsing WSDL
+* [CXF-5754] - JMSConduit - temporary queue not beeing closed if relpyMessage is null (timeout)
+* [CXF-5800] - Exceptions and response problems when using schema-validation and base64Binary element (with or without MTOM)
+* [CXF-6029] - Questionable exception handling
+* [CXF-6161] - wsdl2java can use invalid local filename when working with wsdl imports
+* [CXF-6523] - org.apache.cxf.interceptor.Fault: wrong number of arguments (due to explicit soap header)
+* [CXF-6590] - MAPCodec: memory leak with sync client when soapfaults returned from endpoint
+* [CXF-6598] - java.lang.IndexOutOfBoundsException when processing response
+* [CXF-6672] - PollingMessageListenerContainer does fail silently upon java.lang.Error
+* [CXF-6717] - Live WSDL regression: Fails updating schemaLocation in catalog-imported schema
+* [CXF-6731] - wsdl2java returning error "'{A_Type}' is already defined" from versions 3.1.3, 2.7.18, 3.0.7
+* [CXF-6768] - WS-Discovery missing schema when internet connection not present
+* [CXF-6866] - bindingId on Client/ServerFactoryBean does not overrule WSDL
+* [CXF-6894] - NullPointerException when running Maven plugin cxf-codegen-plugin
+* [CXF-6919] - {http://cxf.apache.org/faultcode}HandleFault is not a standard Code value
+* [CXF-6962] - Basic auth uses UTF-8 for the encoded password when it should use ISO-8859-1
+* [CXF-6976] - High memory footprint when maven assembly plugin is used together with cxf-codegen-plugin
+* [CXF-7025] - Find boundary from InputStream
+* [CXF-7058] - Extra CDATA elements added on long CDATA payload
+* [CXF-7071] - HttpServletRequest.getParameter only get String from query not both posted form data
+* [CXF-7083] - Maven Plugins: System properties handling in ClassLoaderSwitcher breaks thread safety
+* [CXF-7166] - NullPointerException at org.apache.cxf.common.jaxb.JAXBUtils.createJAXBContextProxy with IBM-JDK 8
+* [CXF-7174] - NullPointerException when Content-Type is not specified in the http request
+* [CXF-7183] - CXF Blueprint namespace don't work well with blueprint-core 1.7.x
+* [CXF-7187] - MAPCodec: memory leak with sync client when soapfaults returned from endpoint
+* [CXF-7189] - org.apache.cxf.jaxrs.ext.multipart.Attachment.getObject do not rethrow exception
+* [CXF-7213] - FIQL Parser: Crashes when parsing a collection (java.util.Set) inside an object
+* [CXF-7220] - WS-Security StaX processing fails on whitespace after the SOAP Body opening tag
+* [CXF-7221] - NullPointerException when using org.apache.cxf.logging.enable and logging interceptors
+* [CXF-7230] - Unable to disable access to default wadl genearated by cxf
+* [CXF-7236] - JAXRSInInterceptor throw java.lang.IndexOutOfBoundsException if Accept header is empty
+* [CXF-7240] - JAX-WS Dispatch incorrectly asserts that Message mode with XML/HTTP binding is invalid when using instances of DataSource
+* [CXF-7248] - JAX-RS @Context injected fields cause a NPE in re-used providers from OSGI
+* [CXF-7251] - Connection timeouts set as ints are disregarded
+* [CXF-7271] - add cxf-rt-rs-json-basic bundle into cxf-jaxrs feature
+* [CXF-7301] - Exceptions thrown from the inbound JAXRS client interceptors are not reported
+* [CXF-7303] - java.io.FileNotFoundException on JIBX binding with customization
+* [CXF-7307] - empty query string injects  into number type will lead 404 error
+* [CXF-7310] - org.apache.cxf.jaxrs.client.ClientProxyImpl#getAccept does not handle Accept header with multiple media types
+* [CXF-7312] - FailoverTargetSelector.replaceEndpointAddressPropertyIfNeeded does not update REQUEST_URI
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+** Improvement
+* [CXF-5903] - Change TransportURIResolver to at least log exceptions
+* [CXF-6907] - CXF-WSN improvment in onMessage listenner
+* [CXF-7190] - org.apache.cxf.jaxrs.ext.MessageContextImpl.createAttachments lost inner exception
+* [CXF-7233] - Create workaround for JDK HostnameVerifier issue
+* [CXF-7234] - JavaDocProvider should not require a ref to the JavaDoc lib
+* [CXF-7256] - CrossOriginResourceSharingFilter should have @Provider annotation
+* [CXF-7259] - LoggingOutInterceptor filtering
+* [CXF-7265] - Symmetric INFO logging for registering and unregistering MBeans
+* [CXF-7285] - Subclasses of FailoverTargetSelector should have a way to obtain the InvocationKey
 
 
