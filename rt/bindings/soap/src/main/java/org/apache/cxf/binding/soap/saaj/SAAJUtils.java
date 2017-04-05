@@ -21,12 +21,14 @@ package org.apache.cxf.binding.soap.saaj;
 
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPHeader;
 import javax.xml.soap.SOAPMessage;
 
+import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.common.util.StringUtils;
 
 /**
@@ -52,20 +54,33 @@ public final class SAAJUtils {
             return m.getSOAPPart().getEnvelope().getBody();
         }
     }
+    
     public static void setFaultCode(SOAPFault f, QName code) throws SOAPException {
-        try {
-            f.setFaultCode(code);
-        } catch (Throwable t) {
-            int count = 1;
-            String pfx = "fc1";
-            while (!StringUtils.isEmpty(f.getNamespaceURI(pfx))) {
-                count++;
-                pfx = "fc" + count;
+        if (f.getNamespaceURI().equals(Soap12.SOAP_NAMESPACE)) {
+            try {
+                f.setFaultCode(code);
+            } catch (SOAPException ex) {
+                f.setFaultCode(SOAPConstants.SOAP_SENDER_FAULT);
+                f.appendFaultSubcode(code);
             }
-            f.addNamespaceDeclaration(pfx, code.getNamespaceURI());
-            f.setFaultCode(pfx + ":" + code.getLocalPart());
+        } else {
+            try {
+                f.setFaultCode(code);
+            } catch (Throwable t) {
+                int count = 1;
+                String pfx = "fc1";
+                while (!StringUtils.isEmpty(f.getNamespaceURI(pfx))) {
+                    count++;
+                    pfx = "fc" + count;
+                }
+                if (code.getNamespaceURI() != null && !"".equals(code.getNamespaceURI())) {
+                    f.addNamespaceDeclaration(pfx, code.getNamespaceURI());
+                } else {
+                    f.addNamespaceDeclaration(pfx, f.getNamespaceURI());
+                }
+                f.setFaultCode(pfx + ":" + code.getLocalPart());
+            }
         }
-        
     }
     
     public static SOAPElement adjustPrefix(SOAPElement e, String prefix) {
