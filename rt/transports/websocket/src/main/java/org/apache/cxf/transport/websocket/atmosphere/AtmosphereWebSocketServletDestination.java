@@ -103,12 +103,6 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
                        HttpServletResponse resp) throws IOException {
         if (AtmosphereUtils.useAtmosphere(req)) {
             try {
-//                if (!framework.initialized()) {
-//                    framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "false");
-//                    framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPRESS_JSR356, "false");
-//                    framework.init(config);
-//                }
-                
                 framework.doCometSupport(AtmosphereRequestImpl.wrap(req),
                                          AtmosphereResponseImpl.wrap(resp));
             } catch (ServletException e) {

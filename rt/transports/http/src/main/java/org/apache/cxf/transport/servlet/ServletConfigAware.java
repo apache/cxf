@@ -21,6 +21,10 @@ package org.apache.cxf.transport.servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
+/**
+ * Interface to be implemented by any Destination that wishes to be notified of the
+ * SerlvetConfig availability. 
+ */
 public interface ServletConfigAware {
     default void onServletConfigAvailable(ServletConfig config) throws ServletException {
     }
