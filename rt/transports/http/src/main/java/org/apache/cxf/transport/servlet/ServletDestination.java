@@ -30,7 +30,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 
 
-public class ServletDestination extends AbstractHTTPDestination {
+public class ServletDestination extends AbstractHTTPDestination implements ServletConfigAware {
 
     static final Logger LOG = LogUtils.getL7dLogger(ServletDestination.class);
 

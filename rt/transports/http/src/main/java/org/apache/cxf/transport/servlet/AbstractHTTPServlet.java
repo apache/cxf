@@ -124,7 +124,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         FileUtils.maybeDeleteDefaultTempDir();
     }
 
-    protected void finalizeServletInit(ServletConfig servletConfig) {
+    protected void finalizeServletInit(ServletConfig servletConfig) throws ServletException {
         InputStream is = getResourceAsStream("/WEB-INF" + STATIC_RESOURCES_MAP_RESOURCE);
         if (is == null) {
             is = getResourceAsStream(STATIC_RESOURCES_MAP_RESOURCE);

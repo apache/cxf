@@ -30,10 +30,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.transport.AbstractDestination;
+import org.apache.cxf.transport.servlet.ServletConfigAware;
 
-public class DestinationRegistryImpl implements DestinationRegistry {
+public class DestinationRegistryImpl implements DestinationRegistry, ServletConfigAware {
     private static final String SLASH = "/";
     private ConcurrentMap<String, AbstractHTTPDestination> destinations
         = new ConcurrentHashMap<String, AbstractHTTPDestination>();
@@ -169,6 +173,15 @@ public class DestinationRegistryImpl implements DestinationRegistry {
 
         }
         return path;
+    }
+    
+    @Override
+    public void onServletConfigAvailable(ServletConfig config) throws ServletException {
+        for (final AbstractHTTPDestination destination: getDestinations()) {
+            if (destination instanceof ServletConfigAware) {
+                ((ServletConfigAware)destination).onServletConfigAvailable(config);
+            }
+        }
     }
 
 }

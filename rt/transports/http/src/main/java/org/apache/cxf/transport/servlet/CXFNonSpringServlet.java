@@ -90,6 +90,15 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
         this.controller = createServletController(sc);
         finalizeServletInit(sc);
     }
+    
+    @Override
+    protected void finalizeServletInit(ServletConfig servletConfig) throws ServletException {
+        super.finalizeServletInit(servletConfig);
+        
+        if (this.destinationRegistry instanceof ServletConfigAware) {
+            ((ServletConfigAware)this.destinationRegistry).onServletConfigAvailable(servletConfig);
+        }
+    }
 
     protected void registerServletContextResolver(ServletConfig sc) {
         if (Boolean.valueOf(sc.getInitParameter(IGNORE_SERVLET_CONTEXT_RESOLVER))) {
