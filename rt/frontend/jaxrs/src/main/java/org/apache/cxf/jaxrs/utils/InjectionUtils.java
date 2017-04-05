@@ -365,7 +365,7 @@ public final class InjectionUtils {
                                         Annotation[] paramAnns,
                                         ParameterType pType,
                                         Message message) {
-        if (value == null) {
+        if (value == null || Number.class.isAssignableFrom(pClass) && "".equals(value)) {
             return null;
         }
         if (pType == ParameterType.PATH) {
@@ -393,11 +393,6 @@ public final class InjectionUtils {
                 theResult = pClass.cast(result);
             }
             return theResult;
-        }
-
-        if (Number.class.isAssignableFrom(pClass) && "".equals(value)) {
-            //pass empty string to boxed number type will result in 404
-            return null;
         }
         if (pClass.isPrimitive()) {
             try {
