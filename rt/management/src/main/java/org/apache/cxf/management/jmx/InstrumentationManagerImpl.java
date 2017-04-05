@@ -63,7 +63,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     implements InstrumentationManager, BusLifeCycleListener {
     private static final Logger LOG = LogUtils.getL7dLogger(InstrumentationManagerImpl.class);
 
-    private static Map<String, String>mbeanServerIDMap = new HashMap<String, String>();
+    private static Map<String, String>mbeanServerIDMap = new HashMap<>();
 
     private Bus bus;
     private MBServerConnectorFactory mcf;
@@ -260,6 +260,9 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
             return;
         }
 
+        if (LOG.isLoggable(Level.INFO)) {
+            LOG.info("unregistering MBean " + name);
+        }
         busMBeans.remove(name);
         mbs.unregisterMBean(name);
     }

@@ -507,7 +507,7 @@ public final class ServerProviderFactory extends ProviderFactory {
 
         @Override
         public Map<Class<?>, Integer> getContracts(Class<?> cls) {
-            Map<Class<?>, Integer> map = new HashMap<Class<?>, Integer>();
+            Map<Class<?>, Integer> map = new HashMap<>();
             if (isRegistered(cls)) {
                 if (ContainerRequestFilter.class.isAssignableFrom(cls)) {
                     boolean isPreMatch = cls.getAnnotation(PreMatching.class) != null;

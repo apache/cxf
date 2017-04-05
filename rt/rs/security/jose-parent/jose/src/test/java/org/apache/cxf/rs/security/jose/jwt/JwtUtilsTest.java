@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import org.junit.Assert;
 
@@ -36,9 +36,8 @@ public class JwtUtilsTest extends Assert {
         claims.setIssuer("DoubleItSTSIssuer");
 
         // Set the expiry date to be yesterday
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, -1);
-        claims.setExpiryTime(cal.getTimeInMillis() / 1000L);
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC).minusDays(1L);
+        claims.setExpiryTime(dateTime.toEpochSecond());
 
         try {
             JwtUtils.validateJwtExpiry(claims, 0, true);
@@ -56,9 +55,8 @@ public class JwtUtilsTest extends Assert {
         claims.setIssuer("DoubleItSTSIssuer");
 
         // Set the issued date to be in the future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, 1);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC).plusDays(1L);
+        claims.setIssuedAt(dateTime.toEpochSecond());
 
         try {
             JwtUtils.validateJwtIssuedAt(claims, 300, 0, true);
@@ -76,9 +74,8 @@ public class JwtUtilsTest extends Assert {
         claims.setIssuer("DoubleItSTSIssuer");
 
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(30L);
+        claims.setIssuedAt(dateTime.toEpochSecond());
 
         try {
             JwtUtils.validateJwtIssuedAt(claims, 0, 0, true);
@@ -99,10 +96,9 @@ public class JwtUtilsTest extends Assert {
         claims.setIssuer("DoubleItSTSIssuer");
 
         // Set the issued date to be in the near future
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 30);
-        claims.setIssuedAt(new Date().getTime() / 1000L);
-        claims.setNotBefore(cal.getTimeInMillis() / 1000L);
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(dateTime.toEpochSecond());
+        claims.setNotBefore(dateTime.plusSeconds(30L).toEpochSecond());
 
         try {
             JwtUtils.validateJwtNotBefore(claims, 0, true);
@@ -123,15 +119,14 @@ public class JwtUtilsTest extends Assert {
         claims.setIssuer("DoubleItSTSIssuer");
 
         // Set the issued date to be now
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        ZonedDateTime dateTime = ZonedDateTime.now(ZoneOffset.UTC);
+        claims.setIssuedAt(dateTime.toEpochSecond());
 
         // Now test the TTL
         JwtUtils.validateJwtIssuedAt(claims, 60, 0, true);
 
         // Now create the token 70 seconds ago
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, -70);
-        claims.setIssuedAt(cal.getTimeInMillis() / 1000L);
+        claims.setIssuedAt(dateTime.minusSeconds(70L).toEpochSecond());
 
         try {
             JwtUtils.validateJwtIssuedAt(claims, 60, 0, true);

@@ -781,7 +781,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             //get imported schemas
             int xsdCount = 0;
             SchemaCollection schemas = (SchemaCollection) context.get(ToolConstants.XML_SCHEMA_COLLECTION);
-            Map<String, String> sourceMap = new HashMap<String, String>();
+            Map<String, String> sourceMap = new HashMap<>();
             for (XmlSchema imp : schemas.getXmlSchemas()) {
                 if (imp.getSourceURI() != null && !imp.getSourceURI().contains(".wsdl#")) {
                     String schemaFileName = "schema" + (++xsdCount) + ".xsd";
@@ -790,8 +790,9 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             }
 
             //get imported wsdls
+            int wsdlImportCount = 0;
             List<Definition> defs = (List<Definition>)context.get(ToolConstants.IMPORTED_DEFINITION);
-            Map<String, String> importWSDLMap = new HashMap<String, String>();
+            Map<String, String> importWSDLMap = new HashMap<>();
             for (Definition importDef : defs) {
                 File importedWsdlFile = null;
                 if (!StringUtils.isEmpty(importDef.getDocumentBaseURI())) {
@@ -799,9 +800,11 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 } else {
                     importedWsdlFile = new File(importDef.getQName().getLocalPart() + ".wsdl");
                 }
+                if (!FileUtils.isValidFileName(importedWsdlFile.getName())) {
+                    importedWsdlFile = new File("import" + (++wsdlImportCount) + ".wsdl");
+                }
                 importWSDLMap.put(importDef.getTargetNamespace(), importedWsdlFile.getName());
             }
-
 
             OutputStreamCreator outputStreamCreator = null;
             if (context.get(OutputStreamCreator.class) != null) {

@@ -33,6 +33,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.types.GreetMe;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -45,7 +46,7 @@ import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * Tests the correct interaction of ws-rm calls with ws-security when policy validator verifies the calls.
+ * Tests the correct interaction of ws-rm calls with security.when policy validator verifies the calls.
  */
 public class WSRMWithWSSecurityPolicyTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
@@ -104,18 +105,19 @@ public class WSRMWithWSSecurityPolicyTest extends AbstractBusClientServerTestBas
             Client client = ClientProxy.getClient(greeter);
             QName operationQName = new QName("http://cxf.apache.org/greeter_control", "greetMe");
             BindingOperationInfo boi = client.getEndpoint().getBinding().getBindingInfo().getOperation(operationQName);
-            Map<String, Object> invocationContext = new HashMap<String, Object>();
-            Map<String, Object> requestContext = new HashMap<String, Object>();
-            Map<String, Object> responseContext = new HashMap<String, Object>();
+            Map<String, Object> invocationContext = new HashMap<>();
+            Map<String, Object> requestContext = new HashMap<>();
+            Map<String, Object> responseContext = new HashMap<>();
             invocationContext.put(Client.REQUEST_CONTEXT, requestContext);
             invocationContext.put(Client.RESPONSE_CONTEXT, responseContext);
 
-            requestContext.put("ws-security.username", "Alice");
-            requestContext.put("ws-security.callback-handler", "org.apache.cxf.systest.ws.rm.sec.UTPasswordCallback");
-            requestContext.put("ws-security.encryption.properties", "bob.properties");
-            requestContext.put("ws-security.encryption.username", "bob");
-            requestContext.put("ws-security.signature.properties", "alice.properties");
-            requestContext.put("ws-security.signature.username", "alice");
+            requestContext.put(SecurityConstants.USERNAME, "Alice");
+            requestContext.put(SecurityConstants.CALLBACK_HANDLER,
+                "org.apache.cxf.systest.ws.rm.sec.UTPasswordCallback");
+            requestContext.put(SecurityConstants.ENCRYPT_PROPERTIES, "bob.properties");
+            requestContext.put(SecurityConstants.ENCRYPT_USERNAME, "bob");
+            requestContext.put(SecurityConstants.SIGNATURE_PROPERTIES, "alice.properties");
+            requestContext.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
             RMManager manager = bus.getExtension(RMManager.class);
             boolean empty = manager.getRetransmissionQueue().isEmpty();
             assertTrue("RetransmissionQueue is not empty", empty);

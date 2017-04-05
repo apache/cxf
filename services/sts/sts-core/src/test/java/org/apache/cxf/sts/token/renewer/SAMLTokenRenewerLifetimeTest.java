@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.sts.token.renewer;
 
-import java.util.Date;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Properties;
 
 import javax.security.auth.callback.CallbackHandler;
@@ -48,8 +50,8 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.junit.BeforeClass;
 
 
@@ -82,13 +84,13 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerParameters renewerParameters = createRenewerParameters();
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        Instant creationTime = Instant.now();
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
@@ -110,8 +112,9 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
-        assertEquals(requestedLifetime * 1000L, renewerResponse.getExpires().getTime()
-                     - renewerResponse.getCreated().getTime());
+        
+        long duration = Duration.between(renewerResponse.getCreated(), renewerResponse.getExpires()).getSeconds();
+        assertEquals(requestedLifetime, duration);
     }
 
 
@@ -151,8 +154,9 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
-        assertEquals(providerLifetime * 1000L, renewerResponse.getExpires().getTime()
-                     - renewerResponse.getCreated().getTime());
+        
+        long duration = Duration.between(renewerResponse.getCreated(), renewerResponse.getExpires()).getSeconds();
+        assertEquals(providerLifetime, duration);
     }
 
 
@@ -175,14 +179,14 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerParameters renewerParameters = createRenewerParameters();
 
         // Set expected lifetime to 35 minutes
+        Instant creationTime = Instant.now();
         long requestedLifetime = 35 * 60L;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
@@ -226,14 +230,14 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerParameters renewerParameters = createRenewerParameters();
 
         // Set expected lifetime to Default max lifetime plus 1
+        Instant creationTime = Instant.now();
         long requestedLifetime = DefaultConditionsProvider.DEFAULT_MAX_LIFETIME + 1;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
@@ -282,14 +286,14 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerParameters renewerParameters = createRenewerParameters();
 
         // Set expected lifetime to 35 minutes
+        Instant creationTime = Instant.now();
         long requestedLifetime = 35 * 60L;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        
         renewerParameters.getTokenRequirements().setLifetime(lifetime);
 
         CallbackHandler callbackHandler = new PasswordCallbackHandler();
@@ -311,8 +315,9 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         TokenRenewerResponse renewerResponse = samlTokenRenewer.renewToken(renewerParameters);
         assertTrue(renewerResponse != null);
         assertTrue(renewerResponse.getToken() != null);
-        assertEquals(maxLifetime * 1000L, renewerResponse.getExpires().getTime()
-                     - renewerResponse.getCreated().getTime());
+        
+        long duration = Duration.between(renewerResponse.getCreated(), renewerResponse.getExpires()).getSeconds();
+        assertEquals(maxLifetime, duration);
     }
 
 
@@ -369,14 +374,12 @@ public class SAMLTokenRenewerLifetimeTest extends org.junit.Assert {
         providerParameters.getTokenRequirements().setRenewing(renewing);
 
         if (ttlMs != 0) {
-            Lifetime lifetime = new Lifetime();
-            Date creationTime = new Date();
-            Date expirationTime = new Date();
-            expirationTime.setTime(creationTime.getTime() + ttlMs);
+            Instant creationTime = Instant.now();
+            Instant expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
 
-            XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-            lifetime.setCreated(fmt.format(creationTime));
-            lifetime.setExpires(fmt.format(expirationTime));
+            Lifetime lifetime = new Lifetime();
+            lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+            lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
 
             providerParameters.getTokenRequirements().setLifetime(lifetime);
         }

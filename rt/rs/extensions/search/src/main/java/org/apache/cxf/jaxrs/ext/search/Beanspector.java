@@ -173,7 +173,7 @@ public class Beanspector<T> {
     }
 
     private Map< Class< ? >, Class< ? > > getPrimitiveWrappers() {
-        final Map< Class< ? >, Class< ? > > wrappers = new HashMap< Class< ? >, Class< ? > >();
+        final Map< Class< ? >, Class< ? > > wrappers = new HashMap<>();
 
         wrappers.put(boolean.class, Boolean.class);
         wrappers.put(byte.class, Byte.class);

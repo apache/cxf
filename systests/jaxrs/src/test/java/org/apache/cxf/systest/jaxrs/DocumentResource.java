@@ -16,10 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ext.logging.event;
 
-import org.apache.cxf.message.Message;
+package org.apache.cxf.systest.jaxrs;
 
-public interface LogEventMapper {
-    LogEvent map(Message message);
+import java.util.Set;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+@Path("resource")
+public interface DocumentResource<ID, T extends Document<ID>> {
+    @Path("{id}")
+    @GET
+    @Produces("application/json")
+    Set<T> getDocuments(@PathParam("id") ID id);
 }

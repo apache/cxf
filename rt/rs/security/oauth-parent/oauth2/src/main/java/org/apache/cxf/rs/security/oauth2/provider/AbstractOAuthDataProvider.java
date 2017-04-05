@@ -25,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
@@ -43,7 +45,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private long accessTokenLifetime = 3600L;
     private long refreshTokenLifetime; // refresh tokens are eternal by default
     private boolean recycleRefreshTokens = true;
-    private Map<String, OAuthPermission> permissionMap = new HashMap<String, OAuthPermission>();
+    private Map<String, OAuthPermission> permissionMap = new HashMap<>();
     private MessageContext messageContext;
     private List<String> defaultScopes;
     private List<String> requiredScopes;
@@ -53,6 +55,8 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private boolean useJwtFormatForAccessTokens;
     private OAuthJoseJwtProducer jwtAccessTokenProducer;
     private Map<String, String> jwtAccessTokenClaimMap;
+    private ProviderAuthenticationStrategy authenticationStrategy;
+    
 
     protected AbstractOAuthDataProvider() {
     }
@@ -241,9 +245,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
 
     @Override
     public List<OAuthPermission> convertScopeToPermissions(Client client, List<String> requestedScopes) {
-        if (requiredScopes != null && !requestedScopes.containsAll(requiredScopes)) {
-            throw new OAuthServiceException("Required scopes are missing");
-        }
+        checkRequestedScopes(client, requestedScopes);
         if (requestedScopes.isEmpty()) {
             return Collections.emptyList();
         } else {
@@ -257,6 +259,12 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         }
         throw new OAuthServiceException("Requested scopes can not be mapped");
 
+    }
+    
+    protected void checkRequestedScopes(Client client, List<String> requestedScopes) {
+        if (requiredScopes != null && !requestedScopes.containsAll(requiredScopes)) {
+            throw new OAuthServiceException("Required scopes are missing");
+        }
     }
 
     protected void convertSingleScopeToPermission(Client client,
@@ -301,10 +309,20 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
 
     protected String getCurrentRequestedGrantType() {
-        return (String)messageContext.get(OAuthConstants.GRANT_TYPE);
+        return messageContext != null ? (String)messageContext.get(OAuthConstants.GRANT_TYPE) : null;
     }
     protected String getCurrentClientSecret() {
-        return (String)messageContext.get(OAuthConstants.CLIENT_SECRET);
+        return messageContext != null ? (String)messageContext.get(OAuthConstants.CLIENT_SECRET) : null;
+    }
+    protected MultivaluedMap<String, String> getCurrentTokenRequestParams() {
+        if (messageContext != null) {
+            @SuppressWarnings("unchecked")
+            MultivaluedMap<String, String> params = 
+                (MultivaluedMap<String, String>)messageContext.get(OAuthConstants.TOKEN_REQUEST_PARAMS);
+            return params;
+        } else {
+            return null;
+        }
     }
     protected RefreshToken updateRefreshToken(RefreshToken rt, ServerAccessToken at) {
         linkAccessTokenToRefreshToken(rt, at);
@@ -347,14 +365,16 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                                                      RefreshToken oldRefreshToken,
                                                      List<String> restrictedScopes) {
         ServerAccessToken at = createNewAccessToken(client, oldRefreshToken.getSubject());
-        at.setAudiences(oldRefreshToken.getAudiences());
+        at.setAudiences(oldRefreshToken.getAudiences() != null
+                ? new ArrayList<String>(oldRefreshToken.getAudiences()) : null);
         at.setGrantType(oldRefreshToken.getGrantType());
         at.setGrantCode(oldRefreshToken.getGrantCode());
         at.setSubject(oldRefreshToken.getSubject());
         at.setNonce(oldRefreshToken.getNonce());
         at.setClientCodeVerifier(oldRefreshToken.getClientCodeVerifier());
         if (restrictedScopes.isEmpty()) {
-            at.setScopes(oldRefreshToken.getScopes());
+            at.setScopes(oldRefreshToken.getScopes() != null
+                    ? new ArrayList<OAuthPermission>(oldRefreshToken.getScopes()) : null);
         } else {
             List<OAuthPermission> theNewScopes = convertScopeToPermissions(client, restrictedScopes);
             if (oldRefreshToken.getScopes().containsAll(theNewScopes)) {
@@ -413,6 +433,9 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
 
     public void setMessageContext(MessageContext messageContext) {
         this.messageContext = messageContext;
+        if (authenticationStrategy != null) {
+            OAuthUtils.injectContextIntoOAuthProvider(messageContext, authenticationStrategy);
+        }
     }
 
     protected void removeClientTokens(Client c) {
@@ -432,12 +455,47 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
 
     @Override
     public Client removeClient(String clientId) {
-        Client c = getClient(clientId);
+        Client c = doGetClient(clientId);
         removeClientTokens(c);
         doRemoveClient(c);
         return c;
     }
+    
+    @Override
+    public Client getClient(String clientId) {
+        Client client = doGetClient(clientId);
+        if (client != null) {
+            return client;
+        }
+        
+        String grantType = getCurrentRequestedGrantType();
+        if (OAuthConstants.CLIENT_CREDENTIALS_GRANT.equals(grantType)) {
+            String clientSecret = getCurrentClientSecret();
+            if (clientSecret != null) {
+                return createClientCredentialsClient(clientId, clientSecret);
+            }
+        }
+        return null;
+    }
 
+    public void setAuthenticationStrategy(ProviderAuthenticationStrategy authenticationStrategy) {
+        this.authenticationStrategy = authenticationStrategy;
+    }
+    
+    protected boolean authenticateUnregisteredClient(String clientId, String clientSecret) {
+        return authenticationStrategy != null
+            && authenticationStrategy.authenticate(clientId, clientSecret);
+    }
+    
+    protected Client createClientCredentialsClient(String clientId, String password) {
+        if (authenticateUnregisteredClient(clientId, password)) {
+            Client c = new Client(clientId, password, true);
+            c.setAllowedGrantTypes(Collections.singletonList(OAuthConstants.CLIENT_CREDENTIALS_GRANT));
+            return c;
+        }
+        return null;
+    }
+    
     protected ServerAccessToken revokeAccessToken(String accessTokenKey) {
         ServerAccessToken at = getAccessToken(accessTokenKey);
         if (at != null) {
@@ -459,6 +517,9 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     protected abstract void doRevokeAccessToken(ServerAccessToken accessToken);
     protected abstract void doRevokeRefreshToken(RefreshToken  refreshToken);
     protected abstract RefreshToken getRefreshToken(String refreshTokenKey);
+    
+    protected abstract Client doGetClient(String clientId);
+    
     protected abstract void doRemoveClient(Client c);
 
     public List<String> getDefaultScopes() {

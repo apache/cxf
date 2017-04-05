@@ -200,7 +200,7 @@ public class TokenRenewOperation extends AbstractOperation implements RenewOpera
         }
     }
 
-    private RequestSecurityTokenResponseType createResponse(
+    protected RequestSecurityTokenResponseType createResponse(
             EncryptionProperties encryptionProperties,
             TokenRenewerResponse tokenRenewerResponse,
             TokenRequirements tokenRequirements,

@@ -183,10 +183,7 @@ public final class SecurityUtils {
      * values. If none is configured, then the defaultValue parameter is returned.
      */
     public static boolean getSecurityPropertyBoolean(String property, Message message, boolean defaultValue) {
-        Object value = message.getContextualProperty(property);
-        if (value == null) {
-            value = message.getContextualProperty("ws-" + property);
-        }
+        Object value = getSecurityPropertyValue(property, message);
 
         if (value != null) {
             return PropertyUtils.isTrue(value);

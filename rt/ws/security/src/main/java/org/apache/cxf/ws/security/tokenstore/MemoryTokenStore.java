@@ -19,8 +19,8 @@
 
 package org.apache.cxf.ws.security.tokenstore;
 
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -84,10 +84,10 @@ public class MemoryTokenStore implements TokenStore {
     }
 
     protected void processTokenExpiry() {
-        Date current = new Date();
+        Instant current = Instant.now();
         synchronized (tokens) {
             for (Map.Entry<String, CacheEntry> entry : tokens.entrySet()) {
-                if (entry.getValue().getExpiry().before(current)) {
+                if (entry.getValue().getExpiry().isBefore(current)) {
                     tokens.remove(entry.getKey());
                 }
             }
@@ -95,18 +95,16 @@ public class MemoryTokenStore implements TokenStore {
     }
 
     private CacheEntry createCacheEntry(SecurityToken token) {
-        Date expires = new Date();
-        long currentTime = expires.getTime();
-        expires.setTime(currentTime + (ttl * 1000L));
+        Instant expires = Instant.now().plusSeconds(ttl);
         return new CacheEntry(token, expires);
     }
 
     private static class CacheEntry {
 
         private final SecurityToken securityToken;
-        private final Date expires;
+        private final Instant expires;
 
-        CacheEntry(SecurityToken securityToken, Date expires) {
+        CacheEntry(SecurityToken securityToken, Instant expires) {
             this.securityToken = securityToken;
             this.expires = expires;
         }
@@ -123,7 +121,7 @@ public class MemoryTokenStore implements TokenStore {
          * Get when this CacheEntry is to be removed from the cache
          * @return when this CacheEntry is to be removed from the cache
          */
-        public Date getExpiry() {
+        public Instant getExpiry() {
             return expires;
         }
 

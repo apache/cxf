@@ -63,7 +63,7 @@ public class CXFWSNHelper extends WSNHelper {
                                            serviceInterface.getSimpleName() + "Port"));
             jwfb.setAddress(address);
             if (extraClasses != null && extraClasses.length > 0) {
-                Map<String, Object> props = new HashMap<String, Object>();
+                Map<String, Object> props = new HashMap<>();
                 props.put("jaxb.additionalContextClasses", extraClasses);
                 jwfb.getClientFactoryBean().getServiceFactory().setProperties(props);
             }
@@ -75,7 +75,7 @@ public class CXFWSNHelper extends WSNHelper {
     public Endpoint publish(String address, Object o, Class<?> ... extraClasses) {
         Endpoint endpoint = Endpoint.create(SOAPBinding.SOAP12HTTP_BINDING, o);
         if (extraClasses != null && extraClasses.length > 0) {
-            Map<String, Object> props = new HashMap<String, Object>();
+            Map<String, Object> props = new HashMap<>();
             props.put("jaxb.additionalContextClasses", extraClasses);
             endpoint.setProperties(props);
         }

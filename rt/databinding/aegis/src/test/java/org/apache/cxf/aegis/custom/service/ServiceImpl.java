@@ -30,7 +30,7 @@ public class ServiceImpl implements Service {
             throw new IllegalArgumentException("beanIds is null");
         }
 
-        Map<String, NoDefaultConstructorBean> map = new HashMap<String, NoDefaultConstructorBean>();
+        Map<String, NoDefaultConstructorBean> map = new HashMap<>();
 
         map.put("1", new NoDefaultConstructorBeanImpl("1", "name"));
         map.put("2", new NoDefaultConstructorBeanImpl("2", "name"));

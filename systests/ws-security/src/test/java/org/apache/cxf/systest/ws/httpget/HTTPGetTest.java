@@ -138,7 +138,7 @@ public class HTTPGetTest extends AbstractBusClientServerTestBase {
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(port, PORT);
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "Timestamp Signature");
         outProps.put("signaturePropFile", "alice.properties");
         outProps.put("user", "alice");

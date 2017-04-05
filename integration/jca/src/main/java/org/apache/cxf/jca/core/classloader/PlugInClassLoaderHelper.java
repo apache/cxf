@@ -31,7 +31,7 @@ import org.apache.cxf.jca.jarloader.JarLoader;
 public final class PlugInClassLoaderHelper {
     private static final Logger LOG =
         LogUtils.getL7dLogger(PlugInClassLoaderHelper.class);
-    private static Map<String, byte[]> nonClassesMap = new HashMap<String, byte[]>();
+    private static Map<String, byte[]> nonClassesMap = new HashMap<>();
 
 
     private PlugInClassLoaderHelper() {

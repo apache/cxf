@@ -131,8 +131,8 @@ public class RMEndpoint {
         destination = new Destination(this);
         proxy = new Proxy(this);
         servant = new Servant(this);
-        services = new HashMap<ProtocolVariation, WrappedService>();
-        endpoints = new HashMap<ProtocolVariation, Endpoint>();
+        services = new HashMap<>();
+        endpoints = new HashMap<>();
         applicationMessageCount = new AtomicInteger();
         controlMessageCount = new AtomicInteger();
         acknowledgementSequence = new AtomicInteger();

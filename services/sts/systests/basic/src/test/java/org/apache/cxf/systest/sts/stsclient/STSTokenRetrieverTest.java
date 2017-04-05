@@ -26,7 +26,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -157,7 +157,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         stsClient.setAllowRenewingAfterExpiry(true);
         stsClient.setEnableLifetime(true);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(SecurityConstants.CALLBACK_HANDLER, "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         props.put(SecurityConstants.ENCRYPT_USERNAME, "mystskey");
         props.put(SecurityConstants.ENCRYPT_PROPERTIES, "clientKeystore.properties");
@@ -182,7 +182,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         stsClient.setAllowRenewingAfterExpiry(true);
         stsClient.setEnableLifetime(true);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(SecurityConstants.USERNAME, "alice");
         props.put(SecurityConstants.CALLBACK_HANDLER, "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         stsClient.setProperties(props);
@@ -266,7 +266,7 @@ public class STSTokenRetrieverTest extends AbstractBusClientServerTestBase {
         Assert.assertNotNull(token);
         Assert.assertEquals(TOKEN_TYPE_SAML_2_0, token.getTokenType());
         Assert.assertNotNull(token.getId());
-        Assert.assertTrue(token.getExpires().after(new Date()));
+        Assert.assertTrue(token.getExpires().isAfter(Instant.now()));
         Assert.assertEquals("Assertion", token.getToken().getLocalName());
     }
 

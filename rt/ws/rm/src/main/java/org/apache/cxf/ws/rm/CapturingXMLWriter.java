@@ -42,7 +42,7 @@ public class CapturingXMLWriter implements XMLStreamWriter {
         delegate = del;
         capture = StaxUtils.createXMLStreamWriter(bos, StandardCharsets.UTF_8.name());
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://schemas.xmlsoap.org/ws/2005/02/rm}Sequence", "");
         map.put("{http://schemas.xmlsoap.org/ws/2005/02/rm}SequenceAcknowledgement", "");
         map.put("{http://docs.oasis-open.org/ws-rx/wsrm/200702}Sequence", "");

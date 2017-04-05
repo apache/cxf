@@ -60,6 +60,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.helpers.IOUtils;
@@ -960,7 +961,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             int result = httpClient.executeMethod(get);
             assertEquals(500, result);
             String content = getStringFromInputStream(get.getResponseBodyAsStream());
-            assertTrue(content.contains("Error") && content.contains("500"));
+            if (!StringUtils.isEmpty(content)) {
+                assertTrue(content, content.contains("Error") && content.contains("500"));
+            }
         } finally {
             get.releaseConnection();
         }
@@ -1078,8 +1081,10 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testAddBookProxyResponse() {
-        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Book b = new Book("CXF rocks", 123L);
+        
+        System.out.println(Arrays.deepToString(Arrays.asList(b, b).toArray()));
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Response r = store.addBook(b);
         assertNotNull(r);
         InputStream is = (InputStream)r.getEntity();
@@ -2092,7 +2097,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostGetBookAdapterList() throws Exception {
         JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
-        Map<String, String> outMap = new HashMap<String, String>();
+        Map<String, String> outMap = new HashMap<>();
         outMap.put("Books", "CollectionWrapper");
         outMap.put("books", "Book");
         provider.setOutTransformElements(outMap);
@@ -2107,7 +2112,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testPostGetBookAdapterListJSON() throws Exception {
         JAXBElementProvider<?> provider = new JAXBElementProvider<Object>();
-        Map<String, String> outMap = new HashMap<String, String>();
+        Map<String, String> outMap = new HashMap<>();
         outMap.put("Books", "CollectionWrapper");
         outMap.put("books", "Book");
         provider.setOutTransformElements(outMap);

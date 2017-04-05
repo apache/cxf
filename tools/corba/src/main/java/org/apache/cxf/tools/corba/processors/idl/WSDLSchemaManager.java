@@ -70,11 +70,11 @@ public class WSDLSchemaManager {
     List<DeferredSchemaAttachment> deferredAttachments;
 
     public WSDLSchemaManager() {
-        defns = new HashMap<String, Definition>();
-        schemas = new HashMap<String, XmlSchema>();
-        importedDefns = new HashMap<File, Definition>();
-        importedSchemas = new HashMap<File, XmlSchema>();
-        defnSchemas = new HashMap<String, XmlSchema>();
+        defns = new HashMap<>();
+        schemas = new HashMap<>();
+        importedDefns = new HashMap<>();
+        importedSchemas = new HashMap<>();
+        defnSchemas = new HashMap<>();
 
         deferredAttachments = new ArrayList<>();
     }

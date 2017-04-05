@@ -87,7 +87,7 @@ public class StaxBuilder {
      * Map that contains conversion from textual attribute types StAX uses, to
      * int values JDOM uses.
      */
-    private static final Map<String, Integer> ATTR_TYPES = new HashMap<String, Integer>(32);
+    private static final Map<String, Integer> ATTR_TYPES = new HashMap<>(32);
     static {
         ATTR_TYPES.put("CDATA", new Integer(Attribute.CDATA_TYPE));
         ATTR_TYPES.put("cdata", new Integer(Attribute.CDATA_TYPE));

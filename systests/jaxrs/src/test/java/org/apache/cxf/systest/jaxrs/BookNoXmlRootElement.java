@@ -31,7 +31,7 @@ import javax.ws.rs.Produces;
 public class BookNoXmlRootElement {
     private String name;
     private long id;
-    private Map<Long, Chapter> chapters = new HashMap<Long, Chapter>();
+    private Map<Long, Chapter> chapters = new HashMap<>();
 
     public BookNoXmlRootElement() {
         init();

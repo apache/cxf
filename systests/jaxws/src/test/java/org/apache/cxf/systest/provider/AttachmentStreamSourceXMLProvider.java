@@ -98,7 +98,7 @@ public class AttachmentStreamSourceXMLProvider implements Provider<StreamSource>
             Map<String, List<String>> respHeaders = CastUtils
                 .cast((Map<?, ?>)mc.get(MessageContext.HTTP_RESPONSE_HEADERS));
             if (respHeaders == null) {
-                respHeaders = new HashMap<String, List<String>>();
+                respHeaders = new HashMap<>();
                 mc.put(MessageContext.HTTP_RESPONSE_HEADERS, respHeaders);
             }
 

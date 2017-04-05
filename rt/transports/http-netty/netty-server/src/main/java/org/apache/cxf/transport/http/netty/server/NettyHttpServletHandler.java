@@ -50,6 +50,7 @@ import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.CharsetUtil;
 
 public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
@@ -87,10 +88,10 @@ public class NettyHttpServletHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        if (evt instanceof IdleState) {
-            IdleState e = (IdleState) evt;
-            if (e == IdleState.READER_IDLE || e == IdleState.WRITER_IDLE) {
-                LOG.log(Level.FINE, "Closing idle channel: {}", e);
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent e = (IdleStateEvent) evt;
+            if (e.state() == IdleState.READER_IDLE || e.state() == IdleState.WRITER_IDLE) {
+                LOG.log(Level.FINE, "Closing idle channel: {}", e.state());
                 ctx.close();
             }
         }

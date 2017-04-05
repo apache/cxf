@@ -21,9 +21,9 @@ package org.apache.cxf.systest.jaxrs.security.jose.jwt;
 
 import java.net.URL;
 import java.security.Security;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,12 +92,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.encryption.properties",
             "org/apache/cxf/systest/jaxrs/security/bob.jwk.properties");
         properties.put(JwtConstants.JWT_TOKEN, token);
@@ -132,12 +132,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
@@ -175,12 +175,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
@@ -217,12 +217,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
@@ -260,12 +260,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "AliceCert");
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
@@ -300,12 +300,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.properties",
                        "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
         properties.put(JwtConstants.JWT_TOKEN, token);
@@ -337,12 +337,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
@@ -377,12 +377,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file",
@@ -413,12 +413,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
@@ -450,12 +450,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "ECKey");
         properties.put("rs.security.keystore.file",
@@ -491,12 +491,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.alias", "smallkey");
         properties.put("rs.security.keystore.password", "security");
@@ -529,12 +529,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -565,12 +565,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.algorithm", "none");
         properties.put(JwtConstants.JWT_TOKEN, token);
         WebClient.getConfig(client).getRequestContext().putAll(properties);
@@ -600,12 +600,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.signature.properties",
                        "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
         properties.put("rs.security.encryption.properties",
@@ -640,12 +640,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.password", "password");
         properties.put("rs.security.key.password", "password");
@@ -682,12 +682,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "HMAC512Key");
         properties.put("rs.security.keystore.file",
@@ -721,12 +721,12 @@ public class JWTAlgorithmTest extends AbstractBusClientServerTestBase {
         JwtClaims claims = new JwtClaims();
         claims.setSubject("alice");
         claims.setIssuer("DoubleItSTSIssuer");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(toList(address));
 
         JwtToken token = new JwtToken(claims);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "HMACKey");
         properties.put("rs.security.keystore.file",

@@ -19,6 +19,7 @@
 package org.apache.cxf.ext.logging.event;
 
 import java.security.AccessController;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,7 +45,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.ContextUtils;
 
-public class DefaultLogEventMapper implements LogEventMapper {
+public class DefaultLogEventMapper {
     private static final Set<String> BINARY_CONTENT_MEDIA_TYPES;
     static {
         BINARY_CONTENT_MEDIA_TYPES = new HashSet<>();
@@ -126,17 +127,19 @@ public class DefaultLogEventMapper implements LogEventMapper {
     }
 
     private Map<String, String> getHeaders(Message message) {
-        Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+        Map<String, List<Object>> headers = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         Map<String, String> result = new HashMap<>();
         if (headers == null) {
             return result;
         }
-        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+        for (Map.Entry<String, List<Object>> entry : headers.entrySet()) {
             if (entry.getValue().size() == 1) {
-                result.put(entry.getKey(), entry.getValue().get(0));
+                Object value = entry.getValue().get(0);
+                if (value != null) {
+                    result.put(entry.getKey(), value.toString());
+                }
             } else {
-                String[] valueAr = entry.getValue().toArray(new String[] {});
-                result.put(entry.getKey(), valueAr.toString());
+                result.put(entry.getKey(), Arrays.deepToString(entry.getValue().toArray()));
             }
         }
         return result;

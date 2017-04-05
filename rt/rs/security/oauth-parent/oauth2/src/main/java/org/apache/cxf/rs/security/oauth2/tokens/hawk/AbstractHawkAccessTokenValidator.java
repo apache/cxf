@@ -98,7 +98,7 @@ public abstract class AbstractHawkAccessTokenValidator implements AccessTokenVal
 
     protected static Map<String, String> getSchemeParameters(String authData) {
         String[] attributePairs = authData.split(",");
-        Map<String, String> attributeMap = new HashMap<String, String>();
+        Map<String, String> attributeMap = new HashMap<>();
         for (String pair : attributePairs) {
             String[] pairValues = pair.trim().split("=", 2);
             attributeMap.put(pairValues[0].trim(), pairValues[1].trim().replaceAll("\"", ""));

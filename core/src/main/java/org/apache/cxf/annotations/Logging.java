@@ -31,6 +31,7 @@ import org.apache.cxf.interceptor.AbstractLoggingInterceptor;
 /**
  * Enables message Logging
  */
+@Deprecated
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })

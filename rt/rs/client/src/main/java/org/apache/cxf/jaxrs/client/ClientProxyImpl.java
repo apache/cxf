@@ -231,8 +231,11 @@ public class ClientProxyImpl extends AbstractClient implements
         setRequestHeaders(headers, ori, types.containsKey(ParameterType.FORM),
             body == null ? null : body.getClass(), m.getReturnType());
 
-
-        return doChainedInvocation(uri, headers, ori, params, body, bodyIndex, null, null);
+        try {
+            return doChainedInvocation(uri, headers, ori, params, body, bodyIndex, null, null);
+        } finally {
+            resetResponseStateImmediatelyIfNeeded();
+        }
 
     }
 
@@ -393,7 +396,7 @@ public class ClientProxyImpl extends AbstractClient implements
         }
         List<MediaType> types = new ArrayList<>();
         for (String s : headers) {
-            types.add(JAXRSUtils.toMediaType(s));
+            types.addAll(JAXRSUtils.parseMediaTypes(s));
         }
         return types;
     }
@@ -408,7 +411,7 @@ public class ClientProxyImpl extends AbstractClient implements
 
         List<String> methodVars = ori.getURITemplate().getVariables();
         List<Parameter> paramsList = getParameters(map, ParameterType.PATH);
-        Map<String, BeanPair> beanParamValues = new HashMap<String, BeanPair>(beanParams.size());
+        Map<String, BeanPair> beanParamValues = new HashMap<>(beanParams.size());
         for (Parameter p : beanParams) {
             beanParamValues.putAll(getValuesFromBeanParam(params[p.getIndex()], PathParam.class));
         }
@@ -515,7 +518,7 @@ public class ClientProxyImpl extends AbstractClient implements
     }
 
     private Map<String, BeanPair> getValuesFromBeanParam(Object bean, Class<? extends Annotation> annClass) {
-        Map<String, BeanPair> values = new HashMap<String, BeanPair>();
+        Map<String, BeanPair> values = new HashMap<>();
         getValuesFromBeanParam(bean, annClass, values);
         return values;
     }
@@ -523,18 +526,19 @@ public class ClientProxyImpl extends AbstractClient implements
     private Map<String, BeanPair> getValuesFromBeanParam(Object bean,
                                                          Class<? extends Annotation> annClass,
                                                          Map<String, BeanPair> values) {
+        boolean completeFieldIntrospectionNeeded = false;
         for (Method m : bean.getClass().getMethods()) {
             if (m.getName().startsWith("set")) {
                 try {
                     String propertyName = m.getName().substring(3);
-                    Annotation annotation = m.getAnnotation(annClass);
+                    Annotation methodAnnotation = m.getAnnotation(annClass);
                     boolean beanParam = m.getAnnotation(BeanParam.class) != null;
-                    if (annotation != null || beanParam) {
+                    if (methodAnnotation != null || beanParam) {
                         Method getter = bean.getClass().getMethod("get" + propertyName, new Class[]{});
                         Object value = getter.invoke(bean, new Object[]{});
                         if (value != null) {
-                            if (annotation != null) {
-                                String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
+                            if (methodAnnotation != null) {
+                                String annotationValue = AnnotationUtils.getAnnotationValue(methodAnnotation);
                                 values.put(annotationValue, new BeanPair(value, m.getParameterAnnotations()[0]));
                             } else {
                                 getValuesFromBeanParam(value, annClass, values);
@@ -544,16 +548,11 @@ public class ClientProxyImpl extends AbstractClient implements
                         String fieldName = StringUtils.uncapitalize(propertyName);
                         Field f = InjectionUtils.getDeclaredField(bean.getClass(), fieldName);
                         if (f == null) {
+                            completeFieldIntrospectionNeeded = true;
                             continue;
                         }
-                        annotation = f.getAnnotation(annClass);
-                        if (annotation != null) {
-                            Object value = ReflectionUtil.accessDeclaredField(f, bean, Object.class);
-                            if (value != null) {
-                                String annotationValue = AnnotationUtils.getAnnotationValue(annotation);
-                                values.put(annotationValue, new BeanPair(value, f.getAnnotations()));
-                            }
-                        } else if (f.getAnnotation(BeanParam.class) != null) {
+                        boolean jaxrsParamAnnAvailable = getValuesFromBeanParamField(bean, f, annClass, values);
+                        if (!jaxrsParamAnnAvailable && f.getAnnotation(BeanParam.class) != null) {
                             Object value = ReflectionUtil.accessDeclaredField(f, bean, Object.class);
                             if (value != null) {
                                 getValuesFromBeanParam(value, annClass, values);
@@ -564,10 +563,38 @@ public class ClientProxyImpl extends AbstractClient implements
                     // ignore
                 }
             }
+            if (completeFieldIntrospectionNeeded) {
+                for (Field f : bean.getClass().getDeclaredFields()) {
+                    boolean jaxrsParamAnnAvailable = getValuesFromBeanParamField(bean, f, annClass, values);
+                    if (!jaxrsParamAnnAvailable && f.getAnnotation(BeanParam.class) != null) {
+                        Object value = ReflectionUtil.accessDeclaredField(f, bean, Object.class);
+                        if (value != null) {
+                            getValuesFromBeanParam(value, annClass, values);
+                        }
+                    }
+                }
+            }
         }
         return values;
     }
 
+    private boolean getValuesFromBeanParamField(Object bean,
+                                                Field f,
+                                                Class<? extends Annotation> annClass,
+                                                Map<String, BeanPair> values) {
+        boolean jaxrsParamAnnAvailable = false;
+        Annotation fieldAnnotation = f.getAnnotation(annClass);
+        if (fieldAnnotation != null) {
+            jaxrsParamAnnAvailable = true;
+            Object value = ReflectionUtil.accessDeclaredField(f, bean, Object.class);
+            if (value != null) {
+                String annotationValue = AnnotationUtils.getAnnotationValue(fieldAnnotation);
+                values.put(annotationValue, new BeanPair(value, f.getAnnotations()));
+            }
+        }
+        return jaxrsParamAnnAvailable;
+    }
+    
     private void handleMatrixes(Method m,
                                 Object[] params,
                                 MultivaluedMap<ParameterType, Parameter> map,

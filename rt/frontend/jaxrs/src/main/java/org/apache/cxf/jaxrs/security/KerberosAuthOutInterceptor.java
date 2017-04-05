@@ -56,7 +56,7 @@ public class KerberosAuthOutInterceptor extends AbstractSpnegoAuthSupplier
         Map<String, List<String>> headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
         if (headers == null) {
-            headers = new HashMap<String, List<String>>();
+            headers = new HashMap<>();
             message.put(Message.PROTOCOL_HEADERS, headers);
         }
         headers.put("Authorization", Collections.singletonList(value));

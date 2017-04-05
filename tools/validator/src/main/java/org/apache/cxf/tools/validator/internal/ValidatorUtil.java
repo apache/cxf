@@ -140,7 +140,7 @@ public final class ValidatorUtil {
      */
     public static Map<String, Document> getImportedWsdlMap(Document document,
         String basePath) throws IOException, SAXException {
-        Map<String, Document> docMap = new HashMap<String, Document>();
+        Map<String, Document> docMap = new HashMap<>();
         if (document == null) {
             return docMap;
         }

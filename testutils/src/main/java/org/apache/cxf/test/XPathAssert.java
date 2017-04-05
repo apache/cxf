@@ -188,7 +188,7 @@ public final class XPathAssert {
     }
 
     public static void assertNoFault(Node node) throws Exception {
-        Map<String, String> namespaces = new HashMap<String, String>();
+        Map<String, String> namespaces = new HashMap<>();
         namespaces.put("s", "http://schemas.xmlsoap.org/soap/envelope/");
         namespaces.put("s12", "http://www.w3.org/2003/05/soap-envelope");
 
@@ -197,7 +197,7 @@ public final class XPathAssert {
     }
 
     public static void assertFault(Node node) throws Exception {
-        Map<String, String> namespaces = new HashMap<String, String>();
+        Map<String, String> namespaces = new HashMap<>();
         namespaces.put("s", "http://schemas.xmlsoap.org/soap/envelope/");
         namespaces.put("s12", "http://www.w3.org/2003/05/soap-envelope");
 

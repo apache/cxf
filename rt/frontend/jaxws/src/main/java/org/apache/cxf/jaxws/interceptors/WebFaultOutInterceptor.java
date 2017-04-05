@@ -123,6 +123,12 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
         WebFault fault = null;
         if (cause != null) {
             fault = getWebFaultAnnotation(cause.getClass());
+            if (fault == null && cause.getCause() != null) {
+                fault = getWebFaultAnnotation(cause.getCause().getClass());
+                if (fault != null || cause instanceof RuntimeException) {
+                    cause = cause.getCause();
+                }
+            }
         }
         if (cause instanceof Exception && fault != null) {
             Exception ex = (Exception)cause;

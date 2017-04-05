@@ -292,7 +292,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBDataBinding.class);
 
     private static final Set<String> DEFAULT_TYPE_MAP = new HashSet<>();
-    private static final Map<String, String> JLDEFAULT_TYPE_MAP = new HashMap<String, String>();
+    private static final Map<String, String> JLDEFAULT_TYPE_MAP = new HashMap<>();
 
     private S2JJAXBModel rawJaxbModelGenCode;
     private ToolContext context;
@@ -604,12 +604,12 @@ public class JAXBDataBinding implements DataBindingProfile {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     private void addSchemas(Options opts,
                             SchemaCompiler schemaCompiler,
                             SchemaCollection schemaCollection) {
 
         Set<String> ids = new HashSet<>();
+        @SuppressWarnings("unchecked")
         List<ServiceInfo> serviceList = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
         for (ServiceInfo si : serviceList) {
             for (SchemaInfo sci : si.getSchemas()) {
@@ -672,8 +672,10 @@ public class JAXBDataBinding implements DataBindingProfile {
                 continue;
             }
             String key = schema.getSourceURI();
+            String tns = schema.getTargetNamespace();
+            String ltns = schema.getLogicalTargetNamespace();
             // accepting also a null tns (e.g., reported by apache.ws.xmlschema for no-namespace)
-            if (ids.contains(key)) {
+            if (ids.contains(key) || (tns == null && !StringUtils.isEmpty(ltns))) {
                 continue;
             }
             if (key.startsWith("file:") || key.startsWith("jar:")) {
@@ -706,7 +708,14 @@ public class JAXBDataBinding implements DataBindingProfile {
                 }
             }
         }
-        ids.clear();
+        addSchemasForServiceInfos(catalog, serviceList, opts, schemaCompiler, schemaCollection);
+    }
+    private void addSchemasForServiceInfos(OASISCatalogManager catalog,
+                                           List<ServiceInfo> serviceList,
+                                          Options opts,
+                                          SchemaCompiler schemaCompiler,
+                                          SchemaCollection schemaCollection) {
+        Set<String> ids = new HashSet<>();
         for (ServiceInfo si : serviceList) {
             for (SchemaInfo sci : si.getSchemas()) {
                 String key = sci.getSystemId();

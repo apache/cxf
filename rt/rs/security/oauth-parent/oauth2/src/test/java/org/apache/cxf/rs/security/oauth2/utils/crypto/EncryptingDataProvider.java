@@ -44,7 +44,7 @@ public class EncryptingDataProvider implements OAuthDataProvider {
     SecretKey key;
     private Map<String, String> clients;
     private Set<String> tokens = new HashSet<>();
-    private Map<String, String> refreshTokens = new HashMap<String, String>();
+    private Map<String, String> refreshTokens = new HashMap<>();
 
     public EncryptingDataProvider() throws Exception {
         key = CryptoUtils.getSecretKey("AES");

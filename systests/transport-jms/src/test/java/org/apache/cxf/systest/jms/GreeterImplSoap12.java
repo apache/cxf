@@ -21,7 +21,7 @@ package org.apache.cxf.systest.jms;
 import javax.jws.WebService;
 import javax.xml.ws.soap.Addressing;
 
-import org.apache.cxf.annotations.Logging;
+import org.apache.cxf.ext.logging.Logging;
 
 
 @WebService(serviceName = "SOAPService8",

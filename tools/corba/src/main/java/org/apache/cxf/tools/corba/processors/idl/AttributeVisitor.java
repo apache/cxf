@@ -57,8 +57,8 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 
 public class AttributeVisitor extends VisitorBase {
 
-    private static Map<String, String> duplicateTypeTrackerMap = new HashMap<String, String>();
-//    private static Map<String, String> duplicateMessageTrackerMap = new HashMap<String, String>();
+    private static Map<String, String> duplicateTypeTrackerMap = new HashMap<>();
+//    private static Map<String, String> duplicateMessageTrackerMap = new HashMap<>();
 
     private static final String GETTER_PREFIX = "_get_";
     private static final String SETTER_PREFIX = "_set_";

@@ -172,7 +172,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
     }
 
     public void setNamespaceJavascriptPrefixes(ToolContext env) {
-        Map<String, String> nsPrefixMap = new HashMap<String, String>();
+        Map<String, String> nsPrefixMap = new HashMap<>();
         if (env.get(ToolConstants.CFG_JSPACKAGEPREFIX) != null) {
             String[] pns = null;
             try {

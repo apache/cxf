@@ -113,7 +113,7 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new StreamingResponseProvider<Object>());
         providers.add(new ContentTypeModifyingMBW());
         JAXBElementProvider<?> jaxbProvider = new JAXBElementProvider<Object>();
-        Map<String, String> jaxbElementClassMap = new HashMap<String, String>();
+        Map<String, String> jaxbElementClassMap = new HashMap<>();
         jaxbElementClassMap.put(BookNoXmlRootElement.class.getName(), "BookNoXmlRootElement");
         jaxbProvider.setJaxbElementClassMap(jaxbElementClassMap);
         providers.add(jaxbProvider);

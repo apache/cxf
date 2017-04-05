@@ -94,10 +94,10 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
-            "security.callback-handler",
+            SecurityConstants.CALLBACK_HANDLER,
             "org.apache.cxf.systest.sts.common.CommonCallbackHandler"
         );
         properties.put("ws-security.sts.token.properties", "serviceKeystore.properties");
@@ -119,7 +119,7 @@ public class SecurityContextTokenCancelTest extends AbstractBusClientServerTestB
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName(port);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(SecurityConstants.SIGNATURE_USERNAME, "myservicekey");
         properties.put(

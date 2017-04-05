@@ -85,11 +85,11 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     private Map<Method, Annotation[][]> methodAnnotationCache;
 
     public JaxWsServiceConfiguration() {
-        responseMethodClassCache = new HashMap<Object, Class<?>>();
-        requestMethodClassCache = new HashMap<Object, Class<?>>();
+        responseMethodClassCache = new HashMap<>();
+        requestMethodClassCache = new HashMap<>();
         responseMethodClassNotFoundCache = new ArrayList<>();
         requestMethodClassNotFoundCache = new ArrayList<>();
-        methodAnnotationCache = new HashMap<Method, Annotation[][]>();
+        methodAnnotationCache = new HashMap<>();
     }
 
     @Override

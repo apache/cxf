@@ -27,9 +27,9 @@ import java.io.StringReader;
 import java.security.Key;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
@@ -44,7 +44,6 @@ import org.apache.wss4j.common.token.Reference;
 import org.apache.wss4j.common.util.DOM2Writer;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 
 /**
@@ -126,12 +125,12 @@ public class SecurityToken implements Serializable {
     /**
      * Created time
      */
-    private Date created;
+    private Instant created;
 
     /**
      * Expiration time
      */
-    private Date expires;
+    private Instant expires;
 
     /**
      * Issuer end point address
@@ -180,30 +179,22 @@ public class SecurityToken implements Serializable {
         this.id = XMLUtils.getIDFromReference(id);
     }
 
-    public SecurityToken(String id, Date created, Date expires) {
+    public SecurityToken(String id, Instant created, Instant expires) {
         this.id = XMLUtils.getIDFromReference(id);
 
-        if (created != null) {
-            this.created = new Date(created.getTime());
-        }
-        if (expires != null) {
-            this.expires = new Date(expires.getTime());
-        }
+        this.created = created;
+        this.expires = expires;
     }
 
     public SecurityToken(String id,
                  Element tokenElem,
-                 Date created,
-                 Date expires) {
+                 Instant created,
+                 Instant expires) {
         this.id = XMLUtils.getIDFromReference(id);
 
         this.token = cloneElement(tokenElem);
-        if (created != null) {
-            this.created = new Date(created.getTime());
-        }
-        if (expires != null) {
-            this.expires = new Date(expires.getTime());
-        }
+        this.created = created;
+        this.expires = expires;
     }
 
     public SecurityToken(String id,
@@ -238,16 +229,14 @@ public class SecurityToken implements Serializable {
                 DOMUtils.getFirstChildWithName(lifetimeElem,
                                                 WSConstants.WSU_NS,
                                                 WSConstants.CREATED_LN);
-            DateFormat zulu = new XmlSchemaDateFormat();
-
-            this.created = zulu.parse(DOMUtils.getContent(createdElem));
+            this.created = ZonedDateTime.parse(DOMUtils.getContent(createdElem)).toInstant();
 
             Element expiresElem =
                 DOMUtils.getFirstChildWithName(lifetimeElem,
                                                 WSConstants.WSU_NS,
                                                 WSConstants.EXPIRES_LN);
-            this.expires = zulu.parse(DOMUtils.getContent(expiresElem));
-        } catch (ParseException e) {
+            this.expires = ZonedDateTime.parse(DOMUtils.getContent(expiresElem)).toInstant();
+        } catch (DateTimeParseException e) {
             //shouldn't happen
         }
     }
@@ -359,21 +348,15 @@ public class SecurityToken implements Serializable {
     /**
      * @return Returns the created.
      */
-    public Date getCreated() {
-        if (created == null) {
-            return null;
-        }
-        return (Date)created.clone();
+    public Instant getCreated() {
+        return created;
     }
 
     /**
      * @return Returns the expires.
      */
-    public Date getExpires() {
-        if (expires == null) {
-            return null;
-        }
-        return (Date)expires.clone();
+    public Instant getExpires() {
+        return expires;
     }
 
     /**
@@ -381,8 +364,8 @@ public class SecurityToken implements Serializable {
      */
     public boolean isExpired() {
         if (expires != null) {
-            Date rightNow = new Date();
-            if (expires.before(rightNow)) {
+            Instant now = Instant.now();
+            if (expires.isBefore(now)) {
                 return true;
             }
         }
@@ -394,9 +377,8 @@ public class SecurityToken implements Serializable {
      */
     public boolean isAboutToExpire(long secondsToExpiry) {
         if (expires != null && secondsToExpiry > 0) {
-            Date rightNow = new Date();
-            rightNow.setTime(rightNow.getTime() + (secondsToExpiry * 1000L));
-            if (expires.before(rightNow)) {
+            Instant now = Instant.now().plusSeconds(secondsToExpiry);
+            if (expires.isBefore(now)) {
                 return true;
             }
         }
@@ -406,12 +388,8 @@ public class SecurityToken implements Serializable {
     /**
      * @param expires The expires to set.
      */
-    public void setExpires(Date expires) {
-        if (expires == null) {
-            this.expires = null;
-        } else {
-            this.expires = new Date(expires.getTime());
-        }
+    public void setExpires(Instant expires) {
+        this.expires = expires;
     }
 
     public String getIssuerAddress() {

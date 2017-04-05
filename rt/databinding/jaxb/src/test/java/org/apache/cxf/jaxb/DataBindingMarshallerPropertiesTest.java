@@ -28,7 +28,7 @@ public class DataBindingMarshallerPropertiesTest extends TestBase {
     @Test
     public void testInitializeUnmarshallerProperties() throws Exception {
         JAXBDataBinding db = new JAXBDataBinding();
-        Map<String, Object> unmarshallerProperties = new HashMap<String, Object>();
+        Map<String, Object> unmarshallerProperties = new HashMap<>();
         unmarshallerProperties.put("someproperty", "somevalue");
         db.setUnmarshallerProperties(unmarshallerProperties);
 

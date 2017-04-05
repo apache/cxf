@@ -104,8 +104,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     protected List<String> inDropElements;
     protected Map<String, String> inElementsMap;
     protected Map<String, String> inAppendMap;
-    protected Map<String, JAXBContext> packageContexts = new HashMap<String, JAXBContext>();
-    protected Map<Class<?>, JAXBContext> classContexts = new HashMap<Class<?>, JAXBContext>();
+    protected Map<String, JAXBContext> packageContexts = new HashMap<>();
+    protected Map<Class<?>, JAXBContext> classContexts = new HashMap<>();
     private boolean attributesToElements;
 
     private MessageContext mc;

@@ -284,6 +284,25 @@ public class DynamicClientFactory {
         return createClient(wsdlUrl.toString(), service, classLoader, port, bindingFiles);
     }
 
+    static class DynamicClientImpl extends ClientImpl implements AutoCloseable {
+        final ClassLoader cl;
+        final ClassLoader orig;
+        DynamicClientImpl(Bus bus, Service svc, QName port, 
+                          EndpointImplFactory endpointImplFactory,
+                          ClassLoader l) {
+            super(bus, svc, port, endpointImplFactory);
+            cl = l;
+            orig = Thread.currentThread().getContextClassLoader();
+        }
+        @Override
+        public void close() throws Exception {
+            destroy();
+            if (Thread.currentThread().getContextClassLoader() == cl) {
+                Thread.currentThread().setContextClassLoader(orig);
+            }
+        }
+    }
+    
     public Client createClient(String wsdlUrl, QName service,
                                ClassLoader classLoader, QName port,
                                List<String> bindingFiles) {
@@ -297,9 +316,6 @@ public class DynamicClientFactory {
             ? (new WSDLServiceFactory(bus, wsdlUrl)) : (new WSDLServiceFactory(bus, wsdlUrl, service));
         sf.setAllowElementRefs(allowRefs);
         Service svc = sf.create();
-
-        ClientImpl client = new ClientImpl(bus, svc, port,
-                                           getEndpointImplFactory());
 
         //all SI's should have the same schemas
         SchemaCollection schemas = svc.getServiceInfos().get(0).getXmlSchemaCollection();
@@ -378,7 +394,7 @@ public class DynamicClientFactory {
             throw new IllegalStateException("Internal error; a directory returns a malformed URL: "
                                             + mue.getMessage(), mue);
         }
-        ClassLoader cl = ClassLoaderUtils.getURLClassLoader(urls, classLoader);
+        final ClassLoader cl = ClassLoaderUtils.getURLClassLoader(urls, classLoader);
 
         JAXBContext context;
         Map<String, Object> contextProperties = jaxbContextProperties;
@@ -401,6 +417,9 @@ public class DynamicClientFactory {
         JAXBDataBinding databinding = new JAXBDataBinding();
         databinding.setContext(context);
         svc.setDataBinding(databinding);
+
+        ClientImpl client = new DynamicClientImpl(bus, svc, port,
+                                                  getEndpointImplFactory(), cl);
 
         ServiceInfo svcfo = client.getEndpoint().getEndpointInfo().getService();
 
@@ -472,8 +491,8 @@ public class DynamicClientFactory {
                             List<ServiceInfo> serviceList,
                             SchemaCollection schemaCollection) {
 
-        Map<String, Element> done = new HashMap<String, Element>();
-        Map<String, Element> notDone = new HashMap<String, Element>();
+        Map<String, Element> done = new HashMap<>();
+        Map<String, Element> notDone = new HashMap<>();
         OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
             if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {
@@ -609,9 +628,8 @@ public class DynamicClientFactory {
         if (System.getProperty("java.version").startsWith("9")) {
             javaCompiler.setTarget("9");
         } else {
-            javaCompiler.setTarget("1.6");
+            javaCompiler.setTarget("1.8");
         }
-
         return javaCompiler.compileFiles(srcList);
     }
 

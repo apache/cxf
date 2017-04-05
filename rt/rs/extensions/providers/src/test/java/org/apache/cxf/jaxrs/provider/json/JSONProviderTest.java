@@ -174,7 +174,7 @@ public class JSONProviderTest extends Assert {
                + "}                    ";
 
         JSONProvider<QualifiedStore> p = new JSONProvider<QualifiedStore>();
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://superbooks", "ns1");
         p.setNamespaceMap(namespaceMap);
 
@@ -440,7 +440,7 @@ public class JSONProviderTest extends Assert {
     }
     private void doTestReadFromQualifiedTag(String nsSep) throws Exception {
         JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
         if (!".".equals(nsSep)) {
@@ -468,7 +468,7 @@ public class JSONProviderTest extends Assert {
         JSONProvider<TagVO> p = new JSONProvider<TagVO>();
         p.setSupportUnwrapped(true);
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(TagVO.class.getName(), "tagVO");
         p.setWrapperMap(map);
         readUnwrapped(p);
@@ -485,7 +485,7 @@ public class JSONProviderTest extends Assert {
     public void testReadFromUnwrappedQualifiedTagRoot() throws Exception {
         JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
         p.setSupportUnwrapped(true);
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
 
@@ -657,7 +657,7 @@ public class JSONProviderTest extends Assert {
     }
     private void doTestWriteToSingleQualifiedTag(String nsSep) throws Exception {
         JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
         if (!".".equals(nsSep)) {
@@ -677,7 +677,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testWriteToSingleQualifiedTagBadgerFish() throws Exception {
         JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://tags", "ns2");
         p.setNamespaceMap(namespaceMap);
 
@@ -699,7 +699,7 @@ public class JSONProviderTest extends Assert {
         JSONProvider<TagVO2> p = new JSONProvider<TagVO2>();
         p.setDropRootElement(true);
         p.setIgnoreNamespaces(true);
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
         TagVO2 tag = createTag2("a", "b");
@@ -764,7 +764,7 @@ public class JSONProviderTest extends Assert {
         p.setCollectionWrapperName("{http://tags}tag");
         p.setDropCollectionWrapperElement(drop);
         p.setSerializeAsArray(serializeAsArray);
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
         p.setIgnoreNamespaces(ignoreNamespaces);
@@ -870,7 +870,7 @@ public class JSONProviderTest extends Assert {
     public void doReadQualifiedCollection(String data, boolean isArray) throws Exception {
 
         JSONProvider provider = new JSONProvider();
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://tags", "ns1");
         provider.setNamespaceMap(namespaceMap);
 
@@ -958,7 +958,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testWriteListOfDerivedTypes() throws Exception {
         JSONProvider<Books2> p = new JSONProvider<Books2>();
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsins");
         p.setNamespaceMap(namespaceMap);
         Books2 books2 = new Books2();
@@ -977,7 +977,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testReadListOfDerivedTypes() throws Exception {
         JSONProvider<Books2> p = new JSONProvider<Books2>();
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsins");
         p.setNamespaceMap(namespaceMap);
         String data = "{\"books2\":{\"books\":{\"@xsins.type\":\"superBook\",\"id\":123,"
@@ -997,7 +997,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testReadListOfDerivedTypesWithNullField() throws Exception {
         JSONProvider<Books2> p = new JSONProvider<Books2>();
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsins");
         p.setNamespaceMap(namespaceMap);
         String data = "{\"books2\":{\"books\":{\"@xsins.type\":\"superBook\",\"id\":123,"
@@ -1286,9 +1286,9 @@ public class JSONProviderTest extends Assert {
 
     private void readTagVO2AfterTransform(String data, String keyValue) throws Exception {
         JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(keyValue, "{http://tags}thetag");
-        Map<String, String> nsmap = new HashMap<String, String>();
+        Map<String, String> nsmap = new HashMap<>();
         nsmap.put("http://bar", "t");
         provider.setNamespaceMap(nsmap);
         provider.setInTransformElements(map);
@@ -1305,7 +1305,7 @@ public class JSONProviderTest extends Assert {
     public void testInNsElementsFromLocals() throws Exception {
         String data = "{tagholder:{thetag:{\"group\":\"B\",\"name\":\"A\"}}}";
         JSONProvider<TagVO2Holder> provider = new JSONProvider<TagVO2Holder>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("tagholder", "{http://tags}tagholder");
         map.put("thetag", "{http://tags}thetag");
         provider.setInTransformElements(map);
@@ -1321,7 +1321,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testOutAttributesAsElements() throws Exception {
         JSONProvider<TagVO2Holder> provider = new JSONProvider<TagVO2Holder>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}thetag", "thetag");
         map.put("{http://tags}tagholder", "tagholder");
         provider.setOutTransformElements(map);
@@ -1390,7 +1390,7 @@ public class JSONProviderTest extends Assert {
         //Provider
         JSONProvider<List<?>> provider = new JSONProvider<List<?>>();
         provider.setCollectionWrapperName("tagholders");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}*", "*");
         provider.setOutTransformElements(map);
         provider.setAttributesToElements(true);
@@ -1427,10 +1427,10 @@ public class JSONProviderTest extends Assert {
 
     private void readTagVOAfterTransform(String data, String keyValue) throws Exception {
         JSONProvider<TagVO> provider = new JSONProvider<TagVO>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(keyValue, "tagVO");
         provider.setInTransformElements(map);
-        Map<String, String> nsmap = new HashMap<String, String>();
+        Map<String, String> nsmap = new HashMap<>();
         nsmap.put("http://bar", "t");
         provider.setNamespaceMap(nsmap);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
@@ -1502,7 +1502,7 @@ public class JSONProviderTest extends Assert {
         List<String> list = new ArrayList<>();
         list.add("{http://tags}thetag");
         provider.setOutDropElements(list);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("name", "");
         provider.setOutTransformElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -1516,7 +1516,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testOutAppendNsElementBeforeLocal() throws Exception {
         JSONProvider<TagVO> provider = new JSONProvider<TagVO>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("tagVO", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
         TagVO tag = new TagVO("A", "B");
@@ -1530,7 +1530,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testOutAppendLocalBeforeLocal() throws Exception {
         JSONProvider<TagVO> provider = new JSONProvider<TagVO>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("tagVO", "supertag");
         provider.setOutAppendElements(map);
         TagVO tag = new TagVO("A", "B");
@@ -1545,11 +1545,11 @@ public class JSONProviderTest extends Assert {
     public void testOutAppendElementsSameNs() throws Exception {
         JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
 
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://tags", "ns2");
         provider.setNamespaceMap(namespaceMap);
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}thetag", "{http://tags}t");
         provider.setOutAppendElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -1564,11 +1564,11 @@ public class JSONProviderTest extends Assert {
     public void testOutAppendElementsDiffNs() throws Exception {
         JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
 
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://tags", "ns2");
         provider.setNamespaceMap(namespaceMap);
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -1582,10 +1582,10 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalNsToLocalNs() throws Exception {
         JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://tags", "ns2");
         provider.setNamespaceMap(namespaceMap);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutTransformElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -1600,7 +1600,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalNsToLocal() throws Exception {
         JSONProvider<TagVO2> provider = new JSONProvider<TagVO2>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}thetag", "t");
         provider.setOutTransformElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -1614,9 +1614,9 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalToLocalNs() throws Exception {
         JSONProvider<TagVO> provider = new JSONProvider<TagVO>();
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://tags", "ns1");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("tagVO", "{http://tags}thetag");
         provider.setOutTransformElements(map);
         TagVO tag = new TagVO("A", "B");
@@ -1630,7 +1630,7 @@ public class JSONProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalToLocal() throws Exception {
         JSONProvider<TagVO> provider = new JSONProvider<TagVO>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("tagVO", "supertag");
         map.put("group", "group2");
         provider.setOutTransformElements(map);
@@ -1654,7 +1654,7 @@ public class JSONProviderTest extends Assert {
     public void testWriteReadDerivedNamespace() throws Exception {
         JSONProvider<Base1> provider = new JSONProvider<Base1>();
         provider.setMarshallAsJaxbElement(true);
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://derivedtest", "derivedtestnamespace");
         provider.setNamespaceMap(namespaceMap);
 
@@ -1670,7 +1670,7 @@ public class JSONProviderTest extends Assert {
     private void readBase(String data) throws Exception {
         JSONProvider<Base1> provider = new JSONProvider<Base1>();
         provider.setUnmarshallAsJaxbElement(true);
-        Map<String, String> namespaceMap = new HashMap<String, String>();
+        Map<String, String> namespaceMap = new HashMap<>();
         namespaceMap.put("http://derivedtest", "derivedtestnamespace");
         provider.setNamespaceMap(namespaceMap);
 

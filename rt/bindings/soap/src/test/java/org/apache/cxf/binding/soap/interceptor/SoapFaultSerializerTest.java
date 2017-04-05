@@ -58,7 +58,7 @@ import org.junit.Test;
 
 public class SoapFaultSerializerTest extends Assert {
     private void assertValid(String xpathExpression, Document doc) {
-        Map<String, String> namespaces = new HashMap<String, String>();
+        Map<String, String> namespaces = new HashMap<>();
         namespaces.put("s", "http://schemas.xmlsoap.org/soap/envelope/");
         namespaces.put("xsd", "http://www.w3.org/2001/XMLSchema");
         namespaces.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");

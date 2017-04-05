@@ -90,6 +90,14 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         Book book = wc.replaceHeader("Accept", "application/xml").query("id", 1L).get(Book.class);
         assertEquals("CXF", book.getName());
     }
+    
+    @Test
+    public void testGetDocuments() throws Exception {
+        String baseAddress = "http://localhost:" + PORT + "/the/thedocs/resource/doc";
+        WebClient wc = WebClient.create(baseAddress);
+        Response r = wc.accept("application/json").get();
+        assertEquals("[{\"t\":\"doc\"}]", r.readEntity(String.class));
+    }
 
     @Test
     public void testGetBookWebEx() throws Exception {
@@ -164,6 +172,13 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform4";
         doTestEchoBookForm(address);
     }
+    
+    @Test
+    public void testEchoBookForm5() throws Exception {
+        String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform5";
+        doTestEchoBookForm(address);
+    }
+    
     private void doTestEchoBookForm(String address) throws Exception {
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
@@ -457,7 +472,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         wc.accept("application/xhtml+xml").path(666).matrix("name2", 2).query("name", "Action - ");
         XMLSource source = wc.get(XMLSource.class);
         source.setBuffering();
-        Map<String, String> namespaces = new HashMap<String, String>();
+        Map<String, String> namespaces = new HashMap<>();
         namespaces.put("xhtml", "http://www.w3.org/1999/xhtml");
         Book2 b = source.getNode("xhtml:html/xhtml:body/xhtml:ul/xhtml:Book", namespaces, Book2.class);
         assertEquals(666, b.getId());

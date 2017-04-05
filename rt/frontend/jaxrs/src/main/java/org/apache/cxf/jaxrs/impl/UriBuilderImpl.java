@@ -276,7 +276,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
                                      boolean encodePathSlash) {
 
    //CHECKSTYLE:ON
-        Map<String, String> varValueMap = new HashMap<String, String>();
+        Map<String, String> varValueMap = new HashMap<>();
 
         // vars in set are properly ordered due to linking in hash set
         Set<String> uniqueVars = new LinkedHashSet<String>(templ.getVariables());
@@ -382,7 +382,7 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
     public URI buildFromEncodedMap(Map<String, ?> map) throws IllegalArgumentException,
         UriBuilderException {
 
-        Map<String, String> decodedMap = new HashMap<String, String>(map.size());
+        Map<String, String> decodedMap = new HashMap<>(map.size());
         for (Map.Entry<String, ? extends Object> entry : map.entrySet()) {
             if (entry.getValue() == null) {
                 throw new IllegalArgumentException("Value is null");

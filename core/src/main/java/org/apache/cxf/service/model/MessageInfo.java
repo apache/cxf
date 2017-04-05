@@ -51,7 +51,7 @@ public class MessageInfo extends AbstractMessageContainer {
     }
 
     public Map<QName, MessagePartInfo> getMessagePartsMap() {
-        Map<QName, MessagePartInfo> partsMap = new HashMap<QName, MessagePartInfo>();
+        Map<QName, MessagePartInfo> partsMap = new HashMap<>();
         for (MessagePartInfo part : getMessageParts()) {
             partsMap.put(part.getName(), part);
         }

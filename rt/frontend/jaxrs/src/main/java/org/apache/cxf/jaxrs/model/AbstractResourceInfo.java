@@ -265,7 +265,7 @@ public abstract class AbstractResourceInfo {
 
     private void addContextMethod(Class<?> contextClass, Method m, Object provider) {
         if (contextMethods == null) {
-            contextMethods = new HashMap<Class<?>, Map<Class<?>, Method>>();
+            contextMethods = new HashMap<>();
         }
         addToMap(contextMethods, contextClass, m);
         if (!InjectionUtils.VALUE_CONTEXTS.contains(m.getParameterTypes()[0].getName())) {
@@ -334,7 +334,7 @@ public abstract class AbstractResourceInfo {
 
     private Map<Class<?>, List<Field>> addContextField(Map<Class<?>, List<Field>> theFields, Field f) {
         if (theFields == null) {
-            theFields = new HashMap<Class<?>, List<Field>>();
+            theFields = new HashMap<>();
         }
 
         List<Field> fields = theFields.get(serviceClass);

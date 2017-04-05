@@ -38,8 +38,8 @@ public class CorbaTypeMap {
 
     public CorbaTypeMap(String namespace) {
         targetNamespace = namespace;
-        typeMap = new HashMap<String, CorbaType>();
-        typeCodeMap = new HashMap<QName, TypeCode>();
+        typeMap = new HashMap<>();
+        typeCodeMap = new HashMap<>();
     }
 
     public void addType(String name, CorbaType type) {

@@ -20,6 +20,7 @@ package org.apache.cxf.rs.security.jose.jwe;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 
@@ -30,8 +31,12 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
     private byte[] cek;
     private byte[] iv;
     private AtomicInteger providedIvUsageCount;
-
-
+    private boolean generateCekOnce;
+    
+    protected AbstractContentEncryptionAlgorithm(ContentAlgorithm algo, boolean generateCekOnce) {
+        super(algo);
+        this.generateCekOnce = generateCekOnce;
+    }
     protected AbstractContentEncryptionAlgorithm(byte[] cek, byte[] iv, ContentAlgorithm algo) {
         super(algo);
         this.cek = cek;
@@ -42,7 +47,20 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
     }
 
     public byte[] getContentEncryptionKey(JweHeaders headers) {
-        return cek;
+        byte[] theCek = null;
+        if (cek == null) {
+            String algoJava = getAlgorithm().getJavaName();
+            theCek = CryptoUtils.getSecretKey(AlgorithmUtils.stripAlgoProperties(algoJava),
+                          getContentEncryptionKeySize(headers)).getEncoded();
+            if (generateCekOnce) {
+                synchronized (this) {
+                    cek = theCek;
+                }
+            }
+        } else {
+            theCek = cek;
+        }
+        return theCek;
     }
     public byte[] getInitVector() {
         if (iv == null) {
@@ -53,6 +71,9 @@ public abstract class AbstractContentEncryptionAlgorithm extends AbstractContent
         } else {
             return iv;
         }
+    }
+    protected int getContentEncryptionKeySize(JweHeaders headers) {
+        return getAlgorithm().getKeySizeBits();
     }
     protected int getIvSize() {
         return DEFAULT_IV_SIZE;

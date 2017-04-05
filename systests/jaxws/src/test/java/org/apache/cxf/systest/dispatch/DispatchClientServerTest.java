@@ -111,8 +111,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
                 + TestUtil.getPortNumber(DispatchClientServerTest.class)
                 + "/SOAPDispatchService/SoapDispatchPort";
             ep = Endpoint.create(SOAPBinding.SOAP11HTTP_BINDING, implementor);
-            Map<String, Object> properties = new HashMap<String, Object>();
-            Map<String, String> nsMap = new HashMap<String, String>();
+            Map<String, Object> properties = new HashMap<>();
+            Map<String, String> nsMap = new HashMap<>();
             nsMap.put("gmns", "http://apache.org/hello_world_soap_http/types");
             properties.put("soap.env.ns.map", nsMap);
             properties.put("disable.outputstream.optimization", "true");

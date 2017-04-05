@@ -117,7 +117,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
         Document doc = StaxUtils.read(respin);
         assertNotNull(doc);
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("soap11", Soap11.SOAP_NAMESPACE);
         XPathUtils xu = new XPathUtils(ns);
         Node fault = (Node) xu.getValue("/soap11:Envelope/soap11:Body/soap11:Fault", doc, XPathConstants.NODE);

@@ -34,7 +34,7 @@ public class JAXRSClientServerODataSearchTest extends AbstractBusClientServerTes
 
     @BeforeClass
     public static void startServers() throws Exception {
-        final Map< String, Object > properties = new HashMap< String, Object >();
+        final Map< String, Object > properties = new HashMap<>();
         properties.put("search.query.parameter.name", "$filter");
         properties.put("search.parser", new ODataParser< Book >(Book.class));
 

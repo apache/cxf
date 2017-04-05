@@ -187,7 +187,7 @@ public class JWTClaimsTest extends org.junit.Assert {
 
         ClaimsManager claimsManager = new ClaimsManager();
         StaticClaimsHandler claimsHandler = new StaticClaimsHandler();
-        Map<String, String> staticClaimsMap = new HashMap<String, String>();
+        Map<String, String> staticClaimsMap = new HashMap<>();
         staticClaimsMap.put(CLAIM_STATIC_COMPANY.toString(), CLAIM_STATIC_COMPANY_VALUE);
         claimsHandler.setGlobalClaims(staticClaimsMap);
         claimsManager.setClaimHandlers(Collections.singletonList((ClaimsHandler)claimsHandler));

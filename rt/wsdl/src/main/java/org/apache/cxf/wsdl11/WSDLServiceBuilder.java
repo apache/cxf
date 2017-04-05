@@ -108,7 +108,7 @@ public class WSDLServiceBuilder {
 
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLServiceBuilder.class);
     private Bus bus;
-    private Map<String, Element> schemaList = new HashMap<String, Element>();
+    private Map<String, Element> schemaList = new HashMap<>();
     private boolean recordOriginal = true;
     private boolean allowRefs;
     private boolean ignoreUnknownBindings;

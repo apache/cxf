@@ -202,7 +202,7 @@ public class Soap12Test extends AbstractBusClientServerTestBase {
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Soap12_Port");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
             SecurityConstants.CALLBACK_HANDLER,

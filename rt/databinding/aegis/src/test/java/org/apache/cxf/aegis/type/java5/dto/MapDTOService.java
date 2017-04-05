@@ -25,7 +25,7 @@ public class MapDTOService {
     public MapDTO getDTO() {
         MapDTO dto = new MapDTO();
 
-        Map<String, Integer> strings = new HashMap<String, Integer>();
+        Map<String, Integer> strings = new HashMap<>();
         strings.put("hi", 4);
         dto.setStrings(strings);
 

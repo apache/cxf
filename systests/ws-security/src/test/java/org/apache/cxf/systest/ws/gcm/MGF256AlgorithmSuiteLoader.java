@@ -52,7 +52,7 @@ public class MGF256AlgorithmSuiteLoader implements AlgorithmSuiteLoader {
         AssertionBuilderRegistry reg = bus.getExtension(AssertionBuilderRegistry.class);
         if (reg != null) {
             String ns = "http://cxf.apache.org/custom/security-policy";
-            final Map<QName, Assertion> assertions = new HashMap<QName, Assertion>();
+            final Map<QName, Assertion> assertions = new HashMap<>();
             QName qName = new QName(ns, "Basic256GCMMGFSHA256");
             assertions.put(qName, new PrimitiveAssertion(qName));
 

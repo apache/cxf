@@ -48,7 +48,7 @@ public class InitParamResourceResolverTest extends Assert {
     public static final String BOOLEAN_PARAM = "booleanParam";
     public static final String BOOLEAN_VALUE = "true";
 
-    private Map<String, String> params = new HashMap<String, String>();
+    private Map<String, String> params = new HashMap<>();
 
     private InitParamResourceResolver resolver;
 

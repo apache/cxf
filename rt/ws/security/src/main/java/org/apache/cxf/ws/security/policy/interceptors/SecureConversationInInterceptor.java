@@ -19,10 +19,10 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -375,9 +375,8 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                         .createSecureId("sctId-", sct.getElement()));
             }
 
-            Date created = new Date();
-            Date expires = new Date();
-            expires.setTime(created.getTime() + ttl);
+            Instant created = Instant.now();
+            Instant expires = created.plusSeconds(ttl / 1000L);
 
             SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setToken(sct.getElement());

@@ -50,7 +50,7 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
         protected void run() {
             Object implementor = new HWSoapMessageDocProvider();
             Endpoint ep = Endpoint.create(implementor);
-            Map<String, Object> map = new HashMap<String, Object>();
+            Map<String, Object> map = new HashMap<>();
             map.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
             ep.setProperties(map);
             ((EndpointImpl)ep).getInInterceptors().add(new LoggingInInterceptor());

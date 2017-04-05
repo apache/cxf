@@ -69,7 +69,7 @@ public class DomainExpressionBuilderRegistryTest extends Assert {
     @Test
     public void testBuild() {
         DomainExpressionBuilder builder = control.createMock(DomainExpressionBuilder.class);
-        Map<QName, DomainExpressionBuilder> builders = new HashMap<QName, DomainExpressionBuilder>();
+        Map<QName, DomainExpressionBuilder> builders = new HashMap<>();
         QName qn = new QName("http://a.b.c", "x");
         builders.put(qn, builder);
         DomainExpressionBuilderRegistry reg = new DomainExpressionBuilderRegistry(builders);

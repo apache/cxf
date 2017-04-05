@@ -47,7 +47,7 @@ public abstract class TestHandlerBase {
     private int invokeOrderOfHandleFault;
     private int invokeOrderOfClose;
 
-    private Map<String, Integer> methodCallCount = new HashMap<String, Integer>();
+    private Map<String, Integer> methodCallCount = new HashMap<>();
     private final int id;
     private final boolean isServerSideHandler;
 

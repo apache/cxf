@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -34,16 +35,21 @@ import java.util.regex.PatternSyntaxException;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.ReaderInterceptorContext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
+import org.apache.cxf.jaxrs.impl.ReaderInterceptorContextImpl;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.rs.security.common.CryptoLoader;
@@ -61,6 +67,7 @@ import org.apache.xml.security.stax.ext.InboundXMLSec;
 import org.apache.xml.security.stax.ext.XMLSec;
 import org.apache.xml.security.stax.ext.XMLSecurityConstants;
 import org.apache.xml.security.stax.ext.XMLSecurityProperties;
+import org.apache.xml.security.stax.impl.securityToken.KeyNameSecurityToken;
 import org.apache.xml.security.stax.securityEvent.AlgorithmSuiteSecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -72,7 +79,7 @@ import org.apache.xml.security.stax.securityToken.SecurityToken;
 /**
  * A new StAX-based interceptor for processing messages with XML Signature + Encryption content.
  */
-public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
+public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> implements ReaderInterceptor  {
 
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSecInInterceptor.class);
 
@@ -94,13 +101,15 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) throws Fault {
-        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
-        if ("GET".equals(method)) {
+        if (!canDocumentBeRead(message)) {
             return;
         }
+        prepareMessage(message);
+        message.getInterceptorChain().add(
+              new StaxActionInInterceptor(requireSignature, requireEncryption));
+    }
 
-        Message outMs = message.getExchange().getOutMessage();
-        Message inMsg = outMs == null ? message : outMs.getExchange().getInMessage();
+    private void prepareMessage(Message inMsg) throws Fault {
 
         XMLStreamReader originalXmlStreamReader = inMsg.getContent(XMLStreamReader.class);
         if (originalXmlStreamReader == null) {
@@ -109,9 +118,6 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
                 originalXmlStreamReader = StaxUtils.createXMLStreamReader(is);
             }
         }
-
-        inMsg.getInterceptorChain().add(
-            new StaxActionInInterceptor(requireSignature, requireEncryption));
 
         try {
             XMLSecurityProperties properties = new XMLSecurityProperties();
@@ -137,6 +143,24 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             throwFault(e.getMessage(), e);
         }
     }
+
+    private boolean canDocumentBeRead(Message message) {
+        if (isServerGet(message)) {
+            return false;
+        } else {
+            Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+            if (responseCode != null && responseCode != 200) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    private boolean isServerGet(Message message) {
+        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
+        return "GET".equals(method) && !MessageUtils.isRequestor(message);
+    }
+
 
     private void configureDecryptionKeys(Message message, XMLSecurityProperties properties)
         throws IOException,
@@ -206,7 +230,19 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             if (certs != null && certs.length > 0) {
                 properties.setSignatureVerificationKey(certs[0].getPublicKey());
             }
+        } else if (sigCrypto != null && sigProps != null && sigProps.getKeyNameAliasMap() != null) {
+            Map<String, String> keyNameAliasMap = sigProps.getKeyNameAliasMap();
+            for (Map.Entry<String, String> mapping: keyNameAliasMap.entrySet()) {
+                CryptoType cryptoType = new CryptoType(CryptoType.TYPE.ALIAS);
+                cryptoType.setAlias(mapping.getValue());
+                X509Certificate[] certs = sigCrypto.getX509Certificates(cryptoType);
+                if (certs != null && certs.length > 0) {
+                    properties.addKeyNameMapping(mapping.getKey(), certs[0].getPublicKey());
+                }
+            }
         }
+
+
     }
 
     protected SecurityEventListener configureSecurityEventListener(
@@ -290,6 +326,10 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
         SecurityToken token = event.getSecurityToken();
         if (token != null) {
             X509Certificate[] certs = token.getX509Certificates();
+            if (certs == null && token.getPublicKey() == null && token instanceof KeyNameSecurityToken) {
+                certs = getX509CertificatesForKeyName(sigCrypto, msg, (KeyNameSecurityToken)token);
+            }
+
             PublicKey publicKey = token.getPublicKey();
             X509Certificate cert = null;
             if (certs != null && certs.length > 0) {
@@ -301,8 +341,8 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
                 new TrustValidator().validateTrust(sigCrypto, cert, publicKey,
                                                    getSubjectContraints(msg));
             } catch (WSSecurityException e) {
-                throw new XMLSecurityException("empty", new Object[] {"Error during Signature Trust "
-                                               + "validation: " + e.getMessage()});
+                String error = "Signature validation failed";
+                throw new XMLSecurityException("empty", new Object[] {error});
             }
 
             if (persistSignature) {
@@ -311,9 +351,28 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
 
+    private X509Certificate[] getX509CertificatesForKeyName(Crypto sigCrypto, Message msg, KeyNameSecurityToken token)
+        throws XMLSecurityException {
+        X509Certificate[] certs;
+        KeyNameSecurityToken keyNameSecurityToken = token;
+        String keyName = keyNameSecurityToken.getKeyName();
+        String alias = null;
+        if (sigProps != null && sigProps.getKeyNameAliasMap() != null) {
+            alias = sigProps.getKeyNameAliasMap().get(keyName);
+        }
+        try {
+            certs = RSSecurityUtils.getCertificates(sigCrypto, alias);
+        } catch (Exception e) {
+            throw new XMLSecurityException("empty", new Object[] {"Error during Signature Trust "
+                + "validation"});
+        }
+        return certs;
+    }
+
+
     protected void throwFault(String error, Exception ex) {
         LOG.warning(error);
-        Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
+        Response response = JAXRSUtils.toResponseBuilder(400).entity(error).type("text/plain").build();
         throw ExceptionUtils.toBadRequestException(null, response);
     }
 
@@ -393,6 +452,22 @@ public class XmlSecInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
         return subjectDNPatterns;
+    }
+
+    @Override
+    public Object aroundReadFrom(ReaderInterceptorContext ctx) throws IOException, WebApplicationException {
+        Message message = ((ReaderInterceptorContextImpl)ctx).getMessage();
+
+        if (!canDocumentBeRead(message)) {
+            return ctx.proceed();
+        } else {
+            prepareMessage(message);
+            Object object = ctx.proceed();
+            new StaxActionInInterceptor(requireSignature,
+                                        requireEncryption).handleMessage(message);
+            return object;
+        }
+
     }
 
     /**

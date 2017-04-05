@@ -157,7 +157,7 @@ public class UriBuilderImplTest extends Assert {
 
     @Test
     public void testResolveTemplate5() {
-        Map<String, Object> templs = new HashMap<String, Object>();
+        Map<String, Object> templs = new HashMap<>();
         templs.put("a", "1");
         templs.put("b", "2");
         URI uri;
@@ -179,7 +179,7 @@ public class UriBuilderImplTest extends Assert {
         String expected =
             "path-rootless%2Ftest2/x%25yz/%2Fpath-absolute%2F%2525test1/fred@example.com/x%25yz";
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("v", new StringBuilder("path-rootless%2Ftest2"));
         map.put("w", new StringBuilder("x%yz"));
         map.put("x", new Object() {
@@ -207,7 +207,7 @@ public class UriBuilderImplTest extends Assert {
         String expected =
             "path-rootless%2Ftest2/x%25yz/%2Fpath-absolute%2F%2525test1/fred@example.com/x%25yz";
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("x", new StringBuilder("x%yz"));
         map.put("y", new StringBuffer("/path-absolute/%25test1"));
         map.put("z", new Object() {
@@ -226,7 +226,7 @@ public class UriBuilderImplTest extends Assert {
     public void testResolveTemplatesMapBooleanSlashEncoded() throws Exception {
         String expected =
             "path-rootless%2Ftest2/x%25yz/%2Fpath-absolute%2F%2525test1/fred@example.com/x%25yz";
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("x", new StringBuilder("x%yz"));
         map.put("y", new StringBuffer("/path-absolute/%25test1"));
         map.put("z", new Object() {
@@ -244,7 +244,7 @@ public class UriBuilderImplTest extends Assert {
     public void testResolveTemplatesMapBooleanSlashNotEncoded() throws Exception {
         String expected =
             "path-rootless/test2/x%25yz//path-absolute/test1/fred@example.com/x%25yz";
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put("x", new StringBuilder("x%yz"));
         map.put("y", new StringBuffer("/path-absolute/test1"));
         map.put("z", new Object() {
@@ -308,7 +308,7 @@ public class UriBuilderImplTest extends Assert {
 
     @Test
     public void testQueryParamUsingMapWithTemplateValues() {
-        Map<String, String> values = new HashMap<String, String>();
+        Map<String, String> values = new HashMap<>();
         values.put("a", "valueA");
         values.put("b", "valueB");
         URI uri;
@@ -321,7 +321,7 @@ public class UriBuilderImplTest extends Assert {
 
     @Test
     public void testPathAndQueryParamUsingMapWithTemplateValues() {
-        Map<String, String> values = new HashMap<String, String>();
+        Map<String, String> values = new HashMap<>();
         values.put("a", "valueA");
         values.put("b", "valueB");
         values.put("ind", "1");
@@ -623,7 +623,7 @@ public class UriBuilderImplTest extends Assert {
     @Test
     public void testBuildFromMapValues() throws Exception {
         URI uri = new URI("http://zzz");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("b", "foo");
         map.put("a", "bar");
         Map<String, String> immutable = Collections.unmodifiableMap(map);
@@ -634,7 +634,7 @@ public class UriBuilderImplTest extends Assert {
     @Test(expected = IllegalArgumentException.class)
     public void testBuildFromMapMissingValues() throws Exception {
         URI uri = new URI("http://zzz");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("b", "foo");
         Map<String, String> immutable = Collections.unmodifiableMap(map);
         new UriBuilderImpl(uri).path("/{b}/{a}/{b}").buildFromMap(immutable);
@@ -643,7 +643,7 @@ public class UriBuilderImplTest extends Assert {
     @Test
     public void testBuildFromMapValueWithBrackets() throws Exception {
         URI uri = new URI("http://zzz");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("a", "{foo}");
         Map<String, String> immutable = Collections.unmodifiableMap(map);
         URI newUri = new UriBuilderImpl(uri).path("/{a}").buildFromMap(immutable);
@@ -653,7 +653,7 @@ public class UriBuilderImplTest extends Assert {
     @Test
     public void testBuildFromMapValuesPct() throws Exception {
         URI uri = new URI("http://zzz");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("a", "foo%25/bar%");
         Map<String, String> immutable = Collections.unmodifiableMap(map);
         URI newUri = new UriBuilderImpl(uri).path("/{a}").buildFromMap(immutable);
@@ -664,7 +664,7 @@ public class UriBuilderImplTest extends Assert {
     @Test
     public void testBuildFromMapValuesPctEncoded() throws Exception {
         URI uri = new URI("http://zzz");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("a", "foo%25");
         map.put("b", "bar%");
         Map<String, String> immutable = Collections.unmodifiableMap(map);
@@ -674,7 +674,7 @@ public class UriBuilderImplTest extends Assert {
 
     @Test
     public void testBuildFromEncodedMapComplex() throws Exception {
-        Map<String, Object> maps = new HashMap<String, Object>();
+        Map<String, Object> maps = new HashMap<>();
         maps.put("x", "x%20yz");
         maps.put("y", "/path-absolute/%test1");
         maps.put("z", "fred@example.com");
@@ -691,7 +691,7 @@ public class UriBuilderImplTest extends Assert {
 
     @Test
     public void testBuildFromEncodedMapComplex2() throws Exception {
-        Map<String, Object> maps = new HashMap<String, Object>();
+        Map<String, Object> maps = new HashMap<>();
         maps.put("x", "x%yz");
         maps.put("y", "/path-absolute/test1");
         maps.put("z", "fred@example.com");
@@ -709,19 +709,19 @@ public class UriBuilderImplTest extends Assert {
 
     @Test
     public void testBuildFromEncodedMapMultipleTimes() throws Exception {
-        Map<String, Object> maps = new HashMap<String, Object>();
+        Map<String, Object> maps = new HashMap<>();
         maps.put("x", "x%yz");
         maps.put("y", "/path-absolute/test1");
         maps.put("z", "fred@example.com");
         maps.put("w", "path-rootless/test2");
 
-        Map<String, Object> maps1 = new HashMap<String, Object>();
+        Map<String, Object> maps1 = new HashMap<>();
         maps1.put("x", "x%20yz");
         maps1.put("y", "/path-absolute/test1");
         maps1.put("z", "fred@example.com");
         maps1.put("w", "path-rootless/test2");
 
-        Map<String, Object> maps2 = new HashMap<String, Object>();
+        Map<String, Object> maps2 = new HashMap<>();
         maps2.put("x", "x%yz");
         maps2.put("y", "/path-absolute/test1");
         maps2.put("z", "fred@example.com");
@@ -752,7 +752,7 @@ public class UriBuilderImplTest extends Assert {
     @Test(expected = IllegalArgumentException.class)
     public void testBuildFromEncodedMapWithNullValue() throws Exception {
 
-        Map<String, Object> maps = new HashMap<String, Object>();
+        Map<String, Object> maps = new HashMap<>();
         maps.put("x", null);
         maps.put("y", "bar");
         UriBuilder.fromPath("").path("{x}/{y}").buildFromEncodedMap(maps);
@@ -1241,7 +1241,7 @@ public class UriBuilderImplTest extends Assert {
 
     @Test
     public void testToTemplateAndResolved() {
-        Map<String, Object> templs = new HashMap<String, Object>();
+        Map<String, Object> templs = new HashMap<>();
         templs.put("a", "1");
         templs.put("b", "2");
         String template = ((UriBuilderImpl)UriBuilder.fromPath("/{a}/{b}").queryParam("c", "{c}"))
@@ -1371,7 +1371,7 @@ public class UriBuilderImplTest extends Assert {
     @Test
     public void testNullMapValue() {
         try {
-            Map<String, String> maps = new HashMap<String, String>();
+            Map<String, String> maps = new HashMap<>();
             maps.put("x", null);
             maps.put("y", "/path-absolute/test1");
             maps.put("z", "fred@example.com");
@@ -1391,7 +1391,7 @@ public class UriBuilderImplTest extends Assert {
     @Test
     public void testMissingMapValue() {
         try {
-            Map<String, String> maps = new HashMap<String, String>();
+            Map<String, String> maps = new HashMap<>();
             maps.put("x", null);
             maps.put("y", "/path-absolute/test1");
             maps.put("z", "fred@example.com");

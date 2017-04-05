@@ -138,7 +138,7 @@ public class PolicyUtilsTest extends Assert {
         pde.assertMessage(message, ep, new ClientPolicyCalculator());
         assertTrue(eai.isAsserted());
         assertTrue(cmai.isAsserted());
-        assertTrue(outbound ? !icmai.isAsserted() : icmai.isAsserted());
+        assertTrue(icmai.isAsserted());
         control.verify();
     }
 

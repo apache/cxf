@@ -119,7 +119,7 @@ public class JDOMStreamReader extends AbstractDOMStreamReader<Element, Integer> 
             namespaceStack.push(prefix2decNs);
         }
 
-        prefix2decNs = new HashMap<String, Namespace>();
+        prefix2decNs = new HashMap<>();
         namespaces.clear();
 
         for (Iterator<?> itr = element.getAdditionalNamespaces().iterator(); itr.hasNext();) {

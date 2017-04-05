@@ -78,7 +78,7 @@ import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 public final class JwkUtils {
     private static final Map<KeyType, List<String>> JWK_REQUIRED_FIELDS_MAP;
     static {
-        JWK_REQUIRED_FIELDS_MAP = new HashMap<KeyType, List<String>>();
+        JWK_REQUIRED_FIELDS_MAP = new HashMap<>();
         JWK_REQUIRED_FIELDS_MAP.put(KeyType.RSA, Arrays.asList(
             JsonWebKey.RSA_PUBLIC_EXP, JsonWebKey.KEY_TYPE, JsonWebKey.RSA_MODULUS));
         JWK_REQUIRED_FIELDS_MAP.put(KeyType.EC, Arrays.asList(

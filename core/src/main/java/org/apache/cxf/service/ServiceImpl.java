@@ -44,7 +44,7 @@ public class ServiceImpl extends AbstractAttributedInterceptorProvider implement
     private DataBinding dataBinding;
     private Executor executor;
     private Invoker invoker;
-    private Map<QName, Endpoint> endpoints = new HashMap<QName, Endpoint>();
+    private Map<QName, Endpoint> endpoints = new HashMap<>();
 
     public ServiceImpl() {
         this((ServiceInfo)null);

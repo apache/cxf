@@ -51,7 +51,7 @@ public class JWTTokenProviderRealmTest extends org.junit.Assert {
         providerParameters.setRealm("A");
 
         // Create Realms
-        Map<String, RealmProperties> jwtRealms = new HashMap<String, RealmProperties>();
+        Map<String, RealmProperties> jwtRealms = new HashMap<>();
         RealmProperties jwtRealm = new RealmProperties();
         jwtRealm.setIssuer("A-Issuer");
         jwtRealms.put("A", jwtRealm);

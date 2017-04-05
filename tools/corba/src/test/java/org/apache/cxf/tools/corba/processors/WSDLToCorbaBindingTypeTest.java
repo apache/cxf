@@ -513,7 +513,7 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
             assertEquals(2, typemap.getElementsByTagName("corba:struct").getLength());
 
             TypeMappingType mapType = (TypeMappingType)model.getExtensibilityElements().get(0);
-            Map<String, CorbaType> tmap = new HashMap<String, CorbaType>();
+            Map<String, CorbaType> tmap = new HashMap<>();
             for (CorbaType type : mapType.getStructOrExceptionOrUnion()) {
                 tmap.put(type.getName(), type);
             }

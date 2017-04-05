@@ -109,7 +109,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(
                       InTransformReader.class.getResourceAsStream("../resources/complexReqIn1.xml"));
-        Map<String, String> inMap = new HashMap<String, String>();
+        Map<String, String> inMap = new HashMap<>();
         inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/element}*");
 
@@ -129,7 +129,7 @@ public class InTransformReaderTest extends Assert {
             StaxUtils.createXMLStreamReader(
                       InTransformReader.class.getResourceAsStream("../resources/complexReqIn2.xml"));
 
-        Map<String, String> inMap = new HashMap<String, String>();
+        Map<String, String> inMap = new HashMap<>();
         inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/otherelement}*");
         inMap.put("{http://cxf.apache.org/transform/test}*",
@@ -151,7 +151,7 @@ public class InTransformReaderTest extends Assert {
             StaxUtils.createXMLStreamReader(
                       InTransformReader.class.getResourceAsStream("../resources/complexReqIn3.xml"));
 
-        Map<String, String> inMap = new HashMap<String, String>();
+        Map<String, String> inMap = new HashMap<>();
         inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/otherelement}*");
         inMap.put("{http://cxf.apache.org/transform/test}*",
@@ -174,7 +174,7 @@ public class InTransformReaderTest extends Assert {
         XMLStreamReader reader =
             StaxUtils.createXMLStreamReader(
                       InTransformReader.class.getResourceAsStream("../resources/complexReqIn1.xml"));
-        Map<String, String> inMap = new HashMap<String, String>();
+        Map<String, String> inMap = new HashMap<>();
         inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/element}*");
 
@@ -197,7 +197,7 @@ public class InTransformReaderTest extends Assert {
             StaxUtils.createXMLStreamReader(
                       InTransformReader.class.getResourceAsStream("../resources/complexReqIn2.xml"));
 
-        Map<String, String> inMap = new HashMap<String, String>();
+        Map<String, String> inMap = new HashMap<>();
         inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/otherelement}*");
         inMap.put("{http://cxf.apache.org/transform/test}*",
@@ -222,7 +222,7 @@ public class InTransformReaderTest extends Assert {
             StaxUtils.createXMLStreamReader(
                       InTransformReader.class.getResourceAsStream("../resources/complexReqIn3.xml"));
 
-        Map<String, String> inMap = new HashMap<String, String>();
+        Map<String, String> inMap = new HashMap<>();
         inMap.put("{http://cxf.apache.org/transform/header/element}*",
                 "{http://cxf.apache.org/transform/header/otherelement}*");
         inMap.put("{http://cxf.apache.org/transform/test}*",
@@ -247,11 +247,11 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithReplaceAppend() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("requestValue",
                               "{http://cxf.apache.org/hello_world_soap_http/types}requestType");
 
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("requestValue",
                            "{http://cxf.apache.org/hello_world_soap_http/types}greetMe");
 
@@ -262,20 +262,20 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithReplaceAppendDelete() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("requestValue",
                               "{http://cxf.apache.org/hello_world_soap_http/types}requestType");
         transformElements.put("{http://cxf.apache.org/hello_world_soap_http/types}requestDate",
                               "");
 
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("requestValue",
                            "{http://cxf.apache.org/hello_world_soap_http/types}greetMe");
 
         List<String> dropElements = new ArrayList<>();
         dropElements.add("value");
 
-        Map<String, String> transformAttributes = new HashMap<String, String>();
+        Map<String, String> transformAttributes = new HashMap<>();
         transformAttributes.put("num", "");
         transformAttributes.put("nombre", "{http://cxf.apache.org/hello_world_soap_http/types}name");
 
@@ -287,7 +287,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithChangeNamespaces() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("*",
                               "{http://cxf.apache.org/hello_world_soap_http/types}*");
 
@@ -298,7 +298,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithDeleteAttributes() throws Exception {
-        Map<String, String> transformAttributes = new HashMap<String, String>();
+        Map<String, String> transformAttributes = new HashMap<>();
         transformAttributes.put("{http://www.w3.org/2001/XMLSchema-instance}type",
                                 "");
 
@@ -309,7 +309,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithAppendPreInclude1() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
         TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn1.xml",
@@ -320,7 +320,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithAppendPreInclude2() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}IdType=ASIN");
         TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn1nospace.xml",
@@ -331,10 +331,10 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithAppendPreWrap1() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("payload",
                               "{http://www.w3.org/2003/05/soap-envelope}Envelope");
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://apache.org/cxf/calculator/types}add",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2.xml",
@@ -344,10 +344,10 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithAppendPreWrap2() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("payload",
                               "{http://www.w3.org/2003/05/soap-envelope}Envelope");
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://apache.org/cxf/calculator/types}add",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn2nospace.xml",
@@ -357,7 +357,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithAppendPostInclude1() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
         TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn2.xml",
@@ -368,7 +368,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithAppendPostInclude2() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://xml.amazon.com/AWSECommerceService/2004-08-01}Request/",
                            "{http://xml.amazon.com/AWSECommerceService/2004-08-01}ItemId=0486411214");
         TransformTestUtils.transformInStreamAndCompare("../resources/amazonIn2nospace.xml",
@@ -379,7 +379,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithAppendPostWrap1() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://www.w3.org/2003/05/soap-envelope}Body/",
                            "{http://apache.org/cxf/calculator/types}add");
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn1.xml",
@@ -390,7 +390,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithAppendPostWrap2() throws Exception {
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("{http://www.w3.org/2003/05/soap-envelope}Body/",
                            "{http://apache.org/cxf/calculator/types}add");
         TransformTestUtils.transformInStreamAndCompare("../resources/AddRequestIn1nospace.xml",
@@ -401,7 +401,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadWithAppendPostWrapReplaceDrop() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("payload",
                               "{http://www.w3.org/2003/05/soap-envelope}Envelope");
         transformElements.put("params",
@@ -412,7 +412,7 @@ public class InTransformReaderTest extends Assert {
                               "{http://apache.org/cxf/calculator/types}arg1");
         transformElements.put("i3",
                               "");
-        Map<String, String> appendElements = new HashMap<String, String>();
+        Map<String, String> appendElements = new HashMap<>();
         appendElements.put("payload/",
                            "{http://www.w3.org/2003/05/soap-envelope}Body");
         List<String> dropElements = new ArrayList<>();
@@ -426,7 +426,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testOldSTSTransform() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
 
         transformElements.put("{http://docs.oasis-open.org/ws-sx/ws-trust/200512}*",
                               "{http://schemas.xmlsoap.org/ws/2005/02/trust}*");
@@ -440,7 +440,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testPreservePrefixBindings() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("{urn:abc}*",
                               "{urn:a}*");
 
@@ -451,7 +451,7 @@ public class InTransformReaderTest extends Assert {
 
     @Test
     public void testReadNamespaceWithDuplicatePrefixes() throws Exception {
-        Map<String, String> transformElements = new HashMap<String, String>();
+        Map<String, String> transformElements = new HashMap<>();
         transformElements.put("{http://bar.com/foo}*",
                               "{http://bar.com/foobar}*");
         TransformTestUtils.transformInStreamAndCompare("../resources/multiNS2In1.xml",

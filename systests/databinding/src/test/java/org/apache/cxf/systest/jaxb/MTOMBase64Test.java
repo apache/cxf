@@ -30,7 +30,7 @@ import javax.xml.ws.Service;
 import javax.xml.ws.soap.MTOM;
 import javax.xml.ws.soap.SOAPBinding;
 
-import org.apache.cxf.annotations.Logging;
+import org.apache.cxf.ext.logging.Logging;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.frontend.ClientProxy;

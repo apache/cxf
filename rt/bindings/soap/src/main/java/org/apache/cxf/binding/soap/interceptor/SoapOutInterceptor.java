@@ -94,6 +94,10 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
             }
         }
 
+        String cte = (String)message.get("soap.attachement.content.transfer.encoding");
+        if (cte != null) {
+            message.put(Message.CONTENT_TRANSFER_ENCODING, cte);
+        }
         // Add a final interceptor to write end elements
         message.getInterceptorChain().add(new SoapOutEndingInterceptor());
     }

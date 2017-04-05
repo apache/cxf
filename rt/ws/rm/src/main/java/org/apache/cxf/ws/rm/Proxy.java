@@ -229,7 +229,7 @@ public class Proxy {
         OperationInfo oi = reliableEndpoint.getEndpoint(protocol).getEndpointInfo().getService()
             .getInterface().getOperation(constants.getCloseSequenceOperationName());
         // pass reference to source sequence in invocation context
-        Map<String, Object> context = new HashMap<String, Object>(
+        Map<String, Object> context = new HashMap<>(
                 Collections.singletonMap(SourceSequence.class.getName(),
                                          (Object)s));
 

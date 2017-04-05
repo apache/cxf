@@ -47,7 +47,7 @@ public class TemporaryCredentialServiceTest extends AbstractBusClientServerTestB
 
     @Test
     public void testGetTemporaryCredentialsURIQuery() throws Exception {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
 
         parameters.put(OAuth.OAUTH_SIGNATURE_METHOD, "HMAC-SHA1");
         parameters.put(OAuth.OAUTH_NONCE, UUID.randomUUID().toString());

@@ -76,7 +76,7 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
         Element detail = null;
         String lang = null;
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("s", Soap12.SOAP_NAMESPACE);
         XPathUtils xu = new XPathUtils(ns);
         try {

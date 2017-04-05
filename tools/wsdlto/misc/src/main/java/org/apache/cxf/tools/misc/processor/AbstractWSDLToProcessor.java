@@ -59,7 +59,7 @@ public class AbstractWSDLToProcessor implements Processor {
 
     protected ClassCollector classColletor;
     private Map<String, WSDLExtensibilityPlugin> wsdlPlugins
-        = new HashMap<String, WSDLExtensibilityPlugin>();
+        = new HashMap<>();
 
 
 

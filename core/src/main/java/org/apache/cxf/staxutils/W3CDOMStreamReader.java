@@ -33,6 +33,7 @@ import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
 import org.w3c.dom.TypeInfo;
 
@@ -188,6 +189,8 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
             return CDATA;
         case Node.ENTITY_REFERENCE_NODE:
             return ENTITY_REFERENCE;
+        case Node.PROCESSING_INSTRUCTION_NODE:
+            return PROCESSING_INSTRUCTION;
         default:
             throw new IllegalStateException("Found type: " + content.getClass().getName());
         }
@@ -398,11 +401,11 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     }
 
     public String getPITarget() {
-        throw new UnsupportedOperationException();
+        return ((ProcessingInstruction)content).getTarget();
     }
 
     public String getPIData() {
-        throw new UnsupportedOperationException();
+        return ((ProcessingInstruction)content).getData();
     }
     public Location getLocation() {
         try {

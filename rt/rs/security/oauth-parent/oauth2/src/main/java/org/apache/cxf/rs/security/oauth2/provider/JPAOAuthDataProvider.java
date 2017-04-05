@@ -59,7 +59,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     @Override
-    public Client getClient(final String clientId) throws OAuthServiceException {
+    public Client doGetClient(final String clientId) throws OAuthServiceException {
         return execute(new EntityManagerOperation<Client>() {
             @Override
             public Client execute(EntityManager em) {
@@ -105,7 +105,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
             public Void execute(EntityManager em) {
                 if (client.getResourceOwnerSubject() != null) {
                     UserSubject sub =
-                            em.find(UserSubject.class, client.getResourceOwnerSubject().getLogin());
+                            em.find(UserSubject.class, client.getResourceOwnerSubject().getId());
                     if (sub == null) {
                         em.persist(client.getResourceOwnerSubject());
                     } else {
@@ -263,12 +263,14 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
                 }
                 serverToken.setScopes(perms);
 
-                UserSubject sub = em.find(UserSubject.class, serverToken.getSubject().getLogin());
-                if (sub == null) {
-                    em.persist(serverToken.getSubject());
-                } else {
-                    sub = em.merge(serverToken.getSubject());
-                    serverToken.setSubject(sub);
+                if (serverToken.getSubject() != null) {
+                    UserSubject sub = em.find(UserSubject.class, serverToken.getSubject().getId());
+                    if (sub == null) {
+                        em.persist(serverToken.getSubject());
+                    } else {
+                        sub = em.merge(serverToken.getSubject());
+                        serverToken.setSubject(sub);
+                    }
                 }
                 // ensure we have a managed association
                 // (needed for OpenJPA : InvalidStateException: Encountered unmanaged object)

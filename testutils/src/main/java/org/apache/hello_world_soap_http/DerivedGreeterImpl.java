@@ -43,7 +43,7 @@ public class DerivedGreeterImpl implements Greeter {
 
     private static final Logger LOG =
         Logger.getLogger(DerivedGreeterImpl.class.getName());
-    private final Map<String, Integer> invocationCount = new HashMap<String, Integer>();
+    private final Map<String, Integer> invocationCount = new HashMap<>();
 
     public DerivedGreeterImpl() {
         invocationCount.put("sayHi", 0);

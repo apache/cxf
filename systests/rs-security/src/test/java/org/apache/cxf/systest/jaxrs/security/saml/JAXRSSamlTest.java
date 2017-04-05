@@ -236,7 +236,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
         Bus springBus = bf.createBus(busFile.toString());
         bean.setBus(springBus);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
         properties.put(SecurityConstants.SAML_CALLBACK_HANDLER, samlCallbackHandler);

@@ -19,9 +19,9 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -920,9 +920,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         String id = encrKey.getId();
         byte[] secret = encrKey.getEphemeralKey();
 
-        Date created = new Date();
-        Date expires = new Date();
-        expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
+        Instant created = Instant.now();
+        Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
         SecurityToken tempTok = new SecurityToken(
                         id,
                         encrKey.getEncryptedKeyElement(),
@@ -965,9 +964,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         String id = usernameToken.getId();
         byte[] secret = usernameToken.getDerivedKey();
 
-        Date created = new Date();
-        Date expires = new Date();
-        expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
+        Instant created = Instant.now();
+        Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
         SecurityToken tempTok =
             new SecurityToken(id, usernameToken.getUsernameTokenElement(), created, expires);
         tempTok.setSecret(secret);
@@ -981,9 +979,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
         WSSecurityEngineResult encryptedKeyResult = getEncryptedKeyResult();
         if (encryptedKeyResult != null) {
             // Store it in the cache
-            Date created = new Date();
-            Date expires = new Date();
-            expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
+            Instant created = Instant.now();
+            Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
 
             String encryptedKeyID = (String)encryptedKeyResult.get(WSSecurityEngineResult.TAG_ID);
             SecurityToken securityToken = new SecurityToken(encryptedKeyID, created, expires);
@@ -1012,9 +1009,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     if (utID == null || utID.length() == 0) {
                         utID = wssConfig.getIdAllocator().createId("UsernameToken-", null);
                     }
-                    Date created = new Date();
-                    Date expires = new Date();
-                    expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
+                    Instant created = Instant.now();
+                    Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
                     SecurityToken securityToken = new SecurityToken(utID, created, expires);
 
                     byte[] secret = (byte[])wser.get(WSSecurityEngineResult.TAG_SECRET);

@@ -33,8 +33,8 @@ public class ModuleToNSMapper {
     boolean defaultMapping = true;
 
     public ModuleToNSMapper() {
-        userMap = new HashMap<String, String>();
-        exModules = new HashMap<String, List<String>>();
+        userMap = new HashMap<>();
+        exModules = new HashMap<>();
     }
 
     public void setDefaultMapping(boolean flag) {

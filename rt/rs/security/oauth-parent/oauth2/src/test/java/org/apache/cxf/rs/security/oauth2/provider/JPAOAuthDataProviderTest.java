@@ -34,6 +34,7 @@ import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JPAOAuthDataProviderTest extends Assert {
@@ -174,6 +175,58 @@ public class JPAOAuthDataProviderTest extends Assert {
         tokens = getProvider().getAccessTokens(c, null);
         assertNotNull(tokens);
         assertEquals(0, tokens.size());
+    }
+
+    @Test
+    @Ignore("uncomment when CXF-7264 is fixed")
+    public void testAddGetDeleteAccessTokenWithNullSubject() {
+        Client c = addClient("102", "bob");
+
+        AccessTokenRegistration atr = new AccessTokenRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Collections.singletonList("a"));
+        atr.setSubject(null);
+
+        getProvider().createAccessToken(atr);
+        List<ServerAccessToken> tokens = getProvider().getAccessTokens(c, null);
+        assertNotNull(tokens);
+        assertEquals(1, tokens.size());
+
+        getProvider().removeClient(c.getClientId());
+
+        tokens = getProvider().getAccessTokens(c, null);
+        assertNotNull(tokens);
+        assertEquals(0, tokens.size());
+    }
+
+    /**
+     * Checks that having multiple token each with its own
+     * userSubject (but having same login) works.
+     */
+    @Test
+    public void testAddGetDeleteMultipleAccessToken() {
+        Client c = addClient("101", "bob");
+
+        AccessTokenRegistration atr = new AccessTokenRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Collections.singletonList("a"));
+        atr.setSubject(c.getResourceOwnerSubject());
+        ServerAccessToken at = getProvider().createAccessToken(atr);
+        at = getProvider().getAccessToken(at.getTokenKey());
+
+        AccessTokenRegistration atr2 = new AccessTokenRegistration();
+        atr2.setClient(c);
+        atr2.setApprovedScope(Collections.singletonList("a"));
+        atr2.setSubject(new TestingUserSubject(c.getResourceOwnerSubject().getLogin()));
+        ServerAccessToken at2 = getProvider().createAccessToken(atr2);
+        at2 = getProvider().getAccessToken(at2.getTokenKey());
+
+        assertNotNull(at.getSubject().getId());
+        assertTrue(at.getSubject() instanceof UserSubject);
+        assertNotNull(at2.getSubject().getId());
+        assertTrue(at2.getSubject() instanceof TestingUserSubject);
+        assertEquals(at.getSubject().getLogin(), at2.getSubject().getLogin());
+        assertNotEquals(at.getSubject().getId(), at2.getSubject().getId());
     }
 
     @Test

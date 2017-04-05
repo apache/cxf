@@ -66,7 +66,7 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
         sf.setStart(false);
         Map<String, Object> props = sf.getProperties();
         if (props == null) {
-            props = new HashMap<String, Object>();
+            props = new HashMap<>();
         }
         props.put("jaxb.additionalContextClasses",
                   new Class[] {DescriptionType.class, DisplayNameType.class});
@@ -109,7 +109,7 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
         def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
         Document doc = wsdlWriter.getDocument(def);
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         ns.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
         XPathUtils xpather = new XPathUtils(ns);
@@ -144,7 +144,7 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
         def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
         Document doc = wsdlWriter.getDocument(def);
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         ns.put("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
         XPathUtils xpather = new XPathUtils(ns);

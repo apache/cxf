@@ -19,8 +19,9 @@
 package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -65,8 +66,8 @@ import org.apache.wss4j.common.principal.CustomTokenPrincipal;
 import org.apache.wss4j.common.saml.builder.SAML1Constants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.DOM2Writer;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.junit.BeforeClass;
 
 /**
@@ -500,13 +501,12 @@ public class RenewSamlUnitTest extends org.junit.Assert {
 
         if (ttlMs != 0) {
             Lifetime lifetime = new Lifetime();
-            Date creationTime = new Date();
-            Date expirationTime = new Date();
-            expirationTime.setTime(creationTime.getTime() + ttlMs);
+            
+            Instant creationTime = Instant.now();
+            Instant expirationTime = creationTime.plusNanos(ttlMs * 1000000L);
 
-            XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-            lifetime.setCreated(fmt.format(creationTime));
-            lifetime.setExpires(fmt.format(expirationTime));
+            lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+            lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
 
             providerParameters.getTokenRequirements().setLifetime(lifetime);
         }

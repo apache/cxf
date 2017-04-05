@@ -217,7 +217,7 @@ public final class ResourceUtils {
         Map<String, UserOperation> ops = model.getOperationsAsMap();
 
         Method defaultMethod = null;
-        Map<String, Method> methodNames = new HashMap<String, Method>();
+        Map<String, Method> methodNames = new HashMap<>();
         for (Method m : cri.getServiceClass().getMethods()) {
             if (m.getAnnotation(DefaultMethod.class) != null) {
                 // if needed we can also support multiple default methods
@@ -826,7 +826,7 @@ public final class ResourceUtils {
         List<Class<?>> resourceClasses = new ArrayList<Class<?>>();
         List<Object> providers = new ArrayList<>();
         List<Feature> features = new ArrayList<>();
-        Map<Class<?>, ResourceProvider> map = new HashMap<Class<?>, ResourceProvider>();
+        Map<Class<?>, ResourceProvider> map = new HashMap<>();
 
         // Note, app.getClasses() returns a list of per-request classes
         // or singleton provider classes

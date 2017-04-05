@@ -202,6 +202,8 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
+
         // add the generated source into compile source
         // do this step first to ensure the source folder will be added to the Eclipse classpath
         if (project != null && getGeneratedSourceRoot() != null) {
@@ -236,21 +238,22 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         String originalNonProxyHosts = SystemPropertyAction.getProperty(HTTP_NON_PROXY_HOSTS);
         String originalProxyUser = SystemPropertyAction.getProperty(HTTP_PROXY_USER);
         String originalProxyPassword = SystemPropertyAction.getProperty(HTTP_PROXY_PASSWORD);
-
-        configureProxyServerSettings();
-
-        List<GenericWsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
-
-        if (effectiveWsdlOptions.size() == 0) {
-            getLog().info("Nothing to generate");
-            return;
-        }
-
-        ClassLoaderSwitcher classLoaderSwitcher = new ClassLoaderSwitcher(getLog());
-        boolean result = true;
+        
 
         Bus bus = null;
+        ClassLoaderSwitcher classLoaderSwitcher = null;
         try {
+            configureProxyServerSettings();
+
+            List<GenericWsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
+
+            if (effectiveWsdlOptions.size() == 0) {
+                getLog().info("Nothing to generate");
+                return;
+            }
+            classLoaderSwitcher = new ClassLoaderSwitcher(getLog());
+            boolean result = true;
+    
             Set<URI> cp = classLoaderSwitcher.switchClassLoader(project, useCompileClasspath, classesDir);
 
             if ("once".equals(fork) || "true".equals(fork)) {
@@ -272,7 +275,9 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
             if (bus != null) {
                 bus.shutdown(true);
             }
-            classLoaderSwitcher.restoreClassLoader();
+            if (classLoaderSwitcher != null) {
+                classLoaderSwitcher.restoreClassLoader();
+            }
             restoreProxySetting(originalProxyHost, originalProxyPort, originalNonProxyHosts,
                                 originalProxyUser, originalProxyPassword);
         }
@@ -871,11 +876,14 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         if (artifactSet != null && !artifactSet.isEmpty()) {
             for (Artifact pArtifact : artifactSet) {
                 if (targetArtifact.getGroupId().equals(pArtifact.getGroupId())
-                    && targetArtifact.getArtifactId().equals(pArtifact.getArtifactId())
-                    && targetArtifact.getVersion().equals(pArtifact.getVersion())
-                    && "wsdl".equals(pArtifact.getType())) {
-                    getLog().info(String.format("%s resolved to %s", pArtifact.toString(), pArtifact
-                                      .getFile().getAbsolutePath()));
+                        && targetArtifact.getArtifactId().equals(pArtifact.getArtifactId())
+                        && targetArtifact.getVersion().equals(pArtifact.getVersion()) 
+                        && ("wsdl".equals(pArtifact.getType()) 
+                        || (
+                                targetArtifact.getClassifier() != null
+                                        && pArtifact.getType() != null
+                                        && (targetArtifact.getClassifier() + ".wsdl").equals(pArtifact.getType())
+                        ))) {
                     return pArtifact;
                 }
             }

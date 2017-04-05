@@ -244,7 +244,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
             Bus b = BusFactory.getAndSetThreadDefaultBus(bus);
             try {
                 udpEndpoint = new EndpointImpl(bus, new WSDiscoveryProvider());
-                Map<String, Object> props = new HashMap<String, Object>();
+                Map<String, Object> props = new HashMap<>();
                 props.put("jaxws.provider.interpretNullAsOneway", "true");
                 udpEndpoint.setProperties(props);
                 if ("true".equals(preferIPv6AddressesValue) && "false".equals(preferIPv4StackValue)) {
@@ -453,7 +453,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
             context.createMarshaller().marshal(mt, r);
 
             XMLStreamReader domReader = StaxUtils.createXMLStreamReader(doc);
-            Map<String, String> inMap = new HashMap<String, String>();
+            Map<String, String> inMap = new HashMap<>();
             inMap.put("{" + WSDVersion.INSTANCE_1_1.getNamespace() + "}*",
                       "{" + WSDVersion.INSTANCE_1_0.getNamespace() + "}*");
             inMap.put("{" + WSDVersion.INSTANCE_1_1.getAddressingNamespace() + "}*",
@@ -477,7 +477,7 @@ public class WSDiscoveryServiceImpl implements WSDiscoveryService {
 
         private Document mapFromOld(Document doc) throws XMLStreamException {
             XMLStreamReader domReader = StaxUtils.createXMLStreamReader(doc);
-            Map<String, String> inMap = new HashMap<String, String>();
+            Map<String, String> inMap = new HashMap<>();
             inMap.put("{" + WSDVersion.INSTANCE_1_0.getNamespace() + "}*",
                       "{" + WSDVersion.INSTANCE_1_1.getNamespace() + "}*");
             inMap.put("{" + WSDVersion.INSTANCE_1_0.getAddressingNamespace() + "}*",

@@ -179,7 +179,7 @@ public class FiqlParserTest extends Assert {
 
     @Test
     public void testParseDateWithCustomFormat() throws SearchParseException, ParseException {
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<>();
         props.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy-MM-dd'T'HH:mm:ss");
         props.put(SearchUtils.TIMEZONE_SUPPORT_PROPERTY, "false");
         parser = new FiqlParser<Condition>(Condition.class, props);

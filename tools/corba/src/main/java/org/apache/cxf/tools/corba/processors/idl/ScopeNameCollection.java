@@ -24,7 +24,7 @@ import java.util.Map;
 
 public final class ScopeNameCollection  {
 
-    Map<String, Scope> scopedNames = new HashMap<String, Scope>();
+    Map<String, Scope> scopedNames = new HashMap<>();
 
     public void add(Scope scope) {
         scopedNames.put(scope.toString(), scope);

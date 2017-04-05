@@ -19,7 +19,8 @@
 package org.apache.cxf.rs.security.saml.sso;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -125,8 +126,8 @@ public class AbstractSSOSpHandler {
         // Note that the Expires property has been deprecated but apparently is
         // supported better than 'max-age' property by different browsers
         // (Firefox, IE, etc)
-        Date expiresDate = new Date(System.currentTimeMillis() + stateTimeToLive);
-        String cookieExpires = HttpUtils.getHttpDateFormat().format(expiresDate);
+        Instant expires = Instant.ofEpochMilli(System.currentTimeMillis() + stateTimeToLive);
+        String cookieExpires = HttpUtils.getHttpDateFormat().format(expires.atZone(ZoneOffset.UTC));
         contextCookie += ";Expires=" + cookieExpires;
         //TODO: Consider adding an 'HttpOnly' attribute
 
@@ -134,12 +135,13 @@ public class AbstractSSOSpHandler {
     }
 
     protected boolean isStateExpired(long stateCreatedAt, long expiresAt) {
-        Date currentTime = new Date();
-        if (currentTime.after(new Date(stateCreatedAt + getStateTimeToLive()))) {
+        Instant currentTime = Instant.now();
+        Instant expires = Instant.ofEpochMilli(stateCreatedAt  + getStateTimeToLive());
+        if (currentTime.isAfter(expires)) {
             return true;
         }
 
-        return expiresAt > 0 && currentTime.after(new Date(expiresAt));
+        return expiresAt > 0 && currentTime.isAfter(Instant.ofEpochMilli(expiresAt));
     }
 
     public void setStateProvider(SPStateManager stateProvider) {

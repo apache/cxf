@@ -392,7 +392,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
         UTPasswordCallback callback = new UTPasswordCallback();
         callback.setAliasPassword(username, password);
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         outProps.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_TEXT);
         outProps.put(WSHandlerConstants.PW_CALLBACK_REF, callback);
@@ -401,7 +401,7 @@ public class JavaFirstPolicyServiceTest extends AbstractBusClientServerTestBase 
     }
 
     private Map<String, Object> getNoPasswordProperties(String username) {
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
         outProps.put(WSHandlerConstants.PASSWORD_TYPE, WSConstants.PW_NONE);
         outProps.put(WSHandlerConstants.USER, username);

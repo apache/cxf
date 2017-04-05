@@ -438,7 +438,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         if (nd instanceof Document) {
             nd = ((Document)nd).getDocumentElement();
         }
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("ns2", "http://www.example.org/schema/DoubleIt");
         XPathUtils xp = new XPathUtils(ns);
         Object o = xp.getValue("//ns2:DoubleItResponse/doubledNumber", nd, XPathConstants.STRING);
@@ -466,7 +466,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             if (el instanceof Document) {
                 el = ((Document)el).getDocumentElement();
             }
-            Map<String, String> ns = new HashMap<String, String>();
+            Map<String, String> ns = new HashMap<>();
             ns.put("ns2", "http://www.example.org/schema/DoubleIt");
             XPathUtils xp = new XPathUtils(ns);
             String o = (String)xp.getValue("//ns2:DoubleIt/numberToDouble", el, XPathConstants.STRING);

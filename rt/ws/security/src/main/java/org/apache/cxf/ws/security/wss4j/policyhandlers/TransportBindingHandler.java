@@ -19,9 +19,9 @@
 
 package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -328,11 +328,12 @@ public class TransportBindingHandler extends AbstractBindingBuilder {
             String id = usernameToken.getId();
             byte[] secret = usernameToken.getDerivedKey();
 
-            Date created = new Date();
-            Date expires = new Date();
-            expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
-            SecurityToken tempTok =
-                new SecurityToken(id, usernameToken.getUsernameTokenElement(), created, expires);
+            Instant created = Instant.now();
+            Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
+            SecurityToken tempTok = new SecurityToken(id,
+                                                      usernameToken.getUsernameTokenElement(),
+                                                      created,
+                                                      expires);
             tempTok.setSecret(secret);
             getTokenStore().add(tempTok);
             message.put(SecurityConstants.TOKEN_ID, tempTok.getId());

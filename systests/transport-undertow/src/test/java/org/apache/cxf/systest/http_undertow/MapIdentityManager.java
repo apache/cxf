@@ -100,6 +100,7 @@ class MapIdentityManager implements IdentityManager {
         if (users.containsKey(id)) {
             return new Account() {
 
+                private static final long serialVersionUID = 1L;
                 private final Principal principal = new Principal() {
 
                     @Override

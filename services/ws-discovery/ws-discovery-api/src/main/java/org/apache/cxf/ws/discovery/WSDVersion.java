@@ -74,14 +74,14 @@ public abstract class WSDVersion {
         }
         public void addVersionTransformer(Dispatch<Object> dispatch) {
             StaxTransformFeature feature = new StaxTransformFeature();
-            Map<String, String> outElements = new HashMap<String, String>();
+            Map<String, String> outElements = new HashMap<>();
             outElements.put("{" + NS_1_1 + "}*",
                             "{" + NS_1_0 + "}*");
             outElements.put("{" + INSTANCE_1_1.getAddressingNamespace() + "}*",
                             "{" + getAddressingNamespace() + "}*");
             feature.setOutTransformElements(outElements);
 
-            Map<String, String> inElements = new HashMap<String, String>();
+            Map<String, String> inElements = new HashMap<>();
             inElements.put("{" + NS_1_0 + "}*",
                            "{" + NS_1_1 + "}*");
             inElements.put("{" + getAddressingNamespace() + "}*",
@@ -91,7 +91,7 @@ public abstract class WSDVersion {
             feature.initialize(((DispatchImpl)dispatch).getClient(),
                                ((DispatchImpl)dispatch).getClient().getBus());
 
-            Map<String, String> nsMap = new HashMap<String, String>();
+            Map<String, String> nsMap = new HashMap<>();
             nsMap.put("tns", NS_1_0);
             nsMap.put("wsa", getAddressingNamespace());
             ((DispatchImpl)dispatch).getClient().getEndpoint().getEndpointInfo()
@@ -117,7 +117,7 @@ public abstract class WSDVersion {
             return "http://www.w3.org/2005/08/addressing";
         }
         public void addVersionTransformer(Dispatch<Object> dispatch) {
-            Map<String, String> nsMap = new HashMap<String, String>();
+            Map<String, String> nsMap = new HashMap<>();
             nsMap.put("tns", NS_1_1);
             nsMap.put("wsa", getAddressingNamespace());
             ((DispatchImpl)dispatch).getClient().getEndpoint().getEndpointInfo()

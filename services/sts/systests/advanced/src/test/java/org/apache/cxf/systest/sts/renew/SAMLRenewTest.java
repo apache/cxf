@@ -111,7 +111,7 @@ public class SAMLRenewTest extends AbstractBusClientServerTestBase {
         updateAddressPort(saml2IntermediaryPort, PORT);
 
         ((BindingProvider)saml2IntermediaryPort).getRequestContext().put(
-            "security.username", "alice"
+            SecurityConstants.USERNAME, "alice"
         );
 
         // Make initial successful invocation(s)

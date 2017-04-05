@@ -42,7 +42,7 @@ class WrappedAttachments implements Set<Attachment> {
 
     WrappedAttachments(Map<String, DataHandler> attachments) {
         this.attachments = attachments;
-        this.cache = new HashMap<String, Attachment>();
+        this.cache = new HashMap<>();
     }
 
     public int size() {

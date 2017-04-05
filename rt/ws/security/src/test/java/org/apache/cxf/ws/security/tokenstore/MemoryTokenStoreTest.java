@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.ws.security.tokenstore;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -75,8 +75,7 @@ public class MemoryTokenStoreTest extends org.junit.Assert {
     public void testTokenExpiry() {
         SecurityToken token = new SecurityToken();
 
-        Date expires = new Date();
-        expires.setTime(expires.getTime() + (5L * 60L * 1000L));
+        Instant expires = Instant.now().plusSeconds(5L * 60L);
         token.setExpires(expires);
 
         assertFalse(token.isExpired());

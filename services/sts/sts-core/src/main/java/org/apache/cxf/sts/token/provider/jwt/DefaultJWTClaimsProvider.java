@@ -19,9 +19,11 @@
 package org.apache.cxf.sts.token.provider.jwt;
 
 import java.security.Principal;
-import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +44,6 @@ import org.apache.cxf.sts.request.ReceivedToken.STATE;
 import org.apache.cxf.sts.token.provider.TokenProviderParameters;
 import org.apache.cxf.sts.token.provider.TokenProviderUtils;
 import org.apache.cxf.ws.security.sts.provider.STSException;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 
 /**
  * A default implementation to create a JWTClaims object. The Subject name is the name
@@ -167,62 +168,59 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     protected void handleConditions(JWTClaimsProviderParameters jwtClaimsProviderParameters, JwtClaims claims) {
         TokenProviderParameters providerParameters = jwtClaimsProviderParameters.getProviderParameters();
 
-        Date currentDate = new Date();
-        long currentTimeInSeconds = currentDate.getTime() / 1000L;
-
+        Instant currentDate = Instant.now();
+        long currentTime = currentDate.getEpochSecond();
+        
         // Set the defaults first
-        claims.setIssuedAt(currentTimeInSeconds);
-        claims.setNotBefore(currentTimeInSeconds);
-        claims.setExpiryTime(currentTimeInSeconds + lifetime);
+        claims.setIssuedAt(currentTime);
+        claims.setNotBefore(currentTime);
+        claims.setExpiryTime(currentTime + lifetime);
 
         Lifetime tokenLifetime = providerParameters.getTokenRequirements().getLifetime();
         if (lifetime > 0 && acceptClientLifetime && tokenLifetime != null
             && tokenLifetime.getCreated() != null && tokenLifetime.getExpires() != null) {
+            Instant creationTime = null;
+            Instant expirationTime = null;
             try {
-                XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-                Date creationTime = fmt.parse(tokenLifetime.getCreated());
-                Date expirationTime = fmt.parse(tokenLifetime.getExpires());
-                if (creationTime == null || expirationTime == null) {
-                    LOG.fine("Error in parsing Timestamp Created or Expiration Strings");
-                    throw new STSException(
-                                           "Error in parsing Timestamp Created or Expiration Strings",
-                                           STSException.INVALID_TIME
-                        );
-                }
-
-                // Check to see if the created time is in the future
-                Date validCreation = new Date();
-                long currentTime = validCreation.getTime();
-                if (futureTimeToLive > 0) {
-                    validCreation.setTime(currentTime + futureTimeToLive * 1000L);
-                }
-                if (creationTime.after(validCreation)) {
-                    LOG.fine("The Created Time is too far in the future");
-                    throw new STSException("The Created Time is too far in the future", STSException.INVALID_TIME);
-                }
-
-                long requestedLifetime = expirationTime.getTime() - creationTime.getTime();
-                if (requestedLifetime > (getMaxLifetime() * 1000L)) {
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Requested lifetime [").append(requestedLifetime / 1000L);
-                    sb.append(" sec] exceed configured maximum lifetime [").append(getMaxLifetime());
-                    sb.append(" sec]");
-                    LOG.warning(sb.toString());
-                    if (isFailLifetimeExceedance()) {
-                        throw new STSException("Requested lifetime exceeds maximum lifetime",
-                                               STSException.INVALID_TIME);
-                    } else {
-                        expirationTime.setTime(creationTime.getTime() + (getMaxLifetime() * 1000L));
-                    }
-                }
-
-                long creationTimeInSeconds = creationTime.getTime() / 1000L;
-                claims.setIssuedAt(creationTimeInSeconds);
-                claims.setNotBefore(creationTimeInSeconds);
-                claims.setExpiryTime(expirationTime.getTime() / 1000L);
-            } catch (ParseException e) {
-                LOG.warning("Failed to parse life time element: " + e.getMessage());
+                creationTime = ZonedDateTime.parse(tokenLifetime.getCreated()).toInstant();
+                expirationTime = ZonedDateTime.parse(tokenLifetime.getExpires()).toInstant();
+            } catch (DateTimeParseException ex) {
+                LOG.fine("Error in parsing Timestamp Created or Expiration Strings");
+                throw new STSException(
+                                       "Error in parsing Timestamp Created or Expiration Strings",
+                                       STSException.INVALID_TIME
+                    );
             }
+
+            // Check to see if the created time is in the future
+            Instant validCreation = Instant.now();
+            if (futureTimeToLive > 0) {
+                validCreation = validCreation.plusSeconds(futureTimeToLive);
+            }
+            if (creationTime.isAfter(validCreation)) {
+                LOG.fine("The Created Time is too far in the future");
+                throw new STSException("The Created Time is too far in the future", STSException.INVALID_TIME);
+            }
+
+            long requestedLifetime = Duration.between(creationTime, expirationTime).getSeconds();
+            if (requestedLifetime > getMaxLifetime()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Requested lifetime [").append(requestedLifetime);
+                sb.append(" sec] exceed configured maximum lifetime [").append(getMaxLifetime());
+                sb.append(" sec]");
+                LOG.warning(sb.toString());
+                if (isFailLifetimeExceedance()) {
+                    throw new STSException("Requested lifetime exceeds maximum lifetime",
+                                           STSException.INVALID_TIME);
+                } else {
+                    expirationTime = creationTime.plusSeconds(getMaxLifetime());
+                }
+            }
+
+            long creationTimeInSeconds = creationTime.getEpochSecond();
+            claims.setIssuedAt(creationTimeInSeconds);
+            claims.setNotBefore(creationTimeInSeconds);
+            claims.setExpiryTime(expirationTime.getEpochSecond());
         }
     }
 

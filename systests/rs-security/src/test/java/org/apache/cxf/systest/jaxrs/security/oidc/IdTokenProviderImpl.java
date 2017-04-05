@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.security.oidc;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
@@ -36,10 +35,9 @@ public class IdTokenProviderImpl implements IdTokenProvider {
     public IdToken getIdToken(String clientId, UserSubject authenticatedUser, List<String> scopes) {
         IdToken token = new IdToken();
 
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.SECOND, 60);
-        token.setExpiryTime(cal.getTimeInMillis() / 1000L);
-        token.setIssuedAt(new Date().getTime() / 1000L);
+        Instant now = Instant.now();
+        token.setIssuedAt(now.getEpochSecond());
+        token.setExpiryTime(now.plusSeconds(60L).getEpochSecond());
         token.setAudience(clientId);
         token.setSubject(authenticatedUser.getLogin());
         token.setIssuer("OIDC IdP");

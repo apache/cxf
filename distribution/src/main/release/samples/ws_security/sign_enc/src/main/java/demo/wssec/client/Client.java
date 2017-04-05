@@ -56,7 +56,7 @@ public final class Client {
             Bus bus = bf.createBus(busFile.toString());
             BusFactory.setDefaultBus(bus);
 
-            Map<String, Object> outProps = new HashMap<String, Object>();
+            Map<String, Object> outProps = new HashMap<>();
             outProps.put("action", "UsernameToken Timestamp Signature Encrypt");
 
             outProps.put("passwordType", "PasswordDigest");
@@ -85,7 +85,7 @@ public final class Client {
             outProps.put("signatureAlgorithm", "http://www.w3.org/2000/09/xmldsig#rsa-sha1");
 
 
-            Map<String, Object> inProps = new HashMap<String, Object>();
+            Map<String, Object> inProps = new HashMap<>();
 
             inProps.put("action", "UsernameToken Timestamp Signature Encrypt");
             inProps.put("passwordType", "PasswordText");

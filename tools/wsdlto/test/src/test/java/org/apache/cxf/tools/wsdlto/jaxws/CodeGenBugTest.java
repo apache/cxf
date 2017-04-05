@@ -1195,7 +1195,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
             fail("shouldn't get exception");
         }
     }
-
+    
     @Test
     public void testCXF5280() throws Exception {
         env.put(ToolConstants.CFG_ALL, "all");

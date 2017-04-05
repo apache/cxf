@@ -197,7 +197,7 @@ public abstract class AbstractXOPType extends AegisType {
     @Override
     public void addToSchemaElement(XmlSchemaElement schemaElement) {
         if (expectedContentTypes != null) {
-            Map<String, Node> extAttrMap = new HashMap<String, Node>();
+            Map<String, Node> extAttrMap = new HashMap<>();
             Attr theAttr = DOMUtils.createDocument().createAttributeNS(XML_MIME_NS, "xmime");
             theAttr.setNodeValue(expectedContentTypes);
             extAttrMap.put("xmime", theAttr);

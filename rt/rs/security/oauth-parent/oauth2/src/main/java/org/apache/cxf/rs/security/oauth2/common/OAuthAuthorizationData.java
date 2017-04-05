@@ -48,13 +48,14 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
     private String applicationDescription;
     private String applicationLogoUri;
     private List<String> applicationCertificates = new LinkedList<String>();
-    private Map<String, String> extraApplicationProperties = new HashMap<String, String>();
+    private Map<String, String> extraApplicationProperties = new HashMap<>();
     private boolean implicitFlow;
 
     private List<OAuthPermission> permissions;
     private List<OAuthPermission> alreadyAuthorizedPermissions;
     private boolean hidePreauthorizedScopesInForm;
     private boolean applicationRegisteredDynamically;
+    private boolean supportSinglePageApplications;
 
     public OAuthAuthorizationData() {
     }
@@ -266,4 +267,13 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
         this.applicationRegisteredDynamically = applicationRegisteredDynamically;
     }
 
+    public boolean isSupportSinglePageApplications() {
+        return supportSinglePageApplications;
+    }
+
+    public void setSupportSinglePageApplications(boolean supportSinglePageApplications) {
+        this.supportSinglePageApplications = supportSinglePageApplications;
+    }
+
+    
 }

@@ -74,7 +74,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     @Override
-    public Client getClient(String clientId) throws OAuthServiceException {
+    public Client doGetClient(String clientId) throws OAuthServiceException {
         return getCacheValue(clientCache, clientId, Client.class);
     }
 
@@ -92,7 +92,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         List<String> keys = CastUtils.cast(clientCache.getKeys());
         List<Client> clients = new ArrayList<>(keys.size());
         for (String key : keys) {
-            Client c = getClient(key);
+            Client c = doGetClient(key);
             if (isClientMatched(c, resourceOwner)) {
                 clients.add(c);
             }

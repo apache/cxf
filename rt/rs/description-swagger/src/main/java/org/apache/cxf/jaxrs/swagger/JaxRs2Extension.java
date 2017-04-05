@@ -97,7 +97,7 @@ public class JaxRs2Extension extends AbstractSwaggerExtension {
 
                     // Gather the field's details
                     if (field != null) {
-                        paramType = field.getGenericType();
+                        paramType = field.getAnnotated().getGenericType();
 
                         for (final Annotation fieldAnnotation : field.annotations()) {
                             if (!paramAnnotations.contains(fieldAnnotation)) {
@@ -109,8 +109,8 @@ public class JaxRs2Extension extends AbstractSwaggerExtension {
                     // Gather the setter's details but only the ones we need
                     if (setter != null) {
                         // Do not set the param class/type from the setter if the values are already identified
-                        if (paramType == null && setter.getGenericParameterTypes() != null) {
-                            paramType = setter.getGenericParameterTypes()[0];
+                        if (paramType == null && setter.getMember().getGenericParameterTypes() != null) {
+                            paramType = setter.getMember().getGenericParameterTypes()[0];
                         }
 
                         for (final Annotation fieldAnnotation : setter.annotations()) {

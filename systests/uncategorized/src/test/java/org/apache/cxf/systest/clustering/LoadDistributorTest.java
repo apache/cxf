@@ -92,7 +92,7 @@ public class LoadDistributorTest extends FailoverTest {
         }
 
 
-        Map< String, Integer > responseCounts = new HashMap< String, Integer >();
+        Map< String, Integer > responseCounts = new HashMap<>();
         for (int i = 0; i < 12; ++i) {
             String response = greeter.greetMe("fred");
             assertNotNull("expected non-null response", response);
@@ -123,7 +123,7 @@ public class LoadDistributorTest extends FailoverTest {
         } else {
             fail("unexpected conduit selector: " + conduitSelector);
         }
-        Map< String, Integer > responseCounts = new HashMap< String, Integer >();
+        Map< String, Integer > responseCounts = new HashMap<>();
         for (int i = 0; i < 12; ++i) {
             String response = greeter.greetMe("fred");
             assertNotNull("expected non-null response", response);
@@ -154,7 +154,7 @@ public class LoadDistributorTest extends FailoverTest {
             fail("unexpected conduit selector: " + conduitSelector);
         }
 
-        Map< String, Integer > responseCounts = new HashMap< String, Integer >();
+        Map< String, Integer > responseCounts = new HashMap<>();
         for (int i = 0; i < 12; ++i) {
             try {
                 String response = greeter.greetMe("fred");

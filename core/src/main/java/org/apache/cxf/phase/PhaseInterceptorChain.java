@@ -142,7 +142,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
 
         int numPhases = ps.size();
         phases = new Phase[numPhases];
-        nameMap = new HashMap<String, Integer>();
+        nameMap = new HashMap<>();
 
         heads = new InterceptorHolder[numPhases];
         tails = new InterceptorHolder[numPhases];

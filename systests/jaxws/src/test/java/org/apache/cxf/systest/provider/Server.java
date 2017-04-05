@@ -37,7 +37,7 @@ public class Server extends AbstractBusTestServerBase {
         Endpoint ep = Endpoint.create(implementor);
         ep.publish(address);
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         map.put(SourceDataBinding.PREFERRED_FORMAT, "dom");
         address = "http://localhost:" + PORT + "/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-dom";
         ep = Endpoint.create(implementor);

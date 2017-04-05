@@ -225,8 +225,8 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
                 validFrom = renewedAssertion.getSaml1().getConditions().getNotBefore();
                 validTill = renewedAssertion.getSaml1().getConditions().getNotOnOrAfter();
             }
-            response.setCreated(validFrom.toDate());
-            response.setExpires(validTill.toDate());
+            response.setCreated(validFrom.toDate().toInstant());
+            response.setExpires(validTill.toDate().toInstant());
 
             LOG.fine("SAML Token successfully renewed");
             return response;
@@ -518,16 +518,10 @@ public class SAMLTokenRenewer extends AbstractSAMLTokenProvider implements Token
         // Store the successfully renewed token in the cache
         byte[] signatureValue = assertion.getSignatureValue();
         if (tokenStore != null && signatureValue != null && signatureValue.length > 0) {
-            DateTime validTill = null;
-            if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-                validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
-            } else {
-                validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
-            }
 
             SecurityToken securityToken =
                 CacheUtils.createSecurityTokenForStorage(assertion.getElement(), assertion.getId(),
-                    validTill.toDate(), tokenParameters.getPrincipal(), tokenParameters.getRealm(),
+                    assertion.getNotOnOrAfter(), tokenParameters.getPrincipal(), tokenParameters.getRealm(),
                     tokenParameters.getTokenRequirements().getRenewing());
             CacheUtils.storeTokenInCache(
                 securityToken, tokenParameters.getTokenStore(), signatureValue);

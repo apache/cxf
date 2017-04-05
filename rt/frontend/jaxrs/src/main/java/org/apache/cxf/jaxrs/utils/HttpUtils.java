@@ -35,7 +35,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -52,6 +55,8 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
+import org.apache.cxf.jaxrs.impl.HttpServletRequestFilter;
+import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.RuntimeDelegateImpl;
@@ -642,5 +647,23 @@ public final class HttpUtils {
         }
 
         return false;
+    }
+    
+    public static <T> T createServletResourceValue(Message m, Class<T> clazz) {
+
+        Object value = null;
+        if (clazz == HttpServletRequest.class) {
+            HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
+            value = request != null ? new HttpServletRequestFilter(request, m) : null;
+        } else if (clazz == HttpServletResponse.class) {
+            HttpServletResponse response = (HttpServletResponse)m.get(AbstractHTTPDestination.HTTP_RESPONSE);
+            value = response != null ? new HttpServletResponseFilter(response, m) : null;
+        } else if (clazz == ServletContext.class) {
+            value = m.get(AbstractHTTPDestination.HTTP_CONTEXT);
+        } else if (clazz == ServletConfig.class) {
+            value = m.get(AbstractHTTPDestination.HTTP_CONFIG);
+        }
+
+        return clazz.cast(value);
     }
 }

@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import java.util.Date;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Properties;
 
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
@@ -39,7 +41,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoFactory;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.CustomTokenPrincipal;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
+import org.apache.wss4j.common.util.DateUtil;
 
 
 /**
@@ -63,27 +65,28 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        Instant creationTime = Instant.now();
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(requestedLifetime * 1000L, providerResponse.getExpires().getTime()
-                     - providerResponse.getCreated().getTime());
+        
+        long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
+        assertEquals(requestedLifetime, duration);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
     /**
@@ -105,15 +108,15 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
 
-        assertEquals(providerLifetime * 1000L, providerResponse.getExpires().getTime()
-                     - providerResponse.getCreated().getTime());
+        long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
+        assertEquals(providerLifetime, duration);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
 
@@ -134,14 +137,14 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
         TokenProviderParameters providerParameters = createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 35 minutes
+        Instant creationTime = Instant.now();
         long requestedLifetime = 35 * 60L;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         try {
@@ -168,14 +171,14 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to Default max lifetime plus 1
+        Instant creationTime = Instant.now();
         long requestedLifetime = DefaultConditionsProvider.DEFAULT_MAX_LIFETIME + 1;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         try {
@@ -206,28 +209,28 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 35 minutes
+        Instant creationTime = Instant.now();
         long requestedLifetime = 35 * 60L;
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(maxLifetime * 1000L, providerResponse.getExpires().getTime()
-                     - providerResponse.getCreated().getTime());
+        long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
+        assertEquals(maxLifetime, duration);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
     /**
@@ -247,28 +250,28 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
-        creationTime.setTime(creationTime.getTime() + (10 * 1000L));
+        Instant creationTime = Instant.now();
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
+        creationTime = creationTime.plusSeconds(10);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(50L * 1000L, providerResponse.getExpires().getTime()
-                     - providerResponse.getCreated().getTime());
+        long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
+        assertEquals(50, duration);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
     /**
@@ -288,14 +291,13 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        creationTime.setTime(creationTime.getTime() + (60L * 2L * 1000L));
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + (requestedLifetime * 1000L));
+        Instant creationTime = Instant.now().plusSeconds(120L);
+        Instant expirationTime = creationTime.plusSeconds(requestedLifetime);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
-        lifetime.setExpires(fmt.format(expirationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        lifetime.setExpires(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         try {
@@ -317,7 +319,7 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
     /**
@@ -336,25 +338,25 @@ public class JWTProviderLifetimeTest extends org.junit.Assert {
             createProviderParameters(JWTTokenProvider.JWT_TOKEN_TYPE);
 
         // Set expected lifetime to 1 minute
-        Date creationTime = new Date();
-        creationTime.setTime(creationTime.getTime() + (60L * 2L * 1000L));
+        Instant creationTime = Instant.now().plusSeconds(120L);
+
         Lifetime lifetime = new Lifetime();
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        lifetime.setCreated(fmt.format(creationTime));
+        lifetime.setCreated(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        
         providerParameters.getTokenRequirements().setLifetime(lifetime);
 
         TokenProviderResponse providerResponse = tokenProvider.createToken(providerParameters);
         assertTrue(providerResponse != null);
         assertTrue(providerResponse.getToken() != null && providerResponse.getTokenId() != null);
-        assertEquals(claimsProvider.getLifetime() * 1000L, providerResponse.getExpires().getTime()
-                     - providerResponse.getCreated().getTime());
+        long duration = Duration.between(providerResponse.getCreated(), providerResponse.getExpires()).getSeconds();
+        assertEquals(claimsProvider.getLifetime(), duration);
 
         String token = (String)providerResponse.getToken();
         assertNotNull(token);
 
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getTime() / 1000L);
+        assertEquals(jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT), providerResponse.getCreated().getEpochSecond());
     }
 
     private TokenProviderParameters createProviderParameters(String tokenType) throws WSSecurityException {

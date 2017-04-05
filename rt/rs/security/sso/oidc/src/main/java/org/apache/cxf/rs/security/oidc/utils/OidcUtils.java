@@ -73,7 +73,7 @@ public final class OidcUtils {
 
     private static final Map<String, List<String>> SCOPES_MAP;
     static {
-        SCOPES_MAP = new HashMap<String, List<String>>();
+        SCOPES_MAP = new HashMap<>();
         SCOPES_MAP.put(PHONE_SCOPE, PHONE_CLAIMS);
         SCOPES_MAP.put(EMAIL_SCOPE, EMAIL_CLAIMS);
         SCOPES_MAP.put(ADDRESS_SCOPE, ADDRESS_CLAIMS);

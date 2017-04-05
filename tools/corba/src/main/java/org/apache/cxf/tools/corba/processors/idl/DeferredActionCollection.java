@@ -34,7 +34,7 @@ import java.util.Map;
  */
 
 public final class DeferredActionCollection {
-    Map<String, List<DeferredAction>> deferredActions = new HashMap<String, List<DeferredAction>>();
+    Map<String, List<DeferredAction>> deferredActions = new HashMap<>();
     public void add(Scope scope, DeferredAction action) {
         List<DeferredAction> list = deferredActions.get(scope.toString());
         if (list == null) {

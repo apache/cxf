@@ -47,16 +47,17 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 @NoJSR250Annotations
 @Provider(value = Type.Feature)
 public class LoggingFeature extends AbstractFeature {
-    private LogEventSender sender;
     private LoggingInInterceptor in;
     private LoggingOutInterceptor out;
-    private PrettyLoggingFilter prettyFilter;
+    private PrettyLoggingFilter inPrettyFilter;
+    private PrettyLoggingFilter outPrettyFilter;
 
     public LoggingFeature() {
-        this.sender = new Slf4jVerboseEventSender();
-        prettyFilter = new PrettyLoggingFilter(sender);
-        in = new LoggingInInterceptor(prettyFilter);
-        out = new LoggingOutInterceptor(prettyFilter);
+        LogEventSender sender = new Slf4jVerboseEventSender();
+        inPrettyFilter = new PrettyLoggingFilter(sender);
+        outPrettyFilter = new PrettyLoggingFilter(sender);
+        in = new LoggingInInterceptor(inPrettyFilter);
+        out = new LoggingOutInterceptor(outPrettyFilter);
     }
 
     @Override
@@ -80,11 +81,19 @@ public class LoggingFeature extends AbstractFeature {
     }
 
     public void setSender(LogEventSender sender) {
-        this.prettyFilter.setNext(sender);
+        this.inPrettyFilter.setNext(sender);
+        this.outPrettyFilter.setNext(sender);
+    }
+    public void setInSender(LogEventSender s) {
+        this.inPrettyFilter.setNext(s);
+    }
+    public void setOutSender(LogEventSender s) {
+        this.outPrettyFilter.setNext(s);
     }
 
     public void setPrettyLogging(boolean prettyLogging) {
-        this.prettyFilter.setPrettyLogging(prettyLogging);
+        this.inPrettyFilter.setPrettyLogging(prettyLogging);
+        this.outPrettyFilter.setPrettyLogging(prettyLogging);
     }
 
     /**
@@ -106,7 +115,6 @@ public class LoggingFeature extends AbstractFeature {
     }
     
     public void setVerbose(boolean verbose) {
-        this.sender = verbose ? new Slf4jVerboseEventSender() : new Slf4jEventSender();
-        this.prettyFilter.setNext(sender);
+        setSender(verbose ? new Slf4jVerboseEventSender() : new Slf4jEventSender());
     }
 }

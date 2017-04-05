@@ -34,7 +34,7 @@ public class Server11 extends AbstractBusTestServerBase {
         String address = "http://localhost:"
             + PORT + "/SoapContext/GreeterPort";
         // enable the options of stack trace and the exception cause message
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("exceptionMessageCauseEnabled", "true");
         properties.put("faultStackTraceEnabled", "true");
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();

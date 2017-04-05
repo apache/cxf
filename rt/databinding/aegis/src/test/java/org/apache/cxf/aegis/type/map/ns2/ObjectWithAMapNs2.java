@@ -29,7 +29,7 @@ public class ObjectWithAMapNs2 {
     private Map<String, Boolean> theMap;
 
     public ObjectWithAMapNs2() {
-        theMap = new HashMap<String, Boolean>();
+        theMap = new HashMap<>();
         theMap.put("rainy", Boolean.TRUE);
         theMap.put("sunny", Boolean.FALSE);
     }

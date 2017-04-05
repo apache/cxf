@@ -100,7 +100,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     @Override
-    public Client getClient(String clientId) throws OAuthServiceException {
+    public Client doGetClient(String clientId) throws OAuthServiceException {
         return clientCache.get(clientId);
     }
 

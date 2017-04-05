@@ -42,7 +42,7 @@ final class SpecExceptions {
     private static final Map<Integer, Class<?>> EXCEPTIONS_MAP;
 
     static {
-        EXCEPTIONS_MAP = new HashMap<Integer, Class<?>>();
+        EXCEPTIONS_MAP = new HashMap<>();
         EXCEPTIONS_MAP.put(400, BadRequestException.class);
         EXCEPTIONS_MAP.put(401, NotAuthorizedException.class);
         EXCEPTIONS_MAP.put(403, ForbiddenException.class);

@@ -18,7 +18,8 @@
  */
 package org.apache.cxf.sts.cache;
 
-import java.util.Date;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -57,18 +58,14 @@ public class HazelCastTokenStoreTest extends org.junit.Assert {
     @org.junit.Test
     public void testTokenAddExpiration() throws Exception {
         SecurityToken expiredToken = new SecurityToken("expiredToken");
-        Date currentDate = new Date();
-        long currentTime = currentDate.getTime();
-        Date expiry = new Date();
-        expiry.setTime(currentTime - 5000L);
-        expiredToken.setExpires(expiry);
+        ZonedDateTime expiry = ZonedDateTime.now(ZoneOffset.UTC).minusSeconds(5L);
+        expiredToken.setExpires(expiry.toInstant());
         store.add(expiredToken);
         assertTrue(store.getTokenIdentifiers().isEmpty());
 
         SecurityToken farFutureToken = new SecurityToken("farFuture");
-        expiry = new Date();
-        expiry.setTime(Long.MAX_VALUE);
-        farFutureToken.setExpires(expiry);
+        expiry = ZonedDateTime.now(ZoneOffset.UTC).plusYears(50L);
+        farFutureToken.setExpires(expiry.toInstant());
         store.add(farFutureToken);
 
         assertTrue(store.getTokenIdentifiers().size() == 1);

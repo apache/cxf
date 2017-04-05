@@ -249,7 +249,7 @@ public class DocLiteralInInterceptorTest extends Assert {
         // we expect a wrapped document
         assertEquals(1, params.size());
 
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("ns", NS);
 
         XPathUtils xu = new XPathUtils(ns);

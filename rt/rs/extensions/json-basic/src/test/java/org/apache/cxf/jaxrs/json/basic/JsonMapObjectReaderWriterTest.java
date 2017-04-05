@@ -57,4 +57,15 @@ public class JsonMapObjectReaderWriterTest extends Assert {
         assertEquals(Collections.singletonList("cValue"), map.get("c"));
         assertNull(map.get("f"));
     }
+    @Test
+    public void testReadMapWithValueCommas() throws Exception {
+        String json = "{\"a\":\"aValue1,aValue2\",\"b\":\"bValue1\"\r\n,\"c\":[\"cValue1, cValue2\"],"
+            + "\"d\":\"dValue1,dValue2,dValue3,dValue4\"}";
+        Map<String, Object> map = new JsonMapObjectReaderWriter().fromJson(json);
+        assertEquals(4, map.size());
+        assertEquals("aValue1,aValue2", map.get("a"));
+        assertEquals("bValue1", map.get("b"));
+        assertEquals(Collections.singletonList("cValue1, cValue2"), map.get("c"));
+        assertEquals("dValue1,dValue2,dValue3,dValue4", map.get("d"));
+    }
 }

@@ -101,7 +101,7 @@ public class UserResource {
     }
 
     public Map<String, UserOperation> getOperationsAsMap() {
-        Map<String, UserOperation> map = new HashMap<String, UserOperation>();
+        Map<String, UserOperation> map = new HashMap<>();
         for (UserOperation op : opers) {
             map.put(op.getName(), op);
         }

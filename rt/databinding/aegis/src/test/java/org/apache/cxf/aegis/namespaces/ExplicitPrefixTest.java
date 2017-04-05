@@ -118,7 +118,7 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
      * @return
      */
     private Map<String, String> getNodeNamespaceDeclarations(Node node) {
-        Map<String, String> result = new HashMap<String, String>();
+        Map<String, String> result = new HashMap<>();
         NamedNodeMap attributes = node.getAttributes();
         for (int x = 0; x < attributes.getLength(); x++) {
             Attr attr = (Attr)attributes.item(x);
@@ -147,7 +147,7 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
 
     @Test
     public void testOnePrefix() throws Exception {
-        Map<String, String> mappings = new HashMap<String, String>();
+        Map<String, String> mappings = new HashMap<>();
         mappings.put(URN_AEGIS_NAMESPACE_TEST, AEGIS_TEST_NAMESPACE_PREFIX_XYZZY);
         ServiceAndMapping serviceAndMapping = setupService(NameServiceImpl.class, mappings);
         Definition def = getWSDLDefinition("NameServiceImpl");

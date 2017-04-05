@@ -105,7 +105,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     @Test
     public void testThatNewInnerSpanIsCreated() throws MalformedURLException {
         final SpanId spanId = SpanId.fromRandom();
-        final Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        final Map<String, List<String>> headers = new HashMap<>();
         headers.put(TracerHeaders.DEFAULT_HEADER_SPAN_ID, Arrays.asList(spanId.toString()));
 
         final BookStoreService service = createJaxWsService(headers);
@@ -211,7 +211,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     }
 
     private static Tracer createTracer() {
-        final Map<String, String> properties = new HashMap<String, String>();
+        final Map<String, String> properties = new HashMap<>();
         properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, TestSpanReceiver.class.getName());
         properties.put(Tracer.SAMPLER_CLASSES_KEY, AlwaysSampler.class.getName());
 

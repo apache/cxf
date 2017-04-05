@@ -142,7 +142,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
                 public void write(byte b[], int off, int len) throws IOException {
                     //REVISIT support multiple writes and flush() to write the entire block data?
                     // or provides the fragment mode?
-                    Map<String, String> headers = new HashMap<String, String>();
+                    Map<String, String> headers = new HashMap<>();
                     headers.put("Content-Type", entity.getContentType());
                     headers.put(requestIdKey, entity.getId());
                     websocket.sendMessage(WebSocketUtils.buildRequest(
@@ -165,7 +165,7 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
         @Override
         protected void handleNoOutput() throws IOException {
             connect();
-            Map<String, String> headers = new HashMap<String, String>();
+            Map<String, String> headers = new HashMap<>();
             headers.put(requestIdKey, entity.getId());
             websocket.sendMessage(WebSocketUtils.buildRequest(
                 entity.getMethod(), entity.getPath(),

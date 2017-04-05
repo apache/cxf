@@ -48,9 +48,9 @@ public class ContextPropertiesMappingTest extends Assert {
     private static final String REQUEST_METHOD = "GET";
     private static final String HEADER = "header";
 
-    private Map<String, Object> message = new HashMap<String, Object>();
-    private Map<String, Object> requestContext = new HashMap<String, Object>();
-    private Map<String, Object> responseContext = new HashMap<String, Object>();
+    private Map<String, Object> message = new HashMap<>();
+    private Map<String, Object> requestContext = new HashMap<>();
+    private Map<String, Object> responseContext = new HashMap<>();
 
     @Before
     public void setUp() throws Exception {

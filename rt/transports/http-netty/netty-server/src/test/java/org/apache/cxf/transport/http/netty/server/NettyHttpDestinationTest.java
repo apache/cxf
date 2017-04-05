@@ -446,7 +446,7 @@ public class NettyHttpDestinationTest extends Assert {
         EndpointReferenceType refWithId = destination.getAddressWithId(id);
         String pathInfo = EndpointReferenceUtils.getAddress(refWithId);
 
-        Map<String, Object> context = new HashMap<String, Object>();
+        Map<String, Object> context = new HashMap<>();
         assertNull("fails with no context", destination.getId(context));
 
         context.put(Message.PATH_INFO, pathInfo);
@@ -462,7 +462,7 @@ public class NettyHttpDestinationTest extends Assert {
         final String id = "ID3";
         EndpointReferenceType refWithId = destination.getAddressWithId(id);
 
-        Map<String, Object> context = new HashMap<String, Object>();
+        Map<String, Object> context = new HashMap<>();
         assertNull("fails with no context", destination.getId(context));
 
         AddressingProperties maps = EasyMock.createMock(AddressingProperties.class);

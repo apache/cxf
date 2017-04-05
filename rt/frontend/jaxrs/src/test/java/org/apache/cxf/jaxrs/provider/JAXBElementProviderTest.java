@@ -464,7 +464,7 @@ public class JAXBElementProviderTest extends Assert {
         JAXBElementProvider<List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>> provider
             = new JAXBElementProvider<List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook>>();
 
-        Map<String, String> prefixes = new HashMap<String, String>();
+        Map<String, String> prefixes = new HashMap<>();
         prefixes.put("http://superbooks", "ns1");
         prefixes.put("http://books", "ns2");
         provider.setNamespacePrefixes(prefixes);
@@ -813,7 +813,7 @@ public class JAXBElementProviderTest extends Assert {
 
     private void readTagVO2AfterTransform(String data, String keyValue) throws Exception {
         JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(keyValue, "{http://tags}thetag");
         provider.setInTransformElements(map);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
@@ -829,7 +829,7 @@ public class JAXBElementProviderTest extends Assert {
         String data = "<?xml version='1.0' encoding='UTF-8'?>"
             + "<tagholder><thetag><group>B</group><name>A</name></thetag></tagholder>";
         JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<TagVO2Holder>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("tagholder", "{http://tags}tagholder");
         map.put("thetag", "{http://tags}thetag");
         provider.setInTransformElements(map);
@@ -883,7 +883,7 @@ public class JAXBElementProviderTest extends Assert {
 
     private void readTagVOAfterTransform(String data, String keyValue) throws Exception {
         JAXBElementProvider<TagVO> provider = new JAXBElementProvider<TagVO>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put(keyValue, "tagVO");
         provider.setInTransformElements(map);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
@@ -897,7 +897,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutAttributesAsElements() throws Exception {
         JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<TagVO2Holder>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}thetag", "thetag");
         map.put("{http://tags}tagholder", "tagholder");
         provider.setOutTransformElements(map);
@@ -920,7 +920,7 @@ public class JAXBElementProviderTest extends Assert {
         JAXBElementProvider<List<?>> provider = new JAXBElementProvider<List<?>>();
         provider.setMessageContext(new MessageContextImpl(createMessage()));
         provider.setCollectionWrapperName("tagholders");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}*", "*");
         provider.setOutTransformElements(map);
         provider.setAttributesToElements(true);
@@ -960,11 +960,11 @@ public class JAXBElementProviderTest extends Assert {
     public void testOutAppendElementsDiffNs() throws Exception {
         JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
 
-        Map<String, String> prefixes = new HashMap<String, String>();
+        Map<String, String> prefixes = new HashMap<>();
         prefixes.put("http://tags", "ns2");
         provider.setNamespacePrefixes(prefixes);
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -979,7 +979,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutAppendNsElementBeforeLocal() throws Exception {
         JAXBElementProvider<TagVO> provider = new JAXBElementProvider<TagVO>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("tagVO", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
         TagVO tag = new TagVO("A", "B");
@@ -994,7 +994,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutAppendLocalBeforeLocal() throws Exception {
         JAXBElementProvider<TagVO> provider = new JAXBElementProvider<TagVO>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("tagVO", "supertag");
         provider.setOutAppendElements(map);
         TagVO tag = new TagVO("A", "B");
@@ -1010,11 +1010,11 @@ public class JAXBElementProviderTest extends Assert {
     public void testOutAppendElementsSameNs() throws Exception {
         JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
 
-        Map<String, String> prefixes = new HashMap<String, String>();
+        Map<String, String> prefixes = new HashMap<>();
         prefixes.put("http://tags", "ns2");
         provider.setNamespacePrefixes(prefixes);
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}thetag", "{http://tags}t");
         provider.setOutAppendElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -1031,10 +1031,10 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalNsToLocalNs() throws Exception {
         JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
-        Map<String, String> prefixes = new HashMap<String, String>();
+        Map<String, String> prefixes = new HashMap<>();
         prefixes.put("http://tags", "ns2");
         provider.setNamespacePrefixes(prefixes);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutTransformElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -1050,7 +1050,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalNsToLocal() throws Exception {
         JAXBElementProvider<TagVO2> provider = new JAXBElementProvider<TagVO2>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}thetag", "t");
         provider.setOutTransformElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -1065,7 +1065,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalNsToLocalWildcard() throws Exception {
         JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<TagVO2Holder>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}*", "*");
         provider.setOutTransformElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -1083,11 +1083,11 @@ public class JAXBElementProviderTest extends Assert {
     public void testOutElementsMapLocalNsToLocalWildcard2() throws Exception {
         JAXBElementProvider<TagVO2Holder> provider = new JAXBElementProvider<TagVO2Holder>();
 
-        Map<String, String> prefixes = new HashMap<String, String>();
+        Map<String, String> prefixes = new HashMap<>();
         prefixes.put("http://tags", "ns2");
         provider.setNamespacePrefixes(prefixes);
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("{http://tags}*", "{http://tags2}*");
         provider.setOutTransformElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -1106,7 +1106,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalToLocalNs() throws Exception {
         JAXBElementProvider<TagVO> provider = new JAXBElementProvider<TagVO>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("tagVO", "{http://tags}thetag");
         provider.setOutTransformElements(map);
         TagVO tag = new TagVO("A", "B");
@@ -1121,7 +1121,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testOutElementsMapLocalToLocal() throws Exception {
         JAXBElementProvider<TagVO> provider = new JAXBElementProvider<TagVO>();
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("tagVO", "thetag");
         map.put("group", "group2");
         provider.setOutTransformElements(map);
@@ -1161,7 +1161,7 @@ public class JAXBElementProviderTest extends Assert {
         List<String> list = new ArrayList<>();
         list.add("{http://tags}thetag");
         provider.setOutDropElements(list);
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("name", "");
         provider.setOutTransformElements(map);
         TagVO2 tag = new TagVO2("A", "B");
@@ -1417,7 +1417,7 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testSetMarshallProperties() throws Exception {
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         props.put(Marshaller.JAXB_SCHEMA_LOCATION, "foo.xsd");
 
@@ -1441,7 +1441,7 @@ public class JAXBElementProviderTest extends Assert {
 
     private static class TestMarshaller implements Marshaller {
 
-        private Map<String, Object> props = new HashMap<String, Object>();
+        private Map<String, Object> props = new HashMap<>();
 
         TestMarshaller() {
 

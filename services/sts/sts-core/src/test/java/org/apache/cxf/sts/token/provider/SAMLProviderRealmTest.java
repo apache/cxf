@@ -56,7 +56,7 @@ public class SAMLProviderRealmTest extends org.junit.Assert {
         providerParameters.setRealm("A");
 
         // Create Realms
-        Map<String, RealmProperties> samlRealms = new HashMap<String, RealmProperties>();
+        Map<String, RealmProperties> samlRealms = new HashMap<>();
         RealmProperties samlRealm = new RealmProperties();
         samlRealm.setIssuer("A-Issuer");
         samlRealms.put("A", samlRealm);

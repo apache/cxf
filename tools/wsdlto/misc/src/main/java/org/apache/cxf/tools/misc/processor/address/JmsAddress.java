@@ -27,13 +27,13 @@ import org.apache.cxf.tools.common.ToolContext;
 
 public class JmsAddress implements Address {
     public Map<String, String> getNamespaces(final ToolContext context) {
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         ns.put("jms", ToolConstants.NS_JMS_ADDRESS);
         return ns;
     }
 
     public Map<String, Object> buildAddressArguments(final ToolContext context) {
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new HashMap<>();
 
         if (context.optionSet(ToolConstants.JMS_ADDR_DEST_STYLE)) {
             args.put(ToolConstants.JMS_ADDR_DEST_STYLE,

@@ -155,7 +155,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
         CountingUsernameTokenAction action = new CountingUsernameTokenAction();
-        Map<Object, Object> customActions = new HashMap<Object, Object>(1);
+        Map<Object, Object> customActions = new HashMap<>(1);
         customActions.put(WSConstants.UT, action);
 
         msg.put(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
@@ -199,7 +199,7 @@ public class WSS4JOutInterceptorTest extends AbstractSecurityTest {
         PhaseInterceptor<SoapMessage> handler = ohandler.createEndingInterceptor();
 
         CountingUsernameTokenAction action = new CountingUsernameTokenAction();
-        Map<Object, Object> customActions = new HashMap<Object, Object>(1);
+        Map<Object, Object> customActions = new HashMap<>(1);
         customActions.put(12345, action);
 
         msg.put(WSHandlerConstants.ACTION, "12345");

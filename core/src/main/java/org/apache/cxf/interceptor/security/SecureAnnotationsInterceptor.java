@@ -67,7 +67,7 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
 
     public void setSecuredObject(Object object) {
         Class<?> cls = ClassHelper.getRealClass(object);
-        Map<String, String> rolesMap = new HashMap<String, String>();
+        Map<String, String> rolesMap = new HashMap<>();
         findRoles(cls, rolesMap);
         if (rolesMap.isEmpty()) {
             LOG.warning("The roles map is empty, the service object is not protected");

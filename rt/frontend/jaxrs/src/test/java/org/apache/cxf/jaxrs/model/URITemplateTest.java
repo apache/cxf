@@ -611,7 +611,7 @@ public class URITemplateTest extends Assert {
     @Test
     public void testSubstituteMap() throws Exception {
         URITemplate ut = new URITemplate("/foo/{a}/{b:\\d\\d}/{c}");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("c", "foo");
         map.put("b", "11");
         map.put("a", "bar");
@@ -621,7 +621,7 @@ public class URITemplateTest extends Assert {
     @Test
     public void testSubstituteMapSameVars() throws Exception {
         URITemplate ut = new URITemplate("/foo/{a}/{a}/{a}");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("a", "bar");
         assertEquals("Wrong substitution", "/foo/bar/bar/bar", ut.substitute(map));
     }
@@ -629,7 +629,7 @@ public class URITemplateTest extends Assert {
     @Test(expected = IllegalArgumentException.class)
     public void testSubstituteMapIncomplete() throws Exception {
         URITemplate ut = new URITemplate("/foo/{a}/{b}/{a:\\d}");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("b", "bar");
         ut.substitute(map);
     }
@@ -637,7 +637,7 @@ public class URITemplateTest extends Assert {
     @Test
     public void testSubstituteMapSameVarWithPattern() throws Exception {
         URITemplate ut = new URITemplate("/foo/{a}/{a:\\d}");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("a", "0");
         assertEquals("Wrong substitution", "/foo/0/0", ut.substitute(map));
     }
@@ -645,7 +645,7 @@ public class URITemplateTest extends Assert {
     @Test(expected = IllegalArgumentException.class)
     public void testSubstituteMapSameVarWithPatternFail() throws Exception {
         URITemplate ut = new URITemplate("/foo/{a}/{a:\\d}");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("a", "not-a-digit");
         ut.substitute(map);
     }
@@ -653,7 +653,7 @@ public class URITemplateTest extends Assert {
     @Test
     public void testSubstituteMapExceeding() throws Exception {
         URITemplate ut = new URITemplate("/foo/{a}");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("b", "baz");
         map.put("a", "blah");
         assertEquals("Wrong substitution", "/foo/blah", ut.substitute(map));
@@ -723,7 +723,7 @@ public class URITemplateTest extends Assert {
     @Test
     public void testNestedCurlyBraces() {
         URITemplate ut = new URITemplate("/foo/{hex:[0-9a-fA-F]{2}}");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("hex", "FF");
         assertEquals("Wrong substitution", "/foo/FF", ut.substitute(map));
     }

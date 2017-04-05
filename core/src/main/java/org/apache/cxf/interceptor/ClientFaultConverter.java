@@ -239,7 +239,7 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
 
     private void setStackTrace(Fault fault, Message msg) {
         Throwable cause = null;
-        Map<String, String> ns = new HashMap<String, String>();
+        Map<String, String> ns = new HashMap<>();
         XPathUtils xu = new XPathUtils(ns);
         ns.put("s", Fault.STACKTRACE_NAMESPACE);
         String ss = (String) xu.getValue("//s:" + Fault.STACKTRACE + "/text()", fault.getDetail(),

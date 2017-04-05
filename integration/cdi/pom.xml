@@ -34,7 +34,7 @@
     <properties>
         <cxf.osgi.import>
             javax.servlet*;version="${cxf.osgi.javax.servlet.version}",
-            javax.enterprise*;version="[${cxf.cdi.api.version},2)",
+            javax.enterprise*;version="${cxf.cda.api.osgi.range}",
             javax.ws.rs*;version="[1.0,3)",
             org.apache.cxf.interceptor;resolution:=optional,
             *          
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.1.0</version>
+            <version>2.7.14</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

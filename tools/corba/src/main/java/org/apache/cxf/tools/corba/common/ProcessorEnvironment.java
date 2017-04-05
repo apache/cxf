@@ -33,9 +33,9 @@ public class ProcessorEnvironment {
 
     private Map<String, Object> paramMap;
     private String packageName;
-    private Map<String, String> namespacePackageMap = new HashMap<String, String>();
-    private Map<String, String> excludeNamespacePackageMap = new HashMap<String, String>();
-    private final Map<String, InputSource> jaxbBindingFiles = new HashMap<String, InputSource>();
+    private Map<String, String> namespacePackageMap = new HashMap<>();
+    private Map<String, String> excludeNamespacePackageMap = new HashMap<>();
+    private final Map<String, InputSource> jaxbBindingFiles = new HashMap<>();
 
     public ProcessorEnvironment() {
     }
@@ -90,7 +90,7 @@ public class ProcessorEnvironment {
 
     public void put(String key, Object value) {
         if (paramMap == null) {
-            paramMap = new HashMap<String, Object>();
+            paramMap = new HashMap<>();
         }
         paramMap.put(key, value);
     }

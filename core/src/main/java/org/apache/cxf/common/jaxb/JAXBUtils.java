@@ -38,6 +38,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -123,7 +125,7 @@ public final class JAXBUtils {
     private static ClassLoader jaxbXjcLoader;
 
     static {
-        BUILTIN_DATATYPES_MAP = new HashMap<String, String>();
+        BUILTIN_DATATYPES_MAP = new HashMap<>();
         BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
         BUILTIN_DATATYPES_MAP.put("integer", "java.math.BigInteger");
         BUILTIN_DATATYPES_MAP.put("int", "int");
@@ -152,7 +154,7 @@ public final class JAXBUtils {
         BUILTIN_DATATYPES_MAP.put("NOTATION", "javax.xml.namespace.QName");
         BUILTIN_DATATYPES_MAP.put("string", "java.lang.String");
 
-        HOLDER_TYPES_MAP = new HashMap<String, Class<?>>();
+        HOLDER_TYPES_MAP = new HashMap<>();
         HOLDER_TYPES_MAP.put("int", java.lang.Integer.class);
         HOLDER_TYPES_MAP.put("long", java.lang.Long.class);
         HOLDER_TYPES_MAP.put("short", java.lang.Short.class);
@@ -739,7 +741,7 @@ public final class JAXBUtils {
     }
 
     public static void logGeneratedClassNames(Logger logger, JCodeModel codeModel) {
-        if (!logger.isLoggable(Level.INFO)) {
+        if (!logger.isLoggable(Level.FINE)) {
             return;
         }
 
@@ -758,7 +760,7 @@ public final class JAXBUtils {
             }
         }
 
-        logger.log(Level.INFO, "Created classes: " + sb.toString());
+        logger.log(Level.FINE, "Created classes: " + sb.toString());
     }
 
     public static List<String> getGeneratedClassNames(JCodeModel codeModel) {
@@ -865,8 +867,8 @@ public final class JAXBUtils {
         // allow loading of extra classes (such as subclasses for inheritance
         // reasons)
         // that are in the same package. Also check for ObjectFactory classes
-        Map<String, InputStream> packages = new HashMap<String, InputStream>();
-        Map<String, ClassLoader> packageLoaders = new HashMap<String, ClassLoader>();
+        Map<String, InputStream> packages = new HashMap<>();
+        Map<String, ClassLoader> packageLoaders = new HashMap<>();
         Set<Class<?>> objectFactories = new HashSet<Class<?>>();
         for (Class<?> jcls : classes) {
             String pkgName = PackageUtils.getPackageName(jcls);
@@ -874,7 +876,7 @@ public final class JAXBUtils {
                 Package pkg = jcls.getPackage();
 
                 packages.put(pkgName, jcls.getResourceAsStream("jaxb.index"));
-                packageLoaders.put(pkgName, jcls.getClassLoader());
+                packageLoaders.put(pkgName, getClassLoader(jcls));
                 String objectFactoryClassName = pkgName + "." + "ObjectFactory";
                 Class<?> ofactory = null;
                 CachedClass cachedFactory = null;
@@ -888,8 +890,7 @@ public final class JAXBUtils {
                 }
                 if (ofactory == null) {
                     try {
-                        ofactory = Class.forName(objectFactoryClassName, false, jcls
-                                                 .getClassLoader());
+                        ofactory = Class.forName(objectFactoryClassName, false, getClassLoader(jcls));
                         objectFactories.add(ofactory);
                         addToObjectFactoryCache(pkg, ofactory, objectFactoryCache);
                     } catch (ClassNotFoundException e) {
@@ -944,8 +945,20 @@ public final class JAXBUtils {
         classes.addAll(objectFactories);
     }
 
-
-    private static void addToObjectFactoryCache(Package objectFactoryPkg,
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                @Override
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
+    }
+       
+    private static void addToObjectFactoryCache(Package objectFactoryPkg, 
                                          Class<?> ofactory,
                                          Map<Package, CachedClass> objectFactoryCache) {
         if (objectFactoryPkg == null || objectFactoryCache == null) {

@@ -20,7 +20,7 @@ package org.apache.cxf.systest.exception;
 
 import javax.jws.WebService;
 
-import org.apache.cxf.annotations.Logging;
+import org.apache.cxf.ext.logging.Logging;
 
 @WebService(targetNamespace = "http://cxf.apache.org/test/HelloService", name = "HelloService")
 @Logging

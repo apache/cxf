@@ -32,7 +32,7 @@ public class EcdhAesWrapKeyEncryptionAlgorithm implements KeyEncryptionProvider 
 
     private static final Map<String, String> ECDH_AES_MAP;
     static {
-        ECDH_AES_MAP = new HashMap<String, String>();
+        ECDH_AES_MAP = new HashMap<>();
         ECDH_AES_MAP.put(KeyAlgorithm.ECDH_ES_A128KW.getJwaName(), KeyAlgorithm.A128KW.getJwaName());
         ECDH_AES_MAP.put(KeyAlgorithm.ECDH_ES_A192KW.getJwaName(), KeyAlgorithm.A192KW.getJwaName());
         ECDH_AES_MAP.put(KeyAlgorithm.ECDH_ES_A256KW.getJwaName(), KeyAlgorithm.A256KW.getJwaName());

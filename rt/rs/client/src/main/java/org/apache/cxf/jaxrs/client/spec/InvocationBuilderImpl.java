@@ -271,7 +271,7 @@ public class InvocationBuilderImpl implements Invocation.Builder {
         Map<String, Object> contextProps = WebClient.getConfig(webClient).getRequestContext();
         Map<String, Object> filterProps = CastUtils.cast((Map<?, ?>)contextProps.get(PROPERTY_KEY));
         if (filterProps == null) {
-            filterProps = new HashMap<String, Object>();
+            filterProps = new HashMap<>();
             contextProps.put(PROPERTY_KEY, filterProps);
         }
         if (value == null) {

@@ -147,9 +147,9 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
         operationsWithNameConflicts = new HashSet<>();
         inputMessagesWithNameConflicts = new HashSet<>();
         outputMessagesWithNameConflicts = new HashSet<>();
-        localOperationsNameMap = new HashMap<String, OperationInfo>();
-        localInputMessagesNameMap = new HashMap<String, MessageInfo>();
-        localOutputMessagesNameMap = new HashMap<String, MessageInfo>();
+        localOperationsNameMap = new HashMap<>();
+        localInputMessagesNameMap = new HashMap<>();
+        localOutputMessagesNameMap = new HashMap<>();
 
         code.append("function " + currentInterfaceClassName + " () {\n");
         utils.appendLine("this.jsutils = new CxfApacheOrgUtil();");

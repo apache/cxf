@@ -53,7 +53,7 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 @Path("/bookstore")
 @Produces("application/xml")
 public class BookStore {
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
 
     @Context
     private UriInfo ui;

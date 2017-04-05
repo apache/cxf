@@ -33,7 +33,7 @@ import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 
 @Path("/bookstorestorage/")
 public class SecureBookStore extends AbstractSecureBookStore implements SecureBookInterface {
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
     private SecureBookInterface subresource;
     private UriInfo uriInfo;
 

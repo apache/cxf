@@ -148,7 +148,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         updateAddressPort(greeter, test.getPort());
 
         Client client = ClientProxy.getClient(greeter);
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("action", "UsernameToken");
         props.put("user", "alice");
         props.put("passwordType", "PasswordText");
@@ -196,7 +196,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         updateAddressPort(greeter, test.getPort());
 
         Client client = ClientProxy.getClient(greeter);
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("action", "UsernameToken");
         props.put("user", "alice");
         props.put("passwordType", "PasswordText");

@@ -26,7 +26,7 @@ import java.util.Map;
 public class Book {
     private String name;
     private long id;
-    private Map<Long, BookChapter> chapters = new HashMap<Long, BookChapter>();
+    private Map<Long, BookChapter> chapters = new HashMap<>();
 
     public Book() {
     }

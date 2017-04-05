@@ -34,6 +34,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.wss4j.common.crypto.WSProviderConfig;
@@ -70,11 +71,14 @@ public abstract class AbstractXmlSecInHandler {
     }
 
     protected Document getDocument(Message message) {
-        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
-        if ("GET".equals(method)) {
+        if (isServerGet(message)) {
             return null;
+        } else {
+            Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+            if (responseCode != null && responseCode != 200) {
+                return null;
+            }
         }
-
         Document doc = null;
         InputStream is = message.getContent(InputStream.class);
         if (is != null) {
@@ -94,10 +98,19 @@ public abstract class AbstractXmlSecInHandler {
         }
         return doc;
     }
+    
+    protected boolean isServerGet(Message message) {
+        String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
+        return "GET".equals(method) && !MessageUtils.isRequestor(message);
+    }
 
     protected void throwFault(String error, Exception ex) {
-        LOG.warning(error);
-        Response response = JAXRSUtils.toResponseBuilder(400).entity(error).build();
+        StringBuilder log = new StringBuilder(error);
+        if (ex != null) {
+            log = log.append(" - ").append(ex.getMessage());
+        }
+        LOG.warning(log.toString());
+        Response response = JAXRSUtils.toResponseBuilder(400).entity(error).type("text/plain").build();
         throw ExceptionUtils.toBadRequestException(null, response);
     }
 

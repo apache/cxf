@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class InterfaceProxy implements InvocationHandler {
 
-    private Map<String, Object> map = new HashMap<String, Object>();
+    private Map<String, Object> map = new HashMap<>();
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();

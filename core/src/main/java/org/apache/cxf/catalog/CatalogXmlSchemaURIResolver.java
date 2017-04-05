@@ -40,7 +40,7 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
 
     private ExtendedURIResolver resolver;
     private Bus bus;
-    private Map<String, String> resolved = new HashMap<String, String>();
+    private Map<String, String> resolved = new HashMap<>();
 
     public CatalogXmlSchemaURIResolver(Bus bus) {
         this.resolver = new TransportURIResolver(bus);

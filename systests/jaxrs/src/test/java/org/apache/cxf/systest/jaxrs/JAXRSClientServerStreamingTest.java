@@ -75,7 +75,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             providers.add(p2);
             sf.setProviders(providers);
             sf.setAddress("http://localhost:" + PORT + "/");
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put("org.apache.cxf.serviceloader-context", "true");
             sf.setProperties(properties);
             sf.create();

@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.https.conduit;
 
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
@@ -27,16 +26,19 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
-import org.jboss.netty.handler.codec.http.HttpRequest;
-
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-import org.littleshoot.proxy.DefaultHttpProxyServer;
-import org.littleshoot.proxy.HttpFilter;
-import org.littleshoot.proxy.HttpRequestFilter;
-import org.littleshoot.proxy.ProxyAuthorizationHandler;
+
+import org.littleshoot.proxy.ActivityTrackerAdapter;
+import org.littleshoot.proxy.FlowContext;
+import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.ProxyAuthenticator;
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
+
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpRequest;
 
 
 /**
@@ -44,13 +46,16 @@ import org.littleshoot.proxy.ProxyAuthorizationHandler;
  */
 public class HTTPSProxyAuthConduitTest extends HTTPSConduitTest {
     static final int PROXY_PORT = Integer.parseInt(allocatePort(HTTPSProxyAuthConduitTest.class));
-    static DefaultHttpProxyServer proxy;
+    static HttpProxyServer proxy;
     static CountingFilter requestFilter = new CountingFilter();
 
-    static class CountingFilter implements HttpRequestFilter {
+    static class CountingFilter extends ActivityTrackerAdapter {
         AtomicInteger count = new AtomicInteger();
-        public void filter(HttpRequest httpRequest) {
-            count.incrementAndGet();
+        public void requestReceivedFromClient(FlowContext flowContext,
+                                              HttpRequest httpRequest) {
+            if (httpRequest.getMethod() != HttpMethod.CONNECT) {
+                count.incrementAndGet();
+            }
         }
 
         public void reset() {
@@ -74,13 +79,20 @@ public class HTTPSProxyAuthConduitTest extends HTTPSConduitTest {
     @BeforeClass
     public static void startProxy() {
         System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
-        proxy = new DefaultHttpProxyServer(PROXY_PORT, requestFilter, new HashMap<String, HttpFilter>());
-        proxy.addProxyAuthenticationHandler(new ProxyAuthorizationHandler() {
-            public boolean authenticate(String userName, String password) {
-                return "password".equals(password) && "CXF".equals(userName);
-            }
-        });
-        proxy.start();
+        proxy = DefaultHttpProxyServer.bootstrap()
+            .withPort(PROXY_PORT)
+            .withProxyAuthenticator(new ProxyAuthenticator() {
+                @Override
+                public boolean authenticate(String userName, String password) {
+                    return "password".equals(password) && "CXF".equals(userName);
+                }
+                @Override
+                public String getRealm() {
+                    return null;
+                }
+            })
+            .plusActivityTracker(requestFilter)
+            .start();
     }
     @Before
     public void resetCount() {

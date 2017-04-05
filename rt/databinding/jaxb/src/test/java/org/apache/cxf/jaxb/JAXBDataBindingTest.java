@@ -187,10 +187,10 @@ public class JAXBDataBindingTest extends Assert {
     @Test
     public void testContextProperties() throws Exception {
         JAXBDataBinding db = new JAXBDataBinding();
-        Map<String, String> nsMap = new HashMap<String, String>();
+        Map<String, String> nsMap = new HashMap<>();
         nsMap.put("uri:ultima:thule", "");
         db.setNamespaceMap(nsMap);
-        Map<String, Object> contextProperties = new HashMap<String, Object>();
+        Map<String, Object> contextProperties = new HashMap<>();
         contextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
         db.setContextProperties(contextProperties);
         Set<Class<?>> classes = new HashSet<Class<?>>();
@@ -210,10 +210,10 @@ public class JAXBDataBindingTest extends Assert {
 
     JAXBDataBinding createJaxbContext(boolean internal) throws Exception {
         JAXBDataBinding db = new JAXBDataBinding();
-        Map<String, String> nsMap = new HashMap<String, String>();
+        Map<String, String> nsMap = new HashMap<>();
         nsMap.put("uri:ultima:thule", "greenland");
         db.setNamespaceMap(nsMap);
-        Map<String, Object> contextProperties = new HashMap<String, Object>();
+        Map<String, Object> contextProperties = new HashMap<>();
         db.setContextProperties(contextProperties);
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(QualifiedBean.class);
@@ -293,7 +293,7 @@ public class JAXBDataBindingTest extends Assert {
     public void testResursiveType() throws Exception {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         Collection<Object> typeReferences = new ArrayList<>();
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         JAXBContextInitializer init = new JAXBContextInitializer(null, classes, typeReferences, props);
         init.addClass(Type2.class);
         assertEquals(2, classes.size());
@@ -368,7 +368,7 @@ public class JAXBDataBindingTest extends Assert {
 
     public static class LanguageAdapter extends XmlAdapter<String, Language> {
 
-        private Map<String, Language> knownLanguages = new HashMap<String, Language>();
+        private Map<String, Language> knownLanguages = new HashMap<>();
 
         public LanguageAdapter(Language... languages) {
             for (Language language : languages) {

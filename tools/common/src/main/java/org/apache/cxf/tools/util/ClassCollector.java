@@ -31,13 +31,13 @@ public class ClassCollector {
 
     private Map<String, String> seiClassNames
         = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
-    private Map<String, String> typesClassNames = new HashMap<String, String>();
-    private Map<String, String> exceptionClassNames = new HashMap<String, String>();
-    private Map<String, String> serviceClassNames = new HashMap<String, String>();
-    private Map<String, String> implClassNames = new HashMap<String, String>();
-    private final Map<String, String> clientClassNames = new HashMap<String, String>();
-    private final Map<String, String> serverClassNames = new HashMap<String, String>();
-    private final Map<String, String> reservedClassNames = new HashMap<String, String>();
+    private Map<String, String> typesClassNames = new HashMap<>();
+    private Map<String, String> exceptionClassNames = new HashMap<>();
+    private Map<String, String> serviceClassNames = new HashMap<>();
+    private Map<String, String> implClassNames = new HashMap<>();
+    private final Map<String, String> clientClassNames = new HashMap<>();
+    private final Map<String, String> serverClassNames = new HashMap<>();
+    private final Map<String, String> reservedClassNames = new HashMap<>();
 
 
     private final Set<String> typesPackages = new HashSet<>();

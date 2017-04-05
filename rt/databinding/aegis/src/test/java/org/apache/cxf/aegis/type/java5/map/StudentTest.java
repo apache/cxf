@@ -89,9 +89,9 @@ public class StudentTest extends AbstractAegisTest {
         proxyFac.setBus(getBus());
         setupAegis(proxyFac.getClientFactoryBean());
         //CHECKSTYLE:OFF
-        HashMap<String, Student> mss = new HashMap<String, Student>();
+        HashMap<String, Student> mss = new HashMap<>();
         mss.put("Alice", new Student());
-        HashMap<String, HashMap<String, Student>> mmss = new HashMap<String, HashMap<String, Student>>();
+        HashMap<String, HashMap<String, Student>> mmss = new HashMap<>();
         mmss.put("Bob", mss);
 
         StudentServiceDocLiteral clientInterface = proxyFac.create(StudentServiceDocLiteral.class);

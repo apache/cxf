@@ -880,7 +880,7 @@ public class IssueSamlClaimsUnitTest extends org.junit.Assert {
 
     private Map<String, RealmProperties> createSamlRealms() {
         // Create Realms
-        Map<String, RealmProperties> samlRealms = new HashMap<String, RealmProperties>();
+        Map<String, RealmProperties> samlRealms = new HashMap<>();
         RealmProperties samlRealm = new RealmProperties();
         samlRealm.setIssuer("A-Issuer");
         samlRealms.put("A", samlRealm);

@@ -61,7 +61,7 @@ public class MemoryResourceManager implements ResourceManager {
     private WebServiceContext context;
 
     public MemoryResourceManager() {
-        storage = new HashMap<String, String>();
+        storage = new HashMap<>();
     }
 
     @Override

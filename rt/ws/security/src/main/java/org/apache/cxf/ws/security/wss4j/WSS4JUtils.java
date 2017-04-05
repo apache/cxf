@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.Key;
 import java.security.cert.X509Certificate;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -161,11 +161,11 @@ public final class WSS4JUtils {
         }
         SecurityToken existingToken = TokenStoreUtils.getTokenStore(message).getToken(securityToken.getId());
         if (existingToken == null || existingToken.isExpired()) {
-            Date created = new Date();
-            Date expires = new Date();
-            expires.setTime(created.getTime() + getSecurityTokenLifetime(message));
+            Instant created = Instant.now();
+            Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
 
-            SecurityToken cachedTok = new SecurityToken(securityToken.getId(), created, expires);
+            SecurityToken cachedTok =
+                new SecurityToken(securityToken.getId(), created, expires);
             cachedTok.setSHA1(securityToken.getSha1Identifier());
 
             if (securityToken.getTokenType() != null) {

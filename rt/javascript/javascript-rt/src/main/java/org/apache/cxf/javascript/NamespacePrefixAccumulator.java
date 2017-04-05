@@ -39,7 +39,7 @@ public class NamespacePrefixAccumulator {
     public NamespacePrefixAccumulator(SchemaCollection schemaCollection) {
         attributes = new StringBuilder();
         prefixes = new HashSet<>();
-        fallbackNamespacePrefixMap = new HashMap<String, String>();
+        fallbackNamespacePrefixMap = new HashMap<>();
         nsCounter = 0;
         this.schemaCollection = schemaCollection;
     }

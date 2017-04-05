@@ -46,9 +46,9 @@ public class InTransformReader extends DepthXMLStreamReader {
 
     private QNamesMap inElementsMap;
     private QNamesMap inAttributesMap;
-    private Map<QName, ElementProperty> inAppendMap = new HashMap<QName, ElementProperty>(5);
+    private Map<QName, ElementProperty> inAppendMap = new HashMap<>(5);
     private Set<QName> inDropSet = new HashSet<>(5);
-    private Map<String, String> nsMap = new HashMap<String, String>(5);
+    private Map<String, String> nsMap = new HashMap<>(5);
     private List<ParsingEvent> pushedBackEvents = new LinkedList<ParsingEvent>();
     private List<List<ParsingEvent>> pushedAheadEvents = new LinkedList<List<ParsingEvent>>();
     private String replaceText;

@@ -106,7 +106,7 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
     private String getImplName(String port, String service, JavaInterface intf, ToolContext penv) {
         Map<String, String> nm = CastUtils.cast((Map<?, ?>)penv.get(ToolConstants.CFG_IMPL_CLASS));
         if (nm == null) {
-            nm = new HashMap<String, String>();
+            nm = new HashMap<>();
             penv.put(ToolConstants.CFG_IMPL_CLASS, nm);
         }
         String name = nm.get(service + "/" + port);

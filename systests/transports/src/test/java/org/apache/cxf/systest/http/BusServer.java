@@ -32,7 +32,7 @@ import org.apache.cxf.testutil.common.TestUtil;
  * Everything else is designed to be spring-loaded.
  */
 public class BusServer extends AbstractBusTestServerBase {
-    public static final Map<String, String> PORTMAP = new HashMap<String, String>();
+    public static final Map<String, String> PORTMAP = new HashMap<>();
     public static void resetPortMap() {
         PORTMAP.clear();
         for (int x = 0; x < 9; x++) {

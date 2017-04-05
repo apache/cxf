@@ -228,6 +228,7 @@ public class Java2WADLMojo extends AbstractMojo {
     private ClassLoader resourceClassLoader;
 
     public void execute() throws MojoExecutionException {
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
         List<Class<?>> resourceClasses = loadResourceClasses();
         initClassResourceInfoList(resourceClasses);
         WadlGenerator wadlGenerator = new WadlGenerator(getBus());

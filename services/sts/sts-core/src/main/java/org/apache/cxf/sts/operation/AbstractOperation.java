@@ -20,8 +20,9 @@
 package org.apache.cxf.sts.operation;
 
 import java.security.Principal;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,10 +74,10 @@ import org.apache.cxf.ws.security.sts.provider.model.secext.SecurityTokenReferen
 import org.apache.cxf.ws.security.sts.provider.model.utility.AttributedDateTime;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.message.WSSecEncryptedKey;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.stax.securityEvent.SecurityEvent;
 import org.apache.xml.security.stax.securityEvent.SecurityEventConstants;
@@ -289,25 +290,25 @@ public abstract class AbstractOperation {
      * Create a LifetimeType object given a created + expires Dates
      */
     protected static LifetimeType createLifetime(
-        Date tokenCreated, Date tokenExpires
+        Instant tokenCreated, Instant tokenExpires
     ) {
         AttributedDateTime created = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
         AttributedDateTime expires = QNameConstants.UTIL_FACTORY.createAttributedDateTime();
 
-        Date creationTime = tokenCreated;
-        if (creationTime == null) {
-            creationTime = new Date();
+        Instant now = Instant.now();
+        Instant creationTime = tokenCreated;
+        if (tokenCreated == null) {
+            creationTime = now;
         }
-        Date expirationTime = tokenExpires;
-        if (expirationTime == null) {
-            expirationTime = new Date();
+        
+        Instant expirationTime = tokenExpires;
+        if (tokenExpires == null) {
             long lifeTimeOfToken = 300L;
-            expirationTime.setTime(creationTime.getTime() + (lifeTimeOfToken * 1000L));
+            expirationTime = now.plusSeconds(lifeTimeOfToken);
         }
 
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-        created.setValue(fmt.format(creationTime));
-        expires.setValue(fmt.format(expirationTime));
+        created.setValue(creationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
+        expires.setValue(expirationTime.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Token lifetime creation: " + created.getValue());
             LOG.fine("Token lifetime expiration: " + expires.getValue());

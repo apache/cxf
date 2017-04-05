@@ -229,7 +229,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             return server.getEndpoint();
         }
         if (properties == null) {
-            properties = new HashMap<String, Object>();
+            properties = new HashMap<>();
         }
         return properties;
     }

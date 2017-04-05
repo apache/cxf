@@ -34,8 +34,11 @@ if not exist "%CXF_HOME%\lib\cxf-manifest.jar" goto no_cxf_jar
 
 set CXF_JAR=%CXF_HOME%\lib\cxf-manifest.jar
 
+if "%JAVA_MAX_MEM%" == "" (
+    set JAVA_MAX_MEM=512M
+)
 
-"%JAVA_HOME%\bin\java" -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript %*
+"%JAVA_HOME%\bin\java" -Xmx%JAVA_MAX_MEM% -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.wsdlto.javascript.WSDLToJavaScript %*
 
 @endlocal
 

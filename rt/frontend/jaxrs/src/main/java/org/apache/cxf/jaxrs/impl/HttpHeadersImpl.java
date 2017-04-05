@@ -109,7 +109,7 @@ public class HttpHeadersImpl implements HttpHeaders {
             return Collections.emptyMap();
         }
 
-        Map<String, Cookie> cl = new HashMap<String, Cookie>();
+        Map<String, Cookie> cl = new HashMap<>();
         for (String value : values) {
             if (value == null) {
                 continue;
@@ -189,7 +189,7 @@ public class HttpHeadersImpl implements HttpHeaders {
         }
 
         List<Locale> newLs = new ArrayList<>();
-        Map<Locale, Float> prefs = new HashMap<Locale, Float>();
+        Map<Locale, Float> prefs = new HashMap<>();
         for (String l : ls) {
             String[] pair = StringUtils.split(l, ";");
 

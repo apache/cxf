@@ -204,7 +204,7 @@ public final class ResponseImpl extends Response {
         if (cookieValues == null) {
             return Collections.emptyMap();
         } else {
-            Map<String, NewCookie> cookies = new HashMap<String, NewCookie>();
+            Map<String, NewCookie> cookies = new HashMap<>();
             for (Object o : cookieValues) {
                 NewCookie newCookie = NewCookie.valueOf(o.toString());
                 cookies.put(newCookie.getName(), newCookie);

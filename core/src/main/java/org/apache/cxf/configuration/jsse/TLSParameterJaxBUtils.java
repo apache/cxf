@@ -30,11 +30,14 @@ import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.PKIXBuilderParameters;
+import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
@@ -326,10 +329,17 @@ public final class TLSParameterJaxBUtils {
     }
 
     /**
-     * This method converts the JAXB KeyManagersType into a list of
+     * This method converts the JAXB TrustManagersType into a list of
      * JSSE TrustManagers.
      */
+    @Deprecated
     public static TrustManager[] getTrustManagers(TrustManagersType tmc)
+        throws GeneralSecurityException,
+               IOException {
+        return getTrustManagers(tmc, false);
+    }
+
+    public static TrustManager[] getTrustManagers(TrustManagersType tmc, boolean enableRevocation)
         throws GeneralSecurityException,
                IOException {
 
@@ -349,7 +359,14 @@ public final class TLSParameterJaxBUtils {
                      ? TrustManagerFactory.getInstance(alg, tmc.getProvider())
                      : TrustManagerFactory.getInstance(alg);
 
-        fac.init(keyStore);
+        if (enableRevocation) {
+            PKIXBuilderParameters param = new PKIXBuilderParameters(keyStore, new X509CertSelector());
+            param.setRevocationEnabled(true);
+
+            fac.init(new CertPathTrustManagerParameters(param));
+        } else {
+            fac.init(keyStore);
+        }
 
         return fac.getTrustManagers();
     }

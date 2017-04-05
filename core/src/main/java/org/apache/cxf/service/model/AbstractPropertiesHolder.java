@@ -231,7 +231,7 @@ public abstract class AbstractPropertiesHolder implements Extensible {
             return;
         }
         if (null == extensionAttributes) {
-            extensionAttributes = new HashMap<QName, Object>();
+            extensionAttributes = new HashMap<>();
         }
         extensionAttributes.put(name, attr);
     }

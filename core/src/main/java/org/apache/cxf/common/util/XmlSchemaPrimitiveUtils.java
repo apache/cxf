@@ -25,7 +25,7 @@ import java.util.Map;
 
 public final class XmlSchemaPrimitiveUtils {
     private static final String SCHEMA_NS_PREFIX = "xs";
-    private static final Map<Class<?>, String> XML_SCHEMA_PRIMITIVE_MAP = new HashMap<Class<?>, String>();
+    private static final Map<Class<?>, String> XML_SCHEMA_PRIMITIVE_MAP = new HashMap<>();
     static {
         initializeMap();
     }

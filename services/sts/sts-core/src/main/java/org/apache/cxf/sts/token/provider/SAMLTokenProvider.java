@@ -121,16 +121,10 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
             byte[] signatureValue = assertion.getSignatureValue();
             if (tokenParameters.getTokenStore() != null && signatureValue != null
                 && signatureValue.length > 0) {
-                DateTime validTill = null;
-                if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-                    validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
-                } else {
-                    validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
-                }
 
                 SecurityToken securityToken =
                     CacheUtils.createSecurityTokenForStorage(token, assertion.getId(),
-                        validTill.toDate(), tokenParameters.getPrincipal(), tokenParameters.getRealm(),
+                        assertion.getNotOnOrAfter(), tokenParameters.getPrincipal(), tokenParameters.getRealm(),
                         tokenParameters.getTokenRequirements().getRenewing());
                 CacheUtils.storeTokenInCache(
                     securityToken, tokenParameters.getTokenStore(), signatureValue);
@@ -164,8 +158,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 validFrom = assertion.getSaml1().getConditions().getNotBefore();
                 validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
             }
-            response.setCreated(validFrom.toDate());
-            response.setExpires(validTill.toDate());
+            response.setCreated(validFrom.toDate().toInstant());
+            response.setExpires(validTill.toDate().toInstant());
 
             response.setEntropy(entropyBytes);
             if (keySize > 0) {

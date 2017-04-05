@@ -38,7 +38,7 @@ public class BankImpl extends BankPOA {
     BankImpl(POA poa) {
         poa_ = poa;
 
-        accountList = new HashMap<String, Account>();
+        accountList = new HashMap<>();
     }
 
     public Account create_account(String accountName) {

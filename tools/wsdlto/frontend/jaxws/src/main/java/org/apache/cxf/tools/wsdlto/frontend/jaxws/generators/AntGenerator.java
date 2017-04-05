@@ -70,8 +70,8 @@ public class AntGenerator extends AbstractJAXWSGenerator {
                 return;
             }
 
-            Map<String, String> clientClassNamesMap = new HashMap<String, String>();
-            Map<String, String> serverClassNamesMap = new HashMap<String, String>();
+            Map<String, String> clientClassNamesMap = new HashMap<>();
+            Map<String, String> serverClassNamesMap = new HashMap<>();
 
             Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
             int index = 1;

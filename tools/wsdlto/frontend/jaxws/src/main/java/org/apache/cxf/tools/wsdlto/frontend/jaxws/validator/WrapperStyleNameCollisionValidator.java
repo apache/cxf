@@ -141,7 +141,7 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
             output = operation.getOutput().getFirstMessagePart();
         }
         if (!c) {
-            Map<String, QName> names = new HashMap<String, QName>();
+            Map<String, QName> names = new HashMap<>();
             if (input != null) {
                 for (WrapperElement element : ProcessorUtil.getWrappedElement(context,
                                                                               input.getElementQName())) {
@@ -167,9 +167,11 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
                         String mappedName = mapElementName(operation,
                                                            operation.getUnwrappedOperation().getOutput(),
                                                            element);
+                        
+                        QName mn = names.get(mappedName);
                         if (names.containsKey(mappedName)
-                            &&  !(names.get(mappedName) == element.getSchemaTypeName()
-                                || names.get(mappedName).equals(element.getSchemaTypeName()))) {
+                            &&  !(mn == element.getSchemaTypeName()
+                                || (mn != null && mn.equals(element.getSchemaTypeName())))) {
                             handleErrors(names.get(mappedName), element);
                             return false;
                         } else {

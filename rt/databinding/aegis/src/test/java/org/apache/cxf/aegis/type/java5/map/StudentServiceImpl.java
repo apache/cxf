@@ -28,7 +28,7 @@ public class StudentServiceImpl implements StudentService {
     private Map<Long, Student> studentMap;
 
     public StudentServiceImpl() {
-        studentMap = new HashMap<Long, Student>();
+        studentMap = new HashMap<>();
         studentMap.put(Long.valueOf(1), new Student("Student1", 1));
         studentMap.put(Long.valueOf(100), new Student("Student100", 100));
         studentMap.put(Long.valueOf(-1), new Student("StudentNegative", -1));
@@ -64,7 +64,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public Map<String, ?> getWildcardMap() {
-        Map<String, String> m = new HashMap<String, String>();
+        Map<String, String> m = new HashMap<>();
         m.put("keystring", "valuestring");
         return m;
     }

@@ -36,7 +36,7 @@ public class PropertiesExpandingStreamReaderTest extends Assert {
 
     @Test
     public void testSystemPropertyExpansion() throws Exception {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         map.put("bar", "BAR-VALUE");
         map.put("blah", "BLAH-VALUE");
         XMLStreamReader reader = new PropertiesExpandingStreamReader(

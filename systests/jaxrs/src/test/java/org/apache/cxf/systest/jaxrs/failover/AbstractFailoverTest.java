@@ -369,7 +369,7 @@ public abstract class AbstractFailoverTest extends AbstractBusClientServerTestBa
 
     private static class CustomRetryStrategy extends RetryStrategy {
         private int totalCount;
-        private Map<String, Integer> map = new HashMap<String, Integer>();
+        private Map<String, Integer> map = new HashMap<>();
         @Override
         protected <T> T getNextAlternate(List<T> alternates) {
             totalCount++;

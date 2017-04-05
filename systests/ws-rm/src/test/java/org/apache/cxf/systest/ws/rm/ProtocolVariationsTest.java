@@ -221,7 +221,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         // rewrite the outgoing message's WS-RM namespace to 1.1
         TransformOutInterceptor trans = new TransformOutInterceptor();
-        Map<String, String> outElements = new HashMap<String, String>();
+        Map<String, String> outElements = new HashMap<>();
         outElements.put("{" + RM10Constants.NAMESPACE_URI + "}*", "{" + RM11Constants.NAMESPACE_URI + "}*");
         trans.setOutTransformElements(outElements);
 
@@ -250,7 +250,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         // rewrite the outgoing message's WS-A namespace to an invalid one
         TransformOutInterceptor trans = new TransformOutInterceptor();
-        Map<String, String> outElements = new HashMap<String, String>();
+        Map<String, String> outElements = new HashMap<>();
         outElements.put("{" + Names200408.WSA_NAMESPACE_NAME + "}*", "{http://cxf.apache.org/invalid}*");
         trans.setOutTransformElements(outElements);
 
@@ -279,7 +279,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         // rewrite the outgoing message's WS-RM namespace to an invalid one
         TransformOutInterceptor trans = new TransformOutInterceptor();
-        Map<String, String> outElements = new HashMap<String, String>();
+        Map<String, String> outElements = new HashMap<>();
         outElements.put("{" + RM10Constants.NAMESPACE_URI + "}*", "{http://cxf.apache.org/invalid}*");
         trans.setOutTransformElements(outElements);
 
@@ -306,7 +306,7 @@ public class ProtocolVariationsTest extends AbstractBusClientServerTestBase {
 
         // remove the outgoing message's WS-RM header
         TransformOutInterceptor trans = new TransformOutInterceptor();
-        Map<String, String> outElements = new HashMap<String, String>();
+        Map<String, String> outElements = new HashMap<>();
         outElements.put("{" + RM10Constants.NAMESPACE_URI + "}Sequence", "");
         trans.setOutTransformElements(outElements);
 

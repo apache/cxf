@@ -19,9 +19,9 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.time.Instant;
 import java.util.Base64;
 import java.util.Collection;
-import java.util.Date;
 
 import javax.security.auth.callback.CallbackHandler;
 
@@ -194,9 +194,9 @@ class SpnegoContextTokenInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             sct.setID(wssConfig.getIdAllocator().createId("sctId-", sct));
 
             // Lifetime
-            Date created = new Date();
-            Date expires = new Date();
-            expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(exchange.getOutMessage()));
+            Instant created = Instant.now();
+            Instant expires =
+                created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(exchange.getOutMessage()) / 1000L);
 
             SecurityToken token = new SecurityToken(sct.getIdentifier(), created, expires);
             token.setToken(sct.getElement());

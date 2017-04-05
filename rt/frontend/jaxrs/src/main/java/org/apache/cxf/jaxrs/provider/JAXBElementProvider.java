@@ -414,7 +414,7 @@ public class JAXBElementProvider<T> extends AbstractJAXBProvider<T>  {
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
         ms.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         if (ns.length() > 0) {
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             // set the default just in case
             if (!nsPrefixes.containsKey(ns)) {
                 map.put(ns, "ns1");

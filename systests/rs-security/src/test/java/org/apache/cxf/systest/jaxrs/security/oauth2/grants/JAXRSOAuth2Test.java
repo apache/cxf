@@ -50,6 +50,7 @@ import org.apache.cxf.rs.security.oauth2.saml.Constants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.saml.SAMLUtils;
 import org.apache.cxf.rs.security.saml.SAMLUtils.SelfSignInfo;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuth2TestUtils;
 import org.apache.cxf.systest.jaxrs.security.oauth2.common.SamlCallbackHandler;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -119,7 +120,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
         String encodedAssertion = Base64UrlUtility.encode(assertion);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
 
@@ -185,7 +186,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         // Create the JWT Token
         String token = OAuth2TestUtils.createToken("resourceOwner", "alice", address, true, true);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
                         "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
@@ -209,7 +210,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         String assertion = OAuth2TestUtils.createToken(audienceURI, false, true);
         String encodedAssertion = Base64UrlUtility.encode(assertion);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
 
@@ -230,7 +231,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         String assertion = OAuth2TestUtils.createToken(audienceURI, true, true);
         String encodedAssertion = Base64UrlUtility.encode(assertion);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
 
@@ -273,7 +274,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
         String encodedAssertion = Base64UrlUtility.encode(assertion);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
 
@@ -294,7 +295,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         String assertion = OAuth2TestUtils.createToken(audienceURI, true, false);
         String encodedAssertion = Base64UrlUtility.encode(assertion);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
 
@@ -338,7 +339,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
 
         String encodedAssertion = Base64UrlUtility.encode(assertion);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE, Constants.CLIENT_AUTH_SAML2_BEARER);
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, encodedAssertion);
 
@@ -358,7 +359,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         // Create the JWT Token
         String token = OAuth2TestUtils.createToken("resourceOwner", "bob", address, true, true);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
                         "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
@@ -380,7 +381,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         String token = OAuth2TestUtils.createToken("resourceOwner", "alice", address,
                                                    true, false);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
                         "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
@@ -401,7 +402,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         // Create the JWT Token
         String token = OAuth2TestUtils.createToken(null, "alice", address, true, true);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
                         "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
@@ -423,7 +424,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         String token = OAuth2TestUtils.createToken("resourceOwner", "alice",
                                                    address, false, true);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
                         "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
@@ -445,7 +446,7 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         String token = OAuth2TestUtils.createToken("resourceOwner", "alice",
                                                    address + "/badtoken", true, true);
 
-        Map<String, String> extraParams = new HashMap<String, String>();
+        Map<String, String> extraParams = new HashMap<>();
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_TYPE,
                         "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
         extraParams.put(Constants.CLIENT_AUTH_ASSERTION_PARAM, token);
@@ -481,18 +482,18 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         Bus springBus = bf.createBus(busFile.toString());
         bean.setBus(springBus);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.callback-handler",
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback");
 
         SamlCallbackHandler samlCallbackHandler = new SamlCallbackHandler(true);
         samlCallbackHandler.setIssuer("alice");
         String audienceURI = "https://localhost:" + PORT + "/oauth2-auth/token";
         samlCallbackHandler.setAudience(audienceURI);
-        properties.put("security.saml-callback-handler", samlCallbackHandler);
+        properties.put(SecurityConstants.SAML_CALLBACK_HANDLER, samlCallbackHandler);
 
-        properties.put("security.signature.username", "alice");
-        properties.put("security.signature.properties", CRYPTO_RESOURCE_PROPERTIES);
+        properties.put(SecurityConstants.SIGNATURE_USERNAME, "alice");
+        properties.put(SecurityConstants.SIGNATURE_PROPERTIES, CRYPTO_RESOURCE_PROPERTIES);
         bean.setProperties(properties);
 
         bean.getOutInterceptors().add(new Saml2BearerAuthOutInterceptor());

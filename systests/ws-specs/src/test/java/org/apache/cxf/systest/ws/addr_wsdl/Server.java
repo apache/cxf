@@ -112,7 +112,7 @@ public class Server extends AbstractBusTestServerBase {
                 throw new RuntimeException(e);
             }
 
-            Map<String, String> ns = new HashMap<String, String>();
+            Map<String, String> ns = new HashMap<>();
             ns.put("ns", "http://apache.org/cxf/systest/ws/addr_feature/");
             XPathUtils xp = new XPathUtils(ns);
             String o = (String)xp.getValue("/ns:addNumbers/ns:number1", el, XPathConstants.STRING);
@@ -144,7 +144,7 @@ public class Server extends AbstractBusTestServerBase {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-            Map<String, String> ns = new HashMap<String, String>();
+            Map<String, String> ns = new HashMap<>();
             ns.put("ns", "http://apache.org/cxf/systest/ws/addr_feature/");
             XPathUtils xp = new XPathUtils(ns);
             String o = (String)xp.getValue("/ns:addNumbers/ns:number1", el, XPathConstants.STRING);

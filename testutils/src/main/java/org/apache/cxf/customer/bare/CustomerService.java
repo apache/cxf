@@ -38,7 +38,7 @@ import org.apache.cxf.customer.Customers;
 @WebService(targetNamespace = "http://cxf.apache.org/jra")
 public class CustomerService {
     long currentId = 1;
-    Map<Long, Customer> customers = new HashMap<Long, Customer>();
+    Map<Long, Customer> customers = new HashMap<>();
 
     @Resource
     private WebServiceContext context;

@@ -168,7 +168,7 @@ public class ServerLauncher {
 
         if (inProcess) {
             Class<?> cls;
-            Map<String, String> old = new HashMap<String, String>();
+            Map<String, String> old = new HashMap<>();
             try {
                 if (null != properties) {
                     for (Map.Entry<String, String> entry : properties.entrySet()) {

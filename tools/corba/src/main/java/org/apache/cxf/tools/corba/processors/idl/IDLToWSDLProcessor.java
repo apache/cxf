@@ -430,7 +430,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
     }
 
     private Map<String, String> getServiceNames(Binding[] bindings, boolean isDefaultMapping) {
-        Map<String, String> serviceNames = new HashMap<String, String>();
+        Map<String, String> serviceNames = new HashMap<>();
         for (int i = 0; i < bindings.length; i++) {
             QName portTypeName = bindings[i].getPortType().getQName();
             String ns = portTypeName.getNamespaceURI();
@@ -455,7 +455,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
                                      Binding[] bindings,
                                      boolean isDefaultMapping)
         throws Exception {
-        Map<String, Service> serviceMap = new HashMap<String, Service>();
+        Map<String, Service> serviceMap = new HashMap<>();
         Map<String, String> serviceNames = getServiceNames(bindings, isDefaultMapping);
         for (int i = 0; i < bindings.length; i++) {
             QName portTypeName = bindings[i].getPortType().getQName();
@@ -615,7 +615,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
     }
 
     private Map<String, String> getModuleToNSMapping(String mapping) throws IOException {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         if ((mapping != null) && (mapping.length() > 0)) {
             if ((mapping.startsWith("[")) && (mapping.endsWith("]"))) {
                 mapping = mapping.substring(1, mapping.length() - 1);
@@ -664,7 +664,7 @@ public class IDLToWSDLProcessor extends IDLProcessor {
     }
 
     private Map<String, List<String>> getExcludedModules(String modules) {
-        Map<String, List<String>> exModules = new HashMap<String, List<String>>();
+        Map<String, List<String>> exModules = new HashMap<>();
         if ((modules != null) && (modules.length() > 0)) {
             if ((modules.startsWith("[")) && (modules.endsWith("]"))) {
                 modules = modules.substring(1, modules.length() - 1);

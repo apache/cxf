@@ -58,10 +58,11 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     private ConduitSelector conduitSelector;
     private Bus bus;
-    private Map<String, Object> requestContext = new HashMap<String, Object>();
-    private Map<String, Object> responseContext = new HashMap<String, Object>();
+    private Map<String, Object> requestContext = new HashMap<>();
+    private Map<String, Object> responseContext = new HashMap<>();
     private long synchronousTimeout = 60000;
     private boolean shutdownBusOnClose;
+    private boolean resetThreadLocalStateImmediately;
 
     public long getSynchronousTimeout() {
         Conduit conduit = getConduit();
@@ -244,5 +245,12 @@ public class ClientConfiguration implements InterceptorProvider, ConduitSelector
 
     public void setShutdownBusOnClose(boolean shutdownBusOnClose) {
         this.shutdownBusOnClose = shutdownBusOnClose;
+    }
+
+    public boolean isResetThreadLocalStateImmediately() {
+        return resetThreadLocalStateImmediately;
+    }
+    public void setResetThreadLocalStateImmediately(boolean reset) {
+        resetThreadLocalStateImmediately = reset;
     }
 }

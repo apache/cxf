@@ -19,6 +19,7 @@
 package org.apache.cxf.systest.sts.itests.unit;
 
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +56,31 @@ public class STSUnitTest extends BasicSTSIntegrationTest {
     private static final String BEARER_KEYTYPE =
         "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Bearer";
 
+    void waitForWSDL(String loc) throws Exception {
+        URL url = new URL(loc + "?wsdl");
+        for (int x = 0; x < 10; x++) {
+            try {
+                url.openStream().close();
+                return;
+            } catch (Throwable t) {
+                Thread.sleep(100);
+            }
+        }
+    }
+    
     @Test
     public void testBearerSAML2Token() throws URISyntaxException, Exception {
         Bus bus = BusFactory.getDefaultBus();
+        String stsEndpoint = "http://localhost:" 
+            + System.getProperty("BasicSTSIntegrationTest.PORT")
+            + "/cxf/X509";
 
+        //sts could take a second or two to fully startup, make sure we can get the wsdl
+        waitForWSDL(stsEndpoint);
+        
         // Get a token
         SecurityToken token =
-            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus, STS_ENDPOINT);
+            requestSecurityToken(SAML2_TOKEN_TYPE, BEARER_KEYTYPE, bus, stsEndpoint);
         Assert.assertTrue(SAML2_TOKEN_TYPE.equals(token.getTokenType()));
         Assert.assertTrue(token.getToken() != null);
 
@@ -98,7 +117,7 @@ public class STSUnitTest extends BasicSTSIntegrationTest {
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}X509_Port");
         stsClient.setEnableAppliesTo(false);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(SecurityConstants.USERNAME, "alice");
         properties.put(
             SecurityConstants.CALLBACK_HANDLER, new CommonCallbackHandler()

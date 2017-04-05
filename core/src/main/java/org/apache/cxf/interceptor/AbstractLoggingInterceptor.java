@@ -52,6 +52,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * A simple logging handler which outputs the bytes of the message to the
  * Logger.
  */
+@Deprecated
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final int DEFAULT_LIMIT = 48 * 1024;
     protected static final String BINARY_CONTENT_MESSAGE = "--- Binary Content ---";

@@ -150,6 +150,22 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
     }
 
     @Test
+    public void testGetBookSpecTemplate() {
+        String address = "http://localhost:" + PORT + "/bookstore/{a}";
+        Client client = ClientBuilder.newClient();
+        client.register((Object)ClientFilterClientAndConfigCheck.class);
+        client.register(new BTypeParamConverterProvider());
+        client.property("clientproperty", "somevalue");
+        WebTarget webTarget = client.target(address).path("{b}")
+            .resolveTemplate("a", "bookheaders").resolveTemplate("b", "simple");
+        Invocation.Builder builder = webTarget.request("application/xml").header("a", new BType());
+
+        Response r = builder.get();
+        Book book = r.readEntity(Book.class);
+        assertEquals(124L, book.getId());
+        assertEquals("b", r.getHeaderString("a"));
+    }
+    @Test
     public void testGetBookSpec() {
         String address = "http://localhost:" + PORT + "/bookstore/bookheaders/simple";
         Client client = ClientBuilder.newClient();

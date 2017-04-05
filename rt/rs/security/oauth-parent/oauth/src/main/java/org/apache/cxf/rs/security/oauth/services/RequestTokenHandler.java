@@ -96,7 +96,7 @@ public class RequestTokenHandler {
                 LOG.log(Level.FINE, "Preparing Temporary Credentials Endpoint correct response");
             }
             //create response
-            Map<String, Object> responseParams = new HashMap<String, Object>();
+            Map<String, Object> responseParams = new HashMap<>();
             responseParams.put(OAuth.OAUTH_TOKEN, requestToken.getTokenKey());
             responseParams.put(OAuth.OAUTH_TOKEN_SECRET, requestToken.getTokenSecret());
             responseParams.put(OAuth.OAUTH_CALLBACK_CONFIRMED, Boolean.TRUE);

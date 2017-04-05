@@ -474,9 +474,9 @@ public class SoapBindingFactory extends AbstractWSDLBindingFactory {
                 String ns = p.getNamespaceURI();
                 Map<String, String> nsMap = message.getEnvelopeNs();
                 if (nsMap == null) {
-                    nsMap = new HashMap<String, String>();
+                    nsMap = new HashMap<>();
                 } else {
-                    nsMap = new HashMap<String, String>(nsMap);
+                    nsMap = new HashMap<>(nsMap);
                 }
                 message.put("soap.env.ns.map", nsMap);
                 if (!nsMap.containsValue(ns)

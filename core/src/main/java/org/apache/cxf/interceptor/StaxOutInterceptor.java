@@ -52,7 +52,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         = new StaxOutEndingInterceptor(OUTPUT_STREAM_HOLDER, WRITER_HOLDER);
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(StaxOutInterceptor.class);
-    private static Map<Object, XMLOutputFactory> factories = new HashMap<Object, XMLOutputFactory>();
+    private static Map<Object, XMLOutputFactory> factories = new HashMap<>();
 
 
     public StaxOutInterceptor() {

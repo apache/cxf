@@ -20,8 +20,8 @@
 package org.apache.cxf.sts.cache;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +40,7 @@ public final class CacheUtils {
     public static SecurityToken createSecurityTokenForStorage(
         Element token,
         String tokenIdentifier,
-        Date expiry,
+        Instant expiry,
         Principal principal,
         String realm,
         Renewing renewing

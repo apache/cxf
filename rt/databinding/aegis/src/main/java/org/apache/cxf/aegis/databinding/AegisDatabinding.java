@@ -97,7 +97,7 @@ public class AegisDatabinding extends AbstractDataBinding {
 
     public AegisDatabinding() {
         super();
-        part2Type = new HashMap<MessagePartInfo, AegisType>();
+        part2Type = new HashMap<>();
     }
     public AegisDatabinding(AegisContext ctx) {
         this();
@@ -197,7 +197,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                 aegisContext.setMtomUseXmime(true);
             }
 
-            Map<Class<?>, String> implMap = new HashMap<Class<?>, String>();
+            Map<Class<?>, String> implMap = new HashMap<>();
             // now for a really annoying case, the .implementation objects.
             for (String key : s.keySet()) {
                 if (key.endsWith(".implementation")) {
@@ -405,7 +405,7 @@ public class AegisDatabinding extends AbstractDataBinding {
 
     private void createSchemas(Service s, Set<AegisType> deps) {
 
-        Map<String, Set<AegisType>> tns2Type = new HashMap<String, Set<AegisType>>();
+        Map<String, Set<AegisType>> tns2Type = new HashMap<>();
         for (AegisType t : deps) {
             String ns = t.getSchemaType().getNamespaceURI();
             Set<AegisType> types = tns2Type.get(ns);

@@ -253,7 +253,7 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
                                   validateTarget, tokenPrincipal, tokenRoles);
     }
 
-    private RequestSecurityTokenResponseType createResponse(
+    protected RequestSecurityTokenResponseType createResponse(
             EncryptionProperties encryptionProperties,
             TokenProviderResponse tokenResponse,
             TokenRequirements tokenRequirements,

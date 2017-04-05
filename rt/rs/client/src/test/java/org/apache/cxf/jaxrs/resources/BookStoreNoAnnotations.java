@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class BookStoreNoAnnotations {
 
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
 
     public BookStoreNoAnnotations() {
         Book b = new Book();

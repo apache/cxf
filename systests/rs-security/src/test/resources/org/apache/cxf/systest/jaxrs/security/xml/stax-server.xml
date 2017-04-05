@@ -116,7 +116,65 @@ under the License.
         </jaxrs:properties>
     </jaxrs:server>
     
-     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec-stax}/xmlsigconstraints">
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec-stax}/xmlsignegativeserver">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+            <ref bean="xmlSigInHandler"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outInterceptors>
+            <ref bean="xmlSigOutHandler"/>
+        </jaxrs:outInterceptors>
+        <jaxrs:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/morpit.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec-stax}/xmlsignegativeclient">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+            <ref bean="xmlSigInHandler"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outInterceptors>
+            <ref bean="xmlSigOutHandler"/>
+        </jaxrs:outInterceptors>
+        <jaxrs:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/morpittrust.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
+    <util:map id="keyNameMap">
+        <entry key="alice-kn" value="alice" />
+    </util:map>
+    <bean id="keyNameSigProps" class="org.apache.cxf.rs.security.xml.SignatureProperties">
+        <property name="keyNameAliasMap" ref="keyNameMap"/>
+    </bean>
+    <bean id="xmlSecInHandlerKeyName" class="org.apache.cxf.rs.security.xml.XmlSecInInterceptor">
+        <property name="signatureProperties" ref="keyNameSigProps"/>
+        <property name="requireSignature" value="true"/>
+    </bean>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec-stax}/xmlsigkeyname">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:inInterceptors>
+            <ref bean="xmlSecInHandlerKeyName"/>
+        </jaxrs:inInterceptors>
+        <jaxrs:outInterceptors>
+            <ref bean="xmlSigOutHandler"/>
+        </jaxrs:outInterceptors>
+        <jaxrs:properties>
+            <entry key="security.callback-handler" value="org.apache.cxf.systest.jaxrs.security.saml.KeystorePasswordCallback"/>
+            <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-xmlsec-stax}/xmlsigconstraints">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>

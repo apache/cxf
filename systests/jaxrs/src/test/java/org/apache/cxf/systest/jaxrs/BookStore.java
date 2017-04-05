@@ -112,8 +112,8 @@ import org.junit.Assert;
 @GZIP(threshold = 1)
 public class BookStore {
 
-    private Map<Long, Book> books = new HashMap<Long, Book>();
-    private Map<Long, CD> cds = new HashMap<Long, CD>();
+    private Map<Long, Book> books = new HashMap<>();
+    private Map<Long, CD> cds = new HashMap<>();
     private long bookId = 123;
     private long cdId = 123;
 
@@ -319,6 +319,13 @@ public class BookStore {
         if (book.getId() != (long)id) {
             throw new RuntimeException();
         }
+        return book;
+    }
+
+    @POST
+    @Path("/echoxmlbook")
+    @Produces("application/xml")
+    public Book echoXmlBook(Book book) {
         return book;
     }
 
@@ -1873,7 +1880,7 @@ public class BookStore {
     public static class BookBean2 {
         private long id;
         @QueryParam("id_2")
-        private long id2;
+        private long mId2;
         private long id3;
         public long getId() {
             return id;
@@ -1885,11 +1892,11 @@ public class BookStore {
         }
 
         public long getId2() {
-            return id2;
+            return mId2;
         }
 
         public void setId2(long id2) {
-            this.id2 = id2;
+            this.mId2 = id2;
         }
 
         @Context

@@ -39,7 +39,7 @@ public abstract class AbstractAegisIoImpl  {
     protected AbstractAegisIoImpl(AegisContext globalContext) {
         aegisContext = globalContext;
         context = new Context(globalContext);
-        properties = new HashMap<String, Object>();
+        properties = new HashMap<>();
     }
 
     /**
@@ -51,7 +51,7 @@ public abstract class AbstractAegisIoImpl  {
     protected AbstractAegisIoImpl(AegisContext globalContext, Context context) {
         aegisContext = globalContext;
         this.context = context;
-        properties = new HashMap<String, Object>();
+        properties = new HashMap<>();
     }
 
     /** {@inheritDoc}*/

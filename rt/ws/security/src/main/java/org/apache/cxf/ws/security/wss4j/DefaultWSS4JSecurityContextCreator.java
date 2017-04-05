@@ -40,10 +40,11 @@ import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
+import org.apache.wss4j.common.token.PKIPathSecurity;
+import org.apache.wss4j.common.token.X509Security;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
 import org.apache.wss4j.dom.handler.WSHandlerResult;
-import org.apache.wss4j.dom.message.token.KerberosSecurity;
 
 /**
  * The default implementation to create a SecurityContext from a set of WSS4J processing results.
@@ -67,11 +68,15 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
      */
     public void createSecurityContext(SoapMessage msg, WSHandlerResult handlerResult) {
 
-        String allowUnsigned =
-            (String)SecurityUtils.getSecurityPropertyValue(
-                SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, msg
+        boolean allowUnsignedSamlPrincipals =
+            SecurityUtils.getSecurityPropertyBoolean(
+                SecurityConstants.ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, msg, false
             );
-        boolean allowUnsignedSamlPrincipals = Boolean.parseBoolean(allowUnsigned);
+        boolean allowUTNoPassword =
+            SecurityUtils.getSecurityPropertyBoolean(
+                SecurityConstants.ENABLE_UT_NOPASSWORD_PRINCIPAL, msg, false
+            );
+
         boolean useJAASSubject = true;
         String useJAASSubjectStr =
             (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.SC_FROM_JAAS_SUBJECT, msg);
@@ -82,31 +87,37 @@ public class DefaultWSS4JSecurityContextCreator implements WSS4JSecurityContextC
         // Now go through the results in a certain order to set up a security context. Highest priority is first.
         Map<Integer, List<WSSecurityEngineResult>> actionResults = handlerResult.getActionResults();
         for (Integer resultPriority : securityPriorities) {
-            if (resultPriority == WSConstants.ST_UNSIGNED && !allowUnsignedSamlPrincipals) {
+            if ((resultPriority == WSConstants.ST_UNSIGNED && !allowUnsignedSamlPrincipals)
+                || (resultPriority == WSConstants.UT_NOPASSWORD && !allowUTNoPassword)) {
                 continue;
             }
 
             List<WSSecurityEngineResult> foundResults = actionResults.get(resultPriority);
             if (foundResults != null && !foundResults.isEmpty()) {
                 for (WSSecurityEngineResult result : foundResults) {
-                    final Object binarySecurity = result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
-                    PublicKey publickey =
-                        (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
-                    X509Certificate cert =
-                        (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
 
-                    if ((resultPriority == WSConstants.BST && !(binarySecurity instanceof KerberosSecurity))
-                        || (resultPriority == WSConstants.SIGN && publickey == null && cert == null)) {
-                        continue;
-                    }
-                    SecurityContext context = createSecurityContext(msg, useJAASSubject, result);
-                    if (context != null) {
-                        msg.put(SecurityContext.class, context);
-                        return;
+                    if (!skipResult(resultPriority, result)) {
+                        SecurityContext context = createSecurityContext(msg, useJAASSubject, result);
+                        if (context != null) {
+                            msg.put(SecurityContext.class, context);
+                            return;
+                        }
                     }
                 }
             }
         }
+    }
+
+    private boolean skipResult(Integer resultPriority, WSSecurityEngineResult result) {
+        Object binarySecurity = result.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN);
+        PublicKey publickey =
+            (PublicKey)result.get(WSSecurityEngineResult.TAG_PUBLIC_KEY);
+        X509Certificate cert =
+            (X509Certificate)result.get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+
+        return resultPriority == WSConstants.BST
+            && (binarySecurity instanceof X509Security || binarySecurity instanceof PKIPathSecurity)
+            || resultPriority == WSConstants.SIGN && publickey == null && cert == null;
     }
 
     protected SecurityContext createSecurityContext(

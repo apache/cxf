@@ -86,7 +86,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
     }
 
     private static SchemaValidationFeature createSchemaValidationFeature() {
-        Map<String, SchemaValidationType> operationMap = new HashMap<String, SchemaValidationType>();
+        Map<String, SchemaValidationType> operationMap = new HashMap<>();
         operationMap.put("saveInheritEndpoint", SchemaValidationType.BOTH);
         operationMap.put("saveNoValidation", SchemaValidationType.NONE);
         operationMap.put("saveValidateIn", SchemaValidationType.IN);
@@ -399,7 +399,7 @@ public class JavaFirstSchemaValidationTest extends Assert {
         }
 
         if (type != null) {
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put(Message.SCHEMA_VALIDATION_ENABLED, type);
             svrFactory.setProperties(properties);
         }

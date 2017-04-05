@@ -49,7 +49,7 @@ public class UniqueBodyPartsValidator extends AbstractDefinitionValidator {
     public boolean isValid() {
         Collection<Binding> bindings = CastUtils.cast(def.getAllBindings().values());
         for (Binding binding : bindings) {
-            uniqueBodyPartsMap = new HashMap<QName, String>();
+            uniqueBodyPartsMap = new HashMap<>();
             List<BindingOperation> ops = CastUtils.cast(binding.getBindingOperations());
             for (BindingOperation op : ops) {
                 Operation operation = op.getOperation();

@@ -24,9 +24,10 @@ import java.io.StringReader;
 import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -119,6 +120,7 @@ import org.apache.wss4j.common.crypto.PasswordEncryptor;
 import org.apache.wss4j.common.derivedKey.P_SHA1;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.token.Reference;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.WSDocInfo;
@@ -128,7 +130,6 @@ import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.processor.EncryptedKeyProcessor;
 import org.apache.wss4j.dom.util.WSSecurityUtil;
 import org.apache.wss4j.dom.util.X509Util;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.apache.wss4j.policy.SPConstants;
 import org.apache.wss4j.policy.SPConstants.SPVersion;
 import org.apache.wss4j.policy.model.AbstractBinding;
@@ -1375,19 +1376,17 @@ public abstract class AbstractSTSClient implements Configurable, InterceptorProv
     }
 
     protected void addLifetime(XMLStreamWriter writer) throws XMLStreamException {
-        Date creationTime = new Date();
-        Date expirationTime = new Date();
-        expirationTime.setTime(creationTime.getTime() + ((long)ttl * 1000L));
+        Instant created = Instant.now();
+        Instant expires = created.plusSeconds(ttl);
 
-        XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         writer.writeStartElement("wst", "Lifetime", namespace);
         writer.writeNamespace("wsu", WSConstants.WSU_NS);
         writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
-        writer.writeCharacters(fmt.format(creationTime));
+        writer.writeCharacters(created.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
 
         writer.writeStartElement("wsu", "Expires", WSConstants.WSU_NS);
-        writer.writeCharacters(fmt.format(expirationTime));
+        writer.writeCharacters(expires.atZone(ZoneOffset.UTC).format(DateUtil.getDateTimeFormatter(true)));
         writer.writeEndElement();
         writer.writeEndElement();
     }

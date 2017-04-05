@@ -87,7 +87,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     private static final Map<String, String> DEFAULT_STATIC_CONTENT_TYPES;
 
     static {
-        DEFAULT_STATIC_CONTENT_TYPES = new HashMap<String, String>();
+        DEFAULT_STATIC_CONTENT_TYPES = new HashMap<>();
         DEFAULT_STATIC_CONTENT_TYPES.put("html", "text/html");
         DEFAULT_STATIC_CONTENT_TYPES.put("txt", "text/plain");
         DEFAULT_STATIC_CONTENT_TYPES.put("css", "text/css");
@@ -124,7 +124,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
         FileUtils.maybeDeleteDefaultTempDir();
     }
 
-    protected void finalizeServletInit(ServletConfig servletConfig) {
+    protected void finalizeServletInit(ServletConfig servletConfig) throws ServletException {
         InputStream is = getResourceAsStream("/WEB-INF" + STATIC_RESOURCES_MAP_RESOURCE);
         if (is == null) {
             is = getResourceAsStream(STATIC_RESOURCES_MAP_RESOURCE);
@@ -193,7 +193,7 @@ public abstract class AbstractHTTPServlet extends HttpServlet implements Filter 
     protected static Map<String, String> parseMapSequence(String sequence) {
         if (sequence != null) {
             sequence = sequence.trim();
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, String> map = new HashMap<>();
             String[] pairs = StringUtils.split(sequence, " ");
             for (String pair : pairs) {
                 String thePair = pair.trim();

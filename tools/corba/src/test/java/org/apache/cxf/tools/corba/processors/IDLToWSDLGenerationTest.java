@@ -93,7 +93,7 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
         throws Exception {
         URL idl = getClass().getResource(sourceIdlFilename);
         ProcessorEnvironment env = new ProcessorEnvironment();
-        Map<String, Object> cfg = new HashMap<String, Object>();
+        Map<String, Object> cfg = new HashMap<>();
         cfg.put(ToolCorbaConstants.CFG_IDLFILE, new File(idl.toURI()).getAbsolutePath());
         env.setParameters(cfg);
         IDLToWSDLProcessor processor = new IDLToWSDLProcessor();
@@ -357,7 +357,7 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
 
         URL idl = getClass().getResource(idlFilename);
         ProcessorEnvironment env = new ProcessorEnvironment();
-        Map<String, Object> cfg = new HashMap<String, Object>();
+        Map<String, Object> cfg = new HashMap<>();
         cfg.put(ToolCorbaConstants.CFG_IDLFILE, new File(idl.toURI()).getAbsolutePath());
         if (logicalName != null) {
             cfg.put(ToolCorbaConstants.CFG_LOGICAL, logicalName);
@@ -542,7 +542,7 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
             String sourceIdlFilename = "/idl/Enum.idl";
             URL idl = getClass().getResource(sourceIdlFilename);
             ProcessorEnvironment env = new ProcessorEnvironment();
-            Map<String, Object> cfg = new HashMap<String, Object>();
+            Map<String, Object> cfg = new HashMap<>();
             cfg.put(ToolCorbaConstants.CFG_IDLFILE, new File(idl.toURI()).getAbsolutePath());
             cfg.put(ToolCorbaConstants.CFG_WSDL_ENCODING, "UTF-16");
             env.setParameters(cfg);

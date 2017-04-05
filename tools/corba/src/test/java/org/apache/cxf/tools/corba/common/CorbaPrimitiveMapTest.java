@@ -31,7 +31,7 @@ public class CorbaPrimitiveMapTest extends TestCase {
 
     public void testMap() {
 
-        Map<QName, CorbaType> map = new HashMap<QName, CorbaType>();
+        Map<QName, CorbaType> map = new HashMap<>();
         QName corbaName = new QName("http://cxf.apache.org/bindings/corba", "string", "corba");
         QName typeName = new QName("http://www.w3.org/2001/XMLSchema", "string");
 

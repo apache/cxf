@@ -28,7 +28,7 @@ import org.apache.cxf.configuration.ConfiguredBeanLocator;
 
 public class MyBeanLocator implements ConfiguredBeanLocator {
     ConfiguredBeanLocator cbl;
-    Map<String, Object> registry = new HashMap<String, Object>();
+    Map<String, Object> registry = new HashMap<>();
 
     public MyBeanLocator(ConfiguredBeanLocator cbl) {
         this.cbl = cbl;

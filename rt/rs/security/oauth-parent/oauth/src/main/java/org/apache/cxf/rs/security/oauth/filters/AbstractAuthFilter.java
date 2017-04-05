@@ -291,7 +291,7 @@ public class AbstractAuthFilter {
                 return params;
             }
 
-            Map<String, String[]> newParams = new HashMap<String, String[]>();
+            Map<String, String[]> newParams = new HashMap<>();
             for (Map.Entry<String, String[]> entry : params.entrySet()) {
                 if (ALLOWED_OAUTH_PARAMETERS.contains(entry.getKey())) {
                     newParams.put(entry.getKey(), entry.getValue());

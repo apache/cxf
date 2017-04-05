@@ -261,7 +261,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
      * @param stringArrayKeys, contains keys, whose value should be string array
      */
     protected Map<String, Object> getParametersMap(Set<String> stringArrayKeys) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         CommandDocument doc = getCommandDocument();
         if (doc == null) {
             return map;

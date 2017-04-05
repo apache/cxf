@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwt;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.message.Message;
@@ -49,12 +49,12 @@ public final class JwtUtils {
             }
             return;
         }
-        Date rightNow = new Date();
-        Date expiresDate = new Date(expiryTime * 1000L);
+        Instant now = Instant.now();
+        Instant expires = Instant.ofEpochMilli(expiryTime * 1000L);
         if (clockOffset != 0) {
-            expiresDate.setTime(expiresDate.getTime() + (long)clockOffset * 1000L);
+            expires = expires.plusSeconds(clockOffset);
         }
-        if (expiresDate.before(rightNow)) {
+        if (expires.isBefore(now)) {
             throw new JwtException("The token has expired");
         }
     }
@@ -68,15 +68,14 @@ public final class JwtUtils {
             return;
         }
 
-        Date validCreation = new Date();
-        long currentTime = validCreation.getTime();
+        Instant validCreation = Instant.now();
         if (clockOffset != 0) {
-            validCreation.setTime(currentTime + (long)clockOffset * 1000L);
+            validCreation = validCreation.plusSeconds(clockOffset);
         }
-        Date notBeforeDate = new Date(notBeforeTime * 1000L);
+        Instant notBeforeDate = Instant.ofEpochMilli(notBeforeTime * 1000L);
 
         // Check to see if the not before time is in the future
-        if (notBeforeDate.after(validCreation)) {
+        if (notBeforeDate.isAfter(validCreation)) {
             throw new JwtException("The token cannot be accepted yet");
         }
     }
@@ -90,25 +89,24 @@ public final class JwtUtils {
             return;
         }
 
-        Date createdDate = new Date(issuedAtInSecs * 1000L);
-        Date validCreation = new Date();
-        long currentTime = validCreation.getTime();
-        if (clockOffset > 0) {
-            validCreation.setTime(currentTime + (long)clockOffset * 1000L);
+        Instant createdDate = Instant.ofEpochMilli(issuedAtInSecs * 1000L);
+        
+        Instant validCreation = Instant.now();
+        if (clockOffset != 0) {
+            validCreation = validCreation.plusSeconds(clockOffset);
         }
-
+        
         // Check to see if the IssuedAt time is in the future
-        if (createdDate.after(validCreation)) {
+        if (createdDate.isAfter(validCreation)) {
             throw new JwtException("Invalid issuedAt");
         }
 
         if (timeToLive > 0) {
             // Calculate the time that is allowed for the message to travel
-            currentTime -= (long)timeToLive * 1000L;
-            validCreation.setTime(currentTime);
+            validCreation = validCreation.minusSeconds(timeToLive);
 
             // Validate the time it took the message to travel
-            if (createdDate.before(validCreation)) {
+            if (createdDate.isBefore(validCreation)) {
                 throw new JwtException("Invalid issuedAt");
             }
         }

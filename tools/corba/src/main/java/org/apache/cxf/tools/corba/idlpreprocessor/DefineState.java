@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class DefineState {
 
-    Map<String, String> defines = new HashMap<String, String>();
+    Map<String, String> defines = new HashMap<>();
 
     public DefineState(Map<String, String> initialDefines) {
         if (initialDefines != null) {

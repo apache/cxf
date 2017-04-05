@@ -45,7 +45,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 @Path("/bookstore")
 public class BookCxfContinuationStore {
 
-    private Map<String, String> books = new HashMap<String, String>();
+    private Map<String, String> books = new HashMap<>();
     private Map<String, Continuation> suspended =
         new HashMap<String, Continuation>();
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,

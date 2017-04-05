@@ -163,7 +163,7 @@ public class JAXBUtilsTest extends Assert {
     public void testSetNamespaceMapper() throws Exception {
         JAXBContext ctx = JAXBContext.newInstance(GreetMe.class);
         Marshaller marshaller = ctx.createMarshaller();
-        Map<String, String> nspref = new HashMap<String, String>();
+        Map<String, String> nspref = new HashMap<>();
         nspref.put("http://cxf.apache.org/hello_world_soap_http/types", "x");
         JAXBUtils.setNamespaceMapper(nspref, marshaller);
         String mapperkey = null;

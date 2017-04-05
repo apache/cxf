@@ -29,7 +29,6 @@ import javax.crypto.SecretKey;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
-import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
@@ -54,21 +53,6 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
     }
 
     protected byte[] getContentEncryptionKey(JweHeaders headers) {
-        byte[] cek = getProvidedContentEncryptionKey(headers);
-        if (cek == null) {
-            String algoJava = getContentEncryptionAlgoJava();
-            String algoJwt = getContentEncryptionAlgoJwt();
-            cek = CryptoUtils.getSecretKey(AlgorithmUtils.stripAlgoProperties(algoJava),
-                                           getCekSize(algoJwt)).getEncoded();
-        }
-        return cek;
-    }
-
-    protected int getCekSize(String algoJwt) {
-        return ContentAlgorithm.valueOf(algoJwt.replace('-', '_')).getKeySizeBits();
-    }
-
-    protected byte[] getProvidedContentEncryptionKey(JweHeaders headers) {
         return getContentEncryptionAlgorithm().getContentEncryptionKey(headers);
     }
 

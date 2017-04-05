@@ -41,8 +41,8 @@ public class ToolContext {
     private String packageName;
     private boolean packageNameChanged;
     private ToolErrorListener errors;
-    private Map<String, String> namespacePackageMap = new HashMap<String, String>();
-    private Map<String, String> excludeNamespacePackageMap = new HashMap<String, String>();
+    private Map<String, String> namespacePackageMap = new HashMap<>();
+    private Map<String, String> excludeNamespacePackageMap = new HashMap<>();
     private List<InputSource> jaxbBindingFiles = new ArrayList<>();
     private List<String> excludePkgList = new ArrayList<>();
     private List<String> excludeFileList = new ArrayList<>();
@@ -143,7 +143,7 @@ public class ToolContext {
 
     public void put(String key, Object value) {
         if (paramMap == null) {
-            paramMap = new HashMap<String, Object>();
+            paramMap = new HashMap<>();
         }
         paramMap.put(key, value);
     }
@@ -307,11 +307,11 @@ public class ToolContext {
         ToolContext newCopy = new ToolContext();
 
         newCopy.javaModel = javaModel;
-        newCopy.paramMap = new HashMap<String, Object>(paramMap);
+        newCopy.paramMap = new HashMap<>(paramMap);
         newCopy.packageName = packageName;
         newCopy.packageNameChanged = packageNameChanged;
-        newCopy.namespacePackageMap = new HashMap<String, String>(namespacePackageMap);
-        newCopy.excludeNamespacePackageMap = new HashMap<String, String>(excludeNamespacePackageMap);
+        newCopy.namespacePackageMap = new HashMap<>(namespacePackageMap);
+        newCopy.excludeNamespacePackageMap = new HashMap<>(excludeNamespacePackageMap);
         newCopy.jaxbBindingFiles = new ArrayList<>(jaxbBindingFiles);
         newCopy.excludePkgList = new ArrayList<>(excludePkgList);
         newCopy.excludeFileList = new ArrayList<>(excludeFileList);

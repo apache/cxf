@@ -32,6 +32,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.rs.security.saml.SamlEnvelopedOutInterceptor;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -90,7 +91,7 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
     public void testPostBookAdminRoleWithGoodSubjectName() throws Exception {
         String address = "https://localhost:" + PORT + "/saml-roles2/bookstore/books";
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("saml.roles", Collections.singletonList("admin"));
         props.put("saml.subject.name", "bob@mycompany.com");
         WebClient wc = createWebClient(address, props);
@@ -103,7 +104,7 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
     public void testPostBookAdminWithWeakClaims() throws Exception {
         String address = "https://localhost:" + PORT + "/saml-claims/bookstore/books";
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         WebClient wc = createWebClient(address, props);
         wc.type(MediaType.APPLICATION_XML).accept(MediaType.APPLICATION_XML);
         try {
@@ -118,7 +119,7 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
     public void testPostBookAdminWithWeakClaims2() throws Exception {
         String address = "https://localhost:" + PORT + "/saml-claims/bookstore/books";
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("saml.roles", Collections.singletonList("admin"));
         props.put("saml.auth", Collections.singletonList("password"));
         WebClient wc = createWebClient(address, props);
@@ -135,7 +136,7 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
     public void testPostBookAdminWithClaims() throws Exception {
         String address = "https://localhost:" + PORT + "/saml-claims/bookstore/books";
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("saml.roles", Collections.singletonList("admin"));
         props.put("saml.auth", Collections.singletonList("smartcard"));
         WebClient wc = createWebClient(address, props);
@@ -153,8 +154,8 @@ public class JAXRSSamlAuthorizationTest extends AbstractBusClientServerTestBase 
         Bus springBus = bf.createBus(busFile.toString());
         bean.setBus(springBus);
 
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.saml-callback-handler",
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(SecurityConstants.SAML_CALLBACK_HANDLER,
                        "org.apache.cxf.systest.jaxrs.security.saml.SamlCallbackHandler");
         if (extraProperties != null) {
             properties.putAll(extraProperties);

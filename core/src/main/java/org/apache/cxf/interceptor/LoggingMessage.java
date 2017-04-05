@@ -20,6 +20,7 @@ package org.apache.cxf.interceptor;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Deprecated
 public final class LoggingMessage {
     public static final String ID_KEY = LoggingMessage.class.getName() + ".ID";
     private static final AtomicInteger ID = new AtomicInteger();

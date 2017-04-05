@@ -85,7 +85,7 @@ public class PolicyAnnotationTest extends Assert {
             def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
             Element wsdl = wsdlWriter.getDocument(def).getDocumentElement();
 
-            Map<String, String> ns = new HashMap<String, String>();
+            Map<String, String> ns = new HashMap<>();
             ns.put("wsdl", WSDLConstants.NS_WSDL11);
             ns.put("wsu",
                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
@@ -154,7 +154,7 @@ public class PolicyAnnotationTest extends Assert {
             def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
             Element wsdl = wsdlWriter.getDocument(def).getDocumentElement();
 
-            Map<String, String> ns = new HashMap<String, String>();
+            Map<String, String> ns = new HashMap<>();
             ns.put("wsdl", WSDLConstants.NS_WSDL11);
             ns.put("wsu",
                    "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
@@ -211,7 +211,7 @@ public class PolicyAnnotationTest extends Assert {
             def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
             Element wsdl = wsdlWriter.getDocument(def).getDocumentElement();
 
-            Map<String, String> ns = new HashMap<String, String>();
+            Map<String, String> ns = new HashMap<>();
             ns.put("wsdl", WSDLConstants.NS_WSDL11);
             ns.put("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
             ns.put("wsp", Constants.URI_POLICY_13_NS);
@@ -254,7 +254,7 @@ public class PolicyAnnotationTest extends Assert {
             def.setExtensionRegistry(bus.getExtension(WSDLManager.class).getExtensionRegistry());
             Element wsdl = wsdlWriter.getDocument(def).getDocumentElement();
 
-            Map<String, String> ns = new HashMap<String, String>();
+            Map<String, String> ns = new HashMap<>();
             ns.put("wsdl", WSDLConstants.NS_WSDL11);
             ns.put("wsu", "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd");
             ns.put("wsp", Constants.URI_POLICY_13_NS);

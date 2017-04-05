@@ -32,7 +32,7 @@ public class HttpAuthHeaderTest {
         HttpAuthHeader authHeader = new HttpAuthHeader("Digest nonce=\"TUzZmQyYw==\", username=\"testUser\"");
         assertEquals("Digest", authHeader.getAuthType());
         Map<String, String> params = authHeader.getParams();
-        Map<String, String> expectedParams = new HashMap<String, String>();
+        Map<String, String> expectedParams = new HashMap<>();
         expectedParams.put("username", "testUser");
         expectedParams.put("nonce", "TUzZmQyYw==");
         assertEquals(expectedParams, params);

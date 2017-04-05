@@ -20,12 +20,9 @@
 package org.apache.cxf.systest.ws.fault;
 
 import java.net.URL;
-import java.text.DateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.Iterator;
 
-import javax.xml.datatype.Duration;
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPFault;
 import javax.xml.ws.Service;
@@ -40,10 +37,9 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.wss4j.common.ext.WSSecurityException;
+import org.apache.wss4j.common.util.DateUtil;
 import org.apache.wss4j.common.util.XMLUtils;
 import org.apache.wss4j.dom.WSConstants;
-import org.apache.wss4j.dom.engine.WSSConfig;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
 import org.example.contract.doubleit.DoubleItFault;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.BeforeClass;
@@ -313,15 +309,10 @@ public class ModifiedRequestTest extends AbstractBusClientServerTestBase {
                     XMLUtils.findElement(securityHeader, "Timestamp", WSConstants.WSU_NS);
                 Element createdValue =
                     XMLUtils.findElement(timestampElement, "Created", WSConstants.WSU_NS);
-                DateFormat zulu = new XmlSchemaDateFormat();
-
-                XMLGregorianCalendar createdCalendar =
-                    WSSConfig.DATATYPE_FACTORY.newXMLGregorianCalendar(createdValue.getTextContent());
+                
+                ZonedDateTime created = ZonedDateTime.parse(createdValue.getTextContent());
                 // Add 5 seconds
-                Duration duration = WSSConfig.DATATYPE_FACTORY.newDuration(5000L);
-                createdCalendar.add(duration);
-                Date createdDate = createdCalendar.toGregorianCalendar().getTime();
-                createdValue.setTextContent(zulu.format(createdDate));
+                createdValue.setTextContent(DateUtil.getDateTimeFormatter(true).format(created.plusSeconds(5L)));
             }
         }
 

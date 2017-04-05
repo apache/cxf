@@ -73,7 +73,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         sf.setBus(getStaticBus());
         String address = "http://localhost:" + PORT1 + "/EchoService";
         sf.setAddress(address);
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(Message.MTOM_ENABLED, "true");
         sf.setProperties(props);
         sf.create();
@@ -135,7 +135,7 @@ public class MtomServerTest extends AbstractBusClientServerTestBase {
         sf.setBus(getStaticBus());
         String address = "http://localhost:" + PORT2 + "/EchoService";
         sf.setAddress(address);
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put(Message.MTOM_ENABLED, "true");
         sf.setProperties(props);
         Server server = sf.create();

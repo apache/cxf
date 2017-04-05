@@ -31,7 +31,7 @@ import org.apache.cxf.security.SecurityContext;
 
 public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInInterceptor {
 
-    protected Map<String, List<String>> methodRolesMap = new HashMap<String, List<String>>();
+    protected Map<String, List<String>> methodRolesMap = new HashMap<>();
     protected Map<String, List<String>> userRolesMap = Collections.emptyMap();
     protected List<String> globalRoles = Collections.emptyList();
     private boolean checkConfiguredRolesOnly;
@@ -110,7 +110,7 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
     }
 
     private static Map<String, List<String>> parseRolesMap(Map<String, String> rolesMap) {
-        Map<String, List<String>> map = new HashMap<String, List<String>>();
+        Map<String, List<String>> map = new HashMap<>();
         for (Map.Entry<String, String> entry : rolesMap.entrySet()) {
             map.put(entry.getKey(), Arrays.asList(StringUtils.split(entry.getValue(), " ")));
         }

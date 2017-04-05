@@ -33,6 +33,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.MatrixParam;
@@ -61,7 +62,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 @Produces("application/json")
 public class BookStoreSpring {
 
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
     private Long mainId = 123L;
     @Context
     private UriInfo ui;
@@ -118,6 +119,18 @@ public class BookStoreSpring {
         String key = req.getParameterNames().nextElement();
         String name = req.getParameter(key);
         long id = Long.valueOf(req.getParameter("id"));
+        return new Book(name, id);
+    }
+    @POST
+    @Path("/bookform5")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/xml")
+    public Book echoBookForm5(@Context HttpServletRequest req, @FormParam("id") Long formId) {
+        String name = req.getParameter("name");
+        long id = Long.valueOf(req.getParameter("id"));
+        if (id != formId) {
+            throw new WebApplicationException();
+        }
         return new Book(name, id);
     }
     @POST

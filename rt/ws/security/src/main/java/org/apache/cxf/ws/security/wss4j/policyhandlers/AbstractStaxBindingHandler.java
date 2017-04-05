@@ -607,7 +607,7 @@ public abstract class AbstractStaxBindingHandler extends AbstractCommonBindingHa
         boolean endorse
     ) throws Exception {
         if (tokenAssertions != null && !tokenAssertions.isEmpty()) {
-            Map<AbstractToken, SecurePart> ret = new HashMap<AbstractToken, SecurePart>();
+            Map<AbstractToken, SecurePart> ret = new HashMap<>();
             for (AssertionInfo assertionInfo : tokenAssertions) {
                 if (assertionInfo.getAssertion() instanceof SupportingTokens) {
                     assertionInfo.setAsserted(true);

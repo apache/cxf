@@ -72,7 +72,7 @@ public class BasicNameManager implements NameManager {
     }
 
     private void initialize(ServiceInfo service, Endpoint endpoint) {
-        nsPrefixMap = new HashMap<String, String>();
+        nsPrefixMap = new HashMap<>();
         if (endpoint != null) {
             JavascriptOptionsFeature options = getOptions(endpoint);
             if (options.getNamespacePrefixMap() != null) {

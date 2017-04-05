@@ -22,6 +22,8 @@ package org.apache.cxf.common.util;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  *
@@ -55,15 +57,38 @@ public class ProxyHelper {
      * @param interfaces
      * @return classloader that sees all interfaces
      */
-    private ClassLoader getClassLoaderForInterfaces(ClassLoader loader, Class<?>[] interfaces) {
+    private ClassLoader getClassLoaderForInterfaces(final ClassLoader loader, final Class<?>[] interfaces) {
         if (canSeeAllInterfaces(loader, interfaces)) {
             return loader;
         }
-        ProxyClassLoader combined = new ProxyClassLoader(loader, interfaces);
+        ProxyClassLoader combined;
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm == null) {
+            combined = new ProxyClassLoader(loader, interfaces);
+        } else {
+            combined = AccessController.doPrivileged(new PrivilegedAction<ProxyClassLoader>() {
+                @Override
+                public ProxyClassLoader run() {
+                    return new ProxyClassLoader(loader, interfaces);
+                }
+            });
+        }
         for (Class<?> currentInterface : interfaces) {
-            combined.addLoader(currentInterface.getClassLoader());
+            combined.addLoader(getClassLoader(currentInterface));
         }
         return combined;
+    }
+
+    private static ClassLoader getClassLoader(final Class<?> clazz) {
+        final SecurityManager sm = System.getSecurityManager();
+        if (sm != null) {
+            return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+                public ClassLoader run() {
+                    return clazz.getClassLoader();
+                }
+            });
+        }
+        return clazz.getClassLoader();
     }
 
     private boolean canSeeAllInterfaces(ClassLoader loader, Class<?>[] interfaces) {

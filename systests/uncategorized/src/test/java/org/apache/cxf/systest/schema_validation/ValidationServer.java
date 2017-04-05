@@ -37,8 +37,8 @@ import javax.xml.ws.WebServiceProvider;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.annotations.SchemaValidation;
+import org.apache.cxf.ext.logging.Logging;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;

@@ -111,7 +111,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
 
     private static final DocumentBuilderFactory AEGIS_DOCUMENT_BUILDER_FACTORY;
     // cache of classes to documents
-    private Map<String, Document> documents = new HashMap<String, Document>();
+    private Map<String, Document> documents = new HashMap<>();
     static {
         AEGIS_DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
         AEGIS_DOCUMENT_BUILDER_FACTORY.setNamespaceAware(true);

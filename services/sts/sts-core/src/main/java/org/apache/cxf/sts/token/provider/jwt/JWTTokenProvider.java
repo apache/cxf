@@ -20,8 +20,8 @@
 package org.apache.cxf.sts.token.provider.jwt;
 
 import java.security.KeyStore;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -131,11 +131,11 @@ public class JWTTokenProvider implements TokenProvider {
             response.setTokenId(claims.getTokenId());
 
             if (claims.getIssuedAt() > 0) {
-                response.setCreated(new Date(claims.getIssuedAt() * 1000L));
+                response.setCreated(Instant.ofEpochMilli(claims.getIssuedAt() * 1000L));
             }
-            Date expires = null;
+            Instant expires = null;
             if (claims.getExpiryTime() > 0) {
-                expires = new Date(claims.getExpiryTime() * 1000L);
+                expires = Instant.ofEpochMilli(claims.getExpiryTime() * 1000L);
                 response.setExpires(expires);
             }
 

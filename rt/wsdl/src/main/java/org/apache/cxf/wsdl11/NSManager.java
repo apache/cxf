@@ -40,7 +40,7 @@ import org.apache.cxf.wsdl.WSDLConstants;
 ***/
 
 final class NSManager {
-    private final Map<String, String> cache = new HashMap<String, String>();
+    private final Map<String, String> cache = new HashMap<>();
 
 
     NSManager() {

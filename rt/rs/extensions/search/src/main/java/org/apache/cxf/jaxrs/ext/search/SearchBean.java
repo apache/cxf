@@ -27,7 +27,7 @@ import java.util.Set;
  * subsequently introspected or converted into different language expressions
  */
 public class SearchBean {
-    private Map<String, String> values = new HashMap<String, String>(1);
+    private Map<String, String> values = new HashMap<>(1);
 
     public void set(String name, String value) {
         values.put(name, value);

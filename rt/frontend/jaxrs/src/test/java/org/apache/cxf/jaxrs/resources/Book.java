@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 public class Book implements Comparable<Book> {
     private String name;
     private long id;
-    private Map<Long, Chapter> chapters = new HashMap<Long, Chapter>();
+    private Map<Long, Chapter> chapters = new HashMap<>();
 
     public Book() {
     }

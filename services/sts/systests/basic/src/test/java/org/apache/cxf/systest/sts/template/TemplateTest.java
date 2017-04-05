@@ -347,9 +347,9 @@ public class TemplateTest extends AbstractBusClientServerTestBase {
         stsClient.setServiceName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}SecurityTokenService");
         stsClient.setEndpointName("{http://docs.oasis-open.org/ws-sx/ws-trust/200512/}Transport_Port");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put("security.username", "alice");
-        properties.put("security.callback-handler",
+        Map<String, Object> properties = new HashMap<>();
+        properties.put(SecurityConstants.USERNAME, "alice");
+        properties.put(SecurityConstants.CALLBACK_HANDLER,
                        "org.apache.cxf.systest.sts.common.CommonCallbackHandler");
         properties.put("ws-security.sts.token.username", "myclientkey");
         properties.put("ws-security.sts.token.properties", "clientKeystore.properties");

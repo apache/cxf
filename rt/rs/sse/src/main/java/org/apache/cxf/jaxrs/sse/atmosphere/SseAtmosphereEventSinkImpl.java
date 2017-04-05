@@ -58,7 +58,7 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if (!closed) {
             closed = true;
 
@@ -75,12 +75,21 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
                 final AtmosphereResponse response = resource.getResponse();
                 if (!response.isCommitted()) {
                     LOG.fine("Response is not committed, flushing buffer");
-                    response.flushBuffer();
+                    try {
+                        response.flushBuffer();
+                    } catch (IOException ex) {
+                        //REVISIT: and throw a runtime exception ?
+                        LOG.warning("Failed to flush AtmosphereResponse buffer");
+                    }
                 }
 
                 response.closeStreamOrWriter();
             } finally {
-                resource.close();
+                try {
+                    resource.close();
+                } catch (IOException ex) {
+                    // ignore
+                }
                 broadcaster.destroy();
                 LOG.fine("Atmosphere SSE event output is closed");
             }
@@ -104,7 +113,7 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
                     if (!future.isDone()) {
                         // Let us wait at least 200 milliseconds before returning to ensure
                         // that SSE had the opportunity to be delivered.
-                        LOG.info("Waiting 200ms to ensure SSE Atmosphere response is delivered");
+                        LOG.fine("Waiting 200ms to ensure SSE Atmosphere response is delivered");
                         future.get(200, TimeUnit.MILLISECONDS);
                     }
                 } catch (final ExecutionException | InterruptedException ex) {
@@ -125,11 +134,7 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
 
     @Override
     public void onComplete() {
-        try {
-            close();
-        } catch (final IOException ex) {
-            LOG.warning("While closing the SSE connection, an exception was raised: " + ex);
-        }
+        close();
     }
 
     @Override

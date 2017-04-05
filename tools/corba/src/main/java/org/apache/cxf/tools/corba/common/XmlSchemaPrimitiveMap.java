@@ -31,7 +31,7 @@ public class XmlSchemaPrimitiveMap {
     private Map<QName, QName> xmlSchemaPrimitiveMap;
 
     public XmlSchemaPrimitiveMap() {
-        xmlSchemaPrimitiveMap = new HashMap<QName, QName>();
+        xmlSchemaPrimitiveMap = new HashMap<>();
         initializeMap();
     }
 

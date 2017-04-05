@@ -221,7 +221,7 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
                 is = saved.getInputStream();
                 XMLStreamWriter capture = StaxUtils.createXMLStreamWriter(newSaved,
                                                                           StandardCharsets.UTF_8.name());
-                Map<String, String> map = new HashMap<String, String>();
+                Map<String, String> map = new HashMap<>();
                 map.put("{http://schemas.xmlsoap.org/ws/2005/02/rm}Sequence", "");
                 map.put("{http://schemas.xmlsoap.org/ws/2005/02/rm}SequenceAcknowledgement", "");
                 map.put("{http://docs.oasis-open.org/ws-rx/wsrm/200702}Sequence", "");
@@ -229,7 +229,7 @@ public class RMCaptureInInterceptor extends AbstractRMInterceptor<Message> {
                 map.put("{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd}Security",
                         "");
                 // attributes to be removed
-                Map<String, String> amap = new HashMap<String, String>();
+                Map<String, String> amap = new HashMap<>();
                 amap.put("{http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd}Id",
                          "");
 

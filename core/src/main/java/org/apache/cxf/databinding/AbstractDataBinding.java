@@ -50,7 +50,7 @@ import org.apache.ws.commons.schema.XmlSchema;
  * Supply default implementations, as appropriate, for DataBinding.
  */
 public abstract class AbstractDataBinding implements DataBinding {
-    private static final Map<String, String> BUILTIN_SCHEMA_LOCS = new HashMap<String, String>();
+    private static final Map<String, String> BUILTIN_SCHEMA_LOCS = new HashMap<>();
     {
         BUILTIN_SCHEMA_LOCS.put("http://www.w3.org/2005/08/addressing",
                                 "http://www.w3.org/2006/03/addressing/ws-addr.xsd");

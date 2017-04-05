@@ -196,7 +196,7 @@ public class JPATypedQueryVisitorODataTest extends AbstractJPATypedQueryVisitorT
 
     @Test
     public void testEqualsAddressQuery3() throws Exception {
-        Map<String, String> beanPropertiesMap = new HashMap<String, String>();
+        Map<String, String> beanPropertiesMap = new HashMap<>();
         beanPropertiesMap.put("street", "address.street");
         beanPropertiesMap.put("housenum", "address.houseNumber");
         List<Book> books =
@@ -209,7 +209,7 @@ public class JPATypedQueryVisitorODataTest extends AbstractJPATypedQueryVisitorT
 
     @Test
     public void testEqualsAddressQuery4() throws Exception {
-        Map<String, String> beanPropertiesMap = new HashMap<String, String>();
+        Map<String, String> beanPropertiesMap = new HashMap<>();
         beanPropertiesMap.put("street", "address.street");
         List<Book> books = queryBooks("street eq 'Str*t*'", null, beanPropertiesMap);
         assertEquals(3, books.size());
@@ -217,7 +217,7 @@ public class JPATypedQueryVisitorODataTest extends AbstractJPATypedQueryVisitorT
 
     @Test
     public void testEqualsAddressQuery5() throws Exception {
-        Map<String, String> beanPropertiesMap = new HashMap<String, String>();
+        Map<String, String> beanPropertiesMap = new HashMap<>();
         beanPropertiesMap.put("street", "address.street");
         List<Book> books = queryBooks("street eq 'Street&''3'", null, beanPropertiesMap);
         assertEquals(1, books.size());

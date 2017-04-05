@@ -88,9 +88,9 @@ public class JWTTokenProviderTest extends org.junit.Assert {
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
-        Assert.assertEquals(providerResponse.getCreated().getTime() / 1000L,
+        Assert.assertEquals(providerResponse.getCreated().getEpochSecond(),
                             jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
-        Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L,
+        Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
                             jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
     }
 
@@ -115,9 +115,9 @@ public class JWTTokenProviderTest extends org.junit.Assert {
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
-        Assert.assertEquals(providerResponse.getCreated().getTime() / 1000L,
+        Assert.assertEquals(providerResponse.getCreated().getEpochSecond(),
                             jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
-        Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L,
+        Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
                             jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
 
         // Verify Signature
@@ -157,9 +157,9 @@ public class JWTTokenProviderTest extends org.junit.Assert {
             JwtToken jwt = jwtConsumer.getJwtToken();
             Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
             Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
-            Assert.assertEquals(providerResponse.getCreated().getTime() / 1000L,
+            Assert.assertEquals(providerResponse.getCreated().getEpochSecond(),
                                 jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
-            Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L,
+            Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
                                 jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
 
             // Verify Signature
@@ -197,9 +197,9 @@ public class JWTTokenProviderTest extends org.junit.Assert {
         JwtToken jwt = jwtConsumer.getJwtToken();
         Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
         Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
-        Assert.assertEquals(providerResponse.getCreated().getTime() / 1000L,
+        Assert.assertEquals(providerResponse.getCreated().getEpochSecond(),
                             jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
-        Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L,
+        Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
                             jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
 
         // Check that the token is stored correctly in the cache
@@ -246,9 +246,9 @@ public class JWTTokenProviderTest extends org.junit.Assert {
 
             Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
             Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
-            Assert.assertEquals(providerResponse.getCreated().getTime() / 1000L,
+            Assert.assertEquals(providerResponse.getCreated().getEpochSecond(),
                                 jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
-            Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L,
+            Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
                                 jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
         }
 
@@ -300,9 +300,9 @@ public class JWTTokenProviderTest extends org.junit.Assert {
 
                 Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
                 Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
-                Assert.assertEquals(providerResponse.getCreated().getTime() / 1000L,
+                Assert.assertEquals(providerResponse.getCreated().getEpochSecond(),
                                     jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
-                Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L,
+                Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
                                     jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
             }
         } finally {
@@ -347,9 +347,9 @@ public class JWTTokenProviderTest extends org.junit.Assert {
 
             Assert.assertEquals("alice", jwt.getClaim(JwtConstants.CLAIM_SUBJECT));
             Assert.assertEquals(providerResponse.getTokenId(), jwt.getClaim(JwtConstants.CLAIM_JWT_ID));
-            Assert.assertEquals(providerResponse.getCreated().getTime() / 1000L,
+            Assert.assertEquals(providerResponse.getCreated().getEpochSecond(),
                                 jwt.getClaim(JwtConstants.CLAIM_ISSUED_AT));
-            Assert.assertEquals(providerResponse.getExpires().getTime() / 1000L,
+            Assert.assertEquals(providerResponse.getExpires().getEpochSecond(),
                                 jwt.getClaim(JwtConstants.CLAIM_EXPIRY));
         }
 

@@ -86,7 +86,7 @@ public final class ServiceModelUtil {
             ? "ServiceModel.WRAPPER.MAP_OUT" : "ServiceModel.WRAPPER.MAP", Map.class));
 
         if (wrapperMap == null) {
-            wrapperMap = new HashMap<QName, BindingOperationInfo>();
+            wrapperMap = new HashMap<>();
             for (BindingOperationInfo b : service.getOperations()) {
                 if (b.isUnwrappedCapable()) {
                     MessagePartInfo part = null;

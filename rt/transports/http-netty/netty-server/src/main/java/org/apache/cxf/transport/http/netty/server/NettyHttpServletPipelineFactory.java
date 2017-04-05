@@ -142,9 +142,9 @@ public class NettyHttpServletPipelineFactory extends ChannelInitializer<Channel>
         }
 
         pipeline.addLast("decoder", new HttpRequestDecoder());
-        pipeline.addLast("aggregator", new HttpObjectAggregator(maxChunkContentSize));
         pipeline.addLast("encoder", new HttpResponseEncoder());
-
+        pipeline.addLast("aggregator", new HttpObjectAggregator(maxChunkContentSize));
+        
         // Remove the following line if you don't want automatic content
         // compression.
         pipeline.addLast("deflater", new HttpContentCompressor());

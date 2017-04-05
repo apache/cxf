@@ -433,6 +433,11 @@ public final class InjectionUtils {
             }
             return theResult;
         }
+
+        if (Number.class.isAssignableFrom(pClass) && "".equals(value)) {
+            //pass empty string to boxed number type will result in 404
+            return null;
+        }
         if (pClass.isPrimitive()) {
             try {
                 T ret = (T)PrimitiveUtils.read(value, pClass);
@@ -763,7 +768,7 @@ public final class InjectionUtils {
             }
             return theValues;
         } else {
-            Map<Object, Object> theValues = new HashMap<Object, Object>();
+            Map<Object, Object> theValues = new HashMap<>();
             Class<?> valueType =
                 (Class<?>) InjectionUtils.getType(paramType.getActualTypeArguments(), 1);
             for (Map.Entry<String, List<String>> processedValuesEntry : processedValues.entrySet()) {
@@ -1494,15 +1499,21 @@ public final class InjectionUtils {
 
         if (type instanceof TypeVariable) {
             type = InjectionUtils.getSuperType(serviceCls, (TypeVariable<?>)type);
-        } else if (type instanceof ParameterizedType
-            && ((ParameterizedType)type).getActualTypeArguments()[0] instanceof TypeVariable
-            && isSupportedCollectionOrArray(getRawType(type))) {
-            TypeVariable<?> typeVar = (TypeVariable<?>)((ParameterizedType)type).getActualTypeArguments()[0];
-            Type theType = InjectionUtils.getSuperType(serviceCls, typeVar);
-            Class<?> cls = theType instanceof Class
-                ? (Class<?>)theType : InjectionUtils.getActualType(theType, 0);
-            type = new ParameterizedCollectionType(cls);
+        } else if (type instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType)type;
+            if (pt.getActualTypeArguments()[0] instanceof TypeVariable
+                && isSupportedCollectionOrArray(getRawType(pt))) {
+                TypeVariable<?> typeVar = (TypeVariable<?>)pt.getActualTypeArguments()[0];
+                Type theType = InjectionUtils.getSuperType(serviceCls, typeVar);
+                if (theType instanceof Class) {
+                    type = new ParameterizedCollectionType((Class<?>)theType);
+                } else {
+                    type = processGenericTypeIfNeeded(serviceCls, paramCls, theType);
+                    type = new ParameterizedCollectionType(type);
+                }
+            }
         }
+            
         if (type == null || type == Object.class) {
             type = paramCls;
         }

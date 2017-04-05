@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.spring;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -32,7 +33,9 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.annotations.Provider.Scope;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.ClasspathScanner;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
@@ -55,6 +58,10 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractSpringComponentScanServer.class);
     @Value("${cxf.jaxrs.classes-scan-packages:}")
     private String classesScanPackages;
+    @Value("${cxf.jaxrs.component-scan-packages:}")
+    private String componentScanPackages;
+    @Value("${cxf.jaxrs.component-scan-beans:}")
+    private String componentScanBeans;
 
     private List<ResourceProvider> resourceProviders = new LinkedList<ResourceProvider>();
     private List<Object> jaxrsProviders = new LinkedList<Object>();
@@ -74,17 +81,23 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
         boolean checkJaxrsProviders = checkJaxrsProviders();
         boolean checkCxfProviders = checkCxfProviders();
 
+        Set<String> componentScanPackagesSet = !StringUtils.isEmpty(componentScanPackages) 
+            ? ClasspathScanner.parsePackages(componentScanPackages) : null;
+        Set<String> componentScanBeansSet = !StringUtils.isEmpty(componentScanBeans) 
+                ? ClasspathScanner.parsePackages(componentScanBeans) : null;    
+            
         for (String beanName : applicationContext.getBeanDefinitionNames()) {
-            if (checkJaxrsRoots && isAnnotationAvailable(beanName, Path.class)
-                && matchesServiceAnnotation(beanName)) {
+            if (checkJaxrsRoots 
+                && isValidComponent(beanName, Path.class, componentScanPackagesSet, componentScanBeansSet)) {
                 SpringResourceFactory resourceFactory = new SpringResourceFactory(beanName);
                 resourceFactory.setApplicationContext(applicationContext);
                 resourceProviders.add(resourceFactory);
-            } else if (checkJaxrsProviders && isAnnotationAvailable(beanName, Provider.class)
-                && matchesServiceAnnotation(beanName)) {
+            } else if (checkJaxrsProviders 
+                && isValidComponent(beanName, Provider.class, componentScanPackagesSet, componentScanBeansSet)) {
                 jaxrsProviders.add(getProviderBean(beanName));
-            } else if (checkCxfProviders && isAnnotationAvailable(beanName,
-                org.apache.cxf.annotations.Provider.class) && matchesServiceAnnotation(beanName)) {
+            } else if (checkCxfProviders 
+                && isValidComponent(beanName, org.apache.cxf.annotations.Provider.class, 
+                                    componentScanPackagesSet, componentScanBeansSet)) {
                 addCxfProvider(getProviderBean(beanName));
             }
         }
@@ -119,6 +132,41 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
 
     }
 
+    protected boolean isValidComponent(String beanName, 
+                                      Class<? extends Annotation> ann,
+                                      Set<String> componentScanPackagesSet,
+                                      Set<String> componentScanBeansSet) {
+        return isAnnotationAvailable(beanName, ann)
+            && nonProxyClass(beanName)
+            && matchesServiceAnnotation(beanName)
+            && matchesComponentPackage(beanName, componentScanPackagesSet)
+            && matchesComponentName(beanName, componentScanBeansSet);
+    }
+    protected boolean nonProxyClass(String beanName) {
+        // JAX-RS runtime needs to be able to access the real component class to introspect it for
+        // JAX-RS annotations; the following check ensures that the valid proxified components
+        // are accepted while the client proxies are ignored.
+        Class<?> type = ClassHelper.getRealClassFromClass(applicationContext.getType(beanName));
+        if (Proxy.isProxyClass(type) && applicationContext.isSingleton(beanName)) {
+            type = ClassHelper.getRealClass(applicationContext.getBean(beanName));
+        }
+        if (Proxy.isProxyClass(type)) {
+            LOG.fine("Can not determine the real class of the component '" + beanName + "'");
+            return false;
+        } else {
+            return true;
+        }
+    }
+    protected boolean matchesComponentName(String beanName, Set<String> componentScanBeansSet) {
+        return componentScanBeansSet == null || componentScanBeansSet.contains(beanName);
+    }
+    protected boolean matchesComponentPackage(String beanName, Set<String> componentScanPackagesSet) {
+        return componentScanPackagesSet == null 
+            || !applicationContext.isSingleton(beanName)
+            || componentScanPackagesSet.contains(
+                PackageUtils.getPackageName(applicationContext.getBean(beanName).getClass()));
+        
+    }
     private static void warnIfDuplicatesAvailable(List<? extends Object> providers) {
         Set<String> classNames = new HashSet<>();
         for (Object o : providers) {

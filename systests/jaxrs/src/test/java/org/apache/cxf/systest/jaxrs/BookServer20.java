@@ -500,7 +500,7 @@ public class BookServer20 extends AbstractBusTestServerBase {
 
             configurable.register(new PreMatchDynamicContainerRequestFilter());
             configurable.register(RESPONSE_FILTER);
-            Map<Class<?>, Integer> contracts = new HashMap<Class<?>, Integer>();
+            Map<Class<?>, Integer> contracts = new HashMap<>();
             contracts.put(ContainerResponseFilter.class, 2);
             configurable.register(new PostMatchDynamicContainerRequestResponseFilter(),
                                   contracts);

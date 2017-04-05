@@ -54,8 +54,8 @@ public class AntGenerator extends AbstractGenerator {
         Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
 
 
-        Map<String, String> serverClassNamesMap = new HashMap<String, String>();
-        Map<String, String> clientClassNamesMap = new HashMap<String, String>();
+        Map<String, String> serverClassNamesMap = new HashMap<>();
+        Map<String, String> clientClassNamesMap = new HashMap<>();
         for (JavaInterface intf : interfaces.values()) {
             clientClassNamesMap.put(intf.getName() + "Client",
                                     intf.getFullClassName() + "Client");

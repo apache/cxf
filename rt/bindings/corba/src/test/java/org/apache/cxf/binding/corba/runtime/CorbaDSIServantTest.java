@@ -118,7 +118,7 @@ public class CorbaDSIServantTest extends Assert {
         MessageObserver incomingObserver = new TestObserver();
         dsiServant.setObserver(incomingObserver);
 
-        Map<String, QName> map = new HashMap<String, QName>(2);
+        Map<String, QName> map = new HashMap<>(2);
 
         map.put("greetMe", new QName("greetMe"));
         dsiServant.setOperationMapping(map);

@@ -444,7 +444,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
                 el = ((Document)el).getDocumentElement();
             }
 
-            Map<String, String> ns = new HashMap<String, String>();
+            Map<String, String> ns = new HashMap<>();
             ns.put("ns", "http://cxf.apache.org/greeter_control/types");
             XPathUtils xp = new XPathUtils(ns);
             String s = (String)xp.getValue("/ns:greetMe/ns:requestType",

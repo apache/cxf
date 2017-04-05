@@ -36,7 +36,7 @@ import org.apache.cxf.resource.ResourceManager;
 @SuppressWarnings("rawtypes")
 public class HandlerResolverImpl implements HandlerResolver {
     private final Map<PortInfo, List<Handler>> handlerMap
-        = new HashMap<PortInfo, List<Handler>>();
+        = new HashMap<>();
 
     //private QName service;
     private Class<?> annotationClass;

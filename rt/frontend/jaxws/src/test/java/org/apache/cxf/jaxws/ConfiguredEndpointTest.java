@@ -135,7 +135,7 @@ public class ConfiguredEndpointTest extends Assert {
         CXFBusFactory cf = new CXFBusFactory();
         factory = cf;
         BusFactory.setDefaultBus(null);
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(Configurer.USER_CFG_FILE_PROPERTY_NAME,
             "org/apache/cxf/jaxws/configured-endpoints.xml");
         BusFactory.setDefaultBus(cf.createBus(null, properties));
@@ -259,7 +259,7 @@ public class ConfiguredEndpointTest extends Assert {
         CXFBusFactory cf = new CXFBusFactory();
         factory = cf;
         BusFactory.setDefaultBus(null);
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(Configurer.USER_CFG_FILE_PROPERTY_NAME,
             "org/apache/cxf/jaxws/configured-endpoints.xml");
         BusFactory.setDefaultBus(cf.createBus(null, properties));

@@ -102,6 +102,7 @@ import org.apache.ws.commons.schema.constants.Constants;
 public final class JAXBEncoderDecoder {
     private static final class AddXSITypeStreamReader extends StreamReaderDelegate {
         private boolean first = true;
+        private int offset = 1;
         private final QName typeQName;
 
         private AddXSITypeStreamReader(XMLStreamReader reader, QName typeQName) {
@@ -110,42 +111,42 @@ public final class JAXBEncoderDecoder {
         }
 
         public int getAttributeCount() {
-            return super.getAttributeCount() + (first ? 1 : 0);
+            return super.getAttributeCount() + offset;
         }
 
         public String getAttributeLocalName(int index) {
             if (first && index == 0) {
                 return "type";
             }
-            return super.getAttributeLocalName(index - 1);
+            return super.getAttributeLocalName(index - offset);
         }
 
         public QName getAttributeName(int index) {
             if (first && index == 0) {
                 return new QName(Constants.URI_2001_SCHEMA_XSI, "type");
             }
-            return super.getAttributeName(index - 1);
+            return super.getAttributeName(index - offset);
         }
 
         public String getAttributeNamespace(int index) {
             if (first && index == 0) {
                 return Constants.URI_2001_SCHEMA_XSI;
             }
-            return super.getAttributeNamespace(index - 1);
+            return super.getAttributeNamespace(index - offset);
         }
 
         public String getAttributePrefix(int index) {
             if (first && index == 0) {
                 return "xsi";
             }
-            return super.getAttributePrefix(index - 1);
+            return super.getAttributePrefix(index - offset);
         }
 
         public String getAttributeType(int index) {
             if (first && index == 0) {
                 return "#TEXT";
             }
-            return super.getAttributeType(index - 1);
+            return super.getAttributeType(index - offset);
         }
 
         public String getAttributeValue(int index) {
@@ -156,11 +157,12 @@ public final class JAXBEncoderDecoder {
                 }
                 return pfx + ":" + typeQName.getLocalPart();
             }
-            return super.getAttributeValue(index);
+            return super.getAttributeValue(index - offset);
         }
 
         public int next()  throws XMLStreamException {
             first = false;
+            offset = 0;
             return super.next();
         }
 
@@ -867,7 +869,7 @@ public final class JAXBEncoderDecoder {
                 reader = findExtraNamespaces(reader);
             }
             obj = unmarshalWithClass ? u.unmarshal(reader, clazz) : u
-                .unmarshal((XMLStreamReader)source);
+                .unmarshal(reader);
         } else if (source instanceof XMLEventReader) {
             // allows the XML Event Reader to adjust it's behaviour based on the state of the unmarshaller
             if (source instanceof UnmarshallerAwareXMLReader) {

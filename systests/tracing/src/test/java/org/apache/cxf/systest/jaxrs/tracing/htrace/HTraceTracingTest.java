@@ -67,7 +67,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     @Ignore
     public static class Server extends AbstractBusTestServerBase {
         protected void run() {
-            final Map<String, String> properties = new HashMap<String, String>();
+            final Map<String, String> properties = new HashMap<>();
             properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, TestSpanReceiver.class.getName());
             properties.put(Tracer.SAMPLER_CLASSES_KEY, AlwaysSampler.class.getName());
 
@@ -93,7 +93,7 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
     public void setUp() {
         TestSpanReceiver.clear();
 
-        final Map<String, String> properties = new HashMap<String, String>();
+        final Map<String, String> properties = new HashMap<>();
         properties.put(Tracer.SPAN_RECEIVER_CLASSES_KEY, StandardOutSpanReceiver.class.getName());
         properties.put(Tracer.SAMPLER_CLASSES_KEY, AlwaysSampler.class.getName());
 

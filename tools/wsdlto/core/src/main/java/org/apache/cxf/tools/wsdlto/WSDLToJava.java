@@ -176,7 +176,8 @@ public class WSDLToJava {
     }
 
     public static void main(String[] pargs) {
-
+        System.setProperty("org.apache.cxf.JDKBugHacks.defaultUsesCaches", "true");
+        
         CommandInterfaceUtils.commandCommonMain();
         WSDLToJava w2j = new WSDLToJava(pargs);
         try {

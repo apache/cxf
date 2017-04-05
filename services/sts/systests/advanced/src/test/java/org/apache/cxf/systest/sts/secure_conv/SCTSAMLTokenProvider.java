@@ -53,8 +53,6 @@ import org.apache.wss4j.common.saml.bean.AttributeStatementBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectBean;
 import org.apache.wss4j.dom.WSConstants;
-import org.joda.time.DateTime;
-import org.opensaml.saml.common.SAMLVersion;
 
 /**
  * A TokenProvider implementation that provides a SAML Token that contains a Symmetric Key that is obtained
@@ -113,17 +111,8 @@ public class SCTSAMLTokenProvider implements TokenProvider {
                 response.setTokenId(token.getAttributeNS(null, "AssertionID"));
             }
 
-            DateTime validFrom = null;
-            DateTime validTill = null;
-            if (assertion.getSamlVersion().equals(SAMLVersion.VERSION_20)) {
-                validFrom = assertion.getSaml2().getConditions().getNotBefore();
-                validTill = assertion.getSaml2().getConditions().getNotOnOrAfter();
-            } else {
-                validFrom = assertion.getSaml1().getConditions().getNotBefore();
-                validTill = assertion.getSaml1().getConditions().getNotOnOrAfter();
-            }
-            response.setCreated(validFrom.toDate());
-            response.setExpires(validTill.toDate());
+            response.setCreated(assertion.getNotBefore());
+            response.setExpires(assertion.getNotOnOrAfter());
 
             response.setEntropy(entropyBytes);
             if (keySize > 0) {

@@ -142,7 +142,7 @@ public class JAASLoginInterceptorTest {
 
             @Override
             public AppConfigurationEntry[] getAppConfigurationEntry(String name) {
-                Map<String, String> options = new HashMap<String, String>();
+                Map<String, String> options = new HashMap<>();
                 AppConfigurationEntry configEntry = new AppConfigurationEntry(
                                                                               TestUserPasswordLoginModule.class
                                                                                   .getName(),

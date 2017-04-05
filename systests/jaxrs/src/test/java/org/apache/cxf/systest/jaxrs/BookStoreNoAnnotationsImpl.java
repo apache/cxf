@@ -34,7 +34,7 @@ import org.apache.cxf.message.MessageUtils;
 public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterface,
     HttpHeadersContext {
 
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
     @Context
     private UriInfo ui;
 

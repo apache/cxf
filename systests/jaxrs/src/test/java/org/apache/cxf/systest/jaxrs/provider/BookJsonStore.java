@@ -41,7 +41,7 @@ import javax.ws.rs.core.UriInfo;
 
 @Path("/bookstore/")
 public class BookJsonStore {
-    private Map< Long, Book > books = new HashMap< Long, Book >();
+    private Map< Long, Book > books = new HashMap<>();
 
     @GET
     @Path("/books/{bookId}")

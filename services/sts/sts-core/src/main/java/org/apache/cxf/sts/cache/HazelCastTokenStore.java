@@ -19,8 +19,9 @@
 
 package org.apache.cxf.sts.cache;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import com.hazelcast.core.Hazelcast;
@@ -125,15 +126,16 @@ public class HazelCastTokenStore implements TokenStore {
     private int getTTL(SecurityToken token) {
         int parsedTTL = 0;
         if (token.getExpires() != null) {
-            Date expires = token.getExpires();
-            Date current = new Date();
-            long expiryTime = (expires.getTime() - current.getTime()) / 1000L;
-            if (expiryTime < 0) {
+            Instant expires = token.getExpires();
+            Instant now = Instant.now();
+            if (expires.isBefore(now)) {
                 return 0;
             }
+            
+            Duration duration = Duration.between(now, expires);
 
-            parsedTTL = (int)expiryTime;
-            if (expiryTime != (long)parsedTTL || parsedTTL > MAX_TTL) {
+            parsedTTL = (int)duration.getSeconds();
+            if (duration.getSeconds() != (long)parsedTTL || parsedTTL > MAX_TTL) {
                 // Default to configured value
                 parsedTTL = (int)ttl;
                 if (ttl != (long)parsedTTL) {

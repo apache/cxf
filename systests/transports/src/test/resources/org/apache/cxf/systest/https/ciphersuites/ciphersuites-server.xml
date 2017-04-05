@@ -34,6 +34,7 @@
                 <sec:clientAuthentication want="false" required="false"/>
                 <sec:cipherSuitesFilter>
                     <sec:include>.*_WITH_AES_.*</sec:include>
+                    <sec:exclude>SSL_RSA_WITH_DES_CBC_SHA</sec:exclude>
                 </sec:cipherSuitesFilter>
             </httpj:tlsServerParameters>
         </httpj:engine>
@@ -52,7 +53,6 @@
             </bean>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
-    
     
     <httpj:engine-factory id="rc4-tls-settings">
         <httpj:engine port="${testutil.ports.CipherSuitesServer.2}">
@@ -107,7 +107,7 @@
                 </sec:keyManagers>
                 <sec:clientAuthentication want="false" required="false"/>
                 <sec:cipherSuites>
-                    <sec:cipherSuite>TLS_RSA_WITH_AES_256_CBC_SHA</sec:cipherSuite>
+                    <sec:cipherSuite>TLS_RSA_WITH_AES_256_CBC_SHA256</sec:cipherSuite>
                 </sec:cipherSuites>
             </httpj:tlsServerParameters>
         </httpj:engine>
@@ -148,4 +148,5 @@
             </bean>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
+
 </beans>

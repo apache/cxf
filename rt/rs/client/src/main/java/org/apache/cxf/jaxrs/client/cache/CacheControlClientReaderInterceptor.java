@@ -146,7 +146,7 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
     }
 
     private Map<String, String> computeCacheHeaders(final MultivaluedMap<String, String> responseHeaders) {
-        final Map<String, String> cacheHeaders = new HashMap<String, String>(2);
+        final Map<String, String> cacheHeaders = new HashMap<>(2);
 
         final String etagHeader = responseHeaders.getFirst(HttpHeaders.ETAG);
         if (etagHeader != null) {

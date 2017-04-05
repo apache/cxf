@@ -85,7 +85,7 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
     private static final String WSTRUST_REQUESTTYPE_KEYEXCHANGETOKEN = WSTRUST_13_NAMESPACE
             + "/KeyExchangeToken";
 
-    private static final Map<String, Method> OPERATION_METHODS = new HashMap<String, Method>();
+    private static final Map<String, Method> OPERATION_METHODS = new HashMap<>();
     static {
         try {
             Method m = IssueOperation.class.getDeclaredMethod("issue",
@@ -140,7 +140,7 @@ public class SecurityTokenServiceProvider implements Provider<Source> {
     private RenewOperation renewOperation;
     private RequestCollectionOperation requestCollectionOperation;
     private ValidateOperation validateOperation;
-    private Map<String, Object> operationMap = new HashMap<String, Object>();
+    private Map<String, Object> operationMap = new HashMap<>();
 
     @Resource
     private WebServiceContext context;

@@ -323,7 +323,7 @@ public class CorbaConduit implements Conduit {
         if (orb == null) {
             prepareOrb();
         }
-        Map<TypeCode, RaisesType> exceptions = new HashMap<TypeCode, RaisesType>();
+        Map<TypeCode, RaisesType> exceptions = new HashMap<>();
         List<RaisesType> exList = operation.getRaises();
         if (exList != null) {
             for (int i = 0; i < exList.size(); ++i) {

@@ -166,7 +166,7 @@ public class DigestAuthSupplier implements HttpAuthSupplier {
                         + qop + ":" + hasha2;
                 }
                 String response = encode(digester.digest(serverDigestValue.getBytes("US-ASCII")));
-                Map<String, String> outParams = new HashMap<String, String>();
+                Map<String, String> outParams = new HashMap<>();
                 if (qop != null) {
                     outParams.put("qop", "auth");
                 }

@@ -149,7 +149,8 @@ public class Base64DecoderStream extends FilterInputStream {
                 // now check to see if this is normal, or potentially an error
                 // if we didn't get characters as a multiple of 4, we may need to complain about this.
                 if ((readCharacters % 4) != 0) {
-                    throw new IOException("Base64 encoding error, data truncated");
+                    throw new IOException("Base64 encoding error, data truncated: " + readCharacters + " "
+                                          + new String(encodedChars, 0, readCharacters));
                 }
                 // return the count.
                 return readCharacters;

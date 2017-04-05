@@ -34,8 +34,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class BookBean {
     private String name;
     private long id;
-    private Map<Long, Chapter> chapters = new HashMap<Long, Chapter>();
-    private Map<Long, String> comments = new HashMap<Long, String>();
+    private Map<Long, Chapter> chapters = new HashMap<>();
+    private Map<Long, String> comments = new HashMap<>();
 
     public BookBean() {
         init();

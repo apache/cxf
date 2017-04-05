@@ -97,7 +97,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         callbackHandler.setSignAssertion(true);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
 
-        Map<String, Object> outProperties = new HashMap<String, Object>();
+        Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
         outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
 
@@ -136,7 +136,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
 
         callbackHandler.setConditions(conditions);
 
-        Map<String, Object> outProperties = new HashMap<String, Object>();
+        Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
         outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
 
@@ -174,7 +174,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
 
         callbackHandler.setConditions(conditions);
 
-        Map<String, Object> outProperties = new HashMap<String, Object>();
+        Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
         outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
 
@@ -216,7 +216,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
 
         callbackHandler.setConditions(conditions);
 
-        Map<String, Object> outProperties = new HashMap<String, Object>();
+        Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
         outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
 
@@ -254,7 +254,7 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
 
         callbackHandler.setConditions(conditions);
 
-        Map<String, Object> outProperties = new HashMap<String, Object>();
+        Map<String, Object> outProperties = new HashMap<>();
         outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
         outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
 

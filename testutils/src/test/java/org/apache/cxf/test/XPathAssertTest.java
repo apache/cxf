@@ -61,7 +61,7 @@ public class XPathAssertTest extends Assert {
     public void testAssertNamespace() throws Exception {
         Document document = StaxUtils.read(getClass().getResourceAsStream("test2.xml"));
 
-        Map<String, String> namespaces = new HashMap<String, String>();
+        Map<String, String> namespaces = new HashMap<>();
         namespaces.put("a", "urn:foo");
         namespaces.put("z", "urn:z");
 

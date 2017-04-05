@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.systest.jaxrs.sse;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CountDownLatch;
@@ -87,7 +86,7 @@ public class BookStore {
                     sink.onNext(createStatsEvent(builder.name("book"), id + 4));
                     Thread.sleep(200);
                     sink.close();
-                } catch (final InterruptedException | IOException ex) {
+                } catch (final InterruptedException ex) {
                     LOG.error("Communication error", ex);
                 }
             }

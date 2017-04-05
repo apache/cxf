@@ -43,7 +43,7 @@ public final class HttpHeaderHelper {
     public static final String AUTHORIZATION = "Authorization";
     private static final String ISO88591 = Charset.forName("ISO-8859-1").name();
 
-    private static Map<String, String> internalHeaders = new HashMap<String, String>();
+    private static Map<String, String> internalHeaders = new HashMap<>();
     private static ConcurrentHashMap<String, String> encodings = new ConcurrentHashMap<String, String>();
     private static Pattern charsetPattern = Pattern.compile("\"|'");
 

@@ -28,7 +28,7 @@ import javax.ws.rs.Path;
 
 @Path("/bookstorestorage/")
 public abstract class BookStoreStorage implements LifecycleInterface {
-    protected Map<Long, Book> books = new HashMap<Long, Book>();
+    protected Map<Long, Book> books = new HashMap<>();
     protected long bookId = 123;
     protected int postConstructCalls;
     protected int preDestroyCalls;

@@ -404,6 +404,14 @@ public class RMManager {
         }
         return rme;
     }
+    public RMEndpoint findReliableEndpoint(QName qn) {
+        for (RMEndpoint rpe : reliableEndpoints.values()) {
+            if (qn.equals(rpe.getApplicationEndpoint().getService().getName())) {
+                return rpe;
+            }
+        }
+        return null;
+    }
 
     public Destination getDestination(Message message) throws RMException {
         RMEndpoint rme = getReliableEndpoint(message);
@@ -472,10 +480,10 @@ public class RMManager {
             Proxy proxy = source.getReliableEndpoint().getProxy();
             ProtocolVariation protocol = config.getProtocolVariation();
             Exchange exchange = new ExchangeImpl();
-            Map<String, Object> context = new HashMap<String, Object>(16);
+            Map<String, Object> context = new HashMap<>(16);
             for (String key : message.getContextualPropertyKeys()) {
                 //copy other properties?
-                if (key.startsWith("ws-security")) {
+                if (key.startsWith("ws-security") || key.startsWith("security.")) {
                     context.put(key, message.getContextualProperty(key));
                 }
             }

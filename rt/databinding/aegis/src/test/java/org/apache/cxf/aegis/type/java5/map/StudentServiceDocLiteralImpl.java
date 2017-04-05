@@ -28,7 +28,7 @@ public class StudentServiceDocLiteralImpl implements StudentServiceDocLiteral {
     private Map<Long, Student> studentMap;
 
     public StudentServiceDocLiteralImpl() {
-        studentMap = new HashMap<Long, Student>();
+        studentMap = new HashMap<>();
         studentMap.put(Long.valueOf(1), new Student("Student1", 1));
         studentMap.put(Long.valueOf(100), new Student("Student100", 100));
         studentMap.put(Long.valueOf(-1), new Student("StudentNegative", -1));

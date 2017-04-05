@@ -28,7 +28,7 @@ import org.apache.cxf.systest.jaxrs.Book;
 
 @Path("/bookstoregenerics/")
 public class SecureBookStoreGenerics implements SecureBookInterfaceGenerics<Long> {
-    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Map<Long, Book> books = new HashMap<>();
 
     public SecureBookStoreGenerics() {
         Book book = new Book();

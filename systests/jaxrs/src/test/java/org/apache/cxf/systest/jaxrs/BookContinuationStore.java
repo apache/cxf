@@ -46,7 +46,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 @Path("/bookstore")
 public class BookContinuationStore implements BookAsyncInterface {
 
-    private Map<String, String> books = new HashMap<String, String>();
+    private Map<String, String> books = new HashMap<>();
     private Executor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                         new ArrayBlockingQueue<Runnable>(10));
 

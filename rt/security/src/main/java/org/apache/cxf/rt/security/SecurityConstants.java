@@ -158,6 +158,13 @@ public class SecurityConstants {
             "security.enable.unsigned-saml-assertion.principal";
 
     /**
+     * Whether to allow UsernameTokens with no password to be used as SecurityContext Principals.
+     * The default is false.
+     */
+    public static final String ENABLE_UT_NOPASSWORD_PRINCIPAL =
+            "security.enable.ut-no-password.principal";
+
+    /**
      * Whether to validate the SubjectConfirmation requirements of a received SAML Token
      * (sender-vouches or holder-of-key). The default is true.
      */
@@ -337,6 +344,13 @@ public class SecurityConstants {
     public static final String STS_TOKEN_IMMINENT_EXPIRY_VALUE =
         "security.sts.token.imminent-expiry-value";
 
+    /**
+     * An implementation of the STSTokenCacher interface, if you want to plug in custom caching behaviour for
+     * STS clients. The default value is the DefaultSTSTokenCacher.
+     */
+    public static final String STS_TOKEN_CACHER_IMPL =
+        "security.sts.token.cacher.impl";
+
     public static final Set<String> COMMON_PROPERTIES;
 
     static {
@@ -345,13 +359,14 @@ public class SecurityConstants {
             CALLBACK_HANDLER, SAML_CALLBACK_HANDLER, SIGNATURE_PROPERTIES,
             SIGNATURE_CRYPTO, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO, ENCRYPT_CERT,
             ENABLE_REVOCATION, SUBJECT_CERT_CONSTRAINTS, ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL,
+            ENABLE_UT_NOPASSWORD_PRINCIPAL,
             AUDIENCE_RESTRICTION_VALIDATION, SAML_ROLE_ATTRIBUTENAME,
             ENABLE_UNSIGNED_SAML_ASSERTION_PRINCIPAL, SC_FROM_JAAS_SUBJECT,
             STS_TOKEN_USE_CERT_FOR_KEYINFO, STS_TOKEN_DO_CANCEL, CACHE_ISSUED_TOKEN_IN_ENDPOINT,
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
             STS_CLIENT, STS_APPLIES_TO, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
-            STS_TOKEN_IMMINENT_EXPIRY_VALUE
+            STS_TOKEN_IMMINENT_EXPIRY_VALUE, STS_TOKEN_CACHER_IMPL
         }));
         COMMON_PROPERTIES = Collections.unmodifiableSet(s);
     }

@@ -68,8 +68,8 @@ public class UniqueBodyValidator extends ServiceValidator {
 
     private boolean isValidEndpoint(EndpointInfo endpoint) {
         BindingInfo binding = endpoint.getBinding();
-        Map<QName, QName> uniqueNames = new HashMap<QName, QName>();
-        Map<QName, Set<String>> actions = new HashMap<QName, Set<String>>();
+        Map<QName, QName> uniqueNames = new HashMap<>();
+        Map<QName, Set<String>> actions = new HashMap<>();
 
         Collection<BindingOperationInfo> bos = binding.getOperations();
         for (BindingOperationInfo bo : bos) {

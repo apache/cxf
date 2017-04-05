@@ -1762,10 +1762,9 @@ public abstract class HTTPConduit
                     // already connected.
                     HttpsURLConnectionInfo info = getHttpsURLConnectionInfo();
                     if (trustDecider != null) {
-                        trustDecider.establishTrust(
-                                conduitName,
-                            info,
-                            outMessage);
+                        trustDecider.establishTrust(conduitName,
+                                                    info,
+                                                    outMessage);
                         if (LOG.isLoggable(Level.FINE)) {
                             LOG.log(Level.FINE, "Trust Decider "
                                 + trustDecider.getLogicalName()
@@ -1869,7 +1868,7 @@ public abstract class HTTPConduit
                                            Message message) throws IOException {
         Map<String, Integer> visitedURLs = CastUtils.cast((Map<?, ?>)message.get(KEY_VISITED_URLS));
         if (visitedURLs == null) {
-            visitedURLs = new HashMap<String, Integer>();
+            visitedURLs = new HashMap<>();
             message.put(KEY_VISITED_URLS, visitedURLs);
         }
         Integer visitCount = visitedURLs.get(lastURL);

@@ -209,5 +209,8 @@ class FrontendClientAdapter implements org.apache.cxf.endpoint.Client {
         throw new UnsupportedOperationException();
     }
 
-
+    @Override
+    public void close() throws Exception {
+        destroy();
+    }
 }

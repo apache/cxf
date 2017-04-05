@@ -53,7 +53,7 @@ public class SoapFault extends Fault {
     private List<QName> subCodes;
     private String role;
     private String node;
-    private Map<String, String> namespaces = new HashMap<String, String>();
+    private Map<String, String> namespaces = new HashMap<>();
 
     public SoapFault(Message message, Throwable throwable, QName faultCode) {
         super(message, throwable, faultCode);

@@ -28,7 +28,7 @@ import javax.jws.WebService;
 @WebService(endpointInterface = "org.apache.cxf.customer.book.BookService")
 public class BookServiceImpl implements BookService {
     long currentId = 1;
-    Map<Long, Book> books = new HashMap<Long, Book>();
+    Map<Long, Book> books = new HashMap<>();
 
     public BookServiceImpl() {
         Book book = createBook();

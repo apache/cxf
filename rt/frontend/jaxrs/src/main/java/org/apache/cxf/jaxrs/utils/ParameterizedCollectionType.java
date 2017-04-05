@@ -31,6 +31,11 @@ public final class ParameterizedCollectionType implements ParameterizedType {
         this.collectionMemberClass = collectionMemberClass;
         this.typeArgs = new Type[] {collectionMemberClass};
     }
+    
+    public ParameterizedCollectionType(Type pt) {
+        this.collectionMemberClass = InjectionUtils.getRawType(pt);
+        this.typeArgs = new Type[] {pt};
+    }
 
     public Type[] getActualTypeArguments() {
         return typeArgs;

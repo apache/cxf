@@ -86,7 +86,7 @@ import org.apache.cxf.staxutils.transform.OutTransformWriter;
  * JAXBExtensionHelper
  */
 public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeserializer {
-    static final Map<Class<?>, Integer> WSDL_INDENT_MAP = new HashMap<Class<?>, Integer>();
+    static final Map<Class<?>, Integer> WSDL_INDENT_MAP = new HashMap<>();
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBExtensionHelper.class);
     private static final int DEFAULT_INDENT_LEVEL = 2;
 
@@ -312,7 +312,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                 new PrettyPrintXMLStreamWriter(fact.createXMLStreamWriter(pw), 2, getIndentLevel(parent));
 
             if (namespace != null && !namespace.equals(jaxbNamespace)) {
-                Map<String, String> outMap = new HashMap<String, String>();
+                Map<String, String> outMap = new HashMap<>();
                 outMap.put("{" + jaxbNamespace + "}*", "{" + namespace + "}*");
                 writer = new OutTransformWriter(writer,
                                                 outMap,
@@ -321,7 +321,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                                                 false,
                                                 "");
             }
-            Map<String, String> nspref = new HashMap<String, String>();
+            Map<String, String> nspref = new HashMap<>();
             for (Object ent : wsdl.getNamespaces().entrySet()) {
                 Map.Entry<?, ?> entry = (Map.Entry<?, ?>)ent;
                 nspref.put((String)entry.getValue(), (String)entry.getKey());

@@ -916,7 +916,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         //TODO: the following isn't a real test. We need to test against a service
         // that would actually notice the difference. At least it ensures that
         // specifying the property does not explode.
-        Map<String, Object> jaxbContextProperties = new HashMap<String, Object>();
+        Map<String, Object> jaxbContextProperties = new HashMap<>();
         if (JAXBContext.newInstance(String.class).getClass().getName().contains("internal")) {
             jaxbContextProperties.put("com.sun.xml.internal.bind.defaultNamespaceRemap", "uri:ultima:thule");
         } else {

@@ -568,7 +568,9 @@ public abstract class AbstractClient implements Client {
                 }
             }
         }
-        ex = message.getContent(Exception.class);
+        if (ex == null) {
+            ex = message.getContent(Exception.class);
+        }
         if (ex != null
             || PropertyUtils.isTrue(exchange.get(SERVICE_NOT_AVAIL_PROPERTY))
                 && PropertyUtils.isTrue(exchange.get(COMPLETE_IF_SERVICE_NOT_AVAIL_PROPERTY))) {
@@ -589,6 +591,7 @@ public abstract class AbstractClient implements Client {
         Exchange exchange = outMessage.getExchange();
         Integer responseCode = getResponseCode(exchange);
         if (responseCode == null
+            || responseCode < 300 && !(actualEx instanceof IOException) 
             || actualEx instanceof IOException && exchange.get("client.redirect.exception") != null) {
             if (actualEx instanceof ProcessingException) {
                 throw (RuntimeException)actualEx;
@@ -1066,12 +1069,12 @@ public abstract class AbstractClient implements Client {
         Map<String, Object> reqContext = null;
         Map<String, Object> resContext = null;
         if (context == null) {
-            context = new HashMap<String, Object>();
+            context = new HashMap<>();
         }
         reqContext = CastUtils.cast((Map<?, ?>)context.get(REQUEST_CONTEXT));
         resContext = CastUtils.cast((Map<?, ?>)context.get(RESPONSE_CONTEXT));
         if (reqContext == null) {
-            reqContext = new HashMap<String, Object>(cfg.getRequestContext());
+            reqContext = new HashMap<>(cfg.getRequestContext());
             context.put(REQUEST_CONTEXT, reqContext);
         }
         reqContext.put(Message.PROTOCOL_HEADERS, message.get(Message.PROTOCOL_HEADERS));
@@ -1080,7 +1083,7 @@ public abstract class AbstractClient implements Client {
         reqContext.put(PROXY_PROPERTY, proxy);
 
         if (resContext == null) {
-            resContext = new HashMap<String, Object>();
+            resContext = new HashMap<>();
             context.put(RESPONSE_CONTEXT, resContext);
         }
 
@@ -1137,6 +1140,13 @@ public abstract class AbstractClient implements Client {
         return respClass;
     }
 
+    protected void resetResponseStateImmediatelyIfNeeded() {
+        if (state instanceof ThreadLocalClientState
+            && cfg.isResetThreadLocalStateImmediately()) {
+            state.reset();
+        }
+    }
+    
     protected abstract class AbstractBodyWriter extends AbstractOutDatabindingInterceptor {
 
         public AbstractBodyWriter() {

@@ -133,7 +133,12 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                 int count = 0;
                 for (MessagePartInfo part : messageInfo.getMessageParts()) {
                     if (Boolean.TRUE.equals(part.getProperty(ReflectionServiceFactoryBean.HEADER))) {
-                        MessagePartInfo mpi = wrappedMessageInfo.getMessagePart(part.getName());
+                        MessagePartInfo mpi = null;
+                        for (MessagePartInfo mpi2 : wrappedMessageInfo.getMessageParts()) {
+                            if (mpi2.getConcreteName().equals(part.getConcreteName())) {
+                                mpi = mpi2;
+                            }
+                        }
                         if (mpi != null && lst.hasValue(mpi)) {
                             count++;
                             newParams.put(part, lst.get(mpi));

@@ -67,7 +67,7 @@ public class ContextUtilsTest extends Assert {
 
     @Test
     public void testGetActionFromExtensible() {
-        Map<QName, Object> attributes = new HashMap<QName, Object>();
+        Map<QName, Object> attributes = new HashMap<>();
         Extensible ext = control.createMock(Extensible.class);
         EasyMock.expect(ext.getExtensionAttributes()).andReturn(attributes).anyTimes();
         attributes.put(WSA_ACTION_QNAME, "urn:foo:test:2");

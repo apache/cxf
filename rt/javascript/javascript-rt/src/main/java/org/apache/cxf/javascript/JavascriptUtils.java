@@ -87,7 +87,7 @@ public class JavascriptUtils {
 
     public JavascriptUtils(StringBuilder code) {
         this.code = code;
-        defaultValueForSimpleType = new HashMap<String, String>();
+        defaultValueForSimpleType = new HashMap<>();
         defaultValueForSimpleType.put("int", "0");
         defaultValueForSimpleType.put("unsignedInt", "0");
         defaultValueForSimpleType.put("long", "0");

@@ -236,7 +236,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
 
     public static class NSContext implements NamespaceContext {
         NamespaceContext parent;
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
 
         public NSContext(NamespaceContext p) {
             parent = p;

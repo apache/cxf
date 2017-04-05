@@ -56,7 +56,7 @@ public class JAXRSClientServerTikaTest extends AbstractBusClientServerTestBase {
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
 
-            final Map< String, Object > properties = new HashMap< String, Object >();
+            final Map< String, Object > properties = new HashMap<>();
             properties.put("search.query.parameter.name", "$filter");
             properties.put("search.parser", new FiqlParser< SearchBean >(SearchBean.class));
             properties.put(SearchUtils.DATE_FORMAT_PROPERTY, "yyyy/MM/dd");

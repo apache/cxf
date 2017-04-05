@@ -22,7 +22,7 @@ package org.apache.cxf.xkms.x509.validator;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -45,10 +45,10 @@ public class DateValidator implements Validator {
      * @return the validity state of the certificate
      */
     public boolean isCertificateValid(X509Certificate certificate) {
-        Date date = Calendar.getInstance().getTime();
+        Instant now = Instant.now();
 
         try {
-            certificate.checkValidity(date);
+            certificate.checkValidity(Date.from(now));
         } catch (CertificateNotYetValidException e) {
             return false;
         } catch (CertificateExpiredException e) {

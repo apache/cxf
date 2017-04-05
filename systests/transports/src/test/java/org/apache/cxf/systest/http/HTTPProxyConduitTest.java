@@ -19,22 +19,23 @@
 
 package org.apache.cxf.systest.http;
 
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
-import org.jboss.netty.handler.codec.http.HttpRequest;
 
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-import org.littleshoot.proxy.DefaultHttpProxyServer;
-import org.littleshoot.proxy.HttpFilter;
-import org.littleshoot.proxy.HttpRequestFilter;
+
+import org.littleshoot.proxy.ActivityTrackerAdapter;
+import org.littleshoot.proxy.FlowContext;
+import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
+import io.netty.handler.codec.http.HttpRequest;
 
 
 /**
@@ -42,12 +43,13 @@ import org.littleshoot.proxy.HttpRequestFilter;
  */
 public class HTTPProxyConduitTest extends HTTPConduitTest {
     static final int PROXY_PORT = Integer.parseInt(allocatePort(HTTPProxyConduitTest.class));
-    static DefaultHttpProxyServer proxy;
+    static HttpProxyServer proxy;
     static CountingFilter requestFilter = new CountingFilter();
 
-    static class CountingFilter implements HttpRequestFilter {
+    static class CountingFilter extends ActivityTrackerAdapter {
         AtomicInteger count = new AtomicInteger();
-        public void filter(HttpRequest httpRequest) {
+        public void requestReceivedFromClient(FlowContext flowContext,
+                                              HttpRequest httpRequest) {
             count.incrementAndGet();
         }
 
@@ -71,8 +73,10 @@ public class HTTPProxyConduitTest extends HTTPConduitTest {
 
     @BeforeClass
     public static void startProxy() {
-        proxy = new DefaultHttpProxyServer(PROXY_PORT, requestFilter, new HashMap<String, HttpFilter>());
-        proxy.start();
+        proxy = DefaultHttpProxyServer.bootstrap()
+            .withPort(PROXY_PORT)
+            .plusActivityTracker(requestFilter)
+            .start();
     }
     @Before
     public void resetCount() {

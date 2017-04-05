@@ -128,7 +128,7 @@ public class SimpleSearchConditionTest {
     public void testCtorMapCondSupported() {
         for (ConditionType ct : ConditionType.values()) {
             try {
-                Map<String, ConditionType> map = new HashMap<String, ConditionType>();
+                Map<String, ConditionType> map = new HashMap<>();
                 map.put("foo", ct);
                 new SimpleSearchCondition<SingleAttr>(map, attr);
                 if (!supported.contains(ct)) {
@@ -286,7 +286,7 @@ public class SimpleSearchConditionTest {
 
     @Test
     public void testIsMetMappedOperators() {
-        Map<String, ConditionType> map = new HashMap<String, ConditionType>();
+        Map<String, ConditionType> map = new HashMap<>();
         map.put("foo", ConditionType.LESS_THAN);
         map.put("bar", ConditionType.GREATER_THAN);
 

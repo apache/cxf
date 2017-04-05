@@ -80,7 +80,7 @@ public class BookLoginModule implements LoginModule {
     public void initialize(Subject subject, CallbackHandler handler,
                            Map<String, ? extends Object> sharedState, Map<String, ? extends Object> options) {
 
-        Map<String, String> customOptions = new HashMap<String, String>();
+        Map<String, String> customOptions = new HashMap<>();
         customOptions.put("file", fileResource);
 
         module.initialize(subject, handler, sharedState, customOptions);

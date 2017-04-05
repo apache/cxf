@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.jaxws;
 
-import java.util.HashMap;
-
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
@@ -37,14 +35,14 @@ import org.apache.cxf.transports.http.configuration.ProxyServerType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.littleshoot.proxy.DefaultHttpProxyServer;
-import org.littleshoot.proxy.HttpFilter;
-import org.littleshoot.proxy.ProxyUtils;
+
+import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 
 public class CXF6655Test extends AbstractClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final int PROXY_PORT = Integer.parseInt(allocatePort(CXF6655Test.class));
-    static DefaultHttpProxyServer proxy;
+    static HttpProxyServer proxy;
 
     public static class Server extends AbstractBusTestServerBase {
 
@@ -76,9 +74,7 @@ public class CXF6655Test extends AbstractClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
-        proxy = new DefaultHttpProxyServer(PROXY_PORT, ProxyUtils.PASS_THROUGH_REQUEST_FILTER,
-                                           new HashMap<String, HttpFilter>());
-        proxy.start();
+        proxy = DefaultHttpProxyServer.bootstrap().withPort(PROXY_PORT).start();
     }
 
     @Test

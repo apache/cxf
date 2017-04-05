@@ -21,9 +21,9 @@ package org.apache.cxf.ws.security.wss4j.policyhandlers;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -814,9 +814,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 String id = (String)wser.get(WSSecurityEngineResult.TAG_ID);
                 if (actInt.intValue() == WSConstants.ST_SIGNED
                     || actInt.intValue() == WSConstants.ST_UNSIGNED) {
-                    Date created = new Date();
-                    Date expires = new Date();
-                    expires.setTime(created.getTime() + WSS4JUtils.getSecurityTokenLifetime(message));
+                    Instant created = Instant.now();
+                    Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
                     SecurityToken tempTok = new SecurityToken(id, created, expires);
                     tempTok.setSecret((byte[])wser.get(WSSecurityEngineResult.TAG_SECRET));
                     tempTok.setX509Certificate(

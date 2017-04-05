@@ -128,7 +128,7 @@ public final class CorbaHandlerUtils {
                                                              QName idlType,
                                                              CorbaTypeMap typeMap,
                                                              ServiceInfo serviceInfo) {
-        Map<QName, CorbaObjectHandler> seenTypes = new HashMap<QName, CorbaObjectHandler>();
+        Map<QName, CorbaObjectHandler> seenTypes = new HashMap<>();
         return initializeObjectHandler(orb, name, idlType, typeMap, serviceInfo, seenTypes);
     }
 

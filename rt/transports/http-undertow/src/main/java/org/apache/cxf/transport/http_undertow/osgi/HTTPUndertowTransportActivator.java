@@ -177,6 +177,7 @@ public class HTTPUndertowTransportActivator
         SecureRandomParameters srp = null;
         KeyManagersType kmt = null;
         TrustManagersType tmt = null;
+        boolean enableRevocation = false;
         while (keys.hasMoreElements()) {
             String k = keys.nextElement();
             if (k.startsWith("tlsServerParameters.")) {
@@ -192,6 +193,8 @@ public class HTTPUndertowTransportActivator
                     p.setJsseProvider(v);
                 } else if ("certAlias".equals(k)) {
                     p.setCertAlias(v);
+                } else if ("enableRevocation".equals(k)) {
+                    enableRevocation = Boolean.parseBoolean(v);
                 } else if ("clientAuthentication.want".equals(k)) {
                     if (p.getClientAuthentication() == null) {
                         p.setClientAuthentication(new ClientAuthentication());
@@ -238,7 +241,7 @@ public class HTTPUndertowTransportActivator
                 p.setKeyManagers(TLSParameterJaxBUtils.getKeyManagers(kmt));
             }
             if (tmt != null) {
-                p.setTrustManagers(TLSParameterJaxBUtils.getTrustManagers(tmt));
+                p.setTrustManagers(TLSParameterJaxBUtils.getTrustManagers(tmt, enableRevocation));
             }
         } catch (RuntimeException e) {
             throw e;

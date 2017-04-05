@@ -276,7 +276,7 @@ public class ProxyTest extends Assert {
         EasyMock.expect(proxy.createClient(bus, endpoint, ProtocolVariation.RM10WSA200408, conduit, replyTo))
             .andReturn(client).anyTimes();
         Object[] args = new Object[] {};
-        Map<String, Object> context = new HashMap<String, Object>();
+        Map<String, Object> context = new HashMap<>();
         Object[] results = new Object[] {"a", "b", "c"};
         Exchange exchange = control.createMock(Exchange.class);
 
@@ -299,7 +299,7 @@ public class ProxyTest extends Assert {
     }
 
     @Test
-    public void testRMClientGetConduit() {
+    public void testRMClientGetConduit() throws Exception {
         Proxy proxy = new Proxy(rme);
         Bus bus = control.createMock(Bus.class);
         Endpoint endpoint = control.createMock(Endpoint.class);
@@ -309,6 +309,7 @@ public class ProxyTest extends Assert {
         control.replay();
         Proxy.RMClient client = proxy.new RMClient(bus, endpoint, cs);
         assertSame(conduit, client.getConduit());
+        client.close();
     }
 
 
@@ -368,7 +369,7 @@ public class ProxyTest extends Assert {
         EasyMock.expect(defaultAcksTo.getAddress()).andReturn(aut).anyTimes();
         RelatesToType relatesTo = control.createMock(RelatesToType.class);
         control.replay();
-        Map<String, Object> context = new HashMap<String, Object>();
+        Map<String, Object> context = new HashMap<>();
         if (isServer) {
             assertNull(proxy.createSequence(defaultAcksTo, relatesTo, isServer,
                                             ProtocolVariation.RM10WSA200408, exchange, context));

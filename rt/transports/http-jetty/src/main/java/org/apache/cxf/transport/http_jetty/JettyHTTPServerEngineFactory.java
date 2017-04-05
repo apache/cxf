@@ -258,14 +258,19 @@ public class JettyHTTPServerEngineFactory {
      *        server will listen on all local addresses.
      * @param port listen port for server
      * @param protocol "http" or "https"
+     * @param id The key to reference into the tlsParametersMap. Can be null.
      * @return
      * @throws GeneralSecurityException
      * @throws IOException
      */
     public synchronized JettyHTTPServerEngine createJettyHTTPServerEngine(String host, int port,
-        String protocol) throws GeneralSecurityException, IOException {
+        String protocol, String id) throws GeneralSecurityException, IOException {
         LOG.fine("Creating Jetty HTTP Server Engine for port " + port + ".");
-        JettyHTTPServerEngine ref = getOrCreate(this, host, port, null);
+        TLSServerParameters tlsParameters = null;
+        if (id != null && tlsParametersMap != null && tlsParametersMap.containsKey(id)) {
+            tlsParameters = tlsParametersMap.get(id);
+        }
+        JettyHTTPServerEngine ref = getOrCreate(this, host, port, tlsParameters);
         // checking the protocol
         if (!protocol.equals(ref.getProtocol())) {
             throw new IOException("Protocol mismatch for port " + port + ": "
@@ -295,6 +300,11 @@ public class JettyHTTPServerEngineFactory {
     public synchronized JettyHTTPServerEngine createJettyHTTPServerEngine(int port,
         String protocol) throws GeneralSecurityException, IOException {
         return createJettyHTTPServerEngine(null, port, protocol);
+    }
+
+    public synchronized JettyHTTPServerEngine createJettyHTTPServerEngine(String host, int port,
+        String protocol) throws GeneralSecurityException, IOException {
+        return createJettyHTTPServerEngine(host, port, protocol, null);
     }
 
     /**

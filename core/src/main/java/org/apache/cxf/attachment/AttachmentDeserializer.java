@@ -132,9 +132,14 @@ public class AttachmentDeserializer {
                     message.put(Message.ENCODING, HttpHeaderHelper.mapCharset(cs));
                 }
             }
+            val = AttachmentUtil.getHeader(ih, "Content-Transfer-Encoding");
 
-            body = new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount),
-                                             this);
+            MimeBodyPartInputStream mmps = new MimeBodyPartInputStream(stream, boundary, pbAmount);
+            InputStream ins = AttachmentUtil.decode(mmps, val);
+            if (ins != mmps) {
+                ih.remove("Content-Transfer-Encoding");
+            }
+            body = new DelegatingInputStream(ins, this);
             createCount++;
             message.setContent(InputStream.class, body);
         }
@@ -152,8 +157,15 @@ public class AttachmentDeserializer {
         PushbackInputStream in = new PushbackInputStream(is, 4096);
         byte buf[] = new byte[2048];
         int i = in.read(buf);
-        String msg = IOUtils.newStringFromBytes(buf, 0, i);
-        in.unread(buf, 0, i);
+        int len = i;
+        while (i > 0 && len < buf.length) {
+            i = in.read(buf, len, buf.length - len);
+            if (i > 0) {
+                len += i;
+            }
+        }
+        String msg = IOUtils.newStringFromBytes(buf, 0, len);
+        in.unread(buf, 0, len);
 
         // Reset the input stream since we'll need it again later
         message.setContent(InputStream.class, in);

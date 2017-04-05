@@ -52,7 +52,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
@@ -91,7 +91,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
@@ -130,7 +130,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
@@ -169,7 +169,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");
@@ -209,7 +209,7 @@ public class StaxToDOMEncryptionIdentifierTest extends AbstractSecurityTest {
         // Create + configure service
         Service service = createService();
 
-        Map<String, Object> inProperties = new HashMap<String, Object>();
+        Map<String, Object> inProperties = new HashMap<>();
         inProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
         inProperties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         inProperties.put(WSHandlerConstants.DEC_PROP_FILE, "insecurity.properties");

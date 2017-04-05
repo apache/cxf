@@ -636,7 +636,7 @@ public class ServiceProcessor extends AbstractProcessor {
     }
 
     private Map<String, Object> getSoapOperationProp(BindingOperationInfo bop) {
-        Map<String, Object> soapOPProp = new HashMap<String, Object>();
+        Map<String, Object> soapOPProp = new HashMap<>();
         if (bop.getExtensor(ExtensibilityElement.class) != null) {
             for (ExtensibilityElement ext : bop.getExtensors(ExtensibilityElement.class)) {
                 if (SOAPBindingUtil.isSOAPOperation(ext)) {

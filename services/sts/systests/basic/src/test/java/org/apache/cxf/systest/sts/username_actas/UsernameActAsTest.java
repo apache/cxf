@@ -28,6 +28,7 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.sts.common.SecurityTestUtil;
 import org.apache.cxf.systest.sts.common.TestParam;
 import org.apache.cxf.systest.sts.common.TokenTestUtils;
@@ -43,7 +44,7 @@ import org.junit.runners.Parameterized.Parameters;
 /**
  * In this test case, a CXF client requests a Security Token from an STS, passing a username that
  * it has obtained from an unknown client as an "ActAs" element. This username is obtained
- * by parsing the "security.username" property. The client then invokes on the service
+ * by parsing the SecurityConstants.USERNAME property. The client then invokes on the service
  * provider using the returned token from the STS.
  */
 @RunWith(value = org.junit.runners.Parameterized.class)
@@ -126,7 +127,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
 
         // Transport port
         ((BindingProvider)port).getRequestContext().put(
-            "security.username", "alice"
+            SecurityConstants.USERNAME, "alice"
         );
         doubleIt(port, 25);
 
@@ -144,7 +145,7 @@ public class UsernameActAsTest extends AbstractBusClientServerTestBase {
         }
 
         ((BindingProvider)port2).getRequestContext().put(
-            "security.username", "eve"
+            SecurityConstants.USERNAME, "eve"
         );
         // This time we expect a failure as the server validator doesn't accept "eve".
         try {

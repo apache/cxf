@@ -29,7 +29,7 @@ import org.apache.cxf.binding.corba.wsdl.CorbaType;
 public class CorbaPrimitiveMap extends PrimitiveMapBase {
 
     public CorbaPrimitiveMap() {
-        corbaPrimitiveMap = new HashMap<String, QName>();
+        corbaPrimitiveMap = new HashMap<>();
         initialiseMap();
     }
 

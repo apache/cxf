@@ -61,7 +61,7 @@ public class JsonpPreStreamInterceptor extends AbstractJsonpOutInterceptor imple
     protected void setContentType(Message message) {
         Map<String, List<String>> headers = (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS);
         if (headers == null) {
-            headers = new HashMap<String, List<String>>();
+            headers = new HashMap<>();
             message.put(Message.PROTOCOL_HEADERS, headers);
         }
         headers.put(Message.CONTENT_TYPE, Collections.singletonList(getMediaType()));

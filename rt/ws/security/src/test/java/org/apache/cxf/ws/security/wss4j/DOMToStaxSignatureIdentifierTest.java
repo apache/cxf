@@ -64,7 +64,7 @@ public class DOMToStaxSignatureIdentifierTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -97,7 +97,7 @@ public class DOMToStaxSignatureIdentifierTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -130,7 +130,7 @@ public class DOMToStaxSignatureIdentifierTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -163,7 +163,7 @@ public class DOMToStaxSignatureIdentifierTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");
@@ -197,7 +197,7 @@ public class DOMToStaxSignatureIdentifierTest extends AbstractSecurityTest {
         client.getInInterceptors().add(new LoggingInInterceptor());
         client.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
         properties.put(WSHandlerConstants.PW_CALLBACK_REF, new TestPwdCallback());
         properties.put(WSHandlerConstants.SIG_PROP_FILE, "outsecurity.properties");

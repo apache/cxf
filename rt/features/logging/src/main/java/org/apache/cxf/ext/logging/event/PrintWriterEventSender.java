@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ext.logging.event;
 
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.time.Instant;
 
@@ -30,6 +31,9 @@ public class PrintWriterEventSender implements LogEventSender {
 
     public PrintWriterEventSender(PrintWriter writer) {
         this.writer = writer;
+    }
+    public PrintWriterEventSender(PrintStream ps) {
+        this.writer = new PrintWriter(ps);
     }
 
     /** {@inheritDoc}*/

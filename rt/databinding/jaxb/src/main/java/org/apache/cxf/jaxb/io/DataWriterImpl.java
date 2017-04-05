@@ -73,13 +73,7 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     public void setProperty(String prop, Object value) {
         if (prop.equals(org.apache.cxf.message.Message.class.getName())) {
             org.apache.cxf.message.Message m = (org.apache.cxf.message.Message)value;
-            veventHandler = (ValidationEventHandler)m.getContextualProperty(
-                    JAXBDataBinding.WRITER_VALIDATION_EVENT_HANDLER);
-
-            if (veventHandler == null) {
-                veventHandler = (ValidationEventHandler)m.getContextualProperty(
-                    "jaxb-validation-event-handler");
-            }
+            veventHandler = getValidationEventHandler(m, JAXBDataBinding.WRITER_VALIDATION_EVENT_HANDLER);
             if (veventHandler == null) {
                 veventHandler = databinding.getValidationEventHandler();
             }

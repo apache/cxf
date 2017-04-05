@@ -34,8 +34,8 @@ import org.omg.CORBA.ORB;
 public final class CorbaBindingHelper {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CorbaBindingHelper.class);
-    private static Map<String, ORB> orbList = new HashMap<String, ORB>();
-    private static Map<String, Integer> orbUseCount = new HashMap<String, Integer>();
+    private static Map<String, ORB> orbList = new HashMap<>();
+    private static Map<String, Integer> orbUseCount = new HashMap<>();
     private static ORB defaultORB;
 
     private CorbaBindingHelper() {

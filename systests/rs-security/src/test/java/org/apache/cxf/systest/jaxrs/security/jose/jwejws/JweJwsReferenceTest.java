@@ -81,7 +81,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jwk");
         properties.put("rs.security.keystore.alias", "2011-04-29");
         properties.put("rs.security.keystore.file", "org/apache/cxf/systest/jaxrs/security/certs/jwkPublicSet.txt");
@@ -108,7 +108,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.alias", "bob");
         properties.put("rs.security.keystore.password", "password");
@@ -145,7 +145,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.alias", "alice");
         properties.put("rs.security.keystore.password", "password");
@@ -175,7 +175,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.alias", "bob");
         properties.put("rs.security.keystore.password", "password");
@@ -212,7 +212,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.alias", "alice");
         properties.put("rs.security.keystore.password", "password");
@@ -246,7 +246,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.alias", "alice");
         properties.put("rs.security.keystore.password", "password");
@@ -281,7 +281,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.alias", "morpit");
         properties.put("rs.security.keystore.password", "password");
@@ -309,7 +309,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.alias", "alice");
         properties.put("rs.security.keystore.password", "password");
@@ -345,7 +345,7 @@ public class JweJwsReferenceTest extends AbstractBusClientServerTestBase {
             WebClient.create(address, providers, busFile.toString());
         client.type("application/json").accept("application/json");
 
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Object> properties = new HashMap<>();
         properties.put("rs.security.keystore.type", "jks");
         properties.put("rs.security.keystore.alias", "morpit");
         properties.put("rs.security.keystore.password", "password");

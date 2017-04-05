@@ -26,8 +26,8 @@ import javax.ws.rs.core.Response;
 
 public class CustomerServiceImpl implements CustomerService {
     long currentId = 123;
-    Map<Long, Customer> customers = new HashMap<Long, Customer>();
-    Map<Long, Order> orders = new HashMap<Long, Order>();
+    Map<Long, Customer> customers = new HashMap<>();
+    Map<Long, Order> orders = new HashMap<>();
 
     public CustomerServiceImpl() {
         init();

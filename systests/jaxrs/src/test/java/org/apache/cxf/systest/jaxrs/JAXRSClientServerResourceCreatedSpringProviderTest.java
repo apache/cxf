@@ -122,7 +122,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         checkPetStoreInfo(resourceEls.get(0));
 
         Element el = (Element)resourceEls.get(0).getParentNode().getParentNode();
-        Map<String, String> namespaces = new HashMap<String, String>();
+        Map<String, String> namespaces = new HashMap<>();
         namespaces.put("xsd", "http://www.w3.org/2001/XMLSchema");
         namespaces.put("ns", "http://pets");
         namespaces.put("wadl", "http://wadl.dev.java.net/2009/02");

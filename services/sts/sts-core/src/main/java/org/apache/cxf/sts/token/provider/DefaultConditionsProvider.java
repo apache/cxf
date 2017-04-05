@@ -18,10 +18,12 @@
  */
 package org.apache.cxf.sts.token.provider;
 
-import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -31,8 +33,6 @@ import org.apache.cxf.sts.request.Participants;
 import org.apache.cxf.ws.security.sts.provider.STSException;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
-import org.apache.wss4j.dom.util.XmlSchemaDateFormat;
-import org.joda.time.DateTime;
 
 /**
  * A default implementation of the ConditionsProvider interface.
@@ -141,55 +141,48 @@ public class DefaultConditionsProvider implements ConditionsProvider {
         if (lifetime > 0) {
             if (acceptClientLifetime && tokenLifetime != null
                 && tokenLifetime.getCreated() != null && tokenLifetime.getExpires() != null) {
+                Instant creationTime = null;
+                Instant expirationTime = null;
                 try {
-                    XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
-                    Date creationTime = fmt.parse(tokenLifetime.getCreated());
-                    Date expirationTime = fmt.parse(tokenLifetime.getExpires());
-                    if (creationTime == null || expirationTime == null) {
-                        LOG.fine("Error in parsing Timestamp Created or Expiration Strings");
-                        throw new STSException(
-                            "Error in parsing Timestamp Created or Expiration Strings",
-                            STSException.INVALID_TIME
-                        );
-                    }
-
-                    // Check to see if the created time is in the future
-                    Date validCreation = new Date();
-                    long currentTime = validCreation.getTime();
-                    if (futureTimeToLive > 0) {
-                        validCreation.setTime(currentTime + futureTimeToLive * 1000L);
-                    }
-                    if (creationTime.after(validCreation)) {
-                        LOG.fine("The Created Time is too far in the future");
-                        throw new STSException(
-                            "The Created Time is too far in the future", STSException.INVALID_TIME
-                        );
-                    }
-
-                    long requestedLifetime = expirationTime.getTime() - creationTime.getTime();
-                    if (requestedLifetime > (getMaxLifetime() * 1000L)) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("Requested lifetime [").append(requestedLifetime / 1000L);
-                        sb.append(" sec] exceed configured maximum lifetime [").append(getMaxLifetime());
-                        sb.append(" sec]");
-                        LOG.warning(sb.toString());
-                        if (isFailLifetimeExceedance()) {
-                            throw new STSException("Requested lifetime exceeds maximum lifetime",
-                                    STSException.INVALID_TIME);
-                        } else {
-                            expirationTime.setTime(creationTime.getTime() + (getMaxLifetime() * 1000L));
-                        }
-                    }
-
-                    DateTime creationDateTime = new DateTime(creationTime.getTime());
-                    DateTime expirationDateTime = new DateTime(expirationTime.getTime());
-
-                    conditions.setNotAfter(expirationDateTime);
-                    conditions.setNotBefore(creationDateTime);
-                } catch (ParseException e) {
-                    LOG.warning("Failed to parse life time element: " + e.getMessage());
-                    conditions.setTokenPeriodSeconds(lifetime);
+                    creationTime = ZonedDateTime.parse(tokenLifetime.getCreated()).toInstant();
+                    expirationTime = ZonedDateTime.parse(tokenLifetime.getExpires()).toInstant();
+                } catch (DateTimeParseException ex) {
+                    LOG.fine("Error in parsing Timestamp Created or Expiration Strings");
+                    throw new STSException(
+                        "Error in parsing Timestamp Created or Expiration Strings",
+                        STSException.INVALID_TIME
+                    );
                 }
+
+                // Check to see if the created time is in the future
+                Instant validCreation = Instant.now();
+                if (futureTimeToLive > 0) {
+                    validCreation = validCreation.plusSeconds(futureTimeToLive);
+                }
+                if (creationTime.isAfter(validCreation)) {
+                    LOG.fine("The Created Time is too far in the future");
+                    throw new STSException(
+                        "The Created Time is too far in the future", STSException.INVALID_TIME
+                    );
+                }
+
+                long requestedLifetime = Duration.between(creationTime, expirationTime).getSeconds();
+                if (requestedLifetime > getMaxLifetime()) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Requested lifetime [").append(requestedLifetime);
+                    sb.append(" sec] exceed configured maximum lifetime [").append(getMaxLifetime());
+                    sb.append(" sec]");
+                    LOG.warning(sb.toString());
+                    if (isFailLifetimeExceedance()) {
+                        throw new STSException("Requested lifetime exceeds maximum lifetime",
+                                               STSException.INVALID_TIME);
+                    } else {
+                        expirationTime = creationTime.plusSeconds(getMaxLifetime());
+                    }
+                }
+
+                conditions.setNotAfter(expirationTime);
+                conditions.setNotBefore(creationTime);
 
             } else {
                 conditions.setTokenPeriodSeconds(lifetime);

@@ -26,8 +26,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
@@ -608,7 +608,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
         JwtClaims claims = new JwtClaims();
         claims.setIssuer("consumer-id");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(
             Collections.singletonList("https://localhost:" + PORT + "/unsignedjwtservices/"));
 
@@ -646,7 +646,7 @@ public class OIDCFlowTest extends AbstractBusClientServerTestBase {
 
         JwtClaims claims = new JwtClaims();
         claims.setIssuer("consumer-id");
-        claims.setIssuedAt(new Date().getTime() / 1000L);
+        claims.setIssuedAt(Instant.now().getEpochSecond());
         claims.setAudiences(
             Collections.singletonList("https://localhost:" + PORT + "/unsignedjwtservices/"));
 

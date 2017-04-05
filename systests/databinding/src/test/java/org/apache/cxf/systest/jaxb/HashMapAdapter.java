@@ -89,7 +89,7 @@ public class HashMapAdapter extends XmlAdapter<HashMapAdapter.HashMapType, Map<S
     }
 
     public Map<String, byte[]> unmarshal(HashMapType arg0) throws Exception {
-        Map<String, byte[]> hashMap = new HashMap<String, byte[]>();
+        Map<String, byte[]> hashMap = new HashMap<>();
         if (arg0 != null && arg0.entry != null) {
             for (HashMapEntryType myHashEntryType : arg0.entry) {
                 if (myHashEntryType.key != null) {

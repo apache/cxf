@@ -90,7 +90,7 @@ public class AccessTokenHandler {
             AccessToken accessToken = dataProvider.createAccessToken(reg);
 
             //create response
-            Map<String, Object> responseParams = new HashMap<String, Object>();
+            Map<String, Object> responseParams = new HashMap<>();
             responseParams.put(OAuth.OAUTH_TOKEN, accessToken.getTokenKey());
             responseParams.put(OAuth.OAUTH_TOKEN_SECRET, accessToken.getTokenSecret());
 

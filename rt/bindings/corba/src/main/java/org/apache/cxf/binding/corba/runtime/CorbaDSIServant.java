@@ -103,7 +103,7 @@ public class CorbaDSIServant extends DynamicImplementation {
         BindingInfo bInfo = destination.getBindingInfo();
         Iterator<BindingOperationInfo> i = bInfo.getOperations().iterator();
 
-        operationMap = new HashMap<String, QName>(bInfo.getOperations().size());
+        operationMap = new HashMap<>(bInfo.getOperations().size());
 
         while (i.hasNext()) {
             BindingOperationInfo bopInfo = i.next();

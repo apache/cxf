@@ -76,7 +76,7 @@ public class ProcessorTestBase extends Assert {
 
     protected File output;
     protected ToolContext env = new ToolContext();
-    protected Map<QName, Set<String>> qnameAtts = new HashMap<QName, Set<String>>();
+    protected Map<QName, Set<String>> qnameAtts = new HashMap<>();
 
     public ProcessorTestBase() {
         addQNameAttribute(new QName(Constants.URI_2001_SCHEMA_XSD, "element"), "type");

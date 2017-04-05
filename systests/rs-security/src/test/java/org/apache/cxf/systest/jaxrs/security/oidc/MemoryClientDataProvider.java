@@ -30,7 +30,7 @@ import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 
 public class MemoryClientDataProvider implements ClientRegistrationProvider {
 
-    private Map<String, Client> clients = new HashMap<String, Client>();
+    private Map<String, Client> clients = new HashMap<>();
     @Override
     public Client getClient(String clientId) throws OAuthServiceException {
         return clients.get(clientId);

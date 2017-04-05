@@ -73,7 +73,7 @@ public class ResourceUtilsTest extends Assert {
         op.setParameters(Collections.singletonList(new Parameter(ParameterType.PATH, "id")));
         ur.setOperations(Collections.singletonList(op));
 
-        Map<String, UserResource> resources = new HashMap<String, UserResource>();
+        Map<String, UserResource> resources = new HashMap<>();
         resources.put(ur.getName(), ur);
         ClassResourceInfo cri =
             ResourceUtils.createClassResourceInfo(resources, ur, null, true, true, BusFactory.getDefaultBus());

@@ -37,7 +37,7 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 
 public class ConfigurationImpl implements Configuration {
     private static final Logger LOG = LogUtils.getL7dLogger(ConfigurationImpl.class);
-    private Map<String, Object> props = new HashMap<String, Object>();
+    private Map<String, Object> props = new HashMap<>();
     private RuntimeType runtimeType;
     private Map<Object, Map<Class<?>, Integer>> providers =
         new LinkedHashMap<Object, Map<Class<?>, Integer>>();
@@ -192,7 +192,7 @@ public class ConfigurationImpl implements Configuration {
 
         Map<Class<?>, Integer> metadata = providers.get(provider);
         if (metadata == null) {
-            metadata = new HashMap<Class<?>, Integer>();
+            metadata = new HashMap<>();
             providers.put(provider, metadata);
         }
         for (Entry<Class<?>, Integer> entry : contracts.entrySet()) {
@@ -204,7 +204,7 @@ public class ConfigurationImpl implements Configuration {
     }
 
     public static Map<Class<?>, Integer> initContractsMap(int bindingPriority, Class<?>... contracts) {
-        Map<Class<?>, Integer> metadata = new HashMap<Class<?>, Integer>();
+        Map<Class<?>, Integer> metadata = new HashMap<>();
         for (Class<?> contract : contracts) {
             metadata.put(contract, bindingPriority);
         }

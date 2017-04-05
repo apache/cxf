@@ -45,7 +45,7 @@ public class AnnotatedGreeterNoOverloadImpl {
 
     private WebServiceContext context;
 
-    private final Map<String, Integer> invocationCount = new HashMap<String, Integer>();
+    private final Map<String, Integer> invocationCount = new HashMap<>();
 
     public AnnotatedGreeterNoOverloadImpl() {
         invocationCount.put("sayHi", 0);

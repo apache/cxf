@@ -30,10 +30,14 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.transport.AbstractDestination;
+import org.apache.cxf.transport.servlet.ServletConfigAware;
 
-public class DestinationRegistryImpl implements DestinationRegistry {
+public class DestinationRegistryImpl implements DestinationRegistry, ServletConfigAware {
     private static final String SLASH = "/";
     private ConcurrentMap<String, AbstractHTTPDestination> destinations
         = new ConcurrentHashMap<String, AbstractHTTPDestination>();
@@ -50,9 +54,9 @@ public class DestinationRegistryImpl implements DestinationRegistry {
             throw new RuntimeException("Already a destination on " + path);
         }
         try {
-            String path2 = URLDecoder.decode(path, "ISO-8859-1");
+            String path2 = URLDecoder.decode(path, "UTF-8");
             if (!path.equals(path2)) {
-                decodedDestinations.put(URLDecoder.decode(path, "ISO-8859-1"), destination);
+                decodedDestinations.put(path2, destination);
             }
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Unsupported Encoding", e);
@@ -62,9 +66,9 @@ public class DestinationRegistryImpl implements DestinationRegistry {
     public synchronized void removeDestination(String path) {
         destinations.remove(path);
         try {
-            String path2 = URLDecoder.decode(path, "ISO-8859-1");
+            String path2 = URLDecoder.decode(path, "UTF-8");
             if (!path.equals(path2)) {
-                decodedDestinations.remove(URLDecoder.decode(path, "ISO-8859-1"));
+                decodedDestinations.remove(path2);
             }
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("Unsupported Encoding", e);
@@ -169,6 +173,15 @@ public class DestinationRegistryImpl implements DestinationRegistry {
 
         }
         return path;
+    }
+    
+    @Override
+    public void onServletConfigAvailable(ServletConfig config) throws ServletException {
+        for (final AbstractHTTPDestination destination: getDestinations()) {
+            if (destination instanceof ServletConfigAware) {
+                ((ServletConfigAware)destination).onServletConfigAvailable(config);
+            }
+        }
     }
 
 }

@@ -32,7 +32,6 @@ import org.apache.aries.blueprint.mutable.MutableBeanMetadata;
 import org.apache.cxf.bus.blueprint.BusDefinitionParser;
 import org.apache.cxf.configuration.blueprint.SimpleBPBeanDefinitionParser;
 import org.apache.cxf.feature.FastInfosetFeature;
-import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.workqueue.AutomaticWorkQueueImpl;
 import org.osgi.service.blueprint.reflect.ComponentMetadata;
 import org.osgi.service.blueprint.reflect.Metadata;
@@ -80,6 +79,7 @@ public class CXFAPINamespaceHandler implements NamespaceHandler {
     }
 
 
+    @SuppressWarnings("deprecation")
     public Metadata parse(Element element, ParserContext context) {
         String s = element.getLocalName();
         if ("bus".equals(s)) {
@@ -87,7 +87,8 @@ public class CXFAPINamespaceHandler implements NamespaceHandler {
             return new BusDefinitionParser().parse(element, context);
         } else if ("logging".equals(s)) {
             //logging feature
-            return new SimpleBPBeanDefinitionParser(LoggingFeature.class).parse(element, context);
+            return new SimpleBPBeanDefinitionParser(org.apache.cxf.feature.LoggingFeature.class)
+                .parse(element, context);
         } else if ("fastinfoset".equals(s)) {
             //fastinfosetfeature
             return new SimpleBPBeanDefinitionParser(FastInfosetFeature.class).parse(element, context);

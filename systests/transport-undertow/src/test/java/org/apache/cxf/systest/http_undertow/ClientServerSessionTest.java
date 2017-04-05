@@ -67,7 +67,7 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
                 = CastUtils.cast((Map<?, ?>)bp.getRequestContext().get("javax.xml.ws.http.request.headers"));
 
             if (headers == null) {
-                headers = new HashMap<String, List<String>>();
+                headers = new HashMap<>();
                 bp.getRequestContext()
                     .put("javax.xml.ws.http.request.headers", headers);
             }

@@ -95,7 +95,7 @@ public class EcdhDirectKeyJweEncryption extends JweEncryption {
 
             headers.setHeader("apu", Base64UrlUtility.encode(apuBytes));
             headers.setHeader("apv", Base64UrlUtility.encode(apvBytes));
-            headers.setJsonWebKey("epv", JwkUtils.fromECPublicKey(publicKey, ecurve));
+            headers.setJsonWebKey("epk", JwkUtils.fromECPublicKey(publicKey, ecurve));
 
             return JweUtils.getECDHKey(privateKey, peerPublicKey, apuBytes, apvBytes,
                                        jwtAlgo.getJwaName(), jwtAlgo.getKeySizeBits());

@@ -24,10 +24,9 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -44,7 +43,7 @@ public class ClassLoaderSwitcher {
 
     private Log log;
     private String origClassPath;
-    private Map<Object, Object> origProps;
+    private Properties origProps;
     private ClassLoader origContextClassloader;
 
     public ClassLoaderSwitcher(Log log) {
@@ -105,7 +104,7 @@ public class ClassLoaderSwitcher {
 
         log.debug("Classpath: " + urlList.toString());
 
-        origProps = new HashMap<Object, Object>(System.getProperties());
+        origProps = (Properties)System.getProperties().clone();
 
         origClassPath = System.getProperty("java.class.path");
 
@@ -127,13 +126,7 @@ public class ClassLoaderSwitcher {
         }
 
         if (origProps != null) {
-            Map<Object, Object> newProps = new HashMap<Object, Object>(System.getProperties());
-            for (Object o : newProps.keySet()) {
-                if (!origProps.containsKey(o)) {
-                    System.clearProperty(o.toString());
-                }
-            }
-            System.getProperties().putAll(origProps);
+            System.setProperties(origProps);
         }
     }
 }

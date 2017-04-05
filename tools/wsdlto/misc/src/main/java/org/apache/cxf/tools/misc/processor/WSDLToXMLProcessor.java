@@ -222,7 +222,7 @@ public class WSDLToXMLProcessor extends AbstractWSDLToProcessor {
         if (extReg == null) {
             extReg = wsdlFactory.newPopulatedExtensionRegistry();
         }
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new HashMap<>();
         args.put(QName.class.getName(), new QName(wsdlDefinition.getTargetNamespace(), operationName));
         args.put(Class.class.getName(), clz);
 

@@ -237,7 +237,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
     }
 
     public Map<Long, RetryStatus> getRetransmissionStatuses(SourceSequence seq) {
-        Map<Long, RetryStatus> cp = new HashMap<Long, RetryStatus>();
+        Map<Long, RetryStatus> cp = new HashMap<>();
         List<ResendCandidate> sequenceCandidates = getSequenceCandidates(seq);
         if (null != sequenceCandidates) {
             for (int i = 0; i < sequenceCandidates.size(); i++) {

@@ -49,7 +49,7 @@ public class Server {
         String address = "http://localhost:9000/SoapContext/GreeterPort";
         EndpointImpl endpoint = (EndpointImpl)Endpoint.publish(address, implementor);
 
-        Map<String, Object> outProps = new HashMap<String, Object>();
+        Map<String, Object> outProps = new HashMap<>();
         outProps.put("action", "UsernameToken Timestamp Signature Encrypt");
 
         outProps.put("passwordType", "PasswordText");
@@ -75,7 +75,7 @@ public class Server {
 
         endpoint.getOutInterceptors().add(new WSS4JOutInterceptor(outProps));
 
-        Map<String, Object> inProps = new HashMap<String, Object>();
+        Map<String, Object> inProps = new HashMap<>();
 
         inProps.put("action", "UsernameToken Timestamp Signature Encrypt");
         inProps.put("passwordType", "PasswordDigest");

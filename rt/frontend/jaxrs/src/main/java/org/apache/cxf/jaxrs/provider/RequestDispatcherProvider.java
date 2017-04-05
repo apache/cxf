@@ -459,7 +459,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
             this.path = path;
             this.servletPath = servletPath;
             this.saveParamsAsAttributes = saveParamsAsAttributes;
-            params = new HashMap<String, String[]>(request.getParameterMap());
+            params = new HashMap<>(request.getParameterMap());
         }
 
         @Override

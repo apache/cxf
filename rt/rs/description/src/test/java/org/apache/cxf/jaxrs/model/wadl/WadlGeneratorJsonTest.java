@@ -69,7 +69,7 @@ public class WadlGeneratorJsonTest extends Assert {
         ClassResourceInfo cri =
             ResourceUtils.createClassResourceInfo(BookChapters.class, BookChapters.class, true, true);
         final Message m = mockMessage("http://localhost:8080/baz", "/bookstore/1", WadlGenerator.WADL_QUERY, cri);
-        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new HashMap<>();
         headers.put("Accept", Collections.singletonList("application/json"));
         m.put(Message.PROTOCOL_HEADERS, headers);
 

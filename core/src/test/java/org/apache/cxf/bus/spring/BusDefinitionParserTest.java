@@ -31,7 +31,6 @@ import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.message.Message;
 
 import org.junit.Assert;
@@ -49,7 +48,7 @@ public class BusDefinitionParserTest extends Assert {
         List<Interceptor<? extends Message>> in = bus.getInInterceptors();
         boolean found = false;
         for (Interceptor<? extends Message> i : in) {
-            if (i instanceof LoggingInInterceptor) {
+            if (i.getClass().getSimpleName().equals("LoggingInInterceptor")) {
                 found = true;
             }
         }
@@ -133,7 +132,7 @@ public class BusDefinitionParserTest extends Assert {
         List<Interceptor<? extends Message>> in = bus.getInInterceptors();
         boolean found = false;
         for (Interceptor<? extends Message> i : in) {
-            if (i instanceof LoggingInInterceptor) {
+            if (i.getClass().getSimpleName().equals("LoggingInInterceptor")) {
                 found = true;
             }
         }
