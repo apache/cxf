@@ -18,6 +18,12 @@
  */
 package org.apache.cxf.osgi.itests.jaxrs;
 
+import java.io.InputStream;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response.Status;
 import org.apache.cxf.osgi.itests.CXFOSGiTestSupport;
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,13 +37,6 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 import org.ops4j.pax.tinybundles.core.TinyBundles;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response.Status;
-import java.io.InputStream;
 
 import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
@@ -57,7 +56,7 @@ public class JaxRsFilterTest extends CXFOSGiTestSupport {
     public JaxRsFilterTest() {
         Client client = ClientBuilder.newClient();
         wt1 = client.target(BASE_URL_1);
-        wt2 = client.target(BASE_URL_1);
+        wt2 = client.target(BASE_URL_2);
     }
     
     @Test
