@@ -27,6 +27,10 @@ public class Consumer {
 
     }
 
+    public Consumer(String id) {
+        this.clientId = id;
+    }
+    
     public Consumer(String id, String secret) {
         this.clientId = id;
         this.clientSecret = secret;
