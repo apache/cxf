@@ -58,12 +58,12 @@ under the License.
             </httpj:tlsServerParameters>
         </httpj:engine>
     </httpj:engine-factory>
-    <bean id="dataProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.common.OAuthDataProviderTlsImpl"/>
     <bean id="customGrantHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.grants.CustomGrantHandler">
         <property name="dataProvider" ref="dataProvider"/>
     </bean>
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
-    <bean id="serviceBean" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
+    <bean id="dataProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.tls.OAuthDataProviderImpl"/>
+    <bean id="accessTokenService" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
         <property name="dataProvider" ref="dataProvider"/>
         <property name="grantHandlers">
             <list>
@@ -71,9 +71,10 @@ under the License.
             </list>
         </property>
     </bean>
+    
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/oauth2">
         <jaxrs:serviceBeans>
-            <ref bean="serviceBean"/>
+            <ref bean="accessTokenService"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     

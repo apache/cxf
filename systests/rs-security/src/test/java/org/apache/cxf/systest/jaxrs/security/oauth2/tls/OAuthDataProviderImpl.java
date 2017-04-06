@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.security.oauth2.common;
+package org.apache.cxf.systest.jaxrs.security.oauth2.tls;
 
 import java.io.InputStream;
 import java.security.cert.Certificate;
@@ -25,27 +25,48 @@ import java.util.Collections;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.grants.code.DefaultEHCacheCodeDataProvider;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
 /**
  * Extend the DefaultEHCacheCodeDataProvider to allow refreshing of tokens
  */
-public class OAuthDataProviderTlsImpl extends DefaultEHCacheCodeDataProvider {
-    public OAuthDataProviderTlsImpl() throws Exception {
+public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
+    public OAuthDataProviderImpl() throws Exception {
 
-        Certificate cert = loadCert();
-        String encodedCert = Base64Utility.encode(cert.getEncoded());
-
-        Client client = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US",
+        Client client1 = new Client("CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US",
                                     null,
                                     true,
                                     null,
                                     null);
-        client.getAllowedGrantTypes().add("custom_grant");
-        client.setApplicationCertificates(Collections.singletonList(encodedCert));
-        this.setClient(client);
+        client1.getAllowedGrantTypes().add("custom_grant");
+        registerCert(client1);
+        
+        Client client2 = new Client("bound",
+                                   null,
+                                   true,
+                                   null,
+                                   null);
+        client2.getProperties().put(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN, 
+                                    "CN=whateverhost.com,OU=Morpit,O=ApacheTest,L=Syracuse,C=US");
+        client2.getAllowedGrantTypes().add("custom_grant");
+        this.setClient(client2);
 
+        Client client3 = new Client("unbound",
+                                    null,
+                                    true,
+                                    null,
+                                    null);
+        this.setClient(client3);
+
+    }
+
+    private void registerCert(Client client) throws Exception {
+        Certificate cert = loadCert();
+        String encodedCert = Base64Utility.encode(cert.getEncoded());
+        client.setApplicationCertificates(Collections.singletonList(encodedCert));
+        
     }
 
     private Certificate loadCert() throws Exception {
