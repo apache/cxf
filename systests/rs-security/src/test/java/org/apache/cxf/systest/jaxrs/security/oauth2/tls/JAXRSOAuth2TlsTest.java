@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.security.oauth2.grants;
+package org.apache.cxf.systest.jaxrs.security.oauth2.tls;
 
 import java.net.URL;
 
@@ -29,9 +29,11 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.rs.security.oauth2.client.Consumer;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
+import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -49,15 +51,40 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
 
 
     @Test
-    public void testTwoWayTLSAuthenticationCustomGrant() throws Exception {
+    public void testTwoWayTLSClientIdIsSubjectDn() throws Exception {
         String address = "https://localhost:" + PORT + "/oauth2/token";
         WebClient wc = createWebClient(address);
 
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, new CustomGrant());
         assertNotNull(at.getTokenKey());
     }
+    
+    @Test
+    public void testTwoWayTLSClientIdBound() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2/token";
+        WebClient wc = createWebClient(address);
 
-
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
+                                        new Consumer("bound"),
+                                        new CustomGrant());
+        assertNotNull(at.getTokenKey());
+    }
+    
+    @Test
+    public void testTwoWayTLSClientUnbound() throws Exception {
+        String address = "https://localhost:" + PORT + "/oauth2/token";
+        WebClient wc = createWebClient(address);
+        try {
+            OAuthClientUtils.getAccessToken(wc,
+                                            new Consumer("unbound"),
+                                            new CustomGrant());
+            fail("exception_expected");
+        } catch (OAuthServiceException ex) {
+            assertEquals("invalid_client", ex.getError().getError());
+        }
+        
+    }
+    
 
     private WebClient createWebClient(String address) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
