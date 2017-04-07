@@ -28,6 +28,7 @@ public final class JwtConstants {
     public static final String CLAIM_NOT_BEFORE = "nbf";
     public static final String CLAIM_ISSUED_AT = "iat";
     public static final String CLAIM_JWT_ID = "jti";
+    public static final String CLAIM_CONFIRMATION = "cnf";
 
     public static final String JWT_TOKEN = "jwt.token";
     public static final String JWT_CLAIMS = "jwt.claims";
