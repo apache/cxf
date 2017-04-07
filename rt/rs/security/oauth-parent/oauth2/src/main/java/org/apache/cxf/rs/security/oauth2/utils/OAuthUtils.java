@@ -80,7 +80,7 @@ public final class OAuthUtils {
             byte[] thumbprint = 
                 MessageDigestUtils.createDigest(cert.getEncoded(), MessageDigestUtils.ALGO_SHA_256);
             String encodedThumbprint = Base64UrlUtility.encode(thumbprint);
-            mc.put("x5t#S256", encodedThumbprint);
+            mc.put(JoseConstants.HEADER_X509_THUMBPRINT_SHA256, encodedThumbprint);
         } catch (Exception ex) {
             throw new OAuthServiceException(ex);
         }

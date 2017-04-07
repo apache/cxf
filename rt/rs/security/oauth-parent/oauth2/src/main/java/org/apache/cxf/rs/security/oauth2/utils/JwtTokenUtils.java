@@ -124,7 +124,7 @@ public final class JwtTokenUtils {
             at.getExtraProperties().putAll(extraProperties);
         }
         
-        // At the moment only a string 'x5#S256' cnf property is recognized
+        // At the moment only a string 'x5t#S256' cnf property is recognized
         Map<String, Object> cnf = CastUtils.cast((Map<?, ?>)claims.getClaim(JwtConstants.CLAIM_CONFIRMATION));
         if (cnf != null && cnf.containsKey(JoseConstants.HEADER_X509_THUMBPRINT_SHA256)) {
             String certCnf = cnf.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256).toString();
