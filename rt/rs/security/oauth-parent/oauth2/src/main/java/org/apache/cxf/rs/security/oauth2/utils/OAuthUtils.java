@@ -20,7 +20,10 @@ package org.apache.cxf.rs.security.oauth2.utils;
 
 import java.lang.reflect.Method;
 import java.security.Principal;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,9 +31,12 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.security.auth.x500.X500Principal;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -55,8 +61,10 @@ import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.UserSubject;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
+import org.apache.cxf.rt.security.crypto.MessageDigestUtils;
 import org.apache.cxf.security.LoginSecurityContext;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 
 /**
  * Various utility methods
@@ -66,6 +74,65 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
 
+
+    public static void setCertificateThumbprintConfirmation(MessageContext mc, X509Certificate cert) {
+        try {
+            byte[] thumbprint = 
+                MessageDigestUtils.createDigest(cert.getEncoded(), MessageDigestUtils.ALGO_SHA_256);
+            String encodedThumbprint = Base64UrlUtility.encode(thumbprint);
+            mc.put("x5t#S256", encodedThumbprint);
+        } catch (Exception ex) {
+            throw new OAuthServiceException(ex);
+        }
+    }
+    
+
+    public static boolean compareTlsCertificates(TLSSessionInfo tlsInfo,
+                                          List<String> base64EncodedCerts) {
+        Certificate[] clientCerts = tlsInfo.getPeerCertificates();
+        if (clientCerts.length == base64EncodedCerts.size()) {
+            try {
+                for (int i = 0; i < clientCerts.length; i++) {
+                    X509Certificate x509Cert = (X509Certificate)clientCerts[i];
+                    byte[] encodedKey = x509Cert.getEncoded();
+                    byte[] clientKey = Base64Utility.decode(base64EncodedCerts.get(i));
+                    if (!Arrays.equals(encodedKey, clientKey)) {
+                        return false;
+                    }
+                }
+                return true;
+            } catch (Exception ex) {
+                // throw exception later
+            }
+        }
+        return false;
+    }
+    
+    public static boolean isMutualTls(javax.ws.rs.core.SecurityContext sc, TLSSessionInfo tlsSessionInfo) {
+        // Pure 2-way TLS authentication
+        return tlsSessionInfo != null 
+            && StringUtils.isEmpty(sc.getAuthenticationScheme())
+            && getRootTLSCertificate(tlsSessionInfo) != null;
+    }
+    
+    public static String getSubjectDnFromTLSCertificates(X509Certificate cert) {
+        X500Principal x509Principal = cert.getSubjectX500Principal();
+        return x509Principal.getName();
+    }
+    
+    public static String getIssuerDnFromTLSCertificates(X509Certificate cert) {
+        X500Principal x509Principal = cert.getIssuerX500Principal();
+        return x509Principal.getName();
+    }
+    
+    public static X509Certificate getRootTLSCertificate(TLSSessionInfo tlsInfo) {
+        Certificate[] clientCerts = tlsInfo.getPeerCertificates();
+        if (clientCerts != null && clientCerts.length > 0) {
+            return (X509Certificate)clientCerts[0];
+        }
+        return null;
+    }
+    
     public static void injectContextIntoOAuthProvider(MessageContext context, Object provider) {
         Method dataProviderContextMethod = null;
         try {

@@ -342,6 +342,8 @@ public final class JwsUtils {
                 m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT, false);
         boolean includeCertSha1 = headers != null && MessageUtils.getContextualBoolean(
                 m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT_SHA1, false);
+        boolean includeCertSha256 = !includeCertSha1 && headers != null && MessageUtils.getContextualBoolean(
+                                  m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT_SHA256, false);
         boolean includeKeyId = headers != null && MessageUtils.getContextualBoolean(
                 m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_KEY_ID, false);
 
@@ -361,9 +363,16 @@ public final class JwsUtils {
                     JwkUtils.includeCertChain(jwk, headers, signatureAlgo.getJwaName());
                 }
                 if (includeCertSha1) {
-                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
+                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
+                                        props, MessageDigestUtils.ALGO_SHA_1);
                     if (digest != null) {
                         headers.setX509Thumbprint(digest);
+                    }
+                } else if (includeCertSha256) {
+                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
+                                        props, MessageDigestUtils.ALGO_SHA_256);
+                    if (digest != null) {
+                        headers.setX509ThumbprintSHA256(digest);
                     }
                 }
                 if (includePublicKey) {
@@ -388,11 +397,18 @@ public final class JwsUtils {
                     headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
                 }
                 if (includeCertSha1) {
-                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
+                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
+                                        props, MessageDigestUtils.ALGO_SHA_1);
                     if (digest != null) {
                         headers.setX509Thumbprint(digest);
                     }
-                }
+                } else if (includeCertSha256) {
+                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
+                                        props, MessageDigestUtils.ALGO_SHA_256);
+                    if (digest != null) {
+                        headers.setX509ThumbprintSHA256(digest);
+                    }
+                }  
                 if (includeKeyId && props.containsKey(JoseConstants.RSSEC_KEY_STORE_ALIAS)) {
                     headers.setKeyId(props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS));
                 }
@@ -435,6 +451,15 @@ public final class JwsUtils {
                 X509Certificate foundCert =
                     KeyManagementUtils.getCertificateFromThumbprint(inHeaders.getX509Thumbprint(),
                                                                     MessageDigestUtils.ALGO_SHA_1,
+                                                                    m, props);
+                if (foundCert != null) {
+                    return getPublicKeySignatureVerifier(foundCert,
+                                                         inHeaders.getSignatureAlgorithm());
+                }
+            } else if (inHeaders.getHeader(JoseConstants.HEADER_X509_THUMBPRINT_SHA256) != null) {
+                X509Certificate foundCert =
+                    KeyManagementUtils.getCertificateFromThumbprint(inHeaders.getX509ThumbprintSHA256(),
+                                                                    MessageDigestUtils.ALGO_SHA_256,
                                                                     m, props);
                 if (foundCert != null) {
                     return getPublicKeySignatureVerifier(foundCert,
