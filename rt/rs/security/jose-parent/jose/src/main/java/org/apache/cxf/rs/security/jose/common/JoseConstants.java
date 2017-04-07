@@ -243,7 +243,7 @@ public final class JoseConstants {
     public static final String RSSEC_ENCRYPTION_INCLUDE_CERT_SHA1 = "rs.security.encryption.include.cert.sha1";
     
     /**
-     * Include the X.509 certificate SHA-246 digest for encryption in the "x5t#S256" header.
+     * Include the X.509 certificate SHA-256 digest for encryption in the "x5t#S256" header.
      */
     public static final String RSSEC_ENCRYPTION_INCLUDE_CERT_SHA256 = "rs.security.encryption.include.cert.sha256";
 
