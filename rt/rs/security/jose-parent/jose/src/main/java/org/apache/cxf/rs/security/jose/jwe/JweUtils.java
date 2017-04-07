@@ -347,7 +347,9 @@ public final class JweUtils {
                 m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_CERT, false);
         boolean includeCertSha1 = headers != null && MessageUtils.getContextualBoolean(
                 m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_CERT_SHA1, false);
-        
+        boolean includeCertSha256 = !includeCertSha1 && headers != null && MessageUtils.getContextualBoolean(
+                m, JoseConstants.RSSEC_ENCRYPTION_INCLUDE_CERT_SHA256, false);
+
         KeyEncryptionProvider keyEncryptionProvider = null;
         KeyAlgorithm keyAlgo = getKeyEncryptionAlgorithm(m, props, null, null);
         ContentAlgorithm contentAlgo = getContentEncryptionAlgorithm(m, props, null, ContentAlgorithm.A128GCM);
@@ -377,9 +379,16 @@ public final class JweUtils {
                     JwkUtils.includeCertChain(jwk, headers, keyAlgo.getJwaName());
                 }
                 if (includeCertSha1) {
-                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
+                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
+                                        props, MessageDigestUtils.ALGO_SHA_1);
                     if (digest != null) {
                         headers.setX509Thumbprint(digest);
+                    }
+                } else if (includeCertSha256) {
+                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
+                                        props, MessageDigestUtils.ALGO_SHA_256);
+                    if (digest != null) {
+                        headers.setX509ThumbprintSHA256(digest);
                     }
                 }
                 if (includePublicKey) {
@@ -398,9 +407,16 @@ public final class JweUtils {
                 headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
             }
             if (includeCertSha1) {
-                String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, props);
+                String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
+                                    props, MessageDigestUtils.ALGO_SHA_1);
                 if (digest != null) {
                     headers.setX509Thumbprint(digest);
+                }
+            } else if (includeCertSha256) {
+                String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
+                                    props, MessageDigestUtils.ALGO_SHA_256);
+                if (digest != null) {
+                    headers.setX509ThumbprintSHA256(digest);
                 }
             }
         }
@@ -452,6 +468,20 @@ public final class JweUtils {
                                                                 m, props);
             if (foundCert != null) {
                 PrivateKey privateKey = 
+                    KeyManagementUtils.loadPrivateKey(m, props, foundCert, KeyOperation.DECRYPT);
+                if (keyAlgo == null) {
+                    keyAlgo = getDefaultPrivateKeyAlgorithm(privateKey);
+                }
+                contentAlgo = inHeaders.getContentEncryptionAlgorithm();
+                keyDecryptionProvider = getPrivateKeyDecryptionProvider(privateKey, keyAlgo);
+            }
+        } else if (inHeaders != null && inHeaders.getHeader(JoseConstants.HEADER_X509_THUMBPRINT_SHA256) != null) {
+            X509Certificate foundCert =
+                KeyManagementUtils.getCertificateFromThumbprint(inHeaders.getX509ThumbprintSHA256(),
+                                                                MessageDigestUtils.ALGO_SHA_256,
+                                                                m, props);
+            if (foundCert != null) {
+                PrivateKey privateKey =
                     KeyManagementUtils.loadPrivateKey(m, props, foundCert, KeyOperation.DECRYPT);
                 if (keyAlgo == null) {
                     keyAlgo = getDefaultPrivateKeyAlgorithm(privateKey);
