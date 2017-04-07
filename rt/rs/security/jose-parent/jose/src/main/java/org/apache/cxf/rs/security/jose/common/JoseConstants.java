@@ -177,7 +177,7 @@ public final class JoseConstants {
     /**
      * Include the X.509 certificate SHA-256 digest for signature in the "x5t#S256" header.
      */
-    public static final String RSSEC_SIGNATURE_INCLUDE_CERT_SHA256 = "rs.security.signature.include.cert.sha1";
+    public static final String RSSEC_SIGNATURE_INCLUDE_CERT_SHA256 = "rs.security.signature.include.cert.sha256";
 
     //
     // JWE specific Configuration
