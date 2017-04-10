@@ -40,7 +40,6 @@ import org.apache.cxf.javascript.UnsupportedConstruct;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaAny;
-import org.apache.ws.commons.schema.XmlSchemaAttributeOrGroupRef;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
@@ -331,10 +330,21 @@ public class SchemaJavascriptBuilder {
         code.append(nameManager.getJavascriptName(name) + ".prototype.serialize = " + functionName + ";\n\n");
     }
 
-    private void complexTypeSerializeAttributes(XmlSchemaComplexType type, String string) {
-        @SuppressWarnings("unused")
-        List<XmlSchemaAttributeOrGroupRef> attributes = type.getAttributes();
-        // work in progress.
+    private void complexTypeSerializeAttributes(XmlSchemaComplexType type, String attrPrefix) {
+        List<XmlSchemaAnnotated> attrs = XmlSchemaUtils.getContentAttributes(type, xmlSchemaCollection);
+
+        for (XmlSchemaAnnotated thing : attrs) {
+            AttributeInfo itemInfo = AttributeInfo.forLocalItem(thing, xmlSchema, xmlSchemaCollection,
+                                                                prefixAccumulator, type.getQName());
+            String attrName = itemInfo.getJavascriptName();
+            utils.startIf(attrPrefix + attrName + " !== null");
+            utils.appendExpression("'" + attrName + "=\"' + " + attrPrefix + attrName + " + '\" '");
+            if (itemInfo.getDefaultValue() != null) {
+                utils.appendElse();
+                utils.appendExpression("'" + attrName + "=\"" + itemInfo.getDefaultValue() + "\" '");
+            }
+            utils.endBlock();
+        }
     }
 
     /**
