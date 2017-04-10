@@ -218,6 +218,7 @@ public class SamlTokenInterceptor extends AbstractTokenInterceptor {
                 return;
             }
             Element el = (Element)h.getObject();
+            el = (Element)DOMUtils.getDomElement(el);
             el.appendChild(wrapper.toDOM(el.getOwnerDocument()));
         } catch (WSSecurityException ex) {
             policyNotAsserted(tok, ex.getMessage(), message);

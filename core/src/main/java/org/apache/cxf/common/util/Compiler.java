@@ -179,7 +179,7 @@ public class Compiler {
 
         if (System.getProperty("java.version").startsWith("9")) {
             list.add("--add-modules");
-            list.add("java.activation,java.annotations.common,java.corba,java.transaction,java.xml.bind,java.xml.ws");
+            list.add("java.activation,java.xml.ws.annotation,java.corba,java.transaction,java.xml.bind,java.xml.ws");
         }
 
         addArgs(list);

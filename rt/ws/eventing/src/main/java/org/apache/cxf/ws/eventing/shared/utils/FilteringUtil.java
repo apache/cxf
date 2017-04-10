@@ -33,6 +33,7 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.eventing.FilterType;
 
 public final class FilteringUtil {
@@ -59,6 +60,7 @@ public final class FilteringUtil {
         try {
             XPath xPath = xPathFactory.newXPath();
             XPathExpression xPathExpression = xPath.compile(xPathString);
+            elm = (Element)DOMUtils.getDomElement(elm);
             return (Boolean)xPathExpression.evaluate(elm, XPathConstants.BOOLEAN);
         } catch (XPathExpressionException ex) {
             LOG.severe(ex.toString());

@@ -233,6 +233,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
 
     protected void insertAfter(Element child, Element sib) {
+        child = (Element)DOMUtils.getDomElement(child);
         if (sib.getNextSibling() == null) {
             secHeader.getSecurityHeaderElement().appendChild(child);
         } else {
@@ -275,6 +276,7 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
     }
 
     protected void addSupportingElement(Element el) {
+        el = (Element)DOMUtils.getDomElement(el);
         if (lastSupportingTokenElement != null) {
             insertAfter(el, lastSupportingTokenElement);
         } else if (lastDerivedKeyElement != null) {
@@ -529,7 +531,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             } else if (token instanceof SamlToken) {
                 SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)token);
                 if (assertionWrapper != null) {
-                    Element assertionElement = assertionWrapper.toDOM(saaj.getSOAPPart());
+                    Element envelope = saaj.getSOAPPart().getEnvelope();
+                    envelope = (Element)DOMUtils.getDomElement(envelope);
+                    Element assertionElement = assertionWrapper.toDOM(envelope.getOwnerDocument());
                     addSupportingElement(assertionElement);
                     ret.add(new SupportingToken(token, assertionWrapper, getSignedParts(suppTokens)));
                     if (suppTokens.isEncryptedToken()) {
@@ -544,8 +548,8 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
         return ret;
     }
     
-    private SupportingToken signSupportingToken(SecurityToken secToken, String id,
-                                                AbstractToken token, SupportingTokens suppTokens)
+    private SupportingToken signSupportingToken(SecurityToken secToken, String id, 
+                                                AbstractToken token, SupportingTokens suppTokens) 
         throws SOAPException {
         WSSecSignature sig = new WSSecSignature(secHeader);
         sig.setIdAllocator(wssConfig.getIdAllocator());
@@ -1315,17 +1319,19 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
             List<Element> found) throws SOAPException {
 
         List<WSEncryptionPart> result = new ArrayList<>();
-
-        if (includeBody && !found.contains(SAAJUtils.getBody(this.saaj))) {
-            found.add(SAAJUtils.getBody(saaj));
-            final String id = this.addWsuIdToElement(SAAJUtils.getBody(this.saaj));
+        Element soapBody = SAAJUtils.getBody(this.saaj);
+        soapBody = (Element)DOMUtils.getDomElement(soapBody);
+        
+        if (includeBody && !found.contains(soapBody)) {
+            found.add(soapBody);
+            final String id = this.addWsuIdToElement(soapBody);
             if (sign) {
                 WSEncryptionPart bodyPart = new WSEncryptionPart(id, "Element");
-                bodyPart.setElement(SAAJUtils.getBody(this.saaj));
+                bodyPart.setElement(soapBody);
                 result.add(bodyPart);
             } else {
                 WSEncryptionPart bodyPart = new WSEncryptionPart(id, "Content");
-                bodyPart.setElement(SAAJUtils.getBody(this.saaj));
+                bodyPart.setElement(soapBody);
                 result.add(bodyPart);
             }
         }
@@ -1409,9 +1415,11 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
                 }
 
                 NodeList list = null;
+                
                 try {
-                    list = (NodeList)xpath.evaluate(xPath.getXPath(), saaj.getSOAPPart().getEnvelope(),
-                                                             XPathConstants.NODESET);
+                    Element envelope = saaj.getSOAPPart().getEnvelope();
+                    envelope = (Element)DOMUtils.getDomElement(envelope);
+                    list = (NodeList)xpath.evaluate(xPath.getXPath(), envelope, XPathConstants.NODESET);
                 } catch (XPathExpressionException e) {
                     LOG.log(Level.WARNING, "Failure in evaluating an XPath expression", e);
                 }
@@ -1932,9 +1940,9 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
 
                 Instant created = Instant.now();
                 Instant expires = created.plusSeconds(WSS4JUtils.getSecurityTokenLifetime(message) / 1000L);
-                SecurityToken secToken = new SecurityToken(id,
-                                                           utBuilder.getUsernameTokenElement(),
-                                                           created,
+                SecurityToken secToken = new SecurityToken(id, 
+                                                           utBuilder.getUsernameTokenElement(), 
+                                                           created, 
                                                            expires);
 
                 if (isTokenProtection) {

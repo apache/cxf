@@ -22,6 +22,8 @@ package org.apache.cxf.ws.security.wss4j.policyvalidators;
 import java.util.Collection;
 
 import org.w3c.dom.Element;
+
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -75,6 +77,9 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
 
         Message msg = parameters.getMessage();
         Element soapBody = parameters.getSoapBody();
+        Element header = parameters.getSoapHeader();
+        soapBody = (Element)DOMUtils.getDomElement(soapBody);
+        header = (Element)DOMUtils.getDomElement(header);
         Collection<WSDataRef> dataRefs = parameters.getEncrypted();
         if (coverageType == CoverageType.SIGNED) {
             dataRefs = parameters.getSigned();
@@ -108,7 +113,7 @@ public class SecuredPartsPolicyValidator implements SecurityPolicyValidator {
 
             for (Header h : p.getHeaders()) {
                 try {
-                    CryptoCoverageUtil.checkHeaderCoverage(parameters.getSoapHeader(), dataRefs,
+                    CryptoCoverageUtil.checkHeaderCoverage(header, dataRefs,
                             h.getNamespace(), h.getName(), coverageType,
                             CoverageScope.ELEMENT);
                 } catch (WSSecurityException e) {

@@ -40,6 +40,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
@@ -126,6 +127,7 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
                 return;
             }
             documentElement = envelope;
+            documentElement = (Element)DOMUtils.getDomElement(documentElement);
         } catch (SOAPException e) {
             throw new SoapFault("Error obtaining SOAP document", Fault.FAULT_CODE_CLIENT);
         }

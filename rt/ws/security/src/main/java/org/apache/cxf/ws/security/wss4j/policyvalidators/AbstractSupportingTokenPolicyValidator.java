@@ -655,6 +655,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
             }
 
             for (Element el : elements) {
+                el = (Element)DOMUtils.getDomElement(el);
                 if (!checkProtectionResult(el, false, protResults, tokenResults)) {
                     return false;
                 }
@@ -673,6 +674,7 @@ public abstract class AbstractSupportingTokenPolicyValidator extends AbstractSec
         List<WSSecurityEngineResult> protResults,
         List<WSSecurityEngineResult> tokenResults
     ) {
+        elementToProtect = (Element)DOMUtils.getDomElement(elementToProtect);
         for (WSSecurityEngineResult result : protResults) {
             List<WSDataRef> dataRefs =
                 CastUtils.cast((List<?>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS));

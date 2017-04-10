@@ -100,13 +100,14 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
             } else {
                 fault = StaxUtils.read(new FragmentStreamReader(reader));
             }
+            fault = DOMUtils.getDomElement(fault);
             Element el = (Element)xu.getValue("//s:Fault/s:Code/s:Value",
                                       fault,
                                       XPathConstants.NODE);
             if (el != null) {
                 faultCode = DOMUtils.createQName(el.getTextContent(), el);
             }
-
+            
             el = (Element)xu.getValue("//s:Fault/s:Code/s:Subcode",
                                       fault,
                                       XPathConstants.NODE);
