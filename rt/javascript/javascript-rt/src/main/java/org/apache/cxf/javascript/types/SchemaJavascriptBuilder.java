@@ -402,13 +402,31 @@ public class SchemaJavascriptBuilder {
         utils = new JavascriptUtils(code);
 
         List<XmlSchemaObject> contentElements = JavascriptUtils.getContentElements(type, xmlSchemaCollection);
+        List<XmlSchemaAnnotated> attributes = XmlSchemaUtils.getContentAttributes(type, xmlSchemaCollection);
+        
         String typeObjectName = nameManager.getJavascriptName(name);
         code.append("function " + typeObjectName + "_deserialize (cxfjsutils, element) {\n");
         // create the object we are deserializing into.
         utils.appendLine("var newobject = new " + typeObjectName + "();");
         utils.appendLine("cxfjsutils.trace('element: ' + cxfjsutils.traceElementName(element));");
-        utils.appendLine("var curElement = cxfjsutils.getFirstElementChild(element);");
 
+        // create attributes
+        utils.appendLine("var attributes = element.attributes;");
+        utils.startFor("var i = 0", "i < attributes.length", "i++");
+        for (XmlSchemaAnnotated thing : attributes) {
+            AttributeInfo itemInfo = AttributeInfo.forLocalItem(thing, xmlSchema, xmlSchemaCollection,
+                                                                prefixAccumulator, type.getQName());
+
+            String attrName = itemInfo.getJavascriptName();
+            String setFunctionProperty = "set" + StringUtils.capitalize(attrName);
+
+            utils.startIf("attributes[i].nodeName === '" + attrName + "'");
+            utils.appendLine("newobject." + setFunctionProperty + "(attributes[i].nodeValue)");
+            utils.endBlock();
+        }
+        utils.endBlock();
+        
+        utils.appendLine("var curElement = cxfjsutils.getFirstElementChild(element);");
         utils.appendLine("var item;");
 
         int nContentElements = contentElements.size();
