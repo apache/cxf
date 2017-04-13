@@ -80,9 +80,6 @@ public class UndertowHTTPDestination extends ServletDestination {
         //Add the default port if the address is missing it
         super(bus, registry, ei, getAddressValue(ei, true).getAddress(), true);
         this.serverEngineFactory = serverEngineFactory;
-        if (serverEngineFactory != null) {
-            nurl = new URL(getAddress(endpointInfo));
-        }
         loader = bus.getExtension(ClassLoader.class);
     }
 
@@ -101,6 +98,8 @@ public class UndertowHTTPDestination extends ServletDestination {
                IOException {
         if (serverEngineFactory == null) {
             return;
+        } else { 
+            nurl = new URL(getAddress(endpointInfo));
         }
         engine =
             serverEngineFactory.retrieveUndertowHTTPServerEngine(nurl.getPort());
@@ -239,7 +238,7 @@ public class UndertowHTTPDestination extends ServletDestination {
     }
 
 
-    protected final String getAddress(EndpointInfo endpointInfo) {
+    protected String getAddress(EndpointInfo endpointInfo) {
         return endpointInfo.getAddress();
     }
 
