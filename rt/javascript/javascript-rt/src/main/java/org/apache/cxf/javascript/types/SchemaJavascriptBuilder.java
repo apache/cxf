@@ -219,7 +219,6 @@ public class SchemaJavascriptBuilder {
 
         String accessorSuffix = StringUtils.capitalize(itemInfo.getJavascriptName());
 
-        String accessorName = typeObjectName + "_get" + accessorSuffix;
         String getFunctionProperty = typeObjectName + ".prototype.get" + accessorSuffix;
         String setFunctionProperty = typeObjectName + ".prototype." + (itemInfo.isArray() ? "add" : "set") 
                 + accessorSuffix;
@@ -250,29 +249,40 @@ public class SchemaJavascriptBuilder {
         
         String valueType = "value"; 
         if (itemInfo.getType() != null) {
-            valueType = itemInfo.getType().getName().toString();
+            valueType = "value_" + itemInfo.getType().getName().toString();
         }
         
         accessors.append("//\n");
         accessors.append("// element set for " + itemInfo.getJavascriptName() + "\n");
         accessors.append("// setter function is is " + setFunctionProperty + "\n");
         accessors.append("//\n");
-        accessors.append("function " + accessorName + "() { return this._" + itemInfo.getJavascriptName()
-                         + ";}\n\n");
-        accessors.append(getFunctionProperty + " = " + accessorName + ";\n\n");
-        if (itemInfo.isArray()) {
-            accessorName = typeObjectName + "_add" + accessorSuffix;
-            accessors.append("function " + accessorName + "(" + valueType + ") {\n    (" + valueType
-                    + " instanceof Array ? this._" + itemInfo.getJavascriptName() + " = this._"
-                    + itemInfo.getJavascriptName() + ".concat(" + valueType + ") : this._"
-                    + itemInfo.getJavascriptName() + ".push(" + valueType + "));\n}\n\n");
-        } else {
-            accessorName = typeObjectName + "_set" + accessorSuffix;
-            accessors.append("function " + accessorName + "(" + valueType + ") { this._" 
-                     + itemInfo.getJavascriptName() + " = " + valueType + ";}\n\n");
-        }
-        accessors.append(setFunctionProperty + " = " + accessorName + ";\n");
 
+        // Getter
+        accessors.append(getFunctionProperty + " = function () { return this._" 
+                         + itemInfo.getJavascriptName() + "; };\n\n");
+        
+        // Setter
+        if (itemInfo.isArray()) {
+            accessors.append(setFunctionProperty + " = function (" + valueType + ") {\n");
+            accessors.append("    var value = " + valueType + ";\n");
+            accessors.append("    if (value !== null && value !== \"undefined\") {\n");
+            accessors.append("        if (value instanceof Array) {\n");
+            accessors.append("            for(var i in value)\n");
+            accessors.append("                this._" + itemInfo.getJavascriptName() + ".push(value[i]);\n");
+            accessors.append("        } else {\n");
+            accessors.append("            if (value.raw) this._" + itemInfo.getJavascriptName() + " = value; "
+                                              + "else this._" + itemInfo.getJavascriptName() + ".push(value);\n");
+            accessors.append("        }\n");
+            accessors.append("    }\n");
+            accessors.append("    return this;\n"); // for method chaining
+            accessors.append("}\n\n");
+        } else {           
+            accessors.append(setFunctionProperty + " = function (" + valueType + ") { ");
+            accessors.append("this._" + itemInfo.getJavascriptName() + " = " + valueType + "; ");
+            accessors.append("return this; "); // for method chaining
+            accessors.append("}\n\n");
+        }
+        
         if (itemInfo.isOptional() || (itemInfo.isNillable() && !itemInfo.isArray())) {
             utils.appendLine("this._" + itemInfo.getJavascriptName() + " = null;");
         } else if (itemInfo.isArray()) {
@@ -418,9 +428,9 @@ public class SchemaJavascriptBuilder {
                                                                 prefixAccumulator, type.getQName());
 
             String attrName = itemInfo.getJavascriptName();
-            String setFunctionProperty = "set" + StringUtils.capitalize(attrName);
+            String setFunctionProperty = (itemInfo.isArray() ? "add" : "set") + StringUtils.capitalize(attrName);
 
-            utils.startIf("attributes[i].nodeName === '" + attrName + "'");
+            utils.startIf("attributes[i] && attributes[i].nodeName === '" + attrName + "'");
             utils.appendLine("newobject." + setFunctionProperty + "(attributes[i].nodeValue)");
             utils.endBlock();
         }
@@ -489,7 +499,6 @@ public class SchemaJavascriptBuilder {
             utils.appendLine("var anyObject = [];");
         } else {
             utils.appendLine("var anyObject = null;");
-
         }
 
         String anyNamespaceSpec = any.getNamespace();
@@ -580,7 +589,12 @@ public class SchemaJavascriptBuilder {
         utils.endBlock(); // while
 
         utils.appendLine("var anyHolder = new org_apache_cxf_any_holder(anyURI, anyLocalPart, anyValue);");
-        utils.appendLine("newobject.setAny(anyHolder);");
+        
+        if (array) {
+            utils.appendLine("newobject.addAny(anyHolder);");
+        } else {
+            utils.appendLine("newobject.setAny(anyHolder);");
+        }
     }
 
     private void deserializeElement(XmlSchemaComplexType type, ParticleInfo itemInfo) {
@@ -595,8 +609,12 @@ public class SchemaJavascriptBuilder {
         boolean simple = itemType instanceof XmlSchemaSimpleType
                          || JavascriptUtils.notVeryComplexType(itemType);
         boolean mtomCandidate = JavascriptUtils.mtomCandidateType(itemType);
-        String accessorName = (itemInfo.isArray() ? "add" : "set")
-                + StringUtils.capitalize(itemInfo.getJavascriptName());
+        String accessorName;
+        if (itemInfo.isArray()) {
+            accessorName = "add" + StringUtils.capitalize(itemInfo.getJavascriptName());
+        } else {
+            accessorName = "set" + StringUtils.capitalize(itemInfo.getJavascriptName());
+        }
         utils.appendLine("cxfjsutils.trace('processing " + itemInfo.getJavascriptName() + "');");
         XmlSchemaElement element = (XmlSchemaElement)itemInfo.getParticle();
         QName elementQName = XmlSchemaUtils.getElementQualifiedName(element, xmlSchema);

@@ -38,7 +38,7 @@ function serializeTestBean1_1()
  	bean1.setBeanTwoItem(bean2);
  	var a = [];
  	a.push(543);
- 	bean1.setOptionalIntArrayItem(a);
+	bean1.addOptionalIntArrayItem(a);
  	bean1.setEnum2('Mineral');
 	return bean1.serialize(jsutils, "testBean1");
 } 
@@ -56,7 +56,7 @@ function serializeTestBean1_1()
  	a.push(543);
  	a.push(null);
  	a.push(345);
- 	bean1.setOptionalIntArrayItem(a);
+	bean1.addOptionalIntArrayItem(a);
 	return bean1.serialize(jsutils, "testBean1");
 }
 
@@ -67,7 +67,7 @@ function serializeTestBean1_1()
  	bean1.setIntItem(64);
  	bean1.setBase64Item(''); // later
  	bean1.setOptionalIntItem(33);
- 	bean1.setOptionalIntArrayItem(null);
+	bean1.addOptionalIntArrayItem(null);
  	bean1.setBeanTwoItem(bean2);
  	return bean1.serialize(jsutils, "testBean1");
 } 

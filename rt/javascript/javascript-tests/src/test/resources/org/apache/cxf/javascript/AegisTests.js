@@ -57,7 +57,7 @@ function testAnyNToServerRaw(url)
 	holderArray.push(new org_apache_cxf_raw_any_holder("<walrus xmlns='uri:iam'>tusks</walrus>"));
 	holderArray.push(new org_apache_cxf_raw_any_holder("<penguin xmlns='uri:linux'>emperor</penguin>"));
 	holderArray.push(new org_apache_cxf_raw_any_holder("<moon xmlns='uri:planets'>blue</moon>"));
-	arrayItem.setAnyType(holderArray);
+	arrayItem.addAnyType(holderArray);
 	service.acceptAny(success, error, "before items", arrayItem);
 }
 
@@ -77,7 +77,7 @@ function testAnyNToServerRawTyped(url)
 													 "This is the cereal &lt; shot from guns");
 	
 	holderArray.push(holder);
-	arrayItem.setAnyType(holderArray);
+	arrayItem.addAnyType(holderArray);
 	service.acceptObjects(success, error, arrayItem);
 }
 
