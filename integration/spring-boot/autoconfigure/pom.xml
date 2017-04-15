@@ -30,13 +30,6 @@
         <version>3.2.0-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
-  <properties>
-		<jcl-over-slf4j.version>1.7.5</jcl-over-slf4j.version>
-		<logback-core.version>1.2.2</logback-core.version>
-		<assertj-core.version>3.3.0</assertj-core.version>
-		<javax.el-api.version>2.2.4</javax.el-api.version>
-		<hibernate-validator.version>5.2.4.Final</hibernate-validator.version>
-	</properties>
     <dependencies>
         <!-- Compile -->
         <dependency>
@@ -102,31 +95,31 @@
             <artifactId>spring-web</artifactId>
             <scope>test</scope>
         </dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>${jcl-over-slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-core</artifactId>
-			<version>${logback-core.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<version>${assertj-core.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>javax.el-api</artifactId>
-			<version>${javax.el-api.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>${hibernate-validator.version}</version>
-		</dependency>
+	<dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>jcl-over-slf4j</artifactId>
+	    <version>${cxf.slf4j.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>ch.qos.logback</groupId>
+	    <artifactId>logback-core</artifactId>
+	    <version>${cxf.logback.core.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.assertj</groupId>
+	    <artifactId>assertj-core</artifactId>
+	    <version>${cxf.assertj.core.version}</version>
+	    <scope>test</scope>
+	</dependency>
+	<dependency>
+	    <groupId>javax.el</groupId>
+	    <artifactId>javax.el-api</artifactId>
+	    <version>${cxf.javax.el.api.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>org.hibernate</groupId>
+	    <artifactId>hibernate-validator</artifactId>
+	    <version>${cxf.hibernate.validator.version}</version>
+	</dependency>
     </dependencies>
 </project>
