@@ -43,7 +43,7 @@ public class CxfPropertiesTest {
         }
 
         @Bean
-        public CxfProperties userCreateService() {
+        public CxfProperties cxfProperties() {
             return new CxfProperties();
         }
     }
@@ -53,8 +53,7 @@ public class CxfPropertiesTest {
 
     @Test
     public void throwsViolationExceptionWhenIsNull() {
-        cxfproperties.setPath(null);
-      
+        cxfproperties.setPath(null);    
         assertThatExceptionOfType(ConstraintViolationException.class)
             .isThrownBy(() -> cxfproperties.getPath())
             .matches(e -> e.getConstraintViolations().size() == 1);
@@ -63,7 +62,6 @@ public class CxfPropertiesTest {
     @Test
     public void throwsViolationExceptionWhenPathIsEmpty() {
         cxfproperties.setPath("");
-      
         assertThatExceptionOfType(ConstraintViolationException.class)
             .isThrownBy(() -> cxfproperties.getPath())
             .matches(e -> e.getConstraintViolations().size() == 1);
@@ -72,7 +70,6 @@ public class CxfPropertiesTest {
     @Test
     public void throwsViolationExceptionWhenHasNoSlash() {
         cxfproperties.setPath("invalid");
-
         assertThatExceptionOfType(ConstraintViolationException.class)
             .isThrownBy(() -> cxfproperties.getPath())
             .matches(e -> e.getConstraintViolations().size() == 1);
