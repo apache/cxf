@@ -80,6 +80,7 @@ public class JaxRsFilterTest extends CXFOSGiTestSupport {
         final Bundle bundle = findBundleByName("filter-bundle");
         bundle.stop();
         bundle.start();
+        Thread.sleep(1500); // Wait for CFX service initialization
         Assert.assertEquals(
                 Status.OK.getStatusCode(),
                 wt2
