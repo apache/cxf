@@ -24,18 +24,20 @@ import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
-/**
- * Created by e.rosas.garcia on 05/04/2017.
- */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @PreMatching
 public class BookFilterImpl implements BookFilter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookFilterImpl.class);
     private UriInfo ui;
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        final String query = ui.getAbsolutePath().getQuery();
-        System.out.println("BookFilter.query = " + query);
+        LOGGER.info("ui = " + ui);
+        LOGGER.info("ui.getAbsolutePath() = " + ui.getAbsolutePath());
+        LOGGER.info("ui.getAbsolutePath().getPath() = " + ui.getAbsolutePath().getPath());
     }
 
     @Override

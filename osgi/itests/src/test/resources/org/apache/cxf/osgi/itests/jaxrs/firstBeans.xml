@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
+    <bean id="bookStore" class="org.apache.cxf.osgi.itests.jaxrs.BookStore"/>
+    <bean id="bookFilter" class="org.apache.cxf.osgi.itests.jaxrs.BookFilterImpl"/>
+    <osgi:service ref="bookFilter" interface="org.apache.cxf.osgi.itests.jaxrs.BookFilter" />
+    <jaxrs:server address="/firstBundle">
+        <jaxrs:serviceBeans>
+            <ref bean="bookStore"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="bookFilter"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+
+</beans>

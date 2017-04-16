@@ -42,7 +42,6 @@ import static org.ops4j.pax.exam.CoreOptions.provision;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
-
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class JaxRsFilterTest extends CXFOSGiTestSupport {
@@ -58,7 +57,7 @@ public class JaxRsFilterTest extends CXFOSGiTestSupport {
         wt1 = client.target(BASE_URL_1);
         wt2 = client.target(BASE_URL_2);
     }
-    
+
     @Test
     public void testJaxRsPut() throws Exception {
         Book book = new Book();
@@ -78,7 +77,7 @@ public class JaxRsFilterTest extends CXFOSGiTestSupport {
                         .request("application/xml")
                         .put(Entity.xml(book))
                         .getStatus());
-        final Bundle bundle = findBundle("filter-bundle");
+        final Bundle bundle = findBundleByName("filter-bundle");
         bundle.stop();
         bundle.start();
         Assert.assertEquals(
@@ -90,31 +89,25 @@ public class JaxRsFilterTest extends CXFOSGiTestSupport {
                         .getStatus());
     }
 
-    private Bundle findBundle(String symbolicName) {
-        for (Bundle b : bundleContext.getBundles()) {
-            if (symbolicName.equals(b.getSymbolicName())) {
-                return b;
-            }
-        }
-        throw new IllegalStateException();
-    }
-
-
     @Configuration
     public Option[] config() {
         return new Option[] {
-            cxfBaseConfig(),
-            features(cxfUrl, "cxf-core", "cxf-wsdl", "cxf-jaxrs", "http",
-                    "cxf-bean-validation-core",
-                    "cxf-bean-validation"),
-            testUtils(),
-            logLevel(LogLevel.INFO),
-            provision(filterBundle()),
-            provision(clientBundle())
+                cxfBaseConfig(),
+                features(cxfUrl,
+                        "cxf-core",
+                        "cxf-wsdl",
+                        "cxf-jaxrs",
+                        "http",
+                        "cxf-bean-validation-core",
+                        "cxf-bean-validation",
+                        "spring 3.2.17.RELEASE_1",
+                        "spring-dm"),
+                testUtils(),
+                logLevel(LogLevel.INFO),
+                provision(filterBundle()),
+                provision(clientBundle())
         };
     }
-
-
 
     private InputStream filterBundle() {
         return TinyBundles.bundle()
@@ -125,16 +118,15 @@ public class JaxRsFilterTest extends CXFOSGiTestSupport {
                 .add(BookStore.class)
                 .add(BookFilter.class)
                 .add(BookFilterImpl.class)
-                .add(FilterBundleActivator.class)
-                .set(Constants.BUNDLE_ACTIVATOR, FilterBundleActivator.class.getName())
+                .add("/META-INF/spring/main-servlet.xml", classpath("firstBeans.xml"))
                 .build(TinyBundles.withBnd());
     }
 
     private InputStream clientBundle() {
         return TinyBundles.bundle()
+                .set(Constants.BUNDLE_SYMBOLICNAME, "second-bundle")
                 .set(Constants.DYNAMICIMPORT_PACKAGE, "*")
-                .add(ClientBundleActivator.class)
-                .set(Constants.BUNDLE_ACTIVATOR, ClientBundleActivator.class.getName())
+                .add("/META-INF/spring/main-servlet.xml", classpath("secondBeans.xml"))
                 .build(TinyBundles.withBnd());
     }
 
