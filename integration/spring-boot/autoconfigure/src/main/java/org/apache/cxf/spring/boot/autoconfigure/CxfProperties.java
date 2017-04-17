@@ -25,6 +25,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * {@link ConfigurationProperties} for Apache CXF.
@@ -32,17 +33,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author Vedran Pavic
  */
 @ConfigurationProperties("cxf")
+@Validated
 public class CxfProperties {
 
     /**
      * Path that serves as the base URI for the services.
      */
-    @NotNull
-    @Pattern(regexp = "/[^?#]*", message = "Path must start with /")
     private String path = "/services";
 
     private final Servlet servlet = new Servlet();
 
+    @NotNull
+    @Pattern(regexp = "/[^?#]*", message = "Path must start with /")
     public String getPath() {
         return this.path;
     }
