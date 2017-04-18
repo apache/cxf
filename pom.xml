@@ -139,8 +139,8 @@
         </developer>
     </developers>
     <ciManagement>
-        <system>Hudson</system>
-        <url>http://hudson.zones.apache.org/hudson/view/CXF/</url>
+        <system>Jenkins</system>
+        <url>https://builds.apache.org/view/C/view/CXF/</url>
         <notifiers>
             <notifier>
                 <type>mail</type>
