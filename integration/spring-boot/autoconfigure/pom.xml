@@ -110,5 +110,27 @@
             <artifactId>spring-web</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+	    <groupId>org.slf4j</groupId>
+	    <artifactId>jcl-over-slf4j</artifactId>
+	    <version>${cxf.slf4j.version}</version>
+	</dependency>
+	<dependency>
+	    <groupId>ch.qos.logback</groupId>
+	    <artifactId>logback-core</artifactId>
+	    <version>${cxf.logback.classic.version}</version>
+        </dependency>
+        <dependency>
+	    <groupId>javax.el</groupId>
+	    <artifactId>javax.el-api</artifactId>
+	    <version>${cxf.javax.el.version}</version>
+	    <scope>test</scope>
+	</dependency>
+	<dependency>
+	   <groupId>org.hibernate</groupId>
+	   <artifactId>hibernate-validator</artifactId>
+	   <version>${cxf.hibernate.validator.version}</version>
+	   <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
