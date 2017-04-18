@@ -42,7 +42,7 @@ public class ResourceInfoImpl implements ResourceInfo {
     }
     @Override
     public Class<?> getResourceClass() {
-        return ori == null ? null : ori.getClassResourceInfo().getResourceClass();
+        return ori == null ? null : ori.getClassResourceInfo().getServiceClass();
     }
     
 }
