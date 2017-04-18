@@ -426,8 +426,8 @@ public final class InjectionUtils {
             throw ex;
         } catch (Exception ex) {
             Throwable t = getOrThrowActualException(ex);
-            LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
-                                                               BUNDLE, 
+            LOG.warning(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE",
+                                                               BUNDLE,
                                                                pClass.getName()).toString());
             Response r = JAXRSUtils.toResponse(HttpUtils.getParameterFailureStatus(pType));
             throw ExceptionUtils.toHttpException(t, r);
@@ -523,8 +523,8 @@ public final class InjectionUtils {
         }
         if (factoryMethodEx != null) {
             Throwable t = getOrThrowActualException(factoryMethodEx);
-            LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_VALUE_OF_FAILURE", 
-                                                               BUNDLE, 
+            LOG.warning(new org.apache.cxf.common.i18n.Message("CLASS_VALUE_OF_FAILURE",
+                                                               BUNDLE,
                                                                cls.getName()).toString());
             throw new WebApplicationException(t, HttpUtils.getParameterFailureStatus(pType));
         } else {
