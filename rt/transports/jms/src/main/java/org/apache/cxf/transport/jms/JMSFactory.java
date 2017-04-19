@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 
 import org.apache.cxf.Bus;
@@ -77,7 +78,7 @@ public final class JMSFactory {
         return correlationIdPrefix.isEmpty() ? null : "JMSCorrelationID LIKE '" + correlationIdPrefix + "%'";
     }
 
-    public static Connection createConnection(JMSConfiguration jmsConfig) throws JMSException {
+    public static Connection createConnection(final JMSConfiguration jmsConfig) throws JMSException {
         String username = jmsConfig.getUserName();
         ConnectionFactory cf = jmsConfig.getConnectionFactory();
         Connection connection = username != null
@@ -86,6 +87,13 @@ public final class JMSFactory {
         if (jmsConfig.getDurableSubscriptionClientId() != null) {
             connection.setClientID(jmsConfig.getDurableSubscriptionClientId());
         }
+        connection.setExceptionListener(new ExceptionListener() {
+            
+            @Override
+            public void onException(JMSException exception) {
+                jmsConfig.resetCachedReplyDestination();
+            }
+        });
         return connection;
     }
 
