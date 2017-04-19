@@ -37,7 +37,7 @@ public abstract class AbstractJaxrsClassesScanServer extends AbstractSpringConfi
     protected AbstractJaxrsClassesScanServer() {
 
     }
-    protected void setJaxrsResources(JAXRSServerFactoryBean factory) {
+    protected JAXRSServerFactoryBean setJaxrsResources(JAXRSServerFactoryBean factory) {
         try {
             final Map< Class< ? extends Annotation >, Collection< Class< ? > > > classes =
                 ClasspathScanner.findClasses(basePackages, Provider.class, Path.class);
@@ -49,6 +49,7 @@ public abstract class AbstractJaxrsClassesScanServer extends AbstractSpringConfi
 
             factory.setServiceBeans(jaxrsServices);
             factory.setProviders(jaxrsProviders);
+            return factory;
         } catch (Exception ex) {
             throw new ServiceConstructionException(ex);
         }
