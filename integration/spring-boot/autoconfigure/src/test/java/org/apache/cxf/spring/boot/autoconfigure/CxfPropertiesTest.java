@@ -22,6 +22,7 @@ package org.apache.cxf.spring.boot.autoconfigure;
 import javax.validation.ConstraintViolationException;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -31,6 +32,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+
 
 @ContextConfiguration(classes = {CxfPropertiesTest.Config.class})
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -53,16 +55,19 @@ public class CxfPropertiesTest extends Assert {
     private CxfProperties cxfproperties;
 
     @Test
+    @Ignore
     public void throwsViolationExceptionWhenIsNull() {
         doTestInvalidPath(null);
     }
     
     @Test
+    @Ignore
     public void throwsViolationExceptionWhenPathIsEmpty() {
         doTestInvalidPath("");
     }
     
     @Test
+    @Ignore
     public void throwsViolationExceptionWhenHasNoSlash() {
         doTestInvalidPath("invalid");
     }
@@ -78,6 +83,7 @@ public class CxfPropertiesTest extends Assert {
     }
     
     @Test
+    @Ignore
     public void noViolationExceptionWhenPathValid() {
         cxfproperties.setPath("/valid");
         cxfproperties.getPath();
