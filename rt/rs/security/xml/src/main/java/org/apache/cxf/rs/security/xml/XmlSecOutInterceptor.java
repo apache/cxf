@@ -332,13 +332,10 @@ public class XmlSecOutInterceptor extends AbstractPhaseInterceptor<Message> {
         if (sigProps.getSignatureC14nTransform() != null) {
             transform = sigProps.getSignatureC14nTransform();
         }
-<<<<<<< HEAD
-=======
 
         if (sigProps.getSignatureLocation() != null) {
             properties.setSignaturePosition(sigProps.getSignatureLocation());
         }
->>>>>>> be99c53... CXF-7340 Add an option to specify the location of the signature element
         
         if (elementsToSign == null || elementsToSign.isEmpty()) {
             LOG.fine("No Elements to sign are specified, so the entire request is signed");
