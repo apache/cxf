@@ -57,6 +57,7 @@ import javax.servlet.http.Part;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.websocket.WebSocketUtils;
 
+import io.undertow.server.HttpServerExchange;
 import io.undertow.websockets.core.BufferedBinaryMessage;
 import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.WebSocketChannel;
@@ -71,8 +72,9 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
     private Map<String, String> requestHeaders;
     private Map<String, Object> attributes;
     private InputStream in;
+    //private HttpServerExchange exchange;
 
-    public WebSocketUndertowServletRequest(WebSocketChannel channel, Object message)
+    public WebSocketUndertowServletRequest(WebSocketChannel channel, Object message, HttpServerExchange exchange)
         throws IOException {
         this.channel = channel;
         if (message instanceof BufferedBinaryMessage) {
@@ -469,7 +471,9 @@ public class WebSocketUndertowServletRequest implements HttpServletRequest {
 
     @Override
     public String getPathInfo() {
+        
         return null;
+      
     }
 
     @Override

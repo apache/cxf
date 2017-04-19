@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.websocket.atmosphere;
+package org.apache.cxf.transport.websocket.undertow;
 
 import java.io.IOException;
 import java.net.URL;
@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,15 +44,7 @@ import org.apache.cxf.transport.http_undertow.UndertowHTTPHandler;
 import org.apache.cxf.transport.http_undertow.UndertowHTTPServerEngineFactory;
 import org.apache.cxf.transport.websocket.WebSocketConstants;
 import org.apache.cxf.transport.websocket.WebSocketDestinationService;
-import org.apache.cxf.transport.websocket.undertow.WebSocketUndertowServletRequest;
-import org.apache.cxf.transport.websocket.undertow.WebSocketUndertowServletResponse;
 import org.apache.cxf.workqueue.WorkQueueManager;
-import org.atmosphere.cpr.ApplicationConfig;
-import org.atmosphere.cpr.AtmosphereFramework;
-import org.atmosphere.cpr.AtmosphereRequestImpl;
-import org.atmosphere.cpr.AtmosphereResource;
-import org.atmosphere.cpr.AtmosphereResponseImpl;
-import org.atmosphere.handler.AbstractReflectorAtmosphereHandler;
 import org.xnio.StreamConnection;
 
 import io.undertow.server.HttpServerExchange;
@@ -76,27 +67,15 @@ import io.undertow.websockets.spi.AsyncWebSocketHttpServerExchange;
 /**
  *
  */
-public class AtmosphereWebSocketUndertowDestination extends UndertowHTTPDestination
+public class UndertowWebSocketDestination extends UndertowHTTPDestination
     implements WebSocketDestinationService {
-    private static final Logger LOG = LogUtils.getL7dLogger(AtmosphereWebSocketUndertowDestination.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(UndertowWebSocketDestination.class);
     private final Executor executor;
-    private AtmosphereFramework framework;
-
-    public AtmosphereWebSocketUndertowDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
+        
+    public UndertowWebSocketDestination(Bus bus, DestinationRegistry registry, EndpointInfo ei,
                                                   UndertowHTTPServerEngineFactory serverEngineFactory)
                                                       throws IOException {
         super(bus, registry, ei, serverEngineFactory);
-        framework = new AtmosphereFramework(false, true);
-        framework.setUseNativeImplementation(false);
-        framework.addInitParameter(ApplicationConfig.PROPERTY_NATIVE_COMETSUPPORT, "true");
-        framework.addInitParameter(ApplicationConfig.PROPERTY_SESSION_SUPPORT, "true");
-        framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPORT, "true");
-        framework.addInitParameter(ApplicationConfig.WEBSOCKET_PROTOCOL_EXECUTION, "true");
-        // workaround for atmosphere's jsr356 initialization requiring servletConfig
-        framework.addInitParameter(ApplicationConfig.WEBSOCKET_SUPPRESS_JSR356, "true");
-        AtmosphereUtils.addInterceptors(framework, bus);
-        framework.addAtmosphereHandler("/", new DestinationHandler());
-        framework.init();
         executor = bus.getExtension(WorkQueueManager.class).getAutomaticWorkQueue();
     }
 
@@ -132,16 +111,7 @@ public class AtmosphereWebSocketUndertowDestination extends UndertowHTTPDestinat
         return new AtmosphereUndertowWebSocketHandler(jhd, cmExact);
     }
 
-    @Override
-    public void shutdown() {
-        try {
-            framework.destroy();
-        } catch (Exception e) {
-            // ignore
-        } finally {
-            super.shutdown();
-        }
-    }
+
 
     private class AtmosphereUndertowWebSocketHandler extends UndertowHTTPHandler {
         private final Set<Handshake> handshakes;
@@ -207,8 +177,9 @@ public class AtmosphereWebSocketUndertowDestination extends UndertowHTTPDestinat
                                 }
                             });
                             channel.resumeReceives();
+                            
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            LOG.log(Level.WARNING, "Failed to invoke service", e);
                         }
                     }
                 });
@@ -226,27 +197,13 @@ public class AtmosphereWebSocketUndertowDestination extends UndertowHTTPDestinat
                 .getDeployment(), request, response, null);
 
             undertowExchange.putAttachment(ServletRequestContext.ATTACHMENT_KEY, servletRequestContext);
-            
-            try {
-                framework.doCometSupport(AtmosphereRequestImpl.wrap(request),
-                                         AtmosphereResponseImpl.wrap(response));
-
-            } catch (ServletException e) {
-                throw new IOException(e);
-            }
+            doService(request, response);
         }
 
         public void handleNormalRequest(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
 
-            try {
-                framework.doCometSupport(AtmosphereRequestImpl.wrap(request),
-                                         AtmosphereResponseImpl.wrap(response));
-
-            } catch (ServletException e) {
-                throw new IOException(e);
-            }
-            
+            doService(request, response);
         }
 
         private void handleReceivedMessage(WebSocketChannel channel, Object message, HttpServerExchange exchange) {
@@ -263,7 +220,7 @@ public class AtmosphereWebSocketUndertowDestination extends UndertowHTTPDestinat
                         }
                         handleNormalRequest(request, response);
                     } catch (Exception ex) {
-                        LOG.log(Level.WARNING, "Failed to invoke service", ex);
+                        ex.printStackTrace();
                     }
                     
                 }
@@ -271,24 +228,5 @@ public class AtmosphereWebSocketUndertowDestination extends UndertowHTTPDestinat
             });
             
         }
-    }
-
-    private class DestinationHandler extends AbstractReflectorAtmosphereHandler {
-
-        @Override
-        public void onRequest(final AtmosphereResource resource) throws IOException {
-            LOG.fine("onRequest");
-            try {
-                invokeInternal(null, resource.getRequest().getServletContext(), resource.getRequest(),
-                               resource.getResponse());
-            } catch (Exception e) {
-                LOG.log(Level.WARNING, "Failed to invoke service", e);
-            }
-        }
-    }
-
-    // used for internal tests
-    AtmosphereFramework getAtmosphereFramework() {
-        return framework;
     }
 }

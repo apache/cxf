@@ -43,6 +43,8 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
     private static final boolean UNDERTOW_AVAILABLE = probeClass("io.undertow.websockets.core.WebSockets");
     private static final Constructor<?> JETTY9_WEBSOCKET_DESTINATION_CTR = 
         probeConstructor("org.apache.cxf.transport.websocket.jetty9.Jetty9WebSocketDestination");
+    private static final Constructor<?> UNDERTOW_WEBSOCKET_DESTINATION_CTR = 
+        probeUndertowConstructor("org.apache.cxf.transport.websocket.undertow.UndertowWebSocketDestination");
     private static final Constructor<?> ATMOSPHERE_WEBSOCKET_JETTY_DESTINATION_CTR = 
         probeConstructor("org.apache.cxf.transport.websocket.atmosphere.AtmosphereWebSocketJettyDestination");
     private static final Constructor<?> ATMOSPHERE_WEBSOCKET_UNDERTOW_DESTINATION_CTR = 
@@ -102,11 +104,20 @@ public class WebSocketDestinationFactory implements HttpDestinationFactory {
                 }
                 return null;
             } else {
-                // for the embedded mode, we stick to jetty
-                JettyHTTPServerEngineFactory serverEngineFactory = bus
-                    .getExtension(JettyHTTPServerEngineFactory.class);
-                return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR, bus, registry,
+                if (JETTY_AVAILABLE) {
+                // for the embedded mode, we stick to jetty if jetty is available
+                    JettyHTTPServerEngineFactory serverEngineFactory = bus
+                        .getExtension(JettyHTTPServerEngineFactory.class);
+                    return createJettyHTTPDestination(JETTY9_WEBSOCKET_DESTINATION_CTR, bus, registry,
                                                   endpointInfo, serverEngineFactory);
+                } else if (UNDERTOW_AVAILABLE) {
+                    // use UndertowWebSocketDestination
+                    UndertowHTTPServerEngineFactory undertowServerEngineFactory = bus
+                        .getExtension(UndertowHTTPServerEngineFactory.class);
+                    return createUndertowHTTPDestination(UNDERTOW_WEBSOCKET_DESTINATION_CTR, bus,
+                                                         registry, endpointInfo, undertowServerEngineFactory);
+                }
+                return null;
             }
         } else {
             // REVISIT other way of getting the registry of http so that the plain cxf servlet finds the
