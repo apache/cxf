@@ -148,6 +148,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             // Close connection so it will be refreshed on next try
             ResourceCloser.close(connection);
             this.connection = null;
+            jmsConfig.resetCachedReplyDestination();
             this.staticReplyDestination = null;
             if (this.jmsListener != null) {
                 this.jmsListener.shutdown();

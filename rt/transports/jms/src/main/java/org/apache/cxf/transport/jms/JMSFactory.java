@@ -23,7 +23,6 @@ import java.util.concurrent.Executors;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
-import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 
 import org.apache.cxf.Bus;
@@ -87,13 +86,6 @@ public final class JMSFactory {
         if (jmsConfig.getDurableSubscriptionClientId() != null) {
             connection.setClientID(jmsConfig.getDurableSubscriptionClientId());
         }
-        connection.setExceptionListener(new ExceptionListener() {
-            
-            @Override
-            public void onException(JMSException exception) {
-                jmsConfig.resetCachedReplyDestination();
-            }
-        });
         return connection;
     }
 
