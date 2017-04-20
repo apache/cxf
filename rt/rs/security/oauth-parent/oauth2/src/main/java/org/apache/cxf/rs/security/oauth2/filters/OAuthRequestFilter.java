@@ -162,7 +162,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         if (certThumbprint != null) {
             TLSSessionInfo tlsInfo = getTlsSessionInfo();
             X509Certificate cert = tlsInfo == null ? null : OAuthUtils.getRootTLSCertificate(tlsInfo);
-            if (!OAuthUtils.compareCertificateThumbprints(cert, certThumbprint)) { 
+            if (cert == null || !OAuthUtils.compareCertificateThumbprints(cert, certThumbprint)) { 
                 throw ExceptionUtils.toForbiddenException(null, null);
             }
         }

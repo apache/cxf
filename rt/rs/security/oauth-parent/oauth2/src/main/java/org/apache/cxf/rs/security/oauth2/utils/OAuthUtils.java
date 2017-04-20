@@ -92,8 +92,8 @@ public final class OAuthUtils {
     public static boolean compareCertificateThumbprints(X509Certificate cert, String encodedThumbprint) {
         try {
             byte[] thumbprint = createCertificateThumbprint(cert);
-            byte[] currentThumbrint = Base64UrlUtility.decode(encodedThumbprint);
-            return MessageDigest.isEqual(thumbprint, currentThumbrint);
+            byte[] currentThumbprint = Base64UrlUtility.decode(encodedThumbprint);
+            return MessageDigest.isEqual(thumbprint, currentThumbprint);
         } catch (Exception ex) {
             return false;
         }
