@@ -60,8 +60,6 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     private JMSConfiguration jmsConfig;
     private Bus bus;
 
-    @SuppressWarnings("unused")
-    private EndpointInfo ei;
     private JMSListenerContainer jmsListener;
     private ThrottlingCounter suspendedContinuations;
     private ClassLoader loader;
@@ -71,7 +69,6 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     public JMSDestination(Bus b, EndpointInfo info, JMSConfiguration jmsConfig) {
         super(b, getTargetReference(info, b), info);
         this.bus = b;
-        this.ei = info;
         this.jmsConfig = jmsConfig;
         info.setProperty(OneWayProcessorInterceptor.USE_ORIGINAL_THREAD, Boolean.TRUE);
         loader = bus.getExtension(ClassLoader.class);
