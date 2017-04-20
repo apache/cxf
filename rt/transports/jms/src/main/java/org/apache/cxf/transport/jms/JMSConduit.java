@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.Session;
@@ -107,12 +108,33 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 result = connection;
                 if (result == null) {
                     result = JMSFactory.createConnection(jmsConfig);
+                    trySetExListener(result);
                     result.start();
                     connection = result;
                 }
             }
         }
         return result;
+    }
+
+    /**
+     * Register exception listener to react faster when a connection is reset.  
+     * 
+     * @param conn
+     */
+    private void trySetExListener(Connection conn) {
+        try {
+            conn.setExceptionListener(new ExceptionListener() {
+                
+                @Override
+                public void onException(JMSException exception) {
+                    jmsConfig.resetCachedReplyDestination();
+                    staticReplyDestination = null;
+                }
+            });
+        } catch (JMSException e) {
+            // setException is not supported on all providers  
+        }
     }
 
     /**
