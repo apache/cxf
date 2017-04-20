@@ -152,7 +152,9 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         if (pfx != null) {
             local = pfx + ":" + local;
         }
-        return document.createElementNS(ns, local);
+        Element element = document.createElementNS(ns, local);
+        element = (Element)DOMUtils.getDomElement(element);
+        return element;
     }
 
     protected void createAndAddElement(String prefix, String local, String namespace) {
@@ -247,10 +249,12 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeComment(String value) throws XMLStreamException {
+        Node nd = document.createComment(value);
+        nd = DOMUtils.getDomElement(nd);
         if (currentNode == null) {
-            document.appendChild(document.createComment(value));
+            document.appendChild(nd);
         } else {
-            currentNode.appendChild(document.createComment(value));
+            currentNode.appendChild(nd);
         }
     }
 
@@ -302,10 +306,12 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeCharacters(String text) throws XMLStreamException {
+        Node nd = document.createTextNode(text);
+        nd = DOMUtils.getDomElement(nd);
         if (currentNode != null) {
-            currentNode.appendChild(document.createTextNode(text));
+            currentNode.appendChild(nd);
         } else {
-            document.appendChild(document.createTextNode(text));
+            document.appendChild(nd);
         }
     }
 

@@ -143,7 +143,8 @@ public final class OAuthConstants {
     public static final String CLIENT_SECRET_CONTENT_ENCRYPTION_ALGORITHM =
         "client.secret.content.encryption.algorithm";
 
-    // Client Secret Encrypting Algorithm
+    public static final String TLS_CLIENT_AUTH_SUBJECT_DN = "tls_client_auth_subject_dn";
+    public static final String TLS_CLIENT_AUTH_ISSUER_DN = "tls_client_auth_issuer_dn";
     private OAuthConstants() {
     }
 

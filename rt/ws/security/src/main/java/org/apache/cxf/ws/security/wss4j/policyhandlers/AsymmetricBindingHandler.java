@@ -37,6 +37,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -147,7 +148,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 } else if (initiatorToken instanceof SamlToken && isRequestor()) {
                     SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
                     if (assertionWrapper != null && isTokenRequired(initiatorToken.getIncludeTokenType())) {
-                        addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
+                        Element envelope = saaj.getSOAPPart().getEnvelope();
+                        envelope = (Element)DOMUtils.getDomElement(envelope);
+                        addSupportingElement(assertionWrapper.toDOM(envelope.getOwnerDocument()));
                         storeAssertionAsSecurityToken(assertionWrapper);
                     }
                 } else if (initiatorToken instanceof SamlToken) {
@@ -282,7 +285,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 try {
                     SamlAssertionWrapper assertionWrapper = addSamlToken((SamlToken)initiatorToken);
                     if (assertionWrapper != null && isTokenRequired(initiatorToken.getIncludeTokenType())) {
-                        addSupportingElement(assertionWrapper.toDOM(saaj.getSOAPPart()));
+                        Element envelope = saaj.getSOAPPart().getEnvelope();
+                        envelope = (Element)DOMUtils.getDomElement(envelope);
+                        addSupportingElement(assertionWrapper.toDOM(envelope.getOwnerDocument()));
                         storeAssertionAsSecurityToken(assertionWrapper);
                     }
                 } catch (Exception e) {

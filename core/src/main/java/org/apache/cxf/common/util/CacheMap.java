@@ -19,6 +19,7 @@
 package org.apache.cxf.common.util;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
@@ -119,7 +120,16 @@ public class CacheMap<K, V> implements Map<K, V> {
 
     public V remove(Object key) {
         V v = mainDataMap.remove(key);
+        Set<K> keys = new HashSet<>(extraKeyMap.keySet());
         V v2 = extraKeyMap.remove(key);
+        for (K nk : keys) {
+            if (key.equals(nk)) {
+                V v3 = extraKeyMap.remove(nk);
+                if (v2 == null) {
+                    v2 = v3;
+                }
+            }
+        }
         return v == null ? v2 : v;
     }
 

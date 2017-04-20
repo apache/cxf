@@ -69,13 +69,12 @@ public final class KeyManagementUtils {
         return encodeX509CertificateChain(chain);
     }
 
-    public static String loadDigestAndEncodeX509Certificate(Message m, Properties props) {
+    public static String loadDigestAndEncodeX509Certificate(Message m, Properties props, String digestAlgo) {
         X509Certificate[] certs = loadX509CertificateOrChain(m, props);
         if (certs != null && certs.length > 0) {
             try {
                 byte[] digest =
-                    MessageDigestUtils.createDigest(certs[0].getEncoded(),
-                                                MessageDigestUtils.ALGO_SHA_1);
+                    MessageDigestUtils.createDigest(certs[0].getEncoded(), digestAlgo);
                 return Base64UrlUtility.encode(digest);
             } catch (NoSuchAlgorithmException ex) {
                 LOG.log(Level.FINE, "Error creating digest", ex);

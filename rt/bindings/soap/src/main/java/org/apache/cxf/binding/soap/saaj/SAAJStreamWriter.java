@@ -111,7 +111,7 @@ public final class SAAJStreamWriter extends OverlayW3CDOMStreamWriter {
         try {
             if (namespace != null
                 && namespace.equals(getEnvelopeURI())) {
-                adjustPrefix((SOAPElement)nd2, pfx);
+                adjustPrefix((Element)nd2, pfx);
                 if ("Envelope".equals(nd2.getLocalName())) {
                     adjustPrefix(getEnvelope().getHeader(), pfx);
                 }

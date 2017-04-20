@@ -327,6 +327,7 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                         validateFault(message, (SOAPFault)nd, bop);
                     }
                     body.removeChild(nd);
+                    nd = DOMUtils.getDomElement(nd);
                     frag.appendChild(nd);
                     nd = SAAJUtils.getBody(soapMessage).getFirstChild();
                 }

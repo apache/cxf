@@ -21,6 +21,7 @@ package org.apache.cxf.helpers;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -50,15 +51,40 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 
 /**
  * Few simple utils to read DOM. This is originally from the Jakarta Commons Modeler.
  */
 public final class DOMUtils {
+    private static boolean isJre9SAAJ;
     private static final Map<ClassLoader, DocumentBuilder> DOCUMENT_BUILDERS
         = Collections.synchronizedMap(new WeakHashMap<ClassLoader, DocumentBuilder>());
     private static final String XMLNAMESPACE = "xmlns";
+    
+    
+    
+    static {
+        if (System.getProperty("java.version").startsWith("9")) {
+            
+            try {
+                Method[] methods = DOMUtils.class.getClassLoader().
+                    loadClass("com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl").getMethods();
+                for (Method method : methods) {
+                    if (method.getName().equals("register")) {
+                        //this is the SAAJ impl in JDK9
+                        setJava9SAAJ(true);
+                        break;
+                    }
+                }
+            } catch (ClassNotFoundException cnfe) {
+                LogUtils.getL7dLogger(DOMUtils.class).finest(
+                    "can't load class com.sun.xml.internal.messaging.saaj.soap.SOAPDocumentImpl");
+            }
+            
+        }
+    }
 
     private DOMUtils() {
     }
@@ -656,6 +682,26 @@ public final class DOMUtils {
         findAllElementsByTagNameNS(elem, nameSpaceURI, localName, ret);
         return ret;
     }
+    
+    /**
+     * Try to get the DOM Node from the SAAJ Node with JAVA9 
+     * @param node The original node we need check
+     * @return The DOM node
+     */
+    public static Node getDomElement(Node node) {
+        if (node != null && isJava9SAAJ()) {
+            //java9 hack since EA 159
+            try {
+                Method method = node.getClass().getMethod("getDomElement");
+                node = (Node)method.invoke(node);
+            } catch (NoSuchMethodException e) {
+                //best effort to try, do nothing if NoSuchMethodException
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return node;
+    }
 
     private static void findAllElementsByTagNameNS(Element el, String nameSpaceURI, String localName,
                                                    List<Element> elementList) {
@@ -744,5 +790,13 @@ public final class DOMUtils {
      */
     public static void addNamespacePrefix(Element element, String namespaceUri, String prefix) {
         element.setAttributeNS(XMLConstants.XMLNS_ATTRIBUTE_NS_URI, "xmlns:" + prefix, namespaceUri);
+    }
+
+    public static boolean isJava9SAAJ() {
+        return isJre9SAAJ;
+    }
+
+    private static void setJava9SAAJ(boolean isJava9SAAJ) {
+        DOMUtils.isJre9SAAJ = isJava9SAAJ;
     }
 }

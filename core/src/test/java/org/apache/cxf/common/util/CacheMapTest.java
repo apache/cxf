@@ -17,25 +17,34 @@
  * under the License.
  */
 
-package org.apache.cxf.rs.security.jose.jwt;
+package org.apache.cxf.common.util;
 
-public final class JwtConstants {
+import java.util.Map;
 
-    public static final String CLAIM_ISSUER = "iss";
-    public static final String CLAIM_SUBJECT = "sub";
-    public static final String CLAIM_AUDIENCE = "aud";
-    public static final String CLAIM_EXPIRY = "exp";
-    public static final String CLAIM_NOT_BEFORE = "nbf";
-    public static final String CLAIM_ISSUED_AT = "iat";
-    public static final String CLAIM_JWT_ID = "jti";
-    public static final String CLAIM_CONFIRMATION = "cnf";
+import org.junit.Assert;
+import org.junit.Test;
 
-    public static final String JWT_TOKEN = "jwt.token";
-    public static final String JWT_CLAIMS = "jwt.claims";
 
-    public static final String EXPECTED_CLAIM_AUDIENCE = "expected.claim.audience";
+/**
+ * 
+ */
+public class CacheMapTest {
 
-    private JwtConstants() {
-
+    @Test
+    public void testRemove() {
+        Map<Object, Object> definitions = new CacheMap<Object, Object>();
+        
+        Object putValue = new Object();
+        
+        String putKey = "test";
+        definitions.put(putKey, putValue);
+        
+        String removeKey = new String("test");
+        Object removeValue = definitions.remove(removeKey);
+        
+        Assert.assertEquals(putKey, removeKey);
+        Assert.assertEquals(putValue, removeValue);
+        Assert.assertTrue(definitions.isEmpty());
     }
+
 }

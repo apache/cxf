@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.ServletDestination;
@@ -117,6 +118,27 @@ public class AtmosphereWebSocketServletDestination extends ServletDestination im
     public void invokeInternal(ServletConfig config, ServletContext context, HttpServletRequest req,
                                HttpServletResponse resp) throws IOException {
         super.invoke(config, context, req, resp);
+    }
+    
+    @Override
+    protected void setupMessage(Message inMessage, ServletConfig config, ServletContext context, 
+            HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        super.setupMessage(inMessage, config, context, req, resp);
+        
+        // There are some complications with detecting a full request URL in JSR-356 spec, so
+        // every WS Container has different interpretation.
+        // 
+        //   https://bz.apache.org/bugzilla/show_bug.cgi?id=56573
+        //   https://java.net/jira/browse/WEBSOCKET_SPEC-228
+        //
+        // We have do manually inject the transport endpoint address, otherwise the
+        // JAX-RS resources won't be found.
+        final Object address = req.getAttribute("org.apache.cxf.transport.endpoint.address");
+        if (address == null) {
+            String basePath = (String)inMessage.get(Message.BASE_PATH);
+            req.setAttribute("org.apache.cxf.transport.endpoint.address", basePath);
+        }
     }
 
     @Override

@@ -79,11 +79,6 @@ public class JMSConfiguration {
     private String replyToDestination;
     private volatile Destination replyToDestinationDest;
     
-    /**
-     * Session that was used to cache the replyToDestinationDest
-     */
-    private volatile Session replyDestinationSession;
-    
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
     private boolean replyPubSubDomain;
@@ -468,18 +463,28 @@ public class JMSConfiguration {
     }
 
     public Destination getReplyDestination(Session session) throws JMSException {
-        if (this.replyDestinationDest == null || this.replyDestinationSession == null) {
+        if (this.replyDestinationDest == null) {
             synchronized (this) {
-                if (this.replyDestinationDest == null || this.replyDestinationSession == null) {
-                    this.replyDestinationDest = replyDestination == null
-                        ? session.createTemporaryQueue()
-                        : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
-                    this.replyDestinationSession = session;
+                if (this.replyDestinationDest == null) {
+                    this.replyDestinationDest = getReplyDestinationInternal(session);
                 }
             }
         }
         return this.replyDestinationDest;
     }
+
+    private Destination getReplyDestinationInternal(Session session) throws JMSException {
+        return replyDestination == null
+            ? session.createTemporaryQueue()
+            : destinationResolver.resolveDestinationName(session, replyDestination, replyPubSubDomain);
+    }
+    
+    public void resetCachedReplyDestination() {
+        synchronized (this) {
+            this.replyDestinationDest = null;
+        }
+    }
+
 
     public Destination getTargetDestination(Session session) throws JMSException {
         return destinationResolver.resolveDestinationName(session, targetDestination, pubSubDomain);

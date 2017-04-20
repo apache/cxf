@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
@@ -87,6 +88,14 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         at.setGrantCode(atReg.getGrantCode());
         at.getExtraProperties().putAll(atReg.getExtraProperties());
 
+        if (messageContext != null) {
+            String certCnf = (String)messageContext.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256);
+            if (certCnf != null) {
+                // At a later stage we will likely introduce a dedicate Confirmation bean (as it is used in POP etc)
+                at.getExtraProperties().put(JoseConstants.HEADER_X509_THUMBPRINT_SHA256, certCnf);
+            }
+        }
+        
         if (isUseJwtFormatForAccessTokens()) {
             JwtClaims claims = createJwtAccessToken(at);
             String jose = processJwtAccessToken(claims);

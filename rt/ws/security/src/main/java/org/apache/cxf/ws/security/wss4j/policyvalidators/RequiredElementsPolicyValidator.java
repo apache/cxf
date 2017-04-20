@@ -27,7 +27,10 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.wss4j.policy.SP11Constants;
@@ -68,9 +71,11 @@ public class RequiredElementsPolicyValidator implements SecurityPolicyValidator 
                         xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
                     }
                     NodeList list;
+                    Element header = parameters.getSoapHeader();
+                    header = (Element)DOMUtils.getDomElement(header);
                     try {
                         list = (NodeList)xpath.evaluate(expression,
-                                                                 parameters.getSoapHeader(),
+                                                                 header,
                                                                  XPathConstants.NODESET);
                         if (list.getLength() == 0) {
                             ai.setNotAsserted("No header element matching XPath " + expression + " found.");

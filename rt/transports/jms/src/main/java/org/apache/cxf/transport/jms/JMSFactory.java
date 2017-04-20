@@ -77,7 +77,7 @@ public final class JMSFactory {
         return correlationIdPrefix.isEmpty() ? null : "JMSCorrelationID LIKE '" + correlationIdPrefix + "%'";
     }
 
-    public static Connection createConnection(JMSConfiguration jmsConfig) throws JMSException {
+    public static Connection createConnection(final JMSConfiguration jmsConfig) throws JMSException {
         String username = jmsConfig.getUserName();
         ConnectionFactory cf = jmsConfig.getConnectionFactory();
         Connection connection = username != null

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.lang.reflect.Method;
 import java.security.Provider;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.dom.DOMSource;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.apache.cxf.attachment.AttachmentUtil;
@@ -49,6 +51,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
@@ -158,7 +161,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     }
 
     public void handleMessage(SoapMessage msg) throws Fault {
-        if (msg.containsKey(SECURITY_PROCESSED) || isGET(msg)) {
+        if (msg.containsKey(SECURITY_PROCESSED) || isGET(msg) || msg.getExchange() == null) {
             return;
         }
 
@@ -272,9 +275,17 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             Element elem =
                 WSSecurityUtil.getSecurityHeader(doc.getSOAPHeader(), actor, version.getVersion() != 1.1);
-
+            elem = (Element)DOMUtils.getDomElement(elem);
+            Node originalNode = null;
+            if (elem != null) {
+                originalNode = elem.cloneNode(true);
+            }
             WSHandlerResult wsResult = engine.processSecurityHeader(elem, reqData);
-
+            importNewDomToSAAJ(doc, elem, originalNode);
+            Element header = SAAJUtils.getHeader(doc);
+            Element body = SAAJUtils.getBody(doc);
+            header = (Element)DOMUtils.getDomElement(header);
+            body = (Element)DOMUtils.getDomElement(body);
             if (!(wsResult.getResults() == null || wsResult.getResults().isEmpty())) {
                 // security header found
                 if (reqData.isEnableSignatureConfirmation()) {
@@ -282,10 +293,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 }
 
                 checkActions(msg, reqData, wsResult.getResults(), actions, SAAJUtils.getBody(doc));
+
                 doResults(
                     msg, actor,
-                    SAAJUtils.getHeader(doc),
-                    SAAJUtils.getBody(doc),
+                    header,
+                    body,
                     wsResult, utWithCallbacks
                 );
             } else { // no security header found
@@ -302,18 +314,20 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     // security was not sufficient.
                     // checkActions(msg, reqData, wsResult, actions);
                     doResults(msg, actor,
-                              SAAJUtils.getHeader(doc),
-                              SAAJUtils.getBody(doc),
+                              header,
+                              body,
                               wsResult, utWithCallbacks);
                 } else {
                     checkActions(msg, reqData, wsResult.getResults(), actions, SAAJUtils.getBody(doc));
                     doResults(msg, actor,
-                              SAAJUtils.getHeader(doc),
-                              SAAJUtils.getBody(doc),
+                              header,
+                              body,
                               wsResult, utWithCallbacks);
                 }
             }
-            advanceBody(msg, SAAJUtils.getBody(doc));
+            if (SAAJUtils.getBody(doc) != null) {
+                advanceBody(msg, body);
+            }
             SAAJInInterceptor.replaceHeaders(doc, msg);
 
             if (doDebug) {
@@ -329,6 +343,43 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             throw new SoapFault(new Message("SAAJ_EX", LOG), e, version.getSender());
         } finally {
             reqData = null;
+        }
+    }
+    private void importNewDomToSAAJ(SOAPMessage doc, Element elem, Node originalNode) throws SOAPException {
+        if (DOMUtils.isJava9SAAJ()
+            && originalNode != null && !originalNode.isEqualNode(elem)) {
+            //ensure the new decrypted dom element could be imported into the SAAJ
+            Node node = null;
+            Document document = null;
+            Element body = SAAJUtils.getBody(doc);
+            if (body != null) {
+                document = body.getOwnerDocument();
+            }
+            if (elem != null && elem.getOwnerDocument() != null
+                && elem.getOwnerDocument().getDocumentElement() != null) {
+                node = elem.getOwnerDocument().
+                    getDocumentElement().getFirstChild().getNextSibling().getFirstChild();
+            }
+            if (document != null && node != null) {
+                Node newNode = null;
+                try {
+                    newNode = document.importNode(node, true);
+                    if (newNode != null) {
+                        try {
+                            Method method = newNode.getClass().getMethod("getDomElement");
+                            newNode = (Element)method.invoke(newNode);
+                        } catch (java.lang.NoSuchMethodException ex) {
+                            // do nothing;
+                        }
+                    }
+                    elem.getOwnerDocument().getDocumentElement().getFirstChild().
+                        getNextSibling().replaceChild(newNode, node);
+                } catch (Exception ex) {
+                    //just to the best try
+                }
+
+            }
+
         }
     }
 
