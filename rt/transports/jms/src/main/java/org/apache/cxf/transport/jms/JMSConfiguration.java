@@ -481,7 +481,7 @@ public class JMSConfiguration {
     
     public void resetCachedReplyDestination() {
         synchronized (this) {
-            this.replyDestination = null;
+            this.replyDestinationDest = null;
         }
     }
 
