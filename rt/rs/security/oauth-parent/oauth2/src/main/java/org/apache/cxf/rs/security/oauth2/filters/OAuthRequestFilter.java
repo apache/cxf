@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.filters;
 
 import java.security.Principal;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenValidation;
 import org.apache.cxf.rs.security.oauth2.common.AuthenticationMethod;
 import org.apache.cxf.rs.security.oauth2.common.OAuthContext;
@@ -56,6 +58,7 @@ import org.apache.cxf.rs.security.oauth2.utils.AuthorizationUtils;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthUtils;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.security.transport.TLSSessionInfo;
 
 /**
  * JAX-RS OAuth2 filter which can be used to protect the end-user endpoints
@@ -153,6 +156,15 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             LOG.warning(message);
             throw ExceptionUtils.toForbiddenException(null, null);
 
+        }
+        // Check Client Certificate Binding if any
+        String certThumbprint = accessTokenV.getExtraProps().get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256);
+        if (certThumbprint != null) {
+            TLSSessionInfo tlsInfo = getTlsSessionInfo();
+            X509Certificate cert = tlsInfo == null ? null : OAuthUtils.getRootTLSCertificate(tlsInfo);
+            if (!OAuthUtils.compareCertificateThumbprints(cert, certThumbprint)) { 
+                throw ExceptionUtils.toForbiddenException(null, null);
+            }
         }
 
         // Create the security context and make it available on the message
@@ -346,4 +358,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
         this.issuer = issuer;
     }
 
+    private TLSSessionInfo getTlsSessionInfo() {
+        return (TLSSessionInfo)getMessageContext().get(TLSSessionInfo.class.getName());
+    }
 }
