@@ -281,10 +281,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 }
 
                 checkActions(msg, reqData, wsResult.getResults(), actions, SAAJUtils.getBody(doc));
-<<<<<<< HEAD
-=======
-
->>>>>>> 0b7b183... NPE fix
                 doResults(
                     msg, actor, 
                     SAAJUtils.getHeader(doc),
@@ -334,48 +330,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             reqData = null;
         }
     }
-<<<<<<< HEAD
-    
-=======
-    private void importNewDomToSAAJ(SOAPMessage doc, Element elem, Node originalNode) throws SOAPException {
-        if (DOMUtils.isJava9SAAJ()
-            && originalNode != null && !originalNode.isEqualNode(elem)) {
-            //ensure the new decrypted dom element could be imported into the SAAJ
-            Node node = null;
-            Document document = null;
-            Element body = SAAJUtils.getBody(doc);
-            if (body != null) {
-                document = body.getOwnerDocument();
-            }
-            if (elem != null && elem.getOwnerDocument() != null
-                && elem.getOwnerDocument().getDocumentElement() != null) {
-                node = elem.getOwnerDocument().
-                    getDocumentElement().getFirstChild().getNextSibling().getFirstChild();
-            }
-            if (document != null && node != null) {
-                Node newNode = null;
-                try {
-                    newNode = document.importNode(node, true);
-                    if (newNode != null) {
-                        try {
-                            Method method = newNode.getClass().getMethod("getDomElement");
-                            newNode = (Element)method.invoke(newNode);
-                        } catch (java.lang.NoSuchMethodException ex) {
-                            // do nothing;
-                        }
-                    }
-                    elem.getOwnerDocument().getDocumentElement().getFirstChild().
-                        getNextSibling().replaceChild(newNode, node);
-                } catch (Exception ex) {
-                    //just to the best try
-                }
 
-            }
-
-        }
-    }
-
->>>>>>> 0b7b183... NPE fix
     private void configureAudienceRestriction(SoapMessage msg, RequestData reqData) {
         // Add Audience Restrictions for SAML
         boolean enableAudienceRestriction = 
