@@ -28,7 +28,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.annotations.Provider.Scope;
@@ -41,6 +43,7 @@ import org.apache.cxf.feature.Feature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +52,8 @@ import org.springframework.context.annotation.FilterType;
 
 @ComponentScan(
     includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION,
-                                           value = {Path.class,
+                                           value = {ApplicationPath.class,
+                                                    Path.class,
                                                     Provider.class,
                                                     org.apache.cxf.annotations.Provider.class})
 )
@@ -76,10 +80,11 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
     protected AbstractSpringComponentScanServer(Class<? extends Annotation> serviceAnnotation) {
         this.serviceAnnotation = serviceAnnotation;
     }
-    protected void setJaxrsResources(JAXRSServerFactoryBean factory) {
+    protected JAXRSServerFactoryBean setJaxrsResources(JAXRSServerFactoryBean factory) {
         boolean checkJaxrsRoots = checkJaxrsRoots();
         boolean checkJaxrsProviders = checkJaxrsProviders();
         boolean checkCxfProviders = checkCxfProviders();
+        boolean checkJaxrsApplications = checkJaxrsApplications();
 
         Set<String> componentScanPackagesSet = !StringUtils.isEmpty(componentScanPackages) 
             ? ClasspathScanner.parsePackages(componentScanPackages) : null;
@@ -87,7 +92,11 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
                 ? ClasspathScanner.parsePackages(componentScanBeans) : null;    
             
         for (String beanName : applicationContext.getBeanDefinitionNames()) {
-            if (checkJaxrsRoots 
+            if (checkJaxrsApplications
+                && isValidComponent(beanName, ApplicationPath.class, componentScanPackagesSet, componentScanBeansSet)) {
+                return ResourceUtils.createApplication(applicationContext.getBean(beanName, Application.class),
+                   false, false, false, factory.getBus());
+            } else if (checkJaxrsRoots
                 && isValidComponent(beanName, Path.class, componentScanPackagesSet, componentScanBeansSet)) {
                 SpringResourceFactory resourceFactory = new SpringResourceFactory(beanName);
                 resourceFactory.setApplicationContext(applicationContext);
@@ -129,7 +138,7 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
         factory.setFeatures(getFeatures());
         factory.setInInterceptors(getInInterceptors());
         factory.setOutInterceptors(getOutInterceptors());
-
+        return factory;
     }
 
     protected boolean isValidComponent(String beanName, 
@@ -210,6 +219,10 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
     }
 
     protected boolean checkJaxrsRoots() {
+        return true;
+    }
+
+    protected boolean checkJaxrsApplications() {
         return true;
     }
 
