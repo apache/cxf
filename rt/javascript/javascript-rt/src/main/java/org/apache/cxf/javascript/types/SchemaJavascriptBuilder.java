@@ -293,7 +293,6 @@ public class SchemaJavascriptBuilder {
             // application code is responsible for this.
             utils.appendLine("this._" + itemInfo.getJavascriptName() + " = null;");
         } else {
-
             if (itemInfo.getDefaultValue() == null) {
                 itemInfo.setDefaultValue(utils.getDefaultValueForSimpleType(itemInfo.getType()));
             }
@@ -361,7 +360,7 @@ public class SchemaJavascriptBuilder {
             String attrName = itemInfo.getJavascriptName();
             utils.startIf(attrPrefix + attrName + " !== null");
             utils.appendExpression("'" + attrName + "=\"' + " + attrPrefix + attrName + " + '\" '");
-            if (itemInfo.getDefaultValue() != null) {
+            if (itemInfo.getDefaultValue() != null && !itemInfo.isOptional()) {
                 utils.appendElse();
                 utils.appendExpression("'" + attrName + "=\"" + itemInfo.getDefaultValue() + "\" '");
             }
