@@ -74,6 +74,7 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
     private List<Feature> cxfFeatures = new LinkedList<Feature>();
     private List<Interceptor<? extends Message>> cxfInInterceptors = new LinkedList<Interceptor<?>>();
     private List<Interceptor<? extends Message>> cxfOutInterceptors = new LinkedList<Interceptor<?>>();
+    private List<Interceptor<? extends Message>> cxfOutFaultInterceptors = new LinkedList<Interceptor<?>>();
     private Class<? extends Annotation> serviceAnnotation;
 
     protected AbstractSpringComponentScanServer() {
@@ -178,7 +179,9 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
         factory.setFeatures(getFeatures());
         factory.setInInterceptors(getInInterceptors());
         factory.setOutInterceptors(getOutInterceptors());
+        factory.setOutFaultInterceptors(getOutFaultInterceptors());
     }
+    
     protected void addCxfProvidersFromClasses(Collection<Class<?>> classes) {
         List<Object> cxfProviders = JAXRSServerFactoryBeanDefinitionParser
             .createBeansFromDiscoveredClasses(applicationContext, classes, null);
@@ -251,9 +254,11 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
             cxfInInterceptors.add((Interceptor<?>)bean);
         } else if (ann.value() == org.apache.cxf.annotations.Provider.Type.OutInterceptor) {
             cxfOutInterceptors.add((Interceptor<?>)bean);
+        } else if (ann.value() == org.apache.cxf.annotations.Provider.Type.OutFaultInterceptor) {
+            cxfOutFaultInterceptors.add((Interceptor<?>)bean);
         }
-
     }
+    
     protected boolean matchesServiceAnnotation(String beanName) {
         return serviceAnnotation == null || isAnnotationAvailable(beanName, serviceAnnotation);
     }
