@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oauth2.utils;
 
 import java.lang.reflect.Method;
+import java.security.MessageDigest;
 import java.security.Principal;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -74,15 +75,27 @@ public final class OAuthUtils {
     private OAuthUtils() {
     }
 
+    public static byte[] createCertificateThumbprint(X509Certificate cert) throws Exception {
+        return MessageDigestUtils.createDigest(cert.getEncoded(), MessageDigestUtils.ALGO_SHA_256);
+    }
 
     public static void setCertificateThumbprintConfirmation(MessageContext mc, X509Certificate cert) {
         try {
-            byte[] thumbprint = 
-                MessageDigestUtils.createDigest(cert.getEncoded(), MessageDigestUtils.ALGO_SHA_256);
+            byte[] thumbprint = createCertificateThumbprint(cert);
             String encodedThumbprint = Base64UrlUtility.encode(thumbprint);
             mc.put(JoseConstants.HEADER_X509_THUMBPRINT_SHA256, encodedThumbprint);
         } catch (Exception ex) {
             throw new OAuthServiceException(ex);
+        }
+    }
+    
+    public static boolean compareCertificateThumbprints(X509Certificate cert, String encodedThumbprint) {
+        try {
+            byte[] thumbprint = createCertificateThumbprint(cert);
+            byte[] currentThumbprint = Base64UrlUtility.decode(encodedThumbprint);
+            return MessageDigest.isEqual(thumbprint, currentThumbprint);
+        } catch (Exception ex) {
+            return false;
         }
     }
     

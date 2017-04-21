@@ -161,7 +161,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     }
 
     public void handleMessage(SoapMessage msg) throws Fault {
-        if (msg.containsKey(SECURITY_PROCESSED) || isGET(msg)) {
+        if (msg.containsKey(SECURITY_PROCESSED) || isGET(msg) || msg.getExchange() == null) {
             return;
         }
 
@@ -293,7 +293,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 }
 
                 checkActions(msg, reqData, wsResult.getResults(), actions, SAAJUtils.getBody(doc));
-                                       
+
                 doResults(
                     msg, actor,
                     header,
@@ -370,16 +370,16 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                             newNode = (Element)method.invoke(newNode);
                         } catch (java.lang.NoSuchMethodException ex) {
                             // do nothing;
-                        } 
+                        }
                     }
                     elem.getOwnerDocument().getDocumentElement().getFirstChild().
                         getNextSibling().replaceChild(newNode, node);
                 } catch (Exception ex) {
                     //just to the best try
                 }
-                
+
             }
-            
+
         }
     }
 

@@ -56,12 +56,13 @@ public class DynamicRegistrationService {
     private int clientIdSizeInBytes = DEFAULT_CLIENT_ID_SIZE;
     private MessageContext mc;
     private boolean supportRegistrationAccessTokens = true;
+    private String userRole;
 
     @POST
     @Consumes("application/json")
     @Produces("application/json")
     public Response register(ClientRegistration request) {
-        checkInitialAccessToken();
+        checkInitialAuthentication();
         Client client = createNewClient(request);
         createRegAccessToken(client);
         clientProvider.setClient(client);
@@ -69,14 +70,27 @@ public class DynamicRegistrationService {
         return Response.status(201).entity(fromClientToRegistrationResponse(client)).build();
     }
 
-    protected void checkInitialAccessToken() {
+    protected void checkInitialAuthentication() {
         if (initialAccessToken != null) {
             String accessToken = getRequestAccessToken();
             if (!initialAccessToken.equals(accessToken)) {
                 throw ExceptionUtils.toNotAuthorizedException(null, null);
             }
+        } else {
+            checkSecurityContext();
         }
 
+    }
+    
+
+    protected void checkSecurityContext() {
+        SecurityContext sc = mc.getSecurityContext();
+        if (sc.getUserPrincipal() == null) {
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
+        }  
+        if (userRole != null && !sc.isUserInRole(userRole)) {
+            throw ExceptionUtils.toForbiddenException(null, null);
+        }
     }
 
     protected String createRegAccessToken(Client client) {
@@ -88,7 +102,7 @@ public class DynamicRegistrationService {
     protected void checkRegistrationAccessToken(Client c, String accessToken) {
         String regAccessToken = c.getProperties().get(ClientRegistrationResponse.REG_ACCESS_TOKEN);
 
-        if (!regAccessToken.equals(accessToken)) {
+        if (regAccessToken == null || !regAccessToken.equals(accessToken)) {
             throw ExceptionUtils.toNotAuthorizedException(null, null);
         }
     }
@@ -205,8 +219,12 @@ public class DynamicRegistrationService {
         if (grantTypes == null) {
             grantTypes = Collections.singletonList("authorization_code");
         }
+        
+        boolean passwordRequired = grantTypes.contains(OAuthConstants.AUTHORIZATION_CODE_GRANT)
+               || grantTypes.contains(OAuthConstants.RESOURCE_OWNER_GRANT)
+               || grantTypes.contains(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
 
-        // Client Type
+        // Application Type
         // https://tools.ietf.org/html/rfc7591 has no this property but
         // but http://openid.net/specs/openid-connect-registration-1_0.html#ClientMetadata does
         String appType = request.getApplicationType();
@@ -214,13 +232,12 @@ public class DynamicRegistrationService {
             appType = DEFAULT_APPLICATION_TYPE;
         }
         boolean isConfidential = DEFAULT_APPLICATION_TYPE.equals(appType)
-            && grantTypes.contains(OAuthConstants.AUTHORIZATION_CODE_GRANT);
+            && !grantTypes.contains(OAuthConstants.IMPLICIT_GRANT);
 
         // Client Secret
-        String clientSecret = isConfidential
-            ? generateClientSecret(request)
-            : null;
+        String clientSecret = passwordRequired ? generateClientSecret(request) : null;
 
+            
         Client newClient = new Client(clientId, clientSecret, isConfidential, clientName);
 
         newClient.setAllowedGrantTypes(grantTypes);
@@ -305,6 +322,7 @@ public class DynamicRegistrationService {
     }
 
     protected String getRequestAccessToken() {
+        // This call will throw 401 if no given authorization scheme exists
         return AuthorizationUtils.getAuthorizationParts(getMessageContext(),
                     Collections.singleton(OAuthConstants.BEARER_AUTHORIZATION_SCHEME))[1];
     }
@@ -323,5 +341,9 @@ public class DynamicRegistrationService {
 
     public void setSupportRegistrationAccessTokens(boolean supportRegistrationAccessTokens) {
         this.supportRegistrationAccessTokens = supportRegistrationAccessTokens;
+    }
+
+    public void setUserRole(String userRole) {
+        this.userRole = userRole;
     }
 }

@@ -52,43 +52,31 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
         assertEquals(401, r.getStatus());
     }
     @org.junit.Test
-    public void testRegisterClient() throws Exception {
-        doTestRegisterClient(null);
-    }
-    @org.junit.Test
-    public void testRegisterClientInitialAccessToken() throws Exception {
-        doTestRegisterClient("123456789");
-    }
-
-    private void doTestRegisterClient(String initialAccessToken) throws Exception {
+    public void testRegisterClientNoInitialAccessToken() throws Exception {
         URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
-        String address = "https://localhost:" + PORT + "/services";
-        if (initialAccessToken != null) {
-            address = address + "/dynamicWithAt/register";
-        } else {
-            address = address + "/dynamic/register";
-        }
+        String address = "https://localhost:" + PORT + "/services/dynamic/register";
+        WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
+                         busFile.toString());
+        wc.accept("application/json").type("application/json");
+         
+        assertEquals(401, wc.post(newClientRegistration()).getStatus());
+    }
+    
+    @org.junit.Test
+    public void testRegisterClientInitialAccessTokenCodeGrant() throws Exception {
+        URL busFile = OIDCDynamicRegistrationTest.class.getResource("client.xml");
+        String address = "https://localhost:" + PORT + "/services/dynamicWithAt/register";
         WebClient wc = WebClient.create(address, Collections.singletonList(new JsonMapObjectProvider()),
                          busFile.toString());
 
         wc.accept("application/json").type("application/json");
-        ClientRegistration reg = new ClientRegistration();
-        reg.setApplicationType("web");
-        reg.setScope("openid");
-        reg.setClientName("dynamic_client");
-        reg.setGrantTypes(Collections.singletonList("authorization_code"));
-        reg.setRedirectUris(Collections.singletonList("https://a/b/c"));
-        reg.setProperty("post_logout_redirect_uris", 
-                        Collections.singletonList("https://rp/logout")); 
+        ClientRegistration reg = newClientRegistration(); 
         ClientRegistrationResponse resp = null;
-        Response r = wc.post(reg);
-        if (initialAccessToken == null) {
-            resp = r.readEntity(ClientRegistrationResponse.class);
-        } else {
-            assertEquals(401, wc.get().getStatus());
-            wc.authorization(new ClientAccessToken("Bearer", initialAccessToken));
-            resp = wc.post(reg, ClientRegistrationResponse.class);
-        }
+        assertEquals(401, wc.post(reg).getStatus());
+        
+        wc.authorization(new ClientAccessToken("Bearer", "123456789"));
+        resp = wc.post(reg, ClientRegistrationResponse.class);
+        
         assertNotNull(resp.getClientId());
         assertNotNull(resp.getClientSecret());
         assertEquals(address + "/" + resp.getClientId(),
@@ -114,6 +102,18 @@ public class OIDCDynamicRegistrationTest extends AbstractBusClientServerTestBase
                      clientRegResp.getListStringProperty("post_logout_redirect_uris"));
 
         assertEquals(200, wc.delete().getStatus());
+    }
+
+    private ClientRegistration newClientRegistration() {
+        ClientRegistration reg = new ClientRegistration();
+        reg.setApplicationType("web");
+        reg.setScope("openid");
+        reg.setClientName("dynamic_client");
+        reg.setGrantTypes(Collections.singletonList("authorization_code"));
+        reg.setRedirectUris(Collections.singletonList("https://a/b/c"));
+        reg.setProperty("post_logout_redirect_uris", 
+                        Collections.singletonList("https://rp/logout"));
+        return reg;
     }
 
 }

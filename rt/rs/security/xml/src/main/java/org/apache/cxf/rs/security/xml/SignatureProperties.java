@@ -28,6 +28,7 @@ public class SignatureProperties {
     private String signatureKeyIdType;
     private String signatureKeyName;
     private Map<String, String> keyNameAliasMap;
+    private Integer signatureLocation;
 
     public void setSignatureAlgo(String signatureAlgo) {
         this.signatureAlgo = signatureAlgo;
@@ -79,4 +80,11 @@ public class SignatureProperties {
         this.keyNameAliasMap = keyNameAliasMap;
     }
 
+    public Integer getSignatureLocation() {
+        return signatureLocation;
+    }
+
+    public void setSignatureLocation(Integer signatureLocation) {
+        this.signatureLocation = signatureLocation;
+    }
 }
