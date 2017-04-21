@@ -20,6 +20,7 @@ package org.apache.cxf.transport.jms.util;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
@@ -36,14 +37,76 @@ import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.RedeliveryPolicy;
 import org.apache.activemq.pool.XaPooledConnectionFactory;
 import org.apache.geronimo.transaction.manager.GeronimoTransactionManager;
+import org.awaitility.Awaitility;
+import org.easymock.Capture;
 import org.junit.Assert;
 import org.junit.Test;
+
+
+import static org.easymock.EasyMock.capture;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.newCapture;
+import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
 
 public class MessageListenerTest {
 
     private static final String FAIL = "fail";
     private static final String FAILFIRST = "failfirst";
     private static final String OK = "ok";
+    
+    @Test
+    public void testConnectionProblem() throws JMSException {
+        Connection connection = createConnection("broker");
+        Queue dest = JMSUtil.createQueue(connection, "test");
+
+        MessageListener listenerHandler = new TestMessageListener();
+        ExceptionListener exListener = createMock(ExceptionListener.class);
+        
+        Capture<JMSException> captured = newCapture();
+        exListener.onException(capture(captured));
+        expectLastCall();
+        replay(exListener);
+
+        PollingMessageListenerContainer container = //
+            new PollingMessageListenerContainer(connection, dest, listenerHandler, exListener);
+        connection.close(); // Simulate connection problem
+        container.start();
+        Awaitility.await().until(() -> !container.isRunning());
+        verify(exListener);
+        JMSException ex = captured.getValue();
+        Assert.assertEquals("The connection is already closed", ex.getMessage());
+    }
+    
+    @Test
+    public void testConnectionProblemXA() throws JMSException, XAException, InterruptedException {
+        TransactionManager transactionManager = new GeronimoTransactionManager();
+        Connection connection = createXAConnection("brokerJTA", transactionManager);
+        Queue dest = JMSUtil.createQueue(connection, "test");
+
+        MessageListener listenerHandler = new TestMessageListener();
+        ExceptionListener exListener = createMock(ExceptionListener.class);
+        
+        Capture<JMSException> captured = newCapture();
+        exListener.onException(capture(captured));
+        expectLastCall();
+        replay(exListener);
+
+        PollingMessageListenerContainer container = //
+            new PollingMessageListenerContainer(connection, dest, listenerHandler, exListener);
+        container.setTransacted(false);
+        container.setAcknowledgeMode(Session.SESSION_TRANSACTED);
+        container.setTransactionManager(transactionManager);
+
+        connection.close(); // Simulate connection problem
+        container.start();
+        Awaitility.await().until(() -> !container.isRunning());
+        verify(exListener);
+        JMSException ex = captured.getValue();
+        // Closing the pooled connection will result in a NPE when using it
+        Assert.assertEquals("Wrapped exception. null", ex.getMessage());
+    }
 
     @Test
     public void testWithJTA() throws JMSException, XAException, InterruptedException {
@@ -52,11 +115,16 @@ public class MessageListenerTest {
         Queue dest = JMSUtil.createQueue(connection, "test");
 
         MessageListener listenerHandler = new TestMessageListener();
+        ExceptionListener exListener = new ExceptionListener() {
+            
+            @Override
+            public void onException(JMSException exception) {
+            }
+        };
         PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection, dest,
-                                                                                        listenerHandler);
+                                                                                        listenerHandler, exListener);
         container.setTransacted(false);
         container.setAcknowledgeMode(Session.SESSION_TRANSACTED);
-
         container.setTransactionManager(transactionManager);
         container.start();
 
