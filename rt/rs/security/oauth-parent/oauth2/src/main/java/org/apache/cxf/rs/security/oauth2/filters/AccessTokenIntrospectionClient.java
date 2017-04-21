@@ -94,6 +94,8 @@ public class AccessTokenIntrospectionClient implements AccessTokenValidator {
         if (response.getUsername() != null) {
             atv.setTokenSubject(new UserSubject(response.getUsername()));
         }
+        atv.getExtraProps().putAll(response.getExtensions());
+        
         return atv;
     }
 
