@@ -39,8 +39,10 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.oauth2.client.OAuthClientUtils;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.common.OAuthError;
@@ -126,7 +128,15 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
             if (!obj.getExtensions().isEmpty()) {
                 for (Map.Entry<String, String> entry : obj.getExtensions().entrySet()) {
                     sb.append(",");
-                    appendJsonPair(sb, entry.getKey(), entry.getValue());
+                    if (JoseConstants.HEADER_X509_THUMBPRINT_SHA256.equals(entry.getKey())) {
+                        StringBuilder cnfObj = new StringBuilder();
+                        cnfObj.append("{");
+                        appendJsonPair(sb, entry.getKey(), entry.getValue());
+                        cnfObj.append("}");
+                        appendJsonPair(sb, "cnf", cnfObj.toString(), false);
+                    } else {
+                        appendJsonPair(sb, entry.getKey(), entry.getValue());
+                    }
                 }
             }
         }
@@ -270,7 +280,14 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
         if (exp != null) {
             resp.setExp(exp);
         }
-        
+        Map<String, Object> cnf = CastUtils.cast((Map<?, ?>)params.get("cnf"));
+        if (cnf != null) {
+            String thumbprint = (String)cnf.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256);
+            if (thumbprint != null) {
+                resp.getExtensions().put(JoseConstants.HEADER_X509_THUMBPRINT_SHA256, thumbprint);
+            }
+        }
+
         return resp;
     }
 
