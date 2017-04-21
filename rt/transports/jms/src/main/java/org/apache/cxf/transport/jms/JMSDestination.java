@@ -118,19 +118,20 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
         Session session = null;
         try {
             connection = JMSFactory.createConnection(jmsConfig);
-            connection.setExceptionListener(new ExceptionListener() {
+            ExceptionListener exListener = new ExceptionListener() {
                 public void onException(JMSException exception) {
                     if (!shutdown) {
                         LOG.log(Level.WARNING, "Exception on JMS connection. Trying to reconnect", exception);
                         restartConnection();
                     }
                 }
-            });
+            };
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = jmsConfig.getTargetDestination(session);
 
             PollingMessageListenerContainer container = new PollingMessageListenerContainer(connection,
-                                                                                            destination, this);
+                                                                                            destination, 
+                                                                                            this, exListener);
             container.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
             container.setTransactionManager(jmsConfig.getTransactionManager());
             container.setMessageSelector(jmsConfig.getMessageSelector());
