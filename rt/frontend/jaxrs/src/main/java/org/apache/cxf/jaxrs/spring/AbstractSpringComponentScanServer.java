@@ -68,6 +68,8 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
     private List<Feature> cxfFeatures = new LinkedList<Feature>();
     private List<Interceptor<? extends Message>> cxfInInterceptors = new LinkedList<Interceptor<?>>();
     private List<Interceptor<? extends Message>> cxfOutInterceptors = new LinkedList<Interceptor<?>>();
+    private List<Interceptor<? extends Message>> cxfInFaultInterceptors = new LinkedList<Interceptor<?>>();
+    private List<Interceptor<? extends Message>> cxfOutFaultInterceptors = new LinkedList<Interceptor<?>>();
     private Class<? extends Annotation> serviceAnnotation;
 
     protected AbstractSpringComponentScanServer() {
@@ -76,6 +78,8 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
     protected AbstractSpringComponentScanServer(Class<? extends Annotation> serviceAnnotation) {
         this.serviceAnnotation = serviceAnnotation;
     }
+
+    @Override
     protected void setJaxrsResources(JAXRSServerFactoryBean factory) {
         boolean checkJaxrsRoots = checkJaxrsRoots();
         boolean checkJaxrsProviders = checkJaxrsProviders();
@@ -128,8 +132,9 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
         factory.setProviders(getJaxrsProviders());
         factory.setFeatures(getFeatures());
         factory.setInInterceptors(getInInterceptors());
+        factory.setInFaultInterceptors(getInFaultInterceptors());
         factory.setOutInterceptors(getOutInterceptors());
-
+        factory.setOutFaultInterceptors(getOutFaultInterceptors());
     }
 
     protected boolean isValidComponent(String beanName, 
@@ -191,6 +196,10 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
             cxfInInterceptors.add((Interceptor<?>)bean);
         } else if (ann.value() == org.apache.cxf.annotations.Provider.Type.OutInterceptor) {
             cxfOutInterceptors.add((Interceptor<?>)bean);
+        } else if (ann.value() == org.apache.cxf.annotations.Provider.Type.InFaultInterceptor) {
+            cxfInFaultInterceptors.add((Interceptor<?>)bean);
+        } else if (ann.value() == org.apache.cxf.annotations.Provider.Type.OutFaultInterceptor) {
+            cxfOutFaultInterceptors.add((Interceptor<?>)bean);
         }
 
     }
@@ -217,19 +226,33 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
         return resourceProviders;
     }
 
+    @Override
     protected List<Object> getJaxrsProviders() {
         return jaxrsProviders;
     }
+
     @Override
     public List<Feature> getFeatures() {
         return cxfFeatures;
     }
+
     @Override
     public List<Interceptor<? extends Message>> getInInterceptors() {
         return cxfInInterceptors;
     }
+
+    @Override
     public List<Interceptor<? extends Message>> getOutInterceptors() {
         return cxfOutInterceptors;
     }
 
+    @Override
+    public List<Interceptor<? extends Message>> getInFaultInterceptors() {
+        return cxfInFaultInterceptors;
+    }
+
+    @Override
+    public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
+        return cxfOutFaultInterceptors;
+    }
 }
