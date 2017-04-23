@@ -71,5 +71,20 @@ public abstract class AbstractBasicInterceptorProvider  implements InterceptorPr
         outFault.addAll(interceptors);
     }
 
+    protected void addInInterceptor(Interceptor<? extends Message> interceptor) {
+        in.add(interceptor);
+    }
+
+    protected void addInFaultInterceptor(Interceptor<? extends Message> interceptor) {
+        inFault.add(interceptor);
+    }
+
+    protected void addOutInterceptor(Interceptor<? extends Message> interceptor) {
+        out.add(interceptor);
+    }
+
+    protected void addOutFaultInterceptor(Interceptor<? extends Message> interceptor) {
+        outFault.add(interceptor);
+    }
 
 }
