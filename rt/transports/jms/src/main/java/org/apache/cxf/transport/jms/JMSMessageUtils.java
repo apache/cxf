@@ -296,7 +296,7 @@ final class JMSMessageUtils {
         JMSMessageUtils.prepareJMSMessageHeaderProperties(messageProperties, outMessage, jmsConfig);
         JMSMessageUtils.prepareJMSMessageProperties(messageProperties, outMessage,
                                                     jmsConfig.getTargetService(), jmsConfig.getRequestURI());
-        JMSMessageUtils.setJMSMessageProperties(jmsMessage, messageProperties);
+        messageProperties.writeTo(jmsMessage);
         jmsMessage.setJMSCorrelationID(correlationId);
         return jmsMessage;
     }
@@ -310,66 +310,6 @@ final class JMSMessageUtils {
             message.put(headerName, messageProperties);
         }
         return messageProperties;
-    }
-
-    /**
-     * @param jmsMessage
-     * @param messageProperties
-     */
-    static void setJMSMessageProperties(Message jmsMessage, JMSMessageHeadersType messageProperties)
-        throws JMSException {
-
-        if (messageProperties == null) {
-            return;
-        }
-
-        setProp(jmsMessage, JMSSpecConstants.TARGETSERVICE_FIELD, messageProperties.getSOAPJMSTargetService());
-        setProp(jmsMessage, JMSSpecConstants.BINDINGVERSION_FIELD, messageProperties.getSOAPJMSBindingVersion());
-        setProp(jmsMessage, JMSSpecConstants.CONTENTTYPE_FIELD, messageProperties.getSOAPJMSContentType());
-        setProp(jmsMessage, JMSSpecConstants.CONTENTENCODING_FIELD, messageProperties.getSOAPJMSContentEncoding());
-        setProp(jmsMessage, JMSSpecConstants.SOAPACTION_FIELD, messageProperties.getSOAPJMSSOAPAction());
-        setProp(jmsMessage, JMSSpecConstants.REQUESTURI_FIELD, messageProperties.getSOAPJMSRequestURI());
-
-        if (messageProperties.isSetSOAPJMSIsFault()) {
-            jmsMessage.setBooleanProperty(JMSSpecConstants.ISFAULT_FIELD, messageProperties
-                .isSOAPJMSIsFault());
-        }
-
-        if (messageProperties.isSetProperty()) {
-            for (JMSPropertyType prop : messageProperties.getProperty()) {
-                Object o = prop.getValue();
-                if (o != null) {
-                    Class<?> cls = o.getClass();
-                    if (cls == String.class) {
-                        jmsMessage.setStringProperty(prop.getName(), (String)o);
-                    } else if (cls == Integer.TYPE || cls == Integer.class) {
-                        jmsMessage.setIntProperty(prop.getName(), (Integer)o);
-                    } else if (cls == Double.TYPE || cls == Double.class) {
-                        jmsMessage.setDoubleProperty(prop.getName(), (Double)o);
-                    } else if (cls == Float.TYPE || cls == Float.class) {
-                        jmsMessage.setFloatProperty(prop.getName(), (Float)o);
-                    } else if (cls == Long.TYPE || cls == Long.class) {
-                        jmsMessage.setLongProperty(prop.getName(), (Long)o);
-                    } else if (cls == Boolean.TYPE || cls == Boolean.class) {
-                        jmsMessage.setBooleanProperty(prop.getName(), (Boolean)o);
-                    } else if (cls == Short.TYPE || cls == Short.class) {
-                        jmsMessage.setShortProperty(prop.getName(), (Short)o);
-                    } else if (cls == Byte.TYPE || cls == Byte.class) {
-                        jmsMessage.setShortProperty(prop.getName(), (Byte)o);
-                    } else {
-                        jmsMessage.setObjectProperty(prop.getName(), o);
-                    }
-                } else {
-                    jmsMessage.setStringProperty(prop.getName(), null);
-                }
-            }
-        }
-    }
-
-    private static void setProp(Message jmsMessage, String name, String value) throws JMSException {
-        if (value != null) {
-            jmsMessage.setStringProperty(name, value);
-        }
     }
 
     /**

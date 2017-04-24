@@ -21,6 +21,11 @@ package org.apache.cxf.transport.jms;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jms.JMSException;
+import javax.jms.Message;
+
+import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
+
 //CHECKSTYLE:OFF
 public class JMSMessageHeadersType {
     protected List<JMSPropertyType> property;
@@ -287,6 +292,37 @@ public class JMSMessageHeadersType {
 
     public boolean isSOAPJMSIsFault() {
         return soapjmsIsFault;
+    }
+
+    /**
+     * @param jmsMessage
+     * @param messageProperties
+     */
+    public void writeTo(Message jmsMessage)
+        throws JMSException {
+
+        setProp(jmsMessage, JMSSpecConstants.TARGETSERVICE_FIELD, soapjmsTargetService);
+        setProp(jmsMessage, JMSSpecConstants.BINDINGVERSION_FIELD, soapjmsBindingVersion);
+        setProp(jmsMessage, JMSSpecConstants.CONTENTTYPE_FIELD, soapjmsContentType);
+        setProp(jmsMessage, JMSSpecConstants.CONTENTENCODING_FIELD, soapjmsContentEncoding);
+        setProp(jmsMessage, JMSSpecConstants.SOAPACTION_FIELD, soapjmssoapAction);
+        setProp(jmsMessage, JMSSpecConstants.REQUESTURI_FIELD, soapjmsRequestURI);
+
+        if (isSetSOAPJMSIsFault()) {
+            jmsMessage.setBooleanProperty(JMSSpecConstants.ISFAULT_FIELD, isSOAPJMSIsFault());
+        }
+
+        if (isSetProperty()) {
+            for (JMSPropertyType prop : getProperty()) {
+                prop.writeTo(jmsMessage);
+            }
+        }
+    }
+    
+    private static void setProp(Message jmsMessage, String name, String value) throws JMSException {
+        if (value != null) {
+            jmsMessage.setStringProperty(name, value);
+        }
     }
 
 }
