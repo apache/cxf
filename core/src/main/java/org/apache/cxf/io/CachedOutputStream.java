@@ -25,13 +25,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -595,7 +595,7 @@ public class CachedOutputStream extends OutputStream {
     }
 
     private OutputStream createOutputStream(File file) throws IOException {
-        OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+        OutputStream out = new BufferedOutputStream(Files.newOutputStream(file.toPath()));
         if (cipherTransformation != null) {
             try {
                 if (ciphers == null) {
@@ -618,7 +618,7 @@ public class CachedOutputStream extends OutputStream {
     }
 
     private InputStream createInputStream(File file) throws IOException {
-        InputStream in = new FileInputStream(file);
+        InputStream in = Files.newInputStream(file.toPath());
         if (cipherTransformation != null) {
             in = new CipherInputStream(in, ciphers.getDecryptor()) {
                 boolean closed;
@@ -660,8 +660,8 @@ public class CachedOutputStream extends OutputStream {
             if (!transfered) {
                 // Data is in memory, or we failed to rename the file, try copying
                 // the stream instead.
-                try (FileOutputStream fout = new FileOutputStream(destinationFile)) {
-                    IOUtils.copyAndCloseInput(this, fout);
+                try (OutputStream out = Files.newOutputStream(destinationFile.toPath())) {
+                    IOUtils.copyAndCloseInput(this, out);
                 }
             }
         }

@@ -20,7 +20,8 @@
 package org.apache.cxf.tools.util;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.List;
 
 import javax.xml.XMLConstants;
@@ -127,17 +128,17 @@ public final class JAXBUtils {
         schemaBindings.appendChild(pkgElement);
         rootElement.appendChild(annoElement);
         File tmpFile = null;
-        FileOutputStream fout = null;
+        OutputStream out = null;
         try {
             tmpFile = FileUtils.createTempFile("customzied", ".xsd");
-            fout = new FileOutputStream(tmpFile);
-            StaxUtils.writeTo(rootElement, fout);
+            out = Files.newOutputStream(tmpFile.toPath());
+            StaxUtils.writeTo(rootElement, out);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (fout != null) {
+            if (out != null) {
                 try {
-                    fout.close();
+                    out.close();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

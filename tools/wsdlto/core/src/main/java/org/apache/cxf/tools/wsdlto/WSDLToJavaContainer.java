@@ -23,8 +23,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,6 +31,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -356,7 +355,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                                       (String)context.get(ToolConstants.CFG_CLIENT_JAR));
         JarOutputStream jarout = null;
         try {
-            jarout = new JarOutputStream(new FileOutputStream(clientJarFile), new Manifest());
+            jarout = new JarOutputStream(Files.newOutputStream(clientJarFile.toPath()), new Manifest());
             createClientJar(tmpDir, jarout);
             jarout.close();
         } catch (Exception e) {
@@ -392,7 +391,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     JarEntry entry = new JarEntry(name);
                     entry.setTime(file.lastModified());
                     jarout.putNextEntry(entry);
-                    InputStream input = new BufferedInputStream(new FileInputStream(file));
+                    InputStream input = new BufferedInputStream(Files.newInputStream(file.toPath()));
                     IOUtils.copy(input, jarout);
                     input.close();
                     jarout.closeEntry();
@@ -830,7 +829,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             }
             
             //change the import location in wsdl file
-            OutputStream wsdloutput = new BufferedOutputStream(new FileOutputStream(wsdlFile));
+            OutputStream wsdloutput = new BufferedOutputStream(Files.newOutputStream(wsdlFile.toPath()));
             WSDLWriter wsdlWriter = WSDLFactory.newInstance().newWSDLWriter();
             LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream();
             wsdlWriter.writeWSDL(def, bout);
@@ -848,7 +847,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                     
             for (Definition importDef : defs) {
                 File importWsdlFile = new File(outputdir, importWSDLMap.get(importDef.getTargetNamespace()));
-                OutputStream wsdlOs = new BufferedOutputStream(new FileOutputStream(importWsdlFile));
+                OutputStream wsdlOs = new BufferedOutputStream(Files.newOutputStream(importWsdlFile.toPath()));
                 bout = new LoadingByteArrayOutputStream();
                 wsdlWriter.writeWSDL(importDef, bout);
                 Element importEle = StaxUtils.read(bout.createInputStream()).getDocumentElement();

@@ -21,14 +21,16 @@ package org.apache.cxf.testutil.common;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -282,10 +284,10 @@ public class ServerLauncher {
 
         public void run() {
             String outputDir = System.getProperty("server.output.dir", "target/surefire-reports/");
-            FileOutputStream fos = null;
+            OutputStream os = null;
             try {
                 try {
-                    fos = new FileOutputStream(outputDir + className + ".out");
+                    os = Files.newOutputStream(Paths.get(outputDir + className + ".out"));
                 } catch (FileNotFoundException fex) {
                     outputDir = System.getProperty("basedir");
                     if (outputDir == null) {
@@ -296,15 +298,15 @@ public class ServerLauncher {
     
                     File file = new File(outputDir);
                     file.mkdirs();
-                    fos = new FileOutputStream(outputDir + className + ".out");
+                    os = Files.newOutputStream(Paths.get(outputDir + className + ".out"));
                 }
             } catch (IOException ex) {
                 if (!ex.getMessage().contains("Stream closed")) {
                     ex.printStackTrace();
                 }
             }
-            
-            try (PrintStream ps = new PrintStream(fos)) {
+
+            try (PrintStream ps = new PrintStream(os)) {
                 boolean running = true;
                 StringBuilder serverOutput = new StringBuilder();
                 for (int ch = in.read(); ch != -1; ch = in.read()) {

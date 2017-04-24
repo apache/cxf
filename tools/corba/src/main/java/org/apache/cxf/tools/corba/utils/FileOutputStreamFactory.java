@@ -21,9 +21,10 @@ package org.apache.cxf.tools.corba.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -152,7 +153,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
 
         addFileName(packageDirName + name);
 
-        return new FileOutputStream(dname + name);
+        return Files.newOutputStream(Paths.get(dname + name));
     }
 
 
@@ -166,7 +167,7 @@ public class FileOutputStreamFactory implements OutputStreamFactory {
             dname = dirName + name;
         }
 
-        return new FileOutputStream(dname);
+        return  Files.newOutputStream(Paths.get(dname));
     }
 
 

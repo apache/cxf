@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.maven_plugin.javatowadl;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import com.sun.javadoc.ClassDoc;
@@ -38,7 +40,7 @@ public final class DumpJavaDoc {
     
     public static boolean start(RootDoc root) throws IOException {
         String dumpFileName = readOptions(root.options());
-        FileOutputStream fos = new FileOutputStream(dumpFileName);
+        OutputStream os = Files.newOutputStream(Paths.get(dumpFileName));
         Properties javaDocMap = new Properties();
         for (ClassDoc classDoc : root.classes()) {
             javaDocMap.put(classDoc.toString(), classDoc.commentText());
@@ -62,9 +64,9 @@ public final class DumpJavaDoc {
             }
                 
         }
-        javaDocMap.store(fos, "");
-        fos.flush();
-        fos.close();
+        javaDocMap.store(os, "");
+        os.flush();
+        os.close();
         return true;
     }
     
