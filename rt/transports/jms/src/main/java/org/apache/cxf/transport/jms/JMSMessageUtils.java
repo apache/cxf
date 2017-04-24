@@ -25,7 +25,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -49,7 +48,6 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.util.JMSMessageConverter;
@@ -220,48 +218,6 @@ final class JMSMessageUtils {
             inMessage.put(org.apache.cxf.message.Message.ENCODING, getEncoding(contentType));
         }
 
-    }
-
-    /**
-     * Extract the property JMSXUserID or JMS_TIBCO_SENDER from the jms message and
-     * create a SecurityContext from it.
-     * For more info see Jira Issue CXF-2055
-     * {@link https://issues.apache.org/jira/browse/CXF-2055}
-     *
-     * @param message jms message to retrieve user information from
-     * @return SecurityContext that contains the user of the producer of the message as the Principal
-     * @throws JMSException if something goes wrong
-     */
-    public static SecurityContext buildSecurityContext(javax.jms.Message message,
-                                                        JMSConfiguration config) throws JMSException {
-        String tempUserName = message.getStringProperty("JMSXUserID");
-        if (tempUserName == null && config.isJmsProviderTibcoEms()) {
-            tempUserName = message.getStringProperty("JMS_TIBCO_SENDER");
-        }
-        if (tempUserName == null) {
-            return null;
-        }
-        final String jmsUserName = tempUserName;
-
-        final Principal principal = new Principal() {
-            public String getName() {
-                return jmsUserName;
-            }
-
-        };
-
-        SecurityContext securityContext = new SecurityContext() {
-
-            public Principal getUserPrincipal() {
-                return principal;
-            }
-
-            public boolean isUserInRole(String role) {
-                return false;
-            }
-
-        };
-        return securityContext;
     }
 
     static String getEncoding(String ct) throws UnsupportedEncodingException {
