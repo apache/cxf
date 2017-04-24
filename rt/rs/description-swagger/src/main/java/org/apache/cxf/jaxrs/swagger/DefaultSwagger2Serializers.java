@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
@@ -73,9 +74,10 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
             final MultivaluedMap<String, Object> headers,
             final OutputStream out) throws IOException {
 
+        MessageContext ctx = null;
+                                                   
         if (dynamicBasePath) {
-            MessageContext ctx = JAXRSUtils.createContextValue(
-                    JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
+            ctx = createMessageContext();
             String currentBasePath = StringUtils.substringBeforeLast(ctx.getHttpServletRequest().getRequestURI(), "/");
             if (!currentBasePath.equals(beanConfig.getBasePath())) {
                 data.setBasePath(currentBasePath);
@@ -87,6 +89,12 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
                 && data.getSecurityDefinitions() == null) {
                 data.setSecurityDefinitions(beanConfig.getSwagger().getSecurityDefinitions());
             }
+        }
+        if (data.getHost() == null) {
+            ctx = ctx == null ? createMessageContext() : ctx;
+            URI uri = ctx.getUriInfo().getAbsolutePath();
+            String authority = uri.getAuthority();
+            data.setHost(authority);
         }
 
         if (replaceTags || javadocProvider != null) {
@@ -156,6 +164,11 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
         }
 
         super.writeTo(data, type, genericType, annotations, mediaType, headers, out);
+    }
+
+    private MessageContext createMessageContext() {
+        return JAXRSUtils.createContextValue(
+                               JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
     }
 
     protected String getNormalizedPath(String classResourcePath, String operationResourcePath) {
