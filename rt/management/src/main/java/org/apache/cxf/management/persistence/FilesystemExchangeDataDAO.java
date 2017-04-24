@@ -19,8 +19,9 @@
 package org.apache.cxf.management.persistence;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
+import java.nio.file.Files;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -116,7 +117,7 @@ public class FilesystemExchangeDataDAO implements ExchangeDataDAO {
             }
         }
 
-        try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {
+        try (OutputStream fileOutputStream = Files.newOutputStream(file.toPath())) {
             fileOutputStream.write(stringWriter.getBuffer().toString().getBytes());
         }
 

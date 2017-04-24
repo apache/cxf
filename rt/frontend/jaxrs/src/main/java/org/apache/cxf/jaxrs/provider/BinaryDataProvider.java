@@ -22,8 +22,6 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,6 +32,7 @@ import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.security.DigestInputStream;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -123,9 +122,9 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
                                                   "jaxrs",
                                                   null,
                                                   true);
-                FileOutputStream fos = new FileOutputStream(f);
-                IOUtils.copy(is, fos, bufferSize);
-                fos.close();
+                OutputStream os = Files.newOutputStream(f.toPath());
+                IOUtils.copy(is, os, bufferSize);
+                os.close();
                 return clazz.cast(f);
             }
             if (StreamingOutput.class.isAssignableFrom(clazz)) {
@@ -166,7 +165,7 @@ public class BinaryDataProvider<T> extends AbstractConfigurableProvider
             copyInputToOutput((InputStream)o, os, annotations, headers);
         } else if (File.class.isAssignableFrom(o.getClass())) {
             copyInputToOutput(new BufferedInputStream(
-                    new FileInputStream((File)o)), os, annotations, headers);
+                    Files.newInputStream(((File)o).toPath())), os, annotations, headers);
         } else if (byte[].class.isAssignableFrom(o.getClass())) {
             copyInputToOutput(new ByteArrayInputStream((byte[])o), os, annotations, headers);
         } else if (Reader.class.isAssignableFrom(o.getClass())) {

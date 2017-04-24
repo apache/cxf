@@ -22,7 +22,6 @@ package org.apache.cxf.helpers;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,6 +31,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 
 import org.apache.cxf.io.CopyingOutputStream;
 import org.apache.cxf.io.Transferable;
@@ -274,8 +274,8 @@ public final class IOUtils {
         if (Transferable.class.isAssignableFrom(inputStream.getClass())) {
             ((Transferable)inputStream).transferTo(destinationFile);
         } else {
-            try (FileOutputStream fout = new FileOutputStream(destinationFile)) {
-                copyAndCloseInput(inputStream, fout);
+            try (OutputStream out = Files.newOutputStream(destinationFile.toPath())) {
+                copyAndCloseInput(inputStream, out);
             }
         }
     }

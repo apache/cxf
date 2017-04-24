@@ -19,7 +19,6 @@
 package org.apache.cxf.endpoint.dynamic;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -32,6 +31,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -287,7 +287,7 @@ public class DynamicClientFactory {
     static class DynamicClientImpl extends ClientImpl implements AutoCloseable {
         final ClassLoader cl;
         final ClassLoader orig;
-        DynamicClientImpl(Bus bus, Service svc, QName port, 
+        DynamicClientImpl(Bus bus, Service svc, QName port,
                           EndpointImplFactory endpointImplFactory,
                           ClassLoader l) {
             super(bus, svc, port, endpointImplFactory);
@@ -302,7 +302,7 @@ public class DynamicClientFactory {
             }
         }
     }
-    
+
     public Client createClient(String wsdlUrl, QName service,
                                ClassLoader classLoader, QName port,
                                List<String> bindingFiles) {
@@ -553,7 +553,7 @@ public class DynamicClientFactory {
                         continue;
                     }
                     if (key.startsWith("file:")) {
-                        in = new FileInputStream(new File(new URI(key)));
+                        in = Files.newInputStream(new File(new URI(key)).toPath());
                     } else {
                         in = new URL(key).openStream();
                     }
@@ -799,7 +799,7 @@ public class DynamicClientFactory {
             if (systemId != null) {
                 File file = new File(baseURI, systemId);
                 if (file.exists()) {
-                    return new InputSource(new FileInputStream(file));
+                    return new InputSource(Files.newInputStream(file.toPath()));
                 } else {
                     return new InputSource(systemId);
                 }

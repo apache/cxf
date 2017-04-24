@@ -21,8 +21,8 @@ package org.apache.cxf.configuration.jsse;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -96,7 +96,7 @@ public final class SSLUtils {
         String location = getKeystore(null, log);
         String keyStorePassword = getKeystorePassword(null, log);
         String keyPassword = getKeyPassword(null, log);
-        FileInputStream fis = null;
+        InputStream is = null;
 
         try {
             File file = new File(location);
@@ -105,8 +105,8 @@ public final class SSLUtils {
                     KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
                 KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
 
-                fis = new FileInputStream(file);
-                ks.load(fis, (keyStorePassword != null) ? keyStorePassword.toCharArray() : null);
+                is = Files.newInputStream(file.toPath());
+                ks.load(is, (keyStorePassword != null) ? keyStorePassword.toCharArray() : null);
                 kmf.init(ks, (keyPassword != null) ? keyPassword.toCharArray() : null);
                 defaultManagers = kmf.getKeyManagers();
             } else {
@@ -117,9 +117,9 @@ public final class SSLUtils {
             log.log(Level.WARNING, "Default key managers cannot be initialized: " + e.getMessage(), e);
             defaultManagers = new KeyManager[0];
         } finally {
-            if (fis != null) {
+            if (is != null) {
                 try {
-                    fis.close();
+                    is.close();
                 } catch (IOException e) {
                     log.warning("Keystore stream cannot be closed: " + e.getMessage());
                 }
@@ -454,7 +454,7 @@ public final class SSLUtils {
         LogUtils.log(log, Level.FINE, logMsg, trustStoreType);
         return trustStoreType;
     }
-    
+
     public static String getTruststorePassword(String trustStorePassword,
                                              Logger log) {
         String logMsg = null;
@@ -470,7 +470,7 @@ public final class SSLUtils {
         LogUtils.log(log, Level.FINE, logMsg);
         return trustStorePassword;
     }
-    
+
     public static String getTruststoreProvider(String trustStoreProvider, Logger log) {
         String logMsg = null;
         if (trustStoreProvider != null) {
