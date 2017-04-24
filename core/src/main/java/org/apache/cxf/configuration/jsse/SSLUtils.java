@@ -22,11 +22,12 @@ package org.apache.cxf.configuration.jsse;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -246,7 +247,7 @@ public final class SSLUtils {
                              new Object[]{trustStoreLocation, e.getMessage()});
             } 
         } else {
-            try (FileInputStream trustStoreInputStream = new FileInputStream(trustStoreLocation)) {
+            try (InputStream trustStoreInputStream = Files.newInputStream(Paths.get(trustStoreLocation))) {
                 trustedCertStore.load(trustStoreInputStream, null);
             }
         }
