@@ -129,7 +129,7 @@ public class WebClient extends AbstractClient {
     
     /**
      * Creates WebClient
-     * @param baseURI baseURI
+     * @param baseAddress baseURI
      * @param providers list of providers
      */
     public static WebClient create(String baseAddress, List<?> providers) {
@@ -138,8 +138,9 @@ public class WebClient extends AbstractClient {
     
     /**
      * Creates WebClient
-     * @param baseURI baseURI
+     * @param baseAddress baseURI
      * @param providers list of providers
+     * @param threadSafe if true ThreadLocalClientState is used
      */
     public static WebClient create(String baseAddress, List<?> providers, boolean threadSafe) {
         JAXRSClientFactoryBean bean = getBean(baseAddress, null);
@@ -152,7 +153,7 @@ public class WebClient extends AbstractClient {
     
     /**
      * Creates a thread safe WebClient
-     * @param baseURI baseURI
+     * @param baseAddress baseURI
      * @param providers list of providers
      * @param timeToKeepState time to keep this thread safe state.
      */
@@ -245,7 +246,7 @@ public class WebClient extends AbstractClient {
     
     /**
      * Creates WebClient, baseURI will be set to Client currentURI
-     * @param client existing client
+     * @param object existing client object
      */
     public static WebClient fromClientObject(Object object) {
         Client client = client(object);
@@ -567,7 +568,6 @@ public class WebClient extends AbstractClient {
     /**
      * Posts the object and returns a collection of typed objects
      * @param body request body
-     * @param memberClass type of collection member class
      * @param responseClass expected type of response object
      * @return JAX-RS Response
      */
@@ -589,8 +589,7 @@ public class WebClient extends AbstractClient {
     }
     
     /**
-     * Does HTTP GET invocation and returns a collection of typed objects 
-     * @param body request body, can be null
+     * Does HTTP GET invocation and returns a collection of typed objects
      * @param memberClass expected type of collection member class
      * @return typed collection
      */
@@ -600,7 +599,6 @@ public class WebClient extends AbstractClient {
     
     /**
      * Does HTTP GET invocation and returns typed response object
-     * @param body request body, can be null
      * @param responseClass expected type of response object
      * @return typed object, can be null. Response status code and headers 
      *         can be obtained too, see Client.getResponse()
@@ -775,8 +773,9 @@ public class WebClient extends AbstractClient {
     
     /**
      * Replaces the current query with the new value.
-     * @param queryString the new value, providing a null is
-     *        equivalent to calling resetQuery().  
+     * @param queryParam query param name
+     * @param value the new value, providing a null is
+     *        equivalent to calling resetQuery().
      * @return updated WebClient
      */
     public WebClient replaceQueryParam(String queryParam, Object... value) {
