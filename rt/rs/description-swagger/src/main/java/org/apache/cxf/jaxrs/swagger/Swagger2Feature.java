@@ -443,7 +443,10 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     @Priority(Priorities.USER)
     protected static class SwaggerUIResourceFilter implements ContainerRequestFilter {
         private static final Pattern PATTERN =
-            Pattern.compile(".*[.]js|/css/.*|/images/.*|/lib/.*|.*ico|/fonts/.*");
+            Pattern.compile(
+                  ".*js|.*gz|.*map|oauth2*[.]html|.*png|.*css|.*ico|"
+                  + "/css/.*|/images/.*|/lib/.*|/fonts/.*"
+            );
 
         @Override
         public void filter(ContainerRequestContext rc) throws IOException {
