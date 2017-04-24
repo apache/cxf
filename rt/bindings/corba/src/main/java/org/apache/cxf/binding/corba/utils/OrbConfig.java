@@ -20,12 +20,13 @@
 package org.apache.cxf.binding.corba.utils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -182,7 +183,7 @@ public class OrbConfig {
         } else {
             f = new File(iorFile);
         }
-        try (FileOutputStream file = new FileOutputStream(f);
+        try (OutputStream file = Files.newOutputStream(f.toPath());
             PrintWriter out = new PrintWriter(file)) {
             out.println(ref);
             out.flush();

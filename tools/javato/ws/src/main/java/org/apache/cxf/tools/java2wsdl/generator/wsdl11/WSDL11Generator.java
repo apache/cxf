@@ -22,11 +22,11 @@ package org.apache.cxf.tools.java2wsdl.generator.wsdl11;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,7 +96,7 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
                     } else {
                         wsdlFile = new File(outputdir, wsdlDef.getQName().getLocalPart() + ".wsdl");
                     }
-                    try (OutputStream wsdlOs = new BufferedOutputStream(new FileOutputStream(wsdlFile))) {
+                    try (OutputStream wsdlOs = new BufferedOutputStream(Files.newOutputStream(wsdlFile.toPath()))) {
                         wsdlWriter.writeWSDL(wsdlDef, wsdlOs);
                     }
                 }

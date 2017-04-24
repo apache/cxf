@@ -19,11 +19,11 @@
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -591,7 +591,7 @@ public final class CustomizationParser {
         InputSource result = null;
         ele.setAttributeNS(null, "schemaLocation", schemaLoc);
         File tmpFile = FileUtils.createTempFile("jaxbbinding", ".xml");
-        StaxUtils.writeTo(ele, new FileOutputStream(tmpFile));
+        StaxUtils.writeTo(ele, Files.newOutputStream(tmpFile.toPath()));
         result = new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
         tmpFile.deleteOnExit();
         return result;

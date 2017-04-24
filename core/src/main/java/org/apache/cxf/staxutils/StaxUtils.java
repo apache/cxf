@@ -20,7 +20,6 @@
 package org.apache.cxf.staxutils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,6 +28,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -1160,7 +1160,7 @@ public final class StaxUtils {
         }
     }
     public static Document read(File is) throws XMLStreamException, IOException {
-        try (InputStream fin = new FileInputStream(is)) {
+        try (InputStream fin = Files.newInputStream(is.toPath())) {
             return read(fin);
         }
     }

@@ -18,10 +18,11 @@
  */
 package org.apache.cxf.configuration.jsse;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -147,7 +148,7 @@ public final class TLSParameterJaxBUtils {
                     : KeyStore.getInstance(type, provider);
 
         if (kst.isSetFile()) {
-            try (FileInputStream kstInputStream = new FileInputStream(kst.getFile())) {
+            try (InputStream kstInputStream = Files.newInputStream(Paths.get(kst.getFile()))) {
                 keyStore.load(kstInputStream, password);
             }
         } else if (kst.isSetResource()) {
@@ -164,7 +165,7 @@ public final class TLSParameterJaxBUtils {
         } else {
             String loc = SSLUtils.getKeystore(null, LOG);
             if (loc != null) {
-                try (InputStream ins = new FileInputStream(loc)) {
+                try (InputStream ins = Files.newInputStream(Paths.get(loc))) {
                     keyStore.load(ins, password);
                 }
             }
@@ -188,7 +189,8 @@ public final class TLSParameterJaxBUtils {
             type = KeyStore.getDefaultType();
         }
         if (pst.isSetFile()) {
-            return createTrustStore(new FileInputStream(pst.getFile()), type);
+            InputStream is = Files.newInputStream(Paths.get(pst.getFile()));
+            return createTrustStore(is, type);
         }
         if (pst.isSetResource()) {
             final InputStream is = getResourceAsStream(pst.getResource());

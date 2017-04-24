@@ -27,10 +27,10 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.Iterator;
 
 import javax.activation.ActivationDataFlavor;
@@ -98,7 +98,7 @@ public class ImageDataContentHandler implements DataContentHandler {
         } else if (obj instanceof InputStream) {
             IOUtils.copyAndCloseInput((InputStream)obj, os);
         } else if (obj instanceof File) {
-            FileInputStream file = new FileInputStream((File)obj);
+            InputStream file = Files.newInputStream(((File)obj).toPath());
             IOUtils.copyAndCloseInput(file, os);
         } else {
             throw new IOException("Attachment type not spported " + obj.getClass());                    

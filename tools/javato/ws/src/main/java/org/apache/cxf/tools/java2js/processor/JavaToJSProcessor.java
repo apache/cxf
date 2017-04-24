@@ -22,10 +22,11 @@ package org.apache.cxf.tools.java2js.processor;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -84,12 +85,12 @@ public class JavaToJSProcessor implements Processor {
         Collection<SchemaInfo> schemata = serviceInfo.getSchemas();
         BufferedWriter writer = null;
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(jsFile);
+            OutputStream outputStream = Files.newOutputStream(jsFile.toPath());
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
-                JavascriptGetInterceptor.writeUtilsToResponseStream(JavaToJSProcessor.class, fileOutputStream);
+                JavascriptGetInterceptor.writeUtilsToResponseStream(JavaToJSProcessor.class, outputStream);
             }
 
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UTF8);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, UTF8);
             writer = new BufferedWriter(outputStreamWriter);
 
             for (SchemaInfo schema : schemata) {

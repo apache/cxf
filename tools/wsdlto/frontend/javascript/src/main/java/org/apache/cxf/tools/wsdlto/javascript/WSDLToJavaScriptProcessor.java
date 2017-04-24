@@ -23,10 +23,11 @@ package org.apache.cxf.tools.wsdlto.javascript;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -71,13 +72,13 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
 
         BufferedWriter writer = null;
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(jsFile);
+            OutputStream outputStream = Files.newOutputStream(jsFile.toPath());
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
-                JavascriptGetInterceptor.writeUtilsToResponseStream(WSDLToJavaScriptProcessor.class, 
-                                                                  fileOutputStream);
+                JavascriptGetInterceptor.writeUtilsToResponseStream(WSDLToJavaScriptProcessor.class,
+                                                                    outputStream);
             }
-            
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UTF8);
+
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(outputStream, UTF8);
             writer = new BufferedWriter(outputStreamWriter);
             
             XmlSchemaCollection collection = serviceInfo.getXmlSchemaCollection().getXmlSchemaCollection();
