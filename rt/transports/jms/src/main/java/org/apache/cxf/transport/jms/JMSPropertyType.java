@@ -19,32 +19,20 @@
 package org.apache.cxf.transport.jms;
 
 public class JMSPropertyType {
-    protected String name;
-    protected Object value;
+    private String name;
+    private Object value;
+    
+    public JMSPropertyType(String name, Object value) {
+        this.name = name;
+        this.value = value;
+    }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public boolean isSetName() {
-        return this.name != null;
-    }
-
     public Object getValue() {
         return value;
     }
-
-    public void setValue(Object value) {
-        this.value = value;
-    }
-
-    public boolean isSetValue() {
-        return this.value != null;
-    }
-    
 }
 

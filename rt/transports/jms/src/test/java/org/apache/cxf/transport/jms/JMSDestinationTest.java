@@ -259,9 +259,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
         final Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage, null);
 
-        JMSPropertyType excludeProp = new JMSPropertyType();
-        excludeProp.setName(customPropertyName);
-        excludeProp.setValue(customPropertyName);
+        JMSPropertyType excludeProp = new JMSPropertyType(customPropertyName, customPropertyName);
 
         JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
             .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);

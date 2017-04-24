@@ -58,9 +58,7 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
         //System.out.println("Reached here :" + me);
 
         // set reply header custom property
-        JMSPropertyType testProperty = new JMSPropertyType();
-        testProperty.setName("Test_Prop");
-        testProperty.setValue("some return value "  + me);
+        JMSPropertyType testProperty = new JMSPropertyType("Test_Prop", "some return value "  + me);
 
         //System.out.println("found property in request headers at index: "
         //                   + headers.getProperty().indexOf(testProperty));

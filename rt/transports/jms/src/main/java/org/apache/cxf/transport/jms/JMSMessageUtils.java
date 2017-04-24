@@ -135,10 +135,7 @@ final class JMSMessageUtils {
         while (enm.hasMoreElements()) {
             String name = enm.nextElement();
             String val = message.getStringProperty(name);
-            JMSPropertyType prop = new JMSPropertyType();
-            prop.setName(name);
-            prop.setValue(val);
-            props.add(prop);
+            props.add(new JMSPropertyType(name, val));
 
             protHeaders.put(name, Collections.singletonList(val));
             if (name.equals(org.apache.cxf.message.Message.CONTENT_TYPE)
@@ -498,28 +495,25 @@ final class JMSMessageUtils {
         }
         if (headers != null) {
             for (Map.Entry<String, List<String>> ent : headers.entrySet()) {
-                JMSPropertyType prop = asJmsProperty(ent);
+                JMSPropertyType prop = asJmsProperty(ent.getKey(), ent.getValue());
                 messageProperties.getProperty().add(prop);
             }
         }
     }
 
-    private static JMSPropertyType asJmsProperty(Map.Entry<String, List<String>> ent) {
-        JMSPropertyType prop = new JMSPropertyType();
-        prop.setName(ent.getKey());
-        if (ent.getValue().size() > 1) {
-            StringBuilder b = new StringBuilder();
-            for (String s : ent.getValue()) {
-                if (b.length() > 0) {
-                    b.append(',');
-                }
-                b.append(s);
+    private static JMSPropertyType asJmsProperty(String key, List<String> value) {
+        return new JMSPropertyType(key, join(value, ','));
+    }
+    
+    private static String join(List<String> valueList, char seperator) {
+        StringBuilder b = new StringBuilder();
+        for (String s : valueList) {
+            if (b.length() > 0) {
+                b.append(seperator);
             }
-            prop.setValue(b.toString());
-        } else {
-            prop.setValue(ent.getValue().get(0));
+            b.append(s);
         }
-        return prop;
+        return b.toString();
     }
 
     private static String getSoapAction(JMSMessageHeadersType messageProperties,
@@ -558,9 +552,7 @@ final class JMSMessageUtils {
                                                   String key) {
         Object value = message.get(key);
         if (value != null) {
-            JMSPropertyType prop = new JMSPropertyType();
-            prop.setName(key);
-            prop.setValue(value.toString());
+            JMSPropertyType prop = new JMSPropertyType(key, value.toString());
             messageProperties.getProperty().add(prop);
         }
     }
