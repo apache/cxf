@@ -97,7 +97,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     /**
      * Sets the time a thread-local client state will be kept.
      * This property is ignored for thread-unsafe clients
-     * @param secondsToKeepState
+     * @param time secondsToKeepState
      */
     public void setSecondsToKeepState(long time) {
         this.timeToKeepState = time;
@@ -161,8 +161,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     }
 
     /**
-     * Sets the resource class, may be called from a Spring handler
-     * @param cls the resource class
+     * Sets the service class, may be called from a Spring handler
+     * @param cls the service class
      */
     public void setServiceClass(Class<?> cls) {
         this.serviceClass = cls;
@@ -171,7 +171,6 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
 
     /**
      * Returns the service class
-     * @param cls the service class
      */
     public Class<?> getServiceClass() {
         return serviceClass;
