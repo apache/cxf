@@ -42,6 +42,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
                                     null);
         client1.getAllowedGrantTypes().add("custom_grant");
         registerCert(client1);
+        this.setClient(client1);
         
         Client client2 = new Client("bound",
                                    null,
