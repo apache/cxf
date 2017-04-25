@@ -22,10 +22,12 @@ package org.apache.cxf.helpers;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.nio.channels.Channels;
+import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
 
 import org.apache.cxf.io.Transferable;
 
@@ -60,14 +62,14 @@ public class LoadingByteArrayOutputStream extends ByteArrayOutputStream {
 
         @Override
         public void transferTo(File file) throws IOException {
-            FileOutputStream fout = new FileOutputStream(file);
-            FileChannel channel = fout.getChannel();
-            ByteBuffer bb = ByteBuffer.wrap(buf, 0, count); 
+            OutputStream out = Files.newOutputStream(file.toPath());
+            WritableByteChannel channel = Channels.newChannel(out);
+            ByteBuffer bb = ByteBuffer.wrap(buf, 0, count);
             while (bb.hasRemaining()) {
                 channel.write(bb);
             }
             channel.close();
-            fout.close();
+            out.close();
         }
         
     }
