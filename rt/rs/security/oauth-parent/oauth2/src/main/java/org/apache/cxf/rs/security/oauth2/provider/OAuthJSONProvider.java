@@ -131,7 +131,7 @@ public class OAuthJSONProvider implements MessageBodyWriter<Object>,
                     if (JoseConstants.HEADER_X509_THUMBPRINT_SHA256.equals(entry.getKey())) {
                         StringBuilder cnfObj = new StringBuilder();
                         cnfObj.append("{");
-                        appendJsonPair(sb, entry.getKey(), entry.getValue());
+                        appendJsonPair(cnfObj, entry.getKey(), entry.getValue());
                         cnfObj.append("}");
                         appendJsonPair(sb, "cnf", cnfObj.toString(), false);
                     } else {
