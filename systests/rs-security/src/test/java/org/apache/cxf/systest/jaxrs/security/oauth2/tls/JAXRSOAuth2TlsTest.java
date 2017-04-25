@@ -35,6 +35,7 @@ import org.apache.cxf.rs.security.oauth2.common.AccessTokenGrant;
 import org.apache.cxf.rs.security.oauth2.common.ClientAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
+import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -53,16 +54,21 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testTwoWayTLSClientIdIsSubjectDn() throws Exception {
         String address = "https://localhost:" + PORT + "/oauth2/token";
-        WebClient wc = createWebClient(address);
+        WebClient wc = createOAuth2WebClient(address);
 
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, new CustomGrant());
         assertNotNull(at.getTokenKey());
+        
+        String rsAddress = "https://localhost:" + PORT + "/rs/bookstore/books/123";
+        WebClient wcRs = createRsWebClient(rsAddress, at);
+        Book book = wcRs.get(Book.class);
+        assertEquals(123L, book.getId());
     }
     
     @Test
     public void testTwoWayTLSClientIdBound() throws Exception {
         String address = "https://localhost:" + PORT + "/oauth2/token";
-        WebClient wc = createWebClient(address);
+        WebClient wc = createOAuth2WebClient(address);
 
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
                                         new Consumer("bound"),
@@ -73,7 +79,7 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testTwoWayTLSClientUnbound() throws Exception {
         String address = "https://localhost:" + PORT + "/oauth2/token";
-        WebClient wc = createWebClient(address);
+        WebClient wc = createOAuth2WebClient(address);
         try {
             OAuthClientUtils.getAccessToken(wc,
                                             new Consumer("unbound"),
@@ -86,7 +92,7 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
     }
     
 
-    private WebClient createWebClient(String address) {
+    private WebClient createOAuth2WebClient(String address) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
 
@@ -97,6 +103,20 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
 
         WebClient wc = bean.createWebClient();
         wc.type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_JSON);
+        return wc;
+    }
+    private WebClient createRsWebClient(String address, ClientAccessToken at) {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSOAuth2TlsTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+
+        WebClient wc = bean.createWebClient();
+        wc.accept(MediaType.APPLICATION_XML);
+        wc.authorization(at);
         return wc;
     }
 
