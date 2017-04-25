@@ -24,8 +24,10 @@ under the License.
     xmlns:sec="http://cxf.apache.org/configuration/security" 
     xmlns:cxf="http://cxf.apache.org/core" 
     xmlns:jaxrs="http://cxf.apache.org/jaxrs" 
+    xmlns:jaxrs-client="http://cxf.apache.org/jaxrs-client"
     xmlns:util="http://www.springframework.org/schema/util"
     xsi:schemaLocation="http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+             http://cxf.apache.org/jaxrs-client http://cxf.apache.org/schemas/jaxrs-client.xsd
              http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
              http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
              http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-4.2.xsd
@@ -45,7 +47,7 @@ under the License.
 	<util:list id="busProviders"> 
 		<ref bean="oauthJson"/> 
 	</util:list> 
-    <httpj:engine-factory id="port-9095-tls-config">
+    <httpj:engine-factory id="client-server-tls-config">
         <httpj:engine port="${testutil.ports.jaxrs-oauth2-tls}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
@@ -61,9 +63,12 @@ under the License.
     <bean id="customGrantHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.grants.CustomGrantHandler">
         <property name="dataProvider" ref="dataProvider"/>
     </bean>
+    
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     <bean id="dataProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.tls.OAuthDataProviderImpl"/>
-    <bean id="accessTokenService" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
+    <bean id="rsService" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
+    
+    <bean id="accessTokenService1" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
         <property name="dataProvider" ref="dataProvider"/>
         <property name="grantHandlers">
             <list>
@@ -72,10 +77,53 @@ under the License.
         </property>
     </bean>
     
-    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/oauth2">
+    <bean id="tokenValidatorService1" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenValidatorService">
+       <property name="dataProvider" ref="dataProvider"/>
+       <property name="blockUnauthorizedRequests" value="false"/>
+    </bean>
+    
+    <jaxrs:server id="tokenServer1" address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/oauth2">
         <jaxrs:serviceBeans>
-            <ref bean="accessTokenService"/>
+            <ref bean="accessTokenService1"/>
+            <ref bean="tokenValidatorService1"/>
         </jaxrs:serviceBeans>
     </jaxrs:server>
     
+    <jaxrs-client:client id="tokenValidatorClient1" 
+        address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/oauth2/validate" 
+        serviceClass="org.apache.cxf.jaxrs.client.WebClient">
+        <jaxrs-client:headers>
+            <entry key="Accept" value="application/xml"/>
+            <entry key="Content-Type" value="application/x-www-form-urlencoded"/>
+         </jaxrs-client:headers>
+    </jaxrs-client:client>
+    
+   <bean id="tokenValidator1" class="org.apache.cxf.rs.security.oauth2.filters.AccessTokenValidatorClient">
+       <property name="tokenValidatorClient" ref="tokenValidatorClient1"/>
+   </bean>
+    
+    <bean id="oauth2Filter1" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
+        <property name="tokenValidator" ref="tokenValidator1"/>
+    </bean>
+    <jaxrs:server id="rsServer1" address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/rs">
+        <jaxrs:serviceBeans>
+            <ref bean="rsService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="oauth2Filter1"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    
+    
+    <http:conduit name="https://localhost.*">
+        <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:keyManagers keyPassword="password">
+                <sec:keyStore type="JKS" password="password" resource="keys/Morpit.jks"/>
+            </sec:keyManagers>
+            <sec:trustManagers>
+                <sec:keyStore type="JKS" password="password" resource="keys/Truststore.jks"/>
+            </sec:trustManagers>
+        </http:tlsClientParameters>
+    </http:conduit>
 </beans>
