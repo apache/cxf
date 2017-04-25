@@ -59,10 +59,22 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, new CustomGrant());
         assertNotNull(at.getTokenKey());
         
-        String rsAddress = "https://localhost:" + PORT + "/rs/bookstore/books/123";
-        WebClient wcRs = createRsWebClient(rsAddress, at);
+        String protectedRsAddress = "https://localhost:" + PORT + "/rs/bookstore/books/123";
+        WebClient wcRs = createRsWebClient(protectedRsAddress, at, "client.xml");
         Book book = wcRs.get(Book.class);
         assertEquals(123L, book.getId());
+        
+        
+        String unprotectedRsAddress = "https://localhost:" + PORT + "/rsUnprotected/bookstore/books/123";
+        WebClient wcRsDiffClientCert = createRsWebClient(unprotectedRsAddress, at, "client2.xml");
+        // Unprotected resource
+        book = wcRsDiffClientCert.get(Book.class);
+        assertEquals(123L, book.getId());
+        
+        // Protected resource, access token was created with Morphit key, RS is accessed with
+        // Bethal.key, thus 401 is expected
+        wcRsDiffClientCert = createRsWebClient(protectedRsAddress, at, "client2.xml");
+        assertEquals(401, wcRsDiffClientCert.get().getStatus());
     }
     
     @Test
@@ -105,12 +117,12 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
         wc.type(MediaType.APPLICATION_FORM_URLENCODED).accept(MediaType.APPLICATION_JSON);
         return wc;
     }
-    private WebClient createRsWebClient(String address, ClientAccessToken at) {
+    private WebClient createRsWebClient(String address, ClientAccessToken at, String clientContext) {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
 
         SpringBusFactory bf = new SpringBusFactory();
-        URL busFile = JAXRSOAuth2TlsTest.class.getResource("client.xml");
+        URL busFile = JAXRSOAuth2TlsTest.class.getResource(clientContext);
         Bus springBus = bf.createBus(busFile.toString());
         bean.setBus(springBus);
 
