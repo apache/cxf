@@ -29,11 +29,6 @@ import java.io.PrintStream;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -55,9 +50,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 import static org.ops4j.pax.exam.CoreOptions.composite;
 import static org.ops4j.pax.exam.CoreOptions.maven;
@@ -73,8 +65,10 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDist
 public class CXFOSGiTestSupport {
     private static final String MAVEN_DEPENDENCIES_PROPERTIES = "/META-INF/maven/dependencies.properties";
     private static final Long COMMAND_TIMEOUT = 10000L;
-    private static final Long SERVICE_TIMEOUT = 30000L;
 
+    @Inject
+    protected CommandProcessor commandProcessor;
+    
     @Inject
     protected BundleContext bundleContext;
 
@@ -183,7 +177,6 @@ public class CXFOSGiTestSupport {
         String response;
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         final PrintStream printStream = new PrintStream(byteArrayOutputStream);
-        final CommandProcessor commandProcessor = getOsgiService(CommandProcessor.class);
         final CommandSession commandSession = commandProcessor.createSession(System.in, printStream,
                                                                              System.err);
         FutureTask<String> commandFuture = new FutureTask<String>(new Callable<String>() {
@@ -222,7 +215,6 @@ public class CXFOSGiTestSupport {
         String response;
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         final PrintStream printStream = new PrintStream(byteArrayOutputStream);
-        final CommandProcessor commandProcessor = getOsgiService(CommandProcessor.class);
         final CommandSession commandSession = commandProcessor.createSession(System.in, printStream,
                                                                              System.err);
         FutureTask<String> commandFuture = new FutureTask<String>(new Callable<String>() {
@@ -260,71 +252,6 @@ public class CXFOSGiTestSupport {
             System.err.println("Bundle: " + b.getSymbolicName());
         }
         throw new RuntimeException("Bundle " + symbolicName + " does not exist");
-    }
-
-    /*
-     * Explode the dictionary into a ,-delimited list of key=value pairs
-     */
-    private static String explode(Dictionary<String, String> dictionary) {
-        Enumeration<String> keys = dictionary.keys();
-        StringBuilder result = new StringBuilder();
-        while (keys.hasMoreElements()) {
-            Object key = keys.nextElement();
-            result.append(String.format("%s=%s", key, dictionary.get(key)));
-            if (keys.hasMoreElements()) {
-                result.append(", ");
-            }
-        }
-        return result.toString();
-    }
-
-    protected <T> T getOsgiService(Class<T> type, long timeout) {
-        return getOsgiService(type, null, timeout);
-    }
-
-    protected <T> T getOsgiService(Class<T> type) {
-        return getOsgiService(type, null, SERVICE_TIMEOUT);
-    }
-
-    protected <T> T getOsgiService(Class<T> type, String filter, long timeout) {
-        ServiceTracker<T, ?> tracker = null;
-        try {
-            String flt;
-            if (filter != null) {
-                if (filter.startsWith("(")) {
-                    flt = "(&(" + Constants.OBJECTCLASS + "=" + type.getName() + ")" + filter + ")";
-                } else {
-                    flt = "(&(" + Constants.OBJECTCLASS + "=" + type.getName() + ")(" + filter + "))";
-                }
-            } else {
-                flt = "(" + Constants.OBJECTCLASS + "=" + type.getName() + ")";
-            }
-            Filter osgiFilter = FrameworkUtil.createFilter(flt);
-            tracker = new ServiceTracker<T, Object>(bundleContext, osgiFilter, null);
-            tracker.open(true);
-            // Note that the tracker is not closed to keep the reference
-            // This is buggy, as the service reference may change i think
-            Object svc = type.cast(tracker.waitForService(timeout));
-            if (svc == null) {
-                Dictionary<String, String> dic = bundleContext.getBundle().getHeaders();
-                System.err.println("Test bundle headers: " + explode(dic));
-
-                for (ServiceReference<?> ref : asCollection(bundleContext.getAllServiceReferences(null, null))) {
-                    System.err.println("ServiceReference: " + ref);
-                }
-
-                for (ServiceReference<?> ref : asCollection(bundleContext.getAllServiceReferences(null, flt))) {
-                    System.err.println("Filtered ServiceReference: " + ref);
-                }
-
-                throw new RuntimeException("Gave up waiting for service " + flt);
-            }
-            return type.cast(svc);
-        } catch (InvalidSyntaxException e) {
-            throw new IllegalArgumentException("Invalid filter", e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -365,13 +292,6 @@ public class CXFOSGiTestSupport {
         }
 
         return false;
-    }
-
-    /**
-     * Provides an iterable collection of references, even if the original array is null
-     */
-    private static Collection<ServiceReference<?>> asCollection(ServiceReference<?>[] references) {
-        return references != null ? Arrays.asList(references) : Collections.<ServiceReference<?>> emptyList();
     }
 
     protected void assertBundleStarted(String name) {

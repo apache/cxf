@@ -36,6 +36,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceCo
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class BundlesAndNamespacesTest extends CXFOSGiTestSupport {
+
     @Test
     public void test() throws Exception {
         assertBundleStarted("org.apache.cxf.cxf-core");
