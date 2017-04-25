@@ -21,25 +21,18 @@ package org.apache.cxf.osgi.itests;
 
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import org.apache.felix.service.command.CommandProcessor;
-import org.apache.felix.service.command.CommandSession;
 import org.apache.karaf.features.FeaturesService;
 import org.junit.Assert;
 import org.ops4j.pax.exam.Option;
@@ -64,11 +57,7 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDist
  */
 public class CXFOSGiTestSupport {
     private static final String MAVEN_DEPENDENCIES_PROPERTIES = "/META-INF/maven/dependencies.properties";
-    private static final Long COMMAND_TIMEOUT = 10000L;
 
-    @Inject
-    protected CommandProcessor commandProcessor;
-    
     @Inject
     protected BundleContext bundleContext;
 
@@ -123,6 +112,7 @@ public class CXFOSGiTestSupport {
             throw new IllegalStateException(MAVEN_DEPENDENCIES_PROPERTIES + " can not be found", t);
         }
     }
+
     /**
      * Create an {@link org.ops4j.pax.exam.Option} for using a .
      *
@@ -144,102 +134,17 @@ public class CXFOSGiTestSupport {
                          //DO NOT COMMIT WITH THIS LINE ENABLED!!!
                          //KarafDistributionOption.keepRuntimeFolder(),
                          //debugConfiguration(), // nor this
-                systemProperty("java.awt.headless").value("true"),
+                         systemProperty("pax.exam.osgi.unresolved.fail").value("true"),
+                         systemProperty("java.awt.headless").value("true"),
                          when(localRepo != null)
                              .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                                                   "org.ops4j.pax.url.mvn.localRepository",
                                                                   localRepo)),
                          when(urp != null).useOptions(systemProperty("cxf.useRandomFirstPort").value("true")));
     }
+
     protected Option testUtils() {
         return mavenBundle().groupId("org.apache.cxf").artifactId("cxf-testutils").versionAsInProject();
-    }
-
-    /**
-     * Executes a shell command and returns output as a String. Commands have a default timeout of 10 seconds.
-     *
-     * @param command
-     * @return
-     */
-    protected String executeCommand(final String command) {
-        return executeCommand(command, COMMAND_TIMEOUT, false);
-    }
-
-    /**
-     * Executes a shell command and returns output as a String. Commands have a default timeout of 10 seconds.
-     *
-     * @param command The command to execute.
-     * @param timeout The amount of time in millis to wait for the command to execute.
-     * @param silent Specifies if the command should be displayed in the screen.
-     * @return
-     */
-    protected String executeCommand(final String command, final Long timeout, final Boolean silent) {
-        String response;
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        final PrintStream printStream = new PrintStream(byteArrayOutputStream);
-        final CommandSession commandSession = commandProcessor.createSession(System.in, printStream,
-                                                                             System.err);
-        FutureTask<String> commandFuture = new FutureTask<String>(new Callable<String>() {
-            public String call() {
-                try {
-                    if (!silent) {
-                        System.err.println(command);
-                    }
-                    commandSession.execute(command);
-                } catch (Exception e) {
-                    e.printStackTrace(System.err);
-                }
-                printStream.flush();
-                return byteArrayOutputStream.toString();
-            }
-        });
-
-        try {
-            executor.submit(commandFuture);
-            response = commandFuture.get(timeout, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
-            response = "SHELL COMMAND TIMED OUT: ";
-        }
-
-        return response;
-    }
-
-    /**
-     * Executes multiple commands inside a Single Session. Commands have a default timeout of 10 seconds.
-     *
-     * @param commands
-     * @return
-     */
-    protected String executeCommands(final String... commands) {
-        String response;
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        final PrintStream printStream = new PrintStream(byteArrayOutputStream);
-        final CommandSession commandSession = commandProcessor.createSession(System.in, printStream,
-                                                                             System.err);
-        FutureTask<String> commandFuture = new FutureTask<String>(new Callable<String>() {
-            public String call() {
-                try {
-                    for (String command : commands) {
-                        System.err.println(command);
-                        commandSession.execute(command);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace(System.err);
-                }
-                return byteArrayOutputStream.toString();
-            }
-        });
-
-        try {
-            executor.submit(commandFuture);
-            response = commandFuture.get(COMMAND_TIMEOUT, TimeUnit.MILLISECONDS);
-        } catch (Exception e) {
-            e.printStackTrace(System.err);
-            response = "SHELL COMMAND TIMED OUT: ";
-        }
-
-        return response;
     }
 
     protected Bundle getInstalledBundle(String symbolicName) {
@@ -312,7 +217,7 @@ public class CXFOSGiTestSupport {
     public void assertServicePublished(String filter, int timeout) {
         try {
             Filter serviceFilter = bundleContext.createFilter(filter);
-            ServiceTracker<?, ?> tracker = new ServiceTracker<>(bundleContext, serviceFilter, null);
+            ServiceTracker tracker = new ServiceTracker(bundleContext, serviceFilter, null);
             tracker.open();
             Object service = tracker.waitForService(timeout);
             tracker.close();
