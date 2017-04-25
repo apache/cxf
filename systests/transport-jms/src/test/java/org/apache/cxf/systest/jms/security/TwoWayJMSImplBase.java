@@ -41,6 +41,7 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
 
     @Resource
     protected WebServiceContext wsContext;
+
     public String greetMe(String me) {
         if (me.startsWith("PauseForTwoSecs")) {
             try {
@@ -51,23 +52,16 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
             me = me.substring("PauseForTwoSecs".length()).trim();
         }
 
-        MessageContext mc = wsContext.getMessageContext();
-        //JMSMessageHeadersType headers =
-        //    (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
-        //System.out.println("get the message headers JMSCorrelationID: " + headers.getJMSCorrelationID());
-        //System.out.println("Reached here :" + me);
-
-        // set reply header custom property
-        JMSPropertyType testProperty = new JMSPropertyType("Test_Prop", "some return value "  + me);
-
-        //System.out.println("found property in request headers at index: "
-        //                   + headers.getProperty().indexOf(testProperty));
-
-        JMSMessageHeadersType responseHeaders =
-            (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
-        responseHeaders.getProperty().add(testProperty);
+        addToReply(new JMSPropertyType("Test_Prop", "some return value "  + me));
 
         return "Hello " + me;
+    }
+
+    private void addToReply(JMSPropertyType prop) {
+        MessageContext mc = wsContext.getMessageContext();
+        JMSMessageHeadersType responseHeaders =
+            (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
+        responseHeaders.getProperty().add(prop);
     }
 
     public String sayHi() {

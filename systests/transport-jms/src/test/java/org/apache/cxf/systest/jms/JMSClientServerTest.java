@@ -558,9 +558,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
         requestHeader.setJMSCorrelationID("JMS_SAMPLE_CORRELATION_ID");
         requestHeader.setJMSExpiration(3600000L);
-        JMSPropertyType propType = new JMSPropertyType(testReturnPropertyName, "mustReturn");
-        requestHeader.getProperty().add(propType);
-        propType = new JMSPropertyType(testIgnoredPropertyName, "mustNotReturn");
+        requestHeader.getProperty().add(new JMSPropertyType(testReturnPropertyName, "mustReturn"));
+        requestHeader.getProperty().add(new JMSPropertyType(testIgnoredPropertyName, "mustNotReturn"));
         requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
 
         String greeting = greeter.greetMe("Milestone-");
