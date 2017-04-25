@@ -113,6 +113,11 @@ under the License.
             <ref bean="oauth2Filter1"/>
         </jaxrs:providers>
     </jaxrs:server>
+    <jaxrs:server id="rsServerUnprotected" address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/rsUnprotected">
+        <jaxrs:serviceBeans>
+            <ref bean="rsService"/>
+        </jaxrs:serviceBeans>
+    </jaxrs:server>
     
     
     <http:conduit name="https://localhost.*">
