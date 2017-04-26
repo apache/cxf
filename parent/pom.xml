@@ -748,6 +748,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>3.0.0-rc3</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>nekohtml</groupId>
                 <artifactId>nekohtml</artifactId>
                 <version>1.9.6.2</version>

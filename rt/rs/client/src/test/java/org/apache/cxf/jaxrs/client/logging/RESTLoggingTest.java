@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.client.logging;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -33,9 +34,11 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.local.LocalTransportFactory;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.core.Is.is;
 
 public class RESTLoggingTest {
 
@@ -45,83 +48,42 @@ public class RESTLoggingTest {
     @Test
     public void testSlf4j() throws IOException {
         LoggingFeature loggingFeature = new LoggingFeature();
-        Server server = createService(loggingFeature);
+        Server server = createService(SERVICE_URI, new TestServiceRest(), loggingFeature);
         server.start();
-        WebClient client = createClient(loggingFeature);
+        WebClient client = createClient(SERVICE_URI, loggingFeature);
         String result = client.get(String.class);
         server.destroy();
         Assert.assertEquals("test1", result);
     }
 
     @Test
-    public void testBinary() throws IOException {
+    public void testBinary() throws IOException, InterruptedException {
         LoggingFeature loggingFeature = new LoggingFeature();
         TestEventSender sender = new TestEventSender();
         loggingFeature.setSender(sender);
-        Server server = createServiceBinary(loggingFeature);
+        Server server = createService(SERVICE_URI_BINARY, new TestServiceRestBinary(), loggingFeature);
         server.start();
-        WebClient client = createClientBinary(loggingFeature);
+        WebClient client = createClient(SERVICE_URI_BINARY, loggingFeature);
         client.get(InputStream.class).close();
         loggingFeature.setLogBinary(true);
         client.get(InputStream.class).close();
         client.close();
+        List<LogEvent> events = sender.getEvents();
+        await().until(() -> events.size(), is(8));
         server.stop();
         server.destroy();
-
-        List<LogEvent> events = sender.getEvents();
-        assertLogged(events.get(0));
-        assertLogged(events.get(1));
-        assertNotLogged(events.get(2));
-        assertNotLogged(events.get(3));
-
-        assertLogged(events.get(4));
-        assertLogged(events.get(5));
-        assertLogged(events.get(6));
-
-        Assert.assertEquals(8, events.size());
-        assertLogged(events.get(7));
-    }
-
-    private void assertLogged(LogEvent event) {
-        Assert.assertNotEquals(AbstractLoggingInterceptor.CONTENT_SUPPRESSED, event.getPayload());
-    }
-
-    private void assertNotLogged(LogEvent event) {
-        Assert.assertEquals(AbstractLoggingInterceptor.CONTENT_SUPPRESSED, event.getPayload());
-    }
-
-    private WebClient createClient(LoggingFeature loggingFeature) {
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress(SERVICE_URI);
-        bean.setFeatures(Collections.singletonList(loggingFeature));
-        bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        return bean.createWebClient().path("test1");
-    }
-
-    private Server createService(LoggingFeature loggingFeature) {
-        JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
-        factory.setAddress(SERVICE_URI);
-        factory.setFeatures(Collections.singletonList(loggingFeature));
-        factory.setServiceBean(new TestServiceRest());
-        factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        return factory.create();
-    }
-
-    private WebClient createClientBinary(LoggingFeature loggingFeature) {
-        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
-        bean.setAddress(SERVICE_URI_BINARY);
-        bean.setFeatures(Collections.singletonList(loggingFeature));
-        bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        return bean.createWebClient().path("test1");
-    }
-
-    private Server createServiceBinary(LoggingFeature loggingFeature) {
-        JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
-        factory.setAddress(SERVICE_URI_BINARY);
-        factory.setFeatures(Collections.singletonList(loggingFeature));
-        factory.setServiceBean(new TestServiceRestBinary());
-        factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
-        return factory.create();
+        
+        // First call with binary logging false
+        assertContentLogged(events.get(0));
+        assertContentLogged(events.get(1));
+        assertContentNotLogged(events.get(2));
+        assertContentNotLogged(events.get(3));
+        
+        // Second call with binary logging true
+        assertContentLogged(events.get(4));
+        assertContentLogged(events.get(5));
+        assertContentLogged(events.get(6));
+        assertContentLogged(events.get(7));
     }
 
     @Test
@@ -130,9 +92,9 @@ public class RESTLoggingTest {
         loggingFeature.setLogBinary(true);
         TestEventSender sender = new TestEventSender();
         loggingFeature.setSender(sender);
-        Server server = createService(loggingFeature);
+        Server server = createService(SERVICE_URI, new TestServiceRest(), loggingFeature);
         server.start();
-        WebClient client = createClient(loggingFeature);
+        WebClient client = createClient(SERVICE_URI, loggingFeature);
         String result = client.get(String.class);
         Assert.assertEquals("test1", result);
         server.destroy();
@@ -143,6 +105,32 @@ public class RESTLoggingTest {
         checkResponseOut(events.get(2));
         checkResponseIn(events.get(3));
     }
+    
+    private void assertContentLogged(LogEvent event) {
+        Assert.assertNotEquals(AbstractLoggingInterceptor.CONTENT_SUPPRESSED, event.getPayload());
+    }
+
+    private void assertContentNotLogged(LogEvent event) {
+        Assert.assertEquals(AbstractLoggingInterceptor.CONTENT_SUPPRESSED, event.getPayload());
+    }
+
+    private WebClient createClient(String serviceURI, LoggingFeature loggingFeature) {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(serviceURI);
+        bean.setFeatures(Collections.singletonList(loggingFeature));
+        bean.setTransportId(LocalTransportFactory.TRANSPORT_ID);
+        return bean.createWebClient().path("test1");
+    }
+
+    private Server createService(String serviceURI, Object serviceImpl, LoggingFeature loggingFeature) {
+        JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
+        factory.setAddress(serviceURI);
+        factory.setFeatures(Collections.singletonList(loggingFeature));
+        factory.setServiceBean(serviceImpl);
+        factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
+        return factory.create();
+    }
+
 
     private void checkRequestOut(LogEvent requestOut) {
         Assert.assertEquals(SERVICE_URI + "/test1", requestOut.getAddress());
