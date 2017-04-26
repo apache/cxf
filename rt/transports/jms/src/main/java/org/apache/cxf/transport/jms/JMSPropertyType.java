@@ -38,6 +38,16 @@ public class JMSPropertyType {
         return value;
     }
     
+    @Deprecated
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Deprecated
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
     public void writeTo(Message jmsMessage) throws JMSException {
         if (value == null) {
             jmsMessage.setStringProperty(name, null);

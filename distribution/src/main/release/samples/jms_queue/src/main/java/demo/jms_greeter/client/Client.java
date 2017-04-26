@@ -85,10 +85,7 @@ public final class Client {
             JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
             requestHeader.setJMSCorrelationID("JMS_QUEUE_SAMPLE_CORRELATION_ID");
             requestHeader.setJMSExpiration(3600000L);
-            JMSPropertyType propType = new JMSPropertyType();
-            propType.setName("Test.Prop");
-            propType.setValue("mustReturn");
-            requestHeader.getProperty().add(propType);
+            requestHeader.getProperty().add(new JMSPropertyType("Test.Prop", "mustReturn"));
             requestContext.put("org.apache.cxf.jms.client.request.headers", requestHeader);
             //To override the default receive timeout.
             requestContext.put("org.apache.cxf.jms.client.timeout", new Long(1000));
