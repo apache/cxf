@@ -25,6 +25,10 @@ public class JMSPropertyType {
     private String name;
     private Object value;
     
+    @Deprecated
+    public JMSPropertyType() {
+    }
+    
     public JMSPropertyType(String name, Object value) {
         this.name = name;
         this.value = value;
