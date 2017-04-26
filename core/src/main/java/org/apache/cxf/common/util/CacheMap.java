@@ -123,7 +123,7 @@ public class CacheMap<K, V> implements Map<K, V> {
         Set<K> keys = new HashSet<>(extraKeyMap.keySet());
         V v2 = extraKeyMap.remove(key);
         for (K nk : keys) {
-            if (key.equals(nk)) {
+            if ((key != null && key.equals(nk)) || (key == null && nk == null)) {
                 V v3 = extraKeyMap.remove(nk);
                 if (v2 == null) {
                     v2 = v3;
