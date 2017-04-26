@@ -53,8 +53,8 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testTwoWayTLSClientIdIsSubjectDn() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2/token";
-        WebClient wc = createOAuth2WebClient(address);
+        String atServiceAddress = "https://localhost:" + PORT + "/oauth2/token";
+        WebClient wc = createOAuth2WebClient(atServiceAddress);
 
         ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, new CustomGrant());
         assertNotNull(at.getTokenKey());
@@ -85,13 +85,46 @@ public class JAXRSOAuth2TlsTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testTwoWayTLSClientIdBound() throws Exception {
-        String address = "https://localhost:" + PORT + "/oauth2/token";
-        WebClient wc = createOAuth2WebClient(address);
+        String atServiceAddress = "https://localhost:" + PORT + "/oauth2/token";
+        WebClient wc = createOAuth2WebClient(atServiceAddress);
 
-        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,
-                                        new Consumer("bound"),
-                                        new CustomGrant());
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, new Consumer("bound"), 
+                                                               new CustomGrant());
         assertNotNull(at.getTokenKey());
+        
+    }
+    
+    @Test
+    public void testTwoWayTLSClientIdBoundJwt() throws Exception {
+        String atServiceAddress = "https://localhost:" + PORT + "/oauth2Jwt/token";
+        WebClient wc = createOAuth2WebClient(atServiceAddress);
+
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, new Consumer("boundJwt"), 
+                                                               new CustomGrant());
+        assertNotNull(at.getTokenKey());
+        
+        String protectedRsAddress = "https://localhost:" + PORT + "/rsJwt/bookstore/books/123";
+        WebClient wcRs = createRsWebClient(protectedRsAddress, at, "client.xml");
+        Book book = wcRs.get(Book.class);
+        assertEquals(123L, book.getId());
+        
+        String protectedRsAddress2 = "https://localhost:" + PORT + "/rsJwt2/bookstore/books/123";
+        WebClient wcRs2 = createRsWebClient(protectedRsAddress2, at, "client.xml");
+        book = wcRs2.get(Book.class);
+        assertEquals(123L, book.getId());
+        
+        String unprotectedRsAddress = "https://localhost:" + PORT + "/rsUnprotected/bookstore/books/123";
+        WebClient wcRsDiffClientCert = createRsWebClient(unprotectedRsAddress, at, "client2.xml");
+        // Unprotected resource
+        book = wcRsDiffClientCert.get(Book.class);
+        assertEquals(123L, book.getId());
+        
+        // Protected resource, access token was created with Morphit.jks key, RS is accessed with
+        // Bethal.jks key, thus 401 is expected
+        wcRsDiffClientCert = createRsWebClient(protectedRsAddress, at, "client2.xml");
+        assertEquals(401, wcRsDiffClientCert.get().getStatus());
+        wcRsDiffClientCert = createRsWebClient(protectedRsAddress2, at, "client2.xml");
+        assertEquals(401, wcRsDiffClientCert.get().getStatus());
     }
     
     @Test

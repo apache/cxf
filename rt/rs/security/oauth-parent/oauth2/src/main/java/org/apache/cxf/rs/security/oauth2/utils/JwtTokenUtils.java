@@ -24,8 +24,10 @@ import java.util.Map;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwt.JoseJwtConsumer;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -117,9 +119,16 @@ public final class JwtTokenUtils {
             at.setNonce(nonce);
         }
         
-        Map<String, String> extraProperties = CastUtils.cast((Map<?, ?>)claims.getClaim("extra_propertirs"));
+        Map<String, String> extraProperties = CastUtils.cast((Map<?, ?>)claims.getClaim("extra_properties"));
         if (extraProperties != null) {
             at.getExtraProperties().putAll(extraProperties);
+            Map<String, Object> cnfClaim = CastUtils.cast((Map<?, ?>)claims.getClaim(JwtConstants.CLAIM_CONFIRMATION));
+            if (cnfClaim != null) {
+                Object certCnf = cnfClaim.get(JoseConstants.HEADER_X509_THUMBPRINT_SHA256);
+                if (certCnf != null) {
+                    at.getExtraProperties().put(JoseConstants.HEADER_X509_THUMBPRINT_SHA256, certCnf.toString());
+                }
+            }
         }
         
         return at;
