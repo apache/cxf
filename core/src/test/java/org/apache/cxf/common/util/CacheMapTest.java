@@ -39,12 +39,15 @@ public class CacheMapTest {
         String putKey = "test";
         definitions.put(putKey, putValue);
         
+        Assert.assertNull(definitions.remove(null));
+
         String removeKey = new String("test");
         Object removeValue = definitions.remove(removeKey);
         
         Assert.assertEquals(putKey, removeKey);
         Assert.assertEquals(putValue, removeValue);
         Assert.assertTrue(definitions.isEmpty());
+        Assert.assertNull(definitions.remove(null));
     }
 
 }
