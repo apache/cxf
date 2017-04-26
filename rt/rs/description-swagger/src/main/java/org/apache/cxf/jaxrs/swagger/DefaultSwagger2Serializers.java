@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
@@ -74,10 +73,8 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
             final MultivaluedMap<String, Object> headers,
             final OutputStream out) throws IOException {
 
-        MessageContext ctx = null;
-                                                   
         if (dynamicBasePath) {
-            ctx = createMessageContext();
+            MessageContext ctx = createMessageContext();
             String currentBasePath = StringUtils.substringBeforeLast(ctx.getHttpServletRequest().getRequestURI(), "/");
             if (!currentBasePath.equals(beanConfig.getBasePath())) {
                 data.setBasePath(currentBasePath);
@@ -89,12 +86,6 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
                 && data.getSecurityDefinitions() == null) {
                 data.setSecurityDefinitions(beanConfig.getSwagger().getSecurityDefinitions());
             }
-        }
-        if (data.getHost() == null) {
-            ctx = ctx == null ? createMessageContext() : ctx;
-            URI uri = ctx.getUriInfo().getAbsolutePath();
-            String authority = uri.getAuthority();
-            data.setHost(authority);
         }
 
         if (replaceTags || javadocProvider != null) {
