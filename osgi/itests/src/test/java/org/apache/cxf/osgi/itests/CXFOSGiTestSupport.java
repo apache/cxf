@@ -23,11 +23,8 @@ package org.apache.cxf.osgi.itests;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
-import java.net.URL;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -35,13 +32,11 @@ import javax.inject.Inject;
 
 import org.apache.karaf.features.FeaturesService;
 import org.junit.Assert;
+import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.ProbeBuilder;
-import org.ops4j.pax.exam.TestProbeBuilder;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.util.tracker.ServiceTracker;
 import static org.ops4j.pax.exam.CoreOptions.composite;
@@ -56,7 +51,6 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDist
  *
  */
 public class CXFOSGiTestSupport {
-    private static final String MAVEN_DEPENDENCIES_PROPERTIES = "/META-INF/maven/dependencies.properties";
 
     @Inject
     protected BundleContext bundleContext;
@@ -69,26 +63,8 @@ public class CXFOSGiTestSupport {
     protected MavenUrlReference cxfUrl;
     protected MavenUrlReference karafUrl;
 
-    /**
-     * @param probe
-     * @return
-     */
-    @ProbeBuilder
-    public TestProbeBuilder probeConfiguration(TestProbeBuilder probe) {
-        probe.setHeader(Constants.DYNAMICIMPORT_PACKAGE, "*,org.apache.felix.service.*;status=provisional");
-        return probe;
-    }
-
-    public File getConfigFile(String path) {
-        URL res = this.getClass().getResource(path);
-        if (res == null) {
-            throw new RuntimeException("Config resource " + path + " not found");
-        }
-        return new File(res.getFile());
-    }
-
     private static String getKarafVersion() {
-        String karafVersion = getVersionFromPom("org.apache.karaf/apache-karaf/version");
+        String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf");
         if (karafVersion == null) {
             karafVersion = System.getProperty("cxf.karaf.version");
         }
@@ -100,17 +76,6 @@ public class CXFOSGiTestSupport {
             karafVersion = "4.0.5";
         }
         return karafVersion;
-    }
-
-    private static String getVersionFromPom(String key) {
-        try {
-            InputStream ins = CXFOSGiTestSupport.class.getResourceAsStream(MAVEN_DEPENDENCIES_PROPERTIES);
-            Properties p = new Properties();
-            p.load(ins);
-            return p.getProperty(key);
-        } catch (Throwable t) {
-            throw new IllegalStateException(MAVEN_DEPENDENCIES_PROPERTIES + " can not be found", t);
-        }
     }
 
     /**
