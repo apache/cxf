@@ -63,9 +63,13 @@ under the License.
     <bean id="customGrantHandler" class="org.apache.cxf.systest.jaxrs.security.oauth2.grants.CustomGrantHandler">
         <property name="dataProvider" ref="dataProvider"/>
     </bean>
+    <bean id="customGrantHandlerJwt" class="org.apache.cxf.systest.jaxrs.security.oauth2.grants.CustomGrantHandler">
+        <property name="dataProvider" ref="dataProviderJwt"/>
+    </bean>
     
     <bean id="oauthJson" class="org.apache.cxf.rs.security.oauth2.provider.OAuthJSONProvider"/>
     <bean id="dataProvider" class="org.apache.cxf.systest.jaxrs.security.oauth2.tls.OAuthDataProviderImpl"/>
+    <bean id="dataProviderJwt" class="org.apache.cxf.systest.jaxrs.security.oauth2.tls.OAuthDataProviderImplJwt"/>
     <bean id="rsService" class="org.apache.cxf.systest.jaxrs.security.BookStore"/>
     
     <bean id="accessTokenService1" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
@@ -73,6 +77,15 @@ under the License.
         <property name="grantHandlers">
             <list>
                 <ref bean="customGrantHandler"/>
+            </list>
+        </property>
+    </bean>
+    <bean id="keyPasswordProvider" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl"/>
+    <bean id="accessTokenServiceJwt" class="org.apache.cxf.rs.security.oauth2.services.AccessTokenService">
+        <property name="dataProvider" ref="dataProviderJwt"/>
+        <property name="grantHandlers">
+            <list>
+                <ref bean="customGrantHandlerJwt"/>
             </list>
         </property>
     </bean>
@@ -86,12 +99,28 @@ under the License.
        <property name="blockUnauthorizedRequests" value="false"/>
     </bean>
     
+    <bean id="tokenIntrospectionServiceJwt" class="org.apache.cxf.rs.security.oauth2.services.TokenIntrospectionService">
+       <property name="dataProvider" ref="dataProviderJwt"/>
+       <property name="blockUnauthorizedRequests" value="false"/>
+    </bean>
+    
     <jaxrs:server id="tokenServer1" address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/oauth2">
         <jaxrs:serviceBeans>
             <ref bean="accessTokenService1"/>
             <ref bean="tokenValidatorService1"/>
             <ref bean="tokenIntrospectionService1"/>
         </jaxrs:serviceBeans>
+    </jaxrs:server>
+    
+    <jaxrs:server id="tokenServerJwt" address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/oauth2Jwt">
+        <jaxrs:serviceBeans>
+            <ref bean="accessTokenServiceJwt"/>
+            <ref bean="tokenIntrospectionServiceJwt"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+            <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
+        </jaxrs:properties>
     </jaxrs:server>
     
     <jaxrs-client:client id="tokenValidatorClient1" 
@@ -128,6 +157,28 @@ under the License.
         <property name="tokenValidator" ref="tokenValidator2"/>
     </bean>
     
+    <jaxrs-client:client id="tokenValidatorClientJwt" 
+        address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/oauth2Jwt/introspect" 
+        serviceClass="org.apache.cxf.jaxrs.client.WebClient">
+        <jaxrs-client:headers>
+            <entry key="Accept" value="application/json"/>
+            <entry key="Content-Type" value="application/x-www-form-urlencoded"/>
+         </jaxrs-client:headers>
+    </jaxrs-client:client>
+    
+    <bean id="tokenValidatorJwt" class="org.apache.cxf.rs.security.oauth2.filters.AccessTokenIntrospectionClient">
+       <property name="tokenValidatorClient" ref="tokenValidatorClientJwt"/>
+    </bean>
+    
+    <bean id="tokenValidatorJwtLocal" class="org.apache.cxf.rs.security.oauth2.filters.JwtAccessTokenValidator"/>
+    
+    <bean id="oauth2FilterJwt" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
+        <property name="tokenValidator" ref="tokenValidatorJwt"/>
+    </bean>
+
+    <bean id="oauth2FilterJwtLocal" class="org.apache.cxf.rs.security.oauth2.filters.OAuthRequestFilter">
+        <property name="tokenValidator" ref="tokenValidatorJwtLocal"/>
+    </bean>    
     
     <jaxrs:server id="rsServer1" address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/rs">
         <jaxrs:serviceBeans>
@@ -144,6 +195,25 @@ under the License.
         <jaxrs:providers>
             <ref bean="oauth2Filter2"/>
         </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="rsServerJwt" address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/rsJwt">
+        <jaxrs:serviceBeans>
+            <ref bean="rsService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="oauth2FilterJwt"/>
+        </jaxrs:providers>
+    </jaxrs:server>
+    <jaxrs:server id="rsServerJwt2" address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/rsJwt2">
+        <jaxrs:serviceBeans>
+            <ref bean="rsService"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="oauth2FilterJwtLocal"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
+        </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server id="rsServerUnprotected" address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/rsUnprotected">
         <jaxrs:serviceBeans>

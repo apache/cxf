@@ -30,6 +30,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
+import org.apache.cxf.rs.security.jose.jwt.JwtConstants;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
 import org.apache.cxf.rs.security.oauth2.common.Client;
@@ -146,7 +147,17 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             }
         }
         if (!at.getExtraProperties().isEmpty()) {
-            claims.setClaim("extra_properties", at.getExtraProperties());
+            Map<String, String> actualExtraProps = new HashMap<String, String>();
+            for (Map.Entry<String, String> entry : at.getExtraProperties().entrySet()) {
+                if (JoseConstants.HEADER_X509_THUMBPRINT_SHA256.equals(entry.getKey())) {
+                    claims.setClaim(JwtConstants.CLAIM_CONFIRMATION, 
+                        Collections.singletonMap(JoseConstants.HEADER_X509_THUMBPRINT_SHA256, 
+                                                 entry.getValue()));
+                } else {
+                    actualExtraProps.put(entry.getKey(), entry.getValue());
+                }
+            }
+            claims.setClaim("extra_properties", actualExtraProps);
         }
         // Can be used to check at RS/etc which grant was used to get this token issued
         if (at.getGrantType() != null) {
