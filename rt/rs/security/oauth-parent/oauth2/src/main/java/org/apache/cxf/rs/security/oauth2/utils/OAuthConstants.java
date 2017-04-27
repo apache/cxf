@@ -130,6 +130,15 @@ public final class OAuthConstants {
     public static final String TOKEN_TYPE_HINT = "token_type_hint";
     public static final String UNSUPPORTED_TOKEN_TYPE = "unsupported_token_type";
 
+    // Token Service Authentication Methods
+    public static final String TOKEN_ENDPOINT_AUTH_NONE = "none";
+    public static final String TOKEN_ENDPOINT_AUTH_BASIC = "client_secret_basic";
+    public static final String TOKEN_ENDPOINT_AUTH_POST = "client_secret_post";
+    public static final String TOKEN_ENDPOINT_AUTH_TLS = "tls_client_auth";
+    // TLS Authentication Binding Properties
+    public static final String TLS_CLIENT_AUTH_SUBJECT_DN = "tls_client_auth_subject_dn";
+    public static final String TLS_CLIENT_AUTH_ISSUER_DN = "tls_client_auth_issuer_dn";
+    
     // Authorization scheme constants, used internally by AccessTokenValidation client and service
     public static final String AUTHORIZATION_SCHEME_TYPE = "authScheme";
     public static final String AUTHORIZATION_SCHEME_DATA = "authSchemeData";
@@ -143,8 +152,6 @@ public final class OAuthConstants {
     public static final String CLIENT_SECRET_CONTENT_ENCRYPTION_ALGORITHM =
         "client.secret.content.encryption.algorithm";
 
-    public static final String TLS_CLIENT_AUTH_SUBJECT_DN = "tls_client_auth_subject_dn";
-    public static final String TLS_CLIENT_AUTH_ISSUER_DN = "tls_client_auth_issuer_dn";
     private OAuthConstants() {
     }
 

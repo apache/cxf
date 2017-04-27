@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.provider;
 
-import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,14 +26,10 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.config.Configuration;
-import net.sf.ehcache.config.ConfigurationFactory;
-import net.sf.ehcache.config.DiskStoreConfiguration;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.rs.security.jose.jwt.JoseJwtConsumer;
 import org.apache.cxf.rs.security.oauth2.common.Client;
 import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
@@ -187,39 +181,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
         element.setTimeToIdle(parsedTTL);
         cache.put(element);
     }
-
-    private static CacheManager createCacheManager(String configFile, Bus bus) {
-        if (bus == null) {
-            bus = BusFactory.getThreadDefaultBus(true);
-        }
-
-        URL configFileURL = null;
-        try {
-            configFileURL =
-                ResourceUtils.getClasspathResourceURL(configFile, DefaultEHCacheOAuthDataProvider.class, bus);
-        } catch (Exception ex) {
-            // ignore
-        }
-        CacheManager cacheManager = null;
-        if (configFileURL == null) {
-            cacheManager = EHCacheUtil.createCacheManager();
-        } else {
-            Configuration conf = ConfigurationFactory.parseConfiguration(configFileURL);
-
-            if (bus != null) {
-                conf.setName(bus.getId());
-                DiskStoreConfiguration dsc = conf.getDiskStoreConfiguration();
-                if (dsc != null && "java.io.tmpdir".equals(dsc.getOriginalPath())) {
-                    String path = conf.getDiskStoreConfiguration().getPath() + File.separator
-                        + bus.getId();
-                    conf.getDiskStoreConfiguration().setPath(path);
-                }
-            }
-
-            cacheManager = EHCacheUtil.createCacheManager(conf);
-        }
-        return cacheManager;
-    }
+    
 
     protected static Ehcache createCache(CacheManager cacheManager, String cacheKey) {
         CacheConfiguration clientCC = EHCacheUtil.getCacheConfiguration(cacheKey, cacheManager);
@@ -228,7 +190,7 @@ public class DefaultEHCacheOAuthDataProvider extends AbstractOAuthDataProvider {
 
     private void createCaches(String configFile, Bus bus,
                               String clientCacheKey, String accessTokenKey, String refreshTokenKey) {
-        cacheManager = createCacheManager(configFile, bus);
+        cacheManager = EHCacheUtil.createCacheManager(configFile, bus);
 
         clientCache = createCache(cacheManager, clientCacheKey);
         accessTokenCache = createCache(cacheManager, accessTokenKey);
