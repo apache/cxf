@@ -104,6 +104,11 @@ under the License.
        <property name="blockUnauthorizedRequests" value="false"/>
     </bean>
     
+    <bean id="dynRegServiceWithAt" class="org.apache.cxf.rs.security.oauth2.services.DynamicRegistrationService">
+      <property name="clientProvider" ref="dataProviderJwt"/>
+      <property name="initialAccessToken" value="123456789"/>
+    </bean>
+    
     <jaxrs:server id="tokenServer1" address="https://localhost:${testutil.ports.jaxrs-oauth2-tls}/oauth2">
         <jaxrs:serviceBeans>
             <ref bean="accessTokenService1"/>
@@ -116,7 +121,11 @@ under the License.
         <jaxrs:serviceBeans>
             <ref bean="accessTokenServiceJwt"/>
             <ref bean="tokenIntrospectionServiceJwt"/>
+            <ref bean="dynRegServiceWithAt"/>
         </jaxrs:serviceBeans>
+        <jaxrs:providers>
+           <bean class="org.apache.cxf.jaxrs.provider.json.JsonMapObjectProvider"/>
+        </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.rs.properties"/>
             <entry key="rs.security.signature.key.password.provider" value-ref="keyPasswordProvider"/>
