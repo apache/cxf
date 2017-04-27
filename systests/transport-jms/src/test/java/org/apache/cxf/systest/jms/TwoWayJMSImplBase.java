@@ -35,7 +35,6 @@ import org.apache.cxf.hello_world_jms.types.NoSuchCodeLit;
 import org.apache.cxf.hello_world_jms.types.TestRpcLitFaultResponse;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.apache.cxf.transport.jms.JMSPropertyType;
 
 public class TwoWayJMSImplBase implements HelloWorldPortType {
 
@@ -54,7 +53,7 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
         MessageContext mc = wsContext.getMessageContext();
         JMSMessageHeadersType responseHeaders =
             (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
-        responseHeaders.getProperty().add(new JMSPropertyType("Test_Prop", "some return value "  + me));
+        responseHeaders.putProperty("Test_Prop", "some return value "  + me);
         return "Hello " + me;
     }
 

@@ -27,6 +27,7 @@ public final class JMSSpecConstants {
 
     public static final String SOAP_JMS_SPECIFICATION_TRANSPORTID
         = "http://www.w3.org/2010/soapjms/";
+    @Deprecated
     public static final String SOAP_JMS_NAMESPACE = SOAP_JMS_SPECIFICATION_TRANSPORTID;
 
     public static final String SOAP_JMS_PREFIX = "SOAPJMS_";
@@ -67,10 +68,6 @@ public final class JMSSpecConstants {
     public static final String CONTENTTYPE_FIELD = SOAP_JMS_PREFIX + CONTENTTYPE_PARAMETER_NAME;
     public static final String CONTENTENCODING_FIELD = SOAP_JMS_PREFIX + CONTENTENCODING_PARAMETER_NAME;
     public static final String ISFAULT_FIELD = SOAP_JMS_PREFIX + ISFAULT_PARAMETER_NAME;
-
-    public static final String JMS_MESSAGE_TYPE = "JMSMessageType";
-    public static final String TARGET_SERVICE_IN_REQUESTURI = "target.service.inrequesturi";
-    public static final String MALFORMED_REQUESTURI = "malformed.requesturi";
 
     private JMSSpecConstants() {
     }

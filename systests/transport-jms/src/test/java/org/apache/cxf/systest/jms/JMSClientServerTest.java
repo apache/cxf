@@ -60,7 +60,6 @@ import org.apache.cxf.transport.jms.JMSConfigFeature;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.apache.cxf.transport.jms.JMSPropertyType;
 import org.apache.cxf.transport.jms.util.TestReceiver;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
@@ -558,8 +557,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
         requestHeader.setJMSCorrelationID("JMS_SAMPLE_CORRELATION_ID");
         requestHeader.setJMSExpiration(3600000L);
-        requestHeader.getProperty().add(new JMSPropertyType(testReturnPropertyName, "mustReturn"));
-        requestHeader.getProperty().add(new JMSPropertyType(testIgnoredPropertyName, "mustNotReturn"));
+        requestHeader.putProperty(testReturnPropertyName, "mustReturn");
+        requestHeader.putProperty(testIgnoredPropertyName, "mustNotReturn");
         requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
 
         String greeting = greeter.greetMe("Milestone-");
@@ -577,14 +576,10 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         assertTrue("CORRELATION ID should match :",
                    "JMS_SAMPLE_CORRELATION_ID".equals(responseHdr.getJMSCorrelationID()));
         assertTrue("response Headers must conain the app property set in request context.",
-                   responseHdr.getProperty() != null);
+                   responseHdr.getPropertyKeys().size() > 0);
 
-        boolean found = false;
-        for (JMSPropertyType p : responseHdr.getProperty()) {
-            if (testReturnPropertyName.equals(p.getName())) {
-                found = true;
-            }
-        }
+        
+        boolean found = responseHdr.getPropertyKeys().contains(testReturnPropertyName);
         assertTrue("response Headers must match the app property set in request context.", found);
         ((Closeable)greeter).close();
     }
