@@ -65,6 +65,7 @@ public class Client implements Serializable {
     private long registeredAt;
     private String homeRealm;
     private boolean registeredDynamically;
+    private String tokenEndpointAuthMethod;
     
     public Client() {
 
@@ -401,5 +402,13 @@ public class Client implements Serializable {
 
     public void setApplicationLogoutUri(String applicationLogoutUri) {
         this.applicationLogoutUri = applicationLogoutUri;
+    }
+
+    public String getTokenEndpointAuthMethod() {
+        return tokenEndpointAuthMethod;
+    }
+
+    public void setTokenEndpointAuthMethod(String tokenEndpointAuthMethod) {
+        this.tokenEndpointAuthMethod = tokenEndpointAuthMethod;
     }
 }
