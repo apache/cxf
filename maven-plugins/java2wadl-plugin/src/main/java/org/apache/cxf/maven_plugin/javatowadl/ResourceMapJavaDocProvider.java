@@ -18,8 +18,10 @@
  */
 package org.apache.cxf.maven_plugin.javatowadl;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -38,10 +40,10 @@ public class ResourceMapJavaDocProvider implements DocumentationProvider {
 
     public ResourceMapJavaDocProvider(String targetFolder) {
         dumpedDocFile = new Properties();
-        try (FileInputStream fis = new FileInputStream(targetFolder + "/site/apidocs/dumpFile.properties")) {
-            dumpedDocFile.load(fis);
+        try (InputStream is = Files.newInputStream(Paths.get(targetFolder + "/site/apidocs/dumpFile.properties"))) {
+            dumpedDocFile.load(is);
         } catch (Exception e) {
-            LOG.warning("can't load dumped Docomentation file" + e.getMessage());
+            LOG.warning("can't load dumped Documentation file" + e.getMessage());
         }
     }
 

@@ -154,7 +154,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             String message = "The token has been authorized by the resource owner "
                 + "using an unsupported authentication method";
             LOG.warning(message);
-            throw ExceptionUtils.toForbiddenException(null, null);
+            throw ExceptionUtils.toNotAuthorizedException(null, null);
 
         }
         // Check Client Certificate Binding if any
@@ -163,7 +163,7 @@ public class OAuthRequestFilter extends AbstractAccessTokenValidator
             TLSSessionInfo tlsInfo = getTlsSessionInfo();
             X509Certificate cert = tlsInfo == null ? null : OAuthUtils.getRootTLSCertificate(tlsInfo);
             if (cert == null || !OAuthUtils.compareCertificateThumbprints(cert, certThumbprint)) { 
-                throw ExceptionUtils.toForbiddenException(null, null);
+                throw ExceptionUtils.toNotAuthorizedException(null, null);
             }
         }
 

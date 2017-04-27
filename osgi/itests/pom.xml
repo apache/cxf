@@ -29,10 +29,8 @@
     <name>Apache CXF :: OSGi :: Integration Tests</name>
     <packaging>jar</packaging>
     <properties>
-        <cxf.surefire.fork.mode>once</cxf.surefire.fork.mode>
     </properties>
     <dependencies>
-
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-core</artifactId>
@@ -63,7 +61,11 @@
             <artifactId>cxf-rt-transports-jms</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-client</artifactId>
+        </dependency>
+
         <!-- Karaf features -->
         <dependency>
             <groupId>org.apache.cxf.karaf</groupId>
@@ -71,6 +73,12 @@
             <version>${project.version}</version>
             <type>xml</type>
             <classifier>features</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+               </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
@@ -78,6 +86,12 @@
             <type>xml</type>
             <version>${cxf.activemq.version}</version>
             <classifier>features</classifier>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+               </exclusion>
+            </exclusions>
         </dependency>
         
         <dependency>
@@ -87,7 +101,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.shell</groupId>
-            <artifactId>org.apache.karaf.shell.console</artifactId>
+            <artifactId>org.apache.karaf.shell.core</artifactId>
             <version>${cxf.karaf.version}</version>
         </dependency>
         <dependency>
@@ -122,7 +136,6 @@
             <scope>test</scope>
         </dependency>
 
-        
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-junit4</artifactId>
@@ -155,6 +168,10 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
         
         <dependency>
             <groupId>org.apache.karaf</groupId>
@@ -162,28 +179,12 @@
             <version>${cxf.karaf.version}</version>
             <type>tar.gz</type>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.karaf.shell</groupId>
-                    <artifactId>org.apache.karaf.shell.dev</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse</groupId>
-                    <artifactId>osgi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse</groupId>
-                    <artifactId>org.eclipse.osgi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.karaf</groupId>
-                    <artifactId>org.apache.karaf.client</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>org.apache.felix.framework</artifactId>
-                </exclusion>
-            </exclusions>
+    		<exclusions>
+        		<exclusion>
+            	<groupId>*</groupId>
+            	<artifactId>*</artifactId>
+        		</exclusion>
+    		</exclusions>
         </dependency>
     </dependencies>
     <build>
@@ -192,6 +193,7 @@
             <plugin>
                 <groupId>org.apache.servicemix.tooling</groupId>
                 <artifactId>depends-maven-plugin</artifactId>
+                <version>1.4.0</version>
                 <executions>
                     <execution>
                         <id>generate-depends-file</id>
@@ -210,46 +212,9 @@
                         <karaf.version>${cxf.karaf.version}</karaf.version>
                         <localRepository>${maven.repo.local}</localRepository>
                     </systemPropertyVariables>
-                    <reuseForks>false</reuseForks>
+                    <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>
-                                            org.apache.servicemix.tooling
-                                        </groupId>
-                                        <artifactId>
-                                            depends-maven-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [1.2,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>
-                                                generate-depends-file
-                                            </goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore />
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 </project>

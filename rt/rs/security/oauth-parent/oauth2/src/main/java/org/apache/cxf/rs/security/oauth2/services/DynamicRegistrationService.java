@@ -181,7 +181,20 @@ public class DynamicRegistrationService {
         if (!c.getRegisteredAudiences().isEmpty()) {
             reg.setResourceUris(c.getRegisteredAudiences());
         }
-        //etc
+        if (c.getTokenEndpointAuthMethod() != null) {
+            reg.setTokenEndpointAuthMethod(c.getTokenEndpointAuthMethod());
+            if (OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS.equals(c.getTokenEndpointAuthMethod())) {
+                String subjectDn = c.getProperties().get(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN);
+                if (subjectDn != null) {
+                    reg.setProperty(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN, subjectDn);
+                }
+                String issuerDn = c.getProperties().get(OAuthConstants.TLS_CLIENT_AUTH_ISSUER_DN);
+                if (issuerDn != null) {
+                    reg.setProperty(OAuthConstants.TLS_CLIENT_AUTH_ISSUER_DN, issuerDn);
+                }
+            }
+        }
+        
         return reg;
     }
 
@@ -220,9 +233,13 @@ public class DynamicRegistrationService {
             grantTypes = Collections.singletonList("authorization_code");
         }
         
-        boolean passwordRequired = grantTypes.contains(OAuthConstants.AUTHORIZATION_CODE_GRANT)
-               || grantTypes.contains(OAuthConstants.RESOURCE_OWNER_GRANT)
-               || grantTypes.contains(OAuthConstants.CLIENT_CREDENTIALS_GRANT);
+        String tokenEndpointAuthMethod = request.getTokenEndpointAuthMethod();
+        //TODO: default is expected to be set to OAuthConstants.TOKEN_ENDPOINT_AUTH_BASIC
+        
+        boolean passwordRequired = !grantTypes.contains(OAuthConstants.IMPLICIT_GRANT)
+            && (tokenEndpointAuthMethod == null
+                || OAuthConstants.TOKEN_ENDPOINT_AUTH_BASIC.equals(tokenEndpointAuthMethod)
+                || OAuthConstants.TOKEN_ENDPOINT_AUTH_POST.equals(tokenEndpointAuthMethod));
 
         // Application Type
         // https://tools.ietf.org/html/rfc7591 has no this property but
@@ -232,7 +249,8 @@ public class DynamicRegistrationService {
             appType = DEFAULT_APPLICATION_TYPE;
         }
         boolean isConfidential = DEFAULT_APPLICATION_TYPE.equals(appType)
-            && !grantTypes.contains(OAuthConstants.IMPLICIT_GRANT);
+            && (passwordRequired
+                || OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS.equals(tokenEndpointAuthMethod));
 
         // Client Secret
         String clientSecret = passwordRequired ? generateClientSecret(request) : null;
@@ -242,6 +260,17 @@ public class DynamicRegistrationService {
 
         newClient.setAllowedGrantTypes(grantTypes);
 
+        newClient.setTokenEndpointAuthMethod(tokenEndpointAuthMethod);
+        if (OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS.equals(tokenEndpointAuthMethod)) {
+            String subjectDn = (String)request.getProperty(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN);
+            if (subjectDn != null) {
+                newClient.getProperties().put(OAuthConstants.TLS_CLIENT_AUTH_SUBJECT_DN, subjectDn);
+            }
+            String issuerDn = (String)request.getProperty(OAuthConstants.TLS_CLIENT_AUTH_ISSUER_DN);
+            if (issuerDn != null) {
+                newClient.getProperties().put(OAuthConstants.TLS_CLIENT_AUTH_ISSUER_DN, issuerDn);
+            }
+        }
         // Client Registration Time
         newClient.setRegisteredAt(System.currentTimeMillis() / 1000);
 

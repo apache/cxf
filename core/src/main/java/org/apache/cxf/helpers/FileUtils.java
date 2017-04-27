@@ -21,7 +21,6 @@ package org.apache.cxf.helpers;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -304,7 +303,7 @@ public final class FileUtils {
         String result = null;
 
         try {
-            is = new FileInputStream(location);
+            is = Files.newInputStream(location.toPath());
             result = normalizeCRLF(is);
         } catch (Exception e) {
             e.printStackTrace();

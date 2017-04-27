@@ -266,7 +266,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
      *
      * For example, if A.xsd imports B.xsd then both A.xsd and B.xsd need to be referenced.
      *
-     * @param schema the schema locations
+     * @param schemas the schema locations
      */
     public void setSchemaLocations(List<String> schemas) {
         this.schemaLocations = schemas;
@@ -282,7 +282,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     /**
      * Add custom JAX-RS providers to the list of providers
      *
-     * @param entityProviders the entityProviders
+     * @param providers the entity providers
      */
     public void setProviders(List<? extends Object> providers) {
         List<Object> newBeans = new ArrayList<>();

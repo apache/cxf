@@ -28,7 +28,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.annotations.Provider.Scope;
@@ -37,11 +39,13 @@ import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.ClasspathScanner;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
-import org.apache.cxf.message.Message;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
@@ -49,7 +53,8 @@ import org.springframework.context.annotation.FilterType;
 
 @ComponentScan(
     includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION,
-                                           value = {Path.class,
+                                           value = {ApplicationPath.class,
+                                                    Path.class,
                                                     Provider.class,
                                                     org.apache.cxf.annotations.Provider.class})
 )
@@ -66,8 +71,6 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
     private List<ResourceProvider> resourceProviders = new LinkedList<ResourceProvider>();
     private List<Object> jaxrsProviders = new LinkedList<Object>();
     private List<Feature> cxfFeatures = new LinkedList<Feature>();
-    private List<Interceptor<? extends Message>> cxfInInterceptors = new LinkedList<Interceptor<?>>();
-    private List<Interceptor<? extends Message>> cxfOutInterceptors = new LinkedList<Interceptor<?>>();
     private Class<? extends Annotation> serviceAnnotation;
 
     protected AbstractSpringComponentScanServer() {
@@ -76,27 +79,72 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
     protected AbstractSpringComponentScanServer(Class<? extends Annotation> serviceAnnotation) {
         this.serviceAnnotation = serviceAnnotation;
     }
-    protected void setJaxrsResources(JAXRSServerFactoryBean factory) {
-        boolean checkJaxrsRoots = checkJaxrsRoots();
-        boolean checkJaxrsProviders = checkJaxrsProviders();
-        boolean checkCxfProviders = checkCxfProviders();
+    @Override
+    protected Server createJaxRsServer() {
+            
+        JAXRSServerFactoryBean factoryBean = null;
+        
+        String[] beanNames = applicationContext.getBeanNamesForAnnotation(ApplicationPath.class);
 
-        Set<String> componentScanPackagesSet = !StringUtils.isEmpty(componentScanPackages) 
-            ? ClasspathScanner.parsePackages(componentScanPackages) : null;
-        Set<String> componentScanBeansSet = !StringUtils.isEmpty(componentScanBeans) 
-                ? ClasspathScanner.parsePackages(componentScanBeans) : null;    
+        if (beanNames.length > 0) {
+            Set<String> componentScanPackagesSet = parseSetProperty(componentScanPackages);
+            Set<String> componentScanBeansSet = parseSetProperty(componentScanBeans);
+            
+            for (String beanName : beanNames) {
+                if (isComponentMatched(beanName, componentScanPackagesSet, componentScanBeansSet)) {
+                    Application app = applicationContext.getBean(beanName, Application.class);
+                    factoryBean = createFactoryBeanFromApplication(app);
+                    for (String cxfBeanName : applicationContext.getBeanNamesForAnnotation(
+                                                  org.apache.cxf.annotations.Provider.class)) {
+                        if (isComponentMatched(cxfBeanName, componentScanPackagesSet, componentScanBeansSet)) {
+                            addCxfProvider(getProviderBean(cxfBeanName));
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+            
+        if (!StringUtils.isEmpty(classesScanPackages)) {
+            try {
+                final Map< Class< ? extends Annotation >, Collection< Class< ? > > > appClasses =
+                    ClasspathScanner.findClasses(classesScanPackages, ApplicationPath.class);
+                
+                List<Application> apps = CastUtils.cast(JAXRSServerFactoryBeanDefinitionParser
+                    .createBeansFromDiscoveredClasses(super.applicationContext, 
+                                                      appClasses.get(ApplicationPath.class), null));
+                if (apps.size() > 0) {
+                    factoryBean = createFactoryBeanFromApplication(apps.get(0));
+                    final Map< Class< ? extends Annotation >, Collection< Class< ? > > > cxfClasses =
+                        ClasspathScanner.findClasses(classesScanPackages, org.apache.cxf.annotations.Provider.class);
+                    addCxfProvidersFromClasses(cxfClasses.get(org.apache.cxf.annotations.Provider.class));
+                }
+                
+            } catch (Exception ex) {
+                throw new ServiceConstructionException(ex);
+            }
+        }
+            
+        if (factoryBean != null) {
+            setFactoryCxfProviders(factoryBean);
+            return factoryBean.create();
+        }
+        
+        return super.createJaxRsServer();
+    }
+    
+    protected void setJaxrsResources(JAXRSServerFactoryBean factory) {
+        Set<String> componentScanPackagesSet = parseSetProperty(componentScanPackages);
+        Set<String> componentScanBeansSet = parseSetProperty(componentScanBeans);
             
         for (String beanName : applicationContext.getBeanDefinitionNames()) {
-            if (checkJaxrsRoots 
-                && isValidComponent(beanName, Path.class, componentScanPackagesSet, componentScanBeansSet)) {
+            if (isValidComponent(beanName, Path.class, componentScanPackagesSet, componentScanBeansSet)) {
                 SpringResourceFactory resourceFactory = new SpringResourceFactory(beanName);
                 resourceFactory.setApplicationContext(applicationContext);
                 resourceProviders.add(resourceFactory);
-            } else if (checkJaxrsProviders 
-                && isValidComponent(beanName, Provider.class, componentScanPackagesSet, componentScanBeansSet)) {
+            } else if (isValidComponent(beanName, Provider.class, componentScanPackagesSet, componentScanBeansSet)) {
                 jaxrsProviders.add(getProviderBean(beanName));
-            } else if (checkCxfProviders 
-                && isValidComponent(beanName, org.apache.cxf.annotations.Provider.class, 
+            } else if (isValidComponent(beanName, org.apache.cxf.annotations.Provider.class, 
                                     componentScanPackagesSet, componentScanBeansSet)) {
                 addCxfProvider(getProviderBean(beanName));
             }
@@ -109,16 +157,9 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
                                                  org.apache.cxf.annotations.Provider.class);
 
                 jaxrsProviders.addAll(JAXRSServerFactoryBeanDefinitionParser
-                    .createBeansFromDiscoveredClasses(super.applicationContext, classes.get(Provider.class), null));
+                    .createBeansFromDiscoveredClasses(applicationContext, classes.get(Provider.class), null));
                 warnIfDuplicatesAvailable(jaxrsProviders);
-                List<Object> cxfProviders = JAXRSServerFactoryBeanDefinitionParser
-                    .createBeansFromDiscoveredClasses(super.applicationContext,
-                                                      classes.get(org.apache.cxf.annotations.Provider.class),
-                                                      null);
-                for (Object cxfProvider : cxfProviders) {
-                    addCxfProvider(cxfProvider);
-                }
-                warnIfDuplicatesAvailable(cxfFeatures);
+                addCxfProvidersFromClasses(classes.get(org.apache.cxf.annotations.Provider.class));
             } catch (Exception ex) {
                 throw new ServiceConstructionException(ex);
             }
@@ -126,19 +167,37 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
 
         factory.setResourceProviders(getResourceProviders());
         factory.setProviders(getJaxrsProviders());
-        factory.setFeatures(getFeatures());
-        factory.setInInterceptors(getInInterceptors());
-        factory.setOutInterceptors(getOutInterceptors());
+        setFactoryCxfProviders(factory);
 
     }
 
+    protected void setFactoryCxfProviders(JAXRSServerFactoryBean factory) {
+        factory.setFeatures(getFeatures());
+        factory.setInInterceptors(getInInterceptors());
+        factory.setOutInterceptors(getOutInterceptors());
+        factory.setOutFaultInterceptors(getOutFaultInterceptors());
+    }
+    
+    protected void addCxfProvidersFromClasses(Collection<Class<?>> classes) {
+        List<Object> cxfProviders = JAXRSServerFactoryBeanDefinitionParser
+            .createBeansFromDiscoveredClasses(applicationContext, classes, null);
+        for (Object cxfProvider : cxfProviders) {
+            addCxfProvider(cxfProvider);
+        }
+        warnIfDuplicatesAvailable(cxfFeatures);    
+    }
     protected boolean isValidComponent(String beanName, 
                                       Class<? extends Annotation> ann,
                                       Set<String> componentScanPackagesSet,
                                       Set<String> componentScanBeansSet) {
         return isAnnotationAvailable(beanName, ann)
             && nonProxyClass(beanName)
-            && matchesServiceAnnotation(beanName)
+            && isComponentMatched(beanName, componentScanPackagesSet, componentScanBeansSet);
+    }
+    protected boolean isComponentMatched(String beanName, 
+                                         Set<String> componentScanPackagesSet,
+                                         Set<String> componentScanBeansSet) {
+        return matchesServiceAnnotation(beanName)
             && matchesComponentPackage(beanName, componentScanPackagesSet)
             && matchesComponentName(beanName, componentScanBeansSet);
     }
@@ -188,29 +247,19 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
         if (ann.value() == org.apache.cxf.annotations.Provider.Type.Feature) {
             cxfFeatures.add((Feature)bean);
         } else if (ann.value() == org.apache.cxf.annotations.Provider.Type.InInterceptor) {
-            cxfInInterceptors.add((Interceptor<?>)bean);
+            super.getInInterceptors().add((Interceptor<?>)bean);
         } else if (ann.value() == org.apache.cxf.annotations.Provider.Type.OutInterceptor) {
-            cxfOutInterceptors.add((Interceptor<?>)bean);
+            super.getOutInterceptors().add((Interceptor<?>)bean);
+        } else if (ann.value() == org.apache.cxf.annotations.Provider.Type.OutFaultInterceptor) {
+            super.getOutFaultInterceptors().add((Interceptor<?>)bean);
         }
-
     }
+    
     protected boolean matchesServiceAnnotation(String beanName) {
         return serviceAnnotation == null || isAnnotationAvailable(beanName, serviceAnnotation);
     }
     protected <A extends Annotation> boolean isAnnotationAvailable(String beanName, Class<A> annClass) {
         return applicationContext.findAnnotationOnBean(beanName, annClass) != null;
-    }
-
-    protected boolean checkCxfProviders() {
-        return true;
-    }
-
-    protected boolean checkJaxrsProviders() {
-        return true;
-    }
-
-    protected boolean checkJaxrsRoots() {
-        return true;
     }
 
     protected List<ResourceProvider> getResourceProviders() {
@@ -224,12 +273,12 @@ public abstract class AbstractSpringComponentScanServer extends AbstractSpringCo
     public List<Feature> getFeatures() {
         return cxfFeatures;
     }
-    @Override
-    public List<Interceptor<? extends Message>> getInInterceptors() {
-        return cxfInInterceptors;
+    
+    protected JAXRSServerFactoryBean createFactoryBeanFromApplication(Application app) {
+        return ResourceUtils.createApplication(app, false, true, false, getBus());
     }
-    public List<Interceptor<? extends Message>> getOutInterceptors() {
-        return cxfOutInterceptors;
+    protected static Set<String> parseSetProperty(String componentScanProp) {
+        return !StringUtils.isEmpty(componentScanProp) 
+            ? ClasspathScanner.parsePackages(componentScanProp) : null;
     }
-
 }

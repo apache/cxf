@@ -35,7 +35,7 @@ public class WSRMPolicyResolveTest extends AbstractCXFSpringTest {
     @Override
     protected void additionalSpringConfiguration(GenericApplicationContext context) throws Exception {
     }
-
+    
     @Test
     public void testHello() throws Exception {
         BasicDocEndpoint port = getApplicationContext().getBean("TestClient",

@@ -58,6 +58,15 @@ public class JsonMapObject implements Serializable {
     public Object getProperty(String name) {
         return values.get(name);
     }
+    
+    public Map<String, Object> getMapProperty(String name) {
+        Object value = getProperty(name);
+        if (value != null) {
+            return CastUtils.cast((Map<?, ?>)value);
+        } else {
+            return null;
+        }
+    }
 
     public Map<String, Object> asMap() {
         return values;

@@ -259,13 +259,9 @@ public class JMSDestinationTest extends AbstractJMSTester {
         final Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage, null);
 
-        JMSPropertyType excludeProp = new JMSPropertyType();
-        excludeProp.setName(customPropertyName);
-        excludeProp.setValue(customPropertyName);
-
         JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
             .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
-        headers.getProperty().add(excludeProp);
+        headers.putProperty(customPropertyName, customPropertyName);
 
         final JMSDestination destination = setupJMSDestination(ei);
 
@@ -304,7 +300,6 @@ public class JMSDestinationTest extends AbstractJMSTester {
         JMSMessageHeadersType inHeader = (JMSMessageHeadersType)inMessage
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
         assertNotNull("The inHeader should not be null", inHeader);
-        assertNotNull("The property should not be null " + inHeader.getProperty());
         // TODO we need to check the SOAP JMS transport properties here
 
         // wait for a while for the jms session recycling

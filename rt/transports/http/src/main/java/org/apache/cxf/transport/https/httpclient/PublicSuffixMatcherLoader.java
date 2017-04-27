@@ -26,12 +26,12 @@
 package org.apache.cxf.transport.https.httpclient;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,7 +71,7 @@ public final class PublicSuffixMatcherLoader {
         if (file == null) {
             throw new IllegalArgumentException("File is null");
         }
-        try (InputStream in = new FileInputStream(file)) {
+        try (InputStream in = Files.newInputStream(file.toPath())) {
             return load(in);
         }
     }

@@ -25,9 +25,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.Principal;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -35,13 +33,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jms.BytesMessage;
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.jms.Topic;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -49,8 +44,6 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
-import org.apache.cxf.security.SecurityContext;
-import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.util.JMSMessageConverter;
 import org.apache.cxf.transport.jms.util.JMSUtil;
@@ -64,10 +57,12 @@ final class JMSMessageUtils {
     private JMSMessageUtils() {
 
     }
-    public static org.apache.cxf.message.Message asCXFMessage(Message message, String headerType)
+    public static org.apache.cxf.message.Message asCXFMessage(Message message, String jmsHeadersKey)
         throws UnsupportedEncodingException, JMSException {
         org.apache.cxf.message.Message inMessage = new MessageImpl();
-        populateIncomingContext(message, inMessage, headerType);
+        JMSMessageHeadersType messageHeaders = JMSMessageHeadersType.from(message);
+        inMessage.put(jmsHeadersKey, messageHeaders);
+        populateIncomingContext(messageHeaders, inMessage);
         retrieveAndSetPayload(inMessage, message);
         return inMessage;
     }
@@ -80,7 +75,7 @@ final class JMSMessageUtils {
      * @throws UnsupportedEncodingException
      * @throws JMSException
      */
-    public static void retrieveAndSetPayload(org.apache.cxf.message.Message inMessage, Message message)
+    private static void retrieveAndSetPayload(org.apache.cxf.message.Message inMessage, Message message)
         throws UnsupportedEncodingException, JMSException {
         String messageType = null;
         Object converted = new JMSMessageConverter().fromMessage(message);
@@ -95,177 +90,44 @@ final class JMSMessageUtils {
         }
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)inMessage
             .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
-        if (headers == null) {
-            headers = new TreeMap<String, List<String>>();
-            inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
-        }
-        headers.put(JMSSpecConstants.JMS_MESSAGE_TYPE, Collections.singletonList(messageType));
+        headers.put(JMSConstants.JMS_MESSAGE_TYPE, Collections.singletonList(messageType));
     }
 
-    private static void populateIncomingContext(javax.jms.Message message,
-                                               org.apache.cxf.message.Message inMessage, String messageType)
-        throws UnsupportedEncodingException, JMSException {
-        JMSMessageHeadersType messageProperties = null;
-        messageProperties = (JMSMessageHeadersType)inMessage.get(messageType);
-        if (messageProperties == null) {
-            messageProperties = new JMSMessageHeadersType();
-            inMessage.put(messageType, messageProperties);
+    private static void populateIncomingContext(JMSMessageHeadersType messageHeaders,
+                                               org.apache.cxf.message.Message inMessage) 
+                                                   throws UnsupportedEncodingException {
+        String contentType = messageHeaders.getContentType();
+        if (contentType != null) {
+            inMessage.put(org.apache.cxf.message.Message.CONTENT_TYPE, contentType);
+            inMessage.put(org.apache.cxf.message.Message.ENCODING, getEncoding(contentType));
         }
-        messageProperties.setJMSCorrelationID(message.getJMSCorrelationID());
-        messageProperties.setJMSDeliveryMode(Integer.valueOf(message.getJMSDeliveryMode()));
-        messageProperties.setJMSExpiration(Long.valueOf(message.getJMSExpiration()));
-        messageProperties.setJMSMessageID(message.getJMSMessageID());
-        messageProperties.setJMSPriority(Integer.valueOf(message.getJMSPriority()));
-        messageProperties.setJMSRedelivered(Boolean.valueOf(message.getJMSRedelivered()));
-        messageProperties.setJMSTimeStamp(Long.valueOf(message.getJMSTimestamp()));
-        messageProperties.setJMSType(message.getJMSType());
-
-        if (message.getJMSReplyTo() != null) {
-            Destination replyTo = message.getJMSReplyTo();
-            if (replyTo instanceof Queue) {
-                messageProperties.setJMSReplyTo(((Queue)replyTo).getQueueName());
-            } else if (replyTo instanceof Topic) {
-                messageProperties.setJMSReplyTo(((Topic)replyTo).getTopicName());
-            }
+        String responseCode = (String)messageHeaders.getProperty(org.apache.cxf.message.Message.RESPONSE_CODE);
+        if (responseCode != null) {
+            inMessage.put(org.apache.cxf.message.Message.RESPONSE_CODE, Integer.valueOf(responseCode));
         }
-
         Map<String, List<String>> protHeaders = new TreeMap<String, List<String>>();
-        List<JMSPropertyType> props = messageProperties.getProperty();
-        Enumeration<String> enm = CastUtils.cast(message.getPropertyNames());
-        while (enm.hasMoreElements()) {
-            String name = enm.nextElement();
-            String val = message.getStringProperty(name);
-            JMSPropertyType prop = new JMSPropertyType();
-            prop.setName(name);
-            prop.setValue(val);
-            props.add(prop);
-
+        for (String name : messageHeaders.getPropertyKeys()) {
+            String val = (String)messageHeaders.getProperty(name);
             protHeaders.put(name, Collections.singletonList(val));
-            if (name.equals(org.apache.cxf.message.Message.CONTENT_TYPE)
-                || name.equals(JMSConstants.JMS_CONTENT_TYPE) && val != null) {
-                inMessage.put(org.apache.cxf.message.Message.CONTENT_TYPE, val);
-                // set the message encoding
-                inMessage.put(org.apache.cxf.message.Message.ENCODING, getEncoding(val));
-            }
-            if (name.equals(org.apache.cxf.message.Message.RESPONSE_CODE)) {
-                inMessage.put(org.apache.cxf.message.Message.RESPONSE_CODE, Integer.valueOf(val));
-            }
         }
-        inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, protHeaders);
-
-        populateIncomingMessageProperties(message, inMessage, messageProperties);
-    }
-
-    /**
-     * @param jmsMessage
-     * @param inMessage
-     * @param messagePropertiesType
-     * @throws UnsupportedEncodingException
-     * @throws JMSException
-     */
-    private static void populateIncomingMessageProperties(Message jmsMessage,
-                                                          org.apache.cxf.message.Message inMessage,
-                                                          JMSMessageHeadersType messageProperties)
-        throws UnsupportedEncodingException, JMSException {
-        if (jmsMessage.propertyExists(JMSSpecConstants.TARGETSERVICE_FIELD)) {
-            messageProperties.setSOAPJMSTargetService(jmsMessage
-                .getStringProperty(JMSSpecConstants.TARGETSERVICE_FIELD));
-        }
-        if (jmsMessage.propertyExists(JMSSpecConstants.BINDINGVERSION_FIELD)) {
-            messageProperties.setSOAPJMSBindingVersion(jmsMessage
-                .getStringProperty(JMSSpecConstants.BINDINGVERSION_FIELD));
-        }
-        if (jmsMessage.propertyExists(JMSSpecConstants.CONTENTTYPE_FIELD)) {
-            messageProperties.setSOAPJMSContentType(jmsMessage
-                .getStringProperty(JMSSpecConstants.CONTENTTYPE_FIELD));
-        }
-        if (jmsMessage.propertyExists(JMSSpecConstants.CONTENTENCODING_FIELD)) {
-            messageProperties.setSOAPJMSContentEncoding(jmsMessage
-                .getStringProperty(JMSSpecConstants.CONTENTENCODING_FIELD));
-        }
-        if (jmsMessage.propertyExists(JMSSpecConstants.SOAPACTION_FIELD)) {
-            messageProperties.setSOAPJMSSOAPAction(jmsMessage
-                .getStringProperty(JMSSpecConstants.SOAPACTION_FIELD));
-        }
-        if (jmsMessage.propertyExists(JMSSpecConstants.ISFAULT_FIELD)) {
-            messageProperties
-                .setSOAPJMSIsFault(jmsMessage.getBooleanProperty(JMSSpecConstants.ISFAULT_FIELD));
-        }
-        if (jmsMessage.propertyExists(JMSSpecConstants.REQUESTURI_FIELD)) {
-            messageProperties.setSOAPJMSRequestURI(jmsMessage
-                .getStringProperty(JMSSpecConstants.REQUESTURI_FIELD));
-
-            Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)inMessage
-                .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
-            if (headers == null) {
-                headers = new TreeMap<String, List<String>>();
-                inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, headers);
-            }
+        String requestURI = messageHeaders.getSOAPJMSRequestURI();
+        if (requestURI != null) {
             try {
-                String requestURI = jmsMessage.getStringProperty(JMSSpecConstants.REQUESTURI_FIELD);
                 JMSEndpoint endpoint = new JMSEndpoint(requestURI);
                 if (endpoint.getTargetService() != null) {
-                    headers.put(JMSSpecConstants.TARGET_SERVICE_IN_REQUESTURI,
-                                Collections.singletonList("true"));
+                    protHeaders.put(JMSConstants.TARGET_SERVICE_IN_REQUESTURI,
+                                    Collections.singletonList("true"));
                 }
                 if (requestURI != null) {
                     inMessage.put(org.apache.cxf.message.Message.REQUEST_URI, requestURI);
                 }
             } catch (Exception e) {
-                headers.put(JMSSpecConstants.MALFORMED_REQUESTURI, Collections.singletonList("true"));
+                protHeaders.put(JMSConstants.MALFORMED_REQUESTURI, Collections.singletonList("true"));
             }
         }
-
-        if (messageProperties.isSetSOAPJMSContentType()) {
-            String contentType = messageProperties.getSOAPJMSContentType();
-            inMessage.put(org.apache.cxf.message.Message.CONTENT_TYPE, contentType);
-            // set the message encoding
-            inMessage.put(org.apache.cxf.message.Message.ENCODING, getEncoding(contentType));
-        }
-
+        inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, protHeaders);
     }
 
-    /**
-     * Extract the property JMSXUserID or JMS_TIBCO_SENDER from the jms message and
-     * create a SecurityContext from it.
-     * For more info see Jira Issue CXF-2055
-     * {@link https://issues.apache.org/jira/browse/CXF-2055}
-     *
-     * @param message jms message to retrieve user information from
-     * @return SecurityContext that contains the user of the producer of the message as the Principal
-     * @throws JMSException if something goes wrong
-     */
-    public static SecurityContext buildSecurityContext(javax.jms.Message message,
-                                                        JMSConfiguration config) throws JMSException {
-        String tempUserName = message.getStringProperty("JMSXUserID");
-        if (tempUserName == null && config.isJmsProviderTibcoEms()) {
-            tempUserName = message.getStringProperty("JMS_TIBCO_SENDER");
-        }
-        if (tempUserName == null) {
-            return null;
-        }
-        final String jmsUserName = tempUserName;
-
-        final Principal principal = new Principal() {
-            public String getName() {
-                return jmsUserName;
-            }
-
-        };
-
-        SecurityContext securityContext = new SecurityContext() {
-
-            public Principal getUserPrincipal() {
-                return principal;
-            }
-
-            public boolean isUserInRole(String role) {
-                return false;
-            }
-
-        };
-        return securityContext;
-    }
 
     static String getEncoding(String ct) throws UnsupportedEncodingException {
         String contentType = ct.toLowerCase();
@@ -339,11 +201,67 @@ final class JMSMessageUtils {
         throws JMSException {
 
         Message jmsMessage = JMSUtil.createAndSetPayload(payload, session, messageType);
-        JMSMessageHeadersType messageProperties = getOrCreateHeader(outMessage, headerType);
-        JMSMessageUtils.prepareJMSMessageHeaderProperties(messageProperties, outMessage, jmsConfig);
-        JMSMessageUtils.prepareJMSMessageProperties(messageProperties, outMessage,
-                                                    jmsConfig.getTargetService(), jmsConfig.getRequestURI());
-        JMSMessageUtils.setJMSMessageProperties(jmsMessage, messageProperties);
+        JMSMessageHeadersType messageHeaders = getOrCreateHeader(outMessage, headerType);
+        if (!messageHeaders.isSetJMSDeliveryMode()) {
+            messageHeaders.setJMSDeliveryMode(jmsConfig.getDeliveryMode());
+        }
+        if (!messageHeaders.isSetTimeToLive()) {
+            messageHeaders.setTimeToLive(jmsConfig.getTimeToLive());
+        }
+        if (!messageHeaders.isSetJMSPriority()) {
+            messageHeaders.setJMSPriority(jmsConfig.getPriority());
+        }
+        // Retrieve or create protocol headers
+        Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)outMessage
+            .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
+        
+        boolean isSoapMessage =
+            !MessageUtils.isTrue(outMessage.getExchange().get(org.apache.cxf.message.Message.REST_MESSAGE));
+        
+        if (isSoapMessage) {
+            if (!messageHeaders.isSetSOAPJMSTargetService()) {
+                messageHeaders.setSOAPJMSTargetService(jmsConfig.getTargetService());
+            }
+            if (!messageHeaders.isSetSOAPJMSBindingVersion()) {
+                messageHeaders.setSOAPJMSBindingVersion("1.0");
+            }
+            messageHeaders.setSOAPJMSContentType(JMSMessageUtils.getContentType(outMessage));
+            if (JMSMessageUtils.getContentEncoding(outMessage) != null) {
+                messageHeaders.setSOAPJMSContentEncoding(JMSMessageUtils.getContentEncoding(outMessage));
+            }
+            String soapAction = JMSMessageUtils.getSoapAction(messageHeaders, outMessage, headers);
+            if (soapAction != null) {
+                messageHeaders.setSOAPJMSSOAPAction(soapAction);
+            }
+            if (!messageHeaders.isSetSOAPJMSIsFault()) {
+                boolean isFault = outMessage.getContent(Exception.class) != null;
+                messageHeaders.setSOAPJMSIsFault(isFault);
+            }
+            if (!messageHeaders.isSetSOAPJMSRequestURI()) {
+                messageHeaders.setSOAPJMSRequestURI(jmsConfig.getRequestURI());
+            }
+        } else {
+            if (MessageUtils.isRequestor(outMessage)) {
+                addJMSPropertiesFromMessage(messageHeaders,
+                                            outMessage,
+                                            org.apache.cxf.message.Message.HTTP_REQUEST_METHOD,
+                                            org.apache.cxf.message.Message.REQUEST_URI,
+                                            org.apache.cxf.message.Message.ACCEPT_CONTENT_TYPE);
+            } else {
+                addJMSPropertyFromMessage(messageHeaders,
+                                          outMessage,
+                                          org.apache.cxf.message.Message.RESPONSE_CODE);
+            }
+            addJMSPropertyFromMessage(messageHeaders,
+                                      outMessage,
+                                      org.apache.cxf.message.Message.CONTENT_TYPE);
+        }
+        if (headers != null) {
+            for (Map.Entry<String, List<String>> ent : headers.entrySet()) {
+                messageHeaders.putProperty(ent.getKey(), JMSMessageUtils.join(ent.getValue(), ','));
+            }
+        }
+        messageHeaders.writeTo(jmsMessage);
         jmsMessage.setJMSCorrelationID(correlationId);
         return jmsMessage;
     }
@@ -359,167 +277,15 @@ final class JMSMessageUtils {
         return messageProperties;
     }
 
-    /**
-     * @param jmsMessage
-     * @param messageProperties
-     */
-    static void setJMSMessageProperties(Message jmsMessage, JMSMessageHeadersType messageProperties)
-        throws JMSException {
-
-        if (messageProperties == null) {
-            return;
-        }
-
-        setProp(jmsMessage, JMSSpecConstants.TARGETSERVICE_FIELD, messageProperties.getSOAPJMSTargetService());
-        setProp(jmsMessage, JMSSpecConstants.BINDINGVERSION_FIELD, messageProperties.getSOAPJMSBindingVersion());
-        setProp(jmsMessage, JMSSpecConstants.CONTENTTYPE_FIELD, messageProperties.getSOAPJMSContentType());
-        setProp(jmsMessage, JMSSpecConstants.CONTENTENCODING_FIELD, messageProperties.getSOAPJMSContentEncoding());
-        setProp(jmsMessage, JMSSpecConstants.SOAPACTION_FIELD, messageProperties.getSOAPJMSSOAPAction());
-        setProp(jmsMessage, JMSSpecConstants.REQUESTURI_FIELD, messageProperties.getSOAPJMSRequestURI());
-
-        if (messageProperties.isSetSOAPJMSIsFault()) {
-            jmsMessage.setBooleanProperty(JMSSpecConstants.ISFAULT_FIELD, messageProperties
-                .isSOAPJMSIsFault());
-        }
-
-        if (messageProperties.isSetProperty()) {
-            for (JMSPropertyType prop : messageProperties.getProperty()) {
-                Object o = prop.getValue();
-                if (o != null) {
-                    Class<?> cls = o.getClass();
-                    if (cls == String.class) {
-                        jmsMessage.setStringProperty(prop.getName(), (String)o);
-                    } else if (cls == Integer.TYPE || cls == Integer.class) {
-                        jmsMessage.setIntProperty(prop.getName(), (Integer)o);
-                    } else if (cls == Double.TYPE || cls == Double.class) {
-                        jmsMessage.setDoubleProperty(prop.getName(), (Double)o);
-                    } else if (cls == Float.TYPE || cls == Float.class) {
-                        jmsMessage.setFloatProperty(prop.getName(), (Float)o);
-                    } else if (cls == Long.TYPE || cls == Long.class) {
-                        jmsMessage.setLongProperty(prop.getName(), (Long)o);
-                    } else if (cls == Boolean.TYPE || cls == Boolean.class) {
-                        jmsMessage.setBooleanProperty(prop.getName(), (Boolean)o);
-                    } else if (cls == Short.TYPE || cls == Short.class) {
-                        jmsMessage.setShortProperty(prop.getName(), (Short)o);
-                    } else if (cls == Byte.TYPE || cls == Byte.class) {
-                        jmsMessage.setShortProperty(prop.getName(), (Byte)o);
-                    } else {
-                        jmsMessage.setObjectProperty(prop.getName(), o);
-                    }
-                } else {
-                    jmsMessage.setStringProperty(prop.getName(), null);
-                }
+    private static String join(List<String> valueList, char seperator) {
+        StringBuilder b = new StringBuilder();
+        for (String s : valueList) {
+            if (b.length() > 0) {
+                b.append(seperator);
             }
+            b.append(s);
         }
-    }
-
-    private static void setProp(Message jmsMessage, String name, String value) throws JMSException {
-        if (value != null) {
-            jmsMessage.setStringProperty(name, value);
-        }
-    }
-
-    /**
-     * @param messageProperteis
-     * @param outMessage
-     * @param jmsConfig
-     */
-    private static void prepareJMSMessageHeaderProperties(
-                                                          JMSMessageHeadersType messageProperteis,
-                                                          org.apache.cxf.message.Message outMessage,
-                                                          JMSConfiguration jmsConfig) {
-        if (!messageProperteis.isSetJMSDeliveryMode()) {
-            messageProperteis.setJMSDeliveryMode(jmsConfig.getDeliveryMode());
-        }
-        if (!messageProperteis.isSetTimeToLive()) {
-            messageProperteis.setTimeToLive(jmsConfig.getTimeToLive());
-        }
-        if (!messageProperteis.isSetJMSPriority()) {
-            messageProperteis.setJMSPriority(jmsConfig.getPriority());
-        }
-    }
-
-    /**
-     * @param messageProperties
-     * @param outMessage
-     * @param jmsConfig
-     * @param targetService TODO
-     * @param requestURI TODO
-     */
-    private static void prepareJMSMessageProperties(JMSMessageHeadersType messageProperties,
-                                                    org.apache.cxf.message.Message outMessage,
-                                                    String targetService,
-                                                    String requestURI) {
-
-        // Retrieve or create protocol headers
-        Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)outMessage
-            .get(org.apache.cxf.message.Message.PROTOCOL_HEADERS));
-
-        boolean isSoapMessage =
-            !MessageUtils.isTrue(outMessage.getExchange().get(org.apache.cxf.message.Message.REST_MESSAGE));
-
-        if (isSoapMessage) {
-            if (!messageProperties.isSetSOAPJMSTargetService()) {
-                messageProperties.setSOAPJMSTargetService(targetService);
-            }
-            if (!messageProperties.isSetSOAPJMSBindingVersion()) {
-                messageProperties.setSOAPJMSBindingVersion("1.0");
-            }
-            messageProperties.setSOAPJMSContentType(getContentType(outMessage));
-            if (getContentEncoding(outMessage) != null) {
-                messageProperties.setSOAPJMSContentEncoding(getContentEncoding(outMessage));
-            }
-            String soapAction = getSoapAction(messageProperties, outMessage, headers);
-            if (soapAction != null) {
-                messageProperties.setSOAPJMSSOAPAction(soapAction);
-            }
-            if (!messageProperties.isSetSOAPJMSIsFault()) {
-                boolean isFault = outMessage.getContent(Exception.class) != null;
-                messageProperties.setSOAPJMSIsFault(isFault);
-            }
-            if (!messageProperties.isSetSOAPJMSRequestURI()) {
-                messageProperties.setSOAPJMSRequestURI(requestURI);
-            }
-        } else {
-            if (MessageUtils.isRequestor(outMessage)) {
-                addJMSPropertiesFromMessage(messageProperties,
-                                            outMessage,
-                                            org.apache.cxf.message.Message.HTTP_REQUEST_METHOD,
-                                            org.apache.cxf.message.Message.REQUEST_URI,
-                                            org.apache.cxf.message.Message.ACCEPT_CONTENT_TYPE);
-            } else {
-                addJMSPropertyFromMessage(messageProperties,
-                                          outMessage,
-                                          org.apache.cxf.message.Message.RESPONSE_CODE);
-            }
-            addJMSPropertyFromMessage(messageProperties,
-                                      outMessage,
-                                      org.apache.cxf.message.Message.CONTENT_TYPE);
-        }
-        if (headers != null) {
-            for (Map.Entry<String, List<String>> ent : headers.entrySet()) {
-                JMSPropertyType prop = asJmsProperty(ent);
-                messageProperties.getProperty().add(prop);
-            }
-        }
-    }
-
-    private static JMSPropertyType asJmsProperty(Map.Entry<String, List<String>> ent) {
-        JMSPropertyType prop = new JMSPropertyType();
-        prop.setName(ent.getKey());
-        if (ent.getValue().size() > 1) {
-            StringBuilder b = new StringBuilder();
-            for (String s : ent.getValue()) {
-                if (b.length() > 0) {
-                    b.append(',');
-                }
-                b.append(s);
-            }
-            prop.setValue(b.toString());
-        } else {
-            prop.setValue(ent.getValue().get(0));
-        }
-        return prop;
+        return b.toString();
     }
 
     private static String getSoapAction(JMSMessageHeadersType messageProperties,
@@ -558,10 +324,7 @@ final class JMSMessageUtils {
                                                   String key) {
         Object value = message.get(key);
         if (value != null) {
-            JMSPropertyType prop = new JMSPropertyType();
-            prop.setName(key);
-            prop.setValue(value.toString());
-            messageProperties.getProperty().add(prop);
+            messageProperties.putProperty(key, value.toString());
         }
     }
 

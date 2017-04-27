@@ -436,7 +436,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             Message inMessage = JMSMessageUtils.asCXFMessage(jmsMessage,
                                                              JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
             if (jmsConfig.isCreateSecurityContext()) {
-                SecurityContext securityContext = JMSMessageUtils.buildSecurityContext(jmsMessage, jmsConfig);
+                SecurityContext securityContext = SecurityContextFactory.buildSecurityContext(jmsMessage, jmsConfig);
                 inMessage.put(SecurityContext.class, securityContext);
             }
             exchange.setInMessage(inMessage);

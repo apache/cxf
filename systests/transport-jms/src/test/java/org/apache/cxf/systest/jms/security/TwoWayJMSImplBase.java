@@ -35,12 +35,12 @@ import org.apache.cxf.hello_world_jms.types.NoSuchCodeLit;
 import org.apache.cxf.hello_world_jms.types.TestRpcLitFaultResponse;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.apache.cxf.transport.jms.JMSPropertyType;
 
 public class TwoWayJMSImplBase implements HelloWorldPortType {
 
     @Resource
     protected WebServiceContext wsContext;
+
     public String greetMe(String me) {
         if (me.startsWith("PauseForTwoSecs")) {
             try {
@@ -51,25 +51,16 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
             me = me.substring("PauseForTwoSecs".length()).trim();
         }
 
-        MessageContext mc = wsContext.getMessageContext();
-        //JMSMessageHeadersType headers =
-        //    (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
-        //System.out.println("get the message headers JMSCorrelationID: " + headers.getJMSCorrelationID());
-        //System.out.println("Reached here :" + me);
-
-        // set reply header custom property
-        JMSPropertyType testProperty = new JMSPropertyType();
-        testProperty.setName("Test_Prop");
-        testProperty.setValue("some return value "  + me);
-
-        //System.out.println("found property in request headers at index: "
-        //                   + headers.getProperty().indexOf(testProperty));
-
-        JMSMessageHeadersType responseHeaders =
-            (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
-        responseHeaders.getProperty().add(testProperty);
+        addToReply("Test_Prop", "some return value "  + me);
 
         return "Hello " + me;
+    }
+
+    private void addToReply(String key, String value) {
+        MessageContext mc = wsContext.getMessageContext();
+        JMSMessageHeadersType responseHeaders =
+            (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
+        responseHeaders.putProperty(key, value);
     }
 
     public String sayHi() {

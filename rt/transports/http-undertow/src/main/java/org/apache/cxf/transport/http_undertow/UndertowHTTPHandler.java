@@ -66,6 +66,10 @@ public class UndertowHTTPHandler implements HttpHandler {
         }
     }
 
+    public ServletContext getServletContext() {
+        return this.servletContext;
+    }
+    
     public void setName(String name) {
         urlName = name;
     }
@@ -87,6 +91,8 @@ public class UndertowHTTPHandler implements HttpHandler {
                 undertowExchange.dispatch(this);
                 return;
             }
+            
+            
             HttpServletResponseImpl response = new HttpServletResponseImpl(undertowExchange,
                                                                            (ServletContextImpl)servletContext);
             HttpServletRequestImpl request = new HttpServletRequestImpl(undertowExchange,

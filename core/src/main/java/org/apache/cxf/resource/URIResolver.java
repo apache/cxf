@@ -19,7 +19,6 @@
 package org.apache.cxf.resource;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +29,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
@@ -250,7 +250,7 @@ public class URIResolver {
         if (is == null && file != null && file.exists()) {
             uri = file.toURI();
             try {
-                is = new FileInputStream(file);
+                is = Files.newInputStream(file.toPath());
             } catch (FileNotFoundException e) {
                 throw new RuntimeException("File was deleted! " + uriStr, e);
             }

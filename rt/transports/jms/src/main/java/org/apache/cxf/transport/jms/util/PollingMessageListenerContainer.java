@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
+import javax.jms.ExceptionListener;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
@@ -36,24 +37,25 @@ import org.apache.cxf.common.logging.LogUtils;
 
 public class PollingMessageListenerContainer extends AbstractMessageListenerContainer {
     private static final Logger LOG = LogUtils.getL7dLogger(PollingMessageListenerContainer.class);
+    private ExceptionListener exceptionListener;
 
     public PollingMessageListenerContainer(Connection connection, Destination destination,
-                                           MessageListener listenerHandler) {
+                                           MessageListener listenerHandler, ExceptionListener exceptionListener) {
         this.connection = connection;
         this.destination = destination;
         this.listenerHandler = listenerHandler;
+        this.exceptionListener = exceptionListener;
     }
 
-    private class Poller extends AbstractPoller implements Runnable {
+    private class Poller implements Runnable {
 
         @Override
         public void run() {
             Session session = null;
-            init();
             while (running) {
                 try (ResourceCloser closer = new ResourceCloser()) {
                     closer.register(createInitialContext());
-                    // Create session early to optimize performance
+                    // Create session early to optimize performance                // In
                     session = closer.register(connection.createSession(transacted, acknowledgeMode));
                     MessageConsumer consumer = closer.register(createConsumer(session));
                     while (running) {
@@ -70,14 +72,12 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                             safeRollBack(session);
                         }
                     }
-                } catch (Throwable e) {
-                    catchUnexpectedExceptionDuringPolling(null, e);
+                } catch (Exception e) {
+                    handleException(e);
                 }
             }
-
         }
 
-        @Override
         protected void safeRollBack(Session session) {
             try {
                 if (session != null && session.getTransacted()) {
@@ -90,11 +90,10 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
     }
 
-    private class XAPoller extends AbstractPoller implements Runnable {
+    private class XAPoller implements Runnable {
 
         @Override
         public void run() {
-            init();
             while (running) {
                 try (ResourceCloser closer = new ResourceCloser()) {
                     closer.register(createInitialContext());
@@ -121,14 +120,12 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
                         safeRollBack(session);
                     }
                 } catch (Exception e) {
-                    catchUnexpectedExceptionDuringPolling(null, e);
+                    handleException(e);
                 }
-
             }
 
         }
 
-        @Override
         protected void safeRollBack(Session session) {
             try {
                 transactionManager.rollback();
@@ -139,64 +136,6 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
 
     }
 
-    private abstract class AbstractPoller {
-        private static final String RETRY_COUNTER_ON_EXCEPTION = "jms.polling.retrycounteronexception";
-        private static final String SLEEPING_TIME_BEFORE_RETRY = "jms.polling.sleepingtimebeforeretry";
-        protected int retryCounter = -1;
-        protected int counter;
-        protected int sleepingTime = 5000;
-
-        protected void init() {
-            if (jndiEnvironment != null) {
-                if (jndiEnvironment.containsKey(RETRY_COUNTER_ON_EXCEPTION)) {
-                    retryCounter = Integer.valueOf(jndiEnvironment.getProperty(RETRY_COUNTER_ON_EXCEPTION));
-                }
-                if (jndiEnvironment.containsKey(SLEEPING_TIME_BEFORE_RETRY)) {
-                    sleepingTime = Integer.valueOf(jndiEnvironment.getProperty(SLEEPING_TIME_BEFORE_RETRY));
-                }
-            }
-        }
-
-        protected boolean hasToCount() {
-            return retryCounter > -1;
-        }
-
-        protected boolean hasToStop() {
-            return counter > retryCounter;
-        }
-
-        protected void catchUnexpectedExceptionDuringPolling(Session session, Throwable e) {
-            LOG.log(Level.WARNING, "Unexpected exception.", e);
-            if (hasToCount()) {
-                counter++;
-                if (hasToStop()) {
-                    stop(session, e);
-                }
-            }
-            if (running) {
-                try {
-                    String log = "Now sleeping for " + sleepingTime / 1000 + " seconds";
-                    log += hasToCount()
-                        ? ". Then restarting session and consumer: attempt " + counter + "/" + retryCounter
-                        : "";
-                    LOG.log(Level.WARNING, log);
-                    Thread.sleep(sleepingTime);
-                } catch (InterruptedException e1) {
-                    LOG.log(Level.WARNING, e1.getMessage());
-                }
-            }
-        }
-
-        protected void stop(Session session, Throwable e) {
-            LOG.log(Level.WARNING, "Stopping the jms message polling thread in cxf", e);
-            safeRollBack(session);
-            running = false;
-        }
-
-        protected abstract void safeRollBack(Session session);
-
-    }
-    
     private MessageConsumer createConsumer(Session session) throws JMSException {
         if (durableSubscriptionName != null && destination instanceof Topic) {
             return session.createDurableSubscriber((Topic)destination, durableSubscriptionName,
@@ -204,6 +143,18 @@ public class PollingMessageListenerContainer extends AbstractMessageListenerCont
         } else {
             return session.createConsumer(destination, messageSelector);
         }
+    }
+    
+    protected void handleException(Exception e) {
+        running = false;
+        JMSException wrapped;
+        if (e  instanceof JMSException) {
+            wrapped = (JMSException) e;
+        } else {
+            wrapped = new JMSException("Wrapped exception. " + e.getMessage());
+            wrapped.addSuppressed(e);
+        }
+        this.exceptionListener.onException(wrapped);
     }
 
     @Override

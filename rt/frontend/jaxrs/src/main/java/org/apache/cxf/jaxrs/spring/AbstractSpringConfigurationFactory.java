@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.spring;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBus;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Server;
@@ -44,7 +45,7 @@ public abstract class AbstractSpringConfigurationFactory
         JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
         factory.setAddress(getAddress());
         factory.setTransportId(getTransportId());
-        factory.setBus(applicationContext.getBean(SpringBus.class));
+        factory.setBus(getBus());
 
         setJaxrsResources(factory);
 
@@ -54,6 +55,10 @@ public abstract class AbstractSpringConfigurationFactory
         factory.setFeatures(getFeatures());
         finalizeFactorySetup(factory);
         return factory.create();
+    }
+    
+    protected Bus getBus() {
+        return applicationContext.getBean(SpringBus.class);
     }
 
     @Override

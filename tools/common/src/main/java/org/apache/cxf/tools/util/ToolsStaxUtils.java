@@ -21,8 +21,8 @@ package org.apache.cxf.tools.util;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +45,7 @@ public final class ToolsStaxUtils {
         List<Tag> tags = new ArrayList<>();
         List<String> ignoreEmptyTags = Arrays.asList(new String[]{"sequence"});
 
-        try (InputStream is = new BufferedInputStream(new FileInputStream(source))) {
+        try (InputStream is = new BufferedInputStream(Files.newInputStream(source.toPath()))) {
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
             Tag newTag = null;
             int count = 0;
@@ -104,14 +104,14 @@ public final class ToolsStaxUtils {
     }
 
     public static Tag getTagTree(final File source, final List<String> ignoreAttr) throws Exception {
-        try (InputStream is = new BufferedInputStream(new FileInputStream(source))) {
+        try (InputStream is = new BufferedInputStream(Files.newInputStream(source.toPath()))) {
             return getTagTree(is, ignoreAttr, null);
         }
     }
     public static Tag getTagTree(final File source,
                                  final List<String> ignoreAttr,
                                  Map<QName, Set<String>> types) throws Exception {
-        try (InputStream is = new BufferedInputStream(new FileInputStream(source))) {
+        try (InputStream is = new BufferedInputStream(Files.newInputStream(source.toPath()))) {
             return getTagTree(is, ignoreAttr, types);
         }
     }

@@ -20,12 +20,12 @@
 package org.apache.cxf.jaxrs.provider;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -343,7 +343,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
             File f = (File)obj;
             ContentDisposition cd = mainMediaType.startsWith(MediaType.MULTIPART_FORM_DATA)
                 ? new ContentDisposition("form-data;name=file;filename=" + f.getName()) :  null;
-            return new Attachment(AttachmentUtil.BODY_ATTACHMENT_ID, new FileInputStream(f), cd);
+            return new Attachment(AttachmentUtil.BODY_ATTACHMENT_ID, Files.newInputStream(f.toPath()), cd);
         } else if (Attachment.class.isAssignableFrom(obj.getClass())) {
             Attachment att = (Attachment)obj;
             if (att.getObject() == null) {

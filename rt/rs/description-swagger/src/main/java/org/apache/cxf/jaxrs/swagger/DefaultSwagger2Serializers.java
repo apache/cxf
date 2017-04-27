@@ -74,8 +74,7 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
             final OutputStream out) throws IOException {
 
         if (dynamicBasePath) {
-            MessageContext ctx = JAXRSUtils.createContextValue(
-                    JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
+            MessageContext ctx = createMessageContext();
             String currentBasePath = StringUtils.substringBeforeLast(ctx.getHttpServletRequest().getRequestURI(), "/");
             if (!currentBasePath.equals(beanConfig.getBasePath())) {
                 data.setBasePath(currentBasePath);
@@ -156,6 +155,11 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
         }
 
         super.writeTo(data, type, genericType, annotations, mediaType, headers, out);
+    }
+
+    private MessageContext createMessageContext() {
+        return JAXRSUtils.createContextValue(
+                               JAXRSUtils.getCurrentMessage(), null, MessageContext.class);
     }
 
     protected String getNormalizedPath(String classResourcePath, String operationResourcePath) {

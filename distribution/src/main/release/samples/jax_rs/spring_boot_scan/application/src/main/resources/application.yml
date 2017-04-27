@@ -2,6 +2,8 @@ server:
   port: 8080
   servlet-path: /system
 
+management.security.enabled: false
+
 cxf:
   path: /services/helloservice
   servlet.init: 

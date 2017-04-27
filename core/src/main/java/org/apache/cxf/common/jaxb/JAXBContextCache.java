@@ -229,7 +229,10 @@ public final class JAXBContextCache {
                 if (cachedContextAndSchemasInternal != null) {
                     context = cachedContextAndSchemasInternal.getContext();
                     if (context == null) {
-                        JAXBCONTEXT_CACHE.remove(cachedContextAndSchemasInternal.getClasses());
+                        final Set<Class<?>> cls = cachedContextAndSchemasInternal.getClasses();
+                        if (cls != null) {
+                            JAXBCONTEXT_CACHE.remove(cls);
+                        }
                         cachedContextAndSchemasInternal = null;
                     } else {
                         return new CachedContextAndSchemas(context, cachedContextAndSchemasInternal.getClasses(),
