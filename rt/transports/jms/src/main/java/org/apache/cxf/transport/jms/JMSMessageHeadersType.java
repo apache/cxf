@@ -72,10 +72,15 @@ public class JMSMessageHeadersType {
     }
     
     public void putProperty(String key, Object value) {
-        properties.put(key, value);
+        String escapedKey = key.replace(".", "_");
+        properties.put(escapedKey, value);
     }
     
     public Object getProperty(String key) {
+        String escapedKey = key.replace(".", "_");
+        if (properties.containsKey(escapedKey)) {
+            return properties.get(escapedKey);
+        }
         return properties.get(key);
     }
     
