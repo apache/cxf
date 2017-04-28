@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.cdi;
 
-import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -63,6 +62,6 @@ public class CdiResourceProvider implements ResourceProvider {
 
     @Override
     public boolean isSingleton() {
-        return !bean.getScope().isAssignableFrom(RequestScoped.class);
+        return !beanManager.isNormalScope(bean.getScope());
     }
 }
