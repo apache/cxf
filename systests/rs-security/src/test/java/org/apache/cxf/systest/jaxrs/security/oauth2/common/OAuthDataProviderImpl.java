@@ -32,6 +32,7 @@ import org.apache.cxf.rs.security.oauth2.common.OAuthPermission;
 import org.apache.cxf.rs.security.oauth2.grants.code.DefaultEHCacheCodeDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.OAuthServiceException;
 import org.apache.cxf.rs.security.oauth2.saml.Constants;
+import org.apache.cxf.rs.security.oauth2.utils.OAuthConstants;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.apache.xml.security.utils.ClassLoaderUtils;
 
@@ -140,6 +141,7 @@ public class OAuthDataProviderImpl extends DefaultEHCacheCodeDataProvider {
             String clientSecret = super.getCurrentClientSecret(); 
             if (externalClients.contains(clientId + ":" + clientSecret)) {
                 c = new Client(clientId, clientSecret, true);
+                c.setTokenEndpointAuthMethod(OAuthConstants.TOKEN_ENDPOINT_AUTH_BASIC);
             }
         }
         return c;

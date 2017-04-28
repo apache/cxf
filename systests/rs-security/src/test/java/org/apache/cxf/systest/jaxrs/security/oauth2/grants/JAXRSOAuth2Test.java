@@ -148,7 +148,17 @@ public class JAXRSOAuth2Test extends AbstractBusClientServerTestBase {
         // (instead WebClient can be initialized with username & password)
         grant.setClientId("bob");
         grant.setClientSecret("bobPassword");
-        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc, grant);
+        try {
+            OAuthClientUtils.getAccessToken(wc, grant);
+            fail("Form based authentication is not supported");
+        } catch (OAuthServiceException ex) {
+            assertEquals(OAuthConstants.UNAUTHORIZED_CLIENT, ex.getError().getError());
+        }
+        
+        ClientAccessToken at = OAuthClientUtils.getAccessToken(wc,  
+                                                               new Consumer("bob", "bobPassword"),
+                                                               new ClientCredentialsGrant(),
+                                                               true);
         assertNotNull(at.getTokenKey());
     }
     
