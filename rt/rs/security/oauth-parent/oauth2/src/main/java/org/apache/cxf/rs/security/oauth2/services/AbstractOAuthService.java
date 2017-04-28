@@ -88,14 +88,7 @@ public abstract class AbstractOAuthService {
      */
     protected Client getValidClient(String clientId, MultivaluedMap<String, String> params)
         throws OAuthServiceException {
-        if (clientId != null) {
-            mc.put(OAuthConstants.CLIENT_SECRET, params.getFirst(OAuthConstants.CLIENT_SECRET));
-            mc.put(OAuthConstants.GRANT_TYPE, params.getFirst(OAuthConstants.GRANT_TYPE));
-            mc.put(OAuthConstants.TOKEN_REQUEST_PARAMS, params);
-            return dataProvider.getClient(clientId);
-        }
-        LOG.fine("No valid client found as the given clientId is null");
-        return null;
+        return getValidClient(clientId, params.getFirst(OAuthConstants.CLIENT_SECRET), params);
     }
     
     protected Client getValidClient(String clientId, String clientSecret, MultivaluedMap<String, String> params)
