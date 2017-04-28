@@ -184,7 +184,6 @@ public final class OAuthClientUtils {
      * using the initialized web client 
      * @param accessTokenService the AccessToken client
      * @param grant {@link AccessTokenGrant} grant
-     * @param extraParams extra parameters
      * @return {@link ClientAccessToken} access token
      * @throws OAuthServiceException
      */

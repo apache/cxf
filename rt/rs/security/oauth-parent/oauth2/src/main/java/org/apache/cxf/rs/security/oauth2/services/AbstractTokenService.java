@@ -62,9 +62,11 @@ public class AbstractTokenService extends AbstractOAuthService {
                 String clientSecret = params.getFirst(OAuthConstants.CLIENT_SECRET);
                 if (clientSecret != null) {
                     client = getAndValidateClientFromIdAndSecret(clientId, clientSecret, params);
+                    validateClientAuthenticationMethod(client, OAuthConstants.TOKEN_ENDPOINT_AUTH_POST);
                 } else if (OAuthUtils.isMutualTls(sc, getTlsSessionInfo())) {
                     client = getClient(clientId, params);
                     checkCertificateBinding(client, getTlsSessionInfo());
+                    validateClientAuthenticationMethod(client, OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS);
                 }
             }
         } else {
@@ -93,6 +95,13 @@ public class AbstractTokenService extends AbstractOAuthService {
         return client;
     }
 
+    protected void validateClientAuthenticationMethod(Client c, String authMethod) {
+        if (c != null && c.getTokenEndpointAuthMethod() != null
+            && !c.getTokenEndpointAuthMethod().equals(authMethod)) {
+            reportInvalidClient(new OAuthError(OAuthConstants.UNAUTHORIZED_CLIENT));
+        }
+    }
+    
     protected String retrieveClientId(MultivaluedMap<String, String> params) {
         String clientId = params.getFirst(OAuthConstants.CLIENT_ID);
         if (clientId == null) {
@@ -108,7 +117,7 @@ public class AbstractTokenService extends AbstractOAuthService {
     protected Client getAndValidateClientFromIdAndSecret(String clientId, 
                                                          String providedClientSecret,
                                                          MultivaluedMap<String, String> params) {
-        Client client = getClient(clientId, params);
+        Client client = getClient(clientId, providedClientSecret, params);
         if (!client.getClientId().equals(clientId)) {
             reportInvalidClient();
         }
@@ -137,12 +146,13 @@ public class AbstractTokenService extends AbstractOAuthService {
     }
     
     protected Client getClientFromBasicAuthScheme(MultivaluedMap<String, String> params) {
+        Client client = null;
         String[] userInfo = AuthorizationUtils.getBasicAuthUserInfo(getMessageContext());
         if (userInfo != null && userInfo.length == 2) {
-            return getAndValidateClientFromIdAndSecret(userInfo[0], userInfo[1], params);
-        } else {
-            return null;
+            client = getAndValidateClientFromIdAndSecret(userInfo[0], userInfo[1], params);
         }
+        validateClientAuthenticationMethod(client, OAuthConstants.TOKEN_ENDPOINT_AUTH_BASIC);
+        return client;
     }
 
     protected void checkCertificateBinding(Client client, TLSSessionInfo tlsSessionInfo) {
@@ -185,6 +195,7 @@ public class AbstractTokenService extends AbstractOAuthService {
             String subjectDn = OAuthUtils.getSubjectDnFromTLSCertificates(cert);
             if (!StringUtils.isEmpty(subjectDn)) {
                 client = getClient(subjectDn, params);
+                validateClientAuthenticationMethod(client, OAuthConstants.TOKEN_ENDPOINT_AUTH_TLS);
                 // The certificates must be registered with the client and match TLS certificates
                 // in case of the binding where Client's clientId is a subject distinguished name
                 compareTlsCertificates(tlsSessionInfo, client.getApplicationCertificates());
@@ -230,13 +241,17 @@ public class AbstractTokenService extends AbstractOAuthService {
      * @throws {@link javax.ws.rs.WebApplicationException} if no matching Client is found
      */
     protected Client getClient(String clientId, MultivaluedMap<String, String> params) {
+        return getClient(clientId, params.getFirst(OAuthConstants.CLIENT_SECRET), params);
+    }
+    
+    protected Client getClient(String clientId, String clientSecret, MultivaluedMap<String, String> params) {
         if (clientId == null) {
             reportInvalidRequestError("Client ID is null");
             return null;
         }
         Client client = null;
         try {
-            client = getValidClient(clientId, params);
+            client = getValidClient(clientId, clientSecret, params);
         } catch (OAuthServiceException ex) {
             LOG.warning("No valid client found for clientId: " + clientId);
             if (ex.getError() != null) {
