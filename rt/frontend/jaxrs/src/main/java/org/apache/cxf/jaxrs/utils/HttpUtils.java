@@ -80,7 +80,8 @@ public final class HttpUtils {
         
     private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
     private static final String CHARSET_PARAMETER = "charset";
-    
+    private static final String DOUBLE_QUOTE = "\"";
+
     // there are more of such characters, ex, '*' but '*' is not affected by UrlEncode
     private static final String PATH_RESERVED_CHARACTERS = "=@/:!$&\'(),;~";
     private static final String QUERY_RESERVED_CHARACTERS = "?/,";
@@ -544,7 +545,7 @@ public final class HttpUtils {
  
     public static String getSetEncoding(MediaType mt, MultivaluedMap<String, Object> headers,
                                         String defaultEncoding) {
-        String enc = mt.getParameters().get(CHARSET_PARAMETER);
+        String enc = getMediaTypeCharsetParameter(mt);
         if (enc == null) {
             return defaultEncoding;
         }
@@ -564,10 +565,19 @@ public final class HttpUtils {
     }
     
     public static String getEncoding(MediaType mt, String defaultEncoding) {
-        String charset = mt == null ? defaultEncoding : mt.getParameters().get("charset");
+        String charset = mt == null ? defaultEncoding : getMediaTypeCharsetParameter(mt);
         return charset == null ? defaultEncoding : charset;
     }
-    
+
+    public static String getMediaTypeCharsetParameter(MediaType mt) {
+        String charset = mt.getParameters().get(CHARSET_PARAMETER);
+        if (charset != null && charset.startsWith(DOUBLE_QUOTE) 
+            && charset.endsWith(DOUBLE_QUOTE) && charset.length() > 1) {
+            charset = charset.substring(1,  charset.length() - 1);
+        }
+        return charset;
+    }
+
     public static URI resolve(UriBuilder baseBuilder, URI uri) {
         if (!uri.isAbsolute()) {
             return baseBuilder.build().resolve(uri);
