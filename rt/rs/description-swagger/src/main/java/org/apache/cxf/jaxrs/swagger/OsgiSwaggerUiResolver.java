@@ -45,7 +45,7 @@ public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
                 return null;
             }
             String[] locations = swaggerUiMavenGroupAndArtifact == null ? DEFAULT_LOCATIONS
-                : new String[]{"mvn:" + DEFAULT_COORDINATES + "/",
+                : new String[]{"mvn:" + swaggerUiMavenGroupAndArtifact + "/",
                                "wrap:mvn:" + swaggerUiMavenGroupAndArtifact + "/"};
             for (Bundle b : bundle.getBundleContext().getBundles()) {
                 String location = b.getLocation();
