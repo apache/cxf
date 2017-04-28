@@ -72,15 +72,10 @@ public class JMSMessageHeadersType {
     }
     
     public void putProperty(String key, Object value) {
-        String escapedKey = key.replace(".", "_");
-        properties.put(escapedKey, value);
+        properties.put(key, value);
     }
     
     public Object getProperty(String key) {
-        String escapedKey = key.replace(".", "_");
-        if (properties.containsKey(escapedKey)) {
-            return properties.get(escapedKey);
-        }
         return properties.get(key);
     }
     
@@ -375,11 +370,13 @@ public class JMSMessageHeadersType {
         while (enm.hasMoreElements()) {
             String name = enm.nextElement();
             String val = message.getStringProperty(name);
-            putProperty(name, val);
+            String unescapedName = name.replace("__", ".");
+            putProperty(unescapedName, val);
         }
     }
     
-    public void writeProp(Message jmsMessage, String name, Object value) throws JMSException {
+    public void writeProp(Message jmsMessage, String origName, Object value) throws JMSException {
+        String name = origName.replace(".", "__");
         if (value == null) {
             jmsMessage.setStringProperty(name, null);
             return;

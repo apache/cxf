@@ -34,25 +34,21 @@ import static org.junit.Assert.assertEquals;
 public class JMSHeaderTypeTest {
 
     private static final String TEST_VALUE = "test";
-    private static final String CONVERTED_RESPONSE_KEY = "org_apache_cxf_message_Message_RESPONSE_CODE";
+    private static final String CONVERTED_RESPONSE_KEY = "org__apache__cxf__message__Message__RESPONSE_CODE";
     
     @Test
     public void testConversionIn() throws JMSException {
         Message message = createMessage();
-        message.setStringProperty(org.apache.cxf.message.Message.RESPONSE_CODE, TEST_VALUE);
+        message.setStringProperty(CONVERTED_RESPONSE_KEY, TEST_VALUE);
         JMSMessageHeadersType messageHeaders = JMSMessageHeadersType.from(message);
         Set<String> keys = messageHeaders.getPropertyKeys();
         Assert.assertEquals(1, keys.size());
-        assertEquals(CONVERTED_RESPONSE_KEY, keys.iterator().next());
         assertEquals(TEST_VALUE, (String)messageHeaders.getProperty(org.apache.cxf.message.Message.RESPONSE_CODE));
-        assertEquals(TEST_VALUE, (String)messageHeaders.getProperty(CONVERTED_RESPONSE_KEY));
     }
     
     @Test
     public void testConversionOut() throws JMSException {
         Message message = createMessage();
-        
-        message.setStringProperty(org.apache.cxf.message.Message.RESPONSE_CODE, TEST_VALUE);
         JMSMessageHeadersType messageHeaders = new JMSMessageHeadersType();
         messageHeaders.putProperty(org.apache.cxf.message.Message.RESPONSE_CODE, TEST_VALUE);
         messageHeaders.writeTo(message);
