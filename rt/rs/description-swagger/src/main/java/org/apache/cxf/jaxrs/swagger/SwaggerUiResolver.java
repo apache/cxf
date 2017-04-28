@@ -36,8 +36,9 @@ public class SwaggerUiResolver {
     
     protected SwaggerUiResolver() {
     }
-    
-    protected String findSwaggerUiRootInternal(String swaggerUiVersion) {
+
+    protected String findSwaggerUiRootInternal(String swaggerUiMavenGroupAndArtifact,
+                                               String swaggerUiVersion) {
         try {
             ClassLoader cl = AbstractSwaggerFeature.class.getClassLoader();
             if (cl instanceof URLClassLoader) {
@@ -68,10 +69,13 @@ public class SwaggerUiResolver {
         return null;
     }
 
-    public static String findSwaggerUiRoot(String swaggerUiVersion) {
-        String root = HELPER.findSwaggerUiRootInternal(swaggerUiVersion);
+    public static String findSwaggerUiRoot(String swaggerUiMavenGroupAndArtifact, 
+                                           String swaggerUiVersion) {
+        String root = HELPER.findSwaggerUiRootInternal(swaggerUiMavenGroupAndArtifact, 
+                                                       swaggerUiVersion);
         if (root == null && HELPER.getClass() != SwaggerUiResolver.class) {
-            root = new SwaggerUiResolver().findSwaggerUiRootInternal(swaggerUiVersion);
+            root = new SwaggerUiResolver().findSwaggerUiRootInternal(swaggerUiMavenGroupAndArtifact, 
+                                                                     swaggerUiVersion);
         }
         return root;
     }
