@@ -89,6 +89,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private boolean supportSwaggerUi = true;
 
     private String swaggerUiVersion;
+    
+    private String swaggerUiMavenGroupAndArtifact;
 
     private Map<String, String> swaggerUiMediaTypes;
 
@@ -134,7 +136,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
 
         if (supportSwaggerUi) {
-            String swaggerUiRoot = SwaggerUiResolver.findSwaggerUiRoot(swaggerUiVersion);
+            String swaggerUiRoot = SwaggerUiResolver.findSwaggerUiRoot(swaggerUiMavenGroupAndArtifact, 
+                                                                       swaggerUiVersion);
             if (swaggerUiRoot != null) {
                 SwaggerUIService swaggerUiService = new SwaggerUIService(swaggerUiRoot, swaggerUiMediaTypes);
                 if (!runAsFilter) {
@@ -267,6 +270,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
     }
 
+    /**
+     * Set SwaggerUI Maven group and artifact using the "groupId/artifactId" format. 
+     * @param swaggerUiMavenGroupAndArtifact
+     */
+    public void setSwaggerUiMavenGroupAndArtifact(String swaggerUiMavenGroupAndArtifact) {
+        this.swaggerUiMavenGroupAndArtifact = swaggerUiMavenGroupAndArtifact;
+    }
+    
     public void setSwaggerUiVersion(String swaggerUiVersion) {
         this.swaggerUiVersion = swaggerUiVersion;
     }

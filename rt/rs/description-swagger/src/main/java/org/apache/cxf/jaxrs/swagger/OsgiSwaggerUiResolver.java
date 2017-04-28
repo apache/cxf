@@ -26,25 +26,31 @@ import org.osgi.framework.FrameworkUtil;
 import io.swagger.annotations.Api;
 
 public class OsgiSwaggerUiResolver extends SwaggerUiResolver {
-    private static final String LOCATIONS[] = {
-        "mvn:org.webjars/swagger-ui/",
-        "wrap:mvn:org.webjars/swagger-ui/"
+    private static final String DEFAULT_COORDINATES = "org.webjars/swagger-ui";
+    private static final String DEFAULT_LOCATIONS[] = {
+        "mvn:" + DEFAULT_COORDINATES + "/",
+        "wrap:mvn:" + DEFAULT_COORDINATES + "/"
     };
 
     OsgiSwaggerUiResolver() throws Exception {
         Class.forName("org.osgi.framework.FrameworkUtil");
     }
 
-    protected String findSwaggerUiRootInternal(String swaggerUiVersion) {
+    @Override
+    protected String findSwaggerUiRootInternal(String swaggerUiMavenGroupAndArtifact,
+                                               String swaggerUiVersion) {
         try {
             Bundle bundle = FrameworkUtil.getBundle(Api.class);
             if (bundle == null) {
                 return null;
             }
+            String[] locations = swaggerUiMavenGroupAndArtifact == null ? DEFAULT_LOCATIONS
+                : new String[]{"mvn:" + DEFAULT_COORDINATES + "/",
+                               "wrap:mvn:" + swaggerUiMavenGroupAndArtifact + "/"};
             for (Bundle b : bundle.getBundleContext().getBundles()) {
                 String location = b.getLocation();
 
-                for (String pattern: LOCATIONS) {
+                for (String pattern: locations) {
                     if (swaggerUiVersion != null) {
                         if (location.equals(pattern + swaggerUiVersion)) {
                             return getSwaggerUiRoot(b, swaggerUiVersion);
