@@ -23,6 +23,7 @@ import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.jaxrs.model.ParameterType;
@@ -81,6 +82,22 @@ public class HttpUtilsTest extends Assert {
         URI c = HttpUtils.relativize(a, b);
         
         assertEquals("../images/subdir/image.png", c.toString());
+    }
+    
+    @Test
+    public void testMediaTypeWithUTF8() {
+        assertEquals("UTF-8",
+                     HttpUtils.getEncoding(MediaType.valueOf("application/json;charset=UTF-8"), "UTF-16"));
+    }
+    @Test
+    public void testMediaTypeWithUTF8WithQuotes() {
+        assertEquals("UTF-8",
+                     HttpUtils.getEncoding(MediaType.valueOf("application/json;charset=\"UTF-8\""), "UTF-16"));
+    }
+    @Test
+    public void testMediaTypeWithNoCharset() {
+        assertEquals("UTF-16",
+                     HttpUtils.getEncoding(MediaType.valueOf("application/json"), "UTF-16"));
     }
     
     @Test
