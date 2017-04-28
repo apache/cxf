@@ -27,6 +27,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
+import org.apache.cxf.ws.rm.manager.RetryPolicyType;
 
 /**
  * Just absorbs faults which will be handled by retransmission.
@@ -68,10 +69,16 @@ public class RetransmissionInterceptor extends AbstractPhaseInterceptor<Message>
             return;
         }
         if (isFault) {
-            // remove the exception set by the PhaseInterceptorChain so that the
-            // error does not reach the client when retransmission is scheduled
-            message.setContent(Exception.class, null);
-            message.getExchange().put(Exception.class, null);
+            RetryPolicyType rmrp = null != manager.getSourcePolicy()
+                ? manager.getSourcePolicy().getRetryPolicy() : null;
+            int maxRetries = null != rmrp ? rmrp.getMaxRetries() : -1;
+            if (maxRetries != 0) {
+                // remove the exception set by the PhaseInterceptorChain so that the
+                // error does not reach the client when retransmission is scheduled
+                message.setContent(Exception.class, null);
+                message.getExchange().put(Exception.class, null);
+            }
+
         }
     }
 }
