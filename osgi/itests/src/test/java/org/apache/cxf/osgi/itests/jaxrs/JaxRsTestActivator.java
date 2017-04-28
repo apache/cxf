@@ -32,6 +32,7 @@ public class JaxRsTestActivator implements BundleActivator {
     @Override
     public void start(BundleContext arg0) throws Exception {
         Bus bus = BusFactory.newInstance().createBus();
+        bus.setExtension(JaxRsTestActivator.class.getClassLoader(), ClassLoader.class);
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setBus(bus);
         sf.setResourceClasses(BookStore.class);

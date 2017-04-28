@@ -50,6 +50,7 @@ public class HttpServiceTest extends CXFOSGiTestSupport {
         String res = greeter.greetMe("Chris");
         Assert.assertEquals("Hi Chris", res);
     }
+
     @Test
     public void testHttpEndpointJetty() throws Exception {
         Greeter greeter = greeterHttpProxy(HttpTestActivator.PORT);

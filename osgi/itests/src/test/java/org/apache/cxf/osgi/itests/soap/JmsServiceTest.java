@@ -75,7 +75,7 @@ public class JmsServiceTest extends CXFOSGiTestSupport {
             cxfBaseConfig(),
             testUtils(),
             features(cxfUrl, "cxf-core", "cxf-jaxws", "cxf-transports-jms"),
-            features(amqUrl, "activemq-broker-noweb"),
+            features(amqUrl, "aries-blueprint", "shell-compat", "activemq-broker-noweb"),
             provision(serviceBundle())
         };
     }

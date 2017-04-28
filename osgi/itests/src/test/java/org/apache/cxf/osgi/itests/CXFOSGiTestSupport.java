@@ -34,7 +34,6 @@ import org.apache.karaf.features.FeaturesService;
 import org.junit.Assert;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -47,7 +46,7 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.when;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.replaceConfigurationFile;
 
 /**
  *
@@ -67,7 +66,7 @@ public class CXFOSGiTestSupport {
     protected MavenUrlReference amqUrl;
 
     private static String getKarafVersion() {
-        return MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf");
+        return MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf-minimal");
     }
 
     /**
@@ -76,7 +75,7 @@ public class CXFOSGiTestSupport {
      * @return
      */
     protected Option cxfBaseConfig() {
-        karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf").version(getKarafVersion())
+        karafUrl = maven().groupId("org.apache.karaf").artifactId("apache-karaf-minimal").version(getKarafVersion())
             .type("tar.gz");
         cxfUrl = maven().groupId("org.apache.cxf.karaf").artifactId("apache-cxf").versionAsInProject()
             .type("xml").classifier("features");
@@ -95,7 +94,8 @@ public class CXFOSGiTestSupport {
                          //debugConfiguration(), // nor this
                          systemProperty("pax.exam.osgi.unresolved.fail").value("true"),
                          systemProperty("java.awt.headless").value("true"),
-                         logLevel(LogLevel.INFO),
+                         replaceConfigurationFile("etc/org.ops4j.pax.logging.cfg",
+                                                  new File("src/test/resources/etc/org.ops4j.pax.logging.cfg")),
                          when(localRepo != null)
                              .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                                                   "org.ops4j.pax.url.mvn.localRepository",
