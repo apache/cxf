@@ -126,14 +126,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
             checkBookInResponse(session, replyToDestination, 129L, "OneWay From WebClient");
             session.close();
         } finally {
-            try {
-                if (connection != null) {
-                    connection.stop();
-                    connection.close();
-                }
-            } catch (JMSException ex) {
-                // ignore
-            }
+            close(connection);
         }
     }
 
@@ -217,14 +210,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
             checkBookInResponse(session, replyToDestination, 123L, "CXF JMS Rocks");
             session.close();
         } finally {
-            try {
-                if (connection != null) {
-                    connection.stop();
-                    connection.close();
-                }
-            } catch (JMSException ex) {
-                // ignore
-            }
+            close(connection);
         }
 
     }
@@ -247,14 +233,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
             checkBookInResponse(session, replyToDestination, 124L, "JMS");
             session.close();
         } finally {
-            try {
-                if (connection != null) {
-                    connection.stop();
-                    connection.close();
-                }
-            } catch (JMSException ex) {
-                // ignore
-            }
+            close(connection);
         }
 
     }
@@ -276,14 +255,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
             checkBookInResponse(session, replyToDestination, 125L, "JMS OneWay");
             session.close();
         } finally {
-            try {
-                if (connection != null) {
-                    connection.stop();
-                    connection.close();
-                }
-            } catch (JMSException ex) {
-                // ignore
-            }
+            close(connection);
         }
 
     }
@@ -383,6 +355,17 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         m.marshal(b, bos);
         return bos.toByteArray();
+    }
+
+    private void close(Connection connection) {
+        try {
+            if (connection != null) {
+                connection.stop();
+                connection.close();
+            }
+        } catch (JMSException ex) {
+            // ignore
+        }
     }
 
 }
