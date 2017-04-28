@@ -31,24 +31,21 @@ public class HttpTestActivator implements BundleActivator {
 
     @Override
     public void start(BundleContext arg0) throws Exception {
+        server = createTestServer("/greeter");
+        serverJetty = createTestServer("http://localhost:" + PORT + "/cxf/greeter");
+    }
+
+    private Server createTestServer(String url) {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setServiceClass(Greeter.class);
-        factory.setAddress("/greeter");
+        factory.setAddress(url);
         factory.setServiceBean(new GreeterImpl());
-        server = factory.create();
-
-        factory = new JaxWsServerFactoryBean();
-        factory.setServiceClass(Greeter.class);
-        factory.setAddress("http://localhost:" + PORT + "/cxf/greeter");
-        factory.setServiceBean(new GreeterImpl());
-        serverJetty = factory.create();
+        return factory.create();
     }
 
     @Override
     public void stop(BundleContext arg0) throws Exception {
-        server.stop();
         server.destroy();
-        serverJetty.stop();
         serverJetty.destroy();
     }
 

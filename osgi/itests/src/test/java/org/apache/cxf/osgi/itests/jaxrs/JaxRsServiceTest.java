@@ -65,45 +65,39 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
 
     @Test
     public void testJaxRsPost() throws Exception {
-        Book book = new Book();
-        book.setId(321);
-        book.setName("New Book");
+        Book book = new Book("New Book", 321);
         Response response = wt.path("/books/").request("application/xml").post(Entity.xml(book));
-        Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+        assertStatus(Status.CREATED, response);
         Assert.assertNotNull(response.getLocation());
+    }
+    
+    @Test
+    public void postWithValidationError() throws Exception {
+        Book book = new Book(null, -1);
+        Response response = wt.path("/books-validate/").request("application/xml").post(Entity.xml(book));
+        assertStatus(Status.BAD_REQUEST, response);
     }
 
     @Test
     public void postWithValidation() throws Exception {
-        Book book = new Book();
-        book.setId(-1);
-        book.setName(null);
+        Book book = new Book("A Book", 3212);
         Response response = wt.path("/books-validate/").request("application/xml").post(Entity.xml(book));
-        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-
-        book = new Book();
-        book.setId(3212);
-        book.setName("A Book");
-        response = wt.path("/books-validate/").request("application/xml").post(Entity.xml(book));
-        Assert.assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
+        assertStatus(Status.CREATED, response);
         Assert.assertNotNull(response.getLocation());
     }
 
     @Test
     public void testJaxRsDelete() throws Exception {
         Response response = wt.path("/books/123").request("application/xml").delete();
-        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertStatus(Status.OK, response);
     }
 
     @Test
     public void testJaxRsPut() throws Exception {
-        Book book = new Book();
-        book.setId(123);
-        book.setName("Updated Book");
+        Book book = new Book("Updated Book", 123);
         Response response = wt.path("/books/123").request("application/xml").put(Entity.xml(book));
-        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        assertStatus(Status.OK, response);
     }
-
 
     @Configuration
     public Option[] config() {
@@ -118,9 +112,12 @@ public class JaxRsServiceTest extends CXFOSGiTestSupport {
         };
     }
 
+    private void assertStatus(Status expectedStatus, Response response) {
+        Assert.assertEquals(expectedStatus.getStatusCode(), response.getStatus());
+    }
+
     private InputStream serviceBundle() {
         return TinyBundles.bundle()
-                  .set(Constants.DYNAMICIMPORT_PACKAGE, "*")
                   .add(JaxRsTestActivator.class)
                   .add(Book.class)
                   .add(BookStore.class)

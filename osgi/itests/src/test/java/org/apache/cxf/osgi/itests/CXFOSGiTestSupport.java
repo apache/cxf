@@ -34,6 +34,7 @@ import org.apache.karaf.features.FeaturesService;
 import org.junit.Assert;
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -46,6 +47,7 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.when;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 /**
  *
@@ -62,20 +64,10 @@ public class CXFOSGiTestSupport {
 
     protected MavenUrlReference cxfUrl;
     protected MavenUrlReference karafUrl;
+    protected MavenUrlReference amqUrl;
 
     private static String getKarafVersion() {
-        String karafVersion = MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf");
-        if (karafVersion == null) {
-            karafVersion = System.getProperty("cxf.karaf.version");
-        }
-        if (karafVersion == null) {
-            karafVersion = System.getProperty("karaf.version");
-        }
-        if (karafVersion == null) {
-            // setup the default version of it
-            karafVersion = "4.0.5";
-        }
-        return karafVersion;
+        return MavenUtils.getArtifactVersion("org.apache.karaf", "apache-karaf");
     }
 
     /**
@@ -88,6 +80,8 @@ public class CXFOSGiTestSupport {
             .type("tar.gz");
         cxfUrl = maven().groupId("org.apache.cxf.karaf").artifactId("apache-cxf").versionAsInProject()
             .type("xml").classifier("features");
+        amqUrl = maven().groupId("org.apache.activemq")
+        .artifactId("activemq-karaf").type("xml").classifier("features").versionAsInProject();
         String localRepo = System.getProperty("localRepository");
         Object urp = System.getProperty("cxf.useRandomFirstPort");
         return composite(karafDistributionConfiguration()
@@ -101,6 +95,7 @@ public class CXFOSGiTestSupport {
                          //debugConfiguration(), // nor this
                          systemProperty("pax.exam.osgi.unresolved.fail").value("true"),
                          systemProperty("java.awt.headless").value("true"),
+                         logLevel(LogLevel.INFO),
                          when(localRepo != null)
                              .useOptions(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                                                   "org.ops4j.pax.url.mvn.localRepository",
@@ -198,4 +193,5 @@ public class CXFOSGiTestSupport {
         assertServicePublished(String.format("(&(objectClass=org.apache.aries.blueprint.NamespaceHandler)"
                                              + "(osgi.service.blueprint.namespace=%s))", namespace), timeout);
     }
+
 }
