@@ -34,6 +34,8 @@ import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.rm.RMManager;
+import org.apache.cxf.ws.rm.manager.RetryPolicyType;
+import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -134,6 +136,50 @@ public class RetransmissionQueueTest extends AbstractBusClientServerTestBase {
          
         empty = manager.getRetransmissionQueue().isEmpty();
         assertTrue("RetransmissionQueue not cleared", empty);
+    }
+    
+    @Test
+    public void testOnewayFaultHandlingWithoutRetry() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        bus = bf.createBus("/org/apache/cxf/systest/ws/rm/message-loss.xml");
+        BusFactory.setDefaultBus(bus);
+        LoggingInInterceptor in = new LoggingInInterceptor();
+        bus.getInInterceptors().add(in);
+        bus.getInFaultInterceptors().add(in);
+        LoggingOutInterceptor out = new LoggingOutInterceptor();
+        bus.getOutInterceptors().add(out);
+        bus.getExtension(RMManager.class).getConfiguration().setBaseRetransmissionInterval(new Long(4000));
+        SourcePolicyType sourcePolicy = new SourcePolicyType();
+        RetryPolicyType retryP = new RetryPolicyType();
+        retryP.setMaxRetries(0);
+        sourcePolicy.setRetryPolicy(retryP);
+        bus.getExtension(RMManager.class).setSourcePolicy(sourcePolicy);
+        // an interceptor to simulate a transmission error
+        MessageLossSimulator loser = new MessageLossSimulator();
+        bus.getOutInterceptors().add(loser);
+
+        bus.getOutFaultInterceptors().add(out);
+
+        GreeterService gs = new GreeterService();
+        final Greeter greeter = gs.getGreeterPort();
+        updateAddressPort(greeter, PORT);
+        LOG.fine("Created greeter client.");
+
+        ConnectionHelper.setKeepAliveConnection(greeter, true);
+        loser.setMode(-1);
+        loser.setThrowsException(true);
+
+        try {
+            greeter.greetMeOneWay("oneway");
+            fail("no retransmission so catch an Exception");
+        } catch (Exception e) {
+            assertEquals("simulated transmission exception", e.getMessage());
+        }
+        Thread.sleep(6000);
+
+        RMManager manager = bus.getExtension(RMManager.class);
+        boolean empty = manager.getRetransmissionQueue().isEmpty();
+        assertFalse("RetransmissionQueue is empty", empty);
     }
 
 }
