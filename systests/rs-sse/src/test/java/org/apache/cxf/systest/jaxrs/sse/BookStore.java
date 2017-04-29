@@ -77,13 +77,13 @@ public class BookStore {
                     final Integer id = Integer.valueOf(lastEventId);
                     final Builder builder = sse.newEventBuilder();
 
-                    sink.onNext(createStatsEvent(builder.name("book"), id + 1));
+                    sink.send(createStatsEvent(builder.name("book"), id + 1));
                     Thread.sleep(200);
-                    sink.onNext(createStatsEvent(builder.name("book"), id + 2));
+                    sink.send(createStatsEvent(builder.name("book"), id + 2));
                     Thread.sleep(200);
-                    sink.onNext(createStatsEvent(builder.name("book"), id + 3));
+                    sink.send(createStatsEvent(builder.name("book"), id + 3));
                     Thread.sleep(200);
-                    sink.onNext(createStatsEvent(builder.name("book"), id + 4));
+                    sink.send(createStatsEvent(builder.name("book"), id + 4));
                     Thread.sleep(200);
                     sink.close();
                 } catch (final InterruptedException ex) {
@@ -98,7 +98,7 @@ public class BookStore {
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void broadcast(@Context SseEventSink sink) {
         try {
-            broadcaster.subscribe(sink);
+            broadcaster.register(sink);
         } finally {
             latch.countDown();
         }

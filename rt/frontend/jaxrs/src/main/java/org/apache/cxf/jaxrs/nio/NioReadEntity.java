@@ -18,9 +18,13 @@
  */
 package org.apache.cxf.jaxrs.nio;
 
-import javax.ws.rs.core.NioCompletionHandler;
-import javax.ws.rs.core.NioErrorHandler;
-import javax.ws.rs.core.NioReaderHandler;
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public class NioReadEntity {
     private final NioReaderHandler reader;
@@ -31,6 +35,18 @@ public class NioReadEntity {
         this.reader = reader;
         this.completion = completion;
         this.error = error;
+        
+        try {
+            final Message m = JAXRSUtils.getCurrentMessage();
+            if (m != null) {
+                final HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
+                if (request != null) {
+                    request.getInputStream().setReadListener(new NioReadListenerImpl(this, request.getInputStream()));
+                }
+            }
+        } catch (final IOException ex) {
+            throw new RuntimeException("Unable to initialize NIO entity", ex);
+        }
     }
 
     public NioReaderHandler getReader() {

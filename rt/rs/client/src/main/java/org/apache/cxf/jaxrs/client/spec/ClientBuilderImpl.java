@@ -20,6 +20,8 @@ package org.apache.cxf.jaxrs.client.spec;
 
 import java.security.KeyStore;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
@@ -148,4 +150,13 @@ public class ClientBuilderImpl extends ClientBuilder {
         return this;
     }
 
+    @Override
+    public ClientBuilder executorService(ExecutorService executorService) {
+        return configImpl.property("executorService", executorService);
+    }
+
+    @Override
+    public ClientBuilder scheduledExecutorService(ScheduledExecutorService scheduledExecutorService) {
+        return configImpl.property("scheduledExecutorService", scheduledExecutorService);
+    }
 }

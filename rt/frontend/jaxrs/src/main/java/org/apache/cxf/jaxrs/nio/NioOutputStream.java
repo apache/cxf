@@ -18,21 +18,11 @@
  */
 package org.apache.cxf.jaxrs.nio;
 
-public final class NioWriteEntity {
-    private final NioWriterHandler writer;
-    private final NioErrorHandler error;
+import java.io.OutputStream;
 
-    public NioWriteEntity(final NioWriterHandler writer, final NioErrorHandler error) {
-        this.writer = writer;
-        this.error = error;
-    }
-
-    public NioWriterHandler getWriter() {
-        return writer;
-    }
-
-    public NioErrorHandler getError() {
-        return error;
-    }
+/**
+ * Class NioReader.
+ */
+public abstract class NioOutputStream extends OutputStream {
 }
 

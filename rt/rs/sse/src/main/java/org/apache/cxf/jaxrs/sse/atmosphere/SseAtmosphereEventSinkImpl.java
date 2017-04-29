@@ -22,13 +22,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
-import javax.ws.rs.Flow.Subscription;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.SseEventSink;
@@ -97,7 +97,9 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
     }
 
     @Override
-    public void onNext(OutboundSseEvent event) {
+    public CompletionStage<?> send(OutboundSseEvent event) {
+        final CompletableFuture<?> future = new CompletableFuture<>();
+        
         if (!closed && writer != null) {
             try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
                 writer.writeTo(event, event.getClass(), null, new Annotation [] {}, event.getMediaType(), null, os);
@@ -105,41 +107,27 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
                 // Atmosphere broadcasts asynchronously which is acceptable in most cases.
                 // Unfortunately, calling close() may lead to response stream being closed
                 // while there are still some SSE delivery scheduled.
-                final Future<Object> future = resource
-                    .getBroadcaster()
-                    .broadcast(os.toString(StandardCharsets.UTF_8.name()));
-
-                try {
-                    if (!future.isDone()) {
-                        // Let us wait at least 200 milliseconds before returning to ensure
-                        // that SSE had the opportunity to be delivered.
-                        LOG.fine("Waiting 200ms to ensure SSE Atmosphere response is delivered");
-                        future.get(200, TimeUnit.MILLISECONDS);
-                    }
-                } catch (final ExecutionException | InterruptedException ex) {
-                    throw new IOException(ex);
-                } catch (final TimeoutException ex) {
-                    LOG.warning("SSE Atmosphere response was not delivered within default timeout");
-                }
+                return CompletableFuture.completedFuture(
+                    resource
+                        .getBroadcaster()
+                        .broadcast(os.toString(StandardCharsets.UTF_8.name()))
+                        .get(1, TimeUnit.SECONDS)
+                    );
             } catch (final IOException ex) {
                 LOG.warning("While writing the SSE event, an exception was raised: " + ex);
+                future.completeExceptionally(ex);
+            } catch (final ExecutionException | InterruptedException ex) {
+                LOG.warning("SSE Atmosphere response was not delivered");
+                future.completeExceptionally(ex);
+            } catch (final TimeoutException ex) {
+                LOG.warning("SSE Atmosphere response was not delivered within default timeout");
+                future.completeExceptionally(ex);
             }
+        } else {
+            future.complete(null);
         }
-    }
-
-    @Override
-    public void onError(Throwable throwable) {
-        // TODO: Should we close the response?
-    }
-
-    @Override
-    public void onComplete() {
-        close();
-    }
-
-    @Override
-    public void onSubscribe(Subscription subscription) {
-        subscription.request(Long.MAX_VALUE);
+        
+        return future;
     }
 
     @Override

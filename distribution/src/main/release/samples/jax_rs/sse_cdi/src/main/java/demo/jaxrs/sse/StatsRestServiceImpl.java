@@ -64,7 +64,7 @@ public class StatsRestServiceImpl {
     @Path("sse")
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void stats(@Context SseEventSink sink) {
-        broadcaster.subscribe(sink);
+        broadcaster.register(sink);
     }
 
     private static OutboundSseEvent createStatsEvent(final OutboundSseEvent.Builder builder, final long eventId) {

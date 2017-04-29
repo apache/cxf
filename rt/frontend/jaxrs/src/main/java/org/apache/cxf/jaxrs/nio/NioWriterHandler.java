@@ -18,21 +18,17 @@
  */
 package org.apache.cxf.jaxrs.nio;
 
-public final class NioWriteEntity {
-    private final NioWriterHandler writer;
-    private final NioErrorHandler error;
-
-    public NioWriteEntity(final NioWriterHandler writer, final NioErrorHandler error) {
-        this.writer = writer;
-        this.error = error;
-    }
-
-    public NioWriterHandler getWriter() {
-        return writer;
-    }
-
-    public NioErrorHandler getError() {
-        return error;
-    }
+/**
+ * Class NioWriterHandler.
+ */
+@FunctionalInterface
+public interface NioWriterHandler {
+    /**
+     * Method called when it is possible to write some data without blocking.
+     *
+     * @param out output stream.
+     * @return {@code true} if there is more data to write, {@code false} otherwise.
+     */
+    boolean write(NioOutputStream out);
 }
 

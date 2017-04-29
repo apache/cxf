@@ -32,7 +32,6 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.InvocationCallback;
-import javax.ws.rs.client.NioInvoker;
 import javax.ws.rs.client.RxInvoker;
 import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.core.CacheControl;
@@ -377,34 +376,27 @@ public class InvocationBuilderImpl implements Invocation.Builder {
 
     @Override
     public CompletionStageRxInvoker rx() {
-        return rx((ExecutorService)null);
+        return webClient.rx((ExecutorService)null);
     }
-
-    @Override
-    public CompletionStageRxInvoker rx(ExecutorService executorService) {
-        // TODO: At the moment we still delegate if possible to the async HTTP conduit.
-        // Investigate if letting the CompletableFuture thread pool deal with the sync invocation
-        // is indeed more effective
-
-        return webClient.rx(executorService);
-    }
-
 
     @SuppressWarnings("rawtypes")
     @Override
     public <T extends RxInvoker> T rx(Class<T> rxCls) {
-        return rx(rxCls, (ExecutorService)null);
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    public <T extends RxInvoker> T rx(Class<T> rxCls, ExecutorService executorService) {
-        return webClient.rx(rxCls, executorService);
+        return webClient.rx(rxCls, (ExecutorService)null);
     }
 
     @Override
-    public NioInvoker nio() {
-        // TODO: Implementation required (JAX-RS 2.1)
-        return null;
+    public Response patch(Entity<?> entity) {
+        return sync.patch(entity);
+    }
+
+    @Override
+    public <T> T patch(Entity<?> entity, Class<T> responseType) {
+        return sync.patch(entity, responseType);
+    }
+
+    @Override
+    public <T> T patch(Entity<?> entity, GenericType<T> responseType) {
+        return sync.patch(entity, responseType);
     }
 }

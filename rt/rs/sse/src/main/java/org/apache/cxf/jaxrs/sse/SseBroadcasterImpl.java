@@ -18,68 +18,62 @@
  */
 package org.apache.cxf.jaxrs.sse;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import javax.ws.rs.Flow;
-import javax.ws.rs.Flow.Subscriber;
 import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.SseBroadcaster;
+import javax.ws.rs.sse.SseEventSink;
 
 public class SseBroadcasterImpl implements SseBroadcaster {
-    private final Map<Flow.Subscriber<? super OutboundSseEvent>, SseUnboundedSubscription> subscribers =
-            new ConcurrentHashMap<>();
+    private final Set<SseEventSink> subscribers = new CopyOnWriteArraySet<>();
 
-    private final Set<Consumer<Subscriber<? super OutboundSseEvent>>> closers =
+    private final Set<Consumer<SseEventSink>> closers =
             new CopyOnWriteArraySet<>();
 
-    private final Set<BiConsumer<Subscriber<? super OutboundSseEvent>, Throwable>> exceptioners =
+    private final Set<BiConsumer<SseEventSink, Throwable>> exceptioners =
             new CopyOnWriteArraySet<>();
 
     @Override
-    public void subscribe(Flow.Subscriber<? super OutboundSseEvent> subscriber) {
-        try {
-            if (!subscribers.containsKey(subscriber)) {
-                final SseUnboundedSubscription subscription = new SseUnboundedSubscription(subscriber);
-                if (subscribers.putIfAbsent(subscriber, subscription) == null) {
-                    subscriber.onSubscribe(subscription);
-                }
-            }
-        } catch (final Exception ex) {
-            subscriber.onError(ex);
-        }
+    public void register(SseEventSink sink) {
+        subscribers.add(sink);
     }
 
     @Override
-    public void broadcast(OutboundSseEvent event) {
-        for (Map.Entry<Flow.Subscriber<? super OutboundSseEvent>, SseUnboundedSubscription> entry 
-            : subscribers.entrySet()) {
+    public CompletionStage<?> broadcast(OutboundSseEvent event) {
+        final Collection<CompletableFuture<?>> futures = new ArrayList<>();
+        
+        for (SseEventSink sink: subscribers) {
             try {
-                entry.getValue().send(event);
+                futures.add(sink.send(event).toCompletableFuture());
             } catch (final Exception ex) {
-                exceptioners.forEach(exceptioner -> exceptioner.accept(entry.getKey(), ex));
+                exceptioners.forEach(exceptioner -> exceptioner.accept(sink, ex));
             }
         }
+        
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
     }
 
     @Override
-    public void onClose(Consumer<Subscriber<? super OutboundSseEvent>> subscriber) {
+    public void onClose(Consumer<SseEventSink> subscriber) {
         closers.add(subscriber);
     }
 
     @Override
-    public void onError(BiConsumer<Subscriber<? super OutboundSseEvent>, Throwable> exceptioner) {
+    public void onError(BiConsumer<SseEventSink, Throwable> exceptioner) {
         exceptioners.add(exceptioner);
     }
 
     @Override
     public void close() {
-        subscribers.keySet().forEach(subscriber -> {
-            subscriber.onComplete();
+        subscribers.forEach(subscriber -> {
+            subscriber.close();
             closers.forEach(closer -> closer.accept(subscriber));
         });
     }

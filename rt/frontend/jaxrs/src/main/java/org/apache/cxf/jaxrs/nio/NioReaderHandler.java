@@ -18,21 +18,18 @@
  */
 package org.apache.cxf.jaxrs.nio;
 
-public final class NioWriteEntity {
-    private final NioWriterHandler writer;
-    private final NioErrorHandler error;
-
-    public NioWriteEntity(final NioWriterHandler writer, final NioErrorHandler error) {
-        this.writer = writer;
-        this.error = error;
-    }
-
-    public NioWriterHandler getWriter() {
-        return writer;
-    }
-
-    public NioErrorHandler getError() {
-        return error;
-    }
+/**
+ * Class NioReader.
+ */
+@FunctionalInterface
+public interface NioReaderHandler {
+    /**
+     * Called every time it is possible to read from the input stream without blocking. The last
+     * time this method is called, the value of {@code in.isFinished()} must be {@code true} to
+     * indicate that all the stream has been read.
+     *
+     * @param in input stream.
+     */
+    void read(NioInputStream in);
 }
 

@@ -34,14 +34,11 @@ import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.NioErrorHandler;
-import javax.ws.rs.core.NioWriterHandler;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
-import org.apache.cxf.jaxrs.nio.NioWriteEntity;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
@@ -316,16 +313,5 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
             return variants((List<Variant>)null);
         }
         return variants(Arrays.asList(variants));
-    }
-
-    @Override
-    public ResponseBuilder entity(NioWriterHandler writerHandler) {
-        return entity(writerHandler, (NioErrorHandler)null);
-    }
-
-    @Override
-    public ResponseBuilder entity(NioWriterHandler writerHandler, NioErrorHandler errorHandler) {
-        entity = new NioWriteEntity(writerHandler, errorHandler);
-        return this;
     }
 }

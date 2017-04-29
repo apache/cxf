@@ -39,6 +39,8 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.annotations.UseNio;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.nio.NioReadEntity;
+import org.apache.cxf.jaxrs.nio.NioWriteEntity;
 
 @Path("/bookstore")
 public class NioBookStore {
@@ -49,31 +51,35 @@ public class NioBookStore {
             IOUtils.readBytesFromStream(getClass().getResourceAsStream("/files/books.txt")));
         final byte[] buffer = new byte[4096];
 
-        return Response.ok().entity(
-            out -> {
-                try {
-                    final int n = in.read(buffer);
-
-                    if (n >= 0) {
-                        out.write(buffer, 0, n);
-                        return true;
-                    }
-
+        return Response
+            .ok()
+            .entity(
+                new NioWriteEntity(
+                out -> {
                     try {
-                        in.close();
+                        final int n = in.read(buffer);
+    
+                        if (n >= 0) {
+                            out.write(buffer, 0, n);
+                            return true;
+                        }
+    
+                        try {
+                            in.close();
+                        } catch (IOException ex) {
+                            /* do nothing */
+                        }
+    
+                        return false;
                     } catch (IOException ex) {
-                        /* do nothing */
+                        throw new WebApplicationException(ex);
                     }
-
-                    return false;
-                } catch (IOException ex) {
-                    throw new WebApplicationException(ex);
+                },
+                throwable -> {
+                    throw throwable;
                 }
-            },
-            throwable -> {
-                throw throwable;
-            }
-        ).build();
+            ))
+            .build();
     }
 
     @GET
@@ -92,34 +98,33 @@ public class NioBookStore {
         final byte[] buffer = new byte[4096];
         final LongAdder adder = new LongAdder();
 
-        request.entity(
-            in -> {
-                try {
-                    final int n = in.read(buffer);
-                    if (n > 0) {
-                        adder.add(n);
-                        out.write(buffer, 0, n);
-                    }
-                } catch (IOException e) {
-                    throw new WebApplicationException(e);
+        new NioReadEntity(
+        in -> {
+            try {
+                final int n = in.read(buffer);
+                if (n > 0) {
+                    adder.add(n);
+                    out.write(buffer, 0, n);
                 }
-            },
-            in -> {
-                try {
-                    if (!in.isFinished()) {
-                        throw new IllegalStateException("Reader did not finish yet");
-                    }
-
-                    out.close();
-                    response.resume("Book Store uploaded: " + adder.longValue() + " bytes");
-                } catch (IOException e) {
-                    throw new WebApplicationException(e);
-                }
-            },
-            throwable -> {              // error handler
-                System.out.println("Problem found: " + throwable.getMessage());
-                throw throwable;
+            } catch (IOException e) {
+                throw new WebApplicationException(e);
             }
-        );
+        },
+        in -> {
+            try {
+                if (!in.isFinished()) {
+                    throw new IllegalStateException("Reader did not finish yet");
+                }
+
+                out.close();
+                response.resume("Book Store uploaded: " + adder.longValue() + " bytes");
+            } catch (IOException e) {
+                throw new WebApplicationException(e);
+            }
+        },
+        throwable -> {              // error handler
+            System.out.println("Problem found: " + throwable.getMessage());
+            throw throwable;
+        });
     }
 }

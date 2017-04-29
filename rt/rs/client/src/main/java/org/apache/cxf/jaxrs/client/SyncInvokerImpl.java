@@ -158,4 +158,19 @@ public class SyncInvokerImpl implements SyncInvoker {
     public WebClient getWebClient() {
         return wc;
     }
+
+    @Override
+    public Response patch(Entity<?> entity) {
+        return method(HttpMethod.PATCH, entity);
+    }
+
+    @Override
+    public <T> T patch(Entity<?> entity, Class<T> responseType) {
+        return method(HttpMethod.PATCH, entity, responseType);
+    }
+
+    @Override
+    public <T> T patch(Entity<?> entity, GenericType<T> responseType) {
+        return method(HttpMethod.PATCH, entity, responseType);
+    }
 }

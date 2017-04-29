@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.nio;
 import java.io.IOException;
 
 import javax.servlet.ServletInputStream;
-import javax.ws.rs.core.NioInputStream;
 
 public class DelegatingNioInputStream extends NioInputStream {
     private final ServletInputStream in;
