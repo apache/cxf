@@ -853,6 +853,8 @@ public final class ResourceUtils {
                 providers.add(o);
             } else if (o instanceof Feature) {
                 features.add((Feature) o);
+            } else if (o instanceof javax.ws.rs.core.Feature) {
+                providers.add(o);
             } else {
                 resourceClasses.add(o.getClass());
                 map.put(o.getClass(), new SingletonResourceProvider(o));
