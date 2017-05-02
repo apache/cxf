@@ -37,9 +37,10 @@ import javax.cache.integration.CacheWriter;
 import javax.cache.spi.CachingProvider;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.ext.Provider;
 
 
-
+@Provider
 public class CacheControlFeature implements Feature {
     private CachingProvider provider;
     private CacheManager manager;

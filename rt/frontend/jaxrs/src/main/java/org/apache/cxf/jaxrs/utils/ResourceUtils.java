@@ -125,6 +125,7 @@ public final class ResourceUtils {
         SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.ContainerRequestFilter");
         SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.ContainerResponseFilter");
         SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.container.DynamicFeature");
+        SERVER_PROVIDER_CLASS_NAMES.add("javax.ws.rs.core.Feature");
         SERVER_PROVIDER_CLASS_NAMES.add("org.apache.cxf.jaxrs.ext.ContextProvider");
 
     }
@@ -853,8 +854,6 @@ public final class ResourceUtils {
                 providers.add(o);
             } else if (o instanceof Feature) {
                 features.add((Feature) o);
-            } else if (o instanceof javax.ws.rs.core.Feature) {
-                providers.add(o);
             } else {
                 resourceClasses.add(o.getClass());
                 map.put(o.getClass(), new SingletonResourceProvider(o));
