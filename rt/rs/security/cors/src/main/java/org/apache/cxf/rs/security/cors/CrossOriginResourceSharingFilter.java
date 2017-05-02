@@ -292,10 +292,12 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
                                                       Message m) {
         final String contentType = MediaType.WILDCARD;
         final MediaType acceptType = MediaType.WILDCARD_TYPE;
-        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(matchedResources, 
-                                    m, httpMethod, values, 
-                                    contentType, 
-                                    Collections.singletonList(acceptType), false); 
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(matchedResources,
+                                    m, httpMethod, values,
+                                    contentType,
+                                    Collections.singletonList(acceptType), 
+                                    false,
+                                    false);
         if (ori == null) {
             return null;
         }

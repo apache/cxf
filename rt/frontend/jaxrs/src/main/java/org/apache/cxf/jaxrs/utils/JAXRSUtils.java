@@ -372,8 +372,9 @@ public final class JAXRSUtils {
         String requestContentType, 
         List<MediaType> acceptContentTypes) {
         return findTargetMethod(matchedResources, message, httpMethod, matchedValues,
-                                requestContentType, acceptContentTypes, true);
+                                requestContentType, acceptContentTypes, true, true);
     }
+    //CHECKSTYLE:OFF
     public static OperationResourceInfo findTargetMethod(
         Map<ClassResourceInfo, MultivaluedMap<String, String>> matchedResources,
         Message message,
@@ -381,9 +382,10 @@ public final class JAXRSUtils {
         MultivaluedMap<String, String> matchedValues,
         String requestContentType, 
         List<MediaType> acceptContentTypes,
-        boolean throwException) {
-        
-        final boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE); 
+        boolean throwException,
+        boolean recordMatchedUri) {
+    //CHECKSTYLE:ON
+        final boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE);
         final boolean getMethod = HttpMethod.GET.equals(httpMethod);
         
         MediaType requestType;
@@ -495,7 +497,9 @@ public final class JAXRSUtils {
                                                                                   MEDIA_TYPE_Q_PARAM, 
                                                                                   MEDIA_TYPE_QS_PARAM));
             }
-            pushOntoStack(ori, matchedValues, message);
+            if (recordMatchedUri) {
+                pushOntoStack(ori, matchedValues, message);
+            }
             return ori;
         }
         
@@ -1778,20 +1782,32 @@ public final class JAXRSUtils {
             values = Collections.emptyList();
         } else {
             values = new ArrayList<String>(params.size() - 1);
+            URITemplate rootTemplate = ori.getClassResourceInfo().getURITemplate();
+            if (rootTemplate != null) {
+                for (String var : rootTemplate.getVariables()) {
+                    addTemplateVarValues(values, params, var);
+                }
+            }
             for (Parameter pm : ori.getParameters()) {
                 if (pm.getType() == ParameterType.PATH) {
-                    List<String> paramValues = params.get(pm.getName());
-                    if (paramValues != null) {
-                        values.addAll(paramValues);
-                    }
-                    
+                    addTemplateVarValues(values, params, pm.getName());
                 }
             }
         }
         Class<?> realClass = ori.getClassResourceInfo().getServiceClass();
         stack.push(new MethodInvocationInfo(ori, realClass, values));
     }
-    
+
+    private static void addTemplateVarValues(List<String> values, 
+                                             MultivaluedMap<String, String> params,
+                                             String var) {
+        List<String> paramValues = params.get(var);
+        if (paramValues != null) {
+            values.addAll(paramValues);
+        }
+        
+    }
+
     public static String logMessageHandlerProblem(String name, Class<?> cls, MediaType ct) {
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(name, BUNDLE, cls.getName(), mediaTypeToString(ct));

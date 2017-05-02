@@ -170,12 +170,12 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         MultivaluedMap<String, String> matchedValues = new MetadataMap<String, String>();
-                
-        OperationResourceInfo ori = null;     
-        
-        try {                
-            ori = JAXRSUtils.findTargetMethod(matchedResources, message, 
-                      httpMethod, matchedValues, requestContentType, acceptContentTypes, true);
+
+        OperationResourceInfo ori = null;
+
+        try {
+            ori = JAXRSUtils.findTargetMethod(matchedResources, message,
+                      httpMethod, matchedValues, requestContentType, acceptContentTypes, true, true);
             setExchangeProperties(message, exchange, ori, matchedValues, resources.size());
         } catch (WebApplicationException ex) {
             if (JAXRSUtils.noResourceMethodForOptions(ex.getResponse(), httpMethod)) {
