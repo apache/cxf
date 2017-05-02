@@ -296,7 +296,9 @@ public class CrossOriginResourceSharingFilter implements ContainerRequestFilter,
         OperationResourceInfo ori = JAXRSUtils.findTargetMethod(matchedResources,
                                     m, httpMethod, values,
                                     contentType,
-                                    Collections.singletonList(acceptType), false);
+                                    Collections.singletonList(acceptType), 
+                                    false,
+                                    false);
         if (ori == null) {
             return null;
         }
