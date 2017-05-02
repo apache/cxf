@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
+import org.apache.cxf.binding.soap.SoapBindingFactory;
 import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.common.i18n.Message;
@@ -149,7 +150,10 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
                     + endpointName + " in wsdl doesn't match " + transportId + ".");
                 BindingInfo bi = ei.getBinding();
                 ei = createEndpointInfo(bi);
-            } else if (bindingId != null && !ei.getBinding().getBindingId().equals(bindingId)) {
+            } else if (bindingId != null && !ei.getBinding().getBindingId().equals(bindingId)
+                //consider SoapBinding has multiple default namespace
+                && !(SoapBindingFactory.DEFAULT_NAMESPACES.contains(bindingId)
+                    && SoapBindingFactory.DEFAULT_NAMESPACES.contains(ei.getBinding().getBindingId()))) {
                 LOG.warning("Binding for endpoint/port "
                     + endpointName + " in wsdl doesn't match " + bindingId + ".");
                 ei = createEndpointInfo(null);
