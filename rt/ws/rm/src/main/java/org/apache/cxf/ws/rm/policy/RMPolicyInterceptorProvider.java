@@ -61,6 +61,7 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
         super(ASSERTION_TYPES);
         rmIn.setBus(bus);
         rmOut.setBus(bus);
+        rmCaptureIn.setBus(bus);
         rmCaptureOut.setBus(bus);
         rmDelivery.setBus(bus);
         
