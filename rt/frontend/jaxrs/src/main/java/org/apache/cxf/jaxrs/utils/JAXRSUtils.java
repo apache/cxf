@@ -1782,17 +1782,8 @@ public final class JAXRSUtils {
             values = Collections.emptyList();
         } else {
             values = new ArrayList<String>(params.size() - 1);
-            URITemplate rootTemplate = ori.getClassResourceInfo().getURITemplate();
-            if (rootTemplate != null) {
-                for (String var : rootTemplate.getVariables()) {
-                    addTemplateVarValues(values, params, var);
-                }
-            }
-            for (Parameter pm : ori.getParameters()) {
-                if (pm.getType() == ParameterType.PATH) {
-                    addTemplateVarValues(values, params, pm.getName());
-                }
-            }
+            addTemplateVarValues(values, params, ori.getClassResourceInfo().getURITemplate());
+            addTemplateVarValues(values, params, ori.getURITemplate());
         }
         Class<?> realClass = ori.getClassResourceInfo().getServiceClass();
         stack.push(new MethodInvocationInfo(ori, realClass, values));
@@ -1800,12 +1791,15 @@ public final class JAXRSUtils {
 
     private static void addTemplateVarValues(List<String> values, 
                                              MultivaluedMap<String, String> params,
-                                             String var) {
-        List<String> paramValues = params.get(var);
-        if (paramValues != null) {
-            values.addAll(paramValues);
+                                             URITemplate template) {
+        if (template != null) {
+            for (String var : template.getVariables()) {
+                List<String> paramValues = params.get(var);
+                if (paramValues != null) {
+                    values.addAll(paramValues);
+                }
+            }
         }
-        
     }
 
     public static String logMessageHandlerProblem(String name, Class<?> cls, MediaType ct) {
