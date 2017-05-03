@@ -22,9 +22,11 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
+import javax.ws.rs.ext.Provider;
 
 import com.github.kristofa.brave.Brave;
 
+@Provider
 public class BraveFeature implements Feature {
     private final Brave brave;
 
