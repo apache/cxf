@@ -72,6 +72,15 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
         assertEquals("/my/resource/1/matched/uris/param,/my/resource/1", data);
     }
     @Test
+    public void testMatchedUrisParam2() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT 
+                                        + "/match/my/resource/1/matched/uris/param/2");
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
+        wc.accept("text/plain");
+        String data = wc.get(String.class);
+        assertEquals("/my/resource/1/matched/uris/param/2,/my/resource/1", data);
+    }
+    @Test
     public void testMatchedResources() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/match/my/resource/1/matched/resources");
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
@@ -96,6 +105,11 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
         @GET
         @Path("matched/uris/param")
         public Object getMatchedUrisParam(@PathParam("param") String param) {
+            return concat(uriInfo.getMatchedURIs());
+        }
+        @GET
+        @Path("matched/uris/param/{param2}")
+        public Object getMatchedUrisParam2() {
             return concat(uriInfo.getMatchedURIs());
         }
         @GET
