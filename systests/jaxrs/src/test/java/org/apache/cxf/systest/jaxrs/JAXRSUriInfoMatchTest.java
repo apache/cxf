@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -62,6 +63,15 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
         assertEquals("/my/resource/1/matched/uris,/my/resource/1", data);
     }
     @Test
+    public void testMatchedUrisParam() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT 
+                                        + "/match/my/resource/1/matched/uris/param");
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
+        wc.accept("text/plain");
+        String data = wc.get(String.class);
+        assertEquals("/my/resource/1/matched/uris/param,/my/resource/1", data);
+    }
+    @Test
     public void testMatchedResources() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/match/my/resource/1/matched/resources");
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(100000000L);
@@ -81,6 +91,11 @@ public class JAXRSUriInfoMatchTest extends AbstractClientServerTestBase {
         @GET
         @Path("matched/uris")
         public Object getMatchedUris() {
+            return concat(uriInfo.getMatchedURIs());
+        }
+        @GET
+        @Path("matched/uris/param")
+        public Object getMatchedUrisParam(@PathParam("param") String param) {
             return concat(uriInfo.getMatchedURIs());
         }
         @GET
