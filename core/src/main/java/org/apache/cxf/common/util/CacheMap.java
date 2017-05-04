@@ -120,7 +120,7 @@ public class CacheMap<K, V> implements Map<K, V> {
 
     public V remove(Object key) {
         V v = mainDataMap.remove(key);
-        Set<K> keys = new HashSet<>(extraKeyMap.keySet());
+        Set<K> keys = new HashSet<K>(extraKeyMap.keySet());
         V v2 = extraKeyMap.remove(key);
         for (K nk : keys) {
             if ((key != null && key.equals(nk)) || (key == null && nk == null)) {
