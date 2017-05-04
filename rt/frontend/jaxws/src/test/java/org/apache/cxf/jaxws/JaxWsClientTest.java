@@ -54,8 +54,6 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-
 public class JaxWsClientTest extends AbstractJaxWsTest {
 
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",

@@ -207,7 +207,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
 
             tmt.setKeyStore(kst);
             try {
-                return TLSParameterJaxBUtils.getTrustManagers(tmt);
+                return TLSParameterJaxBUtils.getTrustManagers(tmt, false);
             } catch (Exception e) {
                 throw new RuntimeException("failed to retrieve trust managers", e);
             }
@@ -240,7 +240,7 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
 
             tmt.setKeyStore(kst);
             try {
-                return TLSParameterJaxBUtils.getTrustManagers(tmt);
+                return TLSParameterJaxBUtils.getTrustManagers(tmt, false);
             } catch (Exception e) {
                 throw new RuntimeException("failed to retrieve trust managers", e);
             }

@@ -177,7 +177,7 @@ public class CXFOSGiTestSupport {
     public void assertServicePublished(String filter, int timeout) {
         try {
             Filter serviceFilter = bundleContext.createFilter(filter);
-            ServiceTracker tracker = new ServiceTracker(bundleContext, serviceFilter, null);
+            ServiceTracker<?, ?> tracker = new ServiceTracker<>(bundleContext, serviceFilter, null);
             tracker.open();
             Object service = tracker.waitForService(timeout);
             tracker.close();
