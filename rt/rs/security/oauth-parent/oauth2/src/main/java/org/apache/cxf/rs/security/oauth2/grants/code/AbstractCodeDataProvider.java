@@ -69,7 +69,7 @@ public abstract class AbstractCodeDataProvider extends AbstractOAuthDataProvider
     protected abstract void saveCodeGrant(ServerAuthorizationCodeGrant grant);
     
     public static boolean isCodeMatched(ServerAuthorizationCodeGrant grant, Client c, UserSubject sub) {
-        if (c == null || grant.getClient().getClientId().equals(c.getClientId())) {
+        if (grant != null && (c == null || grant.getClient().getClientId().equals(c.getClientId()))) {
             UserSubject grantSub = grant.getSubject();
             return sub == null || grantSub != null && grantSub.getLogin().equals(sub.getLogin());
         }
