@@ -579,7 +579,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
                 && c.getResourceOwnerSubject().getLogin().equals(resourceOwner.getLogin());
     }
     protected static boolean isTokenMatched(ServerAccessToken token, Client c, UserSubject sub) {
-        if (c == null || token.getClient().getClientId().equals(c.getClientId())) {
+        if (token != null && (c == null || token.getClient().getClientId().equals(c.getClientId()))) {
             UserSubject tokenSub = token.getSubject();
             if (sub == null || tokenSub != null && tokenSub.getLogin().equals(sub.getLogin())) {
                 return true;
