@@ -24,6 +24,7 @@ import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
@@ -33,6 +34,7 @@ import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -51,6 +53,8 @@ import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
 
 public class JaxWsClientTest extends AbstractJaxWsTest {
 
@@ -118,7 +122,8 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();
         requestContext.put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT, Boolean.TRUE);
 
-        //re-get the context so it's not a thread safe variant
+        // future calls to getRequestContext() will use a thread local request context. 
+        // That allows the request context to be threadsafe.
         requestContext = ((BindingProvider)handler).getRequestContext();
 
         final String key = "Hi";
@@ -128,6 +133,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         final Object[] result = new Object[2];
         Thread t = new Thread() {
             public void run() {
+                //requestContext in main thread shouldn't affect the requestContext in this thread
                 Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();
                 result[0] = requestContext.get(key);
                 requestContext.remove(key);
@@ -137,7 +143,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         t.start();
         t.join();
 
-        assertEquals("thread sees the put", "ho", result[0]);
+        assertNull("thread shouldn't see the put", result[0]);
         assertNull("thread did not remove the put", result[1]);
 
         assertEquals("main thread does not see removal",
@@ -156,7 +162,8 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         Map<String, Object> requestContext = disp.getRequestContext();
         requestContext.put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT, Boolean.TRUE);
 
-        //re-get the context so it's not a thread safe variant
+        // future calls to getRequestContext() will use a thread local request context. 
+        // That allows the request context to be threadsafe.
         requestContext = disp.getRequestContext();
 
         final String key = "Hi";
@@ -166,6 +173,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         final Object[] result = new Object[2];
         Thread t = new Thread() {
             public void run() {
+                //requestContext in main thread shouldn't affect the requestContext in this thread
                 Map<String, Object> requestContext = disp.getRequestContext();
                 result[0] = requestContext.get(key);
                 requestContext.remove(key);
@@ -175,11 +183,37 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         t.start();
         t.join();
 
-        assertEquals("thread sees the put", "ho", result[0]);
+        assertNull("thread shouldn't see the put", result[0]);
         assertNull("thread did not remove the put", result[1]);
 
         assertEquals("main thread does not see removal",
                      "ho", requestContext.get(key));
+    }
+    
+    @Test
+    public void testThreadLocalRequestContextIsIsolated() throws InterruptedException {
+        URL url = getClass().getResource("/wsdl/hello_world.wsdl");
+        javax.xml.ws.Service s = javax.xml.ws.Service.create(url, serviceName);
+        final Greeter handler = s.getPort(portName, Greeter.class);
+        final AtomicBoolean isPropertyAPresent = new AtomicBoolean(false);
+        // Makes request context thread local
+        ClientProxy.getClient(handler).setThreadLocalRequestContext(true);
+        // PropertyA should be added to the request context of current thread only
+        ClientProxy.getClient(handler).getRequestContext().put("PropertyA", "PropertyAVal");
+        Runnable checkRequestContext = new Runnable() {
+            @Override
+            public void run() {
+                if (ClientProxy.getClient(handler).getRequestContext().containsKey("PropertyA")) {
+                    isPropertyAPresent.set(true);
+                }
+            }
+        };
+        Thread thread = new Thread(checkRequestContext);
+        thread.start();
+        thread.join(60000);
+
+        assertFalse("If we have per thread isolation propertyA should be not present in the context of another thread.",
+                    isPropertyAPresent.get());
     }
 
     @Test
