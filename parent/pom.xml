@@ -378,13 +378,14 @@
                             <ruleset>${cxf.resources.base.path}cxf-pmd-ruleset.xml</ruleset>
                         </rulesets>
                         <sourceEncoding>UTF-8</sourceEncoding>
-                        <targetJdk>1.7</targetJdk>
+                        <targetJdk>1.8</targetJdk>
                         <linkXRef>false</linkXRef>
                         <includeTests>true</includeTests>
                         <verbose>true</verbose>
                         <excludeRoots>
                             <excludeRoot>${basedir}/src/main/generated</excludeRoot>
                         </excludeRoots>
+                        <analysisCache>true</analysisCache>
                     </configuration>
                     <executions>
                         <execution>
