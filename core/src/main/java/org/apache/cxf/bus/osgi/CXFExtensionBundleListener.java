@@ -134,7 +134,7 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
         }
         public Object load(ClassLoader cl, Bus b) {
             if (interfaceName == null && bundle.getBundleContext() != null) {
-                ServiceReference ref = bundle.getBundleContext().getServiceReference(className);
+                ServiceReference<?> ref = bundle.getBundleContext().getServiceReference(className);
                 if (ref != null && ref.getBundle().getBundleId() == bundle.getBundleId()) {
                     Object o = bundle.getBundleContext().getService(ref);
                     serviceObject = o;

@@ -45,13 +45,13 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
 
     private Map<String, AutomaticWorkQueueImpl> queues =
         new ConcurrentHashMap<String, AutomaticWorkQueueImpl>(4, 0.75f, 2);
-    private ServiceTracker configAdminTracker;
+    private ServiceTracker<ConfigurationAdmin, ConfigurationAdmin> configAdminTracker;
 
     public String getName() {
         return FACTORY_PID;
     }
 
-    public void updated(String pid, @SuppressWarnings("rawtypes") Dictionary props)
+    public void updated(String pid, Dictionary<String, ?> props)
         throws ConfigurationException {
         if (pid == null) {
             return;
@@ -98,8 +98,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
         String filter = "(service.factoryPid=" + ManagedWorkQueueList.FACTORY_PID + ")";
         Configuration[] configs = configurationAdmin.listConfigurations(filter);
         for (Configuration configuration : configs) {
-            @SuppressWarnings("rawtypes")
-            Dictionary props = configuration.getProperties();
+            Dictionary<String, Object> props = configuration.getProperties();
             String name = (String)props.get(AutomaticWorkQueueImpl.PROPERTY_NAME);
             if (queue.getName().equals(name)) {
                 selectedConfig = configuration;
@@ -118,7 +117,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
         }
     }
 
-    public void setConfigAdminTracker(ServiceTracker configAdminTracker) {
+    public void setConfigAdminTracker(ServiceTracker<ConfigurationAdmin, ConfigurationAdmin> configAdminTracker) {
         this.configAdminTracker = configAdminTracker;
     }
 

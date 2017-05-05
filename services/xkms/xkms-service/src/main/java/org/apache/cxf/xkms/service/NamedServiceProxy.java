@@ -24,10 +24,10 @@ import java.lang.reflect.Method;
 import org.osgi.util.tracker.ServiceTracker;
 
 public class NamedServiceProxy implements InvocationHandler {
-    private ServiceTracker tracker;
+    private ServiceTracker<?, ?> tracker;
     private String filter;
 
-    public NamedServiceProxy(ServiceTracker tracker, String filter) {
+    public NamedServiceProxy(ServiceTracker<?, ?> tracker, String filter) {
         this.tracker = tracker;
         this.filter = filter;
     }

@@ -19,10 +19,9 @@
 
 package org.apache.cxf.transport.http.osgi;
 
-import java.util.Properties;
-
 import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
 import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.DestinationRegistryImpl;
@@ -39,7 +38,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 public class HTTPTransportActivator implements BundleActivator {
     private static final String DISABLE_DEFAULT_HTTP_TRANSPORT = "org.apache.cxf.osgi.http.transport.disable";
-    private ServiceTracker httpServiceTracker;
+    private ServiceTracker<HttpService, ?> httpServiceTracker;
 
     public void start(final BundleContext context) throws Exception {
 
@@ -60,7 +59,7 @@ public class HTTPTransportActivator implements BundleActivator {
         HTTPTransportFactory transportFactory = new HTTPTransportFactory(destinationRegistry);
 
         HttpServiceTrackerCust customizer = new HttpServiceTrackerCust(destinationRegistry, context);
-        httpServiceTracker = new ServiceTracker(context, HttpService.class.getName(), customizer);
+        httpServiceTracker = new ServiceTracker<>(context, HttpService.class, customizer);
         httpServiceTracker.open();
 
         context.registerService(DestinationRegistry.class.getName(), destinationRegistry, null);
@@ -77,11 +76,10 @@ public class HTTPTransportActivator implements BundleActivator {
                                             "http://cxf.apache.org/transports/http/configuration");
     }
 
-    private ServiceRegistration registerService(BundleContext context, Class<?> serviceInterface,
-                                        Object serviceObject, String servicePid) {
-        Properties servProps = new Properties();
-        servProps.put(Constants.SERVICE_PID,  servicePid);
-        return context.registerService(serviceInterface.getName(), serviceObject, servProps);
+    private <T> ServiceRegistration<T> registerService(BundleContext context, Class<T> serviceInterface,
+                                        T serviceObject, String servicePid) {
+        return context.registerService(serviceInterface, serviceObject,
+                                       CollectionUtils.singletonDictionary(Constants.SERVICE_PID, servicePid));
     }
 
     public void stop(BundleContext context) throws Exception {

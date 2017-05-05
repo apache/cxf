@@ -21,7 +21,8 @@ package org.apache.cxf.wsn.services;
 
 import java.net.URL;
 import java.util.Dictionary;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.management.MBeanServer;
 import javax.xml.ws.Endpoint;
@@ -29,6 +30,7 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.blueprint.BlueprintBus;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.wsn.EndpointRegistrationException;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -111,11 +113,11 @@ public class OSGiJaxwsEndpointManager extends JaxwsEndpointManager {
         bp.setId("WS-Notification");
         bp.initialize();
         if (null != bundleContext) {
-            Properties props = new Properties();
+            Map<String, Object> props = new HashMap<>();
             props.put(CONTEXT_SYMBOLIC_NAME_PROPERTY, bundleContext.getBundle().getSymbolicName());
             props.put(CONTEXT_VERSION_PROPERTY, getBundleVersion(bundleContext.getBundle()));
             props.put(CONTEXT_NAME_PROPERTY, bp.getId());
-            bundleContext.registerService(Bus.class.getName(), bp, props);
+            bundleContext.registerService(Bus.class.getName(), bp, CollectionUtils.toDictionary(props));
         }
         cxfBus = bp;
     }

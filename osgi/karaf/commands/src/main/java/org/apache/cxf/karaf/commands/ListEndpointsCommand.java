@@ -148,7 +148,7 @@ public class ListEndpointsCommand extends CXFController implements Action {
         String filter = "(&(" + "objectclass=" + "javax.servlet.Servlet"
             + ")(servlet-name=cxf-osgi-transport-servlet))";
 
-        ServiceReference ref = getBundleContext().getServiceReferences(null, filter)[0];
+        ServiceReference<?> ref = getBundleContext().getServiceReferences((String)null, filter)[0];
 
         if (ref != null) {
             ret = (String)ref.getProperty("alias");
@@ -163,7 +163,7 @@ public class ListEndpointsCommand extends CXFController implements Action {
         String filter = "(&(" + "objectclass=" + "org.osgi.service.http.HttpService"
                 + "))";
 
-        ServiceReference ref = getBundleContext().getServiceReferences(null, filter)[0];
+        ServiceReference<?> ref = getBundleContext().getServiceReferences((String)null, filter)[0];
 
         if (ref != null) {
             ret = (String) ref.getProperty("org.osgi.service.http.port");

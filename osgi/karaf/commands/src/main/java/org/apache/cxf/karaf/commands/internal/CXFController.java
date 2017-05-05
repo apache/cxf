@@ -20,6 +20,7 @@
 package org.apache.cxf.karaf.commands.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,11 +48,11 @@ public class CXFController {
     public List<Bus> getBusses() {
         List<Bus> busses = new ArrayList<>();
         try {
-            ServiceReference[] references = bundleContext.getServiceReferences(Bus.class.getName(), null);
+            Collection<ServiceReference<Bus>> references = bundleContext.getServiceReferences(Bus.class, null);
             if (references != null) {
-                for (ServiceReference reference : references) {
+                for (ServiceReference<Bus> reference : references) {
                     if (reference != null) {
-                        Bus bus = (Bus) bundleContext.getService(reference);
+                        Bus bus = bundleContext.getService(reference);
                         if (bus != null) {
                             busses.add(bus);
                         }
@@ -66,12 +67,12 @@ public class CXFController {
 
     public Bus getBus(String name) {
         try {
-            ServiceReference[] references = bundleContext.getServiceReferences(Bus.class.getName(), null);
+            Collection<ServiceReference<Bus>> references = bundleContext.getServiceReferences(Bus.class, null);
             if (references != null) {
-                for (ServiceReference reference : references) {
+                for (ServiceReference<Bus> reference : references) {
                     if (reference != null
                         && name.equals(reference.getProperty("cxf.bus.id"))) {
-                        return (Bus) bundleContext.getService(reference);
+                        return bundleContext.getService(reference);
                     }
                 }
             }

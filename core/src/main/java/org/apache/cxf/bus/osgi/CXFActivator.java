@@ -21,12 +21,12 @@ package org.apache.cxf.bus.osgi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.cxf.bus.blueprint.BlueprintNameSpaceHandlerFactory;
 import org.apache.cxf.bus.blueprint.NamespaceHandlerRegisterer;
 import org.apache.cxf.bus.extension.Extension;
 import org.apache.cxf.bus.extension.ExtensionRegistry;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.internal.CXFAPINamespaceHandler;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
@@ -48,9 +48,9 @@ public class CXFActivator implements BundleActivator {
 
     private List<Extension> extensions;
     private ManagedWorkQueueList workQueues;
-    private ServiceTracker configAdminTracker;
+    private ServiceTracker<ConfigurationAdmin, ConfigurationAdmin> configAdminTracker;
     private CXFExtensionBundleListener cxfBundleListener;
-    private ServiceRegistration workQueueServiceRegistration;
+    private ServiceRegistration<ManagedServiceFactory> workQueueServiceRegistration;
 
 
 
@@ -61,10 +61,11 @@ public class CXFActivator implements BundleActivator {
         context.addBundleListener(cxfBundleListener);
         cxfBundleListener.registerExistingBundles(context);
 
-        configAdminTracker = new ServiceTracker(context, ConfigurationAdmin.class.getName(), null);
+        configAdminTracker = new ServiceTracker<>(context, ConfigurationAdmin.class, null);
         configAdminTracker.open();
         workQueues.setConfigAdminTracker(configAdminTracker);
-        workQueueServiceRegistration = registerManagedServiceFactory(context, ManagedServiceFactory.class,
+        workQueueServiceRegistration = registerManagedServiceFactory(context,
+                                                                     ManagedServiceFactory.class,
                                                                      workQueues,
                                                                      ManagedWorkQueueList.FACTORY_PID);
 
@@ -91,13 +92,12 @@ public class CXFActivator implements BundleActivator {
 
     }
 
-    private ServiceRegistration registerManagedServiceFactory(BundleContext context,
-                                                              Class<?> serviceClass,
-                                                              Object service,
-                                                              String servicePid) {
-        Properties props = new Properties();
-        props.put(Constants.SERVICE_PID, servicePid);
-        return context.registerService(serviceClass.getName(), service, props);
+    private <T> ServiceRegistration<T> registerManagedServiceFactory(BundleContext context,
+                                                                     Class<T> serviceClass,
+                                                                     T service,
+                                                                     String servicePid) {
+        return context.registerService(serviceClass, service, 
+                                       CollectionUtils.singletonDictionary(Constants.SERVICE_PID, servicePid));
     }
 
     private Extension createOsgiBusListenerExtension(BundleContext context) {

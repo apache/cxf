@@ -39,7 +39,7 @@ class ServletExporter implements ManagedService {
 
     private String alias;
     private Servlet servlet;
-    private ServiceRegistration serviceRegistration;
+    private ServiceRegistration<?> serviceRegistration;
     private HttpService httpService;
 
     ServletExporter(Servlet servlet, HttpService httpService) {

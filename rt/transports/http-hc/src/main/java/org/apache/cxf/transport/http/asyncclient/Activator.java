@@ -50,18 +50,15 @@ public class Activator implements BundleActivator {
         conduitConfigurer.close();
     }
 
-    public class ConduitConfigurer extends ServiceTracker implements ManagedService {
+    public class ConduitConfigurer extends ServiceTracker<Bus, Bus> implements ManagedService {
         private Map<String, Object> currentConfig;
 
         public ConduitConfigurer(BundleContext context) {
-            super(context, Bus.class.getName(), null);
+            super(context, Bus.class, null);
         }
 
-        @SuppressWarnings({
-            "rawtypes", "unchecked"
-        })
         @Override
-        public void updated(Dictionary properties) throws ConfigurationException {
+        public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
             this.currentConfig = toMap(properties);
             Bus[] buses = (Bus[])getServices();
             if (buses == null) {
@@ -73,8 +70,8 @@ public class Activator implements BundleActivator {
         }
 
         @Override
-        public Object addingService(ServiceReference reference) {
-            Bus bus = (Bus)super.addingService(reference);
+        public Bus addingService(ServiceReference<Bus> reference) {
+            Bus bus = super.addingService(reference);
             configureConduitFactory(bus);
             return bus;
         }

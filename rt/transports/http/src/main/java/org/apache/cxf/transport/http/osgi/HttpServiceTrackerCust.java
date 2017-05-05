@@ -18,10 +18,9 @@
  */
 package org.apache.cxf.transport.http.osgi;
 
-import java.util.Properties;
-
 import javax.servlet.Servlet;
 
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.osgi.framework.BundleContext;
@@ -33,11 +32,11 @@ import org.osgi.service.cm.ManagedService;
 import org.osgi.service.http.HttpService;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
-final class HttpServiceTrackerCust implements ServiceTrackerCustomizer {
+final class HttpServiceTrackerCust implements ServiceTrackerCustomizer<HttpService, HttpService> {
     private static final String CXF_CONFIG_PID = "org.apache.cxf.osgi";
     private final DestinationRegistry destinationRegistry;
     private final BundleContext context;
-    private ServiceRegistration servletPublisherReg;
+    private ServiceRegistration<ManagedService> servletPublisherReg;
     private ServletExporter servletExporter;
 
     HttpServiceTrackerCust(DestinationRegistry destinationRegistry, BundleContext context) {
@@ -46,7 +45,7 @@ final class HttpServiceTrackerCust implements ServiceTrackerCustomizer {
     }
 
     @Override
-    public void removedService(ServiceReference reference, Object service) {
+    public void removedService(ServiceReference<HttpService> reference, HttpService service) {
         servletPublisherReg.unregister();
         try {
             servletExporter.updated(null);
@@ -56,18 +55,18 @@ final class HttpServiceTrackerCust implements ServiceTrackerCustomizer {
     }
 
     @Override
-    public void modifiedService(ServiceReference reference, Object service) {
+    public void modifiedService(ServiceReference<HttpService> reference, HttpService service) {
     }
 
     @Override
-    public Object addingService(ServiceReference reference) {
-        HttpService httpService = (HttpService)context.getService(reference);
+    public HttpService addingService(ServiceReference<HttpService> reference) {
+        HttpService httpService = context.getService(reference);
         Servlet servlet = new CXFNonSpringServlet(destinationRegistry, false);
         servletExporter = new ServletExporter(servlet, httpService);
-        Properties servProps = new Properties();
-        servProps.put(Constants.SERVICE_PID,  CXF_CONFIG_PID);
-        servletPublisherReg = context.registerService(ManagedService.class.getName(),
-                                                      servletExporter, servProps);
+        servletPublisherReg = context.registerService(ManagedService.class,
+                                                      servletExporter,
+                                                      CollectionUtils.singletonDictionary(Constants.SERVICE_PID,
+                                                                                          CXF_CONFIG_PID));
         return httpService;
     }
 }

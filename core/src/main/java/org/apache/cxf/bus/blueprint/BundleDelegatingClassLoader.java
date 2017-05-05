@@ -81,7 +81,6 @@ public class BundleDelegatingClassLoader extends ClassLoader {
         Enumeration<URL> urls;
         try {
             urls = AccessController.doPrivileged(new PrivilegedExceptionAction<Enumeration<URL>>() {
-                @SuppressWarnings("unchecked")
                 public Enumeration<URL> run() throws IOException {
                     return bundle.getResources(name);
                 }
