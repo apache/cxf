@@ -35,12 +35,10 @@ public class TypeDclVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        boolean result =
-            TypedefVisitor.accept(node)
+        return TypedefVisitor.accept(node)
             || StructVisitor.accept(node)
             || UnionVisitor.accept(node)
             || EnumVisitor.accept(node);
-        return result;
     }
 
     public void visit(AST node) {

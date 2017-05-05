@@ -175,7 +175,7 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
         }
         final QName typeName = type == null ? null : type.getQName();
 
-        JAXBBeanInfo bi = new JAXBBeanInfo() {
+        return new JAXBBeanInfo() {
             public boolean isElement() {
                 return el == null ? false : true;
             }
@@ -189,7 +189,6 @@ public class SchemaCollectionContextProxy implements JAXBContextProxy {
                 return qname.getLocalPart();
             }
         };
-        return bi;
     }
 
     private QName getTypeQName(Class<?> cls, String namespace) {

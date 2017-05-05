@@ -386,9 +386,8 @@ public class JMSConfiguration {
             return null;
         }
         try {
-            ConnectionFactory cf = new JndiHelper(getJndiEnvironment()).
+            return new JndiHelper(getJndiEnvironment()).
                 lookup(getConnectionFactoryName(), ConnectionFactory.class);
-            return cf;
         } catch (NamingException e) {
             throw new RuntimeException(e);
         }

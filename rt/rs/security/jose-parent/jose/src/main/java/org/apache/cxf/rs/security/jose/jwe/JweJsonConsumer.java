@@ -75,14 +75,13 @@ public class JweJsonConsumer {
             LOG.warning("JWE JSON Entry union headers are not available");
             throw new JweException(JweException.Error.INVALID_JSON_JWE);
         }
-        JweDecryptionInput input = new JweDecryptionInput(entry.getEncryptedKey(),
-                                                          iv,
-                                                          cipherBytes,
-                                                          authTag,
-                                                          aad,
-                                                          protectedHeaderJson,
-                                                          unionHeaders);
-        return input;
+        return new JweDecryptionInput(entry.getEncryptedKey(),
+                                      iv,
+                                      cipherBytes,
+                                      authTag,
+                                      aad,
+                                      protectedHeaderJson,
+                                      unionHeaders);
     }
 
     public JweJsonEncryptionEntry getJweDecryptionEntry(JweDecryptionProvider jwe) {

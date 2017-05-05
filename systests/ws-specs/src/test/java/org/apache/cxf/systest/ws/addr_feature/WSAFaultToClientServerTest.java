@@ -133,9 +133,7 @@ public class WSAFaultToClientServerTest  extends AbstractWSATestBase {
         QName serviceName = new QName("http://apache.org/cxf/systest/ws/addr_feature/", "AddNumbersService");
         AddNumbersService service = new AddNumbersService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
-        AddNumbersPortType port = service.getAddNumbersPort(new AddressingFeature());
-        //updateAddressPort(port, PORT);
-        return port;
+        return service.getAddNumbersPort(new AddressingFeature());
     }
 
 

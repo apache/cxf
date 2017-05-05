@@ -646,9 +646,7 @@ public abstract class AbstractOperation {
         if (incomingEventList != null) {
             for (SecurityEvent incomingEvent : incomingEventList) {
                 if (event == incomingEvent.getSecurityEventType()) {
-                    org.apache.xml.security.stax.securityToken.SecurityToken token =
-                        ((TokenSecurityEvent<?>)incomingEvent).getSecurityToken();
-                    return token;
+                    return ((TokenSecurityEvent<?>)incomingEvent).getSecurityToken();
                 }
             }
         }

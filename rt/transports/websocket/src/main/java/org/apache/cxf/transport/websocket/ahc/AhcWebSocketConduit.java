@@ -100,10 +100,8 @@ public class AhcWebSocketConduit extends URLConnectionHTTPConduit {
     protected OutputStream createOutputStream(Message message, boolean needToCacheRequest,
                                               boolean isChunking, int chunkThreshold) throws IOException {
         AhcWebSocketConduitRequest entity = message.get(AhcWebSocketConduitRequest.class);
-        AhcWebSocketWrappedOutputStream out =
-            new AhcWebSocketWrappedOutputStream(message, needToCacheRequest, isChunking, chunkThreshold,
-                                                getConduitName(), entity.getUri());
-        return out;
+        return new AhcWebSocketWrappedOutputStream(message, needToCacheRequest, isChunking, chunkThreshold,
+                                                   getConduitName(), entity.getUri());
     }
 
     public class AhcWebSocketWrappedOutputStream extends WrappedOutputStream {

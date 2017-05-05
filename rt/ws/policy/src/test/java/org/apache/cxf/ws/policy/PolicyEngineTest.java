@@ -79,12 +79,11 @@ public class PolicyEngineTest extends Assert {
     }
     private BindingOperationInfo createMockBindingOperationInfo() throws Exception {
         OperationInfo info = new OperationInfo();
-        BindingOperationInfo boi = new BindingOperationInfo(null, info) {
+        return new BindingOperationInfo(null, info) {
             public boolean isUnwrapped() {
                 return false;
             }
         };
-        return boi;
     }
 
     @Test

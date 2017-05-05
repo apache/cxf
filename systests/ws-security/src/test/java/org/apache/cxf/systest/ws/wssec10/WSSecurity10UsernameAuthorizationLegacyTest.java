@@ -99,15 +99,13 @@ public class WSSecurity10UsernameAuthorizationLegacyTest extends AbstractBusClie
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
         PingService svc = new PingService(getWsdlLocation("UserNameOverTransport"));
-        final IPingService port =
-            svc.getPort(
+        return svc.getPort(
                 new QName(
                     "http://WSSec/wssec10",
                     "UserNameOverTransport" + "_IPingService"
                 ),
                 IPingService.class
             );
-        return port;
     }
 
 

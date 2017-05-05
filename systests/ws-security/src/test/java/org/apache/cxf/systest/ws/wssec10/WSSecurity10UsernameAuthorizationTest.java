@@ -135,15 +135,13 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
         PingService svc = new PingService(getWsdlLocation("UserNameOverTransport"));
-        final IPingService port =
-            svc.getPort(
+        return svc.getPort(
                 new QName(
                     "http://WSSec/wssec10",
                     "UserNameOverTransport" + "_IPingService"
                 ),
                 IPingService.class
             );
-        return port;
     }
 
     private static IPingService getUTOnlyPort(Bus bus, boolean hashed) {
@@ -151,15 +149,13 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
         PingService svc = new PingService(getWsdlLocation(hashed));
-        final IPingService port =
-            svc.getPort(
+        return svc.getPort(
                 new QName(
                     "http://WSSec/wssec10",
                     hashed ? "UserName_IPingService_hashed" : "UserName_IPingService"
                 ),
                 IPingService.class
             );
-        return port;
     }
 
     private static URL getWsdlLocation(boolean hashed) {

@@ -58,7 +58,7 @@ public final class SecurityContextFactory {
     
         };
     
-        SecurityContext securityContext = new SecurityContext() {
+        return new SecurityContext() {
     
             public Principal getUserPrincipal() {
                 return principal;
@@ -69,7 +69,6 @@ public final class SecurityContextFactory {
             }
     
         };
-        return securityContext;
     }
 
 }

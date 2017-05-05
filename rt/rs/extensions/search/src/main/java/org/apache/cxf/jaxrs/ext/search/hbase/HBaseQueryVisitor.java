@@ -120,11 +120,10 @@ public class HBaseQueryVisitor<T> extends AbstractSearchConditionVisitor<T, Filt
             ? new RegexStringComparator(value.toString().replace("*", "."))
             : new BinaryComparator(value.toString().getBytes(StandardCharsets.UTF_8));
 
-        Filter query = new SingleColumnValueFilter(theFamily.getBytes(StandardCharsets.UTF_8),
-                                                   qualifier.getBytes(StandardCharsets.UTF_8),
-                                                   compareOp,
-                                                   byteArrayComparable);
-        return query;
+        return new SingleColumnValueFilter(theFamily.getBytes(StandardCharsets.UTF_8),
+                                           qualifier.getBytes(StandardCharsets.UTF_8),
+                                           compareOp,
+                                           byteArrayComparable);
     }
 
     private Filter createCompositeQuery(List<Filter> queries, boolean orCondition) {

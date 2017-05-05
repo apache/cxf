@@ -71,19 +71,17 @@ public class DOM4JProviderTest extends Assert {
                                                  new ByteArrayInputStream(strBytes));
         DOM4JProvider p = new DOM4JProvider();
         p.setProviders(new ProvidersImpl(createMessage(false)));
-        org.dom4j.Document dom = p.readFrom(org.dom4j.Document.class, org.dom4j.Document.class,
+        return p.readFrom(org.dom4j.Document.class, org.dom4j.Document.class,
             new Annotation[] {}, MediaType.valueOf("text/xml;a=b"),
             new MetadataMap<String, String>(),
             is);
-        return dom;
     }
     private org.dom4j.Document readXML(MediaType ct, final String xml) throws Exception {
         DOM4JProvider p = new DOM4JProvider();
         p.setProviders(new ProvidersImpl(createMessage(false)));
-        org.dom4j.Document dom = p.readFrom(org.dom4j.Document.class, org.dom4j.Document.class,
+        return p.readFrom(org.dom4j.Document.class, org.dom4j.Document.class,
             new Annotation[] {}, ct, new MetadataMap<String, String>(),
             new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-        return dom;
     }
 
     @Test

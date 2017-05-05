@@ -125,12 +125,10 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
     }
 
     public DestinationFactory getDestinationFactoryForUri(String uri) {
-        DestinationFactory factory = new TransportFinder<DestinationFactory>(bus,
+        return new TransportFinder<DestinationFactory>(bus,
                 destinationFactories,
                 loaded,
                 DestinationFactory.class).findTransportForURI(uri);
-
-        return factory;
     }
 
 }

@@ -231,13 +231,10 @@ public class CorbaStreamInInterceptor extends AbstractPhaseInterceptor<Message> 
 
         List<ParamType> paramTypes = opType.getParam();
         CorbaStreamable[] arguments = new CorbaStreamable[paramTypes.size()];
-        NVList list = prepareDIIArgsList(corbaMsg, bOpInfo,
-                                         arguments, paramTypes,
-                                         typeMap,
-                                         exg.get(ORB.class), service);
-
-        return list;
-
+        return prepareDIIArgsList(corbaMsg, bOpInfo,
+                                  arguments, paramTypes,
+                                  typeMap,
+                                  exg.get(ORB.class), service);
     }
 
     protected NVList prepareDIIArgsList(CorbaMessage corbaMsg,

@@ -99,7 +99,7 @@ public class HawkAuthorizationScheme {
         }
 
 
-        String value = HAWK_1_HEADER + SEPARATOR
+        return HAWK_1_HEADER + SEPARATOR
             + timestamp + SEPARATOR
             + nonce + SEPARATOR
             + props.getHttpMethod().toUpperCase() + SEPARATOR
@@ -108,8 +108,6 @@ public class HawkAuthorizationScheme {
             + props.getPort() + SEPARATOR
             + "" + SEPARATOR
             + "" + SEPARATOR;
-
-        return value;
     }
 
     private static String normalizeQuery(String query) {
@@ -119,9 +117,7 @@ public class HawkAuthorizationScheme {
     private static String generateNonce() {
         byte[] randomBytes = new byte[20];
         new SecureRandom().nextBytes(randomBytes);
-        String random = Base64Utility.encode(randomBytes);
-
-        return random;
+        return Base64Utility.encode(randomBytes);
     }
 
 }

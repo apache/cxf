@@ -226,10 +226,9 @@ public class TestUtilities {
         is.close();
         os.close();
 
-        byte[] bs = obs.getResponseStream().toByteArray();
-
-        return bs;
+        return obs.getResponseStream().toByteArray();
     }
+
     public byte[] invokeBytes(String address, String transport, byte[] message) throws Exception {
         EndpointInfo ei = new EndpointInfo(null, "http://schemas.xmlsoap.org/soap/http");
         ei.setAddress(address);

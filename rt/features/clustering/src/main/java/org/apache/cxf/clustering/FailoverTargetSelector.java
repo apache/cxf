@@ -302,10 +302,9 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
 
     private Exception getExceptionIfPresent(Exchange exchange) {
         Message outMessage = exchange.getOutMessage();
-        Exception ex = outMessage.get(Exception.class) != null
-                       ? outMessage.get(Exception.class)
-                       : exchange.get(Exception.class);
-        return ex;
+        return outMessage.get(Exception.class) != null
+            ? outMessage.get(Exception.class)
+                : exchange.get(Exception.class);
     }
 
     /**

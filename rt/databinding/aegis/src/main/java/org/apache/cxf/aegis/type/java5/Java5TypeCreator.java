@@ -204,9 +204,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         info.setDescription(clazz.toString());
         info.setType(paramType, paramType instanceof ParameterizedType ? pm : null);
 
-        AegisType type = createTypeForClass(info);
-
-        return type;
+        return createTypeForClass(info);
     }
 
     protected Type getComponentType(Type genericType, int index) {

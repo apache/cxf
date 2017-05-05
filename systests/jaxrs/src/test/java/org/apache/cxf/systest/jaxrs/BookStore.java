@@ -1586,18 +1586,14 @@ public class BookStore {
     @GET
     @Path("/cd/{CDId}/")
     public CD getCD() {
-        CD cd = cds.get(Long.parseLong(currentCdId));
-
-        return cd;
+        return cds.get(Long.parseLong(currentCdId));
     }
 
     @GET
     @Path("/cdwithmultitypes/{CDId}/")
     @Produces({"application/xml", "application/bar+xml", "application/json" })
     public CD getCDWithMultiContentTypes(@PathParam("CDId") String id) {
-        CD cd = cds.get(Long.parseLong(id));
-
-        return cd;
+        return cds.get(Long.parseLong(id));
     }
 
     @GET

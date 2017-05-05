@@ -37,10 +37,8 @@ public class SimpleTypeSpecVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        boolean result =
-            PrimitiveTypesVisitor.accept(node)
+        return PrimitiveTypesVisitor.accept(node)
             || TemplateTypeSpecVisitor.accept(node);
-        return result;
     }
 
     public void visit(AST node) {

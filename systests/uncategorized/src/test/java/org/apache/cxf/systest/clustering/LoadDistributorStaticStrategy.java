@@ -37,9 +37,7 @@ public class LoadDistributorStaticStrategy extends SequentialStrategy {
         // Get the list of endpoints, including the current one.
         // This part is required for most FailoverStrategys that provide alternate
         // target endpoints for the LoadDistributorTargetSelector.
-        List<Endpoint> alternateEndpoints = getEndpoints(exchange, true);
-
-        return alternateEndpoints;
+        return getEndpoints(exchange, true);
     }
 
     @Override

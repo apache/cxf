@@ -48,10 +48,7 @@ public class CustomSubjectProvider implements SubjectProvider {
         String confirmationMethod = getSubjectConfirmationMethod(tokenType, keyType);
 
         Principal principal = providerParameters.getPrincipal();
-        SubjectBean subjectBean =
-            new SubjectBean(principal.getName(), subjectNameQualifier, confirmationMethod);
-
-        return subjectBean;
+        return new SubjectBean(principal.getName(), subjectNameQualifier, confirmationMethod);
     }
 
     /**

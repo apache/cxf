@@ -85,11 +85,10 @@ public class HandlerResolverImpl implements HandlerResolver {
     private List<Handler> getHandlersFromAnnotation(Class<?> clazz, PortInfo portInfo) {
         AnnotationHandlerChainBuilder builder = new AnnotationHandlerChainBuilder();
 
-        List<Handler> chain = builder.buildHandlerChainFromClass(clazz,
+        return builder.buildHandlerChainFromClass(clazz,
             portInfo != null ? portInfo.getPortName() : null,
             portInfo != null ? portInfo.getServiceName() : null,
             portInfo != null ? portInfo.getBindingID() : null);
-        return chain;
     }
 
     /**

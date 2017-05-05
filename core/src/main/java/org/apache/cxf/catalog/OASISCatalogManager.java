@@ -95,7 +95,7 @@ public class OASISCatalogManager {
             }
             catalogManager.setUseStaticCatalog(false);
             catalogManager.setIgnoreMissingProperties(true);
-            CatalogResolver catalogResolver = new CatalogResolver(catalogManager) {
+            return new CatalogResolver(catalogManager) {
                 public String getResolvedEntity(String publicId, String systemId) {
                     String s = super.getResolvedEntity(publicId, systemId);
                     if (s != null && s.startsWith("classpath:")) {
@@ -112,7 +112,6 @@ public class OASISCatalogManager {
                     return s;
                 }
             };
-            return catalogResolver;
         } catch (Throwable t) {
             //ignore
         }

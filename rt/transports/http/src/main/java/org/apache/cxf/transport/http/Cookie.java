@@ -135,10 +135,9 @@ public class Cookie {
             return false;
         }
         Cookie c = (Cookie)o;
-        boolean result = this.name.equals(c.name)
+        return this.name.equals(c.name)
                 && ((this.path == null && c.path == null)
                         || (this.path != null && this.path.equals(c.path)));
-        return result;
     }
 
     /**

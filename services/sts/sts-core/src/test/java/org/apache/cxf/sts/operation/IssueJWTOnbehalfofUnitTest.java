@@ -472,12 +472,9 @@ public class IssueJWTOnbehalfofUnitTest extends org.junit.Assert {
             usernameToken.getAny().add(passwordType);
         }
 
-        JAXBElement<UsernameTokenType> tokenType =
-            new JAXBElement<UsernameTokenType>(
+        return new JAXBElement<UsernameTokenType>(
                     QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );
-
-        return tokenType;
     }
 
     private Map<String, RealmProperties> createSamlRealms() {

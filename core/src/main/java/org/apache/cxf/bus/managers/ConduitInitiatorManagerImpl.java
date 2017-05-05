@@ -118,11 +118,9 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
     }
 
     public ConduitInitiator getConduitInitiatorForUri(String uri) {
-        ConduitInitiator factory = new TransportFinder<ConduitInitiator>(bus,
+        return new TransportFinder<ConduitInitiator>(bus,
             conduitInitiators,
             loaded,
             ConduitInitiator.class).findTransportForURI(uri);
-
-        return factory;
     }
 }

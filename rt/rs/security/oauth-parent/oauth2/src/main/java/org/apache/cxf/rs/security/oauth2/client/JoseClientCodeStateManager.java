@@ -107,9 +107,9 @@ public class JoseClientCodeStateManager implements ClientCodeStateManager {
             throw new SecurityException();
         }
         String json = jws.getUnsignedEncodedSequence();
-        Map<String, List<String>> map = CastUtils.cast((Map<?, ?>)jsonp.fromJson(json));
         //CHECKSTYLE:OFF
-        return (MultivaluedMap<String, String>)map;
+        Map<String, List<String>> map = CastUtils.cast((Map<?, ?>)jsonp.fromJson(json));
+        return (MultivaluedMap<String, String>)map; //NOPMD
         //CHECKSTYLE:ON
     }
 

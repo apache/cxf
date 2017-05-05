@@ -37,11 +37,9 @@ public class TemplateTypeSpecVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        boolean result =
-            SequenceVisitor.accept(node)
+        return SequenceVisitor.accept(node)
             || StringVisitor.accept(node)
             || FixedVisitor.accept(node);
-        return result;
     }
 
     public void visit(AST node) {

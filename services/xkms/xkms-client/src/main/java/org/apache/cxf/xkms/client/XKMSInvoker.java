@@ -185,10 +185,9 @@ public class XKMSInvoker {
 
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            X509Certificate cert = (X509Certificate)cf
+            return (X509Certificate)cf
                 .generateCertificate(new ByteArrayInputStream(certificate
                     .getValue()));
-            return cert;
         } catch (CertificateException e) {
             throw new XKMSLocateException(XKMS_LOCATE_INVALID_CERTIFICATE, e);
         }

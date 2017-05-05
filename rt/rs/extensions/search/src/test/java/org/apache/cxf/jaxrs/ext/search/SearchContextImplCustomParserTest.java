@@ -46,12 +46,11 @@ public class SearchContextImplCustomParserTest extends Assert {
                 throw new SearchParseException();
             }
             String value = searchExpression.substring(9);
-            SearchCondition<Color> color = new PrimitiveSearchCondition<Color>("color",
-                                               value,
-                                               ConditionType.EQUALS,
-                                               new Color(value));
+            return new PrimitiveSearchCondition<Color>("color",
+                                                        value,
+                                                        ConditionType.EQUALS,
+                                                        new Color(value));
 
-            return color;
         }
 
     }

@@ -519,7 +519,7 @@ public class MessageFlow extends Assert {
         return !(null != bodyElement && bodyElement.hasChildNodes());
     }
 
-    private String dump(List<byte[]> streams) {
+    String dump(List<byte[]> streams) {
         StringBuilder buf = new StringBuilder();
         try {
             buf.append(System.getProperty("line.separator"));

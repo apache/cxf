@@ -428,8 +428,6 @@ public class TokenIssueOperation extends AbstractOperation implements IssueOpera
         String nonce = "http://docs.oasis-open.org/ws-sx/ws-trust/200512/Nonce";
         binarySecretType.setType(nonce);
         binarySecretType.setValue(secret);
-        JAXBElement<BinarySecretType> binarySecret =
-                QNameConstants.WS_TRUST_FACTORY.createBinarySecret(binarySecretType);
-        return binarySecret;
+        return QNameConstants.WS_TRUST_FACTORY.createBinarySecret(binarySecretType);
     }
 }

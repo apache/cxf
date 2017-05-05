@@ -440,11 +440,10 @@ public final class InjectionUtils {
         }
         if (pClass.isPrimitive()) {
             try {
-                T ret = (T)PrimitiveUtils.read(value, pClass);
                 // cannot us pClass.cast as the pClass is something like
                 // Boolean.TYPE (representing the boolean primitive) and
                 // the object is a Boolean object
-                return ret;
+                return (T)PrimitiveUtils.read(value, pClass);
             } catch (NumberFormatException nfe) {
                 throw createParamConversionException(pType, nfe);
             }

@@ -191,7 +191,7 @@ public final class ProcessorUtil {
         if (location.startsWith("http://")) {
             return location;
         } else {
-            return resolvePath(new File(location).getAbsolutePath());
+            return new File(location).getAbsolutePath().replace('\\', '/');
         }
 
     }
@@ -202,10 +202,6 @@ public final class ProcessorUtil {
         } else {
             return new File(getAbsolutePath(location)).toURI().toURL();
         }
-    }
-
-    private static String resolvePath(String path) {
-        return path.replace('\\', '/');
     }
 
     public static String classNameToFilePath(String className) {
@@ -282,7 +278,7 @@ public final class ProcessorUtil {
         }
     }
 
-    private static String escapeSpace(String url) {
+    static String escapeSpace(String url) {
         StringBuilder buf = new StringBuilder();
         for (int i = 0; i < url.length(); i++) {
             if (url.charAt(i) == ' ') {

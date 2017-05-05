@@ -178,11 +178,9 @@ public abstract class AbstractJPATypedQueryVisitor<T, T1, E>
         CollectionCheckInfo collInfo = cv.getCollectionCheckInfo();
         Path<?> path = getPath(root, name, cv, collInfo);
 
-        Predicate pred = collInfo == null
+        return collInfo == null
             ? doBuildPredicate(ps.getCondition(), path, cv.getCls(), cv.getValue())
             : doBuildCollectionPredicate(ps.getCondition(), path, collInfo);
-
-        return pred;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

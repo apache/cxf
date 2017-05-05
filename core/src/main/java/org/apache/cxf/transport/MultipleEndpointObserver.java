@@ -114,9 +114,7 @@ public class MultipleEndpointObserver implements MessageObserver {
     }
 
     protected PhaseInterceptorChain createChain() {
-        PhaseInterceptorChain chain = new PhaseInterceptorChain(bus.getExtension(PhaseManager.class)
-            .getInPhases());
-        return chain;
+        return new PhaseInterceptorChain(bus.getExtension(PhaseManager.class).getInPhases());
     }
 
     protected void setExchangeProperties(Exchange exchange, Message m) {

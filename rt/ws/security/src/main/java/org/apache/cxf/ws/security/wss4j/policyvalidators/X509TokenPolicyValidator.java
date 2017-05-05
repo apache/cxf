@@ -206,11 +206,9 @@ public class X509TokenPolicyValidator extends AbstractSecurityPolicyValidator {
                         keyInfoElement, "SecurityTokenReference", WSConstants.WSSE_NS
                     );
                 if (strElement != null) {
-                    Element kiElement =
-                        XMLUtils.getDirectChildElement(
+                    return XMLUtils.getDirectChildElement(
                             strElement, "KeyIdentifier", WSConstants.WSSE_NS
                         );
-                    return kiElement;
                 }
             }
         }

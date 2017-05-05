@@ -480,9 +480,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     }
 
     private List<WSHandlerResult> getResults(SoapMessage inmsg) {
-        final List<WSHandlerResult> handlerResults =
-            CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
-        return handlerResults;
+        return CastUtils.cast((List<?>)inmsg.get(WSHandlerConstants.RECV_RESULTS));
     }
 
     // FOR DEBUGGING ONLY

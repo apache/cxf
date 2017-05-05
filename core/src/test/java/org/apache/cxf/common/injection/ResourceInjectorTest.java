@@ -154,10 +154,9 @@ public class ResourceInjectorTest extends Assert {
     }
 
     private Target getProxyObject() {
-        Target t = (Target)Proxy.newProxyInstance(ISetterTarget.class.getClassLoader(),
-                                                  new Class[] {ISetterTarget.class},
-                                                  new ProxyClass(new SetterTarget()));
-        return t;
+        return (Target)Proxy.newProxyInstance(ISetterTarget.class.getClassLoader(),
+                                              new Class[] {ISetterTarget.class},
+                                              new ProxyClass(new SetterTarget()));
     }
 
     private FieldTarget getEnhancedObject() {

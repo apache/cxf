@@ -37,11 +37,9 @@ public class ConstrTypeSpecVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        boolean result =
-            StructVisitor.accept(node)
+        return StructVisitor.accept(node)
             || UnionVisitor.accept(node)
             || EnumVisitor.accept(node);
-        return result;
     }
 
     public void visit(AST node) {

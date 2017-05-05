@@ -237,15 +237,12 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     }
 
     public ObjectName register(ManagedComponent i) throws JMException {
-        ObjectName name = register(i, false);
-
-        return name;
+        return register(i, false);
     }
 
     public ObjectName register(ManagedComponent i, boolean forceRegistration) throws JMException {
         ObjectName name = i.getObjectName();
         register(i, name, forceRegistration);
-
         return name;
     }
 

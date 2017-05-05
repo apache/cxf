@@ -59,9 +59,8 @@ public class FaultProcessor extends AbstractProcessor {
         if (context.optionSet(ToolConstants.CFG_GEN_OVERWRITE)) {
             return false;
         }
-        boolean collision = collector.containTypesClass(packageName, className)
+        return collector.containTypesClass(packageName, className)
             || collector.containSeiClass(packageName, className);
-        return collision;
     }
 
     private void processFault(JavaMethod method, FaultInfo faultMessage) throws ToolException {

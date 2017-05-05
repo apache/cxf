@@ -136,11 +136,9 @@ public class CXFNonSpringServlet extends AbstractHTTPServlet {
     protected ServletController createServletController(ServletConfig servletConfig) {
         HttpServlet serviceListGeneratorServlet =
             new ServiceListGeneratorServlet(destinationRegistry, bus);
-        ServletController newController =
-            new ServletController(destinationRegistry,
-                                  servletConfig,
-                                  serviceListGeneratorServlet);
-        return newController;
+        return new ServletController(destinationRegistry,
+                                     servletConfig,
+                                     serviceListGeneratorServlet);
     }
 
     public Bus getBus() {

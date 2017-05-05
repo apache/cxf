@@ -116,11 +116,7 @@ public class IdlPreprocessorReaderTest extends TestCase {
         final URL orig = findTestResource(location);
         final ClassPathIncludeResolver includeResolver = new ClassPathIncludeResolver();
         final DefineState defineState = new DefineState(new HashMap<String, String>());
-        final IdlPreprocessorReader preprocessor = new IdlPreprocessorReader(orig,
-                                                                             location,
-                                                                             includeResolver,
-                                                                             defineState);
-        return preprocessor;
+        return new IdlPreprocessorReader(orig, location, includeResolver, defineState);
     }
 
     private void assertExpectedPreprocessingResult(final String expectedResultLocation,

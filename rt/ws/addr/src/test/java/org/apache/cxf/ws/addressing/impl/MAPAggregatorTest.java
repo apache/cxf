@@ -890,9 +890,7 @@ public class MAPAggregatorTest extends Assert {
         FaultInfo finfo = opInfo.addFault(new QName(nsuri, opfault), new QName(nsuri, opfault));
         finfo.addMessagePart("fault");
 
-        BindingOperationInfo bindingOpInfo = new TestBindingOperationInfo(opInfo);
-
-        return bindingOpInfo;
+        return new TestBindingOperationInfo(opInfo);
     }
 
     private Message getMessage() {

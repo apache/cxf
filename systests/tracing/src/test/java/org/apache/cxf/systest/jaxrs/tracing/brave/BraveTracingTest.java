@@ -322,13 +322,12 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     }
 
     private SpanId fromRandom() {
-        final SpanId spanId = SpanId
+        return SpanId
             .builder()
             .traceId(random.nextLong())
             .parentId(random.nextLong())
             .spanId(random.nextLong())
             .sampled(true)
             .build();
-        return spanId;
     }
 }

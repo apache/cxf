@@ -102,9 +102,7 @@ public class SoapPreProtocolOutInterceptorTest extends Assert {
         opInfo.setInput(opreq, opInfo.createMessage(new QName(nsuri, opreq), Type.INPUT));
         opInfo.setOutput(opresp, opInfo.createMessage(new QName(nsuri, opresp), Type.INPUT));
 
-        BindingOperationInfo bindingOpInfo = new BindingOperationInfo(null, opInfo);
-
-        return bindingOpInfo;
+        return new BindingOperationInfo(null, opInfo);
     }
 
     private interface SEI {

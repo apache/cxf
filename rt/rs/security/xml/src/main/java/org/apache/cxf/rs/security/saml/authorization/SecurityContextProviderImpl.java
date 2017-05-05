@@ -91,9 +91,7 @@ public class SecurityContextProviderImpl implements SecurityContextProvider {
         Set<Principal> roles =
             SAMLUtils.parseRolesFromClaims(claims, roleName, nameFormat);
 
-        SAMLSecurityContext context =
-            new SAMLSecurityContext(subjectPrincipal, roles, claims);
-        return context;
+        return new SAMLSecurityContext(subjectPrincipal, roles, claims);
     }
 
     //TODO: This can be overridden, but consider also introducing dedicated handlers

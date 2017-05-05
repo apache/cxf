@@ -199,9 +199,7 @@ public class BookStoreSpring {
     @Path("/books/superbook")
     @Produces("application/json")
     public <T extends Book> T getSuperBookJson() {
-        SuperBook book = new SuperBook("SuperBook", 999L, true);
-
-        return (T)book;
+        return (T)new SuperBook("SuperBook", 999L, true);
     }
 
     @SuppressWarnings("unchecked")

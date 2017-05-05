@@ -195,13 +195,10 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
                               expiresAt);
         getStateProvider().setResponseState(securityContextKey, responseState);
 
-        String contextCookie = createCookie(SSOConstants.SECURITY_CONTEXT_TOKEN,
-                                            securityContextKey,
-                                            requestState.getWebAppContext(),
-                                            requestState.getWebAppDomain());
-
-        return contextCookie;
-
+        return createCookie(SSOConstants.SECURITY_CONTEXT_TOKEN,
+                            securityContextKey,
+                            requestState.getWebAppContext(),
+                            requestState.getWebAppDomain());
     }
 
     protected RequestState processRelayState(String relayState) {

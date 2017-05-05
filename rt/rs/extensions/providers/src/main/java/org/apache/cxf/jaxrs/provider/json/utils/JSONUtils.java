@@ -94,10 +94,9 @@ public final class JSONUtils {
                 xsw.serializeAsArray(key);
             }
         }
-        XMLStreamWriter writer = !writeXsiType || dropRootElement
+        return !writeXsiType || dropRootElement
             ? new IgnoreContentJettisonWriter(xsw, writeXsiType, dropRootElement) : xsw;
 
-        return writer;
     }
 
     public static Configuration createConfiguration(ConcurrentHashMap<String, String> namespaceMap,

@@ -69,11 +69,9 @@ public class OidcDynamicRegistrationService extends DynamicRegistrationService {
     protected int getClientSecretSizeInBytes(ClientRegistration request) {
 
         // TODO: may need to be 384/8 or 512/8 if not a default HS256 but HS384 or HS512
-        int keySizeOctets = protectIdTokenWithClientSecret
+        return protectIdTokenWithClientSecret
             ? 32
             : super.getClientSecretSizeInBytes(request);
-
-        return keySizeOctets;
     }
     public void setProtectIdTokenWithClientSecret(boolean protectIdTokenWithClientSecret) {
         this.protectIdTokenWithClientSecret = protectIdTokenWithClientSecret;

@@ -250,12 +250,9 @@ public class ValidateX509TokenUnitTest extends org.junit.Assert {
         binarySecurityToken.setValue(Base64.getMimeEncoder().encodeToString(cert.getEncoded()));
         binarySecurityToken.setValueType(X509TokenValidator.X509_V3_TYPE);
         binarySecurityToken.setEncodingType(WSConstants.SOAPMESSAGE_NS + "#Base64Binary");
-        JAXBElement<BinarySecurityTokenType> tokenType =
-            new JAXBElement<BinarySecurityTokenType>(
+        return new JAXBElement<BinarySecurityTokenType>(
                 QNameConstants.BINARY_SECURITY_TOKEN, BinarySecurityTokenType.class, binarySecurityToken
             );
-
-        return tokenType;
     }
 
 }

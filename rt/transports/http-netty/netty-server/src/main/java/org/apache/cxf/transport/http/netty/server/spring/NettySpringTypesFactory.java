@@ -95,9 +95,7 @@ public final class NettySpringTypesFactory {
                                             "identifiedTLSServerParameters"),
                                   TLSServerParametersIdentifiedType.class,
                                   ctx);
-        Map<String, TLSServerParameters> tlsServerParametersMap =
-            toTLSServerParamenters(tlsServerParameters);
-        return tlsServerParametersMap;
+        return toTLSServerParamenters(tlsServerParameters);
     }
 
     public Map<String, ThreadingParameters> createThreadingParametersMap(String s,
@@ -110,9 +108,7 @@ public final class NettySpringTypesFactory {
                                   new QName(NettyHttpServerEngineFactoryBeanDefinitionParser.HTTP_NETTY_SERVER_NS,
                                             "identifiedThreadingParameters"),
                                   ThreadingParametersIdentifiedType.class, ctx);
-        Map<String, ThreadingParameters> threadingParametersMap =
-            toThreadingParameters(threadingParametersIdentifiedTypes);
-        return threadingParametersMap;
+        return toThreadingParameters(threadingParametersIdentifiedTypes);
     }
 
     @SuppressWarnings("unchecked")

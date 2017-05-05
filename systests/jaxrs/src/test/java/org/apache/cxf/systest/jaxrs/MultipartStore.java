@@ -67,20 +67,14 @@ public class MultipartStore {
     @Path("/content/string")
     @Produces("multipart/mixed")
     public Attachment getAttachmentWithStringContent() throws Exception {
-        Attachment respXMLPayloadAttachment = new Attachment("Response_XML_Payload",
-                                                             "application/xml",
-                                                             "<Book><id>888</id></Book>");
-        return respXMLPayloadAttachment;
+        return new Attachment("Response_XML_Payload", "application/xml", "<Book><id>888</id></Book>");
     }
 
     @GET
     @Path("/content/bytes")
     @Produces("multipart/mixed")
     public Attachment getAttachmentWithByteContent() throws Exception {
-        Attachment respXMLPayloadAttachment = new Attachment("Response_XML_Payload",
-                                                             "application/xml",
-                                                             "<Book><id>888</id></Book>".getBytes());
-        return respXMLPayloadAttachment;
+        return new Attachment("Response_XML_Payload", "application/xml", "<Book><id>888</id></Book>".getBytes());
     }
 
 

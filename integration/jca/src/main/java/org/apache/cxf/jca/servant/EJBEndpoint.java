@@ -118,9 +118,7 @@ public class EJBEndpoint {
 
     public String getServiceClassName() throws Exception {
         String packageName = PackageUtils.parsePackageName(config.getServiceName().getNamespaceURI(), null);
-        String interfaceName = packageName + "."
-                               + config.getJNDIName().substring(0, config.getJNDIName().length() - 4);
-        return interfaceName;
+        return packageName + "." + config.getJNDIName().substring(0, config.getJNDIName().length() - 4);
     }
 
     public String getDefaultEJBServantBaseURL() throws Exception {

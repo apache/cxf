@@ -55,9 +55,8 @@ public class SoapFaultFactory  {
     }
 
     Fault createSoap11Fault(JMSFault jmsFault) {
-        SoapFault fault = new SoapFault(jmsFault.getReason(),
-            jmsFault.getSubCode());
-        return fault;
+        return new SoapFault(jmsFault.getReason(),
+                             jmsFault.getSubCode());
     }
 
     Fault createSoap12Fault(JMSFault jmsFault) {

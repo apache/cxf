@@ -302,11 +302,9 @@ public class ValidateUnitTest extends org.junit.Assert {
         binarySecurityToken.setValue("12345678");
         binarySecurityToken.setValueType(DummyTokenProvider.TOKEN_TYPE);
         binarySecurityToken.setEncodingType(DummyTokenProvider.BASE64_NS);
-        JAXBElement<BinarySecurityTokenType> tokenType =
-            new JAXBElement<BinarySecurityTokenType>(
+        return new JAXBElement<BinarySecurityTokenType>(
                 QNameConstants.BINARY_SECURITY_TOKEN, BinarySecurityTokenType.class, binarySecurityToken
             );
-        return tokenType;
     }
 
     /**

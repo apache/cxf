@@ -625,9 +625,8 @@ public class ManagedRMEndpoint implements ManagedComponent {
                                     ss.getProtocol().getWSRMNamespace(),
                                     ss.getProtocol().getWSANamespace()};
 
-        CompositeData ssps = new CompositeDataSupport(sourceSequenceType,
-                                                      SOURCE_SEQUENCE_NAMES, ssv);
-        return ssps;
+        return new CompositeDataSupport(sourceSequenceType,
+                                        SOURCE_SEQUENCE_NAMES, ssv);
     }
 
     private CompositeData getDestinationSequenceProperties(DestinationSequence ds) throws JMException {
@@ -640,9 +639,8 @@ public class ManagedRMEndpoint implements ManagedComponent {
                                     ds.getProtocol().getWSRMNamespace(),
                                     ds.getProtocol().getWSANamespace()};
 
-        CompositeData dsps = new CompositeDataSupport(destinationSequenceType,
-                                                      DESTINATION_SEQUENCE_NAMES, dsv);
-        return dsps;
+        return new CompositeDataSupport(destinationSequenceType,
+                                        DESTINATION_SEQUENCE_NAMES, dsv);
     }
 
     private CompositeData getRetryStatusProperties(long num, RetryStatus rs) throws JMException {

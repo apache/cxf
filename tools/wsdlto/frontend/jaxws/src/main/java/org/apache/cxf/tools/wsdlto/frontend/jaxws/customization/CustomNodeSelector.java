@@ -70,17 +70,13 @@ public final class CustomNodeSelector {
     public Node queryNode(final Node target, final String expression) {
         XPathUtils xpath = new XPathUtils(context);
 
-        Node node = (Node) xpath.getValue(expression, target, XPathConstants.NODE);
-
-        return node;
+        return (Node) xpath.getValue(expression, target, XPathConstants.NODE);
     }
 
     public NodeList queryNodes(final Node target, final String expression) {
         XPathUtils xpath = new XPathUtils(context);
 
-        NodeList nodeList = (NodeList) xpath.getValue(expression, target, XPathConstants.NODESET);
-
-        return nodeList;
+        return (NodeList) xpath.getValue(expression, target, XPathConstants.NODESET);
     }
 
 }

@@ -771,12 +771,9 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
             );
         usernameToken.getAny().add(passwordType);
 
-        JAXBElement<UsernameTokenType> tokenType =
-            new JAXBElement<UsernameTokenType>(
+        return new JAXBElement<UsernameTokenType>(
                 QNameConstants.USERNAME_TOKEN, UsernameTokenType.class, usernameToken
             );
-
-        return tokenType;
     }
 
     /*
@@ -791,12 +788,9 @@ public class ValidateTokenTransformationUnitTest extends org.junit.Assert {
         claims.setDialect(STSConstants.IDT_NS_05_05);
         claims.getAny().add(claimType);
 
-        JAXBElement<ClaimsType> claimsType =
-            new JAXBElement<ClaimsType>(
+        return new JAXBElement<ClaimsType>(
                     QNameConstants.CLAIMS, ClaimsType.class, claims
             );
-
-        return claimsType;
     }
 
     /*

@@ -266,9 +266,7 @@ public class DefaultSubjectProvider implements SubjectProvider {
                 }
                 Document doc = subjectProviderParameters.getDoc();
                 byte[] secret = subjectProviderParameters.getSecret();
-                KeyInfoBean keyInfo =
-                    createEncryptedKeyKeyInfo(certs[0], secret, doc, encryptionProperties, crypto);
-                return keyInfo;
+                return createEncryptedKeyKeyInfo(certs[0], secret, doc, encryptionProperties, crypto);
             } catch (WSSecurityException ex) {
                 LOG.log(Level.WARNING, "", ex);
                 throw new STSException(ex.getMessage(), ex);

@@ -67,9 +67,8 @@ public class SOAPHandlerFaultOutInterceptor extends
     }
 
     public Set<URI> getRoles() {
-        Set<URI> roles = new HashSet<>();
         // TODO
-        return roles;
+        return new HashSet<>();
     }
 
     public Set<QName> getUnderstoodHeaders() {

@@ -204,10 +204,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 JAXBContext context = JAXBContext
                     .newInstance(new Class[] {org.apache.cxf.ws.addressing.ObjectFactory.class});
                 um = context.createUnmarshaller();
-                EndpointReferenceType internal = um
-                    .unmarshal(reader, EndpointReferenceType.class)
-                    .getValue();
-                return internal;
+                return um.unmarshal(reader, EndpointReferenceType.class).getValue();
             } catch (JAXBException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

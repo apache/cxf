@@ -91,9 +91,7 @@ public final class JettySpringTypesFactory {
                                   new QName(JettyHTTPServerEngineFactoryBeanDefinitionParser.HTTP_JETTY_NS,
                                             "identifiedThreadingParameters"),
                                   ThreadingParametersIdentifiedType.class, ctx);
-        Map<String, ThreadingParameters> threadingParametersMap =
-            toThreadingParameters(threadingParametersIdentifiedTypes);
-        return threadingParametersMap;
+        return toThreadingParameters(threadingParametersIdentifiedTypes);
     }
 
     public Map<String, TLSServerParameters> createTLSServerParametersMap(String s,
@@ -108,9 +106,7 @@ public final class JettySpringTypesFactory {
                                             "identifiedTLSServerParameters"),
                                   TLSServerParametersIdentifiedType.class,
                                   ctx);
-        Map<String, TLSServerParameters> tlsServerParametersMap =
-            toTLSServerParamenters(tlsServerParameters);
-        return tlsServerParametersMap;
+        return toTLSServerParamenters(tlsServerParameters);
     }
 
     @SuppressWarnings("unchecked")

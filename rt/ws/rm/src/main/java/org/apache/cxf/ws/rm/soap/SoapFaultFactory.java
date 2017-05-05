@@ -69,9 +69,8 @@ public class SoapFaultFactory implements BindingFaultFactory {
     }
 
     Fault createSoap11Fault(SequenceFault sf) {
-        SoapFault fault = new SoapFault(sf.getReason(),
+        return new SoapFault(sf.getReason(),
             sf.isSender() ? version.getSender() : version.getReceiver());
-        return fault;
     }
 
     Fault createSoap12Fault(SequenceFault sf, Message msg) {
