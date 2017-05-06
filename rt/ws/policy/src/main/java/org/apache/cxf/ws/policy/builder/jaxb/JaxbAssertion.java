@@ -64,6 +64,23 @@ public class JaxbAssertion<T> extends PrimitiveAssertion {
         JaxbAssertion<T> a = (JaxbAssertion<T>)policyComponent;
         return data.equals(a.getData());
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof JaxbAssertion) {
+            return super.equals(o) && equal((PolicyComponent)o);
+        }
+        return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        int i = super.hashCode();
+        if (data != null) {
+            i ^= data.hashCode();
+        }
+        return i;
+    }
 
     public void setData(T d) {
         data = d;
