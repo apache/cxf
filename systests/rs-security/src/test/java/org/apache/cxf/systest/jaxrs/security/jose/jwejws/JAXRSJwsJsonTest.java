@@ -146,7 +146,7 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
         map.put(JoseConstants.RSSEC_SIGNATURE_IN_PROPS,
                 "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
         BookStore bs = createBookStore(address, map, null);
-        Book book = bs.echoBook2(new Book("book", 123L));
+        Book book = bs.echoBookXml(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }

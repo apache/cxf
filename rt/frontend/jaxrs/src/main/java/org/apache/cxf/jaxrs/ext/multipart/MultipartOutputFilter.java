@@ -16,15 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.rs.security.jose.jws;
+package org.apache.cxf.jaxrs.ext.multipart;
 
-import org.apache.cxf.rs.security.jose.jwa.SignatureAlgorithm;
+import java.util.List;
 
-public interface JwsSignatureVerifier {
-    SignatureAlgorithm getAlgorithm();
-    boolean verify(JwsHeaders headers, String unsignedText, byte[] signature);
-    /**
-     * Create a verification signature handler capable of accumulating the input (optional operation)
-     */
-    JwsVerificationSignature createJwsVerificationSignature(JwsHeaders headers);
+public interface MultipartOutputFilter {
+    void filter(List<Attachment> parts);
 }

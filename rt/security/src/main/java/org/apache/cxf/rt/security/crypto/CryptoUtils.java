@@ -348,6 +348,20 @@ public final class CryptoUtils {
         }
     }
 
+    public static Signature getVerificationSignature(PublicKey key, 
+                                                        String signAlgo, 
+                                                        AlgorithmParameterSpec params) {
+        try {
+            Signature s = Signature.getInstance(signAlgo);
+            s.initVerify(key);
+            if (params != null) {
+                s.setParameter(params);
+            }
+            return s;
+        } catch (Exception ex) {
+            throw new SecurityException(ex);
+        }
+    }
     public static boolean verifySignature(byte[] data, byte[] signature, PublicKey key, String signAlgo) {
         return verifySignature(data, signature, key, signAlgo, null);
     }
@@ -355,11 +369,7 @@ public final class CryptoUtils {
     public static boolean verifySignature(byte[] data, byte[] signature, PublicKey key, String signAlgo,
                                 AlgorithmParameterSpec params) {
         try {
-            Signature s = Signature.getInstance(signAlgo);
-            s.initVerify(key);
-            if (params != null) {
-                s.setParameter(params);
-            }
+            Signature s = getVerificationSignature(key, signAlgo, params);
             s.update(data);
             return s.verify(signature);
         } catch (Exception ex) {

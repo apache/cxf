@@ -62,6 +62,7 @@ import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.InputStreamDataSource;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartOutputFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
@@ -262,6 +263,12 @@ public class MultipartProvider extends AbstractConfigurableProvider
         throws IOException, WebApplicationException {
 
         List<Attachment> handlers = convertToDataHandlers(obj, type, genericType, anns, mt);
+        if (mc.get(AttachmentUtils.OUT_FILTERS) != null) {
+            List<MultipartOutputFilter> filters = CastUtils.cast((List<?>)mc.get(AttachmentUtils.OUT_FILTERS));
+            for (MultipartOutputFilter filter : filters) {
+                filter.filter(handlers);
+            }
+        }
         mc.put(MultipartBody.OUTBOUND_MESSAGE_ATTACHMENTS, handlers);
         handlers.get(0).getDataHandler().writeTo(os);
     }
@@ -361,8 +368,10 @@ public class MultipartProvider extends AbstractConfigurableProvider
             dh = getHandlerForObject(obj, cls, genericType, anns, mimeType, id);
         }
         String contentId = getContentId(anns, id);
-
-        return new Attachment(contentId, dh, new MetadataMap<String, String>());
+        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        headers.putSingle("Content-Type", mimeType);
+        
+        return new Attachment(contentId, dh, headers);
     }
 
     private String getContentId(Annotation[] anns, int id) {

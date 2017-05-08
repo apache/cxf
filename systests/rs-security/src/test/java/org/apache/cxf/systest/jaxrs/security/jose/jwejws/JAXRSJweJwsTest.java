@@ -441,7 +441,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         BookStore bs = createJweJwsBookStore(address, null, null);
         Book book = new Book();
         book.setName("book");
-        book = bs.echoBook2(book);
+        book = bs.echoBookXml(book);
         assertEquals("book", book.getName());
     }
 

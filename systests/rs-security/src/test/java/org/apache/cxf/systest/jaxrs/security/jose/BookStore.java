@@ -20,11 +20,14 @@
 package org.apache.cxf.systest.jaxrs.security.jose;
 
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.systest.jaxrs.security.Book;
 
 @Path("/bookstore")
@@ -53,8 +56,23 @@ public class BookStore {
     @Path("/books")
     @Produces("application/xml")
     @Consumes("application/xml")
-    public Book echoBook2(Book book) {
+    public Book echoBookXml(Book book) {
         return book;
+    }
+    
+    @POST
+    @Path("/books")
+    @Produces("application/xml")
+    @Consumes("multipart/related")
+    public Book echoBookMultipart(@Multipart(type = "application/xml") Book book) {
+        return book;
+    }
+    @POST
+    @Path("/booksList")
+    @Produces("application/xml")
+    @Consumes("multipart/related")
+    public List<Book> echoBooksMultipart(@Multipart(type = "application/xml") List<Book> books) {
+        return books;
     }
 
 }

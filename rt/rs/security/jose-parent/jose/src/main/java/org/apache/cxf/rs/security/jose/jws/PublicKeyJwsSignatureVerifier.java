@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.jose.jws;
 
 import java.security.PublicKey;
+import java.security.Signature;
 import java.security.cert.X509Certificate;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.logging.Logger;
@@ -96,5 +97,39 @@ public class PublicKeyJwsSignatureVerifier implements JwsSignatureVerifier {
 
     public X509Certificate getX509Certificate() {
         return cert;
+    }
+    @Override
+    public JwsVerificationSignature createJwsVerificationSignature(JwsHeaders headers) {
+        Signature sig = CryptoUtils.getVerificationSignature(key,
+                                    AlgorithmUtils.toJavaName(checkAlgorithm(
+                                                              headers.getSignatureAlgorithm())),
+                                    signatureSpec);
+        return new PublicKeyJwsVerificationSignature(sig);
+    }
+    
+    private class PublicKeyJwsVerificationSignature implements JwsVerificationSignature {
+        private Signature sig;
+        PublicKeyJwsVerificationSignature(Signature sig) {
+            this.sig = sig;
+        }
+
+        @Override
+        public void update(byte[] src, int off, int len) {
+            try {
+                sig.update(src, off, len);
+            } catch (Exception ex) {
+                throw new JwsException(JwsException.Error.INVALID_SIGNATURE, ex);
+            }
+        }
+
+        @Override
+        public boolean verify(byte[] signatureBytes) {
+            try {
+                return sig.verify(signatureBytes);
+            } catch (Exception ex) {
+                throw new JwsException(JwsException.Error.INVALID_SIGNATURE, ex);
+            }
+        }
+        
     }
 }

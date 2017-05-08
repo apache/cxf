@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -89,9 +90,15 @@ public class Attachment implements Transferable {
              headers);
     }
 
+    public Attachment(String mediaType, Object object) {
+        this(UUID.randomUUID().toString(), mediaType, object);
+    }
+    
     public Attachment(String id, String mediaType, Object object) {
         this.object = object;
-        headers.putSingle("Content-ID", id);
+        if (id != null) {
+            headers.putSingle("Content-ID", id);
+        }
         headers.putSingle("Content-Type", mediaType);
     }
 
@@ -121,12 +128,16 @@ public class Attachment implements Transferable {
     }
 
     public MediaType getContentType() {
-        String value = handler != null ? handler.getContentType() : headers.getFirst("Content-Type");
+        String value = handler != null && handler.getContentType() != null ? handler.getContentType() 
+            : headers.getFirst("Content-Type");
         return value == null ? MediaType.TEXT_PLAIN_TYPE : JAXRSUtils.toMediaType(value);
     }
 
     public DataHandler getDataHandler() {
         return handler;
+    }
+    public void setDataHandler(DataHandler dataHandler) {
+        this.handler = dataHandler;
     }
 
     public Object getObject() {

@@ -1464,7 +1464,10 @@ public final class JAXRSUtils {
                     boolean parametersMatched = true;
                     for (Map.Entry<String, String> entry : userType.getParameters().entrySet()) {
                         String value = requiredType.getParameters().get(entry.getKey());
-                        if (value != null && !value.equals(entry.getValue())) {
+                        if (value != null && entry.getValue() != null
+                            && !(stripDoubleQuotesIfNeeded(value).equals(
+                                    stripDoubleQuotesIfNeeded(entry.getValue())))) {
+                            
                             if (HTTP_CHARSET_PARAM.equals(entry.getKey())
                                 && value.equalsIgnoreCase(entry.getValue())) {
                                 continue;
@@ -1509,10 +1512,18 @@ public final class JAXRSUtils {
         return new ArrayList<>(supportedMimeTypeList);
 
     }
+    
+    private static String stripDoubleQuotesIfNeeded(String value) {
+        if (value != null && value.startsWith("\"") 
+            && value.endsWith("\"") && value.length() > 1) {
+            value = value.substring(1,  value.length() - 1);
+        }
+        return value;
+    }
 
     private static boolean isMediaTypeCompatible(MediaType requiredType, MediaType userType) {
         boolean isCompatible = requiredType.isCompatible(userType);
-        if (!requiredType.isCompatible(userType) && requiredType.getType().equalsIgnoreCase(userType.getType())) {
+        if (!isCompatible && requiredType.getType().equalsIgnoreCase(userType.getType())) {
             isCompatible = compareCompositeSubtypes(requiredType, userType,
                                                     PhaseInterceptorChain.getCurrentMessage());
         }
