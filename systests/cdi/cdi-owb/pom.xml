@@ -31,9 +31,10 @@
     <description>Apache CXF CDI Integration System Tests - OpenWebBeans</description>
     <url>http://cxf.apache.org</url>
 
-	<modules>
+    <modules>
         <module>cdi-multiple-apps-owb</module>
         <module>cdi-no-apps-owb</module>
+        <module>cdi-producers-owb</module>
     </modules>
 
     <dependencies>

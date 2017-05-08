@@ -16,41 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systests.cdi.base;
+package org.apache.cxf.systest.jaxrs.cdi;
 
 import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.validation.constraints.Size;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
-@XmlRootElement
-public class Book {
-    @NotNull private String name;
-    private String id;
-
-    public Book() {
-    }
-
-    public Book(String id) {
-        this.id = id;
-    }
-
-    public Book(String name, String id) {
-        this.name = name;
-        this.id = id;
-    }
-
-    public void setName(String n) {
-        name = n;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setId(String i) {
-        id = i;
-    }
-
-    public String getId() {
-        return id;
+@Path("/bookstore/")
+public class BookStoreValidatingFeed {
+    @POST
+    @Path("/books/feed")
+    @Produces("application/atom+xml")
+    public Response addBook(@Context final UriInfo uriInfo,
+                            @NotNull @Size(min = 1, max = 50) @FormParam("id") String id,
+                            @NotNull @FormParam("name") String name) {
+        return Response.created(uriInfo.getRequestUriBuilder().path(id).build()).build();
     }
 }
