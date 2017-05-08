@@ -174,21 +174,20 @@
             <version>${cxf.karaf.version}</version>
             <type>tar.gz</type>
             <scope>test</scope>
-    		<exclusions>
-        		<exclusion>
-            	<groupId>*</groupId>
-            	<artifactId>*</artifactId>
-        		</exclusion>
-    		</exclusions>
+            <exclusions>
+                <exclusion>
+                <groupId>*</groupId>
+                <artifactId>*</artifactId>
+               </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     <build>
         <plugins>
-            <!-- generate dependencies versions -->
+            <!-- generate dependencies versions for pax exam -->
             <plugin>
                 <groupId>org.apache.servicemix.tooling</groupId>
                 <artifactId>depends-maven-plugin</artifactId>
-                <version>1.4.0</version>
                 <executions>
                     <execution>
                         <id>generate-depends-file</id>
