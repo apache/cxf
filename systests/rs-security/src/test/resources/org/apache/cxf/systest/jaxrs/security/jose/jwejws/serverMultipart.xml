@@ -53,6 +53,17 @@ under the License.
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkrsaSinglePart">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInMultipartFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkhmacSinglePartModified">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
