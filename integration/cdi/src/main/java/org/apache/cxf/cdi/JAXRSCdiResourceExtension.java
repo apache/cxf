@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.cdi;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,6 +38,8 @@ import javax.enterprise.inject.spi.BeforeShutdown;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.inject.spi.ProcessBean;
+import javax.enterprise.inject.spi.ProcessProducerField;
+import javax.enterprise.inject.spi.ProcessProducerMethod;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
@@ -112,6 +115,16 @@ public class JAXRSCdiResourceExtension implements Extension {
                 && Bus.class.isAssignableFrom(event.getBean().getBeanClass())) {
             hasBus = true;
         }
+    }
+    
+    public <T, X> void collect(@Observes final ProcessProducerField< T, X > event) {
+        final Type baseType = event.getAnnotatedProducerField().getBaseType();
+        processProducer(event, baseType);
+    }
+
+    public <T, X> void collect(@Observes final ProcessProducerMethod< T, X > event) {
+        final Type baseType = event.getAnnotatedProducerMethod().getBaseType();
+        processProducer(event, baseType);
     }
 
     public void load(@Observes final AfterDeploymentValidation event, final BeanManager beanManager) {
@@ -296,7 +309,7 @@ public class JAXRSCdiResourceExtension implements Extension {
                 instances.add(
                       beanManager.getReference(
                             bean,
-                            bean.getBeanClass(),
+                            Object.class,
                             createCreationalContext(beanManager, bean)
                       )
                 );
@@ -319,7 +332,7 @@ public class JAXRSCdiResourceExtension implements Extension {
                 features.add(
                         (Feature) beanManager.getReference(
                                 bean,
-                                bean.getBeanClass(),
+                                Feature.class,
                                 createCreationalContext(beanManager, bean)
                         )
                 );
@@ -342,4 +355,23 @@ public class JAXRSCdiResourceExtension implements Extension {
         }
         return creationalContext;
     }
+
+    /**
+     * Extracts relevant beans from producers.
+     * @param event process bean event
+     * @param baseType base type of the producer
+     */
+    private <T> void processProducer(final ProcessBean<T> event, final Type baseType) {
+        if (baseType instanceof Class<?>) {
+            final Class<?> clazz = (Class<?>)baseType;
+            if (clazz.isAnnotationPresent(Path.class)) {
+                serviceBeans.add(event.getBean());
+            } else if (clazz.isAnnotationPresent(Provider.class)) {
+                providerBeans.add(event.getBean());
+            } else if (clazz.isAnnotationPresent(ApplicationPath.class)) {
+                applicationBeans.add(event.getBean());
+            } 
+        }
+    }
+
 }
