@@ -188,7 +188,7 @@
     </dependencies>
     <build>
         <plugins>
-            <!-- generate dependencies versions -->
+            <!-- generate dependencies versions for pax exam -->
             <plugin>
                 <groupId>org.apache.servicemix.tooling</groupId>
                 <artifactId>depends-maven-plugin</artifactId>
