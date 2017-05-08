@@ -65,7 +65,7 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
         if (useJwsOutputStream) {
             JwsSignature jwsSignature = sigProvider.createJwsSignature(headers);
             JoseUtils.traceHeaders(headers);
-            JwsOutputStream jwsStream = new JwsOutputStream(actualOs, jwsSignature);
+            JwsOutputStream jwsStream = new JwsOutputStream(actualOs, jwsSignature, true);
             byte[] headerBytes = StringUtils.toBytesUTF8(writer.toJson(headers));
             Base64UrlUtility.encodeAndStream(headerBytes, 0, headerBytes.length, jwsStream);
             jwsStream.write(new byte[]{'.'});

@@ -19,7 +19,6 @@
 package org.apache.cxf.jaxrs.ext.multipart;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -30,15 +29,13 @@ public class MultipartBody {
     
     public static final String INBOUND_MESSAGE_ATTACHMENTS = "org.apache.cxf.jaxrs.attachments.inbound";
     public static final String OUTBOUND_MESSAGE_ATTACHMENTS = "org.apache.cxf.jaxrs.attachments.outbound";
-    
-    private static final MediaType MULTIPART_RELATED_TYPE = JAXRSUtils.toMediaType("multipart/related"); 
-    private boolean outbound;
+    private static final MediaType MULTIPART_RELATED_TYPE = JAXRSUtils.toMediaType("multipart/related");
+
     private List<Attachment> atts;
     private MediaType mt; 
     
     public MultipartBody(List<Attachment> atts, MediaType mt, boolean outbound) {
         this.atts = atts;
-        this.outbound = outbound;
         this.mt = mt == null ? MULTIPART_RELATED_TYPE : mt;
     }
     
@@ -49,7 +46,6 @@ public class MultipartBody {
     public MultipartBody(Attachment att) {
         atts = new ArrayList<Attachment>();
         atts.add(att);
-        outbound = true;
         this.mt = MULTIPART_RELATED_TYPE;
     }
     
@@ -66,8 +62,7 @@ public class MultipartBody {
     }
     
     public List<Attachment> getAllAttachments() {
-        
-        return outbound ? atts : Collections.unmodifiableList(atts);
+        return atts;
     }
     
     public List<Attachment> getChildAttachments() {
