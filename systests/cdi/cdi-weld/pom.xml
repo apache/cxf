@@ -34,6 +34,7 @@
 	<modules>
         <module>cdi-multiple-apps-weld</module>
         <module>cdi-no-apps-weld</module>
+        <module>cdi-producers-weld</module>
     </modules>
     
     <dependencies>

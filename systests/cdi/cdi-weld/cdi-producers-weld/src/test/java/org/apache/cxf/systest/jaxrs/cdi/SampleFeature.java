@@ -16,41 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systests.cdi.base;
 
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlRootElement;
+package org.apache.cxf.systest.jaxrs.cdi;
 
-@XmlRootElement
-public class Book {
-    @NotNull private String name;
-    private String id;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
 
-    public Book() {
-    }
+import org.apache.cxf.jaxrs.provider.atom.AtomFeedProvider;
 
-    public Book(String id) {
-        this.id = id;
-    }
-
-    public Book(String name, String id) {
-        this.name = name;
-        this.id = id;
-    }
-
-    public void setName(String n) {
-        name = n;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setId(String i) {
-        id = i;
-    }
-
-    public String getId() {
-        return id;
+public class SampleFeature implements Feature {
+    @Override
+    public boolean configure(FeatureContext context) {
+        context.register(AtomFeedProvider.class);
+        return false;
     }
 }
