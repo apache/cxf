@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.utils.multipart;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,23 +34,50 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartInputFilter;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartOutputFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class AttachmentUtils {
+    public static final String OUT_FILTERS = "multipart.output.filters";
+    public static final String IN_FILTERS = "multipart.input.filters";
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     
     private AttachmentUtils() {
     }
+
+    public static void addMultipartOutFilter(MultipartOutputFilter filter) {
+        Message m = JAXRSUtils.getCurrentMessage();
+        List<MultipartOutputFilter> outFilters = CastUtils.cast((List<?>)m.get(OUT_FILTERS));
+        if (outFilters == null) {
+            outFilters = new ArrayList<MultipartOutputFilter>();
+        }
+        outFilters.add(filter);
+        m.put(OUT_FILTERS, outFilters);
+    }
+    
+    public static void addMultipartInFilter(MultipartInputFilter filter) {
+        Message m = JAXRSUtils.getCurrentMessage();
+        List<MultipartInputFilter> inFilters = CastUtils.cast((List<?>)m.get(IN_FILTERS));
+        if (inFilters == null) {
+            inFilters = new ArrayList<MultipartInputFilter>();
+        }
+        inFilters.add(filter);
+        m.put(IN_FILTERS, inFilters);
+    }
+
     
     public static MultipartBody getMultipartBody(MessageContext mc) {
         return (MultipartBody)mc.get(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS);
@@ -110,8 +138,15 @@ public final class AttachmentUtils {
         boolean embeddedAttachment = mc.get("org.apache.cxf.multipart.embedded") != null;
         String propertyName = embeddedAttachment ? MultipartBody.INBOUND_MESSAGE_ATTACHMENTS + ".embedded"
             : MultipartBody.INBOUND_MESSAGE_ATTACHMENTS;
-                
-        return (MultipartBody)mc.get(propertyName);
+
+        MultipartBody body = (MultipartBody)mc.get(propertyName);
+        if (!embeddedAttachment && mc.get(IN_FILTERS) != null) {
+            List<MultipartInputFilter> filters = CastUtils.cast((List<?>)mc.get(IN_FILTERS));
+            for (MultipartInputFilter filter : filters) {
+                filter.filter(body.getAllAttachments());
+            }
+        }
+        return body;
     }
     
     public static List<Attachment> getAttachments(MessageContext mc, 

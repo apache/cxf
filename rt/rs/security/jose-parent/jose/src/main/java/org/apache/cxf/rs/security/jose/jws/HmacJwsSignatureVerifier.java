@@ -22,6 +22,8 @@ import java.security.MessageDigest;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.logging.Logger;
 
+import javax.crypto.Mac;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
 import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
@@ -81,5 +83,34 @@ public class HmacJwsSignatureVerifier implements JwsSignatureVerifier {
     @Override
     public SignatureAlgorithm getAlgorithm() {
         return supportedAlgo;
+    }
+    @Override
+    public JwsVerificationSignature createJwsVerificationSignature(JwsHeaders headers) {
+        final String sigAlgo = checkAlgorithm(headers.getSignatureAlgorithm());
+        Mac mac = HmacUtils.getInitializedMac(key,
+                                     AlgorithmUtils.toJavaName(sigAlgo),
+                                     hmacSpec);
+        return new HmacJwsVerificationSignature(mac);
+    }
+    
+    private static class HmacJwsVerificationSignature implements JwsVerificationSignature {
+
+        private Mac mac;
+        
+        HmacJwsVerificationSignature(Mac mac) {
+            this.mac = mac;
+        }
+
+        @Override
+        public void update(byte[] src, int off, int len) {
+            mac.update(src, off, len);
+        }
+
+        @Override
+        public boolean verify(byte[] signature) {
+            byte[] macBytes = mac.doFinal();
+            return MessageDigest.isEqual(macBytes, signature);
+        }
+        
     }
 }
