@@ -28,6 +28,7 @@ import org.apache.cxf.ext.logging.event.LogEventSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.slf4j.MarkerFactory;
 
 public class Slf4jEventSender implements LogEventSender {
 
@@ -53,7 +54,7 @@ public class Slf4jEventSender implements LogEventSender {
                 put(keys, "FullContentFile", event.getFullContentFile().getAbsolutePath());
             }
             put(keys, "Headers", event.getHeaders().toString());
-            log.info(getLogMessage(event));
+            log.info(MarkerFactory.getMarker(event.getServiceName() != null ? "SOAP" : "REST"), getLogMessage(event));
         } finally {
             for (String key : keys) {
                 MDC.remove(key);
