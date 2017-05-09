@@ -254,7 +254,7 @@ final class JMSMessageUtils {
             }
             addJMSPropertyFromMessage(messageHeaders,
                                       outMessage,
-                                      org.apache.cxf.message.Message.CONTENT_TYPE);
+                                      JMSConstants.RS_CONTENT_TYPE);
         }
         if (headers != null) {
             for (Map.Entry<String, List<String>> ent : headers.entrySet()) {

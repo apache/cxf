@@ -321,6 +321,9 @@ public class JMSMessageHeadersType {
             contentType = (String)getProperty(JMSSpecConstants.CONTENTTYPE_FIELD);
         }
         if (contentType == null) {
+            contentType = (String)getProperty(JMSConstants.RS_CONTENT_TYPE);
+        }
+        if (contentType == null) {
             contentType = (String)getProperty(org.apache.cxf.message.Message.CONTENT_TYPE);
         }
         return contentType;

@@ -74,6 +74,8 @@ public final class JMSConstants {
     public static final String JMS_MESSAGE_TYPE = "JMSMessageType";
     public static final String TARGET_SERVICE_IN_REQUESTURI = "target.service.inrequesturi";
     public static final String MALFORMED_REQUESTURI = "malformed.requesturi";
+    
+    public static final String RS_CONTENT_TYPE = "org.apache.cxf.jms.rs.ContentType";
 
     private JMSConstants() {
         //utility class
