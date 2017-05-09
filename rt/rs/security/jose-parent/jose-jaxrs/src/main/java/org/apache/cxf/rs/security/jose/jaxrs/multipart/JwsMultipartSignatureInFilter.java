@@ -21,13 +21,17 @@ package org.apache.cxf.rs.security.jose.jaxrs.multipart;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartInputFilter;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.jaxrs.utils.ExceptionUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.common.JoseUtils;
+import org.apache.cxf.rs.security.jose.common.KeyManagementUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsHeaders;
 import org.apache.cxf.rs.security.jose.jws.JwsInputStream;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
@@ -38,12 +42,14 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
 
     private JwsSignatureVerifier verifier;
     private boolean supportSinglePartOnly;
-    
-    public JwsMultipartSignatureInFilter(boolean supportSinglePartOnly) {
-        this(null, supportSinglePartOnly);
+    private Message message;
+    public JwsMultipartSignatureInFilter(Message message, boolean supportSinglePartOnly) {
+        this(message, null, supportSinglePartOnly);
     }
     
-    public JwsMultipartSignatureInFilter(JwsSignatureVerifier verifier, boolean supportSinglePartOnly) {
+    public JwsMultipartSignatureInFilter(Message message, JwsSignatureVerifier verifier, 
+                                         boolean supportSinglePartOnly) {
+        this.message = message;
         this.verifier = verifier;
         this.supportSinglePartOnly = supportSinglePartOnly;
     }
@@ -69,8 +75,18 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
         JwsHeaders headers = new JwsHeaders(
                                  new JsonMapObjectReaderWriter().fromJson(
                                      JoseUtils.decodeToString(parts[0])));
-        JwsSignatureVerifier theVerifier = 
-            verifier == null ? JwsUtils.loadSignatureVerifier(headers, true) : verifier;
+        
+        JwsSignatureVerifier theVerifier = null;
+        if (verifier == null) {
+            Properties props = KeyManagementUtils.loadStoreProperties(message, true,
+                                                   JoseConstants.RSSEC_SIGNATURE_IN_PROPS,
+                                                   JoseConstants.RSSEC_SIGNATURE_PROPS);
+            
+            theVerifier = JwsUtils.loadSignatureVerifier(message, props, headers, false);
+        } else {
+            theVerifier = verifier;
+        }
+        
         
         JwsVerificationSignature sig = theVerifier.createJwsVerificationSignature(headers);
         if (sig == null) {
