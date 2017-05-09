@@ -62,15 +62,17 @@ public class BookStore {
     
     @POST
     @Path("/books")
-    @Produces("application/xml")
+    @Produces("multipart/related")
     @Consumes("multipart/related")
+    @Multipart(type = "application/xml")
     public Book echoBookMultipart(@Multipart(type = "application/xml") Book book) {
         return book;
     }
     @POST
     @Path("/booksList")
-    @Produces("application/xml")
+    @Produces("multipart/related")
     @Consumes("multipart/related")
+    @Multipart(type = "application/xml")
     public List<Book> echoBooksMultipart(@Multipart(type = "application/xml") List<Book> books) {
         return books;
     }

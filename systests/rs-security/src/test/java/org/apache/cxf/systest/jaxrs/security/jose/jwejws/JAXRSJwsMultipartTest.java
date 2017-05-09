@@ -32,8 +32,9 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.rs.security.jose.jaxrs.JwsDetachedSignatureProvider;
 import org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartClientRequestFilter;
-import org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartSignatureProvider;
+import org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartClientResponseFilter;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.systest.jaxrs.security.jose.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -151,10 +152,13 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
         bean.setServiceClass(BookStore.class);
         bean.setAddress(address);
         List<Object> providers = new LinkedList<Object>();
-        JwsMultipartClientRequestFilter filter = new JwsMultipartClientRequestFilter();
-        filter.setSupportSinglePartOnly(supportSinglePart);
-        providers.add(filter);
-        providers.add(new JwsMultipartSignatureProvider());
+        JwsMultipartClientRequestFilter outFilter = new JwsMultipartClientRequestFilter();
+        outFilter.setSupportSinglePartOnly(supportSinglePart);
+        providers.add(outFilter);
+        JwsMultipartClientResponseFilter inFilter = new JwsMultipartClientResponseFilter();
+        inFilter.setSupportSinglePartOnly(supportSinglePart);
+        providers.add(inFilter);
+        providers.add(new JwsDetachedSignatureProvider());
         bean.setProviders(providers);
         return bean;
     }
