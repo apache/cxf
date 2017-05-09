@@ -24,36 +24,17 @@ import javax.annotation.Priority;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.MediaType;
 
-import org.apache.cxf.jaxrs.ext.multipart.MultipartInputFilter;
-import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 import org.apache.cxf.rs.security.jose.jaxrs.Priorities;
-import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 
 @PreMatching
 @Priority(Priorities.JWS_SERVER_READ_PRIORITY)
-public class JwsMultipartContainerRequestFilter implements ContainerRequestFilter {
-    
-    private JwsSignatureVerifier sigVerifier;
-    private boolean supportSinglePartOnly = true;
+public class JwsMultipartContainerRequestFilter extends AbstractJwsMultipartVerificationFilter
+    implements ContainerRequestFilter {
     
     @Override
     public void filter(ContainerRequestContext ctx) throws IOException {
-        MediaType contentType = ctx.getMediaType();
-        if (contentType != null && contentType.getType().equals("multipart")) {
-            MultipartInputFilter jwsFilter = sigVerifier == null 
-                ? new JwsMultipartSignatureInFilter(supportSinglePartOnly) 
-                : new JwsMultipartSignatureInFilter(sigVerifier, supportSinglePartOnly); 
-            AttachmentUtils.addMultipartInFilter(jwsFilter); 
-        }
+        addMultipartFilterIfNeeded(ctx.getMediaType());
         
-    }
-
-    public void setSigVerifier(JwsSignatureVerifier sigVerifier) {
-        this.sigVerifier = sigVerifier;
-    }
-    public void setSupportSinglePartOnly(boolean supportSinglePartOnly) {
-        this.supportSinglePartOnly = supportSinglePartOnly;
     }
 }
