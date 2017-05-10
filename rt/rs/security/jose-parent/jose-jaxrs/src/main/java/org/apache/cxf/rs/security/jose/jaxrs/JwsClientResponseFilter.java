@@ -41,12 +41,17 @@ public class JwsClientResponseFilter extends AbstractJwsReaderProvider implement
         if (!p.verifySignatureWith(theSigVerifier)) {
             throw new JwsException(JwsException.Error.INVALID_SIGNATURE);
         }
+        
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         res.setEntityStream(new ByteArrayInputStream(bytes));
         res.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
         String ct = JoseUtils.checkContentType(p.getJwsHeaders().getContentType(), getDefaultMediaType());
         if (ct != null) {
             res.getHeaders().putSingle("Content-Type", ct);
+        }
+        
+        if (super.isValidateHttpHeaders()) {
+            super.validateHttpHeadersIfNeeded(res.getHeaders(), p.getJwsHeaders());
         }
     }
 

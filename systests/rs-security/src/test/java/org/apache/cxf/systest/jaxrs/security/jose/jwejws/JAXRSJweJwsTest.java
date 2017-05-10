@@ -254,9 +254,16 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         assertEquals("book", text);
     }
     @Test
+    public void testJwsJwkPlainTextHMacHttpHeaders() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjwkhmacHttpHeaders";
+        BookStore bs = createJwsBookStore(address, null, true, true);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+    @Test
     public void testJwsJwkPlainTextHMacUnencoded() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjwkhmac";
-        BookStore bs = createJwsBookStore(address, null, false);
+        BookStore bs = createJwsBookStore(address, null, false, false);
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
@@ -271,11 +278,12 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     }
     private BookStore createJwsBookStore(String address,
                                          List<?> mbProviders) throws Exception {
-        return createJwsBookStore(address, mbProviders, true);
+        return createJwsBookStore(address, mbProviders, true, false);
     }
     private BookStore createJwsBookStore(String address,
                                          List<?> mbProviders,
-                                         boolean encodePayload) throws Exception {
+                                         boolean encodePayload,
+                                         boolean protectHttpHeaders) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
@@ -285,6 +293,7 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         bean.setAddress(address);
         List<Object> providers = new LinkedList<Object>();
         JwsWriterInterceptor jwsWriter = new JwsWriterInterceptor();
+        jwsWriter.setProtectHttpHeaders(protectHttpHeaders);
         jwsWriter.setEncodePayload(encodePayload);
         jwsWriter.setUseJwsOutputStream(true);
         providers.add(jwsWriter);

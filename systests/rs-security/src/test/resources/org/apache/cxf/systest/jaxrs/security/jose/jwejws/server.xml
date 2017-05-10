@@ -72,6 +72,9 @@ under the License.
        <property name="signatureVerifier" ref="hmacSigVerifier"/>
     </bean>
     <bean id="jwsInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter"/>
+    <bean id="jwsInFilterHttpHeaders" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter">
+        <property name="validateHttpHeaders" value="true"/>
+    </bean>
     <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor"/>
     <bean id="keyPasswordProvider" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl"/>
     <bean id="keyPasswordProvider2" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl">
@@ -200,6 +203,19 @@ under the License.
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="jwsInFilter"/>
+            <ref bean="jwsOutFilter"/>
+            <ref bean="jackson"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jwsjwkhmacHttpHeaders">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInFilterHttpHeaders"/>
             <ref bean="jwsOutFilter"/>
             <ref bean="jackson"/>
         </jaxrs:providers>

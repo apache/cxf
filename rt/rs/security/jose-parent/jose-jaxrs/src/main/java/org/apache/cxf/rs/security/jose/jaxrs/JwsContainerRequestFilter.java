@@ -51,6 +51,7 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             return;
         }
         JoseUtils.validateRequestContextProperty(p.getJwsHeaders());
+        
         byte[] bytes = p.getDecodedJwsPayloadBytes();
         context.setEntityStream(new ByteArrayInputStream(bytes));
         context.getHeaders().putSingle("Content-Length", Integer.toString(bytes.length));
@@ -60,6 +61,10 @@ public class JwsContainerRequestFilter extends AbstractJwsReaderProvider impleme
             context.getHeaders().putSingle("Content-Type", ct);
         }
 
+        if (super.isValidateHttpHeaders()) {
+            super.validateHttpHeadersIfNeeded(context.getHeaders(), p.getJwsHeaders());
+        }
+        
         Principal currentPrincipal = context.getSecurityContext().getUserPrincipal();
         if (currentPrincipal == null || currentPrincipal.getName() == null) {
             SecurityContext securityContext = configureSecurityContext(theSigVerifier);
