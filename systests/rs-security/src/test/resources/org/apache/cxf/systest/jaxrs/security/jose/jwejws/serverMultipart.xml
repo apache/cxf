@@ -40,6 +40,9 @@ under the License.
     <bean id="serviceBean" class="org.apache.cxf.systest.jaxrs.security.jose.BookStore"/>
     
     <bean id="jwsInMultipartFilter" class="org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartContainerRequestFilter"/>
+    <bean id="jwsInMultipartFilterJwsJson" class="org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartContainerRequestFilter">
+        <property name="useJwsJsonSignatureFormat" value="true"/>
+    </bean>
     <bean id="jwsOutMultipartFilter" class="org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartContainerResponseFilter"/>
     <bean id="jwsDetachedSignatureWriter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsDetachedSignatureProvider"/>
     <bean id="jwsInMultipartModificationFilter" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.MultipartModificationFilter"/>
@@ -56,6 +59,19 @@ under the License.
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="jwsInMultipartFilter"/>
+            <ref bean="jwsOutMultipartFilter"/>
+            <ref bean="jwsDetachedSignatureWriter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkhmacSinglePartJwsJson">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInMultipartFilterJwsJson"/>
             <ref bean="jwsOutMultipartFilter"/>
             <ref bean="jwsDetachedSignatureWriter"/>
         </jaxrs:providers>
