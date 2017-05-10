@@ -23,9 +23,12 @@ import java.util.List;
 
 import javax.ws.rs.ProcessingException;
 
+import org.apache.cxf.common.util.Base64UrlUtility;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
 import org.apache.cxf.rs.security.jose.jws.JwsDetachedSignature;
@@ -35,9 +38,11 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public abstract class AbstractJwsMultipartSignatureFilter {
-
+    private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
+    
     private JwsSignatureProvider sigProvider;
     private boolean supportSinglePartOnly = true;
+    private boolean useJwsJsonSignatureFormat;
 
     public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
         this.sigProvider = signatureProvider;
@@ -62,13 +67,21 @@ public abstract class AbstractJwsMultipartSignatureFilter {
         }
         
         JwsHeaders headers = new JwsHeaders();
+        headers.setPayloadEncodingStatus(false);
         JwsSignatureProvider theSigProvider = sigProvider != null ? sigProvider
             : JwsUtils.loadSignatureProvider(headers, true);
         JwsSignature jwsSignature = theSigProvider.createJwsSignature(headers);
+        
+        String base64UrlEncodedHeaders = Base64UrlUtility.encode(writer.toJson(headers));
+        byte[] headerBytesWithDot = StringUtils.toBytesASCII(base64UrlEncodedHeaders + ".");
+        jwsSignature.update(headerBytesWithDot, 0, headerBytesWithDot.length);
         AttachmentUtils.addMultipartOutFilter(new JwsMultipartSignatureOutFilter(jwsSignature));
         
         
-        JwsDetachedSignature jws = new JwsDetachedSignature(headers, jwsSignature);
+        JwsDetachedSignature jws = new JwsDetachedSignature(headers, 
+                                                            base64UrlEncodedHeaders,
+                                                            jwsSignature,
+                                                            useJwsJsonSignatureFormat);
         
         Attachment jwsPart = new Attachment("signature", JoseConstants.MEDIA_TYPE_JOSE, jws);
         parts.add(jwsPart);
@@ -77,5 +90,9 @@ public abstract class AbstractJwsMultipartSignatureFilter {
 
     public void setSupportSinglePartOnly(boolean supportSinglePartOnly) {
         this.supportSinglePartOnly = supportSinglePartOnly;
+    }
+
+    public void setUseJwsJsonSignatureFormat(boolean useJwsJsonSignatureFormat) {
+        this.useJwsJsonSignatureFormat = useJwsJsonSignatureFormat;
     }
 }

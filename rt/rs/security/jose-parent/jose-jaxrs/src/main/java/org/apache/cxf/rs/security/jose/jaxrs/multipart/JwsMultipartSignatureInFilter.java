@@ -21,8 +21,10 @@ package org.apache.cxf.rs.security.jose.jaxrs.multipart;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartInputFilter;
@@ -39,19 +41,19 @@ import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsVerificationSignature;
 
 public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
-
+    private JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
     private JwsSignatureVerifier verifier;
     private boolean supportSinglePartOnly;
     private Message message;
-    public JwsMultipartSignatureInFilter(Message message, boolean supportSinglePartOnly) {
-        this(message, null, supportSinglePartOnly);
-    }
-    
-    public JwsMultipartSignatureInFilter(Message message, JwsSignatureVerifier verifier, 
-                                         boolean supportSinglePartOnly) {
+    private boolean useJwsJsonSignatureFormat;
+    public JwsMultipartSignatureInFilter(Message message, 
+                                         JwsSignatureVerifier verifier, 
+                                         boolean supportSinglePartOnly,
+                                         boolean useJwsJsonSignatureFormat) {
         this.message = message;
         this.verifier = verifier;
         this.supportSinglePartOnly = supportSinglePartOnly;
+        this.useJwsJsonSignatureFormat = useJwsJsonSignatureFormat;
     }
     
     @Override
@@ -61,21 +63,39 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
         }
         Attachment sigPart = atts.remove(atts.size() - 1);
         
-        String encodedJws = null;
+        String jwsSequence = null;
         try {
-            encodedJws = IOUtils.readStringFromStream(sigPart.getDataHandler().getInputStream());
+            jwsSequence = IOUtils.readStringFromStream(sigPart.getDataHandler().getInputStream());
         } catch (IOException ex) {
             throw ExceptionUtils.toBadRequestException(null, null);
         }
-        String[] parts = JoseUtils.getCompactParts(encodedJws);
-        // Detached signature
-        if (parts.length != 3 || parts[1].length() > 0) {
-            throw ExceptionUtils.toBadRequestException(null, null);
+        
+        String base64UrlEncodedHeaders = null;
+        String base64UrlEncodedSignature = null;
+        
+        if (!useJwsJsonSignatureFormat) {
+            String[] parts = JoseUtils.getCompactParts(jwsSequence);
+            if (parts.length != 3 || parts[1].length() > 0) {
+                throw ExceptionUtils.toBadRequestException(null, null);
+            }
+            base64UrlEncodedHeaders = parts[0];
+            base64UrlEncodedSignature = parts[2];
+        } else {
+            Map<String, Object> parts = reader.fromJson(jwsSequence);
+            if (parts.size() != 2 || !parts.containsKey("protected") || !parts.containsKey("signature")) {
+                throw ExceptionUtils.toBadRequestException(null, null);
+            }
+            base64UrlEncodedHeaders = (String)parts.get("protected");
+            base64UrlEncodedSignature = (String)parts.get("signature");
         }
+        
         JwsHeaders headers = new JwsHeaders(
                                  new JsonMapObjectReaderWriter().fromJson(
-                                     JoseUtils.decodeToString(parts[0])));
-        
+                                     JoseUtils.decodeToString(base64UrlEncodedHeaders)));
+        JoseUtils.traceHeaders(headers);
+        if (Boolean.FALSE != headers.getPayloadEncodingStatus()) {
+            throw ExceptionUtils.toBadRequestException(null, null);
+        }
         JwsSignatureVerifier theVerifier = null;
         if (verifier == null) {
             Properties props = KeyManagementUtils.loadStoreProperties(message, true,
@@ -92,7 +112,10 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
         if (sig == null) {
             throw ExceptionUtils.toBadRequestException(null, null);
         }
-        byte[] signatureBytes = JoseUtils.decode(parts[2]);
+        byte[] signatureBytes = JoseUtils.decode(base64UrlEncodedSignature);
+        
+        byte[] headerBytesWithDot = StringUtils.toBytesASCII(base64UrlEncodedHeaders + ".");
+        sig.update(headerBytesWithDot, 0, headerBytesWithDot.length);
         
         int attSize = atts.size();
         for (int i = 0; i < attSize; i++) {
