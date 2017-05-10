@@ -74,6 +74,7 @@ import io.swagger.models.auth.SecuritySchemeDefinition;
 
 @Provider(value = Type.Feature, scope = Scope.Server)
 public class Swagger2Feature extends AbstractSwaggerFeature {
+    
     private String host;
 
     private String[] schemes;
@@ -99,6 +100,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     private boolean dynamicBasePath;
 
     private Map<String, SecuritySchemeDefinition> securityDefinitions;
+    
+    private Swagger2Customizer customizer;
 
     @Override
     protected void calculateDefaultBasePath(Server server) {
@@ -127,7 +130,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
 
         List<Object> swaggerResources = new LinkedList<>();
-        ApiListingResource apiListingResource = new ApiListingResource();
+        ApiListingResource apiListingResource = new Swagger2ApiListingResource(customizer);
         swaggerResources.add(apiListingResource);
 
         List<Object> providers = new ArrayList<>();
@@ -161,14 +164,17 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 }
             }
         }
-
-        if (swagger2Serializers == null) {
-            swagger2Serializers = new DefaultSwagger2Serializers();
+        if (customizer == null) {
+            if (swagger2Serializers == null) {
+                swagger2Serializers = new DefaultSwagger2Serializers();
+            }
+            swagger2Serializers.setClassResourceInfos(cris);
+            swagger2Serializers.setDynamicBasePath(dynamicBasePath);
+            providers.add(swagger2Serializers);
+        } else {
+            customizer.setClassResourceInfos(cris);
+            customizer.setDynamicBasePath(dynamicBasePath);
         }
-        swagger2Serializers.setClassResourceInfos(cris);
-        swagger2Serializers.setDynamicBasePath(dynamicBasePath);
-
-        providers.add(swagger2Serializers);
 
         providers.add(new ReaderConfigFilter());
 
@@ -202,8 +208,11 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         if (swagger != null && securityDefinitions != null) {
             swagger.setSecurityDefinitions(securityDefinitions);
         }
-
-        swagger2Serializers.setBeanConfig(beanConfig);
+        if (customizer == null) {
+            swagger2Serializers.setBeanConfig(beanConfig);
+        } else {
+            customizer.setBeanConfig(beanConfig);
+        }
     }
 
     public boolean isUsePathBasedConfig() {
@@ -224,6 +233,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     public String[] getSchemes() {
         return schemes;
+    }
+    
+    public Swagger2Customizer getCustomizer() {
+        return customizer;
+    }
+
+    public void setCustomizer(Swagger2Customizer customizer) {
+        this.customizer = customizer;
     }
 
     public void setSchemes(String[] schemes) {
@@ -502,5 +519,4 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             return serviceClasses;
         }
     }
-
 }
