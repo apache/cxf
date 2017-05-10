@@ -30,6 +30,7 @@ public abstract class AbstractJwsMultipartVerificationFilter {
     
     private JwsSignatureVerifier sigVerifier;
     private boolean supportSinglePartOnly = true;
+    private boolean useJwsJsonSignatureFormat;
     
     public void setSigVerifier(JwsSignatureVerifier sigVerifier) {
         this.sigVerifier = sigVerifier;
@@ -41,11 +42,16 @@ public abstract class AbstractJwsMultipartVerificationFilter {
     protected void addMultipartFilterIfNeeded(MediaType contentType) {
         if (contentType != null && contentType.getType().equals("multipart")) {
             Message m = JAXRSUtils.getCurrentMessage();
-            MultipartInputFilter jwsFilter = sigVerifier == null 
-                ? new JwsMultipartSignatureInFilter(m, supportSinglePartOnly) 
-                : new JwsMultipartSignatureInFilter(m, sigVerifier, supportSinglePartOnly); 
+            MultipartInputFilter jwsFilter = new JwsMultipartSignatureInFilter(m, 
+                                                    sigVerifier, 
+                                                    supportSinglePartOnly, 
+                                                    useJwsJsonSignatureFormat); 
             AttachmentUtils.addMultipartInFilter(jwsFilter); 
         }
         
+    }
+    
+    public void setUseJwsJsonSignatureFormat(boolean useJwsJsonSignatureFormat) {
+        this.useJwsJsonSignatureFormat = useJwsJsonSignatureFormat;
     }
 }
