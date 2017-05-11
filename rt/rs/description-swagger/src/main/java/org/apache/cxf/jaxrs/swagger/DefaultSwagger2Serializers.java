@@ -41,15 +41,15 @@ public class DefaultSwagger2Serializers extends SwaggerSerializers implements Sw
     
     @Override
     public void writeTo(
-            Swagger data,
+            final Swagger data,
             final Class<?> type,
             final Type genericType,
             final Annotation[] annotations,
             final MediaType mediaType,
             final MultivaluedMap<String, Object> headers,
             final OutputStream out) throws IOException {
-        data = customizer.customize(data);
-        super.writeTo(data, type, genericType, annotations, mediaType, headers, out);
+        Swagger customizedData = customizer.customize(data);
+        super.writeTo(customizedData, type, genericType, annotations, mediaType, headers, out);
     }
 
     @Override
