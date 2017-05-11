@@ -22,16 +22,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
@@ -51,9 +47,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 
 @Priority(Priorities.JWS_WRITE_PRIORITY)
 public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider implements WriterInterceptor {
-    private static final Set<String> DEFAULT_PROTECTED_HTTP_HEADERS = 
-        new HashSet<String>(Arrays.asList(HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT));
-    private Set<String> protectedHttpHeaders = DEFAULT_PROTECTED_HTTP_HEADERS;
+    private Set<String> protectedHttpHeaders;
     private boolean protectHttpHeaders;
     private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     private boolean contentTypeRequired = true;
@@ -148,17 +142,9 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
     
     protected void protectHttpHeadersIfNeeded(WriterInterceptorContext ctx, JwsHeaders jwsHeaders) {
         if (protectHttpHeaders) {
-            final String prefix = "http.";
-            MultivaluedMap<String, Object> httpHeaders = ctx.getHeaders(); 
-            for (String headerName : protectedHttpHeaders) {
-                List<Object> headerValues = httpHeaders.get(headerName);
-                if (headerValues != null) {
-                    String jwsHeaderValue = headerValues.size() > 1 ? headerValues.toString()
-                        : headerValues.get(0).toString();
-                    String prefixedHeaderName = prefix + headerName;
-                    jwsHeaders.setHeader(prefixedHeaderName, jwsHeaderValue);
-                }
-            }
+            JoseJaxrsUtils.protectHttpHeaders(ctx.getHeaders(), 
+                                              jwsHeaders, 
+                                              protectedHttpHeaders);
         }
         
     }

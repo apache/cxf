@@ -75,6 +75,7 @@ under the License.
     <bean id="jwsInFilterHttpHeaders" class="org.apache.cxf.rs.security.jose.jaxrs.JwsContainerRequestFilter">
         <property name="validateHttpHeaders" value="true"/>
     </bean>
+    <bean id="httpHeaderFilter" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.HttpHeaderModifyingFilter"/>
     <bean id="jwsOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsWriterInterceptor"/>
     <bean id="keyPasswordProvider" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl"/>
     <bean id="keyPasswordProvider2" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.PrivateKeyPasswordProviderImpl">
@@ -216,6 +217,7 @@ under the License.
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <ref bean="jwsInFilterHttpHeaders"/>
+            <ref bean="httpHeaderFilter"/>
             <ref bean="jwsOutFilter"/>
             <ref bean="jackson"/>
         </jaxrs:providers>

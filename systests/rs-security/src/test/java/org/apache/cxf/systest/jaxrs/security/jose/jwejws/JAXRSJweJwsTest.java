@@ -26,6 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import javax.ws.rs.BadRequestException;
+
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.Bus;
@@ -259,6 +261,13 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
         BookStore bs = createJwsBookStore(address, null, true, true);
         String text = bs.echoText("book");
         assertEquals("book", text);
+    }
+    @Test(expected = BadRequestException.class)
+    public void testJwsJwkPlainTextHMacHttpHeadersModified() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjwkhmacHttpHeaders";
+        BookStore bs = createJwsBookStore(address, null, true, true);
+        WebClient.client(bs).header("Modify", "true");
+        bs.echoText("book");
     }
     @Test
     public void testJwsJwkPlainTextHMacUnencoded() throws Exception {

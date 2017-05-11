@@ -41,6 +41,9 @@ public class JweClientResponseFilter extends AbstractJweDecryptingFilter impleme
         if (ct != null) {
             res.getHeaders().putSingle("Content-Type", ct);
         }
+        if (super.isValidateHttpHeaders()) {
+            super.validateHttpHeadersIfNeeded(res.getHeaders(), out.getHeaders());
+        }
     }
-
+    
 }

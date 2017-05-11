@@ -46,5 +46,8 @@ public class JweContainerRequestFilter extends AbstractJweDecryptingFilter imple
         if (ct != null) {
             context.getHeaders().putSingle("Content-Type", ct);
         }
+        if (super.isValidateHttpHeaders()) {
+            super.validateHttpHeadersIfNeeded(context.getHeaders(), out.getHeaders());
+        }
     }
 }

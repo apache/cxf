@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.jose.jaxrs;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.DeflaterOutputStream;
 
@@ -49,6 +50,8 @@ import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 @Priority(Priorities.JWE_WRITE_PRIORITY)
 public class JweWriterInterceptor implements WriterInterceptor {
     protected static final Logger LOG = LogUtils.getL7dLogger(JweWriterInterceptor.class);
+    private Set<String> protectedHttpHeaders;
+    private boolean protectHttpHeaders;
     private JweEncryptionProvider encryptionProvider;
     private boolean contentTypeRequired = true;
     private boolean useJweOutputStream;
@@ -74,7 +77,7 @@ public class JweWriterInterceptor implements WriterInterceptor {
         if (ctString != null) {
             jweHeaders.setContentType(ctString);
         }
-
+        protectHttpHeadersIfNeeded(ctx, jweHeaders);
         if (useJweOutputStream) {
             JweEncryptionOutput encryption =
                 theEncryptionProvider.getEncryptionOutput(new JweEncryptionInput(jweHeaders));
@@ -133,4 +136,20 @@ public class JweWriterInterceptor implements WriterInterceptor {
         this.encryptionProvider = encryptionProvider;
     }
 
+    protected void protectHttpHeadersIfNeeded(WriterInterceptorContext ctx, JweHeaders jweHeaders) {
+        if (protectHttpHeaders) {
+            JoseJaxrsUtils.protectHttpHeaders(ctx.getHeaders(), 
+                                              jweHeaders, 
+                                              protectedHttpHeaders);
+        }
+        
+    }
+
+    public void setProtectHttpHeaders(boolean protectHttpHeaders) {
+        this.protectHttpHeaders = protectHttpHeaders;
+    }
+
+    public void setProtectedHttpHeaders(Set<String> protectedHttpHeaders) {
+        this.protectedHttpHeaders = protectedHttpHeaders;
+    }
 }

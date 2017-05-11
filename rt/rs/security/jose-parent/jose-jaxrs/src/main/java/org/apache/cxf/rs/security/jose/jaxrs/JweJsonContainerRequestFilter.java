@@ -49,6 +49,9 @@ public class JweJsonContainerRequestFilter extends AbstractJweJsonDecryptingFilt
             if (ct != null) {
                 context.getHeaders().putSingle("Content-Type", ct);
             }
+            if (super.isValidateHttpHeaders()) {
+                super.validateHttpHeadersIfNeeded(context.getHeaders(), out.getHeaders());
+            }
         } catch (JweException ex) {
             context.abortWith(JAXRSUtils.toResponse(400));
             return;

@@ -23,14 +23,12 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.WriterInterceptor;
 import javax.ws.rs.ext.WriterInterceptorContext;
 
@@ -136,17 +134,9 @@ public class JwsWriterInterceptor extends AbstractJwsWriterProvider implements W
     }
     protected void protectHttpHeadersIfNeeded(WriterInterceptorContext ctx, JwsHeaders jwsHeaders) {
         if (protectHttpHeaders) {
-            final String prefix = "http.";
-            MultivaluedMap<String, Object> httpHeaders = ctx.getHeaders(); 
-            for (String headerName : protectedHttpHeaders) {
-                List<Object> headerValues = httpHeaders.get(headerName);
-                if (headerValues != null) {
-                    String jwsHeaderValue = headerValues.size() > 1 ? headerValues.toString()
-                        : headerValues.get(0).toString();
-                    String prefixedHeaderName = prefix + headerName;
-                    jwsHeaders.setHeader(prefixedHeaderName, jwsHeaderValue);
-                }
-            }
+            JoseJaxrsUtils.protectHttpHeaders(ctx.getHeaders(), 
+                                              jwsHeaders, 
+                                              protectedHttpHeaders);
         }
         
     }
