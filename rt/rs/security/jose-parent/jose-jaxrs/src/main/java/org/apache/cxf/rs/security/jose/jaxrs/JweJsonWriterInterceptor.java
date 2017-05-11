@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
@@ -43,6 +44,8 @@ import org.apache.cxf.rs.security.jose.jwe.JweJsonProducer;
 
 @Priority(Priorities.JWE_WRITE_PRIORITY)
 public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider implements WriterInterceptor {
+    private Set<String> protectedHttpHeaders;
+    private boolean protectHttpHeaders;
     private boolean contentTypeRequired = true;
     private boolean useJweOutputStream;
     @Override
@@ -67,6 +70,7 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
         if (ctString != null) {
             protectedHeaders.setContentType(ctString);
         }
+        protectHttpHeadersIfNeeded(ctx, protectedHeaders);
         List<KeyAlgorithm> keyAlgos = new ArrayList<>();
         for (JweEncryptionProvider p : providers) {
             if (!keyAlgos.contains(p.getKeyAlgorithm())) {
@@ -114,6 +118,21 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
         this.useJweOutputStream = useJweOutputStream;
     }
 
-    
-    
+    protected void protectHttpHeadersIfNeeded(WriterInterceptorContext ctx, JweHeaders jweHeaders) {
+        if (protectHttpHeaders) {
+            JoseJaxrsUtils.protectHttpHeaders(ctx.getHeaders(), 
+                                              jweHeaders, 
+                                              protectedHttpHeaders);
+        }
+        
+    }
+
+    public void setProtectHttpHeaders(boolean protectHttpHeaders) {
+        this.protectHttpHeaders = protectHttpHeaders;
+    }
+
+    public void setProtectedHttpHeaders(Set<String> protectedHttpHeaders) {
+        this.protectedHttpHeaders = protectedHttpHeaders;
+    }
+
 }

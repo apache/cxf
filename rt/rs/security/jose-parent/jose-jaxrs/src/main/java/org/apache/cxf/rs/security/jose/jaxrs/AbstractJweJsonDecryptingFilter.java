@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Set;
+
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -34,6 +37,8 @@ import org.apache.cxf.rs.security.jose.jwe.JweJsonEncryptionEntry;
 import org.apache.cxf.rs.security.jose.jwe.JweUtils;
 
 public class AbstractJweJsonDecryptingFilter {
+    private Set<String> protectedHttpHeaders;
+    private boolean validateHttpHeaders;
     private JweDecryptionProvider decryption;
     private String defaultMediaType;
     private Map<String, Object> recipientProperties;
@@ -74,6 +79,21 @@ public class AbstractJweJsonDecryptingFilter {
 
     public void setRecipientProperties(Map<String, Object> recipientProperties) {
         this.recipientProperties = recipientProperties;
-    } 
+    }
+
+    public void setValidateHttpHeaders(boolean validateHttpHeaders) {
+        this.validateHttpHeaders = validateHttpHeaders;
+    }
+    public boolean isValidateHttpHeaders() {
+        return validateHttpHeaders;
+    }
     
+    protected void validateHttpHeadersIfNeeded(MultivaluedMap<String, String> httpHeaders, JweHeaders jweHeaders) {
+        JoseJaxrsUtils.validateHttpHeaders(httpHeaders, 
+                                           jweHeaders, 
+                                           protectedHttpHeaders);
+    }
+    public void setProtectedHttpHeaders(Set<String> protectedHttpHeaders) {
+        this.protectedHttpHeaders = protectedHttpHeaders;
+    }
 }

@@ -38,7 +38,7 @@ public class BookStore {
     
     @POST
     @Path("/books")
-    @Produces("text/plain")
+    @Produces({"text/plain", "application/json"})
     @Consumes("text/plain")
     public String echoText(String text) {
         return text;
