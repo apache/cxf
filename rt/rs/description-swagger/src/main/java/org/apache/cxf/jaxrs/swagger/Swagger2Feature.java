@@ -159,7 +159,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         List<ClassResourceInfo> cris = sfb.getClassResourceInfo();
         if (!runAsFilter) {
             for (ClassResourceInfo cri : cris) {
-                if (ApiListingResource.class == cri.getResourceClass()) {
+                if (ApiListingResource.class.isAssignableFrom(cri.getResourceClass())) {
                     InjectionUtils.injectContextProxies(cri, apiListingResource);
                 }
             }
