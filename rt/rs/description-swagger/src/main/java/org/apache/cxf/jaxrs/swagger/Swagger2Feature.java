@@ -209,8 +209,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             swagger.setSecurityDefinitions(securityDefinitions);
         }
         
-        swagger2Serializers.setBeanConfig(beanConfig);
-
         if (customizer == null) {
             swagger2Serializers.setBeanConfig(beanConfig);
         } else {
