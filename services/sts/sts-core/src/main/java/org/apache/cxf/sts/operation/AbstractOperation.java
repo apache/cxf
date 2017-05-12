@@ -583,13 +583,8 @@ public abstract class AbstractOperation {
         if (responsePrincipal != null) {
             String targetRealm = providerParameters.getRealm();
             String sourceRealm = tokenResponse.getTokenRealm();
-<<<<<<< HEAD
-    
-            if (sourceRealm != null && !sourceRealm.equals(targetRealm)) {
-=======
 
             if (sourceRealm != null && targetRealm != null && !sourceRealm.equals(targetRealm)) {
->>>>>>> a71508214a... Only map principals when both realms are non-null
                 RelationshipResolver relRes = stsProperties.getRelationshipResolver();
                 Relationship relationship = null;
                 if (relRes != null) {
