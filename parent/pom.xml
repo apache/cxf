@@ -131,7 +131,7 @@
         <cxf.littleproxy.version>1.1.2</cxf.littleproxy.version>
         <cxf.maven.core.version>3.0.5</cxf.maven.core.version>
         <cxf.msv.version>2013.6.1</cxf.msv.version>
-        <cxf.neethi.version>3.0.3</cxf.neethi.version>
+        <cxf.neethi.version>3.1.0</cxf.neethi.version>
         <cxf.netty.version>4.0.43.Final</cxf.netty.version>
         <cxf.netty3.version>3.9.2.Final</cxf.netty3.version>
         <cxf.netty.version.range>[4,5)</cxf.netty.version.range>
