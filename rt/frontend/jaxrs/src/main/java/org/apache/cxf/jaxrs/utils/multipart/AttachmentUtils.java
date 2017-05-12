@@ -63,9 +63,9 @@ public final class AttachmentUtils {
         List<MultipartOutputFilter> outFilters = CastUtils.cast((List<?>)m.get(OUT_FILTERS));
         if (outFilters == null) {
             outFilters = new ArrayList<MultipartOutputFilter>();
+            m.put(OUT_FILTERS, outFilters);
         }
         outFilters.add(filter);
-        m.put(OUT_FILTERS, outFilters);
     }
     
     public static void addMultipartInFilter(MultipartInputFilter filter) {
@@ -73,9 +73,9 @@ public final class AttachmentUtils {
         List<MultipartInputFilter> inFilters = CastUtils.cast((List<?>)m.get(IN_FILTERS));
         if (inFilters == null) {
             inFilters = new ArrayList<MultipartInputFilter>();
+            m.put(IN_FILTERS, inFilters);
         }
         inFilters.add(filter);
-        m.put(IN_FILTERS, inFilters);
     }
 
     
