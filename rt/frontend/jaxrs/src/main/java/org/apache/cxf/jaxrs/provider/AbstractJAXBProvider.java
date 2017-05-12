@@ -39,6 +39,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -89,8 +90,10 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
     protected static final String NS_MAPPER_PROPERTY_RI_INT = "com.sun.xml.internal.bind.namespacePrefixMapper";
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
-
-
+    private static final Set<Class<?>> UNSUPPORTED_CLASSES = 
+        new HashSet<Class<?>>(Arrays.asList(InputStream.class,
+                                            OutputStream.class,
+                                            StreamingOutput.class));
     protected Set<Class<?>> collectionContextClasses = new HashSet<Class<?>>();
 
     protected Map<String, String> jaxbElementClassMap = Collections.emptyMap();
@@ -331,7 +334,6 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
                 return false;
             }
         }
-
         return marshalAsJaxbElement && (!xmlTypeAsJaxbElementOnly || isXmlType(type))
             || isSupported(type, genericType, anns);
     }
@@ -561,6 +563,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         if (jaxbElementClassMap != null && jaxbElementClassMap.containsKey(type.getName())
             || isSkipJaxbChecks()) {
             return true;
+        }
+        if (UNSUPPORTED_CLASSES.contains(type)) {
+            return false;
         }
         return isXmlRoot(type)
             || JAXBElement.class.isAssignableFrom(type)
