@@ -25,8 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.WebApplicationException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -64,7 +62,16 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
         
     @Test
     public void testJwsJwkBookHMacMultipart() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwsjwkhmacSinglePart";
+        String address = "https://localhost:" + PORT + "/jwsjwkhmac";
+        BookStore bs = createJwsBookStoreHMac(address, false, false);
+        Book book = bs.echoBookMultipart(new Book("book", 123L));
+        assertEquals("book", book.getName());
+        assertEquals(123L, book.getId());
+    }
+    
+    @Test
+    public void testJwsJwkBookHMacMultipartBuffered() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjwkhmac";
         BookStore bs = createJwsBookStoreHMac(address, true, false);
         Book book = bs.echoBookMultipart(new Book("book", 123L));
         assertEquals("book", book.getName());
@@ -73,8 +80,8 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testJwsJwkBookHMacMultipartJwsJson() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwsjwkhmacSinglePartJwsJson";
-        BookStore bs = createJwsBookStoreHMac(address, true, true);
+        String address = "https://localhost:" + PORT + "/jwsjwkhmacJwsJson";
+        BookStore bs = createJwsBookStoreHMac(address, false, true);
         Book book = bs.echoBookMultipart(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
@@ -82,8 +89,8 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testJwsJwkBookRSAMultipart() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwsjwkrsaSinglePart";
-        BookStore bs = createJwsBookStoreRSA(address, true);
+        String address = "https://localhost:" + PORT + "/jwsjwkrsa";
+        BookStore bs = createJwsBookStoreRSA(address);
         Book book = bs.echoBookMultipart(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
@@ -91,7 +98,7 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testJwsJwkBooksHMacMultipart() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwsjwkhmacManyParts";
+        String address = "https://localhost:" + PORT + "/jwsjwkhmac";
         BookStore bs = createJwsBookStoreHMac(address, false, false);
         List<Book> books = new LinkedList<Book>();
         books.add(new Book("book", 123L));
@@ -102,60 +109,44 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
         assertEquals("book2", returnBooks.get(1).getName());
         assertEquals(124L, returnBooks.get(1).getId());
     }
-    @Test(expected = ProcessingException.class)
-    public void testJwsJwkBooksHMacMultipartClientRestriction() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwsjwkhmacManyParts";
-        BookStore bs = createJwsBookStoreHMac(address, true, false);
-        List<Book> books = new LinkedList<Book>();
-        books.add(new Book("book", 123L));
-        books.add(new Book("book2", 124L));
-        bs.echoBooksMultipart(books);
-    }
-    @Test(expected = BadRequestException.class)
-    public void testJwsJwkBooksHMacMultipartServerRestriction() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwsjwkhmacSinglePart";
-        BookStore bs = createJwsBookStoreHMac(address, false, false);
-        List<Book> books = new LinkedList<Book>();
-        books.add(new Book("book", 123L));
-        books.add(new Book("book2", 124L));
-        bs.echoBooksMultipart(books);
-    }
     
     @Test(expected = BadRequestException.class)
     public void testJwsJwkBooksHMacMultipartUnsigned() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwsjwkhmacSinglePart";
+        String address = "https://localhost:" + PORT + "/jwsjwkhmac";
         BookStore bs = JAXRSClientFactory.create(address, BookStore.class, 
                             JAXRSJwsMultipartTest.class.getResource("client.xml").toString());
         bs.echoBookMultipart(new Book("book", 123L));
     }
-    @Test
+    @Test(expected = BadRequestException.class)
     public void testJwsJwkBookHMacMultipartModified() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwsjwkhmacSinglePartModified";
-        BookStore bs = createJwsBookStoreHMac(address, true, false);
-        try {
-            bs.echoBookMultipart(new Book("book", 123L));
-            fail("Exception is expected");
-        } catch (WebApplicationException ex) {
-            // expected
-        }
+        String address = "https://localhost:" + PORT + "/jwsjwkhmacModified";
+        BookStore bs = createJwsBookStoreHMac(address, false, false);
+        bs.echoBookMultipartModified(new Book("book", 123L));
     }
+    @Test(expected = BadRequestException.class)
+    public void testJwsJwkBookHMacMultipartModifiedBufferPayload() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwsjwkhmacModifiedBufferPayload";
+        BookStore bs = createJwsBookStoreHMac(address, true, false);
+        bs.echoBookMultipartModified(new Book("book", 123L));
+    }
+    
     private BookStore createJwsBookStoreHMac(String address, 
-                                             boolean supportSinglePart,
+                                             boolean bufferPayload,
                                              boolean useJwsJsonSignatureFormat) throws Exception {
-        JAXRSClientFactoryBean bean = createJAXRSClientFactoryBean(address, supportSinglePart, 
+        JAXRSClientFactoryBean bean = createJAXRSClientFactoryBean(address, bufferPayload, 
                                                                    useJwsJsonSignatureFormat);
         bean.getProperties(true).put("rs.security.signature.properties",
             "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
         return bean.create(BookStore.class);
     }
-    private BookStore createJwsBookStoreRSA(String address, boolean supportSinglePart) throws Exception {
-        JAXRSClientFactoryBean bean = createJAXRSClientFactoryBean(address, supportSinglePart, false);
+    private BookStore createJwsBookStoreRSA(String address) throws Exception {
+        JAXRSClientFactoryBean bean = createJAXRSClientFactoryBean(address, false, false);
         bean.getProperties(true).put("rs.security.signature.properties",
             "org/apache/cxf/systest/jaxrs/security/alice.jwk.properties");
         return bean.create(BookStore.class);
     }
     private JAXRSClientFactoryBean createJAXRSClientFactoryBean(String address, 
-                                                                boolean supportSinglePart,
+                                                                boolean bufferPayload,
                                                                 boolean useJwsJsonSignatureFormat) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
@@ -166,11 +157,10 @@ public class JAXRSJwsMultipartTest extends AbstractBusClientServerTestBase {
         bean.setAddress(address);
         List<Object> providers = new LinkedList<Object>();
         JwsMultipartClientRequestFilter outFilter = new JwsMultipartClientRequestFilter();
-        outFilter.setSupportSinglePartOnly(supportSinglePart);
         outFilter.setUseJwsJsonSignatureFormat(useJwsJsonSignatureFormat);
         providers.add(outFilter);
         JwsMultipartClientResponseFilter inFilter = new JwsMultipartClientResponseFilter();
-        inFilter.setSupportSinglePartOnly(supportSinglePart);
+        inFilter.setBufferPayload(bufferPayload);
         providers.add(inFilter);
         providers.add(new JwsDetachedSignatureProvider());
         bean.setProviders(providers);

@@ -29,22 +29,18 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 public abstract class AbstractJwsMultipartVerificationFilter {
     
     private JwsSignatureVerifier sigVerifier;
-    private boolean supportSinglePartOnly = true;
     private boolean useJwsJsonSignatureFormat;
-    
+    private boolean bufferPayload;
     public void setSigVerifier(JwsSignatureVerifier sigVerifier) {
         this.sigVerifier = sigVerifier;
     }
-    public void setSupportSinglePartOnly(boolean supportSinglePartOnly) {
-        this.supportSinglePartOnly = supportSinglePartOnly;
-    }
-
+    
     protected void addMultipartFilterIfNeeded(MediaType contentType) {
         if (contentType != null && contentType.getType().equals("multipart")) {
             Message m = JAXRSUtils.getCurrentMessage();
             MultipartInputFilter jwsFilter = new JwsMultipartSignatureInFilter(m, 
                                                     sigVerifier, 
-                                                    supportSinglePartOnly, 
+                                                    bufferPayload, 
                                                     useJwsJsonSignatureFormat); 
             AttachmentUtils.addMultipartInFilter(jwsFilter); 
         }
@@ -53,5 +49,9 @@ public abstract class AbstractJwsMultipartVerificationFilter {
     
     public void setUseJwsJsonSignatureFormat(boolean useJwsJsonSignatureFormat) {
         this.useJwsJsonSignatureFormat = useJwsJsonSignatureFormat;
+    }
+
+    public void setBufferPayload(boolean bufferPayload) {
+        this.bufferPayload = bufferPayload;
     }
 }

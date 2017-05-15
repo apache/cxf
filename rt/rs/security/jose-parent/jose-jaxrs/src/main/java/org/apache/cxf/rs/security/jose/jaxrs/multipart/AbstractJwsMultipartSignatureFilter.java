@@ -21,8 +21,6 @@ package org.apache.cxf.rs.security.jose.jaxrs.multipart;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.ProcessingException;
-
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
@@ -41,7 +39,6 @@ public abstract class AbstractJwsMultipartSignatureFilter {
     private JsonMapObjectReaderWriter writer = new JsonMapObjectReaderWriter();
     
     private JwsSignatureProvider sigProvider;
-    private boolean supportSinglePartOnly = true;
     private boolean useJwsJsonSignatureFormat;
 
     public void setSignatureProvider(JwsSignatureProvider signatureProvider) {
@@ -61,9 +58,6 @@ public abstract class AbstractJwsMultipartSignatureFilter {
             } else {
                 parts.add(rootEntity);
             }
-        }
-        if (supportSinglePartOnly && parts.size() > 1) {
-            throw new ProcessingException("Single part only is supported");
         }
         
         JwsHeaders headers = new JwsHeaders();
@@ -86,10 +80,6 @@ public abstract class AbstractJwsMultipartSignatureFilter {
         Attachment jwsPart = new Attachment("signature", JoseConstants.MEDIA_TYPE_JOSE, jws);
         parts.add(jwsPart);
         return parts;
-    }
-
-    public void setSupportSinglePartOnly(boolean supportSinglePartOnly) {
-        this.supportSinglePartOnly = supportSinglePartOnly;
     }
 
     public void setUseJwsJsonSignatureFormat(boolean useJwsJsonSignatureFormat) {
