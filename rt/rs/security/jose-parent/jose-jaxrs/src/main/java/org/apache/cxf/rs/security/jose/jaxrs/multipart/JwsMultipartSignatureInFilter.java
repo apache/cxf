@@ -26,6 +26,7 @@ import java.util.Properties;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartInputFilter;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
@@ -43,22 +44,22 @@ import org.apache.cxf.rs.security.jose.jws.JwsVerificationSignature;
 public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
     private JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
     private JwsSignatureVerifier verifier;
-    private boolean supportSinglePartOnly;
+    private boolean bufferPayload;
     private Message message;
     private boolean useJwsJsonSignatureFormat;
     public JwsMultipartSignatureInFilter(Message message, 
                                          JwsSignatureVerifier verifier, 
-                                         boolean supportSinglePartOnly,
+                                         boolean bufferPayload,
                                          boolean useJwsJsonSignatureFormat) {
         this.message = message;
         this.verifier = verifier;
-        this.supportSinglePartOnly = supportSinglePartOnly;
+        this.bufferPayload = bufferPayload;
         this.useJwsJsonSignatureFormat = useJwsJsonSignatureFormat;
     }
     
     @Override
     public void filter(List<Attachment> atts) {
-        if (atts.size() < 2 || supportSinglePartOnly && atts.size() > 2) {
+        if (atts.size() < 2) {
             throw ExceptionUtils.toBadRequestException(null, null);
         }
         Attachment sigPart = atts.remove(atts.size() - 1);
@@ -128,7 +129,20 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
             }
             boolean verifyOnLastRead = i == attSize - 1 ? true : false;
             JwsInputStream jwsStream = new JwsInputStream(dataPartStream, sig, signatureBytes, verifyOnLastRead);
-            Attachment newDataPart = new Attachment(jwsStream, dataPart.getHeaders());
+            
+            InputStream newStream = null;
+            if (bufferPayload) {
+                CachedOutputStream cos = new CachedOutputStream();
+                try {
+                    IOUtils.copy(jwsStream, cos);
+                    newStream = cos.getInputStream();
+                } catch (Exception ex) {
+                    throw ExceptionUtils.toBadRequestException(ex, null);
+                }
+            } else {
+                newStream = jwsStream;
+            }
+            Attachment newDataPart = new Attachment(newStream, dataPart.getHeaders());
             atts.add(i, newDataPart);
         }
     }
