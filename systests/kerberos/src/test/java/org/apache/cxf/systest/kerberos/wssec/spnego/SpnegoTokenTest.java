@@ -21,10 +21,6 @@ package org.apache.cxf.systest.kerberos.wssec.spnego;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -34,59 +30,16 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.kerberos.common.SecurityTestUtil;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.TestUtil;
-import org.apache.directory.server.annotations.CreateKdcServer;
-import org.apache.directory.server.annotations.CreateTransport;
-import org.apache.directory.server.core.annotations.ApplyLdifFiles;
-import org.apache.directory.server.core.annotations.CreateDS;
-import org.apache.directory.server.core.annotations.CreateIndex;
-import org.apache.directory.server.core.annotations.CreatePartition;
 import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
-import org.apache.directory.server.core.integ.FrameworkRunner;
-import org.apache.directory.server.core.kerberos.KeyDerivationInterceptor;
+import org.apache.kerby.kerberos.kerb.server.SimpleKdcServer;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.example.contract.doubleit.DoubleItPortType;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 
 /**
- * A set of tests for Spnego Tokens that use an Apache DS instance as the KDC.
+ * A set of tests for Spnego Tokens that use an Apache Kerby instance as the KDC.
  */
-
-@RunWith(FrameworkRunner.class)
-
-//Define the DirectoryService
-@CreateDS(name = "AbstractKerberosTest-class",
-    enableAccessControl = false,
-    allowAnonAccess = false,
-    enableChangeLog = true,
-    partitions = {
-        @CreatePartition(
-            name = "example",
-            suffix = "dc=example,dc=com",
-            indexes = {
-                @CreateIndex(attribute = "objectClass"),
-                @CreateIndex(attribute = "dc"),
-                @CreateIndex(attribute = "ou")
-            }
-        ) },
-    additionalInterceptors = {
-        KeyDerivationInterceptor.class
-        }
-)
-
-@CreateKdcServer(
-    transports = {
-        @CreateTransport(protocol = "KRB", address = "localhost")
-        },
-    primaryRealm = "service.ws.apache.org",
-    kdcPrincipal = "krbtgt/service.ws.apache.org@service.ws.apache.org"
-)
-
-//Inject an file containing entries
-@ApplyLdifFiles("kerberos.ldif")
-
 public class SpnegoTokenTest extends AbstractLdapTestUnit {
     static final String PORT = TestUtil.getPortNumber(Server.class);
     static final String STAX_PORT = TestUtil.getPortNumber(StaxServer.class);
@@ -100,29 +53,8 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
             SecurityTestUtil.checkUnrestrictedPoliciesInstalled();
 
     private static boolean runTests;
-    private static boolean portUpdated;
-
-    @Before
-    public void updatePort() throws Exception {
-        if (!portUpdated) {
-            String basedir = System.getProperty("basedir");
-            if (basedir == null) {
-                basedir = new File(".").getCanonicalPath();
-            }
-
-            // Read in krb5.conf and substitute in the correct port
-            Path path = FileSystems.getDefault().getPath(basedir, "/src/test/resources/krb5.conf");
-            String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
-            content = content.replaceAll("port", "" + super.getKdcServer().getTransports()[0].getPort());
-
-            Path path2 = FileSystems.getDefault().getPath(basedir, "/target/test-classes/wssec.spnego.krb5.conf");
-            Files.write(path2, content.getBytes());
-
-            System.setProperty("java.security.krb5.conf", path2.toString());
-
-            portUpdated = true;
-        }
-    }
+    
+    private static SimpleKdcServer kerbyServer;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -133,16 +65,35 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
         //
         if (!"IBM Corporation".equals(System.getProperty("java.vendor"))) {
             runTests = true;
-            String basedir = System.getProperty("basedir");
-            if (basedir == null) {
-                basedir = new File(".").getCanonicalPath();
-            }
-
-            // System.setProperty("sun.security.krb5.debug", "true");
-            System.setProperty("java.security.auth.login.config",
-                               basedir + "/src/test/resources/kerberos.jaas");
-
         }
+        
+        String basedir = System.getProperty("basedir");
+        if (basedir == null) {
+            basedir = new File(".").getCanonicalPath();
+        }
+
+        // System.setProperty("sun.security.krb5.debug", "true");
+        System.setProperty("java.security.auth.login.config", basedir + "/target/test-classes/kerberos.jaas");
+        System.setProperty("java.security.krb5.conf", basedir + "/target/krb5.conf");
+
+        kerbyServer = new SimpleKdcServer();
+
+        kerbyServer.setKdcRealm("service.ws.apache.org");
+        kerbyServer.setAllowUdp(false);
+        kerbyServer.setWorkDir(new File(basedir + "/target"));
+
+        //kerbyServer.setInnerKdcImpl(new NettyKdcServerImpl(kerbyServer.getKdcSetting()));
+
+        kerbyServer.init();
+
+        // Create principals
+        String alice = "alice@service.ws.apache.org";
+        String bob = "bob/service.ws.apache.org@service.ws.apache.org";
+
+        kerbyServer.createPrincipal(alice, "alice");
+        kerbyServer.createPrincipal(bob, "bob");
+
+        kerbyServer.start();
 
         // Launch servers
         org.junit.Assert.assertTrue(
@@ -164,6 +115,9 @@ public class SpnegoTokenTest extends AbstractLdapTestUnit {
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
         AbstractBusClientServerTestBase.stopAllServers();
+        if (kerbyServer != null) {
+            kerbyServer.stop();
+        }
     }
 
     @org.junit.Test

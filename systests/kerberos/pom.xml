@@ -241,44 +241,10 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.apache.directory.server</groupId>
-            <artifactId>apacheds-protocol-kerberos</artifactId>
-            <version>${cxf.apacheds.version}</version>
+            <groupId>org.apache.kerby</groupId>
+            <artifactId>kerb-simplekdc</artifactId>
+            <version>${cxf.kerby.version}</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.sf.ehcache</groupId>
-                    <artifactId>ehcache-core</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.directory.server</groupId>
-            <artifactId>apacheds-interceptor-kerberos</artifactId>
-            <version>${cxf.apacheds.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.directory.server</groupId>
-            <artifactId>apacheds-kerberos-codec</artifactId>
-            <version>${cxf.apacheds.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.sf.ehcache</groupId>
-                    <artifactId>ehcache-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.ldap</groupId>
