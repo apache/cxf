@@ -1393,8 +1393,6 @@ public abstract class AbstractBindingBuilder extends AbstractCommonBindingHandle
      *         force adding a wsu:Id onto the elements.  Recommended for signatures.
      * @return a configured list of {@code WSEncryptionPart}s suitable for
      *         processing by WSS4J
-     * @throws XPathExpressionException
-     *             if a provided XPath is invalid
      * @throws SOAPException
      *             if there is an error extracting SOAP content from the SAAJ
      *             model
