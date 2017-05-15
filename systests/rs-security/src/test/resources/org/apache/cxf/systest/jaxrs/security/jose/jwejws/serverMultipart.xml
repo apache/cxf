@@ -46,14 +46,11 @@ under the License.
     <bean id="jwsOutMultipartFilter" class="org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartContainerResponseFilter"/>
     <bean id="jwsDetachedSignatureWriter" class="org.apache.cxf.rs.security.jose.jaxrs.JwsDetachedSignatureProvider"/>
     <bean id="jwsInMultipartModificationFilter" class="org.apache.cxf.systest.jaxrs.security.jose.jwejws.MultipartModificationFilter"/>
-    <bean id="jwsInMultipartFilterManyParts" class="org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartContainerRequestFilter">
-        <property name="supportSinglePartOnly" value="false"/>
-    </bean>
-    <bean id="jwsOutMultipartFilterManyParts" class="org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartContainerResponseFilter">
-        <property name="supportSinglePartOnly" value="false"/>
+    <bean id="jwsInMultipartFilterBufferPayload" class="org.apache.cxf.rs.security.jose.jaxrs.multipart.JwsMultipartContainerRequestFilter">
+        <property name="bufferPayload" value="true"/>
     </bean>
     
-    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkhmacSinglePart">
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkhmac">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
@@ -66,7 +63,7 @@ under the License.
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
-    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkhmacSinglePartJwsJson">
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkhmacJwsJson">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
@@ -79,7 +76,7 @@ under the License.
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
-    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkrsaSinglePart">
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkrsa">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
@@ -92,7 +89,7 @@ under the License.
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
-    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkhmacSinglePartModified">
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkhmacModified">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
@@ -104,13 +101,25 @@ under the License.
             <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
-    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkhmacManyParts">
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkhmacModifiedBufferPayload">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
-            <ref bean="jwsInMultipartFilterManyParts"/>
-            <ref bean="jwsOutMultipartFilterManyParts"/>
+            <ref bean="jwsInMultipartModificationFilter"/>
+            <ref bean="jwsInMultipartFilterBufferPayload"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jws-multipart}/jwsjwkhmacBufferPayload">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jwsInMultipartFilterBufferPayload"/>
+            <ref bean="jwsOutMultipartFilter"/>
             <ref bean="jwsDetachedSignatureWriter"/>
         </jaxrs:providers>
         <jaxrs:properties>

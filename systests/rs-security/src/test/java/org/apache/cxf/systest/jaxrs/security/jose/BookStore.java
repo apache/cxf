@@ -23,6 +23,7 @@ package org.apache.cxf.systest.jaxrs.security.jose;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -67,6 +68,14 @@ public class BookStore {
     @Multipart(type = "application/xml")
     public Book echoBookMultipart(@Multipart(type = "application/xml") Book book) {
         return book;
+    }
+    @POST
+    @Path("/books")
+    @Produces("multipart/related")
+    @Consumes("multipart/related")
+    @Multipart(type = "application/xml")
+    public Book echoBookMultipartModified(@Multipart(type = "application/xml") Book book) {
+        throw new InternalServerErrorException("Failure to detect the payload has been modified");
     }
     @POST
     @Path("/booksList")
