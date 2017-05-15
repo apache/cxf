@@ -29,17 +29,7 @@ This Product also includes software developed by David Heinemeier Hansson.
 This product includes software Copyright University of Southampton IT Innovation Centre, 2009 
 (http://www.it-innovation.soton.ac.uk). 
 
-This product also includes MTOSI wsdl and schemas developed by the
-TeleManagement Forum (http://www.tmforum.org/browse.aspx). The original
-MTOSI wsdl and schemas can be download from
-(http://sourceforge.net/projects/mtosi-ri)
-
 Portions of the included XmlSchema library are Copyright 2006 International Business Machines Corp.
-
-Portions of the included xml-apis library were originally based on the following:
-   - software copyright (c) 1999, IBM Corporation., http://www.ibm.com.
-   - software copyright (c) 1999, Sun Microsystems., http://www.sun.com.
-   - software copyright (c) 2000 World Wide Web Consortium, http://www.w3.org
 
 Portions of the included xmlbeans library were originally based on the following:
    - software copyright (c) 2000-2003, BEA Systems, <http://www.bea.com/>.
@@ -53,6 +43,9 @@ This project includes Public Suffix List copied from
 https://publicsuffix.org/list/effective_tld_names.dat
 licensed under the terms of the Mozilla Public License, v. 2.0
 Full license text: <http://mozilla.org/MPL/2.0/>
+
+This product includes software from the Spring Framework, under the Apache
+License 2.0
 
 Additional copyright notices and license terms applicable are
 present in the licenses directory of this distribution.
