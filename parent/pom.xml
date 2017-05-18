@@ -214,7 +214,7 @@
         <cxf.oro.bundle.version>2.0.8_6</cxf.oro.bundle.version>
         <cxf.dom4j.bundle.version>1.6.1_5</cxf.dom4j.bundle.version>
         <cxf.jdom.bundle.version>1.1_4</cxf.jdom.bundle.version>
-        <cxf.olingo.version>1.2.0</cxf.olingo.version>
+        <cxf.olingo.version>2.0.8</cxf.olingo.version>
         <cxf.tika.version>1.14</cxf.tika.version>
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.htrace.version>4.0.1-incubating</cxf.htrace.version>
