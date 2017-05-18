@@ -19,12 +19,16 @@
 package org.apache.cxf.rs.security.oauth2.provider;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 
 import org.apache.cxf.helpers.CastUtils;
@@ -51,6 +55,10 @@ import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     private static final String CLIENT_QUERY = "SELECT client FROM Client client"
             + " INNER JOIN client.resourceOwnerSubject ros";
+
+    private static final int DEFAULT_PESSIMISTIC_LOCK_TIMEOUT = 10000;
+
+    private int pessimisticLockTimeout = DEFAULT_PESSIMISTIC_LOCK_TIMEOUT;
 
     private EntityManagerFactory entityManagerFactory;
 
@@ -213,6 +221,25 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         });
     }
 
+    protected void lockRefreshTokenForUpdate(final RefreshToken refreshToken) {
+        try {
+            execute(new EntityManagerOperation<Void>() {
+
+                @Override
+                public Void execute(EntityManager em) {
+                    Map<String, Object> options = Collections.emptyMap();
+                    if (pessimisticLockTimeout > 0) {
+                        Collections.singletonMap("javax.persistence.lock.timeout", pessimisticLockTimeout);
+                    }
+                    em.refresh(refreshToken, LockModeType.PESSIMISTIC_WRITE, options);
+                    return null;
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            // entity is not managed yet. ignore
+        }
+    }
+
     @Override
     protected void doRevokeRefreshToken(final RefreshToken rt) {
         executeInTransaction(new EntityManagerOperation<Void>() {
@@ -286,6 +313,13 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     protected void saveRefreshToken(RefreshToken refreshToken) {
         persistEntity(refreshToken);
+    }
+
+    @Override
+    protected RefreshToken updateRefreshToken(RefreshToken rt, ServerAccessToken at) {
+        // lock RT for update
+        lockRefreshTokenForUpdate(rt);
+        return super.updateRefreshToken(rt, at);
     }
 
     protected void persistEntity(final Object entity) {
