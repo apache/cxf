@@ -47,6 +47,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private long accessTokenLifetime = 3600L;
     private long refreshTokenLifetime; // refresh tokens are eternal by default
     private boolean recycleRefreshTokens = true;
+    private Object refreshTokenLock;
     private Map<String, OAuthPermission> permissionMap = new HashMap<>();
     private MessageContext messageContext;
     private List<String> defaultScopes;
@@ -59,7 +60,6 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     private Map<String, String> jwtAccessTokenClaimMap;
     private ProviderAuthenticationStrategy authenticationStrategy;
     
-
     protected AbstractOAuthDataProvider() {
     }
 
@@ -344,6 +344,11 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
             return null;
         }
     }
+    protected RefreshToken updateExistingRefreshToken(RefreshToken rt, ServerAccessToken at) {
+        synchronized (refreshTokenLock) {
+            return updateRefreshToken(rt, at);
+        }
+    }
     protected RefreshToken updateRefreshToken(RefreshToken rt, ServerAccessToken at) {
         linkAccessTokenToRefreshToken(rt, at);
         saveRefreshToken(rt);
@@ -416,8 +421,13 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
 
     public void setRecycleRefreshTokens(boolean recycleRefreshTokens) {
         this.recycleRefreshTokens = recycleRefreshTokens;
+        this.refreshTokenLock = recycleRefreshTokens ? null : new Object();
     }
 
+    public boolean isRecycleRefreshTokens() {
+        return this.recycleRefreshTokens;
+    }
+    
     public void init() {
         for (OAuthPermission perm : permissionMap.values()) {
             if (defaultScopes != null && defaultScopes.contains(perm.getPermission())) {
