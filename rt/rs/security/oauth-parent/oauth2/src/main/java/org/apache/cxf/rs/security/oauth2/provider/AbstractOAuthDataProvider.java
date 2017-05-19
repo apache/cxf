@@ -385,7 +385,9 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
     }
     
     protected void linkAccessTokenToRefreshToken(RefreshToken rt, ServerAccessToken at) {
-        rt.getAccessTokens().add(at.getTokenKey());
+        if (!rt.getAccessTokens().contains(at.getTokenKey())) {
+            rt.getAccessTokens().add(at.getTokenKey());
+        }
     }
     protected void linkRefreshTokenToAccessToken(RefreshToken rt, ServerAccessToken at) {
         at.setRefreshToken(rt.getTokenKey());
