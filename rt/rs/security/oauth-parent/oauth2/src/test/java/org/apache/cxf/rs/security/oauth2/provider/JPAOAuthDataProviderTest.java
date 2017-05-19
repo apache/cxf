@@ -263,7 +263,7 @@ public class JPAOAuthDataProviderTest extends Assert {
         assertNull(getProvider().getRefreshToken(rt.getTokenKey()));
     }
 
-    private Client addClient(String clientId, String userLogin) {
+    protected Client addClient(String clientId, String userLogin) {
         Client c = new Client();
         c.setRedirectUris(Collections.singletonList("http://client/redirect"));
         c.setClientId(clientId);
