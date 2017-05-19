@@ -30,7 +30,6 @@ import org.apache.cxf.rs.security.oauth2.provider.JPAOAuthDataProviderTest;
 import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,7 +77,6 @@ public class JPACMTOAuthDataProviderTest extends JPAOAuthDataProviderTest {
     }
     
     @Test
-    @Ignore
     public void testRefreshAccessTokenConcurrently() throws Exception {
         getProvider().setRecycleRefreshTokens(false);
 
@@ -117,8 +115,7 @@ public class JPACMTOAuthDataProviderTest extends JPAOAuthDataProviderTest {
         List<String> atl = rtl.get(0).getAccessTokens();
         assertNotNull(atl);
 
-        // after 3 parallel refreshes we should have 4 AccessTokens
-        assertEquals(4, atl.size());
+        assertEquals(2, atl.size());
     }
 }
 

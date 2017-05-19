@@ -59,6 +59,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     private static final int DEFAULT_PESSIMISTIC_LOCK_TIMEOUT = 10000;
     
     private int pessimisticLockTimeout = DEFAULT_PESSIMISTIC_LOCK_TIMEOUT;
+    private boolean useJpaLockForExistingRefreshToken = true;
     
     private EntityManagerFactory entityManagerFactory;
 
@@ -99,9 +100,13 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         
     @Override
     protected RefreshToken updateExistingRefreshToken(RefreshToken rt, ServerAccessToken at) {
-        // lock RT for update
-        lockRefreshTokenForUpdate(rt);
-        return super.updateRefreshToken(rt, at);
+        if (useJpaLockForExistingRefreshToken) {
+            // lock RT for update
+            lockRefreshTokenForUpdate(rt);
+            return super.updateRefreshToken(rt, at);
+        } else {
+            return super.updateExistingRefreshToken(rt, at);
+        }
     }
     
     
@@ -453,8 +458,12 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         em.close();
     }
 
-    public int getPessimisticLockTimeout() {
-        return pessimisticLockTimeout;
+    public void setPessimisticLockTimeout(int pessimisticLockTimeout) {
+        this.pessimisticLockTimeout = pessimisticLockTimeout;
+    }
+
+    public void setUseJpaLockForExistingRefreshToken(boolean useJpaLockForExistingRefreshToken) {
+        this.useJpaLockForExistingRefreshToken = useJpaLockForExistingRefreshToken;
     }
 
     public interface EntityManagerOperation<T> {
