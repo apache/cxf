@@ -18,16 +18,28 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.cxf.rs.security.oauth2.common.AccessTokenRegistration;
+import org.apache.cxf.rs.security.oauth2.common.Client;
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
 import org.apache.cxf.rs.security.oauth2.provider.JPAOAuthDataProvider;
 import org.apache.cxf.rs.security.oauth2.provider.JPAOAuthDataProviderTest;
+import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 
 /**
  * Runs the same tests as JPAOAuthDataProviderTest but within a Spring Managed Transaction.
@@ -42,7 +54,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("JPACMTCodeDataProvider.xml")
-@DirtiesContext
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles("hibernate")
 public class JPACMTOAuthDataProviderTest extends JPAOAuthDataProviderTest {
 
@@ -64,4 +76,49 @@ public class JPACMTOAuthDataProviderTest extends JPAOAuthDataProviderTest {
     @Override
     public void tearDown() {
     }
+    
+    @Test
+    @Ignore
+    public void testRefreshAccessTokenConcurrently() throws Exception {
+        getProvider().setRecycleRefreshTokens(false);
+
+        final Client c = addClient("101", "bob");
+
+        AccessTokenRegistration atr = new AccessTokenRegistration();
+        atr.setClient(c);
+        atr.setApprovedScope(Arrays.asList("a", "refreshToken"));
+        atr.setSubject(null);
+        final ServerAccessToken at = getProvider().createAccessToken(atr);
+
+        Runnable task = new Runnable() {
+
+            @Override
+            public void run() {
+                getProvider().refreshAccessToken(c, at.getRefreshToken(), Collections.<String>emptyList());
+            }
+        };
+
+        Thread th1 = new Thread(task);
+        Thread th2 = new Thread(task);
+        Thread th3 = new Thread(task);
+
+        th1.start();
+        th2.start();
+        th3.start();
+
+        th1.join();
+        th2.join();
+        th3.join();
+
+        assertNotNull(getProvider().getAccessToken(at.getTokenKey()));
+        List<RefreshToken> rtl = getProvider().getRefreshTokens(c, null);
+        assertNotNull(rtl);
+        assertEquals(1, rtl.size());
+        List<String> atl = rtl.get(0).getAccessTokens();
+        assertNotNull(atl);
+
+        // after 3 parallel refreshes we should have 4 AccessTokens
+        assertEquals(4, atl.size());
+    }
 }
+
