@@ -157,7 +157,12 @@ public abstract class HTTPConduit
      */
     public static final String KEY_HTTP_CONNECTION = "http.connection";
     public static final String KEY_HTTP_CONNECTION_ADDRESS = "http.connection.address";
-
+    
+    public static final String SET_HTTP_RESPONSE_MESSAGE = "org.apache.cxf.transport.http.set.response.message";
+    public static final String HTTP_RESPONSE_MESSAGE = "http.responseMessage";
+    
+    public static final String PROCESS_FAULT_ON_HTTP_400 = "org.apache.cxf.transport.process_fault_on_http_400";
+    public static final String NO_IO_EXCEPTIONS = "org.apache.cxf.transport.no_io_exceptions";
     /**
      * The Logger for this class.
      */
@@ -1601,9 +1606,9 @@ public abstract class HTTPConduit
             // soap fault because of a HTTP 400 should be returned back to the client (SOAP 1.2 spec)
 
             if (rc >= 400 && rc != 500
-                && !MessageUtils.isTrue(outMessage.getContextualProperty("org.apache.cxf.transport.no_io_exceptions"))
+                && !MessageUtils.isTrue(outMessage.getContextualProperty(NO_IO_EXCEPTIONS))
                 && (rc > 400 || !MessageUtils.isTrue(outMessage
-                    .getContextualProperty("org.apache.cxf.transport.process_fault_on_http_400")))) {
+                    .getContextualProperty(PROCESS_FAULT_ON_HTTP_400)))) {
 
                 throw new HTTPException(rc, getResponseMessage(), url.toURL());
             }
@@ -1621,6 +1626,9 @@ public abstract class HTTPConduit
             inMessage.setExchange(exchange);
             updateResponseHeaders(inMessage);
             inMessage.put(Message.RESPONSE_CODE, responseCode);
+            if (MessageUtils.getContextualBoolean(outMessage, SET_HTTP_RESPONSE_MESSAGE, false)) {
+            	inMessage.put(HTTP_RESPONSE_MESSAGE, getResponseMessage());
+            }
             propagateConduit(exchange, inMessage);
 
             if (!doProcessResponse(outMessage, responseCode)
