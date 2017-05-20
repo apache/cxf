@@ -1627,7 +1627,7 @@ public abstract class HTTPConduit
             updateResponseHeaders(inMessage);
             inMessage.put(Message.RESPONSE_CODE, responseCode);
             if (MessageUtils.getContextualBoolean(outMessage, SET_HTTP_RESPONSE_MESSAGE, false)) {
-            	inMessage.put(HTTP_RESPONSE_MESSAGE, getResponseMessage());
+                inMessage.put(HTTP_RESPONSE_MESSAGE, getResponseMessage());
             }
             propagateConduit(exchange, inMessage);
 

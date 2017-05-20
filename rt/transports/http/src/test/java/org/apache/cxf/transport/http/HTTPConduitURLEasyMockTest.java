@@ -552,8 +552,8 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         connection.getHeaderFields();
         EasyMock.expectLastCall().andReturn(Collections.EMPTY_MAP).anyTimes();
         
-    	connection.getResponseMessage();
-    	EasyMock.expectLastCall().andReturn(HTTP_RESPONSE_MESSAGE).anyTimes();
+        connection.getResponseMessage();
+        EasyMock.expectLastCall().andReturn(HTTP_RESPONSE_MESSAGE).anyTimes();
         
         int responseCode = getResponseCode(style);
         if (conduit.getClient().isAutoRedirect()) {
