@@ -157,8 +157,8 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
     /**
      * Merge WsdlOptions that point to the same file by adding the extraargs to the first option and deleting
      * the second from the options list
-     * 
-     * @param options
+     *
+     * @param effectiveWsdlOptions
      */
     protected void mergeOptions(List<GenericWsdlOption> effectiveWsdlOptions) {
 
@@ -205,8 +205,8 @@ public class WSDL2JavaMojo extends AbstractCodegenMoho {
 
     /**
      * Determine if code should be generated from the given wsdl
-     * 
-     * @param wsdlOption
+     *
+     * @param genericWsdlOption
      * @param doneFile
      * @param wsdlURI
      * @return

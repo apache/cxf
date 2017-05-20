@@ -132,8 +132,9 @@ public abstract class AbstractHTTPDestination
      * Constructor
      * 
      * @param b the associated Bus
-     * @param ci the associated conduit initiator
-     * @param ei the endpoint info of the destination 
+     * @param registry the destination registry
+     * @param ei the endpoint info of the destination
+     * @param path the path
      * @param dp true for adding the default port if it is missing
      * @throws IOException
      */    

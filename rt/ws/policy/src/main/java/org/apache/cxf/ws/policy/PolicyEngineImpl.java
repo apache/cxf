@@ -619,7 +619,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
      * that implements the Assertor interface).
      * 
      * @param alternative the policy alternative
-     * @param Assertor the assertor
+     * @param assertor the assertor
      * @return true iff the alternative can be supported
      */
     public boolean supportsAlternative(Collection<? extends PolicyComponent> alternative, 

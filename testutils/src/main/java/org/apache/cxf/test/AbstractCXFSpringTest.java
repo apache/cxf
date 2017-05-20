@@ -42,7 +42,6 @@ public abstract class AbstractCXFSpringTest extends AbstractCXFTest {
     private Class<?> configContextClass = AbstractCXFSpringTest.class;
     /**
      * Load up all the beans from the XML files returned by the getConfigLocations method.
-     * @throws Exception 
      */
     protected AbstractCXFSpringTest() {
     }
