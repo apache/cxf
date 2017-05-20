@@ -62,6 +62,8 @@ import org.junit.Test;
 public class HTTPConduitURLEasyMockTest extends Assert {
     private static String oldHttpProxyHost;
 
+    private static final String HTTP_RESPONSE_MESSAGE = "Some Response Message I can test";
+    
     private enum ResponseStyle { NONE, BACK_CHANNEL, BACK_CHANNEL_ERROR, DECOUPLED, ONEWAY_NONE };
     private enum ResponseDelimiter { LENGTH, CHUNKED, EOF };
 
@@ -138,21 +140,25 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     @Test
     public void testSend() throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false);
+        HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
+        message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.FALSE);
         conduit.prepare(message);
         verifySentMessage(conduit, message, "POST");
+        assertNull(inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
         finalVerify();
     }
     
     @Test
     public void testSendWithHeaders() throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false);
+        HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
+        message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
         setUpHeaders(message);
         conduit.prepare(message);
         verifySentMessage(conduit, message, true, "POST", false);
+        assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
         finalVerify();
     }
     
@@ -165,32 +171,38 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     
     public void testSendWithHeadersCheckErrorStream() throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false);
+        HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = new MessageImpl();
+        message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
         message.put("Content-Type", "text/xml;charset=utf8");
         setUpHeaders(message);
         conduit.prepare(message);
         verifySentMessage(conduit, message, true, "POST", true);
+        assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
         finalVerify();
     }
     
     @Test
     public void testSendHttpConnection() throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false);
+        HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
+        message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
         conduit.prepare(message);
         verifySentMessage(conduit, message, "POST");
+        assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
         finalVerify();
     }
 
     @Test
     public void testSendHttpConnectionAutoRedirect() throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, true);
+        HTTPConduit conduit = setUpConduit(true, true, "POST");
         Message message = createMessage();
+        message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
         conduit.prepare(message);
         verifySentMessage(conduit, message, "POST");
+        assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
         finalVerify();
     }
 
@@ -199,9 +211,11 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, true, "GET");
         Message message = new MessageImpl();
+        message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
         message.put(Message.HTTP_REQUEST_METHOD, "GET");
         conduit.prepare(message);
         verifySentMessage(conduit, message, "GET");
+        assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
         conduit.close(message);
         finalVerify();
     }
@@ -212,8 +226,10 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         HTTPConduit conduit = setUpConduit(true, false, "GET");
         Message message = new MessageImpl();
         message.put(Message.HTTP_REQUEST_METHOD, "GET");
+        message.put(HTTPConduit.SET_HTTP_RESPONSE_MESSAGE, Boolean.TRUE);
         conduit.prepare(message);
         verifySentMessage(conduit, message, "GET");
+        assertEquals(HTTP_RESPONSE_MESSAGE, inMessage.get(HTTPConduit.HTTP_RESPONSE_MESSAGE));
         conduit.close(message);
         finalVerify();
     }
@@ -222,7 +238,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     public void testSendOnewayChunkedEmptyPartialResponseProcessResponse() 
         throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false);
+        HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
         conduit.prepare(message);
         message.put(Message.PROCESS_ONEWAY_RESPONSE, Boolean.TRUE);
@@ -239,7 +255,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     public void testSendOnewayDoNotProcessResponse() 
         throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false);
+        HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
         conduit.prepare(message);
         verifySentMessage(conduit, 
@@ -255,7 +271,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     public void testSendTwowayDecoupledEmptyPartialResponse() 
         throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false);
+        HTTPConduit conduit = setUpConduit(true, false, "POST");
         Message message = createMessage();
         conduit.prepare(message);
         verifySentMessage(conduit, 
@@ -296,16 +312,11 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         exchange.isEmpty();
         EasyMock.expectLastCall().andReturn(true).anyTimes();
     }
-    
-    private HTTPConduit setUpConduit(boolean send, boolean autoRedirect) throws Exception {
-        return setUpConduit(send, autoRedirect, "POST");
-    }
 
     private HTTPConduit setUpConduit(
         boolean send,
         boolean autoRedirect,
-        String method
-    ) throws Exception {
+        String method) throws Exception {
         endpointInfo = new EndpointInfo();
         endpointInfo.setAddress(NOWHERE + "bar/foo");
         connectionFactory = 
@@ -540,6 +551,10 @@ public class HTTPConduitURLEasyMockTest extends Assert {
                                       HTTPConduit conduit) throws IOException {
         connection.getHeaderFields();
         EasyMock.expectLastCall().andReturn(Collections.EMPTY_MAP).anyTimes();
+        
+        connection.getResponseMessage();
+        EasyMock.expectLastCall().andReturn(HTTP_RESPONSE_MESSAGE).anyTimes();
+        
         int responseCode = getResponseCode(style);
         if (conduit.getClient().isAutoRedirect()) {
             connection.getResponseCode();
