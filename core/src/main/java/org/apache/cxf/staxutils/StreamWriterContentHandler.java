@@ -174,9 +174,9 @@ public class StreamWriterContentHandler implements ContentHandler, LexicalHandle
 
     /**
      * Method getPrefix.
-     * @param namespaceURI 
      *
-     * @param qname
+     * @param ns
+     * @param namespaceURI
      * @return Returns String.
      */
     private String getPrefix(String ns, String namespaceURI) {

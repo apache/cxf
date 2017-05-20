@@ -291,7 +291,7 @@ public abstract class HTTPConduit
      * Constructor
      * 
      * @param b the associated Bus.
-     * @param endpoint the endpoint info of the initiator.
+     * @param ei the endpoint info of the initiator.
      * @param t the endpoint reference of the target.
      * @throws IOException
      */
@@ -526,7 +526,7 @@ public abstract class HTTPConduit
             needToCacheRequest = true;
             isChunking = false;
             LOG.log(Level.FINE,
-                    "Auth Supplier, but no Premeptive User Pass or Digest auth (nonce may be stale)"
+                    "Auth Supplier, but no Preemptive User Pass or Digest auth (nonce may be stale)"
                     + " We must cache request.");
         }
         if (csPolicy.isAutoRedirect()) {
@@ -786,7 +786,7 @@ public abstract class HTTPConduit
      * type?
      * 
      * @param message
-     * @param headers
+     * @param currentURI
      */
     protected void setHeadersByAuthorizationPolicy(
             Message message,
@@ -1498,12 +1498,8 @@ public abstract class HTTPConduit
         
         /**
          * This method performs a retransmit for authorization information.
-         * 
-         * @param connection The currently active connection.
-         * @param message The outbound message.
-         * @param cachedStream The cached request.
-         * @return A new connection if retransmitted. If not retransmitted
-         *         then this method returns the same connection.
+         *
+         * @return true if there was a retransmit
          * @throws IOException
          */
         protected boolean authorizationRetransmit() throws IOException {
@@ -1754,8 +1750,7 @@ public abstract class HTTPConduit
          * 
          * If trust cannot be established the Trust Decider implemenation
          * throws an IOException.
-         * 
-         * @param message      The message being sent.
+         *
          * @throws IOException This exception is thrown if trust cannot be
          *                     established by the configured MessageTrustDecider.
          * @see MessageTrustDecider
