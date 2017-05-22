@@ -173,8 +173,8 @@ public class ClaimsManager {
             
             ProcessedClaimCollection targetClaims = claimsMapper.mapClaims(relationship.getSourceRealm(),
                     sourceClaims, relationship.getTargetRealm(), parameters);
-            validateClaimValues(claims, targetClaims);
-            return targetClaims;
+            validateClaimValues(claims, returnCollection);
+			return targetClaims;
         }
 
     }
