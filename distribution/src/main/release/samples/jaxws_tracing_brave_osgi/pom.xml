@@ -84,9 +84,7 @@
                             javax.ws.rs.container,
                             org.apache.cxf.tracing.brave,
                             org.osgi.service.blueprint,
-                            javax.annotation;version="[1.2,2)",
-                            org.apache.johnzon.core,
-                            !com.github.kristofa.brave.Brave,
+                            brave,
                             *
                         </Import-Package>
                         <Export-Package>

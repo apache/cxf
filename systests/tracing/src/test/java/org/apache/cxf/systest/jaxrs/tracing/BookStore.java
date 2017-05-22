@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -145,8 +146,8 @@ public class BookStore<T extends Closeable> {
     @PUT
     @Path("/process")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response processBooks() {
-        executor.submit(
+    public Response processBooks() throws InterruptedException {
+        final Future<Void> future = executor.submit(
             tracer.wrap("Processing books", new Traceable<Void>() {
                 @Override
                 public Void call(final TracerContext context) throws Exception {
@@ -155,6 +156,11 @@ public class BookStore<T extends Closeable> {
                 }
             })
         );
+        
+        if (!future.isDone()) {
+            // Just give it some time to have trace finished 
+            Thread.sleep(20);
+        }
 
         return Response.ok().build();
     }

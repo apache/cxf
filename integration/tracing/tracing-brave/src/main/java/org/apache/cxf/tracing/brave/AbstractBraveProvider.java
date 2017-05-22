@@ -23,118 +23,113 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.ServerSpan;
-import com.github.kristofa.brave.http.BraveHttpHeaders;
-import com.github.kristofa.brave.http.HttpResponse;
-import com.github.kristofa.brave.http.HttpServerRequest;
-import com.github.kristofa.brave.http.HttpServerRequestAdapter;
-import com.github.kristofa.brave.http.HttpServerResponseAdapter;
-import com.github.kristofa.brave.http.SpanNameProvider;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.tracing.AbstractTracingProvider;
+import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory;
+import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory.Request;
+import org.apache.cxf.tracing.brave.internal.HttpAdapterFactory.Response;
+import org.apache.cxf.tracing.brave.internal.HttpServerAdapterFactory;
+
+import brave.Span;
+import brave.Tracer.SpanInScope;
+import brave.http.HttpServerAdapter;
+import brave.http.HttpServerHandler;
+import brave.http.HttpTracing;
 
 public abstract class AbstractBraveProvider extends AbstractTracingProvider {
     protected static final Logger LOG = LogUtils.getL7dLogger(AbstractBraveProvider.class);
     protected static final String TRACE_SPAN = "org.apache.cxf.tracing.brave.span";
 
-    protected final Brave brave;
-    protected final SpanNameProvider spanNameProvider;
-
-    protected AbstractBraveProvider(final Brave brave) {
-        this(brave, new ServerSpanNameProvider());
-    }
-
-    protected AbstractBraveProvider(final Brave brave, final SpanNameProvider spanNameProvider) {
+    protected final HttpTracing brave;
+    
+    protected AbstractBraveProvider(final HttpTracing brave) {
         this.brave = brave;
-        this.spanNameProvider = spanNameProvider;
     }
 
-    protected TraceScopeHolder<ServerSpan> startTraceSpan(final Map<String, List<String>> requestHeaders,
+    protected TraceScopeHolder<TraceScope> startTraceSpan(final Map<String, List<String>> requestHeaders,
             URI uri, String method) {
 
-        final HttpServerRequest request = new HttpServerRequest() {
-            @Override
-            public URI getUri() {
-                return uri;
-            }
-
-            @Override
-            public String getHttpMethod() {
-                return method;
-            }
-
-            @Override
-            public String getHttpHeaderValue(String headerName) {
-                List<String> value = requestHeaders.get(headerName);
-
-                if (value != null && !value.isEmpty()) {
-                    return value.get(0);
-                }
-
-                return null;
-            }
-        };
-
-        brave.serverRequestInterceptor().handle(new HttpServerRequestAdapter(request, spanNameProvider));
-        final ServerSpan serverSpan = brave.serverSpanThreadBinder().getCurrentServerSpan();
+        final Request request = HttpAdapterFactory.request(requestHeaders, uri, method);
+        final HttpServerAdapter<Request, ?> adapter = HttpServerAdapterFactory.create(request);
+        
+        @SuppressWarnings("unchecked")
+        final HttpServerHandler<Request, ?> handler = HttpServerHandler.create(brave, adapter);
+        
+        Span span = handler.handleReceive(
+            brave
+                .tracing()
+                .propagation()
+                .extractor(adapter::requestHeader), 
+            request);
+        
+        SpanInScope scope = null;
+        if (span != null && !span.isNoop()) {
+            scope = brave.tracing().tracer().withSpanInScope(span);
+        }
 
         // If the service resource is using asynchronous processing mode, the trace
         // scope will be closed in another thread and as such should be detached.
         boolean detached = false;
         if (isAsyncResponse()) {
-            brave.serverSpanThreadBinder().setCurrentSpan(null);
-            propagateContinuationSpan(serverSpan);
+            propagateContinuationSpan(span);
             detached = true;
         }
 
-        return new TraceScopeHolder<ServerSpan>(serverSpan, detached);
-    }
-
-    private void transferRequestHeader(final Map<String, List<String>> requestHeaders,
-            final Map<String, List<Object>> responseHeaders, final BraveHttpHeaders header) {
-        if (requestHeaders.containsKey(header.getName())) {
-            responseHeaders.put(header.getName(), CastUtils.cast(requestHeaders.get(header.getName())));
-        }
+        return new TraceScopeHolder<TraceScope>(new TraceScope(span, scope), detached);
     }
 
     protected void stopTraceSpan(final Map<String, List<String>> requestHeaders,
                                  final Map<String, List<Object>> responseHeaders,
                                  final int responseStatus,
-                                 final TraceScopeHolder<ServerSpan> holder) {
+                                 final TraceScopeHolder<TraceScope> holder) {
 
         // Transfer tracing headers into the response headers
-        transferRequestHeader(requestHeaders, responseHeaders, BraveHttpHeaders.SpanId);
-        transferRequestHeader(requestHeaders, responseHeaders, BraveHttpHeaders.Sampled);
-        transferRequestHeader(requestHeaders, responseHeaders, BraveHttpHeaders.ParentSpanId);
-        transferRequestHeader(requestHeaders, responseHeaders, BraveHttpHeaders.TraceId);
+        brave
+            .tracing()
+            .propagation()
+            .keys()
+            .forEach(key -> transferRequestHeader(requestHeaders, responseHeaders, key));
 
         if (holder == null) {
             return;
         }
 
-        final ServerSpan span = holder.getScope();
-        if (span != null) {
-            // If the service resource is using asynchronous processing mode, the trace
-            // scope has been created in another thread and should be re-attached to the current
-            // one.
-            if (holder.isDetached()) {
-                brave.serverSpanThreadBinder().setCurrentSpan(span);
+        final TraceScope scope = holder.getScope();
+        if (scope != null) {
+            try {
+                // If the service resource is using asynchronous processing mode, the trace
+                // scope has been created in another thread and should be re-attached to the current
+                // one.
+                if (holder.isDetached()) {
+                    brave.tracing().tracer().joinSpan(scope.getSpan().context());
+                }
+    
+                final Response response = HttpAdapterFactory.response(responseStatus);
+                final HttpServerAdapter<?, Response> adapter = HttpServerAdapterFactory.create(response);
+                
+                @SuppressWarnings("unchecked")
+                final HttpServerHandler<?, Response> handler = HttpServerHandler.create(brave, adapter);
+                handler.handleSend(response, null, scope.getSpan());
+            } finally {
+                scope.close();
             }
-
-            final HttpResponse response = () -> responseStatus;
-            brave.serverResponseInterceptor().handle(new HttpServerResponseAdapter(response));
         }
-    }
-
-    private void propagateContinuationSpan(final ServerSpan continuationScope) {
-        PhaseInterceptorChain.getCurrentMessage().put(ServerSpan.class, continuationScope);
     }
 
     protected boolean isAsyncResponse() {
         return !PhaseInterceptorChain.getCurrentMessage().getExchange().isSynchronous();
+    }
+
+    private void propagateContinuationSpan(final Span continuationScope) {
+        PhaseInterceptorChain.getCurrentMessage().put(Span.class, continuationScope);
+    }
+
+    private void transferRequestHeader(final Map<String, List<String>> requestHeaders,
+            final Map<String, List<Object>> responseHeaders, final String header) {
+        if (requestHeaders.containsKey(header)) {
+            responseHeaders.put(header, CastUtils.cast(requestHeaders.get(header)));
+        }
     }
 }

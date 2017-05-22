@@ -5,20 +5,13 @@ The demo shows a basic usage of Brave/OpenZipkin distributed tracer with REST ba
 Web Services using  JAX-RS 2.0 (JSR-339). The REST server provides the 
 following services: 
 
-A RESTful catalog service is provided on URL http://localhost:9000/catalog 
+A SOAP catalog service is provided on URL http://localhost:8181/cxf/catalog. The WSDL 
+contract is available at http://localhost:8181/cxf/catalog?wsdl.
 
-A HTTP GET request to URL http://localhost:8181/cxf/catalog generates following 
-traces:
-
-A HTTP POST request to URL http://localhost:8181/cxf/catalog generates following 
-traces:
-
-A HTTP GET request to URL http://localhost:8181/cxf/catalog/<id> generates following 
-traces:
-
-A HTTP DELETE request to URL http://localhost:8181/cxf/catalog/<id> generates following 
-traces:
-
+There are three SOAP actions:
+  - addBook
+  - deleteBook
+  - getBook
 
 Building and running the demo using Maven
 ---------------------------------------

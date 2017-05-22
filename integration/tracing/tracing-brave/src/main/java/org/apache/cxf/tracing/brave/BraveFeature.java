@@ -20,8 +20,6 @@ package org.apache.cxf.tracing.brave;
 
 import java.util.UUID;
 
-import com.github.kristofa.brave.Brave;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.Provider;
 import org.apache.cxf.annotations.Provider.Scope;
@@ -29,6 +27,9 @@ import org.apache.cxf.annotations.Provider.Type;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
+
+import brave.Tracing;
+import brave.http.HttpTracing;
 
 @NoJSR250Annotations
 @Provider(value = Type.Feature, scope = Scope.Server)
@@ -41,10 +42,24 @@ public class BraveFeature extends AbstractFeature {
     }
 
     public BraveFeature(final String name) {
-        this(new Brave.Builder(name).build());
+        this(
+            HttpTracing
+                .newBuilder(Tracing.newBuilder().localServiceName(name).build())
+                .serverParser(new HttpServerSpanParser())
+                .build()
+        );
+    }
+    
+    public BraveFeature(final Tracing tracing) {
+        this(
+          HttpTracing
+              .newBuilder(tracing)
+              .serverParser(new HttpServerSpanParser())
+              .build()
+         );
     }
 
-    public BraveFeature(Brave brave) {
+    public BraveFeature(HttpTracing brave) {
         in = new BraveStartInterceptor(brave);
         out = new BraveStopInterceptor(brave);
     }

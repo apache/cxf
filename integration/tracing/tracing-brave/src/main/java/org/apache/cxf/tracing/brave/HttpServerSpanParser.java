@@ -18,14 +18,22 @@
  */
 package org.apache.cxf.tracing.brave;
 
-import com.github.kristofa.brave.http.HttpRequest;
-import com.github.kristofa.brave.http.SpanNameProvider;
+import org.apache.cxf.common.util.StringUtils;
 
-public class LoggingSpanNameProvider implements SpanNameProvider {
+import brave.http.HttpAdapter;
+import brave.http.HttpServerParser;
 
+public class HttpServerSpanParser extends HttpServerParser {
     @Override
-    public String spanName(HttpRequest request) {
-        return (request instanceof SpanNameProvider) ? ((SpanNameProvider)request).spanName(request) : "";
+    protected <Req> String spanName(HttpAdapter<Req, ?> adapter, Req request) {
+        return buildSpanDescription(adapter.path(request), adapter.method(request));
     }
 
+    private String buildSpanDescription(final String path, final String method) {
+        if (StringUtils.isEmpty(method)) {
+            return path;
+        } else {
+            return method + " " + path;
+        }
+    }
 }

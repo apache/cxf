@@ -219,7 +219,10 @@
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.htrace.version>4.0.1-incubating</cxf.htrace.version>
         <cxf.zest.version>2.1</cxf.zest.version>
-        <cxf.brave.version>3.16.0</cxf.brave.version>
+        <cxf.brave.version>4.3.1</cxf.brave.version>
+        <cxf.brave.zipkin.version>1.24.0</cxf.brave.zipkin.version>
+        <cxf.brave.reporter.version>0.9.0</cxf.brave.reporter.version>
+        <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
         <cxf.checkstyle.extension />
         <cxf.jaxb.context.class />
         <cxf.jaxb.context.class.property>none</cxf.jaxb.context.class.property>
@@ -1966,7 +1969,12 @@
             </dependency>
             <dependency>
                  <groupId>io.zipkin.brave</groupId>
-                 <artifactId>brave-http</artifactId>
+                 <artifactId>brave</artifactId>
+                 <version>${cxf.brave.version}</version>
+            </dependency>
+            <dependency>
+                 <groupId>io.zipkin.brave</groupId>
+                 <artifactId>brave-instrumentation-http</artifactId>
                  <version>${cxf.brave.version}</version>
             </dependency>
             <dependency>

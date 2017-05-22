@@ -30,10 +30,10 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 
-import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.ServerSpan;
-
 import org.apache.cxf.tracing.brave.AbstractBraveProvider;
+import org.apache.cxf.tracing.brave.TraceScope;
+
+import brave.http.HttpTracing;
 
 @Provider
 public class BraveProvider extends AbstractBraveProvider
@@ -41,15 +41,14 @@ public class BraveProvider extends AbstractBraveProvider
     @Context
     private ResourceInfo resourceInfo;
 
-    public BraveProvider(final Brave brave) {
+    public BraveProvider(final HttpTracing brave) {
         super(brave);
     }
 
     @Override
     public void filter(final ContainerRequestContext requestContext) throws IOException {
-        final TraceScopeHolder<ServerSpan> holder = super.startTraceSpan(requestContext.getHeaders(),
-                                                requestContext.getUriInfo().getRequestUri(),
-                                                requestContext.getMethod());
+        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(requestContext.getHeaders(),
+            requestContext.getUriInfo().getRequestUri(), requestContext.getMethod());
 
         if (holder != null) {
             requestContext.setProperty(TRACE_SPAN, holder);
@@ -60,10 +59,8 @@ public class BraveProvider extends AbstractBraveProvider
     @Override
     public void filter(final ContainerRequestContext requestContext,
             final ContainerResponseContext responseContext) throws IOException {
-        super.stopTraceSpan(requestContext.getHeaders(),
-                            responseContext.getHeaders(),
-                            responseContext.getStatus(),
-                            (TraceScopeHolder<ServerSpan>)requestContext.getProperty(TRACE_SPAN));
+        super.stopTraceSpan(requestContext.getHeaders(), responseContext.getHeaders(),
+            responseContext.getStatus(), (TraceScopeHolder<TraceScope>)requestContext.getProperty(TRACE_SPAN));
     }
 
     @Override

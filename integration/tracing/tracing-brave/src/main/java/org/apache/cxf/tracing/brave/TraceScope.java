@@ -20,24 +20,32 @@ package org.apache.cxf.tracing.brave;
 
 import java.io.Closeable;
 
-import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.SpanId;
-import com.twitter.zipkin.gen.Span;
+import brave.Span;
+import brave.Tracer.SpanInScope;
+import brave.http.HttpTracing;
 
 public class TraceScope implements Closeable {
-    final Brave brave;
-    final SpanId spanId;
+    private final Span span;
+    private final SpanInScope scope;
 
-    TraceScope(final Brave brave, final SpanId spanId) {
-        this.brave = brave;
-        this.spanId = spanId;
+    TraceScope(final HttpTracing brave, final Span span) {
+        this(span, brave.tracing().tracer().withSpanInScope(span));
+    }
+
+    TraceScope(final Span span, final SpanInScope scope) {
+        this.span = span;
+        this.scope = scope;
+    }
+    
+    public Span getSpan() {
+        return span;
     }
 
     @Override
     public void close() {
-        final Span span = brave.localSpanThreadBinder().getCurrentLocalSpan();
-        if (span != null && span.getTrace_id() == spanId.traceId && span.getId() == spanId.spanId) {
-            brave.localTracer().finishSpan();
+        span.finish();
+        if (scope != null) {
+            scope.close();
         }
     }
 }

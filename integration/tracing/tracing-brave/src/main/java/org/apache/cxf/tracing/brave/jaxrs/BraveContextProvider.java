@@ -18,25 +18,25 @@
  */
 package org.apache.cxf.tracing.brave.jaxrs;
 
-import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.ServerSpan;
-
 import org.apache.cxf.jaxrs.ext.ContextProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.tracing.TracerContext;
 import org.apache.cxf.tracing.brave.BraveTracerContext;
 
-public class BraveContextProvider implements ContextProvider< TracerContext > {
-    private final Brave brave;
+import brave.Span;
+import brave.http.HttpTracing;
 
-    public BraveContextProvider(final Brave brave) {
+public class BraveContextProvider implements ContextProvider< TracerContext > {
+    private final HttpTracing brave;
+
+    public BraveContextProvider(final HttpTracing brave) {
         this.brave = brave;
     }
 
     @Override
     public TracerContext createContext(final Message message) {
         // Check if there is a server span passed along with the message
-        final ServerSpan continuationSpan = message.get(ServerSpan.class);
+        final Span continuationSpan = message.get(Span.class);
 
         // If server span is already present, let us check if it is detached
         // (asynchronous invocation)

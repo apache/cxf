@@ -25,39 +25,35 @@ import java.util.UUID;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
-import com.github.kristofa.brave.Brave;
-
 import org.apache.cxf.systest.Book;
 import org.apache.cxf.systest.TestSpanReporter;
 import org.apache.cxf.systest.jaxws.tracing.BookStoreService;
 
-import zipkin.Constants;
+import brave.Span;
+import brave.Tracer.SpanInScope;
+import brave.Tracing;
 
 @WebService(endpointInterface = "org.apache.cxf.systest.jaxws.tracing.BookStoreService", serviceName = "BookStore")
 public class BookStore implements BookStoreService {
-    private final Brave brave;
+    private final Tracing brave;
 
     public BookStore() {
-        brave = new Brave.Builder("book-store")
+        brave = Tracing.newBuilder()
+            .localServiceName("book-store")
             .reporter(new TestSpanReporter())
             .build();
     }
 
     @WebMethod
     public Collection< Book > getBooks() {
-        try {
-            brave
-                .localTracer()
-                .startNewSpan(Constants.LOCAL_COMPONENT, "Get Books");
-
+        final Span span = brave.tracer().nextSpan().name("Get Books").start();
+        try (final SpanInScope scope = brave.tracer().withSpanInScope(span)) {
             return Arrays.asList(
                     new Book("Apache CXF in Action", UUID.randomUUID().toString()),
                     new Book("Mastering Apache CXF", UUID.randomUUID().toString())
                 );
         } finally {
-            brave
-                .localTracer()
-                .finishSpan();
+            span.finish();
         }
     }
 

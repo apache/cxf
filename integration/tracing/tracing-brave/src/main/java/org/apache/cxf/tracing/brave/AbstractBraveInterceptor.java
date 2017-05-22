@@ -28,13 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.http.SpanNameProvider;
-
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
+
+import brave.http.HttpTracing;
 
 public abstract class AbstractBraveInterceptor extends AbstractBraveProvider implements PhaseInterceptor<Message> {
     private final String phase;
@@ -122,8 +121,8 @@ public abstract class AbstractBraveInterceptor extends AbstractBraveProvider imp
         }
     }
 
-    protected AbstractBraveInterceptor(String phase, Brave brave, SpanNameProvider spanNameProvider) {
-        super(brave, spanNameProvider);
+    protected AbstractBraveInterceptor(String phase, HttpTracing brave) {
+        super(brave);
         this.phase = phase;
     }
 

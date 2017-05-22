@@ -26,16 +26,27 @@ import javax.ws.rs.client.ClientResponseContext;
 import javax.ws.rs.client.ClientResponseFilter;
 import javax.ws.rs.ext.Provider;
 
-import com.github.kristofa.brave.Brave;
-import com.twitter.zipkin.gen.Span;
-
 import org.apache.cxf.tracing.brave.AbstractBraveClientProvider;
+import org.apache.cxf.tracing.brave.HttpClientSpanParser;
+
+import brave.Span;
+import brave.Tracing;
+import brave.http.HttpTracing;
 
 @Provider
 public class BraveClientProvider extends AbstractBraveClientProvider
         implements ClientRequestFilter, ClientResponseFilter {
 
-    public BraveClientProvider(final Brave brave) {
+    public BraveClientProvider(final Tracing brave) {
+        this(
+            HttpTracing
+                .newBuilder(brave)
+                .clientParser(new HttpClientSpanParser())
+                .build()
+        );
+    }
+
+    public BraveClientProvider(final HttpTracing brave) {
         super(brave);
     }
 

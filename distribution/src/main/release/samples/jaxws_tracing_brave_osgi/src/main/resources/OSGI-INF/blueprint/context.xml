@@ -42,11 +42,13 @@
         <argument index="0" ref="brave" />
     </bean>
     
-    <bean id="braveBuilder" class="com.github.kristofa.brave.Brave.Builder">
+    <bean id="braveBuilder" class="brave.Tracing" factory-method="newBuilder" />
+
+    <bean id="braveCatalogBuilder" factory-ref="braveBuilder" factory-method="localServiceName">
         <argument index="0" value="catalog-service" />
     </bean>
     
-    <bean id="brave" factory-ref="braveBuilder" factory-method="build" />
+    <bean id="brave" factory-ref="braveCatalogBuilder" factory-method="build" />
     
     <jaxws:endpoint
         implementor="#catalogServiceImpl"

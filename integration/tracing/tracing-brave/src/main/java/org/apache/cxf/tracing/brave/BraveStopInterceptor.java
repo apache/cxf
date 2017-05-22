@@ -22,9 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.ServerSpan;
-
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -32,13 +29,12 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 
-/**
- *
- */
+import brave.http.HttpTracing;
+
 @NoJSR250Annotations
 public class BraveStopInterceptor extends AbstractBraveInterceptor {
-    public BraveStopInterceptor(final Brave brave) {
-        super(Phase.PRE_MARSHAL, brave, new ServerSpanNameProvider());
+    public BraveStopInterceptor(final HttpTracing brave) {
+        super(Phase.PRE_MARSHAL, brave);
     }
 
     @Override
@@ -57,8 +53,8 @@ public class BraveStopInterceptor extends AbstractBraveInterceptor {
             CastUtils.cast((Map<?, ?>)requestMessage.get(Message.PROTOCOL_HEADERS));
 
         @SuppressWarnings("unchecked")
-        final TraceScopeHolder<ServerSpan> holder =
-            (TraceScopeHolder<ServerSpan>)message.getExchange().get(TRACE_SPAN);
+        final TraceScopeHolder<TraceScope> holder =
+            (TraceScopeHolder<TraceScope>)message.getExchange().get(TRACE_SPAN);
 
         Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
         if (responseCode == null) {

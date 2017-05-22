@@ -26,21 +26,22 @@ import java.util.concurrent.Future;
 
 import javax.xml.ws.AsyncHandler;
 
-import com.github.kristofa.brave.Brave;
-
 import org.apache.cxf.annotations.UseAsyncMethod;
 import org.apache.cxf.jaxws.ServerAsyncResponse;
 
+import brave.Span;
+import brave.Tracer.SpanInScope;
+import brave.Tracing;
+
 import demo.jaxws.tracing.server.Book;
 import demo.jaxws.tracing.server.CatalogService;
-import zipkin.Constants;
 
 public class CatalogServiceImpl implements CatalogService {
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
     private final Map<String, Book> books = new ConcurrentHashMap<>();
-    private final Brave brave;
+    private final Tracing brave;
 
-    public CatalogServiceImpl(final Brave brave) {
+    public CatalogServiceImpl(final Tracing brave) {
         this.brave = brave;
     }
 
@@ -53,12 +54,12 @@ public class CatalogServiceImpl implements CatalogService {
         final ServerAsyncResponse<Book> response = new ServerAsyncResponse<Book>();
 
         executor.submit(() -> {
-            try {
-                brave.localTracer().startNewSpan(Constants.LOCAL_COMPONENT, "Inserting New Book");
+            final Span span = brave.tracer().nextSpan().name("Inserting New Book").start();
+            try (final SpanInScope scope = brave.tracer().withSpanInScope(span)) {
                 books.put(book.getId(), book);
                 handler.handleResponse(response);
             } finally {
-                brave.localTracer().finishSpan();
+                span.finish();
             }
         });
 
@@ -77,7 +78,7 @@ public class CatalogServiceImpl implements CatalogService {
     }
 
     @Override
-    public void delete(final String id) {
+    public void deleteBook(final String id) {
         if (books.remove(id) == null) {
             throw new RuntimeException("Book with does not exists: " + id);
         }

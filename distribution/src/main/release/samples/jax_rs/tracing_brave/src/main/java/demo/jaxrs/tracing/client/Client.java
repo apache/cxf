@@ -24,17 +24,17 @@ import java.util.Arrays;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.github.kristofa.brave.Brave;
-
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.tracing.brave.jaxrs.BraveClientProvider;
+
+import brave.Tracing;
 
 public final class Client {
     private Client() {
     }
 
     public static void main(final String[] args) throws Exception {
-        final Brave brave = new Brave.Builder().build();
+        final Tracing brave = Tracing.newBuilder().build();
         final BraveClientProvider provider = new BraveClientProvider(brave);
 
         final Response response = WebClient

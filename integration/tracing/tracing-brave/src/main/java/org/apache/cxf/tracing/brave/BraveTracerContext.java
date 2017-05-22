@@ -20,52 +20,49 @@ package org.apache.cxf.tracing.brave;
 
 import java.util.concurrent.Callable;
 
-import com.github.kristofa.brave.Brave;
-import com.github.kristofa.brave.ServerSpan;
-import com.github.kristofa.brave.ServerSpanThreadBinder;
-
 import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
 
-import zipkin.Constants;
+import brave.Span;
+import brave.Tracer;
+import brave.Tracer.SpanInScope;
+import brave.http.HttpTracing;
 
 public class BraveTracerContext implements TracerContext {
-    private final Brave brave;
-    private final ServerSpan continuationSpan;
-    private final ServerSpanThreadBinder serverSpanThreadBinder;
+    private final HttpTracing brave;
+    private final Tracer tracer;
+    private final Span continuationSpan;
 
-    public BraveTracerContext(final Brave brave) {
+    public BraveTracerContext(final HttpTracing brave) {
         this(brave, null);
     }
 
-    public BraveTracerContext(final Brave brave, final ServerSpan continuationSpan) {
+    public BraveTracerContext(final HttpTracing brave, final 
+            Span continuationSpan) {
         this.brave = brave;
+        this.tracer = brave.tracing().tracer();
         this.continuationSpan = continuationSpan;
-        this.serverSpanThreadBinder = brave.serverSpanThreadBinder();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public TraceScope startSpan(final String description) {
-        return new TraceScope(brave,
-            brave
-                .localTracer()
-                .startNewSpan(Constants.LOCAL_COMPONENT, description));
+        return new TraceScope(brave, tracer.nextSpan().name(description).start());
     }
 
     @Override
     public <T> T continueSpan(final Traceable<T> traceable) throws Exception {
-        boolean attached = false;
-        if (serverSpanThreadBinder.getCurrentServerSpan() != null && continuationSpan != null) {
-            serverSpanThreadBinder.setCurrentSpan(continuationSpan);
-            attached = true;
+        SpanInScope scope = null;
+        
+        if (tracer.currentSpan() != null && continuationSpan != null) {
+            scope = tracer.withSpanInScope(continuationSpan);
         }
 
         try {
             return traceable.call(new BraveTracerContext(brave));
         } finally {
-            if (continuationSpan != null && attached) {
-                serverSpanThreadBinder.setCurrentSpan(null);
+            if (continuationSpan != null && scope != null) {
+                scope.close();
             }
         }
     }
@@ -80,30 +77,25 @@ public class BraveTracerContext implements TracerContext {
         };
 
         return () -> {
-            try {
-                startSpan(description);
+            try (final TraceScope span = startSpan(description)) {
                 return callable.call();
-            } finally {
-                brave.localTracer().finishSpan();
-            }
+            } 
         };
     }
 
     @Override
     public void annotate(String key, String value) {
-        if (brave.localSpanThreadBinder().getCurrentLocalSpan() != null) {
-            brave.localTracer().submitBinaryAnnotation(key, value);
-        } else if (brave.serverSpanThreadBinder().getCurrentServerSpan() != null) {
-            brave.serverTracer().submitBinaryAnnotation(key, value);
+        final Span current = tracer.currentSpan();
+        if (current != null) {
+            current.tag(key, value);
         }
     }
 
     @Override
     public void timeline(String message) {
-        if (brave.localSpanThreadBinder().getCurrentLocalSpan() != null) {
-            brave.localTracer().submitAnnotation(message);
-        } else if (brave.serverSpanThreadBinder().getCurrentServerSpan() != null) {
-            brave.serverTracer().submitAnnotation(message);
+        final Span current = tracer.currentSpan();
+        if (current != null) {
+            current.annotate(message);
         }
     }
 }

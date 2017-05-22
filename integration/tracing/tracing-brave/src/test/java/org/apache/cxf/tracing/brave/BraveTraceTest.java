@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.github.kristofa.brave.Brave;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -32,6 +31,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import brave.Tracing;
 import zipkin.Span;
 import zipkin.reporter.Reporter;
 
@@ -84,12 +85,12 @@ public class BraveTraceTest {
     }
 
     private static BraveFeature createLoggingFeature(Reporter<Span> reporter) {
-        Brave brave = new Brave.Builder("myservice").reporter(reporter).build();
+        Tracing brave = Tracing.newBuilder().localServiceName("myservice").reporter(reporter).build();
         return new BraveFeature(brave);
     }
 
     private static BraveClientFeature createClientLoggingFeature(Reporter<Span> reporter) {
-        Brave brave = new Brave.Builder("myservice").reporter(reporter).build();
+        Tracing brave = Tracing.newBuilder().localServiceName("myservice").reporter(reporter).build();
         return new BraveClientFeature(brave);
     }
 

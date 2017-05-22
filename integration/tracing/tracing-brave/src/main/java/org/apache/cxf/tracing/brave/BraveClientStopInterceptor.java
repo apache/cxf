@@ -18,19 +18,19 @@
  */
 package org.apache.cxf.tracing.brave;
 
-import com.github.kristofa.brave.Brave;
-import com.twitter.zipkin.gen.Span;
-
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
+import brave.Span;
+import brave.http.HttpTracing;
+
 public class BraveClientStopInterceptor extends AbstractBraveClientInterceptor {
-    public BraveClientStopInterceptor(final Brave brave) {
+    public BraveClientStopInterceptor(final HttpTracing brave) {
         this(Phase.RECEIVE, brave);
     }
 
-    public BraveClientStopInterceptor(final String phase, final Brave brave) {
+    public BraveClientStopInterceptor(final String phase, final HttpTracing brave) {
         super(phase, brave);
     }
 

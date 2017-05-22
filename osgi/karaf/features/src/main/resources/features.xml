@@ -291,10 +291,11 @@
     </feature>
     <feature name="cxf-tracing-brave" version="${project.version}">
         <feature version="${project.version}">cxf-core</feature>
-        <bundle start-level="35">mvn:io.zipkin.java/zipkin/1.16.2</bundle>
-        <bundle start-level="35">mvn:io.zipkin.reporter/zipkin-reporter/0.6.9</bundle>
-        <bundle start-level="35">mvn:io.zipkin.brave/brave-core/${cxf.brave.version}</bundle>
-        <bundle start-level="35">mvn:io.zipkin.brave/brave-http/${cxf.brave.version}</bundle>
+        <bundle start-level="10" dependency="true">mvn:com.google.code.findbugs/jsr305/${cxf.findbugs.version}</bundle>
+        <bundle start-level="35">mvn:io.zipkin.java/zipkin/${cxf.brave.zipkin.version}</bundle>
+        <bundle start-level="35">mvn:io.zipkin.reporter/zipkin-reporter/${cxf.brave.reporter.version}</bundle>
+        <bundle start-level="35">mvn:io.zipkin.brave/brave/${cxf.brave.version}</bundle>
+        <bundle start-level="35">mvn:io.zipkin.brave/brave-instrumentation-http/${cxf.brave.version}</bundle>
         <bundle start-level="40">mvn:org.apache.cxf/cxf-integration-tracing-brave/${project.version}</bundle>
     </feature>
     <feature name="cxf-rs-description-swagger2" version="${project.version}">

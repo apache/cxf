@@ -24,21 +24,38 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.ext.Provider;
 
-import com.github.kristofa.brave.Brave;
+import org.apache.cxf.tracing.brave.HttpServerSpanParser;
+
+import brave.Tracing;
+import brave.http.HttpTracing;
 
 @Provider
 public class BraveFeature implements Feature {
-    private final Brave brave;
+    private final HttpTracing brave;
 
     public BraveFeature() {
         this("cxf-svc-" + UUID.randomUUID().toString());
     }
 
     public BraveFeature(final String name) {
-        this(new Brave.Builder(name).build());
+        this(
+            HttpTracing
+                .newBuilder(Tracing.newBuilder().localServiceName(name).build())
+                .serverParser(new HttpServerSpanParser())
+                .build()
+        );
     }
 
-    public BraveFeature(final Brave brave) {
+    public BraveFeature(final Tracing tracing) {
+        this(
+          HttpTracing
+              .newBuilder(tracing)
+              .serverParser(new HttpServerSpanParser())
+              .build()
+         );
+    }
+
+    public BraveFeature(final HttpTracing brave) {
         this.brave = brave;
     }
 

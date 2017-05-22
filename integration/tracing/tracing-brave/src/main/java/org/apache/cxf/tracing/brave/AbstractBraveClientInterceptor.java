@@ -22,17 +22,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import com.github.kristofa.brave.Brave;
-
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
+
+import brave.http.HttpTracing;
 
 public abstract class AbstractBraveClientInterceptor extends AbstractBraveClientProvider
         implements PhaseInterceptor<Message> {
 
     private String phase;
 
-    protected AbstractBraveClientInterceptor(final String phase, final Brave brave) {
+    protected AbstractBraveClientInterceptor(final String phase, final HttpTracing brave) {
         super(brave);
         this.phase = phase;
     }
