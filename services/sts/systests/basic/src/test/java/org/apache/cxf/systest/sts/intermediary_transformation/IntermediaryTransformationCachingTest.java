@@ -132,6 +132,7 @@ public class IntermediaryTransformationCachingTest extends AbstractBusClientServ
         // Make invocation for "myservicekey"...this should fail as the intermediary's STS client is disabled
         try {
             doubleIt(servicePort, 45);
+            fail("Expected failure on a cache retrieval failure");
         } catch (SOAPFaultException ex) {
             // expected
         }
