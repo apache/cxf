@@ -42,7 +42,6 @@
         </httpj:engine>
     </httpj:engine-factory>
     <bean id="delegationCallbackHandler" class="org.apache.cxf.ws.security.trust.delegation.ReceivedTokenCallbackHandler"/>
-    <bean id="defaultTokenStore" class="org.apache.cxf.ws.security.tokenstore.MemoryTokenStore"/>
     <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItTransportSAML2Port" createdFromAPI="true">
         <jaxws:properties>
             <entry key="security.sts.client">
@@ -62,9 +61,6 @@
                         </map>
                     </property>
                 </bean>
-            </entry>
-            <entry key="org.apache.cxf.ws.security.tokenstore.TokenStore">
-                <ref bean="defaultTokenStore"/>
             </entry>
             <entry key="ws-security.cache.issued.token.in.endpoint" value="false"/>
         </jaxws:properties>
