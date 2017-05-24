@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response.Status;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -39,7 +38,6 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 
 public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusClientServerTestBase {
     private static final JsonObject DELETE_METHOD_SPEC = Json.createObjectBuilder()
@@ -164,24 +162,24 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
 
-            JSONAssert.assertEquals(
-                Json.createObjectBuilder()
-                    .add("apiVersion", "1.0.0")
-                    .add("swaggerVersion", "1.2")
-                    .add("apis", Json.createArrayBuilder()
-                        .add(Json.createObjectBuilder()
-                            .add("path", "/bookstore")
-                            .add("description", "Sample JAX-RS service with Swagger documentation")
-                        )
+            JsonObject expected = Json.createObjectBuilder()
+                .add("apiVersion", "1.0.0")
+                .add("swaggerVersion", "1.2")
+                .add("apis", Json.createArrayBuilder()
+                    .add(Json.createObjectBuilder()
+                        .add("path", "/bookstore")
+                        .add("description", "Sample JAX-RS service with Swagger documentation")
                     )
-                    .add("info", Json.createObjectBuilder()
-                        .add("title", "Sample REST Application")
-                        .add("description", "The Application")
-                        .add("contact", "users@cxf.apache.org")
-                        .add("license", "Apache 2.0 License")
-                        .add("licenseUrl", "http://www.apache.org/licenses/LICENSE-2.0.html")
-                    ).build().toString(),
-                    IOUtils.readStringFromStream((InputStream)r.getEntity()), false);
+                )
+                .add("info", Json.createObjectBuilder()
+                    .add("title", "Sample REST Application")
+                    .add("description", "The Application")
+                    .add("contact", "users@cxf.apache.org")
+                    .add("license", "Apache 2.0 License")
+                    .add("licenseUrl", "http://www.apache.org/licenses/LICENSE-2.0.html")
+                ).build();
+            JsonObject received = Json.createReader((InputStream)r.getEntity()).readObject();
+            assertEquals(expected, received);
         } finally {
             client.close();
         }
@@ -194,24 +192,26 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
         try {
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
+            
+            JsonObject expected = Json.createObjectBuilder()
+                .add("apiVersion", "1.0.0")
+                .add("swaggerVersion", "1.2")
+                .add("basePath", "http://localhost:" + getPort() + "/")
+                .add("resourcePath", "/bookstore")
+                .add("apis", Json.createArrayBuilder()
+                    .add(Json.createObjectBuilder()
+                        .add("path", "/bookstore/{id}")
+                        .add("operations", Json.createArrayBuilder()
+                            .add(DELETE_METHOD_SPEC)
+                            .add(GET_BY_ID_METHOD_SPEC)))
+                    .add(Json.createObjectBuilder()
+                        .add("path", "/bookstore")
+                        .add("operations", Json.createArrayBuilder().add(GET_METHOD_SPEC))))
+                .add("models", BOOK_MODEL_SPEC).build();
+            
+            JsonObject received = Json.createReader((InputStream)r.getEntity()).readObject();
+            assertEquals(expected, received);
 
-            JSONAssert.assertEquals(
-                Json.createObjectBuilder()
-                    .add("apiVersion", "1.0.0")
-                    .add("swaggerVersion", "1.2")
-                    .add("basePath", "http://localhost:" + getPort() + "/")
-                    .add("resourcePath", "/bookstore")
-                    .add("apis", Json.createArrayBuilder()
-                        .add(Json.createObjectBuilder()
-                            .add("path", "/bookstore/{id}")
-                            .add("operations", Json.createArrayBuilder()
-                                .add(DELETE_METHOD_SPEC)
-                                .add(GET_BY_ID_METHOD_SPEC)))
-                        .add(Json.createObjectBuilder()
-                            .add("path", "/bookstore")
-                            .add("operations", Json.createArrayBuilder().add(GET_METHOD_SPEC))))
-                    .add("models", BOOK_MODEL_SPEC).build().toString(),
-                    IOUtils.readStringFromStream((InputStream)r.getEntity()), false);
         } finally {
             client.close();
         }
