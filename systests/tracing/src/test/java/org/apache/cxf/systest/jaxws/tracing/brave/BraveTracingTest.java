@@ -180,7 +180,7 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
 
         final Span span = brave.tracer().nextSpan().name("test span").start();
         try {
-            try (final SpanInScope scope = brave.tracer().withSpanInScope(span)) {
+            try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
                 assertThat(service.getBooks().size(), equalTo(2));
                 assertThat(brave.tracer().currentSpan(), not(nullValue()));
     

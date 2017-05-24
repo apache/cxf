@@ -47,7 +47,7 @@ public class BookStore implements BookStoreService {
     @WebMethod
     public Collection< Book > getBooks() {
         final Span span = brave.tracer().nextSpan().name("Get Books").start();
-        try (final SpanInScope scope = brave.tracer().withSpanInScope(span)) {
+        try (SpanInScope scope = brave.tracer().withSpanInScope(span)) {
             return Arrays.asList(
                     new Book("Apache CXF in Action", UUID.randomUUID().toString()),
                     new Book("Mastering Apache CXF", UUID.randomUUID().toString())

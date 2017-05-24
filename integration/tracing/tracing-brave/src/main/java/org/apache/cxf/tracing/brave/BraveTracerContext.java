@@ -77,7 +77,7 @@ public class BraveTracerContext implements TracerContext {
         };
 
         return () -> {
-            try (final TraceScope span = startSpan(description)) {
+            try (TraceScope span = startSpan(description)) {
                 return callable.call();
             } 
         };
