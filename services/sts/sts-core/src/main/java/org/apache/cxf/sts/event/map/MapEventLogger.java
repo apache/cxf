@@ -37,7 +37,7 @@ public class MapEventLogger implements MapEventListener {
     private boolean logStacktrace;
     private boolean logFieldname;
     private Level logLevel = Level.FINE;
-    private DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+    private String format;
 
     public MapEventLogger() {
         fieldOrder.add(KEYS.TIME.name());
@@ -86,6 +86,12 @@ public class MapEventLogger implements MapEventListener {
         if (value instanceof String) {
             return (String) value;
         } else if (value instanceof Date) {
+            DateFormat dateFormat = null;
+            if (format != null) {
+                dateFormat = new SimpleDateFormat(format);
+            } else {
+                dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+            }
             return dateFormat.format(value);
         } else {
             return (value == null) ? "<null>" : value.toString();
@@ -116,8 +122,8 @@ public class MapEventLogger implements MapEventListener {
         this.logFieldname = logFieldname;
     }
 
-    public void setDateFormat(String format) {
-        this.dateFormat = new SimpleDateFormat(format);
+    public void setDateFormat(String dateFormat) {
+        this.format = dateFormat;
     }
 
     public String getLogLevel() {
