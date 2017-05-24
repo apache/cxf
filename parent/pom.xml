@@ -1951,6 +1951,12 @@
                 <groupId>org.apache.tika</groupId>
                 <artifactId>tika-parsers</artifactId>
                 <version>${cxf.tika.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.json</groupId>
+                        <artifactId>json</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -1981,6 +1987,12 @@
                 <groupId>org.qi4j.library</groupId>
                 <artifactId>org.qi4j.library.circuitbreaker</artifactId>
                 <version>${cxf.zest.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.codeartisans</groupId>
+                        <artifactId>org.json</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.wss4j</groupId>
