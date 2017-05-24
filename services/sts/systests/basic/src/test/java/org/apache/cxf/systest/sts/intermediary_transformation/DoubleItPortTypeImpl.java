@@ -43,7 +43,7 @@ public class DoubleItPortTypeImpl implements DoubleItPortType {
     @Resource
     WebServiceContext wsContext;
     
-    private Map<String, Integer> userCount = new ConcurrentHashMap<>();
+    private Map<String, Integer> userCount = new ConcurrentHashMap<String, Integer>();
 
     public int doubleIt(int numberToDouble) {
         Principal pr = wsContext.getUserPrincipal();
