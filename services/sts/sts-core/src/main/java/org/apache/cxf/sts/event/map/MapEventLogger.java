@@ -121,15 +121,9 @@ public class MapEventLogger implements MapEventListener {
     public void setLogFieldname(boolean logFieldname) {
         this.logFieldname = logFieldname;
     }
-<<<<<<< HEAD
-    
-    public void setDateFormat(String format) {
-        this.dateFormat = new SimpleDateFormat(format);
-=======
 
     public void setDateFormat(String dateFormat) {
         this.format = dateFormat;
->>>>>>> ee62e3c371... CXF-7381 - DateFormat in MapEventLogger in the STS is not thread safe
     }
 
     public String getLogLevel() {
