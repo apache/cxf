@@ -32,6 +32,7 @@ import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
 
@@ -51,29 +52,24 @@ public final class STSTokenRetriever {
     }
 
     public static SecurityToken getToken(Message message, TokenRequestParams params, STSTokenCacher tokenCacher) {
-        SecurityToken tok = tokenCacher.retrieveToken(message);
-        if (tok == null) {
-            tok = issueToken(message, params, tokenCacher);
-        } else {
-            tok = renewToken(message, tok, params, tokenCacher);
+        Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_APPLIES_TO, message);
+        String appliesTo = o == null ? null : o.toString();
+        if (appliesTo == null) {
+            String endpointAddress =
+                message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
+            // Strip out any query parameters if they exist
+            int query = endpointAddress.indexOf('?');
+            if (query > 0) {
+                endpointAddress = endpointAddress.substring(0, query);
+            }
+            appliesTo = endpointAddress;
         }
-
-        tokenCacher.storeToken(message, tok);
-
-        return tok;
-    }
-
-    private static SecurityToken issueToken(Message message, TokenRequestParams params, STSTokenCacher tokenCacher) {
-        AddressingProperties maps =
-            (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context.outbound");
-        if (maps == null) {
-            maps = (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context");
-        }
+        
         STSClient client = STSUtils.getClientWithIssuer(message, "sts", params.getIssuer());
         synchronized (client) {
             try {
+                client.setMessage(message);
+                
                 // Transpose ActAs/OnBehalfOf info from original request to the STS client.
                 Object token =
                     SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_TOKEN_ACT_AS, message);
@@ -85,24 +81,9 @@ public final class STSTokenRetriever {
                 if (token != null) {
                     client.setOnBehalfOf(token);
                 }
-                Map<String, Object> ctx = client.getRequestContext();
-                mapSecurityProps(message, ctx);
 
-                Object o = SecurityUtils.getSecurityPropertyValue(SecurityConstants.STS_APPLIES_TO, message);
-                String appliesTo = o == null ? null : o.toString();
-                if (appliesTo == null) {
-                    String endpointAddress =
-                        message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
-                    // Strip out any query parameters if they exist
-                    int query = endpointAddress.indexOf('?');
-                    if (query > 0) {
-                        endpointAddress = endpointAddress.substring(0, query);
-                    }
-                    appliesTo = endpointAddress;
-                }
                 boolean enableAppliesTo = client.isEnableAppliesTo();
 
-                client.setMessage(message);
                 Element onBehalfOfToken = client.getOnBehalfOfToken();
                 Element actAsToken = client.getActAsToken();
 
@@ -110,22 +91,40 @@ public final class STSTokenRetriever {
                 if (!enableAppliesTo || key == null || "".equals(key)) {
                     key = ASSOCIATED_TOKEN;
                 }
-                // See if the token corresponding to the OnBehalfOf/ActAs Token is stored in the cache
-                // and if it points to an issued token
-                SecurityToken secToken = tokenCacher.retrieveToken(message, onBehalfOfToken, key);
-                if (secToken == null) {
-                    secToken = tokenCacher.retrieveToken(message, actAsToken, key);
+                
+                SecurityToken secToken = null;
+                if (onBehalfOfToken == null && actAsToken == null) {
+                    // If we have no delegation token then try to retrieve a cached token from the message
+                    secToken = tokenCacher.retrieveToken(message);
+                } else {
+                    // Otherwise try to get a cached token corresponding to the delegation token
+                    if (onBehalfOfToken != null) {
+                        secToken = tokenCacher.retrieveToken(message, onBehalfOfToken, key);
+                    }
+                    if (secToken == null && actAsToken != null) {
+                        secToken = tokenCacher.retrieveToken(message, actAsToken, key);
+                    }
                 }
+                
                 if (secToken != null) {
-                    // Check to see whether the delegated token needs to be renewed
+                    // Check to see whether the token needs to be renewed
                     secToken = renewToken(message, secToken, params, tokenCacher);
                 } else {
-                    secToken = getTokenFromSTS(client, maps, appliesTo, params);
+                    secToken = getTokenFromSTS(message, client, appliesTo, params);
                 }
 
                 if (secToken != null) {
                     tokenCacher.storeToken(message, onBehalfOfToken, secToken.getId(), key);
                     tokenCacher.storeToken(message, actAsToken, secToken.getId(), key);
+                    if (onBehalfOfToken == null && actAsToken == null) {
+                        tokenCacher.storeToken(message, secToken);
+                    } else {
+                        TokenStoreUtils.getTokenStore(message).add(secToken);
+                    }
+                    
+                    message.put(SecurityConstants.TOKEN, secToken);
+                    message.put(SecurityConstants.TOKEN_ID, secToken.getId());
+                    message.put(SecurityConstants.TOKEN_ELEMENT, secToken.getToken());
                 }
                 return secToken;
             } catch (RuntimeException e) {
@@ -166,16 +165,9 @@ public final class STSTokenRetriever {
         // so just get a new one
         STSClient client = STSUtils.getClientWithIssuer(message, "sts", params.getIssuer());
         if (!client.isAllowRenewing()) {
-            return issueToken(message, params, tokenCacher);
+            return getToken(message, params, tokenCacher);
         }
 
-        AddressingProperties maps =
-            (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context.outbound");
-        if (maps == null) {
-            maps = (AddressingProperties)message
-                .get("javax.xml.ws.addressing.context");
-        }
         synchronized (client) {
             try {
                 Map<String, Object> ctx = client.getRequestContext();
@@ -183,8 +175,9 @@ public final class STSTokenRetriever {
 
                 client.setMessage(message);
 
-                if (maps != null) {
-                    client.setAddressingNamespace(maps.getNamespaceURI());
+                String addressingNamespace = getAddressingNamespaceURI(message);
+                if (addressingNamespace != null) {
+                    client.setAddressingNamespace(addressingNamespace);
                 }
 
                 client.setTrust(params.getTrust10());
@@ -199,7 +192,7 @@ public final class STSTokenRetriever {
                                               SecurityConstants.STS_ISSUE_AFTER_FAILED_RENEW, message, true);
                 if (issueAfterFailedRenew) {
                     // Perhaps the STS does not support renewing, so try to issue a new token
-                    return issueToken(message, params, tokenCacher);
+                    return getToken(message, params, tokenCacher);
                 } else {
                     throw ex;
                 }
@@ -210,7 +203,7 @@ public final class STSTokenRetriever {
                                               SecurityConstants.STS_ISSUE_AFTER_FAILED_RENEW, message, true);
                 if (issueAfterFailedRenew) {
                     // Perhaps the STS does not support renewing, so try to issue a new token
-                    return issueToken(message, params, tokenCacher);
+                    return getToken(message, params, tokenCacher);
                 } else {
                     throw new Fault(ex);
                 }
@@ -221,6 +214,21 @@ public final class STSTokenRetriever {
                 client.setAddressingNamespace(null);
             }
         }
+    }
+    
+    private static String getAddressingNamespaceURI(Message message) {
+        AddressingProperties maps =
+            (AddressingProperties)message
+                .get("javax.xml.ws.addressing.context.outbound");
+        if (maps == null) {
+            maps = (AddressingProperties)message
+                .get("javax.xml.ws.addressing.context");
+        }
+        if (maps != null) {
+            return maps.getNamespaceURI();
+        }
+        
+        return null;
     }
 
     private static void mapSecurityProps(Message message, Map<String, Object> ctx) {
@@ -235,8 +243,8 @@ public final class STSTokenRetriever {
         }
     }
 
-    private static SecurityToken getTokenFromSTS(STSClient client,
-                                          AddressingProperties maps, String appliesTo,
+    private static SecurityToken getTokenFromSTS(Message message,
+                                          STSClient client, String appliesTo,
                                           TokenRequestParams params) throws Exception {
         client.setTrust(params.getTrust10());
         client.setTrust(params.getTrust13());
@@ -244,12 +252,16 @@ public final class STSTokenRetriever {
         if (params.getWspNamespace() != null) {
             client.setWspNamespace(params.getWspNamespace());
         }
-        if (maps != null && maps.getNamespaceURI() != null) {
-            client.setAddressingNamespace(maps.getNamespaceURI());
+        String addressingNamespace = getAddressingNamespaceURI(message);
+        if (addressingNamespace != null) {
+            client.setAddressingNamespace(addressingNamespace);
         }
         if (params.getClaims() != null) {
             client.setClaims(params.getClaims());
         }
+        Map<String, Object> ctx = client.getRequestContext();
+        mapSecurityProps(message, ctx);
+        
         return client.requestSecurityToken(appliesTo);
     }
 

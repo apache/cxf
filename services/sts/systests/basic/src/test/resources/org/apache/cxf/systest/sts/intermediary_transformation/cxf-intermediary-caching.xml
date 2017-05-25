@@ -62,7 +62,6 @@
                     </property>
                 </bean>
             </entry>
-            <entry key="ws-security.cache.issued.token.in.endpoint" value="false"/>
         </jaxws:properties>
     </jaxws:client>
     <http:conduit name="https://localhost.*">

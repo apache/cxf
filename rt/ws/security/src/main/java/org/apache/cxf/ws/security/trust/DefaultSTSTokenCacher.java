@@ -100,16 +100,10 @@ public class DefaultSTSTokenCacher implements STSTokenCacher {
         if (cacheIssuedToken) {
             message.getExchange().getEndpoint().put(SecurityConstants.TOKEN, securityToken);
             message.getExchange().put(SecurityConstants.TOKEN, securityToken);
-            message.put(SecurityConstants.TOKEN_ELEMENT, securityToken.getToken());
             message.getExchange().put(SecurityConstants.TOKEN_ID, securityToken.getId());
             message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID,
                                                     securityToken.getId());
-        } else {
-            message.put(SecurityConstants.TOKEN, securityToken);
-            message.put(SecurityConstants.TOKEN_ID, securityToken.getId());
-            message.put(SecurityConstants.TOKEN_ELEMENT, securityToken.getToken());
         }
-        // ?
         TokenStoreUtils.getTokenStore(message).add(securityToken);
     }
 
