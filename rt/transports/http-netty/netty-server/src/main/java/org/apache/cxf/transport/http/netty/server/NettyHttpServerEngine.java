@@ -90,8 +90,8 @@ public class NettyHttpServerEngine implements ServerEngine {
     private boolean sessionSupport;
 
     // TODO need to setup configuration about them
-    private EventLoopGroup bossGroup = new NioEventLoopGroup();
-    private EventLoopGroup workerGroup = new NioEventLoopGroup();
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
 
     public NettyHttpServerEngine() {
 
@@ -104,19 +104,10 @@ public class NettyHttpServerEngine implements ServerEngine {
         this.port = port;
     }
 
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
-    }
-
     @PostConstruct
     public void finalizeConfig() {
         // need to check if we need to any other thing other than Setting the TLSServerParameter
     }
-
 
     /**
      * This method is used to programmatically set the TLSServerParameters.
@@ -130,7 +121,6 @@ public class NettyHttpServerEngine implements ServerEngine {
      * This method returns the programmatically set TLSServerParameters, not
      * the TLSServerParametersType, which is the JAXB generated type used
      * in SpringConfiguration.
-     * @return
      */
     public TLSServerParameters getTlsServerParameters() {
         return tlsServerParameters;
@@ -145,6 +135,12 @@ public class NettyHttpServerEngine implements ServerEngine {
     }
 
     protected Channel startServer() {
+        if (bossGroup == null) {
+            bossGroup = new NioEventLoopGroup();
+        }
+        if (workerGroup == null) {
+            workerGroup = new NioEventLoopGroup();
+        }
 
         final ServerBootstrap bootstrap = new ServerBootstrap();
         bootstrap.group(bossGroup, workerGroup)
@@ -161,7 +157,7 @@ public class NettyHttpServerEngine implements ServerEngine {
         // Start the servletPipeline's timer
         servletPipeline.start();
         bootstrap.childHandler(servletPipeline);
-        InetSocketAddress address = null;
+        InetSocketAddress address;
         if (host == null) {
             address = new InetSocketAddress(port);
         } else {
@@ -184,9 +180,7 @@ public class NettyHttpServerEngine implements ServerEngine {
                 throw new Fault(new Message("ADD_HANDLER_CONTEXT_IS_USED_MSG", LOG, url, registedPath));
             }
         }
-
     }
-
 
     @Override
     public void addServant(URL url, NettyHttpHandler handler) {
@@ -220,7 +214,6 @@ public class NettyHttpServerEngine implements ServerEngine {
             }
         }
         registedPaths.remove(url.getPath());
-
     }
 
     @Override
@@ -248,9 +241,13 @@ public class NettyHttpServerEngine implements ServerEngine {
             serverChannel.close();
         }
 
-        bossGroup.shutdownGracefully();
-        workerGroup.shutdownGracefully();
-
+        // shutdown executors
+        if (bossGroup != null) {
+            bossGroup.shutdownGracefully();
+        }
+        if (workerGroup != null) {
+            workerGroup.shutdownGracefully();
+        }
     }
 
     public int getReadIdleTime() {
@@ -299,5 +296,37 @@ public class NettyHttpServerEngine implements ServerEngine {
 
     public String getHost() {
         return host;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    public void setBossGroup(EventLoopGroup bossGroup) {
+        if (this.bossGroup == null) {
+            this.bossGroup = bossGroup;
+        } else {
+            throw new IllegalStateException("bossGroup is already defined");
+        }
+    }
+
+    public EventLoopGroup getBossGroup() {
+        return bossGroup;
+    }
+
+    public void setWorkerGroup(EventLoopGroup workerGroup) {
+        if (this.workerGroup == null) {
+            this.workerGroup = workerGroup;
+        } else {
+            throw new IllegalStateException("workerGroup is already defined");
+        }
+    }
+
+    public EventLoopGroup getWorkerGroup() {
+        return workerGroup;
     }
 }
