@@ -30,9 +30,10 @@ import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 public interface STSTokenCacher {
 
     /**
-     * Retrieve a cached STS token
+     * Retrieve a cached STS token. The retrieveTokenFromEndpoint boolean lets us known whether we want to retrieve the
+     * token from the endpoint or not.
      */
-    SecurityToken retrieveToken(Message message);
+    SecurityToken retrieveToken(Message message, boolean retrieveTokenFromEndpoint);
 
     /**
      * Retrieve a cached STS token for a given delegation token Element
@@ -40,9 +41,10 @@ public interface STSTokenCacher {
     SecurityToken retrieveToken(Message message, Element delegationToken, String cacheKey);
 
     /**
-     * Store a token in the cache
+     * Store a token in the cache. The storeTokenInEndpoint boolean lets us know whether we want to store the token
+     * in the endpoint or not.
      */
-    void storeToken(Message message, SecurityToken securityToken);
+    void storeToken(Message message, SecurityToken securityToken, boolean storeTokenInEndpoint);
 
     /**
      * Store a given delegation token in the cache (or update it if it's already there), with a reference to the

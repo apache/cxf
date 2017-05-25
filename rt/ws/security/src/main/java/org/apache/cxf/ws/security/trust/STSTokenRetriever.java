@@ -32,7 +32,6 @@ import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
 import org.apache.wss4j.policy.model.Trust10;
 import org.apache.wss4j.policy.model.Trust13;
 
@@ -92,20 +91,18 @@ public final class STSTokenRetriever {
                     key = ASSOCIATED_TOKEN;
                 }
                 
-                SecurityToken secToken = null;
-                if (onBehalfOfToken == null && actAsToken == null) {
-                    // If we have no delegation token then try to retrieve a cached token from the message
-                    secToken = tokenCacher.retrieveToken(message);
-                } else {
-                    // Otherwise try to get a cached token corresponding to the delegation token
-                    if (onBehalfOfToken != null) {
-                        secToken = tokenCacher.retrieveToken(message, onBehalfOfToken, key);
-                    }
-                    if (secToken == null && actAsToken != null) {
-                        secToken = tokenCacher.retrieveToken(message, actAsToken, key);
-                    }
+                boolean cacheToken = isCachedTokenFromEndpoint(message, onBehalfOfToken, actAsToken);
+                // Try to retrieve a cached token from the message
+                SecurityToken secToken = tokenCacher.retrieveToken(message, cacheToken);
+
+                // Otherwise try to get a cached token corresponding to the delegation token
+                if (secToken == null && onBehalfOfToken != null) {
+                    secToken = tokenCacher.retrieveToken(message, onBehalfOfToken, key);
                 }
-                
+                if (secToken == null && actAsToken != null) {
+                    secToken = tokenCacher.retrieveToken(message, actAsToken, key);
+                }
+
                 if (secToken != null) {
                     // Check to see whether the token needs to be renewed
                     secToken = renewToken(message, secToken, params, tokenCacher);
@@ -116,15 +113,7 @@ public final class STSTokenRetriever {
                 if (secToken != null) {
                     tokenCacher.storeToken(message, onBehalfOfToken, secToken.getId(), key);
                     tokenCacher.storeToken(message, actAsToken, secToken.getId(), key);
-                    if (onBehalfOfToken == null && actAsToken == null) {
-                        tokenCacher.storeToken(message, secToken);
-                    } else {
-                        TokenStoreUtils.getTokenStore(message).add(secToken);
-                    }
-                    
-                    message.put(SecurityConstants.TOKEN, secToken);
-                    message.put(SecurityConstants.TOKEN_ID, secToken.getId());
-                    message.put(SecurityConstants.TOKEN_ELEMENT, secToken.getToken());
+                    tokenCacher.storeToken(message, secToken, cacheToken);
                 }
                 return secToken;
             } catch (RuntimeException e) {
@@ -138,6 +127,16 @@ public final class STSTokenRetriever {
                 client.setAddressingNamespace(null);
             }
         }
+    }
+    
+    private static boolean isCachedTokenFromEndpoint(Message message, Element onBehalfOfToken, Element actAsToken) {
+        if (onBehalfOfToken != null || actAsToken != null) {
+            return false;
+        }
+        return
+            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT,
+                                              message,
+                                              true);
     }
 
     private static SecurityToken renewToken(

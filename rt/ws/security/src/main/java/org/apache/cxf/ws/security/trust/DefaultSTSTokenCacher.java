@@ -29,7 +29,6 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
@@ -41,13 +40,9 @@ import org.apache.wss4j.dom.WSConstants;
 
 public class DefaultSTSTokenCacher implements STSTokenCacher {
 
-    public SecurityToken retrieveToken(Message message) {
-        boolean cacheIssuedToken =
-            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT,
-                                              message,
-                                              true);
+    public SecurityToken retrieveToken(Message message, boolean retrieveTokenFromEndpoint) {
         SecurityToken tok = null;
-        if (cacheIssuedToken) {
+        if (retrieveTokenFromEndpoint) {
             tok = (SecurityToken)message.getContextualProperty(SecurityConstants.TOKEN);
             if (tok == null) {
                 String tokId = (String)message.getContextualProperty(SecurityConstants.TOKEN_ID);
@@ -91,18 +86,17 @@ public class DefaultSTSTokenCacher implements STSTokenCacher {
         return null;
     }
 
-    public void storeToken(Message message, SecurityToken securityToken) {
-        boolean cacheIssuedToken =
-            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT,
-                                              message,
-                                              true)
-                && !isOneTimeUse(securityToken);
-        if (cacheIssuedToken) {
+    public void storeToken(Message message, SecurityToken securityToken, boolean storeTokenInEndpoint) {
+        if (storeTokenInEndpoint && !isOneTimeUse(securityToken)) {
             message.getExchange().getEndpoint().put(SecurityConstants.TOKEN, securityToken);
             message.getExchange().put(SecurityConstants.TOKEN, securityToken);
             message.getExchange().put(SecurityConstants.TOKEN_ID, securityToken.getId());
             message.getExchange().getEndpoint().put(SecurityConstants.TOKEN_ID,
                                                     securityToken.getId());
+        } else {
+            message.put(SecurityConstants.TOKEN, securityToken);
+            message.put(SecurityConstants.TOKEN_ID, securityToken.getId());
+            message.put(SecurityConstants.TOKEN_ELEMENT, securityToken.getToken());
         }
         TokenStoreUtils.getTokenStore(message).add(securityToken);
     }
