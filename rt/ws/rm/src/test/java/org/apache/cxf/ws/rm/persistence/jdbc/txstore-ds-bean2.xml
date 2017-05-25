@@ -25,5 +25,8 @@
         </wsrm-mgr:store>
     </wsrm-mgr:rmManager>
     <wsrm-mgr:jdbcStore id="testStore" dataSource="testStoreDS"/>
-    <bean id="testStoreDS" class="org.apache.cxf.ws.rm.persistence.jdbc.RMTxStoreConfigurationTest$TestDataSource"/>
+    <bean id="testStoreDS" class="org.apache.derby.jdbc.EmbeddedDataSource">
+    	<property name="databaseName" value="target/wsrmdb2"/>
+    	<property name="createDatabase" value="create"/>
+    </bean>
 </beans>

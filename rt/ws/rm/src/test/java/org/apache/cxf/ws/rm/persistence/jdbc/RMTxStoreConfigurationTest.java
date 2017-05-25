@@ -19,12 +19,7 @@
 
 package org.apache.cxf.ws.rm.persistence.jdbc;
 
-import java.io.PrintWriter;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.logging.Logger;
-
-import javax.sql.DataSource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -89,8 +84,7 @@ public class RMTxStoreConfigurationTest extends Assert {
         RMTxStore store = (RMTxStore)manager.getStore();
                 
         assertNotNull(store.getDataSource());
-        
-        assertNull(store.getConnection());
+        assertNotNull(store.getConnection());
     }
     
     @Test
@@ -102,45 +96,6 @@ public class RMTxStoreConfigurationTest extends Assert {
         RMTxStore store = (RMTxStore)manager.getStore();
                 
         assertNotNull(store.getDataSource());
-        
-        assertNull(store.getConnection());
-    }
-    
-    static class TestDataSource implements DataSource {
-        public PrintWriter getLogWriter() throws SQLException {
-            return null;
-        }
-
-        public void setLogWriter(PrintWriter out) throws SQLException {
-        }
-
-        public void setLoginTimeout(int seconds) throws SQLException {
-        }
-
-        public int getLoginTimeout() throws SQLException {
-            return 0;
-        }
-
-        public <T> T unwrap(Class<T> iface) throws SQLException {
-            return null;
-        }
-
-        public boolean isWrapperFor(Class<?> iface) throws SQLException {
-            return false;
-        }
-
-        public Connection getConnection() throws SQLException {
-            // avoid creating a connection and tables at RMTxStore.init()
-            throw new SQLException("test");
-        }
-
-        public Connection getConnection(String username, String password) throws SQLException {
-            // avoid creating a connection and tables at RMTxStore.init()
-            throw new SQLException("test");
-        }
-
-        public Logger getParentLogger() {
-            return null;
-        }
+        assertNotNull(store.getConnection());
     }
 }
