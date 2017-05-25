@@ -135,6 +135,7 @@ public class DefaultSTSTokenCacher implements STSTokenCacher {
         message.getExchange().getEndpoint().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN_ID);
         message.getExchange().remove(SecurityConstants.TOKEN);
+        message.resetContextCache();
         if (securityToken != null) {
             TokenStoreUtils.getTokenStore(message).remove(securityToken.getId());
         }
