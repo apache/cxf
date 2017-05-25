@@ -1,0 +1,21 @@
+{
+  "request" : {
+    "url" : "/globalweather.asmx",
+    "method" : "POST",
+    "bodyPatterns" : [ {
+      "equalToXml" : "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\"><soap:Body><GetWeather xmlns=\"http://www.webserviceX.NET\"><CityName>Berlin-Tegel</CityName><CountryName>Germany</CountryName></GetWeather></soap:Body></soap:Envelope>"
+    } ]
+  },
+  "response" : {
+    "status" : 200,
+    "bodyFileName" : "body-globalweather.asmx-Iu9Jc.xml",
+    "headers" : {
+      "Cache-Control" : "private, max-age=0",
+      "Content-Type" : "application/soap+xml; charset=utf-8",
+      "Server" : "Microsoft-IIS/7.0",
+      "X-AspNet-Version" : "4.0.30319",
+      "X-Powered-By" : "ASP.NET",
+      "Date" : "Thu, 03 Nov 2016 10:18:57 GMT"
+    }
+  }
+}
