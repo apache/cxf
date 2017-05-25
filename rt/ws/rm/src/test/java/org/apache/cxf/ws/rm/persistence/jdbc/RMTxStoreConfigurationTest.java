@@ -41,11 +41,11 @@ public class RMTxStoreConfigurationTest extends Assert {
         assertNotNull(manager);
         RMTxStore store = (RMTxStore)manager.getStore();
         assertNotNull(store);
-        assertNull("Connection should be null", store.getConnection());
-        assertEquals("org.apache.derby.jdbc.NoDriver", store.getDriverClassName());
+        assertNotNull("Connection should be null", store.getConnection());
+        assertEquals("org.apache.derby.jdbc.EmbeddedDriver", store.getDriverClassName());
         assertEquals("scott", store.getUserName());
         assertEquals("tiger", store.getPassword());
-        assertEquals("jdbc:derby://localhost:1527/rmdb;create=true", store.getUrl());
+        assertEquals("jdbc:derby:target/wsrmdb3;create=true", store.getUrl());
         assertNull("schema should be unset", store.getSchemaName());
     }
    
@@ -64,6 +64,7 @@ public class RMTxStoreConfigurationTest extends Assert {
 
     @Test
     public void testSetCustomTableExistsState2() {
+        RMTxStore.deleteDatabaseFiles("target/wsrmdb5", true);
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/ws/rm/persistence/jdbc/txstore-custom-error-bean2.xml");
         RMManager manager = bus.getExtension(RMManager.class);

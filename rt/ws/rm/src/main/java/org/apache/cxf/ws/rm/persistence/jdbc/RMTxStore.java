@@ -834,6 +834,10 @@ public class RMTxStore implements RMStore {
     
     protected void createTables() throws SQLException {
         Connection con = verifyConnection();
+        if (con == null) {
+            LOG.warning("Skip creating tables as we have no connection.");
+            return;
+        }
         Statement stmt = null;
         
         try {
