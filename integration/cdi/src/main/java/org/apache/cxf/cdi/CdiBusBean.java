@@ -40,7 +40,7 @@ final class CdiBusBean extends AbstractCXFBean< ExtensionManagerBus > {
     
     @Override
     public Class< ? > getBeanClass() {
-        return Bus.class;
+        return ExtensionManagerBus.class;
     }
 
     @Override
@@ -57,6 +57,7 @@ final class CdiBusBean extends AbstractCXFBean< ExtensionManagerBus > {
     public Set<Type> getTypes() {
         final Set< Type > types = super.getTypes();
         types.add(Bus.class);
+        types.add(ExtensionManagerBus.class);
         return types;
     }
     
