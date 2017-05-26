@@ -273,11 +273,11 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
     
     @Context
-    public void setServletContext3(ServletContext sc) {
+    public void setServletContext(ServletContext sc) {
         servletContext3 = sc;
     }
     
-    public ServletContext getServletContext3() {
+    public ServletContext getThreadLocalServletContext() {
         return servletContext3;
     }
     
