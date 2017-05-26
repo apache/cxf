@@ -474,7 +474,10 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.20</version>
+                    <!-- The current 2.19, 2.19.1 and 2.20 versions are broken.
+                         Wait for https://issues.apache.org/jira/browse/SUREFIRE-1302 to be fixed.
+                         See also http://maven.40175.n5.nabble.com/surefire-forked-vm-failed-td5858900.html -->
+                    <version>2.18.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
