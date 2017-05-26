@@ -193,7 +193,7 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
             final Response r = client.get();
             assertEquals(Status.OK.getStatusCode(), r.getStatus());
             
-            JsonObject expected = Json.createObjectBuilder()
+            JsonObject expected1 = Json.createObjectBuilder()
                 .add("apiVersion", "1.0.0")
                 .add("swaggerVersion", "1.2")
                 .add("basePath", "http://localhost:" + getPort() + "/")
@@ -209,8 +209,25 @@ public abstract class AbstractSwaggerServiceDescriptionTest extends AbstractBusC
                         .add("operations", Json.createArrayBuilder().add(GET_METHOD_SPEC))))
                 .add("models", BOOK_MODEL_SPEC).build();
             
+            JsonObject expected2 = Json.createObjectBuilder()
+                .add("apiVersion", "1.0.0")
+                .add("swaggerVersion", "1.2")
+                .add("basePath", "http://localhost:" + getPort() + "/")
+                .add("resourcePath", "/bookstore")
+                .add("apis", Json.createArrayBuilder()
+                    .add(Json.createObjectBuilder()
+                        .add("path", "/bookstore/{id}")
+                        .add("operations", Json.createArrayBuilder()
+                            .add(DELETE_METHOD_SPEC)
+                            .add(GET_BY_ID_METHOD_SPEC)))
+                    .add(Json.createObjectBuilder()
+                        .add("path", "/bookstore")
+                        .add("operations", Json.createArrayBuilder().add(GET_METHOD_SPEC))))
+                .add("models", BOOK_MODEL_SPEC).build();
+            
             JsonObject received = Json.createReader((InputStream)r.getEntity()).readObject();
-            assertEquals(expected, received);
+            assertTrue(expected1.equals(received) || expected2.equals(received));
+
         } finally {
             client.close();
         }
