@@ -129,7 +129,7 @@
     <dependencyManagement>
         <dependencies>
             <!-- 
-            Pull in the cxf-parents as import scope to re-use the dependenecyManagement 
+            Pull in the cxf-parents as import scope to re-use the dependencyManagement
             sections of those poms.   Those sections define the versions of various third
             party deps that CXF used to build with and test with and we would like
             to make sure the same versions are used for the samples
@@ -157,7 +157,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.3</version>
+                    <version>3.6.1</version>
                     <configuration>
                         <source>1.8</source>
                         <target>1.8</target>
