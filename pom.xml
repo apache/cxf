@@ -140,7 +140,7 @@
     </developers>
     <ciManagement>
         <system>Jenkins</system>
-        <url>https://builds.apache.org/view/C/view/CXF/</url>
+        <url>https://builds.apache.org/view/A-D/view/CXF/</url>
         <notifiers>
             <notifier>
                 <type>mail</type>
