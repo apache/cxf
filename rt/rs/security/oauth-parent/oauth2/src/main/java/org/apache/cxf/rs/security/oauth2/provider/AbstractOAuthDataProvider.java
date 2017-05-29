@@ -213,7 +213,7 @@ public abstract class AbstractOAuthDataProvider implements OAuthDataProvider, Cl
         if (recycleRefreshTokens) {
             createNewRefreshToken(at);
         } else {
-            updateRefreshToken(currentRefreshToken, at);
+            updateExistingRefreshToken(currentRefreshToken, at);
         }
         return at;
     }
