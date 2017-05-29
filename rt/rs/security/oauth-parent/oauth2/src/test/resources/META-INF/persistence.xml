@@ -54,6 +54,7 @@
             <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema"/>
             <property name="openjpa.jdbc.EagerFetchMode" value="parallel"/>
             <property name="openjpa.MaxFetchDepth" value="20"/>
+            <property name="openjpa.jdbc.DBDictionary" value="SupportsSelectForUpdate=true"/>
             <!--
             <property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=TRACE, Tool=INFO"/>
             -->

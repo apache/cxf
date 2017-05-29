@@ -114,10 +114,9 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
                     }
                 }
                 boolean clientExists = em.createQuery("SELECT count(client) from Client client "
-                                + "where client.clientId = :id",
-                        Long.class)
+                                + "where client.clientId = :id", Long.class)
                         .setParameter("id", client.getClientId())
-                        .getSingleResult() > 0 ? true : false;
+                        .getSingleResult() > 0;
                 if (clientExists) {
                     em.merge(client);
                 } else {
@@ -321,8 +320,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     protected TypedQuery<BearerAccessToken> getTokensQuery(Client c, UserSubject resourceOwnerSubject,
                                                            EntityManager entityManager) {
         if (c == null && resourceOwnerSubject == null) {
-            return entityManager.createQuery("SELECT t FROM BearerAccessToken t",
-                    BearerAccessToken.class);
+            return entityManager.createQuery("SELECT t FROM BearerAccessToken t", BearerAccessToken.class);
         } else if (c == null) {
             return entityManager.createQuery(
                     "SELECT t FROM BearerAccessToken t"
@@ -349,8 +347,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     protected TypedQuery<RefreshToken> getRefreshTokensQuery(Client c, UserSubject resourceOwnerSubject,
                                                              EntityManager entityManager) {
         if (c == null && resourceOwnerSubject == null) {
-            return entityManager.createQuery("SELECT t FROM RefreshToken t",
-                    RefreshToken.class);
+            return entityManager.createQuery("SELECT t FROM RefreshToken t", RefreshToken.class);
         } else if (c == null) {
             return entityManager.createQuery(
                     "SELECT t FROM RefreshToken t"
