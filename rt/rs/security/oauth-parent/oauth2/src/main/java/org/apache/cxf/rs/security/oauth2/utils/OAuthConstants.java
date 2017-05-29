@@ -137,7 +137,7 @@ public final class OAuthConstants {
     public static final String TOKEN_ENDPOINT_AUTH_TLS = "tls_client_auth";
     // TLS Authentication Binding Properties
     public static final String TLS_CLIENT_AUTH_SUBJECT_DN = "tls_client_auth_subject_dn";
-    public static final String TLS_CLIENT_AUTH_ISSUER_DN = "tls_client_auth_issuer_dn";
+    public static final String TLS_CLIENT_AUTH_ISSUER_DN = "tls_client_auth_root_dn";
     
     // Authorization scheme constants, used internally by AccessTokenValidation client and service
     public static final String AUTHORIZATION_SCHEME_TYPE = "authScheme";
