@@ -19,16 +19,13 @@
 package org.apache.cxf.rs.security.oauth2.provider;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 
 import org.apache.cxf.helpers.CastUtils;
@@ -56,11 +53,6 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     private static final String CLIENT_QUERY = "SELECT client FROM Client client"
             + " INNER JOIN client.resourceOwnerSubject ros";
 
-    private static final int DEFAULT_PESSIMISTIC_LOCK_TIMEOUT = 10000;
-    
-    private int pessimisticLockTimeout = DEFAULT_PESSIMISTIC_LOCK_TIMEOUT;
-    private boolean useJpaLockForExistingRefreshToken = true;
-    
     private EntityManagerFactory entityManagerFactory;
 
     public void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -77,39 +69,6 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         });
     }
 
-    protected void lockRefreshTokenForUpdate(final RefreshToken refreshToken) {
-        try {
-            execute(new EntityManagerOperation<Void>() {
-
-                @Override
-                public Void execute(EntityManager em) {
-                    Map<String, Object> options = null;
-                    if (pessimisticLockTimeout > 0) {
-                        options = Collections.singletonMap("javax.persistence.lock.timeout", pessimisticLockTimeout);
-                    } else {
-                        options = Collections.emptyMap();
-                    }
-                    em.refresh(refreshToken, LockModeType.PESSIMISTIC_WRITE, options);
-                    return null;
-                }
-            });
-        } catch (IllegalArgumentException e) {
-            // entity is not managed yet. ignore
-        }
-    }
-        
-    @Override
-    protected RefreshToken updateExistingRefreshToken(RefreshToken rt, ServerAccessToken at) {
-        if (useJpaLockForExistingRefreshToken) {
-            // lock RT for update
-            lockRefreshTokenForUpdate(rt);
-            return super.updateRefreshToken(rt, at);
-        } else {
-            return super.updateExistingRefreshToken(rt, at);
-        }
-    }
-    
-    
     protected <T> T execute(EntityManagerOperation<T> operation) {
         EntityManager em = getEntityManager();
         T value;
@@ -456,14 +415,6 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
      */
     protected void closeIfNeeded(EntityManager em) {
         em.close();
-    }
-
-    public void setPessimisticLockTimeout(int pessimisticLockTimeout) {
-        this.pessimisticLockTimeout = pessimisticLockTimeout;
-    }
-
-    public void setUseJpaLockForExistingRefreshToken(boolean useJpaLockForExistingRefreshToken) {
-        this.useJpaLockForExistingRefreshToken = useJpaLockForExistingRefreshToken;
     }
 
     public interface EntityManagerOperation<T> {
