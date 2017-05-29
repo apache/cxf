@@ -115,7 +115,7 @@ public class JPACMTOAuthDataProviderTest extends JPAOAuthDataProviderTest {
         List<String> atl = rtl.get(0).getAccessTokens();
         assertNotNull(atl);
 
-        assertEquals(2, atl.size());
+        assertEquals(4, atl.size());
     }
 }
 
