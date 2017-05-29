@@ -19,16 +19,13 @@
 package org.apache.cxf.rs.security.oauth2.provider;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.LockModeType;
 import javax.persistence.TypedQuery;
 
 import org.apache.cxf.helpers.CastUtils;
@@ -47,20 +44,16 @@ import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
  * container managed persistence, you'll have to override
  * the following methods :
  * <ul>
- *     <li> {@link #getEntityManager()}</li>
- *     <li> {@link #commitIfNeeded(EntityManager)}</li>
- *     <li> {@link #closeIfNeeded(EntityManager)}</li>
+ * <li>{@link #getEntityManager()}</li>
+ * <li>{@link #commitIfNeeded(EntityManager)}</li>
+ * <li>{@link #closeIfNeeded(EntityManager)}</li>
  * </ul>
  */
 public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
+
     private static final String CLIENT_QUERY = "SELECT client FROM Client client"
             + " INNER JOIN client.resourceOwnerSubject ros";
 
-    private static final int DEFAULT_PESSIMISTIC_LOCK_TIMEOUT = 10000;
-    
-    private int pessimisticLockTimeout = DEFAULT_PESSIMISTIC_LOCK_TIMEOUT;
-    private boolean useJpaLockForExistingRefreshToken = true;
-    
     private EntityManagerFactory entityManagerFactory;
 
     public void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -70,6 +63,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     public Client doGetClient(final String clientId) throws OAuthServiceException {
         return execute(new EntityManagerOperation<Client>() {
+
             @Override
             public Client execute(EntityManager em) {
                 return em.find(Client.class, clientId);
@@ -77,40 +71,6 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         });
     }
 
-    protected void lockRefreshTokenForUpdate(final RefreshToken refreshToken) {
-        try {
-            execute(new EntityManagerOperation<Void>() {
-
-                @Override
-                public Void execute(EntityManager em) {
-                    Map<String, Object> options = null;
-                    if (pessimisticLockTimeout > 0) {
-                        options = Collections.<String, Object>singletonMap("javax.persistence.lock.timeout", 
-                                                                           pessimisticLockTimeout);
-                    } else {
-                        options = Collections.emptyMap();
-                    }
-                    em.refresh(refreshToken, LockModeType.PESSIMISTIC_WRITE, options);
-                    return null;
-                }
-            });
-        } catch (IllegalArgumentException e) {
-            // entity is not managed yet. ignore
-        }
-    }
-        
-    @Override
-    protected RefreshToken updateExistingRefreshToken(RefreshToken rt, ServerAccessToken at) {
-        if (useJpaLockForExistingRefreshToken) {
-            // lock RT for update
-            lockRefreshTokenForUpdate(rt);
-            return super.updateRefreshToken(rt, at);
-        } else {
-            return super.updateExistingRefreshToken(rt, at);
-        }
-    }
-    
-    
     protected <T> T execute(EntityManagerOperation<T> operation) {
         EntityManager em = getEntityManager();
         T value;
@@ -144,22 +104,22 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     public void setClient(final Client client) {
         executeInTransaction(new EntityManagerOperation<Void>() {
+
             @Override
             public Void execute(EntityManager em) {
                 if (client.getResourceOwnerSubject() != null) {
-                    UserSubject sub =
-                            em.find(UserSubject.class, client.getResourceOwnerSubject().getId());
+                    UserSubject sub = em.find(UserSubject.class, client.getResourceOwnerSubject().getId());
                     if (sub == null) {
                         em.persist(client.getResourceOwnerSubject());
                     } else {
                         client.setResourceOwnerSubject(sub);
                     }
                 }
-                boolean clientExists = em.createQuery("SELECT count(client) from Client client "
-                                + "where client.clientId = :id",
-                        Long.class)
+                boolean clientExists = em
+                        .createQuery("SELECT count(client) from Client client "
+                                + "where client.clientId = :id", Long.class)
                         .setParameter("id", client.getClientId())
-                        .getSingleResult() > 0 ? true : false;
+                        .getSingleResult() > 0;
                 if (clientExists) {
                     em.merge(client);
                 } else {
@@ -173,6 +133,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     protected void doRemoveClient(final Client c) {
         executeInTransaction(new EntityManagerOperation<Void>() {
+
             @Override
             public Void execute(EntityManager em) {
                 Client clientToRemove = em.getReference(Client.class, c.getClientId());
@@ -185,6 +146,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     public List<Client> getClients(final UserSubject resourceOwner) {
         return execute(new EntityManagerOperation<List<Client>>() {
+
             @Override
             public List<Client> execute(EntityManager em) {
                 return getClientsQuery(resourceOwner, em).getResultList();
@@ -195,6 +157,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     public List<ServerAccessToken> getAccessTokens(final Client c, final UserSubject sub) {
         return execute(new EntityManagerOperation<List<ServerAccessToken>>() {
+
             @Override
             public List<ServerAccessToken> execute(EntityManager em) {
                 return CastUtils.cast(getTokensQuery(c, sub, em).getResultList());
@@ -205,6 +168,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     public List<RefreshToken> getRefreshTokens(final Client c, final UserSubject sub) {
         return execute(new EntityManagerOperation<List<RefreshToken>>() {
+
             @Override
             public List<RefreshToken> execute(EntityManager em) {
                 return getRefreshTokensQuery(c, sub, em).getResultList();
@@ -215,6 +179,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     public ServerAccessToken getAccessToken(final String accessToken) throws OAuthServiceException {
         return execute(new EntityManagerOperation<ServerAccessToken>() {
+
             @Override
             public ServerAccessToken execute(EntityManager em) {
                 return em.find(BearerAccessToken.class, accessToken);
@@ -225,6 +190,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     protected void doRevokeAccessToken(final ServerAccessToken at) {
         executeInTransaction(new EntityManagerOperation<Void>() {
+
             @Override
             public Void execute(EntityManager em) {
                 ServerAccessToken tokenToRemove = em.getReference(at.getClass(), at.getTokenKey());
@@ -238,6 +204,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     protected void linkRefreshTokenToAccessToken(final RefreshToken rt, final ServerAccessToken at) {
         super.linkRefreshTokenToAccessToken(rt, at);
         executeInTransaction(new EntityManagerOperation<Void>() {
+
             @Override
             public Void execute(EntityManager em) {
                 em.merge(at);
@@ -249,6 +216,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     protected RefreshToken getRefreshToken(final String refreshTokenKey) {
         return execute(new EntityManagerOperation<RefreshToken>() {
+
             @Override
             public RefreshToken execute(EntityManager em) {
                 return em.find(RefreshToken.class, refreshTokenKey);
@@ -259,6 +227,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     @Override
     protected void doRevokeRefreshToken(final RefreshToken rt) {
         executeInTransaction(new EntityManagerOperation<Void>() {
+
             @Override
             public Void execute(EntityManager em) {
                 RefreshToken tokentoRemove = em.getReference(RefreshToken.class, rt.getTokenKey());
@@ -292,6 +261,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     protected void saveAccessToken(final ServerAccessToken serverToken) {
         executeInTransaction(new EntityManagerOperation<Void>() {
+
             @Override
             public Void execute(EntityManager em) {
                 List<OAuthPermission> perms = new LinkedList<OAuthPermission>();
@@ -333,6 +303,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     protected void persistEntity(final Object entity) {
         executeInTransaction(new EntityManagerOperation<Void>() {
+
             @Override
             public Void execute(EntityManager em) {
                 em.persist(entity);
@@ -343,6 +314,7 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
 
     protected void removeEntity(final Object entity) {
         executeInTransaction(new EntityManagerOperation<Void>() {
+
             @Override
             public Void execute(EntityManager em) {
                 em.remove(entity);
@@ -361,10 +333,9 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     protected TypedQuery<BearerAccessToken> getTokensQuery(Client c, UserSubject resourceOwnerSubject,
-                                                           EntityManager entityManager) {
+            EntityManager entityManager) {
         if (c == null && resourceOwnerSubject == null) {
-            return entityManager.createQuery("SELECT t FROM BearerAccessToken t",
-                    BearerAccessToken.class);
+            return entityManager.createQuery("SELECT t FROM BearerAccessToken t", BearerAccessToken.class);
         } else if (c == null) {
             return entityManager.createQuery(
                     "SELECT t FROM BearerAccessToken t"
@@ -389,10 +360,9 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
     }
 
     protected TypedQuery<RefreshToken> getRefreshTokensQuery(Client c, UserSubject resourceOwnerSubject,
-                                                             EntityManager entityManager) {
+            EntityManager entityManager) {
         if (c == null && resourceOwnerSubject == null) {
-            return entityManager.createQuery("SELECT t FROM RefreshToken t",
-                    RefreshToken.class);
+            return entityManager.createQuery("SELECT t FROM RefreshToken t", RefreshToken.class);
         } else if (c == null) {
             return entityManager.createQuery(
                     "SELECT t FROM RefreshToken t"
@@ -459,15 +429,8 @@ public class JPAOAuthDataProvider extends AbstractOAuthDataProvider {
         em.close();
     }
 
-    public void setPessimisticLockTimeout(int pessimisticLockTimeout) {
-        this.pessimisticLockTimeout = pessimisticLockTimeout;
-    }
-
-    public void setUseJpaLockForExistingRefreshToken(boolean useJpaLockForExistingRefreshToken) {
-        this.useJpaLockForExistingRefreshToken = useJpaLockForExistingRefreshToken;
-    }
-
     public interface EntityManagerOperation<T> {
+
         T execute(EntityManager em);
     }
 }

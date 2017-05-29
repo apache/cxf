@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
-import org.apache.cxf.rs.security.oauth2.provider.JPAOAuthDataProviderTest;
 import org.junit.runner.RunWith;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -38,7 +37,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("JPACMTCodeDataProvider.xml")
-@DirtiesContext
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ActiveProfiles(value = "openJPA", inheritProfiles = false)
-public class JPACMTOAuthDataProviderOpenJPATest extends JPAOAuthDataProviderTest {
+public class JPACMTOAuthDataProviderOpenJPATest extends JPACMTOAuthDataProviderTest {
 }
