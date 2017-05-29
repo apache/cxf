@@ -280,10 +280,36 @@ public class JPAOAuthDataProviderTest extends Assert {
         assertEquals("http://client/redirect", c.getRedirectUris().get(0));
         assertEquals(c.getResourceOwnerSubject().getLogin(), c2.getResourceOwnerSubject().getLogin());
     }
+    
+    protected void tearDownClient(String clientId) {
+        if (getProvider() == null) {
+            return;
+        }
+        Client client = getProvider().getClient(clientId);
+        if (client != null) {
+            List<RefreshToken> refreshTokens = getProvider().getRefreshTokens(client, null);
+            for (RefreshToken refreshToken : refreshTokens) {
+                getProvider().revokeToken(client, refreshToken.getTokenKey(), refreshToken.getTokenType());
+            }
+            List<ServerAccessToken> accessTokens = getProvider().getAccessTokens(client, null);
+            for (ServerAccessToken accessToken : accessTokens) {
+                getProvider().revokeToken(client, accessToken.getTokenKey(), accessToken.getTokenType());
+            }
+            getProvider().removeClient(clientId);
+        }
+    }
+
+    protected void tearDownClients() {
+        tearDownClient("101");
+        tearDownClient("12345");
+        tearDownClient("56789");
+        tearDownClient("09876");
+    }
 
     @After
     public void tearDown() throws Exception {
         try {
+            tearDownClients();
             if (provider != null) {
                 getProvider().close();
             }
