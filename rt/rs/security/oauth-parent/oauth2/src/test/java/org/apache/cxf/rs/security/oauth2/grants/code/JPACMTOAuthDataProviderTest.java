@@ -74,6 +74,7 @@ public class JPACMTOAuthDataProviderTest extends JPAOAuthDataProviderTest {
     @After
     @Override
     public void tearDown() {
+        tearDownClients();
     }
     
     @Test
