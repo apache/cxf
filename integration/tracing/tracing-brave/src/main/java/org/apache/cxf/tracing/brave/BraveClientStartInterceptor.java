@@ -23,7 +23,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.tracing.brave.AbstractBraveInterceptor.ParsedMessage;
 
-import brave.Span;
 import brave.http.HttpTracing;
 
 public class BraveClientStartInterceptor extends AbstractBraveClientInterceptor {
@@ -39,12 +38,11 @@ public class BraveClientStartInterceptor extends AbstractBraveClientInterceptor 
     public void handleMessage(Message message) throws Fault {
         final ParsedMessage parsed = new ParsedMessage(message);
 
-        final TraceScopeHolder<Span> holder = super.startTraceSpan(parsed.getHeaders(),
+        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(parsed.getHeaders(),
             parsed.getUri(), parsed.getHttpMethod());
 
         if (holder != null) {
             message.getExchange().put(TRACE_SPAN, holder);
         }
     }
-
 }

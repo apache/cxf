@@ -64,20 +64,17 @@ public abstract class AbstractBraveProvider extends AbstractTracingProvider {
                 .extractor(adapter::requestHeader), 
             request);
         
+        // If the service resource is using asynchronous processing mode, the trace
+        // scope will be closed in another thread and as such should be detached.
         SpanInScope scope = null;
-        if (span != null && !span.isNoop()) {
+        if (isAsyncResponse() && span != null) {
+           // Do not modify the current context span
+            propagateContinuationSpan(span);
+        } else if (span != null && !span.isNoop()) {
             scope = brave.tracing().tracer().withSpanInScope(span);
         }
 
-        // If the service resource is using asynchronous processing mode, the trace
-        // scope will be closed in another thread and as such should be detached.
-        boolean detached = false;
-        if (isAsyncResponse()) {
-            propagateContinuationSpan(span);
-            detached = true;
-        }
-
-        return new TraceScopeHolder<TraceScope>(new TraceScope(span, scope), detached);
+        return new TraceScopeHolder<TraceScope>(new TraceScope(span, scope), scope == null /* detached */);
     }
 
     protected void stopTraceSpan(final Map<String, List<String>> requestHeaders,

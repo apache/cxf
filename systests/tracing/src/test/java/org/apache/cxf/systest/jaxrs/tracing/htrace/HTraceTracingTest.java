@@ -20,10 +20,15 @@ package org.apache.cxf.systest.jaxrs.tracing.htrace;
 
 import java.net.MalformedURLException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -286,6 +291,77 @@ public class HTraceTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReceiver.getAllSpans().get(0).getDescription(), equalTo("Processing books"));
 
         assertThat((String)r.getHeaders().getFirst(TracerHeaders.DEFAULT_HEADER_SPAN_ID), equalTo(spanId.toString()));
+    }
+
+    @Test
+    public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleAsyncClients() throws Exception {
+        final WebClient client = createWebClient("/bookstore/books", htraceClientProvider);
+        
+        // The intention is to make a calls one after another, not in parallel, to ensure the
+        // thread have trace contexts cleared out.
+        final Collection<Response> responses = IntStream
+            .range(0, 4)
+            .mapToObj(index -> client.async().get())
+            .map(this::get)
+            .collect(Collectors.toList());
+
+        for (final Response r: responses) {
+            assertEquals(Status.OK.getStatusCode(), r.getStatus());
+            assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
+        }
+
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(12));
+        
+        IntStream
+            .range(0, 4)
+            .map(index -> index * 3)
+            .forEach(index -> {
+                assertThat(TestSpanReceiver.getAllSpans().get(index).getDescription(), 
+                    equalTo("Get Books"));
+                assertThat(TestSpanReceiver.getAllSpans().get(index + 1).getDescription(), 
+                    equalTo("GET bookstore/books"));
+                assertThat(TestSpanReceiver.getAllSpans().get(index + 2).getDescription(), 
+                    equalTo("GET " + client.getCurrentURI()));
+            });
+    }
+    
+    @Test
+    public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleClients() throws Exception {
+        final WebClient client = createWebClient("/bookstore/books", htraceClientProvider);
+        
+        // The intention is to make a calls one after another, not in parallel, to ensure the
+        // thread have trace contexts cleared out.
+        final Collection<Response> responses = IntStream
+            .range(0, 4)
+            .mapToObj(index -> client.get())
+            .collect(Collectors.toList());
+
+        for (final Response r: responses) {
+            assertEquals(Status.OK.getStatusCode(), r.getStatus());
+            assertTrue(r.getHeaders().containsKey(TracerHeaders.DEFAULT_HEADER_SPAN_ID));
+        }
+
+        assertThat(TestSpanReceiver.getAllSpans().size(), equalTo(12));
+        
+        IntStream
+            .range(0, 4)
+            .map(index -> index * 3)
+            .forEach(index -> {
+                assertThat(TestSpanReceiver.getAllSpans().get(index).getDescription(), 
+                    equalTo("Get Books"));
+                assertThat(TestSpanReceiver.getAllSpans().get(index + 1).getDescription(), 
+                    equalTo("GET bookstore/books"));
+                assertThat(TestSpanReceiver.getAllSpans().get(index + 2).getDescription(), 
+                    equalTo("GET " + client.getCurrentURI()));
+            });
+    }
+
+    private<T> T get(final Future<T> future) {
+        try {
+            return future.get(1, TimeUnit.HOURS);
+        } catch (InterruptedException | TimeoutException | ExecutionException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     protected WebClient createWebClient(final String url, final Object ... providers) {

@@ -20,9 +20,14 @@ package org.apache.cxf.systest.jaxrs.tracing.brave;
 
 import java.net.MalformedURLException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -235,6 +240,69 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleAsyncClients() throws Exception {
+        final WebClient client = createWebClient("/bookstore/books", braveClientProvider);
+        
+        // The intention is to make a calls one after another, not in parallel, to ensure the
+        // thread have trace contexts cleared out.
+        final Collection<Response> responses = IntStream
+            .range(0, 4)
+            .mapToObj(index -> client.async().get())
+            .map(this::get)
+            .collect(Collectors.toList());
+
+        for (final Response r: responses) {
+            assertEquals(Status.OK.getStatusCode(), r.getStatus());
+            assertThatTraceHeadersArePresent(r, false);
+        }
+
+        assertThat(TestSpanReporter.getAllSpans().size(), equalTo(12));
+        
+        IntStream
+            .range(0, 4)
+            .map(index -> index * 3)
+            .forEach(index -> {
+                assertThat(TestSpanReporter.getAllSpans().get(index).name, 
+                    equalTo("get books"));
+                assertThat(TestSpanReporter.getAllSpans().get(index + 1).name, 
+                    equalTo("get /bookstore/books"));
+                assertThat(TestSpanReporter.getAllSpans().get(index + 2).name, 
+                    equalTo("get " + client.getCurrentURI()));
+            });
+    }
+    
+    @Test
+    public void testThatNewSpansAreCreatedWhenNotProvidedUsingMultipleClients() throws Exception {
+        final WebClient client = createWebClient("/bookstore/books", braveClientProvider);
+        
+        // The intention is to make a calls one after another, not in parallel, to ensure the
+        // thread have trace contexts cleared out.
+        final Collection<Response> responses = IntStream
+            .range(0, 4)
+            .mapToObj(index -> client.get())
+            .collect(Collectors.toList());
+
+        for (final Response r: responses) {
+            assertEquals(Status.OK.getStatusCode(), r.getStatus());
+            assertThatTraceHeadersArePresent(r, false);
+        }
+
+        assertThat(TestSpanReporter.getAllSpans().size(), equalTo(12));
+        
+        IntStream
+            .range(0, 4)
+            .map(index -> index * 3)
+            .forEach(index -> {
+                assertThat(TestSpanReporter.getAllSpans().get(index).name, 
+                    equalTo("get books"));
+                assertThat(TestSpanReporter.getAllSpans().get(index + 1).name, 
+                    equalTo("get /bookstore/books"));
+                assertThat(TestSpanReporter.getAllSpans().get(index + 2).name, 
+                    equalTo("get " + client.getCurrentURI()));
+            });
+    }
+
+    @Test
     public void testThatProvidedSpanIsNotClosedWhenActive() throws MalformedURLException {
         final WebClient client = createWebClient("/bookstore/books", braveClientProvider);
         final Span span = brave.tracer().nextSpan().name("test span").start();
@@ -336,6 +404,14 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
             assertTrue(r.getHeaders().containsKey(PARENT_SPAN_ID_NAME));
         } else {
             assertFalse(r.getHeaders().containsKey(PARENT_SPAN_ID_NAME));
+        }
+    }
+    
+    private<T> T get(final Future<T> future) {
+        try {
+            return future.get(1, TimeUnit.HOURS);
+        } catch (InterruptedException | TimeoutException | ExecutionException ex) {
+            throw new RuntimeException(ex);
         }
     }
 

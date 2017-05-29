@@ -28,8 +28,8 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.tracing.brave.AbstractBraveClientProvider;
 import org.apache.cxf.tracing.brave.HttpClientSpanParser;
+import org.apache.cxf.tracing.brave.TraceScope;
 
-import brave.Span;
 import brave.Tracing;
 import brave.http.HttpTracing;
 
@@ -52,7 +52,7 @@ public class BraveClientProvider extends AbstractBraveClientProvider
 
     @Override
     public void filter(final ClientRequestContext requestContext) throws IOException {
-        final TraceScopeHolder<Span> holder = super.startTraceSpan(requestContext.getStringHeaders(),
+        final TraceScopeHolder<TraceScope> holder = super.startTraceSpan(requestContext.getStringHeaders(),
             requestContext.getUri(), requestContext.getMethod());
 
         if (holder != null) {
@@ -64,8 +64,8 @@ public class BraveClientProvider extends AbstractBraveClientProvider
     @Override
     public void filter(final ClientRequestContext requestContext,
             final ClientResponseContext responseContext) throws IOException {
-        final TraceScopeHolder<Span> holder =
-            (TraceScopeHolder<Span>)requestContext.getProperty(TRACE_SPAN);
+        final TraceScopeHolder<TraceScope> holder =
+            (TraceScopeHolder<TraceScope>)requestContext.getProperty(TRACE_SPAN);
         super.stopTraceSpan(holder, responseContext.getStatus());
     }
 }

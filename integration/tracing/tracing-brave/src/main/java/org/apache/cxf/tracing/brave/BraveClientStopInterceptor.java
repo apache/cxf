@@ -22,7 +22,6 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
-import brave.Span;
 import brave.http.HttpTracing;
 
 public class BraveClientStopInterceptor extends AbstractBraveClientInterceptor {
@@ -37,8 +36,8 @@ public class BraveClientStopInterceptor extends AbstractBraveClientInterceptor {
     @Override
     public void handleMessage(Message message) throws Fault {
         @SuppressWarnings("unchecked")
-        final TraceScopeHolder<Span> holder =
-            (TraceScopeHolder<Span>)message.getExchange().get(TRACE_SPAN);
+        final TraceScopeHolder<TraceScope> holder =
+            (TraceScopeHolder<TraceScope>)message.getExchange().get(TRACE_SPAN);
 
         Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
         if (responseCode == null) {
