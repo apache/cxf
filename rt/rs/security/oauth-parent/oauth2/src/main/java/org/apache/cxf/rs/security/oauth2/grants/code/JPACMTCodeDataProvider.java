@@ -18,12 +18,24 @@
  */
 package org.apache.cxf.rs.security.oauth2.grants.code;
 
+import java.util.Collections;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.LockModeType;
 import javax.persistence.PersistenceContext;
+
+import org.apache.cxf.rs.security.oauth2.common.ServerAccessToken;
+import org.apache.cxf.rs.security.oauth2.tokens.refresh.RefreshToken;
 
 public class JPACMTCodeDataProvider extends JPACodeDataProvider {
 
+    private static final int DEFAULT_PESSIMISTIC_LOCK_TIMEOUT = 10000;
+    
+    private int pessimisticLockTimeout = DEFAULT_PESSIMISTIC_LOCK_TIMEOUT;
+    private boolean useJpaLockForExistingRefreshToken = true;
+    
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -59,5 +71,46 @@ public class JPACMTCodeDataProvider extends JPACodeDataProvider {
      */
     @Override
     protected void closeIfNeeded(EntityManager em) {
+    }
+    
+    @Override
+    protected RefreshToken updateExistingRefreshToken(RefreshToken rt, ServerAccessToken at) {
+        if (useJpaLockForExistingRefreshToken) {
+            // lock RT for update
+            lockRefreshTokenForUpdate(rt);
+            return super.updateRefreshToken(rt, at);
+        } else {
+            return super.updateExistingRefreshToken(rt, at);
+        }
+    }
+    
+    protected void lockRefreshTokenForUpdate(final RefreshToken refreshToken) {
+        try {
+            execute(new EntityManagerOperation<Void>() {
+
+                @Override
+                public Void execute(EntityManager em) {
+                    Map<String, Object> options = null;
+                    if (pessimisticLockTimeout > 0) {
+                        options = Collections.<String, Object>singletonMap("javax.persistence.lock.timeout", 
+                                                                           pessimisticLockTimeout);
+                    } else {
+                        options = Collections.emptyMap();
+                    }
+                    em.refresh(refreshToken, LockModeType.PESSIMISTIC_WRITE, options);
+                    return null;
+                }
+            });
+        } catch (IllegalArgumentException e) {
+            // entity is not managed yet. ignore
+        }
+    }
+    
+    public void setPessimisticLockTimeout(int pessimisticLockTimeout) {
+        this.pessimisticLockTimeout = pessimisticLockTimeout;
+    }
+
+    public void setUseJpaLockForExistingRefreshToken(boolean useJpaLockForExistingRefreshToken) {
+        this.useJpaLockForExistingRefreshToken = useJpaLockForExistingRefreshToken;
     }
 }
