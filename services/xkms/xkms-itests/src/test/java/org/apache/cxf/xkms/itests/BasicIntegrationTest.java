@@ -57,15 +57,11 @@ public class BasicIntegrationTest {
 
     @Configuration
     public Option[] getConfig() {
-<<<<<<< HEAD
-        String karafVersion = System.getProperty("karaf.version", "3.0.4");
-=======
         String port = TestUtil.getPortNumber(BasicIntegrationTest.class);
         System.setProperty("BasicIntegrationTest.PORT", port);
         String xkmsEndpoint = "http://localhost:" + port + "/cxf/XKMS";
 
-        String karafVersion = System.getProperty("karaf.version", "4.0.8");
->>>>>>> da59b25117... Updating XKMS tests to use random ports
+        String karafVersion = System.getProperty("karaf.version", "3.0.4");
         String localRepository = System.getProperty("localRepository");
         MavenArtifactUrlReference karafUrl = maven() //
             .groupId("org.apache.karaf") //
