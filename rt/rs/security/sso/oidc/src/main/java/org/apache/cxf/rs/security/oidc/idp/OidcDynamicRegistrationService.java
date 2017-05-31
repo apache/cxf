@@ -27,22 +27,27 @@ import org.apache.cxf.rs.security.oauth2.services.ClientRegistrationResponse;
 import org.apache.cxf.rs.security.oauth2.services.DynamicRegistrationService;
 
 public class OidcDynamicRegistrationService extends DynamicRegistrationService {
-    private static final String RP_INITIATED_LOGOUT_URIS = "post_logout_redirect_uris";
+    private static final String POST_LOGOUT_LOGOUT_URIS = "post_logout_redirect_uris";
+    private static final String BACK_CHANNEL_LOGOUT_URI = "backchannel_logout_uri";
     private boolean protectIdTokenWithClientSecret;
 
     @Override
     protected Client createNewClient(ClientRegistration request) {
         Client client = super.createNewClient(request);
-        List<String> logoutUris = request.getListStringProperty(RP_INITIATED_LOGOUT_URIS);
-        if (logoutUris != null) {
+        List<String> postLogoutUris = request.getListStringProperty(POST_LOGOUT_LOGOUT_URIS);
+        if (postLogoutUris != null) {
             StringBuilder sb = new StringBuilder();
-            for (String uri : logoutUris) {
+            for (String uri : postLogoutUris) {
                 if (sb.length() > 0) {
                     sb.append(" ");
                 }
                 sb.append(uri);
             }
-            client.getProperties().put(RP_INITIATED_LOGOUT_URIS, sb.toString());
+            client.getProperties().put(POST_LOGOUT_LOGOUT_URIS, sb.toString());
+        }
+        String backChannelLogoutUri = request.getStringProperty(BACK_CHANNEL_LOGOUT_URI);
+        if (backChannelLogoutUri != null) {
+            client.getProperties().put(BACK_CHANNEL_LOGOUT_URI, backChannelLogoutUri);
         }
         return client;
     }
@@ -55,13 +60,13 @@ public class OidcDynamicRegistrationService extends DynamicRegistrationService {
     @Override
     protected ClientRegistration fromClientToClientRegistration(Client client) {
         ClientRegistration resp = super.fromClientToClientRegistration(client);
-        String logoutUris = client.getProperties().get(RP_INITIATED_LOGOUT_URIS);
+        String logoutUris = client.getProperties().get(POST_LOGOUT_LOGOUT_URIS);
         if (logoutUris != null) {
             List<String> list = new LinkedList<String>();
             for (String s : logoutUris.split(" ")) { 
                 list.add(s);
             }
-            resp.setProperty(RP_INITIATED_LOGOUT_URIS, list);
+            resp.setProperty(POST_LOGOUT_LOGOUT_URIS, list);
         }
         return resp;
     }
