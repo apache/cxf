@@ -18,12 +18,15 @@
  */
 package org.apache.cxf.systest.jaxrs.tracing;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -39,18 +42,17 @@ import javax.ws.rs.core.Response;
 import org.apache.cxf.systest.Book;
 import org.apache.cxf.tracing.Traceable;
 import org.apache.cxf.tracing.TracerContext;
-import org.apache.htrace.core.TraceScope;
 
 @Path("/bookstore/")
-public class BookStore {
+public class BookStore<T extends Closeable> {
     @Context private TracerContext tracer;
     private ExecutorService executor = Executors.newSingleThreadExecutor();
         
     @GET
     @Path("/books")
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection< Book > getBooks() {
-        try (TraceScope span =  tracer.startSpan("Get Books")) {
+    public Collection< Book > getBooks() throws IOException {
+        try (T span = tracer.startSpan("Get Books")) {
             return Arrays.asList(
                 new Book("Apache CXF in Action", UUID.randomUUID().toString()),
                 new Book("Mastering Apache CXF", UUID.randomUUID().toString())
@@ -144,8 +146,8 @@ public class BookStore {
     @PUT
     @Path("/process")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response processBooks() {
-        executor.submit(
+    public Response processBooks() throws InterruptedException {
+        final Future<Void> future = executor.submit(
             tracer.wrap("Processing books", new Traceable<Void>() {
                 @Override
                 public Void call(final TracerContext context) throws Exception {
@@ -155,6 +157,11 @@ public class BookStore {
             })
         );
         
+        if (!future.isDone()) {
+            // Just give it some time to have trace finished 
+            Thread.sleep(20);
+        }
+
         return Response.ok().build();
     }
 }

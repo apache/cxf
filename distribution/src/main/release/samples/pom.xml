@@ -120,6 +120,9 @@
         <module>ws_eventing</module>
         <module>throttling</module>
         <module>jax_rs/tracing_htrace</module>
+        <module>jax_rs/tracing_brave</module>
+        <module>jax_rs/tracing_brave_osgi</module>
+        <module>jaxws_tracing_brave_osgi</module>
     </modules>
     <dependencyManagement>
         <dependencies>

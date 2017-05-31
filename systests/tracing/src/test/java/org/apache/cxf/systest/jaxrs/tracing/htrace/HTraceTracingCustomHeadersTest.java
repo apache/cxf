@@ -43,6 +43,7 @@ import org.apache.htrace.core.AlwaysSampler;
 import org.apache.htrace.core.HTraceConfiguration;
 import org.apache.htrace.core.SpanId;
 import org.apache.htrace.core.StandardOutSpanReceiver;
+import org.apache.htrace.core.TraceScope;
 import org.apache.htrace.core.Tracer;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -72,7 +73,7 @@ public class HTraceTracingCustomHeadersTest extends AbstractBusClientServerTestB
             
             final JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
             sf.setResourceClasses(BookStore.class);
-            sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore()));
+            sf.setResourceProvider(BookStore.class, new SingletonResourceProvider(new BookStore<TraceScope>()));
             sf.setAddress("http://localhost:" + PORT);
             sf.setProvider(new JacksonJsonProvider());
             sf.setFeatures(Arrays.asList(new HTraceFeature(HTraceConfiguration.fromMap(properties), "test-tracer")));
