@@ -16,28 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxws.tracing;
+package org.apache.cxf.tracing.brave;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.UUID;
+import java.io.Closeable;
 
-import javax.jws.WebMethod;
-import javax.jws.WebService;
+import brave.Span;
+import brave.Tracer.SpanInScope;
+import brave.http.HttpTracing;
 
-import org.apache.cxf.systest.Book;
-import org.apache.htrace.core.TraceScope;
-import org.apache.htrace.core.Tracer;
+public class TraceScope implements Closeable {
+    private final Span span;
+    private final SpanInScope scope;
 
-@WebService(endpointInterface = "org.apache.cxf.systest.jaxws.tracing.BookStoreService", serviceName = "BookStore")
-public class BookStore implements BookStoreService {
-    @WebMethod
-    public Collection< Book > getBooks() {
-        try (TraceScope span = Tracer.curThreadTracer().newScope("Get Books")) {
-            return Arrays.asList(
-                new Book("Apache CXF in Action", UUID.randomUUID().toString()),
-                new Book("Mastering Apache CXF", UUID.randomUUID().toString())
-            );
+    TraceScope(final HttpTracing brave, final Span span) {
+        this(span, brave.tracing().tracer().withSpanInScope(span));
+    }
+
+    TraceScope(final Span span, final SpanInScope scope) {
+        this.span = span;
+        this.scope = scope;
+    }
+    
+    public Span getSpan() {
+        return span;
+    }
+
+    @Override
+    public void close() {
+        span.finish();
+        if (scope != null) {
+            scope.close();
         }
     }
 }

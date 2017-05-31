@@ -178,6 +178,7 @@
         <cxf.osgi.validation.api.version>1.1.0</cxf.osgi.validation.api.version>
         <cxf.hibernate.validator.version>5.2.2.Final</cxf.hibernate.validator.version>
         <cxf.glassfish.json.version>1.0.4</cxf.glassfish.json.version>
+        <cxf.johnzon.version>1.0.0</cxf.johnzon.version>
         <cxf.javax.el.version>3.0.0</cxf.javax.el.version>
         <!-- various OSGi related versions -->
         <cxf.aries.version>1.0.0</cxf.aries.version>
@@ -215,6 +216,10 @@
         <cxf.tika.version>1.14</cxf.tika.version>
         <cxf.jexl.version>2.1.1</cxf.jexl.version>
         <cxf.htrace.version>4.0.1-incubating</cxf.htrace.version>
+        <cxf.brave.version>4.3.1</cxf.brave.version>
+        <cxf.brave.zipkin.version>1.24.0</cxf.brave.zipkin.version>
+        <cxf.brave.reporter.version>0.9.0</cxf.brave.reporter.version>
+        <cxf.findbugs.version>3.0.2</cxf.findbugs.version>
         <cxf.checkstyle.extension />
         <cxf.jaxb.context.class />
         <cxf.jaxb.context.class.property>none</cxf.jaxb.context.class.property>
@@ -949,6 +954,12 @@
                 <groupId>org.glassfish</groupId>
                 <artifactId>javax.json</artifactId>
                 <version>${cxf.glassfish.json.version}</version>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.johnzon</groupId>
+                <artifactId>johnzon-core</artifactId>
+                <version>${cxf.johnzon.version}</version>
                 <optional>true</optional>
             </dependency>
             <dependency>
@@ -1905,6 +1916,16 @@
                 <groupId>org.apache.htrace</groupId>
                 <artifactId>htrace-core4</artifactId>
                 <version>${cxf.htrace.version}</version>
+            </dependency>
+            <dependency>
+                 <groupId>io.zipkin.brave</groupId>
+                 <artifactId>brave</artifactId>
+                 <version>${cxf.brave.version}</version>
+            </dependency>
+            <dependency>
+                 <groupId>io.zipkin.brave</groupId>
+                 <artifactId>brave-instrumentation-http</artifactId>
+                 <version>${cxf.brave.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.wss4j</groupId>
