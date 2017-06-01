@@ -353,8 +353,7 @@
             </plugin>
             <plugin>
         <groupId>org.jibx</groupId>
-        <artifactId>jibx-maven-plugin</artifactId>
-        <version>${cxf.jibx.version}</version>
+        <artifactId>maven-jibx-plugin</artifactId>
         <executions>
             <execution>
                 <id>generate-java-code-from-schema</id>
