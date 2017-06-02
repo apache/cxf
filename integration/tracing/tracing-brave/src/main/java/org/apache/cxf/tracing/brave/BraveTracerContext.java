@@ -54,7 +54,7 @@ public class BraveTracerContext implements TracerContext {
     public <T> T continueSpan(final Traceable<T> traceable) throws Exception {
         SpanInScope scope = null;
         
-        if (tracer.currentSpan() != null && continuationSpan != null) {
+        if (tracer.currentSpan() == null && continuationSpan != null) {
             scope = tracer.withSpanInScope(continuationSpan);
         }
 
@@ -76,8 +76,10 @@ public class BraveTracerContext implements TracerContext {
             }
         };
 
+        // Carry over parent from the current thread
+        final Span parent = tracer.currentSpan();
         return () -> {
-            try (TraceScope span = startSpan(description)) {
+            try (TraceScope span = newOrChildSpan(description, parent)) {
                 return callable.call();
             } 
         };
@@ -96,6 +98,14 @@ public class BraveTracerContext implements TracerContext {
         final Span current = tracer.currentSpan();
         if (current != null) {
             current.annotate(message);
+        }
+    }
+    
+    private TraceScope newOrChildSpan(final String description, final Span parent) {
+        if (parent == null) { 
+            return new TraceScope(brave, tracer.newTrace().name(description).start());
+        } else {
+            return new TraceScope(brave, tracer.newChild(parent.context()).name(description).start());
         }
     }
 }
