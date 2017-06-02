@@ -70,7 +70,42 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                    launchServer(BookServerSpring.class));
         createStaticBus();
     }
-    
+   
+    @Test
+    public void testGetServicesPageNotFound() throws Exception {
+        final String address = "http://localhost:" + PORT + "/the/services;a=b"; 
+        WebClient wc = WebClient.create(address).accept("text/*");
+        WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        Response response = wc.get();
+        String s = getStringFromInputStream((InputStream) response.getEntity());
+        assertNotNull(s);
+        assertTrue(s.contains("No service was found"));
+        assertFalse(s.contains(";a=b"));
+        assertEquals(404, response.getStatus());
+    }
+
+    @Test
+    public void testGetServicesPageWithServletPatternMatchOnly() throws Exception {
+        final String address = "http://localhost:" + PORT + "/the/;a=b"; 
+        WebClient wc = WebClient.create(address).accept("text/*");
+        String s = wc.get(String.class);
+        assertTrue(s.contains("href=\"/the/?stylesheet=1\""));
+        assertTrue(s.contains("<title>CXF - Service list</title>"));
+        assertFalse(s.contains(";a=b"));
+        assertTrue(s.contains("<a href=\"http://localhost:" + PORT + "/the/"));
+    }
+
+    @Test
+    public void testGetServicesPageWithServletPatternMatchOnly2() throws Exception {
+        final String address = "http://localhost:" + PORT + "/the;a=b;/services;a=b/;a=b"; 
+        WebClient wc = WebClient.create(address).accept("text/*");
+        String s = wc.get(String.class);
+        assertTrue(s.contains("href=\"/the/?stylesheet=1\""));
+        assertTrue(s.contains("<title>CXF - Service list</title>"));
+        assertFalse(s.contains(";a=b"));
+        assertTrue(s.contains("<a href=\"http://localhost:" + PORT + "/the/thebooks/bookstore"));
+    }
+
     @Test
     public void testGetGenericBook() throws Exception {
         String baseAddress = "http://localhost:" + PORT + "/the/thebooks8/books"; 
