@@ -85,7 +85,7 @@ public class JCacheCodeDataProvider extends JCacheOAuthDataProvider
             Cache.Entry<String, ServerAuthorizationCodeGrant> entry = it.next();
             ServerAuthorizationCodeGrant grant = entry.getValue();
 
-            if (!isExpired(grant)) {
+            if (isExpired(grant)) {
                 toRemove.add(entry.getKey());
             } else if (AbstractCodeDataProvider.isCodeMatched(grant, c, sub)) {
                 grants.add(grant);
