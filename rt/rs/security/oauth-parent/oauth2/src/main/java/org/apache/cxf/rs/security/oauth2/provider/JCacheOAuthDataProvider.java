@@ -227,7 +227,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
             Cache.Entry<K, V> entry = it.next();
             V token = entry.getValue();
 
-            if (!isExpired(token)) {
+            if (isExpired(token)) {
                 toRemove.add(entry.getKey());
             } else if (isTokenMatched(token, client, sub)) {
                 tokens.add(token);
@@ -251,7 +251,7 @@ public class JCacheOAuthDataProvider extends AbstractOAuthDataProvider {
             ServerAccessToken token = JwtTokenUtils.createAccessTokenFromJwt(theConsumer, jose, this,
                                                                                    super.getJwtAccessTokenClaimMap());
 
-            if (!isExpired(token)) {
+            if (isExpired(token)) {
                 toRemove.add(entry.getKey());
             } else if (isTokenMatched(token, client, sub)) {
                 tokens.add(token);
