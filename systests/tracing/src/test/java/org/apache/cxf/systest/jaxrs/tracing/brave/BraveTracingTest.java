@@ -195,6 +195,9 @@ public class BraveTracingTest extends AbstractBusClientServerTestBase {
         assertThat(TestSpanReporter.getAllSpans().size(), equalTo(2));
         assertThat(TestSpanReporter.getAllSpans().get(1).name, equalTo("get /bookstore/books/async"));
         assertThat(TestSpanReporter.getAllSpans().get(0).name, equalTo("processing books"));
+        assertThat(TestSpanReporter.getAllSpans().get(0).parentId, not(nullValue()));
+        assertThat(TestSpanReporter.getAllSpans().get(0).parentId, 
+            equalTo(TestSpanReporter.getAllSpans().get(1).id));
 
         assertThatTraceIsPresent(r, spanId);
     }

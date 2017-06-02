@@ -5,20 +5,13 @@ The demo shows a basic usage of Brave/OpenZipkin distributed tracer with REST ba
 Web Services using  JAX-RS 2.0 (JSR-339). The REST server provides the 
 following services: 
 
-A RESTful catalog service is provided on URL http://localhost:9000/catalog 
+A RESTful catalog service is provided on URL http://localhost:9000/catalog with 
+following endpoints available: 
 
-A HTTP GET request to URL http://localhost:8181/cxf/catalog generates following 
-traces:
-
-A HTTP POST request to URL http://localhost:8181/cxf/catalog generates following 
-traces:
-
-A HTTP GET request to URL http://localhost:8181/cxf/catalog/<id> generates following 
-traces:
-
-A HTTP DELETE request to URL http://localhost:8181/cxf/catalog/<id> generates following 
-traces:
-
+  GET http://localhost:8181/cxf/catalog 
+  POST http://localhost:8181/cxf/catalog 
+  GET http://localhost:8181/cxf/catalog/<id>
+  DELETE http://localhost:8181/cxf/catalog/<id>
 
 Building and running the demo using Maven
 ---------------------------------------
