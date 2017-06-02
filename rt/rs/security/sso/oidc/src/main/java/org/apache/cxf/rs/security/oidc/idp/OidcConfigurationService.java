@@ -37,6 +37,7 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
     // Optional RP initiated logout
     private boolean endSessionEndpointNotAvailable;
     private String endSessionEndpointAddress;
+    private boolean backchannelLogoutSupported;
 
     @Override
     protected void prepareConfigurationData(Map<String, Object> cfg, String baseUri) {
@@ -59,6 +60,10 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
             String theEndSessionEndpointAddress =
                 calculateEndpointAddress(endSessionEndpointAddress, baseUri, "/idp/logout");
             cfg.put("end_session_endpoint", theEndSessionEndpointAddress);
+        }
+        
+        if (isBackchannelLogoutSupported()) {
+            cfg.put("backchannel_logout_supported", Boolean.TRUE);
         }
     }
 
@@ -84,6 +89,14 @@ public class OidcConfigurationService extends AuthorizationMetadataService {
 
     public void setEndSessionEndpointAddress(String endSessionEndpointAddress) {
         this.endSessionEndpointAddress = endSessionEndpointAddress;
+    }
+
+    public boolean isBackchannelLogoutSupported() {
+        return backchannelLogoutSupported;
+    }
+
+    public void setBackchannelLogoutSupported(boolean backchannelLogoutSupported) {
+        this.backchannelLogoutSupported = backchannelLogoutSupported;
     }
 
 }
