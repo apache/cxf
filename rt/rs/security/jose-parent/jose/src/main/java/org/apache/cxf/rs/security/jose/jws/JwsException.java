@@ -28,7 +28,7 @@ public class JwsException extends JoseException {
         this(status, null);
     }
     public JwsException(Error status, Throwable cause) {
-        super(cause);
+        super(status != null ? status.toString() : null, cause);
         this.status = status;
     }
     public Error getError() {
