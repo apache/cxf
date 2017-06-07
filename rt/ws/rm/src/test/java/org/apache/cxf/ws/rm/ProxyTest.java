@@ -22,6 +22,7 @@ package org.apache.cxf.ws.rm;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.xml.datatype.Duration;
 
@@ -145,7 +146,8 @@ public class ProxyTest extends Assert {
     @Test
     public void testLastMessage() throws NoSuchMethodException, RMException {
         Method m = Proxy.class.getDeclaredMethod("invoke",
-            new Class[] {OperationInfo.class, ProtocolVariation.class, Object[].class, Map.class});
+            new Class[] {OperationInfo.class, ProtocolVariation.class, Object[].class,
+                         Map.class, Level.class});
         Proxy proxy = EasyMock.createMockBuilder(Proxy.class)
             .addMockedMethod(m).createMock(control);
         proxy.setReliableEndpoint(rme);
@@ -400,6 +402,6 @@ public class ProxyTest extends Assert {
         throws RMException {
         EasyMock.expect(proxy.invoke(EasyMock.same(oi), EasyMock.isA(ProtocolVariation.class),
             EasyMock.isA(Object[].class),
-            EasyMock.isA(Map.class))).andReturn(expectedReturn).anyTimes();
+            EasyMock.isA(Map.class), EasyMock.same(Level.FINER))).andReturn(expectedReturn).anyTimes();
     }
 }

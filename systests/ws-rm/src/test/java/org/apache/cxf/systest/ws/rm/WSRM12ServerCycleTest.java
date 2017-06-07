@@ -35,6 +35,7 @@ import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.ws.rm.RM11Constants;
 import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.feature.RMFeature;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
@@ -128,7 +129,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
         RMFeature feature = new RMFeature();
         feature.setRMAssertion(rmAssertion);
         feature.setDestinationPolicy(destinationPolicy);
-        //feature.setRMNamespace(RM11Constants.NAMESPACE_URI);
+        feature.setRMNamespace(RM11Constants.NAMESPACE_URI);
 
         return feature;
     }
@@ -165,7 +166,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
 
 
         control.stopGreeter(CFG);
-        control.startGreeter(CFG);
+        //control.startGreeter(CFG);
         
         // this will cause an exception as the sequence is no longer valid
         //greeter.greetMe("four");
