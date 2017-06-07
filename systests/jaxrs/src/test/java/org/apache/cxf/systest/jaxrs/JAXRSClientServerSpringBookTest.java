@@ -49,10 +49,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ProcessingInstruction;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.FileRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
@@ -64,6 +60,13 @@ import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.aegis.AegisElementProvider;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.apache.ws.commons.schema.constants.Constants;
 
 import org.junit.BeforeClass;
@@ -90,7 +93,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         Book book = wc.replaceHeader("Accept", "application/xml").query("id", 1L).get(Book.class);
         assertEquals("CXF", book.getName());
     }
-    
+
     @Test
     public void testGetDocuments() throws Exception {
         String baseAddress = "http://localhost:" + PORT + "/the/thedocs/resource/doc";
@@ -172,13 +175,13 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform4";
         doTestEchoBookForm(address);
     }
-    
+
     @Test
     public void testEchoBookForm5() throws Exception {
         String address = "http://localhost:" + PORT + "/bus/thebooksform/bookform5";
         doTestEchoBookForm(address);
     }
-    
+
     private void doTestEchoBookForm(String address) throws Exception {
         WebClient wc = WebClient.create(address);
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
@@ -995,24 +998,22 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     
     private void doPost(String endpointAddress, int expectedStatus, String contentType,
                         String inResource, String expectedResource) throws Exception {
-        
-        File input = new File(getClass().getResource(inResource).toURI());         
-        PostMethod post = new PostMethod(endpointAddress);
-        post.setRequestHeader("Content-Type", contentType);
-        RequestEntity entity = new FileRequestEntity(input, "text/xml");
-        post.setRequestEntity(entity);
-        HttpClient httpclient = new HttpClient();
-        
+        File input = new File(getClass().getResource(inResource).toURI());
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(endpointAddress);
+        post.setHeader("Content-Type", contentType);
+        post.setEntity(new FileEntity(input, ContentType.TEXT_XML));
+
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(expectedStatus, result);
-            
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(expectedStatus, response.getStatusLine().getStatusCode());
+
             if (expectedStatus != 400) {
                 InputStream expected = getClass().getResourceAsStream(expectedResource);
-                assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
-                             stripXmlInstructionIfNeeded(post.getResponseBodyAsString()));
+                assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
+                             stripXmlInstructionIfNeeded(EntityUtils.toString(response.getEntity())));
             } else {
-                assertTrue(post.getResponseBodyAsString()
+                assertTrue(EntityUtils.toString(response.getEntity())
                                .contains("Cannot find the declaration of element"));
             }
         } finally {

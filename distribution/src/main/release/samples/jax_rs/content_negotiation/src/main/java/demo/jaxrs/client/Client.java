@@ -19,8 +19,11 @@
 
 package demo.jaxrs.client;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 public final class Client {
 
@@ -30,15 +33,15 @@ public final class Client {
     public static void main(String args[]) throws Exception {
         // Sent HTTP GET request to query customer info, expect XML
         System.out.println("Sent HTTP GET request to query customer info, expect XML");
-        GetMethod get = new GetMethod("http://localhost:9000/customerservice/customers/123");
-        get.addRequestHeader("Accept", "application/xml");
-        HttpClient httpclient = new HttpClient();
+        HttpGet get = new HttpGet("http://localhost:9000/customerservice/customers/123");
+        get.addHeader("Accept", "application/xml");
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
         try {
-            int result = httpclient.executeMethod(get);
-            System.out.println("Response status code: " + result);
+            CloseableHttpResponse response = httpClient.execute(get);
+            System.out.println("Response status code: " + response.getStatusLine().getStatusCode());
             System.out.println("Response body: ");
-            System.out.println(get.getResponseBodyAsString());
+            System.out.println(EntityUtils.toString(response.getEntity()));
         } finally {
             get.releaseConnection();
         }
@@ -46,15 +49,15 @@ public final class Client {
         // Sent HTTP GET request to query customer info, expect JSON.
         System.out.println("\n");
         System.out.println("Sent HTTP GET request to query customer info, expect JSON");
-        get = new GetMethod("http://localhost:9000/customerservice/customers/123");
-        get.addRequestHeader("Accept", "application/json");
-        httpclient = new HttpClient();
+        get = new HttpGet("http://localhost:9000/customerservice/customers/123");
+        get.addHeader("Accept", "application/json");
+        httpClient = HttpClientBuilder.create().build();
 
         try {
-            int result = httpclient.executeMethod(get);
-            System.out.println("Response status code: " + result);
+            CloseableHttpResponse response = httpClient.execute(get);
+            System.out.println("Response status code: " + response.getStatusLine().getStatusCode());
             System.out.println("Response body: ");
-            System.out.println(get.getResponseBodyAsString());
+            System.out.println(EntityUtils.toString(response.getEntity()));
         } finally {
             get.releaseConnection();
         }
@@ -64,14 +67,14 @@ public final class Client {
         //The default behavior without setting Accept header explicitly is depending on your client.
         //In the case of  HTTP Client, the Accept header will be absent. The CXF server will treat this
         //as "*/*", XML format is returned
-        get = new GetMethod("http://localhost:9000/customerservice/customers/123");
-        httpclient = new HttpClient();
+        get = new HttpGet("http://localhost:9000/customerservice/customers/123");
+        httpClient = HttpClientBuilder.create().build();
 
         try {
-            int result = httpclient.executeMethod(get);
-            System.out.println("Response status code: " + result);
+            CloseableHttpResponse response = httpClient.execute(get);
+            System.out.println("Response status code: " + response.getStatusLine().getStatusCode());
             System.out.println("Response body: ");
-            System.out.println(get.getResponseBodyAsString());
+            System.out.println(EntityUtils.toString(response.getEntity()));
         } finally {
             get.releaseConnection();
         }

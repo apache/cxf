@@ -52,14 +52,6 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.FileRequestEntity;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.helpers.IOUtils;
@@ -76,7 +68,18 @@ import org.apache.cxf.systest.jaxrs.BookStore.BookInfoInterface;
 import org.apache.cxf.systest.jaxrs.BookStore.BookNotReturnedException;
 import org.apache.cxf.systest.jaxrs.CustomFaultInInterceptor.CustomRuntimeException;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -949,18 +952,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testPropogateException() throws Exception {       
-        GetMethod get = new GetMethod("http://localhost:" + PORT + "/bookstore/propagate-exception");
-        get.setRequestHeader("Accept", "application/xml");
-        get.addRequestHeader("Cookie", "a=b;c=d");
-        get.addRequestHeader("Cookie", "e=f");
-        get.setRequestHeader("Accept-Language", "da;q=0.8,en");
-        get.setRequestHeader("Book", "1,2,3");
-        HttpClient httpClient = new HttpClient();
+    public void testPropogateException() throws Exception {
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + PORT + "/bookstore/propagate-exception");
+        get.addHeader("Accept", "application/xml");
+        get.addHeader("Cookie", "a=b;c=d");
+        get.addHeader("Cookie", "e=f");
+        get.addHeader("Accept-Language", "da;q=0.8,en");
+        get.addHeader("Book", "1,2,3");
         try {
-            int result = httpClient.executeMethod(get);
-            assertEquals(500, result);
-            String content = getStringFromInputStream(get.getResponseBodyAsStream());
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(500, response.getStatusLine().getStatusCode());
+            String content = EntityUtils.toString(response.getEntity());
             if (!StringUtils.isEmpty(content)) {
                 assertTrue(content, content.contains("Error") && content.contains("500"));
             }
@@ -1082,7 +1085,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test 
     public void testAddBookProxyResponse() {
         Book b = new Book("CXF rocks", 123L);
-        
+
         System.out.println(Arrays.deepToString(Arrays.asList(b, b).toArray()));
         BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Response r = store.addBook(b);
@@ -1558,23 +1561,22 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String s = r.readEntity(String.class);
         assertTrue(s.equals(msg1) || s.equals(msg2));
     }
-    
-    @SuppressWarnings("deprecation")
+
     @Test
     public void testNoMessageReaderFound() throws Exception {
         
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/binarybooks";
 
-        PostMethod post = new PostMethod(endpointAddress);
-        post.setRequestHeader("Content-Type", "application/octet-stream");
-        post.setRequestHeader("Accept", "text/xml");
-        post.setRequestBody("Bar");
-        HttpClient httpclient = new HttpClient();
-        
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(endpointAddress);
+        post.addHeader("Content-Type", "application/octet-stream");
+        post.addHeader("Accept", "text/xml");
+        post.setEntity(new StringEntity("Bar"));
+
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(415, result);
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(415, response.getStatusLine().getStatusCode());
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
@@ -1586,14 +1588,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/unsupportedcontenttype";
 
-        PostMethod post = new PostMethod(endpointAddress);
-        post.setRequestHeader("Content-Type", "application/bar");
-        post.setRequestHeader("Accept", "text/xml");
-        HttpClient httpclient = new HttpClient();
-        
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(endpointAddress);
+        post.addHeader("Content-Type", "application/bar");
+        post.addHeader("Accept", "text/xml");
+
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(415, result);
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(415, response.getStatusLine().getStatusCode());
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
@@ -1643,19 +1645,19 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     private void checkBook(String address, boolean expected) throws Exception {
-        GetMethod get = new GetMethod(address);
-        get.setRequestHeader("Accept", "text/plain");
-        HttpClient httpclient = new HttpClient();
-        
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(address);
+        get.addHeader("Accept", "text/plain");
+
         try {
-            int result = httpclient.executeMethod(get);
-            assertEquals(200, result);
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(200, response.getStatusLine().getStatusCode());
             if (expected) {
                 assertEquals("Book must be available",
-                             "true", get.getResponseBodyAsString());
+                             "true", EntityUtils.toString(response.getEntity()));
             } else {
                 assertEquals("Book must not be available",
-                             "false", get.getResponseBodyAsString());
+                             "false", EntityUtils.toString(response.getEntity()));
             }
         } finally {
             // Release current connection to the connection pool once you are done
@@ -2274,13 +2276,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testAddBookNoBody() throws Exception {
-        PostMethod post = new PostMethod("http://localhost:" + PORT + "/bookstore/books");
-        post.setRequestHeader("Content-Type", "application/xml");
-        HttpClient httpclient = new HttpClient();
-        
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("http://localhost:" + PORT + "/bookstore/books");
+        post.addHeader("Content-Type", "application/xml");
+
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(400, result);
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(400, response.getStatusLine().getStatusCode());
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
@@ -2312,21 +2314,20 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     private void doAddBook(String address) throws Exception {
-        File input = new File(getClass().getResource("resources/add_book.txt").toURI());         
-        PostMethod post = new PostMethod(address);
-        post.setRequestHeader("Content-Type", "application/xml");
-        RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
-        post.setRequestEntity(entity);
-        HttpClient httpclient = new HttpClient();
-        
+        File input = new File(getClass().getResource("resources/add_book.txt").toURI());
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(address);
+        post.addHeader("Content-Type", "application/xml");
+        post.setEntity(new FileEntity(input, ContentType.TEXT_XML));
+
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(200, result);
-            
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(200, response.getStatusLine().getStatusCode());
+
             InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt");
-            
-            assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
-                         stripXmlInstructionIfNeeded(post.getResponseBodyAsString()));
+
+            assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
+                         stripXmlInstructionIfNeeded(EntityUtils.toString(response.getEntity())));
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
@@ -2351,17 +2352,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress = "http://localhost:" + PORT + "/bookstore/books";
 
         File input = new File(getClass().getResource("resources/update_book.txt").toURI());
-        PutMethod put = new PutMethod(endpointAddress);
-        RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
-        put.setRequestEntity(entity);
-        HttpClient httpclient = new HttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPut put = new HttpPut(endpointAddress);
+        put.setEntity(new FileEntity(input, ContentType.TEXT_XML));
 
         try {
-            int result = httpclient.executeMethod(put);
-            assertEquals(200, result);
+            CloseableHttpResponse response = client.execute(put);
+            assertEquals(200, response.getStatusLine().getStatusCode());
             InputStream expected = getClass().getResourceAsStream("resources/expected_update_book.txt");
-            assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
-                         stripXmlInstructionIfNeeded(getStringFromInputStream(put.getResponseBodyAsStream())));
+            assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
+                         stripXmlInstructionIfNeeded(EntityUtils.toString(response.getEntity())));
         } finally {
             // Release current connection to the connection pool once you are
             // done
@@ -2374,14 +2374,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress = "http://localhost:" + PORT + "/bookstore/bookswithdom";
 
         File input = new File(getClass().getResource("resources/update_book.txt").toURI());
-        PutMethod put = new PutMethod(endpointAddress);
-        RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
-        put.setRequestEntity(entity);
-        HttpClient httpclient = new HttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPut put = new HttpPut(endpointAddress);
+        put.setEntity(new FileEntity(input, ContentType.TEXT_XML));
         try {
-            int result = httpclient.executeMethod(put);
-            assertEquals(200, result);
-            String resp = put.getResponseBodyAsString();
+            CloseableHttpResponse response = client.execute(put);
+            assertEquals(200, response.getStatusLine().getStatusCode());
+            String resp = EntityUtils.toString(response.getEntity());
             InputStream expected = getClass().getResourceAsStream("resources/update_book.txt");
             String s = getStringFromInputStream(expected);
             //System.out.println(resp);
@@ -2399,17 +2398,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress = "http://localhost:" + PORT + "/bookstore/bookswithjson";
 
         File input = new File(getClass().getResource("resources/update_book_json.txt").toURI());
-        PutMethod put = new PutMethod(endpointAddress);
-        RequestEntity entity = new FileRequestEntity(input, "application/json; charset=ISO-8859-1");
-        put.setRequestEntity(entity);
-        HttpClient httpclient = new HttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPut put = new HttpPut(endpointAddress);
+        put.setEntity(new FileEntity(input, ContentType.APPLICATION_JSON));
 
         try {
-            int result = httpclient.executeMethod(put);
-            assertEquals(200, result);
+            CloseableHttpResponse response = client.execute(put);
+            assertEquals(200, response.getStatusLine().getStatusCode());
             InputStream expected = getClass().getResourceAsStream("resources/expected_update_book.txt");
-            assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)), 
-                         stripXmlInstructionIfNeeded(getStringFromInputStream(put.getResponseBodyAsStream())));
+            assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
+                         stripXmlInstructionIfNeeded(EntityUtils.toString(response.getEntity())));
         } finally {
             // Release current connection to the connection pool once you are
             // done
@@ -2422,21 +2420,20 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/books";
 
-        File input = new File(getClass().getResource("resources/update_book_not_exist.txt").toURI());         
-        PutMethod post = new PutMethod(endpointAddress);
-        RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
-        post.setRequestEntity(entity);
-        HttpClient httpclient = new HttpClient();
-        
+        File input = new File(getClass().getResource("resources/update_book_not_exist.txt").toURI());
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPut put = new HttpPut(endpointAddress);
+        put.setEntity(new FileEntity(input, ContentType.TEXT_XML));
+
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(304, result);
+            CloseableHttpResponse response = client.execute(put);
+            assertEquals(304, response.getStatusLine().getStatusCode());
         } finally {
             // Release current connection to the connection pool once you are done
-            post.releaseConnection();
-        }               
-    } 
-        
+            put.releaseConnection();
+        }
+    }
+
     @Test
     public void testGetCDs() throws Exception {
         
@@ -2456,23 +2453,22 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                "application/json", "application/json", 200);
         
     }
-    
-    @SuppressWarnings("deprecation")
+
     @Test
     public void testGetPlainLong() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/booksplain"; 
 
-        PostMethod post = new PostMethod(endpointAddress);
-        post.addRequestHeader("Content-Type", "text/plain");
-        post.addRequestHeader("Accept", "text/plain");
-        post.setRequestBody("12345");
-        HttpClient httpclient = new HttpClient();
-        
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(endpointAddress);
+        post.addHeader("Content-Type", "text/plain");
+        post.addHeader("Accept", "text/plain");
+        post.setEntity(new StringEntity("12345"));
+
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(200, result);
-            assertEquals(post.getResponseBodyAsString(), "12345");
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(200, response.getStatusLine().getStatusCode());
+            assertEquals(EntityUtils.toString(response.getEntity()), "12345");
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
@@ -2484,16 +2480,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/books/123"; 
 
-        DeleteMethod post = new DeleteMethod(endpointAddress);
-        HttpClient httpclient = new HttpClient();
-        
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpDelete delete = new HttpDelete(endpointAddress);
+
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(200, result);
+            CloseableHttpResponse response = client.execute(delete);
+            assertEquals(200, response.getStatusLine().getStatusCode());
         } finally {
             // Release current connection to the connection pool once you are done
-            post.releaseConnection();
-        }  
+            delete.releaseConnection();
+        }
     }
     
     @Test
@@ -2501,16 +2497,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/books/id?value=123"; 
 
-        DeleteMethod post = new DeleteMethod(endpointAddress);
-        HttpClient httpclient = new HttpClient();
-        
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpDelete delete = new HttpDelete(endpointAddress);
+
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(200, result);
+            CloseableHttpResponse response = client.execute(delete);
+            assertEquals(200, response.getStatusLine().getStatusCode());
         } finally {
             // Release current connection to the connection pool once you are done
-            post.releaseConnection();
-        }  
+            delete.releaseConnection();
+        }
     }
     
     @Test
@@ -2519,20 +2515,20 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstore/cds"; 
 
-        GetMethod get = new GetMethod(endpointAddress);
-        get.addRequestHeader("Accept", "application/json");
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(endpointAddress);
+        get.addHeader("Accept", "application/json");
 
-        HttpClient httpclient = new HttpClient();
-        
         try {
-            int result = httpclient.executeMethod(get);
-            assertEquals(200, result);
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(200, response.getStatusLine().getStatusCode());
 
             InputStream expected123 = getClass().getResourceAsStream("resources/expected_get_cdsjson123.txt");
             InputStream expected124 = getClass().getResourceAsStream("resources/expected_get_cdsjson124.txt");
-            
-            assertTrue(get.getResponseBodyAsString().indexOf(getStringFromInputStream(expected123)) >= 0);
-            assertTrue(get.getResponseBodyAsString().indexOf(getStringFromInputStream(expected124)) >= 0);
+
+            String content = EntityUtils.toString(response.getEntity());
+            assertTrue(content.indexOf(getStringFromInputStream(expected123)) >= 0);
+            assertTrue(content.indexOf(getStringFromInputStream(expected124)) >= 0);
 
         } finally {
             // Release current connection to the connection pool once you are done
@@ -2716,28 +2712,29 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                String acceptType,
                                String expectedContentType,
                                int expectedStatus) throws Exception {
-        GetMethod get = new GetMethod(address);
-        get.setRequestHeader("Accept", acceptType);
-        get.addRequestHeader("Cookie", "a=b;c=d");
-        get.addRequestHeader("Cookie", "e=f");
-        get.setRequestHeader("Accept-Language", "da;q=0.8,en");
-        get.setRequestHeader("Book", "1,2,3");
-        HttpClient httpClient = new HttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(address);
+        get.addHeader("Accept", acceptType);
+        get.addHeader("Cookie", "a=b;c=d");
+        get.addHeader("Cookie", "e=f");
+        get.addHeader("Accept-Language", "da;q=0.8,en");
+        get.addHeader("Book", "1,2,3");
+
         try {
-            int result = httpClient.executeMethod(get);
-            assertEquals(expectedStatus, result);
-            String content = getStringFromInputStream(get.getResponseBodyAsStream());
-            assertEquals("Expected value is wrong", 
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(expectedStatus, response.getStatusLine().getStatusCode());
+            String content = EntityUtils.toString(response.getEntity());
+            assertEquals("Expected value is wrong",
                          stripXmlInstructionIfNeeded(expectedValue), stripXmlInstructionIfNeeded(content));
             if (expectedStatus == 200) {
-                assertEquals("123", get.getResponseHeader("BookId").getValue());
-                assertNotNull(get.getResponseHeader("Date"));
+                assertEquals("123", response.getFirstHeader("BookId").getValue());
+                assertNotNull(response.getFirstHeader("Date"));
             }
             if (expectedStatus == 405) {
-                assertNotNull(get.getResponseHeader("Allow"));
+                assertNotNull(response.getFirstHeader("Allow"));
             }
             if (expectedContentType != null) {
-                Header ct = get.getResponseHeader("Content-Type");
+                Header ct = response.getFirstHeader("Content-Type");
                 assertEquals("Wrong type of response", expectedContentType, ct.getValue());
             }
         } finally {

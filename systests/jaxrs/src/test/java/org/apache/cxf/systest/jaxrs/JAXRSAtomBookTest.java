@@ -30,14 +30,18 @@ import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONObject;
 
 import org.junit.BeforeClass;
@@ -112,18 +116,17 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         Entry e = createBookEntry(256, "AtomBook");
         StringWriter w = new StringWriter();
         e.writeTo(w);
-        
-        PostMethod post = new PostMethod(endpointAddress);
-        post.setRequestEntity(
-             new StringRequestEntity(w.toString(), "application/atom+xml", null));
-        HttpClient httpclient = new HttpClient();
-        
+
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(endpointAddress);
+        post.setEntity(new StringEntity(w.toString(), ContentType.APPLICATION_ATOM_XML));
+
         String location = null;
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(201, result);
-            location = post.getResponseHeader("Location").getValue();
-            InputStream ins = post.getResponseBodyAsStream();
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(201, response.getStatusLine().getStatusCode());
+            location = response.getFirstHeader("Location").getValue();
+            InputStream ins = response.getEntity().getContent();
             Document<Entry> entryDoc = abdera.getParser().parse(copyIn(ins));
             assertEquals(entryDoc.getRoot().toString(), e.toString());
         } finally {
@@ -170,13 +173,11 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     private void getAndCompareJson(String address, 
                                    String resourcePath,
                                    String type) throws Exception {
-        GetMethod get = new GetMethod(address);
-        get.setRequestHeader("Content-Type", "*/*");
-        get.setRequestHeader("Accept", type);
-        HttpClient httpClient = new HttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(address);
+        get.setHeader("Content-Type", "*/*");
+        get.setHeader("Accept", type);
         try {
-            httpClient.executeMethod(get);           
-            String jsonContent = getStringFromInputStream(get.getResponseBodyAsStream());
             String expected = getStringFromInputStream(
                   getClass().getResourceAsStream(resourcePath));
             expected = expected.replaceAll("9080", PORT);
@@ -216,15 +217,15 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     }   
     
     private Feed getFeed(String endpointAddress, String acceptType) throws Exception {
-        GetMethod get = new GetMethod(endpointAddress);
-        get.setRequestHeader("Content-Type", "*/*");
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(endpointAddress);
+        get.setHeader("Content-Type", "*/*");
         if (acceptType != null) {
-            get.setRequestHeader("Accept", acceptType);
+            get.setHeader("Accept", acceptType);
         }
-        HttpClient httpClient = new HttpClient();
         try {
-            httpClient.executeMethod(get);           
-            Document<Feed> doc = abdera.getParser().parse(copyIn(get.getResponseBodyAsStream()));
+            CloseableHttpResponse response = client.execute(get);
+            Document<Feed> doc = abdera.getParser().parse(copyIn(response.getEntity().getContent()));
             return doc.getRoot();
         } finally {
             get.releaseConnection();
@@ -232,15 +233,15 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     }
     
     private Entry getEntry(String endpointAddress, String acceptType) throws Exception {
-        GetMethod get = new GetMethod(endpointAddress);
-        get.setRequestHeader("Content-Type", "*/*");
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(endpointAddress);
+        get.setHeader("Content-Type", "*/*");
         if (acceptType != null) {
-            get.setRequestHeader("Accept", acceptType);
+            get.setHeader("Accept", acceptType);
         }
-        HttpClient httpClient = new HttpClient();
         try {
-            httpClient.executeMethod(get);           
-            Document<Entry> doc = abdera.getParser().parse(copyIn(get.getResponseBodyAsStream()));
+            CloseableHttpResponse response = client.execute(get);
+            Document<Entry> doc = abdera.getParser().parse(copyIn(response.getEntity().getContent()));
             return doc.getRoot();
         } finally {
             get.releaseConnection();

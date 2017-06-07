@@ -24,11 +24,13 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -74,14 +76,14 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
     }
     
     private void checkBook(String address, String id, String expected) throws Exception {
-        GetMethod get = new GetMethod(address);
-        HttpClient httpclient = new HttpClient();
-        
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(address);
+
         try {
-            int result = httpclient.executeMethod(get);
-            assertEquals(200, result);
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(200, response.getStatusLine().getStatusCode());
             assertEquals("Book description for id " + id + " is wrong",
-                         expected, get.getResponseBodyAsString());
+                         expected, EntityUtils.toString(response.getEntity()));
         } finally {
             // Release current connection to the connection pool once you are done
             get.releaseConnection();
@@ -128,15 +130,15 @@ public class JAXRSCxfContinuationsTest extends AbstractBusClientServerTestBase {
     @Test
     public void testEncodedURL() throws Exception {
         String id = "A%20B%20C"; // "A B C"
-        GetMethod get = new GetMethod("http://localhost:" + PORT + "/bookstore/books/" + id);
-        HttpClient httpclient = new HttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + PORT + "/bookstore/books/" + id);
 
         try {
-            int result = httpclient.executeMethod(get);
+            CloseableHttpResponse response = client.execute(get);
             assertEquals("Encoded path '/" + id + "' is not handled successfully",
-                         200, result);
+                         200,  response.getStatusLine().getStatusCode());
             assertEquals("Book description for id " + id + " is wrong",
-                         "CXF in Action A B C", get.getResponseBodyAsString());
+                         "CXF in Action A B C", EntityUtils.toString(response.getEntity()));
         } finally {
             // Release current connection to the connection pool once you are done
             get.releaseConnection();

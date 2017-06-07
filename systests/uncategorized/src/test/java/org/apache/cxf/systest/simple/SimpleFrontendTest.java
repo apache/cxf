@@ -19,13 +19,16 @@
 
 package org.apache.cxf.systest.simple;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.systest.simple.impl.WSSimpleImpl;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -59,10 +62,10 @@ public class SimpleFrontendTest extends Assert {
 
     @Test
     public void testGetWSDL() throws Exception {
-        GetMethod getMethod = new GetMethod("http://localhost:" + PORT1 + "/test11?wsdl");
-        HttpClient httpClient = new HttpClient();
-        httpClient.executeMethod(getMethod);
-        String response = getMethod.getResponseBodyAsString();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet("http://localhost:" + PORT1 + "/test11?wsdl");
+        CloseableHttpResponse httpResponse = client.execute(get);
+        String response = EntityUtils.toString(httpResponse.getEntity());
         assertFalse(response.indexOf("import") >= 0);
         assertFalse(response.indexOf("?wsdl?wsdl") >= 0);
     }
