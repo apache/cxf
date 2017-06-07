@@ -178,6 +178,8 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
         get.setHeader("Content-Type", "*/*");
         get.setHeader("Accept", type);
         try {
+            CloseableHttpResponse response = client.execute(get);
+            String jsonContent = EntityUtils.toString(response.getEntity());
             String expected = getStringFromInputStream(
                   getClass().getResourceAsStream(resourcePath));
             expected = expected.replaceAll("9080", PORT);
