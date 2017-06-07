@@ -29,12 +29,13 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -195,13 +196,13 @@ public abstract class AbstractJAXRSContinuationsTest extends AbstractBusClientSe
     }
 
     private void checkBook(String address, String id, String expected) throws Exception {
-        GetMethod get = new GetMethod(address);
-        HttpClient httpclient = new HttpClient();
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(address);
         try {
-            int result = httpclient.executeMethod(get);
-            assertEquals(200, result);
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(200, response.getStatusLine().getStatusCode());
             assertEquals("Book description for id " + id + " is wrong",
-                         expected, IOUtils.toString(get.getResponseBodyAsStream()));
+                         expected, EntityUtils.toString(response.getEntity()));
         } finally {
             // Release current connection to the connection pool once you are done
             get.releaseConnection();

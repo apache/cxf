@@ -30,7 +30,6 @@
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <httpclient.version>3.1</httpclient.version>
     </properties>
     <profiles>
         <profile>
@@ -120,10 +119,6 @@
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
         </dependency>                    
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-        </dependency>                
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>

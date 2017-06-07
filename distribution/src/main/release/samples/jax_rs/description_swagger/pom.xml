@@ -31,7 +31,6 @@
 
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <httpclient.version>3.1</httpclient.version>
     </properties>
 
     <profiles>
@@ -147,10 +146,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>                        
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-        </dependency>                
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>

@@ -21,11 +21,14 @@ package org.apache.cxf.systest.jaxrs.security;
 
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 public abstract class AbstractSpringSecurityTest extends AbstractBusClientServerTestBase {
 
@@ -41,16 +44,16 @@ public abstract class AbstractSpringSecurityTest extends AbstractBusClientServer
                          int expectedStatus)
         throws Exception {
 
-        GetMethod get = new GetMethod(endpointAddress);
-        get.setRequestHeader("Accept", "application/xml");
-        get.setRequestHeader("Authorization",
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpGet get = new HttpGet(endpointAddress);
+        get.addHeader("Accept", "application/xml");
+        get.addHeader("Authorization",
                              "Basic " + base64Encode(user + ":" + password));
-        HttpClient httpClient = new HttpClient();
         try {
-            int result = httpClient.executeMethod(get);
-            assertEquals(expectedStatus, result);
+            CloseableHttpResponse response = client.execute(get);
+            assertEquals(expectedStatus, response.getStatusLine().getStatusCode());
             if (expectedStatus == 200) {
-                String content = getStringFromInputStream(get.getResponseBodyAsStream());
+                String content = EntityUtils.toString(response.getEntity());
                 String resource = "/org/apache/cxf/systest/jaxrs/resources/expected_get_book123.txt";
                 InputStream expected = getClass().getResourceAsStream(resource);
                 assertEquals("Expected value is wrong",

@@ -31,7 +31,6 @@
     <properties>
         <cxf.version>${project.version}</cxf.version>
         <cxf.lucene.version>4.9.0</cxf.lucene.version>
-        <httpclient.version>3.1</httpclient.version>
     </properties>
     <profiles>
         <profile>
@@ -151,17 +150,22 @@
             <artifactId>commons-lang3</artifactId>
         </dependency>                        
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-        </dependency>                
-        <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>    
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.5.3</version>
+        </dependency>    
     </dependencies>
     <repositories>
         <repository>

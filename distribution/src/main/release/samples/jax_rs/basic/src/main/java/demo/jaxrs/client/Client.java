@@ -23,15 +23,17 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.FileRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.resource.URIResolver;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 public final class Client {
 
@@ -67,16 +69,15 @@ public final class Client {
         String inputFile = client.getClass().getResource("/update_customer.xml").getFile();
         URIResolver resolver = new URIResolver(inputFile);
         File input = new File(resolver.getURI());
-        PutMethod put = new PutMethod("http://localhost:9000/customerservice/customers");
-        RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
-        put.setRequestEntity(entity);
-        HttpClient httpclient = new HttpClient();
 
+        HttpPut put = new HttpPut("http://localhost:9000/customerservice/customers");
+        put.setEntity(new FileEntity(input, ContentType.TEXT_XML));
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         try {
-            int result = httpclient.executeMethod(put);
-            System.out.println("Response status code: " + result);
+            CloseableHttpResponse response = httpClient.execute(put);
+            System.out.println("Response status code: " + response.getStatusLine().getStatusCode());
             System.out.println("Response body: ");
-            System.out.println(put.getResponseBodyAsString());
+            System.out.println(EntityUtils.toString(response.getEntity()));
         } finally {
             // Release current connection to the connection pool once you are
             // done
@@ -89,17 +90,17 @@ public final class Client {
         inputFile = client.getClass().getResource("/add_customer.xml").getFile();
         resolver = new URIResolver(inputFile);
         input = new File(resolver.getURI());
-        PostMethod post = new PostMethod("http://localhost:9000/customerservice/customers");
-        post.addRequestHeader("Accept", "text/xml");
-        entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
-        post.setRequestEntity(entity);
-        httpclient = new HttpClient();
+
+        HttpPost post = new HttpPost("http://localhost:9000/customerservice/customers");
+        post.addHeader("Accept", "text/xml");
+        post.setEntity(new FileEntity(input, ContentType.TEXT_XML));
+        httpClient = HttpClientBuilder.create().build();
 
         try {
-            int result = httpclient.executeMethod(post);
-            System.out.println("Response status code: " + result);
+            CloseableHttpResponse response = httpClient.execute(post);
+            System.out.println("Response status code: " + response.getStatusLine().getStatusCode());
             System.out.println("Response body: ");
-            System.out.println(post.getResponseBodyAsString());
+            System.out.println(EntityUtils.toString(response.getEntity()));
         } finally {
             // Release current connection to the connection pool once you are
             // done

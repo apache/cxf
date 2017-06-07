@@ -44,14 +44,6 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
 import org.apache.cxf.helpers.FileUtils;
@@ -66,7 +58,14 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
-
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -881,14 +880,14 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testMultipartRequestNoBody() throws Exception {
-        PostMethod post = new PostMethod("http://localhost:" + PORT + "/bookstore/books/image");
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("http://localhost:" + PORT + "/bookstore/books/image");
         String ct = "multipart/mixed";
-        post.setRequestHeader("Content-Type", ct);
-        HttpClient httpclient = new HttpClient();
+        post.setHeader("Content-Type", ct);
 
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(400, result);
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(400, response.getStatusLine().getStatusCode());
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
@@ -897,44 +896,41 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testMultipartRequestTooLarge() throws Exception {
-        PostMethod post = new PostMethod("http://localhost:" + PORT + "/bookstore/books/image");
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("http://localhost:" + PORT + "/bookstore/books/image");
         String ct = "multipart/mixed";
-        post.setRequestHeader("Content-Type", ct);
-        Part[] parts = new Part[1];
-        parts[0] = new FilePart("image",
-                new ByteArrayPartSource("testfile.png", new byte[1024 * 11]),
-                "image/png", null);
-        post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
+        post.setHeader("Content-Type", ct);
 
-        HttpClient httpclient = new HttpClient();
+        MultipartEntity entity = new MultipartEntity();
+        entity.addPart("image", new ByteArrayBody(new byte[1024 * 11], "testfile.png"));
+
+        post.setEntity(entity);
 
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(413, result);
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(413, response.getStatusLine().getStatusCode());
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
         }
     }
+
     @Test
     public void testMultipartRequestTooLargeManyParts() throws Exception {
-        PostMethod post = new PostMethod("http://localhost:" + PORT + "/bookstore/books/image");
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("http://localhost:" + PORT + "/bookstore/books/image");
         String ct = "multipart/mixed";
-        post.setRequestHeader("Content-Type", ct);
-        Part[] parts = new Part[2];
-        parts[0] = new FilePart("image",
-                new ByteArrayPartSource("testfile.png", new byte[1024 * 9]),
-                "image/png", null);
-        parts[1] = new FilePart("image",
-                new ByteArrayPartSource("testfile2.png", new byte[1024 * 11]),
-                "image/png", null);
-        post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
+        post.setHeader("Content-Type", ct);
 
-        HttpClient httpclient = new HttpClient();
+        MultipartEntity entity = new MultipartEntity();
+        entity.addPart("image", new ByteArrayBody(new byte[1024 * 9], "testfile.png"));
+        entity.addPart("image", new ByteArrayBody(new byte[1024 * 11], "testfile2.png"));
+
+        post.setEntity(entity);
 
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(413, result);
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(413, response.getStatusLine().getStatusCode());
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
@@ -952,24 +948,22 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     private void doAddBook(String type, String address, InputStream is, int status) throws Exception {
 
-        PostMethod post = new PostMethod(address);
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(address);
 
         String ct = type + "; type=\"text/xml\"; " + "start=\"rootPart\"; "
             + "boundary=\"----=_Part_4_701508.1145579811786\"";
-        post.setRequestHeader("Content-Type", ct);
+        post.setHeader("Content-Type", ct);
 
-
-        RequestEntity entity = new InputStreamRequestEntity(is);
-        post.setRequestEntity(entity);
-        HttpClient httpclient = new HttpClient();
+        post.setEntity(new InputStreamEntity(is));
 
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(status, result);
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(status, response.getStatusLine().getStatusCode());
             if (status == 200) {
                 InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt");
                 assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
-                             stripXmlInstructionIfNeeded(post.getResponseBodyAsString()));
+                             stripXmlInstructionIfNeeded(EntityUtils.toString(response.getEntity())));
             }
         } finally {
             // Release current connection to the connection pool once you are done
@@ -978,23 +972,22 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
 
     private void doAddFormBook(String address, String resourceName, int status) throws Exception {
-        PostMethod post = new PostMethod(address);
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(address);
 
         String ct = "multipart/form-data; boundary=bqJky99mlBWa-ZuqjC53mG6EzbmlxB";
-        post.setRequestHeader("Content-Type", ct);
+        post.setHeader("Content-Type", ct);
         InputStream is =
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/" + resourceName);
-        RequestEntity entity = new InputStreamRequestEntity(is);
-        post.setRequestEntity(entity);
-        HttpClient httpclient = new HttpClient();
+        post.setEntity(new InputStreamEntity(is));
 
         try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(status, result);
+            CloseableHttpResponse response = client.execute(post);
+            assertEquals(status, response.getStatusLine().getStatusCode());
             if (status == 200) {
                 InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt");
                 assertEquals(stripXmlInstructionIfNeeded(getStringFromInputStream(expected)),
-                             stripXmlInstructionIfNeeded(post.getResponseBodyAsString()));
+                             stripXmlInstructionIfNeeded(EntityUtils.toString(response.getEntity())));
             }
         } finally {
             // Release current connection to the connection pool once you are done
