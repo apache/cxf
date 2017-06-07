@@ -35,6 +35,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.jaxb.JAXBContextCache;
 import org.apache.cxf.common.jaxb.JAXBContextCache.CachedContextAndSchemas;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -283,6 +284,13 @@ public final class ContextUtils {
         relatesTo.setValue(uri);
         return relatesTo;
     }
+    
+    private static boolean startsWith(String value, String ref) {
+        if (StringUtils.isEmpty(value)) {
+            return false;
+        }
+        return value.startsWith(ref);
+    }
 
     /**
      * Helper method to determine if an EPR address is generic (either null,
@@ -294,8 +302,8 @@ public final class ContextUtils {
     public static boolean isGenericAddress(EndpointReferenceType ref) {
         return ref == null
                || ref.getAddress() == null
-               || Names.WSA_ANONYMOUS_ADDRESS.equals(ref.getAddress().getValue())
-               || Names.WSA_NONE_ADDRESS.equals(ref.getAddress().getValue());
+               || startsWith(ref.getAddress().getValue(), Names.WSA_ANONYMOUS_ADDRESS)
+               || startsWith(ref.getAddress().getValue(), Names.WSA_NONE_ADDRESS);
     }
 
     /**
@@ -308,7 +316,7 @@ public final class ContextUtils {
     public static boolean isAnonymousAddress(EndpointReferenceType ref) {
         return ref == null
                || ref.getAddress() == null
-               || Names.WSA_ANONYMOUS_ADDRESS.equals(ref.getAddress().getValue());
+               || startsWith(ref.getAddress().getValue(), Names.WSA_ANONYMOUS_ADDRESS);
     }
 
     /**
