@@ -28,13 +28,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
-import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -72,12 +75,12 @@ public class CXF4130Test extends AbstractBusClientServerTestBase {
     @Test
     public void testCxf4130() throws Exception {
         InputStream body = getClass().getResourceAsStream("cxf4130data.txt");
-        HttpClient client = new HttpClient();
-        PostMethod post = new PostMethod(ADDRESS);
-        post.setRequestEntity(new InputStreamRequestEntity(body, "text/xml"));
-        client.executeMethod(post); 
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(ADDRESS);
+        post.setEntity(new InputStreamEntity(body, ContentType.TEXT_XML));
+        CloseableHttpResponse response = client.execute(post);
 
-        Document doc = StaxUtils.read(post.getResponseBodyAsStream());
+        Document doc = StaxUtils.read(response.getEntity().getContent());
         Element root = doc.getDocumentElement();
         Node child = root.getFirstChild();
         

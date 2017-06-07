@@ -21,16 +21,16 @@ package demo.jaxrs.search.client;
 
 import java.io.IOException;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.ByteArrayPartSource;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 public final class Client {
     private Client() {
@@ -38,8 +38,9 @@ public final class Client {
 
     public static void main(String args[]) throws Exception {               
         final String url = "http://localhost:9000/catalog";
-        final HttpClient httpClient = new HttpClient();
-                        
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
         uploadToCatalog(url, httpClient, "jsr339-jaxrs-2.0-final-spec.pdf");
         uploadToCatalog(url, httpClient, "JavaWebSocketAPI_1.0_Final.pdf");
         uploadToCatalog(url, httpClient, "apache-cxf-tika-lucene.odt");
@@ -58,34 +59,33 @@ public final class Client {
         delete(url, httpClient);
     }
 
-    private static void list(final String url, final HttpClient httpClient) 
-        throws IOException, HttpException {
-        
+    private static void list(final String url, final CloseableHttpClient httpClient)
+        throws IOException {
+
         System.out.println("Sent HTTP GET request to query all books in catalog");
-        
-        final GetMethod get = new GetMethod(url);
+
+        final HttpGet get = new HttpGet(url);
         try {
-            int status = httpClient.executeMethod(get);
-            if (status == 200) {   
-                System.out.println(get.getResponseBodyAsString());
+            CloseableHttpResponse response = httpClient.execute(get);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                System.out.println(EntityUtils.toString(response.getEntity()));
             }
         } finally {
             get.releaseConnection();
         }
     }
-    
-    private static void search(final String url, final HttpClient httpClient, final String expression) 
-        throws IOException, HttpException {
-            
+
+    private static void search(final String url, final CloseableHttpClient httpClient, final String expression)
+        throws IOException {
+
         System.out.println("Sent HTTP GET request to search the books in catalog: " + expression);
-        
-        final GetMethod get = new GetMethod(url + "/search");
-        get.setQueryString("$filter=" + expression);
-        
+
+        final HttpGet get = new HttpGet(url + "/search?$filter=" + expression);
+
         try {
-            int status = httpClient.executeMethod(get);
-            if (status == 200) {   
-                System.out.println(get.getResponseBodyAsString());
+            CloseableHttpResponse response = httpClient.execute(get);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                System.out.println(EntityUtils.toString(response.getEntity()));
             }
         } finally {
             get.releaseConnection();
@@ -93,27 +93,23 @@ public final class Client {
     }
     
 
-    private static void uploadToCatalog(final String url, final HttpClient httpClient,
-            final String filename) throws IOException, HttpException {
-        
+    private static void uploadToCatalog(final String url, final CloseableHttpClient httpClient,
+            final String filename) throws IOException {
+
         System.out.println("Sent HTTP POST request to upload the file into catalog: " + filename);
-        
-        final PostMethod post = new PostMethod(url);
-        final Part[] parts = {
-            new FilePart(filename,
-                new ByteArrayPartSource(filename, 
-                    IOUtils.readBytesFromStream(Client.class.getResourceAsStream("/" + filename)) 
-                ) 
-            )
-        };
-        
-        post.setRequestEntity(new MultipartRequestEntity(parts, post.getParams()));
-        
+
+        final HttpPost post = new HttpPost(url);
+        MultipartEntity entity = new MultipartEntity();
+        byte[] bytes = IOUtils.readBytesFromStream(Client.class.getResourceAsStream("/" + filename));
+        entity.addPart(filename, new ByteArrayBody(bytes, filename));
+
+        post.setEntity(entity);
+
         try {
-            int status = httpClient.executeMethod(post);
-            if (status == 201) {   
-                System.out.println(post.getResponseHeader("Location"));
-            } else if (status == 409) {   
+            CloseableHttpResponse response = httpClient.execute(post);
+            if (response.getStatusLine().getStatusCode() == 201) {
+                System.out.println(response.getFirstHeader("Location"));
+            } else if (response.getStatusLine().getStatusCode() == 409) {
                 System.out.println("Document already exists: " + filename);
             }
 
@@ -121,17 +117,17 @@ public final class Client {
             post.releaseConnection();
         }
     }
-    
-    private static void delete(final String url, final HttpClient httpClient) 
-        throws IOException, HttpException {
-                
+
+    private static void delete(final String url, final CloseableHttpClient httpClient)
+        throws IOException {
+
         System.out.println("Sent HTTP DELETE request to remove all books from catalog");
-        
-        final DeleteMethod delete = new DeleteMethod(url);            
+
+        final HttpDelete delete = new HttpDelete(url);
         try {
-            int status = httpClient.executeMethod(delete);
-            if (status == 200) {   
-                System.out.println(delete.getResponseBodyAsString());
+            CloseableHttpResponse response = httpClient.execute(delete);
+            if (response.getStatusLine().getStatusCode() == 200) {
+                System.out.println(EntityUtils.toString(response.getEntity()));
             }
         } finally {
             delete.releaseConnection();
