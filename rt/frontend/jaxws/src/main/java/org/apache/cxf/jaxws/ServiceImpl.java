@@ -589,7 +589,7 @@ public class ServiceImpl extends ServiceDelegate {
                 try {
                     seiClass = Thread.currentThread().getContextClassLoader().loadClass(epi);
                 } catch (ClassNotFoundException e) {
-                    Message msg = new Message("COULD_NOT_LOAD_CLASS", BUNDLE, api);
+                    Message msg = new Message("COULD_NOT_LOAD_CLASS", BUNDLE, epi);
                     throw new WebServiceException(msg.toString());
                 }
                 if (!seiClass.isAnnotationPresent(javax.jws.WebService.class)) {
