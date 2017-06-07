@@ -29,6 +29,8 @@ public class SignatureProperties {
     private String signatureKeyName;
     private Map<String, String> keyNameAliasMap;
     private Integer signatureLocation;
+    private Boolean signatureGenerateIdAttributes;
+    private Boolean signatureOmitC14nTransform;
 
     public void setSignatureAlgo(String signatureAlgo) {
         this.signatureAlgo = signatureAlgo;
@@ -86,5 +88,21 @@ public class SignatureProperties {
 
     public void setSignatureLocation(Integer signatureLocation) {
         this.signatureLocation = signatureLocation;
+    }
+
+    public Boolean getSignatureGenerateIdAttributes() {
+        return signatureGenerateIdAttributes;
+    }
+
+    public void setSignatureGenerateIdAttributes(Boolean signatureGenerateIdAttributes) {
+        this.signatureGenerateIdAttributes = signatureGenerateIdAttributes;
+    }
+
+    public Boolean getSignatureOmitC14nTransform() {
+        return signatureOmitC14nTransform;
+    }
+
+    public void setSignatureOmitC14nTransform(Boolean signatureOmitC14nTransform) {
+        this.signatureOmitC14nTransform = signatureOmitC14nTransform;
     }
 }
