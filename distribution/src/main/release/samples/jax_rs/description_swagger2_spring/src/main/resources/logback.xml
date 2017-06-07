@@ -10,7 +10,7 @@
 		<appender-ref ref="STDOUT" />
 	</root>
 	
-	<logger category="com.wordnik.swagger" name="swagger">  
+	<logger category="io.swagger" name="swagger">
     	<level name="DEBUG"/>  
 	</logger>
 </configuration>

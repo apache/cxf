@@ -56,7 +56,6 @@
         <module>jax_rs/websocket_web</module>
         <module>jax_rs/websocket_osgi</module>
         <module>jax_rs/search</module>
-        <module>jax_rs/description_swagger</module>
         <module>jax_rs/description_swagger2</module>
         <module>jax_rs/description_swagger2_web</module>
         <module>jax_rs/description_swagger2_osgi</module>
