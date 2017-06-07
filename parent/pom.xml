@@ -70,7 +70,7 @@
         <cxf.abdera.osgi.version>1.1.3_2</cxf.abdera.osgi.version>
         <cxf.activemq.version>5.14.5</cxf.activemq.version>
         <cxf.ahc.version>1.9.40</cxf.ahc.version>
-        <cxf.apacheds.version>2.0.0-M23</cxf.apacheds.version>
+        <cxf.apacheds.version>2.0.0-M24</cxf.apacheds.version>
         <cxf.atmosphere.version>2.4.9</cxf.atmosphere.version>
         <cxf.atmosphere.version.range>[2.4,3.0)</cxf.atmosphere.version.range>
         <cxf.axiom.version>1.2.14</cxf.axiom.version>
