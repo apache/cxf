@@ -63,7 +63,7 @@ import org.apache.cxf.message.MessageUtils;
 
 public final class ResponseImpl extends Response {
 
-    private int status;
+    private StatusType status;
     private Object entity;
     private Annotation[] entityAnnotations;
     private MultivaluedMap<String, Object> metadata;
@@ -73,21 +73,30 @@ public final class ResponseImpl extends Response {
     private boolean entityBufferred;
     private Object lastEntity;
 
-    ResponseImpl(int s) {
-        this.status = s;
+    ResponseImpl(int statusCode) {
+        this.status = createStatusType(statusCode, null);
     }
 
-    ResponseImpl(int s, Object e) {
-        this.status = s;
-        this.entity = e;
+    ResponseImpl(int statusCode, Object entity) {
+        this(statusCode);
+        this.entity = entity;
+    }
+
+    ResponseImpl(int statusCode, Object entity, String reasonPhrase) {
+        this.status = createStatusType(statusCode, reasonPhrase);
+        this.entity = entity;
     }
 
     public void addMetadata(MultivaluedMap<String, Object> meta) {
         this.metadata = meta;
     }
 
-    public void setStatus(int s) {
-        this.status = s;
+    public void setStatus(int statusCode) {
+        this.status = createStatusType(statusCode, null);
+    }
+
+    public void setStatus(int statusCode, String reasonPhrase) {
+        this.status = createStatusType(statusCode, reasonPhrase);
     }
 
     public void setEntity(Object e, Annotation[] anns) {
@@ -112,26 +121,11 @@ public final class ResponseImpl extends Response {
     }
 
     public int getStatus() {
-        return status;
+        return status.getStatusCode();
     }
 
     public StatusType getStatusInfo() {
-        return new Response.StatusType() {
-
-            public Family getFamily() {
-                return Response.Status.Family.familyOf(ResponseImpl.this.status);
-            }
-
-            public String getReasonPhrase() {
-                Response.Status statusEnum = Response.Status.fromStatusCode(ResponseImpl.this.status);
-                return statusEnum != null ? statusEnum.getReasonPhrase() : "";
-            }
-
-            public int getStatusCode() {
-                return ResponseImpl.this.status;
-            }
-
-        };
+        return status;
     }
 
     public Object getActualEntity() {
@@ -480,5 +474,28 @@ public final class ResponseImpl extends Response {
         if (entityClosed) {
             throw new IllegalStateException("Entity is not available");
         }
+    }
+
+    private Response.StatusType createStatusType(int statusCode, String reasonPhrase) {
+        return new Response.StatusType() {
+
+            public Family getFamily() {
+                return Response.Status.Family.familyOf(statusCode);
+            }
+
+            public String getReasonPhrase() {
+                if (reasonPhrase != null) {
+                    return reasonPhrase;
+                } else {
+                    Response.Status statusEnum = Response.Status.fromStatusCode(statusCode);
+                    return statusEnum != null ? statusEnum.getReasonPhrase() : "";
+                }
+            }
+
+            public int getStatusCode() {
+                return statusCode;
+            }
+
+        };
     }
 }

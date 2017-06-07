@@ -160,19 +160,4 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
         return wc.doInvokeAsyncStage(name, null, responseType.getRawType(), responseType.getType(), ex);
     }
 
-    @Override
-    public CompletionStage<Response> patch(Entity<?> entity) {
-        return method(HttpMethod.PATCH, entity);
-    }
-
-    @Override
-    public <T> CompletionStage<T> patch(Entity<?> entity, Class<T> responseType) {
-        return method(HttpMethod.PATCH, entity, responseType);
-    }
-
-    @Override
-    public <T> CompletionStage<T> patch(Entity<?> entity, GenericType<T> responseType) {
-        return method(HttpMethod.PATCH, entity, responseType);
-    }
-
 }

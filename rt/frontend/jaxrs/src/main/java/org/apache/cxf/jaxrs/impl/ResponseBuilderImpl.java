@@ -45,6 +45,7 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
 
     private int status = 200;
+    private String reasonPhrase;
     private boolean statusSet;
     private Object entity;
     private MultivaluedMap<String, Object> metadata = new MetadataMap<String, Object>();
@@ -56,6 +57,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     private ResponseBuilderImpl(ResponseBuilderImpl copy) {
         status = copy.status;
         statusSet = copy.statusSet;
+        reasonPhrase = copy.reasonPhrase;
         metadata.putAll(copy.metadata);
         entity = copy.entity;
     }
@@ -64,7 +66,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
         if (entity == null && !statusSet) {
             status = 204;
         }
-        ResponseImpl r = new ResponseImpl(status);
+        ResponseImpl r = new ResponseImpl(status, null, reasonPhrase);
         MetadataMap<String, Object> m =
             new MetadataMap<String, Object>(metadata, false, true);
         r.addMetadata(m);
@@ -73,13 +75,25 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
         return r;
     }
 
-    public ResponseBuilder status(int s) {
-        if (s < 100 || s > 599) {
-            throw new IllegalArgumentException("Illegal status value : " + s);
-        }
-        status = s;
+    public ResponseBuilder status(int statusCode) {
+        validateStatusCode(statusCode);
+        status = statusCode;
         statusSet = true;
         return this;
+    }
+
+    public ResponseBuilder status(int statusCode, String reason) {
+        validateStatusCode(statusCode);
+        status = statusCode;
+        statusSet = true;
+        reasonPhrase = reason;
+        return this;
+    }
+
+    private void validateStatusCode(int statusCode) {
+        if (statusCode < 100 || statusCode > 599) {
+            throw new IllegalArgumentException("Illegal status value : " + statusCode);
+        }
     }
 
     public ResponseBuilder entity(Object e) {
@@ -224,6 +238,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
         entity = null;
         annotations = null;
         status = 200;
+        reasonPhrase = null;
     }
 
     private ResponseBuilder setHeader(String name, Object value) {
@@ -252,7 +267,7 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
 
     private boolean valueExists(String key, Object value) {
         List<Object> values = metadata.get(key);
-        return values == null ? false : values.contains(value);
+        return values != null && values.contains(value);
     }
 
     @Override

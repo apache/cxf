@@ -172,18 +172,4 @@ public class ObservableRxInvokerImpl implements ObservableRxInvoker {
         return cb.getObservable();
     }
 
-    @Override
-    public Observable<Response> patch(Entity<?> entity) {
-        return method(HttpMethod.PATCH, entity);
-    }
-
-    @Override
-    public <T> Observable<T> patch(Entity<?> entity, Class<T> responseType) {
-        return method(HttpMethod.PATCH, entity, responseType);
-    }
-
-    @Override
-    public <T> Observable<T> patch(Entity<?> entity, GenericType<T> responseType) {
-        return method(HttpMethod.PATCH, entity, responseType);
-    }
 }

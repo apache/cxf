@@ -22,6 +22,7 @@ import java.security.KeyStore;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.KeyManagerFactory;
@@ -158,5 +159,23 @@ public class ClientBuilderImpl extends ClientBuilder {
     @Override
     public ClientBuilder scheduledExecutorService(ScheduledExecutorService scheduledExecutorService) {
         return configImpl.property("scheduledExecutorService", scheduledExecutorService);
+    }
+
+    @Override
+    public ClientBuilder connectTimeout(long timeout, TimeUnit timeUnit) {
+        validateTimeout(timeout);
+        return property(ClientImpl.HTTP_CONNECTION_TIMEOUT_PROP, timeUnit.toMillis(timeout));
+    }
+
+    @Override
+    public ClientBuilder readTimeout(long timeout, TimeUnit timeUnit) {
+        validateTimeout(timeout);
+        return property(ClientImpl.HTTP_RECEIVE_TIMEOUT_PROP, timeUnit.toMillis(timeout));
+    }
+
+    private void validateTimeout(long timeout) {
+        if (timeout < 0) {
+            throw new IllegalArgumentException("Negative timeout is not allowed.");
+        }
     }
 }

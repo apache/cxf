@@ -385,18 +385,4 @@ public class InvocationBuilderImpl implements Invocation.Builder {
         return webClient.rx(rxCls, (ExecutorService)null);
     }
 
-    @Override
-    public Response patch(Entity<?> entity) {
-        return sync.patch(entity);
-    }
-
-    @Override
-    public <T> T patch(Entity<?> entity, Class<T> responseType) {
-        return sync.patch(entity, responseType);
-    }
-
-    @Override
-    public <T> T patch(Entity<?> entity, GenericType<T> responseType) {
-        return sync.patch(entity, responseType);
-    }
 }

@@ -50,8 +50,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.https.SSLUtils;
 
 public class ClientImpl implements Client {
-    private static final String HTTP_CONNECTION_TIMEOUT_PROP = "http.connection.timeout";
-    private static final String HTTP_RECEIVE_TIMEOUT_PROP = "http.receive.timeout";
+    static final String HTTP_CONNECTION_TIMEOUT_PROP = "http.connection.timeout";
+    static final String HTTP_RECEIVE_TIMEOUT_PROP = "http.receive.timeout";
     private static final String HTTP_PROXY_SERVER_PROP = "http.proxy.server.uri";
     private static final String HTTP_PROXY_SERVER_PORT_PROP = "http.proxy.server.port";
     private static final String HTTP_AUTOREDIRECT_PROP = "http.autoredirect";

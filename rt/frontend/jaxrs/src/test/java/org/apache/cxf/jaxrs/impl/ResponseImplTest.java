@@ -225,6 +225,17 @@ public class ResponseImplTest extends Assert {
         assertEquals("", si.getReasonPhrase());
     }
 
+    @Test
+    public void testReasonPhrase() {
+        int statusCode = 111;
+        String reasonPhrase = "custom info";
+        Response response = Response.status(statusCode, reasonPhrase).build();
+
+        assertNotNull(response);
+        assertEquals(statusCode, response.getStatus());
+        assertEquals(reasonPhrase, response.getStatusInfo().getReasonPhrase());
+    }
+
     @Test(expected = IllegalStateException.class)
     public void testHasEntityAfterClose() {
         Response r = new ResponseImpl(200, new ByteArrayInputStream("data".getBytes()));
