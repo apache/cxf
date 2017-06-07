@@ -76,7 +76,9 @@ public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
         if (null != maps.getAction()) {
             action = maps.getAction().getValue();
         }
-        
+        //make sure we use the appropriate namespace
+        maps.exposeAs(wsaNamespace);
+
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Action: " + action);
         }

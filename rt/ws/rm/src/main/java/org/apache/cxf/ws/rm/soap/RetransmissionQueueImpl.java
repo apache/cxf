@@ -439,6 +439,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             AttributedURIType to = null;
             if (null != maps) {
                 to = maps.getTo();
+                maps.exposeAs(cfg.getAddressingNamespace());
             }
             if (to != null  && RMUtils.getAddressingConstants().getAnonymousURI().equals(to.getValue())) {
                 LOG.log(Level.INFO, "Cannot resend to anonymous target.  Not scheduling a resend.");
@@ -796,7 +797,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             }
             
             // set message addressing properties
-            AddressingProperties maps = new MAPCodec().unmarshalMAPs(message);
+            AddressingProperties maps = MAPCodec.getInstance(message.getExchange().getBus()).unmarshalMAPs(message);
             RMContextUtils.storeMAPs(maps, message, true, MessageUtils.isRequestor(message));
             AttributedURIType to = null;
             if (null != maps) {

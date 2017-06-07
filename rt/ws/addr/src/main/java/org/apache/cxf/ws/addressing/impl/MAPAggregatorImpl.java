@@ -1076,6 +1076,10 @@ public class MAPAggregatorImpl extends MAPAggregator {
     private void setupNamespace(AddressingProperties maps, Message message) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         if (null == aim) {
+            String ns = (String)message.getContextualProperty(MAPAggregator.ADDRESSING_NAMESPACE);
+            if (ns != null) {
+                maps.exposeAs(ns);
+            }
             return;
         }
         Collection<AssertionInfo> aic = aim.getAssertionInfo(MetadataConstants.USING_ADDRESSING_2004_QNAME);

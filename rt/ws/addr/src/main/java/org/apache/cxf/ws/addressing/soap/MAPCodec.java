@@ -40,6 +40,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -76,7 +77,8 @@ import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
  * Properties for {outgo|incom}ing messages.
  */
 public class MAPCodec extends AbstractSoapInterceptor {
-
+    public static final MAPCodec INSTANCE = new MAPCodec();
+    
     private static final Logger LOG = LogUtils.getL7dLogger(MAPCodec.class);
     private static final String IS_REFERENCE_PARAM_ATTR_NAME = "IsReferenceParameter";
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
@@ -101,6 +103,22 @@ public class MAPCodec extends AbstractSoapInterceptor {
         transformer = new VersionTransformer(this);
     } 
 
+    public static synchronized MAPCodec getInstance(Bus bus) {
+        MAPCodec mc = bus.getExtension(MAPCodec.class);
+        if (mc == null) {
+            return createMAPCodec(bus);
+        }
+        return mc;
+    }
+    private static synchronized MAPCodec createMAPCodec(Bus bus) {
+        MAPCodec mc = bus.getExtension(MAPCodec.class);
+        if (mc == null) {
+            bus.setExtension(new MAPCodec(), MAPCodec.class);
+            mc = bus.getExtension(MAPCodec.class);
+        }
+        return mc;
+    }
+    
     public Map<String, Exchange> getUncorrelatedExchanges() {
         return uncorrelatedExchanges;
     }
