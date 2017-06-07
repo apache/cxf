@@ -23,6 +23,7 @@ import java.io.Closeable;
 
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.AddressingFeature;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -53,7 +54,8 @@ import org.junit.Test;
  */
 public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
     public static final String PORT = allocatePort(WSRM12ServerCycleTest.class);
-    private static final String CFG = "/org/apache/cxf/systest/ws/rm/persistent.xml";
+    private static final String CFG_PERSISTENT = "/org/apache/cxf/systest/ws/rm/persistent.xml";
+    private static final String CFG_SIMPLE = "/org/apache/cxf/systest/ws/rm/simple.xml";
 
     private static final long DEFAULT_BASE_RETRANSMISSION_INTERVAL = 4000L;
     private static final long DEFAULT_ACKNOWLEDGEMENT_INTERVAL = 2000L;
@@ -95,8 +97,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        RMTxStore.deleteDatabaseFiles("cxf7392-recovery", true);
-        RMTxStore.deleteDatabaseFiles("cxf7392-greeter", true);
+        RMTxStore.deleteDatabaseFiles("cxf7392-server", true);
         assertTrue("server did not launch correctly",
                    launchServer(Server.class, null, new String[] {PORT, "cxf7392"}, true));
 
@@ -134,10 +135,30 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
         return feature;
     }
 
-    
+    @Test
+    public void testPersistentSequences() throws Exception {
+        runTest(CFG_PERSISTENT, false);
+    }
 
     @Test
-    public void testCXF7392() throws Exception {
+    public void testNonPersistentSequence() throws Exception {
+        runTest(CFG_SIMPLE, true);
+    }
+
+    @Test
+    @org.junit.Ignore 
+    public void testNonPersistentSequenceNoTransformer() throws Exception {
+        try {
+            //CXF-7392
+            System.setProperty("javax.xml.transform.TransformerFactory", "foo.snarf");
+            runTest(CFG_SIMPLE, true);
+        } finally {
+            System.clearProperty("javax.xml.transform.TransformerFactory");
+        }
+    }
+        
+
+    public void runTest(String cfg, boolean faultOnRestart) throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus();
         BusFactory.setDefaultBus(bus);
@@ -146,7 +167,7 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
         ConnectionHelper.setKeepAliveConnection(control, false, true);
         updateAddressPort(control, PORT);
 
-        Assert.assertTrue("Failed to start greeter", control.startGreeter(CFG));
+        Assert.assertTrue("Failed to start greeter", control.startGreeter(cfg));
 
         System.setProperty("db.name", getPrefix() + "-recovery");
         Bus greeterBus = new SpringBusFactory().createBus();
@@ -165,16 +186,29 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
         greeter.greetMe("three");
 
 
-        control.stopGreeter(CFG);
-        //control.startGreeter(CFG);
+        control.stopGreeter(cfg);
         
-        // this will cause an exception as the sequence is no longer valid
-        //greeter.greetMe("four");
+        //make sure greeter is down
+        Thread.sleep(1000);
+        control.startGreeter(cfg);
+        
+        //CXF-7392
+        if (faultOnRestart) {
+            try {
+                greeter.greetMe("four");
+            } catch (SOAPFaultException ex) {
+                assertTrue(ex.getMessage().contains("wsrm:Identifier"));
+                //expected, sequence identifier doesn't exist on other side
+            }
+        } else {
+            // this should work as the sequence should be recovered on the server side
+            greeter.greetMe("four");
+        }
         
 
         ((Closeable)greeter).close();
         greeterBus.shutdown(true);
-        control.stopGreeter(CFG);
+        control.stopGreeter(cfg);
         bus.shutdown(true);
     }
 
