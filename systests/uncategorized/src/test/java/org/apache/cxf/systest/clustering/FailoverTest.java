@@ -436,7 +436,7 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
     protected void enableWSAForCurrentEndpoint() {
         Endpoint provider = ClientProxy.getClient(greeter).getEndpoint();
         mapAggregator = new MAPAggregator();
-        mapCodec = new MAPCodec();
+        mapCodec = MAPCodec.getInstance(ClientProxy.getClient(greeter).getBus());
         provider.getInInterceptors().add(mapAggregator);
         provider.getInInterceptors().add(mapCodec);
         

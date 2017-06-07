@@ -127,7 +127,7 @@ public class NestedAddressingPolicyTest extends AbstractBusClientServerTestBase 
         updateAddressPort(greeter, PORT);
         LoggingInInterceptor in = new LoggingInInterceptor();
         LoggingOutInterceptor out = new LoggingOutInterceptor();
-        MAPCodec mapCodec = new MAPCodec();
+        MAPCodec mapCodec = MAPCodec.getInstance(bus);
         MAPAggregatorImpl mapAggregator = new MAPAggregatorImpl();
 
         bus.getInInterceptors().add(in);

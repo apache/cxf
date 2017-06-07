@@ -40,6 +40,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.ext.logging.LoggingFeature;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
@@ -69,11 +70,9 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
         LOG.info("Initialised bus " + greeterBus + " with cfg file resource: " + cfgResource);
         LOG.fine("greeterBus inInterceptors: " + greeterBus.getInInterceptors());
 
-        LoggingInInterceptor logIn = new LoggingInInterceptor();
-        LoggingOutInterceptor logOut = new LoggingOutInterceptor();
-        greeterBus.getInInterceptors().add(logIn);
-        greeterBus.getOutInterceptors().add(logOut);
-        greeterBus.getOutFaultInterceptors().add(logOut);
+        LoggingFeature lf = new LoggingFeature();
+        lf.setPrettyLogging(true);
+        lf.initialize(greeterBus);
 
         if (cfgResource.indexOf("provider") == -1) {
             endpoint = Endpoint.publish(address, implementor);
