@@ -597,6 +597,8 @@ public class RMManager {
         if (s.getAssociatedSequence(null) == null && !ss.isExpired() && !ss.isLastMessage()) {
             s.setCurrent(ss);
         }
+        //make sure this is associated with the offering id
+        s.setCurrent(ss.getOfferingSequenceIdentifier(), ss);
         for (RMMessage m : ms) {
 
             Message message = new MessageImpl();

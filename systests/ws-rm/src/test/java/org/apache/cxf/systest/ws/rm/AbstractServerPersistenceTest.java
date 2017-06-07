@@ -267,7 +267,7 @@ public abstract class AbstractServerPersistenceTest extends AbstractBusClientSer
 
 
     void verifyRetransmissionQueue() throws Exception {
-        awaitMessages(2, 3, 60000);
+        awaitMessages(2, 2, 60000);
 
         Thread.sleep(5000);
         boolean empty = greeterBus.getExtension(RMManager.class).getRetransmissionQueue().isEmpty();
