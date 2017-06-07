@@ -36,6 +36,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     public static final String DECOUPLED_DESTINATION = MAPAggregator.class.getName()
         + ".decoupledDestination";
     public static final String ACTION_VERIFIED = MAPAggregator.class.getName() + ".actionVerified";
+    public static final String ADDRESSING_NAMESPACE = MAPAggregator.class.getName() + ".addressingNamespace";
 
     public interface MAPAggregatorLoader {
         MAPAggregator createImplementation(MAPAggregator mag);

@@ -309,15 +309,18 @@ public class RMManagerTest extends Assert {
     public void testGetReliableEndpointExisting() throws NoSuchMethodException, RMException {
         Method m1 = RMManager.class.getDeclaredMethod("createReliableEndpoint",
             new Class[] {Endpoint.class});
-        manager = control.createMock(RMManager.class, new Method[] {m1});
+        Method m2 = RMManager.class.getDeclaredMethod("getEffectiveConfiguration",
+                                                      new Class[] {Message.class});
+        manager = control.createMock(RMManager.class, new Method[] {m1, m2});
         manager.setReliableEndpointsMap(new HashMap<Endpoint, RMEndpoint>());
         Message message = control.createMock(Message.class);
+        Exchange exchange = control.createMock(Exchange.class);
+        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
+        
         RMConfiguration config = new RMConfiguration();
         config.setRMNamespace(RM10Constants.NAMESPACE_URI);
         config.setRM10AddressingNamespace(RM10Constants.NAMESPACE_URI);
         EasyMock.expect(manager.getEffectiveConfiguration(message)).andReturn(config).anyTimes();
-        Exchange exchange = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(exchange);
         Endpoint endpoint = control.createMock(Endpoint.class);
         EasyMock.expect(exchange.getEndpoint()).andReturn(endpoint);
         EndpointInfo ei = control.createMock(EndpointInfo.class);

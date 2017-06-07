@@ -29,6 +29,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxb.DatatypeFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -45,6 +46,8 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.RelatesToType;
+import org.apache.cxf.ws.addressing.WSAddressingFeature;
+import org.apache.cxf.ws.addressing.WSAddressingFeature.WSAddressingFeatureApplier;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.v200702.Identifier;
 import org.apache.cxf.ws.rm.v200702.OfferType;
@@ -290,6 +293,12 @@ public class ProxyTest extends Assert {
     public void testRMClientConstruction() {
         Proxy proxy = new Proxy(rme);
         Bus bus = control.createMock(Bus.class);
+        EasyMock.expect(bus.getExtension(WSAddressingFeatureApplier.class))
+            .andReturn(new WSAddressingFeatureApplier() {
+                @Override
+                public void initializeProvider(WSAddressingFeature feature, InterceptorProvider provider,
+                                               Bus bus) {
+                } }).anyTimes();
         Endpoint endpoint = control.createMock(Endpoint.class);
         Conduit conduit = control.createMock(Conduit.class);
         org.apache.cxf.ws.addressing.EndpointReferenceType address =

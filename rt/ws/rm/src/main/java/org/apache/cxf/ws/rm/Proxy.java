@@ -47,7 +47,9 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.workqueue.SynchronousExecutor;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.RelatesToType;
+import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.rm.manager.SourcePolicyType;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
@@ -359,7 +361,12 @@ public class Proxy {
             }
         };
         RMClient client = new RMClient(bus, endpoint, cs);
+        // WS-RM requires ws-addressing
+        WSAddressingFeature wsa = new WSAddressingFeature();
+        wsa.setAddressingRequired(true);
+        wsa.initialize(client, bus);
         Map<String, Object> context = client.getRequestContext();
+        context.put(MAPAggregator.ADDRESSING_NAMESPACE, protocol.getWSANamespace());
         context.put(RMManager.WSRM_VERSION_PROPERTY, protocol.getWSRMNamespace());
         context.put(RMManager.WSRM_WSA_VERSION_PROPERTY, protocol.getWSANamespace());
         return client;
