@@ -274,18 +274,18 @@ public class RMSoapOutInterceptorTest extends Assert {
                     namespace = elem.getNamespaceURI();
                     localName = elem.getLocalName();
                 }
-                    if (RM10Constants.NAMESPACE_URI.equals(namespace)
-                        && localName.equals(name)) {
-                        found = true;
+                if (RM10Constants.NAMESPACE_URI.equals(namespace)
+                    && localName.equals(name)) {
+                    found = true;
                     iter.remove();
-                        break;
-                    } else if (Names.WSA_NAMESPACE_NAME.equals(namespace)
-                        && localName.equals(name)) {
-                        found = true;
+                    break;
+                } else if (Names.WSA_NAMESPACE_NAME.equals(namespace)
+                    && localName.equals(name)) {
+                    found = true;
                     iter.remove();
-                        break;
-                    }
+                    break;
                 }
+            }
             assertTrue("Could not find header element " + name, found);
         }
 
