@@ -135,19 +135,14 @@ public final class EncoderDecoder10Impl extends EncoderDecoder {
         org.apache.cxf.ws.rm.v200502.SequenceFaultType flt = new org.apache.cxf.ws.rm.v200502.SequenceFaultType();
         flt.setFaultCode(sf.getFaultCode());
         Object detail = sf.getDetail();
-        Document doc = DOMUtils.createDocument();
         if (detail instanceof Element) {
             flt.getAny().add(detail);
         } else if (detail instanceof Identifier) {
-            marshaller.marshal(VersionTransformer.convert200502((Identifier)detail), doc);
+            flt.getAny().add(VersionTransformer.convert200502((Identifier)detail));
         } else if (detail instanceof SequenceAcknowledgement) {
-            marshaller.marshal(VersionTransformer.convert200502((SequenceAcknowledgement)detail), doc);
+            flt.getAny().add(VersionTransformer.convert200502((SequenceAcknowledgement)detail));
         }
-        Element data = doc.getDocumentElement();
-        if (data != null) {
-            flt.getAny().add(data);
-        }
-        data = sf.getExtraDetail();
+        Element data = sf.getExtraDetail();
         if (data != null) {
             flt.getAny().add(data);
         }

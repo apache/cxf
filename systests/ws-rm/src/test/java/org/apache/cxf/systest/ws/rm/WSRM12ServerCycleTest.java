@@ -146,7 +146,6 @@ public class WSRM12ServerCycleTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    @org.junit.Ignore 
     public void testNonPersistentSequenceNoTransformer() throws Exception {
         try {
             //CXF-7392
