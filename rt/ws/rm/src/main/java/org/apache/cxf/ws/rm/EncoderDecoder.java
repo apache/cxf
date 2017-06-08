@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
@@ -144,9 +143,6 @@ public abstract class EncoderDecoder {
             return;
         }
 
-        // build individual headers
-        Marshaller marshaller = getContext().createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         buildHeaders(seq, acks, reqs, rmps.isLastMessage(), headers);
     }
 
