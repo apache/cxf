@@ -131,9 +131,9 @@ public class RMSoapOutInterceptor extends AbstractSoapInterceptor {
             int startSize = headers.size();
             protocol.getCodec().buildHeaders(rmps, headers);
             if (startSize != headers.size() && MessageUtils.isPartialResponse(message)) {
-                    // make sure the response is returned as HTTP 200 and not 202
-                    message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_OK);
-                }
+                // make sure the response is returned as HTTP 200 and not 202
+                message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_OK);
+            }
         } catch (JAXBException je) {
             LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", je);
         }

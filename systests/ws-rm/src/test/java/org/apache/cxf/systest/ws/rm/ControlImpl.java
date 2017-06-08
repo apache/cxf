@@ -66,7 +66,7 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
         if (StringUtils.isEmpty(cfgResource)) {
             greeterBus = bf.createBus();
         } else {
-        greeterBus = bf.createBus(cfgResource);
+            greeterBus = bf.createBus(cfgResource);
         }
         System.clearProperty("db.name");
         BusFactory.setDefaultBus(greeterBus);
