@@ -108,10 +108,13 @@ public abstract class AbstractSAMLTokenProvider {
             }
         }
         // Get the password
-        WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
-        LOG.fine("Creating SAML Token");
-        callbackHandler.handle(cb);
-        String password = cb[0].getPassword();
+        String password = null;
+        if (callbackHandler != null) {
+            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
+            LOG.fine("Creating SAML Token");
+            callbackHandler.handle(cb);
+            password = cb[0].getPassword();
+        }
 
         LOG.fine("Signing SAML Token");
         boolean useKeyValue = signatureProperties.isUseKeyValue();
