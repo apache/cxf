@@ -133,19 +133,8 @@ public final class EncoderDecoder11Impl extends EncoderDecoder {
         SequenceFaultType flt = new SequenceFaultType();
         flt.setFaultCode(sf.getFaultCode());
         Object detail = sf.getDetail();
-        Document doc = DOMUtils.createDocument();
-        if (detail instanceof Element) {
-            flt.getAny().add(detail);
-        } else if (detail instanceof Identifier) {
-            marshaller.marshal(detail, doc);
-        } else if (detail instanceof SequenceAcknowledgement) {
-            marshaller.marshal(detail, doc);
-        }
-        Element data = doc.getDocumentElement();
-        if (data != null) {
-            addDetail(flt, data);
-        }
-        data = sf.getExtraDetail();
+        flt.getAny().add(detail);
+        Element data = sf.getExtraDetail();
         if (data != null) {
             addDetail(flt, data);
         }
