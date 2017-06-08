@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,12 +30,15 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
@@ -107,29 +111,36 @@ public final class EncoderDecoder11Impl extends EncoderDecoder {
         return jaxbContext;
     }
 
+    @Override
     protected void buildHeaders(SequenceType seq, Collection<SequenceAcknowledgement> acks,
-        Collection<AckRequestedType> reqs, boolean last, Element header, Marshaller marshaller) throws JAXBException {
+        Collection<AckRequestedType> reqs, boolean last, List<Header> headers) throws JAXBException {
 
         if (null != seq) {
             LOG.log(Level.FINE, "encoding sequence into RM header");
             JAXBElement<SequenceType> element = RMUtils.getWSRMFactory().createSequence(seq);
-            marshaller.marshal(element, header);
+            headers.add(new SoapHeader(element.getName(), element, getDataBinding(), true));
         }
         if (null != acks) {
             LOG.log(Level.FINE, "encoding sequence acknowledgement(s) into RM header");
             for (SequenceAcknowledgement ack : acks) {
-                marshaller.marshal(ack, header);
+                headers.add(new SoapHeader(new QName(getConstants().getWSRMNamespace(), 
+                                                     RMConstants.SEQUENCE_ACK_NAME),
+                                           ack, getDataBinding()));
             }
         }
         if (null != reqs) {
             LOG.log(Level.FINE, "encoding acknowledgement request(s) into RM header");
             for (AckRequestedType req : reqs) {
-                marshaller.marshal(RMUtils.getWSRMFactory().createAckRequested(req), header);
+                headers.add(new SoapHeader(new QName(getConstants().getWSRMNamespace(), 
+                                                     RMConstants.ACK_REQUESTED_NAME),
+                                           RMUtils.getWSRMFactory().createAckRequested(req),
+                                           getDataBinding()));
             }
         }
     }
 
-    public void buildHeaderFault(SequenceFault sf, Element header, Marshaller marshaller) throws JAXBException {
+    @Override
+    protected Object buildHeaderFaultObject(SequenceFault sf) {
         SequenceFaultType flt = new SequenceFaultType();
         flt.setFaultCode(sf.getFaultCode());
         Object detail = sf.getDetail();
@@ -138,8 +149,7 @@ public final class EncoderDecoder11Impl extends EncoderDecoder {
         if (data != null) {
             addDetail(flt, data);
         }
-        marshaller.marshal(new JAXBElement<SequenceFaultType>(RM11Constants.SEQUENCE_FAULT_QNAME,
-            SequenceFaultType.class, flt), header);
+        return flt;
     }
 
     private static void addDetail(SequenceFaultType sft, Element data) {

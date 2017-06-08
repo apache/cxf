@@ -257,53 +257,41 @@ public class RMSoapOutInterceptorTest extends Assert {
     }
 
     private void verifyHeaders(SoapMessage message, String... names) {
-        List<Header> header = message.getHeaders();
+        List<Header> headers = new ArrayList<Header>(message.getHeaders());
 
         // check all expected headers are present
 
         for (String name : names) {
             boolean found = false;
-            Iterator<Header> iter = header.iterator();
+            Iterator<Header> iter = headers.iterator();
             while (iter.hasNext()) {
-                Object obj = iter.next().getObject();
+                Header header = iter.next();
+                Object obj = header.getObject();
+                String namespace = header.getName().getNamespaceURI();
+                String localName = header.getName().getLocalPart();
                 if (obj instanceof Element) {
                     Element elem = (Element) obj;
-                    String namespace = elem.getNamespaceURI();
-                    String localName = elem.getLocalName();
-                    if (RM10Constants.NAMESPACE_URI.equals(namespace)
-                        && localName.equals(name)) {
-                        found = true;
-                        break;
-                    } else if (Names.WSA_NAMESPACE_NAME.equals(namespace)
-                        && localName.equals(name)) {
-                        found = true;
-                        break;
-                    }
+                    namespace = elem.getNamespaceURI();
+                    localName = elem.getLocalName();
+                }
+                if (RM10Constants.NAMESPACE_URI.equals(namespace)
+                    && localName.equals(name)) {
+                    found = true;
+                    iter.remove();
+                    break;
+                } else if (Names.WSA_NAMESPACE_NAME.equals(namespace)
+                    && localName.equals(name)) {
+                    found = true;
+                    iter.remove();
+                    break;
                 }
             }
             assertTrue("Could not find header element " + name, found);
         }
 
         // no other headers should be present
-
-        Iterator<Header> iter1 = header.iterator();
-        while (iter1.hasNext()) {
-            Object obj = iter1.next().getObject();
-            if (obj instanceof Element) {
-                Element elem = (Element) obj;
-                String namespace = elem.getNamespaceURI();
-                String localName = elem.getLocalName();
-                assertTrue(RM10Constants.NAMESPACE_URI.equals(namespace)
-                    || Names.WSA_NAMESPACE_NAME.equals(namespace));
-                boolean found = false;
-                for (String name : names) {
-                    if (localName.equals(name)) {
-                        found = true;
-                        break;
-                    }
-                }
-                assertTrue("Unexpected header element " + localName, found);
-            }
+        if (!headers.isEmpty()) {
+            assertTrue("Unexpected header element " + headers.get(0).getName(), false);
         }
     }
 }

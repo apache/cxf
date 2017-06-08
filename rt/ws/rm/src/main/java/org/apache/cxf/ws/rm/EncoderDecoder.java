@@ -20,17 +20,18 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.headers.Header;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
 import org.apache.cxf.ws.rm.v200702.CloseSequenceType;
 import org.apache.cxf.ws.rm.v200702.CreateSequenceResponseType;
@@ -45,7 +46,8 @@ import org.apache.cxf.ws.rm.v200702.TerminateSequenceType;
  * encoding and decoding.
  */
 public abstract class EncoderDecoder {
-
+    protected volatile DataBinding databinding;
+    
     /**
      * Get context for JAXB marshalling/unmarshalling.
      *
@@ -53,6 +55,7 @@ public abstract class EncoderDecoder {
      * @throws JAXBException
      */
     protected abstract JAXBContext getContext() throws JAXBException;
+        
 
     /**
      * Get the WS-ReliableMessaging namespace used by this encoder/decoder.
@@ -103,6 +106,26 @@ public abstract class EncoderDecoder {
      */
     public abstract Class<?> getTerminateSequenceResponseType();
 
+    
+    /**
+     * Get the databinding used for the header objects
+     * @return databinding
+     */
+    protected DataBinding getDataBinding() throws JAXBException {
+        DataBinding result = databinding;
+        if (result == null) {
+            synchronized (this) {
+                result = databinding;
+                if (result == null) {
+                    result = new JAXBDataBinding(getContext());
+                    databinding = result;
+                }
+            }
+        }
+        return result;
+    }
+
+    
     /**
      * Builds an element containing WS-RM headers. This adds the appropriate WS-RM namespace declaration to the element,
      * and then adds any WS-RM headers set in the supplied properties as child elements.
@@ -111,38 +134,20 @@ public abstract class EncoderDecoder {
      * @param qname constructed element name
      * @return element (<code>null</code> if none)
      */
-    public Element buildHeaders(RMProperties rmps, QName qname) throws JAXBException {
+    public void buildHeaders(RMProperties rmps, List<Header> headers) throws JAXBException {
 
         // check if there's anything to insert
         SequenceType seq = rmps.getSequence();
         Collection<SequenceAcknowledgement> acks = rmps.getAcks();
         Collection<AckRequestedType> reqs = rmps.getAcksRequested();
         if (seq == null && acks == null && reqs == null) {
-            return null;
+            return;
         }
-
-        // create element with namespace declaration included
-        Document doc = DOMUtils.createDocument();
-        Element header = doc.createElementNS(qname.getNamespaceURI(), qname.getLocalPart());
-        addNamespaceDecl(header);
 
         // build individual headers
         Marshaller marshaller = getContext().createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-        buildHeaders(seq, acks, reqs, rmps.isLastMessage(), header, marshaller);
-        return header;
-    }
-
-    /**
-     * Add WS-RM namespace declaration to element.
-     *
-     * @param element
-     */
-    protected void addNamespaceDecl(Element element) {
-        Attr attr = element.getOwnerDocument().createAttributeNS("http://www.w3.org/2000/xmlns/",
-            "xmlns:" + RMConstants.NAMESPACE_PREFIX);
-        attr.setValue(getWSRMNamespace());
-        element.setAttributeNodeNS(attr);
+        buildHeaders(seq, acks, reqs, rmps.isLastMessage(), headers);
     }
 
     /**
@@ -153,18 +158,12 @@ public abstract class EncoderDecoder {
      * @param qname constructed element name
      * @return element
      */
-    public Element buildHeaderFault(SequenceFault sf, QName qname) throws JAXBException {
-
-        // create element with namespace declaration included
-        Document doc = DOMUtils.createDocument();
-        Element header = doc.createElementNS(qname.getNamespaceURI(), qname.getLocalPart());
-        addNamespaceDecl(header);
-
-        // insert the actual fault
-        Marshaller marshaller = getContext().createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-        buildHeaderFault(sf, header, marshaller);
-        return header;
+    public Header buildHeaderFault(SequenceFault sf) throws JAXBException {
+        Object o = buildHeaderFaultObject(sf);
+        
+        return new Header(new QName(getConstants().getWSRMNamespace(),
+                                    RMConstants.SEQUENCE_FAULT_NAME),
+                          o, getDataBinding());
     }
 
     /**
@@ -179,18 +178,15 @@ public abstract class EncoderDecoder {
      * @throws JAXBException
      */
     protected abstract void buildHeaders(SequenceType seq, Collection<SequenceAcknowledgement> acks,
-        Collection<AckRequestedType> reqs, boolean last, Element header, Marshaller marshaller) throws JAXBException;
+        Collection<AckRequestedType> reqs, boolean last, List<Header> headers) throws JAXBException;
 
     /**
      * Build a header fault, using the correct protocol variation.
      *
      * @param sf
-     * @param header
-     * @param marshaller
-     * @throws JAXBException
+     * @return the object marshallable with the JAXContext 
      */
-    protected abstract void buildHeaderFault(SequenceFault sf, Element header, Marshaller marshaller)
-        throws JAXBException;
+    protected abstract Object buildHeaderFaultObject(SequenceFault sf);
 
     /**
      * Marshals a SequenceAcknowledgement to the appropriate external form.

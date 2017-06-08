@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.rm;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,12 +30,15 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.rm.v200702.AckRequestedType;
@@ -105,8 +109,10 @@ public final class EncoderDecoder10AImpl extends EncoderDecoder {
         return jaxbContext;
     }
 
+    @Override
     protected void buildHeaders(SequenceType seq, Collection<SequenceAcknowledgement> acks,
-        Collection<AckRequestedType> reqs, boolean last, Element header, Marshaller marshaller) throws JAXBException {
+        Collection<AckRequestedType> reqs, boolean last, List<Header> headers) throws JAXBException {
+       
         if (null != seq) {
             LOG.log(Level.FINE, "encoding sequence into RM header");
             org.apache.cxf.ws.rm.v200502wsa15.SequenceType toseq = VersionTransformer.convert200502wsa15(seq);
@@ -115,24 +121,30 @@ public final class EncoderDecoder10AImpl extends EncoderDecoder {
             }
             JAXBElement<org.apache.cxf.ws.rm.v200502wsa15.SequenceType> element
                 = RMUtils.getWSRM200502WSA200508Factory().createSequence(toseq);
-            marshaller.marshal(element, header);
+            headers.add(new SoapHeader(element.getName(), element, getDataBinding(), true));
         }
         if (null != acks) {
             LOG.log(Level.FINE, "encoding sequence acknowledgement(s) into RM header");
             for (SequenceAcknowledgement ack : acks) {
-                marshaller.marshal(VersionTransformer.convert200502wsa15(ack), header);
+                headers.add(new SoapHeader(new QName(getConstants().getWSRMNamespace(), 
+                                                     RMConstants.SEQUENCE_ACK_NAME),
+                                           VersionTransformer.convert200502wsa15(ack), getDataBinding()));
             }
         }
         if (null != reqs) {
             LOG.log(Level.FINE, "encoding acknowledgement request(s) into RM header");
             for (AckRequestedType req : reqs) {
-                marshaller.marshal(RMUtils.getWSRM200502WSA200508Factory()
-                    .createAckRequested(VersionTransformer.convert200502wsa15(req)), header);
+                headers.add(new SoapHeader(new QName(getConstants().getWSRMNamespace(), 
+                                                     RMConstants.ACK_REQUESTED_NAME),
+                                           RMUtils.getWSRM200502WSA200508Factory()
+                                               .createAckRequested(VersionTransformer.convert200502wsa15(req)),
+                                           getDataBinding()));
             }
         }
     }
 
-    public void buildHeaderFault(SequenceFault sf, Element header, Marshaller marshaller) throws JAXBException {
+    @Override
+    protected Object buildHeaderFaultObject(SequenceFault sf) {
         org.apache.cxf.ws.rm.v200502wsa15.SequenceFaultType flt =
             new org.apache.cxf.ws.rm.v200502wsa15.SequenceFaultType();
         flt.setFaultCode(sf.getFaultCode());
@@ -148,9 +160,7 @@ public final class EncoderDecoder10AImpl extends EncoderDecoder {
         if (data != null) {
             flt.getAny().add(data);
         }
-        marshaller.marshal(new JAXBElement<org.apache.cxf.ws.rm.v200502wsa15.SequenceFaultType>(
-            RM10Constants.SEQUENCE_FAULT_QNAME,
-            org.apache.cxf.ws.rm.v200502wsa15.SequenceFaultType.class, flt), header);
+        return flt;
     }
 
     public Element encodeSequenceAcknowledgement(SequenceAcknowledgement ack) throws JAXBException {
