@@ -22,15 +22,23 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.Set;
+import java.util.function.BiFunction;
+
+import static java.util.Arrays.asList;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AfterDeploymentValidation;
+import javax.enterprise.inject.spi.Annotated;
+import javax.enterprise.inject.spi.AnnotatedField;
+import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -41,6 +49,7 @@ import javax.enterprise.inject.spi.ProcessBean;
 import javax.enterprise.inject.spi.ProcessProducerField;
 import javax.enterprise.inject.spi.ProcessProducerMethod;
 import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -52,6 +61,7 @@ import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.cdi.extension.JAXRSServerFactoryCustomizationExtension;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.provider.ConfigurableProviderWrapper;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 /**
@@ -63,7 +73,7 @@ public class JAXRSCdiResourceExtension implements Extension {
 
     private final Set< Bean< ? > > applicationBeans = new LinkedHashSet< Bean< ? > >();
     private final List< Bean< ? > > serviceBeans = new ArrayList< Bean< ? > >();
-    private final List< Bean< ? > > providerBeans = new ArrayList< Bean< ? > >();
+    private final Map< Bean<?>, Annotated > providerBeans = new HashMap<>();
     private final List< Bean< ? extends Feature > > featureBeans = new ArrayList< Bean< ? extends Feature > >();
     private final List< CreationalContext< ? > > disposableCreationalContexts =
         new ArrayList< CreationalContext< ? > >();
@@ -109,9 +119,9 @@ public class JAXRSCdiResourceExtension implements Extension {
         } else if (event.getAnnotated().isAnnotationPresent(Path.class)) {
             serviceBeans.add(event.getBean());
         } else if (event.getAnnotated().isAnnotationPresent(Provider.class)) {
-            providerBeans.add(event.getBean());
+            providerBeans.put(event.getBean(), event.getAnnotated());
         } else if (event.getBean().getTypes().contains(javax.ws.rs.core.Feature.class)) {
-            providerBeans.add((Bean< ? extends Feature >)event.getBean());
+            providerBeans.put(event.getBean(), event.getAnnotated());
         } else if (event.getBean().getTypes().contains(Feature.class)) {
             featureBeans.add((Bean< ? extends Feature >)event.getBean());
         } else if (CdiBusBean.CXF.equals(event.getBean().getName())
@@ -285,7 +295,49 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @return the references for all discovered JAX-RS resources
      */
     private List< Object > loadProviders(final BeanManager beanManager, Collection<Class<?>> limitedClasses) {
-        return loadBeans(beanManager, limitedClasses, providerBeans);
+        return loadBeans(beanManager, limitedClasses, providerBeans.keySet(), (bean, provider) -> {
+            final Annotated annotatedType = providerBeans.get(bean);
+            if ((AnnotatedMethod.class.isInstance(annotatedType) || AnnotatedField.class.isInstance(annotatedType))
+                    && (annotatedType.isAnnotationPresent(Consumes.class)
+                    || annotatedType.isAnnotationPresent(javax.ws.rs.Produces.class))) {
+                final boolean reader = MessageBodyReader.class.isInstance(provider);
+                final boolean writer = MessageBodyWriter.class.isInstance(provider);
+                final ConfigurableProviderWrapper wrapper;
+                if (reader && writer) {
+                    wrapper = new ConfigurableProviderWrapper.ReaderWriter<>(
+                            MessageBodyReader.class.cast(provider), MessageBodyWriter.class.cast(provider));
+                } else if (reader) {
+                    wrapper = new ConfigurableProviderWrapper.Reader<>(MessageBodyReader.class.cast(provider));
+                } else if (writer) {
+                    wrapper = new ConfigurableProviderWrapper.Writer<>(MessageBodyWriter.class.cast(provider));
+                } else {
+                    return provider;
+                }
+
+                if (reader) {
+                    Consumes consumes = annotatedType.getAnnotation(Consumes.class);
+                    if (consumes == null) {
+                        consumes = provider.getClass().getAnnotation(Consumes.class);
+                    }
+                    if (consumes != null) {
+                        wrapper.setConsumeMediaTypes(asList(consumes.value()));
+                    }
+                }
+
+                if (writer) {
+                    javax.ws.rs.Produces produces = annotatedType.getAnnotation(javax.ws.rs.Produces.class);
+                    if (produces == null) {
+                        produces = provider.getClass().getAnnotation(javax.ws.rs.Produces.class);
+                    }
+                    if (produces != null) {
+                        wrapper.setConsumeMediaTypes(asList(produces.value()));
+                    }
+                }
+
+                return wrapper;
+            }
+            return provider;
+        });
     }
 
     /**
@@ -295,7 +347,7 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @return the references for all discovered JAX-RS providers
      */
     private List< Object > loadServices(final BeanManager beanManager, Collection<Class<?>> limitedClasses) {
-        return loadBeans(beanManager, limitedClasses, serviceBeans);
+        return loadBeans(beanManager, limitedClasses, serviceBeans, (a, b) -> b);
     }
 
     /**
@@ -306,16 +358,18 @@ public class JAXRSCdiResourceExtension implements Extension {
      * @return the references for all discovered JAX-RS providers
      */
     private List< Object > loadBeans(final BeanManager beanManager, Collection<Class<?>> limitedClasses,
-                                     Collection<Bean<?>> beans) {
+                                     Collection<Bean<?>> beans, final BiFunction<Bean<?>, Object, Object> processor) {
         final List< Object > instances = new ArrayList<>();
 
         for (final Bean< ? > bean: beans) {
             if (limitedClasses.isEmpty() || limitedClasses.contains(bean.getBeanClass())) {
                 instances.add(
-                      beanManager.getReference(
-                            bean,
-                            Object.class,
-                            createCreationalContext(beanManager, bean)
+                        processor.apply(
+                                bean,
+                                beanManager.getReference(
+                                    bean,
+                                    Object.class,
+                                    createCreationalContext(beanManager, bean))
                       )
                 );
             }
@@ -392,11 +446,10 @@ public class JAXRSCdiResourceExtension implements Extension {
             if (clazz.isAnnotationPresent(Path.class)) {
                 serviceBeans.add(event.getBean());
             } else if (clazz.isAnnotationPresent(Provider.class)) {
-                providerBeans.add(event.getBean());
+                providerBeans.put(event.getBean(), event.getAnnotated());
             } else if (clazz.isAnnotationPresent(ApplicationPath.class)) {
                 applicationBeans.add(event.getBean());
             } 
         }
     }
-
 }
