@@ -122,4 +122,20 @@
             </p:policies>
         </jaxws:features>
     </jaxws:client>
+    <http:conduit name="https://localhost:.*/DoubleItNoChildPolicy.*">
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:trustManagers>
+                <sec:keyStore type="jks" password="password" resource="keys/Truststore.jks"/>
+            </sec:trustManagers>
+        </http:tlsClientParameters>
+    </http:conduit>
+    <jaxws:client name="{http://www.example.org/contract/DoubleIt}DoubleItNoChildPolicyPort" createdFromAPI="true">
+        <jaxws:properties>
+       </jaxws:properties>
+        <jaxws:features>
+            <p:policies>
+                <wsp:PolicyReference xmlns:wsp="http://www.w3.org/ns/ws-policy" URI="classpath:/org/apache/cxf/systest/ws/https/nochild-policy.xml"/>
+            </p:policies>
+        </jaxws:features>
+    </jaxws:client>
 </beans>
