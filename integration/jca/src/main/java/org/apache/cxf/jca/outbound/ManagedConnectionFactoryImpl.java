@@ -35,7 +35,7 @@ import javax.resource.spi.ResourceAdapterAssociation;
 import javax.resource.spi.work.WorkManager;
 import javax.security.auth.Subject;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jca.core.logging.LoggerHelper;
 import org.apache.cxf.jca.cxf.ResourceAdapterImpl;

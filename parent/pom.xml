@@ -158,7 +158,7 @@
         <cxf.spring.ldap.version>2.3.1.RELEASE</cxf.spring.ldap.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.swagger2.version>1.5.16</cxf.swagger2.version>
-        <cxf.velocity.version>1.7</cxf.velocity.version>
+        <cxf.velocity.version>2.0</cxf.velocity.version>
         <cxf.woodstox.core.version>5.0.3</cxf.woodstox.core.version>
         <cxf.woodstox.stax2-api.version>3.1.4</cxf.woodstox.stax2-api.version>
         <cxf.wsdl4j.version>1.6.3</cxf.wsdl4j.version>
@@ -1563,7 +1563,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.velocity</groupId>
-                <artifactId>velocity</artifactId>
+                <artifactId>velocity-engine-core</artifactId>
                 <version>${cxf.velocity.version}</version>
             </dependency>
             <dependency>

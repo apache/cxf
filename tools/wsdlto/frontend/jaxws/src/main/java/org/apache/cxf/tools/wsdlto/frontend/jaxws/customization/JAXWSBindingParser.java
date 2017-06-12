@@ -35,7 +35,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -94,14 +94,14 @@ public class JAXWSBindingParser {
                     jaxwsBinding.setPackage(getPackageName(child));
                     Node docChild = DOMUtils.getChild(child, Node.ELEMENT_NODE);
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
-                        jaxwsBinding.setPackageJavaDoc(StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild)));
+                        jaxwsBinding.setPackageJavaDoc(StringEscapeUtils.escapeHtml4(DOMUtils.getContent(docChild)));
                     }
                 } else if (isJAXWSMethodElement(child)) {
                     jaxwsBinding.setMethodName(getMethodName(child));
                     Node docChild = DOMUtils.getChild(child, Node.ELEMENT_NODE);
 
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
-                        jaxwsBinding.setMethodJavaDoc(StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild)));
+                        jaxwsBinding.setMethodJavaDoc(StringEscapeUtils.escapeHtml4(DOMUtils.getContent(docChild)));
                     }
                 } else if (isJAXWSParameterElement(child)) {
                     Element childElement = (Element)child;
@@ -140,7 +140,7 @@ public class JAXWSBindingParser {
                     Node docChild = DOMUtils.getChild(child, Node.ELEMENT_NODE);
 
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
-                        javadoc = StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild));
+                        javadoc = StringEscapeUtils.escapeHtml4(DOMUtils.getContent(docChild));
                     }
 
                     JAXWSClass jaxwsClass = new JAXWSClass(clzName, javadoc);

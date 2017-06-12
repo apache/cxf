@@ -17,7 +17,7 @@
 
 package $intf.PackageName;
 
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
 import javax.annotation.Generated;
 #end
 import javax.xml.ws.Endpoint;
@@ -29,12 +29,12 @@ import javax.xml.ws.Endpoint;
  * 
  */
  
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
 @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
 #end
 public class ${serverClassName}{
 
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     protected ${serverClassName}() throws java.lang.Exception {
@@ -44,7 +44,7 @@ public class ${serverClassName}{
         Endpoint.publish(address, implementor);
     }
     
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     public static void main(String args[]) throws java.lang.Exception { 

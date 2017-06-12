@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.common.CommandInterfaceUtils;
 import org.apache.cxf.tools.java2ws.JavaToWS;

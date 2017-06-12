@@ -35,7 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;

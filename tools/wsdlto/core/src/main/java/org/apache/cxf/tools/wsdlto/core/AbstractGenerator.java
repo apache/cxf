@@ -116,7 +116,7 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
         setAttributes("version", Version.getCurrentVersion());
         setAttributes("fullversion", Version.getCompleteVersionString());
         setAttributes("name", Version.getName());
-        setAttributes("mark-generated", env.optionSet(ToolConstants.CFG_MARK_GENERATED));
+        setAttributes("markGenerated", env.optionSet(ToolConstants.CFG_MARK_GENERATED));
         if (env.optionSet(ToolConstants.CFG_FRONTEND)) {
             setAttributes("frontend", env.get(ToolConstants.CFG_FRONTEND));
         }

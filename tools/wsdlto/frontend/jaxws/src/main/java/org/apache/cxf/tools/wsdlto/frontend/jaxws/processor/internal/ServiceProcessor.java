@@ -35,7 +35,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.binding.soap.SOAPBindingUtil;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBinding;
 import org.apache.cxf.binding.soap.wsdl.extensions.SoapBody;

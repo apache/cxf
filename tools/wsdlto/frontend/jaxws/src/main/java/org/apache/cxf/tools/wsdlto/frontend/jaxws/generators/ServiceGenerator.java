@@ -158,7 +158,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                 setCommonAttributes();
 
                 String target = (String)env.get("service.target");
-                setAttributes("service-target", target);
+                setAttributes("serviceTarget", target);
                 if ("jaxws22".equals(target)) {
                     setAttributes("jaxws22", true);
                 }

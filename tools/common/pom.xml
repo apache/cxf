@@ -44,7 +44,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
+            <artifactId>velocity-engine-core</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>commons-collections</groupId>

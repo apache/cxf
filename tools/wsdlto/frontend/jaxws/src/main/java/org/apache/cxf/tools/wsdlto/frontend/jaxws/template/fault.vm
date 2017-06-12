@@ -17,7 +17,7 @@
 
 package $expClass.PackageName;
 
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
 import javax.annotation.Generated;
 #end
 import javax.xml.ws.WebFault;
@@ -39,45 +39,45 @@ $expClass.classJavaDoc
 #foreach ($field in $expClass.Fields)
 @WebFault(name = "$field.Name", targetNamespace = "$field.TargetNamespace")
 #end
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
 @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
 #end
 public class $expClass.Name extends $exceptionSuperclass {
 #if (${suid} != "")
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     public static final long serialVersionUID = ${suid}L;
 #end
 #foreach ($field in $expClass.Fields)
     
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     $field.Modifier $field.ClassName $paraName;
 
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     public ${expClass.Name}() {
         super();
     }
     
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     public ${expClass.Name}(String message) {
         super(message);
     }
     
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     public ${expClass.Name}(String message, Throwable cause) {
         super(message, cause);
     }
 
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     public ${expClass.Name}(String message, $field.ClassName $paraName) {
@@ -85,7 +85,7 @@ public class $expClass.Name extends $exceptionSuperclass {
         this.$paraName = $paraName;
     }
 
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     public ${expClass.Name}(String message, $field.ClassName $paraName, Throwable cause) {
@@ -93,7 +93,7 @@ public class $expClass.Name extends $exceptionSuperclass {
         this.$paraName = $paraName;
     }
 
-#if ($mark-generated == "true")
+#if ($markGenerated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     public $field.ClassName getFaultInfo() {

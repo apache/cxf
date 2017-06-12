@@ -33,7 +33,7 @@ import javax.jws.WebService;
 public class ${intf.Name}Impl implements $intf.Name {
 #foreach ($method in $intf.Methods)
 
-    public $method.return.ClassName ${method.Name}(#if($method.ParameterList.size() == 0))#end#if($method.ParameterList.size() != 0)#foreach ($param in ${method.ParameterList})$param#end)#end#if($method.Exceptions.size() > 0) throws#foreach($exception in $method.Exceptions) $exception.ClassName#if($method.Exceptions.size() != $velocityCount),#end#end#end {  
+    public $method.return.ClassName ${method.Name}(#if($method.ParameterList.size() == 0))#end#if($method.ParameterList.size() != 0)#foreach ($param in ${method.ParameterList})$param#end)#end#if($method.Exceptions.size() > 0) throws#foreach($exception in $method.Exceptions) $exception.ClassName#if($method.Exceptions.size() != $foreach.count),#end#end#end {  
 #foreach ($parameter in $method.Parameters)
 #if ($parameter.Style.toString() == "IN")
         System.out.println($parameter.Name);#end#end
