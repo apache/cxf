@@ -108,8 +108,14 @@ public final class TLSClientParametersConfig {
                         params.getSecureRandomParameters()));
         }
         if (params.isSetKeyManagers() && !usingDefaults) {
-            ret.setKeyManagers(
-                TLSParameterJaxBUtils.getKeyManagers(params.getKeyManagers()));
+            if (!params.isSetCertAlias()) {
+                ret.setKeyManagers(
+                                    TLSParameterJaxBUtils.getKeyManagers(params.getKeyManagers()));
+            } else {
+                ret.setKeyManagers(
+                                    TLSParameterJaxBUtils.getKeyManagers(params.getKeyManagers(), 
+                                                                         params.getCertAlias()));
+            }
         }
         if (params.isSetTrustManagers() && !usingDefaults) {
             ret.setTrustManagers(
