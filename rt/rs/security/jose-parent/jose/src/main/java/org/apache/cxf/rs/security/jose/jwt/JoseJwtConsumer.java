@@ -27,9 +27,7 @@ import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactConsumer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 
 public class JoseJwtConsumer extends AbstractJoseConsumer {
-    private boolean jwsRequired = true;
-    private boolean jweRequired;
-
+    
     private int clockOffset;
     private int ttl;
 
@@ -39,9 +37,7 @@ public class JoseJwtConsumer extends AbstractJoseConsumer {
     public JwtToken getJwtToken(String wrappedJwtToken,
                                    JweDecryptionProvider theDecryptor,
                                    JwsSignatureVerifier theSigVerifier) {
-        if (!isJwsRequired() && !isJweRequired()) {
-            throw new JwtException("Unable to process JWT");
-        }
+        super.checkProcessRequirements();
 
         JweHeaders jweHeaders = new JweHeaders();
         if (isJweRequired()) {
@@ -91,22 +87,7 @@ public class JoseJwtConsumer extends AbstractJoseConsumer {
 
     protected void validateToken(JwtToken jwt) {
     }
-    public boolean isJwsRequired() {
-        return jwsRequired;
-    }
-
-    public void setJwsRequired(boolean jwsRequired) {
-        this.jwsRequired = jwsRequired;
-    }
-
-    public boolean isJweRequired() {
-        return jweRequired;
-    }
-
-    public void setJweRequired(boolean jweRequired) {
-        this.jweRequired = jweRequired;
-    }
-
+    
     public int getClockOffset() {
         return clockOffset;
     }

@@ -26,18 +26,14 @@ import org.apache.cxf.rs.security.jose.jws.JwsJwtCompactProducer;
 import org.apache.cxf.rs.security.jose.jws.JwsSignatureProvider;
 
 public class JoseJwtProducer extends AbstractJoseProducer {
-    private boolean jwsRequired = true;
-    private boolean jweRequired;
-
+    
     public String processJwt(JwtToken jwt) {
         return processJwt(jwt, null, null);
     }
     public String processJwt(JwtToken jwt,
                                 JweEncryptionProvider theEncProvider,
                                 JwsSignatureProvider theSigProvider) {
-        if (!isJwsRequired() && !isJweRequired()) {
-            throw new JwtException("Unable to secure JWT");
-        }
+        super.checkProcessRequirements();
         String data = null;
 
         if (isJweRequired() && theEncProvider == null) {
@@ -48,12 +44,13 @@ public class JoseJwtProducer extends AbstractJoseProducer {
         }
 
         if (isJwsRequired()) {
+            
             JwsJwtCompactProducer jws = new JwsJwtCompactProducer(jwt);
             if (jws.isPlainText()) {
                 data = jws.getSignedEncodedJws();
             } else {
                 if (theSigProvider == null) {
-                    theSigProvider = getInitializedSignatureProvider(jwt.getJwsHeaders());
+                    theSigProvider = getInitializedSignatureProvider(jws.getJwsHeaders());
                 }
 
                 if (theSigProvider == null) {
@@ -63,29 +60,13 @@ public class JoseJwtProducer extends AbstractJoseProducer {
                 data = jws.signWith(theSigProvider);
             }
             if (theEncProvider != null) {
-                data = theEncProvider.encrypt(StringUtils.toBytesUTF8(data), null);
+                data = theEncProvider.encrypt(StringUtils.toBytesUTF8(data), jwt.getJweHeaders());
             }
         } else {
-            JweJwtCompactProducer jwe = new JweJwtCompactProducer(jwt);
+            JweJwtCompactProducer jwe = new JweJwtCompactProducer(jwt.getJweHeaders(), jwt.getClaims());
             data = jwe.encryptWith(theEncProvider);
         }
         return data;
-    }
-
-    public boolean isJwsRequired() {
-        return jwsRequired;
-    }
-
-    public void setJwsRequired(boolean jwsRequired) {
-        this.jwsRequired = jwsRequired;
-    }
-
-    public boolean isJweRequired() {
-        return jweRequired;
-    }
-
-    public void setJweRequired(boolean jweRequired) {
-        this.jweRequired = jweRequired;
     }
 
 }
