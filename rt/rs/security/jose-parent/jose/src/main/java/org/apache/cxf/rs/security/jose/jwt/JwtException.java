@@ -26,10 +26,13 @@ public class JwtException extends JoseException {
     public JwtException() {
 
     }
-    public JwtException(String error) {
-        super(error);
+    public JwtException(String message) {
+        super(message);
     }
     public JwtException(Throwable cause) {
         super(cause);
+    }
+    public JwtException(String error, Throwable cause) {
+        super(error, cause);
     }
 }

@@ -473,7 +473,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     protected static class SwaggerUIResourceFilter implements ContainerRequestFilter {
         private static final Pattern PATTERN =
             Pattern.compile(
-                  ".*js|.*gz|.*map|oauth2*[.]html|.*png|.*css|.*ico|"
+                  ".*[.]js|.*[.]gz|.*[.]map|oauth2*[.]html|.*[.]png|.*[.]css|.*[.]ico|"
                   + "/css/.*|/images/.*|/lib/.*|/fonts/.*"
             );
 
