@@ -26,6 +26,8 @@ import org.apache.cxf.rs.security.jose.jws.JwsSignatureVerifier;
 import org.apache.cxf.rs.security.jose.jws.JwsUtils;
 
 public abstract class AbstractJoseConsumer {
+    private boolean jwsRequired = true;
+    private boolean jweRequired;
     private JweDecryptionProvider jweDecryptor;
     private JwsSignatureVerifier jwsVerifier;
     
@@ -59,4 +61,25 @@ public abstract class AbstractJoseConsumer {
         return JwsUtils.loadSignatureVerifier(jwsHeaders, false);
     }
 
+    public boolean isJwsRequired() {
+        return jwsRequired;
+    }
+
+    public void setJwsRequired(boolean jwsRequired) {
+        this.jwsRequired = jwsRequired;
+    }
+
+    public boolean isJweRequired() {
+        return jweRequired;
+    }
+
+    public void setJweRequired(boolean jweRequired) {
+        this.jweRequired = jweRequired;
+    }
+
+    protected void checkProcessRequirements() {
+        if (!isJwsRequired() && !isJweRequired()) {
+            throw new JoseException("Unable to process the data");
+        }
+    }
 }
