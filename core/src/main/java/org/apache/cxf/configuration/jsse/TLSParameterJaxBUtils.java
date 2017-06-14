@@ -293,19 +293,20 @@ public final class TLSParameterJaxBUtils {
         throws GeneralSecurityException,
                IOException {
 
-        KeyStore keyStore = getKeyStore(kmc.getKeyStore(), false);
+        KeyStore keyStore = getKeyStore(kmc.getKeyStore());
 
         String alg = kmc.isSetFactoryAlgorithm()
                      ? kmc.getFactoryAlgorithm()
                      : KeyManagerFactory.getDefaultAlgorithm();
 
-        char[] keyPass = getKeyPassword(kmc);
+        char[] keyPass = kmc.isSetKeyPassword()
+                     ? deobfuscate(kmc.getKeyPassword())
+                     : null;
 
         KeyManagerFactory fac =
                      kmc.isSetProvider()
                      ? KeyManagerFactory.getInstance(alg, kmc.getProvider())
                      : KeyManagerFactory.getInstance(alg);
-                     
         try {             
             fac.init(keyStore, keyPass);
 
