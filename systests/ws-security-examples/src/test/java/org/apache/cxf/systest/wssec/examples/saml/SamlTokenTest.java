@@ -37,18 +37,17 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.example.contract.doubleit.DoubleItPortType;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 
 /**
  * A set of tests for SAML Tokens using policies defined in the OASIS spec:
  * "WS-SecurityPolicy Examples Version 1.0".
  */
-@Ignore("invalid")
+//@Ignore("invalid")
 public class SamlTokenTest extends AbstractBusClientServerTestBase {
     static final String PORT = allocatePort(Server.class);
     static final String PORT2 = allocatePort(Server.class, 2);
     static final String STS_PORT = allocatePort(STSServer.class);
-    
+
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
@@ -67,7 +66,7 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             launchServer(STSServer.class, true)
         );
     }
-    
+
     @org.junit.AfterClass
     public static void cleanup() throws Exception {
         SecurityTestUtil.cleanup();
@@ -90,16 +89,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItBearerPort");
-        DoubleItPortType samlPort = 
+        DoubleItPortType samlPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
-        
+
         samlPort.doubleIt(25);
-        
+
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * 2.3.1.2 (WSS1.0) SAML1.1 Assertion (Sender Vouches) over SSL
      */
@@ -116,16 +115,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSSenderVouchesPort");
-        DoubleItPortType samlPort = 
+        DoubleItPortType samlPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT2);
-        
+
         samlPort.doubleIt(25);
-        
+
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * 2.3.1.3 (WSS1.0) SAML1.1 Assertion (HK) over SSL
      */
@@ -142,16 +141,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSHOKSignedEndorsingPort");
-        DoubleItPortType samlPort = 
+        DoubleItPortType samlPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT2);
-        
+
         samlPort.doubleIt(25);
-        
+
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * 2.3.1.4 (WSS1.0) SAML1.1 Sender Vouches with X.509 Certificates, Sign, Optional Encrypt
      */
@@ -168,16 +167,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSignedPort");
-        DoubleItPortType samlPort = 
+        DoubleItPortType samlPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
-        
+
         samlPort.doubleIt(25);
-        
+
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * 2.3.1.5 (WSS1.0) SAML1.1 Holder of Key, Sign, Optional Encrypt
      */
@@ -194,17 +193,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricInitiatorPort");
-        DoubleItPortType samlPort = 
+        DoubleItPortType samlPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
-        
+
         samlPort.doubleIt(25);
-        
+
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
-    
+
+
     /**
      * 2.3.2.1 (WSS1.1) SAML 2.0 Bearer
      */
@@ -221,16 +220,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItAsymmetricSaml2BearerPort");
-        DoubleItPortType samlPort = 
+        DoubleItPortType samlPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
-        
+
         samlPort.doubleIt(25);
-        
+
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * 2.3.2.2 (WSS1.1) SAML2.0 Sender Vouches over SSL
      */
@@ -247,16 +246,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSSenderVouchesSaml2Port");
-        DoubleItPortType samlPort = 
+        DoubleItPortType samlPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT2);
-        
+
         samlPort.doubleIt(25);
-        
+
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * 2.3.2.3 (WSS1.1) SAML2.0 HoK over SSL
      */
@@ -273,16 +272,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItTLSHOKSignedEndorsingSaml2Port");
-        DoubleItPortType samlPort = 
+        DoubleItPortType samlPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT2);
-        
+
         samlPort.doubleIt(25);
-        
+
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * 2.3.2.4 (WSS1.1) SAML1.1/2.0 Sender Vouches with X.509 Certificate, Sign, Encrypt
      */
@@ -299,16 +298,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricSVPort");
-        DoubleItPortType samlPort = 
+        DoubleItPortType samlPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
-        
+
         samlPort.doubleIt(25);
-        
+
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
+
     /**
      * 2.3.2.5 (WSS1.1) SAML1.1/2.0 Holder of Key, Sign, Encrypt
      */
@@ -325,17 +324,17 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
         URL wsdl = SamlTokenTest.class.getResource("DoubleItSaml.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);
         QName portQName = new QName(NAMESPACE, "DoubleItSymmetricIssuedTokenPort");
-        DoubleItPortType samlPort = 
+        DoubleItPortType samlPort =
                 service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(samlPort, PORT);
         updateSTSPort((BindingProvider)samlPort, STS_PORT);
-        
+
         samlPort.doubleIt(25);
-        
+
         ((java.io.Closeable)samlPort).close();
         bus.shutdown(true);
     }
-    
+
     private static void updateSTSPort(BindingProvider p, String port) {
         STSClient stsClient = (STSClient)p.getRequestContext().get(SecurityConstants.STS_CLIENT);
         if (stsClient != null) {
