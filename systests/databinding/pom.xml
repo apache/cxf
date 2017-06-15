@@ -165,6 +165,7 @@
             <plugin>
                 <groupId>org.jibx</groupId>
                 <artifactId>maven-jibx-plugin</artifactId>
+                <version>${cxf.jibx.version}</version>
                 <configuration>
                     <directory>target/generated/src/test/java/jibx_bindings</directory>
                     <!--load>true</load-->

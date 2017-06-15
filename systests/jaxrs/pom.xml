@@ -354,6 +354,7 @@
             <plugin>
         <groupId>org.jibx</groupId>
         <artifactId>maven-jibx-plugin</artifactId>
+        <version>${cxf.jibx.version}</version>
         <executions>
             <execution>
                 <id>generate-java-code-from-schema</id>
