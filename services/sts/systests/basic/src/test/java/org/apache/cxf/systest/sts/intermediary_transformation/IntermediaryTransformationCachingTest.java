@@ -41,7 +41,7 @@ import org.junit.BeforeClass;
  * service provider. The intermediary service provider validates the token, and then the
  * Intermediary client uses delegation to dispatch the received token (via OnBehalfOf) to another
  * STS instance. The retrieved token is sent to the service provider via (2-way) TLS. The STSClient is disabled
- * after two invocations, meaning that the Intermediary client must rely on its cache to get tokens. 
+ * after two invocations, meaning that the Intermediary client must rely on its cache to get tokens.
  */
 public class IntermediaryTransformationCachingTest extends AbstractBusClientServerTestBase {
 
@@ -53,7 +53,7 @@ public class IntermediaryTransformationCachingTest extends AbstractBusClientServ
     private static final String NAMESPACE = "http://www.example.org/contract/DoubleIt";
     private static final QName SERVICE_QNAME = new QName(NAMESPACE, "DoubleItService");
 
-    private static final String PORT = allocatePort(Intermediary.class);
+    private static final String PORT = allocatePort(IntermediaryCaching.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -103,7 +103,7 @@ public class IntermediaryTransformationCachingTest extends AbstractBusClientServ
 
         // Make initial successful invocation (for "alice")
         doubleIt(alicePort, 25);
-        
+
         // Make another successful invocation for "bob"
         DoubleItPortType bobPort = service.getPort(portQName, DoubleItPortType.class);
         updateAddressPort(bobPort, PORT);
@@ -115,7 +115,7 @@ public class IntermediaryTransformationCachingTest extends AbstractBusClientServ
         // Make another invocation for "bob" - this should work as the intermediary caches the token
         // even though its STSClient is disabled after the second invocation
         doubleIt(bobPort, 35);
-        
+
         // Make another invocation for "alice" - this should work as the intermediary caches the token
         // even though its STSClient is disabled after the first invocation
         doubleIt(alicePort, 40);
