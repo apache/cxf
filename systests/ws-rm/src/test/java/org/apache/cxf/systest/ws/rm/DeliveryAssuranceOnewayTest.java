@@ -25,7 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import javax.jws.WebService;
@@ -234,6 +236,44 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
                 argNum++;
             }
             assertTrue("Message out of order", argNum < callArgs.length);
+        }
+    }
+    
+    @Test
+    public void testOnewayAtLeastOnceInOrderDelay() throws Exception {
+        int numMessages = 4;
+        init("org/apache/cxf/systest/ws/rm/atleastonce-inorder.xml", null);
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        SingleMessageDelaySimulator sps = new SingleMessageDelaySimulator();
+        sps.setDelay(600L);
+        greeterBus.getOutInterceptors().add(sps);
+        int num = 1;
+        greeter.greetMe(Integer.toString(num++));
+        for (int c = 2; c <= numMessages; c++) {
+            int currentNum = num++;
+            Thread.sleep(100);
+            executor.submit(new Runnable() {
+
+                @Override
+                public void run() {
+                    greeter.greetMe(Integer.toString(currentNum));
+                }
+            });
+        }
+        executor.shutdown();
+        executor.awaitTermination(10, TimeUnit.SECONDS);
+        LOG.info("Waiting for " + numMessages + " messages to arrive");
+        awaitMessages(numMessages, 1000, 10000);
+        List<String> actualArgs = GreeterProvider.CALL_ARGS;
+        assertEquals("Some messages were not received", numMessages, actualArgs.size());
+        assertInOrder(actualArgs);
+    }
+
+    private void assertInOrder(List<String> actualArgs) {
+        int argNum = 0;
+        for (String actual : actualArgs) {
+            argNum++;
+            assertEquals(Integer.toString(argNum), actual);
         }
     }
 
