@@ -24,10 +24,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,7 +68,8 @@ public class DestinationSequence extends AbstractSequence {
     private volatile long inProcessNumber;
     private volatile long highNumberCompleted;
     private long nextInOrder;
-    private List<Continuation> continuations = new LinkedList<Continuation>();
+    //be careful, must be used in sync block
+    private Map<Long, Continuation> continuations = new TreeMap<Long, Continuation>();
     // this map is used for robust and redelivery tracking. for redelivery it holds the beingDeliverd messages
     private Set<Long> deliveringMessageNumbers = new HashSet<>();
 
@@ -383,7 +385,7 @@ public class DestinationSequence extends AbstractSequence {
             if (continuation != null) {
                 continuation.setObject(message);
                 if (continuation.suspend(-1)) {
-                    continuations.add(continuation);
+                    continuations.put(mn, continuation);
                     throw new SuspendedInvocationException();
                 }
             }
@@ -396,17 +398,28 @@ public class DestinationSequence extends AbstractSequence {
             }
         }
     }
-    synchronized void wakeupAll() {
-        if (!continuations.isEmpty()) {
-            continuations.remove(0).resume();
+    synchronized void wakeupNext(long i) {
+        try {
+            Continuation c = continuations.remove(i + 1);
+            if (c != null) {
+                //next was found, don't resume everything, just the next one
+                c.resume();
+                return;
+            }
+            //next wasn't found, just resume whatever is first...
+            for (Map.Entry<Long, Continuation> entry : continuations.entrySet()) {
+                entry.getValue().resume();
+                return;
+            }
+        } finally {
+            notifyAll();
         }
-        notifyAll();
     }
 
     synchronized void processingComplete(long mn) {
         inProcessNumber = 0;
         highNumberCompleted = mn;
-        wakeupAll();
+        wakeupNext(mn);
     }
 
     void purgeAcknowledged(long messageNr) {
