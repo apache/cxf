@@ -397,9 +397,8 @@ public class DestinationSequence extends AbstractSequence {
         }
     }
     synchronized void wakeupAll() {
-        while (!continuations.isEmpty()) {
-            Continuation c = continuations.remove(0);
-            c.resume();
+        if (!continuations.isEmpty()) {
+            continuations.remove(0).resume();
         }
         notifyAll();
     }
