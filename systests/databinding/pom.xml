@@ -165,7 +165,7 @@
             <plugin>
                 <groupId>org.jibx</groupId>
                 <artifactId>maven-jibx-plugin</artifactId>
-                <version>${cxf.jibx.version}</version>
+                <version>1.3.1</version>
                 <configuration>
                     <directory>target/generated/src/test/java/jibx_bindings</directory>
                     <!--load>true</load-->
@@ -183,6 +183,24 @@
                         </goals>
                     </execution>
                 </executions>
+	            <dependencies>
+	               <dependency>
+	                  <groupId>org.jibx</groupId>
+	                  <artifactId>jibx-bind</artifactId>
+	                  <version>1.3.1</version>
+	                  <exclusions>
+	                     <exclusion>
+	                        <artifactId>bcel</artifactId>
+	                        <groupId>bcel</groupId>
+	                     </exclusion>
+	                  </exclusions>
+	               </dependency>
+	               <dependency>
+	                  <groupId>org.apache.bcel</groupId>
+	                  <artifactId>bcel</artifactId>
+	                  <version>6.0</version>
+	               </dependency>
+	            </dependencies>
             </plugin>
         </plugins>
     </build>
