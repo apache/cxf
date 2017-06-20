@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.rs.security.jose.jwe;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.Key;
 import java.security.PrivateKey;
@@ -28,6 +29,9 @@ import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.ECFieldFp;
+import java.security.spec.ECPoint;
+import java.security.spec.EllipticCurve;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -667,12 +671,53 @@ public final class JweUtils {
                           JwkUtils.toECPublicKey(peerPublicKey),
                           partyUInfo, partyVInfo, algoName, algoKeyBitLen);
     }
+    
     public static byte[] getECDHKey(ECPrivateKey privateKey,
                                     ECPublicKey peerPublicKey,
                                     byte[] partyUInfo,
                                     byte[] partyVInfo,
                                     String algoName,
                                     int algoKeyBitLen) {
+        // Validate the peerPublicKey first
+        
+        // Credits: 
+        // https://neilmadden.wordpress.com/2017/05/17/so-how-do-you-validate-nist-ecdh-public-keys/
+        // https://blogs.adobe.com/security/2017/03/critical-vulnerability-uncovered-in-json-encryption.html 
+        
+        // Step 1: Verify public key is not point at infinity. 
+        if (ECPoint.POINT_INFINITY.equals(peerPublicKey.getW())) {
+            throw new JweException(JweException.Error.KEY_ENCRYPTION_FAILURE);
+        }
+        EllipticCurve curve = peerPublicKey.getParams().getCurve();
+        
+        final BigInteger x = peerPublicKey.getW().getAffineX();
+        final BigInteger y = peerPublicKey.getW().getAffineY();
+        final BigInteger p = ((ECFieldFp) curve.getField()).getP();
+
+        // Step 2: Verify x and y are in range [0,p-1]
+        if (x.compareTo(BigInteger.ZERO) < 0 || x.compareTo(p) >= 0
+                || y.compareTo(BigInteger.ZERO) < 0 || y.compareTo(p) >= 0) {
+            throw new JweException(JweException.Error.KEY_ENCRYPTION_FAILURE);
+        }
+        final BigInteger a = curve.getA();
+        final BigInteger b = curve.getB();
+
+        // Step 3: Verify that y^2 == x^3 + ax + b (mod p)
+        final BigInteger ySquared = y.modPow(BigInteger.valueOf(2), p);
+        final BigInteger xCubedPlusAXPlusB = x.modPow(BigInteger.valueOf(3), p).add(a.multiply(x)).add(b).mod(p);
+        if (!ySquared.equals(xCubedPlusAXPlusB)) {
+            throw new JweException(JweException.Error.KEY_ENCRYPTION_FAILURE);
+        }
+        
+        // Step 4: Verify that nQ = 0, where n is the order of the curve and Q is the public key.
+        // As per http://www.secg.org/sec1-v2.pdf section 3.2.2:
+        // "In Step 4, it may not be necessary to compute the point nQ. For example, if h = 1, then nQ = O is implied
+        // by the checks in Steps 2 and 3, because this property holds for all points Q ∈ E"
+        // All the NIST curves used here define h = 1.
+        assert peerPublicKey.getParams().getCofactor() == 1;
+
+        // Finally calculate the derived key
+        
         byte[] keyZ = generateKeyZ(privateKey, peerPublicKey);
         return calculateDerivedKey(keyZ, algoName, partyUInfo, partyVInfo, algoKeyBitLen);
     }

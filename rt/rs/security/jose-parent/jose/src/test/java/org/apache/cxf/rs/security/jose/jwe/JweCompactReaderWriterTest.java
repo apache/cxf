@@ -33,9 +33,11 @@ import org.apache.cxf.rs.security.jose.jwa.AlgorithmUtils;
 import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
 import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
+import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.rs.security.jose.jws.JwsCompactReaderWriterTest;
 import org.apache.cxf.rt.security.crypto.CryptoUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -138,6 +140,61 @@ public class JweCompactReaderWriterTest extends Assert {
         JweDecryptionProvider jweIn =
             new EcdhDirectKeyJweDecryption(bobPrivateKey, ContentAlgorithm.A128GCM);
         assertEquals("Hello", jweIn.decrypt(jweOutput).getContentText());
+    }
+    
+    @Test
+    public void testRejectInvalidCurve() throws Exception {
+        // Test vectors are provided by Antonio Sanso, test follows a pattern based 
+        // on a similar contribution from Antonio to jose4j.
+        String receiverJwkJson = "\n{\"kty\":\"EC\",\n"
+                + " \"crv\":\"P-256\",\n"
+                + " \"x\":\"weNJy2HscCSM6AEDTDg04biOvhFhyyWvOHQfeF_PxMQ\",\n"
+                + " \"y\":\"e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck\",\n"
+                + " \"d\":\"VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw\"\n"
+                + "}";
+        JsonWebKey receiverJwk = JwkUtils.readJwkKey(receiverJwkJson);
+        ECPrivateKey privateKey = JwkUtils.toECPrivateKey(receiverJwk);
+        
+        //========================= attacking point #1 with order 113 ======================
+        //The malicious JWE contains a public key with order 113
+        String maliciousJWE1 = "eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkExMjhDQkMtSFMyNTYiLCJlcGsiOnsia3R5IjoiRU"
+            + "MiLCJ4IjoiZ1Rsa"
+            + "TY1ZVRRN3otQmgxNDdmZjhLM203azJVaURpRzJMcFlrV0FhRkpDYyIsInkiOiJjTEFuakthNGJ6akQ3REpWUHdhOUVQclJ6TUc3"
+            + "ck9OZ3NpVUQta"
+            + "2YzMEZzIiwiY3J2IjoiUC0yNTYifX0.qGAdxtEnrV_3zbIxU2ZKrMWcejNltjA_dtefBFnRh9A2z9cNIqYRWg.pEA5kX304PMCOm"
+            + "FSKX_cEg.a9f"
+            + "wUrx2JXi1OnWEMOmZhXd94-bEGCH9xxRwqcGuG2AMo-AwHoljdsH5C_kcTqlXS5p51OB1tvgQcMwB5rpTxg.72CHiYFecyDvuUa4"
+            + "3KKT6w";
+
+        
+        JweDecryptionProvider jweIn = JweUtils.createJweDecryptionProvider(privateKey, 
+                                                                 KeyAlgorithm.ECDH_ES_A128KW,
+                                                                 ContentAlgorithm.A128CBC_HS256);
+        try {
+            jweIn.decrypt(maliciousJWE1);
+            fail("Decryption should have failed due to invalid curve");
+        } catch (JweException e) {
+            // continue
+        }
+
+        //========================= attacking point #2 with order 2447 ======================
+        //The malicious JWE contains a public key with order 2447
+        String maliciousJWE2 = "eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkExMjhDQkMtSFMyNTYiLCJlcGsiOnsia3R5IjoiRU"
+        + "MiLCJ4IjoiWE9YR1"
+        + "E5XzZRQ3ZCZzN1OHZDSS1VZEJ2SUNBRWNOTkJyZnFkN3RHN29RNCIsInkiOiJoUW9XTm90bk56S2x3aUNuZUprTElxRG5UTnc3SXNkQ"
+        + "kM1M1ZVcVZ"
+        + "qVkpjIiwiY3J2IjoiUC0yNTYifX0.UGb3hX3ePAvtFB9TCdWsNkFTv9QWxSr3MpYNiSBdW630uRXRBT3sxw.6VpU84oMob16DxOR98Y"
+        + "TRw.y1Uslv"
+        + "tkoWdl9HpugfP0rSAkTw1xhm_LbK1iRXzGdpYqNwIG5VU33UBpKAtKFBoA1Kk_sYtfnHYAvn-aes4FTg.UZPN8h7FcvA5MIOq-Pkj8A";
+        JweDecryptionProvider jweIn2 = JweUtils.createJweDecryptionProvider(privateKey, 
+                                                                           KeyAlgorithm.ECDH_ES_A128KW,
+                                                                           ContentAlgorithm.A128CBC_HS256);
+        try {
+            jweIn2.decrypt(maliciousJWE2);
+            fail("Decryption should have failed due to invalid curve");
+        } catch (JweException e) {
+            // expected
+        }
     }
     @Test
     public void testEncryptDecryptRSA15WrapA128CBCHS256() throws Exception {
