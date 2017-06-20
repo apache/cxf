@@ -714,7 +714,9 @@ public final class JweUtils {
         // "In Step 4, it may not be necessary to compute the point nQ. For example, if h = 1, then nQ = O is implied
         // by the checks in Steps 2 and 3, because this property holds for all points Q ∈ E"
         // All the NIST curves used here define h = 1.
-        assert peerPublicKey.getParams().getCofactor() == 1;
+        if (peerPublicKey.getParams().getCofactor() != 1) {
+            throw new JweException(JweException.Error.KEY_ENCRYPTION_FAILURE);
+        }
 
         // Finally calculate the derived key
         
