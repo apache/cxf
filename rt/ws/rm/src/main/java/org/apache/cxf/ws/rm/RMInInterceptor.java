@@ -188,6 +188,7 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
         RMEndpoint rme = getManager().getReliableEndpoint(message);
         Destination destination = getManager().getDestination(message);
 
+        assertReliability(message);
         if (isApplicationMessage) {
             if (null != rmps) {
                 processAcknowledgments(rme, rmps, protocol);
@@ -225,8 +226,6 @@ public class RMInInterceptor extends AbstractRMInterceptor<Message> {
                 return;
             }
         }
-
-        assertReliability(message);
     }
 
     void processAcknowledgments(RMEndpoint rme, RMProperties rmps, ProtocolVariation protocol)
