@@ -406,11 +406,7 @@ public class DestinationSequence extends AbstractSequence {
                 c.resume();
                 return;
             }
-            //next wasn't found, just resume whatever is first...
-            for (Map.Entry<Long, Continuation> entry : continuations.entrySet()) {
-                entry.getValue().resume();
-                return;
-            }
+            //next wasn't found, nothing to resume, assume it will come in later...
         } finally {
             notifyAll();
         }
