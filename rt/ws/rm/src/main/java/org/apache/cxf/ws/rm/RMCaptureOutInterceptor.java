@@ -164,7 +164,7 @@ public class RMCaptureOutInterceptor extends AbstractRMInterceptor<Message>  {
                     seq = getManager().getSequence(inSeqId, msg, maps);
                 }
                 assert null != seq;
-
+                
                 // increase message number and store a sequence type object in
                 // context
                 seq.nextMessageNumber(inSeqId, inMessageNumber, isLastMessage);
