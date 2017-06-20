@@ -250,7 +250,7 @@ public class DeliveryAssuranceOnewayTest extends AbstractBusClientServerTestBase
         int num = 1;
         greeter.greetMe(Integer.toString(num++));
         for (int c = 2; c <= numMessages; c++) {
-            int currentNum = num++;
+            final int currentNum = num++;
             Thread.sleep(100);
             executor.submit(new Runnable() {
 
