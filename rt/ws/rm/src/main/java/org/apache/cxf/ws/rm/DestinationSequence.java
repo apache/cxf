@@ -41,7 +41,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.ws.policy.PolicyVerificationInInterceptor;
 import org.apache.cxf.ws.rm.RMConfiguration.DeliveryAssurance;
 import org.apache.cxf.ws.rm.manager.AcksPolicyType;
 import org.apache.cxf.ws.rm.persistence.PersistenceUtils;
@@ -184,39 +183,24 @@ public class DestinationSequence extends AbstractSequence {
 
         if (updated) {
             RMStore store = destination.getManager().getStore();
-            if (null != store) {
-                // only save message, when policy verification is successful
-                // otherwise msgs will be stored and redelivered which do not pass initial verification
-                // as interceptor is called in a later phase than the capturing
-                PolicyVerificationInInterceptor intercep = new PolicyVerificationInInterceptor();
-                boolean policiesVerified = false;
+            if (null != store && !MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
                 try {
-                    intercep.handleMessage(message);
-                    policiesVerified = true;
-                } catch (Fault e) {
-                    // Ignore
-                }
-                RMMessage msg = null;
-                if (policiesVerified
-                    && !MessageUtils.isTrue(message.getContextualProperty(Message.ROBUST_ONEWAY))) {
-                    try {
-                        msg = new RMMessage();
-                        CachedOutputStream cos = (CachedOutputStream)message
-                            .get(RMMessageConstants.SAVED_CONTENT);
-                        msg.setMessageNumber(st.getMessageNumber());
-                        msg.setCreatedTime(rmps.getCreatedTime());
-                        // in case no attachments are available, cos can be saved directly
-                        if (message.getAttachments() == null) {
-                            msg.setContent(cos);
-                            msg.setContentType((String)message.get(Message.CONTENT_TYPE));
-                        } else {
-                            InputStream is = cos.getInputStream();
-                            PersistenceUtils.encodeRMContent(msg, message, is);
-                        }
-                        store.persistIncoming(this, msg);
-                    } catch (IOException e) {
-                        throw new Fault(e);
+                    RMMessage msg = new RMMessage();
+                    CachedOutputStream cos = (CachedOutputStream)message
+                        .get(RMMessageConstants.SAVED_CONTENT);
+                    msg.setMessageNumber(st.getMessageNumber());
+                    msg.setCreatedTime(rmps.getCreatedTime());
+                    // in case no attachments are available, cos can be saved directly
+                    if (message.getAttachments() == null) {
+                        msg.setContent(cos);
+                        msg.setContentType((String)message.get(Message.CONTENT_TYPE));
+                    } else {
+                        InputStream is = cos.getInputStream();
+                        PersistenceUtils.encodeRMContent(msg, message, is);
                     }
+                    store.persistIncoming(this, msg);
+                } catch (IOException e) {
+                    throw new Fault(e);
                 }
             }
         }
