@@ -116,7 +116,17 @@ public class JAXRSClientServerValidationTest extends AbstractJAXRSValidationTest
         final Response r = createWebClient("/bookstore/books").post(new Form());
         assertEquals(Status.BAD_REQUEST.getStatusCode(), r.getStatus());
     }
-    
+    @Test
+    public void testThatNotNullValidationSkipped()  {
+        final Response r = createWebClient("/bookstore/booksNoValidate").post(new Form());
+        assertEquals(200, r.getStatus());
+    }
+    @Test
+    public void testThatNotNullValidationNotSkipped()  {
+        final Response r = createWebClient("/bookstore/booksValidate").post(new Form());
+        assertEquals(400, r.getStatus());
+    }
+
     @Test
     public void testThatSizeValidationFails()  {
         final Response r = createWebClient("/bookstore/books").post(new Form().param("id", ""));
