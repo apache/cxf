@@ -122,7 +122,7 @@ public class ServiceImpl extends ServiceDelegate {
     public ServiceImpl(Bus b, URL url, QName name, Class<?> cls, WebServiceFeature ... f) {
         clazz = cls;
         this.serviceName = name;
-        
+
         //If the class is a CXFService, then it will call initialize directly later
         //when the bus is determined
         if (cls == null || !CXFService.class.isAssignableFrom(cls)) {
@@ -136,9 +136,9 @@ public class ServiceImpl extends ServiceDelegate {
         serviceFeatures = f;
         bus = b;
         handlerResolver = new HandlerResolverImpl(bus, serviceName, clazz);
-        
+
         if (null == url && null != bus) {
-            ServiceContractResolverRegistry registry = 
+            ServiceContractResolverRegistry registry =
                 bus.getExtension(ServiceContractResolverRegistry.class);
             if (null != registry) {
                 URI uri = registry.getContractLocation(serviceName);
@@ -154,7 +154,7 @@ public class ServiceImpl extends ServiceDelegate {
         }
 
         wsdlURL = url == null ? null : url.toString();
-        
+
         if (url != null) {
             try {
                 initializePorts();
@@ -163,23 +163,23 @@ public class ServiceImpl extends ServiceDelegate {
             }
         }
     }
-    
+
     private void initializePorts() {
         try {
             Definition def = bus.getExtension(WSDLManager.class).getDefinition(wsdlURL);
             javax.wsdl.Service serv = def.getService(serviceName);
             if (serv == null) {
-                throw new WebServiceException("Could not find service named " + serviceName 
+                throw new WebServiceException("Could not find service named " + serviceName
                                               + " in wsdl " + wsdlURL);
             }
-            
+
             Map<String, Port> wsdlports = CastUtils.cast(serv.getPorts());
             for (Port port : wsdlports.values()) {
                 QName name = new QName(serviceName.getNamespaceURI(), port.getName());
-                
+
                 String address = null;
                 String bindingID = null;
-                List<? extends ExtensibilityElement> extensions 
+                List<? extends ExtensibilityElement> extensions
                     = CastUtils.cast(port.getBinding().getExtensibilityElements());
                 if (!extensions.isEmpty()) {
                     ExtensibilityElement e = extensions.get(0);
@@ -197,11 +197,11 @@ public class ServiceImpl extends ServiceDelegate {
                     if (e instanceof SoapAddress) {
                         address = ((SoapAddress)e).getLocationURI();
                     } else if (e instanceof AddressType) {
-                        address = ((AddressType)e).getLocation();                        
+                        address = ((AddressType)e).getLocation();
                     } else if (e instanceof SOAP12Address) {
                         address = ((SOAP12Address)e).getLocationURI();
                     } else if (e instanceof SOAPAddress) {
-                        address = ((SOAPAddress)e).getLocationURI();                        
+                        address = ((SOAPAddress)e).getLocationURI();
                     } else if (e instanceof HTTPAddress) {
                         address = ((HTTPAddress)e).getLocationURI();
                     }
@@ -216,7 +216,7 @@ public class ServiceImpl extends ServiceDelegate {
             }
             WSDLServiceFactory sf = new WSDLServiceFactory(bus, wsdlURL, serviceName);
             Service service = sf.create();
-            for (ServiceInfo si : service.getServiceInfos()) { 
+            for (ServiceInfo si : service.getServiceInfos()) {
                 for (EndpointInfo ei : si.getEndpoints()) {
                     String bindingID = BindingID.getJaxwsBindingID(ei.getTransportId());
                     addPort(ei.getName(), bindingID, ei.getAddress());
@@ -241,8 +241,8 @@ public class ServiceImpl extends ServiceDelegate {
         }
         return f;
     }
-    
-    private JaxWsClientEndpointImpl getJaxwsEndpoint(QName portName, AbstractServiceFactoryBean sf, 
+
+    private JaxWsClientEndpointImpl getJaxwsEndpoint(QName portName, AbstractServiceFactoryBean sf,
                                       WebServiceFeature...features) {
         Service service = sf.getService();
         EndpointInfo ei = null;
@@ -261,16 +261,16 @@ public class ServiceImpl extends ServiceDelegate {
                 }
             }
         }
-        
+
         if (ei == null) {
             Message msg = new Message("INVALID_PORT", BUNDLE, portName);
             throw new WebServiceException(msg.toString());
         }
-        
+
         //When the dispatch is created from EPR, the EPR's address will be set in portInfo
         PortInfoImpl portInfo = getPortInfo(portName);
         if (portInfo != null
-            && portInfo.getAddress() != null 
+            && portInfo.getAddress() != null
             && !portInfo.getAddress().equals(ei.getAddress())) {
             ei.setAddress(portInfo.getAddress());
         }
@@ -286,11 +286,11 @@ public class ServiceImpl extends ServiceDelegate {
     private AbstractServiceFactoryBean createDispatchService(DataBinding db) {
         AbstractServiceFactoryBean serviceFactory;
 
-        Service dispatchService = null;        
-        
+        Service dispatchService = null;
+
         if (null != wsdlURL) {
             WSDLServiceFactory sf = new WSDLServiceFactory(bus, wsdlURL, serviceName);
-            dispatchService = sf.create();            
+            dispatchService = sf.create();
             dispatchService.setDataBinding(db);
             serviceFactory = sf;
         } else {
@@ -302,7 +302,7 @@ public class ServiceImpl extends ServiceDelegate {
             sf.setDataBinding(db);
             dispatchService = sf.create();
             serviceFactory = sf;
-        }    
+        }
         configureObject(dispatchService);
         for (ServiceInfo si : dispatchService.getServiceInfos()) {
             si.setProperty("soap.force.doclit.bare", Boolean.TRUE);
@@ -311,7 +311,7 @@ public class ServiceImpl extends ServiceDelegate {
                     ei.setProperty("soap.no.validate.parts", Boolean.TRUE);
                 }
             }
-            
+
             for (BindingInfo bind : si.getBindings()) {
                 for (BindingOperationInfo bop : bind.getOperations()) {
                     //force to bare, no unwrapping
@@ -323,7 +323,7 @@ public class ServiceImpl extends ServiceDelegate {
             }
         }
         return serviceFactory;
-    }    
+    }
 
     public Executor getExecutor() {
         return executor;
@@ -353,7 +353,7 @@ public class ServiceImpl extends ServiceDelegate {
         if (portName == null) {
             throw new WebServiceException(BUNDLE.getString("PORT_NAME_NULL_EXC"));
         }
-        
+
         try {
             return createPort(portName, null, serviceEndpointInterface, features);
         } catch (ServiceConstructionException e) {
@@ -364,8 +364,8 @@ public class ServiceImpl extends ServiceDelegate {
     public <T> T getPort(EndpointReferenceType endpointReference,
                             Class<T> type) {
         return getPort(endpointReference, type, new WebServiceFeature[]{});
-    }    
-    
+    }
+
     public <T> T getPort(EndpointReferenceType endpointReference, Class<T> type,
                          WebServiceFeature... features) {
         endpointReference = EndpointReferenceUtils.resolve(endpointReference, bus);
@@ -390,8 +390,8 @@ public class ServiceImpl extends ServiceDelegate {
         }
 
         return createPort(portQName, endpointReference, type, features);
-    } 
-    
+    }
+
     public Iterator<QName> getPorts() {
         return portInfos.keySet().iterator();
     }
@@ -424,7 +424,7 @@ public class ServiceImpl extends ServiceDelegate {
         return createPort(portName, epr, serviceEndpointInterface, new WebServiceFeature[]{});
     }
 
-    protected <T> T createPort(QName portName, EndpointReferenceType epr, Class<T> serviceEndpointInterface, 
+    protected <T> T createPort(QName portName, EndpointReferenceType epr, Class<T> serviceEndpointInterface,
                                WebServiceFeature... features) {
         LOG.log(Level.FINE, "creating port for portName", portName);
         LOG.log(Level.FINE, "endpoint reference:", epr);
@@ -439,12 +439,12 @@ public class ServiceImpl extends ServiceDelegate {
             serviceFactory.setWsFeatures(f);
         }
 
-        
+
         proxyFac.setBus(bus);
         proxyFac.setServiceClass(serviceEndpointInterface);
         proxyFac.setServiceName(serviceName);
-        if (epr != null 
-            && epr.getAddress() != null 
+        if (epr != null
+            && epr.getAddress() != null
             && epr.getAddress().getValue() != null) {
             clientFac.setAddress(epr.getAddress().getValue());
         }
@@ -452,20 +452,20 @@ public class ServiceImpl extends ServiceDelegate {
         if (wsdlURL != null) {
             proxyFac.setWsdlURL(wsdlURL);
         }
-        
+
         configureObject(proxyFac);
         configureObject(clientFac);
-        
+
         if (portName == null) {
             QName portTypeName = getPortTypeName(serviceEndpointInterface);
-            
+
             Service service = serviceFactory.getService();
             if (service == null) {
                 serviceFactory.setServiceClass(serviceEndpointInterface);
-                serviceFactory.setBus(getBus());                
+                serviceFactory.setBus(getBus());
                 service = serviceFactory.create();
             }
-            
+
             EndpointInfo ei = ServiceModelUtil.findBestEndpointInfo(portTypeName, service.getServiceInfos());
             if (ei != null) {
                 portName = ei.getName();
@@ -473,9 +473,9 @@ public class ServiceImpl extends ServiceDelegate {
                 portName = serviceFactory.getEndpointName();
             }
         }
- 
+
         serviceFactory.setEndpointName(portName);
-        
+
         if (epr != null) {
             clientFac.setEndpointReference(epr);
         }
@@ -490,20 +490,20 @@ public class ServiceImpl extends ServiceDelegate {
             proxyFac.setLoadHandlers(false);
         }
         Object obj = proxyFac.create();
-        
+
         // Configure the Service
         Service service = serviceFactory.getService();
         configureObject(service);
-                
+
         // Configure the JaxWsEndpoitnImpl
         Client client = ClientProxy.getClient(obj);
         client.getEndpoint().setExecutor(executor);
         client.setExecutor(executor);
         JaxWsEndpointImpl jaxwsEndpoint = (JaxWsEndpointImpl) client.getEndpoint();
-        configureObject(jaxwsEndpoint);  
+        configureObject(jaxwsEndpoint);
         @SuppressWarnings("rawtypes")
         List<Handler> hc = jaxwsEndpoint.getJaxwsBinding().getHandlerChain();
-        
+
         hc.addAll(handlerResolver.getHandlerChain(portInfos.get(portName)));
         jaxwsEndpoint.getJaxwsBinding().setHandlerChain(hc);
         LOG.log(Level.FINE, "created proxy", obj);
@@ -512,17 +512,17 @@ public class ServiceImpl extends ServiceDelegate {
         }
         return serviceEndpointInterface.cast(obj);
     }
-    
-    private EndpointInfo createEndpointInfo(AbstractServiceFactoryBean serviceFactory, 
+
+    private EndpointInfo createEndpointInfo(AbstractServiceFactoryBean serviceFactory,
                                             QName portName,
                                             PortInfoImpl portInfo) throws BusException {
-        EndpointInfo ei = null;               
+        EndpointInfo ei = null;
         String address = portInfo.getAddress();
         String bindingID = BindingID.getBindingID(portInfo.getBindingID());
-       
+
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
         try {
-            //the bindingId might be the transportId, just attempt to 
+            //the bindingId might be the transportId, just attempt to
             //load it to force the factory to load
             dfm.getDestinationFactory(bindingID);
         } catch (BusException ex) {
@@ -536,7 +536,7 @@ public class ServiceImpl extends ServiceDelegate {
         } else {
             transportId = bindingID;
         }
-                
+
         Object config = null;
         if (serviceFactory instanceof JaxWsServiceFactoryBean) {
             config = new JaxWsSoapBindingConfiguration((JaxWsServiceFactoryBean)serviceFactory);
@@ -560,7 +560,7 @@ public class ServiceImpl extends ServiceDelegate {
     private void configureObject(Object instance) {
         configureObject(null, instance);
     }
-    
+
     private void configureObject(String name, Object instance) {
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
@@ -572,7 +572,7 @@ public class ServiceImpl extends ServiceDelegate {
         // TODO if the portName null ?
         return portInfos.get(portName);
     }
-    
+
     private QName getPortTypeName(Class<?> serviceEndpointInterface) {
         Class<?> seiClass = serviceEndpointInterface;
         if (!serviceEndpointInterface.isAnnotationPresent(WebService.class)) {
@@ -580,7 +580,7 @@ public class ServiceImpl extends ServiceDelegate {
                 .getCanonicalName());
             throw new WebServiceException(msg.toString());
         }
- 
+
         if (!serviceEndpointInterface.isInterface()) {
             WebService webService = serviceEndpointInterface.getAnnotation(WebService.class);
             String epi = webService.endpointInterface();
@@ -588,14 +588,13 @@ public class ServiceImpl extends ServiceDelegate {
                 try {
                     seiClass = Thread.currentThread().getContextClassLoader().loadClass(epi);
                 } catch (ClassNotFoundException e) {
-                    Message msg = new Message("COULD_NOT_LOAD_CLASS", BUNDLE,
-                                              seiClass.getCanonicalName());
-                    throw new WebServiceException(msg.toString());   
+                    Message msg = new Message("COULD_NOT_LOAD_CLASS", BUNDLE, epi);
+                    throw new WebServiceException(msg.toString());
                 }
                 if (!seiClass.isAnnotationPresent(javax.jws.WebService.class)) {
                     Message msg = new Message("SEI_NO_WEBSERVICE_ANNOTATION", BUNDLE,
                                               seiClass.getCanonicalName());
-                    throw new WebServiceException(msg.toString());                
+                    throw new WebServiceException(msg.toString());
                 }
             }
         }
@@ -613,18 +612,18 @@ public class ServiceImpl extends ServiceDelegate {
 
         return new QName(tns, name);
     }
-    
+
     @Override
     public <T> Dispatch<T> createDispatch(QName portName, Class<T> type, Mode mode) {
         return createDispatch(portName, type, mode, new WebServiceFeature[]{});
     }
-    
+
     @Override
     public <T> Dispatch<T> createDispatch(QName portName,
                                           Class<T> type,
                                           Mode mode,
                                           WebServiceFeature... features) {
-        return createDispatch(portName, type, null, mode, features); 
+        return createDispatch(portName, type, null, mode, features);
     }
     public <T> Dispatch<T> createDispatch(QName portName,
                                           Class<T> type,
@@ -666,9 +665,9 @@ public class ServiceImpl extends ServiceDelegate {
         @SuppressWarnings("rawtypes")
         List<Handler> hc = clientFac.getHandlers();
         //CXF-3956
-        hc.addAll(handlerResolver.getHandlerChain(portInfos.get(portName)));        
+        hc.addAll(handlerResolver.getHandlerChain(portInfos.get(portName)));
         endpoint.getJaxwsBinding().setHandlerChain(hc);
-        
+
         // create the client object, then initialize the endpoint features against it
         Client client = new ClientImpl(clientBus, endpoint, clientFac.getConduitSelector());
         for (Feature af : endpoint.getFeatures()) {
@@ -695,7 +694,7 @@ public class ServiceImpl extends ServiceDelegate {
         configureObject(disp);
         return disp;
     }
-    
+
     @Override
     public <T> Dispatch<T> createDispatch(EndpointReference endpointReference,
                                           Class<T> type,
@@ -704,14 +703,14 @@ public class ServiceImpl extends ServiceDelegate {
         EndpointReferenceType ref = ProviderImpl.convertToInternal(endpointReference);
         QName portName = EndpointReferenceUtils.getPortQName(ref, bus);
         updatePortInfoAddress(portName, EndpointReferenceUtils.getAddress(ref));
-        return createDispatch(portName, 
+        return createDispatch(portName,
                               type, mode, features);
-    }   
+    }
 
     @Override
     public Dispatch<Object> createDispatch(QName portName, JAXBContext context, Mode mode) {
         return createDispatch(portName, context, mode, new WebServiceFeature[]{});
-    }    
+    }
 
     @Override
     public Dispatch<Object> createDispatch(QName portName,
@@ -720,7 +719,7 @@ public class ServiceImpl extends ServiceDelegate {
                                            WebServiceFeature... features) {
         return createDispatch(portName, Object.class, context, mode, features);
     }
-    
+
     @Override
     public Dispatch<Object> createDispatch(EndpointReference endpointReference,
                                            JAXBContext context,
@@ -729,7 +728,7 @@ public class ServiceImpl extends ServiceDelegate {
         EndpointReferenceType ref = ProviderImpl.convertToInternal(endpointReference);
         QName portName = EndpointReferenceUtils.getPortQName(ref, bus);
         updatePortInfoAddress(portName, EndpointReferenceUtils.getAddress(ref));
-        return createDispatch(portName, context, mode, features);        
+        return createDispatch(portName, context, mode, features);
     }
 
     @Override
@@ -739,14 +738,14 @@ public class ServiceImpl extends ServiceDelegate {
                        features);
 
     }
-    
+
     private void initIntercepors(Client client, AbstractBasicInterceptorProvider clientFact) {
         client.getInInterceptors().addAll(clientFact.getInInterceptors());
         client.getOutInterceptors().addAll(clientFact.getOutInterceptors());
         client.getInFaultInterceptors().addAll(clientFact.getInFaultInterceptors());
         client.getOutFaultInterceptors().addAll(clientFact.getOutFaultInterceptors());
-    } 
-    
+    }
+
     private void updatePortInfoAddress(QName portName, String eprAddress) {
         PortInfoImpl portInfo = portInfos.get(portName);
         if (!StringUtils.isEmpty(eprAddress) && portInfo != null) {
