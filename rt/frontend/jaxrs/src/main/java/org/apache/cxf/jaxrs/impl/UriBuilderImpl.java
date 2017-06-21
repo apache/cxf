@@ -623,8 +623,8 @@ public class UriBuilderImpl extends UriBuilder implements Cloneable {
             scheme = theScheme;
         }
         String rawPath = uri.getRawPath();
-        if (!uri.isOpaque()
-            && (theScheme != null || rawPath != null && rawPath.startsWith("/"))) {
+        if (!uri.isOpaque() && schemeSpecificPart == null
+            && (theScheme != null || rawPath != null)) {
             port = uri.getPort();
             host = uri.getHost();
             if (rawPath != null) {

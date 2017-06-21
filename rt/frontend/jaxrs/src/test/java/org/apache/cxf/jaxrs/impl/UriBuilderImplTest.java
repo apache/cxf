@@ -43,6 +43,12 @@ import org.junit.Test;
 public class UriBuilderImplTest extends Assert {
 
     @Test
+    public void testFromUriRelativePath() throws Exception {
+        UriBuilder builder = UriBuilder.fromUri("path");
+        URI uri = builder.queryParam("a", "b").build();
+        assertEquals("path?a=b", uri.toString());
+    }
+    @Test
     public void testUriTemplate() throws Exception {
         UriBuilder builder = UriBuilder.fromUri("http://localhost:8080/{a}/{b}");
         URI uri = builder.build("1", "2");
