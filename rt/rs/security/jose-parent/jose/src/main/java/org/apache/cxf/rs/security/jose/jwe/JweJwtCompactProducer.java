@@ -17,20 +17,12 @@
  * under the License.
  */
 package org.apache.cxf.rs.security.jose.jwe;
-import java.security.PublicKey;
-
-import javax.crypto.SecretKey;
-
-import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
 import org.apache.cxf.rs.security.jose.jwt.JwtClaims;
 import org.apache.cxf.rs.security.jose.jwt.JwtToken;
 import org.apache.cxf.rs.security.jose.jwt.JwtUtils;
 
 
-public class JweJwtCompactProducer  {
-    private JweHeaders headers;
-    private String claimsJson;
+public class JweJwtCompactProducer extends JweCompactProducer {
     public JweJwtCompactProducer(JwtToken token) {
         this(new JweHeaders(token.getJweHeaders()), token.getClaims());
     }
@@ -38,23 +30,6 @@ public class JweJwtCompactProducer  {
         this(new JweHeaders(), claims);
     }
     public JweJwtCompactProducer(JweHeaders joseHeaders, JwtClaims claims) {
-        headers = joseHeaders;
-        claimsJson = JwtUtils.claimsToJson(claims);
-    }
-    
-    public String encryptWith(JsonWebKey key) {
-        JweEncryptionProvider jwe = JweUtils.createJweEncryptionProvider(key, headers);
-        return encryptWith(jwe);
-    }
-    public String encryptWith(PublicKey key) {
-        JweEncryptionProvider jwe = JweUtils.createJweEncryptionProvider(key, headers);
-        return encryptWith(jwe);
-    }
-    public String encryptWith(SecretKey key) {
-        JweEncryptionProvider jwe = JweUtils.createJweEncryptionProvider(key, headers);
-        return encryptWith(jwe);
-    }
-    public String encryptWith(JweEncryptionProvider jwe) {
-        return jwe.encrypt(StringUtils.toBytesUTF8(claimsJson), headers);
+        super(joseHeaders, JwtUtils.claimsToJson(claims));
     }
 }
