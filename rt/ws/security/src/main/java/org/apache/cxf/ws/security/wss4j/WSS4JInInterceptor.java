@@ -66,6 +66,7 @@ import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.ThreadLocalSecurityProvider;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.WSConstants;
+import org.apache.wss4j.dom.WSDataRef;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.apache.wss4j.dom.engine.WSSecurityEngine;
 import org.apache.wss4j.dom.engine.WSSecurityEngineResult;
@@ -279,7 +280,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 originalNode = elem.cloneNode(true);
             }
             WSHandlerResult wsResult = engine.processSecurityHeader(elem, reqData);
-            importNewDomToSAAJ(doc, elem, originalNode);
+            importNewDomToSAAJ(doc, elem, originalNode, wsResult);
             Element header = SAAJUtils.getHeader(doc);
             Element body = SAAJUtils.getBody(doc);
             header = (Element)DOMUtils.getDomElement(header);
@@ -343,7 +344,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             reqData = null;
         }
     }
-    private void importNewDomToSAAJ(SOAPMessage doc, Element elem, Node originalNode) throws SOAPException {
+    private void importNewDomToSAAJ(SOAPMessage doc, Element elem, 
+                                    Node originalNode, WSHandlerResult wsResult) throws SOAPException {
         if (DOMUtils.isJava9SAAJ()
             && originalNode != null && !originalNode.isEqualNode(elem)) {
             //ensure the new decrypted dom element could be imported into the SAAJ
@@ -372,8 +374,39 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     }
                     elem.getOwnerDocument().getDocumentElement().getFirstChild().
                         getNextSibling().replaceChild(newNode, node);
+                    List<WSSecurityEngineResult> encryptResults = wsResult.getActionResults().get(WSConstants.ENCR);
+                    if (encryptResults != null) {
+                        for (WSSecurityEngineResult result : wsResult.getActionResults().get(WSConstants.ENCR)) {
+                            for (WSDataRef dataRef 
+                                : (List<WSDataRef>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS)) {
+                                if (dataRef.getProtectedElement() == node) {
+                                    dataRef.setProtectedElement((Element)newNode);
+                                }
+                            }
+                        }
+                    }
+                    
+                    List<WSSecurityEngineResult> signedResults = new ArrayList<>();
+                    if (wsResult.getActionResults().containsKey(WSConstants.SIGN)) {
+                        signedResults.addAll(wsResult.getActionResults().get(WSConstants.SIGN));
+                    }
+                    if (wsResult.getActionResults().containsKey(WSConstants.UT_SIGN)) {
+                        signedResults.addAll(wsResult.getActionResults().get(WSConstants.UT_SIGN));
+                    }
+                    if (wsResult.getActionResults().containsKey(WSConstants.ST_SIGNED)) {
+                        signedResults.addAll(wsResult.getActionResults().get(WSConstants.ST_SIGNED));
+                    }
+                    for (WSSecurityEngineResult result : signedResults) {
+                        for (WSDataRef dataRef 
+                            : (List<WSDataRef>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS)) {
+                            if (dataRef.getProtectedElement() == node) {
+                                dataRef.setProtectedElement((Element)newNode);
+                            }
+                        }
+                    }
                 } catch (Exception ex) {
                     //just to the best try
+                    LOG.log(Level.FINE, "Something wrong during importNewDomToSAAJ", ex);
                 }
 
             }
