@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.validation.executable.ExecutableType;
+import javax.validation.executable.ValidateOnExecution;
+
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -66,7 +69,14 @@ public abstract class AbstractValidationInterceptor extends AbstractPhaseInterce
             return;
         }
         
-        
+        ValidateOnExecution validateOnExec = method.getAnnotation(ValidateOnExecution.class);
+        if (validateOnExec != null) {
+            ExecutableType[] execTypes = validateOnExec.type();
+            if (execTypes.length == 1 && execTypes[0] == ExecutableType.NONE) {
+                return;
+            }
+        }
+
         final List< Object > arguments = MessageContentsList.getContentsList(message);
         
         handleValidation(message, theServiceObject, method, arguments);
