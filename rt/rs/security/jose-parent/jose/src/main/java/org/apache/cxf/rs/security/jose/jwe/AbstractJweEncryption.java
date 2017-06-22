@@ -76,7 +76,7 @@ public abstract class AbstractJweEncryption implements JweEncryptionProvider {
         byte[] encryptedContent = encryptInternal(state, content);
         byte[] cipher = getActualCipher(encryptedContent);
         byte[] authTag = getAuthenticationTag(state, encryptedContent);
-        JweCompactProducerBuilder producer = new JweCompactProducerBuilder(state.protectedHeadersJson,
+        JweCompactBuilder producer = new JweCompactBuilder(state.protectedHeadersJson,
                                                              state.jweContentEncryptionKey,
                                                              state.theIv,
                                                              cipher,
