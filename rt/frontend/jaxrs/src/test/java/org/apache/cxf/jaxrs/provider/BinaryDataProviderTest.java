@@ -100,17 +100,11 @@ public class BinaryDataProviderTest extends Assert {
     @Test
     public void testReadBytesFromUtf8() throws Exception {
         MessageBodyReader p = new BinaryDataProvider();
-        byte[] utf8Bytes = "世界ーファイル".getBytes("UTF-8");
+        byte[] utf8Bytes = "世界ーファイル".getBytes("UTF-16");
         byte[] readBytes = (byte[])p.readFrom(byte[].class, byte[].class, new Annotation[]{},
                                           MediaType.APPLICATION_OCTET_STREAM_TYPE,
                                           new MetadataMap<String, Object>(),
                                           new ByteArrayInputStream(utf8Bytes));
-        assertTrue(Arrays.equals(utf8Bytes, readBytes));
-
-        readBytes = (byte[])p.readFrom(byte[].class, byte[].class, new Annotation[]{},
-                                              MediaType.valueOf("application/octet-stream;charset=UTF-8"),
-                                              new MetadataMap<String, Object>(),
-                                              new ByteArrayInputStream(utf8Bytes));
         assertTrue(Arrays.equals(utf8Bytes, readBytes));
     }
 
