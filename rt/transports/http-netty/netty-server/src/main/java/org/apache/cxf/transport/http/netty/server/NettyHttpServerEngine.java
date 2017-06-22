@@ -40,7 +40,8 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-
+import io.netty.util.concurrent.DefaultEventExecutorGroup;
+import io.netty.util.concurrent.EventExecutorGroup;
 
 public class NettyHttpServerEngine implements ServerEngine {
 
@@ -90,9 +91,10 @@ public class NettyHttpServerEngine implements ServerEngine {
     private boolean sessionSupport;
     
     // TODO need to setup configuration about them
-    private EventLoopGroup bossGroup = new NioEventLoopGroup();
-    private EventLoopGroup workerGroup = new NioEventLoopGroup();
-    
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
+    private EventExecutorGroup applicationExecutor;
+
     public NettyHttpServerEngine() {
         
     }
@@ -104,14 +106,6 @@ public class NettyHttpServerEngine implements ServerEngine {
         this.port = port;
     }
 
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
-    }
-    
     @PostConstruct
     public void finalizeConfig() {
         // need to check if we need to any other thing other than Setting the TLSServerParameter
@@ -145,7 +139,16 @@ public class NettyHttpServerEngine implements ServerEngine {
     }
       
     protected Channel startServer() {
-          
+        if (bossGroup == null) {
+            bossGroup = new NioEventLoopGroup();
+        }
+        if (workerGroup == null) {
+            workerGroup = new NioEventLoopGroup();
+        }
+        if (applicationExecutor == null) {
+            applicationExecutor = new DefaultEventExecutorGroup(threadingParameters.getThreadPoolSize());
+        }
+
         final ServerBootstrap bootstrap = new ServerBootstrap();
         bootstrap.group(bossGroup, workerGroup)
             .channel(NioServerSocketChannel.class)
@@ -154,10 +157,9 @@ public class NettyHttpServerEngine implements ServerEngine {
         // Set up the event pipeline factory.
         servletPipeline = 
             new NettyHttpServletPipelineFactory(
-                 tlsServerParameters, sessionSupport, 
-                 threadingParameters.getThreadPoolSize(),
-                 maxChunkContentSize,
-                 handlerMap, this);
+                 tlsServerParameters, sessionSupport,
+                 maxChunkContentSize, handlerMap,
+                 this, applicationExecutor);
         // Start the servletPipeline's timer
         servletPipeline.start();
         bootstrap.childHandler(servletPipeline);
@@ -242,6 +244,9 @@ public class NettyHttpServerEngine implements ServerEngine {
         // just unbind the channel
         if (servletPipeline != null) {
             servletPipeline.shutdown();
+        } else if (applicationExecutor != null) {
+            // shutdown executor if it set but not server started
+            applicationExecutor.shutdownGracefully();
         }
         
         if (serverChannel != null) {
@@ -299,5 +304,49 @@ public class NettyHttpServerEngine implements ServerEngine {
     
     public String getHost() {
         return host;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    public void setBossGroup(EventLoopGroup bossGroup) {
+        if (this.bossGroup == null) {
+            this.bossGroup = bossGroup;
+        } else {
+            throw new IllegalStateException("bossGroup is already defined");
+        }
+    }
+
+    public EventLoopGroup getBossGroup() {
+        return bossGroup;
+    }
+
+    public void setWorkerGroup(EventLoopGroup workerGroup) {
+        if (this.workerGroup == null) {
+            this.workerGroup = workerGroup;
+        } else {
+            throw new IllegalStateException("workerGroup is already defined");
+        }
+    }
+
+    public EventLoopGroup getWorkerGroup() {
+        return workerGroup;
+    }
+
+    public EventExecutorGroup getApplicationExecutor() {
+        return applicationExecutor;
+    }
+
+    public void setApplicationExecutor(EventExecutorGroup applicationExecutor) {
+        if (this.applicationExecutor == null) {
+            this.applicationExecutor = applicationExecutor;
+        } else {
+            throw new IllegalStateException("applicationExecutor is already defined");
+        }
     }
 }
