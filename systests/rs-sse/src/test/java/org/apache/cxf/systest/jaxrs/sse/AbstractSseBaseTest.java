@@ -19,8 +19,11 @@
 package org.apache.cxf.systest.jaxrs.sse;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,6 +53,26 @@ public abstract class AbstractSseBaseTest extends AbstractBusClientServerTestBas
 
     protected WebClient createWebClient(final String url) {
         return createWebClient(url, MediaType.SERVER_SENT_EVENTS);
+    }
+
+    protected WebTarget createWebTarget(final String url) {
+        return ClientBuilder
+            .newClient()
+            .property("http.receive.timeout", 8000)
+            .register(JacksonJsonProvider.class)
+            .target("http://localhost:" + getPort() + url);
+    }
+    
+    protected void awaitEvents(long timeout, final Collection<?> events, int size) throws InterruptedException {
+        final long sleep = timeout / 10;
+        
+        for (int i = 0; i < timeout; i += sleep) {
+            if (events.size() == size) {
+                break;
+            } else {
+                Thread.sleep(sleep);
+            }
+        }
     }
 
     protected abstract int getPort();
