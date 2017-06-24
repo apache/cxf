@@ -21,12 +21,18 @@ package org.apache.cxf.systest.jaxrs.sse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.sse.InboundSseEvent;
+import javax.ws.rs.sse.SseEventSource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -35,7 +41,53 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 
-public abstract class AbstractBroadcasterSseTest extends AbstractSseBaseTest {
+public abstract class AbstractSseTest extends AbstractSseBaseTest {
+    @Test
+    public void testBooksStreamIsReturnedFromLastEventId() throws InterruptedException {
+        final WebTarget target = createWebTarget("/rest/api/bookstore/sse/" + UUID.randomUUID())
+            .property(HttpHeaders.LAST_EVENT_ID_HEADER, 150);
+        final Collection<Book> books = new ArrayList<>();
+        
+        try (final SseEventSource eventSource = SseEventSource.target(target).build()) {
+            eventSource.register(collect(books), System.out::println);
+            eventSource.open();
+            // Give the SSE stream some time to collect all events
+            awaitEvents(3000, books, 4);
+        }
+
+        // Easing the test verification here, it does not work well for Atm + Jetty
+        assertThat(books, 
+            hasItems(
+                new Book("New Book #151", 151), 
+                new Book("New Book #152", 152), 
+                new Book("New Book #153", 153), 
+                new Book("New Book #154", 154)
+            )
+        );
+    }
+
+    @Test
+    public void testBooksStreamIsReturnedFromInboundSseEvents() throws InterruptedException {
+        final WebTarget target = createWebTarget("/rest/api/bookstore/sse/0");
+        final Collection<Book> books = new ArrayList<>();
+        
+        try (final SseEventSource eventSource = SseEventSource.target(target).build()) {
+            eventSource.register(collect(books), System.out::println);
+            eventSource.open();
+            // Give the SSE stream some time to collect all events
+            awaitEvents(3000, books, 4);
+        }
+
+        assertThat(books, 
+            hasItems(
+                new Book("New Book #1", 1), 
+                new Book("New Book #2", 2), 
+                new Book("New Book #3", 3), 
+                new Book("New Book #4", 4)
+            )
+        );
+    }
+    
     @Test
     public void testBooksStreamIsBroadcasted() throws Exception {
         final Collection<Future<Response>> results = new ArrayList<>();
@@ -76,5 +128,9 @@ public abstract class AbstractBroadcasterSseTest extends AbstractSseBaseTest {
         assertThat(Arrays.asList(books), hasItems(new Book("New Book #1", 1), new Book("New Book #2", 2)));
 
         r.close();
+    }
+
+    private static Consumer<InboundSseEvent> collect(final Collection< Book > books) {
+        return event -> books.add(event.readData(Book.class, MediaType.APPLICATION_JSON_TYPE));
     }
 }
