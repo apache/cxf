@@ -23,10 +23,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
 
@@ -34,33 +31,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItems;
 
 public abstract class AbstractSseTest extends AbstractSseBaseTest {
-    @Test
-    public void testBooksStreamIsReturnedFromLastEventId() throws JsonProcessingException {
-        Response r = createWebClient("/rest/api/bookstore/sse/100")
-            .header(HttpHeaders.LAST_EVENT_ID_HEADER, 150)
-            .get();
-        assertEquals(Status.OK.getStatusCode(), r.getStatus());
-
-        final String response = r.readEntity(String.class);
-        assertThat(response, containsString("id: 151"));
-        assertThat(response, containsString("data: " + toJson("New Book #151", 151)));
-
-        assertThat(response, containsString("id: 152"));
-        assertThat(response, containsString("data: " + toJson("New Book #152", 152)));
-
-        assertThat(response, containsString("id: 152"));
-        assertThat(response, containsString("data: " + toJson("New Book #153", 153)));
-
-        assertThat(response, containsString("id: 152"));
-        assertThat(response, containsString("data: " + toJson("New Book #154", 154)));
-
-        r.close();
-    }
-    
     @Test
     public void testBooksStreamIsReturnedFromInboundSseEvents() throws JsonProcessingException, InterruptedException {
         final WebTarget target = createWebTarget("/rest/api/bookstore/sse/0");
@@ -73,8 +46,14 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
             awaitEvents(3000, books, 4);
         }
 
-        assertThat(books, hasItems(new Book("New Book #1", 1), new Book("New Book #2", 2), 
-            new Book("New Book #3", 3), new Book("New Book #4", 4)));
+        assertThat(books, 
+            hasItems(
+                new Book("New Book #1", 1), 
+                new Book("New Book #2", 2), 
+                new Book("New Book #3", 3), 
+                new Book("New Book #4", 4)
+            )
+        );
     }
 
     private static Consumer<InboundSseEvent> collect(final Collection< Book > books) {
