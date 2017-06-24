@@ -26,7 +26,10 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
@@ -122,8 +125,15 @@ public class SseEventSourceImpl implements SseEventSource {
 
         Response response = null; 
         try {
+            final MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
+            final Object lastEventId = target.getConfiguration().getProperty(HttpHeaders.LAST_EVENT_ID_HEADER);
+            if (lastEventId != null) {
+                headers.putSingle(HttpHeaders.LAST_EVENT_ID_HEADER, lastEventId);
+            }
+            
             response = target
                 .request(MediaType.SERVER_SENT_EVENTS)
+                .headers(headers)
                 .get();
 
             final Endpoint endpoint = WebClient.getConfig(target).getEndpoint();
