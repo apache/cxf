@@ -21,8 +21,7 @@ package org.apache.cxf.systest.jaxrs.sse.jetty;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.sse.AbstractSseTest;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 
 public class JettyWarTest extends AbstractSseTest {
@@ -35,16 +34,11 @@ public class JettyWarTest extends AbstractSseTest {
         }
     }
 
-    @Before
-    public void startServers() throws Exception {
+    @BeforeClass
+    public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
         assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
         createStaticBus();
-    }
-
-    @After
-    public void stopServers() throws Exception {
-        stopAllServers();
     }
 
     @Override
