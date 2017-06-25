@@ -25,6 +25,13 @@ import java.lang.annotation.Target;
 
 import org.springframework.context.annotation.Import;
 
+/**
+ * Allows autowiring of @{@link org.apache.cxf.jaxrs.client.WebClient}.
+ *
+ * JAX-RS providers (annotated with @Provider) and marked as Spring Components are added to WebClient.
+ * The providers which are not marked as Spring Components can also be optionally auto-discovered.
+ * WebClient can also be configured with optional headers such as Accept and Content-Type and made thread-safe.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Import(JaxRsWebClientConfiguration.class)
