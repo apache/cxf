@@ -29,7 +29,7 @@
         <relativePath>../..</relativePath>
     </parent>
     <properties>
-        <httpclient.version>4.2.1</httpclient.version>
+        <httpclient.version>4.5.3</httpclient.version>
     </properties>
     <profiles>
         <profile>
