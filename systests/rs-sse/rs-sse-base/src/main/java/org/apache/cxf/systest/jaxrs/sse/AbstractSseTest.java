@@ -52,7 +52,7 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
             eventSource.register(collect(books), System.out::println);
             eventSource.open();
             // Give the SSE stream some time to collect all events
-            awaitEvents(3000, books, 4);
+            awaitEvents(5000, books, 4);
         }
 
         // Easing the test verification here, it does not work well for Atm + Jetty
@@ -75,7 +75,7 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
             eventSource.register(collect(books), System.out::println);
             eventSource.open();
             // Give the SSE stream some time to collect all events
-            awaitEvents(3000, books, 4);
+            awaitEvents(5000, books, 4);
         }
 
         assertThat(books, 
