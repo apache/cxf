@@ -21,7 +21,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jax_rs_description_swagger2</artifactId>
     <name>JAX-RS Swagger2 Demo</name>
-    <description>JAX-RS Basic Demo</description>
+    <description>JAX-RS Swagger2 Basic Demo using Jetty</description>
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
@@ -31,7 +31,6 @@
 
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <httpclient.version>3.1</httpclient.version>
     </properties>
 
     <profiles>
@@ -62,9 +61,9 @@
     
     <dependencies>
         <dependency>
-              <groupId>org.webjars</groupId>
-              <artifactId>swagger-ui</artifactId>
-              <version>2.2.6</version>
+            <groupId>org.webjars</groupId>
+            <artifactId>swagger-ui</artifactId>
+            <version>3.0.14</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>

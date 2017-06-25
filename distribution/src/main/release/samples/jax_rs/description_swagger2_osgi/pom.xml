@@ -22,7 +22,7 @@ under the License.
     <artifactId>jax_rs_description_swagger2_osgi</artifactId>
     <packaging>bundle</packaging>
     <name>CXF JAX-RS Swagger2 Blueprint Demo</name>
-    <description>JAX-RS Basic Demo</description>
+    <description>JAX-RS Swagger2 Basic Demo for OSGi using Blueprint</description>
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
