@@ -46,4 +46,9 @@ public class JettyEmbeddedTest extends AbstractSseTest {
     protected int getPort() {
         return EmbeddedJettyServer.PORT;
     }
+    
+    @Override
+    protected boolean isStrict() {
+        return false;
+    }
 }
