@@ -59,7 +59,8 @@ public class WriterInterceptorMBW implements WriterInterceptor {
     public void aroundWriteTo(WriterInterceptorContext c) throws IOException, WebApplicationException {
         
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
+            String writerClassName = writer == null ? "null" : writer.getClass().getName();
+            LOG.fine("Response EntityProvider is: " + writerClassName);
         }
         
         MultivaluedMap<String, Object> headers = c.getHeaders();
