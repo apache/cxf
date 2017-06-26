@@ -1,4 +1,4 @@
-Apache CXF 3.1.11 Release Notes
+Apache CXF 3.1.12 Release Notes
 
 1. Overview
 
@@ -25,7 +25,7 @@ http://cxf.apache.org/docs/31-migration-guide.html
 for further information and requirements for upgrading from earlier
 versions of CXF.
 
-3.1.11 fixes over 100 JIRA issues reported by users and the community.
+3.1.12 fixes over 50 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -70,108 +70,67 @@ to 3.1.
 
 7. Specific issues, features, and improvements fixed in this version
 
-** Sub-task
-    * [CXF-6942] - cxf-codegen-plugin wsdlArtifact failed to resolve WSDL
 
 ** Bug
-    * [CXF-3574] - JMSPropertyType should support non string properties
-    * [CXF-4028] - X509TokenValidator uses signature-crypto-provider instead of encryption-crypto-provider
-    * [CXF-4821] - UseAsyncMethod annotation does not work with Provider interface
-    * [CXF-4851] - AttachmentDeserializer cannot handle attachments with Quoted Printable content transfer encoding in initializeRootMessage
-    * [CXF-5096] - cxf-utils.js has incorrect error handling
-    * [CXF-5637] - WSDL First approach : Xsd import in wsdl causing validation errors while generating client.
-    * [CXF-5697] - WHICH_JARS inconsistent with lib/ contents for 2.7.11
-    * [CXF-5743] - Full path is missing from schema included in imported schema when parsing WSDL
-    * [CXF-5754] - JMSConduit - temporary queue not beeing closed if relpyMessage is null (timeout)
-    * [CXF-5800] - Exceptions and response problems when using schema-validation and base64Binary element (with or without MTOM)
-    * [CXF-6029] - Questionable exception handling
-    * [CXF-6161] - wsdl2java can use invalid local filename when working with wsdl imports
-    * [CXF-6185] - cxf org.apache.cxf.transport.http.policy.impl.ClientPolicyCalculator
-    * [CXF-6239] - Out of memory when using Async connections in Apache CXF
-    * [CXF-6240] - W3CDOMStreamReader does not report processing instructions
-    * [CXF-6523] - org.apache.cxf.interceptor.Fault: wrong number of arguments (due to explicit soap header)
-    * [CXF-6549] - JMX MBean for IdentityCache throws RuntimeOperationsException
-    * [CXF-6590] - MAPCodec: memory leak with sync client when soapfaults returned from endpoint
-    * [CXF-6598] - java.lang.IndexOutOfBoundsException when processing response
-    * [CXF-6672] - PollingMessageListenerContainer does fail silently upon java.lang.Error
-    * [CXF-6717] - Live WSDL regression: Fails updating schemaLocation in catalog-imported schema
-    * [CXF-6731] - wsdl2java returning error "'{A_Type}' is already defined" from versions 3.1.3, 2.7.18, 3.0.7
-    * [CXF-6768] - WS-Discovery missing schema when internet connection not present
-    * [CXF-6852] - Java 8 java.lang.OutOfMemoryException: Metaspace issue while generating dynamic client
-    * [CXF-6866] - bindingId on Client/ServerFactoryBean does not overrule WSDL
-    * [CXF-6894] - NullPointerException when running Maven plugin cxf-codegen-plugin
-    * [CXF-6919] - {http://cxf.apache.org/faultcode}HandleFault is not a standard Code value
-    * [CXF-6976] - High memory footprint when maven assembly plugin is used together with cxf-codegen-plugin
-    * [CXF-6993] - JweJsonProducer does not support multiple recipients if CEK is auto-generated
-    * [CXF-7025] - Find boundary from InputStream
-    * [CXF-7071] - HttpServletRequest.getParameter only get String from query not both posted form data
-    * [CXF-7083] - Maven Plugins: System properties handling in ClassLoaderSwitcher breaks thread safety
-    * [CXF-7096] - Server side memory leaking if clients do not send CloseSequence
-    * [CXF-7101] - SpringBoot JAX-WS example fails
-    * [CXF-7132] - CDI Multi-app tests fail when classes have scope
-    * [CXF-7141] - cxf-rt-transports-http incorrectly requires org.osgi.http.service
-    * [CXF-7187] - MAPCodec: memory leak with sync client when soapfaults returned from endpoint
-    * [CXF-7198] - cxf-spring-boot-starter does not work with Spring Boot 1.5.0 or above
-    * [CXF-7236] - JAXRSInInterceptor throw java.lang.IndexOutOfBoundsException if Accept header is empty
-    * [CXF-7240] - JAX-WS Dispatch incorrectly asserts that Message mode with XML/HTTP binding is invalid when using instances of DataSource
-    * [CXF-7241] - JAX-RS ContainerRequestContext#setRequestUri() will cause a 404 when Uri contains a query string
-    * [CXF-7242] - New cxf-rt-features-logging doesn't log incoming payloads
-    * [CXF-7244] - CXF 3.1.10 AbstractSearchConditionParser importing Olingo Collection class
-    * [CXF-7248] - JAX-RS @Context injected fields cause a NPE in re-used providers from OSGI
-    * [CXF-7250] - NPE in HTTPTransportActivator stop if DISABLE_DEFAULT_HTTP_TRANSPORT is true
-    * [CXF-7251] - Connection timeouts set as ints are disregarded
-    * [CXF-7252] - TLSParameterJaxBUtils.getTrustManagers getting password from wrong system property
-    * [CXF-7254] - New LoggingFeature Sl4jEventSender does not log the request headers
-    * [CXF-7258] - SwaggerUiResolver: Swagger UI root can't be found
-    * [CXF-7262] - JAXRS: ClientConfig lost when using templates in the path method
-    * [CXF-7264] - NPE on OAuth RO/CC flows using JPA
-    * [CXF-7267] - Member names must match bean attribute for BeanParam to work
-    * [CXF-7269] - schemavalidate failed when use mtom and  Provider
-    * [CXF-7271] - add cxf-rt-rs-json-basic bundle into cxf-jaxrs feature
-    * [CXF-7278] - Netty HttpResponseEncoder is not set before HttpObjectAggregator
-    * [CXF-7279] - Leaky generic type resolver doesn't work with more than 1 parameter
-    * [CXF-7286] - JPA : PersistenceException on refreshAccessToken
-    * [CXF-7287] - Incorrect JSON decoding in JsonMapObjectReaderWriter when commas are used in value
-    * [CXF-7288] - cxf-rs-description-swagger2 cannot be installed in karaf
-    * [CXF-7291] - sharedPackageName for Swagger description should ignore proxy classes
-    * [CXF-7292] - Additional privileged blocks for JAXWS client running with Security Manager enabled
-    * [CXF-7293] - AbstractSpringComponentScanServer must ignore client proxy classes
-    * [CXF-7294] - Incorrect header parameter for Jose ECDH KA public key
-    * [CXF-7298] - JacksonJaxbJsonProvider does not work in OSGi
-    * [CXF-7299] - No way to configure TLS for the JettyHTTPServerEngineFactory in code
-    * [CXF-7300] - JWS verification issue
-    * [CXF-7301] - Exceptions thrown from the inbound JAXRS client interceptors are not reported
-    * [CXF-7303] - java.io.FileNotFoundException on JIBX binding with customization 
-    * [CXF-7307] - empty query string injects  into number type will lead 404 error
-    * [CXF-7310] - org.apache.cxf.jaxrs.client.ClientProxyImpl#getAccept does not handle Accept header with multiple media types
-    * [CXF-7312] - FailoverTargetSelector.replaceEndpointAddressPropertyIfNeeded does not update REQUEST_URI
-    * [CXF-7314] - Custom BinarySecurityTokens are not used to set up the security context
+* [CXF-5407] - WSDLManagerImpl.removeDefinition doesn't take effect
+* [CXF-6441] - JMS Subscription: pubSubNoLocal is not propagated into AbstractMessageListenerContainer
+* [CXF-6782] - Modifications to JAX-WS client request context leak the thread scope
+* [CXF-7178] - RMPolicyInterceptorProvider not initialized properly
+* [CXF-7318] - Continuation.suspend(-1) does not resume request
+* [CXF-7319] - cdi extension uses wrong namespace for beans.xml
+* [CXF-7320] - Returned charset is not decoded properly
+* [CXF-7329] - Missing @Validated on CxfProperties
+* [CXF-7331] - javax.ws.rs.container.ResourceInfo#getResourceClass doesnt unwrap the class
+* [CXF-7339] - NPE in org.apache.cxf.common.util.CacheMap.remove
+* [CXF-7343] - AbstractSpringComponentScanServer is not picking up fault interceptors
+* [CXF-7349] - NPE in ClassLoaderUtils
+* [CXF-7350] - the exception should be able to return to client if retry is 0 with ws-rm
+* [CXF-7351] - JAXRS UriInfo.getMatchedURIs raises error for templated URI
+* [CXF-7352] - JAXRS UriInfo.getMatchedResources does return matched resource twice when CORS filter is used
+* [CXF-7354] - Be able to separate payload logging from JAX-RS and JAX-WS
+* [CXF-7356] - need consider SoapBinding has multiple default namespace when compare two bindingId
+* [CXF-7368] - JAXB provider is handling non-jaxb classes
+* [CXF-7374] - Concurrent calls to refreshAccessToken() fails with SQL constraint violation
+* [CXF-7381] - DateFormat in MapEventLogger in the STS is not thread safe
+* [CXF-7392] - WS-RM: Refresh wsrm:Identifier after service reconnect
+* [CXF-7394] - Incorrect ERROR: Failed to send RM protocol message
+* [CXF-7395] - WS-Addressing issue related to WS-RM when using SoapUI
+* [CXF-7399] - WS-RM persistent store recovery is not re-associated sequences together
+* [CXF-7400] - Swagger2Feature causes 404 on URIs ending with *ico
+* [CXF-7401] - CXF http-jetty fails to get private key if the jks keystore file contains multiple private keys with different password
+* [CXF-7414] - ws-rm Messages get lost in case of multi threaded calls and delays
+* [CXF-7415] - Unexpected WS-RM error in PolicyVerificationInInterceptor
+* [CXF-7416] - Threading issue while marshalling jaxb
+* [CXF-7417] - Updating relative paths after passing them to UriBuilder.fromUri does not work
+* [CXF-7418] - CXF BeanValidation interceptors ignore @ValidateOnExecution(type = ExecutableType.NONE)
+* [CXF-7429] - NPE in WriterInterceptorMBW when writer is null and Log is fine
 
 ** Improvement
-    * [CXF-4692] - Allow customization of Request Security Token Response
-    * [CXF-5782] - Lower logging level of generated class names
-    * [CXF-5903] - Change TransportURIResolver to at least log exceptions
-    * [CXF-6728] - Review and improve the way EC keys are handled in JOSE code
-    * [CXF-6907] - CXF-WSN improvment in onMessage listenner
-    * [CXF-7129] - Provide an optional HTrace Logging receiver 
-    * [CXF-7255] - Allow empty ("") passwords when calling a service
-    * [CXF-7256] - CrossOriginResourceSharingFilter should have @Provider annotation
-    * [CXF-7259] - LoggingOutInterceptor filtering
-    * [CXF-7263] - ResourceOwnerLoginHandler needs to accept Client parameter
-    * [CXF-7265] - Symmetric INFO logging for registering and unregistering MBeans
-    * [CXF-7268] - Make it easier to pre/post process OAuth2 client retrieval in AbstractOauth provider  
-    * [CXF-7277] - Make ClientProxyImpl reset client state after a call
-    * [CXF-7280] - Avoid unnecessary string allocation in IOUtils::toString
-    * [CXF-7282] - Support the overriding of Application resource life-cycle when it is autodiscovered
-    * [CXF-7285] - Subclasses of FailoverTargetSelector should have a way to obtain the InvocationKey
-    * [CXF-7290] - Restrict which @Bean components are treated as JAX-RS providers
-    * [CXF-7296] - Add support to enable revocation for TLS via configuration
-    * [CXF-7313] - RedirectionBasedGrantService scopesRequiringNoConsent check is too restrictive
-    * [CXF-7315] - Abstract the STS client token caching behaviour to allow the user to plug in a custom implementation
+* [CXF-6728] - Review and improve the way EC keys are handled in JOSE code
+* [CXF-7001] - Update JAX-RS SpringBoot starter to support scanning JAX-RS Applications
+* [CXF-7247] - Support tracing using latest Zipkin Brave 4.x release
+* [CXF-7327] - Improve logging for invalid enum values
+* [CXF-7328] - No property metadata for CxfProperties
+* [CXF-7340] - Make it possible to set the SignatureLocation in the XmlSecOutInterceptor from the SignatureProperties
+* [CXF-7353] - Make it possible to customize SwaggerUI Maven group and artifact ids
+* [CXF-7382] - Don't cache SecurityTokens per-endpoint when the STSClient is used as an intermediary
+* [CXF-7393] - add message to Jwe exception.
+* [CXF-7407] - Improve JOSE helpers
+* [CXF-7420] - Align JweCompactProducer with other JWS/JWE helpers
+* [CXF-7424] - Remove redundant byte array conversion from BinaryDataProvider
 
 ** New Feature
-    * [CXF-7084] - Pass a value for the KeyName element from the XmlSecOutInterceptor to Santuario
-    * [CXF-7086] - Dynamically load signature validation keys using KeyName
+* [CXF-7346] - CDI Extension ignores producer methods and fields
+* [CXF-7347] - Support Swagger UI 3
+* [CXF-7365] - Support signing multiparts using Jws Detached Signature
+* [CXF-7366] - Optional protection of the selected HTTP headers with JOSE filters
+* [CXF-7378] - For the HttpConduit set the http response message along side the RESPONSE_CODE
+
+** Task
+* [CXF-7336] - [cdi] wrong org.apache.cxf.cdi.CdiResourceProvider#isSingleton implementation
+* [CXF-7386] - Try to fix old Swagger system tests
+
+
 
 
 
