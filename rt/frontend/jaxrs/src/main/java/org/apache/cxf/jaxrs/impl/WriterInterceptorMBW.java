@@ -57,11 +57,6 @@ public class WriterInterceptorMBW implements WriterInterceptor {
     @SuppressWarnings("unchecked")
     @Override
     public void aroundWriteTo(WriterInterceptorContext c) throws IOException, WebApplicationException {
-        
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
-        }
-        
         MultivaluedMap<String, Object> headers = c.getHeaders();
         Object mtObject = headers.getFirst(HttpHeaders.CONTENT_TYPE);
         MediaType entityMt = mtObject == null ? c.getMediaType() : JAXRSUtils.toMediaType(mtObject.toString());
@@ -77,21 +72,26 @@ public class WriterInterceptorMBW implements WriterInterceptor {
             
             writer = (MessageBodyWriter<Object>)ProviderFactory.getInstance(m)
                 .createMessageBodyWriter(entityCls, entityType, entityAnns, entityMt, m);
-            if (writer == null) {
-                String errorMessage = JAXRSUtils.logMessageHandlerProblem("NO_MSG_WRITER", entityCls, entityMt);
-                throw new ProcessingException(errorMessage);
-            }
+        }
+
+        if (writer == null) {
+            String errorMessage = JAXRSUtils.logMessageHandlerProblem("NO_MSG_WRITER", entityCls, entityMt);
+            throw new ProcessingException(errorMessage);
         }
         
         HttpUtils.convertHeaderValuesToString(headers, true);
+
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
+        }
         
-        writer.writeTo(c.getEntity(), 
-                       c.getType(), 
-                       c.getGenericType(), 
-                       c.getAnnotations(), 
-                       entityMt, 
-                       headers, 
-                       c.getOutputStream());
+        writer.writeTo(c.getEntity(),
+                       c.getType(),
+                       c.getGenericType(),
+                       c.getAnnotations(),
+                       entityMt,
+                       headers,
+                       c.getOutputStream()); 
     }
     
     
