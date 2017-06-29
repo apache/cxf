@@ -1,0 +1,5 @@
+Install it on local repo
+mvn install:install-file -Dfile=Cxf7067Service-1.0.0.wsdl -DgroupId=org.apache.cxf.cxf7067 -DartifactId=Cxf7067Service -Dversion=1.0.0 -Dpackaging=wsdl
+
+Deploy it on remote repo (fix repositoryId and url)
+mvn deploy:deploy-file -Dfile=Cxf7067Service-1.0.0.wsdl -DgroupId=org.apache.cxf.cxf7067 -DartifactId=Cxf7067Service -Dversion=1.0.0 -Dpackaging=wsdl -DrepositoryId=nexus -Durl=http://hostname:port/nexus/content/repositories/thirdparty/
