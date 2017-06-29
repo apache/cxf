@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+==============================================================================
+=====  Describe all service specific name spaces.                        =====               
+==============================================================================
+--><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="urn:org:apache:cxf:Cxf7076Service" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:cxf7076msg="urn:org:apache:cxf:message:Cxf7076Message" targetNamespace="urn:org:apache:cxf:Cxf7076Service"><!--Content from Maven Artifact: "org.apache.cxf.cxf7076:Cxf7076Service:wsdl:1.0.0" generated 2017-06-28T13:11:08CEST:-->
+<!--
+==============================================================================
+=====  Describe all data types transmitted between the client and server.=====              
+==============================================================================
+-->
+	<wsdl:types><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:org:apache:cxf:cxf7076:Domain-1" targetNamespace="urn:org:apache:cxf:cxf7076:Domain-1" elementFormDefault="qualified"><!--Content from Maven Artifact: "org.apache.cxf.cxf7076:Domain-1:xsd:1.0.0":-->
+	<xsd:complexType name="Cxf7067DomainType">
+		<xsd:sequence>
+			<xsd:element name="Id" type="xsd:string" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema><xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="urn:org:apache:cxf:message:Cxf7076Message" xmlns:domain="urn:org:apache:cxf:cxf7076:Domain-1" targetNamespace="urn:org:apache:cxf:message:Cxf7076Message" elementFormDefault="qualified"><!--Content from Maven Artifact: "org.apache.cxf.cxf7076:Cxf7076Message:xsd:1.1.0":-->
+	<xsd:import namespace="urn:org:apache:cxf:cxf7076:Domain-1" />
+	<xsd:element name="Cxf7076Request" type="tns:Cxf7076RequestType" />
+	<xsd:element name="Cxf7076Response" type="tns:Cxf7076ResponseType" />
+	<xsd:complexType name="Cxf7076RequestType">
+		<xsd:sequence>
+			<xsd:element name="domain" type="domain:Cxf7067DomainType" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="Cxf7076ResponseType">
+		<xsd:sequence>
+			<xsd:element name="domain" type="domain:Cxf7067DomainType" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema></wsdl:types>
+<!--
+==============================================================================
+=====   Describe all messages transmitted between the client and server. =====               
+==============================================================================
+-->	
+	<wsdl:message name="cxf7076Request">
+		<wsdl:part name="cxf7076req" element="cxf7076msg:Cxf7076Request" />
+	</wsdl:message>
+	<wsdl:message name="cxf7076Response">
+		<wsdl:part name="cxf7076resp" element="cxf7076msg:Cxf7076Response" />
+	</wsdl:message>
+<!--
+==============================================================================
+=====   Describe interface and all operations.                           =====  
+==============================================================================
+-->	
+	<wsdl:portType name="Cxf7076Port">
+		<wsdl:operation name="cxf7076operation">
+			<wsdl:input message="tns:cxf7076Request" />
+			<wsdl:output message="tns:cxf7076Response" />
+		</wsdl:operation>
+	</wsdl:portType>	
+<!--
+==============================================================================
+=====   Describe how the service will be implemented on the wire.        =====               
+==============================================================================
+-->	
+	<wsdl:binding name="Cxf7076PortBinding" type="tns:Cxf7076Port">
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="cxf7076operation">
+			<soap:operation soapAction="cxf7076operation" style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+<!--
+==============================================================================
+=====   Describe where the service can be invoked.	                     =====               
+==============================================================================
+-->	
+	<wsdl:service name="Cxf7076Service">
+		<wsdl:port name="Cxf7076Port_pt" binding="tns:Cxf7076PortBinding">
+			<soap:address location="http://cxf.apache.cxf/ws/Cxf7076Service" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
