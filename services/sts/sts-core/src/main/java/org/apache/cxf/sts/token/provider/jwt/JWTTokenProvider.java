@@ -332,7 +332,7 @@ public class JWTTokenProvider implements TokenProvider {
         encProperties.put(JoseConstants.RSSEC_KEY_STORE, keystore);
 
         JweEncryptionProvider encProvider =
-            JweUtils.loadEncryptionProvider(encProperties, jweHeaders, false);
+            JweUtils.loadEncryptionProvider(encProperties, jweHeaders);
         // token.getJwsHeaders().setSignatureAlgorithm(sigProvider.getAlgorithm());
 
         return encProvider.encrypt(StringUtils.toBytesUTF8(token), null);

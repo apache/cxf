@@ -59,15 +59,23 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
             ctx.proceed();
             return;
         }
-        List<JwsSignatureProvider> sigProviders = getInitializedSigProviders();
+        List<String> propLocs = getPropertyLocations();
+        List<JwsHeaders> protectedHeaders = new ArrayList<JwsHeaders>(propLocs.size());
+        for (int i = 0; i < propLocs.size(); i++) {
+            protectedHeaders.add(new JwsHeaders());
+        }
+        List<JwsSignatureProvider> sigProviders = getInitializedSigProviders(propLocs, protectedHeaders);
         OutputStream actualOs = ctx.getOutputStream();
         if (useJwsOutputStream) {
-            List<String> protectedHeaders = new ArrayList<String>(sigProviders.size());
-            List<JwsSignature> signatures = new ArrayList<JwsSignature>(sigProviders.size());
-            for (JwsSignatureProvider signer : sigProviders) {
-                JwsHeaders protectedHeader = prepareProtectedHeader(ctx, signer);
+            List<String> encodedProtectedHeaders = new ArrayList<>(sigProviders.size());
+            List<JwsSignature> signatures = new ArrayList<>(sigProviders.size());
+            int size = sigProviders.size();
+            for (int i = 0; i < size; i++) {
+                JwsSignatureProvider signer = sigProviders.get(i);
+                JwsHeaders protectedHeader = protectedHeaders.get(i);
+                prepareProtectedHeader(protectedHeader, ctx, signer, size == 1);
                 String encoded = Base64UrlUtility.encode(writer.toJson(protectedHeader));
-                protectedHeaders.add(encoded);
+                encodedProtectedHeaders.add(encoded);
                 JwsSignature signature = signer.createJwsSignature(protectedHeader);
                 byte[] start = StringUtils.toBytesUTF8(encoded + ".");
                 signature.update(start, 0, start.length);
@@ -75,8 +83,8 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
             }    
             ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE_JSON));
             actualOs.write(StringUtils.toBytesUTF8("{\"payload\":\""));
-            JwsJsonOutputStream jwsStream = new JwsJsonOutputStream(actualOs, protectedHeaders, signatures);
-            
+            JwsJsonOutputStream jwsStream = new JwsJsonOutputStream(actualOs, encodedProtectedHeaders, signatures);
+
             Base64UrlOutputStream base64Stream = null;
             if (encodePayload) {
                 base64Stream = new Base64UrlOutputStream(jwsStream);
@@ -94,26 +102,31 @@ public class JwsJsonWriterInterceptor extends AbstractJwsJsonWriterProvider impl
             ctx.setOutputStream(cos);
             ctx.proceed();
             JwsJsonProducer p = new JwsJsonProducer(new String(cos.getBytes(), StandardCharsets.UTF_8));
-            for (JwsSignatureProvider signer : sigProviders) {
-                JwsHeaders protectedHeader = prepareProtectedHeader(ctx, signer);
-                p.signWith(signer, protectedHeader, null);    
+            int size = sigProviders.size();
+            for (int i = 0; i < size; i++) {
+                JwsSignatureProvider signer = sigProviders.get(i);
+                JwsHeaders protectedHeader = protectedHeaders.get(i);
+                prepareProtectedHeader(protectedHeader, ctx, signer, size == 1);
+                p.signWith(signer, protectedHeader, null);
             }
             ctx.setMediaType(JAXRSUtils.toMediaType(JoseConstants.MEDIA_TYPE_JOSE_JSON));
             writeJws(p, actualOs);
         }
         
     }
-    
-    private JwsHeaders prepareProtectedHeader(WriterInterceptorContext ctx, 
-                                              JwsSignatureProvider signer) {
-        JwsHeaders headers = new JwsHeaders();
+
+    private void prepareProtectedHeader(JwsHeaders headers,
+                                        WriterInterceptorContext ctx,
+                                        JwsSignatureProvider signer,
+                                        boolean protectHttp) {
         headers.setSignatureAlgorithm(signer.getAlgorithm());
         setContentTypeIfNeeded(headers, ctx);
         if (!encodePayload) {
             headers.setPayloadEncodingStatus(false);
         }
-        protectHttpHeadersIfNeeded(ctx, headers);
-        return headers;
+        if (protectHttp) {
+            protectHttpHeadersIfNeeded(ctx, headers);
+        }
     }
     
     public void setContentTypeRequired(boolean contentTypeRequired) {

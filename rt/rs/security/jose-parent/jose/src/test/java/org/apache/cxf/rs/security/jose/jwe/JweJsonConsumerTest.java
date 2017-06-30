@@ -160,18 +160,18 @@ public class JweJsonConsumerTest extends Assert {
         JweEncryptionProvider jwe2 = new JweEncryption(keyEncryption2, contentEncryption);
         jweProviders.add(jwe1);
         jweProviders.add(jwe2);
-        
-        List<JweHeaders> perRecipientHeades = new LinkedList<JweHeaders>();
-        perRecipientHeades.add(new JweHeaders("key1"));
-        perRecipientHeades.add(new JweHeaders("key2"));
-        
+
+        List<JweHeaders> perRecipientHeaders = new LinkedList<JweHeaders>();
+        perRecipientHeaders.add(new JweHeaders("key1"));
+        perRecipientHeaders.add(new JweHeaders("key2"));
+
         JweJsonProducer p = new JweJsonProducer(protectedHeaders,
                                                 sharedUnprotectedHeaders,
                                                 StringUtils.toBytesUTF8(text),
                                                 StringUtils.toBytesUTF8(JweJsonProducerTest.EXTRA_AAD_SOURCE),
                                                 false);
-        
-        String jweJson = p.encryptWith(jweProviders, perRecipientHeades);
+
+        String jweJson = p.encryptWith(jweProviders, perRecipientHeaders);
         doTestMultipleRecipients(jweJson);
     }
     private void doTestMultipleRecipients(String jweJson) {

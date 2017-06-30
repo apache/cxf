@@ -21,10 +21,9 @@ package org.apache.cxf.systest.jaxrs.security.jose.jwejws;
 
 import java.net.URL;
 import java.security.Security;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -59,24 +58,22 @@ public class JAXRSJweJsonTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testJweJsonPlainTextHmac() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwejsonhmac";
-        BookStore bs = createBookStore(address, 
-                                       "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties",
-                                       null);
+    public void testJweJsonSingleRecipientKeyWrapAndAesCbcHmac() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwejsonkeywrap";
+        BookStore bs = createBookStore(address,
+                                       "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
         String text = bs.echoText("book");
         assertEquals("book", text);
     }
-    
-    private BookStore createBookStore(String address, Object properties,
-                                      List<?> extraProviders) throws Exception {
-        return createBookStore(address, 
-                               Collections.singletonMap(JoseConstants.RSSEC_ENCRYPTION_PROPS, properties),
-                               extraProviders);
+    @Test
+    public void testJweJsonSingleRecipientAesGcmDirect() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwejsondirect";
+        BookStore bs = createBookStore(address,
+                                       "org/apache/cxf/systest/jaxrs/security/jwe.direct.properties");
+        String text = bs.echoText("book");
+        assertEquals("book", text);
     }
-    private BookStore createBookStore(String address, 
-                                      Map<String, Object> mapProperties,
-                                      List<?> extraProviders) throws Exception {
+    private BookStore createBookStore(String address, String propLoc) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         SpringBusFactory bf = new SpringBusFactory();
         URL busFile = JAXRSJweJsonTest.class.getResource("client.xml");
@@ -88,11 +85,35 @@ public class JAXRSJweJsonTest extends AbstractBusClientServerTestBase {
         JweJsonWriterInterceptor writer = new JweJsonWriterInterceptor();
         providers.add(writer);
         providers.add(new JweJsonClientResponseFilter());
-        if (extraProviders != null) {
-            providers.addAll(extraProviders);
-        }
         bean.setProviders(providers);
-        bean.getProperties(true).putAll(mapProperties);
+        bean.getProperties(true).put(JoseConstants.RSSEC_ENCRYPTION_PROPS,
+                                     propLoc);
+        return bean.create(BookStore.class);
+    }
+    
+    @Test
+    public void testJweJsontTwoRecipientsKeyWrapAndAesGcm() throws Exception {
+        String address = "https://localhost:" + PORT + "/jwejsonTwoRecipients";
+        BookStore bs = createBookStoreTwoRecipients(address);
+        String text = bs.echoTextJweJsonIn("book");
+        assertEquals("bookbook", text);
+    }
+
+    private BookStore createBookStoreTwoRecipients(String address) throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSJweJsonTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+        bean.setServiceClass(BookStore.class);
+        bean.setAddress(address);
+        bean.setProvider(new JweJsonWriterInterceptor());
+        
+        List<String> properties = new ArrayList<>();
+        properties.add("org/apache/cxf/systest/jaxrs/security/jwejson1.properties");
+        properties.add("org/apache/cxf/systest/jaxrs/security/jwejson2.properties");
+        bean.getProperties(true).put(JoseConstants.RSSEC_ENCRYPTION_PROPS,
+                                 properties);
         return bean.create(BookStore.class);
     }
     
