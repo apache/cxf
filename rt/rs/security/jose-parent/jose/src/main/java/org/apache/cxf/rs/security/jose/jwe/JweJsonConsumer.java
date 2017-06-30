@@ -93,7 +93,8 @@ public class JweJsonConsumer {
         for (Map.Entry<JweJsonEncryptionEntry, JweHeaders> entry : recipientsMap.entrySet()) {
             KeyAlgorithm keyAlgo = entry.getValue().getKeyEncryptionAlgorithm();
             if (keyAlgo != null && keyAlgo.equals(jwe.getKeyAlgorithm())
-                || keyAlgo == null && jwe.getKeyAlgorithm() == null) {
+                || keyAlgo == null 
+                    && (jwe.getKeyAlgorithm() == null || KeyAlgorithm.DIRECT.equals(jwe.getKeyAlgorithm()))) {
                 if (recipientProps != null
                     && !entry.getValue().asMap().entrySet().containsAll(recipientProps.entrySet())) {
                     continue;

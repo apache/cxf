@@ -28,7 +28,6 @@ import java.security.interfaces.RSAKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -268,51 +267,8 @@ public final class JwsUtils {
         Properties props = loadSignatureInProperties(required);
         return loadSignatureVerifier(props, headers);
     }
-    public static List<JwsSignatureProvider> loadSignatureProviders(String propLoc, Message m) {
-        Properties props = loadJwsProperties(m, propLoc);
-        JwsSignatureProvider theSigProvider = loadSignatureProvider(m, props, null, true);
-        if (theSigProvider != null) {
-            return Collections.singletonList(theSigProvider);
-        }
-        List<JwsSignatureProvider> theSigProviders = null;
-        if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
-            List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, KeyOperation.SIGN);
-            if (jwks != null) {
-                theSigProviders = new ArrayList<>(jwks.size());
-                for (JsonWebKey jwk : jwks) {
-                    theSigProviders.add(JwsUtils.getSignatureProvider(jwk));
-                }
-            }
-        }
-        if (theSigProviders == null) {
-            LOG.warning("Providers are not available");
-            throw new JwsException(JwsException.Error.NO_PROVIDER);
-        }
-        return theSigProviders;
-    }
-
-    public static List<JwsSignatureVerifier> loadSignatureVerifiers(String propLoc, Message m) {
-        Properties props = loadJwsProperties(m, propLoc);
-        JwsSignatureVerifier theVerifier = loadSignatureVerifier(m, props, null, true);
-        if (theVerifier != null) {
-            return Collections.singletonList(theVerifier);
-        }
-        List<JwsSignatureVerifier> theVerifiers = null;
-        if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
-            List<JsonWebKey> jwks = JwkUtils.loadJsonWebKeys(m, props, KeyOperation.VERIFY);
-            if (jwks != null) {
-                theVerifiers = new ArrayList<>(jwks.size());
-                for (JsonWebKey jwk : jwks) {
-                    theVerifiers.add(JwsUtils.getSignatureVerifier(jwk));
-                }
-            }
-        }
-        if (theVerifiers == null) {
-            LOG.warning("Verifiers are not available");
-            throw new JwsException(JwsException.Error.NO_VERIFIER);
-        }
-        return theVerifiers;
-    }
+    
+    
     public static boolean validateCriticalHeaders(JwsHeaders headers) {
         //TODO: validate JWS specific constraints
         return JoseUtils.validateCriticalHeaders(headers);
@@ -322,30 +278,25 @@ public final class JwsUtils {
         return loadSignatureProvider(PhaseInterceptorChain.getCurrentMessage(),
                                      props, headers);
     }
-    public static JwsSignatureProvider loadSignatureProvider(Message m,
-                                                              Properties props,
-                                                              JwsHeaders headers) {
-        return loadSignatureProvider(m, props, headers, false);
-    }
+    
     public static JwsSignatureProvider loadSignatureProvider(String propertiesLoc, Bus bus) {
         Properties props = loadSignatureProperties(propertiesLoc, bus);
         return loadSignatureProvider(props, null);
     }
 
-    private static JwsSignatureProvider loadSignatureProvider(Message m,
+    public static JwsSignatureProvider loadSignatureProvider(Message m,
                                                              Properties props,
-                                                             JwsHeaders headers,
-                                                             boolean ignoreNullProvider) {
+                                                             JwsHeaders headers) {
         JwsSignatureProvider theSigProvider = null;
 
-        boolean includeCert = headers != null && MessageUtils.getContextualBoolean(
-                m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT, false);
-        boolean includeCertSha1 = headers != null && MessageUtils.getContextualBoolean(
-                m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT_SHA1, false);
-        boolean includeCertSha256 = !includeCertSha1 && headers != null && MessageUtils.getContextualBoolean(
-                                  m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT_SHA256, false);
-        boolean includeKeyId = headers != null && MessageUtils.getContextualBoolean(
-                m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_KEY_ID, false);
+        boolean includeCert = 
+            JoseUtils.checkBooleanProperty(headers, props, m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT);
+        boolean includeCertSha1 = 
+            JoseUtils.checkBooleanProperty(headers, props, m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT_SHA1);
+        boolean includeCertSha256 =  
+            JoseUtils.checkBooleanProperty(headers, props, m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_CERT_SHA256);
+        boolean includeKeyId =
+            JoseUtils.checkBooleanProperty(headers, props, m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_KEY_ID);
 
         if (JoseConstants.HEADER_JSON_WEB_KEY.equals(props.get(JoseConstants.RSSEC_KEY_STORE_TYPE))) {
             JsonWebKey jwk = JwkUtils.loadJsonWebKey(m, props, KeyOperation.SIGN);
@@ -356,24 +307,17 @@ public final class JwsUtils {
                                                              getDefaultKeyAlgorithm(jwk));
                 theSigProvider = JwsUtils.getSignatureProvider(jwk, signatureAlgo);
 
-                boolean includePublicKey = headers != null && MessageUtils.getContextualBoolean(
-                    m, JoseConstants.RSSEC_SIGNATURE_INCLUDE_PUBLIC_KEY, false);
+                boolean includePublicKey = 
+                    JoseUtils.checkBooleanProperty(headers, props, m, 
+                                                   JoseConstants.RSSEC_SIGNATURE_INCLUDE_PUBLIC_KEY);
 
                 if (includeCert) {
                     JwkUtils.includeCertChain(jwk, headers, signatureAlgo.getJwaName());
                 }
                 if (includeCertSha1) {
-                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
-                                        props, MessageDigestUtils.ALGO_SHA_1);
-                    if (digest != null) {
-                        headers.setX509Thumbprint(digest);
-                    }
+                    KeyManagementUtils.setSha1DigestHeader(headers, m, props);
                 } else if (includeCertSha256) {
-                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
-                                        props, MessageDigestUtils.ALGO_SHA_256);
-                    if (digest != null) {
-                        headers.setX509ThumbprintSHA256(digest);
-                    }
+                    KeyManagementUtils.setSha256DigestHeader(headers, m, props);
                 }
                 if (includePublicKey) {
                     JwkUtils.includePublicKey(jwk, headers, signatureAlgo.getJwaName());
@@ -397,24 +341,16 @@ public final class JwsUtils {
                     headers.setX509Chain(KeyManagementUtils.loadAndEncodeX509CertificateOrChain(m, props));
                 }
                 if (includeCertSha1) {
-                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
-                                        props, MessageDigestUtils.ALGO_SHA_1);
-                    if (digest != null) {
-                        headers.setX509Thumbprint(digest);
-                    }
+                    KeyManagementUtils.setSha1DigestHeader(headers, m, props);
                 } else if (includeCertSha256) {
-                    String digest = KeyManagementUtils.loadDigestAndEncodeX509Certificate(m, 
-                                        props, MessageDigestUtils.ALGO_SHA_256);
-                    if (digest != null) {
-                        headers.setX509ThumbprintSHA256(digest);
-                    }
+                    KeyManagementUtils.setSha256DigestHeader(headers, m, props);
                 }  
                 if (includeKeyId && props.containsKey(JoseConstants.RSSEC_KEY_STORE_ALIAS)) {
                     headers.setKeyId(props.getProperty(JoseConstants.RSSEC_KEY_STORE_ALIAS));
                 }
             }
         }
-        if (theSigProvider == null && !ignoreNullProvider) {
+        if (theSigProvider == null) {
             LOG.warning("Provider is not available");
             throw new JwsException(JwsException.Error.NO_PROVIDER);
         }
@@ -423,12 +359,11 @@ public final class JwsUtils {
     public static JwsSignatureVerifier loadSignatureVerifier(Properties props,
                                                              JwsHeaders inHeaders) {
         return loadSignatureVerifier(PhaseInterceptorChain.getCurrentMessage(),
-                                     props, inHeaders, false);
+                                     props, inHeaders);
     }
     public static JwsSignatureVerifier loadSignatureVerifier(Message m,
                                                               Properties props,
-                                                              JwsHeaders inHeaders,
-                                                              boolean ignoreNullVerifier) {
+                                                              JwsHeaders inHeaders) {
         JwsSignatureVerifier theVerifier = null;
         String inHeaderKid = null;
         if (inHeaders != null) {
@@ -489,13 +424,13 @@ public final class JwsUtils {
                 }
             }
         }
-        if (theVerifier == null && !ignoreNullVerifier) {
+        if (theVerifier == null) {
             LOG.warning("Verifier is not available");
             throw new JwsException(JwsException.Error.NO_VERIFIER);
         }
         return theVerifier;
     }
-    private static Properties loadJwsProperties(Message m, String propLoc) {
+    public static Properties loadJwsProperties(Message m, String propLoc) {
         try {
             return JoseUtils.loadProperties(propLoc, m.getExchange().getBus());
         } catch (Exception ex) {

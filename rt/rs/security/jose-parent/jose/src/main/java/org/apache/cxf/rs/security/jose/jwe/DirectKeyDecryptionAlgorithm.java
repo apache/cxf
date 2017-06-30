@@ -44,7 +44,7 @@ public class DirectKeyDecryptionAlgorithm implements KeyDecryptionProvider {
     }
     @Override
     public KeyAlgorithm getAlgorithm() {
-        return null;
+        return KeyAlgorithm.DIRECT;
     }
     protected void validateKeyEncryptionKey(JweDecryptionInput jweDecryptionInput) {
         byte[] encryptedCEK = jweDecryptionInput.getEncryptedCEK();

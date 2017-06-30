@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PropertyUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.message.Message;
@@ -204,6 +205,17 @@ public final class JoseUtils {
         return props;
     }
 
+    public static boolean checkBooleanProperty(JoseHeaders headers, Properties props, Message m,
+                                                String propertyName) {
+        if (headers == null) {
+            return false;
+        }
+        if (props.containsKey(propertyName)) {
+            return PropertyUtils.isTrue(props.get(propertyName));
+        }
+        return MessageUtils.getContextualBoolean(m, propertyName, false);
+    }
+    
     //
     // <End> Copied from JAX-RS RT FRONTEND ResourceUtils
     //

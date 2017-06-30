@@ -60,8 +60,7 @@ public class JwsUtilsTest extends Assert {
         p.put(JoseConstants.RSSEC_KEY_STORE_ALIAS, "alice");
         JwsSignatureVerifier jws = JwsUtils.loadSignatureVerifier(createMessage(),
                                                                   p,
-                                                                  new JwsHeaders(),
-                                                                  false);
+                                                                  new JwsHeaders());
         assertNotNull(jws);
     }
     @Test

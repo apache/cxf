@@ -42,7 +42,7 @@ under the License.
     <bean id="jweInFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweJsonContainerRequestFilter"/>
     <bean id="jweOutFilter" class="org.apache.cxf.rs.security.jose.jaxrs.JweJsonWriterInterceptor"/>
     
-    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwe-json}/jwejsonhmac">
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwe-json}/jwejsonkeywrap">
         <jaxrs:serviceBeans>
             <ref bean="serviceBean"/>
         </jaxrs:serviceBeans>
@@ -52,6 +52,29 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/secret.jwk.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwe-json}/jwejsondirect">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <ref bean="jweInFilter"/>
+            <ref bean="jweOutFilter"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/jwe.direct.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
+    
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwe-json}/jwejsonTwoRecipients">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.properties" 
+              value="org/apache/cxf/systest/jaxrs/security/jwejson1.properties,org/apache/cxf/systest/jaxrs/security/jwejson2.properties"/>
         </jaxrs:properties>
     </jaxrs:server>
         

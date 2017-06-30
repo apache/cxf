@@ -236,7 +236,7 @@ public class JWTTokenProviderTest extends org.junit.Assert {
             decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "skpass");
 
             JweDecryptionProvider decProvider =
-                JweUtils.loadDecryptionProvider(decProperties, jwtConsumer.getHeaders(), false);
+                JweUtils.loadDecryptionProvider(decProperties, jwtConsumer.getHeaders());
 
             JweDecryptionOutput decOutput = decProvider.decrypt(token);
             String decToken = decOutput.getContentText();
@@ -290,7 +290,7 @@ public class JWTTokenProviderTest extends org.junit.Assert {
                                   ContentAlgorithm.A128CBC_HS256.name());
 
                 JweDecryptionProvider decProvider =
-                    JweUtils.loadDecryptionProvider(decProperties, jwtConsumer.getHeaders(), false);
+                    JweUtils.loadDecryptionProvider(decProperties, jwtConsumer.getHeaders());
 
                 JweDecryptionOutput decOutput = decProvider.decrypt(token);
                 String decToken = decOutput.getContentText();
@@ -337,7 +337,7 @@ public class JWTTokenProviderTest extends org.junit.Assert {
             decProperties.put(JoseConstants.RSSEC_KEY_PSWD, "skpass");
 
             JweDecryptionProvider decProvider =
-                JweUtils.loadDecryptionProvider(decProperties, jwtConsumer.getHeaders(), false);
+                JweUtils.loadDecryptionProvider(decProperties, jwtConsumer.getHeaders());
 
             JweDecryptionOutput decOutput = decProvider.decrypt(token);
             String decToken = decOutput.getContentText();

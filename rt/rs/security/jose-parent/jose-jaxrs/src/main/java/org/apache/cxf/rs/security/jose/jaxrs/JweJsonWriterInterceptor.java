@@ -36,8 +36,6 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
-import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
-import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 import org.apache.cxf.rs.security.jose.jwe.JweEncryptionProvider;
 import org.apache.cxf.rs.security.jose.jwe.JweHeaders;
 import org.apache.cxf.rs.security.jose.jwe.JweJsonProducer;
@@ -55,7 +53,15 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
             return;
         }
         OutputStream actualOs = ctx.getOutputStream();
-        List<JweEncryptionProvider> providers = getInitializedEncryptionProviders();
+        JweHeaders sharedProtectedHeaders = new JweHeaders();
+        List<String> propLocs = getPropertyLocations();
+        List<JweHeaders> perRecipientUnprotectedHeaders = new ArrayList<JweHeaders>(propLocs.size());
+        for (int i = 0; i < propLocs.size(); i++) {
+            perRecipientUnprotectedHeaders.add(new JweHeaders());
+        }
+        List<JweEncryptionProvider> providers = getInitializedEncryptionProviders(propLocs,
+                                                                                  sharedProtectedHeaders,
+                                                                                  perRecipientUnprotectedHeaders);
 
         String ctString = null;
         MediaType contentMediaType = ctx.getMediaType();
@@ -66,30 +72,10 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
                 ctString = JAXRSUtils.mediaTypeToString(contentMediaType);
             }
         }
-        JweHeaders protectedHeaders = new JweHeaders(ContentAlgorithm.A128GCM);
         if (ctString != null) {
-            protectedHeaders.setContentType(ctString);
+            sharedProtectedHeaders.setContentType(ctString);
         }
-        protectHttpHeadersIfNeeded(ctx, protectedHeaders);
-        List<KeyAlgorithm> keyAlgos = new ArrayList<>();
-        for (JweEncryptionProvider p : providers) {
-            if (!keyAlgos.contains(p.getKeyAlgorithm())) {
-                keyAlgos.add(p.getKeyAlgorithm());
-            }
-        }
-        List<JweHeaders> perRecipientUnprotectedHeaders = null;
-        if (keyAlgos.size() == 1) {
-            // Can be optionally set in shared unprotected headers
-            // or per-recipient headers
-            protectedHeaders.setKeyEncryptionAlgorithm(keyAlgos.get(0));
-        } else {
-            perRecipientUnprotectedHeaders = new ArrayList<>();
-            for (KeyAlgorithm keyAlgo : keyAlgos) {
-                JweHeaders headers = new JweHeaders();
-                headers.setKeyEncryptionAlgorithm(keyAlgo);
-                perRecipientUnprotectedHeaders.add(headers);
-            }
-        }
+        protectHttpHeadersIfNeeded(ctx, sharedProtectedHeaders);
         if (useJweOutputStream) {
             //TODO
         } else {
@@ -99,7 +85,7 @@ public class JweJsonWriterInterceptor extends AbstractJweJsonWriterProvider impl
 
 
 
-            JweJsonProducer producer = new JweJsonProducer(protectedHeaders, cos.getBytes());
+            JweJsonProducer producer = new JweJsonProducer(sharedProtectedHeaders, cos.getBytes());
             String jweContent = producer.encryptWith(providers, perRecipientUnprotectedHeaders);
 
             setJoseMediaType(ctx);

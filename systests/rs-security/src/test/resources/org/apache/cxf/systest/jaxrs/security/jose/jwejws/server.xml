@@ -261,4 +261,16 @@ under the License.
             <ref bean="jweOutAesCbcHmacFilter"/>
         </jaxrs:providers>
     </jaxrs:server>
+    <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-jwt}/jweaesgcmdirect">
+        <jaxrs:serviceBeans>
+            <ref bean="serviceBean"/>
+        </jaxrs:serviceBeans>
+        <jaxrs:providers>
+            <bean class="org.apache.cxf.rs.security.jose.jaxrs.JweContainerRequestFilter"/>
+            <bean class="org.apache.cxf.rs.security.jose.jaxrs.JweWriterInterceptor"/>
+        </jaxrs:providers>
+        <jaxrs:properties>
+            <entry key="rs.security.encryption.properties" value="org/apache/cxf/systest/jaxrs/security/jwe.direct.properties"/>
+        </jaxrs:properties>
+    </jaxrs:server>
 </beans>

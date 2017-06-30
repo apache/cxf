@@ -71,6 +71,9 @@ public enum KeyAlgorithm {
         if (algo == null) {
             return null;
         }
+        if (KeyAlgorithm.DIRECT.getJwaName().equals(algo)) {
+            return KeyAlgorithm.DIRECT;
+        }
         return KeyAlgorithm.valueOf(algo.replace('-', '_')
                                     .replace('+', '_'));
 

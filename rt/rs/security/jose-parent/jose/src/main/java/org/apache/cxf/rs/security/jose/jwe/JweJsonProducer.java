@@ -31,6 +31,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64UrlUtility;
 import org.apache.cxf.jaxrs.json.basic.JsonMapObjectReaderWriter;
 import org.apache.cxf.rs.security.jose.common.JoseConstants;
+import org.apache.cxf.rs.security.jose.jwa.KeyAlgorithm;
 
 public class JweJsonProducer {
     protected static final Logger LOG = LogUtils.getL7dLogger(JweJsonProducer.class);
@@ -106,7 +107,7 @@ public class JweJsonProducer {
             JweHeaders perRecipientUnprotected =
                 recipientUnprotected == null ? null : recipientUnprotected.get(i);
             JweHeaders jsonHeaders = null;
-            if (perRecipientUnprotected != null) {
+            if (perRecipientUnprotected != null && !perRecipientUnprotected.asMap().isEmpty()) {
                 checkCriticalHeaders(perRecipientUnprotected);
                 if (!Collections.disjoint(unionHeaders.asMap().keySet(),
                                           perRecipientUnprotected.asMap().keySet())) {
@@ -140,7 +141,9 @@ public class JweJsonProducer {
             }
 
             byte[] encryptedCek = state.getContentEncryptionKey();
-            if (encryptedCek.length == 0 && encryptor.getKeyAlgorithm() != null) {
+            if (encryptedCek.length == 0 
+                && encryptor.getKeyAlgorithm() != null
+                && !KeyAlgorithm.DIRECT.equals(encryptor.getKeyAlgorithm())) {
                 LOG.warning("Unexpected key encryption algorithm");
                 throw new JweException(JweException.Error.INVALID_JSON_JWE);
             }
@@ -157,7 +160,7 @@ public class JweJsonProducer {
         }
         if (entries.size() == 1 && canBeFlat) {
             JweHeaders unprotectedEntryHeader = entries.get(0).getUnprotectedHeader();
-            if (unprotectedEntryHeader != null) {
+            if (unprotectedEntryHeader != null && !unprotectedEntryHeader.asMap().isEmpty()) {
                 jweJsonMap.put("header", unprotectedEntryHeader);
             }
             String encryptedKey = entries.get(0).getEncodedEncryptedKey();

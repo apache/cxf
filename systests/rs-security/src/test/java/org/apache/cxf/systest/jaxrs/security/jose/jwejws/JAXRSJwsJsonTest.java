@@ -121,7 +121,7 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testJwsJsonBookDoubleHmac() throws Exception {
+    public void testJwsJsonBookDoubleHmacManyProps() throws Exception {
         String address = "https://localhost:" + PORT + "/jwsjsonhmac2";
         List<String> properties = new ArrayList<>();
         properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
@@ -132,21 +132,6 @@ public class JAXRSJwsJsonTest extends AbstractBusClientServerTestBase {
                 "org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac.properties");
         BookStore bs = createBookStore(address, map, null);
         Book book = bs.echoBook(new Book("book", 123L));
-        assertEquals("book", book.getName());
-        assertEquals(123L, book.getId());
-    }
-
-    @Test
-    public void testJwsJsonBookDoubleHmacSinglePropsFile() throws Exception {
-        String address = "https://localhost:" + PORT + "/jwsjsonhmac2";
-        List<String> properties = new ArrayList<>();
-        properties.add("org/apache/cxf/systest/jaxrs/security/secret.jwk.hmac2.properties");
-        Map<String, Object> map = new HashMap<>();
-        map.put(JoseConstants.RSSEC_SIGNATURE_OUT_PROPS, properties);
-        map.put(JoseConstants.RSSEC_SIGNATURE_IN_PROPS,
-                "org/apache/cxf/systest/jaxrs/security/secret.jwk.properties");
-        BookStore bs = createBookStore(address, map, null);
-        Book book = bs.echoBookXml(new Book("book", 123L));
         assertEquals("book", book.getName());
         assertEquals(123L, book.getId());
     }

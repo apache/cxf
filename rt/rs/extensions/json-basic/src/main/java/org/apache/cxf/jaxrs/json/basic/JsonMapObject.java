@@ -121,4 +121,8 @@ public class JsonMapObject implements Serializable {
     public Map<String, Object> getUpdateCount() {
         return updateCount == null ? null : Collections.<String, Object>unmodifiableMap(updateCount);
     }
+    
+    public Object removeProperty(String name) {
+        return values.remove(name);
+    }
 }

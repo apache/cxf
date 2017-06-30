@@ -418,6 +418,35 @@ public class JAXRSJweJwsTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testJweAesGcmDirect() throws Exception {
+        String address = "https://localhost:" + PORT + "/jweaesgcmdirect";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        SpringBusFactory bf = new SpringBusFactory();
+        URL busFile = JAXRSJweJwsTest.class.getResource("client.xml");
+        Bus springBus = bf.createBus(busFile.toString());
+        bean.setBus(springBus);
+        bean.setServiceClass(BookStore.class);
+        bean.setAddress(address);
+        List<Object> providers = new LinkedList<Object>();
+        // writer
+        JweWriterInterceptor jweWriter = new JweWriterInterceptor();
+        jweWriter.setUseJweOutputStream(true);
+        // reader
+        JweClientResponseFilter jweReader = new JweClientResponseFilter();
+
+        providers.add(jweWriter);
+        providers.add(jweReader);
+        bean.setProviders(providers);
+
+        bean.getProperties(true).put("rs.security.encryption.properties",
+                                     "org/apache/cxf/systest/jaxrs/security/jwe.direct.properties");
+        
+        BookStore bs = bean.create(BookStore.class);
+        String text = bs.echoText("book");
+        assertEquals("book", text);
+    }
+    
+    @Test
     public void testJweAesCbcHmac() throws Exception {
         String address = "https://localhost:" + PORT + "/jweaescbchmac";
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
