@@ -37,6 +37,7 @@ import java.util.Set;
 
 import org.apache.commons.lang.SystemUtils;
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.SystemPropertyAction;
 import org.apache.cxf.common.util.URIParserUtil;
 import org.apache.cxf.helpers.CastUtils;
@@ -869,7 +870,11 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
         request.setRemoteRepositories(mavenSession.getRequest().getRemoteRepositories());
         ArtifactResolutionResult result = repositorySystem.resolve(request);
 
-        return result.getOriginatingArtifact();
+        Artifact resolvedArtifact = result.getOriginatingArtifact();
+        if (resolvedArtifact == null && !CollectionUtils.isEmpty(result.getArtifacts())) {
+            resolvedArtifact = result.getArtifacts().iterator().next();
+        }
+        return resolvedArtifact;
     }
 
     private Artifact findWsdlArtifact(Artifact targetArtifact, Collection<Artifact> artifactSet) {

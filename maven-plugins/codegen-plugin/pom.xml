@@ -36,11 +36,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.maven.shared</groupId>
-            <artifactId>maven-artifact-resolver</artifactId>
-            <version>1.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
             <scope>provided</scope>
@@ -142,7 +137,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-plugin-plugin</artifactId>
                 <configuration>
-                    <!-- see http://jira.codehaus.org/browse/MNG-5346 -->
+                    <!-- see https://issues.apache.org/jira/browse/MNG-5346 -->
                     <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
                 </configuration>
                 <executions>
@@ -163,7 +158,7 @@
                         <goals>
                             <goal>install</goal>
                         </goals>
-                        <configuration>
+                        <configuration><!-- has no effect -->
                             <localRepositoryPath>${project.build.directory}/it/repo</localRepositoryPath>
                         </configuration>
                     </execution>
@@ -172,10 +167,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-invoker-plugin</artifactId>
-                <version>2.0.0</version>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
-                        <id>test-toolchains-integration</id>
+                        <id>test-integration</id>
                         <phase>integration-test</phase>
                         <goals>
                             <goal>integration-test</goal>
