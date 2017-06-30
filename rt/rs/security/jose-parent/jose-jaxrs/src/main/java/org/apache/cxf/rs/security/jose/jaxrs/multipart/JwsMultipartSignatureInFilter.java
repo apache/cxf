@@ -103,7 +103,7 @@ public class JwsMultipartSignatureInFilter implements MultipartInputFilter {
                                                    JoseConstants.RSSEC_SIGNATURE_IN_PROPS,
                                                    JoseConstants.RSSEC_SIGNATURE_PROPS);
             
-            theVerifier = JwsUtils.loadSignatureVerifier(message, props, headers, false);
+            theVerifier = JwsUtils.loadSignatureVerifier(message, props, headers);
         } else {
             theVerifier = verifier;
         }

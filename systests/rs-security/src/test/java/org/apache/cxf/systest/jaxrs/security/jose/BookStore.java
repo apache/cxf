@@ -20,7 +20,9 @@
 package org.apache.cxf.systest.jaxrs.security.jose;
 
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.InternalServerErrorException;
@@ -29,6 +31,15 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.rs.security.jose.jwa.ContentAlgorithm;
+import org.apache.cxf.rs.security.jose.jwe.JweDecryptionOutput;
+import org.apache.cxf.rs.security.jose.jwe.JweDecryptionProvider;
+import org.apache.cxf.rs.security.jose.jwe.JweJsonConsumer;
+import org.apache.cxf.rs.security.jose.jwe.JweUtils;
+import org.apache.cxf.rs.security.jose.jwk.JsonWebKey;
+import org.apache.cxf.rs.security.jose.jwk.JwkUtils;
 import org.apache.cxf.systest.jaxrs.security.Book;
 
 @Path("/bookstore")
@@ -86,6 +97,43 @@ public class BookStore {
         return books;
     }
 
+    @POST
+    @Path("/books")
+    @Produces({"text/plain"})
+    @Consumes("application/jose+json")
+    public String echoTextJweJsonIn(String jweJson) {
+        
+        JweJsonConsumer consumer = new JweJsonConsumer(jweJson);
+        
+        // Recipient 1
+        final String recipient1PropLoc = "org/apache/cxf/systest/jaxrs/security/jwejson1.properties";
+        final String recipient1Kid = "AesWrapKey";
+        String recipient1DecryptedText = getRecipientText(consumer, recipient1PropLoc, recipient1Kid);
+        
+        // Recipient 2
+        final String recipient2PropLoc = "org/apache/cxf/systest/jaxrs/security/jwejson2.properties";
+        final String recipient2Kid = "AesWrapKey2";
+        String recipient2DecryptedText = getRecipientText(consumer, recipient2PropLoc, recipient2Kid);
+        return recipient1DecryptedText + recipient2DecryptedText;
+    }
+
+    private String getRecipientText(JweJsonConsumer consumer, String recipientPropLoc, String recipientKid) { 
+        Message message = JAXRSUtils.getCurrentMessage();
+        
+        
+        Properties recipientProps = JweUtils.loadJweProperties(message, recipientPropLoc);
+        JsonWebKey recipientKey = JwkUtils.loadJwkSet(message, recipientProps, null).getKey(recipientKid);
+        
+        ContentAlgorithm contentEncryptionAlgorithm = JweUtils.getContentEncryptionAlgorithm(recipientProps);
+        
+        JweDecryptionProvider jweRecipient = 
+            JweUtils.createJweDecryptionProvider(recipientKey, contentEncryptionAlgorithm);
+        
+        JweDecryptionOutput jweRecipientOutput = 
+            consumer.decryptWith(jweRecipient,
+                                 Collections.<String, Object>singletonMap("kid", recipientKid));
+        return jweRecipientOutput.getContentText();
+    }
 }
 
 

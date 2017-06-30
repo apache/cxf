@@ -12,6 +12,17 @@
           "kid":"AesWrapKey"},
           
           {"kty":"oct",
+          "alg":"A128KW",
+          "k":"GawgguFyGrWKav7AX4VKUg",
+          "kid":"AesWrapKey2"},
+          
+          {"kty":"oct",
+          "alg":"A128GCM",
+          "k":"GawgguFyGrWKav7AX4VKUg",
+          "kid":"AesGcmKey"},
+          
+          
+          {"kty":"oct",
           "alg":"HS256",
           "k":"AyM1SysPpbyDfgZld3umj1qzKObwVMkoqQ-EstJQLr_T-1qS0gZH75aKtMN3Yj0iPS4hcgUuTwjAzZr1Z9CAow",
           "kid":"HMACKey"},
