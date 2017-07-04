@@ -159,7 +159,6 @@ public final class SearchUtils {
         if (tableAlias != null) {
             sb.append(" " + tableAlias);
         }
-        sb.append(" WHERE ");
     }
 
     public static String conditionTypeToSqlOperator(ConditionType ct, String value, String originalValue) {
