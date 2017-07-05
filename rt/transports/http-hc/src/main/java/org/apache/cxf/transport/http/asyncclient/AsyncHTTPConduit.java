@@ -347,7 +347,7 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
         }
 
         public boolean isOpen() {
-            return true;
+            return !closed;
         }
 
         public int write(ByteBuffer src) throws IOException {
@@ -428,9 +428,15 @@ public class AsyncHTTPConduit extends URLConnectionHTTPConduit {
             connect(true);
             wrappedStream = new OutputStream() {
                 public void write(byte b[], int off, int len) throws IOException {
+                    if (exception instanceof IOException) {
+                        throw (IOException) exception;
+                    }
                     outbuf.write(b, off, len);
                 }
                 public void write(int b) throws IOException {
+                    if (exception instanceof IOException) {
+                        throw (IOException) exception;
+                    }
                     outbuf.write(b);
                 }
                 public void close() throws IOException {
