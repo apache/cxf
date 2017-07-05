@@ -71,7 +71,7 @@ public final class WsdlOptionLoader {
      * @param wsdlBasedir
      * @param includes file name patterns to include
      * @param excludes file name patterns to exclude
-     * @param defaultOptions options that should be used if no special file is given
+     * @param defaultOutputDir output directory that should be used if no special file is given
      * @return list of one WsdlOption object for each wsdl found
      * @throws MojoExecutionException
      */

@@ -505,4 +505,17 @@ public final class KeyManagementUtils {
         
         return null;
     }
+    
+    public static void setSha1DigestHeader(JoseHeaders headers, Message m, Properties props) {
+        String digest = loadDigestAndEncodeX509Certificate(m, props, MessageDigestUtils.ALGO_SHA_1);
+        if (digest != null) {
+            headers.setX509Thumbprint(digest);
+        }
+    }
+    public static void setSha256DigestHeader(JoseHeaders headers, Message m, Properties props) {
+        String digest = loadDigestAndEncodeX509Certificate(m, props, MessageDigestUtils.ALGO_SHA_256);
+        if (digest != null) {
+            headers.setX509ThumbprintSHA256(digest);
+        }
+    }
 }

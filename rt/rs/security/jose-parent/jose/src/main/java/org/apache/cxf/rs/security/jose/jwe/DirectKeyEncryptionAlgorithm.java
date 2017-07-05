@@ -30,13 +30,14 @@ public class DirectKeyEncryptionAlgorithm implements KeyEncryptionProvider {
         return new byte[0];
     }
     protected void checkKeyEncryptionAlgorithm(JweHeaders headers) {
-        if (headers.getKeyEncryptionAlgorithm() != null) {
+        KeyAlgorithm keyAlgo = headers.getKeyEncryptionAlgorithm();
+        if (keyAlgo != null && !KeyAlgorithm.DIRECT.equals(keyAlgo)) {
             LOG.warning("Key encryption algorithm header is set");
             throw new JweException(JweException.Error.INVALID_KEY_ALGORITHM);
         }
     }
     @Override
     public KeyAlgorithm getAlgorithm() {
-        return null;
+        return KeyAlgorithm.DIRECT;
     }
 }
