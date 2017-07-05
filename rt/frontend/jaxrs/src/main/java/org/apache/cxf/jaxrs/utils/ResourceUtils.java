@@ -313,6 +313,9 @@ public final class ResourceUtils {
                 if (httpMethod == null) {
                     // subresource locator
                     Class<?> subClass = m.getReturnType();
+                    if (subClass == Class.class) {
+                        subClass = InjectionUtils.getActualType(m.getGenericReturnType());
+                    }
                     if (enableStatic) {
                         ClassResourceInfo subCri = cri.findResource(subClass, subClass);
                         if (subCri == null) {

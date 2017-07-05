@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.ResourceContext;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -45,6 +46,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain.State;
 import org.apache.cxf.jaxrs.impl.AsyncResponseImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.impl.ResourceContextImpl;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -235,7 +237,16 @@ public class JAXRSInvoker extends AbstractInvoker {
 
                 result = checkResultObject(result, subResourcePath);
 
-                subCri = cri.getSubResource(methodToInvoke.getReturnType(),
+                Class<?> subResponseType = null;
+                if (result.getClass() == Class.class) {
+                    ResourceContext rc = new ResourceContextImpl(inMessage, ori);
+                    result = rc.getResource((Class<?>)result);
+                    subResponseType = InjectionUtils.getActualType(methodToInvoke.getGenericReturnType());
+                } else {
+                    subResponseType = methodToInvoke.getReturnType();
+                }
+                
+                subCri = cri.getSubResource(subResponseType,
                     ClassHelper.getRealClass(exchange.getBus(), result), result);
                 if (subCri == null) {
                     org.apache.cxf.common.i18n.Message errorM =
