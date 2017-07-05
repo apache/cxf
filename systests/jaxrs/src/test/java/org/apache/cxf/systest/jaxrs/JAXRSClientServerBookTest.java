@@ -2215,6 +2215,12 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT + "/bookstore/booksubresource/instance/context/rc";
         doTestGetBookWithResourceContext(address);
     }
+    
+    @Test
+    public void testGetBookWithResourceContextClass() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/booksubresource/class/context/rc";
+        doTestGetBookWithResourceContext(address);
+    }
 
     private void doTestGetBookWithResourceContext(String address) throws Exception {
         WebClient wc = WebClient.create(address);
