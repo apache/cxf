@@ -254,34 +254,35 @@ public class SOAPHandlerInterceptor extends
         Exchange exch = message.getExchange();
         setupBindingOperationInfo(exch, sm);
         SOAPMessage msg = sm.getMessage();
-        try {
-            List<SOAPElement> params = new ArrayList<>();
-            message.put(MessageContext.REFERENCE_PARAMETERS, params);
-            SOAPHeader head = SAAJUtils.getHeader(msg);
-            if (head != null) {
-                Iterator<Node> it = CastUtils.cast(head.getChildElements());
-                while (it != null && it.hasNext()) {
-                    Node nd = it.next();
-                    if (nd instanceof SOAPElement) {
-                        SOAPElement el = (SOAPElement)nd;
-                        if (el.hasAttributeNS(Names.WSA_NAMESPACE_NAME, "IsReferenceParameter")
-                            && ("1".equals(el.getAttributeNS(Names.WSA_NAMESPACE_NAME,
-                                                             "IsReferenceParameter"))
-                                || Boolean.parseBoolean(el.getAttributeNS(Names.WSA_NAMESPACE_NAME,
-                                                                          "IsReferenceParameter")))) {
-                            params.add(el);
+        if (msg != null) {
+            try {
+                List<SOAPElement> params = new ArrayList<>();
+                message.put(MessageContext.REFERENCE_PARAMETERS, params);
+                SOAPHeader head = SAAJUtils.getHeader(msg);
+                if (head != null) {
+                    Iterator<Node> it = CastUtils.cast(head.getChildElements());
+                    while (it != null && it.hasNext()) {
+                        Node nd = it.next();
+                        if (nd instanceof SOAPElement) {
+                            SOAPElement el = (SOAPElement) nd;
+                            if (el.hasAttributeNS(Names.WSA_NAMESPACE_NAME, "IsReferenceParameter")
+                                    && ("1".equals(el.getAttributeNS(Names.WSA_NAMESPACE_NAME,
+                                    "IsReferenceParameter"))
+                                    || Boolean.parseBoolean(el.getAttributeNS(Names.WSA_NAMESPACE_NAME,
+                                    "IsReferenceParameter")))) {
+                                params.add(el);
+                            }
                         }
                     }
                 }
+                if (isRequestor(message) && msg.getSOAPPart().getEnvelope().getBody() != null
+                        && msg.getSOAPPart().getEnvelope().getBody().hasFault()) {
+                    return null;
+                }
+            } catch (SOAPException e) {
+                throw new Fault(e);
             }
-            if (isRequestor(message) && msg.getSOAPPart().getEnvelope().getBody() != null
-                && msg.getSOAPPart().getEnvelope().getBody().hasFault()) {
-                return null;
-            }
-        } catch (SOAPException e) {
-            throw new Fault(e);
         }
-
 
         return sm;
     }
