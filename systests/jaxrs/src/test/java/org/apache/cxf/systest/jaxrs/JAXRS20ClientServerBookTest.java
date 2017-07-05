@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,6 +63,7 @@ import javax.xml.ws.Holder;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -72,6 +74,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase {
@@ -788,6 +791,19 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         Book b22 = books.get(1).getValue();
         assertEquals(124L, b22.getId());
         assertEquals("CXF Rocks", b22.getName());
+    }
+
+    @Ignore("CXF-7357")
+    @Test
+    public void testUnknownHostException() throws InterruptedException {
+        String address = "http://unknown-host/bookstore/bookheaders/simple/async";
+        try {
+            doTestPostBookAsyncHandler(address);
+            fail("Should fail with UnknownHostException");
+        } catch (ExecutionException e) {
+            assertTrue("Should fail with UnknownHostException",
+                    ExceptionUtils.getRootCause(e) instanceof UnknownHostException);
+        }
     }
 
     private static class ReplaceBodyFilter implements ClientRequestFilter {
