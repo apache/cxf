@@ -65,7 +65,8 @@ import org.opensaml.xmlsec.encryption.EncryptedData;
 import org.opensaml.xmlsec.signature.KeyInfo;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureException;
-import org.opensaml.xmlsec.signature.support.SignatureValidator;
+import org.opensaml.xmlsec.signature.support.SignatureValidationProvider;
+import org.opensaml.xmlsec.signature.support.provider.ApacheSantuarioSignatureValidationProviderImpl;
 
 /**
  * Validate a SAML (1.1 or 2.0) Protocol Response. It validates the Response against the specs,
@@ -336,7 +337,9 @@ public class SAMLProtocolResponseValidator {
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
         }
         try {
-            SignatureValidator.validate(signature, credential);
+            SignatureValidationProvider responseSignatureValidator =
+                new ApacheSantuarioSignatureValidationProviderImpl();
+            responseSignatureValidator.validate(signature, credential);
         } catch (SignatureException ex) {
             LOG.log(Level.FINE, "Error in validating the SAML Signature: " + ex.getMessage(), ex);
             throw new WSSecurityException(WSSecurityException.ErrorCode.FAILURE, "invalidSAMLsecurity");
