@@ -1349,6 +1349,11 @@ public class BookStore {
         return rc.initResource(book2Sub);
     }
     
+    @Path("/booksubresource/class/context")
+    public Class<Book2> getBookSubResourceClass() {
+        return Book2.class;
+    }
+
     @Path("/booksubresourceobject/{bookId}/")
     public Object getBookSubResourceObject(@PathParam("bookId") String id) throws BookNotFoundFault {
         return getBookSubResource(id);
