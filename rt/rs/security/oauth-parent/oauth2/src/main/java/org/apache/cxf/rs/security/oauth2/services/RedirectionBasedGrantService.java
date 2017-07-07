@@ -58,6 +58,7 @@ import org.apache.cxf.security.SecurityContext;
  */
 public abstract class RedirectionBasedGrantService extends AbstractOAuthService {
     private static final String AUTHORIZATION_REQUEST_PARAMETERS = "authorization.request.parameters";
+    private static final String PREAUTHORIZED_TOKEN_KEY = "preauthorized.token.key";
     private Set<String> supportedResponseTypes;
     private String supportedGrantType;
     private boolean useAllClientScopes;
@@ -72,6 +73,7 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
     private AuthorizationRequestFilter authorizationFilter;
     private List<String> scopesRequiringNoConsent;
     private boolean supportSinglePageApplications = true;
+    private boolean revokePreauthorizedTokenOnApproval = true;
 
     protected RedirectionBasedGrantService(String supportedResponseType,
                                            String supportedGrantType) {
@@ -192,9 +194,6 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             alreadyAuthorizedPerms = preAuthorizedToken.getScopes();
             preAuthorizationComplete =
                 OAuthUtils.convertPermissionsToScopeList(alreadyAuthorizedPerms).containsAll(requestedScope);
-            if (!preAuthorizationComplete) {
-                preAuthorizedToken = null;
-            }
         }
 
         Response finalResponse = null;
@@ -219,6 +218,9 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
                                             userSubject,
                                             preAuthorizedToken);
             } else {
+                if (preAuthorizedToken != null) {
+                    data.setPreauthorizedTokenKey(preAuthorizedToken.getTokenKey());
+                }
                 finalResponse = Response.ok(data).build();
             }
         } catch (OAuthServiceException ex) {
@@ -389,6 +391,11 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
             return createErrorResponse(params, redirectUri, OAuthConstants.INVALID_SCOPE);
         }
         getMessageContext().put(AUTHORIZATION_REQUEST_PARAMETERS, params);
+        
+        String preAuthorizedTokenKey = params.getFirst(PREAUTHORIZED_TOKEN_KEY);
+        if (preAuthorizedTokenKey != null && isRevokePreauthorizedTokenOnApproval()) {
+            getDataProvider().revokeToken(client, preAuthorizedTokenKey, OAuthConstants.ACCESS_TOKEN);
+        }
         // Request a new grant
         return createGrant(state,
                            client,
@@ -399,6 +406,13 @@ public abstract class RedirectionBasedGrantService extends AbstractOAuthService 
 
     }
 
+    public boolean isRevokePreauthorizedTokenOnApproval() {
+        return revokePreauthorizedTokenOnApproval;
+    }
+    public void setRevokePreauthorizedTokenOnApproval(boolean revoke) {
+        this.revokePreauthorizedTokenOnApproval = revoke;
+    }
+    
     public void setSessionAuthenticityTokenProvider(SessionAuthenticityTokenProvider sessionAuthenticityTokenProvider) {
         this.sessionAuthenticityTokenProvider = sessionAuthenticityTokenProvider;
     }

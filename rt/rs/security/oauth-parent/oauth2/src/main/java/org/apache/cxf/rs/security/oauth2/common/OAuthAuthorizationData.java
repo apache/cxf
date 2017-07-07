@@ -53,6 +53,7 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
 
     private List<OAuthPermission> permissions;
     private List<OAuthPermission> alreadyAuthorizedPermissions;
+    private String preauthorizedTokenKey;
     private boolean hidePreauthorizedScopesInForm;
     private boolean applicationRegisteredDynamically;
     private boolean supportSinglePageApplications;
@@ -275,5 +276,12 @@ public class OAuthAuthorizationData extends OAuthRedirectionState implements Ser
         this.supportSinglePageApplications = supportSinglePageApplications;
     }
 
+    public void setPreauthorizedTokenKey(String preauthorizedTokenKey) {
+        this.preauthorizedTokenKey = preauthorizedTokenKey;
+    }
+
+    public String getPreauthorizedTokenKey() {
+        return this.preauthorizedTokenKey;
+    }
     
 }
