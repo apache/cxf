@@ -27,7 +27,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -386,47 +385,8 @@ public class JAXRSAsyncClientTest extends AbstractBusClientServerTestBase {
         wc.close();
     }
 
-
-    @Test
-    public void testGetBookAsyncStage() throws Exception {
-        String address = "http://localhost:" + PORT + "/bookstore/books";
-        WebClient wc = createWebClient(address);
-        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
-        Book book = stage.toCompletableFuture().join();
-        assertEquals(123L, book.getId());
-    }
-    @Test
-    public void testGetBookAsyncStageThenAcceptAsync() throws Exception {
-        String address = "http://localhost:" + PORT + "/bookstore/books";
-        WebClient wc = createWebClient(address);
-        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
-        Holder<Book> holder = new Holder<Book>();
-        stage.thenApply(v -> {
-            v.setId(v.getId() * 2);
-            return v;
-        }).thenAcceptAsync(v -> {
-            holder.value = v;
-        });
-        Thread.sleep(3000);
-        assertEquals(246L, holder.value.getId());
-    }
-
-    @Test
-    public void testGetBookAsyncStage404() throws Exception {
-        String address = "http://localhost:" + PORT + "/bookstore/bookheaders/404";
-        WebClient wc = createWebClient(address);
-        CompletionStage<Book> stage = wc.path("123").rx().get(Book.class);
-        try {
-            stage.toCompletableFuture().get();
-            fail("Exception expected");
-        } catch (ExecutionException ex) {
-            assertTrue(ex.getCause() instanceof NotFoundException);
-        }
-
-    }
     private WebClient createWebClient(String address) {
-        List<Object> providers = new ArrayList<>();
-        return WebClient.create(address, providers);
+        return WebClient.create(address);
     }
 
     private InvocationCallback<Object> createCallback(final Holder<Object> holder) {

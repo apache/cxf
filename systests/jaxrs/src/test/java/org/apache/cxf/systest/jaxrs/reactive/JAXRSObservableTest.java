@@ -42,7 +42,7 @@ import org.junit.Test;
 
 import rx.Observable;
 
-public class JAXRSReactiveTest extends AbstractBusClientServerTestBase {
+public class JAXRSObservableTest extends AbstractBusClientServerTestBase {
     public static final String PORT = ReactiveServer.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
