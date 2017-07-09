@@ -74,7 +74,7 @@ public class SseEventSourceImpl implements SseEventSource {
         @Override
         public void onError(Throwable ex) {
             listeners.forEach(listener -> listener.onError(ex));
-            if (delay > 0 && unit != null) {
+            if (delay >= 0 && unit != null) {
                 scheduleReconnect(delay, unit, lastEventId);
             }
         }
@@ -82,7 +82,7 @@ public class SseEventSourceImpl implements SseEventSource {
         @Override
         public void onComplete() {
             listeners.forEach(InboundSseEventListener::onComplete);
-            if (delay > 0 && unit != null) {
+            if (delay >= 0 && unit != null) {
                 scheduleReconnect(delay, unit, lastEventId);
             }
         }
@@ -243,7 +243,7 @@ public class SseEventSourceImpl implements SseEventSource {
     
     private void scheduleReconnect(long delay, TimeUnit unit, String lastEventId) {
         // If delay == RECONNECT_NOT_SET, no reconnection attempt should be performed
-        if (delay <= 0 || executor == null) {
+        if (delay < 0 || executor == null) {
             return;
         }
         
