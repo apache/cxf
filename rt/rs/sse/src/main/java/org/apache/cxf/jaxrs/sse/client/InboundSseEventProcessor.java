@@ -50,6 +50,7 @@ public class InboundSseEventProcessor {
     private final Endpoint endpoint;
     private final InboundSseEventListener listener;
     private final ExecutorService executor;
+    
     private volatile boolean closed = false;
     
     protected InboundSseEventProcessor(Endpoint endpoint, InboundSseEventListener listener) {
@@ -59,6 +60,10 @@ public class InboundSseEventProcessor {
     }
     
     void run(final Response response) {
+        if (closed) {
+            throw new IllegalStateException("The SSE Event Processor is already closed");
+        }
+        
         final InputStream is = response.readEntity(InputStream.class);
         final ClientProviderFactory factory = ClientProviderFactory.getInstance(endpoint);
         
@@ -83,10 +88,7 @@ public class InboundSseEventProcessor {
                         } else {
                             final InboundSseEvent event = builder.build(factory, message);
                             builder = new InboundSseEventImpl.Builder(line.substring(EVENT.length()));
-                            
-                            if (listener != null) {
-                                listener.onNext(event);
-                            }
+                            listener.onNext(event);
                         }
                     } else if (builder != null) {
                         if (line.startsWith(ID)) {
@@ -101,18 +103,14 @@ public class InboundSseEventProcessor {
                     }
                 }
                 
-                if (listener != null) {
-                    if (builder != null) {
-                        listener.onNext(builder.build(factory, message));
-                    }
+                if (builder != null) {
+                    listener.onNext(builder.build(factory, message));
+                }
 
-                    // complete the stream
-                    listener.onComplete();
-                }
+                // complete the stream
+                listener.onComplete();
             } catch (final Exception ex) {
-                if (listener != null) {
-                    listener.onError(ex);
-                }
+                listener.onError(ex);
             }
 
             if (response != null) {
@@ -125,12 +123,13 @@ public class InboundSseEventProcessor {
     }
     
     boolean close(long timeout, TimeUnit unit) {
-        if (closed) {
-            return true;
-        }
-        
         try {
             closed = true;
+            
+            if (executor.isShutdown()) {
+                return true;
+            }
+            
             executor.shutdown();
             return executor.awaitTermination(timeout, unit);
         } catch (final InterruptedException ex) {

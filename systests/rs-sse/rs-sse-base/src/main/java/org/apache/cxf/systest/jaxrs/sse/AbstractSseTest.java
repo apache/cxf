@@ -33,6 +33,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.sse.InboundSseEvent;
 import javax.ws.rs.sse.SseEventSource;
+import javax.ws.rs.sse.SseEventSource.Builder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -99,6 +100,37 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
                 new Book("New Book #2", 2), 
                 new Book("New Book #3", 3), 
                 new Book("New Book #4", 4)
+            )
+        );
+    }
+    
+    @Test
+    public void testBooksStreamIsReconnectedFromInboundSseEvents() throws InterruptedException {
+        final WebTarget target = createWebTarget("/rest/api/bookstore/sse/0");
+        final Collection<Book> books = new ArrayList<>();
+        
+        final Builder builder = SseEventSource.target(target).reconnectingEvery(1, TimeUnit.SECONDS);
+        try (final SseEventSource eventSource = builder.build()) {
+            eventSource.register(collect(books), System.out::println);
+            eventSource.open();
+            // Give the SSE stream some time to collect all events
+            awaitEvents(5000, books, 12);
+        }
+
+        assertThat(books, 
+            hasItems(
+                new Book("New Book #1", 1), 
+                new Book("New Book #2", 2), 
+                new Book("New Book #3", 3), 
+                new Book("New Book #4", 4),
+                new Book("New Book #5", 5), 
+                new Book("New Book #6", 6), 
+                new Book("New Book #7", 7), 
+                new Book("New Book #8", 8),
+                new Book("New Book #9", 9), 
+                new Book("New Book #10", 10), 
+                new Book("New Book #11", 11), 
+                new Book("New Book #12", 12)
             )
         );
     }

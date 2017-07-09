@@ -86,7 +86,7 @@ public class InboundSseEventImpl implements InboundSseEvent {
         }
 
         InboundSseEvent build(ClientProviderFactory factory, Message message) {
-            return new InboundSseEventImpl(id, name, comment, reconnectDelay.orElse(0), 
+            return new InboundSseEventImpl(id, name, comment, reconnectDelay.orElse(RECONNECT_NOT_SET), 
                 reconnectDelay.isPresent(), data, factory, message);
         }
     }
