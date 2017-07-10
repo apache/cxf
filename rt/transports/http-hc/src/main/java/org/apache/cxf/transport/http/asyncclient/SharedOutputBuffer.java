@@ -36,7 +36,7 @@ import org.apache.http.nio.util.ExpandableBuffer;
  * an I/O reactor and a worker thread.
  * <p/>
  * The I/O dispatch thread is expected to transfer data from the buffer to
- *   {@link ContentEncoder} by calling {@link #produceContent(ContentEncoder)}.
+ *   {@link ContentEncoder} by calling {@link #produceContent(ContentEncoder, IOControl)}.
  * <p/>
  * The worker thread is expected to write data to the buffer by calling
  * {@link #write(int)}, {@link #write(byte[], int, int)} or {@link #writeCompleted()}
