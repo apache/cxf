@@ -148,8 +148,6 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
         } else {
             return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType), ex);
         }
-        
-        //return wc.doInvokeAsyncStage(name, entity, responseType, responseType, ex);
     }
 
     @Override
@@ -159,7 +157,6 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
         } else {
             return CompletableFuture.supplyAsync(() -> wc.sync().method(name, entity, responseType), ex);
         }
-        //return wc.doInvokeAsyncStage(name, entity, responseType.getRawType(), responseType.getType(), ex);
     }
 
     @Override
@@ -169,7 +166,6 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
         } else {
             return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType), ex);
         }
-        //return wc.doInvokeAsyncStage(name, null, responseType, responseType, ex);
     }
 
     @Override
@@ -179,7 +175,6 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker {
         } else {
             return CompletableFuture.supplyAsync(() -> wc.sync().method(name, responseType), ex);
         }
-        //return wc.doInvokeAsyncStage(name, null, responseType.getRawType(), responseType.getType(), ex);
     }
 
 }
