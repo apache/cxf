@@ -89,7 +89,16 @@ public final class JAXBUtils {
             if (adapter.type() != XmlJavaTypeAdapter.DEFAULT.class) {
                 theType = adapter.type();
             } else {
-                Type[] types = InjectionUtils.getActualTypes(adapter.value().getGenericSuperclass());
+                Type topAdapterType = adapter.value().getGenericSuperclass();
+                Class<?> superClass = adapter.value().getSuperclass();
+                while (superClass != null) {
+                    Class<?> nextSuperClass = superClass.getSuperclass();
+                    if (nextSuperClass != null && !Object.class.equals(nextSuperClass)) {
+                        topAdapterType = superClass.getGenericSuperclass();
+                    }
+                    superClass = nextSuperClass;
+                }
+                Type[] types = InjectionUtils.getActualTypes(topAdapterType);
                 if (types != null && types.length == 2) {
                     int index = boundType ? 1 : 0;
                     theType = InjectionUtils.getActualType(types[index]);
