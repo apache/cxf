@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -82,7 +81,7 @@ import org.apache.cxf.message.Message;
  * Http-centric web client
  *
  */
-public class WebClient extends AbstractClient implements AsyncClient {
+public class WebClient extends AbstractClient {
     private static final String REQUEST_CLASS = "request.class";
     private static final String REQUEST_TYPE = "request.type";
     private static final String REQUEST_ANNS = "request.annotations";
@@ -930,18 +929,7 @@ public class WebClient extends AbstractClient implements AsyncClient {
         return cb.createFuture();
     }
 
-    protected <T> CompletionStage<T> doInvokeAsyncStage(String httpMethod,
-                                          Object body,
-                                          Class<?> respClass,
-                                          Type outType,
-                                          ExecutorService ex) {
-        JaxrsClientStageCallback<T> cb = new JaxrsClientStageCallback<T>(respClass, outType, ex);
-        prepareAsyncClient(httpMethod, body, null, null, respClass, outType, cb);
-        return cb.getCompletionStage();
-    }
-
-    @Override
-    public void prepareAsyncClient(String httpMethod,
+    protected void prepareAsyncClient(String httpMethod,
                                    Object body,
                                    Class<?> requestClass,
                                    Type inType,
