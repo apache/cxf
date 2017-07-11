@@ -49,6 +49,7 @@ public class VariantListBuilderImpl extends VariantListBuilder {
 
     @Override
     public List<Variant> build() {
+        addVariants();
         List<Variant> vs = new ArrayList<Variant>(variants);
         reset();
         return vs;
