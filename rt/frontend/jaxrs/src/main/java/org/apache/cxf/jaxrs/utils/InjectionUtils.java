@@ -497,7 +497,12 @@ public final class InjectionUtils {
             reportServerError("WRONG_PARAMETER_TYPE", pClass.getName());
         }
 
-        return pClass.cast(result);
+        try {
+            return pClass.cast(result);
+        } catch (ClassCastException ex) {
+            reportServerError("WRONG_PARAMETER_TYPE", pClass.getName());
+            return null;
+        }
     }
 
     private static RuntimeException createParamConversionException(ParameterType pType, Exception ex) {

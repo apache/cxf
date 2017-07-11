@@ -35,6 +35,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MultivaluedMap;
@@ -42,6 +43,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import com.migesok.jaxb.adapter.javatime.LocalDateXmlAdapter;
+
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -53,7 +55,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.easymock.EasyMock;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class InjectionUtilsTest extends Assert {
@@ -183,8 +184,7 @@ public class InjectionUtilsTest extends Assert {
         assertEquals(String.class, list.getActualTypeArguments()[0]);
     }
 
-    @Ignore("CXF-7442")
-    @Test
+    @Test(expected = InternalServerErrorException.class)
     public void testJsr310DateExceptionHandling() {
         Field field = CustomerDetailsWithAdapter.class.getDeclaredFields()[0];
         Annotation[] paramAnns = field.getDeclaredAnnotations();
