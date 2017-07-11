@@ -20,10 +20,13 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +34,14 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.migesok.jaxb.adapter.javatime.LocalDateXmlAdapter;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
@@ -47,6 +53,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.easymock.EasyMock;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class InjectionUtilsTest extends Assert {
@@ -174,6 +181,15 @@ public class InjectionUtilsTest extends Assert {
             GenericInterface.class.getMethod("list"), TestService.class,
             new ArrayList<>(), ArrayList.class, new ExchangeImpl());
         assertEquals(String.class, list.getActualTypeArguments()[0]);
+    }
+
+    @Ignore("CXF-7442")
+    @Test
+    public void testJsr310DateExceptionHandling() {
+        Field field = CustomerDetailsWithAdapter.class.getDeclaredFields()[0];
+        Annotation[] paramAnns = field.getDeclaredAnnotations();
+        InjectionUtils.createParameterObject(Collections.singletonList("wrongDate"), LocalDate.class,
+                LocalDate.class, paramAnns, null, false, ParameterType.QUERY, createMessage());
     }
 
     static class CustomerBean1 {
@@ -350,6 +366,21 @@ public class InjectionUtilsTest extends Assert {
         @Override
         public List<String> list() {
             return new ArrayList<>();
+        }
+    }
+
+    public class CustomerDetailsWithAdapter {
+        @NotNull
+        @QueryParam("birthDate")
+        @XmlJavaTypeAdapter(LocalDateXmlAdapter.class)
+        private LocalDate birthDate;
+
+        public LocalDate getBirthDate() {
+            return birthDate;
+        }
+
+        public void setBirthDate(LocalDate birthDate) {
+            this.birthDate = birthDate;
         }
     }
 }
