@@ -307,7 +307,7 @@ public class ClientImpl implements Client {
             }
             // Start building the invocation
             return new InvocationBuilderImpl(WebClient.fromClient(targetClient),
-                                             configImpl);
+                                             getConfiguration());
         }
         private void setConnectionProperties(Map<String, Object> configProps, ClientConfiguration clientCfg) {
             Long connTimeOutValue = getLongValue(configProps.get(HTTP_CONNECTION_TIMEOUT_PROP));
