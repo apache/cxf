@@ -77,7 +77,14 @@
     </bean>
     <bean id="transportSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
     </bean>
+    <util:map id="claimTypes">
+        <entry key="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role" value="roles"/>
+    </util:map>
+    <bean id="customJWTClaimsProvider" class="org.apache.cxf.sts.token.provider.jwt.DefaultJWTClaimsProvider">
+        <property name="claimTypeMap" ref="claimTypes"/>
+    </bean>
     <bean id="transportJWTTokenProvider" class="org.apache.cxf.sts.token.provider.jwt.JWTTokenProvider">
+        <property name="jwtClaimsProvider" ref="customJWTClaimsProvider" />
     </bean>
     <bean id="transportJWTTokenValidator" class="org.apache.cxf.sts.token.validator.jwt.JWTTokenValidator">
     </bean>
