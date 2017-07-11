@@ -160,7 +160,12 @@ public class SseEventSourceImpl implements SseEventSource {
         }
 
         // Create the executor for scheduling the reconnect tasks 
-        executor = Executors.newSingleThreadScheduledExecutor();
+        executor = 
+            (ScheduledExecutorService)target.getConfiguration().getProperty("scheduledExecutorService");
+        if (executor == null) {
+            executor = Executors.newSingleThreadScheduledExecutor();    
+        }
+        
         
         final Object lastEventId = target.getConfiguration().getProperty(HttpHeaders.LAST_EVENT_ID_HEADER);
         connect(lastEventId != null ? lastEventId.toString() : null);
