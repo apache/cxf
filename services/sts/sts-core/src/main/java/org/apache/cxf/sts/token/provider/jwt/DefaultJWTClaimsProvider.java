@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -60,7 +61,8 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     private boolean failLifetimeExceedance = true;
     private boolean acceptClientLifetime;
     private long futureTimeToLive = 60L;
-                                                            
+    private Map<String, String> claimTypeMap;
+
     /**
      * Get a JwtClaims object.
      */
@@ -158,7 +160,7 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
                     if (claim.getValues().size() == 1) {
                         claimValues = claim.getValues().get(0);
                     }
-                    claims.setProperty(claim.getClaimType().toString(), claimValues);
+                    claims.setProperty(translateClaim(claim.getClaimType().toString()), claimValues);
                 }
             }
         }
@@ -277,7 +279,14 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
             }
         } 
     }
-    
+
+    private String translateClaim(String claimType) {
+        if (claimTypeMap == null || !claimTypeMap.containsKey(claimType)) {
+            return claimType;
+        }
+        return claimTypeMap.get(claimType);
+    }
+
     public boolean isUseX500CN() {
         return useX500CN;
     }
@@ -366,5 +375,17 @@ public class DefaultJWTClaimsProvider implements JWTClaimsProvider {
     public void setFailLifetimeExceedance(boolean failLifetimeExceedance) {
         this.failLifetimeExceedance = failLifetimeExceedance;
     }
-    
+
+    public Map<String, String> getClaimTypeMap() {
+        return claimTypeMap;
+    }
+
+    /**
+     * Specify a way to map ClaimType URIs to custom ClaimTypes
+     * @param claimTypeMap
+     */
+    public void setClaimTypeMap(Map<String, String> claimTypeMap) {
+        this.claimTypeMap = claimTypeMap;
+    }
+
 }

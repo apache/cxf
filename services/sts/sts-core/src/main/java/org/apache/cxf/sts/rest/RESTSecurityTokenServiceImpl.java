@@ -77,6 +77,7 @@ public class RESTSecurityTokenServiceImpl extends SecurityTokenServiceImpl imple
         DEFAULT_CLAIM_TYPE_MAP = new HashMap<String, String>();
         DEFAULT_CLAIM_TYPE_MAP.put("emailaddress", CLAIM_TYPE_NS + "/claims/emailaddress");
         DEFAULT_CLAIM_TYPE_MAP.put("role", CLAIM_TYPE_NS + "/claims/role");
+        DEFAULT_CLAIM_TYPE_MAP.put("roles", CLAIM_TYPE_NS + "/claims/role");
         DEFAULT_CLAIM_TYPE_MAP.put("surname", CLAIM_TYPE_NS + "/claims/surname");
         DEFAULT_CLAIM_TYPE_MAP.put("givenname", CLAIM_TYPE_NS + "/claims/givenname");
         DEFAULT_CLAIM_TYPE_MAP.put("name", CLAIM_TYPE_NS + "/claims/name");
