@@ -936,13 +936,11 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         
         JwsJwtCompactConsumer jwtConsumer = new JwsJwtCompactConsumer(token);
         JwtToken jwt = jwtConsumer.getJwtToken();
-        
-        String role = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role";
-        assertTrue(jwt.getClaim(role) == null);
-        
+        assertTrue(jwt.getClaim("roles") == null);
+
         // Now get another token specifying the role
-        client.query("claim", role);
-        
+        client.query("claim", "roles");
+
         response = client.get();
         token = response.readEntity(String.class);
         assertNotNull(token);
@@ -952,8 +950,8 @@ public class STSRESTTest extends AbstractBusClientServerTestBase {
         
         jwtConsumer = new JwsJwtCompactConsumer(token);
         jwt = jwtConsumer.getJwtToken();
-        assertEquals("ordinary-user", jwt.getClaim(role));
-        
+        assertEquals("ordinary-user", jwt.getClaim("roles"));
+
         bus.shutdown(true);
     }
     
