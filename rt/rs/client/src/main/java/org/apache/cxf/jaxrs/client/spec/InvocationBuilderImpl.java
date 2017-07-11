@@ -34,7 +34,9 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.RxInvoker;
 import javax.ws.rs.client.SyncInvoker;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
@@ -53,10 +55,13 @@ public class InvocationBuilderImpl implements Invocation.Builder {
 
     private WebClient webClient;
     private SyncInvoker sync;
+    private Configurable<WebTarget> config;
 
-    public InvocationBuilderImpl(WebClient webClient) {
+    public InvocationBuilderImpl(WebClient webClient,
+                                 Configurable<WebTarget> config) {
         this.webClient = webClient;
         this.sync = webClient.sync();
+        this.config = config;
     }
 
     public WebClient getWebClient() {
@@ -376,13 +381,17 @@ public class InvocationBuilderImpl implements Invocation.Builder {
 
     @Override
     public CompletionStageRxInvoker rx() {
-        return webClient.rx((ExecutorService)null);
+        return webClient.rx(getConfiguredExecutorService());
     }
 
     @SuppressWarnings("rawtypes")
     @Override
     public <T extends RxInvoker> T rx(Class<T> rxCls) {
-        return webClient.rx(rxCls, (ExecutorService)null);
+        return webClient.rx(rxCls, getConfiguredExecutorService());
+    }
+
+    private ExecutorService getConfiguredExecutorService() {
+        return (ExecutorService)config.getConfiguration().getProperty("executorService");
     }
 
 }

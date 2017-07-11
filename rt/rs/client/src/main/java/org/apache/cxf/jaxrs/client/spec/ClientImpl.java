@@ -306,7 +306,8 @@ public class ClientImpl implements Client {
                 cxfFeature.initialize(clientCfg, clientCfg.getBus());
             }
             // Start building the invocation
-            return new InvocationBuilderImpl(WebClient.fromClient(targetClient));
+            return new InvocationBuilderImpl(WebClient.fromClient(targetClient),
+                                             configImpl);
         }
         private void setConnectionProperties(Map<String, Object> configProps, ClientConfiguration clientCfg) {
             Long connTimeOutValue = getLongValue(configProps.get(HTTP_CONNECTION_TIMEOUT_PROP));
