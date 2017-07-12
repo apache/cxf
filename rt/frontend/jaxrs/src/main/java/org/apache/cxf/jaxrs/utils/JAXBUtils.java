@@ -22,12 +22,18 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.apache.cxf.common.logging.LogUtils;
+
 public final class JAXBUtils {
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class);
+
     private JAXBUtils() {
 
     }
@@ -132,7 +138,7 @@ public final class JAXBUtils {
                     return xmlAdapter.unmarshal(obj);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                LOG.log(Level.INFO, "(un)marshalling failed, using defaultValue", ex);
             }
         }
         return defaultValue;
