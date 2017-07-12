@@ -19,6 +19,7 @@
 package org.apache.cxf.rs.security.oidc.utils;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,9 +54,21 @@ public final class OidcUtils {
     public static final String EMAIL_SCOPE = "email";
     public static final String ADDRESS_SCOPE = "address";
     public static final String PHONE_SCOPE = "phone";
-    public static final List<String> PROFILE_CLAIMS = Arrays.asList(UserInfo.NAME_CLAIM, 
-                                                                    UserInfo.PROFILE_CLAIM);
-    public static final List<String> EMAIL_CLAIMS = Arrays.asList(UserInfo.EMAIL_CLAIM, 
+    public static final List<String> PROFILE_CLAIMS = Arrays.asList(UserInfo.NAME_CLAIM,
+                                                                    UserInfo.FAMILY_NAME_CLAIM,
+                                                                    UserInfo.GIVEN_NAME_CLAIM,
+                                                                    UserInfo.MIDDLE_NAME_CLAIM,
+                                                                    UserInfo.NICKNAME_CLAIM,
+                                                                    UserInfo.PREFERRED_USERNAME_CLAIM,
+                                                                    UserInfo.PROFILE_CLAIM,
+                                                                    UserInfo.PICTURE_CLAIM,
+                                                                    UserInfo.WEBSITE_CLAIM,
+                                                                    UserInfo.GENDER_CLAIM,
+                                                                    UserInfo.BIRTHDATE_CLAIM,
+                                                                    UserInfo.ZONEINFO_CLAIM,
+                                                                    UserInfo.LOCALE_CLAIM,
+                                                                    UserInfo.UPDATED_AT_CLAIM);
+    public static final List<String> EMAIL_CLAIMS = Arrays.asList(UserInfo.EMAIL_CLAIM,
                                                                   UserInfo.EMAIL_VERIFIED_CLAIM);
     public static final List<String> ADDRESS_CLAIMS = Arrays.asList(UserInfo.ADDRESS_CLAIM);
     public static final List<String> PHONE_CLAIMS = Arrays.asList(UserInfo.PHONE_CLAIM);
@@ -110,8 +123,17 @@ public final class OidcUtils {
     public static String getAllScopes() {
         return getScope(OPENID_SCOPE, PROFILE_SCOPE, EMAIL_SCOPE, ADDRESS_SCOPE, PHONE_SCOPE);
     }
-    public static List<String> getScopeProperties(String scope) {
-        return SCOPES_MAP.get(scope);
+    
+    public static List<String> getScopeClaims(String... scope) {
+        List<String> claims = new ArrayList<>();
+        if (scope != null) {
+            for (String s : scope) {
+                if (SCOPES_MAP.containsKey(s)) {
+                    claims.addAll(SCOPES_MAP.get(s));
+                }
+            }
+        }
+        return claims;
     }
     
     private static String getScope(String... scopes) {
