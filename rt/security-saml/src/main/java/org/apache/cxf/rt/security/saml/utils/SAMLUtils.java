@@ -20,15 +20,20 @@ package org.apache.cxf.rt.security.saml.utils;
 
 import java.net.URI;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.common.security.SimpleGroup;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.rt.security.claims.Claim;
 import org.apache.cxf.rt.security.claims.ClaimCollection;
 import org.apache.cxf.rt.security.saml.claims.SAMLClaim;
+import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.saml.common.SAMLVersion;
@@ -137,5 +142,36 @@ public final class SAMLUtils {
     public static Element getAssertionElement(Object assertion) {
         return ((SamlAssertionWrapper)assertion).getElement();
     }
-    
+
+    public static List<String> getAudienceRestrictions(Message msg) {
+        // Add Audience Restrictions for SAML
+        boolean enableAudienceRestriction =
+            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg, true);
+        if (enableAudienceRestriction) {
+            List<String> audiences = new ArrayList<>();
+            // See if we have custom audience restriction values specified first
+            String audienceRestrictions =
+                (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.AUDIENCE_RESTRICTIONS, msg);
+            if (audienceRestrictions != null) {
+                for (String audienceRestriction : audienceRestrictions.split(",")) {
+                    audiences.add(audienceRestriction);
+                }
+            }
+
+            // Defaults
+            if (audiences.isEmpty()) {
+                if (msg.get(org.apache.cxf.message.Message.REQUEST_URL) != null) {
+                    audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URL));
+                } else if (msg.get(org.apache.cxf.message.Message.REQUEST_URI) != null) {
+                    audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URI));
+                }
+
+                if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
+                    audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
+                }
+            }
+            return audiences;
+        }
+        return Collections.emptyList();
+    }
 }

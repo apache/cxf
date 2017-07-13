@@ -19,7 +19,6 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.security.Provider;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +40,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.tokenstore.TokenStoreUtils;
@@ -293,27 +293,7 @@ public class WSS4JStaxInInterceptor extends AbstractWSS4JStaxInterceptor {
         }
         
         // Add Audience Restrictions for SAML
-        configureAudienceRestriction(msg, securityProperties);
-    }
-    
-    private void configureAudienceRestriction(SoapMessage msg, WSSSecurityProperties securityProperties) {
-        // Add Audience Restrictions for SAML
-        boolean enableAudienceRestriction = true;
-        String audRestrStr = 
-            (String)SecurityUtils.getSecurityPropertyValue(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg);
-        if (audRestrStr != null) {
-            enableAudienceRestriction = Boolean.parseBoolean(audRestrStr);
-        }
-        if (enableAudienceRestriction) {
-            List<String> audiences = new ArrayList<String>();
-            if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
-                audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
-            }
-            if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
-                audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
-            }
-            securityProperties.setAudienceRestrictions(audiences);
-        }
+        securityProperties.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg));
     }
     
     /**
