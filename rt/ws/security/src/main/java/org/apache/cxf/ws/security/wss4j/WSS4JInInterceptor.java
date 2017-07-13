@@ -20,7 +20,6 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.security.Provider;
 import java.security.cert.Certificate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -331,99 +330,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             reqData = null;
         }
     }
-<<<<<<< HEAD
 
-    private void configureAudienceRestriction(SoapMessage msg, RequestData reqData) {
-        // Add Audience Restrictions for SAML
-        boolean enableAudienceRestriction = 
-            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg, true);
-        if (enableAudienceRestriction) {
-            List<String> audiences = new ArrayList<>();
-            if (msg.get(org.apache.cxf.message.Message.REQUEST_URL) != null) {
-                audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URL));
-            } else if (msg.get(org.apache.cxf.message.Message.REQUEST_URI) != null) {
-                audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URI));
-            }
-            
-            if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
-                audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
-            }
-            reqData.setAudienceRestrictions(audiences);
-        }
-    }
-
-=======
-    private void importNewDomToSAAJ(SOAPMessage doc, Element elem,
-                                    Node originalNode, WSHandlerResult wsResult) throws SOAPException {
-        if (DOMUtils.isJava9SAAJ()
-            && originalNode != null && !originalNode.isEqualNode(elem)) {
-            //ensure the new decrypted dom element could be imported into the SAAJ
-            Node node = null;
-            Document document = null;
-            Element body = SAAJUtils.getBody(doc);
-            if (body != null) {
-                document = body.getOwnerDocument();
-            }
-            if (elem != null && elem.getOwnerDocument() != null
-                && elem.getOwnerDocument().getDocumentElement() != null) {
-                node = elem.getOwnerDocument().
-                    getDocumentElement().getFirstChild().getNextSibling().getFirstChild();
-            }
-            if (document != null && node != null) {
-                Node newNode = null;
-                try {
-                    newNode = document.importNode(node, true);
-                    if (newNode != null) {
-                        try {
-                            Method method = newNode.getClass().getMethod("getDomElement");
-                            newNode = (Element)method.invoke(newNode);
-                        } catch (java.lang.NoSuchMethodException ex) {
-                            // do nothing;
-                        }
-                    }
-                    elem.getOwnerDocument().getDocumentElement().getFirstChild().
-                        getNextSibling().replaceChild(newNode, node);
-                    List<WSSecurityEngineResult> encryptResults = wsResult.getActionResults().get(WSConstants.ENCR);
-                    if (encryptResults != null) {
-                        for (WSSecurityEngineResult result : wsResult.getActionResults().get(WSConstants.ENCR)) {
-                            for (WSDataRef dataRef
-                                : (List<WSDataRef>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS)) {
-                                if (dataRef.getProtectedElement() == node) {
-                                    dataRef.setProtectedElement((Element)newNode);
-                                }
-                            }
-                        }
-                    }
-
-                    List<WSSecurityEngineResult> signedResults = new ArrayList<>();
-                    if (wsResult.getActionResults().containsKey(WSConstants.SIGN)) {
-                        signedResults.addAll(wsResult.getActionResults().get(WSConstants.SIGN));
-                    }
-                    if (wsResult.getActionResults().containsKey(WSConstants.UT_SIGN)) {
-                        signedResults.addAll(wsResult.getActionResults().get(WSConstants.UT_SIGN));
-                    }
-                    if (wsResult.getActionResults().containsKey(WSConstants.ST_SIGNED)) {
-                        signedResults.addAll(wsResult.getActionResults().get(WSConstants.ST_SIGNED));
-                    }
-                    for (WSSecurityEngineResult result : signedResults) {
-                        for (WSDataRef dataRef
-                            : (List<WSDataRef>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS)) {
-                            if (dataRef.getProtectedElement() == node) {
-                                dataRef.setProtectedElement((Element)newNode);
-                            }
-                        }
-                    }
-                } catch (Exception ex) {
-                    //just to the best try
-                    LOG.log(Level.FINE, "Something wrong during importNewDomToSAAJ", ex);
-                }
-
-            }
-
-        }
-    }
-
->>>>>>> 3779d24229... CXF-7444 - Add the ability to configure custom SAML audience restriction values
     private void checkActions(
         SoapMessage msg, 
         RequestData reqData, 
