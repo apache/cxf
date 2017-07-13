@@ -95,7 +95,7 @@ public class HeadersTest extends Assert {
 
     @Test
     public void sensitiveHeadersTest() {
-        Map<String, List<String>> headerMap = new HashMap<>();
+        Map<String, List<Object>> headerMap = new HashMap<>();
         headerMap.put("Authorization", Arrays.asList("FAIL"));
         headerMap.put("Proxy-Authorization", Arrays.asList("FAIL"));
         headerMap.put("Content-Type", Arrays.asList("application/xml"));
@@ -112,7 +112,7 @@ public class HeadersTest extends Assert {
 
     @Test
     public void logProtocolHeadersTest() {
-        Map<String, List<String>> headerMap = new HashMap<>();
+        Map<String, List<Object>> headerMap = new HashMap<>();
         headerMap.put("Normal-Header", Arrays.asList("normal"));
         headerMap.put("Multivalue-Header", Arrays.asList("first", "second"));
         headerMap.put("Authorization", Arrays.asList("myPassword"));
