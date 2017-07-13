@@ -95,11 +95,11 @@ public class HeadersTest extends Assert {
 
     @Test
     public void sensitiveHeadersTest() {
-        Map<String, List<String>> headerMap = new HashMap<String, List<String>>();
-        headerMap.put("Authorization", Arrays.asList("FAIL"));
-        headerMap.put("Proxy-Authorization", Arrays.asList("FAIL"));
-        headerMap.put("Content-Type", Arrays.asList("application/xml"));
-        headerMap.put("Accept", Arrays.asList("text/plain"));
+        Map<String, List<Object>> headerMap = new HashMap<String, List<Object>>();
+        headerMap.put("Authorization", Arrays.asList((Object)"FAIL"));
+        headerMap.put("Proxy-Authorization", Arrays.asList((Object)"FAIL"));
+        headerMap.put("Content-Type", Arrays.asList((Object)"application/xml"));
+        headerMap.put("Accept", Arrays.asList((Object)"text/plain"));
 
         String loggedString = Headers.toString(headerMap, false);
         assertFalse("The value of a sensitive header could be logged: " + loggedString, loggedString.contains("FAIL"));
@@ -112,11 +112,11 @@ public class HeadersTest extends Assert {
 
     @Test
     public void logProtocolHeadersTest() {
-        Map<String, List<String>> headerMap = new HashMap<String, List<String>>();
-        headerMap.put("Normal-Header", Arrays.asList("normal"));
-        headerMap.put("Multivalue-Header", Arrays.asList("first", "second"));
-        headerMap.put("Authorization", Arrays.asList("myPassword"));
-        headerMap.put("Null-Header", Arrays.asList((String)null));
+        Map<String, List<Object>> headerMap = new HashMap<String, List<Object>>();
+        headerMap.put("Normal-Header", Arrays.asList((Object)"normal"));
+        headerMap.put("Multivalue-Header", Arrays.asList((Object)"first", (Object)"second"));
+        headerMap.put("Authorization", Arrays.asList((Object)"myPassword"));
+        headerMap.put("Null-Header", Arrays.asList((Object)null));
 
         //Set up test logger
         Logger logger = Logger.getAnonymousLogger();
