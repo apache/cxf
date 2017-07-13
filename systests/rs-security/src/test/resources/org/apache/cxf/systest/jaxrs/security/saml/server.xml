@@ -51,6 +51,7 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+            <entry key="security.audience-restrictions" value="https://sp.example.com/SAML2"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-saml}/samlform">
@@ -62,6 +63,7 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+            <entry key="security.audience-restrictions" value="https://sp.example.com/SAML2"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-saml}/samlxml">
@@ -74,6 +76,7 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="security.signature.properties" value="org/apache/cxf/systest/jaxrs/security/alice.properties"/>
+            <entry key="security.audience-restrictions" value="https://sp.example.com/SAML2"/>
         </jaxrs:properties>
     </jaxrs:server>
 </beans>
