@@ -180,8 +180,8 @@ public class SecurityConstants {
     
     /**
      * Enable SAML AudienceRestriction validation. If this is set to "true", then IF the
-     * SAML Token contains Audience Restriction URIs, one of them must match either the
-     * request URL or the Service QName. The default is "true".
+     * SAML Token contains Audience Restriction URIs, one of them must match one of the values of the
+     * AUDIENCE_RESTRICTIONS property. The default is "true".
      */
     public static final String AUDIENCE_RESTRICTION_VALIDATION = "security.validate.audience-restriction";
     
@@ -351,6 +351,14 @@ public class SecurityConstants {
     public static final String STS_TOKEN_CACHER_IMPL =
         "security.sts.token.cacher.impl";
 
+    /**
+     * This property contains a comma separated String corresponding to a list of audience restriction URIs.
+     * The default value for this property contains the request URL and the Service QName. If the
+     * AUDIENCE_RESTRICTION_VALIDATION property is "true", and if a received SAML Token contains audience
+     * restriction URIs, then one of them must match one of the values specified in this property.
+     */
+    public static final String AUDIENCE_RESTRICTIONS = "security.audience-restrictions";
+
     public static final Set<String> COMMON_PROPERTIES;
     
     static {
@@ -366,7 +374,7 @@ public class SecurityConstants {
             DISABLE_STS_CLIENT_WSMEX_CALL_USING_EPR_ADDRESS, STS_TOKEN_CRYPTO,
             STS_TOKEN_PROPERTIES, STS_TOKEN_USERNAME, STS_TOKEN_ACT_AS, STS_TOKEN_ON_BEHALF_OF,
             STS_CLIENT, STS_APPLIES_TO, CACHE_ISSUED_TOKEN_IN_ENDPOINT, PREFER_WSMEX_OVER_STS_CLIENT_CONFIG,
-            STS_TOKEN_IMMINENT_EXPIRY_VALUE, STS_TOKEN_CACHER_IMPL
+            STS_TOKEN_IMMINENT_EXPIRY_VALUE, STS_TOKEN_CACHER_IMPL, AUDIENCE_RESTRICTIONS
         }));
         COMMON_PROPERTIES = Collections.unmodifiableSet(s);
     }
