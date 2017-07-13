@@ -55,6 +55,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -202,7 +203,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         reqData.setEncryptionSerializer(new StaxSerializer());
 
         // Add Audience Restrictions for SAML
-        configureAudienceRestriction(msg, reqData);
+        reqData.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg));
 
         SOAPMessage doc = getSOAPMessage(msg);
 
@@ -344,7 +345,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             reqData = null;
         }
     }
-    private void importNewDomToSAAJ(SOAPMessage doc, Element elem, 
+    private void importNewDomToSAAJ(SOAPMessage doc, Element elem,
                                     Node originalNode, WSHandlerResult wsResult) throws SOAPException {
         if (DOMUtils.isJava9SAAJ()
             && originalNode != null && !originalNode.isEqualNode(elem)) {
@@ -377,7 +378,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     List<WSSecurityEngineResult> encryptResults = wsResult.getActionResults().get(WSConstants.ENCR);
                     if (encryptResults != null) {
                         for (WSSecurityEngineResult result : wsResult.getActionResults().get(WSConstants.ENCR)) {
-                            for (WSDataRef dataRef 
+                            for (WSDataRef dataRef
                                 : (List<WSDataRef>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS)) {
                                 if (dataRef.getProtectedElement() == node) {
                                     dataRef.setProtectedElement((Element)newNode);
@@ -385,7 +386,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                             }
                         }
                     }
-                    
+
                     List<WSSecurityEngineResult> signedResults = new ArrayList<>();
                     if (wsResult.getActionResults().containsKey(WSConstants.SIGN)) {
                         signedResults.addAll(wsResult.getActionResults().get(WSConstants.SIGN));
@@ -397,7 +398,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                         signedResults.addAll(wsResult.getActionResults().get(WSConstants.ST_SIGNED));
                     }
                     for (WSSecurityEngineResult result : signedResults) {
-                        for (WSDataRef dataRef 
+                        for (WSDataRef dataRef
                             : (List<WSDataRef>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS)) {
                             if (dataRef.getProtectedElement() == node) {
                                 dataRef.setProtectedElement((Element)newNode);
@@ -411,25 +412,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             }
 
-        }
-    }
-
-    private void configureAudienceRestriction(SoapMessage msg, RequestData reqData) {
-        // Add Audience Restrictions for SAML
-        boolean enableAudienceRestriction =
-            SecurityUtils.getSecurityPropertyBoolean(SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg, true);
-        if (enableAudienceRestriction) {
-            List<String> audiences = new ArrayList<>();
-            if (msg.get(org.apache.cxf.message.Message.REQUEST_URL) != null) {
-                audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URL));
-            } else if (msg.get(org.apache.cxf.message.Message.REQUEST_URI) != null) {
-                audiences.add((String)msg.get(org.apache.cxf.message.Message.REQUEST_URI));
-            }
-
-            if (msg.getContextualProperty("javax.xml.ws.wsdl.service") != null) {
-                audiences.add(msg.getContextualProperty("javax.xml.ws.wsdl.service").toString());
-            }
-            reqData.setAudienceRestrictions(audiences);
         }
     }
 

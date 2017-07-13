@@ -26,7 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,6 +47,7 @@ import org.apache.cxf.rs.security.saml.authorization.SecurityContextProvider;
 import org.apache.cxf.rs.security.saml.authorization.SecurityContextProviderImpl;
 import org.apache.cxf.rs.security.xml.AbstractXmlSecInHandler;
 import org.apache.cxf.rt.security.SecurityConstants;
+import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.security.transport.TLSSessionInfo;
@@ -193,22 +193,7 @@ public abstract class AbstractSamlInHandler implements ContainerRequestFilter {
     }
 
     protected void configureAudienceRestriction(Message msg, RequestData reqData) {
-        // Add Audience Restrictions for SAML
-        boolean enableAudienceRestriction = false;
-        String audRestrStr =
-            (String)org.apache.cxf.rt.security.utils.SecurityUtils.getSecurityPropertyValue(
-                SecurityConstants.AUDIENCE_RESTRICTION_VALIDATION, msg);
-        if (audRestrStr != null) {
-            enableAudienceRestriction = Boolean.parseBoolean(audRestrStr);
-        }
-
-        if (enableAudienceRestriction) {
-            List<String> audiences = new ArrayList<>();
-            if (msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL) != null) {
-                audiences.add((String)msg.getContextualProperty(org.apache.cxf.message.Message.REQUEST_URL));
-            }
-            reqData.setAudienceRestrictions(audiences);
-        }
+        reqData.setAudienceRestrictions(SAMLUtils.getAudienceRestrictions(msg));
     }
 
     protected SAMLKeyInfo createKeyInfoFromDefaultAlias(Crypto sigCrypto) throws WSSecurityException {

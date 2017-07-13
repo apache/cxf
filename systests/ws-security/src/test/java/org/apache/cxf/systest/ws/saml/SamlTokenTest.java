@@ -1152,6 +1152,16 @@ public class SamlTokenTest extends AbstractBusClientServerTestBase {
             SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
         );
         saml2Port.doubleIt(25);
+
+        // It should pass because we explicitly allow the given audience restriction
+        portQName = new QName(NAMESPACE, "DoubleItSaml2TransportPort4");
+        saml2Port = service.getPort(portQName, DoubleItPortType.class);
+        updateAddressPort(saml2Port, portNumber);
+
+        ((BindingProvider)saml2Port).getRequestContext().put(
+            SecurityConstants.SAML_CALLBACK_HANDLER, callbackHandler
+        );
+        saml2Port.doubleIt(25);
     }
 
     @org.junit.Test
