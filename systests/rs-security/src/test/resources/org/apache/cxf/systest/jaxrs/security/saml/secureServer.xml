@@ -59,6 +59,7 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="security.enable.unsigned-saml-assertion.principal" value="true"/>
+            <entry key="security.audience-restrictions" value="https://sp.example.com/SAML2"/>
         </jaxrs:properties>
         <!-- If default role qualifier and format are not supported: 
        
@@ -96,6 +97,7 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="security.enable.unsigned-saml-assertion.principal" value="true"/>
+            <entry key="security.audience-restrictions" value="https://sp.example.com/SAML2"/>
         </jaxrs:properties>
     </jaxrs:server>
     <jaxrs:server address="https://localhost:${testutil.ports.jaxrs-saml}/saml-claims">
@@ -108,6 +110,7 @@ under the License.
         </jaxrs:providers>
         <jaxrs:properties>
             <entry key="security.enable.unsigned-saml-assertion.principal" value="true"/>
+            <entry key="security.audience-restrictions" value="https://sp.example.com/SAML2"/>
         </jaxrs:properties>
     </jaxrs:server>
 </beans>
