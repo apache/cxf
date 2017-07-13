@@ -253,8 +253,12 @@ public class NettyHttpServerEngine implements ServerEngine {
             serverChannel.close();
         }
         
-        bossGroup.shutdownGracefully();
-        workerGroup.shutdownGracefully();
+        if (bossGroup != null) {
+            bossGroup.shutdownGracefully();
+        }
+        if (workerGroup != null) {
+            workerGroup.shutdownGracefully();
+        }
        
     }
 
