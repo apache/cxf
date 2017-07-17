@@ -367,7 +367,20 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             }
         }
         protected int getResponseCode() throws IOException {
-            return connection.getResponseCode();
+            try {
+                return AccessController.doPrivileged(new PrivilegedExceptionAction<Integer>() {
+
+                    @Override
+                    public Integer run() throws IOException {
+                        return connection.getResponseCode();
+                    } });
+            } catch (PrivilegedActionException e) {
+                Throwable t = e.getCause();
+                if (t instanceof IOException) {
+                    throw (IOException) t;
+                }
+                throw new RuntimeException(t);
+            }
         }
         protected String getResponseMessage() throws IOException {
             return connection.getResponseMessage();
