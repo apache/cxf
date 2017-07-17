@@ -129,7 +129,7 @@ public abstract class AbstractClient implements Client {
     /**
      * {@inheritDoc}
      */
-    public Client query(String name, Object ...values) {
+    public Client query(String name, Object...values) {
         addMatrixQueryParamsToBuilder(getCurrentBuilder(), name, ParameterType.QUERY, null, values);
         return this;
     }
@@ -1006,15 +1006,20 @@ public abstract class AbstractClient implements Client {
 
     private void setRequestMethod(Message m, String httpMethod) {
         m.put(Message.HTTP_REQUEST_METHOD, httpMethod);
-        if (!KNOWN_METHODS.contains(httpMethod) && !m.containsKey("use.async.http.conduit")) {
-            // if the async conduit is loaded then let it handle this method without users
-            // having to explicitly request it given that, without reflectively updating
-            // HTTPUrlConnection, it will not work without the async conduit anyway
-            m.put("use.async.http.conduit", true);
+        if (!KNOWN_METHODS.contains(httpMethod)) {
+            if (!m.containsKey("use.async.http.conduit")) {
+                // if the async conduit is loaded then let it handle this method without users
+                // having to explicitly request it given that, without reflectively updating
+                // HTTPUrlConnection, it will not work without the async conduit anyway
+                m.put("use.async.http.conduit", true);
+            }
+
+            if (!m.containsKey("use.httpurlconnection.method.reflection")) {
+                // if the async conduit is not loaded then the only way for the custom HTTP verb
+                // to be supported is to attempt to reflectively modify HTTPUrlConnection
+                m.put("use.httpurlconnection.method.reflection", true);
+            }
         }
-        //TODO: consider setting "use.httpurlconnection.method.reflection" here too -
-        // if the async conduit is not loaded then the only way for the custom HTTP verb
-        // to be supported is to attempt to reflectively modify HTTPUrlConnection
     }
 
     protected void setEmptyRequestPropertyIfNeeded(Message outMessage, Object body) {
