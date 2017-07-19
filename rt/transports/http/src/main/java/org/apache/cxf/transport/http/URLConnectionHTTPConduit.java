@@ -56,11 +56,15 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  */
 public class URLConnectionHTTPConduit extends HTTPConduit {
     public static final String HTTPURL_CONNECTION_METHOD_REFLECTION = "use.httpurlconnection.method.reflection";
+    public static final String SET_REASON_PHRASE_NOT_NULL = "set.reason.phrase.not.null";
 
     private static final boolean DEFAULT_USE_REFLECTION;
+    private static final boolean SET_REASON_PHRASE;
     static {
         DEFAULT_USE_REFLECTION =
             Boolean.valueOf(SystemPropertyAction.getProperty(HTTPURL_CONNECTION_METHOD_REFLECTION, "false"));
+        SET_REASON_PHRASE = 
+            Boolean.valueOf(SystemPropertyAction.getProperty(SET_REASON_PHRASE_NOT_NULL, "false"));
     }
 
     /**
@@ -383,7 +387,19 @@ public class URLConnectionHTTPConduit extends HTTPConduit {
             }
         }
         protected String getResponseMessage() throws IOException {
-            return connection.getResponseMessage();
+            Object o = this.outMessage.getContextualProperty(SET_REASON_PHRASE_NOT_NULL);
+            boolean b = SET_REASON_PHRASE;
+            if (o != null) {
+                b = MessageUtils.isTrue(o);
+            }
+            if (connection.getResponseMessage() == null && b) {
+                //some http server like tomcat 8.5+ won't return the
+                //reason phrase in response, return a informative value
+                //to tell user no reason phrase in the response instead of null
+                return "no reason phrase in the response";
+            } else {
+                return connection.getResponseMessage();
+            }
         }
         protected InputStream getPartialResponse() throws IOException {
             return ChunkedUtil.getPartialResponse(connection, connection.getResponseCode());
