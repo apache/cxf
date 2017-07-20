@@ -173,7 +173,9 @@ public abstract class AbstractHTTPDestination
             String authEncoded = creds.get(1);
             try {
                 byte[] authBytes = Base64Utility.decode(authEncoded);
-
+                if (authBytes == null) {
+                    throw new Base64Exception(new Throwable("invalid Base64 data."));
+                }
                 String authDecoded = decodeBasicAuthWithIso8859
                     ? new String(authBytes, StandardCharsets.ISO_8859_1) : new String(authBytes);
 
