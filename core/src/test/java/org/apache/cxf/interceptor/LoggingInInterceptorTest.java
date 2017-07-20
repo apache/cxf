@@ -29,6 +29,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 import org.easymock.IMocksControl;
 
 import org.junit.After;
@@ -65,12 +66,14 @@ public class LoggingInInterceptorTest extends Assert {
         message.setContent(Writer.class, sw);
 
         inputStream = control.createMock(InputStream.class);
-        EasyMock.expect(inputStream.read(EasyMock.anyObject(), EasyMock.anyInt(), EasyMock.anyInt()))
-                .andAnswer(() -> {
-                    System.arraycopy(bufferContent.getBytes(), 0,
-                            EasyMock.getCurrentArguments()[0], 0,
-                            bufferLength);
-                    return bufferLength;
+        EasyMock.expect(inputStream.read(EasyMock.anyObject(byte[].class), EasyMock.anyInt(), EasyMock.anyInt()))
+                .andAnswer(new IAnswer<Integer>() {
+                    public Integer answer() {
+                        System.arraycopy(bufferContent.getBytes(), 0,
+                                EasyMock.getCurrentArguments()[0], 0,
+                                bufferLength);
+                        return bufferLength;
+                    }
                 }).andStubReturn(-1);
         control.replay();
     }
