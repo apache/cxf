@@ -268,9 +268,9 @@ public class SOAPHandlerInterceptor extends
                             SOAPElement el = (SOAPElement) nd;
                             if (el.hasAttributeNS(Names.WSA_NAMESPACE_NAME, "IsReferenceParameter")
                                     && ("1".equals(el.getAttributeNS(Names.WSA_NAMESPACE_NAME,
-                                    "IsReferenceParameter"))
+                                        "IsReferenceParameter"))
                                     || Boolean.parseBoolean(el.getAttributeNS(Names.WSA_NAMESPACE_NAME,
-                                    "IsReferenceParameter")))) {
+                                        "IsReferenceParameter")))) {
                                 params.add(el);
                             }
                         }
