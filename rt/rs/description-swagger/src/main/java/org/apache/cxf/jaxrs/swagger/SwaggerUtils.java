@@ -46,21 +46,21 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public final class SwaggerUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(ResourceUtils.class);
-    private static final Map<String, String> SWAGGER_TYPE_MAP; 
+    private static final Map<String, Class<?>> SWAGGER_TYPE_MAP;
     static {
-        SWAGGER_TYPE_MAP = new HashMap<String, String>();
-        SWAGGER_TYPE_MAP.put("string", "String");
-        SWAGGER_TYPE_MAP.put("integer", "long");
-        SWAGGER_TYPE_MAP.put("float", "float");
-        SWAGGER_TYPE_MAP.put("double", "double");
-        SWAGGER_TYPE_MAP.put("int", "int");
-        SWAGGER_TYPE_MAP.put("long", "long");
-        SWAGGER_TYPE_MAP.put("byte", "byte");
-        SWAGGER_TYPE_MAP.put("boolean", "boolean");
-        SWAGGER_TYPE_MAP.put("date", "java.util.Date");
-        SWAGGER_TYPE_MAP.put("dateTime", "java.util.Date");
-        SWAGGER_TYPE_MAP.put("File", "java.io.InputStream");
-        SWAGGER_TYPE_MAP.put("file", "java.io.InputStream");
+        SWAGGER_TYPE_MAP = new HashMap<String, Class<?>>();
+        SWAGGER_TYPE_MAP.put("string", String.class);
+        SWAGGER_TYPE_MAP.put("integer", long.class);
+        SWAGGER_TYPE_MAP.put("float", float.class);
+        SWAGGER_TYPE_MAP.put("double", double.class);
+        SWAGGER_TYPE_MAP.put("int", int.class);
+        SWAGGER_TYPE_MAP.put("long", long.class);
+        SWAGGER_TYPE_MAP.put("byte", byte.class);
+        SWAGGER_TYPE_MAP.put("boolean", boolean.class);
+        SWAGGER_TYPE_MAP.put("date", java.util.Date.class);
+        SWAGGER_TYPE_MAP.put("dateTime", java.util.Date.class);
+        SWAGGER_TYPE_MAP.put("File", java.io.InputStream.class);
+        SWAGGER_TYPE_MAP.put("file", java.io.InputStream.class);
     }
     private SwaggerUtils() {
         
@@ -168,16 +168,20 @@ public final class SwaggerUtils {
     }
     
     private static void setJavaType(Parameter userParam, String typeName) {
-        String javaTypeName = SWAGGER_TYPE_MAP.get(typeName);
-        if (javaTypeName != null) {
+        Class<?> javaType = SWAGGER_TYPE_MAP.get(typeName);
+        if (javaType == null) {
             try {
-                userParam.setJavaType(ClassLoaderUtils.loadClass(javaTypeName, SwaggerUtils.class));
+                // May work if the model has already been compiled
+                // TODO: need to know the package name
+                javaType = ClassLoaderUtils.loadClass(typeName, SwaggerUtils.class); 
             } catch (Throwable t) {
-                // ignore - can be a reference to a JSON model class, etc
+                // ignore
             }
         }
-        
+
+        userParam.setJavaType(javaType);
     }
+    
     private static String listToString(List<String> list) {
         if (list != null) {
             StringBuilder sb = new StringBuilder();
