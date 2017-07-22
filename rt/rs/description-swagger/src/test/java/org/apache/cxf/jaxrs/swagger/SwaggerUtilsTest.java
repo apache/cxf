@@ -39,19 +39,142 @@ public class SwaggerUtilsTest extends Assert {
         Map<String, UserResource> map = ap.getResourcesAsMap();
         assertEquals(3, map.size());
         
-        UserResource store = map.get("store");
-        verifyPetStoreResource(store);
+        UserResource pet = map.get("pet");
+        verifyPetResource(pet);
         
         UserResource user = map.get("user");
         verifyPetUserResource(user);
         
-        UserResource pet = map.get("pet");
-        verifyPetResource(pet);
-        
+        UserResource store = map.get("store");
+        verifyPetStoreResource(store);
         
     }
     
-    
+    private void verifyPetResource(UserResource ur) {
+        assertNotNull(ur);
+    }
+    //CHECKSTYLE:OFF
+    private void verifyPetUserResource(UserResource ur) {
+        assertNotNull(ur);
+        assertEquals("/user", ur.getPath());
+        assertEquals(8, ur.getOperations().size());
+        //POST /user
+        UserOperation createUser = ur.getOperations().get(0);
+        assertEquals("createUser", createUser.getName());
+        assertEquals("/", createUser.getPath());
+        assertEquals("POST", createUser.getVerb());
+        assertEquals("application/xml,application/json", createUser.getProduces());
+        assertNull(createUser.getConsumes());
+        assertEquals(1, createUser.getParameters().size());
+        Parameter createUserParam1 = createUser.getParameters().get(0);
+        assertEquals("body", createUserParam1.getName());
+        assertEquals(ParameterType.REQUEST_BODY, createUserParam1.getType());
+        //TODO: check that createUserParam1 refers to User model 
+        //TODO: check default response type: JAX-RS Response ?
+        
+        //POST /user/createWithArray
+        UserOperation createWithArray = ur.getOperations().get(1);
+        assertEquals("createUsersWithArrayInput", createWithArray.getName());
+        assertEquals("/createWithArray", createWithArray.getPath());
+        assertEquals("POST", createUser.getVerb());
+        assertEquals("application/xml,application/json", createUser.getProduces());
+        assertNull(createWithArray.getConsumes());
+        assertEquals(1, createUser.getParameters().size());
+        Parameter createWithArrayParam1 = createUser.getParameters().get(0);
+        assertEquals("body", createWithArrayParam1.getName());
+        assertEquals(ParameterType.REQUEST_BODY, createWithArrayParam1.getType());
+        //TODO: check that createUserParam1 refers to an array of User model 
+        //TODO: check default response type: JAX-RS Response ?
+        
+        //POST /user/createWithList
+        UserOperation createWithList = ur.getOperations().get(2);
+        assertEquals("createUsersWithListInput", createWithList.getName());
+        assertEquals("/createWithList", createWithList.getPath());
+        assertEquals("POST", createWithList.getVerb());
+        assertEquals("application/xml,application/json", createWithList.getProduces());
+        assertNull(createWithList.getConsumes());
+        assertEquals(1, createWithList.getParameters().size());
+        Parameter createWithListParam1 = createWithList.getParameters().get(0);
+        assertEquals("body", createWithListParam1.getName());
+        assertEquals(ParameterType.REQUEST_BODY, createWithListParam1.getType());
+        //TODO: check that createUserParam1 refers to an array of User model 
+        //TODO: check default response type: JAX-RS Response ?
+        
+        //GET /user/login
+        UserOperation loginUser = ur.getOperations().get(3);
+        assertEquals("loginUser", loginUser.getName());
+        assertEquals("/login", loginUser.getPath());
+        assertEquals("GET", loginUser.getVerb());
+        assertEquals("application/xml,application/json", loginUser.getProduces());
+        assertNull(loginUser.getConsumes());
+        assertEquals(2, loginUser.getParameters().size());
+        Parameter loginUserParam1 = loginUser.getParameters().get(0);
+        assertEquals("username", loginUserParam1.getName());
+        assertEquals(ParameterType.QUERY, loginUserParam1.getType());
+        assertEquals(String.class, loginUserParam1.getJavaType());
+        Parameter loginUserParam2 = loginUser.getParameters().get(1);
+        assertEquals("password", loginUserParam2.getName());
+        assertEquals(ParameterType.QUERY, loginUserParam2.getType());
+        assertEquals(String.class, loginUserParam2.getJavaType());
+        //TODO: check 200 response type
+        
+        //GET /user/logout
+        UserOperation logoutUser = ur.getOperations().get(4);
+        assertEquals("logoutUser", logoutUser.getName());
+        assertEquals("/logout", logoutUser.getPath());
+        assertEquals("GET", loginUser.getVerb());
+        assertEquals("application/xml,application/json", logoutUser.getProduces());
+        assertNull(logoutUser.getConsumes());
+        assertEquals(0, logoutUser.getParameters().size());
+        //TODO: check 200 response type
+        
+        //GET /user/{username}
+        UserOperation getUserByName = ur.getOperations().get(5);
+        assertEquals("getUserByName", getUserByName.getName());
+        assertEquals("/{username}", getUserByName.getPath());
+        assertEquals("GET", getUserByName.getVerb());
+        assertEquals("application/xml,application/json", getUserByName.getProduces());
+        assertNull(getUserByName.getConsumes());
+        assertEquals(1, getUserByName.getParameters().size());
+        Parameter getUserByNameParam1 = getUserByName.getParameters().get(0);
+        assertEquals("username", getUserByNameParam1.getName());
+        assertEquals(ParameterType.PATH, getUserByNameParam1.getType());
+        assertEquals(String.class, getUserByNameParam1.getJavaType());
+        //TODO: check 200 response type
+        
+        //PUT /user/{username}
+        UserOperation updateUser = ur.getOperations().get(6);
+        assertEquals("updateUser", updateUser.getName());
+        assertEquals("/{username}", updateUser.getPath());
+        assertEquals("PUT", updateUser.getVerb());
+        assertEquals("application/xml,application/json", updateUser.getProduces());
+        assertNull(updateUser.getConsumes());
+        assertEquals(2, updateUser.getParameters().size());
+        Parameter updateUserParam1 = updateUser.getParameters().get(0);
+        assertEquals("username", updateUserParam1.getName());
+        assertEquals(ParameterType.PATH, updateUserParam1.getType());
+        assertEquals(String.class, updateUserParam1.getJavaType());
+        Parameter updateUserParam2 = updateUser.getParameters().get(1);
+        assertEquals("body", updateUserParam2.getName());
+        assertEquals(ParameterType.REQUEST_BODY, updateUserParam2.getType());
+        //TODO: check that createUserParam1 refers to an array of User model
+        //TODO: check 200 response type
+        
+        //DELETE /user/{username}
+        UserOperation deleteUser = ur.getOperations().get(7);
+        assertEquals("deleteUser", deleteUser.getName());
+        assertEquals("/{username}", deleteUser.getPath());
+        assertEquals("DELETE", deleteUser.getVerb());
+        assertEquals("application/xml,application/json", deleteUser.getProduces());
+        assertNull(deleteUser.getConsumes());
+        assertEquals(1, deleteUser.getParameters().size());
+        Parameter deleteUserParam1 = deleteUser.getParameters().get(0);
+        assertEquals("username", deleteUserParam1.getName());
+        assertEquals(ParameterType.PATH, deleteUserParam1.getType());
+        assertEquals(String.class, deleteUserParam1.getJavaType());
+        
+    }
+    //CHECKSTYLE:ON
     private void verifyPetStoreResource(UserResource ur) {
         assertNotNull(ur);
         assertEquals("/store", ur.getPath());
@@ -110,16 +233,7 @@ public class SwaggerUtilsTest extends Assert {
         
     }
     
-    private void verifyPetUserResource(UserResource ur) {
-        assertNotNull(ur);
-        
-        
-    }
     
-    private void verifyPetResource(UserResource ur) {
-        assertNotNull(ur);
-    }
-
     @Test
     public void testConvertSwaggerToUserApp() {
         UserApplication ap = SwaggerUtils.getUserApplication("/swagger20.json");
