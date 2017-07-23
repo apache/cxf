@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.swagger;
 
+import java.io.InputStream;
 import java.util.Map;
 
 import org.apache.cxf.jaxrs.model.Parameter;
@@ -49,10 +50,141 @@ public class SwaggerUtilsTest extends Assert {
         verifyPetStoreResource(store);
         
     }
-    
+    //CHECKSTYLE:OFF
     private void verifyPetResource(UserResource ur) {
         assertNotNull(ur);
+        assertEquals("/pet", ur.getPath());
+        assertEquals(8, ur.getOperations().size());
+        //POST /pet
+        UserOperation addPet = ur.getOperations().get(0);
+        assertEquals("addPet", addPet.getName());
+        assertEquals("/", addPet.getPath());
+        assertEquals("POST", addPet.getVerb());
+        assertEquals("application/xml,application/json", addPet.getProduces());
+        assertEquals("application/json,application/xml", addPet.getConsumes());
+        assertEquals(1, addPet.getParameters().size());
+        Parameter addPetParam1 = addPet.getParameters().get(0);
+        assertEquals("body", addPetParam1.getName());
+        assertEquals(ParameterType.REQUEST_BODY, addPetParam1.getType());
+        //TODO: check that addPetParam1 refers to Pet model 
+        //TODO: check default response type: JAX-RS Response ?
+        
+        //PUT /pet
+        UserOperation putPet = ur.getOperations().get(1);
+        assertEquals("updatePet", putPet.getName());
+        assertEquals("/", putPet.getPath());
+        assertEquals("PUT", putPet.getVerb());
+        assertEquals("application/xml,application/json", addPet.getProduces());
+        assertEquals("application/json,application/xml", addPet.getConsumes());
+        assertEquals(1, putPet.getParameters().size());
+        Parameter putPetParam1 = putPet.getParameters().get(0);
+        assertEquals("body", putPetParam1.getName());
+        assertEquals(ParameterType.REQUEST_BODY, putPetParam1.getType());
+        //TODO: check that putPetParam1 refers to Pet model 
+        //TODO: check default response type: JAX-RS Response ?
+        
+        //GET /pet/findByStatus
+        UserOperation findPetsByStatus = ur.getOperations().get(2);
+        assertEquals("findPetsByStatus", findPetsByStatus.getName());
+        assertEquals("/findByStatus", findPetsByStatus.getPath());
+        assertEquals("GET", findPetsByStatus.getVerb());
+        assertEquals("application/xml,application/json", findPetsByStatus.getProduces());
+        assertNull(findPetsByStatus.getConsumes());
+        assertEquals(1, findPetsByStatus.getParameters().size());
+        Parameter findPetsByStatusParam1 = findPetsByStatus.getParameters().get(0);
+        assertEquals("status", findPetsByStatusParam1.getName());
+        assertEquals(ParameterType.QUERY, findPetsByStatusParam1.getType());
+        //TODO: check that findPetsByStatusParam1 refers to List of String
+        //TODO: check that response refers to List of Pets
+        
+        //GET /pet/findByTag
+        UserOperation findPetsByTags = ur.getOperations().get(3);
+        assertEquals("findPetsByTags", findPetsByTags.getName());
+        assertEquals("/findByTags", findPetsByTags.getPath());
+        assertEquals("GET", findPetsByTags.getVerb());
+        assertEquals("application/xml,application/json", findPetsByTags.getProduces());
+        assertNull(findPetsByTags.getConsumes());
+        assertEquals(1, findPetsByTags.getParameters().size());
+        Parameter findPetsByTagsParam1 = findPetsByTags.getParameters().get(0);
+        assertEquals("tags", findPetsByTagsParam1.getName());
+        assertEquals(ParameterType.QUERY, findPetsByTagsParam1.getType());
+        //TODO: check that findPetsByTagsParam1 refers to List of String
+        //TODO: check that response refers to List of Pets
+        
+        //GET /pet/{petId}
+        UserOperation getPetById = ur.getOperations().get(4);
+        assertEquals("getPetById", getPetById.getName());
+        assertEquals("/{petId}", getPetById.getPath());
+        assertEquals("GET", getPetById.getVerb());
+        assertEquals("application/xml,application/json", getPetById.getProduces());
+        assertNull(getPetById.getConsumes());
+        assertEquals(1, getPetById.getParameters().size());
+        Parameter getPetByIdParam1 = getPetById.getParameters().get(0);
+        assertEquals("petId", getPetByIdParam1.getName());
+        assertEquals(ParameterType.PATH, getPetByIdParam1.getType());
+        assertEquals(long.class, getPetByIdParam1.getJavaType());
+        
+        //POST /pet/{petId}
+        UserOperation updatePetWithForm = ur.getOperations().get(5);
+        assertEquals("updatePetWithForm", updatePetWithForm.getName());
+        assertEquals("/{petId}", updatePetWithForm.getPath());
+        assertEquals("POST", updatePetWithForm.getVerb());
+        assertEquals("application/xml,application/json", updatePetWithForm.getProduces());
+        assertEquals("application/x-www-form-urlencoded", updatePetWithForm.getConsumes());
+        assertEquals(3, updatePetWithForm.getParameters().size());
+        Parameter updatePetWithFormParam1 = updatePetWithForm.getParameters().get(0);
+        assertEquals("petId", updatePetWithFormParam1.getName());
+        assertEquals(ParameterType.PATH, updatePetWithFormParam1.getType());
+        assertEquals(long.class, updatePetWithFormParam1.getJavaType());
+        Parameter updatePetWithFormParam2 = updatePetWithForm.getParameters().get(1);
+        assertEquals("name", updatePetWithFormParam2.getName());
+        assertEquals(ParameterType.FORM, updatePetWithFormParam2.getType());
+        assertEquals(String.class, updatePetWithFormParam2.getJavaType());
+        Parameter updatePetWithFormParam3 = updatePetWithForm.getParameters().get(2);
+        assertEquals("status", updatePetWithFormParam3.getName());
+        assertEquals(ParameterType.FORM, updatePetWithFormParam3.getType());
+        assertEquals(String.class, updatePetWithFormParam3.getJavaType());
+        
+        //DELETE /pet/{petId}
+        UserOperation deletePet = ur.getOperations().get(6);
+        assertEquals("deletePet", deletePet.getName());
+        assertEquals("/{petId}", deletePet.getPath());
+        assertEquals("DELETE", deletePet.getVerb());
+        assertEquals("application/xml,application/json", deletePet.getProduces());
+        assertNull(deletePet.getConsumes());
+        assertEquals(2, deletePet.getParameters().size());
+        Parameter deletePetParam1 = deletePet.getParameters().get(0);
+        assertEquals("api_key", deletePetParam1.getName());
+        assertEquals(ParameterType.HEADER, deletePetParam1.getType());
+        assertEquals(String.class, deletePetParam1.getJavaType());
+        Parameter deletePetParam2 = deletePet.getParameters().get(1);
+        assertEquals("petId", deletePetParam2.getName());
+        assertEquals(ParameterType.PATH, deletePetParam2.getType());
+        assertEquals(long.class, deletePetParam2.getJavaType());
+        
+        //POST /pet/{petId}/uploadImage
+        UserOperation uploadFile = ur.getOperations().get(7);
+        assertEquals("uploadFile", uploadFile.getName());
+        assertEquals("/{petId}/uploadImage", uploadFile.getPath());
+        assertEquals("POST", uploadFile.getVerb());
+        assertEquals("application/json", uploadFile.getProduces());
+        assertEquals("multipart/form-data", uploadFile.getConsumes());
+        assertEquals(3, uploadFile.getParameters().size());
+        Parameter uploadFileParam1 = uploadFile.getParameters().get(0);
+        assertEquals("petId", uploadFileParam1.getName());
+        assertEquals(ParameterType.PATH, uploadFileParam1.getType());
+        assertEquals(long.class, uploadFileParam1.getJavaType());
+        Parameter uploadFileParam2 = uploadFile.getParameters().get(1);
+        assertEquals("additionalMetadata", uploadFileParam2.getName());
+        assertEquals(ParameterType.FORM, uploadFileParam2.getType());
+        assertEquals(String.class, uploadFileParam2.getJavaType());
+        Parameter uploadFileParam3 = uploadFile.getParameters().get(2);
+        assertEquals("file", uploadFileParam3.getName());
+        assertEquals(ParameterType.FORM, uploadFileParam3.getType());
+        assertEquals(InputStream.class, uploadFileParam3.getJavaType());
+        
     }
+    //CHECKSTYLE:ON
     //CHECKSTYLE:OFF
     private void verifyPetUserResource(UserResource ur) {
         assertNotNull(ur);
