@@ -336,8 +336,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 if (statementBean != null) {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine(
-                            "AttributeStatements" + statementBean.toString() 
-                            + "returned by AttributeStatementProvider " 
+                            "AttributeStatements " + statementBean.toString()
+                            + " returned by AttributeStatementProvider "
                             + statementProvider.getClass().getName()
                         );
                     }
@@ -356,8 +356,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 if (statementBean != null) {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine(
-                            "AuthenticationStatement" + statementBean.toString() 
-                            + "returned by AuthenticationStatementProvider " 
+                            "AuthenticationStatement " + statementBean.toString()
+                            + " returned by AuthenticationStatementProvider "
                             + statementProvider.getClass().getName()
                         );
                     }
@@ -377,8 +377,8 @@ public class SAMLTokenProvider extends AbstractSAMLTokenProvider implements Toke
                 if (statementBean != null) {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine(
-                            "AuthDecisionStatement" + statementBean.toString() 
-                            + "returned by AuthDecisionStatementProvider " 
+                            "AuthDecisionStatement " + statementBean.toString()
+                            + " returned by AuthDecisionStatementProvider "
                             + statementProvider.getClass().getName()
                         );
                     }
