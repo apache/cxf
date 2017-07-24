@@ -69,25 +69,32 @@ public final class SwaggerParseUtils {
         return getUserApplication(loc, BusFactory.getThreadDefaultBus());
     }
     public static UserApplication getUserApplication(String loc, Bus bus) {
-        return getUserApplication(new ParseConfiguration(loc, bus));
+        return getUserApplication(loc, bus, new ParseConfiguration());
     }    
-    public static UserApplication getUserApplication(ParseConfiguration cfg) {    
+    public static UserApplication getUserApplication(String loc, Bus bus, ParseConfiguration cfg) {    
         try {
-            InputStream is = ResourceUtils.getResourceStream(cfg.getDocLocation(),
-                                                             cfg.getBus());
+            InputStream is = ResourceUtils.getResourceStream(loc, bus);
             if (is == null) {
                 return null;
             }
-            return getUserApplicationFromStream(is);
+            return getUserApplicationFromStream(is, cfg);
         } catch (Exception ex) {
-            LOG.warning("Problem with processing a user model at " + cfg.getDocLocation());
+            LOG.warning("Problem with processing a user model at " + loc);
         }
         return null;
     }
     public static UserApplication getUserApplicationFromStream(InputStream is) throws IOException {
-        return getUserApplicationFromJson(IOUtils.readStringFromStream(is));
+        return getUserApplicationFromStream(is, new ParseConfiguration());
+    }
+    public static UserApplication getUserApplicationFromStream(InputStream is,
+                                                               ParseConfiguration cfg) throws IOException {
+        return getUserApplicationFromJson(IOUtils.readStringFromStream(is), cfg);
     }
     public static UserApplication getUserApplicationFromJson(String json) {
+        return getUserApplicationFromJson(json, new ParseConfiguration());
+    }
+    public static UserApplication getUserApplicationFromJson(String json,
+                                                             ParseConfiguration cfg) {
         JsonMapObjectReaderWriter reader = new JsonMapObjectReaderWriter();
         Map<String, Object> map = reader.fromJson(json);
 

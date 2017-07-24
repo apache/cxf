@@ -18,30 +18,8 @@
  */
 package org.apache.cxf.jaxrs.swagger.parse;
 
-import org.apache.cxf.Bus;
-
 public class ParseConfiguration {
-    private String docLocation;
-    private Bus bus;
     
     public ParseConfiguration() {
-    }
-    
-    public ParseConfiguration(String docLocation, Bus bus) {
-        this.docLocation = docLocation;
-        this.bus = bus;
-    }
-    
-    public String getDocLocation() {
-        return docLocation;
-    }
-    public void setDocLocation(String docLocation) {
-        this.docLocation = docLocation;
-    }
-    public Bus getBus() {
-        return bus;
-    }
-    public void setBus(Bus bus) {
-        this.bus = bus;
     }
 }
