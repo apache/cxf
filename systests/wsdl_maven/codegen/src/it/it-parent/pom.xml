@@ -25,6 +25,7 @@
     <packaging>pom</packaging>
     <properties>
         <cxf.version>@project.version@</cxf.version>
+        <cxf.xjc-utils.version>3.1.0</cxf.xjc-utils.version>
     </properties>
     <build>
         <pluginManagement>

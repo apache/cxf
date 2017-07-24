@@ -35,7 +35,7 @@
                     <dependency>
                         <groupId>org.apache.cxf.xjcplugins</groupId>
                         <artifactId>cxf-xjc-ts</artifactId>
-                        <version>2.4.0</version>
+                        <version>${cxf.xjc-utils.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>net.java.dev.jaxb2-commons</groupId>
@@ -79,6 +79,11 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf.xjc-utils</groupId>
+            <artifactId>cxf-xjc-runtime</artifactId>
+            <version>${cxf.xjc-utils.version}</version>
         </dependency>
     </dependencies>
 </project>
