@@ -46,7 +46,7 @@ import org.apache.cxf.jaxrs.model.UserApplication;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.swagger.Swagger2Feature;
-import org.apache.cxf.jaxrs.swagger.SwaggerUtils;
+import org.apache.cxf.jaxrs.swagger.parse.SwaggerParseUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -122,7 +122,7 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
         final WebClient client = createWebClient("/swagger.json");
         try {
             String swaggerJson = client.get(String.class);
-            UserApplication ap = SwaggerUtils.getUserApplicationFromJson(swaggerJson);
+            UserApplication ap = SwaggerParseUtils.getUserApplicationFromJson(swaggerJson);
             assertNotNull(ap);
             
             List<UserResource> urs = ap.getResources();

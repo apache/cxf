@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.swagger;
+package org.apache.cxf.jaxrs.swagger.parse;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -30,11 +30,11 @@ import org.apache.cxf.jaxrs.model.UserResource;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SwaggerUtilsTest extends Assert {
+public class SwaggerParseUtilsTest extends Assert {
 
     @Test
     public void testConvertSwaggerPetShopToUserApp() {
-        UserApplication ap = SwaggerUtils.getUserApplication("/swagger2petShop.json");
+        UserApplication ap = SwaggerParseUtils.getUserApplication("/swagger2petShop.json");
         assertNotNull(ap);
         assertEquals("/v2", ap.getBasePath());
         Map<String, UserResource> map = ap.getResourcesAsMap();
@@ -368,7 +368,7 @@ public class SwaggerUtilsTest extends Assert {
     
     @Test
     public void testConvertSwaggerToUserApp() {
-        UserApplication ap = SwaggerUtils.getUserApplication("/swagger20.json");
+        UserApplication ap = SwaggerParseUtils.getUserApplication("/swagger20.json");
         assertNotNull(ap);
         assertEquals("/services/helloservice", ap.getBasePath());
         Map<String, UserResource> map = ap.getResourcesAsMap();
