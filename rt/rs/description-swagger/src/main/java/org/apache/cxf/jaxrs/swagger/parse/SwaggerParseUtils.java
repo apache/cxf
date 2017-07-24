@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.swagger;
+package org.apache.cxf.jaxrs.swagger.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,7 +44,7 @@ import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
-public final class SwaggerUtils {
+public final class SwaggerParseUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(ResourceUtils.class);
     private static final Map<String, Class<?>> SWAGGER_TYPE_MAP;
     static {
@@ -62,21 +62,25 @@ public final class SwaggerUtils {
         SWAGGER_TYPE_MAP.put("File", java.io.InputStream.class);
         SWAGGER_TYPE_MAP.put("file", java.io.InputStream.class);
     }
-    private SwaggerUtils() {
+    private SwaggerParseUtils() {
 
     }
     public static UserApplication getUserApplication(String loc) {
         return getUserApplication(loc, BusFactory.getThreadDefaultBus());
     }
     public static UserApplication getUserApplication(String loc, Bus bus) {
+        return getUserApplication(new ParseConfiguration(loc, bus));
+    }    
+    public static UserApplication getUserApplication(ParseConfiguration cfg) {    
         try {
-            InputStream is = ResourceUtils.getResourceStream(loc, bus);
+            InputStream is = ResourceUtils.getResourceStream(cfg.getDocLocation(),
+                                                             cfg.getBus());
             if (is == null) {
                 return null;
             }
             return getUserApplicationFromStream(is);
         } catch (Exception ex) {
-            LOG.warning("Problem with processing a user model at " + loc);
+            LOG.warning("Problem with processing a user model at " + cfg.getDocLocation());
         }
         return null;
     }
@@ -173,7 +177,7 @@ public final class SwaggerUtils {
             try {
                 // May work if the model has already been compiled
                 // TODO: need to know the package name
-                javaType = ClassLoaderUtils.loadClass(typeName, SwaggerUtils.class); 
+                javaType = ClassLoaderUtils.loadClass(typeName, SwaggerParseUtils.class); 
             } catch (Throwable t) {
                 // ignore
             }
