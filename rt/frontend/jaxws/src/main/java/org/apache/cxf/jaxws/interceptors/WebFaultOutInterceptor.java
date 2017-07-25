@@ -35,6 +35,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.annotations.SchemaValidation.SchemaValidationType;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -100,20 +101,23 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 sf = (SOAPFaultException)thr.getCause();
             }
             if (sf != null) {
-                if (f instanceof SoapFault) {
-                    for (Iterator<QName> it = CastUtils.cast(sf.getFault().getFaultSubcodes()); it.hasNext();) {
-                        ((SoapFault) f).addSubCode(it.next());    
+                SoapVersion soapVersion = (SoapVersion)message.get(SoapVersion.class.getName());
+                if (soapVersion != null && soapVersion.getVersion() != 1.1) {
+                    if (f instanceof SoapFault) {
+                        for (Iterator<QName> it = CastUtils.cast(sf.getFault().getFaultSubcodes()); it.hasNext();) {
+                            ((SoapFault) f).addSubCode(it.next());
+                        }
                     }
-                }
-                if (sf.getFault().getFaultReasonLocales().hasNext()) {
-                    Locale lang = (Locale) sf.getFault()
-                           .getFaultReasonLocales().next();
-                    String convertedLang = lang.getLanguage();
-                    String country = lang.getCountry();
-                    if (country.length() > 0) {
-                        convertedLang = convertedLang + '-' + country;
+                    if (sf.getFault().getFaultReasonLocales().hasNext()) {
+                        Locale lang = (Locale) sf.getFault()
+                                .getFaultReasonLocales().next();
+                        String convertedLang = lang.getLanguage();
+                        String country = lang.getCountry();
+                        if (country.length() > 0) {
+                            convertedLang = convertedLang + '-' + country;
+                        }
+                        f.setLang(convertedLang);
                     }
-                    f.setLang(convertedLang);
                 }
                 message.setContent(Exception.class, f);
             }
