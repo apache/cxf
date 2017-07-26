@@ -984,14 +984,18 @@ public class JAXBDataBinding implements DataBindingProfile {
                                            String systemId,
                                            String baseURI) {
                 String s = JAXBDataBinding.mapSchemaLocation(systemId, baseURI, catalog);
-                //System.out.println(namespaceURI + " " + systemId + " " + baseURI + " " + s);
+                LOG.fine("validating: " + namespaceURI + " " + systemId + " " + baseURI + " " + s);
                 if (s == null) {
                     XmlSchema sc = schemaCollection.getSchemaByTargetNamespace(namespaceURI);
-                    StringWriter writer = new StringWriter();
-                    sc.write(writer);
-                    InputSource src = new InputSource(new StringReader(writer.toString()));
-                    src.setSystemId(sc.getSourceURI());
-                    return new LSInputSAXWrapper(src);
+                    if (sc != null) {
+                        StringWriter writer = new StringWriter();
+                        sc.write(writer);
+                        InputSource src = new InputSource(new StringReader(writer.toString()));
+                        src.setSystemId(sc.getSourceURI());
+                        return new LSInputSAXWrapper(src);
+                    } else {
+                        throw new ToolException("Schema not found for namespace: " + namespaceURI);
+                    }
                 }
                 return new LSInputSAXWrapper(new InputSource(s));
             }
