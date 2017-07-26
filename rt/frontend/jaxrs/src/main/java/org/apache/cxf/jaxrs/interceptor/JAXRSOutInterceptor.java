@@ -87,7 +87,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             
 
     }
-    
+
+    @SuppressWarnings("resource") // Response shouldn't be closed here
     private void processResponse(ServerProviderFactory providerFactory, Message message) {
         
         if (isResponseAlreadyHandled(message)) {
