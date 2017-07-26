@@ -36,15 +36,15 @@ public class SseEventSourceBuilderImpl extends SseEventSource.Builder {
     }
 
     @Override
-    public Builder reconnectingEvery(long delay, TimeUnit unit) {
-        this.delay = delay;
-        this.unit = unit;
+    public Builder reconnectingEvery(long tdelay, TimeUnit tunit) {
+        this.delay = tdelay;
+        this.unit = tunit;
         return this;
     }
 
     @Override
-    protected Builder target(WebTarget target) {
-        this.target = target;
+    protected Builder target(WebTarget tgt) {
+        this.target = tgt;
         return this;
     }
 }

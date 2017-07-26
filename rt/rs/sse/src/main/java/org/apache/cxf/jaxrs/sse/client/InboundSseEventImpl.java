@@ -60,19 +60,19 @@ public class InboundSseEventImpl implements InboundSseEvent {
             this.name = name;
         }
 
-        Builder id(String id) {
-            this.id = id;
+        Builder id(String i) {
+            this.id = i;
             return this;
         }
 
-        Builder comment(String comment) {
-            this.comment = comment;
+        Builder comment(String cmt) {
+            this.comment = cmt;
             return this;
         }
 
-        Builder reconnectDelay(String reconnectDelay) {
+        Builder reconnectDelay(String rd) {
             try {
-                this.reconnectDelay = OptionalLong.of(Long.parseLong(reconnectDelay));
+                this.reconnectDelay = OptionalLong.of(Long.parseLong(rd));
             } catch (final NumberFormatException ex) {
                 LOG.warning("Unable to parse reconnectDelay, long number expected: " + ex.getMessage());
             }
@@ -80,8 +80,8 @@ public class InboundSseEventImpl implements InboundSseEvent {
             return this;
         }
         
-        Builder data(String data) {
-            this.data = data;
+        Builder data(String d) {
+            this.data = d;
             return this;
         }
 
@@ -91,8 +91,10 @@ public class InboundSseEventImpl implements InboundSseEvent {
         }
     }
     
-    InboundSseEventImpl(String id, String name, String comment, long reconnectDelay, boolean reconnectDelaySet, 
+    //CHECKSTYLE:OFF
+    InboundSseEventImpl(String id, String name, String comment, long reconnectDelay, boolean reconnectDelaySet,   
             String data, ClientProviderFactory factory, Message message) {
+        //CHECKSTYLE:ON
         this.id = id;
         this.name = name;
         this.comment = comment;
@@ -175,7 +177,7 @@ public class InboundSseEventImpl implements InboundSseEvent {
             throw new RuntimeException("No suitable message body reader for class: " + messageType.getName());
         }
 
-        try (final ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))) {
+        try (ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8))) {
             return reader.readFrom(messageType, type, annotations, mediaType, headers, is);
         } catch (final IOException ex) {
             throw new RuntimeException("Unable to read data of type " + messageType.getName(), ex);

@@ -94,11 +94,11 @@ public class SseEventSourceImpl implements SseEventSource {
         private final Runnable onComplete;
         
         InboundSseEventListenerImpl(Consumer<InboundSseEvent> e) {
-            this(e, ex -> {}, () -> {});
+            this(e, ex -> { }, () -> { });
         }
         
         InboundSseEventListenerImpl(Consumer<InboundSseEvent> e, Consumer<Throwable> t) {
-            this(e, t, () -> {});
+            this(e, t, () -> { });    
         }
 
         InboundSseEventListenerImpl(Consumer<InboundSseEvent> e, Consumer<Throwable> t, Runnable c) {
@@ -223,7 +223,7 @@ public class SseEventSourceImpl implements SseEventSource {
     }
 
     @Override
-    public boolean close(long timeout, TimeUnit unit) {
+    public boolean close(long timeout, TimeUnit tunit) {
         if (state.get() == SseSourceState.CLOSED) {
             return true;
         }
@@ -243,12 +243,12 @@ public class SseEventSourceImpl implements SseEventSource {
             return true;
         }
         
-        return processor.close(timeout, unit); 
+        return processor.close(timeout, tunit); 
     }
     
-    private void scheduleReconnect(long delay, TimeUnit unit, String lastEventId) {
+    private void scheduleReconnect(long tdelay, TimeUnit tunit, String lastEventId) {
         // If delay == RECONNECT_NOT_SET, no reconnection attempt should be performed
-        if (delay < 0 || executor == null) {
+        if (tdelay < 0 || executor == null) {
             return;
         }
         
@@ -258,9 +258,10 @@ public class SseEventSourceImpl implements SseEventSource {
         }
         
         // If the connection was still on connecting state, just try to reconnect
-        if (state.get() != SseSourceState.CONNECTING && !state.compareAndSet(SseSourceState.OPEN, SseSourceState.CONNECTING)) {
-            throw new IllegalStateException("The SseEventSource is not opened, but in " + state.get() + 
-                " state, unable to reconnect");
+        if (state.get() != SseSourceState.CONNECTING 
+            && !state.compareAndSet(SseSourceState.OPEN, SseSourceState.CONNECTING)) {
+            throw new IllegalStateException("The SseEventSource is not opened, but in " + state.get()
+                + " state, unable to reconnect");
         }
                 
         executor.schedule(() -> {
@@ -269,9 +270,9 @@ public class SseEventSourceImpl implements SseEventSource {
                 LOG.fine("Reestablishing SSE connection to " + target.getUri());
                 connect(lastEventId);
             }
-        }, delay, unit);
+        }, tdelay, tunit);
         
-        LOG.fine("The reconnection attempt to " + target.getUri() + " is scheduled in " + 
-            unit.toMillis(delay) + "ms");
+        LOG.fine("The reconnection attempt to " + target.getUri() + " is scheduled in "
+            + tunit.toMillis(tdelay) + "ms");
     }
 }

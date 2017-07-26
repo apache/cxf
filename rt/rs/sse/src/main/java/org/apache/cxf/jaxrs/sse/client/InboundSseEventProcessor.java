@@ -51,7 +51,7 @@ public class InboundSseEventProcessor {
     private final InboundSseEventListener listener;
     private final ExecutorService executor;
     
-    private volatile boolean closed = false;
+    private volatile boolean closed;
     
     protected InboundSseEventProcessor(Endpoint endpoint, InboundSseEventListener listener) {
         this.endpoint = endpoint;
@@ -77,11 +77,11 @@ public class InboundSseEventProcessor {
     
     private Callable<?> process(Response response, InputStream is, ClientProviderFactory factory, Message message) {
         return () -> {
-            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
-                String line = null;
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                String line = reader.readLine();
                 InboundSseEventImpl.Builder builder = null;
 
-                while ((line = reader.readLine()) != null && !Thread.interrupted() && !closed) {
+                while (line != null && !Thread.interrupted() && !closed) {
                     if (!StringUtils.isEmpty(line) && line.startsWith(EVENT)) {
                         if (builder == null) {
                             builder = new InboundSseEventImpl.Builder(line.substring(EVENT.length()));
@@ -101,6 +101,7 @@ public class InboundSseEventProcessor {
                             builder.data(line.substring(DATA.length()));
                         }
                     }
+                    line = reader.readLine();
                 }
                 
                 if (builder != null) {
