@@ -526,7 +526,8 @@ public class JSONProvider<T> extends AbstractJAXBProvider<T>  {
         }
         if (ignoreEmptyArrayValues) {
             try { 
-	        config.getClass().getMethod("setIgnoreEmptyArrayValues", Boolean.TYPE).invoke(config, ignoreEmptyArrayValues);
+                config.getClass().getMethod("setIgnoreEmptyArrayValues", Boolean.TYPE)
+                    .invoke(config, ignoreEmptyArrayValues);
             } catch (Throwable t) {
                 LOG.log(Level.WARNING, "Could not set IgnoreEmptyArrayValues. Check the Jettison version.");
             }
