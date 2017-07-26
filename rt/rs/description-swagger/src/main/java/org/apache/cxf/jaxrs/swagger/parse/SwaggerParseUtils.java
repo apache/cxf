@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.swagger.parse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -130,13 +131,9 @@ public final class SwaggerParseUtils {
                 userOp.setVerb(operEntry.getKey().toUpperCase());
                 
                 Map<String, Object> oper = CastUtils.cast((Map<?, ?>)operEntry.getValue());
-                List<String> opTags = CastUtils.cast((List<?>)oper.get("tags"));
-                String opTag = tagsProp == null || opTags == null ? "" : opTags.get(0);
-
-                String realOpPath = operPath.equals("/" + opTag) ? "/" 
-                    : tagsProp != null ? operPath.substring(opTag.length() + 1) : operPath;
-                userOp.setPath(realOpPath);
                 
+                userOp.setPath(operPath);
+
                 userOp.setName((String)oper.get("operationId"));
                 List<String> opProduces = CastUtils.cast((List<?>)oper.get("produces"));
                 userOp.setProduces(listToString(opProduces));
@@ -161,8 +158,14 @@ public final class SwaggerParseUtils {
                 if (!userOpParams.isEmpty()) {
                     userOp.setParameters(userOpParams);
                 }
-                userOpsMap.get(opTag).add(userOp);    
-                
+
+                List<String> opTags = CastUtils.cast((List<?>)oper.get("tags"));
+                if (opTags == null) {
+                    opTags = Collections.singletonList("");
+                }
+                for (String opTag : opTags) {
+                    userOpsMap.get(opTag).add(userOp);
+                }
             }
         }
         
@@ -170,7 +173,7 @@ public final class SwaggerParseUtils {
         
         for (Map.Entry<String, List<UserOperation>> entry : userOpsMap.entrySet()) {
             UserResource ur = new UserResource();
-            ur.setPath("/" + entry.getKey());
+            ur.setPath("/");
             ur.setOperations(entry.getValue());
             ur.setName(entry.getKey());
             resources.add(ur);
