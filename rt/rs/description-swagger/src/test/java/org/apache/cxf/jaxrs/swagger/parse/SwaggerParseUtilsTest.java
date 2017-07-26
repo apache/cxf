@@ -53,12 +53,12 @@ public class SwaggerParseUtilsTest extends Assert {
     //CHECKSTYLE:OFF
     private void verifyPetResource(UserResource ur) {
         assertNotNull(ur);
-        assertEquals("/pet", ur.getPath());
+        assertEquals("/", ur.getPath());
         assertEquals(8, ur.getOperations().size());
         //POST /pet
         UserOperation addPet = ur.getOperations().get(0);
         assertEquals("addPet", addPet.getName());
-        assertEquals("/", addPet.getPath());
+        assertEquals("/pet", addPet.getPath());
         assertEquals("POST", addPet.getVerb());
         assertEquals("application/xml,application/json", addPet.getProduces());
         assertEquals("application/json,application/xml", addPet.getConsumes());
@@ -72,7 +72,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //PUT /pet
         UserOperation putPet = ur.getOperations().get(1);
         assertEquals("updatePet", putPet.getName());
-        assertEquals("/", putPet.getPath());
+        assertEquals("/pet", putPet.getPath());
         assertEquals("PUT", putPet.getVerb());
         assertEquals("application/xml,application/json", addPet.getProduces());
         assertEquals("application/json,application/xml", addPet.getConsumes());
@@ -86,7 +86,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //GET /pet/findByStatus
         UserOperation findPetsByStatus = ur.getOperations().get(2);
         assertEquals("findPetsByStatus", findPetsByStatus.getName());
-        assertEquals("/findByStatus", findPetsByStatus.getPath());
+        assertEquals("/pet/findByStatus", findPetsByStatus.getPath());
         assertEquals("GET", findPetsByStatus.getVerb());
         assertEquals("application/xml,application/json", findPetsByStatus.getProduces());
         assertNull(findPetsByStatus.getConsumes());
@@ -100,7 +100,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //GET /pet/findByTag
         UserOperation findPetsByTags = ur.getOperations().get(3);
         assertEquals("findPetsByTags", findPetsByTags.getName());
-        assertEquals("/findByTags", findPetsByTags.getPath());
+        assertEquals("/pet/findByTags", findPetsByTags.getPath());
         assertEquals("GET", findPetsByTags.getVerb());
         assertEquals("application/xml,application/json", findPetsByTags.getProduces());
         assertNull(findPetsByTags.getConsumes());
@@ -114,7 +114,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //GET /pet/{petId}
         UserOperation getPetById = ur.getOperations().get(4);
         assertEquals("getPetById", getPetById.getName());
-        assertEquals("/{petId}", getPetById.getPath());
+        assertEquals("/pet/{petId}", getPetById.getPath());
         assertEquals("GET", getPetById.getVerb());
         assertEquals("application/xml,application/json", getPetById.getProduces());
         assertNull(getPetById.getConsumes());
@@ -127,7 +127,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //POST /pet/{petId}
         UserOperation updatePetWithForm = ur.getOperations().get(5);
         assertEquals("updatePetWithForm", updatePetWithForm.getName());
-        assertEquals("/{petId}", updatePetWithForm.getPath());
+        assertEquals("/pet/{petId}", updatePetWithForm.getPath());
         assertEquals("POST", updatePetWithForm.getVerb());
         assertEquals("application/xml,application/json", updatePetWithForm.getProduces());
         assertEquals("application/x-www-form-urlencoded", updatePetWithForm.getConsumes());
@@ -148,7 +148,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //DELETE /pet/{petId}
         UserOperation deletePet = ur.getOperations().get(6);
         assertEquals("deletePet", deletePet.getName());
-        assertEquals("/{petId}", deletePet.getPath());
+        assertEquals("/pet/{petId}", deletePet.getPath());
         assertEquals("DELETE", deletePet.getVerb());
         assertEquals("application/xml,application/json", deletePet.getProduces());
         assertNull(deletePet.getConsumes());
@@ -165,7 +165,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //POST /pet/{petId}/uploadImage
         UserOperation uploadFile = ur.getOperations().get(7);
         assertEquals("uploadFile", uploadFile.getName());
-        assertEquals("/{petId}/uploadImage", uploadFile.getPath());
+        assertEquals("/pet/{petId}/uploadImage", uploadFile.getPath());
         assertEquals("POST", uploadFile.getVerb());
         assertEquals("application/json", uploadFile.getProduces());
         assertEquals("multipart/form-data", uploadFile.getConsumes());
@@ -188,12 +188,12 @@ public class SwaggerParseUtilsTest extends Assert {
     //CHECKSTYLE:OFF
     private void verifyPetUserResource(UserResource ur) {
         assertNotNull(ur);
-        assertEquals("/user", ur.getPath());
+        assertEquals("/", ur.getPath());
         assertEquals(8, ur.getOperations().size());
         //POST /user
         UserOperation createUser = ur.getOperations().get(0);
         assertEquals("createUser", createUser.getName());
-        assertEquals("/", createUser.getPath());
+        assertEquals("/user", createUser.getPath());
         assertEquals("POST", createUser.getVerb());
         assertEquals("application/xml,application/json", createUser.getProduces());
         assertNull(createUser.getConsumes());
@@ -207,7 +207,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //POST /user/createWithArray
         UserOperation createWithArray = ur.getOperations().get(1);
         assertEquals("createUsersWithArrayInput", createWithArray.getName());
-        assertEquals("/createWithArray", createWithArray.getPath());
+        assertEquals("/user/createWithArray", createWithArray.getPath());
         assertEquals("POST", createUser.getVerb());
         assertEquals("application/xml,application/json", createUser.getProduces());
         assertNull(createWithArray.getConsumes());
@@ -221,7 +221,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //POST /user/createWithList
         UserOperation createWithList = ur.getOperations().get(2);
         assertEquals("createUsersWithListInput", createWithList.getName());
-        assertEquals("/createWithList", createWithList.getPath());
+        assertEquals("/user/createWithList", createWithList.getPath());
         assertEquals("POST", createWithList.getVerb());
         assertEquals("application/xml,application/json", createWithList.getProduces());
         assertNull(createWithList.getConsumes());
@@ -235,7 +235,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //GET /user/login
         UserOperation loginUser = ur.getOperations().get(3);
         assertEquals("loginUser", loginUser.getName());
-        assertEquals("/login", loginUser.getPath());
+        assertEquals("/user/login", loginUser.getPath());
         assertEquals("GET", loginUser.getVerb());
         assertEquals("application/xml,application/json", loginUser.getProduces());
         assertNull(loginUser.getConsumes());
@@ -253,7 +253,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //GET /user/logout
         UserOperation logoutUser = ur.getOperations().get(4);
         assertEquals("logoutUser", logoutUser.getName());
-        assertEquals("/logout", logoutUser.getPath());
+        assertEquals("/user/logout", logoutUser.getPath());
         assertEquals("GET", loginUser.getVerb());
         assertEquals("application/xml,application/json", logoutUser.getProduces());
         assertNull(logoutUser.getConsumes());
@@ -263,7 +263,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //GET /user/{username}
         UserOperation getUserByName = ur.getOperations().get(5);
         assertEquals("getUserByName", getUserByName.getName());
-        assertEquals("/{username}", getUserByName.getPath());
+        assertEquals("/user/{username}", getUserByName.getPath());
         assertEquals("GET", getUserByName.getVerb());
         assertEquals("application/xml,application/json", getUserByName.getProduces());
         assertNull(getUserByName.getConsumes());
@@ -277,7 +277,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //PUT /user/{username}
         UserOperation updateUser = ur.getOperations().get(6);
         assertEquals("updateUser", updateUser.getName());
-        assertEquals("/{username}", updateUser.getPath());
+        assertEquals("/user/{username}", updateUser.getPath());
         assertEquals("PUT", updateUser.getVerb());
         assertEquals("application/xml,application/json", updateUser.getProduces());
         assertNull(updateUser.getConsumes());
@@ -295,7 +295,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //DELETE /user/{username}
         UserOperation deleteUser = ur.getOperations().get(7);
         assertEquals("deleteUser", deleteUser.getName());
-        assertEquals("/{username}", deleteUser.getPath());
+        assertEquals("/user/{username}", deleteUser.getPath());
         assertEquals("DELETE", deleteUser.getVerb());
         assertEquals("application/xml,application/json", deleteUser.getProduces());
         assertNull(deleteUser.getConsumes());
@@ -309,12 +309,12 @@ public class SwaggerParseUtilsTest extends Assert {
     //CHECKSTYLE:ON
     private void verifyPetStoreResource(UserResource ur) {
         assertNotNull(ur);
-        assertEquals("/store", ur.getPath());
+        assertEquals("/", ur.getPath());
         assertEquals(4, ur.getOperations().size());
         //GET /store/inventory
         UserOperation getInv = ur.getOperations().get(0);
         assertEquals("getInventory", getInv.getName());
-        assertEquals("/inventory", getInv.getPath());
+        assertEquals("/store/inventory", getInv.getPath());
         assertEquals("GET", getInv.getVerb());
         assertEquals("application/json", getInv.getProduces());
         assertNull(getInv.getConsumes());
@@ -324,7 +324,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //POST /store/inventory
         UserOperation placeOrder = ur.getOperations().get(1);
         assertEquals("placeOrder", placeOrder.getName());
-        assertEquals("/order", placeOrder.getPath());
+        assertEquals("/store/order", placeOrder.getPath());
         assertEquals("POST", placeOrder.getVerb());
         assertEquals("application/xml,application/json", placeOrder.getProduces());
         assertNull(placeOrder.getConsumes());
@@ -338,7 +338,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //GET /store/order/{orderId}
         UserOperation getOrderById = ur.getOperations().get(2);
         assertEquals("getOrderById", getOrderById.getName());
-        assertEquals("/order/{orderId}", getOrderById.getPath());
+        assertEquals("/store/order/{orderId}", getOrderById.getPath());
         assertEquals("GET", getOrderById.getVerb());
         assertEquals("application/xml,application/json", getOrderById.getProduces());
         assertNull(getOrderById.getConsumes());
@@ -352,7 +352,7 @@ public class SwaggerParseUtilsTest extends Assert {
         //DELETE /store/order/{orderId}
         UserOperation deleteOrder = ur.getOperations().get(3);
         assertEquals("deleteOrder", deleteOrder.getName());
-        assertEquals("/order/{orderId}", deleteOrder.getPath());
+        assertEquals("/store/order/{orderId}", deleteOrder.getPath());
         assertEquals("DELETE", deleteOrder.getVerb());
         assertEquals("application/xml,application/json", deleteOrder.getProduces());
         assertNull(deleteOrder.getConsumes());
@@ -376,11 +376,11 @@ public class SwaggerParseUtilsTest extends Assert {
 
         UserResource ur = map.get("sayHello");
         assertNotNull(ur);
-        assertEquals("/sayHello", ur.getPath());
+        assertEquals("/", ur.getPath());
         assertEquals(1, ur.getOperations().size());
         UserOperation op = ur.getOperations().get(0);
         assertEquals("sayHello", op.getName());
-        assertEquals("/{a}", op.getPath());
+        assertEquals("/sayHello/{a}", op.getPath());
         assertEquals("GET", op.getVerb());
         assertEquals("text/plain", op.getProduces());
 
@@ -392,11 +392,53 @@ public class SwaggerParseUtilsTest extends Assert {
 
         UserResource ur2 = map.get("sayHello2");
         assertNotNull(ur2);
-        assertEquals("/sayHello2", ur2.getPath());
+        assertEquals("/", ur2.getPath());
         assertEquals(1, ur2.getOperations().size());
         UserOperation op2 = ur2.getOperations().get(0);
         assertEquals("sayHello", op2.getName());
-        assertEquals("/{a}", op2.getPath());
+        assertEquals("/sayHello2/{a}", op2.getPath());
+        assertEquals("GET", op2.getVerb());
+        assertEquals("text/plain", op2.getProduces());
+
+        assertEquals(1, op2.getParameters().size());
+        Parameter param2 = op.getParameters().get(0);
+        assertEquals("a", param2.getName());
+        assertEquals(ParameterType.PATH, param2.getType());
+        assertEquals(String.class, param2.getJavaType());
+
+    }
+    
+    @Test
+    public void testConvertSimpleDocTagAndPathMismatchToUserApp() {
+        UserApplication ap = SwaggerParseUtils.getUserApplication("/swagger20TagsPathsMismatch.json");
+        assertNotNull(ap);
+        assertEquals("/services/helloservice", ap.getBasePath());
+        Map<String, UserResource> map = ap.getResourcesAsMap();
+        assertEquals(2, map.size());
+
+        UserResource ur = map.get("sayHello");
+        assertNotNull(ur);
+        assertEquals("/", ur.getPath());
+        assertEquals(1, ur.getOperations().size());
+        UserOperation op = ur.getOperations().get(0);
+        assertEquals("sayHello", op.getName());
+        assertEquals("/sayHi/{a}", op.getPath());
+        assertEquals("GET", op.getVerb());
+        assertEquals("text/plain", op.getProduces());
+
+        assertEquals(1, op.getParameters().size());
+        Parameter param1 = op.getParameters().get(0);
+        assertEquals("a", param1.getName());
+        assertEquals(ParameterType.PATH, param1.getType());
+        assertEquals(String.class, param1.getJavaType());
+
+        UserResource ur2 = map.get("sayHello2");
+        assertNotNull(ur2);
+        assertEquals("/", ur2.getPath());
+        assertEquals(1, ur2.getOperations().size());
+        UserOperation op2 = ur2.getOperations().get(0);
+        assertEquals("sayHello", op2.getName());
+        assertEquals("/sayHi2/{a}", op2.getPath());
         assertEquals("GET", op2.getVerb());
         assertEquals("text/plain", op2.getProduces());
 
