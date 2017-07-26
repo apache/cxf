@@ -65,6 +65,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
+@SuppressWarnings("resource") // Responses built in this test don't need to be closed
 public class ResponseImplTest extends Assert {
 
     @Test
@@ -402,27 +403,27 @@ public class ResponseImplTest extends Assert {
 
     @Test
     public void testGetLinksNoRel() {
-        ResponseImpl ri = new ResponseImpl(200);
-        MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
-        ri.addMetadata(meta);
-
-        Set<Link> links = ri.getLinks();
-        assertTrue(links.isEmpty());
-
-        meta.add(HttpHeaders.LINK, "<http://next>");
-        meta.add(HttpHeaders.LINK, "<http://prev>");
-
-        assertFalse(ri.hasLink("next"));
-        Link next = ri.getLink("next");
-        assertNull(next);
-        assertFalse(ri.hasLink("prev"));
-        Link prev = ri.getLink("prev");
-        assertNull(prev);
-
-        links = ri.getLinks();
-        assertTrue(links.contains(Link.fromUri("http://next").build()));
-        assertTrue(links.contains(Link.fromUri("http://prev").build()));
-
+        try (ResponseImpl ri = new ResponseImpl(200)) {
+            MetadataMap<String, Object> meta = new MetadataMap<String, Object>();
+            ri.addMetadata(meta);
+    
+            Set<Link> links = ri.getLinks();
+            assertTrue(links.isEmpty());
+    
+            meta.add(HttpHeaders.LINK, "<http://next>");
+            meta.add(HttpHeaders.LINK, "<http://prev>");
+    
+            assertFalse(ri.hasLink("next"));
+            Link next = ri.getLink("next");
+            assertNull(next);
+            assertFalse(ri.hasLink("prev"));
+            Link prev = ri.getLink("prev");
+            assertNull(prev);
+    
+            links = ri.getLinks();
+            assertTrue(links.contains(Link.fromUri("http://next").build()));
+            assertTrue(links.contains(Link.fromUri("http://prev").build()));
+        }
     }
 
     public static class StringBean {

@@ -378,8 +378,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     List<WSSecurityEngineResult> encryptResults = wsResult.getActionResults().get(WSConstants.ENCR);
                     if (encryptResults != null) {
                         for (WSSecurityEngineResult result : wsResult.getActionResults().get(WSConstants.ENCR)) {
-                            for (WSDataRef dataRef
-                                : (List<WSDataRef>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS)) {
+                            List<WSDataRef> dataRefs = CastUtils.cast((List<?>)result
+                                                                      .get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+                            for (WSDataRef dataRef : dataRefs) {
                                 if (dataRef.getProtectedElement() == node) {
                                     dataRef.setProtectedElement((Element)newNode);
                                 }
@@ -398,8 +399,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                         signedResults.addAll(wsResult.getActionResults().get(WSConstants.ST_SIGNED));
                     }
                     for (WSSecurityEngineResult result : signedResults) {
-                        for (WSDataRef dataRef
-                            : (List<WSDataRef>)result.get(WSSecurityEngineResult.TAG_DATA_REF_URIS)) {
+                        List<WSDataRef> dataRefs = CastUtils.cast((List<?>)result
+                                                                  .get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
+                        for (WSDataRef dataRef :dataRefs) {
                             if (dataRef.getProtectedElement() == node) {
                                 dataRef.setProtectedElement((Element)newNode);
                             }

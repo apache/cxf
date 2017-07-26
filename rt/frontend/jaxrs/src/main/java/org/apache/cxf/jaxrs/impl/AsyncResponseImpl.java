@@ -270,6 +270,7 @@ public class AsyncResponseImpl implements AsyncResponse, ContinuationCallback {
         }
     }
 
+    @SuppressWarnings("resource") // Response that is built here shouldn't be closed here
     public Object getResponseObject() {
         Object obj = cont.getObject();
         if (!(obj instanceof Response) && !(obj instanceof Throwable)) {
