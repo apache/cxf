@@ -76,9 +76,7 @@ public class UserResource {
     }
 
     public void setName(String name) {
-        if (!StringUtils.isEmpty(name)) {
-            className = name;
-        }
+        className = name;
     }
 
     public String getPath() {

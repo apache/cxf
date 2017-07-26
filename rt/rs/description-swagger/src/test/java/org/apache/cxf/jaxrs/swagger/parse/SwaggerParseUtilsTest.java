@@ -33,7 +33,7 @@ import org.junit.Test;
 public class SwaggerParseUtilsTest extends Assert {
 
     @Test
-    public void testConvertSwaggerPetShopToUserApp() {
+    public void testConvertPetShopDocToUserApp() {
         UserApplication ap = SwaggerParseUtils.getUserApplication("/swagger2petShop.json");
         assertNotNull(ap);
         assertEquals("/v2", ap.getBasePath());
@@ -367,7 +367,7 @@ public class SwaggerParseUtilsTest extends Assert {
     
     
     @Test
-    public void testConvertSwaggerToUserApp() {
+    public void testConvertSimpleDocToUserApp() {
         UserApplication ap = SwaggerParseUtils.getUserApplication("/swagger20.json");
         assertNotNull(ap);
         assertEquals("/services/helloservice", ap.getBasePath());
@@ -397,6 +397,44 @@ public class SwaggerParseUtilsTest extends Assert {
         UserOperation op2 = ur2.getOperations().get(0);
         assertEquals("sayHello", op2.getName());
         assertEquals("/{a}", op2.getPath());
+        assertEquals("GET", op2.getVerb());
+        assertEquals("text/plain", op2.getProduces());
+
+        assertEquals(1, op2.getParameters().size());
+        Parameter param2 = op.getParameters().get(0);
+        assertEquals("a", param2.getName());
+        assertEquals(ParameterType.PATH, param2.getType());
+        assertEquals(String.class, param2.getJavaType());
+
+    }
+    
+    @Test
+    public void testConvertSimpleDocNoTagsToUserApp() {
+        UserApplication ap = SwaggerParseUtils.getUserApplication("/swagger20NoTags.json");
+        assertNotNull(ap);
+        assertEquals("/services/helloservice", ap.getBasePath());
+        Map<String, UserResource> map = ap.getResourcesAsMap();
+        assertEquals(1, map.size());
+
+        UserResource ur = map.get("");
+        assertNotNull(ur);
+        assertEquals("/", ur.getPath());
+        assertEquals(2, ur.getOperations().size());
+        UserOperation op = ur.getOperations().get(0);
+        assertEquals("sayHello", op.getName());
+        assertEquals("/sayHello/{a}", op.getPath());
+        assertEquals("GET", op.getVerb());
+        assertEquals("text/plain", op.getProduces());
+
+        assertEquals(1, op.getParameters().size());
+        Parameter param1 = op.getParameters().get(0);
+        assertEquals("a", param1.getName());
+        assertEquals(ParameterType.PATH, param1.getType());
+        assertEquals(String.class, param1.getJavaType());
+
+        UserOperation op2 = ur.getOperations().get(1);
+        assertEquals("sayHello2", op2.getName());
+        assertEquals("/sayHello2/{a}", op2.getPath());
         assertEquals("GET", op2.getVerb());
         assertEquals("text/plain", op2.getProduces());
 
