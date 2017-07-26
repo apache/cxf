@@ -113,6 +113,7 @@ public final class SwaggerParseUtils {
         } else {
             tags.add("");
         }
+        
         for (String tag : tags) {
             userOpsMap.put(tag, new LinkedList<UserOperation>());
         }
@@ -130,9 +131,10 @@ public final class SwaggerParseUtils {
                 
                 Map<String, Object> oper = CastUtils.cast((Map<?, ?>)operEntry.getValue());
                 List<String> opTags = CastUtils.cast((List<?>)oper.get("tags"));
-                String opTag = opTags == null ? "" : opTags.get(0);
-                
-                String realOpPath = operPath.equals("/" + opTag) ? "/" : operPath.substring(opTag.length() + 1);
+                String opTag = tagsProp == null || opTags == null ? "" : opTags.get(0);
+
+                String realOpPath = operPath.equals("/" + opTag) ? "/" 
+                    : tagsProp != null ? operPath.substring(opTag.length() + 1) : operPath;
                 userOp.setPath(realOpPath);
                 
                 userOp.setName((String)oper.get("operationId"));
