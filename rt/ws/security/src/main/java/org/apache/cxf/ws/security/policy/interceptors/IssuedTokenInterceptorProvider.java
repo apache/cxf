@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +29,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.w3c.dom.CDATASection;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
@@ -64,36 +69,37 @@ import org.apache.ws.security.message.token.BinarySecurity;
 import org.apache.ws.security.saml.SAMLKeyInfo;
 import org.apache.ws.security.saml.ext.AssertionWrapper;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.utils.Base64;
 
 /**
- * 
+ *
  */
 public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
-    
+
     private static final long serialVersionUID = -6936475570762840527L;
-    private static final String ASSOCIATED_TOKEN = 
+    private static final String ASSOCIATED_TOKEN =
         IssuedTokenInterceptorProvider.class.getName() + "-" + "Associated_Token";
 
     public IssuedTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.ISSUED_TOKEN, SP12Constants.ISSUED_TOKEN));
-        
+
         //issued tokens can be attached as a supporting token without
         //any type of binding.  Make sure we can support that.
         this.getOutInterceptors().add(PolicyBasedWSS4JOutInterceptor.INSTANCE);
         this.getOutFaultInterceptors().add(PolicyBasedWSS4JOutInterceptor.INSTANCE);
         this.getInInterceptors().add(PolicyBasedWSS4JInInterceptor.INSTANCE);
         this.getInFaultInterceptors().add(PolicyBasedWSS4JInInterceptor.INSTANCE);
-        
+
         this.getOutInterceptors().add(new IssuedTokenOutInterceptor());
         this.getOutFaultInterceptors().add(new IssuedTokenOutInterceptor());
         this.getInInterceptors().add(new IssuedTokenInInterceptor());
         this.getInFaultInterceptors().add(new IssuedTokenInInterceptor());
     }
-    
+
     static final TokenStore createTokenStore(Message message) {
         EndpointInfo info = message.getExchange().get(Endpoint.class).getEndpointInfo();
         synchronized (info) {
-            TokenStore tokenStore = 
+            TokenStore tokenStore =
                 (TokenStore)message.getContextualProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
             if (tokenStore == null) {
                 tokenStore = (TokenStore)info.getProperty(SecurityConstants.TOKEN_STORE_CACHE_INSTANCE);
@@ -121,7 +127,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
     static class IssuedTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         public IssuedTokenOutInterceptor() {
             super(Phase.PREPARE_SEND);
-        }    
+        }
         private static void mapSecurityProps(Message message, Map<String, Object> ctx) {
             for (String s : SecurityConstants.ALL_PROPERTIES) {
                 Object v = message.getContextualProperty(s + ".it");
@@ -143,7 +149,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 }
                 if (isRequestor(message)) {
                     IssuedToken itok = (IssuedToken)ais.iterator().next().getAssertion();
-                    
+
                     SecurityToken tok = retrieveCachedToken(message);
                     if (tok == null) {
                         tok = issueToken(message, aim, itok);
@@ -154,7 +160,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                         for (AssertionInfo ai : ais) {
                             ai.setAsserted(true);
                         }
-                        boolean cacheIssuedToken = 
+                        boolean cacheIssuedToken =
                             MessageUtils.getContextualBoolean(
                                 message, SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, true
                             );
@@ -162,7 +168,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                             message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN, tok);
                             message.getExchange().put(SecurityConstants.TOKEN, tok);
                             message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getId());
-                            message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, 
+                            message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID,
                                                                           tok.getId());
                         } else {
                             message.put(SecurityConstants.TOKEN, tok);
@@ -174,7 +180,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     //server side should be checked on the way in
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
-                    }                    
+                    }
                 }
             }
         }
@@ -192,9 +198,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
             return (Trust13)ais.iterator().next().getAssertion();
         }
-        
+
         private SecurityToken retrieveCachedToken(Message message) {
-            boolean cacheIssuedToken = 
+            boolean cacheIssuedToken =
                 MessageUtils.getContextualBoolean(
                     message, SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, true
                 );
@@ -218,12 +224,12 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
             return tok;
         }
-        
+
         /**
          * Parse ActAs/OnBehalfOf appropriately. See if the required token is stored in the cache.
          */
         private SecurityToken handleDelegation(
-            Message message, 
+            Message message,
             Element onBehalfOfToken,
             Element actAsToken,
             String appliesTo,
@@ -250,7 +256,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     }
                 }
             }
-            
+
             // See if the token corresponding to the ActAs Token is stored in the cache
             // and if it points to an issued token
             if (actAsToken != null) {
@@ -269,21 +275,70 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
             return null;
         }
-        
+
         private String getIdFromToken(Element token) {
             if (token != null) {
-                // Try to find the "Id" on the token.
-                if (token.hasAttributeNS(WSConstants.WSU_NS, "Id")) {
-                    return token.getAttributeNS(WSConstants.WSU_NS, "Id");
-                } else if (token.hasAttributeNS(null, "ID")) {
+                // For SAML tokens get the ID/AssertionID
+                if ("Assertion".equals(token.getLocalName())
+                    && WSConstants.SAML2_NS.equals(token.getNamespaceURI())) {
                     return token.getAttributeNS(null, "ID");
-                } else if (token.hasAttributeNS(null, "AssertionID")) {
+                } else if ("Assertion".equals(token.getLocalName())
+                    && WSConstants.SAML_NS.equals(token.getNamespaceURI())) {
                     return token.getAttributeNS(null, "AssertionID");
+                }
+
+                // For UsernameTokens get the username
+                if (WSConstants.USERNAME_TOKEN_LN.equals(token.getLocalName())
+                    && WSConstants.WSSE_NS.equals(token.getNamespaceURI())) {
+                    Element usernameElement =
+                        WSSecurityUtil.getDirectChildElement(token, WSConstants.USERNAME_LN, WSConstants.WSSE_NS);
+                    if (usernameElement != null) {
+                        return nodeString(usernameElement);
+                    }
+                }
+
+                // For BinarySecurityTokens take the hash of the value
+                if (WSConstants.BINARY_TOKEN_LN.equals(token.getLocalName())
+                    && WSConstants.WSSE_NS.equals(token.getNamespaceURI())) {
+                    String text = nodeString(token);
+                    if (text != null && !"".equals(text)) {
+                        try {
+                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                            byte[] bytes = digest.digest(text.getBytes());
+                            return Base64.encode(bytes);
+                        } catch (NoSuchAlgorithmException e) {
+                            // SHA-256 must be supported so not going to happen...
+                        }
+                    }
                 }
             }
             return "";
         }
-        
+
+        private String nodeString(Element e) {
+            if (e != null) {
+                Node node = e.getFirstChild();
+                StringBuilder builder = new StringBuilder();
+                boolean found = false;
+                while (node != null) {
+                    if (Node.TEXT_NODE == node.getNodeType()) {
+                        found = true;
+                        builder.append(((Text)node).getData());
+                    } else if (Node.CDATA_SECTION_NODE == node.getNodeType()) {
+                        found = true;
+                        builder.append(((CDATASection)node).getData());
+                    }
+                    node = node.getNextSibling();
+                }
+
+                if (!found) {
+                    return null;
+                }
+                return builder.toString();
+            }
+            return null;
+        }
+
         private void storeDelegationTokens(
             Message message,
             SecurityToken issuedToken,
@@ -331,7 +386,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 tokenStore.add(cachedToken);
             }
         }
-        
+
         private SecurityToken getTokenFromSTS(
             Message message,
             STSClient client,
@@ -355,9 +410,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
             return client.requestSecurityToken(appliesTo);
         }
-        
+
         private SecurityToken renewToken(
-            Message message, 
+            Message message,
             AssertionInfoMap aim,
             IssuedToken itok,
             SecurityToken tok
@@ -366,21 +421,21 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             if (!tok.isExpired()) {
                 return tok;
             }
-            
+
             // Remove token from cache
             message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN);
             message.getExchange().get(Endpoint.class).remove(SecurityConstants.TOKEN_ID);
             message.getExchange().remove(SecurityConstants.TOKEN_ID);
             message.getExchange().remove(SecurityConstants.TOKEN);
             NegotiationUtils.getTokenStore(message).remove(tok.getId());
-            
+
             // If the user has explicitly disabled Renewing then we can't renew a token,
             // so just get a new one
             STSClient client = STSUtils.getClient(message, "sts", itok);
             if (!client.isAllowRenewing()) {
                 return issueToken(message, aim, itok);
             }
-            
+
             AddressingProperties maps =
                 (AddressingProperties)message
                     .get("javax.xml.ws.addressing.context.outbound");
@@ -392,16 +447,16 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 try {
                     Map<String, Object> ctx = client.getRequestContext();
                     mapSecurityProps(message, ctx);
-                
+
                     client.setMessage(message);
 
                     if (maps != null) {
                         client.setAddressingNamespace(maps.getNamespaceURI());
                     }
-                    
+
                     client.setTrust(getTrust10(aim));
                     client.setTrust(getTrust13(aim));
-                    
+
                     client.setTemplate(itok.getRstTemplate());
                     return client.renewSecurityToken(tok);
                 } catch (RuntimeException e) {
@@ -416,9 +471,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 }
             }
         }
-        
+
         private SecurityToken issueToken(
-             Message message, 
+             Message message,
              AssertionInfoMap aim,
              IssuedToken itok
         ) {
@@ -433,31 +488,31 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             synchronized (client) {
                 try {
                     // Transpose ActAs/OnBehalfOf info from original request to the STS client.
-                    Object token = 
+                    Object token =
                         message.getContextualProperty(SecurityConstants.STS_TOKEN_ACT_AS);
                     if (token != null) {
                         client.setActAs(token);
                     }
-                    token = 
+                    token =
                         message.getContextualProperty(SecurityConstants.STS_TOKEN_ON_BEHALF_OF);
                     if (token != null) {
                         client.setOnBehalfOf(token);
                     }
                     Map<String, Object> ctx = client.getRequestContext();
                     mapSecurityProps(message, ctx);
-                
+
                     Object o = message.getContextualProperty(SecurityConstants.STS_APPLIES_TO);
                     String appliesTo = o == null ? null : o.toString();
-                    appliesTo = appliesTo == null 
+                    appliesTo = appliesTo == null
                         ? message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString()
                             : appliesTo;
                     boolean enableAppliesTo = client.isEnableAppliesTo();
-                    
+
                     client.setMessage(message);
                     Element onBehalfOfToken = client.getOnBehalfOfToken();
                     Element actAsToken = client.getActAsToken();
-                    
-                    SecurityToken secToken = 
+
+                    SecurityToken secToken =
                         handleDelegation(
                             message, onBehalfOfToken, actAsToken, appliesTo, enableAppliesTo
                         );
@@ -480,9 +535,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 }
             }
         }
-        
+
     }
-    
+
     static class IssuedTokenInInterceptor extends AbstractPhaseInterceptor<Message> {
         public IssuedTokenInInterceptor() {
             super(Phase.PRE_PROTOCOL);
@@ -498,10 +553,10 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 if (ais == null) {
                     return;
                 }
-                
+
                 if (!isRequestor(message)) {
                     message.getExchange().remove(SecurityConstants.TOKEN);
-                    List<WSHandlerResult> results = 
+                    List<WSHandlerResult> results =
                         CastUtils.cast((List<?>)message.get(WSHandlerConstants.RECV_RESULTS));
                     if (results != null && results.size() > 0) {
                         parseHandlerResults(results.get(0), message, ais);
@@ -510,11 +565,11 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     //client side should be checked on the way out
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
-                    }                    
+                    }
                 }
             }
         }
-        
+
         private void parseHandlerResults(
             WSHandlerResult rResult,
             Message message,
@@ -524,8 +579,8 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             WSSecurityUtil.fetchAllActionResults(
                 rResult.getResults(), WSConstants.SIGN, signedResults
             );
-            
-            IssuedTokenPolicyValidator issuedValidator = 
+
+            IssuedTokenPolicyValidator issuedValidator =
                 new IssuedTokenPolicyValidator(signedResults, message);
 
             for (AssertionWrapper assertionWrapper : findSamlTokenResults(rResult.getResults())) {
@@ -545,7 +600,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 }
             }
         }
-        
+
         private List<AssertionWrapper> findSamlTokenResults(
             List<WSSecurityEngineResult> wsSecEngineResults
         ) {
@@ -559,21 +614,21 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             }
             return results;
         }
-        
+
         private List<BinarySecurity> findBinarySecurityTokenResults(
             List<WSSecurityEngineResult> wsSecEngineResults
         ) {
             List<BinarySecurity> results = new ArrayList<BinarySecurity>();
             for (WSSecurityEngineResult wser : wsSecEngineResults) {
                 Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                if (actInt.intValue() == WSConstants.BST 
+                if (actInt.intValue() == WSConstants.BST
                     && Boolean.TRUE.equals(wser.get(WSSecurityEngineResult.TAG_VALIDATED_TOKEN))) {
                     results.add((BinarySecurity)wser.get(WSSecurityEngineResult.TAG_BINARY_SECURITY_TOKEN));
                 }
             }
             return results;
         }
-        
+
         private SecurityToken createSecurityToken(
             AssertionWrapper assertionWrapper
         ) {
@@ -596,16 +651,16 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
 
             return token;
         }
-    
+
         private SecurityToken createSecurityToken(BinarySecurity binarySecurityToken) {
             SecurityToken token = new SecurityToken(binarySecurityToken.getID());
             token.setToken(binarySecurityToken.getElement());
             token.setSecret(binarySecurityToken.getToken());
             token.setTokenType(binarySecurityToken.getValueType());
-    
+
             return token;
         }
-        
+
     }
-        
+
 }

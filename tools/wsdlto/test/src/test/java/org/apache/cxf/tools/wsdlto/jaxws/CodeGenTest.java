@@ -52,6 +52,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class CodeGenTest extends AbstractCodeGenTest {
@@ -221,6 +222,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     }
 
     @Test
+    @Ignore("not supported by higher jvm")
     public void testHeaderFromAnotherMessage5() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/OutOfBandHeaderBug.wsdl"));
         env.put(ToolConstants.CFG_EXTRA_SOAPHEADER, "TRUE");
@@ -1205,6 +1207,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     }
 
     @Test
+    @Ignore("not supported by higher jvm")
     public void testRefTNS() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/locator.wsdl"));
         processor.setContext(env);
@@ -1255,6 +1258,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
     }
 
     @Test
+    @Ignore("not supported by higher jvm")
     public void testWsdlWithInvalidSchema() {
         try {
             env.put(ToolConstants.CFG_WSDLURL,
@@ -1263,6 +1267,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
             processor.setContext(env);
             processor.execute();
         } catch (Exception e) {
+            e.printStackTrace();
             assertTrue("Jaxb databinding can not find the schema error ",
                        e.getLocalizedMessage().indexOf(" cos-st-restricts.1.1: "
                                                        + "The type 'TpAny' is atomic") > -1);
