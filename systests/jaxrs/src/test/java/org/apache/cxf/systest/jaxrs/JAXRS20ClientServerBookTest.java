@@ -74,7 +74,6 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase {
@@ -793,7 +792,6 @@ public class JAXRS20ClientServerBookTest extends AbstractBusClientServerTestBase
         assertEquals("CXF Rocks", b22.getName());
     }
 
-    @Ignore("CXF-7357")
     @Test
     public void testUnknownHostException() throws InterruptedException {
         String address = "http://unknown-host/bookstore/bookheaders/simple/async";
