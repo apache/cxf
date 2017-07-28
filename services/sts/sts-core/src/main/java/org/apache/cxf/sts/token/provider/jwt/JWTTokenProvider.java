@@ -245,9 +245,12 @@ public class JWTTokenProvider implements TokenProvider {
                 }
             }
             // Get the password
-            WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
-            callbackHandler.handle(cb);
-            String password = cb[0].getPassword();
+            String password = null;
+            if (callbackHandler != null) {
+                WSPasswordCallback[] cb = {new WSPasswordCallback(alias, WSPasswordCallback.SIGNATURE)};
+                callbackHandler.handle(cb);
+                password = cb[0].getPassword();
+            }
 
             Properties signingProperties = new Properties();
 

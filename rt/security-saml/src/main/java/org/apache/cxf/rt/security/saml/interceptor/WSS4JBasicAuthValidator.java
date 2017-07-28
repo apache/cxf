@@ -48,7 +48,7 @@ import org.apache.wss4j.dom.validate.Validator;
 /**
  * An abstract class containing some functionality to validate a username + password received
  * via HTTP Basic Authentication via a WSS4J Validator (and hence JAAS, the STS, etc.). It can
- * be subclasses and used as a CXF interceptor or else via a JAX-RS ContainerRequestFilter.
+ * be subclassed and used as a CXF interceptor or else via a JAX-RS ContainerRequestFilter.
  */
 public abstract class WSS4JBasicAuthValidator {
 
