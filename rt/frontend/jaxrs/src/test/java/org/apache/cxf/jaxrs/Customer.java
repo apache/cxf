@@ -574,4 +574,4 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
             return entity;
         }
     }
-};
+}

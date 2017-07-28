@@ -340,6 +340,18 @@
                             <artifactId>cxf-buildtools</artifactId>
                             <version>${cxf.build-utils.version}</version>
                         </dependency>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>7.8.2</version>
+                            <exclusions>
+                                <!--  MCHECKSTYLE-156  -->
+                                <exclusion>
+                                    <groupId>com.sun</groupId>
+                                    <artifactId>tools</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
                     </dependencies>
                     <configuration>
                         <encoding>UTF-8</encoding>

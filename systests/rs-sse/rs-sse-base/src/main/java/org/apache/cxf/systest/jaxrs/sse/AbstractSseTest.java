@@ -51,7 +51,7 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
             .property(HttpHeaders.LAST_EVENT_ID_HEADER, 150);
         final Collection<Book> books = new ArrayList<>();
         
-        try (final SseEventSource eventSource = SseEventSource.target(target).build()) {
+        try (SseEventSource eventSource = SseEventSource.target(target).build()) {
             eventSource.register(collect(books), System.out::println);
             eventSource.open();
             // Give the SSE stream some time to collect all events
@@ -87,7 +87,7 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
         final WebTarget target = createWebTarget("/rest/api/bookstore/sse/0");
         final Collection<Book> books = new ArrayList<>();
         
-        try (final SseEventSource eventSource = SseEventSource.target(target).build()) {
+        try (SseEventSource eventSource = SseEventSource.target(target).build()) {
             eventSource.register(collect(books), System.out::println);
             eventSource.open();
             // Give the SSE stream some time to collect all events
@@ -123,7 +123,7 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
         final Collection<Book> books = new ArrayList<>();
         
         final Builder builder = SseEventSource.target(target).reconnectingEvery(1, TimeUnit.SECONDS);
-        try (final SseEventSource eventSource = builder.build()) {
+        try (SseEventSource eventSource = builder.build()) {
             eventSource.register(collect(books), System.out::println);
             eventSource.open();
             // Give the SSE stream some time to collect all events
