@@ -1883,13 +1883,13 @@ tryAgain:
 	}
 
 
-	private static final long[] mk_tokenSet_0() {
+	private static long[] mk_tokenSet_0() {
 		long[] data = new long[1025];
 		data[1]=576460743847706622L;
 		return data;
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
-	private static final long[] mk_tokenSet_1() {
+	private static long[] mk_tokenSet_1() {
 		long[] data = new long[2048];
 		data[0]=-1025L;
 		for (int i = 1; i<=1022; i++) { data[i]=-1L; }
@@ -1897,7 +1897,7 @@ tryAgain:
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
-	private static final long[] mk_tokenSet_2() {
+	private static long[] mk_tokenSet_2() {
 		long[] data = new long[2048];
 		data[0]=-140737488355329L;
 		for (int i = 1; i<=1022; i++) { data[i]=-1L; }
@@ -1905,7 +1905,7 @@ tryAgain:
 		return data;
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
-	private static final long[] mk_tokenSet_3() {
+	private static long[] mk_tokenSet_3() {
 		long[] data = new long[2048];
 		data[0]=-145135534867457L;
 		for (int i = 1; i<=1022; i++) { data[i]=-1L; }
@@ -1913,7 +1913,7 @@ tryAgain:
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
-	private static final long[] mk_tokenSet_4() {
+	private static long[] mk_tokenSet_4() {
 		long[] data = new long[2048];
 		data[0]=-4398046512129L;
 		for (int i = 1; i<=1022; i++) { data[i]=-1L; }
@@ -1921,7 +1921,7 @@ tryAgain:
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
-	private static final long[] mk_tokenSet_5() {
+	private static long[] mk_tokenSet_5() {
 		long[] data = new long[2048];
 		data[0]=-549755813889L;
 		data[1]=-268435457L;
@@ -1930,14 +1930,14 @@ tryAgain:
 		return data;
 	}
 	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
-	private static final long[] mk_tokenSet_6() {
+	private static long[] mk_tokenSet_6() {
 		long[] data = new long[1025];
 		data[0]=287948901175001088L;
 		data[1]=541165879422L;
 		return data;
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
-	private static final long[] mk_tokenSet_7() {
+	private static long[] mk_tokenSet_7() {
 		long[] data = new long[2048];
 		data[0]=-17179869185L;
 		data[1]=-268435457L;
