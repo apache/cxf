@@ -33,8 +33,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 
 public class ProviderCache {
-    private static final int MAX_PROVIDER_CACHE_SIZE = 
-        Integer.getInteger("org.apache.cxf.jaxrs.max_provider_cache_size", 100);
     private static final int MAX_PROVIDER_CACHE_SIZE =
         AccessController.doPrivileged(new PrivilegedAction<Integer>() {
             @Override
