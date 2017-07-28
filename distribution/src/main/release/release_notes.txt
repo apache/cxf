@@ -34,10 +34,15 @@ User applications may need to add additional dependencies into their
 applications in order to upgrade.
 
 
-2.6.16 will be the last release on the 2.6.x line.  This release only
-fixes some problems that were found trying to use 2.6.14 with Java 5.
-
-
+2.6.17 will be the last release on the 2.6.x line.  This release just 
+contains some fixes for the following security advisories:
+ 
+  - CVE-2014-3577
+  - CVE-2014-3623
+  - CVE-2015-5253
+  - CVE-2016-8739
+  - CVE-2016-6812
+  - CVE-2017-5656
 
 
 2. Installation Prerequisites 
