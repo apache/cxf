@@ -61,6 +61,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+@org.junit.Ignore
 public class WadlGeneratorTest extends Assert {
 
     private IMocksControl control;
