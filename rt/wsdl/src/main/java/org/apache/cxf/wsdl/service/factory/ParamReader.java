@@ -22,13 +22,20 @@ package org.apache.cxf.wsdl.service.factory;
 // import org.apache.axis.utils.Messages;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 /**
  * This is the class file reader for obtaining the parameter names for declared
@@ -42,10 +49,8 @@ import java.util.Map;
  * don't get tricky, it's the bare minimum. Instances of this class are not
  * threadsafe -- don't share them.
  */
-class ParamReader extends ClassReader {
-    private String methodName;
-    private Map<String, MethodInfo> methods = new HashMap<>();
-    private Class<?>[] paramTypes;
+class ParamReader {
+    private Map<Member, String[]> paramNames = new HashMap<>();
 
     /**
      * process a class file, given it's class. We'll use the defining
@@ -55,56 +60,29 @@ class ParamReader extends ClassReader {
      * @throws IOException
      */
     ParamReader(Class<?> c) throws IOException {
-        this(getBytes(c));
-    }
-
-    /**
-     * process the given class bytes directly.
-     *
-     * @param b
-     * @throws IOException
-     */
-    ParamReader(byte[] b) throws IOException {
-        super(b, findAttributeReaders(ParamReader.class));
-
-        // check the magic number
-        if (readInt() != 0xCAFEBABE) {
-            // not a class file!
-            throw new IOException();
+        final Map<String, ParameterNameExtractor> parameterNameExtractor = new HashMap<>();
+        for (Method method : c.getDeclaredMethods()) {
+            parameterNameExtractor.put(key(method.getName(), Type.getMethodDescriptor(method)),
+                    new ParameterNameExtractor(method, method.getParameterTypes()));
         }
-
-        readShort(); // minor version
-        readShort(); // major version
-
-        readCpool(); // slurp in the constant pool
-
-        readShort(); // access flags
-        readShort(); // this class name
-        readShort(); // super class name
-
-        int count = readShort(); // ifaces count
-        for (int i = 0; i < count; i++) {
-            readShort(); // interface index
+        for (Constructor<?> constructor : c.getDeclaredConstructors()) {
+            parameterNameExtractor.put(key("<init>", Type.getConstructorDescriptor(constructor)),
+                    new ParameterNameExtractor(constructor, constructor.getParameterTypes()));
         }
-
-        count = readShort(); // fields count
-        for (int i = 0; i < count; i++) {
-            readShort(); // access flags
-            readShort(); // name index
-            readShort(); // descriptor index
-            skipAttributes(); // field attributes
+        ClassReader reader;
+        try (InputStream in = c.getResourceAsStream(c.getSimpleName() + ".class")) {
+            reader = new ClassReader(in);
         }
-
-        count = readShort(); // methods count
-        for (int i = 0; i < count; i++) {
-            readShort(); // access flags
-            int m = readShort(); // name index
-            String name = resolveUtf8(m);
-            int d = readShort(); // descriptor index
-            this.methodName = name + resolveUtf8(d);
-            readAttributes(); // method attributes
+        reader.accept(new ClassVisitor(Opcodes.ASM5) {
+            @Override
+            public MethodVisitor visitMethod(int access, String name, String desc,
+                                             String signature, String[] exceptions) {
+                return parameterNameExtractor.get(key(name, desc));
+            }
+        }, 0);
+        for (ParameterNameExtractor e : parameterNameExtractor.values()) {
+            paramNames.put(e.member, e.parameterNames);
         }
-
     }
 
     /**
@@ -112,46 +90,11 @@ class ParamReader extends ClassReader {
      * unable to read parameter names (i.e. bytecode not built with debug).
      */
     static String[] getParameterNamesFromDebugInfo(Method method) {
-        // Don't worry about it if there are no params.
-        int numParams = method.getParameterTypes().length;
-        if (numParams == 0) {
-            return null;
-        }
-
-        // get declaring class
-        Class<?> c = method.getDeclaringClass();
-
-        // Don't worry about it if the class is a Java dynamic proxy
-        if (Proxy.isProxyClass(c)) {
-            return null;
-        }
-
         try {
-            // get the parameter names
-            try (ParamReader pr = new ParamReader(c)) {
-                return pr.getParameterNames(method);
-            }
+            return new ParamReader(method.getDeclaringClass()).getParameterNames(method);
         } catch (IOException e) {
-            // log it and leave
-            // log.info(Messages.getMessage("error00") + ":" + e);
             return null;
         }
-    }
-
-    public void readCode() throws IOException {
-        readShort(); // max stack
-        int maxLocals = readShort(); // max locals
-
-        MethodInfo info = new MethodInfo(maxLocals);
-        if (methods != null && methodName != null) {
-            methods.put(methodName, info);
-        }
-
-        skipFully(readInt()); // code
-        skipFully(8 * readShort()); // exception table
-        // read the code attributes (recursive). This is where
-        // we will find the LocalVariableTable attribute.
-        readAttributes();
     }
 
     /**
@@ -164,8 +107,7 @@ class ParamReader extends ClassReader {
      * @return String[] array of names, one per parameter, or null
      */
     public String[] getParameterNames(Constructor<?> ctor) {
-        paramTypes = ctor.getParameterTypes();
-        return getParameterNames(ctor, paramTypes);
+        return paramNames.get(ctor);
     }
 
     /**
@@ -178,77 +120,43 @@ class ParamReader extends ClassReader {
      * @return String[] array of names, one per parameter, or null
      */
     public String[] getParameterNames(Method method) {
-        paramTypes = method.getParameterTypes();
-        return getParameterNames(method, paramTypes);
+        return paramNames.get(method);
     }
 
-    protected String[] getParameterNames(Member member, Class<?>[] pTypes) {
-        // look up the names for this method
-        MethodInfo info = methods.get(getSignature(member, pTypes));
-
-        // we know all the local variable names, but we only need to return
-        // the names of the parameters.
-
-        if (info != null) {
-            String[] paramNames = new String[pTypes.length];
-            int j = Modifier.isStatic(member.getModifiers()) ? 0 : 1;
-
-            boolean found = false; // did we find any non-null names
-            for (int i = 0; i < paramNames.length; i++) {
-                if (info.names[j] != null) {
-                    found = true;
-                    paramNames[i] = info.names[j];
-                }
-                j++;
-                if (pTypes[i] == double.class || pTypes[i] == long.class) {
-                    // skip a slot for 64bit params
-                    j++;
-                }
-            }
-
-            if (found) {
-                return paramNames;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    private static class MethodInfo {
-        String[] names;
-
-        MethodInfo(int maxLocals) {
-            names = new String[maxLocals];
-        }
-    }
-
-    private MethodInfo getMethodInfo() {
-        MethodInfo info = null;
-        if (methods != null && methodName != null) {
-            info = methods.get(methodName);
-        }
-        return info;
+    private static String key(String memberName, String memberDescription) {
+        return memberName + ", " + memberDescription;
     }
 
     /**
-     * this is invoked when a LocalVariableTable attribute is encountered.
-     *
-     * @throws IOException
+     * ASM-method-visitor extracting the names of method-parameters from the debug-info
      */
-    public void readLocalVariableTable() throws IOException {
-        int len = readShort(); // table length
-        MethodInfo info = getMethodInfo();
-        for (int j = 0; j < len; j++) {
-            readShort(); // start pc
-            readShort(); // length
-            int nameIndex = readShort(); // name_index
-            readShort(); // descriptor_index
-            int index = readShort(); // local index
-            if (info != null) {
-                info.names[index] = resolveUtf8(nameIndex);
+    private static class ParameterNameExtractor extends MethodVisitor {
+        final Member member;
+        final String[] parameterNames;
+        private Map<Integer, Integer> varToParam = new TreeMap<>();
+
+        ParameterNameExtractor(Member member, Class<?>[] parameterTypes) {
+            super(Opcodes.ASM5);
+            this.member = member;
+            parameterNames = new String[parameterTypes.length];
+            int localVariableIndex = Modifier.isStatic(member.getModifiers()) ? 0 : 1;
+            for (int i = 0; i < parameterTypes.length; i++) {
+                varToParam.put(localVariableIndex, i);
+                localVariableIndex++;
+                Class t = parameterTypes[i];
+                if (Long.TYPE.equals(t) || Double.TYPE.equals(t)) {
+                    localVariableIndex++;
+                }
             }
+        }
+
+        @Override
+        public void visitLocalVariable(String name, String desc, String signature, Label start, Label end, int index) {
+            Integer parameterIndex = varToParam.get(index);
+            if (parameterIndex != null) {
+                parameterNames[parameterIndex] = name;
+            }
+            super.visitLocalVariable(name, desc, signature, start, end, index);
         }
     }
 }
