@@ -7,7 +7,7 @@ A SSE endpoint service is provided on URL http://localhost:8686/rest/stats/sse, 
 
   http://localhost:8686/rest/stats/sse
 
-Under the hood, embedded Tomcat 8.5 container is being used. The client is a simple 
+Under the hood, Undertow application container is being used. The client is a simple 
 SSE EventSource consumer which prints each event received in the console. 
 
 Building and running the demo using maven

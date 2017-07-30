@@ -14,7 +14,6 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <cxf.tomcat.version>8.5.16</cxf.tomcat.version>
     </properties>
 
     <dependencies>
@@ -47,21 +46,13 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-core</artifactId>
-            <version>${cxf.tomcat.version}</version>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-core</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
-            <version>${cxf.tomcat.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-websocket</artifactId>
-            <version>${cxf.tomcat.version}</version>
+            <groupId>io.undertow</groupId>
+            <artifactId>undertow-servlet</artifactId>
         </dependency>
 
         <dependency>

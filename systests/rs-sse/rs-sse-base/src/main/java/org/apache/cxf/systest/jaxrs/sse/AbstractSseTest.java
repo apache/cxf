@@ -39,9 +39,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 
 public abstract class AbstractSseTest extends AbstractSseBaseTest {
@@ -59,27 +57,14 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
         }
 
         // Easing the test verification here, it does not work well for Atm + Jetty
-        if (!isStrict()) {
-            if (!books.isEmpty()) {
-                assertThat(books, 
-                    anyOf(
-                        hasItem(new Book("New Book #151", 151)), 
-                        hasItem(new Book("New Book #152", 152)), 
-                        hasItem(new Book("New Book #153", 153)), 
-                        hasItem(new Book("New Book #154", 154))
-                    )
-                );
-            }
-        } else {
-            assertThat(books, 
-                hasItems(
-                    new Book("New Book #151", 151), 
-                    new Book("New Book #152", 152), 
-                    new Book("New Book #153", 153), 
-                    new Book("New Book #154", 154)
-                )
-            );
-        }
+        assertThat(books, 
+            hasItems(
+                new Book("New Book #151", 151), 
+                new Book("New Book #152", 152), 
+                new Book("New Book #153", 153), 
+                new Book("New Book #154", 154)
+            )
+        );
     }
 
     @Test
@@ -94,27 +79,14 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
             awaitEvents(5000, books, 4);
         }
         // Easing the test verification here, it does not work well for Atm + Jetty
-        if (!isStrict()) {
-            if (!books.isEmpty()) {
-                assertThat(books, 
-                    anyOf(
-                        hasItem(new Book("New Book #1", 1)), 
-                        hasItem(new Book("New Book #2", 2)), 
-                        hasItem(new Book("New Book #3", 3)), 
-                        hasItem(new Book("New Book #4", 4))
-                    )
-                );
-            }
-        } else {
-            assertThat(books, 
-                hasItems(
-                    new Book("New Book #1", 1), 
-                    new Book("New Book #2", 2), 
-                    new Book("New Book #3", 3), 
-                    new Book("New Book #4", 4)
-                )
-            );
-        }
+        assertThat(books, 
+            hasItems(
+                new Book("New Book #1", 1), 
+                new Book("New Book #2", 2), 
+                new Book("New Book #3", 3), 
+                new Book("New Book #4", 4)
+            )
+        );
     }
     
     @Test
@@ -130,37 +102,22 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
             awaitEvents(5000, books, 12);
         }
 
-        if (!isStrict()) {
-            if (!books.isEmpty()) {
-                assertThat(books, 
-                    anyOf(
-                        hasItem(new Book("New Book #1", 1)), 
-                        hasItem(new Book("New Book #5", 5)), 
-                        hasItem(new Book("New Book #6", 6)), 
-                        hasItem(new Book("New Book #10", 10)),
-                        hasItem(new Book("New Book #11", 11)), 
-                        hasItem(new Book("New Book #12", 12))
-                    )
-                );
-            }
-        } else {
-            assertThat(books, 
-                hasItems(
-                    new Book("New Book #1", 1), 
-                    new Book("New Book #2", 2), 
-                    new Book("New Book #3", 3), 
-                    new Book("New Book #4", 4),
-                    new Book("New Book #5", 5), 
-                    new Book("New Book #6", 6), 
-                    new Book("New Book #7", 7), 
-                    new Book("New Book #8", 8),
-                    new Book("New Book #9", 9), 
-                    new Book("New Book #10", 10), 
-                    new Book("New Book #11", 11), 
-                    new Book("New Book #12", 12)
-                )
-            );
-        }
+        assertThat(books, 
+            hasItems(
+                new Book("New Book #1", 1), 
+                new Book("New Book #2", 2), 
+                new Book("New Book #3", 3), 
+                new Book("New Book #4", 4),
+                new Book("New Book #5", 5), 
+                new Book("New Book #6", 6), 
+                new Book("New Book #7", 7), 
+                new Book("New Book #8", 8),
+                new Book("New Book #9", 9), 
+                new Book("New Book #10", 10), 
+                new Book("New Book #11", 11), 
+                new Book("New Book #12", 12)
+            )
+        );
     }
     
     @Test
@@ -203,14 +160,6 @@ public abstract class AbstractSseTest extends AbstractSseBaseTest {
         assertThat(Arrays.asList(books), hasItems(new Book("New Book #1", 1), new Book("New Book #2", 2)));
 
         r.close();
-    }
-    
-    /**
-     * Some test cases may fail under Jetty + Atm integration, the real cause(s) is 
-     * unknown yet. To make them pass, we easy the verification a bit.
-     */
-    protected boolean isStrict() {
-        return true;
     }
 
     private static Consumer<InboundSseEvent> collect(final Collection< Book > books) {

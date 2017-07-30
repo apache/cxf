@@ -17,32 +17,33 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.sse.jetty;
+package org.apache.cxf.systest.jaxrs.sse.undertow;
 
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.systest.jaxrs.sse.AbstractSseTest;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 
-public class JettyWarTest extends AbstractSseTest {
+public class UndertowEmbeddedTest extends AbstractSseTest {
     @Ignore
-    public static class EmbeddedJettyServer extends AbstractJettyServer {
-        public static final int PORT = allocatePortAsInt(EmbeddedJettyServer.class);
+    public static class EmbeddedTomcatServer extends AbstractUndertowServer {
+        public static final int PORT = allocatePortAsInt(EmbeddedTomcatServer.class);
 
-        public EmbeddedJettyServer() {
-            super("/jaxrs_sse", "/", PORT);
+        public EmbeddedTomcatServer() {
+            super("/", PORT);
         }
     }
 
     @BeforeClass
     public static void startServers() throws Exception {
         AbstractResourceInfo.clearAllMaps();
-        assertTrue("server did not launch correctly", launchServer(EmbeddedJettyServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(EmbeddedTomcatServer.class, true));
         createStaticBus();
     }
 
     @Override
     protected int getPort() {
-        return EmbeddedJettyServer.PORT;
+        return EmbeddedTomcatServer.PORT;
     }
+
 }

@@ -36,7 +36,7 @@ public final class StatsClient {
             .register(JacksonJsonProvider.class)
             .target("http://localhost:8686/rest/stats/sse");
         
-        try (final SseEventSource eventSource = SseEventSource.target(target).build()) {
+        try (SseEventSource eventSource = SseEventSource.target(target).build()) {
             eventSource.register(StatsClient::print, System.out::println);
             eventSource.open();
             // Give the SSE stream 5 seconds to collect all events

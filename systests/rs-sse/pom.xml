@@ -113,5 +113,6 @@
         <module>rs-sse-base</module>
         <module>rs-sse-tomcat</module>
         <module>rs-sse-jetty</module>
+        <module>rs-sse-undertow</module>
     </modules>
 </project>

@@ -38,18 +38,22 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResponse;
 import org.atmosphere.cpr.Broadcaster;
 
+import static org.atmosphere.cpr.ApplicationConfig.PROPERTY_USE_STREAM;
+
 public class SseAtmosphereEventSinkImpl implements SseEventSink {
     private static final Logger LOG = LogUtils.getL7dLogger(SseAtmosphereEventSinkImpl.class);
 
     private final AtmosphereResource resource;
     private final MessageBodyWriter<OutboundSseEvent> writer;
-
+    private final boolean usingStream;
+    
     private volatile boolean closed;
 
     public SseAtmosphereEventSinkImpl(final MessageBodyWriter<OutboundSseEvent> writer,
             final AtmosphereResource resource) {
         this.writer = writer;
         this.resource = resource;
+        this.usingStream = (Boolean)resource.getRequest().getAttribute(PROPERTY_USE_STREAM);
 
         if (!resource.isSuspended()) {
             LOG.fine("Atmosphere resource is not suspended, suspending");
@@ -73,17 +77,20 @@ public class SseAtmosphereEventSinkImpl implements SseEventSink {
 
             try {
                 final AtmosphereResponse response = resource.getResponse();
-                if (!response.isCommitted()) {
-                    LOG.fine("Response is not committed, flushing buffer");
-                    try {
-                        response.flushBuffer();
-                    } catch (IOException ex) {
-                        //REVISIT: and throw a runtime exception ?
-                        LOG.warning("Failed to flush AtmosphereResponse buffer");
-                    }
+                
+                try {
+                    // The resource's request property is null here, we have to
+                    // rely on initial request to understand what to close, response
+                    // or stream.
+                    if (usingStream) {
+                        response.getOutputStream().close();
+                    } else {
+                        response.getWriter().close();
+                    }                    
+                } catch (final IOException ex) {
+                    LOG.warning("Failed to flush AtmosphereResponse buffer: "
+                        + ex.getMessage());
                 }
-
-                response.closeStreamOrWriter();
             } finally {
                 try {
                     resource.close();
