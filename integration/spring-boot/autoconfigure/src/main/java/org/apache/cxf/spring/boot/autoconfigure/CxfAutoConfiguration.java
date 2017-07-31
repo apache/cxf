@@ -31,7 +31,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
-import org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -48,7 +47,10 @@ import org.springframework.context.annotation.ImportResource;
 @ConditionalOnWebApplication
 @ConditionalOnClass({ SpringBus.class, CXFServlet.class })
 @EnableConfigurationProperties(CxfProperties.class)
-@AutoConfigureAfter(EmbeddedServletContainerAutoConfiguration.class)
+@AutoConfigureAfter(name = {
+        "org.springframework.boot.autoconfigure.web.EmbeddedServletContainerAutoConfiguration", // Spring Boot 1.x
+        "org.springframework.boot.autoconfigure.web.servlet.ServletWebServerFactoryAutoConfiguration" // Spring Boot 2.x
+})
 public class CxfAutoConfiguration {
 
     @Autowired
