@@ -127,26 +127,29 @@ public abstract class AbstractSwagger2ServiceDescriptionTest extends AbstractBus
             assertNotNull(urs);
             assertEquals(1, urs.size());
             UserResource r = urs.get(0);
-            assertEquals("/bookstore", r.getPath());
+            String basePath = "";
+            if (!"/".equals(r.getPath())) {
+                basePath = r.getPath();
+            }
             Map<String, UserOperation> map = r.getOperationsAsMap();
             assertEquals(3, map.size());
             UserOperation getBooksOp = map.get("getBooks");
             assertEquals(HttpMethod.GET, getBooksOp.getVerb());
-            assertEquals("/", getBooksOp.getPath());
+            assertEquals("/bookstore", basePath + getBooksOp.getPath());
             assertEquals(MediaType.APPLICATION_JSON, getBooksOp.getProduces());
             List<Parameter> getBooksOpParams = getBooksOp.getParameters();
             assertEquals(1, getBooksOpParams.size());
             assertEquals(ParameterType.QUERY, getBooksOpParams.get(0).getType());
             UserOperation getBookOp = map.get("getBook");
             assertEquals(HttpMethod.GET, getBookOp.getVerb());
-            assertEquals("/{id}", getBookOp.getPath());
+            assertEquals("/bookstore/{id}", basePath + getBookOp.getPath());
             assertEquals(MediaType.APPLICATION_JSON, getBookOp.getProduces());
             List<Parameter> getBookOpParams = getBookOp.getParameters();
             assertEquals(1, getBookOpParams.size());
             assertEquals(ParameterType.PATH, getBookOpParams.get(0).getType());
             UserOperation deleteOp = map.get("delete");
             assertEquals(HttpMethod.DELETE, deleteOp.getVerb());
-            assertEquals("/{id}", deleteOp.getPath());
+            assertEquals("/bookstore/{id}", basePath + deleteOp.getPath());
             List<Parameter> delOpParams = deleteOp.getParameters();
             assertEquals(1, delOpParams.size());
             assertEquals(ParameterType.PATH, delOpParams.get(0).getType());
