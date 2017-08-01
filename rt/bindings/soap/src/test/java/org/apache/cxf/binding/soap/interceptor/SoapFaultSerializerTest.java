@@ -144,7 +144,7 @@ public class SoapFaultSerializerTest extends Assert {
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Value[text()='ns1:Sender']", 
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Subcode/"
-                    + "soap12env:Value[text()='ns2:invalidsoap']", 
+                    + "soap12env:Value[text()='cxffaultcode:invalidsoap']",
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[@xml:lang='en']", 
                     faultDoc);
@@ -170,8 +170,8 @@ public class SoapFaultSerializerTest extends Assert {
     public void testSoap12WithMultipleSubCodesOut() throws Exception {
         String faultString = "Hadrian caused this Fault!";
         SoapFault fault = new SoapFault(faultString, Soap12.getInstance().getSender());
-        
-        fault.addSubCode(new QName("http://cxf.apache.org/soap/fault", "invalidsoap", "cxffaultcode"));
+
+        fault.addSubCode(new QName("http://cxf.apache.org/soap/fault", "invalidsoap"));
         fault.addSubCode(new QName("http://cxf.apache.org/soap/fault2", "invalidsoap2", "cxffaultcode2"));
 
         SoapMessage m = new SoapMessage(new MessageImpl());
@@ -200,7 +200,7 @@ public class SoapFaultSerializerTest extends Assert {
                     + "soap12env:Value[text()='ns2:invalidsoap']", 
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Code/soap12env:Subcode/soap12env:Subcode/"
-                    + "soap12env:Value[text()='ns2:invalidsoap2']", 
+                    + "soap12env:Value[text()='cxffaultcode2:invalidsoap2']",
                     faultDoc);
         assertValid("//soap12env:Fault/soap12env:Reason/soap12env:Text[@xml:lang='en']", 
                     faultDoc);
