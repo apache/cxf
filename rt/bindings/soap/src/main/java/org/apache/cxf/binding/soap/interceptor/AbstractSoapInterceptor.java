@@ -32,6 +32,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
@@ -62,7 +63,18 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
         String codeNs = faultCode.getNamespaceURI();
         String prefix = null;
         if (codeNs.length() > 0) {
-            prefix = StaxUtils.getUniquePrefix(writer, codeNs, true);
+            prefix = faultCode.getPrefix();
+            if (!StringUtils.isEmpty(prefix)) {
+                String boundNS = writer.getNamespaceContext().getNamespaceURI(prefix);
+                if (StringUtils.isEmpty(boundNS)) {
+                    writer.writeNamespace(prefix, codeNs);
+                } else if (!codeNs.equals(boundNS)) {
+                    prefix = null;
+                }
+            }
+            if (StringUtils.isEmpty(prefix)) {
+                prefix = StaxUtils.getUniquePrefix(writer, codeNs, true);
+            }
         }
         return prefix;
     }
