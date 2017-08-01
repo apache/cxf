@@ -130,6 +130,10 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         }
 
         List<Object> swaggerResources = new LinkedList<>();
+        
+        if (swagger2Serializers == null && customizer == null) {
+            customizer = new Swagger2Customizer();
+        }
         ApiListingResource apiListingResource = new Swagger2ApiListingResource(customizer);
         swaggerResources.add(apiListingResource);
 
@@ -169,9 +173,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
             swagger2Serializers.setDynamicBasePath(dynamicBasePath);
             providers.add(swagger2Serializers);
         } else {
-            if (customizer == null) {
-                customizer = new Swagger2Customizer();
-            }
             customizer.setClassResourceInfos(cris);
             customizer.setDynamicBasePath(dynamicBasePath);
         }
