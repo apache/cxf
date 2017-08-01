@@ -89,7 +89,7 @@ public class JAXBUtilsTest extends Assert {
     
     @Test
     public void testNameToIdentifier() {
-        assertEquals("_return", 
+        assertEquals("_return",
                      JAXBUtils.nameToIdentifier("return", JAXBUtils.IdentifierType.VARIABLE));
         assertEquals("getReturn", 
                      JAXBUtils.nameToIdentifier("return", JAXBUtils.IdentifierType.GETTER));
@@ -146,6 +146,10 @@ public class JAXBUtilsTest extends Assert {
                      JAXBUtils.nameToIdentifier("other_punct-chars", JAXBUtils.IdentifierType.GETTER));
         assertEquals("OTHER_PUNCT_CHARS", 
                      JAXBUtils.nameToIdentifier("other_punct-chars", JAXBUtils.IdentifierType.CONSTANT));
+        
+        assertEquals("XMLTransfer",
+                     JAXBUtils.nameToIdentifier("XMLTransfer", JAXBUtils.IdentifierType.CLASS));
+
     }
     
     @Test
