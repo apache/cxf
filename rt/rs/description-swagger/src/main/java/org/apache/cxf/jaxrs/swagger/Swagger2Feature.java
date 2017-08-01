@@ -164,14 +164,14 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 }
             }
         }
-        if (customizer == null) {
-            if (swagger2Serializers == null) {
-                swagger2Serializers = new DefaultSwagger2Serializers();
-            }
+        if (swagger2Serializers != null) {
             swagger2Serializers.setClassResourceInfos(cris);
             swagger2Serializers.setDynamicBasePath(dynamicBasePath);
             providers.add(swagger2Serializers);
         } else {
+            if (customizer == null) {
+                customizer = new Swagger2Customizer();
+            }
             customizer.setClassResourceInfos(cris);
             customizer.setDynamicBasePath(dynamicBasePath);
         }
