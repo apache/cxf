@@ -402,10 +402,12 @@ public final class JAXBUtils {
 
         boolean legalIdentifier = false;
         StringBuilder buf = new StringBuilder(name);
+        boolean hasUnderscore = false;
         legalIdentifier = Character.isJavaIdentifierStart(buf.charAt(0));
 
         for (int i = 1; i < name.length() && legalIdentifier; i++) {
-            legalIdentifier = legalIdentifier && Character.isJavaIdentifierPart(buf.charAt(i));
+            legalIdentifier &= Character.isJavaIdentifierPart(buf.charAt(i));
+            hasUnderscore |= '_' == buf.charAt(i);
         }
 
         boolean conventionalIdentifier = isConventionalIdentifier(buf, type);
@@ -413,7 +415,9 @@ public final class JAXBUtils {
             if (JAXBUtils.isJavaKeyword(name) && type == IdentifierType.VARIABLE) {
                 name = normalizePackageNamePart(name);
             }
-            return name;
+            if (!hasUnderscore || IdentifierType.CLASS != type) {
+                return name;
+            }
         }
 
         // split into words
