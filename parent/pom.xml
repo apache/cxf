@@ -1622,9 +1622,9 @@
                 <version>${cxf.servlet-api-2.5.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-javamail_1.4_spec</artifactId>
-                <version>1.7.1</version>
+                <groupId>org.apache.geronimo.javamail</groupId>
+                <artifactId>geronimo-javamail_1.4_mail</artifactId>
+                <version>1.8.4</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
