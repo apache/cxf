@@ -299,9 +299,9 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         Book book;
         if (!fromResponse) {
-            book = wc.post(new Book("CXF", 126L), Book.class);
+            book = wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
         } else {
-            book = wc.post(new Book("CXF", 126L)).readEntity(Book.class);
+            book = wc.type("application/xml").post(new Book("CXF", 126L)).readEntity(Book.class);
         }
         assertEquals(126L, book.getId());
     }
@@ -344,7 +344,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         try {
-            wc.post(new Book("CXF", 126L), Book.class);
+            wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
             fail("Failure expected on signature trust failure");
         } catch (WebApplicationException ex) {
             assertTrue(ex.getMessage().contains("400 Bad Request"));
@@ -389,7 +389,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         try {
-            wc.post(new Book("CXF", 126L), Book.class);
+            wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
             fail("Failure expected on signature trust failure");
         } catch (ProcessingException ex) {
             assertTrue(ex.getCause() instanceof BadRequestException);
@@ -438,7 +438,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         try {
-            wc.post(new Book("CXF", 126L), Book.class);
+            wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
             fail("Failure expected on an unsigned response message");
         } catch (ProcessingException ex) {
             assertTrue(ex.getCause() instanceof BadRequestException);
@@ -485,7 +485,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
 
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
-        Book book = wc.post(new Book("CXF", 126L), Book.class);
+        Book book = wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
         assertEquals(126L, book.getId());
     }
 
@@ -686,7 +686,7 @@ public class JAXRSXmlSecTest extends AbstractBusClientServerTestBase {
         WebClient wc = bean.createWebClient();
         WebClient.getConfig(wc).getHttpConduit().getClient().setReceiveTimeout(10000000L);
         try {
-            Book book = wc.post(new Book("CXF", 126L), Book.class);
+            Book book = wc.type("application/xml").post(new Book("CXF", 126L), Book.class);
             assertEquals(126L, book.getId());
         } catch (WebApplicationException ex) {
             if (propagateException) {
