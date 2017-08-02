@@ -85,8 +85,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     private String ignoreRoutes;
 
-    private Swagger2Serializers swagger2Serializers;
-
     private boolean supportSwaggerUi = true;
 
     private String swaggerUiVersion;
@@ -131,7 +129,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
         List<Object> swaggerResources = new LinkedList<>();
         
-        if (swagger2Serializers == null && customizer == null) {
+        if (customizer == null) {
             customizer = new Swagger2Customizer();
         }
         ApiListingResource apiListingResource = new Swagger2ApiListingResource(customizer);
@@ -169,15 +167,9 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
                 }
             }
         }
-        if (swagger2Serializers != null) {
-            swagger2Serializers.setClassResourceInfos(cris);
-            swagger2Serializers.setDynamicBasePath(dynamicBasePath);
-            providers.add(swagger2Serializers);
-        } else {
-            customizer.setClassResourceInfos(cris);
-            customizer.setDynamicBasePath(dynamicBasePath);
-        }
-
+        customizer.setClassResourceInfos(cris);
+        customizer.setDynamicBasePath(dynamicBasePath);
+        
         providers.add(new ReaderConfigFilter());
 
         if (usePathBasedConfig) {
@@ -210,11 +202,7 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         if (swagger != null && securityDefinitions != null) {
             swagger.setSecurityDefinitions(securityDefinitions);
         }
-        if (customizer == null) {
-            swagger2Serializers.setBeanConfig(beanConfig);
-        } else {
-            customizer.setBeanConfig(beanConfig);
-        }
+        customizer.setBeanConfig(beanConfig);
     }
 
     public boolean isUsePathBasedConfig() {
@@ -271,10 +259,6 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
     public void setIgnoreRoutes(String ignoreRoutes) {
         this.ignoreRoutes = ignoreRoutes;
-    }
-
-    public void setSwagger2Serializers(final Swagger2Serializers swagger2Serializers) {
-        this.swagger2Serializers = swagger2Serializers;
     }
 
     @Override
