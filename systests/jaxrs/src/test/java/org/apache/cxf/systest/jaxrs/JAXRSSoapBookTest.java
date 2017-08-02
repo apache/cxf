@@ -217,7 +217,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         WebClient client = WebClient.create(address);
         WebClient.getConfig(client).getInInterceptors().add(in);
         WebClient.getConfig(client).getOutInterceptors().add(out);
-        Book2 book = client.accept("text/xml").post(new Book2(), Book2.class);
+        Book2 book = client.type("application/xml").accept("text/xml").post(new Book2(), Book2.class);
         assertEquals(124L, book.getId());
     }
     
@@ -227,7 +227,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         String address = "http://localhost:" + PORT 
                          + "/test/v2/rest-transform/bookstore/books";
         WebClient client = WebClient.create(address);
-        Book book = client.accept("text/xml").post(new Book(), Book.class);
+        Book book = client.type("application/xml").accept("text/xml").post(new Book(), Book.class);
         assertEquals(124L, book.getId());
     }
     
