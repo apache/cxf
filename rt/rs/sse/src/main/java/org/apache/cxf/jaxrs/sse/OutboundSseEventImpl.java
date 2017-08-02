@@ -39,9 +39,9 @@ public final class OutboundSseEventImpl implements OutboundSseEvent {
         private String name;
         private String comment;
         private long reconnectDelay = -1;
-        private Class<?> type = String.class;
+        private Class<?> type;
         private Type genericType;
-        private MediaType mediaType = MediaType.SERVER_SENT_EVENTS_TYPE;
+        private MediaType mediaType = MediaType.TEXT_PLAIN_TYPE;
         private Object data;
 
         @Override
@@ -77,6 +77,9 @@ public final class OutboundSseEventImpl implements OutboundSseEvent {
         @Override
         @SuppressWarnings("rawtypes")
         public Builder data(Class newType, Object newData) {
+            if (newType == null || newData == null) {
+                throw new IllegalArgumentException("Parameters 'type' and 'data' must not be null.");
+            }
             this.type = newType;
             this.data = newData;
             return this;
@@ -85,6 +88,9 @@ public final class OutboundSseEventImpl implements OutboundSseEvent {
         @Override
         @SuppressWarnings("rawtypes")
         public Builder data(GenericType newType, Object newData) {
+            if (newType == null || newData == null) {
+                throw new IllegalArgumentException("Parameters 'type' and 'data' must not be null.");
+            }
             this.genericType = newType.getType();
             this.data = newData;
             return this;
@@ -92,6 +98,10 @@ public final class OutboundSseEventImpl implements OutboundSseEvent {
 
         @Override
         public Builder data(Object newData) {
+            if (newData == null) {
+                throw new IllegalArgumentException("Parameter 'data' must not be null.");
+            }
+            this.type = newData.getClass();
             this.data = newData;
             return this;
         }
