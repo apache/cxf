@@ -26,9 +26,6 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
@@ -70,12 +67,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
 
     @org.junit.Test
     public void testCreateAndValidateResponse() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
@@ -109,12 +103,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testInvalidStatusCode() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML1_STATUSCODE_SUCCESS, null
             );
@@ -153,12 +144,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testRequestDeniedStatusCode() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 "urn:oasis:names:tc:SAML:2.0:status:RequestDenied", null
             );
@@ -197,12 +185,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testResponseSignedAssertion() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
@@ -255,12 +240,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testResponseModifiedSignedAssertion() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
@@ -318,12 +300,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testSignedResponse() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
@@ -375,12 +354,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testModifiedSignedResponse() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
@@ -432,12 +408,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testSignedResponseNoKeyInfo() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
@@ -568,12 +541,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testResponseIssueInstant() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
@@ -614,12 +584,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testAssertionIssueInstant() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
@@ -660,12 +627,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testFutureAuthnInstant() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
@@ -705,12 +669,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testStaleSessionNotOnOrAfter() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
@@ -750,12 +711,9 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testInvalidSubjectLocality() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Status status = 
+        Document doc = DOMUtils.createDocument();
+
+        Status status =
             SAML2PResponseComponentBuilder.createStatus(
                 SAMLProtocolResponseValidator.SAML2_STATUSCODE_SUCCESS, null
             );
@@ -859,10 +817,7 @@ public class SAMLResponseValidatorTest extends org.junit.Assert {
         SubjectConfirmationDataBean subjectConfirmationData,
         SAML2CallbackHandler callbackHandler
     ) throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
+        Document doc = DOMUtils.createDocument();
 
         Status status = 
             SAML2PResponseComponentBuilder.createStatus(
