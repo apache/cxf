@@ -219,7 +219,7 @@ public class JAXRSLocalTransportTest extends AbstractBusClientServerTestBase {
         WebClient localClient = WebClient.create("local://books");
         localClient.accept("text/xml");
         localClient.path("bookstore/books");
-        Book book = localClient.post(new Book("New", 124L), Book.class);
+        Book book = localClient.type("application/xml").post(new Book("New", 124L), Book.class);
         assertEquals(124L, book.getId());
     }
     

@@ -109,7 +109,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         WebClient.getConfig(client).getRequestContext()
             .put(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/oneway");
         client.header("OnewayRequest", "true");
-        Response r = client.put(new Book("OneWay From WebClient", 129L));
+        Response r = client.type("application/xml").put(new Book("OneWay From WebClient", 129L));
         assertEquals(202, r.getStatus());
         assertFalse(r.hasEntity());
         

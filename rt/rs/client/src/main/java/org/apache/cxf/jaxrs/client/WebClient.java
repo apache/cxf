@@ -956,10 +956,8 @@ public class WebClient extends AbstractClient {
     
     private MultivaluedMap<String, String> prepareHeaders(Class<?> responseClass, Object body) {
         MultivaluedMap<String, String> headers = getHeaders();
-        if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null && body != null) {
-            String contentType = body instanceof Form ? MediaType.APPLICATION_FORM_URLENCODED 
-                                     : MediaType.APPLICATION_XML;
-            headers.putSingle(HttpHeaders.CONTENT_TYPE, contentType);
+        if (headers.getFirst(HttpHeaders.CONTENT_TYPE) == null && body instanceof Form) {
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
         }
         
         if (responseClass != null && responseClass != Response.class 
