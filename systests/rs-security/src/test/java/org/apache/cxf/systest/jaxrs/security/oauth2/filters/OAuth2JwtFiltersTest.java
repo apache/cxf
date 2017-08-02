@@ -105,8 +105,8 @@ public class OAuth2JwtFiltersTest extends AbstractBusClientServerTestBase {
         WebClient client = WebClient.create(rsAddress, OAuth2TestUtils.setupProviders(),
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
-        
-        Response response = client.post(new Book("book", 123L));
+
+        Response response = client.type("application/xml").post(new Book("book", 123L));
         assertEquals(200, response.getStatus());
         
         Book returnedBook = response.readEntity(Book.class);
