@@ -139,7 +139,7 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
         URL url = new URL("http://localhost:" + PORT + "/test/5/bookstorestorage/thosebooks");
         WebClient wc = WebClient.create(url.toString(),
                                         Collections.singletonList(new CustomJaxbElementProvider()));
-        Response r = wc.post(new Book("proxy", 333L));
+        Response r = wc.type("application/xml").post(new Book("proxy", 333L));
         Book book = r.readEntity(Book.class);
         assertEquals(333L, book.getId());
         String ct = r.getHeaderString("Content-Type");

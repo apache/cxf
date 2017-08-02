@@ -358,8 +358,6 @@ public class ClientProxyImpl extends AbstractClient implements
                 List<MediaType> consumeTypes = ori.getConsumeTypes();
                 if (!consumeTypes.isEmpty() && !consumeTypes.get(0).equals(MediaType.WILDCARD_TYPE)) {
                     ctType = JAXRSUtils.mediaTypeToString(ori.getConsumeTypes().get(0));
-                } else if (bodyClass != null) {
-                    ctType = MediaType.APPLICATION_XML;
                 }
                 if (ctType != null) {
                     headers.putSingle(HttpHeaders.CONTENT_TYPE, ctType);

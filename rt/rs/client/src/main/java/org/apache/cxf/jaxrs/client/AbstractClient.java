@@ -471,7 +471,11 @@ public abstract class AbstractClient implements Client {
         @SuppressWarnings("unchecked")
         Class<T> theClass = (Class<T>)cls;
 
-        MediaType contentType = JAXRSUtils.toMediaType(headers.getFirst("Content-Type").toString());
+        Object contentTypeHeader = headers.getFirst("Content-Type");
+        if (contentTypeHeader == null) {
+            contentTypeHeader = MediaType.WILDCARD;
+        }
+        MediaType contentType = JAXRSUtils.toMediaType(contentTypeHeader.toString());
 
         List<WriterInterceptor> writers = ClientProviderFactory.getInstance(outMessage)
             .createMessageBodyWriterInterceptor(theClass, type, anns, contentType, outMessage, null);
