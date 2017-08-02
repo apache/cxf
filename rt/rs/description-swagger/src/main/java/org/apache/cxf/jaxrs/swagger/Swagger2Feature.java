@@ -139,7 +139,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
 
         List<Object> providers = new ArrayList<>();
         if (runAsFilter) {
-            providers.add(new SwaggerContainerRequestFilter(appInfo == null ? null : appInfo.getProvider()));
+            providers.add(new SwaggerContainerRequestFilter(appInfo == null ? null : appInfo.getProvider(),
+                                                            customizer));
         }
 
         if (supportSwaggerUi) {
@@ -336,7 +337,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
     }
 
     @PreMatching
-    protected static class SwaggerContainerRequestFilter extends ApiListingResource implements ContainerRequestFilter {
+    protected static class SwaggerContainerRequestFilter extends Swagger2ApiListingResource 
+        implements ContainerRequestFilter {
 
         protected static final String APIDOCS_LISTING_PATH_JSON = "swagger.json";
         protected static final String APIDOCS_LISTING_PATH_YAML = "swagger.yaml";
@@ -345,7 +347,8 @@ public class Swagger2Feature extends AbstractSwaggerFeature {
         protected MessageContext mc;
 
         private Application app;
-        public SwaggerContainerRequestFilter(Application app) {
+        public SwaggerContainerRequestFilter(Application app, Swagger2Customizer customizer) {
+            super(customizer);
             this.app = app;
         }
 
