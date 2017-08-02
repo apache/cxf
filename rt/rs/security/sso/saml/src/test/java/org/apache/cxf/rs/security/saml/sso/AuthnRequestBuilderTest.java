@@ -21,12 +21,9 @@ package org.apache.cxf.rs.security.saml.sso;
 
 import java.util.Collections;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.wss4j.common.saml.OpenSAMLUtil;
@@ -49,12 +46,9 @@ public class AuthnRequestBuilderTest extends org.junit.Assert {
 
     @org.junit.Test
     public void testCreateAuthnRequest() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
-        Issuer issuer = 
+        Document doc = DOMUtils.createDocument();
+
+        Issuer issuer =
             SamlpRequestComponentBuilder.createIssuer("http://localhost:9001/app");
         NameIDPolicy nameIDPolicy = 
             SamlpRequestComponentBuilder.createNameIDPolicy(
@@ -86,11 +80,8 @@ public class AuthnRequestBuilderTest extends org.junit.Assert {
     
     @org.junit.Test
     public void testAuthnRequestBuilder() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        
+        Document doc = DOMUtils.createDocument();
+
         AuthnRequestBuilder authnRequestBuilder = new DefaultAuthnRequestBuilder();
         Message message = new MessageImpl();
         
