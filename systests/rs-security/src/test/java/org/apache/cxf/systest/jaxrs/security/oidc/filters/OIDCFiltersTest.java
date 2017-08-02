@@ -82,8 +82,8 @@ public class OIDCFiltersTest extends AbstractBusClientServerTestBase {
         // Now invoke back on the service using the authorization code
         client.query("code", code);
         client.query("state", state);
-        
-        Response serviceResponse = client.post(new Book("book", 123L));
+
+        Response serviceResponse = client.type("application/xml").post(new Book("book", 123L));
         assertEquals(serviceResponse.getStatus(), 200);
         
         Book returnedBook = serviceResponse.readEntity(Book.class);

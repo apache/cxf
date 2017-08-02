@@ -78,8 +78,8 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
-        
-        Response response = client.post(new Book("book", 123L));
+
+        Response response = client.type("application/xml").post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
         
         Book returnedBook = response.readEntity(Book.class);
@@ -160,8 +160,8 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(),
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
-        
-        Response response = client.post(new Book("book", 123L));
+
+        Response response = client.type("application/xml").post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
         
         Book returnedBook = response.readEntity(Book.class);
@@ -278,8 +278,8 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
-        
-        Response response = client.post(new Book("book", 123L));
+
+        Response response = client.type("application/xml").post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
         
         Book returnedBook = response.readEntity(Book.class);
@@ -320,8 +320,8 @@ public class OAuth2FiltersTest extends AbstractBusClientServerTestBase {
         WebClient client = WebClient.create(address, OAuth2TestUtils.setupProviders(), 
                                             busFile.toString());
         client.header("Authorization", "Bearer " + accessToken.getTokenKey());
-        
-        Response response = client.post(new Book("book", 123L));
+
+        Response response = client.type("application/xml").post(new Book("book", 123L));
         assertEquals(response.getStatus(), 200);
         
         Book returnedBook = response.readEntity(Book.class);
