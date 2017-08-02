@@ -25,11 +25,9 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -61,19 +59,15 @@ import org.opensaml.xmlsec.signature.support.SignatureConstants;
  */
 public class CombinedValidatorTest extends org.junit.Assert {
 
-    private static final DocumentBuilderFactory DOC_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-
     static {
         WSSConfig.init();
         OpenSAMLUtil.initSamlEngine();
-        DOC_BUILDER_FACTORY.setNamespaceAware(true);
     }
 
     @org.junit.Test
     public void testSuccessfulValidation() throws Exception {
 
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
+        Document doc = DOMUtils.createDocument();
 
         Response response = createResponse(doc);
 
@@ -115,9 +109,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
 
     @org.junit.Test
     public void testWrappingAttack3() throws Exception {
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-
+        Document doc = DOMUtils.createDocument();
         Response response = createResponse(doc);
 
         Element responseElement = OpenSAMLUtil.toDom(response, doc);
@@ -187,9 +179,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
     @org.junit.Test
     public void testSuccessfulSignedValidation() throws Exception {
 
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-
+        Document doc = DOMUtils.createDocument();
         Response response = createResponse(doc);
 
         Crypto issuerCrypto = new Merlin();
@@ -233,8 +223,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
     @org.junit.Test
     public void testEnforceResponseSigned() throws Exception {
 
-        DocumentBuilder docBuilder = DOC_BUILDER_FACTORY.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
+        Document doc = DOMUtils.createDocument();
 
         Response response = createResponse(doc);
 

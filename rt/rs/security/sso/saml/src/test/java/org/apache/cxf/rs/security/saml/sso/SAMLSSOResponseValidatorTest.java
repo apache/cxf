@@ -27,11 +27,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -219,10 +217,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
 
     @org.junit.Test
     public void testSignedResponseInvalidDestination() throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
+        Document doc = DOMUtils.createDocument();
 
         Status status =
             SAML2PResponseComponentBuilder.createStatus(
@@ -589,10 +584,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         List<AudienceRestrictionBean> audienceRestrictions,
         String authnClassRef
     ) throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
+        Document doc = DOMUtils.createDocument();
 
         Status status =
             SAML2PResponseComponentBuilder.createStatus(
@@ -648,10 +640,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         SubjectConfirmationDataBean subjectConfirmationData,
         SAML2CallbackHandler callbackHandler
     ) throws Exception {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        docBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
+        Document doc = DOMUtils.createDocument();
 
         Status status =
             SAML2PResponseComponentBuilder.createStatus(
