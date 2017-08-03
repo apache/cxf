@@ -181,9 +181,8 @@ public class StaxSource extends SAXSource implements XMLReader {
         String prefix = streamReader.getPrefix();
         if (prefix != null && prefix.length() > 0) {
             return prefix + ":" + streamReader.getLocalName();
-        } else {
-            return streamReader.getLocalName();
         }
+        return streamReader.getLocalName();
     }
 
     protected Attributes getAttributes() {

@@ -94,8 +94,8 @@ public final class UrlUtils {
                     out.put((byte) ' ');
                 } else if (b == ESCAPE_CHAR) {
                     try {
-                        final int u = digit16((byte) in.get());
-                        final int l = digit16((byte) in.get());
+                        final int u = digit16(in.get());
+                        final int l = digit16(in.get());
                         out.put((byte) ((u << 4) + l));
                     } catch (final BufferUnderflowException e) {
                         throw new IllegalArgumentException(
@@ -107,9 +107,8 @@ public final class UrlUtils {
             }
             out.flip();
             return Charset.forName(enc).decode(out).toString();
-        } else {
-            return value;
         }
+        return value;
     }
 
     private static int digit16(final byte b) {

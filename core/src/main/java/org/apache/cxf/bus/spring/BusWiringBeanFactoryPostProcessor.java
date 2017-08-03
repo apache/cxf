@@ -71,7 +71,7 @@ public class BusWiringBeanFactoryPostProcessor implements BeanFactoryPostProcess
             cctx.getBeanFactory().registerSingleton(name, b);
             b.setApplicationContext(context);
         }
-        return (Bus)context.getBean(name, Bus.class);
+        return context.getBean(name, Bus.class);
     }
     private Object getBusForName(String name,
                                  ConfigurableListableBeanFactory factory,

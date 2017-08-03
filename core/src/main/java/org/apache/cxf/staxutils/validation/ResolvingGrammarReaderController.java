@@ -81,8 +81,7 @@ public class ResolvingGrammarReaderController implements GrammarReaderController
         if (embeddedSchema != null) {
             return new DOMLSInputImpl(this.baseURI, embeddedSchema.getSystemId(), embeddedSchema
                 .getSchemaElement());
-        } else {
-            return null;
         }
+        return null;
     }
 }

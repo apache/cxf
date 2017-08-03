@@ -368,9 +368,8 @@ public final class SSLUtils {
                      excludedCipherSuites);
         if (exclude) {
             return getCiphersFromList(excludedCipherSuites, log, exclude);
-        } else {
-            return getCiphersFromList(filteredCipherSuites, log, exclude);
         }
+        return getCiphersFromList(filteredCipherSuites, log, exclude);
     }
 
     private static String[] getSystemCiphersuites(Logger log) {
@@ -378,9 +377,8 @@ public final class SSLUtils {
         if ((jvmCipherSuites != null) && (!jvmCipherSuites.isEmpty())) {
             LogUtils.log(log, Level.FINE, "CIPHERSUITES_SYSTEM_PROPERTY_SET", jvmCipherSuites);
             return jvmCipherSuites.split(",");
-        } else {
-            return null;
         }
+        return null;
 
     }
 

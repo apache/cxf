@@ -160,13 +160,12 @@ public abstract class AbstractInvoker implements Invoker {
 
         if (checked) {
             return new Fault(ex);
-        } else {
-            String message = (ex == null) ? "" : ex.getMessage();
-            String method = (m == null) ? "<null>" : m.toString();
-            return new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG,
-                                         message, method, params),
-                                         ex);
         }
+        String message = (ex == null) ? "" : ex.getMessage();
+        String method = (m == null) ? "<null>" : m.toString();
+        return new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG,
+                                     message, method, params),
+                                     ex);
     }
 
     protected Object performInvocation(Exchange exchange, final Object serviceObject, Method m,

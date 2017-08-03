@@ -112,7 +112,7 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
                             }
                         } else {
                             try {
-                                Method m = bean.getClass().getMethod("getActivationNamespace", new Class[0]);
+                                Method m = bean.getClass().getMethod("getActivationNamespace");
                                 Collection<String> c = CastUtils.cast((Collection<?>)m.invoke(bean));
                                 for (String s : c) {
                                     registerBindingFactory(s, bean);

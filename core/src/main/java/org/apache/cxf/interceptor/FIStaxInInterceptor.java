@@ -93,8 +93,7 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (isGET(message)) {
             return isRequestor(message)
                 && MessageUtils.isTrue(message.getContextualProperty(FI_GET_SUPPORTED));
-        } else {
-            return true;
         }
+        return true;
     }
 }

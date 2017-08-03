@@ -46,9 +46,8 @@ public final class CompressionUtils {
             if (inflateLen == 0 && !inflater.finished()) {
                 if (inflater.needsInput()) {
                     throw new DataFormatException("Inflater can not inflate all the token bytes");
-                } else {
-                    break;
                 }
+                break;
             }
 
             inflatedToken.write(buffer, 0, inflateLen);

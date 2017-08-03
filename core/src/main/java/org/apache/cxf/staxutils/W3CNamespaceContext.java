@@ -106,9 +106,8 @@ public class W3CNamespaceContext implements NamespaceContext {
                     String name = a.getLocalName();
                     if ("xmlns".equals(name)) {
                         return "";
-                    } else {
-                        return name;
                     }
+                    return name;
                 }
             }
         }

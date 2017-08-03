@@ -53,9 +53,8 @@ public final class Base64UrlUtility {
         char[] chunk = Base64Utility.encodeChunk(id, offset, length, true);
         if (chunk != null) {
             return new String(chunk);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public static void encodeAndStream(byte[] id,

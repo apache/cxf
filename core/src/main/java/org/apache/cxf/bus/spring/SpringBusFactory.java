@@ -166,9 +166,8 @@ public class SpringBusFactory extends BusFactory {
                 } finally {
                     Thread.currentThread().setContextClassLoader(contextLoader);
                 }
-            } else {
-                throw ex;
             }
+            throw ex;
         }
     }
 

@@ -268,20 +268,17 @@ public final class LogUtils {
                         } catch (InvocationTargetException ite) {
                             if (ite.getTargetException() instanceof MissingResourceException) {
                                 return (Logger) cns.newInstance(loggerName, null);
-                            } else {
-                                throw ite;
                             }
+                            throw ite;
                         }
-                    } else {
-                        try {
-                            return (Logger) cns.newInstance(loggerName, bundleName);
-                        } catch (InvocationTargetException ite) {
-                            if (ite.getTargetException() instanceof MissingResourceException) {
-                                throw (MissingResourceException)ite.getTargetException();
-                            } else {
-                                throw ite;
-                            }
+                    }
+                    try {
+                        return (Logger) cns.newInstance(loggerName, bundleName);
+                    } catch (InvocationTargetException ite) {
+                        if (ite.getTargetException() instanceof MissingResourceException) {
+                            throw (MissingResourceException)ite.getTargetException();
                         }
+                        throw ite;
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);

@@ -88,9 +88,8 @@ public class ExtendedURIResolver {
     public String getURI() {
         if (currentResolver.getURI() != null) {
             return currentResolver.getURI().toString();
-        } else {
-            return lastestImportUri;
         }
+        return lastestImportUri;
     }
 
 }

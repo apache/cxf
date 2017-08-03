@@ -173,13 +173,13 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
                     return;
                 }
                 if (e == null) {
-                    Constructor<?> constructor = exClass.getConstructor(new Class[]{String.class});
-                    e = constructor.newInstance(new Object[]{fault.getMessage()});
+                    Constructor<?> constructor = exClass.getConstructor(String.class);
+                    e = constructor.newInstance(fault.getMessage());
                 } else {
 
                     try {
                         Constructor<?> constructor = getConstructor(exClass, e);
-                        e = constructor.newInstance(new Object[]{fault.getMessage(), e});
+                        e = constructor.newInstance(fault.getMessage(), e);
                     } catch (NoSuchMethodException e1) {
                         //Use reflection to convert fault bean to exception
                         e = convertFaultBean(exClass, e, fault);
@@ -215,14 +215,13 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
             }
         }
         try {
-            return faultClass.getConstructor(new Class[]{String.class, beanClass});
+            return faultClass.getConstructor(String.class, beanClass);
         } catch (NoSuchMethodException ex) {
             Class<?> cls = getPrimitiveClass(beanClass);
             if (cls != null) {
-                return faultClass.getConstructor(new Class[]{String.class, cls});
-            } else {
-                throw ex;
+                return faultClass.getConstructor(String.class, cls);
             }
+            throw ex;
         }
 
     }
@@ -334,8 +333,8 @@ public class ClientFaultConverter extends AbstractInDatabindingInterceptor {
     }
 
     private Exception convertFaultBean(Class<?> exClass, Object faultBean, Fault fault) throws Exception {
-        Constructor<?> constructor = exClass.getConstructor(new Class[]{String.class});
-        Exception e = (Exception)constructor.newInstance(new Object[]{fault.getMessage()});
+        Constructor<?> constructor = exClass.getConstructor(String.class);
+        Exception e = (Exception)constructor.newInstance(fault.getMessage());
 
         //Copy fault bean fields to exception
         for (Class<?> obj = exClass; !obj.equals(Object.class);  obj = obj.getSuperclass()) {

@@ -156,7 +156,7 @@ public class ReflectionInvokationHandler implements InvocationHandler {
 
     public static <T> T createProxyWrapper(Object target, Class<T> inf) {
         InvocationHandler h = new ReflectionInvokationHandler(target);
-        return inf.cast(Proxy.newProxyInstance(inf.getClassLoader(), new Class[] {inf}, h));
+        return inf.cast(Proxy.newProxyInstance(inf.getClassLoader(), new Class<?>[] {inf}, h));
     }
 
     @Target(ElementType.PARAMETER)

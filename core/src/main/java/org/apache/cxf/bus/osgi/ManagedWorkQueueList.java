@@ -79,7 +79,7 @@ public class ManagedWorkQueueList implements ManagedServiceFactory, PropertyChan
     public void propertyChange(PropertyChangeEvent evt) {
         try {
             AutomaticWorkQueueImpl queue = (AutomaticWorkQueueImpl)evt.getSource();
-            ConfigurationAdmin configurationAdmin = (ConfigurationAdmin)configAdminTracker.getService();
+            ConfigurationAdmin configurationAdmin = configAdminTracker.getService();
             if (configurationAdmin != null) {
                 Configuration selectedConfig = findConfigForQueueName(queue, configurationAdmin);
                 if (selectedConfig != null) {

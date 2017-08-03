@@ -289,14 +289,12 @@ public class CachedOutputStream extends OutputStream {
         if (inmem) {
             if (currentStream instanceof ByteArrayOutputStream) {
                 return ((ByteArrayOutputStream)currentStream).toByteArray();
-            } else {
-                throw new IOException("Unknown format of currentStream");
             }
-        } else {
-            // read the file
-            try (InputStream fin = createInputStream(tempFile)) {
-                return IOUtils.readBytesFromStream(fin);
-            }
+            throw new IOException("Unknown format of currentStream");
+        }
+        // read the file
+        try (InputStream fin = createInputStream(tempFile)) {
+            return IOUtils.readBytesFromStream(fin);
         }
     }
 
@@ -498,26 +496,25 @@ public class CachedOutputStream extends OutputStream {
             } else {
                 return null;
             }
-        } else {
-            try {
-                InputStream fileInputStream = new TransferableFileInputStream(tempFile);
-                streamList.add(fileInputStream);
-                if (cipherTransformation != null) {
-                    fileInputStream = new CipherInputStream(fileInputStream, ciphers.getDecryptor()) {
-                        boolean closed;
-                        public void close() throws IOException {
-                            if (!closed) {
-                                super.close();
-                                closed = true;
-                            }
+        }
+        try {
+            InputStream fileInputStream = new TransferableFileInputStream(tempFile);
+            streamList.add(fileInputStream);
+            if (cipherTransformation != null) {
+                fileInputStream = new CipherInputStream(fileInputStream, ciphers.getDecryptor()) {
+                    boolean closed;
+                    public void close() throws IOException {
+                        if (!closed) {
+                            super.close();
+                            closed = true;
                         }
-                    };
-                }
-
-                return fileInputStream;
-            } catch (FileNotFoundException e) {
-                throw new IOException("Cached file was deleted, " + e.toString());
+                    }
+                };
             }
+
+            return fileInputStream;
+        } catch (FileNotFoundException e) {
+            throw new IOException("Cached file was deleted, " + e.toString());
         }
     }
 

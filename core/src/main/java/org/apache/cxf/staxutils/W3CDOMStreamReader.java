@@ -269,9 +269,8 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
 
         if (prefix == null) {
             return new QName(ns, ln);
-        } else {
-            return new QName(ns, ln, prefix);
         }
+        return new QName(ns, ln, prefix);
     }
 
     public String getAttributeNamespace(int i) {

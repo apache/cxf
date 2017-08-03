@@ -78,9 +78,8 @@ public final class MessageUtils {
             FaultMode mode = message.get(FaultMode.class);
             if (null != mode) {
                 return mode;
-            } else {
-                return FaultMode.RUNTIME_FAULT;
             }
+            return FaultMode.RUNTIME_FAULT;
         }
         return null;
     }

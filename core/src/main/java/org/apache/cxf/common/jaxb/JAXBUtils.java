@@ -482,10 +482,9 @@ public final class JAXBUtils {
             index++;
             if (i >= sword.length()) {
                 break;
-            } else {
-                first = i;
-                firstChar = sword.charAt(first);
             }
+            first = i;
+            firstChar = sword.charAt(first);
         }
 
         if (index > (listIndex + 1)) {
@@ -676,7 +675,7 @@ public final class JAXBUtils {
             for (Method m : cls.getDeclaredMethods()) {
                 if (m.getName().equals("newInstance")
                     && m.getParameterTypes().length == 6) {
-                    ctx = m.invoke(null, clses.toArray(new Class[clses.size()]),
+                    ctx = m.invoke(null, clses.toArray(new Class<?>[clses.size()]),
                                          typeRefs, null, null, true, null);
 
                 }

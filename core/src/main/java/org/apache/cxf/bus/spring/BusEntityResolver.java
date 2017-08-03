@@ -75,11 +75,14 @@ public class BusEntityResolver extends DelegatingEntityResolver  {
             if (null == source) {
                 source = dtdResolver.resolveEntity(publicId, systemId);
             }
+            if (null == source) {
+                return null;
+            }
         }
         String resourceLocation = schemaMappings.get(systemId);
         if (resourceLocation != null && publicId == null) {
             Resource resource = new ClassPathResource(resourceLocation, classLoader);
-            if (resource != null && resource.exists()) {
+            if (resource.exists()) {
                 source.setPublicId(systemId);
                 source.setSystemId(resource.getURL().toString());
             }

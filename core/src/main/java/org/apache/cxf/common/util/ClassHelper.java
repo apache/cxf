@@ -81,8 +81,7 @@ public class ClassHelper {
         if (bus != null && bus.getProperty(ClassUnwrapper.class.getName()) != null) {
             ClassUnwrapper unwrapper = (ClassUnwrapper)bus.getProperty(ClassUnwrapper.class.getName());
             return unwrapper.getRealClass(o);
-        } else {
-            return HELPER.getRealClassInternal(o);
         }
+        return HELPER.getRealClassInternal(o);
     }
 }

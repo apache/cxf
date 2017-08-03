@@ -167,9 +167,8 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
                 aex.initCause(ex);
                 throw aex;
 
-            } else {
-                throw new AuthenticationException("Authentication failed (details can be found in server log)");
             }
+            throw new AuthenticationException("Authentication failed (details can be found in server log)");
         }
     }
 
@@ -194,9 +193,8 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         if (getRoleClassifier() != null) {
             return new RolePrefixSecurityContextImpl(subject, getRoleClassifier(),
                                                      getRoleClassifierType());
-        } else {
-            return new DefaultSecurityContext(name, subject);
         }
+        return new DefaultSecurityContext(name, subject);
     }
 
     public Configuration getLoginConfig() {

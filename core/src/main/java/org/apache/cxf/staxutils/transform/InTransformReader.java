@@ -102,10 +102,9 @@ public class InTransformReader extends DepthXMLStreamReader {
                 LOG.fine("pushed event available: " + currentEvent);
             }
             return currentEvent.getEvent();
-        } else {
-            if (doDebug) {
-                LOG.fine("no pushed event");
-            }
+        }
+        if (doDebug) {
+            LOG.fine("no pushed event");
         }
 
         int event = super.next();
@@ -279,9 +278,8 @@ public class InTransformReader extends DepthXMLStreamReader {
     public String getLocalName() {
         if (currentEvent != null) {
             return currentEvent.getName().getLocalPart();
-        } else {
-            return super.getLocalName();
         }
+        return super.getLocalName();
     }
 
 
@@ -319,9 +317,8 @@ public class InTransformReader extends DepthXMLStreamReader {
         if (actualNs != null) {
             if (actualNs.length() > 0) {
                 return super.getNamespacePrefix(index);
-            } else {
-                return "";
             }
+            return "";
         } else if (ns.equals(reader.getNamespaceURI())) {
             return getPrefix();
         } else {
@@ -335,17 +332,15 @@ public class InTransformReader extends DepthXMLStreamReader {
         String actualNs = nsMap.get(ns);
         if (actualNs != null) {
             return actualNs;
-        } else {
-            return ns != null ? ns : namespaceContext.getNamespaceURI(prefix);
         }
+        return ns != null ? ns : namespaceContext.getNamespaceURI(prefix);
     }
 
     public String getNamespaceURI() {
         if (currentEvent != null) {
             return currentEvent.getName().getNamespaceURI();
-        } else {
-            return super.getNamespaceURI();
         }
+        return super.getNamespaceURI();
     }
 
     private QName readCurrentElement() {
@@ -408,14 +403,12 @@ public class InTransformReader extends DepthXMLStreamReader {
         QName aname = getAttributeName(arg0);
         if (XMLConstants.NULL_NS_URI.equals(aname.getNamespaceURI())) {
             return "";
-        } else {
-            String actualNs = nsMap.get(aname.getNamespaceURI());
-            if (actualNs != null) {
-                return namespaceContext.findUniquePrefix(actualNs);
-            } else {
-                return namespaceContext.getPrefix(aname.getNamespaceURI());
-            }
         }
+        String actualNs = nsMap.get(aname.getNamespaceURI());
+        if (actualNs != null) {
+            return namespaceContext.findUniquePrefix(actualNs);
+        }
+        return namespaceContext.getPrefix(aname.getNamespaceURI());
     }
 
     public String getAttributeType(int arg0) {

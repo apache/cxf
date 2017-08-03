@@ -83,9 +83,8 @@ public class RolePrefixSecurityContextImpl implements LoginSecurityContext {
     private static boolean isRole(Principal p, String roleClassifier, String roleClassifierType) {
         if (JAASLoginInterceptor.ROLE_CLASSIFIER_PREFIX.equals(roleClassifierType)) {
             return p.getName().startsWith(roleClassifier);
-        } else {
-            return p.getClass().getName().endsWith(roleClassifier);
         }
+        return p.getClass().getName().endsWith(roleClassifier);
     }
 
     public Subject getSubject() {

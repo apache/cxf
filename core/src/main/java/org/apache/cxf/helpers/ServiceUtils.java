@@ -94,9 +94,8 @@ public final class ServiceUtils {
         if (obj != null) {
             // this method will transform the legacy enabled as well
             return getSchemaValidationType(obj);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private static SchemaValidationType getSchemaValidationTypeFromModel(Message message) {
@@ -111,7 +110,7 @@ public final class ServiceUtils {
                 OperationInfo opInfo = boi.getOperationInfo();
                 EndpointInfo ep = endpoint.getEndpointInfo();
 
-                if (validationType == null && opInfo != null) {
+                if (opInfo != null) {
                     validationType = getSchemaValidationTypeFromModel(opInfo);
 
                     if (validationType == null && ep != null) {
@@ -132,9 +131,8 @@ public final class ServiceUtils {
         Object obj = properties.getProperty(Message.SCHEMA_VALIDATION_TYPE);
         if (obj != null) {
             return getSchemaValidationType(obj);
-        } else {
-            return null;
         }
+        return null;
     }
 
     public static SchemaValidationType getSchemaValidationType(Object obj) {

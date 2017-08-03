@@ -160,9 +160,8 @@ public class CXFExtensionBundleListener implements SynchronousBundleListener {
                         throw new ExtensionException(new Message("PROBLEM_LOADING_EXTENSION_CLASS",
                                                                  Extension.LOG, name),
                                                      origExc);
-                    } else {
-                        throw ee;
                     }
+                    throw ee;
                 }
             }
             return c;

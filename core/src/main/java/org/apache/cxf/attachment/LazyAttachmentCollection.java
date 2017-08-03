@@ -95,10 +95,9 @@ public class LazyAttachmentCollection
                     Attachment a = deserializer.readNext();
                     if (a == null) {
                         return false;
-                    } else {
-                        attachments.add(a);
-                        return true;
                     }
+                    attachments.add(a);
+                    return true;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -280,9 +279,8 @@ public class LazyAttachmentCollection
                                         DataHandler h = at.getDataHandler();
                                         ((AttachmentImpl)at).setDataHandler(value);
                                         return h;
-                                    } else {
-                                        throw new UnsupportedOperationException();
                                     }
+                                    throw new UnsupportedOperationException();
                                 }
                             };
                         }

@@ -205,7 +205,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                     }
                 } else {
                     try {
-                        f = (Factory)scope.factoryClass().getConstructor(Class.class, String[].class)
+                        f = scope.factoryClass().getConstructor(Class.class, String[].class)
                             .newInstance(cls, scope.args());
                     } catch (Throwable t) {
                         throw new ServiceConstructionException(t);

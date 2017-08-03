@@ -121,7 +121,7 @@ public class OSGIBusListener implements BusLifeCycleListener {
             // ignore
         }
         if (refs == null) {
-            refs = new ServiceReference[]{};
+            refs = new ServiceReference<?>[]{};
         }
         return refs;
     }

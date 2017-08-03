@@ -272,12 +272,10 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             //their hosts also match
             if (conduitAddress.equalsIgnoreCase(actualAddress)) {
                 return true;
-            } else {
-                return cbg.isFullComparison() ? false : matchAddressSubstrings(conduitAddress, actualAddress);
             }
-        } else {
             return cbg.isFullComparison() ? false : matchAddressSubstrings(conduitAddress, actualAddress);
         }
+        return cbg.isFullComparison() ? false : matchAddressSubstrings(conduitAddress, actualAddress);
     }
 
     //smart address substring comparison that tries to avoid building and comparing substrings unless strictly required
@@ -290,10 +288,9 @@ public abstract class AbstractConduitSelector implements ConduitSelector, Closea
             conduitAddress = conduitAddress.substring(0, idx);
             actualAddress = actualAddress.substring(0, idx);
             return conduitAddress.equalsIgnoreCase(actualAddress);
-        } else {
-            //no possible match as for sure the substrings before idx will be different
-            return false;
         }
+        //no possible match as for sure the substrings before idx will be different
+        return false;
     }
 
     private static final class ContextualBooleanGetter {

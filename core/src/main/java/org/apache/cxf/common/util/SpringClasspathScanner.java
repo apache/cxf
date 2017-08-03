@@ -194,8 +194,7 @@ class SpringClasspathScanner extends ClasspathScanner {
         throws ClassNotFoundException {
         if (loader == null) {
             return ClassLoaderUtils.loadClass(className, getClass());
-        } else {
-            return loader.loadClass(className);
         }
+        return loader.loadClass(className);
     }
 }

@@ -247,17 +247,15 @@ public class TLSClientParameters extends TLSParameterBase {
     private static boolean equals(final Object[] a1, final Object[] a2) {
         if (a1 == null) {
             return a2 == null;
-        } else {
-            if (a2 != null && a1.length == a2.length) {
-                for (int i = 0; i < a1.length; i++) {
-                    if (!equals(a1[i], a2[i])) {
-                        return false;
-                    }
-                }
-                return true;
-            } else {
-                return false;
-            }
         }
+        if (a2 != null && a1.length == a2.length) {
+            for (int i = 0; i < a1.length; i++) {
+                if (!equals(a1[i], a2[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }

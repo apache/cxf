@@ -60,9 +60,8 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
                 }
             }
             return false;
-        } else {
-            return !checkConfiguredRolesOnly;
         }
+        return !checkConfiguredRolesOnly;
     }
 
     protected String createMethodSig(Method method) {

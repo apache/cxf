@@ -65,10 +65,9 @@ public class LazyDataSource implements DataSource {
                     if (dataSource != null) {
                         ids = null;
                         break;
-                    } else {
-                        throw new IllegalStateException("Could not get DataSource for "
-                                                        + "attachment of id " + id);
                     }
+                    throw new IllegalStateException("Could not get DataSource for "
+                                                    + "attachment of id " + id);
                 }
             }
             if (ids != null) {

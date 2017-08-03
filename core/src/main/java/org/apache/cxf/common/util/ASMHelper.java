@@ -229,9 +229,8 @@ public class ASMHelper {
             java.lang.reflect.Type[] bounds = tv.getBounds();
             if (bounds != null && bounds.length == 1) {
                 return getClassCode(bounds[0]);
-            } else {
-                throw new IllegalArgumentException("Unable to determine type for: " + tv);
             }
+            throw new IllegalArgumentException("Unable to determine type for: " + tv);
         } else if (type instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType)type;
             StringBuilder a = new StringBuilder(getClassCode(pt.getRawType()));

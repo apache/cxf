@@ -109,9 +109,8 @@ public abstract class BusFactory {
         if (defaultBus == null) {
             // never set up.
             return null;
-        } else {
-            return defaultBus;
         }
+        return defaultBus;
     }
 
     private static BusHolder getThreadBusHolder(boolean set) {

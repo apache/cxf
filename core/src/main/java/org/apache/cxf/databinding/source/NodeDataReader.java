@@ -58,7 +58,6 @@ public class NodeDataReader implements DataReader<Node> {
             try (CachedOutputStream out = new CachedOutputStream()) {
                 StaxUtils.writeTo(input, out);
                 InputStream is = out.getInputStream();
-                out.close();
 
                 return new StreamSource(is);
             } catch (IOException e) {

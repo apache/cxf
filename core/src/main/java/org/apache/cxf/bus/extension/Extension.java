@@ -251,17 +251,15 @@ public class Extension {
             notFound = true;
             if (!optional) {
                 throw ex;
-            } else {
-                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)ex);
             }
+            LOG.log(Level.FINE, "Could not load optional extension " + getName(), ex);
         } catch (InvocationTargetException ex) {
             notFound = true;
             if (!optional) {
                 throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()),
                                              ex.getCause());
-            } else {
-                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)ex);
             }
+            LOG.log(Level.FINE, "Could not load optional extension " + getName(), ex);
         } catch (NoSuchMethodException ex) {
             notFound = true;
             List<Object> a = new ArrayList<>();
@@ -274,16 +272,14 @@ public class Extension {
             if (!optional) {
                 throw new ExtensionException(new Message("PROBLEM_FINDING_CONSTRUCTOR", LOG,
                                                          cls.getName(), a), ex);
-            } else {
-                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)ex);
             }
+            LOG.log(Level.FINE, "Could not load optional extension " + getName(), ex);
         } catch (Throwable e) {
             notFound = true;
             if (!optional) {
                 throw new ExtensionException(new Message("PROBLEM_CREATING_EXTENSION_CLASS", LOG, cls.getName()), e);
-            } else {
-                LOG.log(Level.FINE, "Could not load optional extension " + getName(), (Throwable)e);
             }
+            LOG.log(Level.FINE, "Could not load optional extension " + getName(), e);
         }
         return obj;
     }

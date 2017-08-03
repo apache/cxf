@@ -112,10 +112,9 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
             W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
             StaxUtils.copy(saxSource, writer);
             return writer.getDocument();
-        } else {
-            return super.loadDocument(inputSource, entityResolver, errorHandler, validationMode,
-                                      namespaceAware);
         }
+        return super.loadDocument(inputSource, entityResolver, errorHandler, validationMode,
+                                  namespaceAware);
     }
 
     @Override

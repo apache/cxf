@@ -159,9 +159,8 @@ public final class ReflectionUtil {
             Exception e = pae.getException();
             if (e instanceof NoSuchMethodException) {
                 throw (NoSuchMethodException)e;
-            } else {
-                throw new SecurityException(e);
             }
+            throw new SecurityException(e);
         }
     }
     public static Method getMethod(final Class<?> clazz, final String name,
@@ -176,9 +175,8 @@ public final class ReflectionUtil {
             Exception e = pae.getException();
             if (e instanceof NoSuchMethodException) {
                 throw (NoSuchMethodException)e;
-            } else {
-                throw new SecurityException(e);
             }
+            throw new SecurityException(e);
         }
     }
 
@@ -231,7 +229,7 @@ public final class ReflectionUtil {
                 Class<?> cls = ClassLoaderUtils
                     .loadClass("org.springframework.beans.BeanUtils", refClass);
                 springBeanUtilsDescriptorFetcher
-                    = cls.getMethod("getPropertyDescriptor", new Class[] {Class.class, String.class});
+                    = cls.getMethod("getPropertyDescriptor", Class.class, String.class);
             } catch (Exception e) {
                 //ignore - just assume it's an unsupported/unknown annotation
             }
@@ -260,9 +258,8 @@ public final class ReflectionUtil {
                 return descriptors.toArray(new PropertyDescriptor[descriptors.size()]);
             }
             return null;
-        } else {
-            return beanInfo.getPropertyDescriptors();
         }
+        return beanInfo.getPropertyDescriptors();
     }
 
     /**

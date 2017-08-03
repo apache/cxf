@@ -38,7 +38,7 @@ public class NameDigestPasswordCallbackHandler implements CallbackHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(NameDigestPasswordCallbackHandler.class);
     private static final String PASSWORD_CALLBACK_NAME = "setObject";
     private static final Class<?>[] PASSWORD_CALLBACK_TYPES =
-        new Class[]{Object.class, char[].class, String.class};
+        new Class<?>[]{Object.class, char[].class, String.class};
 
     private String username;
     private String password;

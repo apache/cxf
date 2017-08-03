@@ -93,7 +93,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                         LOG, "(none)"));
             }
             throw new Fault(new org.apache.cxf.common.i18n.Message("INVALID_HTML_RESPONSETYPE",
-                    LOG, (htmlMessage == null || htmlMessage.length() == 0) ? "(none)" : htmlMessage));
+                    LOG, (htmlMessage.length() == 0) ? "(none)" : htmlMessage));
         }
         if (contentType == null) {
             //if contentType is null, this is likely a an empty post/put/delete/similar, lets see if it's

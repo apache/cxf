@@ -289,14 +289,13 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                 DOMSource o = new DOMSource(domreader.getCurrentElement());
                 domreader.consumeFrame();
                 return o;
-            } else {
-                Document document = StaxUtils.read(reader);
-                if (reader.hasNext()) {
-                    //need to actually consume the END_ELEMENT
-                    reader.next();
-                }
-                return new DOMSource(document);
             }
+            Document document = StaxUtils.read(reader);
+            if (reader.hasNext()) {
+                //need to actually consume the END_ELEMENT
+                reader.next();
+            }
+            return new DOMSource(document);
         } catch (XMLStreamException e) {
             throw new Fault("COULD_NOT_READ_XML_STREAM_CAUSED_BY", LOG, e,
                             e.getClass().getCanonicalName(), e.getMessage());

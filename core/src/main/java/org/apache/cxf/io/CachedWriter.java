@@ -307,21 +307,19 @@ public class CachedWriter extends Writer {
         if (inmem) {
             if (currentStream instanceof LoadingCharArrayWriter) {
                 return ((LoadingCharArrayWriter)currentStream).toCharArray();
-            } else {
-                throw new IOException("Unknown format of currentStream");
             }
-        } else {
-            // read the file
-            try (Reader fin = createInputStreamReader(tempFile)) {
-                CharArrayWriter out = new CharArrayWriter((int)tempFile.length());
-                char bytes[] = new char[1024];
-                int x = fin.read(bytes);
-                while (x != -1) {
-                    out.write(bytes, 0, x);
-                    x = fin.read(bytes);
-                }
-                return out.toCharArray();
+            throw new IOException("Unknown format of currentStream");
+        }
+        // read the file
+        try (Reader fin = createInputStreamReader(tempFile)) {
+            CharArrayWriter out = new CharArrayWriter((int)tempFile.length());
+            char bytes[] = new char[1024];
+            int x = fin.read(bytes);
+            while (x != -1) {
+                out.write(bytes, 0, x);
+                x = fin.read(bytes);
             }
+            return out.toCharArray();
         }
     }
 
@@ -491,37 +489,35 @@ public class CachedWriter extends Writer {
             if (currentStream instanceof LoadingCharArrayWriter) {
                 LoadingCharArrayWriter lcaw = (LoadingCharArrayWriter)currentStream;
                 return new CharArrayReader(lcaw.rawCharArray(), 0, lcaw.size());
-            } else {
-                return null;
             }
-        } else {
-            try {
-                InputStream fileInputStream = new FileInputStream(tempFile) {
+            return null;
+        }
+        try {
+            InputStream fileInputStream = new FileInputStream(tempFile) {
+                boolean closed;
+                public void close() throws IOException {
+                    if (!closed) {
+                        super.close();
+                        maybeDeleteTempFile(this);
+                    }
+                    closed = true;
+                }
+            };
+            streamList.add(fileInputStream);
+            if (cipherTransformation != null) {
+                fileInputStream = new CipherInputStream(fileInputStream, ciphers.getDecryptor()) {
                     boolean closed;
                     public void close() throws IOException {
                         if (!closed) {
                             super.close();
-                            maybeDeleteTempFile(this);
+                            closed = true;
                         }
-                        closed = true;
                     }
                 };
-                streamList.add(fileInputStream);
-                if (cipherTransformation != null) {
-                    fileInputStream = new CipherInputStream(fileInputStream, ciphers.getDecryptor()) {
-                        boolean closed;
-                        public void close() throws IOException {
-                            if (!closed) {
-                                super.close();
-                                closed = true;
-                            }
-                        }
-                    };
-                }
-                return new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
-            } catch (FileNotFoundException e) {
-                throw new IOException("Cached file was deleted, " + e.toString());
             }
+            return new InputStreamReader(fileInputStream, StandardCharsets.UTF_8);
+        } catch (FileNotFoundException e) {
+            throw new IOException("Cached file was deleted, " + e.toString());
         }
     }
 

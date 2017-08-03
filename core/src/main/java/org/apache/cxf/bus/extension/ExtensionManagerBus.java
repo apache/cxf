@@ -198,10 +198,9 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
         }
         if (null != obj) {
             return extensionType.cast(obj);
-        } else {
-            //record that it couldn't be found to avoid expensive searches again in the future
-            missingExtensions.add(extensionType);
         }
+        //record that it couldn't be found to avoid expensive searches again in the future
+        missingExtensions.add(extensionType);
         return null;
     }
 

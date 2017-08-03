@@ -200,41 +200,37 @@ public class ClientImpl
     }
 
     private EndpointInfo findEndpoint(Service svc, QName port) {
-        EndpointInfo epfo;
         if (port != null) {
-            epfo = svc.getEndpointInfo(port);
+            EndpointInfo epfo = svc.getEndpointInfo(port);
             if (epfo == null) {
                 throw new IllegalArgumentException("The service " + svc.getName()
                                                    + " does not have an endpoint " + port + ".");
             }
-        } else {
-            epfo = null;
-            for (ServiceInfo svcfo : svc.getServiceInfos()) {
-                for (EndpointInfo e : svcfo.getEndpoints()) {
-                    BindingInfo bfo = e.getBinding();
-                    String bid = bfo.getBindingId();
-                    if ("http://schemas.xmlsoap.org/wsdl/soap/".equals(bid)
-                        || "http://schemas.xmlsoap.org/wsdl/soap12/".equals(bid)) {
-                        for (Object o : bfo.getExtensors().get()) {
-                            try {
-                                String s = (String)o.getClass().getMethod("getTransportURI").invoke(o);
-                                if (s != null && s.endsWith("http")) {
-                                    return e;
-                                }
-                            } catch (Throwable t) {
-                                //ignore
+            return epfo;
+        }
+        
+        for (ServiceInfo svcfo : svc.getServiceInfos()) {
+            for (EndpointInfo e : svcfo.getEndpoints()) {
+                BindingInfo bfo = e.getBinding();
+                String bid = bfo.getBindingId();
+                if ("http://schemas.xmlsoap.org/wsdl/soap/".equals(bid)
+                    || "http://schemas.xmlsoap.org/wsdl/soap12/".equals(bid)) {
+                    for (Object o : bfo.getExtensors().get()) {
+                        try {
+                            String s = (String)o.getClass().getMethod("getTransportURI").invoke(o);
+                            if (s != null && s.endsWith("http")) {
+                                return e;
                             }
+                        } catch (Throwable t) {
+                            //ignore
                         }
                     }
                 }
             }
-            if (epfo == null) {
-                throw new UnsupportedOperationException(
-                     "Only document-style SOAP 1.1 and 1.2 http are supported "
-                     + "for auto-selection of endpoint; none were found.");
-            }
         }
-        return epfo;
+        throw new UnsupportedOperationException(
+             "Only document-style SOAP 1.1 and 1.2 http are supported "
+             + "for auto-selection of endpoint; none were found.");
     }
 
     public Endpoint getEndpoint() {
@@ -525,9 +521,8 @@ public class ClientImpl
 
             if (callback != null) {
                 return null;
-            } else {
-                return processResult(message, exchange, oi, resContext);
             }
+            return processResult(message, exchange, oi, resContext);
         } finally {
             if (origLoader != null) {
                 origLoader.reset();

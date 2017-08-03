@@ -279,9 +279,8 @@ public final class URIParserUtil {
                     return uri.normalize().toString();
                 }
                 return new File("").toURI().resolve(uri.getPath()).toString();
-            } else {
-                return normalize(arg);
             }
+            return normalize(arg);
         } catch (Exception e2) {
             return normalize(arg);
         }

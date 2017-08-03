@@ -21,7 +21,7 @@ package org.apache.cxf.common.util;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.net.URL;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -75,8 +75,12 @@ public class ClasspathScanner {
     public static Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClasses(
         String basePackage, Class< ? extends Annotation > ... annotations)
         throws IOException, ClassNotFoundException {
+        List<Class<? extends Annotation>> annotationList = new ArrayList<>(annotations.length);
+        for (Class< ? extends Annotation > c : annotations) {
+            annotationList.add(c);
+        }
         return findClasses(parsePackages(basePackage),
-                           Collections.unmodifiableList(Arrays.asList(annotations)));
+                           Collections.unmodifiableList(annotationList));
     }
 
     /**
@@ -91,7 +95,11 @@ public class ClasspathScanner {
     public static Map< Class< ? extends Annotation >, Collection< Class< ? > > > findClasses(
         Collection< String > basePackages, Class< ? extends Annotation > ... annotations)
         throws IOException, ClassNotFoundException {
-        return findClasses(basePackages, Collections.unmodifiableList(Arrays.asList(annotations)));
+        List<Class<? extends Annotation>> annotationList = new ArrayList<>(annotations.length);
+        for (Class< ? extends Annotation > c : annotations) {
+            annotationList.add(c);
+        }
+        return findClasses(basePackages, Collections.unmodifiableList(annotationList));
     }
 
     /**

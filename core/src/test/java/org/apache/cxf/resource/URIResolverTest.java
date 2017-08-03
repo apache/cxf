@@ -45,22 +45,17 @@ public class URIResolverTest extends Assert {
         URL jarURL = new URL(uriStr);
         InputStream is = jarURL.openStream();
         assertNotNull(is);
-        if (is != null) {
-            barray = new byte[is.available()];
-            is.read(barray);
-            is.close();
-        }
+        barray = new byte[is.available()];
+        is.read(barray);
+        is.close();
 
         uriResolver.resolve("baseUriStr", uriStr, null);
 
         InputStream is2 = uriResolver.getInputStream();
         assertNotNull(is2);
-        if (is2 != null) {
-            barray2 = new byte[is2.available()];
-            is2.read(barray2);
-            is2.close();
-
-        }
+        barray2 = new byte[is2.available()];
+        is2.read(barray2);
+        is2.close();
         assertEquals(IOUtils.newStringFromBytes(barray), IOUtils.newStringFromBytes(barray2));
     }
 

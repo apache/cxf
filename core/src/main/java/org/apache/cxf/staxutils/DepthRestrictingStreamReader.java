@@ -70,9 +70,8 @@ public class DepthRestrictingStreamReader extends DepthXMLStreamReader {
                     int currentCount = stack.pop();
                     if (++currentCount >= props.getInnerElementCountThreshold()) {
                         throw new DepthExceededStaxException();
-                    } else {
-                        stack.push(currentCount);
                     }
+                    stack.push(currentCount);
                 }
                 stack.push(0);
             }

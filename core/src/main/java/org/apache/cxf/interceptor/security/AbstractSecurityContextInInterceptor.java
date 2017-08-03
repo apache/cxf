@@ -72,9 +72,8 @@ public abstract class AbstractSecurityContextInInterceptor extends AbstractPhase
         Principal[] ps = subject.getPrincipals().toArray(new Principal[subject.getPrincipals().size()]);
         if (ps != null && ps.length > 0 && !(ps[0] instanceof Group)) {
             return ps[0];
-        } else {
-            return originalPrincipal;
         }
+        return originalPrincipal;
     }
 
     protected SecurityContext createSecurityContext(Principal p, Subject subject) {

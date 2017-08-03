@@ -37,9 +37,8 @@ public final class PackageUtils {
         int pos = className.lastIndexOf('.');
         if (pos != -1) {
             return className.substring(0, pos);
-        } else {
-            return "";
         }
+        return "";
     }
 
     public static String getPackageName(Class<?> clazz) {

@@ -76,12 +76,11 @@ public class BindingInfo extends AbstractDescriptionElement implements NamedItem
         if (a == null) {
             // in case of input/output itself is empty
             return true;
-        } else {
-            if (b == null) {
-                b = def;
-            }
-            return "".equals(a) ? "".equals(b) : a.equals(b);
         }
+        if (b == null) {
+            b = def;
+        }
+        return "".equals(a) ? "".equals(b) : a.equals(b);
     }
     public BindingOperationInfo buildOperation(QName opName, String inName, String outName) {
         for (OperationInfo op : getInterface().getOperations()) {

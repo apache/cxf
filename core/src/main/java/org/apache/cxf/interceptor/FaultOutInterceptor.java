@@ -131,8 +131,8 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
     protected Object getFaultBean(Throwable cause, FaultInfo faultPart, Message message) {
         if (cause instanceof FaultInfoException) {
             try {
-                Method method = cause.getClass().getMethod("getFaultInfo", new Class[0]);
-                return method.invoke(cause, new Object[0]);
+                Method method = cause.getClass().getMethod("getFaultInfo");
+                return method.invoke(cause);
             } catch (InvocationTargetException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("INVOKE_FAULT_INFO", LOG), e);
             } catch (NoSuchMethodException e) {
