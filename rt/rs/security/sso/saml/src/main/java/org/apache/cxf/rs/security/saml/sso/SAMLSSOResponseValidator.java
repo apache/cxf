@@ -249,7 +249,7 @@ public class SAMLSSOResponseValidator {
         }
 
         // Check address
-        if (subjectConfData.getAddress() != null
+        if (subjectConfData.getAddress() != null && clientAddress != null
             && !subjectConfData.getAddress().equals(clientAddress)) {
             LOG.fine("Subject Conf Data address " + subjectConfData.getAddress() + " does match"
                      + " client address " + clientAddress);
