@@ -24,15 +24,15 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.sse.OutboundSseEvent;
 
-public class OutboundSseEventImpl implements OutboundSseEvent {
-    private String id;
-    private String name;
-    private String comment;
-    private long reconnectDelay = -1;
-    private Class<?> type;
-    private Type genericType;
-    private MediaType mediaType;
-    private Object data;
+public final class OutboundSseEventImpl implements OutboundSseEvent {
+    private final String id;
+    private final String name;
+    private final String comment;
+    private final long reconnectDelay;
+    private final Class<?> type;
+    private final Type genericType;
+    private final MediaType mediaType;
+    private final Object data;
 
     public static class BuilderImpl implements Builder {
         private String id;
@@ -41,7 +41,7 @@ public class OutboundSseEventImpl implements OutboundSseEvent {
         private long reconnectDelay = -1;
         private Class<?> type;
         private Type genericType;
-        private MediaType mediaType;
+        private MediaType mediaType = MediaType.TEXT_PLAIN_TYPE;
         private Object data;
 
         @Override
@@ -77,6 +77,9 @@ public class OutboundSseEventImpl implements OutboundSseEvent {
         @Override
         @SuppressWarnings("rawtypes")
         public Builder data(Class newType, Object newData) {
+            if (newType == null || newData == null) {
+                throw new IllegalArgumentException("Parameters 'type' and 'data' must not be null.");
+            }
             this.type = newType;
             this.data = newData;
             return this;
@@ -85,6 +88,9 @@ public class OutboundSseEventImpl implements OutboundSseEvent {
         @Override
         @SuppressWarnings("rawtypes")
         public Builder data(GenericType newType, Object newData) {
+            if (newType == null || newData == null) {
+                throw new IllegalArgumentException("Parameters 'type' and 'data' must not be null.");
+            }
             this.genericType = newType.getType();
             this.data = newData;
             return this;
@@ -92,6 +98,10 @@ public class OutboundSseEventImpl implements OutboundSseEvent {
 
         @Override
         public Builder data(Object newData) {
+            if (newData == null) {
+                throw new IllegalArgumentException("Parameter 'data' must not be null.");
+            }
+            this.type = newData.getClass();
             this.data = newData;
             return this;
         }
@@ -112,7 +122,7 @@ public class OutboundSseEventImpl implements OutboundSseEvent {
 
     }
     //CHECKSTYLE:OFF
-    OutboundSseEventImpl(String id, String name, String comment, long reconnectDelay,
+    private OutboundSseEventImpl(String id, String name, String comment, long reconnectDelay,
             Class<?> type, Type genericType, MediaType mediaType, Object data) {
         this.id = id;
         this.name = name;
