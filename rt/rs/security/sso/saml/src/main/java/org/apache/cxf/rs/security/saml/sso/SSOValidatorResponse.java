@@ -21,6 +21,7 @@ package org.apache.cxf.rs.security.saml.sso;
 import java.time.Instant;
 
 import org.w3c.dom.Element;
+import org.opensaml.saml.saml2.core.Assertion;
 
 /**
  * Some information that encapsulates a successful validation by the SAMLSSOResponseValidator
@@ -31,6 +32,7 @@ public class SSOValidatorResponse {
     private String responseId;
     private String assertion;
     private Element assertionElement;
+    private Assertion opensamlAssertion;
 
     public String getAssertion() {
         return assertion;
@@ -70,5 +72,13 @@ public class SSOValidatorResponse {
 
     public void setCreated(Instant created) {
         this.created = created;
+    }
+
+    public Assertion getOpensamlAssertion() {
+        return opensamlAssertion;
+    }
+
+    public void setOpensamlAssertion(Assertion opensamlAssertion) {
+        this.opensamlAssertion = opensamlAssertion;
     }
 }

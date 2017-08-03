@@ -158,6 +158,7 @@ public class SAMLSSOResponseValidator {
         Element clonedAssertionElement = (Element)assertionElement.cloneNode(true);
         validatorResponse.setAssertionElement(clonedAssertionElement);
         validatorResponse.setAssertion(DOM2Writer.nodeToString(clonedAssertionElement));
+        validatorResponse.setOpensamlAssertion(validAssertion);
 
         return validatorResponse;
     }
