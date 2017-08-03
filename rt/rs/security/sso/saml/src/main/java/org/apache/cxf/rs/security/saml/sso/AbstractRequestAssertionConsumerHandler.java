@@ -66,6 +66,7 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
     private boolean enforceAssertionsSigned = true;
     private boolean enforceKnownIssuer = true;
     private boolean keyInfoMustBeAvailable = true;
+    private boolean checkClientAddress = true;
     private boolean enforceResponseSigned;
     private TokenReplayCache<String> replayCache;
 
@@ -343,8 +344,10 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
             }
             ssoResponseValidator.setAssertionConsumerURL(racsAddress);
 
-            ssoResponseValidator.setClientAddress(
-                 messageContext.getHttpServletRequest().getRemoteAddr());
+            if (checkClientAddress) {
+                ssoResponseValidator.setClientAddress(
+                    messageContext.getHttpServletRequest().getRemoteAddr());
+            }
 
             ssoResponseValidator.setIssuerIDP(requestState.getIdpServiceAddress());
             ssoResponseValidator.setRequestId(requestState.getSamlRequestId());
@@ -414,6 +417,14 @@ public abstract class AbstractRequestAssertionConsumerHandler extends AbstractSS
 
     public void setAssertionConsumerServiceAddress(String assertionConsumerServiceAddress) {
         this.assertionConsumerServiceAddress = assertionConsumerServiceAddress;
+    }
+
+    public boolean isCheckClientAddress() {
+        return checkClientAddress;
+    }
+
+    public void setCheckClientAddress(boolean checkClientAddress) {
+        this.checkClientAddress = checkClientAddress;
     }
 
 }
