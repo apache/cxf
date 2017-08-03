@@ -121,7 +121,7 @@ public class RequestParser {
                     }
                     if (!found) {
                         if (allowCustomContent) {
-                            tokenRequirements.addCustomContentJAXB(jaxbElement);
+                            tokenRequirements.addCustomContent(jaxbElement);
                         } else {
                             LOG.log(
                                 Level.WARNING,

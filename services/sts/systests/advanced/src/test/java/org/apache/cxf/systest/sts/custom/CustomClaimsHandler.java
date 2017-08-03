@@ -49,10 +49,14 @@ public class CustomClaimsHandler implements ClaimsHandler {
 
         if (claims != null && !claims.isEmpty()) {
             ProcessedClaimCollection claimCollection = new ProcessedClaimCollection();
-            List<Element> customContent = parameters.getTokenRequirements().getCustomContent();
+            List<Object> customContent = parameters.getTokenRequirements().getCustomContent();
             boolean foundContent = false;
             if (customContent != null) {
-                for (Element customContentElement : customContent) {
+                for (Object customContentObj : customContent) {
+                    if (!(customContentObj instanceof Element)) {
+                        continue;
+                    }
+                    Element customContentElement = (Element)customContentObj;
                     Element realm = XMLUtils.findElement(customContentElement, "realm", "http://cxf.apache.org/custom");
                     if (realm != null) {
                         String realmStr = realm.getTextContent();

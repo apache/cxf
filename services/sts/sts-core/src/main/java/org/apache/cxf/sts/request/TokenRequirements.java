@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
-
 import org.w3c.dom.Element;
 
 import org.apache.cxf.rt.security.claims.ClaimCollection;
@@ -47,8 +45,7 @@ public class TokenRequirements {
     private ClaimCollection secondaryClaims;
     private Renewing renewing;
     private Participants participants;
-    private final List<Element> customContent = new ArrayList<>();
-    private final List<JAXBElement<?>> customContentJAXB = new ArrayList<>();
+    private final List<Object> customContent = new ArrayList<>();
 
     public Renewing getRenewing() {
         return renewing;
@@ -154,23 +151,13 @@ public class TokenRequirements {
         this.participants = participants;
     }
 
-    public List<Element> getCustomContent() {
+    public List<Object> getCustomContent() {
         return Collections.unmodifiableList(customContent);
     }
 
-    public void addCustomContent(Element customElement) {
+    public void addCustomContent(Object customElement) {
         if (customElement != null) {
             this.customContent.add(customElement);
-        }
-    }
-
-    public List<JAXBElement<?>> getCustomContentJAXB() {
-        return Collections.unmodifiableList(customContentJAXB);
-    }
-
-    public void addCustomContentJAXB(JAXBElement<?> jaxbElement) {
-        if (jaxbElement != null) {
-            this.customContentJAXB.add(jaxbElement);
         }
     }
 
