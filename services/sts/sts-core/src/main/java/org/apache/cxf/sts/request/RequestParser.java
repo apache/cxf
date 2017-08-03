@@ -120,13 +120,17 @@ public class RequestParser {
                         found = parseKeyRequirements(jaxbElement, keyRequirements, messageContext, stsProperties);
                     }
                     if (!found) {
-                        LOG.log(
-                            Level.WARNING, 
-                            "Found a JAXB object of unknown type: " + jaxbElement.getName()
-                        );
-                        throw new STSException(
-                            "An unknown element was received", STSException.BAD_REQUEST
-                        );
+                        if (allowCustomContent) {
+                            tokenRequirements.addCustomContentJAXB(jaxbElement);
+                        } else {
+                            LOG.log(
+                                Level.WARNING,
+                                "Found a JAXB object of unknown type: " + jaxbElement.getName()
+                            );
+                            throw new STSException(
+                                "An unknown element was received", STSException.BAD_REQUEST
+                            );
+                        }
                     }
                 } catch (STSException ex) {
                     LOG.log(Level.WARNING, "", ex);
