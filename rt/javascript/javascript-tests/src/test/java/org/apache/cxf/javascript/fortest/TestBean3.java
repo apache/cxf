@@ -109,9 +109,8 @@ public class TestBean3 {
         // decisions are simpler for the last one.
         if (null == beanTwoNotRequiredItem) {
             return other.beanTwoNotRequiredItem == null;
-        } else {
-            return beanTwoNotRequiredItem.equals(other.beanTwoNotRequiredItem);
         }
+        return beanTwoNotRequiredItem.equals(other.beanTwoNotRequiredItem);
     }
 
     @Override

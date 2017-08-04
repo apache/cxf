@@ -83,10 +83,10 @@ public class JsSimpleDomNode extends ScriptableObject {
 
     public Object jsGet_firstChild() {
         establishChildren();
-        if (!children.isEmpty())
+        if (!children.isEmpty()) {
             return children.get(0);
-        else
-            return null;
+        }
+        return null;
     }
 
     public Object jsGet_nextSibling() {
@@ -118,10 +118,9 @@ public class JsSimpleDomNode extends ScriptableObject {
     public Object jsGet_documentElement() {
         if (9 /* Document */!= wrappedNode.getNodeType()) {
             return null;
-        } else {
-            establishChildren();
-            return children.get(0); // it is, after all, just a convenience feature.
         }
+        establishChildren();
+        return children.get(0); // it is, after all, just a convenience feature.
     }
 
     public Object[] jsGet_childNodes() {
@@ -139,10 +138,9 @@ public class JsSimpleDomNode extends ScriptableObject {
         Node attrNode = attributes.getNamedItemNS(namespaceURI, localName);
         if (attrNode == null) {
             return null;
-        } else {
-            Attr attribute = (Attr)attrNode;
-            return attribute.getValue();
         }
+        Attr attribute = (Attr)attrNode;
+        return attribute.getValue();
     }
 
     public String jsFunction_getAttribute(String localName) {
@@ -150,10 +148,9 @@ public class JsSimpleDomNode extends ScriptableObject {
         Node attrNode = attributes.getNamedItem(localName);
         if (attrNode == null) {
             return null;
-        } else {
-            Attr attribute = (Attr)attrNode;
-            return attribute.getValue();
         }
+        Attr attribute = (Attr)attrNode;
+        return attribute.getValue();
     }
 
     // CHECKSTYLE:ON

@@ -39,6 +39,7 @@ import org.apache.cxf.sts.request.KeyRequirements;
 import org.apache.cxf.sts.service.EncryptionProperties;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.security.wss4j.WSS4JUtils;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.WSEncryptionPart;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.dom.handler.WSHandlerConstants;
@@ -153,7 +154,7 @@ public final class TokenProviderUtils {
         doc.appendChild(element);
 
         WSSecEncrypt builder = new WSSecEncrypt(doc);
-        if (WSHandlerConstants.USE_REQ_SIG_CERT.equals(name)) {
+        if (ConfigurationConstants.USE_REQ_SIG_CERT.equals(name)) {
             X509Certificate cert = getReqSigCert(messageContext);
             builder.setUseThisCert(cert);
         } else {

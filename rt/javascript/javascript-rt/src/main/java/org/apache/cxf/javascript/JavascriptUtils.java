@@ -119,9 +119,8 @@ public class JavascriptUtils {
         String val = defaultValueForSimpleType.get(type.getName());
         if (val == null) { // ints and such return the appropriate 0.
             return "''";
-        } else {
-            return val;
         }
+        return val;
     }
 
     public boolean isStringSimpleType(QName typeName) {
@@ -680,14 +679,13 @@ public class JavascriptUtils {
                 }
             }
             return results;
-        } else {
-            // no base type, the simple case.
-            XmlSchemaSequence sequence = getSequence(type);
-            for (XmlSchemaSequenceMember item : sequence.getItems()) {
-                results.add((XmlSchemaObject)item);
-            }
-            return results;
         }
+        // no base type, the simple case.
+        XmlSchemaSequence sequence = getSequence(type);
+        for (XmlSchemaSequenceMember item : sequence.getItems()) {
+            results.add((XmlSchemaObject)item);
+        }
+        return results;
     }
 
     public static XmlSchemaSequence getContentSequence(XmlSchemaComplexType type) {
@@ -737,8 +735,7 @@ public class JavascriptUtils {
     static String cleanedUpSchemaSource(XmlSchemaObject subject) {
         if (subject == null || subject.getSourceURI() == null) {
             return "";
-        } else {
-            return subject.getSourceURI() + ":" + subject.getLineNumber();
         }
+        return subject.getSourceURI() + ":" + subject.getLineNumber();
     }
 }

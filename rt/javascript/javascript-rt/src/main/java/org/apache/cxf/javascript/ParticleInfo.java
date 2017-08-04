@@ -473,9 +473,8 @@ public final class ParticleInfo implements ItemInfo {
     public String getDefaultValue() {
         if (isOptional()) {
             return "null";
-        } else {
-            return defaultValue;
         }
+        return defaultValue;
     }
 
     /**
