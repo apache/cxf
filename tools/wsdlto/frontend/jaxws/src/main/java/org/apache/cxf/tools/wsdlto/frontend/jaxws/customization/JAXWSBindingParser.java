@@ -92,13 +92,13 @@ public class JAXWSBindingParser {
                     jaxwsBinding.setEnableWrapperStyle(getNodeValue(child));
                 } else if (isPackageElement(child)) {
                     jaxwsBinding.setPackage(getPackageName(child));
-                    Node docChild = DOMUtils.getChild(child, Element.ELEMENT_NODE);
+                    Node docChild = DOMUtils.getChild(child, Node.ELEMENT_NODE);
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
                         jaxwsBinding.setPackageJavaDoc(StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild)));
                     }
                 } else if (isJAXWSMethodElement(child)) {
                     jaxwsBinding.setMethodName(getMethodName(child));
-                    Node docChild = DOMUtils.getChild(child, Element.ELEMENT_NODE);
+                    Node docChild = DOMUtils.getChild(child, Node.ELEMENT_NODE);
 
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
                         jaxwsBinding.setMethodJavaDoc(StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild)));
@@ -137,7 +137,7 @@ public class JAXWSBindingParser {
                     Element childElement = (Element)child;
                     String clzName = childElement.getAttribute("name");
                     String javadoc = "";
-                    Node docChild = DOMUtils.getChild(child, Element.ELEMENT_NODE);
+                    Node docChild = DOMUtils.getChild(child, Node.ELEMENT_NODE);
 
                     if (docChild != null && this.isJAXWSClassDoc(docChild)) {
                         javadoc = StringEscapeUtils.escapeHtml(DOMUtils.getContent(docChild));

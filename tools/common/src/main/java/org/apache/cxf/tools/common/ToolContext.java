@@ -109,9 +109,8 @@ public class ToolContext {
     public Object get(String key, Object defaultValue) {
         if (!optionSet(key)) {
             return defaultValue;
-        } else {
-            return get(key);
         }
+        return get(key);
     }
 
     /**
@@ -163,9 +162,8 @@ public class ToolContext {
         String verboseProperty = get(ToolConstants.CFG_VERBOSE, String.class);
         if (verboseProperty == null) {
             return false;
-        } else {
-            return ToolConstants.CFG_VERBOSE.equals(verboseProperty) || Boolean.parseBoolean(verboseProperty);
         }
+        return ToolConstants.CFG_VERBOSE.equals(verboseProperty) || Boolean.parseBoolean(verboseProperty);
     }
 
     // REVIST: Prefer using optionSet, to keep the context clean
@@ -224,13 +222,11 @@ public class ToolContext {
         }
         if (hasNamespace(ns)) {
             return mapNamespaceToPackageName(ns);
-        } else {
-            if (getPackageName() != null) {
-                return getPackageName();
-            }
-            return URIParserUtil.parsePackageName(ns, null);
-
         }
+        if (getPackageName() != null) {
+            return getPackageName();
+        }
+        return URIParserUtil.parsePackageName(ns, null);
     }
 
     public String getCustomizedNS(String ns) {
@@ -270,9 +266,8 @@ public class ToolContext {
                 String ns = pns.substring(0, pos);
                 localname = pns.substring(pos + 1);
                 return new QName(ns, localname);
-            } else {
-                return new QName(defaultNamespace, localname);
             }
+            return new QName(defaultNamespace, localname);
         }
         return null;
     }

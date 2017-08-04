@@ -457,9 +457,8 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
     private boolean isOverloading(String operationName) {
         if (operationMap.contains(operationName)) {
             return true;
-        } else {
-            operationMap.add(operationName);
         }
+        operationMap.add(operationName);
         return false;
     }
 

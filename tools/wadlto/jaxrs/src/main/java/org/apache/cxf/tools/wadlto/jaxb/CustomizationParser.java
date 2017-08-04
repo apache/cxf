@@ -184,9 +184,8 @@ public final class CustomizationParser {
         if (files != null) {
             return files instanceof String ? new String[]{(String)files}
                                                    : (String[])files;
-        } else {
-            return new String[] {};
         }
+        return new String[] {};
     }
 
     public List<InputSource> getJaxbBindings() {

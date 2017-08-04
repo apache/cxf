@@ -91,10 +91,9 @@ public abstract class WSDLCorbaFactory {
                 throw new WSDLException(WSDLException.CONFIGURATION_ERROR, "Problem instantiating factory "
                                                                            + "implementation.", e);
             }
-        } else {
-            throw new WSDLException(WSDLException.CONFIGURATION_ERROR, "Unable to find name of factory "
-                                                                       + "implementation.");
         }
+        throw new WSDLException(WSDLException.CONFIGURATION_ERROR, "Unable to find name of factory "
+                                                                   + "implementation.");
     }
 
     /**

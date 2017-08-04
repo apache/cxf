@@ -146,11 +146,10 @@ public class JavaType {
         Constructor<?>[] cons = clz.getConstructors();
         if (cons.length == 0) {
             return false;
-        } else {
-            for (int i = 0; i < cons.length; i++) {
-                if (cons[i].getParameterTypes().length == 0) {
-                    return true;
-                }
+        }
+        for (int i = 0; i < cons.length; i++) {
+            if (cons[i].getParameterTypes().length == 0) {
+                return true;
             }
         }
         return false;

@@ -211,10 +211,9 @@ public class Option implements TokenConsumer {
         for (int i = 0; i < value.length(); i++) {
             if (value.charAt(i) == '.') {
                 continue;
-            } else {
-                if (!Character.isJavaIdentifierPart(value.charAt(i))) {
-                    return false;
-                }
+            }
+            if (!Character.isJavaIdentifierPart(value.charAt(i))) {
+                return false;
             }
         }
         return true;
@@ -223,10 +222,9 @@ public class Option implements TokenConsumer {
     private boolean isNamingSpacePackageString(String value) {
         if (value.indexOf("=") < 0) {
             return isIdentifyString(value);
-        } else {
-            String packageName = value.substring(value.indexOf("=") + 1, value.length());
-            return isIdentifyString(packageName);
         }
+        String packageName = value.substring(value.indexOf("=") + 1, value.length());
+        return isIdentifyString(packageName);
     }
 
 

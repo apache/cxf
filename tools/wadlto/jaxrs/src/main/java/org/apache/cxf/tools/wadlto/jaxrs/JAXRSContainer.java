@@ -244,17 +244,15 @@ public class JAXRSContainer extends AbstractCXFToolContainer {
                 methods.add("*");
             }
             return methods;
-        } else {
-            return Collections.emptySet();
         }
+        return Collections.emptySet();
     }
     private boolean isInheritResourceParamsFirst() {
         Object value = context.get(WadlToolConstants.CFG_INHERIT_PARAMS);
         if (StringUtils.isEmpty((String)value)) {
             return true;
-        } else {
-            return "first".equals(value.toString().trim());
         }
+        return "first".equals(value.toString().trim());
     }
 
     //TODO: this belongs to JAXB Databinding, should we just reuse

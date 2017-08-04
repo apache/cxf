@@ -386,9 +386,8 @@ public class ObjectReferenceVisitor extends VisitorBase {
                                              "InferFromTypeId",
                                              b.getQName().getPrefix());
 
-                        } else {
-                            return b.getQName();
                         }
+                        return b.getQName();
                     }
                 }
             }

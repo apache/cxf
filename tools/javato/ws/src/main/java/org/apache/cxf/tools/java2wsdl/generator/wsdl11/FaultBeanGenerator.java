@@ -40,9 +40,8 @@ public final class FaultBeanGenerator extends BeanGenerator {
         String pkg = PackageUtils.getPackageName(method.getDeclaringClass());
         if (pkg.length() == 0) {
             return ToolConstants.DEFAULT_PACKAGE_NAME;
-        } else {
-            return pkg;
         }
+        return pkg;
     }
 
     protected Collection<JavaClass> generateBeanClasses(final ServiceInfo serviceInfo) {

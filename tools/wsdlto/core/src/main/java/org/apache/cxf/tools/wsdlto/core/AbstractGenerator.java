@@ -82,7 +82,7 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
         }
 
         fw = new FileWriterUtil(getOutputDir(),
-                                (OutputStreamCreator)env.get(OutputStreamCreator.class));
+                                env.get(OutputStreamCreator.class));
         try {
             if (".java".equals(ext)) {
                 writer = fw.getWriter(packageName, filename + ext,

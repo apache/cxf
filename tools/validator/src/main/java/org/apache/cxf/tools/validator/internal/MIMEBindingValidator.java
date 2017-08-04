@@ -109,17 +109,16 @@ public class MIMEBindingValidator
                                 + operationName
                                 + "): Must provide part attribute value for meme:content elements");
                 return false;
+            }
+            if (partName == null) {
+                partName = mimeContnetPart;
             } else {
-                if (partName == null) {
-                    partName = mimeContnetPart;
-                } else {
-                    if (!partName.equals(mimeContnetPart)) {
-                        addErrorMessage("Operation("
-                                        + operationName
-                                        + "): Part attribute value for meme:content "
-                                        + "elements are different");
-                        return false;
-                    }
+                if (!partName.equals(mimeContnetPart)) {
+                    addErrorMessage("Operation("
+                                    + operationName
+                                    + "): Part attribute value for meme:content "
+                                    + "elements are different");
+                    return false;
                 }
             }
         }

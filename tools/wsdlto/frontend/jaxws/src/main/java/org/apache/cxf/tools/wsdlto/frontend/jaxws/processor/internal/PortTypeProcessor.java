@@ -163,9 +163,8 @@ public class PortTypeProcessor extends AbstractProcessor {
     private boolean isOverloading(QName operationName) {
         if (operationMap.contains(operationName)) {
             return true;
-        } else {
-            operationMap.add(operationName);
         }
+        operationMap.add(operationName);
         return false;
     }
 

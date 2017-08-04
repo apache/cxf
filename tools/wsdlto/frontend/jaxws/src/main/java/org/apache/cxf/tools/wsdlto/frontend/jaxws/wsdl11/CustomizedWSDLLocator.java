@@ -64,10 +64,9 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
                 new OASISCatalogManagerHelper().resolve(catalogResolver, target, base);
             if (resolvedLocation == null) {
                 return this.resolver.resolve(target, base);
-            } else {
-                resolvedMap.put(target, resolvedLocation);
-                return this.resolver.resolve(resolvedLocation, base);
             }
+            resolvedMap.put(target, resolvedLocation);
+            return this.resolver.resolve(resolvedLocation, base);
         } catch (Exception e) {
             throw new RuntimeException("Catalog resolve failed: ", e);
         }

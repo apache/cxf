@@ -154,9 +154,8 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
                             || names.get(mappedName).equals(element.getSchemaTypeName()))) {
                         handleErrors(names.get(mappedName), element);
                         return false;
-                    } else {
-                        names.put(mappedName, element.getSchemaTypeName());
                     }
+                    names.put(mappedName, element.getSchemaTypeName());
                 }
             }
 
@@ -174,9 +173,8 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
                                 || (mn != null && mn.equals(element.getSchemaTypeName())))) {
                             handleErrors(names.get(mappedName), element);
                             return false;
-                        } else {
-                            names.put(mappedName, element.getSchemaTypeName());
                         }
+                        names.put(mappedName, element.getSchemaTypeName());
                     }
                 }
             }

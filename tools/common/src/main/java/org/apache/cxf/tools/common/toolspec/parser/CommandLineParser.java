@@ -132,16 +132,15 @@ public class CommandLineParser {
                 if (form.accept(tokens, commandEl, errors)) {
                     commandEl.setAttribute("form", form.getName());
                     break;
-                } else {
-                    // if no more left then return null;
-                    tokens.setPosition(pos);
+                }
+                // if no more left then return null;
+                tokens.setPosition(pos);
 
-                    if (elem.getNextSibling() == null) {
-                        if (LOG.isLoggable(Level.INFO)) {
-                            LOG.info("No more forms left to try, returning null");
-                        }
-                        throwUsage(errors);
+                if (elem.getNextSibling() == null) {
+                    if (LOG.isLoggable(Level.INFO)) {
+                        LOG.info("No more forms left to try, returning null");
                     }
+                    throwUsage(errors);
                 }
 
 

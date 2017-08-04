@@ -92,15 +92,14 @@ public class UniqueBodyValidator extends ServiceValidator {
                                               endpoint.getName(), op.getName(), opName, mName);
                     addErrorMessage(msg.toString());
                     return false;
-                } else {
-                    uniqueNames.put(mName, op.getName());
-                    if (action != null) {
-                        if (opActions == null) {
-                            opActions = new HashSet<>();
-                            actions.put(mName, opActions);
-                        }
-                        opActions.add(action);
+                }
+                uniqueNames.put(mName, op.getName());
+                if (action != null) {
+                    if (opActions == null) {
+                        opActions = new HashSet<>();
+                        actions.put(mName, opActions);
                     }
+                    opActions.add(action);
                 }
             }
 

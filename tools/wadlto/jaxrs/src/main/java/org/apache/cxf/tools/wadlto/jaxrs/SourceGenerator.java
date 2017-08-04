@@ -383,9 +383,8 @@ public class SourceGenerator {
         if (href.length() > 0 && href.startsWith("#")) {
             return resolveLocalReference(wadlEl.getOwnerDocument().getDocumentElement(),
                                          wadlEl.getLocalName(), href);
-        } else {
-            return wadlEl;
         }
+        return wadlEl;
     }
 
     private Element resolveLocalReference(Element appEl, String elementName, String localRef) {
@@ -576,25 +575,22 @@ public class SourceGenerator {
     private String firstCharToUpperCase(String name) {
         if (name.length() > 0 && Character.isLowerCase(name.charAt(0))) {
             return StringUtils.capitalize(name);
-        } else {
-            return name;
         }
+        return name;
     }
 
     private String firstCharToLowerCase(String name) {
         if (name.length() > 0 && Character.isUpperCase(name.charAt(0))) {
             return StringUtils.uncapitalize(name);
-        } else {
-            return name;
         }
+        return name;
     }
 
     private boolean writeAnnotations(boolean interfaceIsGenerated) {
         if (interfaceIsGenerated) {
             return true;
-        } else {
-            return !generateInterfaces && generateImpl;
         }
+        return !generateInterfaces && generateImpl;
     }
 
     private void writeImplementsInterface(StringBuilder sb, String clsName,
@@ -921,9 +917,8 @@ public class SourceGenerator {
         Element doc = DOMUtils.getFirstChildWithName(el, getWadlNamespace(), "doc");
         if (doc != null) {
             return DOMUtils.getContent(doc);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private void writeCustomHttpMethod(ContextInfo info,
@@ -1157,10 +1152,9 @@ public class SourceGenerator {
             if (useVoidForEmptyResponses && !responseRequired || suspendedAsync) {
                 sbCode.append("void ");
                 return false;
-            } else {
-                writeJaxrResponse(sbCode, imports);
-                return true;
             }
+            writeJaxrResponse(sbCode, imports);
+            return true;
         }
         String elementType = null;
         if (!responseRequired) {
@@ -1477,10 +1471,9 @@ public class SourceGenerator {
         String theName = name.toUpperCase();
         if (theName.length() == 1) {
             return theName;
-        } else {
-            theName = theName.substring(0, 1) + theName.substring(1).toLowerCase();
-            return theName.replaceAll("[\\.\\-]", "");
         }
+        theName = theName.substring(0, 1) + theName.substring(1).toLowerCase();
+        return theName.replaceAll("[\\.\\-]", "");
     }
 
     private List<Element> getWadlElements(Element parent, String name) {
@@ -1520,9 +1513,8 @@ public class SourceGenerator {
 
             String value = pair[1].replaceAll("[\\-\\_]", "");
             return convertRefToClassName(pair[0], value, defaultValue, info, imports);
-        } else {
-            return addImportsAndGetSimpleName(imports, type);
         }
+        return addImportsAndGetSimpleName(imports, type);
 
     }
 
@@ -1853,9 +1845,8 @@ public class SourceGenerator {
             } catch (Exception e) {
                 throw new RuntimeException("Catalog resolution failed", e);
             }
-        } else {
-            return null;
         }
+        return null;
     }
 
     private Element readIncludedDocument(String href) {

@@ -125,9 +125,8 @@ public final class AnnotationUtil {
         Annotation ann = method.getAnnotation(WebResult.class);
         if (ann == null) {
             return null;
-        } else {
-            return (WebResult)ann;
         }
+        return (WebResult)ann;
     }
 
 }

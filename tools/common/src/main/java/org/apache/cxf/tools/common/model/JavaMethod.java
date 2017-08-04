@@ -174,11 +174,10 @@ public class JavaMethod implements JavaAnnotatable {
                 //removeParameter(paramInList);
                 replaceParameter(paramInList, param);
                 return;
-            } else {
-                Message message = new Message("PARAMETER_ALREADY_EXIST", LOG, param.getName(),
-                                              getName(), paramInList.getType(), param.getType());
-                throw new ToolException(message);
             }
+            Message message = new Message("PARAMETER_ALREADY_EXIST", LOG, param.getName(),
+                                          getName(), paramInList.getType(), param.getType());
+            throw new ToolException(message);
         }
 
         if (param.getType() == null && param.getClassName() == null) {
