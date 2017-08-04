@@ -29,10 +29,26 @@ import javax.ws.rs.core.Response;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.systests.cdi.base.provider.Custom1ReaderWriter;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.Test;
 
 public abstract class AbstractCdiSingleAppTest extends AbstractBusClientServerTestBase {
+    @Test
+    public void testOverridenMediaTypeForProducerSupport() {
+        assertStatusAndPayload(
+                createWebClient(getBasePath().replace("bookstore", "custom/1"), "custom1/default").get(),
+                Response.Status.OK.getStatusCode(),
+                Custom1ReaderWriter.class.getName());
+        assertStatusAndPayload(
+                createWebClient(getBasePath().replace("bookstore", "custom/1/override"), "custom1/default").get(),
+                406, null);
+        assertStatusAndPayload(
+                createWebClient(getBasePath().replace("bookstore", "custom/1/override"), "custom1/overriden").get(),
+                Response.Status.OK.getStatusCode(),
+                Custom1ReaderWriter.class.getName());
+    }
+
     @Test
     public void testInjectedVersionIsProperlyReturned() {
         Response r = createWebClient(getBasePath() + "/version", MediaType.TEXT_PLAIN).get();
@@ -93,4 +109,11 @@ public abstract class AbstractCdiSingleAppTest extends AbstractBusClientServerTe
     }
 
     protected abstract int getPort();
+
+    private void assertStatusAndPayload(final Response response, final int statusCode, final String payload) {
+        assertEquals(statusCode, response.getStatus());
+        if (payload != null) {
+            assertEquals(payload, response.readEntity(String.class));
+        }
+    }
 }
