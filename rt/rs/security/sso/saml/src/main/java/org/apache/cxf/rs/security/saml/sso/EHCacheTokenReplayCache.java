@@ -137,10 +137,10 @@ public class EHCacheTokenReplayCache implements TokenReplayCache<String> {
         }
 
         int parsedTTL = (int)timeToLive;
-        if (timeToLive != (long)parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
+        if (timeToLive != parsedTTL || parsedTTL < 0 || parsedTTL > MAX_TTL) {
             // Default to configured value
             parsedTTL = (int)ttl;
-            if (ttl != (long)parsedTTL) {
+            if (ttl != parsedTTL) {
                 // Fall back to 60 minutes if the default TTL is set incorrectly
                 parsedTTL = 3600;
             }

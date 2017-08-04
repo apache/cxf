@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.wssec.examples.common.SecurityTestUtil;
 import org.apache.cxf.systest.wssec.examples.common.TestParam;
@@ -97,8 +98,8 @@ public class SecureConversationTest extends AbstractBusClientServerTestBase {
         URL busFile = SecureConversationTest.class.getResource("client.xml");
 
         Bus bus = bf.createBus(busFile.toString());
-        SpringBusFactory.setDefaultBus(bus);
-        SpringBusFactory.setThreadDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
 
         URL wsdl = SecureConversationTest.class.getResource("DoubleItSecConv.wsdl");
         Service service = Service.create(wsdl, SERVICE_QNAME);

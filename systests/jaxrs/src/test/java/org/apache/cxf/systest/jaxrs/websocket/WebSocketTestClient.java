@@ -251,7 +251,7 @@ class WebSocketTestClient {
                 entity = ((String)data).substring(pos);
             } else if (data instanceof byte[]) {
                 entity = new byte[((byte[])data).length - pos];
-                System.arraycopy((byte[])data, pos, (byte[])entity, 0, ((byte[])entity).length);
+                System.arraycopy(data, pos, entity, 0, ((byte[])entity).length);
             }
         }
 

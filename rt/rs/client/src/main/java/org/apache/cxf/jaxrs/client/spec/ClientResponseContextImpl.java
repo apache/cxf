@@ -42,7 +42,7 @@ public class ClientResponseContextImpl extends AbstractResponseContextImpl
     public InputStream getEntityStream() {
         InputStream is = m.getContent(InputStream.class);
         if (is == null) {
-            is = ((ResponseImpl)r).convertEntityToStreamIfPossible();
+            is = r.convertEntityToStreamIfPossible();
         }
         return is;
     }

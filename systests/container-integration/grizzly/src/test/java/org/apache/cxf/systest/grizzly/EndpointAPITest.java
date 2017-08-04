@@ -154,7 +154,7 @@ public class EndpointAPITest extends Assert {
     }
 
     private static void checkBasicInvocations(Service service) {
-        EndpointInterface port = (EndpointInterface)service.getPort(EndpointInterface.class);
+        EndpointInterface port = service.getPort(EndpointInterface.class);
         String helloWorld = "Hello world!";
         assertEquals(0, port.getCount());
         Object retObj = port.echo(helloWorld);
@@ -188,7 +188,7 @@ public class EndpointAPITest extends Assert {
                 return null;
             }
         };
-        EndpointInterface port = (EndpointInterface)service.getPort(EndpointInterface.class,
+        EndpointInterface port = service.getPort(EndpointInterface.class,
                                                                     new MTOMFeature(true));
         DataHandler dh = new DataHandler(ds);
         DHResponse response = port.echoDataHandler(new DHRequest(dh));

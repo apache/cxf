@@ -50,8 +50,8 @@ public class FormEncodingProviderTest extends Assert {
         InputStream is = getClass().getResourceAsStream("singleValPostBody.txt");
         @SuppressWarnings("unchecked")
         MultivaluedMap<String, String> mvMap =
-            (MultivaluedMap<String, String>)ferp.readFrom(MultivaluedMap.class, null,
-                new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null, is);
+            ferp.readFrom(MultivaluedMap.class, null,
+            new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null, is);
         assertEquals("Wrong entry for foo", "bar", mvMap.getFirst("foo"));
         assertEquals("Wrong entry for boo", "far", mvMap.getFirst("boo"));
 
@@ -77,11 +77,10 @@ public class FormEncodingProviderTest extends Assert {
         @SuppressWarnings("rawtypes")
         FormEncodingProvider<MultivaluedMap> ferp
             = new FormEncodingProvider<MultivaluedMap>();
-        @SuppressWarnings("rawtypes")
         MultivaluedMap<String, String> mvMap =
-            (MultivaluedMap<String, String>)ferp.readFrom((Class)MultivaluedMap.class, null,
-                new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null,
-                new ByteArrayInputStream(values.getBytes()));
+            ferp.readFrom(MultivaluedMap.class, null,
+            new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null,
+            new ByteArrayInputStream(values.getBytes()));
         assertEquals("Wrong entry for foo", "1 2", mvMap.getFirst("foo"));
         assertEquals("Wrong entry for boo", "1 3", mvMap.getFirst("bar"));
 
@@ -95,10 +94,10 @@ public class FormEncodingProviderTest extends Assert {
         FormEncodingProvider<MultivaluedMap> ferp
             = new FormEncodingProvider<MultivaluedMap>();
         MultivaluedMap<String, String> mvMap =
-            (MultivaluedMap<String, String>)ferp.readFrom(MultivaluedMap.class, null,
-                new Annotation[]{CustomMap.class.getAnnotations()[0]},
-                    MediaType.APPLICATION_FORM_URLENCODED_TYPE, null,
-                    new ByteArrayInputStream(values.getBytes()));
+            ferp.readFrom(MultivaluedMap.class, null,
+            new Annotation[]{CustomMap.class.getAnnotations()[0]},
+                MediaType.APPLICATION_FORM_URLENCODED_TYPE, null,
+                new ByteArrayInputStream(values.getBytes()));
         assertEquals("Wrong entry for foo", "1+2", mvMap.getFirst("foo"));
         assertEquals("Wrong entry for boo", "1+3", mvMap.getFirst("bar"));
 
@@ -231,8 +230,8 @@ public class FormEncodingProviderTest extends Assert {
             = new FormEncodingProvider<MultivaluedMap>();
 
         MultivaluedMap<String, String> mvMap =
-            (MultivaluedMap<String, String>)ferp.readFrom(MultivaluedMap.class, null,
-                new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null, is);
+            ferp.readFrom(MultivaluedMap.class, null,
+            new Annotation[]{}, MediaType.APPLICATION_FORM_URLENCODED_TYPE, null, is);
 
         List<String> vals = mvMap.get("foo");
 
@@ -258,10 +257,10 @@ public class FormEncodingProviderTest extends Assert {
             = new FormEncodingProvider<MultivaluedMap>();
 
         MultivaluedMap<String, String> mvMap =
-            (MultivaluedMap<String, String>)ferp.readFrom(MultivaluedMap.class, null,
-                new Annotation[]{},
-                MediaType.valueOf(MediaType.APPLICATION_FORM_URLENCODED + ";charset=ISO-8859-1"), null,
-                new ByteArrayInputStream(iso88591bytes));
+            ferp.readFrom(MultivaluedMap.class, null,
+            new Annotation[]{},
+            MediaType.valueOf(MediaType.APPLICATION_FORM_URLENCODED + ";charset=ISO-8859-1"), null,
+            new ByteArrayInputStream(iso88591bytes));
         String value = mvMap.getFirst("name");
         assertEquals(helloStringISO88591, "name=" + value);
     }
@@ -277,10 +276,10 @@ public class FormEncodingProviderTest extends Assert {
             = new FormEncodingProvider<MultivaluedMap>();
 
         MultivaluedMap<String, String> mvMap =
-            (MultivaluedMap<String, String>)ferp.readFrom(MultivaluedMap.class, null,
-                new Annotation[]{},
-                MediaType.valueOf(MediaType.APPLICATION_FORM_URLENCODED + ";charset=UTF-8"), null,
-                new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
+            ferp.readFrom(MultivaluedMap.class, null,
+            new Annotation[]{},
+            MediaType.valueOf(MediaType.APPLICATION_FORM_URLENCODED + ";charset=UTF-8"), null,
+            new ByteArrayInputStream(s.getBytes(StandardCharsets.UTF_8)));
         String value = mvMap.getFirst("name");
         assertEquals(s, "name=" + value);
     }

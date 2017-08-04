@@ -22,6 +22,7 @@ package org.apache.cxf.systest.http;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -33,7 +34,7 @@ public class BareServer extends AbstractBusTestServerBase {
     @Override
     protected void run() {
         Bus bus = new SpringBusFactory().createBus();
-        SpringBusFactory.setDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
         Object implementor = new GreeterImpl();
         String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
         ep = Endpoint.publish(address, implementor);

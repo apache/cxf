@@ -45,8 +45,8 @@ import org.apache.cxf.rs.security.xml.XmlSigOutInterceptor;
 import org.apache.cxf.rt.security.SecurityConstants;
 import org.apache.cxf.systest.jaxrs.security.Book;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.WSConstants;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -131,7 +131,7 @@ public class JAXRSSamlTest extends AbstractBusClientServerTestBase {
     public void testBearerSignedDifferentAlgorithms() throws Exception {
         SamlCallbackHandler callbackHandler = new SamlCallbackHandler();
         callbackHandler.setSignatureAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
-        callbackHandler.setDigestAlgorithm(WSConstants.SHA256);
+        callbackHandler.setDigestAlgorithm(WSS4JConstants.SHA256);
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
         callbackHandler.setSignAssertion(true);
         doTestEnvelopedSAMLToken(true, callbackHandler);

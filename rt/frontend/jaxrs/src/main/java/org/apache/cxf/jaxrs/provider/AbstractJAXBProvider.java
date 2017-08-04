@@ -308,9 +308,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractConfigurableProvid
         }
         if (jaxbElementClassNames.contains(cls.getName())) {
             return cls;
-        } else {
-            return getJaxbElementClass(cls.getSuperclass());
         }
+        return getJaxbElementClass(cls.getSuperclass());
 
     }
 

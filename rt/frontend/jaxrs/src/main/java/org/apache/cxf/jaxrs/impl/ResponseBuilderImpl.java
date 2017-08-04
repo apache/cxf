@@ -279,9 +279,8 @@ public class ResponseBuilderImpl extends ResponseBuilder implements Cloneable {
     public ResponseBuilder allow(Set<String> methods) {
         if (methods == null) {
             return allow();
-        } else {
-            return allow(methods.toArray(new String[methods.size()]));
         }
+        return allow(methods.toArray(new String[methods.size()]));
     }
 
     @Override

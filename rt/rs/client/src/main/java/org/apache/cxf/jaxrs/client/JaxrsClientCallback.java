@@ -118,7 +118,7 @@ public class JaxrsClientCallback<T> extends ClientCallback {
                 return getObject(callback.get()[0]);
             } catch (InterruptedException ex) {
                 if (callback.handler != null) {
-                    callback.handler.failed((InterruptedException)ex);
+                    callback.handler.failed(ex);
                 }
                 throw ex;
             }
@@ -129,7 +129,7 @@ public class JaxrsClientCallback<T> extends ClientCallback {
                 return getObject(callback.get(timeout, unit)[0]);
             } catch (InterruptedException ex) {
                 if (callback.handler != null) {
-                    callback.handler.failed((InterruptedException)ex);
+                    callback.handler.failed(ex);
                 }
                 throw ex;
             }

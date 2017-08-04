@@ -773,10 +773,10 @@ public class UndertowHTTPDestinationTest extends Assert {
                     bus, threadDefaultBus);
         assertNotNull("unexpected null message", inMessage);
         assertSame("unexpected HTTP request",
-                   inMessage.get(UndertowHTTPDestination.HTTP_REQUEST),
+                   inMessage.get(AbstractHTTPDestination.HTTP_REQUEST),
                    request);
         assertSame("unexpected HTTP response",
-                   inMessage.get(UndertowHTTPDestination.HTTP_RESPONSE),
+                   inMessage.get(AbstractHTTPDestination.HTTP_RESPONSE),
                    response);
         assertEquals("unexpected method",
                      inMessage.get(Message.HTTP_REQUEST_METHOD),
@@ -862,10 +862,10 @@ public class UndertowHTTPDestinationTest extends Assert {
 
         if (oneway) {
             assertNull("unexpected HTTP response",
-                       outMsg.get(UndertowHTTPDestination.HTTP_RESPONSE));
+                       outMsg.get(AbstractHTTPDestination.HTTP_RESPONSE));
         } else {
             assertNotNull("expected HTTP response",
-                           outMsg.get(UndertowHTTPDestination.HTTP_RESPONSE));
+                           outMsg.get(AbstractHTTPDestination.HTTP_RESPONSE));
             responseOS.close();
         }
     }

@@ -58,9 +58,8 @@ public class HttpServletRequestFilter extends HttpServletRequestWrapper {
         }
         if (is instanceof ServletInputStream) {
             return (ServletInputStream)is;
-        } else {
-            return super.getInputStream();
         }
+        return super.getInputStream();
     }
     @Override
     public String getParameter(String name) {
@@ -90,9 +89,8 @@ public class HttpServletRequestFilter extends HttpServletRequestWrapper {
                 map2.put(e.getKey(), e.getValue().toArray(new String[]{}));
             }
             return Collections.unmodifiableMap(map2);
-        } else {
-            return map1;
         }
+        return map1;
     }
     @Override
     public Enumeration<String> getParameterNames() {

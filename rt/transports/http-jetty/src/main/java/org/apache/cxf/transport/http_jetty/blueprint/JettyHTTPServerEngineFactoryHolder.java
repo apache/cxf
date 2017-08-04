@@ -74,8 +74,8 @@ public class JettyHTTPServerEngineFactoryHolder {
             Element element = StaxUtils.read(new StringReader(parsedElement)).getDocumentElement();
 
             JettyHTTPServerEngineFactoryConfigType config
-                = (JettyHTTPServerEngineFactoryConfigType) getJaxbObject(element,
-                    JettyHTTPServerEngineFactoryConfigType.class);
+                = getJaxbObject(element,
+                JettyHTTPServerEngineFactoryConfigType.class);
 
             factory = new JettyHTTPServerEngineFactory();
 

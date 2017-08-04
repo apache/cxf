@@ -53,7 +53,7 @@ public class JAXRSBeanValidationInvoker extends JAXRSInvoker {
             if (response instanceof MessageContentsList) {
                 MessageContentsList list = (MessageContentsList)response;
                 if (list.size() == 1) {
-                    Object entity = ((MessageContentsList)list).get(0);
+                    Object entity = list.get(0);
 
                     if (entity instanceof Response) {
                         theProvider.validateReturnValue(serviceObject, m, ((Response)entity).getEntity());

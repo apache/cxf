@@ -125,7 +125,7 @@ public abstract class AbstractGreeterImpl implements Greeter {
             String property = ADDRESSING_PROPERTIES_INBOUND;
             AddressingProperties maps = (AddressingProperties)
                 context.getMessageContext().get(property);
-            verificationCache.put(MAPTest.verifyMAPs(maps, this));
+            verificationCache.put(MAPTestBase.verifyMAPs(maps, this));
         }
     }
 

@@ -167,7 +167,7 @@ public class SamlPostBindingFilter extends AbstractServiceProviderFilter {
                     "Error generating KeyInfo from signing credential", ex);
         }
 
-        SignableSAMLObject signableObject = (SignableSAMLObject) authnRequest;
+        SignableSAMLObject signableObject = authnRequest;
         signableObject.setSignature(signature);
         signableObject.releaseDOM();
         signableObject.releaseChildrenDOM(true);

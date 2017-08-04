@@ -226,7 +226,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 discardMAPs(header, maps);
 
                 JAXBContext jaxbContext =
-                    VersionTransformer.getExposedJAXBContext(
+                    org.apache.cxf.ws.addressing.VersionTransformer.getExposedJAXBContext(
                                                      maps.getNamespaceURI());
                 QName duplicate = maps.getDuplicate();
                 encodeAsExposed(maps,
@@ -359,7 +359,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
         return maps.getReplyTo() != null
             && maps.getReplyTo().getAddress() != null
             && maps.getReplyTo().getAddress().getValue() != null
-            && !(VersionTransformer.Names200408.WSA_NAMESPACE_NAME.equals(maps.getNamespaceURI())
+            && !(Names200408.WSA_NAMESPACE_NAME.equals(maps.getNamespaceURI())
                 && maps.getReplyTo().getAddress().getValue()
                 .equals(ContextUtils.getNoneEndpointReference().getAddress().getValue()));
     }
@@ -505,10 +505,10 @@ public class MAPCodec extends AbstractSoapInterceptor {
                         // Need to check the uri before getting unmarshaller else
                         // would get wrong unmarshaller and fail to process required
                         // headers.
-                        if (VersionTransformer.isSupported(headerURI)) {
+                        if (org.apache.cxf.ws.addressing.VersionTransformer.isSupported(headerURI)) {
                             if (unmarshaller == null) {
                                 JAXBContext jaxbContext =
-                                    VersionTransformer.getExposedJAXBContext(headerURI);
+                                    org.apache.cxf.ws.addressing.VersionTransformer.getExposedJAXBContext(headerURI);
                                 unmarshaller =
                                     jaxbContext.createUnmarshaller();
                                 unmarshaller.setEventHandler(null);

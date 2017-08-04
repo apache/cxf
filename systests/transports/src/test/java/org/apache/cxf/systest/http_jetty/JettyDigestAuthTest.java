@@ -29,7 +29,6 @@ import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
@@ -78,7 +77,7 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
             Bus bus = new SpringBusFactory().createBus(configure, true);
             bus.getInInterceptors().add(new LoggingInInterceptor());
             bus.getOutInterceptors().add(new LoggingOutInterceptor());
-            SpringBusFactory.setDefaultBus(bus);
+            BusFactory.setDefaultBus(bus);
             setBus(bus);
 
             GreeterImpl implementor = new GreeterImpl();
@@ -175,7 +174,7 @@ public class JettyDigestAuthTest extends AbstractClientServerTestBase {
 
     @org.junit.Test
     public void testGetWSDL() throws Exception {
-        BusFactory bf = CXFBusFactory.newInstance();
+        BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
         bus.getInInterceptors().add(new LoggingInInterceptor());
         bus.getOutInterceptors().add(new LoggingOutInterceptor());

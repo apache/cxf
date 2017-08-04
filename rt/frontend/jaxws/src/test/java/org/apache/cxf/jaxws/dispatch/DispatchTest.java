@@ -25,6 +25,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.http.HTTPBinding;
@@ -100,7 +101,7 @@ public class DispatchTest extends AbstractJaxWsTest {
             new ServiceImpl(getBus(), getClass().getResource("/wsdl/hello_world.wsdl"), serviceName, null);
 
         Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
-        disp.getRequestContext().put(Dispatch.ENDPOINT_ADDRESS_PROPERTY, address);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
 
         d.setMessageObserver(new MessageReplayObserver("/org/apache/cxf/jaxws/sayHiResponse.xml"));
 
@@ -176,7 +177,7 @@ public class DispatchTest extends AbstractJaxWsTest {
             new ServiceImpl(getBus(), getClass().getResource("/wsdl/hello_world.wsdl"), serviceName, null);
 
         Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
-        disp.getRequestContext().put(Dispatch.ENDPOINT_ADDRESS_PROPERTY, address);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
         disp.getRequestContext().put("find.dispatch.operation", Boolean.TRUE);
 
         d.setMessageObserver(new MessageReplayObserver("/org/apache/cxf/jaxws/sayHiResponse.xml"));

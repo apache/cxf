@@ -721,7 +721,7 @@ public class SAMLSSOResponseValidatorTest extends org.junit.Assert {
         }
 
         // add the signature to the assertion
-        SignableSAMLObject signableObject = (SignableSAMLObject) response;
+        SignableSAMLObject signableObject = response;
         signableObject.setSignature(signature);
         signableObject.releaseDOM();
         signableObject.releaseChildrenDOM(true);

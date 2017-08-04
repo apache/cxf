@@ -26,7 +26,6 @@ import javax.xml.ws.BindingProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
@@ -77,7 +76,7 @@ public class UndertowBasicAuthTest extends AbstractClientServerTestBase {
 
     @org.junit.Test
     public void testGetWSDL() throws Exception {
-        BusFactory bf = CXFBusFactory.newInstance();
+        BusFactory bf = BusFactory.newInstance();
         Bus bus = bf.createBus();
         bus.getInInterceptors().add(new LoggingInInterceptor());
         bus.getOutInterceptors().add(new LoggingOutInterceptor());

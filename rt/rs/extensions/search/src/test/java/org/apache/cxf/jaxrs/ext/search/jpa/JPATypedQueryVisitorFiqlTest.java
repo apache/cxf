@@ -207,7 +207,7 @@ public class JPATypedQueryVisitorFiqlTest extends AbstractJPATypedQueryVisitorTe
         assertEquals(1, books.size());
         Object[] info = books.get(0);
         assertEquals(10, ((Integer)info[0]).intValue());
-        assertEquals("num10", (String)info[1]);
+        assertEquals("num10", info[1]);
     }
 
     @Test

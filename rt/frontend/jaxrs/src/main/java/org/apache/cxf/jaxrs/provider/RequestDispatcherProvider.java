@@ -277,7 +277,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
 
     private String getPathFromMessageContext() {
         if (mc != null) {
-            Object resourcePathProp = (String)mc.get(MESSAGE_RESOURCE_PATH_PROPERTY);
+            Object resourcePathProp = mc.get(MESSAGE_RESOURCE_PATH_PROPERTY);
             if (resourcePathProp != null) {
                 StringBuilder sb = new StringBuilder();
                 if (locationPrefix != null) {

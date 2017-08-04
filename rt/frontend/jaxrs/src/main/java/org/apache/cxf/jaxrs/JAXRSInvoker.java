@@ -126,10 +126,9 @@ public class JAXRSInvoker extends AbstractInvoker {
         Object asyncObj = ar.getResponseObject();
         if (asyncObj instanceof Throwable) {
             return handleAsyncFault(exchange, ar, (Throwable)asyncObj);
-        } else {
-            setResponseContentTypeIfNeeded(exchange.getInMessage(), asyncObj);
-            return new MessageContentsList(asyncObj);
         }
+        setResponseContentTypeIfNeeded(exchange.getInMessage(), asyncObj);
+        return new MessageContentsList(asyncObj);
     }
 
     private Object handleAsyncFault(Exchange exchange, AsyncResponseImpl ar, Throwable t) {
@@ -313,9 +312,8 @@ public class JAXRSInvoker extends AbstractInvoker {
         if (r != null) {
             JAXRSUtils.setMessageContentType(exchange.getInMessage(), r);
             return new MessageContentsList(r);
-        } else {
-            return null;
         }
+        return null;
     }
 
     private void setResponseContentTypeIfNeeded(Message inMessage, Object response) {
@@ -375,9 +373,8 @@ public class JAXRSInvoker extends AbstractInvoker {
             OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
             ClassResourceInfo cri = ori.getClassResourceInfo();
             return cri.getResourceProvider();
-        } else {
-            return (ResourceProvider)provider;
         }
+        return (ResourceProvider)provider;
     }
 
     public Object getServiceObject(Exchange exchange) {

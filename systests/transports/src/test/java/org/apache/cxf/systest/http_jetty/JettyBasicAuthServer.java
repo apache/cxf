@@ -25,6 +25,7 @@ import java.net.URL;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.ext.logging.LoggingInInterceptor;
 import org.apache.cxf.ext.logging.LoggingOutInterceptor;
@@ -44,7 +45,7 @@ public class JettyBasicAuthServer extends AbstractBusTestServerBase  {
         Bus bus = new SpringBusFactory().createBus(configure, true);
         bus.getInInterceptors().add(new LoggingInInterceptor());
         bus.getOutInterceptors().add(new LoggingOutInterceptor());
-        SpringBusFactory.setDefaultBus(bus);
+        BusFactory.setDefaultBus(bus);
         setBus(bus);
 
         GreeterImpl implementor = new GreeterImpl();

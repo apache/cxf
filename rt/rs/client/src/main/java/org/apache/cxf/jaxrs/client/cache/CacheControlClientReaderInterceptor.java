@@ -94,7 +94,7 @@ public class CacheControlClientReaderInterceptor implements ReaderInterceptor {
         final boolean validCacheControl = isCacheControlValid(context, cacheControl);
         if (validCacheControl && cacheResponseInputStream) {
             // if Cache-Control is set and the stream needs to be cached then do it
-            cachedBytes = IOUtils.readBytesFromStream((InputStream)context.getInputStream());
+            cachedBytes = IOUtils.readBytesFromStream(context.getInputStream());
             context.setInputStream(new ByteArrayInputStream(cachedBytes));
         }
         // Read the stream and get the actual entity

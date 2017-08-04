@@ -105,7 +105,7 @@ public class SimpleTypeJsonProvider<T> extends AbstractConfigurableProvider
         throws IOException, WebApplicationException {
         if (!supportSimpleTypesOnly && !InjectionUtils.isPrimitive(type)) {
             MessageBodyReader<T> next =
-                (MessageBodyReader<T>)providers.getMessageBodyReader(type, genericType, annotations, mediaType);
+                providers.getMessageBodyReader(type, genericType, annotations, mediaType);
             JAXRSUtils.getCurrentMessage().put(ProviderFactory.ACTIVE_JAXRS_PROVIDER_KEY, this);
             try {
                 return next.readFrom(type, genericType, annotations, mediaType, headers, is);

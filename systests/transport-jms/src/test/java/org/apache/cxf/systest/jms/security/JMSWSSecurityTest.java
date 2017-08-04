@@ -36,10 +36,10 @@ import org.apache.cxf.hello_world_jms.HelloWorldService;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
+import org.apache.wss4j.common.ConfigurationConstants;
 import org.apache.wss4j.common.saml.bean.AudienceRestrictionBean;
 import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
-import org.apache.wss4j.dom.handler.WSHandlerConstants;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -98,8 +98,8 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         callbackHandler.setConfirmationMethod(SAML2Constants.CONF_BEARER);
 
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
-        outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
+        outProperties.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
 
         WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProperties);
         Client client = ClientProxy.getClient(greeter);
@@ -137,8 +137,8 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         callbackHandler.setConditions(conditions);
 
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
-        outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
+        outProperties.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
 
         WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProperties);
         Client client = ClientProxy.getClient(greeter);
@@ -175,8 +175,8 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         callbackHandler.setConditions(conditions);
 
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
-        outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
+        outProperties.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
 
         WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProperties);
         Client client = ClientProxy.getClient(greeter);
@@ -217,8 +217,8 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         callbackHandler.setConditions(conditions);
 
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
-        outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
+        outProperties.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
 
         WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProperties);
         Client client = ClientProxy.getClient(greeter);
@@ -255,8 +255,8 @@ public class JMSWSSecurityTest extends AbstractBusClientServerTestBase {
         callbackHandler.setConditions(conditions);
 
         Map<String, Object> outProperties = new HashMap<>();
-        outProperties.put(WSHandlerConstants.ACTION, WSHandlerConstants.SAML_TOKEN_UNSIGNED);
-        outProperties.put(WSHandlerConstants.SAML_CALLBACK_REF, callbackHandler);
+        outProperties.put(ConfigurationConstants.ACTION, ConfigurationConstants.SAML_TOKEN_UNSIGNED);
+        outProperties.put(ConfigurationConstants.SAML_CALLBACK_REF, callbackHandler);
 
         WSS4JOutInterceptor outInterceptor = new WSS4JOutInterceptor(outProperties);
         Client client = ClientProxy.getClient(greeter);

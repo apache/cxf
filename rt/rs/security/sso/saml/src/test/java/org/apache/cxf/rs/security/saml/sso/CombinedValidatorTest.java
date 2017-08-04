@@ -28,6 +28,7 @@ import java.util.Collections;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.crypto.Crypto;
 import org.apache.wss4j.common.crypto.CryptoType;
 import org.apache.wss4j.common.crypto.Merlin;
@@ -41,7 +42,6 @@ import org.apache.wss4j.common.saml.bean.ConditionsBean;
 import org.apache.wss4j.common.saml.bean.SubjectConfirmationDataBean;
 import org.apache.wss4j.common.saml.builder.SAML2Constants;
 import org.apache.wss4j.common.util.Loader;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.engine.WSSConfig;
 import org.joda.time.DateTime;
 import org.opensaml.saml.common.SignableSAMLObject;
@@ -125,7 +125,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
         Element clonedAssertion = (Element)assertionElement.cloneNode(true);
         clonedAssertion.setAttributeNS(null, "ID", "_12345623562");
         Element sigElement =
-            (Element)clonedAssertion.getElementsByTagNameNS(WSConstants.SIG_NS, "Signature").item(0);
+            (Element)clonedAssertion.getElementsByTagNameNS(WSS4JConstants.SIG_NS, "Signature").item(0);
         clonedAssertion.removeChild(sigElement);
 
         Element subjElement =
@@ -366,7 +366,7 @@ public class CombinedValidatorTest extends org.junit.Assert {
         }
 
         // add the signature to the assertion
-        SignableSAMLObject signableObject = (SignableSAMLObject) response;
+        SignableSAMLObject signableObject = response;
         signableObject.setSignature(signature);
         signableObject.releaseDOM();
         signableObject.releaseChildrenDOM(true);

@@ -167,28 +167,26 @@ public final class ResponseImpl extends Response {
     private List<String> toListOfStrings(String headerName, List<Object> values) {
         if (values == null) {
             return null;
-        } else {
-            List<String> stringValues = new ArrayList<>(values.size());
-            HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(values.get(0));
-            for (Object value : values) {
-                String actualValue = hd == null ? value.toString() : hd.toString(value);
-                stringValues.add(actualValue);
-            }
-            return stringValues;
         }
+        List<String> stringValues = new ArrayList<>(values.size());
+        HeaderDelegate<Object> hd = HttpUtils.getHeaderDelegate(values.get(0));
+        for (Object value : values) {
+            String actualValue = hd == null ? value.toString() : hd.toString(value);
+            stringValues.add(actualValue);
+        }
+        return stringValues;
     }
 
     public Set<String> getAllowedMethods() {
         List<Object> methodValues = metadata.get(HttpHeaders.ALLOW);
         if (methodValues == null) {
             return Collections.emptySet();
-        } else {
-            Set<String> methods = new HashSet<>();
-            for (Object o : methodValues) {
-                methods.add(o.toString());
-            }
-            return methods;
         }
+        Set<String> methods = new HashSet<>();
+        for (Object o : methodValues) {
+            methods.add(o.toString());
+        }
+        return methods;
     }
 
 

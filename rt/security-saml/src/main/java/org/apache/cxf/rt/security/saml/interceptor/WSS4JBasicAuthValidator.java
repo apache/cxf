@@ -35,10 +35,10 @@ import org.apache.cxf.rt.security.saml.claims.SAMLSecurityContext;
 import org.apache.cxf.rt.security.saml.utils.SAMLUtils;
 import org.apache.cxf.rt.security.utils.SecurityUtils;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.wss4j.common.WSS4JConstants;
 import org.apache.wss4j.common.ext.WSSecurityException;
 import org.apache.wss4j.common.principal.WSUsernameTokenPrincipalImpl;
 import org.apache.wss4j.common.saml.SamlAssertionWrapper;
-import org.apache.wss4j.dom.WSConstants;
 import org.apache.wss4j.dom.handler.RequestData;
 import org.apache.wss4j.dom.message.token.UsernameToken;
 import org.apache.wss4j.dom.validate.Credential;
@@ -98,7 +98,7 @@ public abstract class WSS4JBasicAuthValidator {
 
         Document doc = DOMUtils.createDocument();
         UsernameToken token = new UsernameToken(false, doc,
-                                                WSConstants.PASSWORD_TEXT);
+                                                WSS4JConstants.PASSWORD_TEXT);
         token.setName(policy.getUserName());
         token.setPassword(policy.getPassword());
         return token;
@@ -130,7 +130,7 @@ public abstract class WSS4JBasicAuthValidator {
             }
 
             ClaimCollection claims =
-                SAMLUtils.getClaims((SamlAssertionWrapper)samlAssertion);
+                SAMLUtils.getClaims(samlAssertion);
             Set<Principal> roles =
                 SAMLUtils.parseRolesFromClaims(claims, roleAttributeName, null);
 

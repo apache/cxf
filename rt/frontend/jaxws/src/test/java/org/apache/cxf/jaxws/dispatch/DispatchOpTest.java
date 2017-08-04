@@ -21,6 +21,7 @@ package org.apache.cxf.jaxws.dispatch;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.handler.MessageContext;
@@ -75,7 +76,7 @@ public class DispatchOpTest extends AbstractJaxWsTest {
         Dispatch<Source> disp = service.createDispatch(
                 portName, Source.class, Service.Mode.PAYLOAD);
         disp.getRequestContext().put(MessageContext.WSDL_OPERATION, operationName);
-        disp.getRequestContext().put(Dispatch.ENDPOINT_ADDRESS_PROPERTY, address);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
 
         d.setMessageObserver(new MessageReplayObserver(responseResource));
 
@@ -102,7 +103,7 @@ public class DispatchOpTest extends AbstractJaxWsTest {
         Dispatch<Source> disp = service.createDispatch(
                 portName, Source.class, Service.Mode.PAYLOAD);
         disp.getRequestContext().put(MessageContext.WSDL_OPERATION, operationName);
-        disp.getRequestContext().put(Dispatch.ENDPOINT_ADDRESS_PROPERTY, address);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
 
         d.setMessageObserver(new MessageReplayObserver(responseResource));
 

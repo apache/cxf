@@ -174,11 +174,10 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
     public Set<K> keySet() {
         if (!caseInsensitive) {
             return m.keySet();
-        } else {
-            Set<K> set = new TreeSet<K>(new KeyComparator<K>());
-            set.addAll(m.keySet());
-            return set;
         }
+        Set<K> set = new TreeSet<K>(new KeyComparator<K>());
+        set.addAll(m.keySet());
+        return set;
     }
 
     public List<V> put(K key, List<V> value) {
@@ -200,9 +199,8 @@ public class MetadataMap<K, V> implements MultivaluedMap<K, V> {
         if (caseInsensitive) {
             K realKey = getMatchingKey(key);
             return m.remove(realKey == null ? key : realKey);
-        } else {
-            return m.remove(key);
         }
+        return m.remove(key);
     }
 
     public int size() {

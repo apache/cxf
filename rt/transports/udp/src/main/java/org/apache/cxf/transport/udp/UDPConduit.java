@@ -128,7 +128,7 @@ public class UDPConduit extends AbstractConduit {
                 }
             } else {
                 IoSessionInputStream ins = message.getExchange().getInMessage().get(IoSessionInputStream.class);
-                ins.setBuffer((IoBuffer)buf);
+                ins.setBuffer(buf);
             }
         }
     }

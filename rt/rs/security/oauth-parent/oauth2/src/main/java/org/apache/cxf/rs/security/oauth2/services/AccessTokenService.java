@@ -175,7 +175,7 @@ public class AccessTokenService extends AbstractTokenService {
             if (super.getDataProvider() instanceof AuthorizationCodeDataProvider) {
                 AuthorizationCodeGrantHandler handler = new AuthorizationCodeGrantHandler();
                 if (handler.getSupportedGrantTypes().contains(grantType)) {
-                    handler.setDataProvider((AuthorizationCodeDataProvider)super.getDataProvider());
+                    handler.setDataProvider(super.getDataProvider());
                     return handler;
                 }
             }

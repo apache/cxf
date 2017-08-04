@@ -111,7 +111,7 @@ public class AuthorizationCodeGrantService extends RedirectionBasedGrantService 
             bean.setAuthorizationCode(grantCode);
             bean.setUserId(userSubject.getLogin());
             bean.setExpiresIn(grant.getExpiresIn());
-            return deliverOOBResponse((OOBAuthorizationResponse)bean);
+            return deliverOOBResponse(bean);
         } else if (isFormResponse(state)) {
             FormAuthorizationResponse bean = new FormAuthorizationResponse();
             bean.setAuthorizationCode(grantCode);
