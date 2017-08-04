@@ -57,9 +57,8 @@ public class SoapBindingConfiguration extends BindingConfiguration {
         String action = (String)op.getProperty("action");
         if (action == null) {
             return defaultSoapAction;
-        } else {
-            return action;
         }
+        return action;
     }
 
     public String getTransportURI() {

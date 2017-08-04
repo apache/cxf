@@ -28,7 +28,7 @@ import javax.wsdl.Binding;
 import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
@@ -164,9 +164,9 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
     class CorbaAddressEventProducer implements CorbaTypeEventProducer {
         int state;
 
-        int[] states = {XMLStreamReader.START_ELEMENT,
-                        XMLStreamReader.CHARACTERS,
-                        XMLStreamReader.END_ELEMENT};
+        int[] states = {XMLStreamConstants.START_ELEMENT,
+                        XMLStreamConstants.CHARACTERS,
+                        XMLStreamConstants.END_ELEMENT};
         final String address;
 
         CorbaAddressEventProducer(String value) {
@@ -240,9 +240,8 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
         public List<Attribute> getAttributes() {
             if (currentEventProducer != null) {
                 return currentEventProducer.getAttributes();
-            } else {
-                return metaAttrs;
             }
+            return metaAttrs;
         }
 
     }
@@ -250,9 +249,9 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
     // An event producer to handle the production of the ServiceName XML data.
     class CorbaServiceNameEventProducer implements CorbaTypeEventProducer {
         int state;
-        int[] states = {XMLStreamReader.START_ELEMENT,
-                        XMLStreamReader.CHARACTERS,
-                        XMLStreamReader.END_ELEMENT};
+        int[] states = {XMLStreamConstants.START_ELEMENT,
+                        XMLStreamConstants.CHARACTERS,
+                        XMLStreamConstants.END_ELEMENT};
         QName serviceName;
         QName name;
 
@@ -306,9 +305,9 @@ public final class CorbaObjectReferenceEventProducer extends AbstractStartEndEve
     // An event producer to handle the production of the InterfaceName XML data.
     class CorbaInterfaceNameEventProducer implements CorbaTypeEventProducer {
         int state;
-        int[] states = {XMLStreamReader.START_ELEMENT,
-                        XMLStreamReader.CHARACTERS,
-                        XMLStreamReader.END_ELEMENT};
+        int[] states = {XMLStreamConstants.START_ELEMENT,
+                        XMLStreamConstants.CHARACTERS,
+                        XMLStreamConstants.END_ELEMENT};
         QName interfaceName;
         QName name;
         List<Namespace> namespaces;

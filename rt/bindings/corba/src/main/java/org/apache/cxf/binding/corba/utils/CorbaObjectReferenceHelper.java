@@ -175,12 +175,11 @@ public final class CorbaObjectReferenceHelper {
                 | ((data[index + 1] << 16) & 0x00ff0000);
             return partial | ((data[index + 2] << 8) & 0x0000ff00)
                 | ((data[index + 3]) & 0x000000ff);
-        } else {
-            int partial = ((data[index]) & 0x000000ff)
-                | ((data[index + 1] << 8) & 0x0000ff00);
-            return partial | ((data[index + 2] << 16) & 0x00ff0000)
-                | ((data[index + 3] << 24) & 0xff000000);
         }
+        int partial = ((data[index]) & 0x000000ff)
+            | ((data[index + 1] << 8) & 0x0000ff00);
+        return partial | ((data[index + 2] << 16) & 0x00ff0000)
+            | ((data[index + 3] << 24) & 0xff000000);
     }
 
     public static void populateEprInfo(EprMetaData info) {

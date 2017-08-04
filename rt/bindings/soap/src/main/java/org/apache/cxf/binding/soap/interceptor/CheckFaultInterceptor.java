@@ -21,6 +21,7 @@ package org.apache.cxf.binding.soap.interceptor;
 
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -49,8 +50,8 @@ public class CheckFaultInterceptor extends AbstractSoapInterceptor {
         try {
             // advance to first tag.
             int x = xmlReader.getEventType();
-            while (x != XMLStreamReader.START_ELEMENT
-                && x != XMLStreamReader.END_ELEMENT
+            while (x != XMLStreamConstants.START_ELEMENT
+                && x != XMLStreamConstants.END_ELEMENT
                 && xmlReader.hasNext()) {
                 x = xmlReader.next();
             }

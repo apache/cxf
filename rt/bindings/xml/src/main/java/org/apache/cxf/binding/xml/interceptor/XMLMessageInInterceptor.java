@@ -125,13 +125,12 @@ public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
                     throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_READ_EXC", LOG));
                 }
                 return boi;
-            } else {
-                Collection<MessagePartInfo> bodyParts = bmi.getMessageParts();
-                if (bodyParts.size() == 1) {
-                    MessagePartInfo p = bodyParts.iterator().next();
-                    if (p.getConcreteName().equals(startQName)) {
-                        return boi;
-                    }
+            }
+            Collection<MessagePartInfo> bodyParts = bmi.getMessageParts();
+            if (bodyParts.size() == 1) {
+                MessagePartInfo p = bodyParts.iterator().next();
+                if (p.getConcreteName().equals(startQName)) {
+                    return boi;
                 }
             }
         }

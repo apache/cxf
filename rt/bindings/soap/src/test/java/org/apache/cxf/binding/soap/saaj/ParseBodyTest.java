@@ -28,6 +28,7 @@ import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMSource;
@@ -63,7 +64,7 @@ public class ParseBodyTest extends Assert {
         xmlReader = StaxUtils.createXMLStreamReader(new ByteArrayInputStream(data.getBytes("utf-8")));
 
         //reader should be on the start element for the
-        assertEquals(XMLStreamReader.START_ELEMENT, xmlReader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, xmlReader.next());
         assertEquals("Body", xmlReader.getLocalName());
 
         factory = MessageFactory.newInstance();

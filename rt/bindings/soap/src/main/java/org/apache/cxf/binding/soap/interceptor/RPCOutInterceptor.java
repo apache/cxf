@@ -53,7 +53,7 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
             NSStack nsStack = new NSStack();
             nsStack.push();
 
-            BindingOperationInfo operation = (BindingOperationInfo) message.getExchange().getBindingOperationInfo();
+            BindingOperationInfo operation = message.getExchange().getBindingOperationInfo();
 
             assert operation.getName() != null;
 

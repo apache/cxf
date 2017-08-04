@@ -22,7 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.Namespace;
 
@@ -34,7 +34,7 @@ public abstract class AbstractStartEndEventProducer implements
         CorbaTypeEventProducer {
 
     protected int state;
-    protected final int[] states = {XMLStreamReader.START_ELEMENT, 0, XMLStreamReader.END_ELEMENT};
+    protected final int[] states = {XMLStreamConstants.START_ELEMENT, 0, XMLStreamConstants.END_ELEMENT};
 
     protected CorbaTypeEventProducer currentEventProducer;
     protected QName name;

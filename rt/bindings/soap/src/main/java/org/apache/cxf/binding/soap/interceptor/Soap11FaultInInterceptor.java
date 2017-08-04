@@ -22,6 +22,7 @@ package org.apache.cxf.binding.soap.interceptor;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -60,7 +61,7 @@ public class Soap11FaultInInterceptor extends AbstractSoapInterceptor {
         Element detail = null;
         String lang = null;
         try {
-            while (reader.nextTag() == XMLStreamReader.START_ELEMENT) {
+            while (reader.nextTag() == XMLStreamConstants.START_ELEMENT) {
                 if (reader.getLocalName().equals("faultcode")) {
                     faultCode = StaxUtils.readQName(reader);
                 } else if (reader.getLocalName().equals("faultstring")) {

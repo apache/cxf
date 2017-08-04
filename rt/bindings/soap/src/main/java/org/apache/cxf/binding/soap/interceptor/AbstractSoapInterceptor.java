@@ -127,15 +127,13 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
             if (config && fault.getCause() != null
                 && fault.getCause().getMessage() != null && !fault.getMessage().equals(fault.getCause().getMessage())) {
                 return fault.getMessage() + " Caused by: " + fault.getCause().getMessage();
-            } else {
-                return fault.getMessage();
             }
+            return fault.getMessage();
         } else if (config && fault.getCause() != null) {
             if (fault.getCause().getMessage() != null) {
                 return fault.getCause().getMessage();
-            } else {
-                return fault.getCause().toString();
             }
+            return fault.getCause().toString();
         } else {
             return "Fault occurred while processing.";
         }

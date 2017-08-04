@@ -67,16 +67,15 @@ public class CorbaStructListener extends AbstractCorbaTypeListener {
                 if (member.getName().equals(name.getLocalPart())
                     || (member.isSetAnonschematype() && member.isAnonschematype())) {
                     break;
-                } else {
-                    currentTypeListener =
-                        CorbaHandlerUtils.getTypeListener(elName,
-                                                          member.getIdltype(),
-                                                          typeMap,
-                                                          orb,
-                                                          serviceInfo);
-                    currentTypeListener.setNamespaceContext(ctx);
-                    ((CorbaStructHandler)handler).addMember(currentTypeListener.getCorbaObject());
                 }
+                currentTypeListener =
+                    CorbaHandlerUtils.getTypeListener(elName,
+                                                      member.getIdltype(),
+                                                      typeMap,
+                                                      orb,
+                                                      serviceInfo);
+                currentTypeListener.setNamespaceContext(ctx);
+                ((CorbaStructHandler)handler).addMember(currentTypeListener.getCorbaObject());
             }
             boolean anonType = false;
             if (member.isSetAnonschematype() && member.isAnonschematype()) {

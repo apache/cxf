@@ -87,7 +87,7 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
             if (xmlReader != null) {
                 try {
                     while (xmlReader.hasNext()) {
-                        if (xmlReader.next() == XMLStreamReader.END_DOCUMENT) {
+                        if (xmlReader.next() == XMLStreamConstants.END_DOCUMENT) {
                             return;
                         }
                     }
@@ -460,17 +460,15 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
         public List<XMLEvent> getBodyAttributeAndNamespaceEvents() {
             if (bodyEvents == null) {
                 return Collections.emptyList();
-            } else {
-                return Collections.unmodifiableList(bodyEvents);
             }
+            return Collections.unmodifiableList(bodyEvents);
         }
 
         public List<XMLEvent> getEnvAttributeAndNamespaceEvents() {
             if (envEvents == null) {
                 return Collections.emptyList();
-            } else {
-                return Collections.unmodifiableList(envEvents);
             }
+            return Collections.unmodifiableList(envEvents);
         }
 
         public String getEnvelopePrefix() {
