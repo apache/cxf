@@ -959,6 +959,7 @@ public class WebClient extends AbstractClient {
                                   inAnns, respClass, outType, null, null);
 
         m.getExchange().setSynchronous(false);
+        setAsyncMessageObserverIfNeeded(m.getExchange());
         m.getExchange().put(JaxrsClientCallback.class, cb);
 
         doRunInterceptorChain(m);

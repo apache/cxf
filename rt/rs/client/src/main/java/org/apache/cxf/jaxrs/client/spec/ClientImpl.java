@@ -299,7 +299,11 @@ public class ClientImpl implements Client {
                 || tlsParams.getHostnameVerifier() != null) {
                 clientCfg.getHttpConduit().setTlsClientParameters(tlsParams);
             }
-
+            // Executor for the asynchronous calls
+            Object executorServiceProp = configProps.get(WebClient.EXECUTOR_SERVICE_PROPERTY);
+            if (executorServiceProp != null) {
+                clientCfg.getResponseContext().put(WebClient.EXECUTOR_SERVICE_PROPERTY, executorServiceProp);
+            }
             setConnectionProperties(configProps, clientCfg);
             // CXF Features
             for (org.apache.cxf.feature.Feature cxfFeature : cxfFeatures) {

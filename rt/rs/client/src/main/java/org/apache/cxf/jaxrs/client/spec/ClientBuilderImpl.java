@@ -35,6 +35,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Configurable;
 import javax.ws.rs.core.Configuration;
 
+import org.apache.cxf.jaxrs.client.WebClient;
+
 public class ClientBuilderImpl extends ClientBuilder {
 
     private Configurable<ClientBuilder> configImpl;
@@ -153,7 +155,7 @@ public class ClientBuilderImpl extends ClientBuilder {
 
     @Override
     public ClientBuilder executorService(ExecutorService executorService) {
-        return configImpl.property("executorService", executorService);
+        return configImpl.property(WebClient.EXECUTOR_SERVICE_PROPERTY, executorService);
     }
 
     @Override

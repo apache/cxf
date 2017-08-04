@@ -390,7 +390,7 @@ public class InvocationBuilderImpl implements Invocation.Builder {
     }
 
     private ExecutorService getConfiguredExecutorService() {
-        return (ExecutorService)config.getProperty("executorService");
+        return (ExecutorService)config.getProperty(WebClient.EXECUTOR_SERVICE_PROPERTY);
     }
 
 }
