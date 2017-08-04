@@ -434,29 +434,28 @@ public abstract class AbstractCodegenMoho extends AbstractMojo {
 
             if (proxy.getHost() == null) {
                 throw new MojoExecutionException("Proxy in settings.xml has no host");
-            } else {
-                if (proxy.getHost() != null) {
-                    System.setProperty(HTTP_PROXY_HOST, proxy.getHost());
-                }
-                if (String.valueOf(proxy.getPort()) != null) {
-                    System.setProperty(HTTP_PROXY_PORT, String.valueOf(proxy.getPort()));
-                }
-                if (proxy.getNonProxyHosts() != null) {
-                    System.setProperty(HTTP_NON_PROXY_HOSTS, proxy.getNonProxyHosts());
-                }
-                if (!StringUtils.isEmpty(proxy.getUsername())
-                    && !StringUtils.isEmpty(proxy.getPassword())) {
-                    final String authUser = proxy.getUsername();
-                    final String authPassword = proxy.getPassword();
-                    Authenticator.setDefault(new Authenticator() {
-                        public PasswordAuthentication getPasswordAuthentication() {
-                            return new PasswordAuthentication(authUser, authPassword.toCharArray());
-                        }
-                    });
+            }
+            if (proxy.getHost() != null) {
+                System.setProperty(HTTP_PROXY_HOST, proxy.getHost());
+            }
+            if (String.valueOf(proxy.getPort()) != null) {
+                System.setProperty(HTTP_PROXY_PORT, String.valueOf(proxy.getPort()));
+            }
+            if (proxy.getNonProxyHosts() != null) {
+                System.setProperty(HTTP_NON_PROXY_HOSTS, proxy.getNonProxyHosts());
+            }
+            if (!StringUtils.isEmpty(proxy.getUsername())
+                && !StringUtils.isEmpty(proxy.getPassword())) {
+                final String authUser = proxy.getUsername();
+                final String authPassword = proxy.getPassword();
+                Authenticator.setDefault(new Authenticator() {
+                    public PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(authUser, authPassword.toCharArray());
+                    }
+                });
 
-                    System.setProperty(HTTP_PROXY_USER, authUser);
-                    System.setProperty(HTTP_PROXY_PORT, authPassword);
-                }
+                System.setProperty(HTTP_PROXY_USER, authUser);
+                System.setProperty(HTTP_PROXY_PORT, authPassword);
             }
 
         }

@@ -330,10 +330,9 @@ public class Java2WADLMojo extends AbstractMojo {
     private String getBaseURI() {
         if (address != null) {
             return address;
-        } else {
-            // the consumer may use the original target URI to figure out absolute URI
-            return "/";
         }
+        // the consumer may use the original target URI to figure out absolute URI
+        return "/";
     }
 
 

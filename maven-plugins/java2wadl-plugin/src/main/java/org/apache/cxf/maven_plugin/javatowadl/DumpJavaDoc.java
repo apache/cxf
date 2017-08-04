@@ -96,9 +96,8 @@ public final class DumpJavaDoc {
                 if (foundTagOption) {
                     reporter.printError("Only one -dumpJavaDocFile option allowed.");
                     return false;
-                } else {
-                    foundTagOption = true;
                 }
+                foundTagOption = true;
             }
         }
         if (!foundTagOption) {
