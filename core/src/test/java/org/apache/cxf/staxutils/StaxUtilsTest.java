@@ -29,6 +29,7 @@ import java.io.Writer;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
@@ -425,14 +426,14 @@ public class StaxUtilsTest extends Assert {
              new ByteArrayInputStream(in.toString().getBytes()));
 
         QName qname = new QName("http://example.com/", "Bar");
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
         // first bar
         assertEquals(qname, StaxUtils.readQName(reader));
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
         // second bar
         assertEquals(qname, StaxUtils.readQName(reader));
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.next());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.next());
         // third bar
         try {
             StaxUtils.readQName(reader);

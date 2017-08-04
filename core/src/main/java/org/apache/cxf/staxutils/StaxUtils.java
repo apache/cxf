@@ -462,7 +462,7 @@ public final class StaxUtils {
     }
 
     public static boolean toNextText(DepthXMLStreamReader reader) {
-        if (reader.getEventType() == XMLStreamReader.CHARACTERS) {
+        if (reader.getEventType() == XMLStreamConstants.CHARACTERS) {
             return true;
         }
 
@@ -470,7 +470,7 @@ public final class StaxUtils {
             int depth = reader.getDepth();
             int event = reader.getEventType();
             while (reader.getDepth() >= depth && reader.hasNext()) {
-                if (event == XMLStreamReader.CHARACTERS && reader.getDepth() == depth + 1) {
+                if (event == XMLStreamConstants.CHARACTERS && reader.getDepth() == depth + 1) {
                     return true;
                 }
                 event = reader.next();
@@ -484,8 +484,8 @@ public final class StaxUtils {
         try {
             // advance to first tag.
             int x = reader.getEventType();
-            while (x != XMLStreamReader.START_ELEMENT
-                && x != XMLStreamReader.END_ELEMENT
+            while (x != XMLStreamConstants.START_ELEMENT
+                && x != XMLStreamConstants.END_ELEMENT
                 && reader.hasNext()) {
                 x = reader.next();
             }
@@ -500,7 +500,7 @@ public final class StaxUtils {
             int depth = reader.getDepth();
             int event = reader.getEventType();
             while (reader.getDepth() >= depth && reader.hasNext()) {
-                if (event == XMLStreamReader.START_ELEMENT && reader.getName().equals(endTag)
+                if (event == XMLStreamConstants.START_ELEMENT && reader.getName().equals(endTag)
                     && reader.getDepth() == depth + 1) {
                     return true;
                 }
@@ -540,8 +540,8 @@ public final class StaxUtils {
      * returned if the end of the stream is reached.
      */
     public static boolean skipToStartOfElement(XMLStreamReader in) throws XMLStreamException {
-        for (int code = in.getEventType(); code != XMLStreamReader.END_DOCUMENT; code = in.next()) {
-            if (code == XMLStreamReader.START_ELEMENT) {
+        for (int code = in.getEventType(); code != XMLStreamConstants.END_DOCUMENT; code = in.next()) {
+            if (code == XMLStreamConstants.START_ELEMENT) {
                 return true;
             }
         }
@@ -549,19 +549,19 @@ public final class StaxUtils {
     }
 
     public static boolean toNextElement(DepthXMLStreamReader dr) {
-        if (dr.getEventType() == XMLStreamReader.START_ELEMENT) {
+        if (dr.getEventType() == XMLStreamConstants.START_ELEMENT) {
             return true;
         }
-        if (dr.getEventType() == XMLStreamReader.END_ELEMENT) {
+        if (dr.getEventType() == XMLStreamConstants.END_ELEMENT) {
             return false;
         }
         try {
             int depth = dr.getDepth();
 
             for (int event = dr.getEventType(); dr.getDepth() >= depth && dr.hasNext(); event = dr.next()) {
-                if (event == XMLStreamReader.START_ELEMENT && dr.getDepth() == depth + 1) {
+                if (event == XMLStreamConstants.START_ELEMENT && dr.getDepth() == depth + 1) {
                     return true;
-                } else if (event == XMLStreamReader.END_ELEMENT) {
+                } else if (event == XMLStreamConstants.END_ELEMENT) {
                     depth--;
                 }
             }
@@ -573,8 +573,8 @@ public final class StaxUtils {
     }
 
     public static boolean skipToStartOfElement(DepthXMLStreamReader in) throws XMLStreamException {
-        for (int code = in.getEventType(); code != XMLStreamReader.END_DOCUMENT; code = in.next()) {
-            if (code == XMLStreamReader.START_ELEMENT) {
+        for (int code = in.getEventType(); code != XMLStreamConstants.END_DOCUMENT; code = in.next()) {
+            if (code == XMLStreamConstants.START_ELEMENT) {
                 return true;
             }
         }
@@ -1984,22 +1984,22 @@ public final class StaxUtils {
         throws XMLStreamException {
 
         switch (event.getEventType()) {
-        case XMLEvent.START_ELEMENT:
+        case XMLStreamConstants.START_ELEMENT:
             writeStartElementEvent(event, writer);
             break;
-        case XMLEvent.END_ELEMENT:
+        case XMLStreamConstants.END_ELEMENT:
             writer.writeEndElement();
             break;
-        case XMLEvent.ATTRIBUTE:
+        case XMLStreamConstants.ATTRIBUTE:
             writeAttributeEvent(event, writer);
             break;
-        case XMLEvent.ENTITY_REFERENCE:
+        case XMLStreamConstants.ENTITY_REFERENCE:
             writer.writeEntityRef(((javax.xml.stream.events.EntityReference)event).getName());
             break;
-        case XMLEvent.DTD:
+        case XMLStreamConstants.DTD:
             writer.writeDTD(((DTD)event).getDocumentTypeDeclaration());
             break;
-        case XMLEvent.PROCESSING_INSTRUCTION:
+        case XMLStreamConstants.PROCESSING_INSTRUCTION:
             if (((javax.xml.stream.events.ProcessingInstruction)event).getData() != null) {
                 writer.writeProcessingInstruction(
                     ((javax.xml.stream.events.ProcessingInstruction)event).getTarget(),
@@ -2009,7 +2009,7 @@ public final class StaxUtils {
                     ((javax.xml.stream.events.ProcessingInstruction)event).getTarget());
             }
             break;
-        case XMLEvent.NAMESPACE:
+        case XMLStreamConstants.NAMESPACE:
             if (((Namespace)event).isDefaultNamespaceDeclaration()) {
                 writer.writeDefaultNamespace(((Namespace)event).getNamespaceURI());
                 writer.setDefaultNamespace(((Namespace)event).getNamespaceURI());
@@ -2020,17 +2020,17 @@ public final class StaxUtils {
                                  ((Namespace)event).getNamespaceURI());
             }
             break;
-        case XMLEvent.COMMENT:
+        case XMLStreamConstants.COMMENT:
             writer.writeComment(((javax.xml.stream.events.Comment)event).getText());
             break;
-        case XMLEvent.CHARACTERS:
-        case XMLEvent.SPACE:
+        case XMLStreamConstants.CHARACTERS:
+        case XMLStreamConstants.SPACE:
             writer.writeCharacters(event.asCharacters().getData());
             break;
-        case XMLEvent.CDATA:
+        case XMLStreamConstants.CDATA:
             writer.writeCData(event.asCharacters().getData());
             break;
-        case XMLEvent.START_DOCUMENT:
+        case XMLStreamConstants.START_DOCUMENT:
             if (((StartDocument)event).encodingSet()) {
                 writer.writeStartDocument(((StartDocument)event).getCharacterEncodingScheme(),
                                           ((StartDocument)event).getVersion());
@@ -2039,7 +2039,7 @@ public final class StaxUtils {
                 writer.writeStartDocument(((StartDocument)event).getVersion());
             }
             break;
-        case XMLEvent.END_DOCUMENT:
+        case XMLStreamConstants.END_DOCUMENT:
             writer.writeEndDocument();
             break;
         default:

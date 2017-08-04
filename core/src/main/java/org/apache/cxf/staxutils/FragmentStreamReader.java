@@ -19,6 +19,7 @@
 
 package org.apache.cxf.staxutils;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -32,7 +33,7 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
     private boolean doDocEvents = true;
 
     private int depth;
-    private int current = XMLStreamReader.START_DOCUMENT;
+    private int current = XMLStreamConstants.START_DOCUMENT;
     private boolean filter = true;
     private boolean advanceAtEnd = true;
 
@@ -45,7 +46,7 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
         if (!doDocEvents) {
             depth = getDepth();
             current = reader.getEventType();
-            if (current != XMLStreamReader.START_DOCUMENT) {
+            if (current != XMLStreamConstants.START_DOCUMENT) {
                 startElement = true;
             }
         }
@@ -56,19 +57,19 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
     }
 
     public boolean isCharacters() {
-        return current == XMLStreamReader.CHARACTERS;
+        return current == XMLStreamConstants.CHARACTERS;
     }
 
     public boolean isEndElement() {
-        return current == XMLStreamReader.END_ELEMENT;
+        return current == XMLStreamConstants.END_ELEMENT;
     }
 
     public boolean isStartElement() {
-        return current == XMLStreamReader.START_ELEMENT;
+        return current == XMLStreamConstants.START_ELEMENT;
     }
 
     public boolean isWhiteSpace() {
-        return current == XMLStreamReader.CHARACTERS && reader.isWhiteSpace();
+        return current == XMLStreamConstants.CHARACTERS && reader.isWhiteSpace();
     }
 
     public boolean hasNext() throws XMLStreamException {

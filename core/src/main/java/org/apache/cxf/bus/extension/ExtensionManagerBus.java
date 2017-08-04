@@ -29,7 +29,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
-import org.apache.cxf.bus.CXFBusFactory;
 import org.apache.cxf.bus.managers.BindingFactoryManagerImpl;
 import org.apache.cxf.bus.managers.ConduitInitiatorManagerImpl;
 import org.apache.cxf.bus.managers.DestinationFactoryManagerImpl;
@@ -84,7 +83,7 @@ public class ExtensionManagerBus extends AbstractBasicInterceptorProvider implem
 
         state = BusState.INITIAL;
 
-        CXFBusFactory.possiblySetDefaultBus(this);
+        BusFactory.possiblySetDefaultBus(this);
         if (null != props) {
             properties.putAll(props);
         }

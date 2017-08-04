@@ -19,6 +19,7 @@
 
 package org.apache.cxf.staxutils;
 
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
 import org.junit.Assert;
@@ -35,7 +36,7 @@ public class DepthXMLStreamReaderTest extends Assert {
 
         StaxUtils.toNextElement(dr);
         assertEquals("ItemLookup", dr.getLocalName());
-        assertEquals(XMLStreamReader.START_ELEMENT, reader.getEventType());
+        assertEquals(XMLStreamConstants.START_ELEMENT, reader.getEventType());
 
         assertEquals(1, dr.getDepth());
 
