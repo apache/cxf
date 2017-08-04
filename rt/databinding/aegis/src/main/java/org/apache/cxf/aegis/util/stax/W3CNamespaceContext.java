@@ -75,9 +75,8 @@ public class W3CNamespaceContext implements NamespaceContext {
                     String name = a.getNodeName();
                     if ("xmlns".equals(name)) {
                         return "";
-                    } else {
-                        return name.substring(6);
                     }
+                    return name.substring(6);
                 }
             }
         }

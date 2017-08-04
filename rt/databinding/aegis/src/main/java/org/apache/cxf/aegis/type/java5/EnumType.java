@@ -43,7 +43,7 @@ public class EnumType extends AegisType {
     @Override
     public void writeObject(Object object, MessageWriter writer, Context context) {
         // match the reader.
-        writer.writeValue(getValue((Enum<?>)object));
+        writer.writeValue(getValue(object));
     }
 
     @Override

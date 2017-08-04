@@ -611,9 +611,8 @@ public class BeanType extends AegisType {
                 this.info.setExtension(true);
             }
             return superType;
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**

@@ -179,9 +179,8 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 Message faultMessage = new Message("MARSHAL_ERROR", LOG, marshalEx.getLinkedException()
                     .getMessage());
                 throw new Fault(faultMessage, ex);
-            } else {
-                throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
             }
+            throw new Fault(new Message("MARSHAL_ERROR", LOG, ex.getMessage()), ex);
         }
         for (XmlAdapter<?, ?> adapter : databinding.getConfiguredXmlAdapters()) {
             marshaller.setAdapter(adapter);
@@ -307,9 +306,8 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
                 if (e.getLinkedException() != null) {
                     throw new Fault(new Message("MARSHAL_ERROR", LOG,
                             e.getLinkedException().getMessage()), e);
-                } else {
-                    throw new Fault(new Message("MARSHAL_ERROR", LOG, e.getMessage()), e);
                 }
+                throw new Fault(new Message("MARSHAL_ERROR", LOG, e.getMessage()), e);
             }
         }
     }

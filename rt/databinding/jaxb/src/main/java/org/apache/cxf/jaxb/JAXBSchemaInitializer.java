@@ -98,9 +98,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (cls instanceof Class) {
             if (((Class<?>)cls).isArray()) {
                 return ((Class<?>)cls).getComponentType();
-            } else {
-                return (Class<?>)cls;
             }
+            return (Class<?>)cls;
         } else if (cls instanceof ParameterizedType) {
             for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
                 return getArrayComponentType(t2);
@@ -117,9 +116,8 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         if (cls instanceof Class) {
             if (((Class<?>)cls).isArray()) {
                 return getBeanInfo(((Class<?>)cls).getComponentType());
-            } else {
-                return getBeanInfo((Class<?>)cls);
             }
+            return getBeanInfo((Class<?>)cls);
         } else if (cls instanceof ParameterizedType) {
             for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
                 return getBeanInfo(t2);

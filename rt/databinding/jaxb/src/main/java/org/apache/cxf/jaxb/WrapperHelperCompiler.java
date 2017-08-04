@@ -237,9 +237,8 @@ final class WrapperHelperCompiler extends ASMHelper {
                     && fields[x] == null) {
                     // null placeholder
                     continue;
-                } else {
-                    return false;
                 }
+                return false;
             }
             Class<?> tp = getMethods[x].getReturnType();
             mv.visitVarInsn(Opcodes.ALOAD, 2);

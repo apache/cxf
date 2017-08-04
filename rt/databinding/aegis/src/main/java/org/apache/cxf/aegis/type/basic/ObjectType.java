@@ -130,10 +130,9 @@ public class ObjectType extends AegisType {
 
         if (-1 == colon) {
             return new QName(reader.getNamespace(), typeName);
-        } else {
-            return new QName(reader.getNamespaceForPrefix(typeName.substring(0, colon)), typeName
-                .substring(colon + 1));
         }
+        return new QName(reader.getNamespaceForPrefix(typeName.substring(0, colon)), typeName
+            .substring(colon + 1));
     }
 
 

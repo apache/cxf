@@ -59,9 +59,8 @@ public class JAXBAttachmentMarshaller extends AttachmentMarshaller {
             atts.add(att);
             lastElementName = new QName(elementNS, elementLocalName);
             return "cid:" + att.getId();
-        } else {
-            return null;
         }
+        return null;
     }
 
     public String addMtomAttachment(DataHandler handler, String elementNS, String elementLocalName) {
@@ -71,9 +70,8 @@ public class JAXBAttachmentMarshaller extends AttachmentMarshaller {
             atts.add(att);
             lastElementName = new QName(elementNS, elementLocalName);
             return "cid:" + att.getId();
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override

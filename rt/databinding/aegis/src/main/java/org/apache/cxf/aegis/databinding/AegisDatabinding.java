@@ -486,9 +486,8 @@ public class AegisDatabinding extends AbstractDataBinding {
                         String message = ex.getMessage();
                         if (expected.equals(message)) {
                             continue;
-                        } else {
-                            throw ex;
                         }
+                        throw ex;
                     }
                 }
 

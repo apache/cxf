@@ -19,6 +19,7 @@
 package org.apache.cxf.aegis.xml.stax;
 
 import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -47,7 +48,7 @@ public class ReaderTest extends AbstractCXFTest {
          */
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(getResourceAsStream(resource), null);
 
-        while (reader.getEventType() != XMLStreamReader.START_ELEMENT) {
+        while (reader.getEventType() != XMLStreamConstants.START_ELEMENT) {
             reader.next();
         }
 
