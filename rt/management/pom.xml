@@ -94,7 +94,7 @@
                                     <extension>true</extension>
                                     <bindingFile>${basedir}/src/main/build-resources/instrumentation.xjb</bindingFile>
                                     <extensionArgs>
-                                        <extensionArg>-Xdv</extensionArg>
+                                        <extensionArg>-Xdv:attributes</extensionArg>
                                     </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>

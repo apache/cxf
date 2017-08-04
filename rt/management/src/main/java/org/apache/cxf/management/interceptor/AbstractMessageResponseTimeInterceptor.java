@@ -101,13 +101,12 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         if (null == cr) {
             LOG.log(Level.WARNING, "NO_COUNTER_REPOSITORY");
             return;
-        } else {
-            ObjectName serviceCountername = this.getServiceCounterName(ex);
-            cr.increaseCounter(serviceCountername, mhtr);
-
-            ObjectName operationCounter = this.getOperationCounterName(ex, serviceCountername);
-            cr.increaseCounter(operationCounter, mhtr);
         }
+        ObjectName serviceCountername = this.getServiceCounterName(ex);
+        cr.increaseCounter(serviceCountername, mhtr);
+
+        ObjectName operationCounter = this.getOperationCounterName(ex, serviceCountername);
+        cr.increaseCounter(operationCounter, mhtr);
     }
 
     protected ObjectName getServiceCounterName(Exchange ex) {

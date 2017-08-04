@@ -152,9 +152,8 @@ public class ModelMBeanAssembler {
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getName().compareTo(methodName) == 0) {
                 return methods[i];
-            } else {
-                continue;
             }
+            continue;
 
         }
         return null;
